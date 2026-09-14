@@ -36,3 +36,6 @@ jobs:
 
       - name: Validate responsive navigation
         run: python scripts/validate_responsive_navigation.py
+
+      - name: Validate person entry and locked roles
+        run: python scripts/validate_person_entry_role_lock.py
