@@ -1,36 +1,82 @@
-# HarmonyOS Homework Assistant
+# 小伴作业 · HarmonyOS Homework Assistant
 
-面向深圳小学家庭的 HarmonyOS 6.0 作业辅导与进度管理应用。
+面向一个家庭的 HarmonyOS AI 作业管家。
 
-## Product goals
+> 家长把老师消息丢进来，小伴自动整理；孩子打开只管完成；不会的问小伴；家长最后看结果。
 
-- 对接深圳小学教材体系，并允许家庭/班级补充教材资料。
-- 支持老师提供的视频、语音、图片和文档形成结构化作业。
-- 支持将微信、钉钉中的作业通过主动分享、截图识别或文本粘贴转成作业清单。
-- 学生完成后拍照/录音/视频提交，家长实时查看进度。
-- Phone 与 Pad 同时作为一级设备形态设计，Pad 支持主从分栏、大屏看板和横竖屏/分屏窗口。
+## V0.1 只解决三件事
 
-## Engineering workflow
+1. **收作业**：微信/钉钉截图、文本、文件 → AI 整理 → 家长确认；
+2. **做作业**：孩子打开 App，只看到今天该做什么；需要时进入 AI Tutor；
+3. **看进度**：家长查看未开始、进行中、已提交、已完成等状态。
 
-本项目采用 Matt Pocock `skills` 的工程方法作为 Agent 辅助开发流程。安装与使用约定见 `docs/agents/matt-pocock-skills.md`，项目领域语言见 `CONTEXT.md`。
+## 产品边界
 
-后续建议流程：需求澄清 → 规格化 → 领域建模/架构设计 → 原型 → TDD 实现 → Code Review。
+V0.1 按单家庭、单孩子优先设计：
 
-## Current development baseline
+- 家长是 App 的管理模式，不建设复杂 Parent / Guardian 权限体系；
+- 不建设 School / Class / Teacher / Organization 组织模型；
+- 不做班级社交、排行榜、题库平台、在线课堂；
+- 不后台读取微信/钉钉，导入必须由用户主动分享、截图、粘贴或选择文件；
+- AI 解析结果必须经过家长确认；
+- AI Tutor 默认引导优先，不直接代做。
 
-- DevEco Studio / project model: 6.0.2
-- HarmonyOS API baseline: 6.0.0(20) for compile / compatible / target
-- Devices: Phone + Tablet
-- UI: ArkTS + ArkUI, Stage model
+## 核心业务链路
 
-### Static gate
+`老师原始内容 → Candidate Assignment → 家长确认 → Assignment → 学生完成 → Submission → 家长进度`
+
+核心数据对象控制为：
+
+- `StudentProfile`
+- `Assignment`
+- `CandidateAssignment`
+- `Submission`
+- `TutorSession`
+- `AppSettings`
+
+## 轻量架构
+
+保持到四层为止：
+
+`ArkUI Pages → HomeworkStore / HomeworkService → Local Persistence → AI Ports`
+
+保留三个可替换接口：
+
+- `HomeworkPersistence`
+- `HomeworkTextExtractor`
+- `HomeworkAssignmentParser`
+
+不引入微服务、Gateway、Event Bus、CQRS、Workflow Engine 或复杂 UseCase / Handler / Repository 层次。
+
+## 当前工程基线
+
+- DevEco Studio：26.0.0
+- `compileSdkVersion`: `26.0.0`
+- `compatibleSdkVersion`: `6.0.0(20)`
+- `targetSdkVersion`: 未显式设置
+- project `modelVersion`: `5.0.0`
+- Hvigor / `@ohos/hvigor-ohos-plugin`: `6.26.4`
+- UI：ArkTS + ArkUI，Stage model
+- Devices：Phone + Tablet
+
+## 当前实现
+
+已经具备：
+
+- Phone / Pad 响应式 AppShell；
+- 家长导入 → 确认 → 发布；
+- 学生 Today → 学习 → Mock 提交；
+- 家长 Dashboard / Progress；
+- Assignment 集中状态机；
+- ArkData Preferences 本地持久化；
+- OCR / LLM 的 Extractor / Parser Port；
+- Mock AI 导入流水线；
+- GitHub static gate。
+
+## Static Gate
 
 在仓库根目录执行：
 
 `python scripts/validate_harmony_project.py`
 
-该 Gate 会检查 SDK 基线、Hvigor 插件、统一响应式断点、Phone/Tablet 声明、Navigation 根结构以及 API 26+ 能力误用等关键工程约束。
-
-## Current implementation status
-
-Issue #2 / PR #3 已完成工程骨架、首批四个 Mock 页面、响应式 Shell、失败态复现与静态 Gate。PR 仍保持 Draft，等待 DevEco Studio 本地编译、Previewer / 模拟器和软键盘 / 分屏验证后再进入合并评审。
+Gate 除工程版本和响应式规则外，还会阻止 V0.1 重新引入 `familyId / parentId / guardianId / organizationId / classId` 等不必要的多租户复杂度，并保护 Persistence / OCR / LLM 的轻量接口边界。
