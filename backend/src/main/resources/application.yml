@@ -1,0 +1,29 @@
+server:
+  port: ${SERVER_PORT:8080}
+
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/homework}
+    username: ${DB_USERNAME:homework}
+    password: ${DB_PASSWORD:homework}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+
+app:
+  bootstrap:
+    enabled: ${BOOTSTRAP_ENABLED:true}
+    login-name: ${BOOTSTRAP_LOGIN:parent}
+    password: ${BOOTSTRAP_PASSWORD:parent123}
+    family-name: ${BOOTSTRAP_FAMILY_NAME:我的家庭}
+  auth:
+    token-ttl-hours: ${AUTH_TOKEN_TTL_HOURS:24}
+  storage:
+    root: ${APP_STORAGE_ROOT:./data/uploads}

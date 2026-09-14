@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: homework
+      POSTGRES_USER: homework
+      POSTGRES_PASSWORD: homework
+    ports:
+      - "5432:5432"
+    volumes:
+      - homework_pg:/var/lib/postgresql/data
+volumes:
+  homework_pg:
