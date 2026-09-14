@@ -1,18 +1,30 @@
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { MockData } from '../../../data/MockData';
-import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
+import { HomeworkStore } from '../../../data/HomeworkStore';
+import { CandidateAssignment, RawHomeworkImport } from '../../../domain/model/HomeworkModels';
 
 @Component
 export struct HomeworkImportPage {
   @Prop sizeClass: WindowSizeClass;
+  @Prop revision: number = 0;
   @State private showCompactCandidates: boolean = false;
+  onOpenConfirmation: () => void = () => {};
+
+  private rawImport(): RawHomeworkImport {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getRawImport();
+  }
+
+  private candidates(): CandidateAssignment[] {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getCandidates();
+  }
 
   @Builder
   private SourcePane() {
     Column({ space: 12 }) {
       Text('老师原始内容').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
-      Text(MockData.importSource)
+      Text(this.rawImport().rawText)
         .width('100%')
         .padding(16)
         .fontSize(15)
@@ -20,7 +32,7 @@ export struct HomeworkImportPage {
         .fontColor(AppTheme.TEXT)
         .backgroundColor('#F7F8FA')
         .borderRadius(14);
-      Text('来源：微信群聊天截图 · 19:01')
+      Text('来源：' + this.rawImport().sourceLabel)
         .width('100%')
         .fontSize(12)
         .fontColor(AppTheme.SUBTEXT);
@@ -64,41 +76,52 @@ export struct HomeworkImportPage {
       Row() {
         Text('AI 解析结果').fontSize(20).fontWeight(FontWeight.Bold);
         Blank();
-        Text('3 项').fontSize(13).fontColor(AppTheme.SUCCESS);
+        Text(`${this.candidates().length} 项`).fontSize(13).fontColor(AppTheme.SUCCESS);
       }
       .width('100%');
 
-      ForEach(MockData.candidates, (item: CandidateAssignment) => {
-        Column({ space: 8 }) {
-          Row() {
-            Text(item.subject).fontSize(12).fontColor(AppTheme.PRIMARY);
-            Blank();
-            Text(item.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
+      if (this.candidates().length === 0) {
+        Text('当前候选作业已经发布，可切换到学生空间查看。')
+          .width('100%')
+          .padding(16)
+          .fontSize(14)
+          .fontColor(AppTheme.SUCCESS)
+          .backgroundColor('#EEF9F3')
+          .borderRadius(14);
+      } else {
+        ForEach(this.candidates(), (item: CandidateAssignment) => {
+          Column({ space: 8 }) {
+            Row() {
+              Text(item.subject).fontSize(12).fontColor(AppTheme.PRIMARY);
+              Blank();
+              Text(item.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%');
+            Text(item.title).width('100%').fontSize(16).fontWeight(FontWeight.Medium);
+            Text('证据：' + item.sourceEvidence.excerpt)
+              .width('100%')
+              .fontSize(12)
+              .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT)
+              .backgroundColor(item.confidence < 0.8 ? '#FFF7E6' : '#F7F8FA')
+              .padding(10)
+              .borderRadius(10);
+            if (item.confidence < 0.8) {
+              Text('需要家长确认教材/页码').fontSize(12).fontColor(AppTheme.WARNING);
+            }
           }
-          .width('100%');
-          Text(item.title).width('100%').fontSize(16).fontWeight(FontWeight.Medium);
-          Text('证据：' + item.sourceEvidence)
-            .width('100%')
-            .fontSize(12)
-            .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT)
-            .backgroundColor(item.confidence < 0.8 ? '#FFF7E6' : '#F7F8FA')
-            .padding(10)
-            .borderRadius(10);
-          if (item.confidence < 0.8) {
-            Text('需要家长确认教材/页码').fontSize(12).fontColor(AppTheme.WARNING);
-          }
-        }
-        .width('100%')
-        .padding(14)
-        .backgroundColor(AppTheme.SURFACE)
-        .borderRadius(14)
-        .border({ width: 1, color: AppTheme.BORDER });
-      }, (item: CandidateAssignment) => item.id);
+          .width('100%')
+          .padding(14)
+          .backgroundColor(AppTheme.SURFACE)
+          .borderRadius(14)
+          .border({ width: 1, color: AppTheme.BORDER });
+        }, (item: CandidateAssignment) => item.id);
 
-      Button('确认并发布 3 项作业')
-        .width('100%')
-        .height(48)
-        .backgroundColor(AppTheme.PRIMARY);
+        Button('进入家长确认')
+          .width('100%')
+          .height(48)
+          .backgroundColor(AppTheme.PRIMARY)
+          .onClick(() => this.onOpenConfirmation());
+      }
     }
     .width('100%');
   }

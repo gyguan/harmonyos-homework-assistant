@@ -25,6 +25,15 @@ oh_package = read("oh-package.json5")
 module_config = read("entry/src/main/module.json5")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 responsive = read("entry/src/main/ets/common/responsive/WindowSizeClass.ets")
+models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
+state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.ets")
+store = read("entry/src/main/ets/data/HomeworkStore.ets")
+confirmation_page = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
+progress_page = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
+student_today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
+study_workspace = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+parent_dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 
 require('"compileSdkVersion": "26.0.0"' in build_profile,
         "compileSdkVersion must match the DevEco Studio 26.0.0 toolchain")
@@ -48,6 +57,49 @@ require("ResponsiveContext.resolve(this.widthVp)" in app_shell,
 
 require("widthVp <= 600" in responsive and "widthVp <= 840" in responsive,
         "shared responsive breakpoints must remain 600vp / 840vp")
+
+required_statuses = [
+    "NOT_STARTED",
+    "IN_PROGRESS",
+    "READY_TO_SUBMIT",
+    "SUBMITTED",
+    "COMPLETED",
+    "NEEDS_REWORK",
+    "OVERDUE",
+]
+for status in required_statuses:
+    require(status in models, f"missing assignment lifecycle status: {status}")
+
+require("class AssignmentStateMachine" in state_machine,
+        "assignment transitions must be centralized in AssignmentStateMachine")
+require("canTransition" in state_machine,
+        "AssignmentStateMachine must reject illegal transitions")
+require("class HomeworkStore" in store and "static readonly instance" in store,
+        "HomeworkStore singleton must own the local lifecycle state")
+require("publishCandidates" in store and "submitMockImage" in store,
+        "HomeworkStore must support candidate publishing and submission")
+require("AssignmentStateMachine.canTransition" in store,
+        "HomeworkStore transitions must delegate to AssignmentStateMachine")
+
+require("CONFIRMATION" in app_shell and "PROGRESS" in app_shell,
+        "AppShell must expose parent confirmation and progress routes")
+require("storeRevision" in app_shell,
+        "AppShell must propagate shared store updates across role/page switches")
+require("publishCandidates" in confirmation_page,
+        "parent confirmation must publish candidates through HomeworkStore")
+require("submitMockImage" in study_workspace,
+        "student study workspace must submit through HomeworkStore")
+require("getSubmissionsForAssignment" in progress_page,
+        "parent progress must expose submission records")
+
+for page_name, page_text in {
+    "StudentTodayPage": student_today,
+    "StudyWorkspacePage": study_workspace,
+    "ParentDashboardPage": parent_dashboard,
+    "HomeworkImportPage": import_page,
+}.items():
+    require("MockData" not in page_text,
+            f"{page_name} must read business state through HomeworkStore, not MockData")
 
 if ETS_ROOT.exists():
     for file in ETS_ROOT.rglob("*.ets"):

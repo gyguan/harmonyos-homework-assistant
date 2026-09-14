@@ -1,14 +1,43 @@
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
-import { MockData } from '../../../data/MockData';
-import { Assignment } from '../../../domain/model/HomeworkModels';
+import { HomeworkStore } from '../../../data/HomeworkStore';
+import { Assignment, AssignmentStatus, TodaySummary } from '../../../domain/model/HomeworkModels';
 
 @Component
 export struct StudentTodayPage {
   @Prop sizeClass: WindowSizeClass;
   @Prop offlineMode: boolean = false;
+  @Prop revision: number = 0;
   onOpenStudy: (assignmentId: string) => void = () => {};
+
+  private assignments(): Assignment[] {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getTodayAssignments();
+  }
+
+  private summary(): TodaySummary {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getTodaySummary();
+  }
+
+  private nextAssignment(): Assignment | null {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getNextAssignment();
+  }
+
+  private actionLabel(assignment: Assignment): string {
+    if (assignment.status === AssignmentStatus.NOT_STARTED || assignment.status === AssignmentStatus.OVERDUE) {
+      return '开始作业';
+    }
+    if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
+      return '去提交';
+    }
+    if (assignment.status === AssignmentStatus.SUBMITTED) {
+      return '查看提交';
+    }
+    return '继续完成';
+  }
 
   @Builder
   private OfflineBanner() {
@@ -31,14 +60,14 @@ export struct StudentTodayPage {
   private ProgressHero() {
     Column({ space: 8 }) {
       Text('今日完成度').fontSize(13).fontColor('#FFFFFFCC');
-      Text(`${MockData.todaySummary.completed} / ${MockData.todaySummary.total}`)
+      Text(`${this.summary().completed} / ${this.summary().total}`)
         .fontSize(34)
         .fontWeight(FontWeight.Bold)
         .fontColor(Color.White);
       Text('完成今天的任务后，就可以休息啦')
         .fontSize(14)
         .fontColor(Color.White);
-      Progress({ value: MockData.todaySummary.completed, total: MockData.todaySummary.total, type: ProgressType.Linear })
+      Progress({ value: this.summary().completed, total: this.summary().total, type: ProgressType.Linear })
         .width('100%')
         .height(8)
         .color(Color.White)
@@ -61,7 +90,7 @@ export struct StudentTodayPage {
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.TEXT);
-      ForEach(MockData.assignments.slice(0, 3), (item: Assignment) => {
+      ForEach(this.assignments(), (item: Assignment) => {
         AssignmentCard({ assignment: item });
       }, (item: Assignment) => item.id);
     }
@@ -70,36 +99,55 @@ export struct StudentTodayPage {
 
   @Builder
   private NextAssignmentPane() {
-    Column({ space: 14 }) {
-      Text('下一项')
-        .width('100%')
-        .fontSize(14)
-        .fontColor(AppTheme.SUBTEXT);
-      Text(MockData.assignments[0].title)
-        .width('100%')
-        .fontSize(26)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.TEXT);
-      Text(MockData.assignments[0].instruction)
-        .width('100%')
-        .fontSize(15)
-        .fontColor(AppTheme.SUBTEXT);
-      Text(MockData.assignments[0].textbookRef)
-        .width('100%')
-        .fontSize(13)
-        .fontColor(AppTheme.PRIMARY);
-      Button('继续完成')
-        .width('100%')
-        .height(48)
-        .fontSize(16)
-        .backgroundColor(AppTheme.PRIMARY)
-        .onClick(() => this.onOpenStudy(MockData.assignments[0].id));
+    if (this.nextAssignment() === null) {
+      Column({ space: 12 }) {
+        Text('今天的主要任务已经完成')
+          .width('100%')
+          .fontSize(22)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT);
+        Text('可以休息一下，或者和家长一起检查已经提交的作业。')
+          .width('100%')
+          .fontSize(14)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%')
+      .padding(22)
+      .backgroundColor(AppTheme.SURFACE)
+      .borderRadius(20)
+      .border({ width: 1, color: AppTheme.BORDER });
+    } else {
+      Column({ space: 14 }) {
+        Text('下一项')
+          .width('100%')
+          .fontSize(14)
+          .fontColor(AppTheme.SUBTEXT);
+        Text(this.nextAssignment()!.title)
+          .width('100%')
+          .fontSize(26)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT);
+        Text(this.nextAssignment()!.instruction)
+          .width('100%')
+          .fontSize(15)
+          .fontColor(AppTheme.SUBTEXT);
+        Text(this.nextAssignment()!.textbookRef)
+          .width('100%')
+          .fontSize(13)
+          .fontColor(AppTheme.PRIMARY);
+        Button(this.actionLabel(this.nextAssignment()!))
+          .width('100%')
+          .height(48)
+          .fontSize(16)
+          .backgroundColor(AppTheme.PRIMARY)
+          .onClick(() => this.onOpenStudy(this.nextAssignment()!.id));
+      }
+      .width('100%')
+      .padding(22)
+      .backgroundColor(AppTheme.SURFACE)
+      .borderRadius(20)
+      .border({ width: 1, color: AppTheme.BORDER });
     }
-    .width('100%')
-    .padding(22)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(20)
-    .border({ width: 1, color: AppTheme.BORDER });
   }
 
   build() {
@@ -111,7 +159,7 @@ export struct StudentTodayPage {
               .fontSize(26)
               .fontWeight(FontWeight.Bold)
               .fontColor(AppTheme.TEXT);
-            Text('今天还有 2 项作业需要完成')
+            Text(`今天共 ${this.summary().total} 项作业`)
               .fontSize(14)
               .fontColor(AppTheme.SUBTEXT);
           }
