@@ -1,6 +1,12 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
-import { Assignment, CandidateAssignment, Submission } from '../../domain/model/HomeworkModels';
+import {
+  AppSettings,
+  Assignment,
+  CandidateAssignment,
+  Submission,
+  TutorSession
+} from '../../domain/model/HomeworkModels';
 import { HomeworkSnapshot } from '../../domain/model/PersistenceModels';
 import { HomeworkPersistence } from '../../domain/port/HomeworkPersistence';
 
@@ -32,9 +38,11 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
       let parsed: Record<string, Object> = JSON.parse(value);
       let snapshot: HomeworkSnapshot = {
         schemaVersion: parsed.schemaVersion as number,
+        settings: parsed.settings as AppSettings,
         assignments: parsed.assignments as Assignment[],
         candidates: parsed.candidates as CandidateAssignment[],
         submissions: parsed.submissions as Submission[],
+        tutorSessions: parsed.tutorSessions as TutorSession[],
         submissionSequence: parsed.submissionSequence as number
       };
       return snapshot;
