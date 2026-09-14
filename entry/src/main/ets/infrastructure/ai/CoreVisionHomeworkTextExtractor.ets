@@ -24,6 +24,7 @@ export class CoreVisionHomeworkTextExtractor implements HomeworkTextExtractor {
     if (existingText.length > 0) {
       return {
         importId: input.id,
+        studentId: input.studentId,
         sourceLabel: input.sourceLabel,
         text: existingText
       };
@@ -50,6 +51,7 @@ export class CoreVisionHomeworkTextExtractor implements HomeworkTextExtractor {
       }
       return {
         importId: input.id,
+        studentId: input.studentId,
         sourceLabel: input.sourceLabel,
         text: text
       };
