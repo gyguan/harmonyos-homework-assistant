@@ -21,6 +21,7 @@ def read(path: str) -> str:
 
 build_profile = read("build-profile.json5")
 hvigor_config = read("hvigor/hvigor-config.json5")
+oh_package = read("oh-package.json5")
 module_config = read("entry/src/main/module.json5")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 responsive = read("entry/src/main/ets/common/responsive/WindowSizeClass.ets")
@@ -29,10 +30,11 @@ require('"compileSdkVersion": "26.0.0"' in build_profile,
         "compileSdkVersion must match the DevEco Studio 26.0.0 toolchain")
 require('"compatibleSdkVersion": "6.0.0(20)"' in build_profile,
         "compatibleSdkVersion must keep the V0.1 runtime baseline at HarmonyOS 6.0.0(20)")
-require('"targetSdkVersion": "6.0.0(20)"' in build_profile,
-        "targetSdkVersion must stay at HarmonyOS 6.0.0(20) until target-26 behavior adaptation is complete")
+require('"targetSdkVersion"' not in build_profile,
+        "targetSdkVersion must remain unset for the locally verified DevEco configuration")
 
-require('"modelVersion": "6.0.2"' in hvigor_config, "Hvigor modelVersion must be 6.0.2")
+require('"modelVersion": "5.0.0"' in hvigor_config, "Hvigor modelVersion must be 5.0.0")
+require('"modelVersion": "5.0.0"' in oh_package, "OHPM modelVersion must be 5.0.0")
 require('"hvigorVersion": "6.26.4"' in hvigor_config, "Hvigor version must be pinned to 6.26.4")
 require('"@ohos/hvigor-ohos-plugin": "6.26.4"' in hvigor_config,
         "Hvigor OHOS plugin must be pinned to 6.26.4")
