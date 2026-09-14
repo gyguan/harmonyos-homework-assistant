@@ -32,26 +32,33 @@ export struct PageStateView {
   }
 
   build() {
-    Column({ space: 12 }) {
+    Column({ space: 14 }) {
       if (this.scenario === DemoScenario.LOADING) {
         LoadingProgress()
-          .width(40)
-          .height(40)
+          .width(36)
+          .height(36)
           .color(AppTheme.PRIMARY);
       } else {
         Text(this.scenario === DemoScenario.ERROR ? '!' : '✓')
-          .fontSize(28)
+          .width(48)
+          .height(48)
+          .padding({ top: 9 })
+          .fontSize(22)
           .fontWeight(FontWeight.Bold)
-          .fontColor(this.scenario === DemoScenario.ERROR ? AppTheme.DANGER : AppTheme.PRIMARY);
+          .textAlign(TextAlign.Center)
+          .fontColor(this.scenario === DemoScenario.ERROR ? AppTheme.DANGER : AppTheme.SUCCESS)
+          .backgroundColor(this.scenario === DemoScenario.ERROR ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
+          .borderRadius(16);
       }
 
       Text(this.title())
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
 
       Text(this.description())
-        .fontSize(14)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(21)
         .fontColor(AppTheme.SUBTEXT)
         .textAlign(TextAlign.Center);
     }

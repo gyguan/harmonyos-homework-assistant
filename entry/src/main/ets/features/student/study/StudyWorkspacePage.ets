@@ -151,17 +151,18 @@ export struct StudyWorkspacePage {
     Scroll() {
       Row({ space: 10 }) {
         ForEach(photoUris, (uri: string) => {
-          Column({ space: 5 }) {
+          Column({ space: 6 }) {
             Image(uri)
               .width(96)
               .height(96)
               .objectFit(ImageFit.Cover)
-              .borderRadius(10)
-              .backgroundColor('#F1F3F5');
+              .borderRadius(12)
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS);
             if (removable) {
               Text('移除')
                 .fontSize(11)
                 .fontColor(AppTheme.DANGER)
+                .padding({ top: 2, bottom: 2 })
                 .onClick(() => this.removeSubmissionPhoto(uri));
             }
           }
@@ -178,11 +179,14 @@ export struct StudyWorkspacePage {
   @Builder
   private SubmissionDraftPane() {
     if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
-      Column({ space: 10 }) {
+      Column({ space: 11 }) {
         Row() {
-          Text('提交作业照片').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('提交作业照片')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
           Blank();
-          Text('最多 6 张').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('最多 6 张').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
 
@@ -190,11 +194,12 @@ export struct StudyWorkspacePage {
           this.PhotoStrip(this.submissionPhotoUris, true);
           Text('请确认照片清晰、完整，页数和顺序无误。')
             .width('100%')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.SUBTEXT);
-          Button('重新选择照片')
+          Button('重新选择照片', { type: ButtonType.Normal })
             .width('100%')
-            .height(38)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
             .enabled(!this.submittingPhotos)
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
@@ -203,44 +208,59 @@ export struct StudyWorkspacePage {
           Text('从系统相册选择已经拍好的作业照片，选择后可以预览再提交。')
             .width('100%')
             .fontSize(13)
+            .lineHeight(20)
             .fontColor(AppTheme.SUBTEXT);
         }
 
         if (this.submissionMessage.length > 0) {
           Text(this.submissionMessage)
             .width('100%')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.PRIMARY);
         }
       }
       .width('100%')
       .padding(14)
-      .backgroundColor('#F7F8FA')
-      .borderRadius(14);
+      .backgroundColor(AppTheme.PRIMARY_FAINT)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
     }
   }
 
   @Builder
   private SavedSubmissionPane() {
     if (this.submissions().length > 0) {
-      Column({ space: 8 }) {
-        Text(`已提交：${this.submissions()[0].fileLabel} · ${this.submissions()[0].submittedAtText}`)
-          .width('100%')
-          .fontSize(13)
-          .fontColor(AppTheme.SUCCESS);
+      Column({ space: 9 }) {
+        Row({ space: 7 }) {
+          SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
+            .fontSize(17)
+            .fontColor([AppTheme.SUCCESS]);
+          Text(`已提交 · ${this.submissions()[0].fileLabel}`)
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.SUCCESS);
+          Blank();
+          Text(this.submissions()[0].submittedAtText)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%');
         this.PhotoStrip(this.submissions()[0].photoUris, false);
       }
       .width('100%')
-      .padding(12)
-      .backgroundColor('#EEF9F3')
-      .borderRadius(12);
+      .padding(13)
+      .backgroundColor(AppTheme.SUCCESS_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
     }
   }
 
   @Builder
   private TaskRail() {
-    Column({ space: 10 }) {
-      Text('今天').fontSize(18).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+    Column({ space: AppTheme.ITEM_GAP }) {
+      Text('今天的作业')
+        .width('100%')
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
       ForEach(this.assignments(), (item: Assignment) => {
         AssignmentCard({ assignment: item });
       }, (item: Assignment) => item.id);
@@ -252,20 +272,37 @@ export struct StudyWorkspacePage {
   private StudyContent() {
     if (this.assignment() === null) {
       Column({ space: 10 }) {
-        Text('找不到这项作业').fontSize(20).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        Text('请返回今日作业重新进入。').fontSize(14).fontColor(AppTheme.SUBTEXT);
+        Text('找不到这项作业')
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Text('请返回今日作业重新进入。')
+          .fontSize(AppTheme.BODY_SIZE)
+          .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
-      .padding(18);
+      .padding(AppTheme.CARD_PADDING)
+      .backgroundColor(AppTheme.SURFACE)
+      .borderRadius(AppTheme.CARD_RADIUS);
     } else {
       Scroll() {
-        Column({ space: 14 }) {
+        Column({ space: 15 }) {
           Row() {
-            Text(`${this.assignment()!.subject} · ${AssignmentStateMachine.label(this.assignment()!.status)}`)
-              .fontSize(13)
-              .fontColor(AppTheme.PRIMARY);
+            Text(this.assignment()!.subject)
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY)
+              .padding({ left: 9, right: 9, top: 5, bottom: 5 })
+              .backgroundColor(AppTheme.PRIMARY_SOFT)
+              .borderRadius(AppTheme.CHIP_RADIUS);
+            Text(AssignmentStateMachine.label(this.assignment()!.status))
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .fontColor(AppTheme.SUBTEXT)
+              .margin({ left: 8 });
             Blank();
-            Text(this.assignment()!.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
+            Text(this.assignment()!.dueText)
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .fontColor(AppTheme.TERTIARY_TEXT);
           }
           .width('100%');
 
@@ -277,37 +314,51 @@ export struct StudyWorkspacePage {
           Text(this.assignment()!.instruction)
             .width('100%')
             .fontSize(15)
+            .lineHeight(22)
             .fontColor(AppTheme.SUBTEXT);
 
-          Column({ space: 8 }) {
+          Column({ space: 9 }) {
+            Text('作业资料')
+              .width('100%')
+              .fontSize(13)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
             if (this.assignment()!.resourceLabels.length === 0) {
-              Text('暂无老师附件').width('100%').fontSize(14).fontColor(AppTheme.SUBTEXT);
+              Text('暂无老师附件').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
             } else {
               ForEach(this.assignment()!.resourceLabels, (label: string) => {
-                Text(label).width('100%').fontSize(15);
+                Text(label).width('100%').fontSize(14).fontColor(AppTheme.TEXT);
               }, (label: string) => label);
             }
-            Text('📘 ' + this.assignment()!.textbookRef)
+            Divider().color(AppTheme.DIVIDER);
+            Text('教材 · ' + this.assignment()!.textbookRef)
               .width('100%')
-              .fontSize(14)
+              .fontSize(13)
               .fontColor(AppTheme.PRIMARY);
           }
           .width('100%')
-          .padding(18)
-          .borderRadius(16)
-          .backgroundColor('#F4F6F9');
+          .padding(15)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE);
 
           this.SubmissionDraftPane();
           this.SavedSubmissionPane();
 
-          Button(this.primaryActionLabel())
+          Button(this.primaryActionLabel(), { type: ButtonType.Normal })
             .width('100%')
-            .height(48)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
             .enabled(this.primaryActionEnabled())
-            .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : '#C9D1DD')
+            .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
             .onClick(() => this.runPrimaryAction());
         }
-        .width('100%');
+        .width('100%')
+        .padding(AppTheme.CARD_PADDING)
+        .backgroundColor(AppTheme.SURFACE)
+        .borderRadius(AppTheme.CARD_RADIUS);
       }
       .width('100%')
       .height('100%');
@@ -316,60 +367,75 @@ export struct StudyWorkspacePage {
 
   @Builder
   private TutorPane() {
-    Column({ space: 12 }) {
+    Column({ space: 13 }) {
       Text('问小伴')
         .width('100%')
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
 
       if (this.tutorUnavailable) {
-        Text('AI 辅导暂时不可用')
-          .width('100%')
-          .padding(14)
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.WARNING)
-          .backgroundColor('#FFF8E7')
-          .borderRadius(14);
-        Text('你仍然可以查看老师资料、完成作业并提交。联网或服务恢复后再继续问小伴。')
-          .width('100%')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
+        Column({ space: 6 }) {
+          Text('AI 辅导暂时不可用')
+            .width('100%')
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.WARNING);
+          Text('你仍然可以查看资料、完成作业并提交。服务恢复后再继续问小伴。')
+            .width('100%')
+            .fontSize(13)
+            .lineHeight(20)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%')
+        .padding(14)
+        .backgroundColor(AppTheme.WARNING_SOFT)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       } else {
-        Text('你现在卡在哪一道题？可以拍给我看，也可以直接说。')
+        Text('你现在卡在哪一道题？可以先说说你已经做到哪一步。')
           .width('100%')
           .padding(14)
-          .fontSize(14)
+          .fontSize(AppTheme.BODY_SIZE)
+          .lineHeight(21)
           .fontColor(AppTheme.TEXT)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .borderRadius(14);
-        Text('提示策略：先给一点提示，不直接说答案。')
+          .backgroundColor(AppTheme.PRIMARY_FAINT)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+        Text('小伴会先给提示，不直接替你完成作业。')
           .width('100%')
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
           .fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '输入问题…' })
           .width('100%')
-          .height(44)
-          .backgroundColor('#F7F8FA');
+          .height(AppTheme.INPUT_HEIGHT)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
         Row({ space: 8 }) {
-          Button('🎙 语音').layoutWeight(1);
-          Button('📷 拍题').layoutWeight(1);
+          Button('语音', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT);
+          Button('拍题', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT);
         }
         .width('100%');
       }
     }
     .width('100%')
-    .padding(18)
+    .padding(AppTheme.CARD_PADDING)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(18)
-    .border({ width: 1, color: AppTheme.BORDER });
+    .borderRadius(AppTheme.CARD_RADIUS);
   }
 
   @Builder
   private CompactWorkspace() {
     if (this.compactTutorOpen) {
-      Column({ space: 12 }) {
+      Column({ space: AppTheme.ITEM_GAP }) {
         Text('‹ 返回作业')
           .width('100%')
           .fontSize(14)
@@ -380,16 +446,15 @@ export struct StudyWorkspacePage {
       .width('100%')
       .layoutWeight(1);
     } else {
-      Column({ space: 12 }) {
-        Column() {
-          this.StudyContent();
-        }
-        .width('100%')
-        .layoutWeight(1);
-
-        Button('问小伴')
+      Column({ space: AppTheme.ITEM_GAP }) {
+        Column() { this.StudyContent(); }
           .width('100%')
-          .height(48)
+          .layoutWeight(1);
+
+        Button('问小伴', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
           .backgroundColor(AppTheme.PRIMARY_SOFT)
           .fontColor(AppTheme.PRIMARY)
           .onClick(() => this.compactTutorOpen = true);
@@ -400,7 +465,7 @@ export struct StudyWorkspacePage {
   }
 
   build() {
-    Column({ space: 14 }) {
+    Column({ space: AppTheme.ITEM_GAP }) {
       Row() {
         Text('‹ 返回')
           .fontSize(15)
@@ -408,13 +473,15 @@ export struct StudyWorkspacePage {
           .onClick(() => this.onBack());
         Blank();
         if (this.assignment() !== null) {
-          Text(this.assignment()!.dueText).fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text(`截至 ${this.assignment()!.dueText}`)
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
         }
       }
       .width('100%');
 
       if (this.sizeClass === WindowSizeClass.EXPANDED) {
-        Row({ space: 14 }) {
+        Row({ space: 16 }) {
           Column() { this.TaskRail(); }.width('20%');
           Column() { this.StudyContent(); }.width('50%').height('100%');
           Column() { this.TutorPane(); }.layoutWeight(1);
@@ -423,7 +490,7 @@ export struct StudyWorkspacePage {
         .layoutWeight(1)
         .alignItems(VerticalAlign.Top);
       } else if (this.sizeClass === WindowSizeClass.MEDIUM) {
-        Row({ space: 14 }) {
+        Row({ space: 16 }) {
           Column() { this.StudyContent(); }.width('64%').height('100%');
           Column() { this.TutorPane(); }.layoutWeight(1);
         }
@@ -436,7 +503,7 @@ export struct StudyWorkspacePage {
     }
     .width('100%')
     .height('100%')
-    .padding(18)
+    .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }

@@ -26,45 +26,67 @@ export struct AssignmentCard {
     }
   }
 
+  private statusBackground(): string {
+    switch (this.assignment.status) {
+      case AssignmentStatus.IN_PROGRESS:
+      case AssignmentStatus.READY_TO_SUBMIT:
+        return AppTheme.WARNING_SOFT;
+      case AssignmentStatus.SUBMITTED:
+      case AssignmentStatus.COMPLETED:
+        return AppTheme.SUCCESS_SOFT;
+      case AssignmentStatus.NEEDS_REWORK:
+      case AssignmentStatus.OVERDUE:
+        return AppTheme.DANGER_SOFT;
+      default:
+        return AppTheme.SURFACE_EMPHASIS;
+    }
+  }
+
   build() {
-    Column({ space: 8 }) {
-      Row() {
+    Column({ space: AppTheme.ITEM_GAP }) {
+      Row({ space: 8 }) {
         Text(this.assignment.subject)
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .borderRadius(12)
-          .padding({ left: 9, right: 9, top: 5, bottom: 5 });
+          .borderRadius(AppTheme.CHIP_RADIUS)
+          .padding({ left: 10, right: 10, top: 6, bottom: 6 });
         Blank();
         Text(this.statusLabel())
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
           .fontWeight(FontWeight.Medium)
-          .fontColor(this.statusColor());
+          .fontColor(this.statusColor())
+          .backgroundColor(this.statusBackground())
+          .borderRadius(AppTheme.CHIP_RADIUS)
+          .padding({ left: 9, right: 9, top: 5, bottom: 5 });
       }
       .width('100%');
 
       Text(this.assignment.title)
         .width('100%')
-        .fontSize(16)
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.TEXT);
+        .fontColor(AppTheme.TEXT)
+        .maxLines(2);
 
       Text(this.assignment.textbookRef)
         .width('100%')
-        .fontSize(12)
+        .fontSize(13)
+        .lineHeight(19)
         .fontColor(AppTheme.SUBTEXT)
         .maxLines(2);
 
-      Text(this.assignment.dueText)
-        .width('100%')
-        .fontSize(12)
-        .fontColor(AppTheme.SUBTEXT);
+      Row() {
+        Text(`截至 ${this.assignment.dueText}`)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+      }
+      .width('100%');
     }
     .width('100%')
-    .padding(16)
+    .padding(AppTheme.CARD_PADDING)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(18)
-    .border({ width: 1, color: AppTheme.BORDER });
+    .borderRadius(AppTheme.CARD_RADIUS);
   }
 }

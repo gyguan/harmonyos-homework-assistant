@@ -27,39 +27,63 @@ export struct ParentDashboardPage {
 
   @Builder
   private TodayCard() {
-    Column({ space: 10 }) {
-      Text(`${this.student().name}今天`)
-        .width('100%')
-        .fontSize(14)
-        .fontColor('#FFFFFFCC');
-      Text(`${this.summary().completed} / ${this.summary().total} 已完成`)
-        .width('100%')
-        .fontSize(32)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(Color.White);
-      Text('不用盯过程，只看今天还有什么没完成。')
-        .width('100%')
-        .fontSize(14)
-        .fontColor(Color.White);
+    Column({ space: 12 }) {
+      Row() {
+        Column({ space: 5 }) {
+          Text(`${this.student().name} · 今日完成`)
+            .width('100%')
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
+          Text(`${this.summary().completed} / ${this.summary().total}`)
+            .width('100%')
+            .fontSize(34)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        Text(this.summary().completed === this.summary().total && this.summary().total > 0 ? '已完成' : '进行中')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.summary().completed === this.summary().total && this.summary().total > 0 ? AppTheme.SUCCESS : AppTheme.PRIMARY)
+          .padding({ left: 10, right: 10, top: 6, bottom: 6 })
+          .backgroundColor(this.summary().completed === this.summary().total && this.summary().total > 0 ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
+          .borderRadius(AppTheme.CHIP_RADIUS);
+      }
+      .width('100%');
+
       Progress({ value: this.summary().completed, total: this.summary().total, type: ProgressType.Linear })
         .width('100%')
-        .height(8)
-        .color(Color.White)
-        .backgroundColor('#FFFFFF44');
+        .height(7)
+        .color(AppTheme.PRIMARY)
+        .backgroundColor(AppTheme.PRIMARY_SOFT);
+
+      Text('只看今天的完成和提交情况，不需要一直盯着孩子做作业。')
+        .width('100%')
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(21)
+        .fontColor(AppTheme.SUBTEXT);
     }
     .width('100%')
-    .padding(20)
-    .borderRadius(22)
-    .linearGradient({
-      angle: 135,
-      colors: [[AppTheme.PRIMARY, 0.0], ['#6D8DFF', 1.0]]
-    });
+    .padding(AppTheme.CARD_PADDING)
+    .backgroundColor(AppTheme.SURFACE)
+    .borderRadius(AppTheme.CARD_RADIUS);
   }
 
   @Builder
   private AssignmentProgress() {
-    Column({ space: 10 }) {
-      Text('今天的作业').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
+    Column({ space: AppTheme.ITEM_GAP }) {
+      Row() {
+        Text('今天的作业')
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Blank();
+        Text(`${this.assignments().length} 项`)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%');
       ForEach(this.assignments(), (item: Assignment) => {
         AssignmentCard({ assignment: item });
       }, (item: Assignment) => item.id);
@@ -69,35 +93,46 @@ export struct ParentDashboardPage {
 
   @Builder
   private ImportCard() {
-    Column({ space: 10 }) {
-      Text(`给 ${this.student().name} 收作业`)
+    Column({ space: 12 }) {
+      Row({ space: 10 }) {
+        SymbolGlyph($r('sys.symbol.plus_square'))
+          .fontSize(24)
+          .fontColor([AppTheme.PRIMARY]);
+        Text(`给 ${this.student().name} 收作业`)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+      }
+      .width('100%');
+      Text(`${this.student().className} · 把老师发来的文字或截图交给小伴，确认后只进入 ${this.student().name} 的作业空间。`)
         .width('100%')
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.TEXT);
-      Text(`当前班级：${this.student().className}。把这个班老师发来的截图或文字交给小伴，确认后只进入 ${this.student().name} 的作业。`)
-        .width('100%')
-        .fontSize(14)
+        .fontSize(AppTheme.BODY_SIZE)
         .lineHeight(22)
         .fontColor(AppTheme.SUBTEXT);
-      Button('导入老师作业')
+      Button('导入老师作业', { type: ButtonType.Normal })
         .width('100%')
-        .height(48)
+        .height(AppTheme.BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .fontSize(15)
+        .fontWeight(FontWeight.Medium)
         .backgroundColor(AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
         .onClick(() => this.onOpenImport());
     }
     .width('100%')
-    .padding(18)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(18)
-    .border({ width: 1, color: AppTheme.BORDER });
+    .padding(AppTheme.CARD_PADDING)
+    .backgroundColor(AppTheme.PRIMARY_FAINT)
+    .borderRadius(AppTheme.CARD_RADIUS);
   }
 
   build() {
     Scroll() {
-      Column({ space: 16 }) {
-        Column({ space: 4 }) {
-          Text('作业进度').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+      Column({ space: AppTheme.SECTION_GAP }) {
+        Column({ space: 5 }) {
+          Text('作业进度')
+            .fontSize(AppTheme.PAGE_TITLE_SIZE)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
           Text(`${this.student().name} · ${this.student().grade} · ${this.student().className} · ${this.student().semester}`)
             .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
@@ -108,7 +143,7 @@ export struct ParentDashboardPage {
         this.TodayCard();
 
         if (this.sizeClass === WindowSizeClass.EXPANDED) {
-          Row({ space: 18 }) {
+          Row({ space: 20 }) {
             Column() { this.AssignmentProgress(); }.width('64%');
             Column() { this.ImportCard(); }.layoutWeight(1);
           }
@@ -120,7 +155,7 @@ export struct ParentDashboardPage {
         }
       }
       .width('100%')
-      .padding(20);
+      .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING);
     }
     .width('100%')
     .height('100%')
