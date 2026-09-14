@@ -7,6 +7,7 @@ import { Assignment } from '../../../domain/model/HomeworkModels';
 @Component
 export struct StudyWorkspacePage {
   @Prop sizeClass: WindowSizeClass;
+  @Prop tutorUnavailable: boolean = false;
   onBack: () => void = () => {};
 
   @Builder
@@ -63,26 +64,42 @@ export struct StudyWorkspacePage {
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.TEXT);
-      Text('你现在卡在哪一道题？可以拍给我看，也可以直接说。')
-        .width('100%')
-        .padding(14)
-        .fontSize(14)
-        .fontColor(AppTheme.TEXT)
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(14);
-      Text('提示策略：先给一点提示，不直接说答案。')
-        .width('100%')
-        .fontSize(12)
-        .fontColor(AppTheme.SUBTEXT);
-      TextInput({ placeholder: '输入问题…' })
-        .width('100%')
-        .height(44)
-        .backgroundColor('#F7F8FA');
-      Row({ space: 8 }) {
-        Button('🎙 语音').layoutWeight(1);
-        Button('📷 拍题').layoutWeight(1);
+
+      if (this.tutorUnavailable) {
+        Text('AI 辅导暂时不可用')
+          .width('100%')
+          .padding(14)
+          .fontSize(15)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.WARNING)
+          .backgroundColor('#FFF8E7')
+          .borderRadius(14);
+        Text('你仍然可以查看老师资料、完成作业并拍照提交。联网或服务恢复后再继续问小伴。')
+          .width('100%')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT);
+      } else {
+        Text('你现在卡在哪一道题？可以拍给我看，也可以直接说。')
+          .width('100%')
+          .padding(14)
+          .fontSize(14)
+          .fontColor(AppTheme.TEXT)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .borderRadius(14);
+        Text('提示策略：先给一点提示，不直接说答案。')
+          .width('100%')
+          .fontSize(12)
+          .fontColor(AppTheme.SUBTEXT);
+        TextInput({ placeholder: '输入问题…' })
+          .width('100%')
+          .height(44)
+          .backgroundColor('#F7F8FA');
+        Row({ space: 8 }) {
+          Button('🎙 语音').layoutWeight(1);
+          Button('📷 拍题').layoutWeight(1);
+        }
+        .width('100%');
       }
-      .width('100%');
     }
     .width('100%')
     .padding(18)
