@@ -47,9 +47,13 @@ export struct StudentTodayPage {
   @Builder
   private OfflineBanner() {
     Row({ space: 10 }) {
-      SymbolGlyph($r('sys.symbol.exclamationmark_triangle'))
-        .fontSize(18)
-        .fontColor([AppTheme.WARNING]);
+      Text('离线')
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.WARNING)
+        .padding({ left: 8, right: 8, top: 5, bottom: 5 })
+        .backgroundColor(AppTheme.SURFACE)
+        .borderRadius(AppTheme.CHIP_RADIUS);
       Column({ space: 2 }) {
         Text('当前为离线状态')
           .width('100%')
