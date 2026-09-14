@@ -7,7 +7,25 @@ import { Assignment } from '../../../domain/model/HomeworkModels';
 @Component
 export struct StudentTodayPage {
   @Prop sizeClass: WindowSizeClass;
+  @Prop offlineMode: boolean = false;
   onOpenStudy: (assignmentId: string) => void = () => {};
+
+  @Builder
+  private OfflineBanner() {
+    Row({ space: 8 }) {
+      Text('离线')
+        .fontSize(12)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.WARNING);
+      Text('正在使用已缓存的今日作业，提交将在联网后同步。')
+        .fontSize(12)
+        .fontColor(AppTheme.SUBTEXT);
+    }
+    .width('100%')
+    .padding(12)
+    .backgroundColor('#FFF8E7')
+    .borderRadius(14);
+  }
 
   @Builder
   private ProgressHero() {
@@ -101,6 +119,10 @@ export struct StudentTodayPage {
           Blank();
         }
         .width('100%');
+
+        if (this.offlineMode) {
+          this.OfflineBanner();
+        }
 
         this.ProgressHero();
 
