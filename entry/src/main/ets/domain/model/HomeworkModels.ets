@@ -29,18 +29,21 @@ export interface StudentProfile {
   id: string;
   name: string;
   grade: string;
+  className: string;
   semester: string;
   textbookSummary: string;
 }
 
 export interface AppSettings {
-  student: StudentProfile;
+  students: StudentProfile[];
+  activeStudentId: string;
   tutorGuidanceFirst: boolean;
   directAnswerAllowed: boolean;
 }
 
 export interface RawHomeworkImport {
   id: string;
+  studentId: string;
   sourceKind: HomeworkImportSourceKind;
   sourceLabel: string;
   resourceUri: string;
@@ -54,6 +57,7 @@ export interface SourceEvidence {
 
 export interface CandidateAssignment {
   id: string;
+  studentId: string;
   subject: Subject;
   title: string;
   instruction: string;
@@ -65,6 +69,7 @@ export interface CandidateAssignment {
 
 export interface Assignment {
   id: string;
+  studentId: string;
   candidateId: string;
   subject: Subject;
   title: string;
@@ -86,6 +91,7 @@ export interface Submission {
 
 export interface TutorSession {
   id: string;
+  studentId: string;
   assignmentId: string;
   startedAtText: string;
   questionCount: number;

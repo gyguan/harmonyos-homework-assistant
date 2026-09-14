@@ -6,6 +6,7 @@ import {
   AssignmentStatus,
   CandidateAssignment,
   DashboardSummary,
+  HomeworkImportSourceKind,
   RawHomeworkImport,
   StudentProfile,
   Submission,
@@ -17,17 +18,17 @@ import { HomeworkSnapshot } from '../domain/model/PersistenceModels';
 import { HomeworkPersistence } from '../domain/port/HomeworkPersistence';
 import { AssignmentStateMachine } from '../domain/service/AssignmentStateMachine';
 
-const SNAPSHOT_SCHEMA_VERSION: number = 3;
+const SNAPSHOT_SCHEMA_VERSION: number = 4;
 
 export class HomeworkStore {
   static readonly instance: HomeworkStore = new HomeworkStore();
 
   private settings: AppSettings = MockData.settings;
+  private rawImports: RawHomeworkImport[] = [];
   private assignments: Assignment[] = [];
   private candidates: CandidateAssignment[] = [];
   private submissions: Submission[] = [];
   private tutorSessions: TutorSession[] = [];
-  private rawImport: RawHomeworkImport = MockData.rawImport;
   private submissionSequence: number = 1;
   private persistence: HomeworkPersistence | null = null;
   private persistRequested: boolean = false;
@@ -50,12 +51,15 @@ export class HomeworkStore {
 
   private seedFromMockData(): void {
     this.settings = this.cloneSettings(MockData.settings);
-    this.rawImport = this.cloneRawImport(MockData.rawImport);
+    this.rawImports = [];
     this.assignments = [];
     this.candidates = [];
     this.submissions = [];
     this.tutorSessions = [];
     this.submissionSequence = 1;
+    for (let rawImport of MockData.rawImports) {
+      this.rawImports.push(this.cloneRawImport(rawImport));
+    }
     for (let assignment of MockData.assignments) {
       this.assignments.push(this.cloneAssignment(assignment));
     }
@@ -66,10 +70,14 @@ export class HomeworkStore {
 
   private restoreSnapshot(snapshot: HomeworkSnapshot): void {
     this.settings = this.cloneSettings(snapshot.settings);
+    this.rawImports = [];
     this.assignments = [];
     this.candidates = [];
     this.submissions = [];
     this.tutorSessions = [];
+    for (let rawImport of snapshot.rawImports) {
+      this.rawImports.push(this.cloneRawImport(rawImport));
+    }
     for (let assignment of snapshot.assignments) {
       this.assignments.push(this.cloneAssignment(assignment));
     }
@@ -83,13 +91,20 @@ export class HomeworkStore {
       this.tutorSessions.push(this.cloneTutorSession(session));
     }
     this.submissionSequence = snapshot.submissionSequence > 0 ? snapshot.submissionSequence : 1;
+    if (this.studentIndex(this.settings.activeStudentId) < 0 && this.settings.students.length > 0) {
+      this.settings.activeStudentId = this.settings.students[0].id;
+    }
   }
 
   private createSnapshot(): HomeworkSnapshot {
+    let rawImportCopies: RawHomeworkImport[] = [];
     let assignmentCopies: Assignment[] = [];
     let candidateCopies: CandidateAssignment[] = [];
     let submissionCopies: Submission[] = [];
     let tutorSessionCopies: TutorSession[] = [];
+    for (let rawImport of this.rawImports) {
+      rawImportCopies.push(this.cloneRawImport(rawImport));
+    }
     for (let assignment of this.assignments) {
       assignmentCopies.push(this.cloneAssignment(assignment));
     }
@@ -105,6 +120,7 @@ export class HomeworkStore {
     return {
       schemaVersion: SNAPSHOT_SCHEMA_VERSION,
       settings: this.cloneSettings(this.settings),
+      rawImports: rawImportCopies,
       assignments: assignmentCopies,
       candidates: candidateCopies,
       submissions: submissionCopies,
@@ -141,14 +157,20 @@ export class HomeworkStore {
       id: source.id,
       name: source.name,
       grade: source.grade,
+      className: source.className,
       semester: source.semester,
       textbookSummary: source.textbookSummary
     };
   }
 
   private cloneSettings(source: AppSettings): AppSettings {
+    let students: StudentProfile[] = [];
+    for (let student of source.students) {
+      students.push(this.cloneStudent(student));
+    }
     return {
-      student: this.cloneStudent(source.student),
+      students: students,
+      activeStudentId: source.activeStudentId,
       tutorGuidanceFirst: source.tutorGuidanceFirst,
       directAnswerAllowed: source.directAnswerAllowed
     };
@@ -157,6 +179,7 @@ export class HomeworkStore {
   private cloneRawImport(source: RawHomeworkImport): RawHomeworkImport {
     return {
       id: source.id,
+      studentId: source.studentId,
       sourceKind: source.sourceKind,
       sourceLabel: source.sourceLabel,
       resourceUri: source.resourceUri,
@@ -167,6 +190,7 @@ export class HomeworkStore {
   private cloneAssignment(source: Assignment): Assignment {
     return {
       id: source.id,
+      studentId: source.studentId,
       candidateId: source.candidateId,
       subject: source.subject,
       title: source.title,
@@ -181,6 +205,7 @@ export class HomeworkStore {
   private cloneCandidate(source: CandidateAssignment): CandidateAssignment {
     return {
       id: source.id,
+      studentId: source.studentId,
       subject: source.subject,
       title: source.title,
       instruction: source.instruction,
@@ -208,10 +233,29 @@ export class HomeworkStore {
   private cloneTutorSession(source: TutorSession): TutorSession {
     return {
       id: source.id,
+      studentId: source.studentId,
       assignmentId: source.assignmentId,
       startedAtText: source.startedAtText,
       questionCount: source.questionCount
     };
+  }
+
+  private studentIndex(studentId: string): number {
+    for (let i = 0; i < this.settings.students.length; i++) {
+      if (this.settings.students[i].id === studentId) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  private rawImportIndex(studentId: string): number {
+    for (let i = 0; i < this.rawImports.length; i++) {
+      if (this.rawImports[i].studentId === studentId) {
+        return i;
+      }
+    }
+    return -1;
   }
 
   private assignmentIndex(assignmentId: string): number {
@@ -248,25 +292,77 @@ export class HomeworkStore {
     return this.settings;
   }
 
+  getStudents(): StudentProfile[] {
+    return this.settings.students;
+  }
+
+  getActiveStudentId(): string {
+    return this.settings.activeStudentId;
+  }
+
   getStudent(): StudentProfile {
-    return this.settings.student;
+    let index = this.studentIndex(this.settings.activeStudentId);
+    if (index >= 0) {
+      return this.settings.students[index];
+    }
+    return this.settings.students[0];
+  }
+
+  setActiveStudent(studentId: string): boolean {
+    if (studentId === this.settings.activeStudentId) {
+      return true;
+    }
+    if (this.studentIndex(studentId) < 0) {
+      return false;
+    }
+    this.settings.activeStudentId = studentId;
+    this.requestPersist();
+    return true;
   }
 
   getRawImport(): RawHomeworkImport {
-    return this.rawImport;
+    let studentId = this.getActiveStudentId();
+    let index = this.rawImportIndex(studentId);
+    if (index >= 0) {
+      return this.rawImports[index];
+    }
+    return {
+      id: '',
+      studentId: studentId,
+      sourceKind: HomeworkImportSourceKind.TEXT,
+      sourceLabel: '',
+      resourceUri: '',
+      rawText: ''
+    };
   }
 
   replaceRawImport(input: RawHomeworkImport): void {
-    this.rawImport = this.cloneRawImport(input);
+    if (input.studentId !== this.getActiveStudentId()) {
+      return;
+    }
+    let index = this.rawImportIndex(input.studentId);
+    if (index >= 0) {
+      this.rawImports[index] = this.cloneRawImport(input);
+    } else {
+      this.rawImports.push(this.cloneRawImport(input));
+    }
+    this.requestPersist();
   }
 
   getAssignments(): Assignment[] {
-    return this.assignments;
+    let result: Assignment[] = [];
+    let studentId = this.getActiveStudentId();
+    for (let assignment of this.assignments) {
+      if (assignment.studentId === studentId) {
+        result.push(assignment);
+      }
+    }
+    return result;
   }
 
   getTodayAssignments(): Assignment[] {
     let result: Assignment[] = [];
-    for (let assignment of this.assignments) {
+    for (let assignment of this.getAssignments()) {
       if (assignment.status !== AssignmentStatus.OVERDUE) {
         result.push(assignment);
       }
@@ -276,7 +372,7 @@ export class HomeworkStore {
 
   getAssignment(assignmentId: string): Assignment | null {
     let index = this.assignmentIndex(assignmentId);
-    if (index < 0) {
+    if (index < 0 || this.assignments[index].studentId !== this.getActiveStudentId()) {
       return null;
     }
     return this.assignments[index];
@@ -290,8 +386,9 @@ export class HomeworkStore {
       AssignmentStatus.OVERDUE,
       AssignmentStatus.READY_TO_SUBMIT
     ];
+    let activeAssignments = this.getAssignments();
     for (let status of priorities) {
-      for (let assignment of this.assignments) {
+      for (let assignment of activeAssignments) {
         if (assignment.status === status) {
           return assignment;
         }
@@ -301,22 +398,37 @@ export class HomeworkStore {
   }
 
   getCandidates(): CandidateAssignment[] {
-    return this.candidates;
+    let result: CandidateAssignment[] = [];
+    let studentId = this.getActiveStudentId();
+    for (let candidate of this.candidates) {
+      if (candidate.studentId === studentId) {
+        result.push(candidate);
+      }
+    }
+    return result;
   }
 
   replaceCandidates(candidates: CandidateAssignment[]): void {
-    this.candidates = [];
-    for (let candidate of candidates) {
-      if (!this.hasAssignmentForCandidate(candidate.id)) {
-        this.candidates.push(this.cloneCandidate(candidate));
+    let studentId = this.getActiveStudentId();
+    let retained: CandidateAssignment[] = [];
+    for (let existing of this.candidates) {
+      if (existing.studentId !== studentId) {
+        retained.push(existing);
       }
     }
+    for (let candidate of candidates) {
+      if (candidate.studentId === studentId && !this.hasAssignmentForCandidate(candidate.id)) {
+        retained.push(this.cloneCandidate(candidate));
+      }
+    }
+    this.candidates = retained;
     this.requestPersist();
   }
 
   updateCandidate(candidate: CandidateAssignment): boolean {
     let index = this.candidateIndex(candidate.id);
-    if (index < 0) {
+    if (index < 0 || candidate.studentId !== this.getActiveStudentId() ||
+      this.candidates[index].studentId !== this.getActiveStudentId()) {
       return false;
     }
     this.candidates[index] = this.cloneCandidate(candidate);
@@ -325,7 +437,8 @@ export class HomeworkStore {
   }
 
   addCandidate(candidate: CandidateAssignment): boolean {
-    if (this.candidateIndex(candidate.id) >= 0 || this.hasAssignmentForCandidate(candidate.id)) {
+    if (candidate.studentId !== this.getActiveStudentId() || this.candidateIndex(candidate.id) >= 0 ||
+      this.hasAssignmentForCandidate(candidate.id)) {
       return false;
     }
     this.candidates.push(this.cloneCandidate(candidate));
@@ -335,7 +448,7 @@ export class HomeworkStore {
 
   updateCandidateTitle(candidateId: string, title: string): boolean {
     let index = this.candidateIndex(candidateId);
-    if (index < 0) {
+    if (index < 0 || this.candidates[index].studentId !== this.getActiveStudentId()) {
       return false;
     }
     this.candidates[index].title = title;
@@ -346,7 +459,7 @@ export class HomeworkStore {
 
   removeCandidate(candidateId: string): boolean {
     let index = this.candidateIndex(candidateId);
-    if (index < 0) {
+    if (index < 0 || this.candidates[index].studentId !== this.getActiveStudentId()) {
       return false;
     }
     this.candidates.splice(index, 1);
@@ -355,13 +468,20 @@ export class HomeworkStore {
   }
 
   publishCandidates(): number {
+    let studentId = this.getActiveStudentId();
     let published: number = 0;
+    let retained: CandidateAssignment[] = [];
     for (let candidate of this.candidates) {
+      if (candidate.studentId !== studentId) {
+        retained.push(candidate);
+        continue;
+      }
       if (this.hasAssignmentForCandidate(candidate.id)) {
         continue;
       }
       let assignment: Assignment = {
         id: `a-published-${candidate.id}`,
+        studentId: studentId,
         candidateId: candidate.id,
         subject: candidate.subject,
         title: candidate.title,
@@ -374,14 +494,14 @@ export class HomeworkStore {
       this.assignments.push(assignment);
       published++;
     }
-    this.candidates = [];
+    this.candidates = retained;
     this.requestPersist();
     return published;
   }
 
   transitionAssignment(assignmentId: string, to: AssignmentStatus): boolean {
     let index = this.assignmentIndex(assignmentId);
-    if (index < 0) {
+    if (index < 0 || this.assignments[index].studentId !== this.getActiveStudentId()) {
       return false;
     }
     let current = this.assignments[index].status;
@@ -432,6 +552,9 @@ export class HomeworkStore {
   }
 
   getSubmissionsForAssignment(assignmentId: string): Submission[] {
+    if (this.getAssignment(assignmentId) === null) {
+      return [];
+    }
     let result: Submission[] = [];
     for (let submission of this.submissions) {
       if (submission.assignmentId === assignmentId) {
@@ -467,7 +590,7 @@ export class HomeworkStore {
       submitted: 0,
       needsRework: 0
     };
-    for (let assignment of this.assignments) {
+    for (let assignment of this.getAssignments()) {
       switch (assignment.status) {
         case AssignmentStatus.COMPLETED:
           summary.completed++;
@@ -497,7 +620,7 @@ export class HomeworkStore {
 
   getProgress(): AssignmentProgress[] {
     let result: AssignmentProgress[] = [];
-    for (let assignment of this.assignments) {
+    for (let assignment of this.getAssignments()) {
       result.push({
         assignmentId: assignment.id,
         status: assignment.status,

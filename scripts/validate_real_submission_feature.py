@@ -29,7 +29,8 @@ entry_ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
 require("photoUris: string[]" in models, "Submission must persist photoUris")
 require("IMAGE = 'IMAGE'" in models and "MOCK_IMAGE" not in models, "Submission type must be real IMAGE only")
 require("submitImages" in store and "submitMockImage" not in store, "Store must use real image submission")
-require("SNAPSHOT_SCHEMA_VERSION: number = 3" in store, "Submission persistence change must use snapshot schema v3")
+require("SNAPSHOT_SCHEMA_VERSION: number = 4" in store,
+        "real submission must remain durable after the multi-child snapshot upgrade to v4")
 require("MAX_SUBMISSION_PHOTOS: number = 6" in service, "Submission service must cap selection at six photos")
 require("photoAccessHelper.PhotoViewPicker" in service, "Submission service must use PhotoViewPicker")
 require("fileIo.copyFile" in service and "fileUri.getUriFromPath" in service,

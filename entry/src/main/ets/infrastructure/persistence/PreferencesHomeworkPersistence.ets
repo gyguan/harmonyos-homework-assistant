@@ -4,6 +4,7 @@ import {
   AppSettings,
   Assignment,
   CandidateAssignment,
+  RawHomeworkImport,
   Submission,
   TutorSession
 } from '../../domain/model/HomeworkModels';
@@ -39,6 +40,7 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
       let snapshot: HomeworkSnapshot = {
         schemaVersion: parsed.schemaVersion as number,
         settings: parsed.settings as AppSettings,
+        rawImports: parsed.rawImports as RawHomeworkImport[],
         assignments: parsed.assignments as Assignment[],
         candidates: parsed.candidates as CandidateAssignment[],
         submissions: parsed.submissions as Submission[],
@@ -57,7 +59,7 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
       await store.put(SNAPSHOT_KEY, JSON.stringify(snapshot));
       await store.flush();
     } catch {
-      // V0.1 persistence is best-effort. Keep the in-memory state available even if disk persistence fails.
+      // Local persistence is best-effort. Keep in-memory state available even if disk persistence fails.
     }
   }
 }

@@ -30,6 +30,7 @@ models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 persistence_models = read("entry/src/main/ets/domain/model/PersistenceModels.ets")
 state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
+mock_data = read("entry/src/main/ets/data/MockData.ets")
 confirmation_page = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 progress_page = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 student_today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
@@ -49,7 +50,7 @@ local_parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmen
 require('"compileSdkVersion": "26.0.0"' in build_profile,
         "compileSdkVersion must match the DevEco Studio 26.0.0 toolchain")
 require('"compatibleSdkVersion": "6.0.0(20)"' in build_profile,
-        "compatibleSdkVersion must keep the V0.1 runtime baseline at HarmonyOS 6.0.0(20)")
+        "compatibleSdkVersion must keep the runtime baseline at HarmonyOS 6.0.0(20)")
 require('"targetSdkVersion"' not in build_profile,
         "targetSdkVersion must remain unset for the locally verified DevEco configuration")
 
@@ -66,7 +67,7 @@ require("Navigation(this.navPathStack)" in app_shell,
 require("ResponsiveContext.resolve(this.widthVp)" in app_shell,
         "AppShell must derive size class from the shared responsive resolver")
 require("this.NavText('教材'" not in app_shell and "this.SideItem('教材'" not in app_shell,
-        "student V0.1 navigation must stay focused on Today / Homework / Me")
+        "student navigation must stay focused on Today / Homework / Me")
 
 require("widthVp <= 600" in responsive and "widthVp <= 840" in responsive,
         "shared responsive breakpoints must remain 600vp / 840vp")
@@ -84,28 +85,43 @@ for status in required_statuses:
     require(status in models, f"missing assignment lifecycle status: {status}")
 
 for core_model in ["StudentProfile", "AppSettings", "CandidateAssignment", "Assignment", "Submission", "TutorSession"]:
-    require(f"interface {core_model}" in models, f"missing simplified V0.1 core model: {core_model}")
+    require(f"interface {core_model}" in models, f"missing core model: {core_model}")
 
+require("className: string" in models,
+        "StudentProfile must carry className so siblings in different classes are distinguishable")
+require("students: StudentProfile[]" in models and "activeStudentId: string" in models,
+        "AppSettings must model one family with multiple children and an active child")
+require(models.count("studentId: string") >= 4,
+        "RawImport, Candidate, Assignment and TutorSession must carry studentId isolation")
 require("HomeworkImportSourceKind" in models and "resourceUri" in models,
         "RawHomeworkImport must preserve source kind and resource URI for OCR/file extraction")
 require("photoUris: string[]" in models and "IMAGE = 'IMAGE'" in models and "MOCK_IMAGE" not in models,
         "Submission must store real image URIs and must not use MOCK_IMAGE")
-require("familyId" not in models and "studentId" not in models,
-        "single-family V0.1 domain must not carry tenant/family routing fields")
+require("familyId" not in models and "tenantId" not in models and "organizationId" not in models,
+        "single-family design must not introduce tenant/family routing fields")
+
+require("student-xiaoyu-001" in mock_data and "student-xiaomi-002" in mock_data and
+        "三（2）班" in mock_data and "一（5）班" in mock_data,
+        "mock baseline must include two children from different classes")
+
 require("class AssignmentStateMachine" in state_machine,
         "assignment transitions must be centralized in AssignmentStateMachine")
 require("canTransition" in state_machine,
         "AssignmentStateMachine must reject illegal transitions")
 require("class HomeworkStore" in store and "static readonly instance" in store,
         "HomeworkStore singleton must own the local lifecycle state")
-require("getStudent" in store and "getSettings" in store,
-        "HomeworkStore must own the single-child profile and app settings")
+require("getStudents" in store and "getActiveStudentId" in store and "setActiveStudent" in store,
+        "HomeworkStore must expose the family child context")
+require("assignment.studentId === studentId" in store and "candidate.studentId === studentId" in store,
+        "HomeworkStore list reads must filter assignments and candidates by active child")
+require("input.studentId !== this.getActiveStudentId()" in store,
+        "raw import replacement must reject another child's import")
 require("replaceRawImport" in store and "replaceCandidates" in store,
-        "HomeworkStore must accept a successful OCR import atomically from the application service")
+        "HomeworkStore must accept successful OCR imports")
 require("publishCandidates" in store and "submitImages" in store and "submitMockImage" not in store,
         "HomeworkStore must support candidate publishing and real image submission")
-require("SNAPSHOT_SCHEMA_VERSION: number = 3" in store,
-        "real submission model change must bump the local snapshot schema to v3")
+require("SNAPSHOT_SCHEMA_VERSION: number = 4" in store,
+        "multi-child model change must bump the local snapshot schema to v4")
 require("AssignmentStateMachine.canTransition" in store,
         "HomeworkStore transitions must delegate to AssignmentStateMachine")
 
@@ -114,15 +130,17 @@ require("interface HomeworkPersistence" in persistence_port,
 require("HomeworkPersistence" in store and "@kit.ArkData" not in store,
         "HomeworkStore must depend on the persistence port, not ArkData")
 require("class PreferencesHomeworkPersistence" in persistence_adapter,
-        "V0.1 must provide a Preferences persistence adapter")
+        "must provide a Preferences persistence adapter")
 require("@kit.ArkData" in persistence_adapter and "preferences.getPreferences" in persistence_adapter,
         "Preferences adapter must use ArkData Preferences")
 require("store.flush" in persistence_adapter,
         "Preferences adapter must flush snapshots to durable storage")
 require("HomeworkStore.instance.initialize" in entry_ability and "PreferencesHomeworkPersistence" in entry_ability,
         "EntryAbility must restore the store before loading the UI")
-require("settings: AppSettings" in persistence_models and "tutorSessions: TutorSession[]" in persistence_models,
-        "HomeworkSnapshot must include settings and tutorSessions")
+require("rawImports: RawHomeworkImport[]" in persistence_models,
+        "HomeworkSnapshot must persist one raw import context per child")
+require("rawImports: parsed.rawImports as RawHomeworkImport[]" in persistence_adapter,
+        "Preferences adapter must restore child-scoped raw imports")
 require("settings: parsed.settings as AppSettings" in persistence_adapter and
         "tutorSessions: parsed.tutorSessions as TutorSession[]" in persistence_adapter,
         "Preferences adapter must restore every required HomeworkSnapshot field")
@@ -134,7 +152,9 @@ require("interface HomeworkAssignmentParser" in assignment_parser_port,
 require("class HomeworkImportPipeline" in import_pipeline,
         "extractor and parser must be orchestrated by HomeworkImportPipeline")
 require("class HomeworkImportService" in import_service and "selectImageAndParse" in import_service,
-        "Import UI must select and process a screenshot through HomeworkImportService")
+        "Import UI must process screenshots through HomeworkImportService")
+require("getActiveStudentId" in import_service and "studentId: studentId" in import_service,
+        "new text and screenshot imports must bind to the active child")
 require("photoAccessHelper.PhotoViewPicker" in import_service,
         "screenshot import must use the HarmonyOS photo picker")
 require("HomeworkImportService" in import_page and "选择作业截图" in import_page,
@@ -154,11 +174,13 @@ require("submission.photoUris" in progress_page and "Image(uri)" in progress_pag
         "parent progress must preview real submitted photo URIs")
 
 require("class CoreVisionHomeworkTextExtractor" in core_ocr,
-        "V0.1 must provide a real Core Vision OCR extractor")
+        "must provide a real Core Vision OCR extractor")
 require("@kit.CoreVisionKit" in core_ocr and "textRecognition.recognizeText" in core_ocr,
         "real OCR extractor must use Core Vision textRecognition")
+require("studentId: input.studentId" in core_ocr and "studentId: input.studentId" in local_parser,
+        "student context must survive OCR and semantic parsing")
 require("class LocalHomeworkAssignmentParser" in local_parser,
-        "V0.1 must provide a local homework parser without cloud credentials")
+        "must provide a local homework parser without cloud credentials")
 for subject_label in ["语文", "数学", "英语"]:
     require(subject_label in local_parser, f"local parser must recognize subject marker: {subject_label}")
 require("sourceEvidence" in local_parser and "input.sourceLabel" in local_parser,
@@ -170,14 +192,20 @@ require("MockHomeworkTextExtractor" not in entry_ability and "MockHomeworkAssign
 
 require("CONFIRMATION" in app_shell and "PROGRESS" in app_shell,
         "AppShell must expose parent confirmation and progress routes")
+require("switchStudent" in app_shell and "setActiveStudent" in app_shell,
+        "AppShell must provide a shared child switcher")
 require("storeRevision" in app_shell,
         "AppShell must propagate shared store updates across role/page switches")
+require("studentId: item.studentId" in confirmation_page and "getActiveStudentId" in confirmation_page,
+        "parent confirmation edits/manual additions must stay in the active child")
 require("publishCandidates" in confirmation_page,
         "parent confirmation must publish candidates through HomeworkStore")
 require("getSubmissionsForAssignment" in progress_page,
         "parent progress must expose submission records")
 require("导入老师作业" in parent_dashboard and "Kpi(" not in parent_dashboard,
         "parent home must stay a simple family overview, not a management dashboard")
+require("className" in parent_dashboard and "className" in student_today,
+        "parent and student views must make the current child's class visible")
 
 for page_name, page_text in {
     "StudentTodayPage": student_today,
@@ -188,14 +216,14 @@ for page_name, page_text in {
     require("MockData" not in page_text,
             f"{page_name} must read business state through HomeworkStore, not MockData")
 
-forbidden_single_family_fields = ["familyId", "parentId", "guardianId", "organizationId", "classId"]
+forbidden_multi_tenant_fields = ["familyId", "parentId", "guardianId", "organizationId", "tenantId", "classId"]
 
 if ETS_ROOT.exists():
     for file in ETS_ROOT.rglob("*.ets"):
         text = file.read_text(encoding="utf-8")
         rel = file.relative_to(ROOT).as_posix()
         if "ContainerReader" in text:
-            errors.append(f"API 26+ ContainerReader is not allowed in V0.1 runtime-compatible code: {rel}")
+            errors.append(f"API 26+ ContainerReader is not allowed in runtime-compatible code: {rel}")
         if file.name != "WindowSizeClass.ets":
             if re.search(r"(?:<=|>=|<|>)\s*(?:600|840)\b", text):
                 errors.append(f"responsive breakpoint duplicated outside WindowSizeClass: {rel}")
@@ -207,9 +235,9 @@ if ETS_ROOT.exists():
             errors.append(f"MediaLibraryKit picker leaked outside application service: {rel}")
         if "/features/" in f"/{rel}" and ("CoreVisionHomeworkTextExtractor" in text or "LocalHomeworkAssignmentParser" in text):
             errors.append(f"UI page depends on concrete OCR/parser adapter: {rel}")
-        for field in forbidden_single_family_fields:
+        for field in forbidden_multi_tenant_fields:
             if field in text:
-                errors.append(f"single-family V0.1 contains unnecessary multi-tenant field {field}: {rel}")
+                errors.append(f"single-family app contains unnecessary multi-tenant field {field}: {rel}")
 
 required_scenarios = ["LOADING", "EMPTY", "ERROR", "OFFLINE", "TUTOR_UNAVAILABLE"]
 demo_scenario = read("entry/src/main/ets/common/state/DemoScenario.ets")

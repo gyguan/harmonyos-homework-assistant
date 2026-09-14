@@ -32,6 +32,7 @@ export struct HomeworkConfirmationPage {
   private updateSubject(item: CandidateAssignment, subject: Subject): void {
     this.saveCandidate({
       id: item.id,
+      studentId: item.studentId,
       subject: subject,
       title: item.title,
       instruction: item.instruction,
@@ -45,6 +46,7 @@ export struct HomeworkConfirmationPage {
   private updateTitle(item: CandidateAssignment, title: string): void {
     this.saveCandidate({
       id: item.id,
+      studentId: item.studentId,
       subject: item.subject,
       title: title,
       instruction: title,
@@ -58,6 +60,7 @@ export struct HomeworkConfirmationPage {
   private updateDueText(item: CandidateAssignment, dueText: string): void {
     this.saveCandidate({
       id: item.id,
+      studentId: item.studentId,
       subject: item.subject,
       title: item.title,
       instruction: item.instruction,
@@ -71,6 +74,7 @@ export struct HomeworkConfirmationPage {
   private updateTextbookRef(item: CandidateAssignment, textbookRef: string): void {
     this.saveCandidate({
       id: item.id,
+      studentId: item.studentId,
       subject: item.subject,
       title: item.title,
       instruction: item.instruction,
@@ -85,6 +89,7 @@ export struct HomeworkConfirmationPage {
     let raw = this.rawImport();
     let candidate: CandidateAssignment = {
       id: `manual-${Date.now()}`,
+      studentId: HomeworkStore.instance.getActiveStudentId(),
       subject: Subject.CHINESE,
       title: '新作业',
       instruction: '新作业',
@@ -259,7 +264,9 @@ export struct HomeworkConfirmationPage {
 
         Column({ space: 4 }) {
           Text('确认老师作业').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('检查学科、标题、截止时间和教材信息，确认后再进入学生作业').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text(`当前孩子：${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);

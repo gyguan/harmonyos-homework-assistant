@@ -12,16 +12,28 @@ import {
 } from '../domain/model/HomeworkModels';
 
 export class MockData {
-  static readonly student: StudentProfile = {
-    id: 'student-xiaoyu-001',
-    name: '小宇',
-    grade: '三年级',
-    semester: '上学期',
-    textbookSummary: '语文部编版 · 数学北师大版 · 英语沪教版'
-  };
+  static readonly students: StudentProfile[] = [
+    {
+      id: 'student-xiaoyu-001',
+      name: '小宇',
+      grade: '三年级',
+      className: '三（2）班',
+      semester: '上学期',
+      textbookSummary: '语文部编版 · 数学北师大版 · 英语沪教版'
+    },
+    {
+      id: 'student-xiaomi-002',
+      name: '小米',
+      grade: '一年级',
+      className: '一（5）班',
+      semester: '上学期',
+      textbookSummary: '语文部编版 · 数学北师大版 · 英语沪教版'
+    }
+  ];
 
   static readonly settings: AppSettings = {
-    student: MockData.student,
+    students: MockData.students,
+    activeStudentId: 'student-xiaoyu-001',
     tutorGuidanceFirst: true,
     directAnswerAllowed: false
   };
@@ -29,6 +41,7 @@ export class MockData {
   static readonly assignments: Assignment[] = [
     {
       id: 'a-math-001',
+      studentId: 'student-xiaoyu-001',
       candidateId: '',
       subject: Subject.MATH,
       title: '练习册 P26 第 1～6 题',
@@ -40,6 +53,7 @@ export class MockData {
     },
     {
       id: 'a-chinese-001',
+      studentId: 'student-xiaoyu-001',
       candidateId: '',
       subject: Subject.CHINESE,
       title: '朗读《秋天的雨》第 2～4 自然段',
@@ -51,6 +65,7 @@ export class MockData {
     },
     {
       id: 'a-english-001',
+      studentId: 'student-xiaoyu-001',
       candidateId: '',
       subject: Subject.ENGLISH,
       title: '听读 Unit 3 Look and learn',
@@ -62,6 +77,7 @@ export class MockData {
     },
     {
       id: 'a-overdue-001',
+      studentId: 'student-xiaoyu-001',
       candidateId: '',
       subject: Subject.MATH,
       title: '错题订正 3 题',
@@ -69,6 +85,30 @@ export class MockData {
       textbookRef: '北师大版三年级上册',
       dueText: '昨天 21:00',
       status: AssignmentStatus.OVERDUE,
+      resourceLabels: []
+    },
+    {
+      id: 'a-xiaomi-chinese-001',
+      studentId: 'student-xiaomi-002',
+      candidateId: '',
+      subject: Subject.CHINESE,
+      title: '拼音 a o e 各读三遍',
+      instruction: '指读并录音一次。',
+      textbookRef: '部编版一年级上册 · 拼音单元',
+      dueText: '今晚',
+      status: AssignmentStatus.NOT_STARTED,
+      resourceLabels: []
+    },
+    {
+      id: 'a-xiaomi-math-001',
+      studentId: 'student-xiaomi-002',
+      candidateId: '',
+      subject: Subject.MATH,
+      title: '口算 10 题',
+      instruction: '独立完成 10 以内加减法。',
+      textbookRef: '北师大版一年级上册',
+      dueText: '今晚',
+      status: AssignmentStatus.NOT_STARTED,
       resourceLabels: []
     }
   ];
@@ -89,58 +129,70 @@ export class MockData {
     needsRework: 0
   };
 
-  static readonly rawImport: RawHomeworkImport = {
-    id: 'import-001',
-    sourceKind: HomeworkImportSourceKind.IMAGE,
-    sourceLabel: '微信群聊天截图 · 19:01',
-    resourceUri: 'mock://wechat-homework-screenshot-001',
-    rawText: '今天作业：语文背诵第12课古诗两首；数学练习册32页；英语听读U4，明天检查。'
-  };
-
-  static readonly importSource: string = MockData.rawImport.rawText;
+  static readonly rawImports: RawHomeworkImport[] = [
+    {
+      id: 'import-001',
+      studentId: 'student-xiaoyu-001',
+      sourceKind: HomeworkImportSourceKind.IMAGE,
+      sourceLabel: '三（2）班微信群截图 · 19:01',
+      resourceUri: 'mock://wechat-homework-screenshot-001',
+      rawText: '今天作业：语文背诵第12课古诗两首；数学练习册32页；英语听读U4，明天检查。'
+    },
+    {
+      id: 'import-002',
+      studentId: 'student-xiaomi-002',
+      sourceKind: HomeworkImportSourceKind.TEXT,
+      sourceLabel: '一（5）班老师文字 · 18:40',
+      resourceUri: '',
+      rawText: '语文：拼音a o e各读三遍；数学：口算10题。'
+    }
+  ];
 
   static readonly candidates: CandidateAssignment[] = [
     {
       id: 'c-1',
+      studentId: 'student-xiaoyu-001',
       subject: Subject.CHINESE,
       title: '背诵第 12 课《古诗两首》',
       instruction: '按老师要求完成背诵，明天检查。',
       textbookRef: '部编版三年级上册 · 第 12 课',
       dueText: '明天',
       sourceEvidence: {
-        sourceLabel: MockData.rawImport.sourceLabel,
+        sourceLabel: '三（2）班微信群截图 · 19:01',
         excerpt: '语文背诵第12课古诗两首'
       },
       confidence: 0.96
     },
     {
       id: 'c-2',
+      studentId: 'student-xiaoyu-001',
       subject: Subject.MATH,
       title: '完成练习册 P32',
       instruction: '完成练习册第 32 页，明天检查。',
       textbookRef: '北师大版三年级上册 · 待家长确认页码',
       dueText: '明天',
       sourceEvidence: {
-        sourceLabel: MockData.rawImport.sourceLabel,
+        sourceLabel: '三（2）班微信群截图 · 19:01',
         excerpt: '数学练习册32页'
       },
       confidence: 0.72
     },
     {
       id: 'c-3',
+      studentId: 'student-xiaoyu-001',
       subject: Subject.ENGLISH,
       title: '听读 Unit 4',
       instruction: '完成 Unit 4 听读，明天检查。',
       textbookRef: '沪教版三年级上册 · Unit 4',
       dueText: '明天',
       sourceEvidence: {
-        sourceLabel: MockData.rawImport.sourceLabel,
+        sourceLabel: '三（2）班微信群截图 · 19:01',
         excerpt: '英语听读U4'
       },
       confidence: 0.95
     }
   ];
 
-  static readonly offlineCacheNote: string = '已缓存今日作业与老师资料，恢复网络后自动同步提交。';
+  static readonly offlineCacheNote: string = '已缓存当前孩子的今日作业与老师资料。';
   static readonly tutorUnavailableNote: string = 'AI Tutor 暂时不可用，但作业查看与提交能力不受影响。';
 }

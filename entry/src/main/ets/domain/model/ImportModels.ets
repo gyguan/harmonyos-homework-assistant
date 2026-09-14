@@ -2,6 +2,7 @@ import { CandidateAssignment } from './HomeworkModels';
 
 export interface ExtractedHomeworkText {
   importId: string;
+  studentId: string;
   sourceLabel: string;
   text: string;
 }
