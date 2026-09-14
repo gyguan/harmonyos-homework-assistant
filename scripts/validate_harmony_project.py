@@ -23,6 +23,7 @@ build_profile = read("build-profile.json5")
 hvigor_config = read("hvigor/hvigor-config.json5")
 oh_package = read("oh-package.json5")
 module_config = read("entry/src/main/module.json5")
+entry_ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 responsive = read("entry/src/main/ets/common/responsive/WindowSizeClass.ets")
 models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
@@ -34,6 +35,12 @@ student_today = read("entry/src/main/ets/features/student/today/StudentTodayPage
 study_workspace = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 parent_dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
+persistence_port = read("entry/src/main/ets/domain/port/HomeworkPersistence.ets")
+persistence_adapter = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkPersistence.ets")
+text_extractor_port = read("entry/src/main/ets/domain/port/HomeworkTextExtractor.ets")
+assignment_parser_port = read("entry/src/main/ets/domain/port/HomeworkAssignmentParser.ets")
+import_pipeline = read("entry/src/main/ets/application/import/HomeworkImportPipeline.ets")
+import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
 
 require('"compileSdkVersion": "26.0.0"' in build_profile,
         "compileSdkVersion must match the DevEco Studio 26.0.0 toolchain")
@@ -70,6 +77,8 @@ required_statuses = [
 for status in required_statuses:
     require(status in models, f"missing assignment lifecycle status: {status}")
 
+require("HomeworkImportSourceKind" in models and "resourceUri" in models,
+        "RawHomeworkImport must preserve source kind and resource URI for future OCR/file extraction")
 require("class AssignmentStateMachine" in state_machine,
         "assignment transitions must be centralized in AssignmentStateMachine")
 require("canTransition" in state_machine,
@@ -80,6 +89,32 @@ require("publishCandidates" in store and "submitMockImage" in store,
         "HomeworkStore must support candidate publishing and submission")
 require("AssignmentStateMachine.canTransition" in store,
         "HomeworkStore transitions must delegate to AssignmentStateMachine")
+
+require("interface HomeworkPersistence" in persistence_port,
+        "local persistence must be hidden behind HomeworkPersistence")
+require("HomeworkPersistence" in store and "@kit.ArkData" not in store,
+        "HomeworkStore must depend on the persistence port, not ArkData")
+require("class PreferencesHomeworkPersistence" in persistence_adapter,
+        "V0.1 must provide a Preferences persistence adapter")
+require("@kit.ArkData" in persistence_adapter and "preferences.getPreferences" in persistence_adapter,
+        "Preferences adapter must use ArkData Preferences")
+require("store.flush" in persistence_adapter,
+        "Preferences adapter must flush snapshots to durable storage")
+require("HomeworkStore.instance.initialize" in entry_ability and "PreferencesHomeworkPersistence" in entry_ability,
+        "EntryAbility must restore the store before loading the UI")
+
+require("interface HomeworkTextExtractor" in text_extractor_port,
+        "OCR/text extraction must be hidden behind HomeworkTextExtractor")
+require("interface HomeworkAssignmentParser" in assignment_parser_port,
+        "LLM/semantic parsing must be hidden behind HomeworkAssignmentParser")
+require("class HomeworkImportPipeline" in import_pipeline,
+        "extractor and parser must be orchestrated by HomeworkImportPipeline")
+require("class HomeworkImportService" in import_service and "replaceCandidates" in import_service,
+        "Import UI must write parser results through HomeworkImportService and HomeworkStore")
+require("HomeworkImportService" in import_page,
+        "HomeworkImportPage must invoke the application import service")
+require("MockHomeworkTextExtractor" not in import_page and "MockHomeworkAssignmentParser" not in import_page,
+        "HomeworkImportPage must not depend on concrete OCR/LLM adapters")
 
 require("CONFIRMATION" in app_shell and "PROGRESS" in app_shell,
         "AppShell must expose parent confirmation and progress routes")
@@ -110,6 +145,10 @@ if ETS_ROOT.exists():
         if file.name != "WindowSizeClass.ets":
             if re.search(r"(?:<=|>=|<|>)\s*(?:600|840)\b", text):
                 errors.append(f"responsive breakpoint duplicated outside WindowSizeClass: {rel}")
+        if "@kit.ArkData" in text and "infrastructure/persistence/" not in rel:
+            errors.append(f"ArkData persistence leaked outside infrastructure adapter: {rel}")
+        if "/features/" in f"/{rel}" and ("MockHomeworkTextExtractor" in text or "MockHomeworkAssignmentParser" in text):
+            errors.append(f"UI page depends on concrete OCR/LLM adapter: {rel}")
 
 required_scenarios = ["LOADING", "EMPTY", "ERROR", "OFFLINE", "TUTOR_UNAVAILABLE"]
 demo_scenario = read("entry/src/main/ets/common/state/DemoScenario.ets")

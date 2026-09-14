@@ -10,7 +10,11 @@ import {
   SubmissionType,
   TodaySummary
 } from '../domain/model/HomeworkModels';
+import { HomeworkSnapshot } from '../domain/model/PersistenceModels';
+import { HomeworkPersistence } from '../domain/port/HomeworkPersistence';
 import { AssignmentStateMachine } from '../domain/service/AssignmentStateMachine';
+
+const SNAPSHOT_SCHEMA_VERSION: number = 1;
 
 export class HomeworkStore {
   static readonly instance: HomeworkStore = new HomeworkStore();
@@ -20,14 +24,96 @@ export class HomeworkStore {
   private submissions: Submission[] = [];
   private readonly rawImport: RawHomeworkImport = MockData.rawImport;
   private submissionSequence: number = 1;
+  private persistence: HomeworkPersistence | null = null;
+  private persistRequested: boolean = false;
+  private persistRunning: boolean = false;
 
   private constructor() {
+    this.seedFromMockData();
+  }
+
+  async initialize(persistence: HomeworkPersistence): Promise<void> {
+    this.persistence = persistence;
+    let snapshot = await persistence.load();
+    if (snapshot !== null && snapshot.schemaVersion === SNAPSHOT_SCHEMA_VERSION) {
+      this.restoreSnapshot(snapshot);
+      return;
+    }
+    await persistence.save(this.createSnapshot());
+  }
+
+  private seedFromMockData(): void {
+    this.assignments = [];
+    this.candidates = [];
+    this.submissions = [];
+    this.submissionSequence = 1;
     for (let assignment of MockData.assignments) {
       this.assignments.push(this.cloneAssignment(assignment));
     }
     for (let candidate of MockData.candidates) {
       this.candidates.push(this.cloneCandidate(candidate));
     }
+  }
+
+  private restoreSnapshot(snapshot: HomeworkSnapshot): void {
+    this.assignments = [];
+    this.candidates = [];
+    this.submissions = [];
+    for (let assignment of snapshot.assignments) {
+      this.assignments.push(this.cloneAssignment(assignment));
+    }
+    for (let candidate of snapshot.candidates) {
+      this.candidates.push(this.cloneCandidate(candidate));
+    }
+    for (let submission of snapshot.submissions) {
+      this.submissions.push(this.cloneSubmission(submission));
+    }
+    this.submissionSequence = snapshot.submissionSequence > 0 ? snapshot.submissionSequence : 1;
+  }
+
+  private createSnapshot(): HomeworkSnapshot {
+    let assignmentCopies: Assignment[] = [];
+    let candidateCopies: CandidateAssignment[] = [];
+    let submissionCopies: Submission[] = [];
+    for (let assignment of this.assignments) {
+      assignmentCopies.push(this.cloneAssignment(assignment));
+    }
+    for (let candidate of this.candidates) {
+      candidateCopies.push(this.cloneCandidate(candidate));
+    }
+    for (let submission of this.submissions) {
+      submissionCopies.push(this.cloneSubmission(submission));
+    }
+    return {
+      schemaVersion: SNAPSHOT_SCHEMA_VERSION,
+      assignments: assignmentCopies,
+      candidates: candidateCopies,
+      submissions: submissionCopies,
+      submissionSequence: this.submissionSequence
+    };
+  }
+
+  private requestPersist(): void {
+    if (this.persistence === null) {
+      return;
+    }
+    this.persistRequested = true;
+    if (!this.persistRunning) {
+      this.flushPersistQueue();
+    }
+  }
+
+  private async flushPersistQueue(): Promise<void> {
+    let persistence = this.persistence;
+    if (persistence === null || this.persistRunning) {
+      return;
+    }
+    this.persistRunning = true;
+    while (this.persistRequested) {
+      this.persistRequested = false;
+      await persistence.save(this.createSnapshot());
+    }
+    this.persistRunning = false;
   }
 
   private cloneAssignment(source: Assignment): Assignment {
@@ -64,6 +150,16 @@ export class HomeworkStore {
     };
   }
 
+  private cloneSubmission(source: Submission): Submission {
+    return {
+      id: source.id,
+      assignmentId: source.assignmentId,
+      type: source.type,
+      fileLabel: source.fileLabel,
+      submittedAtText: source.submittedAtText
+    };
+  }
+
   private assignmentIndex(assignmentId: string): number {
     for (let i = 0; i < this.assignments.length; i++) {
       if (this.assignments[i].id === assignmentId) {
@@ -71,6 +167,18 @@ export class HomeworkStore {
       }
     }
     return -1;
+  }
+
+  private hasAssignmentForCandidate(candidateId: string): boolean {
+    if (candidateId.length === 0) {
+      return false;
+    }
+    for (let assignment of this.assignments) {
+      if (assignment.candidateId === candidateId) {
+        return true;
+      }
+    }
+    return false;
   }
 
   getRawImport(): RawHomeworkImport {
@@ -121,10 +229,21 @@ export class HomeworkStore {
     return this.candidates;
   }
 
+  replaceCandidates(candidates: CandidateAssignment[]): void {
+    this.candidates = [];
+    for (let candidate of candidates) {
+      if (!this.hasAssignmentForCandidate(candidate.id)) {
+        this.candidates.push(this.cloneCandidate(candidate));
+      }
+    }
+    this.requestPersist();
+  }
+
   updateCandidateTitle(candidateId: string, title: string): boolean {
     for (let candidate of this.candidates) {
       if (candidate.id === candidateId) {
         candidate.title = title;
+        this.requestPersist();
         return true;
       }
     }
@@ -135,6 +254,7 @@ export class HomeworkStore {
     for (let i = 0; i < this.candidates.length; i++) {
       if (this.candidates[i].id === candidateId) {
         this.candidates.splice(i, 1);
+        this.requestPersist();
         return true;
       }
     }
@@ -144,6 +264,9 @@ export class HomeworkStore {
   publishCandidates(): number {
     let published: number = 0;
     for (let candidate of this.candidates) {
+      if (this.hasAssignmentForCandidate(candidate.id)) {
+        continue;
+      }
       let assignment: Assignment = {
         id: `a-published-${candidate.id}`,
         familyId: candidate.familyId,
@@ -161,6 +284,7 @@ export class HomeworkStore {
       published++;
     }
     this.candidates = [];
+    this.requestPersist();
     return published;
   }
 
@@ -174,6 +298,7 @@ export class HomeworkStore {
       return false;
     }
     this.assignments[index].status = AssignmentStateMachine.transition(current, to);
+    this.requestPersist();
     return true;
   }
 
@@ -207,6 +332,7 @@ export class HomeworkStore {
     };
     this.submissionSequence++;
     this.submissions.push(submission);
+    this.requestPersist();
     return true;
   }
 
