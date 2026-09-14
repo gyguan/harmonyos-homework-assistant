@@ -88,7 +88,7 @@ export struct HomeworkImportPage {
           this.showCompactCandidates = true;
         }
       } else {
-        this.parseMessage = '文字识别成功，但暂时没有拆出明确作业。你可以直接修改上方文字后再点“智能整理作业”';
+        this.parseMessage = '文字识别成功，但暂时没有拆出明确作业。你可以修改文字后重新整理。';
         this.parseError = true;
       }
     } catch (_error) {
@@ -100,84 +100,113 @@ export struct HomeworkImportPage {
   }
 
   @Builder
+  private FeedbackBanner() {
+    if (this.parseMessage.length > 0) {
+      Row({ space: 8 }) {
+        Text(this.parseError ? '!' : '✓')
+          .fontSize(13)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS);
+        Text(this.parseMessage)
+          .layoutWeight(1)
+          .fontSize(13)
+          .lineHeight(19)
+          .fontColor(this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS);
+      }
+      .width('100%')
+      .padding(12)
+      .backgroundColor(this.parseError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
+  }
+
+  @Builder
   private SourcePane() {
-    Column({ space: 12 }) {
-      Text('老师原始内容').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
-      Text('直接粘贴老师发来的文字，或从相册选择截图。小伴会把一段内容拆成多项作业。')
-        .width('100%')
-        .fontSize(13)
-        .lineHeight(20)
-        .fontColor(AppTheme.SUBTEXT);
+    Column({ space: 14 }) {
+      Column({ space: 5 }) {
+        Text('老师原始内容')
+          .width('100%')
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Text('粘贴文字，或从相册选择截图。小伴会先整理，再由家长确认。')
+          .width('100%')
+          .fontSize(13)
+          .lineHeight(20)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start);
 
       TextArea({
-        placeholder: '例如：\n1. 语文背诵第12课\n2. 语文完成练习册P35\n3. 数学口算20题\n4. 数学练习册P32\n5. 英语听读U4，明天检查',
+        placeholder: '例如：\n1. 语文背诵第12课\n2. 语文完成练习册P35\n3. 数学口算20题\n4. 英语听读U4，明天检查',
         text: this.textDraft
       })
         .width('100%')
-        .height(190)
+        .height(196)
         .fontSize(15)
         .lineHeight(22)
-        .backgroundColor('#F7F8FA')
-        .borderRadius(14)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => {
           this.textDraft = value;
         });
 
-      Button(this.parseBusy ? '正在整理…' : '智能整理作业')
+      Button(this.parseBusy ? '正在整理…' : '智能整理作业', { type: ButtonType.Normal })
         .width('100%')
-        .height(48)
+        .height(AppTheme.BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
         .enabled(!this.parseBusy)
+        .fontSize(15)
+        .fontWeight(FontWeight.Medium)
         .backgroundColor(AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
         .onClick(() => this.parseTypedText());
 
-      Row() {
-        Blank();
-        Text('或者').fontSize(12).fontColor(AppTheme.SUBTEXT);
-        Blank();
+      Row({ space: 10 }) {
+        Divider().layoutWeight(1).color(AppTheme.DIVIDER);
+        Text('或者').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+        Divider().layoutWeight(1).color(AppTheme.DIVIDER);
       }
       .width('100%');
 
-      Button(this.parseBusy ? '正在识别…' : '从相册选择作业截图')
+      Button(this.parseBusy ? '正在识别…' : '从相册选择作业截图', { type: ButtonType.Normal })
         .width('100%')
-        .height(44)
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
         .enabled(!this.parseBusy)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .fontColor(AppTheme.PRIMARY)
         .onClick(() => this.selectScreenshot());
 
       if (this.rawImport().sourceLabel.length > 0 && this.rawImport().rawText.length > 0) {
-        Text('最近来源：' + this.rawImport().sourceLabel)
+        Text('最近来源 · ' + this.rawImport().sourceLabel)
           .width('100%')
-          .fontSize(12)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontColor(AppTheme.TERTIARY_TEXT);
       }
 
-      if (this.parseMessage.length > 0) {
-        Text(this.parseMessage)
-          .width('100%')
-          .fontSize(12)
-          .fontColor(this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS);
-      }
+      this.FeedbackBanner();
 
       if (this.sizeClass === WindowSizeClass.COMPACT && this.candidates().length > 0) {
-        Button('查看整理结果')
+        Button(`查看整理结果 · ${this.candidates().length} 项`, { type: ButtonType.Normal })
           .width('100%')
-          .height(44)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .fontColor(AppTheme.PRIMARY)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
           .onClick(() => this.showCompactCandidates = true);
       }
     }
     .width('100%')
-    .padding(18)
+    .padding(AppTheme.CARD_PADDING)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(18)
-    .border({ width: 1, color: AppTheme.BORDER });
+    .borderRadius(AppTheme.CARD_RADIUS);
   }
 
   @Builder
   private CandidatePane() {
-    Column({ space: 10 }) {
+    Column({ space: AppTheme.ITEM_GAP }) {
       if (this.sizeClass === WindowSizeClass.COMPACT) {
         Text('‹ 返回原始内容')
           .width('100%')
@@ -187,52 +216,83 @@ export struct HomeworkImportPage {
       }
 
       Row() {
-        Text('整理结果').fontSize(20).fontWeight(FontWeight.Bold);
+        Text('整理结果')
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
         Blank();
-        Text(`${this.candidates().length} 项`).fontSize(13).fontColor(AppTheme.SUCCESS);
+        Text(`${this.candidates().length} 项`)
+          .fontSize(13)
+          .fontColor(this.candidates().length > 0 ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
       }
       .width('100%');
 
       if (this.candidates().length === 0) {
-        Text('还没有待确认作业。粘贴老师文字并点“智能整理作业”，或选择一张作业截图。')
-          .width('100%')
-          .padding(16)
-          .fontSize(14)
-          .fontColor(AppTheme.SUBTEXT)
-          .backgroundColor('#F7F8FA')
-          .borderRadius(14);
+        Column({ space: 8 }) {
+          SymbolGlyph($r('sys.symbol.checkmark_square'))
+            .fontSize(26)
+            .fontColor([AppTheme.TERTIARY_TEXT]);
+          Text('还没有待确认作业')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('整理老师文字或截图后，结果会显示在这里。')
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT)
+            .textAlign(TextAlign.Center);
+        }
+        .width('100%')
+        .padding(24)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       } else {
         ForEach(this.candidates(), (item: CandidateAssignment) => {
-          Column({ space: 8 }) {
+          Column({ space: 10 }) {
             Row() {
-              Text(item.subject).fontSize(12).fontColor(AppTheme.PRIMARY);
+              Text(item.subject)
+                .fontSize(AppTheme.CAPTION_SIZE)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.PRIMARY)
+                .padding({ left: 9, right: 9, top: 5, bottom: 5 })
+                .backgroundColor(AppTheme.PRIMARY_SOFT)
+                .borderRadius(AppTheme.CHIP_RADIUS);
               Blank();
-              Text(item.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
+              Text(item.dueText).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
             }
             .width('100%');
-            Text(item.title).width('100%').fontSize(16).fontWeight(FontWeight.Medium);
-            Text('原文：' + item.sourceEvidence.excerpt)
+            Text(item.title)
               .width('100%')
-              .fontSize(12)
+              .fontSize(AppTheme.CARD_TITLE_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text('原文 · ' + item.sourceEvidence.excerpt)
+              .width('100%')
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(18)
               .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT)
-              .backgroundColor(item.confidence < 0.8 ? '#FFF7E6' : '#F7F8FA')
-              .padding(10)
-              .borderRadius(10);
+              .backgroundColor(item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE_SUBTLE)
+              .padding(11)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
             if (item.confidence < 0.8) {
-              Text('识别置信度较低，请家长重点确认').fontSize(12).fontColor(AppTheme.WARNING);
+              Text('识别置信度较低，请重点确认')
+                .fontSize(AppTheme.CAPTION_SIZE)
+                .fontColor(AppTheme.WARNING);
             }
           }
           .width('100%')
-          .padding(14)
+          .padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.SURFACE)
-          .borderRadius(14)
-          .border({ width: 1, color: AppTheme.BORDER });
+          .borderRadius(AppTheme.CARD_RADIUS);
         }, (item: CandidateAssignment) => item.id);
 
-        Button('确认这些作业')
+        Button('确认这些作业', { type: ButtonType.Normal })
           .width('100%')
-          .height(48)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .fontSize(15)
+          .fontWeight(FontWeight.Medium)
           .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
           .onClick(() => this.onOpenConfirmation());
       }
     }
@@ -241,16 +301,21 @@ export struct HomeworkImportPage {
 
   build() {
     Scroll() {
-      Column({ space: 16 }) {
-        Column({ space: 4 }) {
-          Text('收作业').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('粘贴老师文字或选择截图 → 智能拆分 → 家长确认').fontSize(13).fontColor(AppTheme.SUBTEXT);
+      Column({ space: AppTheme.SECTION_GAP }) {
+        Column({ space: 5 }) {
+          Text('收作业')
+            .fontSize(AppTheme.PAGE_TITLE_SIZE)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
+          Text('老师内容 → 智能整理 → 家长确认')
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);
 
         if (this.sizeClass === WindowSizeClass.EXPANDED) {
-          Row({ space: 18 }) {
+          Row({ space: 20 }) {
             Column() { this.SourcePane(); }.width('45%');
             Column() { this.CandidatePane(); }.layoutWeight(1);
           }
@@ -268,7 +333,7 @@ export struct HomeworkImportPage {
         }
       }
       .width('100%')
-      .padding(20);
+      .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING);
     }
     .width('100%')
     .height('100%')
