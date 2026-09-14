@@ -1,32 +1,25 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { Assignment, AssignmentStatus } from '../../domain/model/HomeworkModels';
+import { Assignment } from '../../domain/model/HomeworkModels';
+import { AssignmentStateMachine } from '../../domain/service/AssignmentStateMachine';
 
 @Component
 export struct AssignmentCard {
   @Prop assignment: Assignment;
 
   private statusLabel(): string {
-    switch (this.assignment.status) {
-      case AssignmentStatus.IN_PROGRESS:
-        return '进行中';
-      case AssignmentStatus.SUBMITTED:
-        return '已提交';
-      case AssignmentStatus.COMPLETED:
-        return '已完成';
-      case AssignmentStatus.OVERDUE:
-        return '已超时';
-      default:
-        return '未开始';
-    }
+    return AssignmentStateMachine.label(this.assignment.status);
   }
 
   private statusColor(): string {
     switch (this.assignment.status) {
-      case AssignmentStatus.IN_PROGRESS:
+      case 'IN_PROGRESS':
+      case 'READY_TO_SUBMIT':
         return AppTheme.WARNING;
-      case AssignmentStatus.COMPLETED:
+      case 'SUBMITTED':
+      case 'COMPLETED':
         return AppTheme.SUCCESS;
-      case AssignmentStatus.OVERDUE:
+      case 'NEEDS_REWORK':
+      case 'OVERDUE':
         return AppTheme.DANGER;
       default:
         return AppTheme.SUBTEXT;
