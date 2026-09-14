@@ -1,12 +1,23 @@
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
-import { MockData } from '../../../data/MockData';
-import { Assignment } from '../../../domain/model/HomeworkModels';
+import { HomeworkStore } from '../../../data/HomeworkStore';
+import { Assignment, DashboardSummary } from '../../../domain/model/HomeworkModels';
 
 @Component
 export struct ParentDashboardPage {
   @Prop sizeClass: WindowSizeClass;
+  @Prop revision: number = 0;
+
+  private dashboard(): DashboardSummary {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getDashboardSummary();
+  }
+
+  private assignments(): Assignment[] {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getAssignments();
+  }
 
   @Builder
   private Kpi(label: string, value: number, color: string) {
@@ -26,23 +37,23 @@ export struct ParentDashboardPage {
     if (this.sizeClass === WindowSizeClass.COMPACT) {
       Column({ space: 10 }) {
         Row({ space: 10 }) {
-          this.Kpi('已完成', MockData.dashboard.completed, AppTheme.SUCCESS);
-          this.Kpi('进行中', MockData.dashboard.inProgress, AppTheme.WARNING);
+          this.Kpi('已完成', this.dashboard().completed, AppTheme.SUCCESS);
+          this.Kpi('进行中', this.dashboard().inProgress, AppTheme.WARNING);
         }
         .width('100%');
         Row({ space: 10 }) {
-          this.Kpi('未开始', MockData.dashboard.notStarted, AppTheme.SUBTEXT);
-          this.Kpi('超时', MockData.dashboard.overdue, AppTheme.DANGER);
+          this.Kpi('未开始', this.dashboard().notStarted, AppTheme.SUBTEXT);
+          this.Kpi('已提交', this.dashboard().submitted, AppTheme.SUCCESS);
         }
         .width('100%');
       }
       .width('100%');
     } else {
       Row({ space: 10 }) {
-        this.Kpi('已完成', MockData.dashboard.completed, AppTheme.SUCCESS);
-        this.Kpi('进行中', MockData.dashboard.inProgress, AppTheme.WARNING);
-        this.Kpi('未开始', MockData.dashboard.notStarted, AppTheme.SUBTEXT);
-        this.Kpi('超时', MockData.dashboard.overdue, AppTheme.DANGER);
+        this.Kpi('已完成', this.dashboard().completed, AppTheme.SUCCESS);
+        this.Kpi('进行中', this.dashboard().inProgress, AppTheme.WARNING);
+        this.Kpi('未开始', this.dashboard().notStarted, AppTheme.SUBTEXT);
+        this.Kpi('已提交', this.dashboard().submitted, AppTheme.SUCCESS);
       }
       .width('100%');
     }
@@ -51,8 +62,8 @@ export struct ParentDashboardPage {
   @Builder
   private AssignmentProgress() {
     Column({ space: 10 }) {
-      Text('今日作业').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
-      ForEach(MockData.assignments.slice(0, 3), (item: Assignment) => {
+      Text('全部作业').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
+      ForEach(this.assignments(), (item: Assignment) => {
         AssignmentCard({ assignment: item });
       }, (item: Assignment) => item.id);
     }
@@ -63,14 +74,28 @@ export struct ParentDashboardPage {
   private Attention() {
     Column({ space: 10 }) {
       Text('需要关注').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
-      Text('数学今天用时比近几天偏长，目前仍在正常截止时间内。')
-        .width('100%')
-        .fontSize(14)
-        .fontColor(AppTheme.SUBTEXT);
-      Text('AI Tutor 当前可用；没有需要家长立即介入的异常。')
+      if (this.dashboard().overdue > 0) {
+        Text(`有 ${this.dashboard().overdue} 项作业已超时，建议优先处理。`)
+          .width('100%')
+          .fontSize(14)
+          .fontColor(AppTheme.DANGER);
+      }
+      if (this.dashboard().readyToSubmit > 0) {
+        Text(`有 ${this.dashboard().readyToSubmit} 项已经做完，等待学生提交。`)
+          .width('100%')
+          .fontSize(14)
+          .fontColor(AppTheme.WARNING);
+      }
+      if (this.dashboard().needsRework > 0) {
+        Text(`有 ${this.dashboard().needsRework} 项需要重做。`)
+          .width('100%')
+          .fontSize(14)
+          .fontColor(AppTheme.DANGER);
+      }
+      Text('所有统计都直接来自统一 Assignment 状态，不再维护页面级重复计数。')
         .width('100%')
         .fontSize(13)
-        .fontColor(AppTheme.SUCCESS);
+        .fontColor(AppTheme.SUBTEXT);
     }
     .width('100%')
     .padding(18)
@@ -84,7 +109,7 @@ export struct ParentDashboardPage {
       Column({ space: 16 }) {
         Column({ space: 4 }) {
           Text('小宇今天的学习').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('最后同步：刚刚').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('状态来自本地 HomeworkStore · 刚刚更新').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);
