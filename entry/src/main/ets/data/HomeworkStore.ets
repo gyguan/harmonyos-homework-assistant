@@ -222,6 +222,15 @@ export class HomeworkStore {
     return -1;
   }
 
+  private candidateIndex(candidateId: string): number {
+    for (let i = 0; i < this.candidates.length; i++) {
+      if (this.candidates[i].id === candidateId) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   private hasAssignmentForCandidate(candidateId: string): boolean {
     if (candidateId.length === 0) {
       return false;
@@ -304,26 +313,44 @@ export class HomeworkStore {
     this.requestPersist();
   }
 
-  updateCandidateTitle(candidateId: string, title: string): boolean {
-    for (let candidate of this.candidates) {
-      if (candidate.id === candidateId) {
-        candidate.title = title;
-        this.requestPersist();
-        return true;
-      }
+  updateCandidate(candidate: CandidateAssignment): boolean {
+    let index = this.candidateIndex(candidate.id);
+    if (index < 0) {
+      return false;
     }
-    return false;
+    this.candidates[index] = this.cloneCandidate(candidate);
+    this.requestPersist();
+    return true;
+  }
+
+  addCandidate(candidate: CandidateAssignment): boolean {
+    if (this.candidateIndex(candidate.id) >= 0 || this.hasAssignmentForCandidate(candidate.id)) {
+      return false;
+    }
+    this.candidates.push(this.cloneCandidate(candidate));
+    this.requestPersist();
+    return true;
+  }
+
+  updateCandidateTitle(candidateId: string, title: string): boolean {
+    let index = this.candidateIndex(candidateId);
+    if (index < 0) {
+      return false;
+    }
+    this.candidates[index].title = title;
+    this.candidates[index].instruction = title;
+    this.requestPersist();
+    return true;
   }
 
   removeCandidate(candidateId: string): boolean {
-    for (let i = 0; i < this.candidates.length; i++) {
-      if (this.candidates[i].id === candidateId) {
-        this.candidates.splice(i, 1);
-        this.requestPersist();
-        return true;
-      }
+    let index = this.candidateIndex(candidateId);
+    if (index < 0) {
+      return false;
     }
-    return false;
+    this.candidates.splice(index, 1);
+    this.requestPersist();
+    return true;
   }
 
   publishCandidates(): number {
