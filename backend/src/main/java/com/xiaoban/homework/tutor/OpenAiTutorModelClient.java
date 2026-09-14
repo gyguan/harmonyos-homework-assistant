@@ -1,7 +1,7 @@
 package com.xiaoban.homework.tutor;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
@@ -17,6 +17,10 @@ public class OpenAiTutorModelClient implements TutorModelClient {
   private final String apiKey;
   private final String model;
   private final RestClient client;
+
+  record OpenAiContent(String type, String text) {}
+  record OpenAiOutput(List<OpenAiContent> content) {}
+  record OpenAiResponse(List<OpenAiOutput> output) {}
 
   public OpenAiTutorModelClient(@Value("${app.tutor.openai.api-key:}") String apiKey,
       @Value("${app.tutor.openai.model:gpt-5.6-luna}") String model,
@@ -40,9 +44,9 @@ public class OpenAiTutorModelClient implements TutorModelClient {
       body.put("instructions", request.instructions());
       body.put("input", request.input());
       body.put("max_output_tokens", 700);
-      JsonNode response = client.post().uri("/v1/responses")
+      OpenAiResponse response = client.post().uri("/v1/responses")
           .header(HttpHeaders.AUTHORIZATION, "Bearer " + apiKey)
-          .body(body).retrieve().body(JsonNode.class);
+          .body(body).retrieve().body(OpenAiResponse.class);
       return extractText(response);
     } catch (Exception error) {
       log.warn("Tutor model request failed: {}", error.getMessage());
@@ -50,12 +54,13 @@ public class OpenAiTutorModelClient implements TutorModelClient {
     }
   }
 
-  static Optional<String> extractText(JsonNode response) {
-    if (response == null) return Optional.empty();
-    for (JsonNode item : response.path("output")) {
-      for (JsonNode content : item.path("content")) {
-        if ("output_text".equals(content.path("type").asText())) {
-          String text = content.path("text").asText("").trim();
+  static Optional<String> extractText(OpenAiResponse response) {
+    if (response == null || response.output() == null) return Optional.empty();
+    for (OpenAiOutput item : response.output()) {
+      if (item == null || item.content() == null) continue;
+      for (OpenAiContent content : item.content()) {
+        if (content != null && "output_text".equals(content.type()) && content.text() != null) {
+          String text = content.text().trim();
           if (!text.isEmpty()) return Optional.of(text);
         }
       }
