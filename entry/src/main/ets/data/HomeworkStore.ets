@@ -17,7 +17,7 @@ import { HomeworkSnapshot } from '../domain/model/PersistenceModels';
 import { HomeworkPersistence } from '../domain/port/HomeworkPersistence';
 import { AssignmentStateMachine } from '../domain/service/AssignmentStateMachine';
 
-const SNAPSHOT_SCHEMA_VERSION: number = 2;
+const SNAPSHOT_SCHEMA_VERSION: number = 3;
 
 export class HomeworkStore {
   static readonly instance: HomeworkStore = new HomeworkStore();
@@ -199,6 +199,7 @@ export class HomeworkStore {
       id: source.id,
       assignmentId: source.assignmentId,
       type: source.type,
+      photoUris: source.photoUris.slice(),
       fileLabel: source.fileLabel,
       submittedAtText: source.submittedAtText
     };
@@ -409,16 +410,20 @@ export class HomeworkStore {
     return this.transitionAssignment(assignmentId, AssignmentStatus.READY_TO_SUBMIT);
   }
 
-  submitMockImage(assignmentId: string): boolean {
+  submitImages(assignmentId: string, photoUris: string[], submittedAtText: string): boolean {
+    if (photoUris.length === 0 || photoUris.length > 6) {
+      return false;
+    }
     if (!this.transitionAssignment(assignmentId, AssignmentStatus.SUBMITTED)) {
       return false;
     }
     let submission: Submission = {
       id: `submission-${this.submissionSequence}`,
       assignmentId: assignmentId,
-      type: SubmissionType.MOCK_IMAGE,
-      fileLabel: '作业照片 1 张（Mock）',
-      submittedAtText: '刚刚'
+      type: SubmissionType.IMAGE,
+      photoUris: photoUris.slice(),
+      fileLabel: `${photoUris.length} 张作业照片`,
+      submittedAtText: submittedAtText
     };
     this.submissionSequence++;
     this.submissions.push(submission);
