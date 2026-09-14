@@ -3,6 +3,7 @@ import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
 import { PageStateView } from '../components/state/PageStateView';
 import { HomeworkStore } from '../data/HomeworkStore';
+import { StudentProfile } from '../domain/model/HomeworkModels';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
 import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage';
@@ -52,6 +53,27 @@ export struct AppShell {
     this.storeRevision++;
   }
 
+  private switchStudent(): void {
+    let students: StudentProfile[] = HomeworkStore.instance.getStudents();
+    if (students.length <= 1) {
+      return;
+    }
+    let activeId = HomeworkStore.instance.getActiveStudentId();
+    let activeIndex = -1;
+    for (let i = 0; i < students.length; i++) {
+      if (students[i].id === activeId) {
+        activeIndex = i;
+        break;
+      }
+    }
+    let nextIndex = activeIndex < 0 || activeIndex + 1 >= students.length ? 0 : activeIndex + 1;
+    if (HomeworkStore.instance.setActiveStudent(students[nextIndex].id)) {
+      this.selectedAssignmentId = '';
+      this.studentRoute = StudentRoute.TODAY;
+      this.touchStore();
+    }
+  }
+
   private openStudy(assignmentId: string): void {
     HomeworkStore.instance.startAssignment(assignmentId);
     this.selectedAssignmentId = assignmentId;
@@ -92,7 +114,8 @@ export struct AppShell {
         HomeworkImportPage({
           sizeClass: this.sizeClass,
           revision: this.storeRevision,
-          onOpenConfirmation: () => this.parentRoute = ParentRoute.CONFIRMATION
+          onOpenConfirmation: () => this.parentRoute = ParentRoute.CONFIRMATION,
+          onStoreChanged: () => this.touchStore()
         });
       } else if (this.parentRoute === ParentRoute.CONFIRMATION) {
         HomeworkConfirmationPage({
@@ -129,6 +152,17 @@ export struct AppShell {
   }
 
   @Builder
+  private ChildChip() {
+    Text(`${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
+      .fontSize(12)
+      .fontColor(AppTheme.PRIMARY)
+      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+      .backgroundColor(AppTheme.PRIMARY_SOFT)
+      .borderRadius(12)
+      .onClick(() => this.switchStudent());
+  }
+
+  @Builder
   private RoleSwitch() {
     Row({ space: 8 }) {
       Text(this.role === AppRole.STUDENT ? '学生模式' : '家长模式')
@@ -136,11 +170,14 @@ export struct AppShell {
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Blank();
-      this.ScenarioChip();
+      this.ChildChip();
+      if (this.widthVp > 420) {
+        this.ScenarioChip();
+      }
       Text(this.role === AppRole.STUDENT ? '切换家长' : '切换学生')
         .fontSize(13)
         .fontColor(AppTheme.PRIMARY)
-        .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+        .padding({ left: 10, right: 10, top: 8, bottom: 8 })
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .borderRadius(14)
         .onClick(() => {
@@ -216,14 +253,21 @@ export struct AppShell {
       }
 
       Blank();
-      Text(DemoScenarioHelper.label(this.demoScenario))
+      Text(HomeworkStore.instance.getStudent().name)
         .width(66)
-        .fontSize(10)
+        .fontSize(11)
+        .fontWeight(FontWeight.Medium)
         .textAlign(TextAlign.Center)
         .fontColor(AppTheme.PRIMARY)
         .padding({ top: 7, bottom: 7 })
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .borderRadius(10)
+        .onClick(() => this.switchStudent());
+      Text(DemoScenarioHelper.label(this.demoScenario))
+        .width(66)
+        .fontSize(10)
+        .textAlign(TextAlign.Center)
+        .fontColor(AppTheme.SUBTEXT)
         .onClick(() => this.nextDemoScenario());
       Text(this.role === AppRole.STUDENT ? '家长' : '学生')
         .fontSize(12)
