@@ -15,7 +15,7 @@ export enum Subject {
 }
 
 export enum SubmissionType {
-  MOCK_IMAGE = 'MOCK_IMAGE'
+  IMAGE = 'IMAGE'
 }
 
 export enum HomeworkImportSourceKind {
@@ -79,6 +79,7 @@ export interface Submission {
   id: string;
   assignmentId: string;
   type: SubmissionType;
+  photoUris: string[];
   fileLabel: string;
   submittedAtText: string;
 }
