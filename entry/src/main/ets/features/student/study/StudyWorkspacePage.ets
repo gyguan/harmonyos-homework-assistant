@@ -176,6 +176,10 @@ export struct StudyWorkspacePage {
         Text('提交作业照片').width('100%').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         if (this.submissionPhotoUris.length > 0) {
           this.PhotoStrip(this.submissionPhotoUris, true);
+          Button('重新选择照片', { type: ButtonType.Normal })
+            .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.submittingPhotos).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+            .onClick(() => { void this.selectSubmissionPhotos(); });
         }
         Text(this.submissionPhotoUris.length === 0 ? '从系统相册选择已经拍好的作业照片，最多 6 张。' : '请确认照片清晰、完整，页数和顺序无误。')
           .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
