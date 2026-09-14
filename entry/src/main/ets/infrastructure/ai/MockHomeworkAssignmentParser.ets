@@ -9,8 +9,6 @@ export class MockHomeworkAssignmentParser implements HomeworkAssignmentParser {
     for (let candidate of MockData.candidates) {
       result.push({
         id: candidate.id,
-        familyId: input.familyId,
-        studentId: candidate.studentId,
         subject: candidate.subject,
         title: candidate.title,
         instruction: candidate.instruction,
