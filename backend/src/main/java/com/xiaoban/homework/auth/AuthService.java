@@ -1,6 +1,7 @@
 package com.xiaoban.homework.auth;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,15 @@ public class AuthService {
     if (!passwordEncoder.matches(request.password(), account.passwordHash)) {
       throw new ApiExceptions.Unauthorized("账号或密码错误");
     }
-    return new LoginResponse(tokens.issue(account.familyId), account.displayName, account.familyId.toString());
+    return new LoginResponse(tokens.issue(account.id, account.familyId), account.displayName, account.familyId.toString());
   }
+
+  public SessionResponse session(UUID accountId, UUID familyId) {
+    AccountEntity account = accounts.findById(accountId)
+        .orElseThrow(() -> new ApiExceptions.Unauthorized("登录状态已失效，请重新登录"));
+    if (!familyId.equals(account.familyId)) throw new ApiExceptions.Unauthorized("登录状态无效");
+    return new SessionResponse(account.displayName);
+  }
+
+  public record SessionResponse(String displayName) {}
 }

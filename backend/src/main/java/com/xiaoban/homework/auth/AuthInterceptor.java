@@ -8,6 +8,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @Component
 public class AuthInterceptor implements HandlerInterceptor {
   public static final String FAMILY_ID = "familyId";
+  public static final String ACCOUNT_ID = "accountId";
+  public static final String AUTH_TOKEN = "authToken";
   private final AuthTokenService tokens;
   public AuthInterceptor(AuthTokenService tokens) { this.tokens = tokens; }
 
@@ -15,7 +17,10 @@ public class AuthInterceptor implements HandlerInterceptor {
   public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
     String header = request.getHeader("Authorization");
     String token = header != null && header.startsWith("Bearer ") ? header.substring(7) : null;
-    request.setAttribute(FAMILY_ID, tokens.requireFamily(token));
+    AuthTokenService.SessionInfo session = tokens.requireSession(token);
+    request.setAttribute(FAMILY_ID, session.familyId());
+    request.setAttribute(ACCOUNT_ID, session.accountId());
+    request.setAttribute(AUTH_TOKEN, token);
     return true;
   }
 }

@@ -6,4 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface AssignmentRepository extends JpaRepository<AssignmentEntity, String> {
   List<AssignmentEntity> findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(UUID familyId, String studentId);
+  boolean existsByFamilyIdAndStudentId(UUID familyId, String studentId);
 }
