@@ -15,6 +15,7 @@ export struct StudyWorkspacePage {
   @State private compactTutorOpen: boolean = false;
   @State private submissionPhotoUris: string[] = [];
   @State private selectingPhotos: boolean = false;
+  @State private submittingPhotos: boolean = false;
   @State private submissionMessage: string = '';
   onBack: () => void = () => {};
   onStoreChanged: () => void = () => {};
@@ -50,6 +51,9 @@ export struct StudyWorkspacePage {
         if (this.selectingPhotos) {
           return '正在打开相册…';
         }
+        if (this.submittingPhotos) {
+          return '正在保存并提交…';
+        }
         return this.submissionPhotoUris.length === 0 ? '选择作业照片' : `确认提交 ${this.submissionPhotoUris.length} 张照片`;
       case AssignmentStatus.SUBMITTED:
         return '已提交';
@@ -62,7 +66,7 @@ export struct StudyWorkspacePage {
 
   private primaryActionEnabled(): boolean {
     let assignment = this.assignment();
-    if (assignment === null || this.selectingPhotos) {
+    if (assignment === null || this.selectingPhotos || this.submittingPhotos) {
       return false;
     }
     return assignment.status !== AssignmentStatus.SUBMITTED && assignment.status !== AssignmentStatus.COMPLETED;
@@ -85,11 +89,8 @@ export struct StudyWorkspacePage {
         void this.selectSubmissionPhotos();
         return;
       }
-      changed = HomeworkSubmissionService.instance.submit(assignment.id, this.submissionPhotoUris);
-      if (changed) {
-        this.submissionPhotoUris = [];
-        this.submissionMessage = '作业照片已提交';
-      }
+      void this.submitSelectedPhotos(assignment.id);
+      return;
     }
     if (changed) {
       this.onStoreChanged();
@@ -97,7 +98,7 @@ export struct StudyWorkspacePage {
   }
 
   private async selectSubmissionPhotos(): Promise<void> {
-    if (this.selectingPhotos) {
+    if (this.selectingPhotos || this.submittingPhotos) {
       return;
     }
     this.selectingPhotos = true;
@@ -110,6 +111,28 @@ export struct StudyWorkspacePage {
     }
     this.submissionPhotoUris = selected;
     this.submissionMessage = `已选择 ${selected.length} 张，请确认后提交`;
+  }
+
+  private async submitSelectedPhotos(assignmentId: string): Promise<void> {
+    if (this.submittingPhotos || this.submissionPhotoUris.length === 0) {
+      return;
+    }
+    this.submittingPhotos = true;
+    this.submissionMessage = '正在把照片保存到本地…';
+    try {
+      let submitted = await HomeworkSubmissionService.instance.submit(assignmentId, this.submissionPhotoUris);
+      if (!submitted) {
+        this.submissionMessage = '提交失败，请确认作业状态后重试';
+        return;
+      }
+      this.submissionPhotoUris = [];
+      this.submissionMessage = '作业照片已提交';
+      this.onStoreChanged();
+    } catch {
+      this.submissionMessage = '照片保存失败，请重新选择后再试';
+    } finally {
+      this.submittingPhotos = false;
+    }
   }
 
   private removeSubmissionPhoto(uri: string): void {
@@ -172,6 +195,7 @@ export struct StudyWorkspacePage {
           Button('重新选择照片')
             .width('100%')
             .height(38)
+            .enabled(!this.submittingPhotos)
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
             .onClick(() => { void this.selectSubmissionPhotos(); });
@@ -199,13 +223,12 @@ export struct StudyWorkspacePage {
   @Builder
   private SavedSubmissionPane() {
     if (this.submissions().length > 0) {
-      let submission = this.submissions()[0];
       Column({ space: 8 }) {
-        Text(`已提交：${submission.fileLabel} · ${submission.submittedAtText}`)
+        Text(`已提交：${this.submissions()[0].fileLabel} · ${this.submissions()[0].submittedAtText}`)
           .width('100%')
           .fontSize(13)
           .fontColor(AppTheme.SUCCESS);
-        this.PhotoStrip(submission.photoUris, false);
+        this.PhotoStrip(this.submissions()[0].photoUris, false);
       }
       .width('100%')
       .padding(12)
