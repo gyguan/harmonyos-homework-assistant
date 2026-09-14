@@ -4,6 +4,10 @@ import { AppShell } from './AppShell';
 @Component
 struct Index {
   build() {
-    AppShell();
+    Stack() {
+      AppShell();
+    }
+    .width('100%')
+    .height('100%')
   }
 }
