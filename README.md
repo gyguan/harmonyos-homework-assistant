@@ -30,3 +30,7 @@
 `python scripts/validate_harmony_project.py`
 
 该 Gate 会检查 SDK 基线、Hvigor 插件、统一响应式断点、Phone/Tablet 声明、Navigation 根结构以及 API 26+ 能力误用等关键工程约束。
+
+## Current implementation status
+
+Issue #2 / PR #3 已完成工程骨架、首批四个 Mock 页面、响应式 Shell、失败态复现与静态 Gate。PR 仍保持 Draft，等待 DevEco Studio 本地编译、Previewer / 模拟器和软键盘 / 分屏验证后再进入合并评审。
