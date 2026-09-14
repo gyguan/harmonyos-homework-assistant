@@ -1,27 +1,32 @@
 import { MockData } from './MockData';
 import {
+  AppSettings,
   Assignment,
   AssignmentProgress,
   AssignmentStatus,
   CandidateAssignment,
   DashboardSummary,
   RawHomeworkImport,
+  StudentProfile,
   Submission,
   SubmissionType,
-  TodaySummary
+  TodaySummary,
+  TutorSession
 } from '../domain/model/HomeworkModels';
 import { HomeworkSnapshot } from '../domain/model/PersistenceModels';
 import { HomeworkPersistence } from '../domain/port/HomeworkPersistence';
 import { AssignmentStateMachine } from '../domain/service/AssignmentStateMachine';
 
-const SNAPSHOT_SCHEMA_VERSION: number = 1;
+const SNAPSHOT_SCHEMA_VERSION: number = 2;
 
 export class HomeworkStore {
   static readonly instance: HomeworkStore = new HomeworkStore();
 
+  private settings: AppSettings = MockData.settings;
   private assignments: Assignment[] = [];
   private candidates: CandidateAssignment[] = [];
   private submissions: Submission[] = [];
+  private tutorSessions: TutorSession[] = [];
   private readonly rawImport: RawHomeworkImport = MockData.rawImport;
   private submissionSequence: number = 1;
   private persistence: HomeworkPersistence | null = null;
@@ -39,13 +44,16 @@ export class HomeworkStore {
       this.restoreSnapshot(snapshot);
       return;
     }
+    this.seedFromMockData();
     await persistence.save(this.createSnapshot());
   }
 
   private seedFromMockData(): void {
+    this.settings = this.cloneSettings(MockData.settings);
     this.assignments = [];
     this.candidates = [];
     this.submissions = [];
+    this.tutorSessions = [];
     this.submissionSequence = 1;
     for (let assignment of MockData.assignments) {
       this.assignments.push(this.cloneAssignment(assignment));
@@ -56,9 +64,11 @@ export class HomeworkStore {
   }
 
   private restoreSnapshot(snapshot: HomeworkSnapshot): void {
+    this.settings = this.cloneSettings(snapshot.settings);
     this.assignments = [];
     this.candidates = [];
     this.submissions = [];
+    this.tutorSessions = [];
     for (let assignment of snapshot.assignments) {
       this.assignments.push(this.cloneAssignment(assignment));
     }
@@ -68,6 +78,9 @@ export class HomeworkStore {
     for (let submission of snapshot.submissions) {
       this.submissions.push(this.cloneSubmission(submission));
     }
+    for (let session of snapshot.tutorSessions) {
+      this.tutorSessions.push(this.cloneTutorSession(session));
+    }
     this.submissionSequence = snapshot.submissionSequence > 0 ? snapshot.submissionSequence : 1;
   }
 
@@ -75,6 +88,7 @@ export class HomeworkStore {
     let assignmentCopies: Assignment[] = [];
     let candidateCopies: CandidateAssignment[] = [];
     let submissionCopies: Submission[] = [];
+    let tutorSessionCopies: TutorSession[] = [];
     for (let assignment of this.assignments) {
       assignmentCopies.push(this.cloneAssignment(assignment));
     }
@@ -84,11 +98,16 @@ export class HomeworkStore {
     for (let submission of this.submissions) {
       submissionCopies.push(this.cloneSubmission(submission));
     }
+    for (let session of this.tutorSessions) {
+      tutorSessionCopies.push(this.cloneTutorSession(session));
+    }
     return {
       schemaVersion: SNAPSHOT_SCHEMA_VERSION,
+      settings: this.cloneSettings(this.settings),
       assignments: assignmentCopies,
       candidates: candidateCopies,
       submissions: submissionCopies,
+      tutorSessions: tutorSessionCopies,
       submissionSequence: this.submissionSequence
     };
   }
@@ -116,11 +135,27 @@ export class HomeworkStore {
     this.persistRunning = false;
   }
 
+  private cloneStudent(source: StudentProfile): StudentProfile {
+    return {
+      id: source.id,
+      name: source.name,
+      grade: source.grade,
+      semester: source.semester,
+      textbookSummary: source.textbookSummary
+    };
+  }
+
+  private cloneSettings(source: AppSettings): AppSettings {
+    return {
+      student: this.cloneStudent(source.student),
+      tutorGuidanceFirst: source.tutorGuidanceFirst,
+      directAnswerAllowed: source.directAnswerAllowed
+    };
+  }
+
   private cloneAssignment(source: Assignment): Assignment {
     return {
       id: source.id,
-      familyId: source.familyId,
-      studentId: source.studentId,
       candidateId: source.candidateId,
       subject: source.subject,
       title: source.title,
@@ -135,8 +170,6 @@ export class HomeworkStore {
   private cloneCandidate(source: CandidateAssignment): CandidateAssignment {
     return {
       id: source.id,
-      familyId: source.familyId,
-      studentId: source.studentId,
       subject: source.subject,
       title: source.title,
       instruction: source.instruction,
@@ -160,6 +193,15 @@ export class HomeworkStore {
     };
   }
 
+  private cloneTutorSession(source: TutorSession): TutorSession {
+    return {
+      id: source.id,
+      assignmentId: source.assignmentId,
+      startedAtText: source.startedAtText,
+      questionCount: source.questionCount
+    };
+  }
+
   private assignmentIndex(assignmentId: string): number {
     for (let i = 0; i < this.assignments.length; i++) {
       if (this.assignments[i].id === assignmentId) {
@@ -179,6 +221,14 @@ export class HomeworkStore {
       }
     }
     return false;
+  }
+
+  getSettings(): AppSettings {
+    return this.settings;
+  }
+
+  getStudent(): StudentProfile {
+    return this.settings.student;
   }
 
   getRawImport(): RawHomeworkImport {
@@ -269,8 +319,6 @@ export class HomeworkStore {
       }
       let assignment: Assignment = {
         id: `a-published-${candidate.id}`,
-        familyId: candidate.familyId,
-        studentId: candidate.studentId,
         candidateId: candidate.id,
         subject: candidate.subject,
         title: candidate.title,

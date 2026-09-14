@@ -2,7 +2,7 @@ import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
 import { HomeworkStore } from '../../../data/HomeworkStore';
-import { Assignment, AssignmentStatus, TodaySummary } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, StudentProfile, TodaySummary } from '../../../domain/model/HomeworkModels';
 
 @Component
 export struct StudentTodayPage {
@@ -10,6 +10,11 @@ export struct StudentTodayPage {
   @Prop offlineMode: boolean = false;
   @Prop revision: number = 0;
   onOpenStudy: (assignmentId: string) => void = () => {};
+
+  private student(): StudentProfile {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getStudent();
+  }
 
   private assignments(): Assignment[] {
     let currentRevision = this.revision;
@@ -59,12 +64,12 @@ export struct StudentTodayPage {
   @Builder
   private ProgressHero() {
     Column({ space: 8 }) {
-      Text('今日完成度').fontSize(13).fontColor('#FFFFFFCC');
-      Text(`${this.summary().completed} / ${this.summary().total}`)
-        .fontSize(34)
+      Text('今天').fontSize(13).fontColor('#FFFFFFCC');
+      Text(`${this.summary().completed} / ${this.summary().total} 已完成`)
+        .fontSize(32)
         .fontWeight(FontWeight.Bold)
         .fontColor(Color.White);
-      Text('完成今天的任务后，就可以休息啦')
+      Text('只管完成下一项，小伴会帮你记住其他事情。')
         .fontSize(14)
         .fontColor(Color.White);
       Progress({ value: this.summary().completed, total: this.summary().total, type: ProgressType.Linear })
@@ -118,7 +123,7 @@ export struct StudentTodayPage {
       .border({ width: 1, color: AppTheme.BORDER });
     } else {
       Column({ space: 14 }) {
-        Text('下一项')
+        Text('现在做这个')
           .width('100%')
           .fontSize(14)
           .fontColor(AppTheme.SUBTEXT);
@@ -155,11 +160,11 @@ export struct StudentTodayPage {
       Column({ space: 16 }) {
         Row() {
           Column({ space: 4 }) {
-            Text('晚上好，小宇 👋')
+            Text(`晚上好，${this.student().name} 👋`)
               .fontSize(26)
               .fontWeight(FontWeight.Bold)
               .fontColor(AppTheme.TEXT);
-            Text(`今天共 ${this.summary().total} 项作业`)
+            Text(`${this.student().grade} · ${this.student().semester}`)
               .fontSize(14)
               .fontColor(AppTheme.SUBTEXT);
           }

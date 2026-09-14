@@ -61,6 +61,8 @@ require("Navigation(this.navPathStack)" in app_shell,
         "AppShell must keep Navigation bound to NavPathStack")
 require("ResponsiveContext.resolve(this.widthVp)" in app_shell,
         "AppShell must derive size class from the shared responsive resolver")
+require("this.NavText('教材'" not in app_shell and "this.SideItem('教材'" not in app_shell,
+        "student V0.1 navigation must stay focused on Today / Homework / Me")
 
 require("widthVp <= 600" in responsive and "widthVp <= 840" in responsive,
         "shared responsive breakpoints must remain 600vp / 840vp")
@@ -77,14 +79,21 @@ required_statuses = [
 for status in required_statuses:
     require(status in models, f"missing assignment lifecycle status: {status}")
 
+for core_model in ["StudentProfile", "AppSettings", "CandidateAssignment", "Assignment", "Submission", "TutorSession"]:
+    require(f"interface {core_model}" in models, f"missing simplified V0.1 core model: {core_model}")
+
 require("HomeworkImportSourceKind" in models and "resourceUri" in models,
         "RawHomeworkImport must preserve source kind and resource URI for future OCR/file extraction")
+require("familyId" not in models and "studentId" not in models,
+        "single-family V0.1 domain must not carry tenant/family routing fields")
 require("class AssignmentStateMachine" in state_machine,
         "assignment transitions must be centralized in AssignmentStateMachine")
 require("canTransition" in state_machine,
         "AssignmentStateMachine must reject illegal transitions")
 require("class HomeworkStore" in store and "static readonly instance" in store,
         "HomeworkStore singleton must own the local lifecycle state")
+require("getStudent" in store and "getSettings" in store,
+        "HomeworkStore must own the single-child profile and app settings")
 require("publishCandidates" in store and "submitMockImage" in store,
         "HomeworkStore must support candidate publishing and submission")
 require("AssignmentStateMachine.canTransition" in store,
@@ -126,6 +135,8 @@ require("submitMockImage" in study_workspace,
         "student study workspace must submit through HomeworkStore")
 require("getSubmissionsForAssignment" in progress_page,
         "parent progress must expose submission records")
+require("导入老师作业" in parent_dashboard and "Kpi(" not in parent_dashboard,
+        "parent home must stay a simple family overview, not a management dashboard")
 
 for page_name, page_text in {
     "StudentTodayPage": student_today,
@@ -135,6 +146,8 @@ for page_name, page_text in {
 }.items():
     require("MockData" not in page_text,
             f"{page_name} must read business state through HomeworkStore, not MockData")
+
+forbidden_single_family_fields = ["familyId", "parentId", "guardianId", "organizationId", "classId"]
 
 if ETS_ROOT.exists():
     for file in ETS_ROOT.rglob("*.ets"):
@@ -149,6 +162,9 @@ if ETS_ROOT.exists():
             errors.append(f"ArkData persistence leaked outside infrastructure adapter: {rel}")
         if "/features/" in f"/{rel}" and ("MockHomeworkTextExtractor" in text or "MockHomeworkAssignmentParser" in text):
             errors.append(f"UI page depends on concrete OCR/LLM adapter: {rel}")
+        for field in forbidden_single_family_fields:
+            if field in text:
+                errors.append(f"single-family V0.1 contains unnecessary multi-tenant field {field}: {rel}")
 
 required_scenarios = ["LOADING", "EMPTY", "ERROR", "OFFLINE", "TUTOR_UNAVAILABLE"]
 demo_scenario = read("entry/src/main/ets/common/state/DemoScenario.ets")

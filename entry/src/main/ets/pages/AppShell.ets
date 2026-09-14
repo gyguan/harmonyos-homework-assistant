@@ -110,7 +110,8 @@ export struct AppShell {
       } else {
         ParentDashboardPage({
           sizeClass: this.sizeClass,
-          revision: this.storeRevision
+          revision: this.storeRevision,
+          onOpenImport: () => this.parentRoute = ParentRoute.IMPORT
         });
       }
     }
@@ -130,7 +131,7 @@ export struct AppShell {
   @Builder
   private RoleSwitch() {
     Row({ space: 8 }) {
-      Text(this.role === AppRole.STUDENT ? '学生空间' : '家长空间')
+      Text(this.role === AppRole.STUDENT ? '学生模式' : '家长模式')
         .fontSize(13)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
@@ -158,8 +159,7 @@ export struct AppShell {
     Row() {
       if (this.role === AppRole.STUDENT) {
         this.NavText('今天', this.studentRoute === StudentRoute.TODAY, () => this.studentRoute = StudentRoute.TODAY);
-        this.NavText('学习', this.studentRoute === StudentRoute.STUDY, () => this.studentRoute = StudentRoute.STUDY);
-        this.NavText('教材', false, () => {});
+        this.NavText('作业', this.studentRoute === StudentRoute.STUDY, () => this.studentRoute = StudentRoute.STUDY);
         this.NavText('我的', false, () => {});
       } else {
         this.NavText('首页', this.parentRoute === ParentRoute.DASHBOARD, () => this.parentRoute = ParentRoute.DASHBOARD);
@@ -205,13 +205,14 @@ export struct AppShell {
 
       if (this.role === AppRole.STUDENT) {
         this.SideItem('今天', this.studentRoute === StudentRoute.TODAY, () => this.studentRoute = StudentRoute.TODAY);
-        this.SideItem('学习', this.studentRoute === StudentRoute.STUDY, () => this.studentRoute = StudentRoute.STUDY);
-        this.SideItem('教材', false, () => {});
+        this.SideItem('作业', this.studentRoute === StudentRoute.STUDY, () => this.studentRoute = StudentRoute.STUDY);
+        this.SideItem('我的', false, () => {});
       } else {
         this.SideItem('首页', this.parentRoute === ParentRoute.DASHBOARD, () => this.parentRoute = ParentRoute.DASHBOARD);
         this.SideItem('导入', this.parentRoute === ParentRoute.IMPORT || this.parentRoute === ParentRoute.CONFIRMATION,
           () => this.parentRoute = ParentRoute.IMPORT);
         this.SideItem('进度', this.parentRoute === ParentRoute.PROGRESS, () => this.parentRoute = ParentRoute.PROGRESS);
+        this.SideItem('我的', false, () => {});
       }
 
       Blank();

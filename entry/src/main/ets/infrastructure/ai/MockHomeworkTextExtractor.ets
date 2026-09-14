@@ -6,7 +6,6 @@ export class MockHomeworkTextExtractor implements HomeworkTextExtractor {
   async extract(input: RawHomeworkImport): Promise<ExtractedHomeworkText> {
     return {
       importId: input.id,
-      familyId: input.familyId,
       sourceLabel: input.sourceLabel,
       text: input.rawText
     };

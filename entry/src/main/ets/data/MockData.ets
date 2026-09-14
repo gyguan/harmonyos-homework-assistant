@@ -1,23 +1,34 @@
 import {
+  AppSettings,
   Assignment,
   AssignmentStatus,
   CandidateAssignment,
   DashboardSummary,
   HomeworkImportSourceKind,
   RawHomeworkImport,
+  StudentProfile,
   Subject,
   TodaySummary
 } from '../domain/model/HomeworkModels';
 
 export class MockData {
-  static readonly FAMILY_ID: string = 'family-demo-001';
-  static readonly STUDENT_ID: string = 'student-xiaoyu-001';
+  static readonly student: StudentProfile = {
+    id: 'student-xiaoyu-001',
+    name: '小宇',
+    grade: '三年级',
+    semester: '上学期',
+    textbookSummary: '语文部编版 · 数学北师大版 · 英语沪教版'
+  };
+
+  static readonly settings: AppSettings = {
+    student: MockData.student,
+    tutorGuidanceFirst: true,
+    directAnswerAllowed: false
+  };
 
   static readonly assignments: Assignment[] = [
     {
       id: 'a-math-001',
-      familyId: MockData.FAMILY_ID,
-      studentId: MockData.STUDENT_ID,
       candidateId: '',
       subject: Subject.MATH,
       title: '练习册 P26 第 1～6 题',
@@ -29,8 +40,6 @@ export class MockData {
     },
     {
       id: 'a-chinese-001',
-      familyId: MockData.FAMILY_ID,
-      studentId: MockData.STUDENT_ID,
       candidateId: '',
       subject: Subject.CHINESE,
       title: '朗读《秋天的雨》第 2～4 自然段',
@@ -42,8 +51,6 @@ export class MockData {
     },
     {
       id: 'a-english-001',
-      familyId: MockData.FAMILY_ID,
-      studentId: MockData.STUDENT_ID,
       candidateId: '',
       subject: Subject.ENGLISH,
       title: '听读 Unit 3 Look and learn',
@@ -55,8 +62,6 @@ export class MockData {
     },
     {
       id: 'a-overdue-001',
-      familyId: MockData.FAMILY_ID,
-      studentId: MockData.STUDENT_ID,
       candidateId: '',
       subject: Subject.MATH,
       title: '错题订正 3 题',
@@ -86,7 +91,6 @@ export class MockData {
 
   static readonly rawImport: RawHomeworkImport = {
     id: 'import-001',
-    familyId: MockData.FAMILY_ID,
     sourceKind: HomeworkImportSourceKind.IMAGE,
     sourceLabel: '微信群聊天截图 · 19:01',
     resourceUri: 'mock://wechat-homework-screenshot-001',
@@ -98,8 +102,6 @@ export class MockData {
   static readonly candidates: CandidateAssignment[] = [
     {
       id: 'c-1',
-      familyId: MockData.FAMILY_ID,
-      studentId: MockData.STUDENT_ID,
       subject: Subject.CHINESE,
       title: '背诵第 12 课《古诗两首》',
       instruction: '按老师要求完成背诵，明天检查。',
@@ -113,8 +115,6 @@ export class MockData {
     },
     {
       id: 'c-2',
-      familyId: MockData.FAMILY_ID,
-      studentId: MockData.STUDENT_ID,
       subject: Subject.MATH,
       title: '完成练习册 P32',
       instruction: '完成练习册第 32 页，明天检查。',
@@ -128,8 +128,6 @@ export class MockData {
     },
     {
       id: 'c-3',
-      familyId: MockData.FAMILY_ID,
-      studentId: MockData.STUDENT_ID,
       subject: Subject.ENGLISH,
       title: '听读 Unit 4',
       instruction: '完成 Unit 4 听读，明天检查。',
