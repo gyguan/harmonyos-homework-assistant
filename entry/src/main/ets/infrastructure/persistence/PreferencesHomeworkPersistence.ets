@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
+import { Assignment, CandidateAssignment, Submission } from '../../domain/model/HomeworkModels';
 import { HomeworkSnapshot } from '../../domain/model/PersistenceModels';
 import { HomeworkPersistence } from '../../domain/port/HomeworkPersistence';
 
@@ -28,7 +29,15 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
       if (typeof value !== 'string' || value.length === 0) {
         return null;
       }
-      return JSON.parse(value) as HomeworkSnapshot;
+      let parsed: Record<string, Object> = JSON.parse(value);
+      let snapshot: HomeworkSnapshot = {
+        schemaVersion: parsed.schemaVersion as number,
+        assignments: parsed.assignments as Assignment[],
+        candidates: parsed.candidates as CandidateAssignment[],
+        submissions: parsed.submissions as Submission[],
+        submissionSequence: parsed.submissionSequence as number
+      };
+      return snapshot;
     } catch {
       return null;
     }
