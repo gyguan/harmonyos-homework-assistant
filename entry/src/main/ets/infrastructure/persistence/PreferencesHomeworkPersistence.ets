@@ -23,10 +23,17 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
   }
 
   private async getStore(): Promise<preferences.Preferences> {
-    if (this.store === null) {
-      this.store = await preferences.getPreferences(this.context, STORE_NAME);
+    if (this.store !== null) {
+      return this.store;
     }
-    return this.store;
+
+    try {
+      let store = await preferences.getPreferences(this.context, STORE_NAME);
+      this.store = store;
+      return store;
+    } catch {
+      throw new Error('本地作业存储初始化失败');
+    }
   }
 
   async load(): Promise<HomeworkSnapshot | null> {
