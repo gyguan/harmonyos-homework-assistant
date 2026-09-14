@@ -11,7 +11,8 @@ import { ParentProgressPage } from '../features/parent/progress/ParentProgressPa
 import { StudyWorkspacePage } from '../features/student/study/StudyWorkspacePage';
 import { StudentTodayPage } from '../features/student/today/StudentTodayPage';
 
-enum AppRole {
+export enum AppRole {
+  NONE = 'NONE',
   STUDENT = 'STUDENT',
   PARENT = 'PARENT'
 }
@@ -30,13 +31,13 @@ enum ParentRoute {
 
 @Component
 export struct AppShell {
+  @Prop role: AppRole = AppRole.STUDENT;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
-  @State private role: AppRole = AppRole.STUDENT;
   @State private studentRoute: StudentRoute = StudentRoute.TODAY;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
-  @State private selectedAssignmentId: string = 'a-math-001';
+  @State private selectedAssignmentId: string = '';
   @State private storeRevision: number = 0;
 
   @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
@@ -54,6 +55,9 @@ export struct AppShell {
   }
 
   private switchStudent(): void {
+    if (this.role !== AppRole.PARENT) {
+      return;
+    }
     let students: StudentProfile[] = HomeworkStore.instance.getStudents();
     if (students.length <= 1) {
       return;
@@ -89,7 +93,7 @@ export struct AppShell {
   }
 
   @Builder
-  private RoleContent() {
+  private PersonaContent() {
     if (this.isBlockingPageState()) {
       PageStateView({ scenario: this.demoScenario });
     } else if (this.role === AppRole.STUDENT) {
@@ -153,7 +157,7 @@ export struct AppShell {
   }
 
   @Builder
-  private ChildChip() {
+  private ParentChildChip() {
     Text(`${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
       .fontSize(12)
       .fontColor(AppTheme.PRIMARY)
@@ -164,26 +168,32 @@ export struct AppShell {
   }
 
   @Builder
-  private RoleSwitch() {
+  private StudentIdentityChip() {
+    Text(`${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
+      .fontSize(12)
+      .fontWeight(FontWeight.Medium)
+      .fontColor(AppTheme.TEXT)
+      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+      .backgroundColor('#F4F6F8')
+      .borderRadius(12);
+  }
+
+  @Builder
+  private ContextBar() {
     Row({ space: 8 }) {
-      Text(this.role === AppRole.STUDENT ? '学生模式' : '家长模式')
+      Text(this.role === AppRole.PARENT ? '家长空间' : '学生空间')
         .fontSize(13)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Blank();
-      this.ChildChip();
+      if (this.role === AppRole.PARENT) {
+        this.ParentChildChip();
+      } else {
+        this.StudentIdentityChip();
+      }
       if (this.widthVp > 420) {
         this.ScenarioChip();
       }
-      Text(this.role === AppRole.STUDENT ? '切换家长' : '切换学生')
-        .fontSize(13)
-        .fontColor(AppTheme.PRIMARY)
-        .padding({ left: 10, right: 10, top: 8, bottom: 8 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(14)
-        .onClick(() => {
-          this.role = this.role === AppRole.STUDENT ? AppRole.PARENT : AppRole.STUDENT;
-        });
     }
     .width('100%')
     .height(52)
@@ -254,26 +264,34 @@ export struct AppShell {
       }
 
       Blank();
-      Text(HomeworkStore.instance.getStudent().name)
-        .width(66)
-        .fontSize(11)
-        .fontWeight(FontWeight.Medium)
-        .textAlign(TextAlign.Center)
-        .fontColor(AppTheme.PRIMARY)
-        .padding({ top: 7, bottom: 7 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(10)
-        .onClick(() => this.switchStudent());
+      if (this.role === AppRole.PARENT) {
+        Text(HomeworkStore.instance.getStudent().name)
+          .width(66)
+          .fontSize(11)
+          .fontWeight(FontWeight.Medium)
+          .textAlign(TextAlign.Center)
+          .fontColor(AppTheme.PRIMARY)
+          .padding({ top: 7, bottom: 7 })
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .borderRadius(10)
+          .onClick(() => this.switchStudent());
+      } else {
+        Text(HomeworkStore.instance.getStudent().name)
+          .width(66)
+          .fontSize(11)
+          .fontWeight(FontWeight.Medium)
+          .textAlign(TextAlign.Center)
+          .fontColor(AppTheme.TEXT)
+          .padding({ top: 7, bottom: 7 })
+          .backgroundColor('#F4F6F8')
+          .borderRadius(10);
+      }
       Text(DemoScenarioHelper.label(this.demoScenario))
         .width(66)
         .fontSize(10)
         .textAlign(TextAlign.Center)
         .fontColor(AppTheme.SUBTEXT)
         .onClick(() => this.nextDemoScenario());
-      Text(this.role === AppRole.STUDENT ? '家长' : '学生')
-        .fontSize(12)
-        .fontColor(AppTheme.PRIMARY)
-        .onClick(() => this.role = this.role === AppRole.STUDENT ? AppRole.PARENT : AppRole.STUDENT);
     }
     .width(88)
     .height('100%')
@@ -301,8 +319,8 @@ export struct AppShell {
   @Builder
   private BottomNavShell() {
     Column() {
-      this.RoleSwitch();
-      Column() { this.RoleContent(); }.width('100%').layoutWeight(1);
+      this.ContextBar();
+      Column() { this.PersonaContent(); }.width('100%').layoutWeight(1);
       this.BottomNavigation();
     }
     .width('100%')
@@ -313,7 +331,7 @@ export struct AppShell {
   private SideNavShell() {
     Row() {
       this.SideNavigation();
-      Column() { this.RoleContent(); }.layoutWeight(1).height('100%');
+      Column() { this.PersonaContent(); }.layoutWeight(1).height('100%');
     }
     .width('100%')
     .height('100%');
