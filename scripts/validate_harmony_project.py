@@ -42,6 +42,7 @@ text_extractor_port = read("entry/src/main/ets/domain/port/HomeworkTextExtractor
 assignment_parser_port = read("entry/src/main/ets/domain/port/HomeworkAssignmentParser.ets")
 import_pipeline = read("entry/src/main/ets/application/import/HomeworkImportPipeline.ets")
 import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
+submission_service = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
 core_ocr = read("entry/src/main/ets/infrastructure/ai/CoreVisionHomeworkTextExtractor.ets")
 local_parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
 
@@ -87,6 +88,8 @@ for core_model in ["StudentProfile", "AppSettings", "CandidateAssignment", "Assi
 
 require("HomeworkImportSourceKind" in models and "resourceUri" in models,
         "RawHomeworkImport must preserve source kind and resource URI for OCR/file extraction")
+require("photoUris: string[]" in models and "IMAGE = 'IMAGE'" in models and "MOCK_IMAGE" not in models,
+        "Submission must store real image URIs and must not use MOCK_IMAGE")
 require("familyId" not in models and "studentId" not in models,
         "single-family V0.1 domain must not carry tenant/family routing fields")
 require("class AssignmentStateMachine" in state_machine,
@@ -99,8 +102,10 @@ require("getStudent" in store and "getSettings" in store,
         "HomeworkStore must own the single-child profile and app settings")
 require("replaceRawImport" in store and "replaceCandidates" in store,
         "HomeworkStore must accept a successful OCR import atomically from the application service")
-require("publishCandidates" in store and "submitMockImage" in store,
-        "HomeworkStore must support candidate publishing and submission")
+require("publishCandidates" in store and "submitImages" in store and "submitMockImage" not in store,
+        "HomeworkStore must support candidate publishing and real image submission")
+require("SNAPSHOT_SCHEMA_VERSION: number = 3" in store,
+        "real submission model change must bump the local snapshot schema to v3")
 require("AssignmentStateMachine.canTransition" in store,
         "HomeworkStore transitions must delegate to AssignmentStateMachine")
 
@@ -137,6 +142,17 @@ require("HomeworkImportService" in import_page and "选择作业截图" in impor
 require("CoreVisionHomeworkTextExtractor" not in import_page and "LocalHomeworkAssignmentParser" not in import_page,
         "HomeworkImportPage must not depend on concrete OCR/parser adapters")
 
+require("class HomeworkSubmissionService" in submission_service and "photoAccessHelper.PhotoViewPicker" in submission_service,
+        "real submission must use a small application service around HarmonyOS PhotoViewPicker")
+require("maxSelectNumber: MAX_SUBMISSION_PHOTOS" in submission_service and "MAX_SUBMISSION_PHOTOS: number = 6" in submission_service,
+        "real submission must allow up to six photos")
+require("HomeworkSubmissionService" in study_workspace and "选择作业照片" in study_workspace,
+        "student workspace must expose real photo selection before submission")
+require("submitMockImage" not in study_workspace and "submissionPhotoUris" in study_workspace,
+        "student workspace must not retain the mock submission path")
+require("submission.photoUris" in progress_page and "Image(uri)" in progress_page,
+        "parent progress must preview real submitted photo URIs")
+
 require("class CoreVisionHomeworkTextExtractor" in core_ocr,
         "V0.1 must provide a real Core Vision OCR extractor")
 require("@kit.CoreVisionKit" in core_ocr and "textRecognition.recognizeText" in core_ocr,
@@ -158,8 +174,6 @@ require("storeRevision" in app_shell,
         "AppShell must propagate shared store updates across role/page switches")
 require("publishCandidates" in confirmation_page,
         "parent confirmation must publish candidates through HomeworkStore")
-require("submitMockImage" in study_workspace,
-        "student study workspace must submit through HomeworkStore")
 require("getSubmissionsForAssignment" in progress_page,
         "parent progress must expose submission records")
 require("导入老师作业" in parent_dashboard and "Kpi(" not in parent_dashboard,
@@ -189,6 +203,8 @@ if ETS_ROOT.exists():
             errors.append(f"ArkData persistence leaked outside infrastructure adapter: {rel}")
         if "@kit.CoreVisionKit" in text and "infrastructure/ai/" not in rel:
             errors.append(f"Core Vision OCR leaked outside infrastructure adapter: {rel}")
+        if "@kit.MediaLibraryKit" in text and "/application/" not in f"/{rel}":
+            errors.append(f"MediaLibraryKit picker leaked outside application service: {rel}")
         if "/features/" in f"/{rel}" and ("CoreVisionHomeworkTextExtractor" in text or "LocalHomeworkAssignmentParser" in text):
             errors.append(f"UI page depends on concrete OCR/parser adapter: {rel}")
         for field in forbidden_single_family_fields:

@@ -1,3 +1,4 @@
+import { HomeworkSubmissionService } from '../../../application/submission/HomeworkSubmissionService';
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
@@ -12,6 +13,10 @@ export struct StudyWorkspacePage {
   @Prop assignmentId: string = 'a-math-001';
   @Prop revision: number = 0;
   @State private compactTutorOpen: boolean = false;
+  @State private submissionPhotoUris: string[] = [];
+  @State private selectingPhotos: boolean = false;
+  @State private submittingPhotos: boolean = false;
+  @State private submissionMessage: string = '';
   onBack: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
@@ -43,7 +48,13 @@ export struct StudyWorkspacePage {
       case AssignmentStatus.IN_PROGRESS:
         return '我做完了，准备提交';
       case AssignmentStatus.READY_TO_SUBMIT:
-        return '模拟拍照提交';
+        if (this.selectingPhotos) {
+          return '正在打开相册…';
+        }
+        if (this.submittingPhotos) {
+          return '正在保存并提交…';
+        }
+        return this.submissionPhotoUris.length === 0 ? '选择作业照片' : `确认提交 ${this.submissionPhotoUris.length} 张照片`;
       case AssignmentStatus.SUBMITTED:
         return '已提交';
       case AssignmentStatus.COMPLETED:
@@ -55,7 +66,7 @@ export struct StudyWorkspacePage {
 
   private primaryActionEnabled(): boolean {
     let assignment = this.assignment();
-    if (assignment === null) {
+    if (assignment === null || this.selectingPhotos || this.submittingPhotos) {
       return false;
     }
     return assignment.status !== AssignmentStatus.SUBMITTED && assignment.status !== AssignmentStatus.COMPLETED;
@@ -74,10 +85,155 @@ export struct StudyWorkspacePage {
     } else if (assignment.status === AssignmentStatus.IN_PROGRESS) {
       changed = HomeworkStore.instance.markReadyToSubmit(assignment.id);
     } else if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
-      changed = HomeworkStore.instance.submitMockImage(assignment.id);
+      if (this.submissionPhotoUris.length === 0) {
+        void this.selectSubmissionPhotos();
+        return;
+      }
+      void this.submitSelectedPhotos(assignment.id);
+      return;
     }
     if (changed) {
       this.onStoreChanged();
+    }
+  }
+
+  private async selectSubmissionPhotos(): Promise<void> {
+    if (this.selectingPhotos || this.submittingPhotos) {
+      return;
+    }
+    this.selectingPhotos = true;
+    this.submissionMessage = '';
+    let selected = await HomeworkSubmissionService.instance.selectPhotos();
+    this.selectingPhotos = false;
+    if (selected.length === 0) {
+      this.submissionMessage = '未选择照片，原有选择保持不变';
+      return;
+    }
+    this.submissionPhotoUris = selected;
+    this.submissionMessage = `已选择 ${selected.length} 张，请确认后提交`;
+  }
+
+  private async submitSelectedPhotos(assignmentId: string): Promise<void> {
+    if (this.submittingPhotos || this.submissionPhotoUris.length === 0) {
+      return;
+    }
+    this.submittingPhotos = true;
+    this.submissionMessage = '正在把照片保存到本地…';
+    try {
+      let submitted = await HomeworkSubmissionService.instance.submit(assignmentId, this.submissionPhotoUris);
+      if (!submitted) {
+        this.submissionMessage = '提交失败，请确认作业状态后重试';
+        return;
+      }
+      this.submissionPhotoUris = [];
+      this.submissionMessage = '作业照片已提交';
+      this.onStoreChanged();
+    } catch {
+      this.submissionMessage = '照片保存失败，请重新选择后再试';
+    } finally {
+      this.submittingPhotos = false;
+    }
+  }
+
+  private removeSubmissionPhoto(uri: string): void {
+    let next: string[] = [];
+    for (let item of this.submissionPhotoUris) {
+      if (item !== uri) {
+        next.push(item);
+      }
+    }
+    this.submissionPhotoUris = next;
+    this.submissionMessage = next.length === 0 ? '请重新选择作业照片' : `已选择 ${next.length} 张，请确认后提交`;
+  }
+
+  @Builder
+  private PhotoStrip(photoUris: string[], removable: boolean) {
+    Scroll() {
+      Row({ space: 10 }) {
+        ForEach(photoUris, (uri: string) => {
+          Column({ space: 5 }) {
+            Image(uri)
+              .width(96)
+              .height(96)
+              .objectFit(ImageFit.Cover)
+              .borderRadius(10)
+              .backgroundColor('#F1F3F5');
+            if (removable) {
+              Text('移除')
+                .fontSize(11)
+                .fontColor(AppTheme.DANGER)
+                .onClick(() => this.removeSubmissionPhoto(uri));
+            }
+          }
+          .width(96);
+        }, (uri: string) => uri);
+      }
+      .padding({ right: 4 });
+    }
+    .width('100%')
+    .scrollable(ScrollDirection.Horizontal)
+    .scrollBar(BarState.Off);
+  }
+
+  @Builder
+  private SubmissionDraftPane() {
+    if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
+      Column({ space: 10 }) {
+        Row() {
+          Text('提交作业照片').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Blank();
+          Text('最多 6 张').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%');
+
+        if (this.submissionPhotoUris.length > 0) {
+          this.PhotoStrip(this.submissionPhotoUris, true);
+          Text('请确认照片清晰、完整，页数和顺序无误。')
+            .width('100%')
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+          Button('重新选择照片')
+            .width('100%')
+            .height(38)
+            .enabled(!this.submittingPhotos)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .onClick(() => { void this.selectSubmissionPhotos(); });
+        } else {
+          Text('从系统相册选择已经拍好的作业照片，选择后可以预览再提交。')
+            .width('100%')
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+
+        if (this.submissionMessage.length > 0) {
+          Text(this.submissionMessage)
+            .width('100%')
+            .fontSize(12)
+            .fontColor(AppTheme.PRIMARY);
+        }
+      }
+      .width('100%')
+      .padding(14)
+      .backgroundColor('#F7F8FA')
+      .borderRadius(14);
+    }
+  }
+
+  @Builder
+  private SavedSubmissionPane() {
+    if (this.submissions().length > 0) {
+      Column({ space: 8 }) {
+        Text(`已提交：${this.submissions()[0].fileLabel} · ${this.submissions()[0].submittedAtText}`)
+          .width('100%')
+          .fontSize(13)
+          .fontColor(AppTheme.SUCCESS);
+        this.PhotoStrip(this.submissions()[0].photoUris, false);
+      }
+      .width('100%')
+      .padding(12)
+      .backgroundColor('#EEF9F3')
+      .borderRadius(12);
     }
   }
 
@@ -141,15 +297,8 @@ export struct StudyWorkspacePage {
           .borderRadius(16)
           .backgroundColor('#F4F6F9');
 
-          if (this.submissions().length > 0) {
-            Text(`已保存提交：${this.submissions()[0].fileLabel} · ${this.submissions()[0].submittedAtText}`)
-              .width('100%')
-              .padding(12)
-              .fontSize(13)
-              .fontColor(AppTheme.SUCCESS)
-              .backgroundColor('#EEF9F3')
-              .borderRadius(12);
-          }
+          this.SubmissionDraftPane();
+          this.SavedSubmissionPane();
 
           Button(this.primaryActionLabel())
             .width('100%')

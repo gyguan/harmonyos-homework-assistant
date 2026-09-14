@@ -20,6 +20,36 @@ export struct ParentProgressPage {
   }
 
   @Builder
+  private SubmissionPhotos(submission: Submission) {
+    Column({ space: 8 }) {
+      Text(`提交：${submission.fileLabel} · ${submission.submittedAtText}`)
+        .width('100%')
+        .fontSize(12)
+        .fontColor(AppTheme.SUCCESS);
+
+      Scroll() {
+        Row({ space: 8 }) {
+          ForEach(submission.photoUris, (uri: string) => {
+            Image(uri)
+              .width(82)
+              .height(82)
+              .objectFit(ImageFit.Cover)
+              .borderRadius(9)
+              .backgroundColor('#F1F3F5');
+          }, (uri: string) => uri);
+        }
+      }
+      .width('100%')
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off);
+    }
+    .width('100%')
+    .padding(10)
+    .backgroundColor('#EEF9F3')
+    .borderRadius(10);
+  }
+
+  @Builder
   private ProgressCard(item: Assignment) {
     Column({ space: 9 }) {
       Row() {
@@ -44,13 +74,7 @@ export struct ParentProgressPage {
         .fontColor(AppTheme.SUBTEXT);
 
       if (this.submissions(item.id).length > 0) {
-        Text(`提交：${this.submissions(item.id)[0].fileLabel} · ${this.submissions(item.id)[0].submittedAtText}`)
-          .width('100%')
-          .padding(10)
-          .fontSize(12)
-          .fontColor(AppTheme.SUCCESS)
-          .backgroundColor('#EEF9F3')
-          .borderRadius(10);
+        this.SubmissionPhotos(this.submissions(item.id)[0]);
       }
     }
     .width('100%')
@@ -65,7 +89,7 @@ export struct ParentProgressPage {
       Column({ space: 16 }) {
         Column({ space: 4 }) {
           Text('作业进度').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('同一 Assignment 状态同时驱动学生端与家长端').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('今天做了什么、交了什么，一眼就能看到').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);
