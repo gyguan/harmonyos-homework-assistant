@@ -3,6 +3,7 @@ import {
   AssignmentStatus,
   CandidateAssignment,
   DashboardSummary,
+  HomeworkImportSourceKind,
   RawHomeworkImport,
   Subject,
   TodaySummary
@@ -86,8 +87,10 @@ export class MockData {
   static readonly rawImport: RawHomeworkImport = {
     id: 'import-001',
     familyId: MockData.FAMILY_ID,
-    rawText: '今天作业：语文背诵第12课古诗两首；数学练习册32页；英语听读U4，明天检查。',
-    sourceLabel: '微信群聊天截图 · 19:01'
+    sourceKind: HomeworkImportSourceKind.IMAGE,
+    sourceLabel: '微信群聊天截图 · 19:01',
+    resourceUri: 'mock://wechat-homework-screenshot-001',
+    rawText: '今天作业：语文背诵第12课古诗两首；数学练习册32页；英语听读U4，明天检查。'
   };
 
   static readonly importSource: string = MockData.rawImport.rawText;
