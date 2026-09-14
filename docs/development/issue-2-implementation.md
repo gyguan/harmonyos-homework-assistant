@@ -32,6 +32,7 @@ Branch: `feat/issue-2-app-shell`
   - AI Tutor unavailable
 - Shared loading / empty / error state component.
 - Static project release gate in `scripts/validate_harmony_project.py` and GitHub Actions.
+- Two-axis pre-build review recorded in `docs/development/code-review-issue-2.md`.
 
 ## Layout checkpoint
 
