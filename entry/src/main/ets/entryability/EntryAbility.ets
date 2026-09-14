@@ -8,18 +8,37 @@ import { LocalHomeworkAssignmentParser } from '../infrastructure/ai/LocalHomewor
 import { PreferencesHomeworkPersistence } from '../infrastructure/persistence/PreferencesHomeworkPersistence';
 
 export default class EntryAbility extends UIAbility {
+  private loadMainPage(windowStage: window.WindowStage): void {
+    try {
+      windowStage.loadContent('pages/Index', (error) => {
+        if (error.code) {
+          console.error(`Failed to load pages/Index: ${error.code} ${error.message}`);
+        }
+      });
+    } catch {
+      console.error('Failed to request loading pages/Index');
+    }
+  }
+
   private async bootstrap(windowStage: window.WindowStage): Promise<void> {
     HomeworkImportService.instance.configure(
       new CoreVisionHomeworkTextExtractor(),
       new LocalHomeworkAssignmentParser()
     );
     HomeworkSubmissionService.instance.configure(this.context);
-    let persistence = new PreferencesHomeworkPersistence(this.context);
-    await HomeworkStore.instance.initialize(persistence);
-    windowStage.loadContent('pages/Index');
+
+    try {
+      let persistence = new PreferencesHomeworkPersistence(this.context);
+      await HomeworkStore.instance.initialize(persistence);
+    } catch {
+      // Keep the app startable with its current in-memory state if local initialization fails.
+      console.error('Homework store initialization failed; continuing with in-memory state');
+    }
+
+    this.loadMainPage(windowStage);
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
-    this.bootstrap(windowStage);
+    void this.bootstrap(windowStage);
   }
 }
