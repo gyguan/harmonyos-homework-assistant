@@ -1,5 +1,7 @@
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
+import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
+import { PageStateView } from '../components/state/PageStateView';
 import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
 import { StudyWorkspacePage } from '../features/student/study/StudyWorkspacePage';
@@ -27,6 +29,7 @@ export struct AppShell {
   @State private role: AppRole = AppRole.STUDENT;
   @State private studentRoute: StudentRoute = StudentRoute.TODAY;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
+  @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
 
   @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
 
@@ -34,17 +37,31 @@ export struct AppShell {
     return ResponsiveContext.resolve(this.widthVp);
   }
 
+  private nextDemoScenario(): void {
+    this.demoScenario = DemoScenarioHelper.next(this.demoScenario);
+  }
+
+  private isBlockingPageState(): boolean {
+    return this.demoScenario === DemoScenario.LOADING ||
+      this.demoScenario === DemoScenario.EMPTY ||
+      this.demoScenario === DemoScenario.ERROR;
+  }
+
   @Builder
   private RoleContent() {
-    if (this.role === AppRole.STUDENT) {
+    if (this.isBlockingPageState()) {
+      PageStateView({ scenario: this.demoScenario });
+    } else if (this.role === AppRole.STUDENT) {
       if (this.studentRoute === StudentRoute.STUDY) {
         StudyWorkspacePage({
           sizeClass: this.sizeClass,
+          tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
           onBack: () => this.studentRoute = StudentRoute.TODAY
         });
       } else {
         StudentTodayPage({
           sizeClass: this.sizeClass,
+          offlineMode: this.demoScenario === DemoScenario.OFFLINE,
           onOpenStudy: () => this.studentRoute = StudentRoute.STUDY
         });
       }
@@ -58,13 +75,25 @@ export struct AppShell {
   }
 
   @Builder
+  private ScenarioChip() {
+    Text(`演示：${DemoScenarioHelper.label(this.demoScenario)}`)
+      .fontSize(12)
+      .fontColor(AppTheme.PRIMARY)
+      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+      .backgroundColor(AppTheme.PRIMARY_SOFT)
+      .borderRadius(12)
+      .onClick(() => this.nextDemoScenario());
+  }
+
+  @Builder
   private RoleSwitch() {
-    Row() {
+    Row({ space: 8 }) {
       Text(this.role === AppRole.STUDENT ? '学生空间' : '家长空间')
         .fontSize(13)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Blank();
+      this.ScenarioChip();
       Text(this.role === AppRole.STUDENT ? '切换家长' : '切换学生')
         .fontSize(13)
         .fontColor(AppTheme.PRIMARY)
@@ -142,6 +171,15 @@ export struct AppShell {
       }
 
       Blank();
+      Text(DemoScenarioHelper.label(this.demoScenario))
+        .width(66)
+        .fontSize(10)
+        .textAlign(TextAlign.Center)
+        .fontColor(AppTheme.PRIMARY)
+        .padding({ top: 7, bottom: 7 })
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .borderRadius(10)
+        .onClick(() => this.nextDemoScenario());
       Text(this.role === AppRole.STUDENT ? '家长' : '学生')
         .fontSize(12)
         .fontColor(AppTheme.PRIMARY)
