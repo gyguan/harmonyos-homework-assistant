@@ -15,3 +15,18 @@
 本项目采用 Matt Pocock `skills` 的工程方法作为 Agent 辅助开发流程。安装与使用约定见 `docs/agents/matt-pocock-skills.md`，项目领域语言见 `CONTEXT.md`。
 
 后续建议流程：需求澄清 → 规格化 → 领域建模/架构设计 → 原型 → TDD 实现 → Code Review。
+
+## Current development baseline
+
+- DevEco Studio / project model: 6.0.2
+- HarmonyOS API baseline: 6.0.0(20) for compile / compatible / target
+- Devices: Phone + Tablet
+- UI: ArkTS + ArkUI, Stage model
+
+### Static gate
+
+在仓库根目录执行：
+
+`python scripts/validate_harmony_project.py`
+
+该 Gate 会检查 SDK 基线、Hvigor 插件、统一响应式断点、Phone/Tablet 声明、Navigation 根结构以及 API 26+ 能力误用等关键工程约束。
