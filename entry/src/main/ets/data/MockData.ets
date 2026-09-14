@@ -93,4 +93,7 @@ export class MockData {
       confidence: 0.95
     }
   ];
+
+  static readonly offlineCacheNote: string = '已缓存今日作业与老师资料，恢复网络后自动同步提交。';
+  static readonly tutorUnavailableNote: string = 'AI Tutor 暂时不可用，但作业查看与提交能力不受影响。';
 }
