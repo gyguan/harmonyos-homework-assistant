@@ -78,12 +78,19 @@ export class HomeworkImportService {
       throw new Error('作业导入能力尚未初始化');
     }
 
-    let picker = new photoAccessHelper.PhotoViewPicker();
-    let selection = await picker.select({
-      MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
-      maxSelectNumber: 1
-    });
-    if (selection.photoUris.length === 0) {
+    let photoUris: string[] = [];
+    try {
+      let picker = new photoAccessHelper.PhotoViewPicker();
+      let selection = await picker.select({
+        MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
+        maxSelectNumber: 1
+      });
+      photoUris = selection.photoUris.slice();
+    } catch {
+      throw new Error('无法打开相册或读取所选图片');
+    }
+
+    if (photoUris.length === 0) {
       return {
         selected: false,
         candidateCount: 0,
@@ -97,7 +104,7 @@ export class HomeworkImportService {
       studentId: studentId,
       sourceKind: HomeworkImportSourceKind.IMAGE,
       sourceLabel: '相册作业截图',
-      resourceUri: selection.photoUris[0],
+      resourceUri: photoUris[0],
       rawText: ''
     };
 
