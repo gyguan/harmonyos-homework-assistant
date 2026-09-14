@@ -51,7 +51,9 @@ UI Prototype V1 提供了三个方向：
 
 ## Implementation guidance
 
-优先使用 HarmonyOS ArkUI 的 Navigation 分栏能力、GridRow/GridCol、ContainerReader 与 SplitLayout。复杂页面应根据“剩余容器宽度”而非物理屏幕尺寸适配。
+V0.1 运行与编译基线为 HarmonyOS 6.0.0(20)，因此优先使用 API 20 可用的 `Navigation`、`NavPathStack`、`Row` / `Column`、`Grid` 与 `onAreaChange`，并通过统一 `ResponsiveContext` 管理窗口断点。
+
+`ContainerReader` 当前官方文档标注为 API 26+，不属于 V0.1 可用实现能力。只有在未来提升最低 API，或确认存在 API 20 兼容替代方案后，才用于更细粒度的容器级响应式布局。
 
 ## Sources
 

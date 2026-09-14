@@ -67,7 +67,7 @@ AppShell
    └─ ExpandedNavigation (Pad side rail)
 ```
 
-`Navigation` 建议使用自适应 / 分栏模式；Pad 主从页面可使用 Navigation Split；具体内容区域再根据剩余容器宽度切换布局。
+`Navigation` 作为根导航容器并与 `NavPathStack` 绑定。一级 Student / Parent Shell 自己管理主导航，后续详情页逐步迁移到 `NavDestination`。
 
 ## 3. 响应式基础设施
 
@@ -92,15 +92,17 @@ ResponsiveContext
 - isLandscape
 ```
 
-复杂主从页面优先组合：
+V0.1 基线为 HarmonyOS 6.0.0(20)，优先组合：
 
 - `Navigation`
 - `GridRow / GridCol`
-- `ContainerReader`
-- `SplitLayout`
 - `Row / Column / List / Scroll`
+- `onAreaChange`
+- 统一 `ResponsiveContext`
 
 不要通过设备型号判断 Phone / Pad。
+
+> `ContainerReader` 当前官方文档标注为 API 26+，因此不进入 V0.1 实现。未来提升最低 API 后，可用于更细粒度的容器级断点适配。
 
 # 4. 学生端页面规格
 
@@ -183,7 +185,7 @@ Column
 └─ StickyActionBar
 ```
 
-AI Tutor 在 Phone 上进入独立页面或底部 Sheet，避免同时挤压作业内容。
+AI Tutor 在 Phone 上进入独立页面或独立子表面，避免同时挤压作业内容。
 
 ### Medium
 

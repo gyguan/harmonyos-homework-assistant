@@ -1,0 +1,28 @@
+# DevEco Studio / IDE
+.idea/
+*.iml
+local.properties
+
+# HarmonyOS / Hvigor build output
+.hvigor/
+oh_modules/
+**/oh_modules/
+**/build/
+**/.preview/
+
+# Signing material - never commit
+*.p12
+*.p7b
+*.cer
+*.pem
+*.key
+*.jks
+*.keystore
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+
+# Logs
+*.log
