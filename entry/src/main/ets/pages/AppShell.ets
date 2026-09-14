@@ -1,6 +1,7 @@
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
+import { HomeworkSyncService } from '../application/remote/HomeworkSyncService';
 import { PageStateView } from '../components/state/PageStateView';
 import { HomeworkStore } from '../data/HomeworkStore';
 import { StudentProfile } from '../domain/model/HomeworkModels';
@@ -8,6 +9,7 @@ import { HomeworkConfirmationPage } from '../features/parent/confirmation/Homewo
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
 import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
+import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
 import { StudyWorkspacePage } from '../features/student/study/StudyWorkspacePage';
 import { StudentTodayPage } from '../features/student/today/StudentTodayPage';
 
@@ -26,7 +28,8 @@ enum ParentRoute {
   DASHBOARD = 'DASHBOARD',
   IMPORT = 'IMPORT',
   CONFIRMATION = 'CONFIRMATION',
-  PROGRESS = 'PROGRESS'
+  PROGRESS = 'PROGRESS',
+  SETTINGS = 'SETTINGS'
 }
 
 @Component
@@ -52,6 +55,7 @@ export struct AppShell {
 
   private touchStore(): void {
     this.storeRevision++;
+    HomeworkSyncService.instance.requestSync();
   }
 
   private switchStudent(): void {
@@ -132,6 +136,8 @@ export struct AppShell {
         });
       } else if (this.parentRoute === ParentRoute.PROGRESS) {
         ParentProgressPage({ sizeClass: this.sizeClass, revision: this.storeRevision });
+      } else if (this.parentRoute === ParentRoute.SETTINGS) {
+        BackendConnectionPage({ onStoreChanged: () => this.touchStore() });
       } else {
         ParentDashboardPage({
           sizeClass: this.sizeClass,
@@ -237,7 +243,8 @@ export struct AppShell {
           () => this.parentRoute = ParentRoute.IMPORT);
         this.BottomItem($r('sys.symbol.checkmark_circle'), '进度', this.parentRoute === ParentRoute.PROGRESS,
           () => this.parentRoute = ParentRoute.PROGRESS);
-        this.BottomItem($r('sys.symbol.gearshape'), '我的', false, () => {});
+        this.BottomItem($r('sys.symbol.gearshape'), '我的', this.parentRoute === ParentRoute.SETTINGS,
+          () => this.parentRoute = ParentRoute.SETTINGS);
       }
     }
     .width('100%')
@@ -295,7 +302,8 @@ export struct AppShell {
           () => this.parentRoute = ParentRoute.IMPORT);
         this.SideItem($r('sys.symbol.checkmark_circle'), '进度', this.parentRoute === ParentRoute.PROGRESS,
           () => this.parentRoute = ParentRoute.PROGRESS);
-        this.SideItem($r('sys.symbol.gearshape'), '我的', false, () => {});
+        this.SideItem($r('sys.symbol.gearshape'), '我的', this.parentRoute === ParentRoute.SETTINGS,
+          () => this.parentRoute = ParentRoute.SETTINGS);
       }
 
       Blank();
