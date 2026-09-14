@@ -368,16 +368,11 @@ export struct StudyWorkspacePage {
   @Builder
   private TutorPane() {
     Column({ space: 13 }) {
-      Row({ space: 8 }) {
-        SymbolGlyph($r('sys.symbol.bubble_left'))
-          .fontSize(22)
-          .fontColor([AppTheme.PRIMARY]);
-        Text('问小伴')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-      }
-      .width('100%');
+      Text('问小伴')
+        .width('100%')
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
 
       if (this.tutorUnavailable) {
         Column({ space: 6 }) {
