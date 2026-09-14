@@ -3,7 +3,7 @@
     "products": [
       {
         "name": "default",
-        "compileSdkVersion": "6.0.0(20)",
+        "compileSdkVersion": "26.0.0",
         "compatibleSdkVersion": "6.0.0(20)",
         "targetSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
