@@ -6,6 +6,7 @@ import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
 @Component
 export struct HomeworkImportPage {
   @Prop sizeClass: WindowSizeClass;
+  @State private showCompactCandidates: boolean = false;
 
   @Builder
   private SourcePane() {
@@ -33,6 +34,14 @@ export struct HomeworkImportPage {
         Button('上传文件').layoutWeight(1);
       }
       .width('100%');
+
+      if (this.sizeClass === WindowSizeClass.COMPACT) {
+        Button('查看 AI 解析结果')
+          .width('100%')
+          .height(48)
+          .backgroundColor(AppTheme.PRIMARY)
+          .onClick(() => this.showCompactCandidates = true);
+      }
     }
     .width('100%')
     .padding(18)
@@ -44,6 +53,14 @@ export struct HomeworkImportPage {
   @Builder
   private CandidatePane() {
     Column({ space: 10 }) {
+      if (this.sizeClass === WindowSizeClass.COMPACT) {
+        Text('‹ 返回原始内容')
+          .width('100%')
+          .fontSize(14)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => this.showCompactCandidates = false);
+      }
+
       Row() {
         Text('AI 解析结果').fontSize(20).fontWeight(FontWeight.Bold);
         Blank();
@@ -103,6 +120,12 @@ export struct HomeworkImportPage {
           }
           .width('100%')
           .alignItems(VerticalAlign.Top);
+        } else if (this.sizeClass === WindowSizeClass.COMPACT) {
+          if (this.showCompactCandidates) {
+            this.CandidatePane();
+          } else {
+            this.SourcePane();
+          }
         } else {
           this.SourcePane();
           this.CandidatePane();
