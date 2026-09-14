@@ -22,6 +22,33 @@ export struct ParentDashboardPage {
   }
 
   @Builder
+  private KpiSection() {
+    if (this.sizeClass === WindowSizeClass.COMPACT) {
+      Column({ space: 10 }) {
+        Row({ space: 10 }) {
+          this.Kpi('已完成', MockData.dashboard.completed, AppTheme.SUCCESS);
+          this.Kpi('进行中', MockData.dashboard.inProgress, AppTheme.WARNING);
+        }
+        .width('100%');
+        Row({ space: 10 }) {
+          this.Kpi('未开始', MockData.dashboard.notStarted, AppTheme.SUBTEXT);
+          this.Kpi('超时', MockData.dashboard.overdue, AppTheme.DANGER);
+        }
+        .width('100%');
+      }
+      .width('100%');
+    } else {
+      Row({ space: 10 }) {
+        this.Kpi('已完成', MockData.dashboard.completed, AppTheme.SUCCESS);
+        this.Kpi('进行中', MockData.dashboard.inProgress, AppTheme.WARNING);
+        this.Kpi('未开始', MockData.dashboard.notStarted, AppTheme.SUBTEXT);
+        this.Kpi('超时', MockData.dashboard.overdue, AppTheme.DANGER);
+      }
+      .width('100%');
+    }
+  }
+
+  @Builder
   private AssignmentProgress() {
     Column({ space: 10 }) {
       Text('今日作业').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
@@ -62,15 +89,7 @@ export struct ParentDashboardPage {
         .width('100%')
         .alignItems(HorizontalAlign.Start);
 
-        Row({ space: 10 }) {
-          this.Kpi('已完成', MockData.dashboard.completed, AppTheme.SUCCESS);
-          this.Kpi('进行中', MockData.dashboard.inProgress, AppTheme.WARNING);
-          this.Kpi('未开始', MockData.dashboard.notStarted, AppTheme.SUBTEXT);
-          if (this.sizeClass !== WindowSizeClass.COMPACT) {
-            this.Kpi('超时', MockData.dashboard.overdue, AppTheme.DANGER);
-          }
-        }
-        .width('100%');
+        this.KpiSection();
 
         if (this.sizeClass === WindowSizeClass.EXPANDED) {
           Row({ space: 18 }) {
