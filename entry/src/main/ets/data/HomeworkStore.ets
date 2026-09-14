@@ -169,6 +169,18 @@ export class HomeworkStore {
     return -1;
   }
 
+  private hasAssignmentForCandidate(candidateId: string): boolean {
+    if (candidateId.length === 0) {
+      return false;
+    }
+    for (let assignment of this.assignments) {
+      if (assignment.candidateId === candidateId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   getRawImport(): RawHomeworkImport {
     return this.rawImport;
   }
@@ -220,7 +232,9 @@ export class HomeworkStore {
   replaceCandidates(candidates: CandidateAssignment[]): void {
     this.candidates = [];
     for (let candidate of candidates) {
-      this.candidates.push(this.cloneCandidate(candidate));
+      if (!this.hasAssignmentForCandidate(candidate.id)) {
+        this.candidates.push(this.cloneCandidate(candidate));
+      }
     }
     this.requestPersist();
   }
@@ -250,6 +264,9 @@ export class HomeworkStore {
   publishCandidates(): number {
     let published: number = 0;
     for (let candidate of this.candidates) {
+      if (this.hasAssignmentForCandidate(candidate.id)) {
+        continue;
+      }
       let assignment: Assignment = {
         id: `a-published-${candidate.id}`,
         familyId: candidate.familyId,
