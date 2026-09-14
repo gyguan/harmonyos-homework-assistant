@@ -1,5 +1,5 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { Assignment } from '../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus } from '../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../domain/service/AssignmentStateMachine';
 
 @Component
@@ -12,14 +12,14 @@ export struct AssignmentCard {
 
   private statusColor(): string {
     switch (this.assignment.status) {
-      case 'IN_PROGRESS':
-      case 'READY_TO_SUBMIT':
+      case AssignmentStatus.IN_PROGRESS:
+      case AssignmentStatus.READY_TO_SUBMIT:
         return AppTheme.WARNING;
-      case 'SUBMITTED':
-      case 'COMPLETED':
+      case AssignmentStatus.SUBMITTED:
+      case AssignmentStatus.COMPLETED:
         return AppTheme.SUCCESS;
-      case 'NEEDS_REWORK':
-      case 'OVERDUE':
+      case AssignmentStatus.NEEDS_REWORK:
+      case AssignmentStatus.OVERDUE:
         return AppTheme.DANGER;
       default:
         return AppTheme.SUBTEXT;
