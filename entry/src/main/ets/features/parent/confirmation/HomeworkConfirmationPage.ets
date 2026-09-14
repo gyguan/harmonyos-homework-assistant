@@ -1,7 +1,7 @@
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkStore } from '../../../data/HomeworkStore';
-import { CandidateAssignment, RawHomeworkImport } from '../../../domain/model/HomeworkModels';
+import { CandidateAssignment, RawHomeworkImport, Subject } from '../../../domain/model/HomeworkModels';
 
 @Component
 export struct HomeworkConfirmationPage {
@@ -22,8 +22,81 @@ export struct HomeworkConfirmationPage {
     return HomeworkStore.instance.getRawImport();
   }
 
-  private updateTitle(candidateId: string, title: string): void {
-    if (HomeworkStore.instance.updateCandidateTitle(candidateId, title)) {
+  private saveCandidate(candidate: CandidateAssignment): void {
+    if (HomeworkStore.instance.updateCandidate(candidate)) {
+      this.localRevision++;
+      this.onStoreChanged();
+    }
+  }
+
+  private updateSubject(item: CandidateAssignment, subject: Subject): void {
+    this.saveCandidate({
+      id: item.id,
+      subject: subject,
+      title: item.title,
+      instruction: item.instruction,
+      textbookRef: item.textbookRef,
+      dueText: item.dueText,
+      sourceEvidence: item.sourceEvidence,
+      confidence: item.confidence
+    });
+  }
+
+  private updateTitle(item: CandidateAssignment, title: string): void {
+    this.saveCandidate({
+      id: item.id,
+      subject: item.subject,
+      title: title,
+      instruction: title,
+      textbookRef: item.textbookRef,
+      dueText: item.dueText,
+      sourceEvidence: item.sourceEvidence,
+      confidence: item.confidence
+    });
+  }
+
+  private updateDueText(item: CandidateAssignment, dueText: string): void {
+    this.saveCandidate({
+      id: item.id,
+      subject: item.subject,
+      title: item.title,
+      instruction: item.instruction,
+      textbookRef: item.textbookRef,
+      dueText: dueText,
+      sourceEvidence: item.sourceEvidence,
+      confidence: item.confidence
+    });
+  }
+
+  private updateTextbookRef(item: CandidateAssignment, textbookRef: string): void {
+    this.saveCandidate({
+      id: item.id,
+      subject: item.subject,
+      title: item.title,
+      instruction: item.instruction,
+      textbookRef: textbookRef,
+      dueText: item.dueText,
+      sourceEvidence: item.sourceEvidence,
+      confidence: item.confidence
+    });
+  }
+
+  private addCandidate(): void {
+    let raw = this.rawImport();
+    let candidate: CandidateAssignment = {
+      id: `manual-${Date.now()}`,
+      subject: Subject.CHINESE,
+      title: '新作业',
+      instruction: '新作业',
+      textbookRef: '待家长确认',
+      dueText: '今天',
+      sourceEvidence: {
+        sourceLabel: raw.sourceLabel.length > 0 ? raw.sourceLabel : '家长手工新增',
+        excerpt: '家长手工新增'
+      },
+      confidence: 1.0
+    };
+    if (HomeworkStore.instance.addCandidate(candidate)) {
       this.localRevision++;
       this.onStoreChanged();
     }
@@ -70,19 +143,36 @@ export struct HomeworkConfirmationPage {
   }
 
   @Builder
+  private SubjectChip(item: CandidateAssignment, subject: Subject) {
+    Text(subject)
+      .fontSize(12)
+      .fontColor(item.subject === subject ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .padding({ left: 12, right: 12, top: 7, bottom: 7 })
+      .backgroundColor(item.subject === subject ? AppTheme.PRIMARY_SOFT : '#F7F8FA')
+      .borderRadius(12)
+      .onClick(() => this.updateSubject(item, subject));
+  }
+
+  @Builder
   private CandidateEditor(item: CandidateAssignment) {
     Column({ space: 10 }) {
       Row() {
-        Text(item.subject)
-          .fontSize(12)
-          .fontColor(AppTheme.PRIMARY)
-          .padding({ left: 8, right: 8, top: 5, bottom: 5 })
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .borderRadius(10);
-        Blank();
-        Text(item.confidence < 0.8 ? '低置信度' : '已识别')
+        Text(item.confidence < 0.8 ? '请重点确认' : '已识别')
           .fontSize(12)
           .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUCCESS);
+        Blank();
+        Text('删除')
+          .fontSize(12)
+          .fontColor(AppTheme.DANGER)
+          .onClick(() => this.removeCandidate(item.id));
+      }
+      .width('100%');
+
+      Text('学科').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Row({ space: 8 }) {
+        this.SubjectChip(item, Subject.CHINESE);
+        this.SubjectChip(item, Subject.MATH);
+        this.SubjectChip(item, Subject.ENGLISH);
       }
       .width('100%');
 
@@ -91,26 +181,30 @@ export struct HomeworkConfirmationPage {
         .width('100%')
         .height(44)
         .backgroundColor('#F7F8FA')
-        .onChange((value: string) => this.updateTitle(item.id, value));
+        .onChange((value: string) => this.updateTitle(item, value));
 
-      Text(item.instruction).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-      Text(item.textbookRef).width('100%').fontSize(13).fontColor(AppTheme.PRIMARY);
-      Text(`截止：${item.dueText}`).width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      TextInput({ text: item.dueText })
+        .width('100%')
+        .height(44)
+        .backgroundColor('#F7F8FA')
+        .onChange((value: string) => this.updateDueText(item, value));
+
+      Text('教材 / 页码').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      TextInput({ text: item.textbookRef })
+        .width('100%')
+        .height(44)
+        .backgroundColor('#F7F8FA')
+        .onChange((value: string) => this.updateTextbookRef(item, value));
 
       Column({ space: 4 }) {
-        Text('Source Evidence').width('100%').fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('老师原文').width('100%').fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Text(item.sourceEvidence.excerpt).width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
       .padding(10)
       .backgroundColor(item.confidence < 0.8 ? '#FFF8E7' : '#F7F8FA')
       .borderRadius(10);
-
-      Text('删除这项候选')
-        .width('100%')
-        .fontSize(12)
-        .fontColor(AppTheme.DANGER)
-        .onClick(() => this.removeCandidate(item.id));
     }
     .width('100%')
     .padding(16)
@@ -132,6 +226,13 @@ export struct HomeworkConfirmationPage {
       ForEach(this.candidates(), (item: CandidateAssignment) => {
         this.CandidateEditor(item);
       }, (item: CandidateAssignment) => item.id);
+
+      Button('＋ 手工新增一项')
+        .width('100%')
+        .height(44)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .fontColor(AppTheme.PRIMARY)
+        .onClick(() => this.addCandidate());
 
       Button(`确认并发布 ${this.candidates().length} 项作业`)
         .width('100%')
@@ -158,7 +259,7 @@ export struct HomeworkConfirmationPage {
 
         Column({ space: 4 }) {
           Text('确认老师作业').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('AI 整理结果必须经过家长确认后才会进入学生今日作业').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('检查学科、标题、截止时间和教材信息，确认后再进入学生作业').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);
