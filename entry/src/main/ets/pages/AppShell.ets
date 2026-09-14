@@ -299,7 +299,7 @@ export struct AppShell {
   }
 
   @Builder
-  private CompactShell() {
+  private BottomNavShell() {
     Column() {
       this.RoleSwitch();
       Column() { this.RoleContent(); }.width('100%').layoutWeight(1);
@@ -310,7 +310,7 @@ export struct AppShell {
   }
 
   @Builder
-  private WideShell() {
+  private SideNavShell() {
     Row() {
       this.SideNavigation();
       Column() { this.RoleContent(); }.layoutWeight(1).height('100%');
@@ -322,10 +322,10 @@ export struct AppShell {
   @Builder
   private ShellContent() {
     Stack() {
-      if (this.sizeClass === WindowSizeClass.COMPACT) {
-        this.CompactShell();
+      if (this.sizeClass === WindowSizeClass.EXPANDED) {
+        this.SideNavShell();
       } else {
-        this.WideShell();
+        this.BottomNavShell();
       }
     }
     .width('100%')
