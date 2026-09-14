@@ -8,6 +8,9 @@ export class HomeworkSyncService {
   static readonly instance: HomeworkSyncService = new HomeworkSyncService();
   private running: boolean = false;
   private requested: boolean = false;
+  // Sync metadata deliberately stays outside the domain model. If this app process has never
+  // observed a server version for an assignment, the server wins on first reconciliation.
+  private observedVersions: Map<string, number> = new Map<string, number>();
   private constructor() {}
 
   requestSync(): void {
@@ -23,18 +26,35 @@ export class HomeworkSyncService {
       let remote = await HomeworkRemoteApi.instance.list(studentId);
       let remoteById: Map<string, RemoteAssignment> = new Map<string, RemoteAssignment>();
       for (let item of remote) remoteById.set(item.id, item);
+
       let local = HomeworkStore.instance.getAssignments().slice();
       for (let assignment of local) {
         let existing = remoteById.get(assignment.id);
         if (existing === undefined) {
-          await HomeworkRemoteApi.instance.create(assignment);
-        } else {
-          try { await HomeworkRemoteApi.instance.update(assignment, existing.version); } catch {}
+          let created = await HomeworkRemoteApi.instance.create(assignment);
+          this.observedVersions.set(created.id, created.version);
+          continue;
+        }
+
+        let lastObserved = this.observedVersions.get(assignment.id);
+        // Only write when this process is still based on the same remote version it saw before.
+        // A missing/mismatched version means another device may be newer, so server data wins.
+        if (lastObserved !== undefined && lastObserved === existing.version) {
+          try {
+            let updated = await HomeworkRemoteApi.instance.update(assignment, lastObserved);
+            this.observedVersions.set(updated.id, updated.version);
+          } catch {
+            // A 409 or transient write failure is resolved by the final server refresh below.
+          }
         }
       }
+
       let finalRemote = await HomeworkRemoteApi.instance.list(studentId);
       let merged: Assignment[] = [];
-      for (let item of finalRemote) merged.push(RemoteAssignmentMapper.toLocal(item, HomeworkStore.instance.getAssignment(item.id)));
+      for (let item of finalRemote) {
+        this.observedVersions.set(item.id, item.version);
+        merged.push(RemoteAssignmentMapper.toLocal(item, HomeworkStore.instance.getAssignment(item.id)));
+      }
       HomeworkStore.instance.replaceAssignmentsForActiveStudent(merged);
       return true;
     } catch {
