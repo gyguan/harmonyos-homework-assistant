@@ -9,7 +9,8 @@ Branch: `feat/issue-2-app-shell`
 - Build baseline:
   - compile SDK: `26.0.0`
   - compatible SDK: `6.0.0(20)`
-  - target SDK: `6.0.0(20)`
+  - target SDK: unset (follow the locally verified DevEco configuration)
+- Project model version: `5.0.0` in both `hvigor/hvigor-config.json5` and root `oh-package.json5`.
 - Hvigor 6.26.4 and `@ohos/hvigor-ohos-plugin` 6.26.4 explicitly pinned.
 - Phone + tablet device declaration.
 - One shared responsive resolver:
@@ -54,7 +55,7 @@ Branch: `feat/issue-2-app-shell`
 
 ## Compatibility decisions
 
-The local DevEco Studio 26.0.0 installation only accepts `compileSdkVersion: 26.0.0`, so the project compiles with the latest installed SDK while keeping the application runtime/behavior baseline at HarmonyOS 6.0.0(20) through `compatibleSdkVersion` and `targetSdkVersion`.
+The locally verified DevEco Studio 26.0.0 configuration uses `compileSdkVersion: 26.0.0`, keeps `compatibleSdkVersion: 6.0.0(20)`, leaves `targetSdkVersion` unset, and requires project `modelVersion: 5.0.0`.
 
 `ContainerReader` is intentionally not used because it requires API 26+. V0.1 runtime-compatible code continues to use API-20-compatible primitives such as `Navigation`, `Row` / `Column`, shared window size classes and `onAreaChange`.
 
@@ -66,7 +67,8 @@ Run from the repository root:
 
 The gate checks:
 
-- compile SDK 26.0.0 with compatible / target baseline 6.0.0(20).
+- compile SDK 26.0.0 with compatible baseline 6.0.0(20) and no explicit target SDK override.
+- project modelVersion 5.0.0.
 - Hvigor 6.26.4 plugin pinning.
 - Phone + tablet device declaration.
 - `Navigation` + `NavPathStack` root.
