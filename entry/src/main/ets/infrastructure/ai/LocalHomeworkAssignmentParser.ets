@@ -58,7 +58,7 @@ export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
 
     for (let i = 1; i <= 30; i++) {
       let markers: string[] = [
-        `${i}. `,
+        `${i}.`,
         `${i}．`,
         `${i}、`,
         `(${i})`,
@@ -115,6 +115,7 @@ export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
       bestSubject = Subject.MATH;
     }
     if (english >= 0 && (bestIndex < 0 || english < bestIndex)) {
+      bestIndex = english;
       bestSubject = Subject.ENGLISH;
     }
     return bestSubject;
