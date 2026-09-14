@@ -2,16 +2,22 @@ import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
 import { HomeworkStore } from '../../../data/HomeworkStore';
-import { Assignment, DashboardSummary } from '../../../domain/model/HomeworkModels';
+import { Assignment, StudentProfile, TodaySummary } from '../../../domain/model/HomeworkModels';
 
 @Component
 export struct ParentDashboardPage {
   @Prop sizeClass: WindowSizeClass;
   @Prop revision: number = 0;
+  onOpenImport: () => void = () => {};
 
-  private dashboard(): DashboardSummary {
+  private student(): StudentProfile {
     let currentRevision = this.revision;
-    return HomeworkStore.instance.getDashboardSummary();
+    return HomeworkStore.instance.getStudent();
+  }
+
+  private summary(): TodaySummary {
+    let currentRevision = this.revision;
+    return HomeworkStore.instance.getTodaySummary();
   }
 
   private assignments(): Assignment[] {
@@ -20,49 +26,40 @@ export struct ParentDashboardPage {
   }
 
   @Builder
-  private Kpi(label: string, value: number, color: string) {
-    Column({ space: 6 }) {
-      Text(label).fontSize(12).fontColor(AppTheme.SUBTEXT);
-      Text(value.toString()).fontSize(28).fontWeight(FontWeight.Bold).fontColor(color);
+  private TodayCard() {
+    Column({ space: 10 }) {
+      Text(`${this.student().name}今天`)
+        .width('100%')
+        .fontSize(14)
+        .fontColor('#FFFFFFCC');
+      Text(`${this.summary().completed} / ${this.summary().total} 已完成`)
+        .width('100%')
+        .fontSize(32)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(Color.White);
+      Text('不用盯过程，只看今天还有什么没完成。')
+        .width('100%')
+        .fontSize(14)
+        .fontColor(Color.White);
+      Progress({ value: this.summary().completed, total: this.summary().total, type: ProgressType.Linear })
+        .width('100%')
+        .height(8)
+        .color(Color.White)
+        .backgroundColor('#FFFFFF44');
     }
-    .layoutWeight(1)
-    .padding(16)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(16)
-    .border({ width: 1, color: AppTheme.BORDER });
-  }
-
-  @Builder
-  private KpiSection() {
-    if (this.sizeClass === WindowSizeClass.COMPACT) {
-      Column({ space: 10 }) {
-        Row({ space: 10 }) {
-          this.Kpi('已完成', this.dashboard().completed, AppTheme.SUCCESS);
-          this.Kpi('进行中', this.dashboard().inProgress, AppTheme.WARNING);
-        }
-        .width('100%');
-        Row({ space: 10 }) {
-          this.Kpi('未开始', this.dashboard().notStarted, AppTheme.SUBTEXT);
-          this.Kpi('已提交', this.dashboard().submitted, AppTheme.SUCCESS);
-        }
-        .width('100%');
-      }
-      .width('100%');
-    } else {
-      Row({ space: 10 }) {
-        this.Kpi('已完成', this.dashboard().completed, AppTheme.SUCCESS);
-        this.Kpi('进行中', this.dashboard().inProgress, AppTheme.WARNING);
-        this.Kpi('未开始', this.dashboard().notStarted, AppTheme.SUBTEXT);
-        this.Kpi('已提交', this.dashboard().submitted, AppTheme.SUCCESS);
-      }
-      .width('100%');
-    }
+    .width('100%')
+    .padding(20)
+    .borderRadius(22)
+    .linearGradient({
+      angle: 135,
+      colors: [[AppTheme.PRIMARY, 0.0], ['#6D8DFF', 1.0]]
+    });
   }
 
   @Builder
   private AssignmentProgress() {
     Column({ space: 10 }) {
-      Text('全部作业').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
+      Text('今天的作业').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
       ForEach(this.assignments(), (item: Assignment) => {
         AssignmentCard({ assignment: item });
       }, (item: Assignment) => item.id);
@@ -71,31 +68,23 @@ export struct ParentDashboardPage {
   }
 
   @Builder
-  private Attention() {
+  private ImportCard() {
     Column({ space: 10 }) {
-      Text('需要关注').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
-      if (this.dashboard().overdue > 0) {
-        Text(`有 ${this.dashboard().overdue} 项作业已超时，建议优先处理。`)
-          .width('100%')
-          .fontSize(14)
-          .fontColor(AppTheme.DANGER);
-      }
-      if (this.dashboard().readyToSubmit > 0) {
-        Text(`有 ${this.dashboard().readyToSubmit} 项已经做完，等待学生提交。`)
-          .width('100%')
-          .fontSize(14)
-          .fontColor(AppTheme.WARNING);
-      }
-      if (this.dashboard().needsRework > 0) {
-        Text(`有 ${this.dashboard().needsRework} 项需要重做。`)
-          .width('100%')
-          .fontSize(14)
-          .fontColor(AppTheme.DANGER);
-      }
-      Text('所有统计都直接来自统一 Assignment 状态，不再维护页面级重复计数。')
+      Text('老师又发作业了？')
         .width('100%')
-        .fontSize(13)
+        .fontSize(20)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT);
+      Text('把截图、文字或文件丢给小伴，确认后自动进入今天的作业。')
+        .width('100%')
+        .fontSize(14)
+        .lineHeight(22)
         .fontColor(AppTheme.SUBTEXT);
+      Button('导入老师作业')
+        .width('100%')
+        .height(48)
+        .backgroundColor(AppTheme.PRIMARY)
+        .onClick(() => this.onOpenImport());
     }
     .width('100%')
     .padding(18)
@@ -108,24 +97,24 @@ export struct ParentDashboardPage {
     Scroll() {
       Column({ space: 16 }) {
         Column({ space: 4 }) {
-          Text('小宇今天的学习').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('状态来自本地 HomeworkStore · 刚刚更新').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('作业进度').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          Text(`${this.student().grade} · ${this.student().semester}`).fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);
 
-        this.KpiSection();
+        this.TodayCard();
 
         if (this.sizeClass === WindowSizeClass.EXPANDED) {
           Row({ space: 18 }) {
             Column() { this.AssignmentProgress(); }.width('64%');
-            Column() { this.Attention(); }.layoutWeight(1);
+            Column() { this.ImportCard(); }.layoutWeight(1);
           }
           .width('100%')
           .alignItems(VerticalAlign.Top);
         } else {
           this.AssignmentProgress();
-          this.Attention();
+          this.ImportCard();
         }
       }
       .width('100%')
