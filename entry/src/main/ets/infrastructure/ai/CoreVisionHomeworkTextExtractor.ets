@@ -34,29 +34,44 @@ export class CoreVisionHomeworkTextExtractor implements HomeworkTextExtractor {
     }
 
     await this.ensureInitialized();
-    let file = await fileIo.open(input.resourceUri, fileIo.OpenMode.READ_ONLY);
+
     try {
-      let imageSource = image.createImageSource(file.fd);
-      let pixelMap = await imageSource.createPixelMap();
-      let visionInfo: textRecognition.VisionInfo = {
-        pixelMap: pixelMap
-      };
-      let configuration: textRecognition.TextRecognitionConfiguration = {
-        isDirectionDetectionSupported: true
-      };
-      let result = await textRecognition.recognizeText(visionInfo, configuration);
-      let text = result.value.trim();
-      if (text.length === 0) {
-        throw new Error('没有识别到文字，请换一张更清晰的截图');
+      let file = await fileIo.open(input.resourceUri, fileIo.OpenMode.READ_ONLY);
+      try {
+        let recognizedText = '';
+        try {
+          let imageSource = image.createImageSource(file.fd);
+          let pixelMap = await imageSource.createPixelMap();
+          let visionInfo: textRecognition.VisionInfo = {
+            pixelMap: pixelMap
+          };
+          let configuration: textRecognition.TextRecognitionConfiguration = {
+            isDirectionDetectionSupported: true
+          };
+          let result = await textRecognition.recognizeText(visionInfo, configuration);
+          recognizedText = result.value.trim();
+        } catch {
+          throw new Error('文字识别执行失败');
+        }
+
+        if (recognizedText.length === 0) {
+          throw new Error('没有识别到文字，请换一张更清晰的截图');
+        }
+        return {
+          importId: input.id,
+          studentId: input.studentId,
+          sourceLabel: input.sourceLabel,
+          text: recognizedText
+        };
+      } finally {
+        try {
+          await fileIo.close(file);
+        } catch {
+          // Closing is best-effort and must not hide the OCR result or primary error.
+        }
       }
-      return {
-        importId: input.id,
-        studentId: input.studentId,
-        sourceLabel: input.sourceLabel,
-        text: text
-      };
-    } finally {
-      await fileIo.close(file);
+    } catch {
+      throw new Error('无法读取或识别这张图片，请换一张更清晰的截图');
     }
   }
 }

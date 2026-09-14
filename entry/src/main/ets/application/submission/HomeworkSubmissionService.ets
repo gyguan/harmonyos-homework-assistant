@@ -46,13 +46,22 @@ export class HomeworkSubmissionService {
     if (this.context === null) {
       throw new Error('提交服务尚未初始化');
     }
-    let source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
+
     try {
-      let destinationPath = `${this.context.filesDir}/homework-submission-${groupId}-${index}${this.extension(sourceUri)}`;
-      await fileIo.copyFile(source.fd, destinationPath, 0);
-      return fileUri.getUriFromPath(destinationPath);
-    } finally {
-      await fileIo.close(source);
+      let source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
+      try {
+        let destinationPath = `${this.context.filesDir}/homework-submission-${groupId}-${index}${this.extension(sourceUri)}`;
+        await fileIo.copyFile(source.fd, destinationPath, 0);
+        return fileUri.getUriFromPath(destinationPath);
+      } finally {
+        try {
+          await fileIo.close(source);
+        } catch {
+          // Closing is best-effort and must not replace the primary copy error.
+        }
+      }
+    } catch {
+      throw new Error('读取或保存作业照片失败');
     }
   }
 
