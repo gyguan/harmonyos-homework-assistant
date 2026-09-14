@@ -51,7 +51,7 @@ export struct StudentTodayPage {
         .fontSize(12)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.WARNING);
-      Text('正在使用已缓存的今日作业，提交将在联网后同步。')
+      Text('正在使用当前孩子已缓存的今日作业。')
         .fontSize(12)
         .fontColor(AppTheme.SUBTEXT);
     }
@@ -164,7 +164,7 @@ export struct StudentTodayPage {
               .fontSize(26)
               .fontWeight(FontWeight.Bold)
               .fontColor(AppTheme.TEXT);
-            Text(`${this.student().grade} · ${this.student().semester}`)
+            Text(`${this.student().grade} · ${this.student().className} · ${this.student().semester}`)
               .fontSize(14)
               .fontColor(AppTheme.SUBTEXT);
           }
