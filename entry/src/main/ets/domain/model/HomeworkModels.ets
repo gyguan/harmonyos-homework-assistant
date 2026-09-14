@@ -18,11 +18,20 @@ export enum SubmissionType {
   MOCK_IMAGE = 'MOCK_IMAGE'
 }
 
+export enum HomeworkImportSourceKind {
+  TEXT = 'TEXT',
+  IMAGE = 'IMAGE',
+  FILE = 'FILE',
+  SHARE = 'SHARE'
+}
+
 export interface RawHomeworkImport {
   id: string;
   familyId: string;
-  rawText: string;
+  sourceKind: HomeworkImportSourceKind;
   sourceLabel: string;
+  resourceUri: string;
+  rawText: string;
 }
 
 export interface SourceEvidence {
