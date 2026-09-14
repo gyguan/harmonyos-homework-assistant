@@ -20,6 +20,6 @@ export class HomeworkImportService {
     }
     let candidates = await this.pipeline.run(HomeworkStore.instance.getRawImport());
     HomeworkStore.instance.replaceCandidates(candidates);
-    return candidates.length;
+    return HomeworkStore.instance.getCandidates().length;
   }
 }
