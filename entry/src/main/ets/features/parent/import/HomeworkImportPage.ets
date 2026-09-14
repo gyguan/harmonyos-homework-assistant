@@ -1,3 +1,4 @@
+import { HomeworkImportService } from '../../../application/import/HomeworkImportService';
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkStore } from '../../../data/HomeworkStore';
@@ -8,7 +9,10 @@ export struct HomeworkImportPage {
   @Prop sizeClass: WindowSizeClass;
   @Prop revision: number = 0;
   @State private showCompactCandidates: boolean = false;
+  @State private parseBusy: boolean = false;
+  @State private parseMessage: string = '';
   onOpenConfirmation: () => void = () => {};
+  onStoreChanged: () => void = () => {};
 
   private rawImport(): RawHomeworkImport {
     let currentRevision = this.revision;
@@ -18,6 +22,20 @@ export struct HomeworkImportPage {
   private candidates(): CandidateAssignment[] {
     let currentRevision = this.revision;
     return HomeworkStore.instance.getCandidates();
+  }
+
+  private async reparse(): Promise<void> {
+    if (this.parseBusy) {
+      return;
+    }
+    this.parseBusy = true;
+    let count = await HomeworkImportService.instance.reparseCurrentImport();
+    this.parseBusy = false;
+    this.parseMessage = count > 0 ? `Mock Pipeline 已重新生成 ${count} 项候选作业` : '解析流水线当前不可用';
+    this.onStoreChanged();
+    if (this.sizeClass === WindowSizeClass.COMPACT && count > 0) {
+      this.showCompactCandidates = true;
+    }
   }
 
   @Builder
@@ -46,6 +64,21 @@ export struct HomeworkImportPage {
         Button('上传文件').layoutWeight(1);
       }
       .width('100%');
+
+      Button(this.parseBusy ? '解析中…' : '模拟重新解析')
+        .width('100%')
+        .height(44)
+        .enabled(!this.parseBusy)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .fontColor(AppTheme.PRIMARY)
+        .onClick(() => this.reparse());
+
+      if (this.parseMessage.length > 0) {
+        Text(this.parseMessage)
+          .width('100%')
+          .fontSize(12)
+          .fontColor(AppTheme.SUCCESS);
+      }
 
       if (this.sizeClass === WindowSizeClass.COMPACT) {
         Button('查看 AI 解析结果')
@@ -81,12 +114,12 @@ export struct HomeworkImportPage {
       .width('100%');
 
       if (this.candidates().length === 0) {
-        Text('当前候选作业已经发布，可切换到学生空间查看。')
+        Text('当前没有待确认候选。可点击“模拟重新解析”通过 Import Pipeline 重新生成。')
           .width('100%')
           .padding(16)
           .fontSize(14)
-          .fontColor(AppTheme.SUCCESS)
-          .backgroundColor('#EEF9F3')
+          .fontColor(AppTheme.SUBTEXT)
+          .backgroundColor('#F7F8FA')
           .borderRadius(14);
       } else {
         ForEach(this.candidates(), (item: CandidateAssignment) => {
