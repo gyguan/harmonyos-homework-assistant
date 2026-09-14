@@ -28,7 +28,7 @@ export struct AppShell {
   @State private studentRoute: StudentRoute = StudentRoute.TODAY;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
 
-  private navPathStack: NavPathStack = new NavPathStack();
+  @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
 
   private get sizeClass(): WindowSizeClass {
     return ResponsiveContext.resolve(this.widthVp);
@@ -191,7 +191,8 @@ export struct AppShell {
     .height('100%');
   }
 
-  build() {
+  @Builder
+  private ShellContent() {
     Stack() {
       if (this.sizeClass === WindowSizeClass.COMPACT) {
         this.CompactShell();
@@ -206,5 +207,15 @@ export struct AppShell {
       this.widthVp = Number(newValue.width);
       this.heightVp = Number(newValue.height);
     });
+  }
+
+  build() {
+    Navigation(this.navPathStack) {
+      this.ShellContent();
+    }
+    .mode(NavigationMode.Stack)
+    .hideTitleBar(true)
+    .width('100%')
+    .height('100%');
   }
 }
