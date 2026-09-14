@@ -41,6 +41,8 @@ text_extractor_port = read("entry/src/main/ets/domain/port/HomeworkTextExtractor
 assignment_parser_port = read("entry/src/main/ets/domain/port/HomeworkAssignmentParser.ets")
 import_pipeline = read("entry/src/main/ets/application/import/HomeworkImportPipeline.ets")
 import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
+core_ocr = read("entry/src/main/ets/infrastructure/ai/CoreVisionHomeworkTextExtractor.ets")
+local_parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
 
 require('"compileSdkVersion": "26.0.0"' in build_profile,
         "compileSdkVersion must match the DevEco Studio 26.0.0 toolchain")
@@ -83,7 +85,7 @@ for core_model in ["StudentProfile", "AppSettings", "CandidateAssignment", "Assi
     require(f"interface {core_model}" in models, f"missing simplified V0.1 core model: {core_model}")
 
 require("HomeworkImportSourceKind" in models and "resourceUri" in models,
-        "RawHomeworkImport must preserve source kind and resource URI for future OCR/file extraction")
+        "RawHomeworkImport must preserve source kind and resource URI for OCR/file extraction")
 require("familyId" not in models and "studentId" not in models,
         "single-family V0.1 domain must not carry tenant/family routing fields")
 require("class AssignmentStateMachine" in state_machine,
@@ -94,6 +96,8 @@ require("class HomeworkStore" in store and "static readonly instance" in store,
         "HomeworkStore singleton must own the local lifecycle state")
 require("getStudent" in store and "getSettings" in store,
         "HomeworkStore must own the single-child profile and app settings")
+require("replaceRawImport" in store and "replaceCandidates" in store,
+        "HomeworkStore must accept a successful OCR import atomically from the application service")
 require("publishCandidates" in store and "submitMockImage" in store,
         "HomeworkStore must support candidate publishing and submission")
 require("AssignmentStateMachine.canTransition" in store,
@@ -115,15 +119,32 @@ require("HomeworkStore.instance.initialize" in entry_ability and "PreferencesHom
 require("interface HomeworkTextExtractor" in text_extractor_port,
         "OCR/text extraction must be hidden behind HomeworkTextExtractor")
 require("interface HomeworkAssignmentParser" in assignment_parser_port,
-        "LLM/semantic parsing must be hidden behind HomeworkAssignmentParser")
+        "semantic parsing must be hidden behind HomeworkAssignmentParser")
 require("class HomeworkImportPipeline" in import_pipeline,
         "extractor and parser must be orchestrated by HomeworkImportPipeline")
-require("class HomeworkImportService" in import_service and "replaceCandidates" in import_service,
-        "Import UI must write parser results through HomeworkImportService and HomeworkStore")
-require("HomeworkImportService" in import_page,
-        "HomeworkImportPage must invoke the application import service")
-require("MockHomeworkTextExtractor" not in import_page and "MockHomeworkAssignmentParser" not in import_page,
-        "HomeworkImportPage must not depend on concrete OCR/LLM adapters")
+require("class HomeworkImportService" in import_service and "selectImageAndParse" in import_service,
+        "Import UI must select and process a screenshot through HomeworkImportService")
+require("photoAccessHelper.PhotoViewPicker" in import_service,
+        "screenshot import must use the HarmonyOS photo picker")
+require("HomeworkImportService" in import_page and "选择作业截图" in import_page,
+        "HomeworkImportPage must expose the real screenshot import action")
+require("CoreVisionHomeworkTextExtractor" not in import_page and "LocalHomeworkAssignmentParser" not in import_page,
+        "HomeworkImportPage must not depend on concrete OCR/parser adapters")
+
+require("class CoreVisionHomeworkTextExtractor" in core_ocr,
+        "V0.1 must provide a real Core Vision OCR extractor")
+require("@kit.CoreVisionKit" in core_ocr and "textRecognition.recognizeText" in core_ocr,
+        "real OCR extractor must use Core Vision textRecognition")
+require("class LocalHomeworkAssignmentParser" in local_parser,
+        "V0.1 must provide a local homework parser without cloud credentials")
+for subject_label in ["语文", "数学", "英语"]:
+    require(subject_label in local_parser, f"local parser must recognize subject marker: {subject_label}")
+require("sourceEvidence" in local_parser and "input.sourceLabel" in local_parser,
+        "candidate Source Evidence must come from the actual extracted text source")
+require("CoreVisionHomeworkTextExtractor" in entry_ability and "LocalHomeworkAssignmentParser" in entry_ability,
+        "EntryAbility must compose the real OCR extractor with the local parser")
+require("MockHomeworkTextExtractor" not in entry_ability and "MockHomeworkAssignmentParser" not in entry_ability,
+        "production composition root must not use the Mock import pipeline")
 
 require("CONFIRMATION" in app_shell and "PROGRESS" in app_shell,
         "AppShell must expose parent confirmation and progress routes")
@@ -160,8 +181,10 @@ if ETS_ROOT.exists():
                 errors.append(f"responsive breakpoint duplicated outside WindowSizeClass: {rel}")
         if "@kit.ArkData" in text and "infrastructure/persistence/" not in rel:
             errors.append(f"ArkData persistence leaked outside infrastructure adapter: {rel}")
-        if "/features/" in f"/{rel}" and ("MockHomeworkTextExtractor" in text or "MockHomeworkAssignmentParser" in text):
-            errors.append(f"UI page depends on concrete OCR/LLM adapter: {rel}")
+        if "@kit.CoreVisionKit" in text and "infrastructure/ai/" not in rel:
+            errors.append(f"Core Vision OCR leaked outside infrastructure adapter: {rel}")
+        if "/features/" in f"/{rel}" and ("CoreVisionHomeworkTextExtractor" in text or "LocalHomeworkAssignmentParser" in text):
+            errors.append(f"UI page depends on concrete OCR/parser adapter: {rel}")
         for field in forbidden_single_family_fields:
             if field in text:
                 errors.append(f"single-family V0.1 contains unnecessary multi-tenant field {field}: {rel}")
