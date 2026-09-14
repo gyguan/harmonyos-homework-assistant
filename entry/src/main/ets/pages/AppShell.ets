@@ -70,6 +70,7 @@ export struct AppShell {
     if (HomeworkStore.instance.setActiveStudent(students[nextIndex].id)) {
       this.selectedAssignmentId = '';
       this.studentRoute = StudentRoute.TODAY;
+      this.parentRoute = ParentRoute.DASHBOARD;
       this.touchStore();
     }
   }
