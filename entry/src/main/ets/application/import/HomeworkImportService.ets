@@ -17,12 +17,47 @@ export class HomeworkImportService {
     this.pipeline = new HomeworkImportPipeline(extractor, parser);
   }
 
+  async parseText(text: string): Promise<number> {
+    if (this.pipeline === null) {
+      throw new Error('作业导入能力尚未初始化');
+    }
+    let normalized = text.trim();
+    if (normalized.length === 0) {
+      return 0;
+    }
+
+    let rawImport: RawHomeworkImport = {
+      id: `text-${Date.now()}`,
+      sourceKind: HomeworkImportSourceKind.TEXT,
+      sourceLabel: '家长录入文字',
+      resourceUri: '',
+      rawText: normalized
+    };
+    let output: HomeworkImportPipelineResult = await this.pipeline.run(rawImport);
+    if (output.candidates.length === 0) {
+      return 0;
+    }
+
+    HomeworkStore.instance.replaceRawImport({
+      id: rawImport.id,
+      sourceKind: rawImport.sourceKind,
+      sourceLabel: rawImport.sourceLabel,
+      resourceUri: rawImport.resourceUri,
+      rawText: output.extracted.text
+    });
+    HomeworkStore.instance.replaceCandidates(output.candidates);
+    return output.candidates.length;
+  }
+
   async reparseCurrentImport(): Promise<number> {
     if (this.pipeline === null) {
       return 0;
     }
     let current = HomeworkStore.instance.getRawImport();
     let output = await this.pipeline.run(current);
+    if (output.candidates.length === 0) {
+      return 0;
+    }
     HomeworkStore.instance.replaceRawImport({
       id: current.id,
       sourceKind: current.sourceKind,
@@ -31,7 +66,7 @@ export class HomeworkImportService {
       rawText: output.extracted.text
     });
     HomeworkStore.instance.replaceCandidates(output.candidates);
-    return HomeworkStore.instance.getCandidates().length;
+    return output.candidates.length;
   }
 
   async selectImageAndParse(): Promise<HomeworkImageImportResult> {
@@ -68,11 +103,13 @@ export class HomeworkImportService {
       resourceUri: rawImport.resourceUri,
       rawText: output.extracted.text
     });
-    HomeworkStore.instance.replaceCandidates(output.candidates);
+    if (output.candidates.length > 0) {
+      HomeworkStore.instance.replaceCandidates(output.candidates);
+    }
 
     return {
       selected: true,
-      candidateCount: HomeworkStore.instance.getCandidates().length,
+      candidateCount: output.candidates.length,
       recognizedText: output.extracted.text
     };
   }
