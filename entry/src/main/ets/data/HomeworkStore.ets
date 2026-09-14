@@ -27,7 +27,7 @@ export class HomeworkStore {
   private candidates: CandidateAssignment[] = [];
   private submissions: Submission[] = [];
   private tutorSessions: TutorSession[] = [];
-  private readonly rawImport: RawHomeworkImport = MockData.rawImport;
+  private rawImport: RawHomeworkImport = MockData.rawImport;
   private submissionSequence: number = 1;
   private persistence: HomeworkPersistence | null = null;
   private persistRequested: boolean = false;
@@ -50,6 +50,7 @@ export class HomeworkStore {
 
   private seedFromMockData(): void {
     this.settings = this.cloneSettings(MockData.settings);
+    this.rawImport = this.cloneRawImport(MockData.rawImport);
     this.assignments = [];
     this.candidates = [];
     this.submissions = [];
@@ -153,6 +154,16 @@ export class HomeworkStore {
     };
   }
 
+  private cloneRawImport(source: RawHomeworkImport): RawHomeworkImport {
+    return {
+      id: source.id,
+      sourceKind: source.sourceKind,
+      sourceLabel: source.sourceLabel,
+      resourceUri: source.resourceUri,
+      rawText: source.rawText
+    };
+  }
+
   private cloneAssignment(source: Assignment): Assignment {
     return {
       id: source.id,
@@ -233,6 +244,10 @@ export class HomeworkStore {
 
   getRawImport(): RawHomeworkImport {
     return this.rawImport;
+  }
+
+  replaceRawImport(input: RawHomeworkImport): void {
+    this.rawImport = this.cloneRawImport(input);
   }
 
   getAssignments(): Assignment[] {
