@@ -26,8 +26,10 @@ export class HomeworkImportService {
       return 0;
     }
 
+    let studentId = HomeworkStore.instance.getActiveStudentId();
     let rawImport: RawHomeworkImport = {
       id: `text-${Date.now()}`,
+      studentId: studentId,
       sourceKind: HomeworkImportSourceKind.TEXT,
       sourceLabel: '家长录入文字',
       resourceUri: '',
@@ -40,6 +42,7 @@ export class HomeworkImportService {
 
     HomeworkStore.instance.replaceRawImport({
       id: rawImport.id,
+      studentId: studentId,
       sourceKind: rawImport.sourceKind,
       sourceLabel: rawImport.sourceLabel,
       resourceUri: rawImport.resourceUri,
@@ -60,6 +63,7 @@ export class HomeworkImportService {
     }
     HomeworkStore.instance.replaceRawImport({
       id: current.id,
+      studentId: current.studentId,
       sourceKind: current.sourceKind,
       sourceLabel: current.sourceLabel,
       resourceUri: current.resourceUri,
@@ -87,8 +91,10 @@ export class HomeworkImportService {
       };
     }
 
+    let studentId = HomeworkStore.instance.getActiveStudentId();
     let rawImport: RawHomeworkImport = {
       id: `image-${Date.now()}`,
+      studentId: studentId,
       sourceKind: HomeworkImportSourceKind.IMAGE,
       sourceLabel: '相册作业截图',
       resourceUri: selection.photoUris[0],
@@ -98,6 +104,7 @@ export class HomeworkImportService {
     let output: HomeworkImportPipelineResult = await this.pipeline.run(rawImport);
     HomeworkStore.instance.replaceRawImport({
       id: rawImport.id,
+      studentId: studentId,
       sourceKind: rawImport.sourceKind,
       sourceLabel: rawImport.sourceLabel,
       resourceUri: rawImport.resourceUri,
