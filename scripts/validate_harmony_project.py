@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import json
 import re
 import sys
 
@@ -26,9 +25,12 @@ module_config = read("entry/src/main/module.json5")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 responsive = read("entry/src/main/ets/common/responsive/WindowSizeClass.ets")
 
-for sdk_key in ("compileSdkVersion", "compatibleSdkVersion", "targetSdkVersion"):
-    require(f'"{sdk_key}": "6.0.0(20)"' in build_profile,
-            f"{sdk_key} must stay on HarmonyOS 6.0.0(20) for V0.1")
+require('"compileSdkVersion": "26.0.0"' in build_profile,
+        "compileSdkVersion must match the DevEco Studio 26.0.0 toolchain")
+require('"compatibleSdkVersion": "6.0.0(20)"' in build_profile,
+        "compatibleSdkVersion must keep the V0.1 runtime baseline at HarmonyOS 6.0.0(20)")
+require('"targetSdkVersion": "6.0.0(20)"' in build_profile,
+        "targetSdkVersion must stay at HarmonyOS 6.0.0(20) until target-26 behavior adaptation is complete")
 
 require('"modelVersion": "6.0.2"' in hvigor_config, "Hvigor modelVersion must be 6.0.2")
 require('"hvigorVersion": "6.0.2"' in hvigor_config, "Hvigor version must be pinned to 6.0.2")
@@ -50,7 +52,7 @@ if ETS_ROOT.exists():
         text = file.read_text(encoding="utf-8")
         rel = file.relative_to(ROOT).as_posix()
         if "ContainerReader" in text:
-            errors.append(f"API 26+ ContainerReader is not allowed in V0.1: {rel}")
+            errors.append(f"API 26+ ContainerReader is not allowed in V0.1 runtime-compatible code: {rel}")
         if file.name != "WindowSizeClass.ets":
             if re.search(r"(?:<=|>=|<|>)\s*(?:600|840)\b", text):
                 errors.append(f"responsive breakpoint duplicated outside WindowSizeClass: {rel}")
