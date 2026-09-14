@@ -1,4 +1,4 @@
-import { ExtractedHomeworkText } from '../../domain/model/ImportModels';
+import { ExtractedHomeworkText, HomeworkImportPipelineResult } from '../../domain/model/ImportModels';
 import { CandidateAssignment, RawHomeworkImport } from '../../domain/model/HomeworkModels';
 import { HomeworkAssignmentParser } from '../../domain/port/HomeworkAssignmentParser';
 import { HomeworkTextExtractor } from '../../domain/port/HomeworkTextExtractor';
@@ -12,8 +12,12 @@ export class HomeworkImportPipeline {
     this.parser = parser;
   }
 
-  async run(input: RawHomeworkImport): Promise<CandidateAssignment[]> {
+  async run(input: RawHomeworkImport): Promise<HomeworkImportPipelineResult> {
     let extracted: ExtractedHomeworkText = await this.extractor.extract(input);
-    return await this.parser.parse(extracted);
+    let candidates: CandidateAssignment[] = await this.parser.parse(extracted);
+    return {
+      extracted: extracted,
+      candidates: candidates
+    };
   }
 }

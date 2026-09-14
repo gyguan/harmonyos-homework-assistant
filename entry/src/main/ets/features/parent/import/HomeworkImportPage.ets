@@ -2,6 +2,7 @@ import { HomeworkImportService } from '../../../application/import/HomeworkImpor
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkStore } from '../../../data/HomeworkStore';
+import { HomeworkImageImportResult } from '../../../domain/model/ImportModels';
 import { CandidateAssignment, RawHomeworkImport } from '../../../domain/model/HomeworkModels';
 
 @Component
@@ -11,6 +12,7 @@ export struct HomeworkImportPage {
   @State private showCompactCandidates: boolean = false;
   @State private parseBusy: boolean = false;
   @State private parseMessage: string = '';
+  @State private parseError: boolean = false;
   onOpenConfirmation: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
@@ -24,17 +26,56 @@ export struct HomeworkImportPage {
     return HomeworkStore.instance.getCandidates();
   }
 
-  private async reparse(): Promise<void> {
+  private async selectScreenshot(): Promise<void> {
     if (this.parseBusy) {
       return;
     }
     this.parseBusy = true;
-    let count = await HomeworkImportService.instance.reparseCurrentImport();
-    this.parseBusy = false;
-    this.parseMessage = count > 0 ? `Mock Pipeline 已重新生成 ${count} 项候选作业` : '解析流水线当前不可用';
-    this.onStoreChanged();
-    if (this.sizeClass === WindowSizeClass.COMPACT && count > 0) {
-      this.showCompactCandidates = true;
+    this.parseMessage = '';
+    this.parseError = false;
+    try {
+      let result: HomeworkImageImportResult = await HomeworkImportService.instance.selectImageAndParse();
+      if (!result.selected) {
+        this.parseMessage = '已取消选择图片';
+        return;
+      }
+      this.onStoreChanged();
+      if (result.candidateCount > 0) {
+        this.parseMessage = `已识别并整理出 ${result.candidateCount} 项作业，请确认后发布`;
+        if (this.sizeClass === WindowSizeClass.COMPACT) {
+          this.showCompactCandidates = true;
+        }
+      } else {
+        this.parseMessage = '文字识别成功，但没有识别到语文、数学或英语作业，请换一张截图';
+        this.parseError = true;
+      }
+    } catch (_error) {
+      this.parseMessage = '截图识别失败，请换一张更清晰的图片后重试';
+      this.parseError = true;
+    } finally {
+      this.parseBusy = false;
+    }
+  }
+
+  private async reparseText(): Promise<void> {
+    if (this.parseBusy || this.rawImport().rawText.length === 0) {
+      return;
+    }
+    this.parseBusy = true;
+    this.parseError = false;
+    try {
+      let count = await HomeworkImportService.instance.reparseCurrentImport();
+      this.onStoreChanged();
+      this.parseMessage = count > 0 ? `已重新整理出 ${count} 项作业` : '当前文字里没有识别到语文、数学或英语作业';
+      this.parseError = count === 0;
+      if (count > 0 && this.sizeClass === WindowSizeClass.COMPACT) {
+        this.showCompactCandidates = true;
+      }
+    } catch (_error) {
+      this.parseMessage = '重新整理失败，请重新选择截图';
+      this.parseError = true;
+    } finally {
+      this.parseBusy = false;
     }
   }
 
@@ -42,49 +83,61 @@ export struct HomeworkImportPage {
   private SourcePane() {
     Column({ space: 12 }) {
       Text('老师原始内容').width('100%').fontSize(20).fontWeight(FontWeight.Bold);
-      Text(this.rawImport().rawText)
-        .width('100%')
-        .padding(16)
-        .fontSize(15)
-        .lineHeight(24)
-        .fontColor(AppTheme.TEXT)
-        .backgroundColor('#F7F8FA')
-        .borderRadius(14);
-      Text('来源：' + this.rawImport().sourceLabel)
-        .width('100%')
-        .fontSize(12)
-        .fontColor(AppTheme.SUBTEXT);
-      Row({ space: 8 }) {
-        Button('分享导入').layoutWeight(1);
-        Button('截图 OCR').layoutWeight(1);
-      }
-      .width('100%');
-      Row({ space: 8 }) {
-        Button('粘贴文本').layoutWeight(1);
-        Button('上传文件').layoutWeight(1);
-      }
-      .width('100%');
 
-      Button(this.parseBusy ? '解析中…' : '模拟重新解析')
+      if (this.rawImport().rawText.length > 0) {
+        Text(this.rawImport().rawText)
+          .width('100%')
+          .padding(16)
+          .fontSize(15)
+          .lineHeight(24)
+          .fontColor(AppTheme.TEXT)
+          .backgroundColor('#F7F8FA')
+          .borderRadius(14);
+        Text('来源：' + this.rawImport().sourceLabel)
+          .width('100%')
+          .fontSize(12)
+          .fontColor(AppTheme.SUBTEXT);
+      } else {
+        Text('从相册选择老师发来的作业截图，小伴会先识别文字，再整理成作业清单。')
+          .width('100%')
+          .padding(16)
+          .fontSize(14)
+          .lineHeight(22)
+          .fontColor(AppTheme.SUBTEXT)
+          .backgroundColor('#F7F8FA')
+          .borderRadius(14);
+      }
+
+      Button(this.parseBusy ? '正在识别…' : '选择作业截图')
         .width('100%')
-        .height(44)
+        .height(48)
         .enabled(!this.parseBusy)
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .fontColor(AppTheme.PRIMARY)
-        .onClick(() => this.reparse());
+        .backgroundColor(AppTheme.PRIMARY)
+        .onClick(() => this.selectScreenshot());
+
+      if (this.rawImport().rawText.length > 0) {
+        Text('重新整理当前文字')
+          .width('100%')
+          .fontSize(13)
+          .textAlign(TextAlign.Center)
+          .fontColor(AppTheme.PRIMARY)
+          .padding({ top: 6, bottom: 6 })
+          .onClick(() => this.reparseText());
+      }
 
       if (this.parseMessage.length > 0) {
         Text(this.parseMessage)
           .width('100%')
           .fontSize(12)
-          .fontColor(AppTheme.SUCCESS);
+          .fontColor(this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS);
       }
 
-      if (this.sizeClass === WindowSizeClass.COMPACT) {
-        Button('查看 AI 解析结果')
+      if (this.sizeClass === WindowSizeClass.COMPACT && this.candidates().length > 0) {
+        Button('查看整理结果')
           .width('100%')
-          .height(48)
-          .backgroundColor(AppTheme.PRIMARY)
+          .height(44)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
           .onClick(() => this.showCompactCandidates = true);
       }
     }
@@ -107,14 +160,14 @@ export struct HomeworkImportPage {
       }
 
       Row() {
-        Text('AI 解析结果').fontSize(20).fontWeight(FontWeight.Bold);
+        Text('整理结果').fontSize(20).fontWeight(FontWeight.Bold);
         Blank();
         Text(`${this.candidates().length} 项`).fontSize(13).fontColor(AppTheme.SUCCESS);
       }
       .width('100%');
 
       if (this.candidates().length === 0) {
-        Text('当前没有待确认候选。可点击“模拟重新解析”通过 Import Pipeline 重新生成。')
+        Text('还没有待确认作业。先从相册选择一张老师作业截图。')
           .width('100%')
           .padding(16)
           .fontSize(14)
@@ -131,7 +184,7 @@ export struct HomeworkImportPage {
             }
             .width('100%');
             Text(item.title).width('100%').fontSize(16).fontWeight(FontWeight.Medium);
-            Text('证据：' + item.sourceEvidence.excerpt)
+            Text('原文：' + item.sourceEvidence.excerpt)
               .width('100%')
               .fontSize(12)
               .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT)
@@ -139,7 +192,7 @@ export struct HomeworkImportPage {
               .padding(10)
               .borderRadius(10);
             if (item.confidence < 0.8) {
-              Text('需要家长确认教材/页码').fontSize(12).fontColor(AppTheme.WARNING);
+              Text('识别置信度较低，请家长重点确认').fontSize(12).fontColor(AppTheme.WARNING);
             }
           }
           .width('100%')
@@ -149,7 +202,7 @@ export struct HomeworkImportPage {
           .border({ width: 1, color: AppTheme.BORDER });
         }, (item: CandidateAssignment) => item.id);
 
-        Button('进入家长确认')
+        Button('确认这些作业')
           .width('100%')
           .height(48)
           .backgroundColor(AppTheme.PRIMARY)
@@ -163,8 +216,8 @@ export struct HomeworkImportPage {
     Scroll() {
       Column({ space: 16 }) {
         Column({ space: 4 }) {
-          Text('导入老师作业').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('AI 只负责整理，发布前由家长确认').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('收作业').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          Text('选择老师截图 → 识别文字 → 家长确认').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);
