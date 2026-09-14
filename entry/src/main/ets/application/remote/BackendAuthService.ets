@@ -3,7 +3,7 @@ import { BackendHttpClient } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
 
 interface LoginPayload { loginName: string; password: string; }
-interface LoginResult { token: string; displayName: string; familyId: string; }
+interface LoginResult { token: string; displayName: string; }
 
 export class BackendAuthService {
   static readonly instance: BackendAuthService = new BackendAuthService();
