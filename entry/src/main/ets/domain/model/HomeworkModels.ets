@@ -25,9 +25,22 @@ export enum HomeworkImportSourceKind {
   SHARE = 'SHARE'
 }
 
+export interface StudentProfile {
+  id: string;
+  name: string;
+  grade: string;
+  semester: string;
+  textbookSummary: string;
+}
+
+export interface AppSettings {
+  student: StudentProfile;
+  tutorGuidanceFirst: boolean;
+  directAnswerAllowed: boolean;
+}
+
 export interface RawHomeworkImport {
   id: string;
-  familyId: string;
   sourceKind: HomeworkImportSourceKind;
   sourceLabel: string;
   resourceUri: string;
@@ -41,8 +54,6 @@ export interface SourceEvidence {
 
 export interface CandidateAssignment {
   id: string;
-  familyId: string;
-  studentId: string;
   subject: Subject;
   title: string;
   instruction: string;
@@ -54,8 +65,6 @@ export interface CandidateAssignment {
 
 export interface Assignment {
   id: string;
-  familyId: string;
-  studentId: string;
   candidateId: string;
   subject: Subject;
   title: string;
@@ -72,6 +81,13 @@ export interface Submission {
   type: SubmissionType;
   fileLabel: string;
   submittedAtText: string;
+}
+
+export interface TutorSession {
+  id: string;
+  assignmentId: string;
+  startedAtText: string;
+  questionCount: number;
 }
 
 export interface AssignmentProgress {
