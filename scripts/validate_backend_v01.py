@@ -51,6 +51,10 @@ require("replaceAssignmentsForActiveStudent" in store,
         "HomeworkStore must expose a child-scoped remote snapshot replacement method")
 require("HomeworkRemoteApi.instance.list" in sync and "replaceAssignmentsForActiveStudent" in sync,
         "sync service must push/pull through HomeworkRemoteApi and update HomeworkStore")
+require("observedVersions" in sync and "lastObserved === existing.version" in sync,
+        "sync must only overwrite remote data when the device still owns the last observed version")
+require("assignment.candidateId.length === 0" in sync,
+        "demo/seed assignments must remain local instead of polluting the backend")
 require("云端连接" in settings and "BackendAuthService" in settings,
         "parent settings must provide an explicit backend connection surface")
 require("request.uploadFile" in remote_submission and "internal://cache/" in remote_submission,
