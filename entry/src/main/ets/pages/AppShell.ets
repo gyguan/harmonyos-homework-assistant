@@ -2,8 +2,11 @@ import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowS
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
 import { PageStateView } from '../components/state/PageStateView';
-import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage';
+import { HomeworkStore } from '../data/HomeworkStore';
+import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
+import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage';
+import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { StudyWorkspacePage } from '../features/student/study/StudyWorkspacePage';
 import { StudentTodayPage } from '../features/student/today/StudentTodayPage';
 
@@ -19,7 +22,9 @@ enum StudentRoute {
 
 enum ParentRoute {
   DASHBOARD = 'DASHBOARD',
-  IMPORT = 'IMPORT'
+  IMPORT = 'IMPORT',
+  CONFIRMATION = 'CONFIRMATION',
+  PROGRESS = 'PROGRESS'
 }
 
 @Component
@@ -30,6 +35,8 @@ export struct AppShell {
   @State private studentRoute: StudentRoute = StudentRoute.TODAY;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
+  @State private selectedAssignmentId: string = 'a-math-001';
+  @State private storeRevision: number = 0;
 
   @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
 
@@ -39,6 +46,17 @@ export struct AppShell {
 
   private nextDemoScenario(): void {
     this.demoScenario = DemoScenarioHelper.next(this.demoScenario);
+  }
+
+  private touchStore(): void {
+    this.storeRevision++;
+  }
+
+  private openStudy(assignmentId: string): void {
+    HomeworkStore.instance.startAssignment(assignmentId);
+    this.selectedAssignmentId = assignmentId;
+    this.touchStore();
+    this.studentRoute = StudentRoute.STUDY;
   }
 
   private isBlockingPageState(): boolean {
@@ -56,20 +74,44 @@ export struct AppShell {
         StudyWorkspacePage({
           sizeClass: this.sizeClass,
           tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
-          onBack: () => this.studentRoute = StudentRoute.TODAY
+          assignmentId: this.selectedAssignmentId,
+          revision: this.storeRevision,
+          onBack: () => this.studentRoute = StudentRoute.TODAY,
+          onStoreChanged: () => this.touchStore()
         });
       } else {
         StudentTodayPage({
           sizeClass: this.sizeClass,
           offlineMode: this.demoScenario === DemoScenario.OFFLINE,
-          onOpenStudy: () => this.studentRoute = StudentRoute.STUDY
+          revision: this.storeRevision,
+          onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
         });
       }
     } else {
       if (this.parentRoute === ParentRoute.IMPORT) {
-        HomeworkImportPage({ sizeClass: this.sizeClass });
+        HomeworkImportPage({
+          sizeClass: this.sizeClass,
+          revision: this.storeRevision,
+          onOpenConfirmation: () => this.parentRoute = ParentRoute.CONFIRMATION
+        });
+      } else if (this.parentRoute === ParentRoute.CONFIRMATION) {
+        HomeworkConfirmationPage({
+          sizeClass: this.sizeClass,
+          revision: this.storeRevision,
+          onBack: () => this.parentRoute = ParentRoute.IMPORT,
+          onPublished: () => this.parentRoute = ParentRoute.DASHBOARD,
+          onStoreChanged: () => this.touchStore()
+        });
+      } else if (this.parentRoute === ParentRoute.PROGRESS) {
+        ParentProgressPage({
+          sizeClass: this.sizeClass,
+          revision: this.storeRevision
+        });
       } else {
-        ParentDashboardPage({ sizeClass: this.sizeClass });
+        ParentDashboardPage({
+          sizeClass: this.sizeClass,
+          revision: this.storeRevision
+        });
       }
     }
   }
@@ -121,8 +163,9 @@ export struct AppShell {
         this.NavText('我的', false, () => {});
       } else {
         this.NavText('首页', this.parentRoute === ParentRoute.DASHBOARD, () => this.parentRoute = ParentRoute.DASHBOARD);
-        this.NavText('导入', this.parentRoute === ParentRoute.IMPORT, () => this.parentRoute = ParentRoute.IMPORT);
-        this.NavText('进度', false, () => {});
+        this.NavText('导入', this.parentRoute === ParentRoute.IMPORT || this.parentRoute === ParentRoute.CONFIRMATION,
+          () => this.parentRoute = ParentRoute.IMPORT);
+        this.NavText('进度', this.parentRoute === ParentRoute.PROGRESS, () => this.parentRoute = ParentRoute.PROGRESS);
         this.NavText('我的', false, () => {});
       }
     }
@@ -166,8 +209,9 @@ export struct AppShell {
         this.SideItem('教材', false, () => {});
       } else {
         this.SideItem('首页', this.parentRoute === ParentRoute.DASHBOARD, () => this.parentRoute = ParentRoute.DASHBOARD);
-        this.SideItem('导入', this.parentRoute === ParentRoute.IMPORT, () => this.parentRoute = ParentRoute.IMPORT);
-        this.SideItem('进度', false, () => {});
+        this.SideItem('导入', this.parentRoute === ParentRoute.IMPORT || this.parentRoute === ParentRoute.CONFIRMATION,
+          () => this.parentRoute = ParentRoute.IMPORT);
+        this.SideItem('进度', this.parentRoute === ParentRoute.PROGRESS, () => this.parentRoute = ParentRoute.PROGRESS);
       }
 
       Blank();
