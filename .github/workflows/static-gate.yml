@@ -39,3 +39,6 @@ jobs:
 
       - name: Validate person entry and locked roles
         run: python scripts/validate_person_entry_role_lock.py
+
+      - name: Validate HarmonyOS UI design system
+        run: python scripts/validate_harmony_ui_design.py
