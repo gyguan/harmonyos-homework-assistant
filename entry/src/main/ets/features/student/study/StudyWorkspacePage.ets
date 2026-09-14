@@ -8,6 +8,7 @@ import { Assignment } from '../../../domain/model/HomeworkModels';
 export struct StudyWorkspacePage {
   @Prop sizeClass: WindowSizeClass;
   @Prop tutorUnavailable: boolean = false;
+  @State private compactTutorOpen: boolean = false;
   onBack: () => void = () => {};
 
   @Builder
@@ -108,6 +109,39 @@ export struct StudyWorkspacePage {
     .border({ width: 1, color: AppTheme.BORDER });
   }
 
+  @Builder
+  private CompactWorkspace() {
+    if (this.compactTutorOpen) {
+      Column({ space: 12 }) {
+        Text('‹ 返回作业')
+          .width('100%')
+          .fontSize(14)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => this.compactTutorOpen = false);
+        this.TutorPane();
+      }
+      .width('100%')
+      .layoutWeight(1);
+    } else {
+      Column({ space: 12 }) {
+        Column() {
+          this.StudyContent();
+        }
+        .width('100%')
+        .layoutWeight(1);
+
+        Button('问小伴')
+          .width('100%')
+          .height(48)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => this.compactTutorOpen = true);
+      }
+      .width('100%')
+      .layoutWeight(1);
+    }
+  }
+
   build() {
     Column({ space: 14 }) {
       Row() {
@@ -138,15 +172,7 @@ export struct StudyWorkspacePage {
         .layoutWeight(1)
         .alignItems(VerticalAlign.Top);
       } else {
-        Scroll() {
-          Column({ space: 14 }) {
-            this.StudyContent();
-            this.TutorPane();
-          }
-          .width('100%');
-        }
-        .width('100%')
-        .layoutWeight(1);
+        this.CompactWorkspace();
       }
     }
     .width('100%')
