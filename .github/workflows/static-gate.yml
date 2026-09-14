@@ -24,3 +24,6 @@ jobs:
 
       - name: Validate pasted teacher text import
         run: python scripts/validate_text_import_feature.py
+
+      - name: Validate V0.2 parser and confirmation
+        run: python scripts/validate_v02_parser_confirmation.py
