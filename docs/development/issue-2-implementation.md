@@ -10,7 +10,7 @@ Branch: `feat/issue-2-app-shell`
   - compile SDK: `26.0.0`
   - compatible SDK: `6.0.0(20)`
   - target SDK: `6.0.0(20)`
-- Hvigor 6.0.2 and `@ohos/hvigor-ohos-plugin` 6.0.2 explicitly pinned.
+- Hvigor 6.26.4 and `@ohos/hvigor-ohos-plugin` 6.26.4 explicitly pinned.
 - Phone + tablet device declaration.
 - One shared responsive resolver:
   - COMPACT <= 600vp
@@ -56,8 +56,6 @@ Branch: `feat/issue-2-app-shell`
 
 The local DevEco Studio 26.0.0 installation only accepts `compileSdkVersion: 26.0.0`, so the project compiles with the latest installed SDK while keeping the application runtime/behavior baseline at HarmonyOS 6.0.0(20) through `compatibleSdkVersion` and `targetSdkVersion`.
 
-This matches Huawei's upgrade guidance: the compile SDK follows the installed DevEco/SDK toolchain, while `compatibleSdkVersion` can keep support for older systems and `targetSdkVersion` can remain on the previous behavior baseline until adaptation is complete.
-
 `ContainerReader` is intentionally not used because it requires API 26+. V0.1 runtime-compatible code continues to use API-20-compatible primitives such as `Navigation`, `Row` / `Column`, shared window size classes and `onAreaChange`.
 
 ## Static gate
@@ -69,7 +67,7 @@ Run from the repository root:
 The gate checks:
 
 - compile SDK 26.0.0 with compatible / target baseline 6.0.0(20).
-- Hvigor 6.0.2 plugin pinning.
+- Hvigor 6.26.4 plugin pinning.
 - Phone + tablet device declaration.
 - `Navigation` + `NavPathStack` root.
 - central 600vp / 840vp breakpoint ownership.
