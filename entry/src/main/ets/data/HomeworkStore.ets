@@ -360,6 +360,23 @@ export class HomeworkStore {
     return result;
   }
 
+  replaceAssignmentsForActiveStudent(assignments: Assignment[]): void {
+    let studentId = this.getActiveStudentId();
+    let next: Assignment[] = [];
+    for (let existing of this.assignments) {
+      if (existing.studentId !== studentId) {
+        next.push(this.cloneAssignment(existing));
+      }
+    }
+    for (let assignment of assignments) {
+      if (assignment.studentId === studentId) {
+        next.push(this.cloneAssignment(assignment));
+      }
+    }
+    this.assignments = next;
+    this.requestPersist();
+  }
+
   getTodayAssignments(): Assignment[] {
     let result: Assignment[] = [];
     for (let assignment of this.getAssignments()) {

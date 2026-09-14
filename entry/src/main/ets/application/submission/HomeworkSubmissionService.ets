@@ -1,6 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
+import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
 import { HomeworkStore } from '../../data/HomeworkStore';
 
 const MAX_SUBMISSION_PHOTOS: number = 6;
@@ -39,7 +40,11 @@ export class HomeworkSubmissionService {
       let durableUri = await this.copyIntoSandbox(photoUris[i], groupId, i + 1);
       durableUris.push(durableUri);
     }
-    return HomeworkStore.instance.submitImages(assignmentId, durableUris, this.nowText());
+    let submitted = HomeworkStore.instance.submitImages(assignmentId, durableUris, this.nowText());
+    if (submitted) {
+      void RemoteSubmissionApi.instance.upload(assignmentId, durableUris);
+    }
+    return submitted;
   }
 
   private async copyIntoSandbox(sourceUri: string, groupId: number, index: number): Promise<string> {

@@ -1,6 +1,7 @@
 import { UIAbility } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { HomeworkImportService } from '../application/import/HomeworkImportService';
+import { RemoteSubmissionApi } from '../application/remote/RemoteSubmissionApi';
 import { HomeworkSubmissionService } from '../application/submission/HomeworkSubmissionService';
 import { HomeworkStore } from '../data/HomeworkStore';
 import { CoreVisionHomeworkTextExtractor } from '../infrastructure/ai/CoreVisionHomeworkTextExtractor';
@@ -26,12 +27,12 @@ export default class EntryAbility extends UIAbility {
       new LocalHomeworkAssignmentParser()
     );
     HomeworkSubmissionService.instance.configure(this.context);
+    RemoteSubmissionApi.instance.configure(this.context);
 
     try {
       let persistence = new PreferencesHomeworkPersistence(this.context);
       await HomeworkStore.instance.initialize(persistence);
     } catch {
-      // Keep the app startable with its current in-memory state if local initialization fails.
       console.error('Homework store initialization failed; continuing with in-memory state');
     }
 
