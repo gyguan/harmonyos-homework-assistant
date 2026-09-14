@@ -70,12 +70,12 @@ export struct ParentDashboardPage {
   @Builder
   private ImportCard() {
     Column({ space: 10 }) {
-      Text('老师又发作业了？')
+      Text(`给 ${this.student().name} 收作业`)
         .width('100%')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.TEXT);
-      Text('把截图、文字或文件丢给小伴，确认后自动进入今天的作业。')
+      Text(`当前班级：${this.student().className}。把这个班老师发来的截图或文字交给小伴，确认后只进入 ${this.student().name} 的作业。`)
         .width('100%')
         .fontSize(14)
         .lineHeight(22)
@@ -98,7 +98,9 @@ export struct ParentDashboardPage {
       Column({ space: 16 }) {
         Column({ space: 4 }) {
           Text('作业进度').fontSize(26).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text(`${this.student().grade} · ${this.student().semester}`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text(`${this.student().name} · ${this.student().grade} · ${this.student().className} · ${this.student().semester}`)
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);
