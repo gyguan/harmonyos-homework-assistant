@@ -21,3 +21,6 @@ jobs:
 
       - name: Validate HarmonyOS project invariants
         run: python scripts/validate_harmony_project.py
+
+      - name: Validate pasted teacher text import
+        run: python scripts/validate_text_import_feature.py
