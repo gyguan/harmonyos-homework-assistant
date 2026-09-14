@@ -102,31 +102,48 @@ export struct StudyWorkspacePage {
     } else if (assignment.status === AssignmentStatus.IN_PROGRESS) {
       changed = HomeworkStore.instance.markReadyToSubmit(assignment.id);
     } else if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
-      if (this.submissionPhotoUris.length === 0) { void this.selectSubmissionPhotos(); return; }
-      void this.submitSelectedPhotos(assignment.id); return;
+      if (this.submissionPhotoUris.length === 0) {
+        void this.selectSubmissionPhotos();
+        return;
+      }
+      void this.submitSelectedPhotos(assignment.id);
+      return;
     }
     if (changed) this.onStoreChanged();
   }
 
   private async selectSubmissionPhotos(): Promise<void> {
     if (this.selectingPhotos || this.submittingPhotos) return;
-    this.selectingPhotos = true; this.submissionMessage = '';
+    this.selectingPhotos = true;
+    this.submissionMessage = '';
     let selected = await HomeworkSubmissionService.instance.selectPhotos();
     this.selectingPhotos = false;
-    if (selected.length === 0) { this.submissionMessage = '未选择照片，原有选择保持不变'; return; }
-    this.submissionPhotoUris = selected; this.submissionMessage = `已选择 ${selected.length} 张，请确认后提交`;
+    if (selected.length === 0) {
+      this.submissionMessage = '未选择照片，原有选择保持不变';
+      return;
+    }
+    this.submissionPhotoUris = selected;
+    this.submissionMessage = `已选择 ${selected.length} 张，请确认后提交`;
   }
 
   private async submitSelectedPhotos(assignmentId: string): Promise<void> {
     if (this.submittingPhotos || this.submissionPhotoUris.length === 0) return;
-    this.submittingPhotos = true; this.submissionMessage = '正在把照片保存到本地…';
+    this.submittingPhotos = true;
+    this.submissionMessage = '正在把照片保存到本地…';
     try {
       let submitted = await HomeworkSubmissionService.instance.submit(assignmentId, this.submissionPhotoUris);
-      if (!submitted) { this.submissionMessage = '提交失败，请确认作业状态后重试'; return; }
-      this.submissionPhotoUris = []; this.submissionMessage = '作业照片已提交'; this.onStoreChanged();
+      if (!submitted) {
+        this.submissionMessage = '提交失败，请确认作业状态后重试';
+        return;
+      }
+      this.submissionPhotoUris = [];
+      this.submissionMessage = '作业照片已提交';
+      this.onStoreChanged();
     } catch {
       this.submissionMessage = '照片保存失败，请重新选择后再试';
-    } finally { this.submittingPhotos = false; }
+    } finally {
+      this.submittingPhotos = false;
+    }
   }
 
   private removeSubmissionPhoto(uri: string): void {
@@ -143,7 +160,9 @@ export struct StudyWorkspacePage {
         ForEach(photoUris, (uri: string) => {
           Column({ space: 6 }) {
             Image(uri).width(96).height(96).objectFit(ImageFit.Cover).borderRadius(12).backgroundColor(AppTheme.SURFACE_EMPHASIS);
-            if (removable) Text('移除').fontSize(11).fontColor(AppTheme.DANGER).onClick(() => this.removeSubmissionPhoto(uri));
+            if (removable) {
+              Text('移除').fontSize(11).fontColor(AppTheme.DANGER).onClick(() => this.removeSubmissionPhoto(uri));
+            }
           }.width(96);
         }, (uri: string) => uri);
       }
@@ -155,16 +174,22 @@ export struct StudyWorkspacePage {
     if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
       Column({ space: 10 }) {
         Text('提交作业照片').width('100%').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        if (this.submissionPhotoUris.length > 0) this.PhotoStrip(this.submissionPhotoUris, true);
+        if (this.submissionPhotoUris.length > 0) {
+          this.PhotoStrip(this.submissionPhotoUris, true);
+        }
         Text(this.submissionPhotoUris.length === 0 ? '从系统相册选择已经拍好的作业照片，最多 6 张。' : '请确认照片清晰、完整，页数和顺序无误。')
           .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-        if (this.submissionMessage.length > 0) Text(this.submissionMessage).width('100%').fontSize(12).fontColor(AppTheme.PRIMARY);
+        if (this.submissionMessage.length > 0) {
+          Text(this.submissionMessage).width('100%').fontSize(12).fontColor(AppTheme.PRIMARY);
+        }
       }.width('100%').padding(14).backgroundColor(AppTheme.PRIMARY_FAINT).borderRadius(AppTheme.CONTROL_RADIUS);
     }
     if (this.submissions().length > 0) {
       Column({ space: 8 }) {
         Text(`已提交 · ${this.submissions()[0].fileLabel}`).width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
-        if (this.submissions()[0].photoUris.length > 0) this.PhotoStrip(this.submissions()[0].photoUris, false);
+        if (this.submissions()[0].photoUris.length > 0) {
+          this.PhotoStrip(this.submissions()[0].photoUris, false);
+        }
       }.width('100%').padding(13).backgroundColor(AppTheme.SUCCESS_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
     }
   }
@@ -173,7 +198,9 @@ export struct StudyWorkspacePage {
   private TaskRail() {
     Column({ space: AppTheme.ITEM_GAP }) {
       Text('今天的作业').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      ForEach(this.assignments(), (item: Assignment) => { AssignmentCard({ assignment: item }); }, (item: Assignment) => item.id);
+      ForEach(this.assignments(), (item: Assignment) => {
+        AssignmentCard({ assignment: item });
+      }, (item: Assignment) => item.id);
     }.width('100%');
   }
 
@@ -189,14 +216,20 @@ export struct StudyWorkspacePage {
             Text(this.assignment()!.subject).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
               .padding({ left: 9, right: 9, top: 5, bottom: 5 }).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
             Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT).margin({ left: 8 });
-            Blank(); Text(this.assignment()!.dueText).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+            Blank();
+            Text(this.assignment()!.dueText).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
           }.width('100%');
           Text(this.assignment()!.title).width('100%').fontSize(24).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
           Text(this.assignment()!.instruction).width('100%').fontSize(15).lineHeight(22).fontColor(AppTheme.SUBTEXT);
           Column({ space: 8 }) {
             Text('教材 · ' + this.assignment()!.textbookRef).width('100%').fontSize(13).fontColor(AppTheme.PRIMARY);
-            if (this.assignment()!.resourceLabels.length === 0) Text('暂无老师附件').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-            else ForEach(this.assignment()!.resourceLabels, (label: string) => { Text(label).width('100%').fontSize(14).fontColor(AppTheme.TEXT); }, (label: string) => label);
+            if (this.assignment()!.resourceLabels.length === 0) {
+              Text('暂无老师附件').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+            } else {
+              ForEach(this.assignment()!.resourceLabels, (label: string) => {
+                Text(label).width('100%').fontSize(14).fontColor(AppTheme.TEXT);
+              }, (label: string) => label);
+            }
           }.width('100%').padding(15).borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_SUBTLE);
           this.SubmissionPane();
           Button(this.primaryActionLabel(), { type: ButtonType.Normal }).width('100%').height(AppTheme.BUTTON_HEIGHT)
@@ -214,9 +247,10 @@ export struct StudyWorkspacePage {
       Row() {
         Text('问小伴').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        if (this.tutorLoading) Text('同步中').fontSize(11).fontColor(AppTheme.SUBTEXT);
+        if (this.tutorLoading) {
+          Text('同步中').fontSize(11).fontColor(AppTheme.SUBTEXT);
+        }
       }.width('100%');
-
       if (this.tutorUnavailable) {
         Text('AI 辅导暂时不可用，但作业查看与提交不受影响。').width('100%').padding(14).fontSize(13).fontColor(AppTheme.WARNING)
           .backgroundColor(AppTheme.WARNING_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
@@ -229,19 +263,23 @@ export struct StudyWorkspacePage {
             }
             ForEach(this.tutorMessages, (message: TutorChatMessage) => {
               Row() {
-                if (message.role === 'USER') Blank();
+                if (message.role === 'USER') {
+                  Blank();
+                }
                 Text(message.content).constraintSize({ maxWidth: '86%' }).padding(11).fontSize(14).lineHeight(21)
                   .fontColor(message.role === 'USER' ? AppTheme.TEXT_ON_PRIMARY : AppTheme.TEXT)
                   .backgroundColor(message.role === 'USER' ? AppTheme.PRIMARY : AppTheme.SURFACE_SUBTLE)
                   .borderRadius(AppTheme.CONTROL_RADIUS);
-                if (message.role !== 'USER') Blank();
+                if (message.role !== 'USER') {
+                  Blank();
+                }
               }.width('100%');
             }, (message: TutorChatMessage) => message.id);
           }.width('100%');
         }.width('100%').layoutWeight(1).scrollBar(BarState.Off);
-
-        if (this.tutorNotice.length > 0) Text(this.tutorNotice).width('100%').fontSize(12)
-          .fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
+        if (this.tutorNotice.length > 0) {
+          Text(this.tutorNotice).width('100%').fontSize(12).fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
+        }
         Text('小伴默认提示优先，不直接替你完成作业。').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
         TextArea({ placeholder: '输入问题，或者说说你做到哪一步…', text: this.tutorDraft })
           .width('100%').height(82).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -275,7 +313,10 @@ export struct StudyWorkspacePage {
     Column({ space: AppTheme.ITEM_GAP }) {
       Row() {
         Text('‹ 返回').fontSize(15).fontColor(AppTheme.PRIMARY).onClick(() => this.onBack());
-        Blank(); if (this.assignment() !== null) Text(`截至 ${this.assignment()!.dueText}`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Blank();
+        if (this.assignment() !== null) {
+          Text(`截至 ${this.assignment()!.dueText}`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+        }
       }.width('100%');
       if (this.sizeClass === WindowSizeClass.EXPANDED) {
         Row({ space: 16 }) {
@@ -288,10 +329,11 @@ export struct StudyWorkspacePage {
           Column() { this.StudyContent(); }.width('64%').height('100%');
           Column() { this.TutorPane(); }.layoutWeight(1).height('100%');
         }.width('100%').layoutWeight(1).alignItems(VerticalAlign.Top);
-      } else this.CompactWorkspace();
-    }
-    .width('100%').height('100%')
-    .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
-    .backgroundColor(AppTheme.BACKGROUND);
+      } else {
+        this.CompactWorkspace();
+      }
+    }.width('100%').height('100%')
+      .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
+      .backgroundColor(AppTheme.BACKGROUND);
   }
 }

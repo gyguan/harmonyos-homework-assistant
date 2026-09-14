@@ -24,19 +24,23 @@ export struct BackendConnectionPage {
 
   aboutToAppear(): void {
     this.baseUrl = BackendSession.instance.getBaseUrl();
-    if (BackendSession.instance.isConnected()) void this.refreshStudents();
+    if (BackendSession.instance.isConnected()) {
+      void this.refreshStudents();
+    }
   }
 
   private students(): StudentProfile[] {
-    let revision = this.pageRevision;
+    let currentRevision = this.pageRevision;
     return HomeworkStore.instance.getStudents();
   }
 
   private async connect(): Promise<void> {
     if (this.baseUrl.trim().length === 0 || this.loginName.trim().length === 0 || this.password.length === 0) {
-      this.message = '请填写服务地址、账号和密码'; return;
+      this.message = '请填写服务地址、账号和密码';
+      return;
     }
-    this.connecting = true; this.message = '正在连接…';
+    this.connecting = true;
+    this.message = '正在连接…';
     try {
       let displayName = await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
       let familySynced = await FamilyCloudService.instance.syncStudents();
@@ -46,30 +50,42 @@ export struct BackendConnectionPage {
       this.onStoreChanged();
     } catch {
       this.message = '连接失败，请检查电脑局域网地址、后端服务和账号密码';
-    } finally { this.connecting = false; }
+    } finally {
+      this.connecting = false;
+    }
   }
 
   private async refreshStudents(): Promise<void> {
     if (await FamilyCloudService.instance.syncStudents()) {
-      this.pageRevision++; this.onStoreChanged();
+      this.pageRevision++;
+      this.onStoreChanged();
     }
   }
 
   private beginAdd(): void {
     this.editingId = `student-${Date.now()}`;
-    this.editName = ''; this.editGrade = ''; this.editClassName = ''; this.editSemester = '上学期'; this.editTextbooks = '';
+    this.editName = '';
+    this.editGrade = '';
+    this.editClassName = '';
+    this.editSemester = '上学期';
+    this.editTextbooks = '';
   }
 
   private beginEdit(student: StudentProfile): void {
-    this.editingId = student.id; this.editName = student.name; this.editGrade = student.grade;
-    this.editClassName = student.className; this.editSemester = student.semester; this.editTextbooks = student.textbookSummary;
+    this.editingId = student.id;
+    this.editName = student.name;
+    this.editGrade = student.grade;
+    this.editClassName = student.className;
+    this.editSemester = student.semester;
+    this.editTextbooks = student.textbookSummary;
   }
 
   private cancelEdit(): void { this.editingId = ''; }
 
   private async saveStudent(): Promise<void> {
     if (this.editName.trim().length === 0 || this.editGrade.trim().length === 0 || this.editClassName.trim().length === 0) {
-      this.message = '姓名、年级、班级不能为空'; return;
+      this.message = '姓名、年级、班级不能为空';
+      return;
     }
     let student: StudentProfile = {
       id: this.editingId,
@@ -80,7 +96,10 @@ export struct BackendConnectionPage {
       textbookSummary: this.editTextbooks.trim()
     };
     if (await FamilyCloudService.instance.saveStudent(student)) {
-      this.editingId = ''; this.pageRevision++; this.message = '孩子资料已保存并同步'; this.onStoreChanged();
+      this.editingId = '';
+      this.pageRevision++;
+      this.message = '孩子资料已保存并同步';
+      this.onStoreChanged();
       HomeworkSyncService.instance.requestSync();
     } else {
       this.message = '保存失败，请确认云端连接';
@@ -89,7 +108,9 @@ export struct BackendConnectionPage {
 
   private async deleteStudent(studentId: string): Promise<void> {
     if (await FamilyCloudService.instance.deleteStudent(studentId)) {
-      this.pageRevision++; this.message = '孩子资料已删除'; this.onStoreChanged();
+      this.pageRevision++;
+      this.message = '孩子资料已删除';
+      this.onStoreChanged();
     } else {
       this.message = '删除失败：已有作业的孩子或家庭最后一个孩子不能直接删除';
     }
@@ -124,8 +145,7 @@ export struct BackendConnectionPage {
           Button('保存', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
             .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY).onClick(() => { void this.saveStudent(); });
         }.width('100%');
-      }
-      .width('100%').padding(14).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
+      }.width('100%').padding(14).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
     }
   }
 
@@ -134,8 +154,7 @@ export struct BackendConnectionPage {
       Column({ space: AppTheme.SECTION_GAP }) {
         Column({ space: 5 }) {
           Text('我的').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('管理家庭云端连接和孩子资料。老师原文解析中间态仍只保留在本机。')
-            .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+          Text('管理家庭云端连接和孩子资料。老师原文解析中间态仍只保留在本机。').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
         }.width('100%').alignItems(HorizontalAlign.Start);
 
         Column({ space: 12 }) {
@@ -163,9 +182,10 @@ export struct BackendConnectionPage {
                 .onClick(() => { void this.disconnect(); });
             }.width('100%');
           }
-          if (this.message.length > 0) Text(this.message).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+          if (this.message.length > 0) {
+            Text(this.message).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          }
+        }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
 
         Column({ space: 12 }) {
           Row() {
@@ -175,7 +195,6 @@ export struct BackendConnectionPage {
               Text('+ 新增孩子').fontSize(13).fontColor(AppTheme.PRIMARY).onClick(() => this.beginAdd());
             }
           }.width('100%');
-
           ForEach(this.students(), (student: StudentProfile) => {
             Row({ space: 10 }) {
               Column({ space: 3 }) {
@@ -186,16 +205,14 @@ export struct BackendConnectionPage {
                 Text('编辑').fontSize(13).fontColor(AppTheme.PRIMARY).onClick(() => this.beginEdit(student));
                 Text('删除').fontSize(13).fontColor(AppTheme.DANGER).onClick(() => { void this.deleteStudent(student.id); });
               }
-            }
-            .width('100%').padding({ top: 10, bottom: 10 });
+            }.width('100%').padding({ top: 10, bottom: 10 });
             Divider().color(AppTheme.DIVIDER);
           }, (student: StudentProfile) => student.id);
           this.StudentEditor();
           if (!BackendSession.instance.isConnected()) {
             Text('连接家庭云端后可新增、编辑或删除孩子。').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
           }
-        }
-        .width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+        }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
       }.width('100%').padding(AppTheme.PAGE_PADDING);
     }.width('100%').height('100%').backgroundColor(AppTheme.BACKGROUND);
   }

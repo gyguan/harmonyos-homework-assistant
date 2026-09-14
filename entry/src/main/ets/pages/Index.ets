@@ -35,18 +35,16 @@ struct Index {
   }
 
   build() {
-    let revision = this.cloudRevision;
     Stack() {
       if (this.selectedRole === AppRole.NONE) {
         PersonEntryPage({
+          revision: this.cloudRevision,
           onSelectParent: () => this.enterParent(),
           onSelectStudent: (studentId: string) => this.enterStudent(studentId)
         });
       } else {
         AppShell({ role: this.selectedRole });
       }
-    }
-    .width('100%')
-    .height('100%');
+    }.width('100%').height('100%');
   }
 }
