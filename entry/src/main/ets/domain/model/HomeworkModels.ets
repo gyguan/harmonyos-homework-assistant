@@ -1,8 +1,10 @@
 export enum AssignmentStatus {
   NOT_STARTED = 'NOT_STARTED',
   IN_PROGRESS = 'IN_PROGRESS',
+  READY_TO_SUBMIT = 'READY_TO_SUBMIT',
   SUBMITTED = 'SUBMITTED',
   COMPLETED = 'COMPLETED',
+  NEEDS_REWORK = 'NEEDS_REWORK',
   OVERDUE = 'OVERDUE'
 }
 
@@ -12,8 +14,40 @@ export enum Subject {
   ENGLISH = '英语'
 }
 
+export enum SubmissionType {
+  MOCK_IMAGE = 'MOCK_IMAGE'
+}
+
+export interface RawHomeworkImport {
+  id: string;
+  familyId: string;
+  rawText: string;
+  sourceLabel: string;
+}
+
+export interface SourceEvidence {
+  sourceLabel: string;
+  excerpt: string;
+}
+
+export interface CandidateAssignment {
+  id: string;
+  familyId: string;
+  studentId: string;
+  subject: Subject;
+  title: string;
+  instruction: string;
+  textbookRef: string;
+  dueText: string;
+  sourceEvidence: SourceEvidence;
+  confidence: number;
+}
+
 export interface Assignment {
   id: string;
+  familyId: string;
+  studentId: string;
+  candidateId: string;
   subject: Subject;
   title: string;
   instruction: string;
@@ -23,19 +57,25 @@ export interface Assignment {
   resourceLabels: string[];
 }
 
+export interface Submission {
+  id: string;
+  assignmentId: string;
+  type: SubmissionType;
+  fileLabel: string;
+  submittedAtText: string;
+}
+
+export interface AssignmentProgress {
+  assignmentId: string;
+  status: AssignmentStatus;
+  statusLabel: string;
+  submissionCount: number;
+}
+
 export interface TodaySummary {
   completed: number;
   total: number;
   nextAssignmentId: string;
-}
-
-export interface CandidateAssignment {
-  id: string;
-  subject: Subject;
-  title: string;
-  dueText: string;
-  sourceEvidence: string;
-  confidence: number;
 }
 
 export interface DashboardSummary {
@@ -43,4 +83,7 @@ export interface DashboardSummary {
   inProgress: number;
   notStarted: number;
   overdue: number;
+  readyToSubmit: number;
+  submitted: number;
+  needsRework: number;
 }
