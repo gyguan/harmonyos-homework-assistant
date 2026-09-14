@@ -131,10 +131,7 @@ export struct AppShell {
           onStoreChanged: () => this.touchStore()
         });
       } else if (this.parentRoute === ParentRoute.PROGRESS) {
-        ParentProgressPage({
-          sizeClass: this.sizeClass,
-          revision: this.storeRevision
-        });
+        ParentProgressPage({ sizeClass: this.sizeClass, revision: this.storeRevision });
       } else {
         ParentDashboardPage({
           sizeClass: this.sizeClass,
@@ -147,42 +144,46 @@ export struct AppShell {
 
   @Builder
   private ScenarioChip() {
-    Text(`演示：${DemoScenarioHelper.label(this.demoScenario)}`)
-      .fontSize(12)
-      .fontColor(AppTheme.PRIMARY)
+    Text(`演示 · ${DemoScenarioHelper.label(this.demoScenario)}`)
+      .fontSize(AppTheme.CAPTION_SIZE)
+      .fontColor(AppTheme.SUBTEXT)
       .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-      .backgroundColor(AppTheme.PRIMARY_SOFT)
-      .borderRadius(12)
+      .backgroundColor(AppTheme.SURFACE_SUBTLE)
+      .borderRadius(AppTheme.CHIP_RADIUS)
       .onClick(() => this.nextDemoScenario());
   }
 
   @Builder
   private ParentChildChip() {
-    Text(`${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
-      .fontSize(12)
-      .fontColor(AppTheme.PRIMARY)
-      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-      .backgroundColor(AppTheme.PRIMARY_SOFT)
-      .borderRadius(12)
-      .onClick(() => this.switchStudent());
+    Row({ space: 5 }) {
+      Text(`${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.PRIMARY);
+      Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
+    }
+    .padding({ left: 11, right: 11, top: 7, bottom: 7 })
+    .backgroundColor(AppTheme.PRIMARY_SOFT)
+    .borderRadius(AppTheme.CHIP_RADIUS)
+    .onClick(() => this.switchStudent());
   }
 
   @Builder
   private StudentIdentityChip() {
     Text(`${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
-      .fontSize(12)
+      .fontSize(AppTheme.CAPTION_SIZE)
       .fontWeight(FontWeight.Medium)
       .fontColor(AppTheme.TEXT)
-      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-      .backgroundColor('#F4F6F8')
-      .borderRadius(12);
+      .padding({ left: 11, right: 11, top: 7, bottom: 7 })
+      .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS);
   }
 
   @Builder
   private ContextBar() {
     Row({ space: 8 }) {
       Text(this.role === AppRole.PARENT ? '家长空间' : '学生空间')
-        .fontSize(13)
+        .fontSize(15)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Blank();
@@ -191,48 +192,77 @@ export struct AppShell {
       } else {
         this.StudentIdentityChip();
       }
-      if (this.widthVp > 420) {
+      if (this.widthVp > 520) {
         this.ScenarioChip();
       }
     }
     .width('100%')
-    .height(52)
-    .padding({ left: 18, right: 18 })
+    .height(AppTheme.CONTEXT_BAR_HEIGHT)
+    .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING })
     .backgroundColor(AppTheme.SURFACE)
-    .border({ width: { bottom: 1 }, color: AppTheme.BORDER });
+    .border({ width: { bottom: 1 }, color: AppTheme.DIVIDER });
+  }
+
+  @Builder
+  private BottomItem(symbol: Resource, label: string, active: boolean, action: () => void) {
+    Column({ space: 4 }) {
+      SymbolGlyph(symbol)
+        .fontSize(21)
+        .fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
+      Text(label)
+        .fontSize(11)
+        .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
+        .fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
+    }
+    .layoutWeight(1)
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+    .onClick(action);
   }
 
   @Builder
   private BottomNavigation() {
     Row() {
       if (this.role === AppRole.STUDENT) {
-        this.NavText('今天', this.studentRoute === StudentRoute.TODAY, () => this.studentRoute = StudentRoute.TODAY);
-        this.NavText('作业', this.studentRoute === StudentRoute.STUDY, () => this.studentRoute = StudentRoute.STUDY);
-        this.NavText('我的', false, () => {});
+        this.BottomItem($r('sys.symbol.checkmark_circle'), '今天', this.studentRoute === StudentRoute.TODAY,
+          () => this.studentRoute = StudentRoute.TODAY);
+        this.BottomItem($r('sys.symbol.checkmark_square'), '作业', this.studentRoute === StudentRoute.STUDY,
+          () => this.studentRoute = StudentRoute.STUDY);
+        this.BottomItem($r('sys.symbol.gearshape'), '我的', false, () => {});
       } else {
-        this.NavText('首页', this.parentRoute === ParentRoute.DASHBOARD, () => this.parentRoute = ParentRoute.DASHBOARD);
-        this.NavText('导入', this.parentRoute === ParentRoute.IMPORT || this.parentRoute === ParentRoute.CONFIRMATION,
+        this.BottomItem($r('sys.symbol.house'), '首页', this.parentRoute === ParentRoute.DASHBOARD,
+          () => this.parentRoute = ParentRoute.DASHBOARD);
+        this.BottomItem($r('sys.symbol.plus_square'), '导入',
+          this.parentRoute === ParentRoute.IMPORT || this.parentRoute === ParentRoute.CONFIRMATION,
           () => this.parentRoute = ParentRoute.IMPORT);
-        this.NavText('进度', this.parentRoute === ParentRoute.PROGRESS, () => this.parentRoute = ParentRoute.PROGRESS);
-        this.NavText('我的', false, () => {});
+        this.BottomItem($r('sys.symbol.checkmark_circle'), '进度', this.parentRoute === ParentRoute.PROGRESS,
+          () => this.parentRoute = ParentRoute.PROGRESS);
+        this.BottomItem($r('sys.symbol.gearshape'), '我的', false, () => {});
       }
     }
     .width('100%')
-    .height(64)
-    .padding({ left: 10, right: 10 })
+    .height(AppTheme.BOTTOM_NAV_HEIGHT)
+    .padding({ left: 8, right: 8 })
     .backgroundColor(AppTheme.SURFACE)
-    .border({ width: { top: 1 }, color: AppTheme.BORDER });
+    .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
   }
 
   @Builder
-  private NavText(label: string, active: boolean, action: () => void) {
-    Column({ space: 3 }) {
-      Text(active ? '●' : '○').fontSize(14).fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
-      Text(label).fontSize(11).fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
+  private SideItem(symbol: Resource, label: string, active: boolean, action: () => void) {
+    Column({ space: 5 }) {
+      SymbolGlyph(symbol)
+        .fontSize(22)
+        .fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
+      Text(label)
+        .fontSize(11)
+        .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
+        .fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
     }
-    .layoutWeight(1)
-    .height('100%')
+    .width(72)
+    .height(58)
     .justifyContent(FlexAlign.Center)
+    .backgroundColor(active ? AppTheme.PRIMARY_SOFT : Color.Transparent)
+    .borderRadius(AppTheme.CONTROL_RADIUS)
     .onClick(action);
   }
 
@@ -242,78 +272,69 @@ export struct AppShell {
       Text('伴')
         .fontSize(20)
         .fontWeight(FontWeight.Bold)
-        .fontColor(Color.White)
-        .width(48)
-        .height(48)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .width(46)
+        .height(46)
         .textAlign(TextAlign.Center)
         .padding({ top: 11 })
         .backgroundColor(AppTheme.PRIMARY)
         .borderRadius(15)
-        .margin({ bottom: 12 });
+        .margin({ bottom: 14 });
 
       if (this.role === AppRole.STUDENT) {
-        this.SideItem('今天', this.studentRoute === StudentRoute.TODAY, () => this.studentRoute = StudentRoute.TODAY);
-        this.SideItem('作业', this.studentRoute === StudentRoute.STUDY, () => this.studentRoute = StudentRoute.STUDY);
-        this.SideItem('我的', false, () => {});
+        this.SideItem($r('sys.symbol.checkmark_circle'), '今天', this.studentRoute === StudentRoute.TODAY,
+          () => this.studentRoute = StudentRoute.TODAY);
+        this.SideItem($r('sys.symbol.checkmark_square'), '作业', this.studentRoute === StudentRoute.STUDY,
+          () => this.studentRoute = StudentRoute.STUDY);
+        this.SideItem($r('sys.symbol.gearshape'), '我的', false, () => {});
       } else {
-        this.SideItem('首页', this.parentRoute === ParentRoute.DASHBOARD, () => this.parentRoute = ParentRoute.DASHBOARD);
-        this.SideItem('导入', this.parentRoute === ParentRoute.IMPORT || this.parentRoute === ParentRoute.CONFIRMATION,
+        this.SideItem($r('sys.symbol.house'), '首页', this.parentRoute === ParentRoute.DASHBOARD,
+          () => this.parentRoute = ParentRoute.DASHBOARD);
+        this.SideItem($r('sys.symbol.plus_square'), '导入',
+          this.parentRoute === ParentRoute.IMPORT || this.parentRoute === ParentRoute.CONFIRMATION,
           () => this.parentRoute = ParentRoute.IMPORT);
-        this.SideItem('进度', this.parentRoute === ParentRoute.PROGRESS, () => this.parentRoute = ParentRoute.PROGRESS);
-        this.SideItem('我的', false, () => {});
+        this.SideItem($r('sys.symbol.checkmark_circle'), '进度', this.parentRoute === ParentRoute.PROGRESS,
+          () => this.parentRoute = ParentRoute.PROGRESS);
+        this.SideItem($r('sys.symbol.gearshape'), '我的', false, () => {});
       }
 
       Blank();
       if (this.role === AppRole.PARENT) {
         Text(HomeworkStore.instance.getStudent().name)
-          .width(66)
+          .width(72)
           .fontSize(11)
           .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
           .fontColor(AppTheme.PRIMARY)
-          .padding({ top: 7, bottom: 7 })
+          .padding({ top: 8, bottom: 8 })
           .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .borderRadius(10)
+          .borderRadius(AppTheme.CHIP_RADIUS)
           .onClick(() => this.switchStudent());
       } else {
         Text(HomeworkStore.instance.getStudent().name)
-          .width(66)
+          .width(72)
           .fontSize(11)
           .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
           .fontColor(AppTheme.TEXT)
-          .padding({ top: 7, bottom: 7 })
-          .backgroundColor('#F4F6F8')
-          .borderRadius(10);
+          .padding({ top: 8, bottom: 8 })
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .borderRadius(AppTheme.CHIP_RADIUS);
       }
       Text(DemoScenarioHelper.label(this.demoScenario))
-        .width(66)
+        .width(72)
         .fontSize(10)
         .textAlign(TextAlign.Center)
-        .fontColor(AppTheme.SUBTEXT)
+        .fontColor(AppTheme.TERTIARY_TEXT)
+        .padding({ top: 4, bottom: 4 })
         .onClick(() => this.nextDemoScenario());
     }
-    .width(88)
+    .width(AppTheme.SIDE_NAV_WIDTH)
     .height('100%')
-    .padding({ top: 18, bottom: 18 })
+    .padding({ top: 20, bottom: 18 })
     .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.SURFACE)
-    .border({ width: { right: 1 }, color: AppTheme.BORDER });
-  }
-
-  @Builder
-  private SideItem(label: string, active: boolean, action: () => void) {
-    Text(label)
-      .width(66)
-      .height(42)
-      .textAlign(TextAlign.Center)
-      .padding({ top: 12 })
-      .fontSize(12)
-      .fontWeight(active ? FontWeight.Bold : FontWeight.Normal)
-      .fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .backgroundColor(active ? AppTheme.PRIMARY_SOFT : Color.Transparent)
-      .borderRadius(13)
-      .onClick(action);
+    .border({ width: { right: 1 }, color: AppTheme.DIVIDER });
   }
 
   @Builder
