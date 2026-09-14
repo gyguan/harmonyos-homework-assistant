@@ -22,6 +22,7 @@ def read(path: str) -> str:
 build_profile = read("build-profile.json5")
 hvigor_config = read("hvigor/hvigor-config.json5")
 oh_package = read("oh-package.json5")
+entry_oh_package = read("entry/oh-package.json5")
 module_config = read("entry/src/main/module.json5")
 entry_ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
@@ -51,11 +52,13 @@ require('"compileSdkVersion": "26.0.0"' in build_profile,
         "compileSdkVersion must match the DevEco Studio 26.0.0 toolchain")
 require('"compatibleSdkVersion": "6.0.0(20)"' in build_profile,
         "compatibleSdkVersion must keep the runtime baseline at HarmonyOS 6.0.0(20)")
-require('"targetSdkVersion"' not in build_profile,
-        "targetSdkVersion must remain unset for the locally verified DevEco configuration")
+require('"targetSdkVersion": "26.0.0"' in build_profile,
+        "targetSdkVersion must explicitly target the HarmonyOS 26.0.0 API behavior")
 
 require('"modelVersion": "5.0.0"' in hvigor_config, "Hvigor modelVersion must be 5.0.0")
 require('"modelVersion": "5.0.0"' in oh_package, "OHPM modelVersion must be 5.0.0")
+require('"version": "1.0.0"' in entry_oh_package,
+        "entry module package version must use the stable SemVer form expected by the current toolchain")
 require('"hvigorVersion": "6.26.4"' in hvigor_config, "Hvigor version must be pinned to 6.26.4")
 require('"@ohos/hvigor-ohos-plugin": "6.26.4"' in hvigor_config,
         "Hvigor OHOS plugin must be pinned to 6.26.4")
