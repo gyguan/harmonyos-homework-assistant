@@ -78,6 +78,8 @@ export interface Assignment {
   dueText: string;
   status: AssignmentStatus;
   resourceLabels: string[];
+  // Last server version observed by this device. -1/undefined means never synced.
+  remoteVersion?: number;
 }
 
 export interface Submission {
