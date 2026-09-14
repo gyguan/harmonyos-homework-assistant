@@ -33,9 +33,9 @@ require('"targetSdkVersion": "6.0.0(20)"' in build_profile,
         "targetSdkVersion must stay at HarmonyOS 6.0.0(20) until target-26 behavior adaptation is complete")
 
 require('"modelVersion": "6.0.2"' in hvigor_config, "Hvigor modelVersion must be 6.0.2")
-require('"hvigorVersion": "6.0.2"' in hvigor_config, "Hvigor version must be pinned to 6.0.2")
-require('"@ohos/hvigor-ohos-plugin": "6.0.2"' in hvigor_config,
-        "Hvigor OHOS plugin must be pinned to 6.0.2")
+require('"hvigorVersion": "6.26.4"' in hvigor_config, "Hvigor version must be pinned to 6.26.4")
+require('"@ohos/hvigor-ohos-plugin": "6.26.4"' in hvigor_config,
+        "Hvigor OHOS plugin must be pinned to 6.26.4")
 
 require('"phone"' in module_config and '"tablet"' in module_config,
         "entry module must declare both phone and tablet device types")
