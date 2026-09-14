@@ -12,6 +12,38 @@ export struct PersonEntryPage {
   }
 
   @Builder
+  private BrandHeader() {
+    Column({ space: 12 }) {
+      Text('伴')
+        .width(52)
+        .height(52)
+        .fontSize(22)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .textAlign(TextAlign.Center)
+        .padding({ top: 12 })
+        .backgroundColor(AppTheme.PRIMARY)
+        .borderRadius(16);
+      Text('小伴作业')
+        .fontSize(30)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT);
+      Text('今天是谁在使用？')
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+      Text('选择后进入对应空间。孩子只看到自己的作业，家长可以管理多个孩子。')
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(22)
+        .fontColor(AppTheme.SUBTEXT)
+        .textAlign(TextAlign.Center);
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Center)
+    .margin({ bottom: 16 });
+  }
+
+  @Builder
   private ParentCard() {
     Row({ space: 14 }) {
       Text('家')
@@ -19,34 +51,33 @@ export struct PersonEntryPage {
         .height(48)
         .fontSize(18)
         .fontWeight(FontWeight.Bold)
-        .fontColor(Color.White)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
         .textAlign(TextAlign.Center)
         .padding({ top: 12 })
         .backgroundColor(AppTheme.PRIMARY)
-        .borderRadius(16);
-      Column({ space: 4 }) {
+        .borderRadius(15);
+      Column({ space: 5 }) {
         Text('家长')
           .width('100%')
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('收作业、确认任务、查看两个孩子的完成情况')
+        Text('收作业、确认任务、查看孩子完成情况')
           .width('100%')
           .fontSize(13)
-          .lineHeight(20)
+          .lineHeight(19)
           .fontColor(AppTheme.SUBTEXT);
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
-      Text('进入')
-        .fontSize(13)
-        .fontColor(AppTheme.PRIMARY);
+      Text('›')
+        .fontSize(24)
+        .fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
-    .padding(16)
+    .padding(AppTheme.CARD_PADDING)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(18)
-    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS)
     .onClick(() => this.onSelectParent());
   }
 
@@ -62,12 +93,12 @@ export struct PersonEntryPage {
         .textAlign(TextAlign.Center)
         .padding({ top: 12 })
         .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(16);
-      Column({ space: 4 }) {
+        .borderRadius(15);
+      Column({ space: 5 }) {
         Text(student.name)
           .width('100%')
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text(`${student.grade} · ${student.className}`)
           .width('100%')
@@ -76,65 +107,56 @@ export struct PersonEntryPage {
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
-      Text('进入')
-        .fontSize(13)
-        .fontColor(AppTheme.PRIMARY);
+      Text('›')
+        .fontSize(24)
+        .fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
-    .padding(16)
+    .padding(AppTheme.CARD_PADDING)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(18)
-    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS)
     .onClick(() => this.onSelectStudent(student.id));
   }
 
   build() {
     Scroll() {
-      Column({ space: 18 }) {
-        Column({ space: 8 }) {
-          Text('小伴作业')
-            .fontSize(30)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT);
-          Text('谁在使用？')
-            .fontSize(20)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text('选择人员后进入对应空间，进入后身份保持不变。')
-            .fontSize(14)
-            .lineHeight(22)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-        .margin({ bottom: 8 });
+      Column({ space: AppTheme.ITEM_GAP }) {
+        this.BrandHeader();
 
         Text('家长')
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.CAPTION_SIZE)
           .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontColor(AppTheme.SUBTEXT)
+          .margin({ left: 4 });
         this.ParentCard();
 
         Text('孩子')
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.CAPTION_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT)
-          .margin({ top: 6 });
+          .margin({ left: 4, top: 8 });
         ForEach(this.students(), (student: StudentProfile) => {
           this.StudentCard(student);
         }, (student: StudentProfile) => student.id);
 
-        Text('家长可以管理多个孩子；孩子只能进入自己的作业空间。')
-          .width('100%')
-          .fontSize(12)
-          .lineHeight(19)
-          .fontColor(AppTheme.SUBTEXT)
-          .margin({ top: 8 });
+        Row({ space: 8 }) {
+          Text('●').fontSize(8).fontColor(AppTheme.SUCCESS);
+          Text('进入后身份固定，避免家庭成员之间误操作。')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%')
+        .padding({ top: 10, left: 4 });
       }
       .width('100%')
-      .padding({ left: 24, right: 24, top: 56, bottom: 40 });
+      .padding({
+        left: AppTheme.PAGE_PADDING,
+        right: AppTheme.PAGE_PADDING,
+        top: 48,
+        bottom: 40
+      });
     }
     .width('100%')
     .height('100%')
