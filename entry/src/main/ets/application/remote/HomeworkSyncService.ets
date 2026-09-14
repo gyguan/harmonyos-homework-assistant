@@ -31,6 +31,9 @@ export class HomeworkSyncService {
       for (let assignment of local) {
         let existing = remoteById.get(assignment.id);
         if (existing === undefined) {
+          // candidateId is present only for a real assignment published after parent confirmation.
+          // Demo/seed assignments intentionally stay local and are never uploaded automatically.
+          if (assignment.candidateId.length === 0) continue;
           let created = await HomeworkRemoteApi.instance.create(assignment);
           this.observedVersions.set(created.id, created.version);
           continue;
