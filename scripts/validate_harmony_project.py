@@ -27,6 +27,7 @@ entry_ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 responsive = read("entry/src/main/ets/common/responsive/WindowSizeClass.ets")
 models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
+persistence_models = read("entry/src/main/ets/domain/model/PersistenceModels.ets")
 state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 confirmation_page = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
@@ -115,6 +116,11 @@ require("store.flush" in persistence_adapter,
         "Preferences adapter must flush snapshots to durable storage")
 require("HomeworkStore.instance.initialize" in entry_ability and "PreferencesHomeworkPersistence" in entry_ability,
         "EntryAbility must restore the store before loading the UI")
+require("settings: AppSettings" in persistence_models and "tutorSessions: TutorSession[]" in persistence_models,
+        "HomeworkSnapshot must include settings and tutorSessions")
+require("settings: parsed.settings as AppSettings" in persistence_adapter and
+        "tutorSessions: parsed.tutorSessions as TutorSession[]" in persistence_adapter,
+        "Preferences adapter must restore every required HomeworkSnapshot field")
 
 require("interface HomeworkTextExtractor" in text_extractor_port,
         "OCR/text extraction must be hidden behind HomeworkTextExtractor")
