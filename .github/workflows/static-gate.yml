@@ -30,3 +30,6 @@ jobs:
 
       - name: Validate real homework submission
         run: python scripts/validate_real_submission_feature.py
+
+      - name: Validate multi-child isolation
+        run: python scripts/validate_multi_child_isolation.py
