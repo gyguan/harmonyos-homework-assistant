@@ -44,6 +44,7 @@ export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
     hasExplicitSubject: boolean, sourceSegment: string, sequence: number): CandidateAssignment {
     return {
       id: `item-${input.importId}-${sequence}`,
+      studentId: input.studentId,
       subject: subject,
       title: body,
       instruction: body,
