@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.xiaoban.homework.student.StudentEntity;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class OpenAiHomeworkOrganizerModelClientTest {
+class ConfigurableHomeworkOrganizerModelClientTest {
   static class TestStudent extends StudentEntity {
     TestStudent() { super(); }
   }
@@ -20,7 +19,8 @@ class OpenAiHomeworkOrganizerModelClientTest {
     student.semester = "上学期";
     student.textbookSummary = "语文部编版 · 数学北师大版";
 
-    String input = OpenAiHomeworkOrganizerModelClient.buildInput(student, "家长录入文字", "语文背诵第12课");
+    String input = ConfigurableHomeworkOrganizerModelClient.buildInput(
+        student, "家长录入文字", "语文背诵第12课");
 
     assertTrue(input.contains("三年级"));
     assertTrue(input.contains("语文部编版"));
@@ -29,18 +29,16 @@ class OpenAiHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void instructionsForbidInventingHomeworkDetails() {
-    String instructions = OpenAiHomeworkOrganizerModelClient.instructions();
+  void instructionsForbidInventingHomeworkDetailsAndRequestJsonOnly() {
+    String instructions = ConfigurableHomeworkOrganizerModelClient.instructions();
     assertTrue(instructions.contains("不解答作业"));
     assertTrue(instructions.contains("不得编造"));
-    assertTrue(instructions.contains("家长确认"));
+    assertTrue(instructions.contains("JSON"));
   }
 
   @Test
-  void extractsOutputTextFromResponsesPayload() {
-    var response = new OpenAiHomeworkOrganizerModelClient.OpenAiResponse(List.of(
-        new OpenAiHomeworkOrganizerModelClient.OpenAiOutput(List.of(
-            new OpenAiHomeworkOrganizerModelClient.OpenAiContent("output_text", "{\"assignments\":[]}")))));
-    assertTrue(OpenAiHomeworkOrganizerModelClient.extractText(response).isPresent());
+  void schemaKeepsAssignmentsRoot() {
+    assertTrue(ConfigurableHomeworkOrganizerModelClient.structuredSchema().containsKey("properties"));
+    assertTrue(ConfigurableHomeworkOrganizerModelClient.structuredSchema().toString().contains("assignments"));
   }
 }

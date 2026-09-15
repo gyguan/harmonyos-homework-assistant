@@ -10,6 +10,9 @@ oh_modules/
 **/build/
 **/.preview/
 
+# Backend local secrets / overrides - never commit
+backend/config/application-local.yml
+
 # Signing material - never commit
 *.p12
 *.p7b

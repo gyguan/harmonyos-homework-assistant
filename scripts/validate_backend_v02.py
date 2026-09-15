@@ -23,14 +23,18 @@ v3 = read("backend/src/main/resources/db/migration/V3__auth_tutor_schema.sql")
 auth_tokens = read("backend/src/main/java/com/xiaoban/homework/auth/AuthTokenService.java")
 student_controller = read("backend/src/main/java/com/xiaoban/homework/student/StudentController.java")
 student_service = read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java")
-model_client = read("backend/src/main/java/com/xiaoban/homework/tutor/OpenAiTutorModelClient.java")
+ai_properties = read("backend/src/main/java/com/xiaoban/homework/ai/AiProviderProperties.java")
+ai_transport = read("backend/src/main/java/com/xiaoban/homework/ai/OpenAiCompatibleTransport.java")
+model_client = read("backend/src/main/java/com/xiaoban/homework/tutor/ConfigurableTutorModelClient.java")
 tutor_prompt = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorPromptBuilder.java")
 tutor_controller = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorController.java")
 organizer_controller = read("backend/src/main/java/com/xiaoban/homework/organizer/HomeworkOrganizerController.java")
 organizer_service = read("backend/src/main/java/com/xiaoban/homework/organizer/HomeworkOrganizerService.java")
-organizer_model = read("backend/src/main/java/com/xiaoban/homework/organizer/OpenAiHomeworkOrganizerModelClient.java")
+organizer_model = read("backend/src/main/java/com/xiaoban/homework/organizer/ConfigurableHomeworkOrganizerModelClient.java")
 access_log = read("backend/src/main/java/com/xiaoban/homework/common/AccessLogFilter.java")
 app_yml = read("backend/src/main/resources/application.yml")
+local_example = read("backend/config/application-local.example.yml")
+gitignore = read(".gitignore")
 app_config = read("entry/src/main/ets/common/config/AppConfig.ets")
 backend_session = read("entry/src/main/ets/application/remote/BackendSession.ets")
 session_storage = read("entry/src/main/ets/infrastructure/persistence/PreferencesBackendSessionStorage.ets")
@@ -52,28 +56,41 @@ require('@DeleteMapping("/{id}")' in student_controller and "countByFamilyId" in
         "family management must support guarded child deletion")
 require("existsByFamilyIdAndStudentId" in student_service,
         "child deletion must protect children that already own homework")
-require('uri("/v1/responses")' in model_client and 'body.put("store", false)' in model_client,
-        "Tutor provider must use the Responses API without provider-side conversation storage")
-require("OPENAI_API_KEY" in app_yml and "gpt-5.6-luna" in app_yml,
-        "Tutor model must be server-configurable and keep credentials off the app")
+
+require('@ConfigurationProperties(prefix = "app.ai")' in ai_properties and
+        "tutorModel" in ai_properties and "organizerModel" in ai_properties,
+        "AI provider configuration must be centralized and provider-neutral")
+require("responses" in ai_transport and "chatCompletion" in ai_transport and
+        'body.put("store", false)' in ai_transport and '"json_schema"' in ai_transport,
+        "AI transport must support responses/chat-completions and structured output without provider storage")
+require("AiProviderProperties" in model_client and "OpenAiCompatibleTransport" in model_client,
+        "Tutor business must use the generic configurable AI transport")
+require("AiProviderProperties" in organizer_model and "OpenAiCompatibleTransport" in organizer_model,
+        "Organizer business must use the generic configurable AI transport")
+require("不得编造" in organizer_model and "不解答作业" in organizer_model and "JSON" in organizer_model,
+        "AI organizer prompt must avoid hallucinating/solving homework and support JSON fallback")
 for phrase in ["不要直接给出", "个人信息", "可信成年人"]:
     require(phrase in tutor_prompt, f"Tutor safety/guidance prompt missing: {phrase}")
 require('@PostMapping("/messages")' in tutor_controller,
         "Tutor API must support real persisted conversations")
 
+require("optional:file:./config/application-local.yml" in app_yml,
+        "backend must automatically load the external local override file")
+require("backend/config/application-local.yml" in gitignore,
+        "local backend secrets file must be ignored by Git")
+require("app:" in local_example and "ai:" in local_example and "api-key:" in local_example and
+        "protocol:" in local_example and "base-url:" in local_example,
+        "repository must provide a safe local configuration example")
+require("app:\n" in app_yml and "  ai:" in app_yml and "AI_PROTOCOL" in app_yml and
+        "AI_BASE_URL" in app_yml and "AI_TUTOR_MODEL" in app_yml and "AI_ORGANIZER_MODEL" in app_yml,
+        "public configuration must expose provider-neutral AI settings")
+
 require('@PostMapping("/organize")' in organizer_controller and "FAMILY_ID" in organizer_controller,
         "homework organizer must expose an authenticated family-scoped API")
 require("familyId.equals(student.familyId)" in organizer_service and "ServiceUnavailable" in organizer_service,
         "organizer must enforce child ownership and expose provider outage for app fallback")
-require('uri("/v1/responses")' in organizer_model and 'body.put("store", false)' in organizer_model and
-        '"json_schema"' in organizer_model and '"strict", true' in organizer_model,
-        "AI organizer must use Responses Structured Outputs with store=false")
-require("不得编造" in organizer_model and "不解答作业" in organizer_model,
-        "AI organizer prompt must avoid hallucinating or solving homework")
-require("OPENAI_ORGANIZER_MODEL" in app_yml,
-        "AI organizer model must be independently server-configurable")
 require("/homework/organize" in organizer_remote and "BackendHttpClient" in organizer_remote,
-        "HarmonyOS organizer must call the authenticated backend API rather than OpenAI directly")
+        "HarmonyOS organizer must call the authenticated backend API rather than a model provider directly")
 require("HomeworkOrganizerRemoteApi.instance.organize" in import_service and
         "HomeworkOrganizerMode.AI" in import_service and "HomeworkOrganizerMode.LOCAL" in import_service and
         "this.pipeline.parse(extracted)" in import_service,
@@ -103,8 +120,8 @@ ets_root = ROOT / "entry" / "src" / "main" / "ets"
 if ets_root.exists():
     for file in ets_root.rglob("*.ets"):
         text = file.read_text(encoding="utf-8")
-        if "OPENAI_API_KEY" in text or "api.openai.com" in text:
-            errors.append(f"OpenAI credentials/provider endpoint leaked into app code: {file.relative_to(ROOT).as_posix()}")
+        if "OPENAI_API_KEY" in text or "AI_API_KEY" in text or "api.openai.com" in text:
+            errors.append(f"model credentials/provider endpoint leaked into app code: {file.relative_to(ROOT).as_posix()}")
 
 if errors:
     print("BACKEND_V02_GATE_FAIL")
