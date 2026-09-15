@@ -1,7 +1,12 @@
 package com.xiaoban.homework.assignment;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import com.xiaoban.homework.storage.FileStorage;
 import com.xiaoban.homework.student.StudentService;
+import com.xiaoban.homework.submission.SubmissionEntity;
+import com.xiaoban.homework.submission.SubmissionPhotoEntity;
+import com.xiaoban.homework.submission.SubmissionPhotoRepository;
+import com.xiaoban.homework.submission.SubmissionRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +17,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class AssignmentService {
   private final AssignmentRepository repository;
   private final StudentService students;
-  public AssignmentService(AssignmentRepository repository, StudentService students) { this.repository = repository; this.students = students; }
+  private final SubmissionRepository submissions;
+  private final SubmissionPhotoRepository photos;
+  private final FileStorage storage;
+
+  public AssignmentService(AssignmentRepository repository, StudentService students,
+      SubmissionRepository submissions, SubmissionPhotoRepository photos, FileStorage storage) {
+    this.repository = repository;
+    this.students = students;
+    this.submissions = submissions;
+    this.photos = photos;
+    this.storage = storage;
+  }
 
   @Transactional(readOnly = true)
   public List<AssignmentDtos.Response> list(UUID familyId, String studentId) {
@@ -97,6 +113,18 @@ public class AssignmentService {
     }
     e.updatedAt = Instant.now();
     return AssignmentDtos.Response.from(repository.saveAndFlush(e));
+  }
+
+  @Transactional
+  public void delete(UUID familyId, String id) {
+    AssignmentEntity assignment = requireOwned(familyId, id);
+    for (SubmissionEntity submission : submissions.findByFamilyIdAndAssignmentIdOrderBySubmittedAtDesc(familyId, id)) {
+      for (SubmissionPhotoEntity photo : photos.findBySubmissionIdOrderById(submission.id)) {
+        storage.delete(photo.storagePath);
+      }
+    }
+    repository.delete(assignment);
+    repository.flush();
   }
 
   private void pauseOtherActive(UUID familyId, String studentId, String activeId, long nowMs) {
