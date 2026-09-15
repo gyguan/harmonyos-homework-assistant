@@ -28,6 +28,7 @@ store = read("entry/src/main/ets/data/HomeworkStore.ets")
 remote_models = read("entry/src/main/ets/application/remote/RemoteModels.ets")
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 assignment_card = read("entry/src/main/ets/components/assignment/AssignmentCard.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
 
@@ -46,6 +47,12 @@ require("reviewNoteDraft.trim().length > 0" in parent_progress,
         "rework action must require a concrete parent correction note")
 require("items[items.length - 1]" in parent_progress,
         "parent review must show the newest local resubmission")
+require("onStoreChanged: () => void = () => {};" in parent_progress,
+        "ParentProgressPage must declare the onStoreChanged callback passed by AppShell")
+require("this.onStoreChanged();" in parent_progress,
+        "ParentProgressPage must notify AppShell after a successful review mutation")
+require("ParentProgressPage({" in app_shell and "onStoreChanged: () => this.touchStore()" in app_shell,
+        "AppShell must wire ParentProgressPage store changes back to the shell revision")
 require("家长订正说明" in assignment_card and "reviewNote" in assignment_card,
         "student assignment list must show parent correction note")
 require("家长请你订正" in countdown and "reviewNote" in countdown,
