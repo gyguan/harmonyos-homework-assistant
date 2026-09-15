@@ -23,6 +23,7 @@ public class AssignmentEntity {
   public long startedAtEpochMs;
   public long finishedAtEpochMs;
   public long elapsedSeconds;
+  public String reviewNote;
   @Version public long version;
   public Instant createdAt;
   public Instant updatedAt;
