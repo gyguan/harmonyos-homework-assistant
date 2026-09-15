@@ -36,6 +36,9 @@ export class RemoteAssignmentMapper {
       finishedAtEpochMs: remote.finishedAtEpochMs > 0 ? remote.finishedAtEpochMs : 0,
       elapsedSeconds: remote.elapsedSeconds > 0 ? remote.elapsedSeconds : 0,
       reviewNote: remote.reviewNote === undefined ? '' : remote.reviewNote,
+      remoteVersion: remote.version,
+      syncDirty: false,
+      lastSyncedAtEpochMs: Date.now(),
       resourceLabels: existing === null ? [] : existing.resourceLabels.slice()
     };
   }
