@@ -33,8 +33,9 @@ remote_submission = read("entry/src/main/ets/application/remote/RemoteSubmission
 
 require("<version>4.1.1</version>" in pom, "backend must pin Spring Boot 4.1.1")
 require("<java.version>21</java.version>" in pom, "backend must target Java 21")
-require("spring-boot-starter-data-jpa" in pom and "postgresql" in pom and "flyway-core" in pom,
-        "backend must keep the simple Spring Boot + JPA + PostgreSQL + Flyway stack")
+require("spring-boot-starter-data-jpa" in pom and "postgresql" in pom and
+        "spring-boot-starter-flyway" in pom and "flyway-database-postgresql" in pom,
+        "backend must keep Spring Boot + JPA + PostgreSQL with Boot 4 Flyway auto-configuration")
 for forbidden in ["spring-cloud", "kafka", "redis", "rabbitmq", "spring-modulith"]:
     require(forbidden not in pom.lower(), f"backend V0.1 must not introduce {forbidden}")
 require("ddl-auto: validate" in yml, "database schema must be owned by Flyway, not Hibernate DDL")
