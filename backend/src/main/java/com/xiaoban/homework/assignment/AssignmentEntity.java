@@ -19,6 +19,10 @@ public class AssignmentEntity {
   public String status;
   public String sourceLabel;
   public String sourceExcerpt;
+  public int expectedMinutes;
+  public long startedAtEpochMs;
+  public long finishedAtEpochMs;
+  public long elapsedSeconds;
   @Version public long version;
   public Instant createdAt;
   public Instant updatedAt;

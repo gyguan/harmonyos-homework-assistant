@@ -42,6 +42,14 @@ export struct AssignmentCard {
     }
   }
 
+  private timeLabel(): string {
+    if (this.assignment.elapsedSeconds > 0 && this.assignment.status !== AssignmentStatus.IN_PROGRESS) {
+      let minutes = Math.max(1, Math.round(this.assignment.elapsedSeconds / 60));
+      return `预计 ${this.assignment.expectedMinutes} 分钟 · 实际 ${minutes} 分钟`;
+    }
+    return `预计 ${this.assignment.expectedMinutes} 分钟`;
+  }
+
   build() {
     Column({ space: AppTheme.ITEM_GAP }) {
       Row({ space: 8 }) {
@@ -81,6 +89,10 @@ export struct AssignmentCard {
         Text(`截至 ${this.assignment.dueText}`)
           .fontSize(AppTheme.CAPTION_SIZE)
           .fontColor(AppTheme.TERTIARY_TEXT);
+        Blank();
+        Text(this.timeLabel())
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontColor(AppTheme.PRIMARY);
       }
       .width('100%');
     }

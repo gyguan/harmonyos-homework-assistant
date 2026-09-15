@@ -198,6 +198,10 @@ export class HomeworkStore {
       textbookRef: source.textbookRef,
       dueText: source.dueText,
       status: source.status,
+      expectedMinutes: source.expectedMinutes > 0 ? source.expectedMinutes : 20,
+      startedAtEpochMs: source.startedAtEpochMs > 0 ? source.startedAtEpochMs : 0,
+      finishedAtEpochMs: source.finishedAtEpochMs > 0 ? source.finishedAtEpochMs : 0,
+      elapsedSeconds: source.elapsedSeconds > 0 ? source.elapsedSeconds : 0,
       resourceLabels: source.resourceLabels.slice()
     };
   }
@@ -211,6 +215,7 @@ export class HomeworkStore {
       instruction: source.instruction,
       textbookRef: source.textbookRef,
       dueText: source.dueText,
+      expectedMinutes: source.expectedMinutes > 0 ? source.expectedMinutes : 20,
       sourceEvidence: {
         sourceLabel: source.sourceEvidence.sourceLabel,
         excerpt: source.sourceEvidence.excerpt
@@ -506,6 +511,10 @@ export class HomeworkStore {
         textbookRef: candidate.textbookRef,
         dueText: candidate.dueText,
         status: AssignmentStatus.NOT_STARTED,
+        expectedMinutes: candidate.expectedMinutes > 0 ? candidate.expectedMinutes : 20,
+        startedAtEpochMs: 0,
+        finishedAtEpochMs: 0,
+        elapsedSeconds: 0,
         resourceLabels: []
       };
       this.assignments.push(assignment);
@@ -525,7 +534,20 @@ export class HomeworkStore {
     if (!AssignmentStateMachine.canTransition(current, to)) {
       return false;
     }
-    this.assignments[index].status = AssignmentStateMachine.transition(current, to);
+    let next = AssignmentStateMachine.transition(current, to);
+    let now = Date.now();
+    if (current !== AssignmentStatus.IN_PROGRESS && next === AssignmentStatus.IN_PROGRESS) {
+      this.assignments[index].startedAtEpochMs = now;
+      this.assignments[index].finishedAtEpochMs = 0;
+      this.assignments[index].elapsedSeconds = 0;
+    }
+    if (current === AssignmentStatus.IN_PROGRESS && next !== AssignmentStatus.IN_PROGRESS &&
+      this.assignments[index].startedAtEpochMs > 0) {
+      this.assignments[index].finishedAtEpochMs = now;
+      this.assignments[index].elapsedSeconds = Math.max(0,
+        Math.floor((now - this.assignments[index].startedAtEpochMs) / 1000));
+    }
+    this.assignments[index].status = next;
     this.requestPersist();
     return true;
   }

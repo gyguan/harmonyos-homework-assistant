@@ -63,6 +63,7 @@ export interface CandidateAssignment {
   instruction: string;
   textbookRef: string;
   dueText: string;
+  expectedMinutes: number;
   sourceEvidence: SourceEvidence;
   confidence: number;
 }
@@ -77,6 +78,10 @@ export interface Assignment {
   textbookRef: string;
   dueText: string;
   status: AssignmentStatus;
+  expectedMinutes: number;
+  startedAtEpochMs: number;
+  finishedAtEpochMs: number;
+  elapsedSeconds: number;
   resourceLabels: string[];
 }
 

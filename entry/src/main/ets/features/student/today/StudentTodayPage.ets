@@ -180,10 +180,17 @@ export struct StudentTodayPage {
           .fontSize(15)
           .lineHeight(22)
           .fontColor(AppTheme.SUBTEXT);
-        Text(this.nextAssignment()!.textbookRef)
-          .width('100%')
-          .fontSize(13)
-          .fontColor(AppTheme.PRIMARY);
+        Row({ space: 8 }) {
+          Text(this.nextAssignment()!.textbookRef)
+            .layoutWeight(1)
+            .fontSize(13)
+            .fontColor(AppTheme.PRIMARY);
+          Text(`预计 ${this.nextAssignment()!.expectedMinutes} 分钟`)
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.WARNING);
+        }
+        .width('100%');
         Button(this.actionLabel(this.nextAssignment()!), { type: ButtonType.Normal })
           .width('100%')
           .height(AppTheme.BUTTON_HEIGHT)

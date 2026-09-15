@@ -11,6 +11,10 @@ export interface RemoteAssignment {
   status: string;
   sourceLabel: string;
   sourceExcerpt: string;
+  expectedMinutes: number;
+  startedAtEpochMs: number;
+  finishedAtEpochMs: number;
+  elapsedSeconds: number;
   version: number;
 }
 
@@ -26,6 +30,10 @@ export class RemoteAssignmentMapper {
       textbookRef: remote.textbookRef,
       dueText: remote.dueText,
       status: remote.status as AssignmentStatus,
+      expectedMinutes: remote.expectedMinutes > 0 ? remote.expectedMinutes : 20,
+      startedAtEpochMs: remote.startedAtEpochMs > 0 ? remote.startedAtEpochMs : 0,
+      finishedAtEpochMs: remote.finishedAtEpochMs > 0 ? remote.finishedAtEpochMs : 0,
+      elapsedSeconds: remote.elapsedSeconds > 0 ? remote.elapsedSeconds : 0,
       resourceLabels: existing === null ? [] : existing.resourceLabels.slice()
     };
   }

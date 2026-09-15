@@ -3,6 +3,7 @@ import { HomeworkSubmissionService } from '../../../application/submission/Homew
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
+import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { Assignment, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
@@ -225,6 +226,7 @@ export struct StudyWorkspacePage {
           }.width('100%');
           Text(this.assignment()!.title).width('100%').fontSize(24).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
           Text(this.assignment()!.instruction).width('100%').fontSize(15).lineHeight(22).fontColor(AppTheme.SUBTEXT);
+          AssignmentCountdownCard({ assignment: this.assignment()! });
           Column({ space: 8 }) {
             Text('教材 · ' + this.assignment()!.textbookRef).width('100%').fontSize(13).fontColor(AppTheme.PRIMARY);
             if (this.assignment()!.resourceLabels.length === 0) {

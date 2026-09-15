@@ -32,25 +32,41 @@ export struct HomeworkConfirmationPage {
   private updateSubject(item: CandidateAssignment, subject: Subject): void {
     this.saveCandidate({ id: item.id, studentId: item.studentId, subject: subject, title: item.title,
       instruction: item.instruction, textbookRef: item.textbookRef, dueText: item.dueText,
-      sourceEvidence: item.sourceEvidence, confidence: item.confidence });
+      expectedMinutes: item.expectedMinutes, sourceEvidence: item.sourceEvidence, confidence: item.confidence });
   }
 
   private updateTitle(item: CandidateAssignment, title: string): void {
     this.saveCandidate({ id: item.id, studentId: item.studentId, subject: item.subject, title: title,
       instruction: title, textbookRef: item.textbookRef, dueText: item.dueText,
-      sourceEvidence: item.sourceEvidence, confidence: item.confidence });
+      expectedMinutes: item.expectedMinutes, sourceEvidence: item.sourceEvidence, confidence: item.confidence });
   }
 
   private updateDueText(item: CandidateAssignment, dueText: string): void {
     this.saveCandidate({ id: item.id, studentId: item.studentId, subject: item.subject, title: item.title,
       instruction: item.instruction, textbookRef: item.textbookRef, dueText: dueText,
-      sourceEvidence: item.sourceEvidence, confidence: item.confidence });
+      expectedMinutes: item.expectedMinutes, sourceEvidence: item.sourceEvidence, confidence: item.confidence });
   }
 
   private updateTextbookRef(item: CandidateAssignment, textbookRef: string): void {
     this.saveCandidate({ id: item.id, studentId: item.studentId, subject: item.subject, title: item.title,
       instruction: item.instruction, textbookRef: textbookRef, dueText: item.dueText,
-      sourceEvidence: item.sourceEvidence, confidence: item.confidence });
+      expectedMinutes: item.expectedMinutes, sourceEvidence: item.sourceEvidence, confidence: item.confidence });
+  }
+
+  private updateExpectedMinutes(item: CandidateAssignment, value: string): void {
+    let minutes = Number(value);
+    if (minutes < 1) minutes = 1;
+    if (minutes > 240) minutes = 240;
+    minutes = Math.round(minutes);
+    this.saveCandidate({ id: item.id, studentId: item.studentId, subject: item.subject, title: item.title,
+      instruction: item.instruction, textbookRef: item.textbookRef, dueText: item.dueText,
+      expectedMinutes: minutes, sourceEvidence: item.sourceEvidence, confidence: item.confidence });
+  }
+
+  private setExpectedMinutes(item: CandidateAssignment, minutes: number): void {
+    this.saveCandidate({ id: item.id, studentId: item.studentId, subject: item.subject, title: item.title,
+      instruction: item.instruction, textbookRef: item.textbookRef, dueText: item.dueText,
+      expectedMinutes: minutes, sourceEvidence: item.sourceEvidence, confidence: item.confidence });
   }
 
   private addCandidate(): void {
@@ -63,6 +79,7 @@ export struct HomeworkConfirmationPage {
       instruction: '新作业',
       textbookRef: '待家长确认',
       dueText: '今天',
+      expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: raw.sourceLabel.length > 0 ? raw.sourceLabel : '家长手工新增',
         excerpt: '家长手工新增'
@@ -133,6 +150,18 @@ export struct HomeworkConfirmationPage {
   }
 
   @Builder
+  private TimeChip(item: CandidateAssignment, minutes: number) {
+    Text(`${minutes} 分钟`)
+      .fontSize(AppTheme.CAPTION_SIZE)
+      .fontWeight(item.expectedMinutes === minutes ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+      .backgroundColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .onClick(() => this.setExpectedMinutes(item, minutes));
+  }
+
+  @Builder
   private FieldLabel(label: string) {
     Text(label)
       .width('100%')
@@ -176,6 +205,26 @@ export struct HomeworkConfirmationPage {
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.updateTitle(item, value));
+
+      this.FieldLabel('预计完成时间');
+      Row({ space: 7 }) {
+        this.TimeChip(item, 10);
+        this.TimeChip(item, 15);
+        this.TimeChip(item, 20);
+        this.TimeChip(item, 30);
+        this.TimeChip(item, 45);
+      }
+      .width('100%');
+      TextInput({ text: `${item.expectedMinutes}` })
+        .width('100%')
+        .height(AppTheme.INPUT_HEIGHT)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .onChange((value: string) => this.updateExpectedMinutes(item, value));
+      Text('学生点击“开始作业”后按这个时间倒计时，超时不会强制停止。')
+        .width('100%')
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .fontColor(AppTheme.TERTIARY_TEXT);
 
       this.FieldLabel('截止时间');
       TextInput({ text: item.dueText })

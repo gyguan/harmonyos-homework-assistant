@@ -5,11 +5,13 @@ import { RemoteAssignment } from './RemoteModels';
 
 interface CreateAssignmentBody {
   id: string; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
-  status: string; sourceLabel: string; sourceExcerpt: string;
+  status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
+  startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number;
 }
 interface UpdateAssignmentBody {
   version: number; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
-  status: string; sourceLabel: string; sourceExcerpt: string;
+  status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
+  startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number;
 }
 
 export class HomeworkRemoteApi {
@@ -33,7 +35,9 @@ export class HomeworkRemoteApi {
     let body: UpdateAssignmentBody = {
       version: version, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
       textbookRef: assignment.textbookRef, dueText: assignment.dueText, status: assignment.status,
-      sourceLabel: '', sourceExcerpt: ''
+      sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
+      startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
+      elapsedSeconds: assignment.elapsedSeconds
     };
     let response = await BackendHttpClient.instance.request(`/api/v1/assignments/${encodeURIComponent(assignment.id)}`, http.RequestMethod.PATCH, body);
     if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
@@ -43,6 +47,8 @@ export class HomeworkRemoteApi {
 
   private createBody(assignment: Assignment): CreateAssignmentBody {
     return { id: assignment.id, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
-      textbookRef: assignment.textbookRef, dueText: assignment.dueText, status: assignment.status, sourceLabel: '', sourceExcerpt: '' };
+      textbookRef: assignment.textbookRef, dueText: assignment.dueText, status: assignment.status, sourceLabel: '', sourceExcerpt: '',
+      expectedMinutes: assignment.expectedMinutes, startedAtEpochMs: assignment.startedAtEpochMs,
+      finishedAtEpochMs: assignment.finishedAtEpochMs, elapsedSeconds: assignment.elapsedSeconds };
   }
 }
