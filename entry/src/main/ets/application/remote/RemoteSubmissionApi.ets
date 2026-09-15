@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { BusinessError, request } from '@kit.BasicServicesKit';
-import { fileIo } from '@kit.CoreFileKit';
+import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { http } from '@kit.NetworkKit';
 import { BackendHttpClient } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
@@ -23,6 +23,7 @@ export interface RemoteSubmission {
 export class RemoteSubmissionApi {
   static readonly instance: RemoteSubmissionApi = new RemoteSubmissionApi();
   private context: common.UIAbilityContext | null = null;
+  private photoCache: Map<string, string> = new Map<string, string>();
   private constructor() {}
   configure(context: common.UIAbilityContext): void { this.context = context; }
 
@@ -32,6 +33,54 @@ export class RemoteSubmissionApi {
       `/api/v1/assignments/${encodeURIComponent(assignmentId)}/submissions`, http.RequestMethod.GET);
     if (response.statusCode !== 200) throw new Error('读取云端提交记录失败');
     return JSON.parse(response.body) as RemoteSubmission[];
+  }
+
+  cachedPhotoUri(photoId: string): string {
+    let cached = this.photoCache.get(photoId);
+    return cached === undefined ? '' : cached;
+  }
+
+  async downloadPhoto(photo: RemoteSubmissionPhoto): Promise<string> {
+    let cached = this.cachedPhotoUri(photo.id);
+    if (cached.length > 0) return cached;
+    if (this.context === null || !BackendSession.instance.isConnected()) return '';
+
+    let client = http.createHttp();
+    try {
+      let response = await client.request(
+        `${BackendSession.instance.getBaseUrl()}/api/v1/submission-photos/${encodeURIComponent(photo.id)}`,
+        {
+          method: http.RequestMethod.GET,
+          header: { 'Authorization': `Bearer ${BackendSession.instance.getToken()}` },
+          connectTimeout: 10000,
+          readTimeout: 20000,
+          maxLimit: 15 * 1024 * 1024,
+          expectDataType: http.HttpDataType.ARRAY_BUFFER
+        });
+      if (response.responseCode === 401) {
+        BackendSession.instance.disconnect();
+        return '';
+      }
+      if (response.responseCode !== http.ResponseCode.OK) return '';
+
+      let data = response.result as ArrayBuffer;
+      if (data.byteLength === 0) return '';
+      let cachePath = `${this.context.cacheDir}/submission-photo-${photo.id}.${this.extension(photo.contentType)}`;
+      let file = await fileIo.open(cachePath,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      try {
+        await fileIo.write(file.fd, data);
+      } finally {
+        try { await fileIo.close(file); } catch {}
+      }
+      let uri = fileUri.getUriFromPath(cachePath);
+      this.photoCache.set(photo.id, uri);
+      return uri;
+    } catch {
+      return '';
+    } finally {
+      try { client.destroy(); } catch {}
+    }
   }
 
   async upload(assignmentId: string, sourceUris: string[]): Promise<boolean> {
@@ -69,5 +118,12 @@ export class RemoteSubmissionApi {
         try { await fileIo.unlink(path); } catch {}
       }
     }
+  }
+
+  private extension(contentType: string): string {
+    let normalized = contentType.toLowerCase();
+    if (normalized.indexOf('png') >= 0) return 'png';
+    if (normalized.indexOf('webp') >= 0) return 'webp';
+    return 'jpg';
   }
 }
