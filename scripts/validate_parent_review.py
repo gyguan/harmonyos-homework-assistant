@@ -81,6 +81,18 @@ require("on delete cascade" in delete_migration.lower() and "submission_assignme
 require("void delete(String storagePath)" in file_storage,
         "FileStorage must support physical photo cleanup")
 
+require("@State private subjectFilter: string = 'ALL'" in parent_progress and "filteredAssignments()" in parent_progress,
+        "parent progress must keep an explicit subject filter state")
+require("SubjectFilterChip('ALL', '全部')" in parent_progress and
+        "SubjectFilterChip(Subject.CHINESE, '语文')" in parent_progress and
+        "SubjectFilterChip(Subject.MATH, '数学')" in parent_progress and
+        "SubjectFilterChip(Subject.ENGLISH, '英语')" in parent_progress,
+        "parent progress must expose all/chinese/math/english filters")
+require("subjectCount(key)" in parent_progress and "this.filteredAssignments()" in parent_progress,
+        "parent subject filters must display counts and drive the progress list")
+require("this.AssignmentDetail(this.selectedAssignment()!)" in parent_progress,
+        "subject filtering must not replace or block assignment detail rendering")
+
 if errors:
     print("PARENT_REVIEW_GATE_FAIL")
     for error in errors:
