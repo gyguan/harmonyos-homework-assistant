@@ -120,37 +120,38 @@ export class RemoteSubmissionApi {
     if (this.context === null) throw new Error('上传上下文未初始化');
     let boundary = `----xiaoban-homework-${Date.now()}`;
     let multipartPath = `${this.context.cacheDir}/submission-multipart-${Date.now()}.bin`;
-    let writer = await fileIo.open(multipartPath,
-      fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
-    let totalBytes = 0;
-    try {
-      for (let i = 0; i < sourceUris.length; i++) {
-        let fileName = `homework-upload-${i + 1}.jpg`;
-        let header = `--${boundary}\r\nContent-Disposition: form-data; name="photos"; filename="${fileName}"\r\n` +
-          'Content-Type: image/jpeg\r\n\r\n';
-        totalBytes += await fileIo.write(writer.fd, header);
 
-        let source = await fileIo.open(sourceUris[i], fileIo.OpenMode.READ_ONLY);
-        try {
-          let chunk = new ArrayBuffer(64 * 1024);
-          while (true) {
-            let readLength = await fileIo.read(source.fd, chunk);
-            if (readLength <= 0) break;
-            let written = await fileIo.write(writer.fd, chunk, { length: readLength });
-            if (written !== readLength) throw new Error('作业照片写入 multipart 失败');
-            totalBytes += written;
+    try {
+      let writer = await fileIo.open(multipartPath,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      let totalBytes = 0;
+      try {
+        for (let i = 0; i < sourceUris.length; i++) {
+          let fileName = `homework-upload-${i + 1}.jpg`;
+          let header = `--${boundary}\r\nContent-Disposition: form-data; name="photos"; filename="${fileName}"\r\n` +
+            'Content-Type: image/jpeg\r\n\r\n';
+          totalBytes += await fileIo.write(writer.fd, header);
+
+          let source = await fileIo.open(sourceUris[i], fileIo.OpenMode.READ_ONLY);
+          try {
+            let chunk = new ArrayBuffer(64 * 1024);
+            while (true) {
+              let readLength = await fileIo.read(source.fd, chunk);
+              if (readLength <= 0) break;
+              let written = await fileIo.write(writer.fd, chunk, { length: readLength });
+              if (written !== readLength) throw new Error('作业照片写入 multipart 失败');
+              totalBytes += written;
+            }
+          } finally {
+            try { await fileIo.close(source); } catch {}
           }
-        } finally {
-          try { await fileIo.close(source); } catch {}
+          totalBytes += await fileIo.write(writer.fd, '\r\n');
         }
-        totalBytes += await fileIo.write(writer.fd, '\r\n');
+        totalBytes += await fileIo.write(writer.fd, `--${boundary}--\r\n`);
+      } finally {
+        try { await fileIo.close(writer); } catch {}
       }
-      totalBytes += await fileIo.write(writer.fd, `--${boundary}--\r\n`);
-    } finally {
-      try { await fileIo.close(writer); } catch {}
-    }
 
-    try {
       let body = new ArrayBuffer(totalBytes);
       let target = new Uint8Array(body);
       let reader = await fileIo.open(multipartPath, fileIo.OpenMode.READ_ONLY);
@@ -168,6 +169,8 @@ export class RemoteSubmissionApi {
       }
       if (offset !== totalBytes) throw new Error('multipart 请求体读取不完整');
       return { boundary: boundary, body: body };
+    } catch {
+      throw new Error('构建作业照片上传请求失败');
     } finally {
       try { await fileIo.unlink(multipartPath); } catch {}
     }
