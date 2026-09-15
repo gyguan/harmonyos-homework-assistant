@@ -105,11 +105,14 @@ export class RemoteSubmissionApi {
         header: { 'Authorization': `Bearer ${BackendSession.instance.getToken()}` },
         method: 'POST', files: uploadFiles, data: []
       };
-      let task = await request.uploadFile(this.context, config);
-      return await new Promise<boolean>((resolve) => {
-        task.on('complete', (_states: request.TaskState[]) => resolve(true));
-        task.on('fail', (_states: request.TaskState[]) => resolve(false));
-      });
+      if (canIUse('SystemCapability.MiscServices.Upload')) {
+        let task = await request.uploadFile(this.context, config);
+        return await new Promise<boolean>((resolve) => {
+          task.on('complete', (_states: request.TaskState[]) => resolve(true));
+          task.on('fail', (_states: request.TaskState[]) => resolve(false));
+        });
+      }
+      return false;
     } catch (error) {
       let _businessError = error as BusinessError;
       return false;
