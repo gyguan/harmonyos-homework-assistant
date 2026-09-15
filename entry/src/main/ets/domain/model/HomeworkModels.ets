@@ -1,6 +1,7 @@
 export enum AssignmentStatus {
   NOT_STARTED = 'NOT_STARTED',
   IN_PROGRESS = 'IN_PROGRESS',
+  PAUSED = 'PAUSED',
   READY_TO_SUBMIT = 'READY_TO_SUBMIT',
   SUBMITTED = 'SUBMITTED',
   COMPLETED = 'COMPLETED',
@@ -118,6 +119,7 @@ export interface TodaySummary {
 export interface DashboardSummary {
   completed: number;
   inProgress: number;
+  paused: number;
   notStarted: number;
   overdue: number;
   readyToSubmit: number;
