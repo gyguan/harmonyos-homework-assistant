@@ -28,11 +28,11 @@ export struct AssignmentCountdownCard {
   }
 
   private elapsedSeconds(): number {
-    if (this.assignment.elapsedSeconds > 0 && this.assignment.status !== AssignmentStatus.IN_PROGRESS) {
-      return this.assignment.elapsedSeconds;
+    let accumulated = Math.max(0, this.assignment.elapsedSeconds);
+    if (this.assignment.status !== AssignmentStatus.IN_PROGRESS || this.assignment.startedAtEpochMs <= 0) {
+      return accumulated;
     }
-    if (this.assignment.startedAtEpochMs <= 0) return 0;
-    return Math.max(0, Math.floor((this.nowEpochMs - this.assignment.startedAtEpochMs) / 1000));
+    return accumulated + Math.max(0, Math.floor((this.nowEpochMs - this.assignment.startedAtEpochMs) / 1000));
   }
 
   private clock(seconds: number): string {
@@ -46,15 +46,23 @@ export struct AssignmentCountdownCard {
     return this.assignment.status === AssignmentStatus.IN_PROGRESS && this.assignment.startedAtEpochMs > 0;
   }
 
+  private isPaused(): boolean {
+    return this.assignment.status === AssignmentStatus.PAUSED;
+  }
+
   private isOvertime(): boolean {
     return this.isRunning() && this.elapsedSeconds() > this.budgetSeconds();
   }
 
   private headline(): string {
+    let remaining = this.budgetSeconds() - this.elapsedSeconds();
     if (this.isRunning()) {
-      let remaining = this.budgetSeconds() - this.elapsedSeconds();
       if (remaining >= 0) return `还剩 ${this.clock(remaining)}`;
       return `已超出 ${this.clock(-remaining)}`;
+    }
+    if (this.isPaused()) {
+      if (remaining >= 0) return `已暂停 · 还剩 ${this.clock(remaining)}`;
+      return `已暂停 · 已超出 ${this.clock(-remaining)}`;
     }
     if (this.assignment.elapsedSeconds > 0) {
       return `实际用时 ${this.clock(this.assignment.elapsedSeconds)}`;
@@ -66,6 +74,9 @@ export struct AssignmentCountdownCard {
     if (this.isRunning()) {
       return this.isOvertime() ? '不用着急，先把这项作业认真完成。' : '专心完成这一项，小伴帮你看着时间。';
     }
+    if (this.isPaused()) {
+      return `已经专注 ${this.clock(this.assignment.elapsedSeconds)}，继续后从这里接着计时。`;
+    }
     if (this.assignment.elapsedSeconds > 0) {
       let actualMinutes = Math.max(1, Math.round(this.assignment.elapsedSeconds / 60));
       if (actualMinutes <= this.assignment.expectedMinutes) return `比预计时间快 ${this.assignment.expectedMinutes - actualMinutes} 分钟。`;
@@ -75,7 +86,6 @@ export struct AssignmentCountdownCard {
   }
 
   private progressValue(): number {
-    if (!this.isRunning()) return this.assignment.elapsedSeconds > 0 ? Math.min(this.assignment.elapsedSeconds, this.budgetSeconds()) : 0;
     return Math.min(this.elapsedSeconds(), this.budgetSeconds());
   }
 
