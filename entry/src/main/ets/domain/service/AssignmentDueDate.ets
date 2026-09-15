@@ -77,7 +77,15 @@ export class AssignmentDueDate {
       let frozen = this.dayStartFromKey(key);
       if (frozen >= 0) return frozen;
     }
-    return this.resolveDayStart(item.dueText, nowEpochMs);
+    let anchor = this.assignmentCreatedAt(item.id);
+    return this.resolveDayStart(item.dueText, anchor > 0 ? anchor : nowEpochMs);
+  }
+
+  private static assignmentCreatedAt(assignmentId: string): number {
+    let match = assignmentId.match(/(?:text|image)-(\d{13})/);
+    if (match === null || match.length < 2) return -1;
+    let value = Number(match[1]);
+    return Number.isFinite(value) && value > 0 ? value : -1;
   }
 
   private static isOverdue(item: Assignment, nowEpochMs: number): boolean {
