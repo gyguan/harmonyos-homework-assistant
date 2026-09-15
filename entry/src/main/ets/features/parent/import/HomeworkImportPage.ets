@@ -217,14 +217,14 @@ export struct HomeworkImportPage {
       .alignItems(HorizontalAlign.Start);
 
       this.ImportAction(
-        $r('sys.symbol.photo'),
-        this.parseBusy ? '正在识别截图…' : '识别作业截图',
+        $r('sys.symbol.plus_square'),
+        this.parseBusy ? '正在识别截图…' : '选择作业截图并识别',
         '从系统相册选择老师发来的作业截图',
         () => { void this.selectScreenshot(); }
       );
 
       this.ImportAction(
-        $r('sys.symbol.doc_text'),
+        $r('sys.symbol.checkmark_square'),
         '粘贴或输入作业文字',
         '适合微信群、校讯通等文字通知',
         () => this.textEntryOpen = true
