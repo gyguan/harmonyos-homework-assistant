@@ -67,6 +67,9 @@ jobs:
       - name: Validate AI suggested homework duration
         run: python scripts/validate_ai_expected_minutes.py
 
+      - name: Validate Tutor question capture
+        run: python scripts/validate_tutor_question_capture.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
