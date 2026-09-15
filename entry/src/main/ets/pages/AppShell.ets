@@ -47,8 +47,17 @@ export struct AppShell {
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
   @State private selectedAssignmentId: string = '';
   @State private storeRevision: number = 0;
+  onRegisterBackHandler: (handler: () => boolean) => void = (_handler: () => boolean) => {};
 
   @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
+
+  aboutToAppear(): void {
+    this.onRegisterBackHandler(() => this.handleSystemBack());
+  }
+
+  aboutToDisappear(): void {
+    this.onRegisterBackHandler(() => false);
+  }
 
   private get sizeClass(): WindowSizeClass {
     return ResponsiveContext.resolve(this.widthVp);
@@ -57,6 +66,18 @@ export struct AppShell {
   private isDetailFlow(): boolean {
     if (this.role === AppRole.STUDENT) return this.studentRoute === StudentRoute.STUDY;
     return this.parentRoute === ParentRoute.CONFIRMATION;
+  }
+
+  private handleSystemBack(): boolean {
+    if (this.role === AppRole.STUDENT && this.studentRoute === StudentRoute.STUDY) {
+      this.studentRoute = this.studentStudyReturnRoute;
+      return true;
+    }
+    if (this.role === AppRole.PARENT && this.parentRoute === ParentRoute.CONFIRMATION) {
+      this.parentRoute = ParentRoute.IMPORT;
+      return true;
+    }
+    return false;
   }
 
   private nextDemoScenario(): void {
@@ -202,14 +223,18 @@ export struct AppShell {
           Text('切换孩子').fontSize(12).fontColor(AppTheme.PRIMARY);
           Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
         }
-        .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+        .padding({ left: 12, right: 12, top: 8, bottom: 8 })
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .borderRadius(AppTheme.CHIP_RADIUS)
+        .accessibilityGroup(true)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('切换孩子')
         .onClick(() => this.switchStudent());
       }
     }
     .width('100%')
-    .height(48)
+    .height(AppTheme.CONTEXT_BAR_HEIGHT)
     .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING })
     .backgroundColor(AppTheme.BACKGROUND);
   }
@@ -228,6 +253,9 @@ export struct AppShell {
     .layoutWeight(1)
     .height('100%')
     .justifyContent(FlexAlign.Center)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(active ? `${label}，当前页面` : label)
     .onClick(action);
   }
 
@@ -275,6 +303,9 @@ export struct AppShell {
     .justifyContent(FlexAlign.Center)
     .backgroundColor(active ? AppTheme.PRIMARY_SOFT : Color.Transparent)
     .borderRadius(AppTheme.CONTROL_RADIUS)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(active ? `${label}，当前页面` : label)
     .onClick(action);
   }
 
@@ -320,13 +351,17 @@ export struct AppShell {
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
           Text(HomeworkStore.instance.getStudent().className)
-            .fontSize(9)
+            .fontSize(10)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width(68)
+        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
         .padding({ top: 8, bottom: 8 })
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .borderRadius(AppTheme.CHIP_RADIUS)
+        .accessibilityGroup(true)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('切换孩子')
         .onClick(() => this.switchStudent());
       } else {
         Text(HomeworkStore.instance.getStudent().name)
@@ -337,14 +372,6 @@ export struct AppShell {
           .fontColor(AppTheme.TEXT)
           .padding({ top: 8, bottom: 8 });
       }
-
-      Text(DemoScenarioHelper.label(this.demoScenario))
-        .width(68)
-        .fontSize(9)
-        .textAlign(TextAlign.Center)
-        .fontColor(AppTheme.TERTIARY_TEXT)
-        .padding({ top: 4, bottom: 4 })
-        .onClick(() => this.nextDemoScenario());
     }
     .width(AppTheme.SIDE_NAV_WIDTH)
     .height('100%')
