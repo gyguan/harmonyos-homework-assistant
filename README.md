@@ -123,7 +123,7 @@
 
 ## CI / Static Gate
 
-GitHub Actions 会执行 HarmonyOS 静态约束和后端测试，包括：
+GitHub Actions 会执行 HarmonyOS 静态约束、Java 自动化测试以及真实 PostgreSQL Backend E2E，包括：
 
 - 工程版本与轻量架构边界；
 - 文字导入、OCR / Parser / Confirmation；
@@ -138,18 +138,33 @@ GitHub Actions 会执行 HarmonyOS 静态约束和后端测试，包括：
 - 家长 Tutor 设置；
 - AI 建议时长、Tutor 拍题、云端提交照片；
 - Assignment 持久化同步元数据；
-- Java 21 Maven tests。
+- Java 21 Maven tests；
+- `postgres:17-alpine` + 实际 Spring Boot Jar + Flyway 的真实启动；
+- 登录/session、Student CRUD、Assignment CRUD、stale version `409`；
+- multipart Submission、匿名照片读取 `401`、Bearer 鉴权照片下载；
+- 未配置模型时 Tutor fallback；
+- 仅重启 Spring Boot、保留 PostgreSQL 后，旧 Bearer token 继续通过 `/auth/session`。
 
 单独执行基础 HarmonyOS Gate：
 
 `python scripts/validate_harmony_project.py`
 
+本地也可对正在运行的真实 backend 执行：
+
+`python backend/scripts/e2e_smoke.py --expect-tutor-unavailable`
+
+真实模型配置完成后执行：
+
+`python backend/scripts/e2e_smoke.py --expect-tutor-available`
+
 ## 当前剩余验收
 
-主链路代码已经进入 `main`。当前保留的工作主要是**真实环境验收**，不是继续扩展产品架构：
+主链路代码已经进入 `main`。PostgreSQL/Flyway、后端 API 主链、冲突、Submission 鉴权、Tutor fallback 和 backend 重启后的 session 恢复已经由 CI 自动验证。现在只剩 **GitHub Actions 无法替代的本地真实体验验收**：
 
-1. **DevEco 视觉验收**：本地 Build，并在 Phone / Pad / 宽屏模拟器检查所有主要页面的布局、截断和交互；
-2. **家庭云端 E2E**：真实 PostgreSQL + backend + HarmonyOS App 跑一轮孩子管理、作业同步、照片提交、冲突和离线场景；
-3. **AI Tutor E2E**：验证无模型配置 fallback、后端重启后 session 恢复，以及配置真实 `OPENAI_API_KEY` 后的 Responses API 调用与消息隔离。
+1. **#24 DevEco 视觉验收**：Phone / Pad / 宽屏模拟器检查主要页面的布局、截断和交互；
+2. **#28 HarmonyOS ↔ 家庭云端 E2E**：App 连接局域网 backend，跑孩子管理、作业同步、真实照片提交和离线恢复；
+3. **#30 真实 AI Tutor E2E**：使用本地配置的真实 Provider 验证 Tutor 返回、规则生效、对话恢复和跨孩子/作业隔离。
 
-这些验收项分别跟踪在 GitHub Issues #24、#28、#30；全部通过后即可收口 V0.1 产品基线 Issue #1。
+完整的逐步验收入口见：`docs/development/v01-release-acceptance.md`。
+
+#24、#28、#30 全部通过后即可关闭 V0.1 产品基线 Issue #1。
