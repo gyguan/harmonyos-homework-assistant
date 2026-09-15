@@ -27,6 +27,8 @@ require("TextArea" in page, "parent import page must provide editable teacher-te
 require("智能整理作业" in page, "parent import page must expose text parsing action")
 require("parseTypedText" in page and "HomeworkImportService.instance.parseText" in page,
         "text input must flow through HomeworkImportService")
+require(page.count("this.FeedbackBanner();") >= 2 and "if (this.parseMessage.length > 0)" in page,
+        "compact candidate result page must keep organizer feedback visible after auto-navigation")
 require("async parseText(text: string)" in service,
         "HomeworkImportService must support direct text import")
 require("HomeworkImportSourceKind.TEXT" in service and "家长录入文字" in service,
