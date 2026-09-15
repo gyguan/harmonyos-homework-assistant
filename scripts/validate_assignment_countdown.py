@@ -53,7 +53,7 @@ require("expectedMinutes: candidate.expectedMinutes" in store,
 for duration in ["10", "15", "20", "30", "45"]:
     require(f"this.TimeChip(item, {duration})" in confirmation,
             f"parent confirmation must expose quick duration option: {duration} minutes")
-require("预计完成时间" in confirmation and "updateExpectedMinutes" in confirmation,
+require(("预计完成时间" in confirmation or "预计用时" in confirmation) and "updateExpectedMinutes" in confirmation,
         "parent must be able to edit expected completion time before publishing")
 require("预计 ${this.nextAssignment()!.expectedMinutes} 分钟" in student_today,
         "student Today page must show the time budget before starting")

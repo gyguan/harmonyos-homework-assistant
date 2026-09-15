@@ -1,6 +1,6 @@
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
+import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { Assignment, AssignmentStatus, StudentProfile, TodaySummary } from '../../../domain/model/HomeworkModels';
 
@@ -85,31 +85,19 @@ export struct StudentTodayPage {
     return '查看作业';
   }
 
-  private actionIsPrimary(assignment: Assignment): boolean {
-    return assignment.status === AssignmentStatus.NOT_STARTED ||
-      assignment.status === AssignmentStatus.OVERDUE ||
-      assignment.status === AssignmentStatus.NEEDS_REWORK ||
-      assignment.status === AssignmentStatus.IN_PROGRESS ||
-      assignment.status === AssignmentStatus.PAUSED ||
-      assignment.status === AssignmentStatus.READY_TO_SUBMIT;
-  }
-
   @Builder
   private OfflineBanner() {
     Row({ space: 10 }) {
       Text('离线')
         .fontSize(AppTheme.CAPTION_SIZE)
         .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.WARNING)
-        .padding({ left: 8, right: 8, top: 5, bottom: 5 })
-        .backgroundColor(AppTheme.SURFACE)
-        .borderRadius(AppTheme.CHIP_RADIUS);
+        .fontColor(AppTheme.WARNING);
       Column({ space: 2 }) {
         Text('当前为离线状态').width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Text('正在使用已缓存的今日作业。').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
       }.layoutWeight(1).alignItems(HorizontalAlign.Start);
     }
-    .width('100%').padding(14).backgroundColor(AppTheme.WARNING_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+    .width('100%').padding(13).backgroundColor(AppTheme.WARNING_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
@@ -124,56 +112,53 @@ export struct StudentTodayPage {
             .width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
         }.layoutWeight(1).alignItems(HorizontalAlign.Start);
       }
-      .width('100%').padding(14).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+      .width('100%').padding(13).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
     }
   }
 
   @Builder
   private ProgressHero() {
-    Column({ space: 12 }) {
-      Row() {
-        Column({ space: 5 }) {
-          Text('今日完成').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-          Text(`${this.summary().completed} / ${this.summary().total}`)
-            .width('100%').fontSize(34).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        }.layoutWeight(1).alignItems(HorizontalAlign.Start);
-        SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(30).fontColor([AppTheme.PRIMARY]);
-      }.width('100%');
-
-      Progress({ value: this.summary().completed, total: this.summary().total, type: ProgressType.Linear })
-        .width('100%').height(7).color(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT);
-
-      Text('小伴会推荐下一项，你也可以自己选择想先完成的任务。切换任务时，当前作业会自动暂停。')
-        .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+    Row({ space: 14 }) {
+      Column({ space: 5 }) {
+        Text('今日完成').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Row({ space: 7 }) {
+          Text(`${this.summary().completed}`)
+            .fontSize(30).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          Text(`/ ${this.summary().total}`)
+            .fontSize(15).fontColor(AppTheme.SUBTEXT).margin({ top: 10 });
+        }
+      }.alignItems(HorizontalAlign.Start);
+      Column({ space: 8 }) {
+        Progress({ value: this.summary().completed, total: this.summary().total, type: ProgressType.Linear })
+          .width('100%').height(7).color(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT);
+        Text('完成一项就离今天的目标更近一步。')
+          .width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      }.layoutWeight(1).alignItems(HorizontalAlign.Start);
     }
-    .width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+    .width('100%').padding(16).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
   private AssignmentChoice(item: Assignment) {
-    Column({ space: 8 }) {
-      AssignmentCard({ assignment: item });
-      Row({ space: 8 }) {
-        if (this.isRecommended(item)) {
-          Text('小伴推荐')
-            .fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-            .padding({ left: 9, right: 9, top: 5, bottom: 5 })
-            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
-        }
-        Blank();
-        Button(this.actionLabel(item), { type: ButtonType.Normal })
-          .height(AppTheme.SECONDARY_BUTTON_HEIGHT).padding({ left: 18, right: 18 })
-          .borderRadius(AppTheme.CONTROL_RADIUS).fontSize(14).fontWeight(FontWeight.Medium)
-          .backgroundColor(this.actionIsPrimary(item) ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
-          .fontColor(this.actionIsPrimary(item) ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-          .onClick(() => this.onOpenStudy(item.id));
-      }.width('100%');
-    }.width('100%');
+    Column({ space: 4 }) {
+      if (this.isRecommended(item)) {
+        Text('小伴推荐')
+          .width('100%')
+          .fontSize(11)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY);
+      }
+      AssignmentListItem({
+        assignment: item,
+        onOpen: () => this.onOpenStudy(item.id)
+      });
+    }
+    .width('100%');
   }
 
   @Builder
   private AssignmentListPane() {
-    Column({ space: AppTheme.ITEM_GAP }) {
+    Column({ space: 10 }) {
       Row() {
         Column({ space: 3 }) {
           Text('今天的作业').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
@@ -182,23 +167,25 @@ export struct StudentTodayPage {
         Blank();
         Text(`${this.assignments().length} 项`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
       }.width('100%');
-      ForEach(this.assignments(), (item: Assignment) => {
-        this.AssignmentChoice(item);
-      }, (item: Assignment) => item.id);
+      Column({ space: 7 }) {
+        ForEach(this.assignments(), (item: Assignment) => {
+          this.AssignmentChoice(item);
+        }, (item: Assignment) => item.id);
+      }.width('100%');
     }.width('100%');
   }
 
   @Builder
   private NextAssignmentPane() {
     if (this.nextAssignment() === null) {
-      Column({ space: 12 }) {
+      Column({ space: 10 }) {
         SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(30).fontColor([AppTheme.SUCCESS]);
         Text('今天的主要任务已经完成')
           .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Text('可以休息一下，或者和家长一起检查已经提交的作业。')
           .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(21).fontColor(AppTheme.SUBTEXT);
       }
-      .width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SUCCESS_SOFT).borderRadius(AppTheme.CARD_RADIUS);
+      .width('100%').padding(18).backgroundColor(AppTheme.SUCCESS_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
     } else {
       Column({ space: 13 }) {
         Row() {
@@ -223,7 +210,7 @@ export struct StudentTodayPage {
           .fontSize(16).fontWeight(FontWeight.Medium).backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
           .onClick(() => this.onOpenStudy(this.nextAssignment()!.id));
       }
-      .width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.PRIMARY_FAINT).borderRadius(AppTheme.CARD_RADIUS);
+      .width('100%').padding(18).backgroundColor(AppTheme.PRIMARY_FAINT).borderRadius(AppTheme.CONTROL_RADIUS);
     }
   }
 
@@ -240,14 +227,14 @@ export struct StudentTodayPage {
         this.OverdueBanner();
         this.ProgressHero();
 
-        if (this.sizeClass === WindowSizeClass.EXPANDED) {
-          Row({ space: 20 }) {
-            Column() { this.AssignmentListPane(); }.width('38%');
-            Column() { this.NextAssignmentPane(); }.layoutWeight(1);
-          }.width('100%').alignItems(VerticalAlign.Top);
-        } else {
+        if (this.sizeClass === WindowSizeClass.COMPACT) {
           this.NextAssignmentPane();
           this.AssignmentListPane();
+        } else {
+          Row({ space: 20 }) {
+            Column() { this.AssignmentListPane(); }.width(this.sizeClass === WindowSizeClass.EXPANDED ? '40%' : '44%');
+            Column() { this.NextAssignmentPane(); }.layoutWeight(1);
+          }.width('100%').alignItems(VerticalAlign.Top);
         }
       }
       .width('100%')

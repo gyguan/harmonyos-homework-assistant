@@ -1,6 +1,6 @@
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
+import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { Assignment, StudentProfile, TodaySummary } from '../../../domain/model/HomeworkModels';
 
@@ -26,53 +26,59 @@ export struct ParentDashboardPage {
   }
 
   @Builder
-  private TodayCard() {
-    Column({ space: 12 }) {
-      Row() {
-        Column({ space: 5 }) {
-          Text(`${this.student().name} · 今日完成`)
-            .width('100%')
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT);
-          Text(`${this.summary().completed} / ${this.summary().total}`)
-            .width('100%')
-            .fontSize(34)
+  private TodaySummary() {
+    Row({ space: 14 }) {
+      Column({ space: 4 }) {
+        Text('今日完成')
+          .fontSize(12)
+          .fontColor(AppTheme.SUBTEXT);
+        Row({ space: 6 }) {
+          Text(`${this.summary().completed}`)
+            .fontSize(30)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
+          Text(`/ ${this.summary().total}`)
+            .fontSize(15)
+            .fontColor(AppTheme.SUBTEXT)
+            .margin({ top: 10 });
         }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-        Text(this.summary().completed === this.summary().total && this.summary().total > 0 ? '已完成' : '进行中')
-          .fontSize(AppTheme.CAPTION_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(this.summary().completed === this.summary().total && this.summary().total > 0 ? AppTheme.SUCCESS : AppTheme.PRIMARY)
-          .padding({ left: 10, right: 10, top: 6, bottom: 6 })
-          .backgroundColor(this.summary().completed === this.summary().total && this.summary().total > 0 ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
-          .borderRadius(AppTheme.CHIP_RADIUS);
       }
-      .width('100%');
+      .alignItems(HorizontalAlign.Start);
 
-      Progress({ value: this.summary().completed, total: this.summary().total, type: ProgressType.Linear })
-        .width('100%')
-        .height(7)
-        .color(AppTheme.PRIMARY)
-        .backgroundColor(AppTheme.PRIMARY_SOFT);
-
-      Text('只看今天的完成和提交情况，不需要一直盯着孩子做作业。')
-        .width('100%')
-        .fontSize(AppTheme.BODY_SIZE)
-        .lineHeight(21)
-        .fontColor(AppTheme.SUBTEXT);
+      Column({ space: 8 }) {
+        Row() {
+          Text(this.summary().completed === this.summary().total && this.summary().total > 0 ? '今天已完成' : '今天进行中')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.summary().completed === this.summary().total && this.summary().total > 0 ? AppTheme.SUCCESS : AppTheme.PRIMARY);
+          Blank();
+          Text(`${this.assignments().length} 项作业`)
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%');
+        Progress({ value: this.summary().completed, total: this.summary().total, type: ProgressType.Linear })
+          .width('100%')
+          .height(7)
+          .color(AppTheme.PRIMARY)
+          .backgroundColor(AppTheme.PRIMARY_SOFT);
+        Text('关注完成和提交结果，不需要一直盯着孩子做作业。')
+          .width('100%')
+          .fontSize(12)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start);
     }
     .width('100%')
-    .padding(AppTheme.CARD_PADDING)
+    .padding(16)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.CARD_RADIUS);
+    .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
   private AssignmentProgress() {
-    Column({ space: AppTheme.ITEM_GAP }) {
+    Column({ space: 10 }) {
       Row() {
         Text('今天的作业')
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
@@ -84,74 +90,102 @@ export struct ParentDashboardPage {
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
-      ForEach(this.assignments(), (item: Assignment) => {
-        AssignmentCard({ assignment: item });
-      }, (item: Assignment) => item.id);
+
+      Column({ space: 7 }) {
+        ForEach(this.assignments(), (item: Assignment) => {
+          AssignmentListItem({ assignment: item, showChevron: false });
+        }, (item: Assignment) => item.id);
+      }
+      .width('100%');
     }
     .width('100%');
   }
 
   @Builder
-  private ImportCard() {
-    Column({ space: 12 }) {
-      Row({ space: 10 }) {
-        SymbolGlyph($r('sys.symbol.plus_square'))
-          .fontSize(24)
-          .fontColor([AppTheme.PRIMARY]);
+  private ImportAction() {
+    Row({ space: 13 }) {
+      SymbolGlyph($r('sys.symbol.plus_square'))
+        .fontSize(24)
+        .fontColor([AppTheme.PRIMARY]);
+      Column({ space: 4 }) {
         Text(`给 ${this.student().name} 收作业`)
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .width('100%')
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
+        Text('导入老师作业：把截图或文字交给小伴，整理后再确认发布。')
+          .width('100%')
+          .fontSize(12)
+          .lineHeight(18)
+          .fontColor(AppTheme.SUBTEXT);
       }
-      .width('100%');
-      Text(`${this.student().className} · 把老师发来的文字或截图交给小伴，确认后只进入 ${this.student().name} 的作业空间。`)
-        .width('100%')
-        .fontSize(AppTheme.BODY_SIZE)
-        .lineHeight(22)
-        .fontColor(AppTheme.SUBTEXT);
-      Button('导入老师作业', { type: ButtonType.Normal })
-        .width('100%')
-        .height(AppTheme.BUTTON_HEIGHT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .fontSize(15)
-        .fontWeight(FontWeight.Medium)
-        .backgroundColor(AppTheme.PRIMARY)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .onClick(() => this.onOpenImport());
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start);
+      Text('›')
+        .fontSize(22)
+        .fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
-    .padding(AppTheme.CARD_PADDING)
+    .padding(15)
     .backgroundColor(AppTheme.PRIMARY_FAINT)
-    .borderRadius(AppTheme.CARD_RADIUS);
+    .borderRadius(AppTheme.CONTROL_RADIUS)
+    .onClick(() => this.onOpenImport());
+  }
+
+  @Builder
+  private PageHeader() {
+    Column({ space: 5 }) {
+      Text('作业进度')
+        .fontSize(AppTheme.PAGE_TITLE_SIZE)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT);
+      Text(`${this.student().name} · ${this.student().grade} · ${this.student().className} · ${this.student().semester}`)
+        .fontSize(13)
+        .fontColor(AppTheme.SUBTEXT);
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start);
   }
 
   build() {
     Scroll() {
       Column({ space: AppTheme.SECTION_GAP }) {
-        Column({ space: 5 }) {
-          Text('作业进度')
-            .fontSize(AppTheme.PAGE_TITLE_SIZE)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT);
-          Text(`${this.student().name} · ${this.student().grade} · ${this.student().className} · ${this.student().semester}`)
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start);
+        this.PageHeader();
+        this.TodaySummary();
 
-        this.TodayCard();
-
-        if (this.sizeClass === WindowSizeClass.EXPANDED) {
+        if (this.sizeClass === WindowSizeClass.COMPACT) {
+          this.ImportAction();
+          this.AssignmentProgress();
+        } else {
           Row({ space: 20 }) {
-            Column() { this.AssignmentProgress(); }.width('64%');
-            Column() { this.ImportCard(); }.layoutWeight(1);
+            Column({ space: 18 }) {
+              this.AssignmentProgress();
+            }
+            .width(this.sizeClass === WindowSizeClass.EXPANDED ? '62%' : '58%');
+
+            Column({ space: 14 }) {
+              this.ImportAction();
+              Column({ space: 5 }) {
+                Text('家长只需关注结果')
+                  .width('100%')
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                Text('孩子开始、暂停、提交后，状态会同步到这里；待验收时再进入“进度”处理。')
+                  .width('100%')
+                  .fontSize(13)
+                  .lineHeight(20)
+                  .fontColor(AppTheme.SUBTEXT);
+              }
+              .width('100%')
+              .padding(15)
+              .backgroundColor(AppTheme.SURFACE_SUBTLE)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
+            }
+            .layoutWeight(1);
           }
           .width('100%')
           .alignItems(VerticalAlign.Top);
-        } else {
-          this.AssignmentProgress();
-          this.ImportCard();
         }
       }
       .width('100%')

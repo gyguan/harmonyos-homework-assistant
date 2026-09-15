@@ -21,6 +21,7 @@ def require(condition: bool, message: str) -> None:
 
 theme = read("entry/src/main/ets/common/theme/AppTheme.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+assignment_list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
 
 required_theme_tokens = [
     "SURFACE_SUBTLE",
@@ -59,13 +60,17 @@ visible_ui_files = [
     "entry/src/main/ets/pages/PersonEntryPage.ets",
     "entry/src/main/ets/pages/AppShell.ets",
     "entry/src/main/ets/components/assignment/AssignmentCard.ets",
+    "entry/src/main/ets/components/assignment/AssignmentListItem.ets",
     "entry/src/main/ets/components/state/PageStateView.ets",
     "entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets",
     "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
     "entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets",
     "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
+    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
     "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
+    "entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets",
     "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
+    "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
 ]
 
 old_visual_literals = [
@@ -90,26 +95,37 @@ page_files = [
     "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
     "entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets",
     "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
+    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
     "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
+    "entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets",
     "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
+    "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
 ]
 for path in page_files:
     text = read(path)
     require("AppTheme.PAGE_PADDING" in text,
             f"page must use shared page-edge spacing instead of a local magic number: {path}")
 
-for path in [
-    "entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets",
+primary_button_pages = [
     "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
     "entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets",
     "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
     "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
-]:
+]
+for path in primary_button_pages:
     text = read(path)
     require("ButtonType.Normal" in text,
-            f"primary interaction page must use rounded-rectangle ButtonType.Normal controls: {path}")
+            f"primary action page must use rounded-rectangle ButtonType.Normal controls: {path}")
     require("AppTheme.CONTROL_RADIUS" in text,
-            f"primary interaction page must use shared control radius: {path}")
+            f"primary action page must use shared control radius: {path}")
+
+# Dashboard actions may be represented as a full-row native action instead of a separate web-style button.
+parent_dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+require("onClick(() => this.onOpenImport())" in parent_dashboard and "AppTheme.CONTROL_RADIUS" in parent_dashboard,
+        "parent dashboard import must be a rounded full-row action")
+
+require("export struct AssignmentListItem" in assignment_list_item and ".onClick(() => this.onOpen())" in assignment_list_item,
+        "assignment lists must provide a reusable full-row tap surface")
 
 require("sys.symbol.exclamationmark_triangle" not in read("entry/src/main/ets/features/student/today/StudentTodayPage.ets"),
         "unverified warning symbol must not be used")

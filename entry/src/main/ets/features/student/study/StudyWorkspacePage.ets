@@ -2,7 +2,6 @@ import { TutorChatMessage, TutorConversation, TutorRemoteApi } from '../../../ap
 import { HomeworkSubmissionService } from '../../../application/submission/HomeworkSubmissionService';
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
 import { HomeworkStore } from '../../../data/HomeworkStore';
@@ -34,11 +33,6 @@ export struct StudyWorkspacePage {
   private assignment(): Assignment | null {
     let currentRevision = this.revision;
     return HomeworkStore.instance.getAssignment(this.assignmentId);
-  }
-
-  private assignments(): Assignment[] {
-    let currentRevision = this.revision;
-    return HomeworkStore.instance.getTodayAssignments();
   }
 
   private submissions(): Submission[] {
@@ -169,96 +163,214 @@ export struct StudyWorkspacePage {
       Row({ space: 10 }) {
         ForEach(photoUris, (uri: string) => {
           Column({ space: 6 }) {
-            Image(uri).width(96).height(96).objectFit(ImageFit.Cover).borderRadius(12).backgroundColor(AppTheme.SURFACE_EMPHASIS);
+            Image(uri)
+              .width(96)
+              .height(96)
+              .objectFit(ImageFit.Cover)
+              .borderRadius(12)
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS);
             if (removable) {
-              Text('移除').fontSize(11).fontColor(AppTheme.DANGER).onClick(() => this.removeSubmissionPhoto(uri));
+              Text('移除')
+                .fontSize(11)
+                .fontColor(AppTheme.DANGER)
+                .onClick(() => this.removeSubmissionPhoto(uri));
             }
-          }.width(96);
+          }
+          .width(96);
         }, (uri: string) => uri);
       }
-    }.width('100%').scrollable(ScrollDirection.Horizontal).scrollBar(BarState.Off);
+    }
+    .width('100%')
+    .scrollable(ScrollDirection.Horizontal)
+    .scrollBar(BarState.Off);
   }
 
   @Builder
   private SubmissionPane() {
     if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
       Column({ space: 10 }) {
-        Text('提交作业照片').width('100%').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('提交作业照片')
+          .width('100%')
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
         if (this.submissionPhotoUris.length > 0) {
           this.PhotoStrip(this.submissionPhotoUris, true);
           Button('重新选择照片', { type: ButtonType.Normal })
-            .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.submittingPhotos).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+            .width('100%')
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.submittingPhotos)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
             .onClick(() => { void this.selectSubmissionPhotos(); });
         }
         Text(this.submissionPhotoUris.length === 0 ? '从系统相册选择已经拍好的作业照片，最多 6 张。' : '请确认照片清晰、完整，页数和顺序无误。')
-          .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          .width('100%')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT);
         if (this.submissionMessage.length > 0) {
-          Text(this.submissionMessage).width('100%').fontSize(12).fontColor(AppTheme.PRIMARY);
+          Text(this.submissionMessage)
+            .width('100%')
+            .fontSize(12)
+            .fontColor(AppTheme.PRIMARY);
         }
-      }.width('100%').padding(14).backgroundColor(AppTheme.PRIMARY_FAINT).borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+      .width('100%')
+      .padding(14)
+      .backgroundColor(AppTheme.PRIMARY_FAINT)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
     }
+
     if (this.submissions().length > 0) {
       Column({ space: 8 }) {
-        Text(`已提交 · ${this.submissions()[0].fileLabel}`).width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
+        Text(`已提交 · ${this.submissions()[0].fileLabel}`)
+          .width('100%')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.SUCCESS);
         if (this.submissions()[0].photoUris.length > 0) {
           this.PhotoStrip(this.submissions()[0].photoUris, false);
         }
-      }.width('100%').padding(13).backgroundColor(AppTheme.SUCCESS_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+      .width('100%')
+      .padding(13)
+      .backgroundColor(AppTheme.SUCCESS_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
     }
   }
 
   @Builder
-  private TaskRail() {
-    Column({ space: AppTheme.ITEM_GAP }) {
-      Text('今天的作业').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      ForEach(this.assignments(), (item: Assignment) => {
-        AssignmentCard({ assignment: item });
-      }, (item: Assignment) => item.id);
-    }.width('100%');
+  private ResourcePane() {
+    if (this.assignment() !== null) {
+      Column({ space: 0 }) {
+        Row() {
+          Column({ space: 3 }) {
+            Text('教材 / 页码')
+              .fontSize(12)
+              .fontColor(AppTheme.TERTIARY_TEXT);
+            Text(this.assignment()!.textbookRef.length > 0 ? this.assignment()!.textbookRef : '未设置')
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+          Text('›').fontSize(20).fontColor(AppTheme.TERTIARY_TEXT);
+        }
+        .width('100%')
+        .padding({ top: 12, bottom: 12 });
+
+        Divider().color(AppTheme.DIVIDER);
+
+        Row() {
+          Column({ space: 3 }) {
+            Text('老师附件')
+              .fontSize(12)
+              .fontColor(AppTheme.TERTIARY_TEXT);
+            Text(this.assignment()!.resourceLabels.length === 0 ? '暂无附件' : `${this.assignment()!.resourceLabels.length} 项资料`)
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+          Text('›').fontSize(20).fontColor(AppTheme.TERTIARY_TEXT);
+        }
+        .width('100%')
+        .padding({ top: 12, bottom: 12 });
+      }
+      .width('100%')
+      .padding({ left: 14, right: 14 })
+      .backgroundColor(AppTheme.SURFACE_SUBTLE)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
   }
 
   @Builder
-  private StudyContent() {
+  private StudyContent(showPrimaryAction: boolean) {
     if (this.assignment() === null) {
-      Text('找不到这项作业').width('100%').padding(AppTheme.CARD_PADDING).fontSize(AppTheme.SECTION_TITLE_SIZE).fontColor(AppTheme.TEXT)
-        .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+      Column({ space: 8 }) {
+        Text('找不到这项作业')
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Text('这项作业可能已经被删除或切换。')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(HorizontalAlign.Center);
     } else {
       Scroll() {
-        Column({ space: 15 }) {
-          Row() {
-            Text(this.assignment()!.subject).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-              .padding({ left: 9, right: 9, top: 5, bottom: 5 }).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
-            Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT).margin({ left: 8 });
+        Column({ space: 18 }) {
+          Row({ space: 8 }) {
+            Text(this.assignment()!.subject)
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY);
+            Text('·').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+            Text(AssignmentStateMachine.label(this.assignment()!.status))
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .fontColor(AppTheme.SUBTEXT);
             Blank();
-            Text(this.assignment()!.dueText).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-          }.width('100%');
-          Text(this.assignment()!.title).width('100%').fontSize(24).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text(this.assignment()!.instruction).width('100%').fontSize(15).lineHeight(22).fontColor(AppTheme.SUBTEXT);
-          AssignmentCountdownCard({ assignment: this.assignment()! });
-          if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
-            Button('暂停一下', { type: ButtonType.Normal })
-              .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
-              .backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.SUBTEXT)
-              .onClick(() => this.pauseCurrentAssignment());
+            Text(`截至 ${this.assignment()!.dueText}`)
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .fontColor(AppTheme.TERTIARY_TEXT);
           }
-          Column({ space: 8 }) {
-            Text('教材 · ' + this.assignment()!.textbookRef).width('100%').fontSize(13).fontColor(AppTheme.PRIMARY);
-            if (this.assignment()!.resourceLabels.length === 0) {
-              Text('暂无老师附件').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-            } else {
-              ForEach(this.assignment()!.resourceLabels, (label: string) => {
-                Text(label).width('100%').fontSize(14).fontColor(AppTheme.TEXT);
-              }, (label: string) => label);
+          .width('100%');
+
+          Text(this.assignment()!.title)
+            .width('100%')
+            .fontSize(this.sizeClass === WindowSizeClass.COMPACT ? 25 : 30)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
+
+          Text(this.assignment()!.instruction)
+            .width('100%')
+            .fontSize(15)
+            .lineHeight(23)
+            .fontColor(AppTheme.SUBTEXT);
+
+          AssignmentCountdownCard({ assignment: this.assignment()! });
+
+          if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
+            Row() {
+              Blank();
+              Text('暂停一下')
+                .fontSize(13)
+                .fontColor(AppTheme.SUBTEXT)
+                .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+                .onClick(() => this.pauseCurrentAssignment());
             }
-          }.width('100%').padding(15).borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_SUBTLE);
+            .width('100%');
+          }
+
+          this.ResourcePane();
           this.SubmissionPane();
-          Button(this.primaryActionLabel(), { type: ButtonType.Normal }).width('100%').height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS).enabled(this.primaryActionEnabled())
-            .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED).fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .onClick(() => this.runPrimaryAction());
-        }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-      }.width('100%').height('100%');
+
+          if (showPrimaryAction) {
+            Button(this.primaryActionLabel(), { type: ButtonType.Normal })
+              .width('100%')
+              .height(AppTheme.BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(this.primaryActionEnabled())
+              .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .fontSize(15)
+              .fontWeight(FontWeight.Medium)
+              .onClick(() => this.runPrimaryAction());
+          }
+        }
+        .width('100%')
+        .padding(this.sizeClass === WindowSizeClass.COMPACT ? { top: 6, bottom: 16 } : 24);
+      }
+      .width('100%')
+      .height('100%')
+      .backgroundColor(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.BACKGROUND : AppTheme.SURFACE)
+      .borderRadius(this.sizeClass === WindowSizeClass.COMPACT ? 0 : AppTheme.CARD_RADIUS);
     }
   }
 
@@ -266,42 +378,76 @@ export struct StudyWorkspacePage {
   private TutorPane() {
     Column({ space: 12 }) {
       Row() {
-        Text('问小伴').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('问小伴')
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
         Blank();
         if (this.tutorLoading) {
           Text('同步中').fontSize(11).fontColor(AppTheme.SUBTEXT);
         }
-      }.width('100%');
+      }
+      .width('100%');
+
       if (this.tutorUnavailable) {
-        Text('AI 辅导暂时不可用，但作业查看与提交不受影响。').width('100%').padding(14).fontSize(13).fontColor(AppTheme.WARNING)
-          .backgroundColor(AppTheme.WARNING_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+        Text('AI 辅导暂时不可用，但作业查看与提交不受影响。')
+          .width('100%')
+          .padding(14)
+          .fontSize(13)
+          .fontColor(AppTheme.WARNING)
+          .backgroundColor(AppTheme.WARNING_SOFT)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
       } else {
         Scroll() {
           Column({ space: 9 }) {
             if (this.tutorMessages.length === 0) {
-              Text('你现在卡在哪一步？先告诉小伴你已经尝试了什么。').width('100%').padding(13).fontSize(14).lineHeight(21)
-                .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.PRIMARY_FAINT).borderRadius(AppTheme.CONTROL_RADIUS);
+              Text('你现在卡在哪一步？先告诉小伴你已经尝试了什么。')
+                .width('100%')
+                .padding(13)
+                .fontSize(14)
+                .lineHeight(21)
+                .fontColor(AppTheme.TEXT)
+                .backgroundColor(AppTheme.PRIMARY_FAINT)
+                .borderRadius(AppTheme.CONTROL_RADIUS);
             }
             ForEach(this.tutorMessages, (message: TutorChatMessage) => {
               Row() {
                 if (message.role === 'USER') {
                   Blank();
                 }
-                Text(message.content).constraintSize({ maxWidth: '86%' }).padding(11).fontSize(14).lineHeight(21)
+                Text(message.content)
+                  .constraintSize({ maxWidth: '86%' })
+                  .padding(11)
+                  .fontSize(14)
+                  .lineHeight(21)
                   .fontColor(message.role === 'USER' ? AppTheme.TEXT_ON_PRIMARY : AppTheme.TEXT)
                   .backgroundColor(message.role === 'USER' ? AppTheme.PRIMARY : AppTheme.SURFACE_SUBTLE)
                   .borderRadius(AppTheme.CONTROL_RADIUS);
                 if (message.role !== 'USER') {
                   Blank();
                 }
-              }.width('100%');
+              }
+              .width('100%');
             }, (message: TutorChatMessage) => message.id);
-          }.width('100%');
-        }.width('100%').layoutWeight(1).scrollBar(BarState.Off);
-        if (this.tutorNotice.length > 0) {
-          Text(this.tutorNotice).width('100%').fontSize(12).fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
+          }
+          .width('100%');
         }
-        Text('小伴默认提示优先，不直接替你完成作业。').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+        .width('100%')
+        .layoutWeight(1)
+        .scrollBar(BarState.Off);
+
+        if (this.tutorNotice.length > 0) {
+          Text(this.tutorNotice)
+            .width('100%')
+            .fontSize(12)
+            .fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
+        }
+
+        Text('小伴默认提示优先，不直接替你完成作业。')
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontColor(AppTheme.SUBTEXT);
+
         TutorQuestionCapturePanel({
           studentId: HomeworkStore.instance.getActiveStudentId(),
           onRecognized: (text: string) => {
@@ -309,59 +455,139 @@ export struct StudyWorkspacePage {
             this.tutorNotice = '识别文字已放入输入框，请确认或补充后再发送';
           }
         });
+
         TextArea({ placeholder: '输入问题，或者说说你做到哪一步…', text: this.tutorDraft })
-          .width('100%').height(110).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+          .width('100%')
+          .height(110)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.tutorDraft = value);
+
         Button(this.tutorSending ? '发送中…' : '发送给小伴', { type: ButtonType.Normal })
-          .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .width('100%')
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
           .enabled(!this.tutorSending && this.tutorDraft.trim().length > 0)
-          .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
           .onClick(() => { void this.askTutor(); });
       }
-    }.width('100%').height('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+    }
+    .width('100%')
+    .height('100%')
+    .padding(AppTheme.CARD_PADDING)
+    .backgroundColor(AppTheme.SURFACE)
+    .borderRadius(AppTheme.CARD_RADIUS);
+  }
+
+  @Builder
+  private WorkspaceHeader() {
+    Row({ space: 12 }) {
+      Text('‹')
+        .fontSize(30)
+        .fontColor(AppTheme.TEXT)
+        .width(34)
+        .onClick(() => {
+          if (this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen) {
+            this.compactTutorOpen = false;
+          } else {
+            this.onBack();
+          }
+        });
+      Text(this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen ? '问小伴' : '学习空间')
+        .fontSize(17)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+      Blank();
+      if (!(this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen) && this.assignment() !== null) {
+        Text(this.assignment()!.dueText)
+          .fontSize(12)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+    }
+    .width('100%')
+    .height(48);
   }
 
   @Builder
   private CompactWorkspace() {
     if (this.compactTutorOpen) {
-      Column({ space: AppTheme.ITEM_GAP }) {
-        Text('‹ 返回作业').width('100%').fontSize(14).fontColor(AppTheme.PRIMARY).onClick(() => this.compactTutorOpen = false);
-        Column() { this.TutorPane(); }.width('100%').layoutWeight(1);
-      }.width('100%').layoutWeight(1);
+      Column() {
+        this.TutorPane();
+      }
+      .width('100%')
+      .layoutWeight(1);
     } else {
-      Column({ space: AppTheme.ITEM_GAP }) {
-        Column() { this.StudyContent(); }.width('100%').layoutWeight(1);
-        Button('问小伴', { type: ButtonType.Normal }).width('100%').height(AppTheme.BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY).onClick(() => { this.compactTutorOpen = true; void this.loadTutor(); });
-      }.width('100%').layoutWeight(1);
+      Column({ space: 10 }) {
+        Column() {
+          this.StudyContent(false);
+        }
+        .width('100%')
+        .layoutWeight(1);
+
+        Row({ space: 10 }) {
+          Button('问小伴', { type: ButtonType.Normal })
+            .width('32%')
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .onClick(() => {
+              this.compactTutorOpen = true;
+              void this.loadTutor();
+            });
+
+          Button(this.primaryActionLabel(), { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(this.primaryActionEnabled())
+            .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+            .onClick(() => this.runPrimaryAction());
+        }
+        .width('100%')
+        .padding({ top: 2, bottom: 4 });
+      }
+      .width('100%')
+      .layoutWeight(1);
     }
   }
 
-  build() {
-    Column({ space: AppTheme.ITEM_GAP }) {
-      Row() {
-        Text('‹ 返回').fontSize(15).fontColor(AppTheme.PRIMARY).onClick(() => this.onBack());
-        Blank();
-        if (this.assignment() !== null) {
-          Text(`截至 ${this.assignment()!.dueText}`).fontSize(13).fontColor(AppTheme.SUBTEXT);
-        }
-      }.width('100%');
-      if (this.sizeClass === WindowSizeClass.EXPANDED) {
-        Row({ space: 16 }) {
-          Column() { this.TaskRail(); }.width('20%');
-          Column() { this.StudyContent(); }.width('50%').height('100%');
-          Column() { this.TutorPane(); }.layoutWeight(1).height('100%');
-        }.width('100%').layoutWeight(1).alignItems(VerticalAlign.Top);
-      } else if (this.sizeClass === WindowSizeClass.MEDIUM) {
-        Row({ space: 16 }) {
-          Column() { this.StudyContent(); }.width('64%').height('100%');
-          Column() { this.TutorPane(); }.layoutWeight(1).height('100%');
-        }.width('100%').layoutWeight(1).alignItems(VerticalAlign.Top);
-      } else {
-        this.CompactWorkspace();
+  @Builder
+  private PadWorkspace() {
+    Row({ space: 16 }) {
+      Column() {
+        this.StudyContent(true);
       }
-    }.width('100%').height('100%')
-      .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
-      .backgroundColor(AppTheme.BACKGROUND);
+      .width(this.sizeClass === WindowSizeClass.EXPANDED ? '62%' : '58%')
+      .height('100%');
+
+      Column() {
+        this.TutorPane();
+      }
+      .layoutWeight(1)
+      .height('100%');
+    }
+    .width('100%')
+    .layoutWeight(1)
+    .alignItems(VerticalAlign.Top);
+  }
+
+  build() {
+    Column() {
+      this.WorkspaceHeader();
+      if (this.sizeClass === WindowSizeClass.COMPACT) {
+        this.CompactWorkspace();
+      } else {
+        this.PadWorkspace();
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
+    .backgroundColor(AppTheme.BACKGROUND);
   }
 }
