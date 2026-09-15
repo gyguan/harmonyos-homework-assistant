@@ -76,8 +76,9 @@ export class AssignmentDueDate {
   }
 
   private static weekdayNumber(text: string): number {
+    if (text.indexOf('周日') >= 0 || text.indexOf('星期日') >= 0 || text.indexOf('周天') >= 0 || text.indexOf('星期天') >= 0) return 7;
     let labels: string[] = ['周一', '星期一', '周二', '星期二', '周三', '星期三', '周四', '星期四',
-      '周五', '星期五', '周六', '星期六', '周日', '星期日', '周天', '星期天'];
+      '周五', '星期五', '周六', '星期六'];
     for (let i = 0; i < labels.length; i++) {
       if (text.indexOf(labels[i]) >= 0) return Math.floor(i / 2) + 1;
     }
