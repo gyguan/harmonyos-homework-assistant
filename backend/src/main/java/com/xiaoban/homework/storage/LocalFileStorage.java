@@ -38,6 +38,15 @@ public class LocalFileStorage implements FileStorage {
     return path;
   }
 
+  @Override public void delete(String storagePath) {
+    Path path = resolve(storagePath);
+    try {
+      Files.deleteIfExists(path);
+    } catch (IOException e) {
+      throw new IllegalStateException("删除作业照片失败", e);
+    }
+  }
+
   private String extension(String name) {
     int dot = name.lastIndexOf('.');
     if (dot < 0 || dot < name.length() - 6) return ".jpg";

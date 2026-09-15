@@ -15,6 +15,10 @@ export class RemoteSubmissionCache {
     return submissions === undefined ? [] : submissions.slice();
   }
 
+  remove(assignmentId: string): void {
+    this.values.delete(assignmentId);
+  }
+
   clear(): void {
     this.values.clear();
   }

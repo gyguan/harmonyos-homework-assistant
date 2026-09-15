@@ -4,6 +4,7 @@ import com.xiaoban.homework.auth.AuthInterceptor;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,4 +36,9 @@ public class AssignmentController {
   @PutMapping("/assignments/{id}")
   public AssignmentDtos.Response updateCompatible(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String id, @Valid @RequestBody AssignmentDtos.Update input) { return service.update(familyId, id, input); }
+
+  @DeleteMapping("/assignments/{id}")
+  public void delete(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String id) {
+    service.delete(familyId, id);
+  }
 }

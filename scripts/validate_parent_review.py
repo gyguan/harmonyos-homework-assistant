@@ -20,13 +20,17 @@ def require(condition: bool, message: str) -> None:
 
 
 migration = read("backend/src/main/resources/db/migration/V5__assignment_parent_review.sql")
+delete_migration = read("backend/src/main/resources/db/migration/V6__assignment_delete_cascade.sql")
 entity = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentEntity.java")
 dtos = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentDtos.java")
 service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
+controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
+file_storage = read("backend/src/main/java/com/xiaoban/homework/storage/FileStorage.java")
 models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 remote_models = read("entry/src/main/ets/application/remote/RemoteModels.ets")
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
+remote_submission_cache = read("entry/src/main/ets/application/remote/RemoteSubmissionCache.ets")
 parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 assignment_card = read("entry/src/main/ets/components/assignment/AssignmentCard.ets")
@@ -57,6 +61,25 @@ require("家长订正说明" in assignment_card and "reviewNote" in assignment_c
         "student assignment list must show parent correction note")
 require("家长请你订正" in countdown and "reviewNote" in countdown,
         "student study view must show parent correction note")
+
+for phrase in ["查看详情", "编辑任务", "保存修改", "删除任务", "确认删除"]:
+    require(phrase in parent_progress, f"parent assignment management missing action: {phrase}")
+require("syncDirty: true" in parent_progress and "replaceAssignmentsForActiveStudent(next)" in parent_progress,
+        "published assignment edits must persist locally and enter the existing sync pipeline")
+require("BackendSession.instance.isConnected()" in parent_progress and "HomeworkRemoteApi.instance.delete(item.id)" in parent_progress,
+        "synced assignment deletion must require cloud connectivity and delete remote state first")
+require("RemoteSubmissionCache.instance.remove(assignmentId)" in parent_progress and "remove(assignmentId" in remote_submission_cache,
+        "assignment deletion must clear cached remote submission metadata")
+require("async delete(assignmentId: string)" in remote_api and "http.RequestMethod.DELETE" in remote_api,
+        "HarmonyOS remote API must expose assignment DELETE")
+require("@DeleteMapping(\"/assignments/{id}\")" in controller and "service.delete(familyId, id)" in controller,
+        "backend must expose owned assignment deletion")
+require("public void delete(UUID familyId, String id)" in service and "storage.delete(photo.storagePath)" in service,
+        "backend assignment deletion must clean stored submission photos")
+require("on delete cascade" in delete_migration.lower() and "submission_assignment_id_fkey" in delete_migration,
+        "assignment deletion migration must cascade submission relations")
+require("void delete(String storagePath)" in file_storage,
+        "FileStorage must support physical photo cleanup")
 
 if errors:
     print("PARENT_REVIEW_GATE_FAIL")

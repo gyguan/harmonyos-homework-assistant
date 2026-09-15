@@ -1,3 +1,5 @@
+import { BackendSession } from '../../../application/remote/BackendSession';
+import { HomeworkRemoteApi } from '../../../application/remote/HomeworkRemoteApi';
 import { HomeworkSyncService } from '../../../application/remote/HomeworkSyncService';
 import { RemoteSubmission } from '../../../application/remote/RemoteSubmissionApi';
 import { RemoteSubmissionCache } from '../../../application/remote/RemoteSubmissionCache';
@@ -5,7 +7,7 @@ import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
 import { HomeworkStore } from '../../../data/HomeworkStore';
-import { Assignment, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, Subject, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
 
 @Component
@@ -15,11 +17,27 @@ export struct ParentProgressPage {
   @State private localRevision: number = 0;
   @State private reviewAssignmentId: string = '';
   @State private reviewNoteDraft: string = '';
+  @State private selectedAssignmentId: string = '';
+  @State private editing: boolean = false;
+  @State private editSubject: Subject = Subject.CHINESE;
+  @State private editTitle: string = '';
+  @State private editInstruction: string = '';
+  @State private editTextbookRef: string = '';
+  @State private editDueText: string = '';
+  @State private editExpectedMinutes: string = '20';
+  @State private deleteConfirm: boolean = false;
+  @State private operationNotice: string = '';
   onStoreChanged: () => void = () => {};
 
   private assignments(): Assignment[] {
     let currentRevision = this.revision + this.localRevision;
     return HomeworkStore.instance.getAssignments();
+  }
+
+  private selectedAssignment(): Assignment | null {
+    let currentRevision = this.revision + this.localRevision;
+    if (this.selectedAssignmentId.length === 0) return null;
+    return HomeworkStore.instance.getAssignment(this.selectedAssignmentId);
   }
 
   private submissions(assignmentId: string): Submission[] {
@@ -50,6 +68,106 @@ export struct ParentProgressPage {
       return `进行中 · 预计 ${item.expectedMinutes} 分钟`;
     }
     return `预计 ${item.expectedMinutes} 分钟`;
+  }
+
+  private openDetail(item: Assignment): void {
+    this.selectedAssignmentId = item.id;
+    this.editing = false;
+    this.deleteConfirm = false;
+    this.operationNotice = '';
+  }
+
+  private closeDetail(): void {
+    this.selectedAssignmentId = '';
+    this.editing = false;
+    this.deleteConfirm = false;
+    this.operationNotice = '';
+  }
+
+  private beginEdit(item: Assignment): void {
+    this.editSubject = item.subject;
+    this.editTitle = item.title;
+    this.editInstruction = item.instruction;
+    this.editTextbookRef = item.textbookRef;
+    this.editDueText = item.dueText;
+    this.editExpectedMinutes = `${item.expectedMinutes}`;
+    this.editing = true;
+    this.deleteConfirm = false;
+    this.operationNotice = '';
+  }
+
+  private saveEdit(item: Assignment): void {
+    let title = this.editTitle.trim();
+    let minutes = Math.round(Number(this.editExpectedMinutes));
+    if (title.length === 0) {
+      this.operationNotice = '作业标题不能为空';
+      return;
+    }
+    if (!Number.isFinite(minutes) || minutes < 1 || minutes > 240) {
+      this.operationNotice = '预计时长请输入 1-240 分钟';
+      return;
+    }
+    let updated: Assignment = {
+      id: item.id,
+      studentId: item.studentId,
+      candidateId: item.candidateId,
+      subject: this.editSubject,
+      title: title,
+      instruction: this.editInstruction.trim().length > 0 ? this.editInstruction.trim() : title,
+      textbookRef: this.editTextbookRef.trim(),
+      dueText: this.editDueText.trim(),
+      status: item.status,
+      expectedMinutes: minutes,
+      startedAtEpochMs: item.startedAtEpochMs,
+      finishedAtEpochMs: item.finishedAtEpochMs,
+      elapsedSeconds: item.elapsedSeconds,
+      reviewNote: item.reviewNote,
+      remoteVersion: item.remoteVersion,
+      syncDirty: true,
+      lastSyncedAtEpochMs: item.lastSyncedAtEpochMs,
+      resourceLabels: item.resourceLabels.slice()
+    };
+    let next: Assignment[] = [];
+    for (let assignment of this.assignments()) next.push(assignment.id === item.id ? updated : assignment);
+    HomeworkStore.instance.replaceAssignmentsForActiveStudent(next);
+    this.editing = false;
+    this.operationNotice = '已保存，正在同步家庭云端';
+    this.localRevision++;
+    this.onStoreChanged();
+  }
+
+  private removeLocalAssignment(assignmentId: string): void {
+    let next: Assignment[] = [];
+    for (let assignment of this.assignments()) if (assignment.id !== assignmentId) next.push(assignment);
+    HomeworkStore.instance.replaceAssignmentsForActiveStudent(next);
+    RemoteSubmissionCache.instance.remove(assignmentId);
+    this.localRevision++;
+    this.onStoreChanged();
+  }
+
+  private async confirmDelete(item: Assignment): Promise<void> {
+    this.operationNotice = '';
+    if (item.remoteVersion > 0) {
+      if (!BackendSession.instance.isConnected()) {
+        this.deleteConfirm = false;
+        this.operationNotice = '该任务已同步到家庭云端，请连接家庭云端后再删除';
+        return;
+      }
+      try {
+        if (!await HomeworkRemoteApi.instance.delete(item.id)) {
+          this.deleteConfirm = false;
+          this.operationNotice = '云端删除失败，请稍后重试';
+          return;
+        }
+      } catch {
+        this.deleteConfirm = false;
+        this.operationNotice = '云端删除失败，请检查网络连接';
+        return;
+      }
+    }
+    let id = item.id;
+    this.closeDetail();
+    this.removeLocalAssignment(id);
   }
 
   private openReview(item: Assignment): void {
@@ -168,33 +286,180 @@ export struct ParentProgressPage {
         this.CloudSubmission(this.remoteSubmissions(item.id)[0]);
       }
       this.ReviewPane(item);
+      Button('查看详情', { type: ButtonType.Normal }).width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
+        .onClick(() => this.openDetail(item));
     }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+  }
+
+  @Builder
+  private DetailValue(label: string, value: string) {
+    Column({ space: 5 }) {
+      Text(label).width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+      Text(value.length > 0 ? value : '未填写').width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(22).fontColor(AppTheme.TEXT);
+    }.width('100%');
+  }
+
+  @Builder
+  private SubjectChip(subject: Subject) {
+    Text(subject)
+      .fontSize(AppTheme.CAPTION_SIZE)
+      .fontWeight(this.editSubject === subject ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(this.editSubject === subject ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      .backgroundColor(this.editSubject === subject ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .onClick(() => this.editSubject = subject);
+  }
+
+  @Builder
+  private EditPane(item: Assignment) {
+    Column({ space: 12 }) {
+      Text('编辑任务').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+      Text('学科').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+      Row({ space: 8 }) {
+        this.SubjectChip(Subject.CHINESE);
+        this.SubjectChip(Subject.MATH);
+        this.SubjectChip(Subject.ENGLISH);
+      }.width('100%');
+      Text('作业标题').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+      TextInput({ text: this.editTitle }).width('100%').height(AppTheme.INPUT_HEIGHT)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+        .onChange((value: string) => this.editTitle = value.substring(0, 200));
+      Text('作业说明').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+      TextArea({ text: this.editInstruction, placeholder: '填写给孩子的具体作业要求' }).width('100%').height(96)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+        .onChange((value: string) => this.editInstruction = value.substring(0, 1000));
+      Text('教材 / 页码').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+      TextInput({ text: this.editTextbookRef }).width('100%').height(AppTheme.INPUT_HEIGHT)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+        .onChange((value: string) => this.editTextbookRef = value.substring(0, 200));
+      Text('截止时间').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+      TextInput({ text: this.editDueText }).width('100%').height(AppTheme.INPUT_HEIGHT)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+        .onChange((value: string) => this.editDueText = value.substring(0, 100));
+      Text('预计完成时间（分钟）').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+      TextInput({ text: this.editExpectedMinutes }).width('100%').height(AppTheme.INPUT_HEIGHT)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+        .onChange((value: string) => this.editExpectedMinutes = value.substring(0, 3));
+      Row({ space: 8 }) {
+        Button('取消', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.SUBTEXT)
+          .onClick(() => this.editing = false);
+        Button('保存修改', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => this.saveEdit(item));
+      }.width('100%');
+    }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+  }
+
+  @Builder
+  private DeletePane(item: Assignment) {
+    if (this.deleteConfirm) {
+      Column({ space: 9 }) {
+        Text('确认删除这项任务？').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
+        Text('删除后，孩子端将不再看到该任务；已经产生的提交记录、辅导记录和云端作业照片也会一起删除。')
+          .width('100%').fontSize(AppTheme.CAPTION_SIZE).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+        Row({ space: 8 }) {
+          Button('取消', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.SUBTEXT)
+            .onClick(() => this.deleteConfirm = false);
+          Button('确认删除', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.DANGER).fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => { void this.confirmDelete(item); });
+        }.width('100%');
+      }.width('100%').padding(13).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+    }
+  }
+
+  @Builder
+  private AssignmentDetail(item: Assignment) {
+    Column({ space: AppTheme.SECTION_GAP }) {
+      Row() {
+        Text('‹ 返回作业进度').fontSize(14).fontColor(AppTheme.PRIMARY).onClick(() => this.closeDetail());
+        Blank();
+        Text(AssignmentStateMachine.label(item.status)).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+      }.width('100%');
+
+      Column({ space: 8 }) {
+        Text(item.subject).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+          .padding({ left: 9, right: 9, top: 5, bottom: 5 }).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
+        Text(item.title).width('100%').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+        Text(`${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
+          .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+      }.width('100%').alignItems(HorizontalAlign.Start);
+
+      if (this.editing) {
+        this.EditPane(item);
+      } else {
+        Column({ space: 14 }) {
+          this.DetailValue('作业说明', item.instruction);
+          this.DetailValue('教材 / 页码', item.textbookRef);
+          this.DetailValue('截止时间', item.dueText);
+          this.DetailValue('完成时间', this.timingText(item));
+          this.DetailValue('同步状态', item.syncDirty ? '本机有修改，待同步' : (item.remoteVersion > 0 ? '已同步家庭云端' : '仅本机'));
+          Row({ space: 8 }) {
+            Button('编辑任务', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+              .onClick(() => this.beginEdit(item));
+            Button('删除任务', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.DANGER_SOFT).fontColor(AppTheme.DANGER)
+              .onClick(() => { this.deleteConfirm = true; this.operationNotice = ''; });
+          }.width('100%');
+        }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+      }
+
+      if (this.operationNotice.length > 0) {
+        Text(this.operationNotice).width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT)
+          .padding(10).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+
+      this.DeletePane(item);
+
+      if (this.latestLocalSubmission(item.id) !== null) {
+        this.LocalSubmission(this.latestLocalSubmission(item.id)!);
+      } else if (this.remoteSubmissions(item.id).length > 0) {
+        this.CloudSubmission(this.remoteSubmissions(item.id)[0]);
+      }
+      this.ReviewPane(item);
+    }.width('100%');
+  }
+
+  @Builder
+  private ProgressList() {
+    Column({ space: AppTheme.SECTION_GAP }) {
+      Column({ space: 5 }) {
+        Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+        Text(`${HomeworkStore.instance.getStudent().name} · 点击任务查看详情、编辑或删除`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+      }.width('100%').alignItems(HorizontalAlign.Start);
+      if (this.sizeClass === WindowSizeClass.EXPANDED) {
+        Row({ space: 16 }) {
+          Column({ space: AppTheme.ITEM_GAP }) {
+            ForEach(this.assignments().slice(0, Math.ceil(this.assignments().length / 2)), (item: Assignment) => {
+              this.ProgressCard(item);
+            }, (item: Assignment) => item.id);
+          }.layoutWeight(1);
+          Column({ space: AppTheme.ITEM_GAP }) {
+            ForEach(this.assignments().slice(Math.ceil(this.assignments().length / 2)), (item: Assignment) => {
+              this.ProgressCard(item);
+            }, (item: Assignment) => item.id);
+          }.layoutWeight(1);
+        }.width('100%').alignItems(VerticalAlign.Top);
+      } else {
+        ForEach(this.assignments(), (item: Assignment) => {
+          this.ProgressCard(item);
+        }, (item: Assignment) => item.id);
+      }
+    }.width('100%');
   }
 
   build() {
     Scroll() {
       Column({ space: AppTheme.SECTION_GAP }) {
-        Column({ space: 5 }) {
-          Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text(`${HomeworkStore.instance.getStudent().name} · 提交后由家长验收，完成或打回订正`).fontSize(13).fontColor(AppTheme.SUBTEXT);
-        }.width('100%').alignItems(HorizontalAlign.Start);
-        if (this.sizeClass === WindowSizeClass.EXPANDED) {
-          Row({ space: 16 }) {
-            Column({ space: AppTheme.ITEM_GAP }) {
-              ForEach(this.assignments().slice(0, Math.ceil(this.assignments().length / 2)), (item: Assignment) => {
-                this.ProgressCard(item);
-              }, (item: Assignment) => item.id);
-            }.layoutWeight(1);
-            Column({ space: AppTheme.ITEM_GAP }) {
-              ForEach(this.assignments().slice(Math.ceil(this.assignments().length / 2)), (item: Assignment) => {
-                this.ProgressCard(item);
-              }, (item: Assignment) => item.id);
-            }.layoutWeight(1);
-          }.width('100%').alignItems(VerticalAlign.Top);
+        if (this.selectedAssignment() !== null) {
+          this.AssignmentDetail(this.selectedAssignment()!);
         } else {
-          ForEach(this.assignments(), (item: Assignment) => {
-            this.ProgressCard(item);
-          }, (item: Assignment) => item.id);
+          this.ProgressList();
         }
       }.width('100%').padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING);
     }.width('100%').height('100%').backgroundColor(AppTheme.BACKGROUND);
