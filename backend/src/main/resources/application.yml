@@ -2,6 +2,8 @@ server:
   port: ${SERVER_PORT:8080}
 
 spring:
+  config:
+    import: optional:file:./config/application-local.yml
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/homework}
     username: ${DB_USERNAME:homework}
@@ -31,13 +33,13 @@ app:
     token-ttl-hours: ${AUTH_TOKEN_TTL_HOURS:168}
   storage:
     root: ${APP_STORAGE_ROOT:./data/uploads}
-  tutor:
-    openai:
-      api-key: ${OPENAI_API_KEY:}
-      model: ${OPENAI_MODEL:gpt-5.6-luna}
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
-  organizer:
-    openai:
-      api-key: ${OPENAI_API_KEY:}
-      model: ${OPENAI_ORGANIZER_MODEL:gpt-5.6-luna}
-      base-url: ${OPENAI_BASE_URL:https://api.openai.com}
+  ai:
+    protocol: ${AI_PROTOCOL:responses}
+    api-key: ${AI_API_KEY:${OPENAI_API_KEY:}}
+    base-url: ${AI_BASE_URL:${OPENAI_BASE_URL:https://api.openai.com}}
+    responses-path: ${AI_RESPONSES_PATH:/v1/responses}
+    chat-completions-path: ${AI_CHAT_COMPLETIONS_PATH:/v1/chat/completions}
+    tutor-model: ${AI_TUTOR_MODEL:${OPENAI_MODEL:gpt-5.6-luna}}
+    organizer-model: ${AI_ORGANIZER_MODEL:${OPENAI_ORGANIZER_MODEL:gpt-5.6-luna}}
+    allow-unauthenticated: ${AI_ALLOW_UNAUTHENTICATED:false}
+    structured-output: ${AI_STRUCTURED_OUTPUT:true}
