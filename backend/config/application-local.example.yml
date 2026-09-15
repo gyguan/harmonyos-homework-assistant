@@ -1,0 +1,39 @@
+# Copy this file to application-local.yml in the same directory.
+# application-local.yml is ignored by Git and is automatically imported by application.yml.
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/homework
+    username: homework
+    password: homework
+
+app:
+  bootstrap:
+    login-name: parent
+    password: parent123
+
+  ai:
+    # OpenAI-compatible transport. Most hosted/private model gateways can expose one of these protocols.
+    # Supported values: responses | chat-completions
+    protocol: responses
+
+    # API key may be blank only when the target gateway does not require authentication.
+    api-key: sk-your-key
+    allow-unauthenticated: false
+
+    # Examples:
+    # OpenAI: https://api.openai.com
+    # Private gateway / local model: http://127.0.0.1:8000
+    base-url: https://api.openai.com
+
+    # Paths are configurable because compatible providers do not always use exactly the same prefix.
+    responses-path: /v1/responses
+    chat-completions-path: /v1/chat/completions
+
+    # Tutor and homework organizer may use different models on the same provider.
+    tutor-model: gpt-5.6-luna
+    organizer-model: gpt-5.6-luna
+
+    # Set false if the provider does not support json_schema structured output.
+    # The organizer will still ask for JSON and validate the returned structure locally.
+    structured-output: true
