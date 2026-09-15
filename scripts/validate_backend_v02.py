@@ -26,6 +26,7 @@ student_service = read("backend/src/main/java/com/xiaoban/homework/student/Stude
 model_client = read("backend/src/main/java/com/xiaoban/homework/tutor/OpenAiTutorModelClient.java")
 tutor_prompt = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorPromptBuilder.java")
 tutor_controller = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorController.java")
+access_log = read("backend/src/main/java/com/xiaoban/homework/common/AccessLogFilter.java")
 app_yml = read("backend/src/main/resources/application.yml")
 app_config = read("entry/src/main/ets/common/config/AppConfig.ets")
 backend_session = read("entry/src/main/ets/application/remote/BackendSession.ets")
@@ -53,6 +54,13 @@ for phrase in ["不要直接给出", "个人信息", "可信成年人"]:
     require(phrase in tutor_prompt, f"Tutor safety/guidance prompt missing: {phrase}")
 require('@PostMapping("/messages")' in tutor_controller,
         "Tutor API must support real persisted conversations")
+require("OncePerRequestFilter" in access_log and "request.getMethod()" in access_log and
+        "request.getRequestURI()" in access_log and "response.getStatus()" in access_log and
+        "request.getRemoteAddr()" in access_log and "System.nanoTime()" in access_log,
+        "backend must emit lightweight method/path/status/duration/client access logs")
+for forbidden_log_data in ["Authorization", "getHeader(", "getQueryString()", "getInputStream()", "getReader()"]:
+    require(forbidden_log_data not in access_log,
+            f"access log must not capture sensitive/request-body data: {forbidden_log_data}")
 require("PreferencesBackendSessionStorage" in session_storage and "initialize(storage" in backend_session,
         "HarmonyOS must restore its backend session from app-private storage")
 require("AppConfig.BACKEND_BASE_URL" in backend_session and "http://10.37.255.92:8080" in app_config,
