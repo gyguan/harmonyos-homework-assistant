@@ -34,6 +34,31 @@ export struct BackendConnectionPage {
     return HomeworkStore.instance.getStudents();
   }
 
+  private tutorGuidanceFirst(): boolean {
+    let currentRevision = this.pageRevision;
+    return HomeworkStore.instance.getSettings().tutorGuidanceFirst;
+  }
+
+  private directAnswerAllowed(): boolean {
+    let currentRevision = this.pageRevision;
+    return HomeworkStore.instance.getSettings().directAnswerAllowed;
+  }
+
+  private updateTutorSettings(guidanceFirst: boolean, directAnswerAllowed: boolean): void {
+    HomeworkStore.instance.updateTutorSettings(guidanceFirst, directAnswerAllowed);
+    this.pageRevision++;
+    this.message = 'AI 辅导规则已保存';
+    this.onStoreChanged();
+  }
+
+  private toggleGuidanceFirst(): void {
+    this.updateTutorSettings(!this.tutorGuidanceFirst(), this.directAnswerAllowed());
+  }
+
+  private toggleDirectAnswer(): void {
+    this.updateTutorSettings(this.tutorGuidanceFirst(), !this.directAnswerAllowed());
+  }
+
   private async connect(): Promise<void> {
     if (this.baseUrl.trim().length === 0 || this.loginName.trim().length === 0 || this.password.length === 0) {
       this.message = '请填写服务地址、账号和密码';
@@ -149,12 +174,29 @@ export struct BackendConnectionPage {
     }
   }
 
+  @Builder
+  private TutorRule(title: string, description: string, enabled: boolean, action: () => void) {
+    Row({ space: 12 }) {
+      Column({ space: 4 }) {
+        Text(title).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text(description).width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+      Button(enabled ? '已开启' : '已关闭', { type: ButtonType.Normal })
+        .height(36)
+        .padding({ left: 13, right: 13 })
+        .borderRadius(AppTheme.CHIP_RADIUS)
+        .backgroundColor(enabled ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+        .fontColor(enabled ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+        .onClick(action);
+    }.width('100%').padding({ top: 5, bottom: 5 });
+  }
+
   build() {
     Scroll() {
       Column({ space: AppTheme.SECTION_GAP }) {
         Column({ space: 5 }) {
           Text('我的').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('管理家庭云端连接和孩子资料。老师原文解析中间态仍只保留在本机。').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+          Text('管理家庭云端连接、孩子资料和 AI 辅导规则。老师原文解析中间态仍只保留在本机。').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
         }.width('100%').alignItems(HorizontalAlign.Start);
 
         Column({ space: 12 }) {
@@ -185,6 +227,17 @@ export struct BackendConnectionPage {
           if (this.message.length > 0) {
             Text(this.message).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
+        }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+
+        Column({ space: 10 }) {
+          Text('AI 辅导规则').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('家庭级规则会保存在本机，并用于孩子下一次向小伴提问。').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Divider().color(AppTheme.DIVIDER);
+          this.TutorRule('引导优先', '先提醒概念和下一步，再逐步讲解。', this.tutorGuidanceFirst(),
+            () => this.toggleGuidanceFirst());
+          Divider().color(AppTheme.DIVIDER);
+          this.TutorRule('允许直接答案', '默认建议关闭；开启后 Tutor 才能在规则允许时直接展示答案。', this.directAnswerAllowed(),
+            () => this.toggleDirectAnswer());
         }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
 
         Column({ space: 12 }) {
