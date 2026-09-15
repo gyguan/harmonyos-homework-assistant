@@ -15,6 +15,7 @@ export interface RemoteAssignment {
   startedAtEpochMs: number;
   finishedAtEpochMs: number;
   elapsedSeconds: number;
+  reviewNote: string;
   version: number;
 }
 
@@ -34,6 +35,7 @@ export class RemoteAssignmentMapper {
       startedAtEpochMs: remote.startedAtEpochMs > 0 ? remote.startedAtEpochMs : 0,
       finishedAtEpochMs: remote.finishedAtEpochMs > 0 ? remote.finishedAtEpochMs : 0,
       elapsedSeconds: remote.elapsedSeconds > 0 ? remote.elapsedSeconds : 0,
+      reviewNote: remote.reviewNote === undefined ? '' : remote.reviewNote,
       resourceLabels: existing === null ? [] : existing.resourceLabels.slice()
     };
   }

@@ -83,6 +83,7 @@ export interface Assignment {
   startedAtEpochMs: number;
   finishedAtEpochMs: number;
   elapsedSeconds: number;
+  reviewNote: string;
   resourceLabels: string[];
 }
 

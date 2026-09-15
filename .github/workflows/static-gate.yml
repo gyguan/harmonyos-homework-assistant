@@ -58,6 +58,9 @@ jobs:
       - name: Validate single task timer
         run: python scripts/validate_single_task_timer.py
 
+      - name: Validate parent review
+        run: python scripts/validate_parent_review.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:

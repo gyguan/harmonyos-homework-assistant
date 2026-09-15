@@ -91,6 +91,13 @@ export struct AssignmentCountdownCard {
 
   build() {
     Column({ space: 9 }) {
+      if (this.assignment.status === AssignmentStatus.NEEDS_REWORK && this.assignment.reviewNote.length > 0) {
+        Column({ space: 4 }) {
+          Text('家长请你订正').width('100%').fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
+          Text(this.assignment.reviewNote).width('100%').fontSize(14).lineHeight(20).fontColor(AppTheme.TEXT);
+        }.width('100%').padding(11).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+
       Row() {
         Text('作业计时')
           .fontSize(AppTheme.CAPTION_SIZE)
