@@ -320,9 +320,12 @@ export struct ParentProgressPage {
       .fontSize(AppTheme.CAPTION_SIZE)
       .fontWeight(this.editSubject === subject ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(this.editSubject === subject ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 12, right: 12, top: 10, bottom: 10 })
       .backgroundColor(this.editSubject === subject ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
       .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.editSubject === subject ? `${subject}，已选择` : subject)
       .onClick(() => this.editSubject = subject);
   }
 
@@ -391,7 +394,14 @@ export struct ParentProgressPage {
     Column({ space: 16 }) {
       Row() {
         if (this.sizeClass === WindowSizeClass.COMPACT) {
-          Text('‹ 作业进度').fontSize(14).fontColor(AppTheme.PRIMARY).onClick(() => this.closeDetail());
+          Text('‹ 作业进度')
+            .fontSize(14)
+            .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 4, right: 8 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('返回作业进度列表')
+            .onClick(() => this.closeDetail());
         }
         Blank();
         Text(AssignmentStateMachine.label(item.status)).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
@@ -457,9 +467,12 @@ export struct ParentProgressPage {
         .strokeWidth(this.subjectFilter === key ? 2 : 0)
         .color(this.subjectFilter === key ? AppTheme.PRIMARY : Color.Transparent);
     }
-    .height(36)
-    .padding({ left: 4, right: 4 })
+    .height(AppTheme.MIN_TOUCH_TARGET)
+    .padding({ left: 6, right: 6 })
     .justifyContent(FlexAlign.End)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(this.subjectFilter === key ? `${label}，已选择，${this.subjectCount(key)}项` : `${label}，${this.subjectCount(key)}项`)
     .onClick(() => this.subjectFilter = key);
   }
 
@@ -469,9 +482,12 @@ export struct ParentProgressPage {
       .fontSize(12)
       .fontWeight(this.dateFilter === key ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(this.dateFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 12, right: 12, top: 10, bottom: 10 })
       .backgroundColor(this.dateFilter === key ? AppTheme.PRIMARY_SOFT : Color.Transparent)
       .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.dateFilter === key ? `${label}，已选择，${this.dateCount(key)}项` : `${label}，${this.dateCount(key)}项`)
       .onClick(() => this.dateFilter = key);
   }
 
