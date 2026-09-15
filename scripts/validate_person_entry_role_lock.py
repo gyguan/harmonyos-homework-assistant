@@ -37,7 +37,7 @@ require("HomeworkStore.instance.getStudents()" in entry_page,
 require("家长" in entry_page and "孩子" in entry_page and "谁在使用" in entry_page,
         "person entry page must clearly expose parent and child choices")
 require("onSelectStudent(student.id)" in entry_page,
-        "each child card must enter with its own studentId")
+        "each child choice must enter with its own studentId")
 
 require("@Prop role: AppRole" in app_shell,
         "AppShell role must be read-only input from the entry page")
@@ -47,12 +47,14 @@ require("切换家长" not in app_shell and "切换学生" not in app_shell,
         "in-app parent/student role switching must be removed")
 require("if (this.role !== AppRole.PARENT)" in app_shell,
         "child context switching must be guarded to parent role only")
-require("ParentChildChip" in app_shell and "StudentIdentityChip" in app_shell,
-        "parent child switcher and locked student identity must be separate UI surfaces")
-require("this.role === AppRole.PARENT" in app_shell and "this.ParentChildChip()" in app_shell,
-        "parent context bar must retain child management")
-require("this.StudentIdentityChip()" in app_shell,
-        "student context bar must render identity without a child switch action")
+require("private switchStudent()" in app_shell and "HomeworkStore.instance.setActiveStudent" in app_shell,
+        "parent shell must retain explicit child context switching")
+require("private FamilyContextBar()" in app_shell and "this.role === AppRole.PARENT" in app_shell,
+        "phone parent shell must show family context without exposing role switching")
+require("this.role === AppRole.PARENT" in app_shell and "this.switchStudent()" in app_shell,
+        "child switching actions must remain inside parent-only UI branches")
+require("onClick(() => this.switchStudent())" in app_shell,
+        "parent child switch control must remain actionable")
 
 if errors:
     print("PERSON_ENTRY_ROLE_LOCK_GATE_FAIL")
