@@ -1,5 +1,4 @@
 import { common } from '@kit.AbilityKit';
-import { BusinessError, request } from '@kit.BasicServicesKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { http } from '@kit.NetworkKit';
 import { BackendHttpClient } from './BackendHttpClient';
@@ -18,6 +17,11 @@ export interface RemoteSubmission {
   assignmentId: string;
   submittedAt: string;
   photos: RemoteSubmissionPhoto[];
+}
+
+interface MultipartPayload {
+  boundary: string;
+  body: ArrayBuffer;
 }
 
 export class RemoteSubmissionApi {
@@ -84,42 +88,88 @@ export class RemoteSubmissionApi {
   }
 
   async upload(assignmentId: string, sourceUris: string[]): Promise<boolean> {
-    if (this.context === null || !BackendSession.instance.isConnected() || sourceUris.length === 0) return false;
-    let uploadFiles: request.File[] = [];
-    let cachePaths: string[] = [];
+    if (this.context === null || !BackendSession.instance.isConnected() ||
+      sourceUris.length === 0 || sourceUris.length > 6) return false;
+    try {
+      let payload = await this.buildMultipartPayload(sourceUris);
+      let client = http.createHttp();
+      try {
+        let response = await client.request(
+          `${BackendSession.instance.getBaseUrl()}/api/v1/assignments/${encodeURIComponent(assignmentId)}/submissions`,
+          {
+            method: http.RequestMethod.POST,
+            header: {
+              'Authorization': `Bearer ${BackendSession.instance.getToken()}`,
+              'Content-Type': `multipart/form-data; boundary=${payload.boundary}`
+            },
+            extraData: payload.body,
+            connectTimeout: 15000,
+            readTimeout: 60000
+          });
+        if (response.responseCode === 401) BackendSession.instance.disconnect();
+        return response.responseCode >= 200 && response.responseCode < 300;
+      } finally {
+        try { client.destroy(); } catch {}
+      }
+    } catch {
+      return false;
+    }
+  }
+
+  private async buildMultipartPayload(sourceUris: string[]): Promise<MultipartPayload> {
+    if (this.context === null) throw new Error('上传上下文未初始化');
+    let boundary = `----xiaoban-homework-${Date.now()}`;
+    let multipartPath = `${this.context.cacheDir}/submission-multipart-${Date.now()}.bin`;
+    let writer = await fileIo.open(multipartPath,
+      fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+    let totalBytes = 0;
     try {
       for (let i = 0; i < sourceUris.length; i++) {
-        let fileName = `homework-upload-${Date.now()}-${i + 1}.jpg`;
-        let cachePath = `${this.context.cacheDir}/${fileName}`;
+        let fileName = `homework-upload-${i + 1}.jpg`;
+        let header = `--${boundary}\r\nContent-Disposition: form-data; name="photos"; filename="${fileName}"\r\n` +
+          'Content-Type: image/jpeg\r\n\r\n';
+        totalBytes += await fileIo.write(writer.fd, header);
+
         let source = await fileIo.open(sourceUris[i], fileIo.OpenMode.READ_ONLY);
         try {
-          await fileIo.copyFile(source.fd, cachePath, 0);
+          let chunk = new ArrayBuffer(64 * 1024);
+          while (true) {
+            let readLength = await fileIo.read(source.fd, chunk);
+            if (readLength <= 0) break;
+            let written = await fileIo.write(writer.fd, chunk, { length: readLength });
+            if (written !== readLength) throw new Error('作业照片写入 multipart 失败');
+            totalBytes += written;
+          }
         } finally {
           try { await fileIo.close(source); } catch {}
         }
-        cachePaths.push(cachePath);
-        uploadFiles.push({ filename: fileName, name: 'photos', uri: `internal://cache/${fileName}`, type: 'jpg' });
+        totalBytes += await fileIo.write(writer.fd, '\r\n');
       }
-      let config: request.UploadConfig = {
-        url: `${BackendSession.instance.getBaseUrl()}/api/v1/assignments/${encodeURIComponent(assignmentId)}/submissions`,
-        header: { 'Authorization': `Bearer ${BackendSession.instance.getToken()}` },
-        method: 'POST', files: uploadFiles, data: []
-      };
-      if (canIUse('SystemCapability.MiscServices.Upload')) {
-        let task = await request.uploadFile(this.context, config);
-        return await new Promise<boolean>((resolve) => {
-          task.on('complete', (_states: request.TaskState[]) => resolve(true));
-          task.on('fail', (_states: request.TaskState[]) => resolve(false));
-        });
-      }
-      return false;
-    } catch (error) {
-      let _businessError = error as BusinessError;
-      return false;
+      totalBytes += await fileIo.write(writer.fd, `--${boundary}--\r\n`);
     } finally {
-      for (let path of cachePaths) {
-        try { await fileIo.unlink(path); } catch {}
+      try { await fileIo.close(writer); } catch {}
+    }
+
+    try {
+      let body = new ArrayBuffer(totalBytes);
+      let target = new Uint8Array(body);
+      let reader = await fileIo.open(multipartPath, fileIo.OpenMode.READ_ONLY);
+      let offset = 0;
+      try {
+        let chunk = new ArrayBuffer(64 * 1024);
+        while (offset < totalBytes) {
+          let readLength = await fileIo.read(reader.fd, chunk);
+          if (readLength <= 0) break;
+          target.set(new Uint8Array(chunk, 0, readLength), offset);
+          offset += readLength;
+        }
+      } finally {
+        try { await fileIo.close(reader); } catch {}
       }
+      if (offset !== totalBytes) throw new Error('multipart 请求体读取不完整');
+      return { boundary: boundary, body: body };
+    } finally {
+      try { await fileIo.unlink(multipartPath); } catch {}
     }
   }
 
