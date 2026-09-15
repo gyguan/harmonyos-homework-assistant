@@ -599,11 +599,14 @@ export struct ParentProgressPage {
       Divider().vertical(true).height('100%').color(AppTheme.DIVIDER);
 
       Scroll() {
-        if (this.selectedAssignment() !== null) {
-          this.AssignmentDetail(this.selectedAssignment()!);
-        } else {
-          this.EmptyDetail();
+        Column() {
+          if (this.selectedAssignment() !== null) {
+            this.AssignmentDetail(this.selectedAssignment()!);
+          } else {
+            this.EmptyDetail();
+          }
         }
+        .width('100%');
       }
       .layoutWeight(1)
       .height('100%')
