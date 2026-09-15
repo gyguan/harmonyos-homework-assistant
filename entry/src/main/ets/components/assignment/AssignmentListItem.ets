@@ -89,9 +89,7 @@ export struct AssignmentListItem {
           .fontWeight(FontWeight.Medium)
           .fontColor(this.statusColor());
         if (this.showChevron && this.interactive) {
-          SymbolGlyph($r('sys.symbol.chevron_right'))
-            .fontSize(16)
-            .fontColor([AppTheme.TERTIARY_TEXT]);
+          Text('›').fontSize(20).fontColor(AppTheme.TERTIARY_TEXT);
         }
       }
       .alignItems(HorizontalAlign.End);
