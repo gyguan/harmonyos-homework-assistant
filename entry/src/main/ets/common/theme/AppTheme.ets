@@ -28,7 +28,7 @@ export class AppTheme {
   static readonly DANGER_SOFT: string = '#FDECEF';
   static readonly DISABLED: string = '#7D818A';
 
-  // Layout tokens. The base page edge follows HarmonyOS 20vp-level spacing guidance.
+  // Shared layout tokens.
   static readonly PAGE_PADDING: number = 20;
   static readonly PAGE_PADDING_WIDE: number = 28;
   static readonly SECTION_GAP: number = 20;
@@ -38,7 +38,15 @@ export class AppTheme {
   static readonly CONTROL_RADIUS: number = 14;
   static readonly CHIP_RADIUS: number = 12;
 
-  // Type scale.
+  // Compact Phone follows the Focus Journey composition instead of shrinking the Pad workspace.
+  static readonly PHONE_PAGE_PADDING: number = 16;
+  static readonly PHONE_SECTION_GAP: number = 14;
+  static readonly PHONE_CARD_PADDING: number = 14;
+  static readonly PHONE_CARD_RADIUS: number = 16;
+  static readonly PHONE_PAGE_TITLE_SIZE: number = 23;
+  static readonly PHONE_SECTION_TITLE_SIZE: number = 17;
+
+  // Type scale for Medium / Expanded layouts.
   static readonly PAGE_TITLE_SIZE: number = 26;
   static readonly SECTION_TITLE_SIZE: number = 20;
   static readonly CARD_TITLE_SIZE: number = 17;
