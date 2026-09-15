@@ -109,7 +109,13 @@ require("private PhoneLayout()" in parent_progress and "private PadLayout()" in 
         "this.sizeClass === WindowSizeClass.COMPACT" in parent_progress,
         "parent progress must use phone detail navigation and pad list-detail layout")
 require("this.AssignmentDetail(this.selectedAssignment()!)" in parent_progress,
-        "subject/date filtering must not replace or block assignment detail rendering")
+        "subject/date filtering must not replace or block phone assignment detail rendering")
+require("private selectedAssignmentItems(): Assignment[]" in parent_progress and
+        "ForEach(this.selectedAssignmentItems(), (item: Assignment) =>" in parent_progress and
+        "(item: Assignment) => item.id" in parent_progress,
+        "pad detail must be keyed by assignment id so switching list selection rebuilds the detail subtree")
+require("this.reviewAssignmentId = '';" in parent_progress and "this.reviewNoteDraft = '';" in parent_progress,
+        "switching parent progress assignments must clear review state from the previous assignment")
 
 if errors:
     print("PARENT_REVIEW_GATE_FAIL")
