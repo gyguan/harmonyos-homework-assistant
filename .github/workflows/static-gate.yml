@@ -67,6 +67,9 @@ jobs:
       - name: Validate student profile navigation
         run: python scripts/validate_student_profile_navigation.py
 
+      - name: Validate parent Tutor settings
+        run: python scripts/validate_parent_tutor_settings.py
+
       - name: Validate AI suggested homework duration
         run: python scripts/validate_ai_expected_minutes.py
 
