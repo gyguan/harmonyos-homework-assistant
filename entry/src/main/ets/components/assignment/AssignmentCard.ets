@@ -13,6 +13,7 @@ export struct AssignmentCard {
   private statusColor(): string {
     switch (this.assignment.status) {
       case AssignmentStatus.IN_PROGRESS:
+      case AssignmentStatus.PAUSED:
       case AssignmentStatus.READY_TO_SUBMIT:
         return AppTheme.WARNING;
       case AssignmentStatus.SUBMITTED:
@@ -29,6 +30,7 @@ export struct AssignmentCard {
   private statusBackground(): string {
     switch (this.assignment.status) {
       case AssignmentStatus.IN_PROGRESS:
+      case AssignmentStatus.PAUSED:
       case AssignmentStatus.READY_TO_SUBMIT:
         return AppTheme.WARNING_SOFT;
       case AssignmentStatus.SUBMITTED:
@@ -43,6 +45,10 @@ export struct AssignmentCard {
   }
 
   private timeLabel(): string {
+    if (this.assignment.status === AssignmentStatus.PAUSED) {
+      let minutes = this.assignment.elapsedSeconds > 0 ? Math.max(1, Math.round(this.assignment.elapsedSeconds / 60)) : 0;
+      return `已用 ${minutes} 分钟 · 预计 ${this.assignment.expectedMinutes} 分钟`;
+    }
     if (this.assignment.elapsedSeconds > 0 && this.assignment.status !== AssignmentStatus.IN_PROGRESS) {
       let minutes = Math.max(1, Math.round(this.assignment.elapsedSeconds / 60));
       return `预计 ${this.assignment.expectedMinutes} 分钟 · 实际 ${minutes} 分钟`;
@@ -84,6 +90,13 @@ export struct AssignmentCard {
         .lineHeight(19)
         .fontColor(AppTheme.SUBTEXT)
         .maxLines(2);
+
+      if (this.assignment.status === AssignmentStatus.NEEDS_REWORK && this.assignment.reviewNote.length > 0) {
+        Column({ space: 3 }) {
+          Text('家长订正说明').width('100%').fontSize(11).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
+          Text(this.assignment.reviewNote).width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.TEXT).maxLines(3);
+        }.width('100%').padding(10).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+      }
 
       Row() {
         Text(`截至 ${this.assignment.dueText}`)
