@@ -49,6 +49,10 @@ export class MockData {
       textbookRef: '北师大版三年级上册 · 第三单元 加与减',
       dueText: '20:30 前',
       status: AssignmentStatus.IN_PROGRESS,
+      expectedMinutes: 25,
+      startedAtEpochMs: Date.now() - 5 * 60 * 1000,
+      finishedAtEpochMs: 0,
+      elapsedSeconds: 0,
       resourceLabels: ['讲解视频 03:24', '练习说明 PDF']
     },
     {
@@ -61,6 +65,10 @@ export class MockData {
       textbookRef: '部编版三年级上册 · 第二单元',
       dueText: '已完成',
       status: AssignmentStatus.COMPLETED,
+      expectedMinutes: 15,
+      startedAtEpochMs: Date.now() - 18 * 60 * 1000,
+      finishedAtEpochMs: Date.now() - 4 * 60 * 1000,
+      elapsedSeconds: 14 * 60,
       resourceLabels: ['老师示范音频']
     },
     {
@@ -73,6 +81,10 @@ export class MockData {
       textbookRef: '沪教版三年级上册 · Unit 3',
       dueText: '21:00 前',
       status: AssignmentStatus.NOT_STARTED,
+      expectedMinutes: 15,
+      startedAtEpochMs: 0,
+      finishedAtEpochMs: 0,
+      elapsedSeconds: 0,
       resourceLabels: ['课文音频']
     },
     {
@@ -85,6 +97,10 @@ export class MockData {
       textbookRef: '北师大版三年级上册',
       dueText: '昨天 21:00',
       status: AssignmentStatus.OVERDUE,
+      expectedMinutes: 20,
+      startedAtEpochMs: 0,
+      finishedAtEpochMs: 0,
+      elapsedSeconds: 0,
       resourceLabels: []
     },
     {
@@ -97,6 +113,10 @@ export class MockData {
       textbookRef: '部编版一年级上册 · 拼音单元',
       dueText: '今晚',
       status: AssignmentStatus.NOT_STARTED,
+      expectedMinutes: 10,
+      startedAtEpochMs: 0,
+      finishedAtEpochMs: 0,
+      elapsedSeconds: 0,
       resourceLabels: []
     },
     {
@@ -109,6 +129,10 @@ export class MockData {
       textbookRef: '北师大版一年级上册',
       dueText: '今晚',
       status: AssignmentStatus.NOT_STARTED,
+      expectedMinutes: 10,
+      startedAtEpochMs: 0,
+      finishedAtEpochMs: 0,
+      elapsedSeconds: 0,
       resourceLabels: []
     }
   ];
@@ -157,6 +181,7 @@ export class MockData {
       instruction: '按老师要求完成背诵，明天检查。',
       textbookRef: '部编版三年级上册 · 第 12 课',
       dueText: '明天',
+      expectedMinutes: 15,
       sourceEvidence: {
         sourceLabel: '三（2）班微信群截图 · 19:01',
         excerpt: '语文背诵第12课古诗两首'
@@ -171,6 +196,7 @@ export class MockData {
       instruction: '完成练习册第 32 页，明天检查。',
       textbookRef: '北师大版三年级上册 · 待家长确认页码',
       dueText: '明天',
+      expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: '三（2）班微信群截图 · 19:01',
         excerpt: '数学练习册32页'
@@ -185,6 +211,7 @@ export class MockData {
       instruction: '完成 Unit 4 听读，明天检查。',
       textbookRef: '沪教版三年级上册 · Unit 4',
       dueText: '明天',
+      expectedMinutes: 15,
       sourceEvidence: {
         sourceLabel: '三（2）班微信群截图 · 19:01',
         excerpt: '英语听读U4'
