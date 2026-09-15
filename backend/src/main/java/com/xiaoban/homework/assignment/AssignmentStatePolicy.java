@@ -7,8 +7,8 @@ public final class AssignmentStatePolicy {
   private AssignmentStatePolicy() {}
   private static final Map<String, Set<String>> NEXT = Map.of(
       "NOT_STARTED", Set.of("IN_PROGRESS", "OVERDUE"),
-      "IN_PROGRESS", Set.of("PAUSED", "READY_TO_SUBMIT", "OVERDUE"),
-      "PAUSED", Set.of("IN_PROGRESS", "OVERDUE"),
+      "IN_PROGRESS", Set.of("PAUSED", "READY_TO_SUBMIT", "NOT_STARTED", "OVERDUE"),
+      "PAUSED", Set.of("IN_PROGRESS", "NOT_STARTED", "OVERDUE"),
       "READY_TO_SUBMIT", Set.of("SUBMITTED", "IN_PROGRESS"),
       "SUBMITTED", Set.of("COMPLETED", "NEEDS_REWORK"),
       "NEEDS_REWORK", Set.of("IN_PROGRESS", "READY_TO_SUBMIT"),
