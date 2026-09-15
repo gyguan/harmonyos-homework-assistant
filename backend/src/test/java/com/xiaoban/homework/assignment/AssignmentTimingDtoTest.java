@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 class AssignmentTimingDtoTest {
   @Test
-  void responseCarriesPlannedAndActualTiming() {
+  void responseCarriesPlannedActualTimingAndReviewNote() {
     AssignmentEntity entity = new AssignmentEntity();
     entity.id = "a-1";
     entity.studentId = "student-1";
@@ -15,13 +15,14 @@ class AssignmentTimingDtoTest {
     entity.instruction = "独立完成";
     entity.textbookRef = "数学三年级";
     entity.dueText = "今晚";
-    entity.status = "READY_TO_SUBMIT";
+    entity.status = "NEEDS_REWORK";
     entity.sourceLabel = "test";
     entity.sourceExcerpt = "test";
     entity.expectedMinutes = 20;
     entity.startedAtEpochMs = 1_000L;
     entity.finishedAtEpochMs = 901_000L;
     entity.elapsedSeconds = 900L;
+    entity.reviewNote = "第 3 题再检查一下计算过程";
     entity.version = 3L;
 
     AssignmentDtos.Response response = AssignmentDtos.Response.from(entity);
@@ -30,6 +31,7 @@ class AssignmentTimingDtoTest {
     assertEquals(1_000L, response.startedAtEpochMs());
     assertEquals(901_000L, response.finishedAtEpochMs());
     assertEquals(900L, response.elapsedSeconds());
+    assertEquals("第 3 题再检查一下计算过程", response.reviewNote());
     assertEquals(3L, response.version());
   }
 }
