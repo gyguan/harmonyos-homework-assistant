@@ -22,6 +22,10 @@ def require(condition: bool, message: str) -> None:
 theme = read("entry/src/main/ets/common/theme/AppTheme.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 assignment_list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
+student_today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
+parent_dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+student_assignments = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
+study_workspace = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 
 required_theme_tokens = [
     "SURFACE_SUBTLE",
@@ -36,6 +40,12 @@ required_theme_tokens = [
     "BUTTON_HEIGHT",
     "PAGE_TITLE_SIZE",
     "SECTION_TITLE_SIZE",
+    "PHONE_PAGE_PADDING",
+    "PHONE_SECTION_GAP",
+    "PHONE_CARD_PADDING",
+    "PHONE_CARD_RADIUS",
+    "PHONE_PAGE_TITLE_SIZE",
+    "PHONE_SECTION_TITLE_SIZE",
 ]
 for token in required_theme_tokens:
     require(f"static readonly {token}" in theme, f"AppTheme missing design token: {token}")
@@ -56,6 +66,28 @@ require("if (this.sizeClass === WindowSizeClass.EXPANDED)" in app_shell,
         "side navigation must remain limited to EXPANDED windows")
 require("Text(active ? '●' : '○')" not in app_shell,
         "navigation must not regress to text-dot icons")
+
+# Phone is a Focus Journey, not a vertically stacked Pad workspace.
+require("private PhoneLayout()" in student_today and
+        "this.PhoneProgress();" in student_today and
+        "this.PhoneNextTask();" in student_today and
+        "this.PhoneOtherTasks();" in student_today,
+        "student Today must keep a dedicated compact Focus Journey")
+require("private PadLayout()" in student_today and
+        "this.AssignmentListPane();" in student_today and
+        "this.NextAssignmentPane();" in student_today,
+        "student Today must keep a separate Pad composition")
+require("private PhoneLayout()" in parent_dashboard and
+        "this.PhoneSummary();" in parent_dashboard and
+        "this.PhoneImportAction();" in parent_dashboard and
+        "this.PhoneAssignments();" in parent_dashboard,
+        "parent dashboard must keep a dedicated compact composition")
+require("private PadLayout()" in parent_dashboard,
+        "parent dashboard must keep a separate Pad composition")
+require("private CompactLayout()" in student_assignments and "private PadLayout()" in student_assignments,
+        "student assignments must keep separate compact and Pad layouts")
+require("private CompactWorkspace()" in study_workspace and "private PadWorkspace()" in study_workspace,
+        "study workspace must keep separate compact and Pad layouts")
 
 visible_ui_files = [
     "entry/src/main/ets/pages/PersonEntryPage.ets",
@@ -104,7 +136,7 @@ page_files = [
 ]
 for path in page_files:
     text = read(path)
-    require("AppTheme.PAGE_PADDING" in text,
+    require("AppTheme.PAGE_PADDING" in text or "AppTheme.PHONE_PAGE_PADDING" in text,
             f"page must use shared page-edge spacing instead of a local magic number: {path}")
 
 primary_button_pages = [
@@ -120,8 +152,6 @@ for path in primary_button_pages:
     require("AppTheme.CONTROL_RADIUS" in text,
             f"primary action page must use shared control radius: {path}")
 
-# Dashboard actions may be represented as a full-row native action instead of a separate web-style button.
-parent_dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 require("onClick(() => this.onOpenImport())" in parent_dashboard and "AppTheme.CONTROL_RADIUS" in parent_dashboard,
         "parent dashboard import must be a rounded full-row action")
 
@@ -130,9 +160,9 @@ require("export struct AssignmentListItem" in assignment_list_item and
         "accessibilityRole(AccessibilityRoleType.BUTTON)" in assignment_list_item,
         "assignment lists must provide an accessible reusable full-row tap surface")
 
-require("sys.symbol.exclamationmark_triangle" not in read("entry/src/main/ets/features/student/today/StudentTodayPage.ets"),
+require("sys.symbol.exclamationmark_triangle" not in student_today,
         "unverified warning symbol must not be used")
-require("sys.symbol.bubble_left" not in read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets"),
+require("sys.symbol.bubble_left" not in study_workspace,
         "unverified tutor symbol must not be used")
 
 if errors:

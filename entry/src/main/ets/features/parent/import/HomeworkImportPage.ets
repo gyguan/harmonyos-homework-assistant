@@ -43,7 +43,6 @@ export struct HomeworkImportPage {
       this.parseError = true;
       return;
     }
-
     this.parseBusy = true;
     this.parseMessage = '';
     this.parseError = false;
@@ -107,16 +106,11 @@ export struct HomeworkImportPage {
     if (this.parseMessage.length > 0) {
       Row({ space: 8 }) {
         SymbolGlyph(this.parseError ? $r('sys.symbol.exclamationmark_circle_fill') : $r('sys.symbol.checkmark_circle_fill'))
-          .fontSize(17)
-          .fontColor([this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS]);
-        Text(this.parseMessage)
-          .layoutWeight(1)
-          .fontSize(13)
-          .lineHeight(19)
+          .fontSize(17).fontColor([this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS]);
+        Text(this.parseMessage).layoutWeight(1).fontSize(13).lineHeight(19)
           .fontColor(this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS);
       }
-      .width('100%')
-      .padding(12)
+      .width('100%').padding(12)
       .backgroundColor(this.parseError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS);
     }
@@ -124,176 +118,94 @@ export struct HomeworkImportPage {
 
   @Builder
   private ImportAction(symbol: Resource, title: string, description: string, action: () => void) {
-    Row({ space: 14 }) {
-      SymbolGlyph(symbol)
-        .fontSize(24)
-        .fontColor([AppTheme.PRIMARY]);
+    Row({ space: this.sizeClass === WindowSizeClass.COMPACT ? 11 : 14 }) {
+      SymbolGlyph(symbol).fontSize(this.sizeClass === WindowSizeClass.COMPACT ? 22 : 24).fontColor([AppTheme.PRIMARY]);
       Column({ space: 3 }) {
-        Text(title)
-          .width('100%')
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Text(description)
-          .width('100%')
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
-      Text('›').fontSize(22).fontColor(AppTheme.TERTIARY_TEXT);
+        Text(title).width('100%').fontSize(this.sizeClass === WindowSizeClass.COMPACT ? 15 : 16)
+          .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text(description).width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+      }.layoutWeight(1).alignItems(HorizontalAlign.Start);
+      Text('›').fontSize(21).fontColor(AppTheme.TERTIARY_TEXT);
     }
-    .width('100%')
-    .constraintSize({ minHeight: 60 })
-    .padding(15)
+    .width('100%').constraintSize({ minHeight: 58 })
+    .padding(this.sizeClass === WindowSizeClass.COMPACT ? 13 : 15)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.CONTROL_RADIUS)
-    .accessibilityGroup(true)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`${title}，${description}`)
-    .onClick(action);
+    .borderRadius(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PHONE_CARD_RADIUS : AppTheme.CONTROL_RADIUS)
+    .accessibilityGroup(true).accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`${title}，${description}`).onClick(action);
   }
 
   @Builder
   private TextEditor() {
     Column({ space: 10 }) {
       Row() {
-        Text('作业文字')
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
+        Text('作业文字').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
         if (this.sizeClass === WindowSizeClass.COMPACT) {
-          Text('收起')
-            .fontSize(12)
-            .fontColor(AppTheme.PRIMARY)
+          Text('收起').fontSize(12).fontColor(AppTheme.PRIMARY)
             .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .textAlign(TextAlign.Center)
-            .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText('收起作业文字输入')
-            .onClick(() => this.textEntryOpen = false);
+            .textAlign(TextAlign.Center).accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('收起作业文字输入').onClick(() => this.textEntryOpen = false);
         }
-      }
-      .width('100%');
-
-      TextArea({
-        placeholder: '例如：语文背诵第12课；数学口算20题；英语听读U4，明天检查',
-        text: this.textDraft
-      })
-        .width('100%')
-        .height(this.sizeClass === WindowSizeClass.COMPACT ? 168 : 220)
-        .fontSize(15)
-        .lineHeight(22)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.textDraft = value);
-
+      }.width('100%');
+      TextArea({ placeholder: '例如：语文背诵第12课；数学口算20题；英语听读U4，明天检查', text: this.textDraft })
+        .width('100%').height(this.sizeClass === WindowSizeClass.COMPACT ? 150 : 220)
+        .fontSize(15).lineHeight(22).backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.textDraft = value);
       Button(this.parseBusy ? '正在整理…' : '智能整理作业', { type: ButtonType.Normal })
-        .width('100%')
-        .height(AppTheme.BUTTON_HEIGHT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .enabled(!this.parseBusy)
-        .fontSize(15)
-        .fontWeight(FontWeight.Medium)
-        .backgroundColor(AppTheme.PRIMARY)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .width('100%').height(AppTheme.BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.parseBusy).fontSize(15).fontWeight(FontWeight.Medium)
+        .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
         .onClick(() => this.parseTypedText());
     }
-    .width('100%')
-    .padding(15)
+    .width('100%').padding(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PHONE_CARD_PADDING : 15)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+    .borderRadius(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PHONE_CARD_RADIUS : AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
   private SourcePane() {
     Column({ space: 12 }) {
       Column({ space: 4 }) {
-        Text('把老师发来的内容交给小伴')
-          .width('100%')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
+        Text('把老师发来的内容交给小伴').width('100%')
+          .fontSize(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PHONE_SECTION_TITLE_SIZE : AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Text('优先选择截图，也可以粘贴群里的作业文字。AI 整理后由家长确认。')
-          .width('100%')
-          .fontSize(13)
-          .lineHeight(20)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start);
-
-      this.ImportAction(
-        $r('sys.symbol.plus_square'),
-        this.parseBusy ? '正在识别截图…' : '选择作业截图并识别',
-        '从系统相册选择老师发来的作业截图',
-        () => { void this.selectScreenshot(); }
-      );
-
-      this.ImportAction(
-        $r('sys.symbol.checkmark_square'),
-        '粘贴或输入作业文字',
-        '适合微信群、校讯通等文字通知',
-        () => this.textEntryOpen = true
-      );
-
-      if (this.textEntryOpen || this.sizeClass !== WindowSizeClass.COMPACT) {
-        this.TextEditor();
-      }
-
+          .width('100%').fontSize(13).lineHeight(20).fontColor(AppTheme.SUBTEXT);
+      }.width('100%').alignItems(HorizontalAlign.Start);
+      this.ImportAction($r('sys.symbol.plus_square'), this.parseBusy ? '正在识别截图…' : '选择作业截图并识别',
+        '从系统相册选择老师发来的作业截图', () => { void this.selectScreenshot(); });
+      this.ImportAction($r('sys.symbol.checkmark_square'), '粘贴或输入作业文字',
+        '适合微信群、校讯通等文字通知', () => this.textEntryOpen = true);
+      if (this.textEntryOpen || this.sizeClass !== WindowSizeClass.COMPACT) this.TextEditor();
       this.FeedbackBanner();
-
       if (this.rawImport().sourceLabel.length > 0) {
-        Text('最近来源 · ' + this.rawImport().sourceLabel)
-          .width('100%')
-          .fontSize(AppTheme.CAPTION_SIZE)
-          .fontColor(AppTheme.TERTIARY_TEXT);
+        Text('最近来源 · ' + this.rawImport().sourceLabel).width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
       }
-    }
-    .width('100%');
+    }.width('100%');
   }
 
   @Builder
   private CandidateItem(item: CandidateAssignment) {
     Row({ space: 12 }) {
       Text(item.subject.length > 0 ? item.subject.substring(0, 1) : '作')
-        .width(36)
-        .height(36)
-        .padding({ top: 8 })
-        .textAlign(TextAlign.Center)
-        .fontSize(14)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.PRIMARY)
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(11);
+        .width(36).height(36).padding({ top: 8 }).textAlign(TextAlign.Center)
+        .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+        .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(11);
       Column({ space: 4 }) {
         Row() {
-          Text(item.title)
-            .layoutWeight(1)
-            .fontSize(15)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT)
-            .maxLines(2);
-          Text(item.dueText)
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%');
+          Text(item.title).layoutWeight(1).fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT).maxLines(2);
+          Text(item.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        }.width('100%');
         Text(item.confidence < 0.8 ? '识别置信度较低，请重点确认' : item.sourceEvidence.excerpt)
-          .width('100%')
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT)
-          .maxLines(2);
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
+          .width('100%').fontSize(12).lineHeight(18)
+          .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT).maxLines(2);
+      }.layoutWeight(1).alignItems(HorizontalAlign.Start);
     }
-    .width('100%')
-    .padding(12)
+    .width('100%').padding(this.sizeClass === WindowSizeClass.COMPACT ? 11 : 12)
     .backgroundColor(item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+    .borderRadius(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PHONE_CARD_RADIUS : AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
@@ -301,126 +213,72 @@ export struct HomeworkImportPage {
     Column({ space: 12 }) {
       if (this.sizeClass === WindowSizeClass.COMPACT) {
         Row() {
-          Text('‹ 重新导入')
-            .fontSize(14)
-            .fontColor(AppTheme.PRIMARY)
-            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .padding({ left: 4, right: 8 })
-            .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText('返回重新导入')
+          Text('‹ 重新导入').fontSize(14).fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET }).padding({ left: 4, right: 8 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('返回重新导入')
             .onClick(() => this.showCompactCandidates = false);
           Blank();
-          Text(`${this.candidates().length} 项`)
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%');
+          Text(`${this.candidates().length} 项`).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        }.width('100%');
       }
-
       Column({ space: 4 }) {
-        Text('AI 整理结果')
-          .width('100%')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
+        Text('AI 整理结果').width('100%')
+          .fontSize(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PHONE_SECTION_TITLE_SIZE : AppTheme.SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Text(this.candidates().length > 0 ? '发布前再逐项确认，避免识别错误。' : '整理后，待确认作业会显示在这里。')
-          .width('100%')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start);
-
+          .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+      }.width('100%').alignItems(HorizontalAlign.Start);
       if (this.candidates().length === 0) {
         Column({ space: 8 }) {
-          SymbolGlyph($r('sys.symbol.checkmark_square'))
-            .fontSize(30)
-            .fontColor([AppTheme.TERTIARY_TEXT]);
-          Text('还没有待确认作业')
-            .fontSize(16)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
+          SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
+          Text('还没有待确认作业').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           Text('选择截图或输入老师的作业文字后，小伴会在这里整理结果。')
-            .fontSize(13)
-            .lineHeight(20)
-            .fontColor(AppTheme.SUBTEXT)
-            .textAlign(TextAlign.Center);
-        }
-        .width('100%')
-        .padding({ top: 34, bottom: 34 });
+            .fontSize(13).lineHeight(20).fontColor(AppTheme.SUBTEXT).textAlign(TextAlign.Center);
+        }.width('100%').padding({ top: 34, bottom: 34 });
       } else {
         Column({ space: 7 }) {
-          ForEach(this.candidates(), (item: CandidateAssignment) => {
-            this.CandidateItem(item);
-          }, (item: CandidateAssignment) => item.id);
-        }
-        .width('100%');
-
+          ForEach(this.candidates(), (item: CandidateAssignment) => { this.CandidateItem(item); }, (item: CandidateAssignment) => item.id);
+        }.width('100%');
         Button(`确认 ${this.candidates().length} 项作业`, { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .backgroundColor(AppTheme.PRIMARY)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .onClick(() => this.onOpenConfirmation());
+          .width('100%').height(AppTheme.BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .fontSize(15).fontWeight(FontWeight.Medium).backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY).onClick(() => this.onOpenConfirmation());
       }
-    }
-    .width('100%');
+    }.width('100%');
   }
 
   build() {
-    Column({ space: 14 }) {
-      Column({ space: 4 }) {
+    Column({ space: this.sizeClass === WindowSizeClass.COMPACT ? 10 : 14 }) {
+      Column({ space: 3 }) {
         Text('收作业')
-          .fontSize(AppTheme.PAGE_TITLE_SIZE)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
-        Text('导入老师内容 → 小伴整理 → 家长确认')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start);
-
+          .fontSize(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PHONE_PAGE_TITLE_SIZE : AppTheme.PAGE_TITLE_SIZE)
+          .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+        Text('导入老师内容 → 小伴整理 → 家长确认').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      }.width('100%').alignItems(HorizontalAlign.Start);
       if (this.sizeClass === WindowSizeClass.COMPACT) {
         Scroll() {
-          if (this.showCompactCandidates) {
-            this.CandidatePane();
-          } else {
-            this.SourcePane();
-          }
+          Column() {
+            if (this.showCompactCandidates) {
+              this.CandidatePane();
+            } else {
+              this.SourcePane();
+            }
+          }.width('100%');
         }
-        .width('100%')
-        .layoutWeight(1)
-        .scrollBar(BarState.Off);
+        .width('100%').layoutWeight(1).scrollBar(BarState.Off);
       } else {
         Row({ space: 18 }) {
-          Scroll() {
-            this.SourcePane();
-          }
-          .width(this.sizeClass === WindowSizeClass.EXPANDED ? '44%' : '46%')
-          .height('100%')
-          .scrollBar(BarState.Off);
-
+          Scroll() { this.SourcePane(); }
+            .width(this.sizeClass === WindowSizeClass.EXPANDED ? '44%' : '46%').height('100%').scrollBar(BarState.Off);
           Divider().vertical(true).height('100%').color(AppTheme.DIVIDER);
-
-          Scroll() {
-            this.CandidatePane();
-          }
-          .layoutWeight(1)
-          .height('100%')
-          .scrollBar(BarState.Off);
+          Scroll() { this.CandidatePane(); }.layoutWeight(1).height('100%').scrollBar(BarState.Off);
         }
-        .width('100%')
-        .layoutWeight(1)
-        .alignItems(VerticalAlign.Top);
+        .width('100%').layoutWeight(1).alignItems(VerticalAlign.Top);
       }
     }
-    .width('100%')
-    .height('100%')
-    .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
+    .width('100%').height('100%')
+    .padding(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PHONE_PAGE_PADDING :
+      (this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING))
     .backgroundColor(AppTheme.BACKGROUND)
     .onAppear(() => this.syncDraftFromStore());
   }
