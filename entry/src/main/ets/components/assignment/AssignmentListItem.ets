@@ -7,6 +7,7 @@ export struct AssignmentListItem {
   @Prop assignment: Assignment;
   @Prop selected: boolean = false;
   @Prop showChevron: boolean = true;
+  @Prop interactive: boolean = true;
   onOpen: () => void = () => {};
 
   private statusColor(): string {
@@ -38,6 +39,10 @@ export struct AssignmentListItem {
       return `实际 ${Math.max(1, Math.round(this.assignment.elapsedSeconds / 60))} 分钟`;
     }
     return `预计 ${this.assignment.expectedMinutes} 分钟`;
+  }
+
+  private accessibilityLabel(): string {
+    return `${this.assignment.subject}，${this.assignment.title}，${this.assignment.dueText}，${this.timingText()}，${AssignmentStateMachine.label(this.assignment.status)}`;
   }
 
   build() {
@@ -83,16 +88,25 @@ export struct AssignmentListItem {
           .fontSize(AppTheme.CAPTION_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.statusColor());
-        if (this.showChevron) {
-          Text('›').fontSize(20).fontColor(AppTheme.TERTIARY_TEXT);
+        if (this.showChevron && this.interactive) {
+          SymbolGlyph($r('sys.symbol.chevron_right'))
+            .fontSize(16)
+            .fontColor([AppTheme.TERTIARY_TEXT]);
         }
       }
       .alignItems(HorizontalAlign.End);
     }
     .width('100%')
+    .constraintSize({ minHeight: 60 })
     .padding({ left: 12, right: 12, top: 11, bottom: 11 })
     .backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
     .borderRadius(AppTheme.CONTROL_RADIUS)
-    .onClick(() => this.onOpen());
+    .enabled(this.interactive)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(this.accessibilityLabel())
+    .onClick(() => {
+      if (this.interactive) this.onOpen();
+    });
   }
 }
