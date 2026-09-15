@@ -17,6 +17,7 @@ public final class HomeworkOrganizerDtos {
       String instruction,
       String textbookRef,
       String dueText,
+      int expectedMinutes,
       String sourceExcerpt,
       double confidence) {}
 
