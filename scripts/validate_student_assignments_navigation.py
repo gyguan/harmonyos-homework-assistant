@@ -21,6 +21,7 @@ def require(condition: bool, message: str) -> None:
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
+due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 
 require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell, "student route must include ASSIGNMENTS")
 require("StudentAssignmentsPage" in shell, "AppShell must render StudentAssignmentsPage")
@@ -41,8 +42,28 @@ require("SubjectFilterChip('ALL', '全部')" in page and "SubjectFilterChip(Subj
         "student assignments page must expose all/chinese/math/english filters")
 require("subjectCount(key)" in page and "this.filteredAssignments()" in page,
         "student subject filters must show counts and drive the status sections")
+require("@State private dateFilter: DueDateFilterKey = DueDateFilterKey.ALL" in page,
+        "student assignments page must keep an explicit due-date filter state")
+for token in ["DueDateFilterKey.ALL", "DueDateFilterKey.TODAY", "DueDateFilterKey.TOMORROW",
+              "DueDateFilterKey.THIS_WEEK", "DueDateFilterKey.OVERDUE"]:
+    require(token in page, f"student assignments page missing date filter: {token}")
+require("AssignmentDueDate.matches(item, this.dateFilter)" in page and "matchesSubject(item, this.subjectFilter)" in page,
+        "student assignments must combine subject and due-date filters")
+require("dateCount(key)" in page and "DateFilterBar()" in page and "FilterPanel()" in page,
+        "student due-date filters must show counts in a dedicated filter row")
 require("for (let item of this.filteredAssignments())" in page,
-        "student status grouping must run after subject filtering")
+        "student status grouping must run after subject and date filtering")
+
+require("export enum DueDateFilterKey" in due_date and "export class AssignmentDueDate" in due_date,
+        "a shared assignment due-date normalizer must back both homework lists")
+for phrase in ["今天", "明天", "后天", "周日", "星期天", "月"]:
+    require(phrase in due_date, f"due-date normalizer missing supported expression: {phrase}")
+require("AssignmentStatus.COMPLETED" in due_date and "AssignmentStatus.SUBMITTED" in due_date and
+        "AssignmentStatus.OVERDUE" in due_date,
+        "overdue filtering must respect completed/submitted/overdue assignment states")
+require("dueDay >= today && dueDay <= this.endOfWeek(today)" in due_date,
+        "this-week filtering must use the local week boundary")
+
 require("HomeworkStore.instance.getAssignments()" in today,
         "Today must include overdue assignments instead of filtering them out")
 require("overdueAssignments" in today and "逾期" in today,

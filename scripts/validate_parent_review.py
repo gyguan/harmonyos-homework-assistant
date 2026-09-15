@@ -90,8 +90,18 @@ require("SubjectFilterChip('ALL', '全部')" in parent_progress and
         "parent progress must expose all/chinese/math/english filters")
 require("subjectCount(key)" in parent_progress and "this.filteredAssignments()" in parent_progress,
         "parent subject filters must display counts and drive the progress list")
+require("@State private dateFilter: DueDateFilterKey = DueDateFilterKey.ALL" in parent_progress,
+        "parent progress must keep an explicit due-date filter state")
+for token in ["DueDateFilterKey.ALL", "DueDateFilterKey.TODAY", "DueDateFilterKey.TOMORROW",
+              "DueDateFilterKey.THIS_WEEK", "DueDateFilterKey.OVERDUE"]:
+    require(token in parent_progress, f"parent progress missing date filter: {token}")
+require("AssignmentDueDate.matches(item, this.dateFilter)" in parent_progress and
+        "matchesSubject(item, this.subjectFilter)" in parent_progress,
+        "parent progress must combine subject and due-date filtering")
+require("dateCount(key)" in parent_progress and "DateFilterBar()" in parent_progress and "FilterPanel()" in parent_progress,
+        "parent due-date filters must display counts in a dedicated filter row")
 require("this.AssignmentDetail(this.selectedAssignment()!)" in parent_progress,
-        "subject filtering must not replace or block assignment detail rendering")
+        "subject/date filtering must not replace or block assignment detail rendering")
 
 if errors:
     print("PARENT_REVIEW_GATE_FAIL")

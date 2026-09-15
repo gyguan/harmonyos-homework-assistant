@@ -78,6 +78,7 @@ export interface Assignment {
   instruction: string;
   textbookRef: string;
   dueText: string;
+  dueDateKey?: string;
   status: AssignmentStatus;
   expectedMinutes: number;
   startedAtEpochMs: number;

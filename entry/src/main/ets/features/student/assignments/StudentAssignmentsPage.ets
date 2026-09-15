@@ -3,12 +3,14 @@ import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { Assignment, AssignmentStatus, Subject } from '../../../domain/model/HomeworkModels';
+import { AssignmentDueDate, DueDateFilterKey } from '../../../domain/service/AssignmentDueDate';
 
 @Component
 export struct StudentAssignmentsPage {
   @Prop sizeClass: WindowSizeClass;
   @Prop revision: number = 0;
   @State private subjectFilter: string = 'ALL';
+  @State private dateFilter: DueDateFilterKey = DueDateFilterKey.ALL;
   onOpenStudy: (assignmentId: string) => void = () => {};
 
   private assignments(): Assignment[] {
@@ -16,17 +18,31 @@ export struct StudentAssignmentsPage {
     return HomeworkStore.instance.getAssignments();
   }
 
+  private matchesSubject(item: Assignment, subject: string): boolean {
+    return subject === 'ALL' || item.subject === subject;
+  }
+
   private filteredAssignments(): Assignment[] {
-    if (this.subjectFilter === 'ALL') return this.assignments();
     let result: Assignment[] = [];
-    for (let item of this.assignments()) if (item.subject === this.subjectFilter) result.push(item);
+    for (let item of this.assignments()) {
+      if (this.matchesSubject(item, this.subjectFilter) && AssignmentDueDate.matches(item, this.dateFilter)) result.push(item);
+    }
     return result;
   }
 
   private subjectCount(subject: string): number {
-    if (subject === 'ALL') return this.assignments().length;
     let count = 0;
-    for (let item of this.assignments()) if (item.subject === subject) count++;
+    for (let item of this.assignments()) {
+      if (this.matchesSubject(item, subject) && AssignmentDueDate.matches(item, this.dateFilter)) count++;
+    }
+    return count;
+  }
+
+  private dateCount(dateFilter: DueDateFilterKey): number {
+    let count = 0;
+    for (let item of this.assignments()) {
+      if (this.matchesSubject(item, this.subjectFilter) && AssignmentDueDate.matches(item, dateFilter)) count++;
+    }
     return count;
   }
 
@@ -89,6 +105,42 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
+  private DateFilterChip(key: DueDateFilterKey, label: string) {
+    Text(`${label} ${this.dateCount(key)}`)
+      .layoutWeight(1)
+      .height(36)
+      .textAlign(TextAlign.Center)
+      .fontSize(AppTheme.CAPTION_SIZE)
+      .fontWeight(this.dateFilter === key ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(this.dateFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .padding({ top: 9, bottom: 9 })
+      .backgroundColor(this.dateFilter === key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .onClick(() => this.dateFilter = key);
+  }
+
+  @Builder
+  private DateFilterBar() {
+    Row({ space: 6 }) {
+      this.DateFilterChip(DueDateFilterKey.ALL, '全部');
+      this.DateFilterChip(DueDateFilterKey.TODAY, '今天');
+      this.DateFilterChip(DueDateFilterKey.TOMORROW, '明天');
+      this.DateFilterChip(DueDateFilterKey.THIS_WEEK, '本周');
+      this.DateFilterChip(DueDateFilterKey.OVERDUE, '逾期');
+    }.width('100%');
+  }
+
+  @Builder
+  private FilterPanel() {
+    Column({ space: 7 }) {
+      Text('科目').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+      this.SubjectFilterBar();
+      Text('截止').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+      this.DateFilterBar();
+    }.width('100%');
+  }
+
+  @Builder
   private Task(item: Assignment) {
     Column({ space: 8 }) {
       AssignmentCard({ assignment: item });
@@ -127,11 +179,11 @@ export struct StudentAssignmentsPage {
       Column({ space: AppTheme.SECTION_GAP }) {
         Column({ space: 5 }) {
           Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('先按科目定位，再看需要处理、待开始、已提交和已完成。')
+          Text('按科目和截止日期定位，再看需要处理、待开始、已提交和已完成。')
             .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
         }.width('100%').alignItems(HorizontalAlign.Start);
 
-        this.SubjectFilterBar();
+        this.FilterPanel();
 
         this.Section('需要处理', '正在做、已暂停、需要订正或已经逾期',
           this.inStatuses([AssignmentStatus.IN_PROGRESS, AssignmentStatus.PAUSED,
@@ -142,7 +194,7 @@ export struct StudentAssignmentsPage {
         this.Section('已完成', '家长已经确认完成', this.inStatuses([AssignmentStatus.COMPLETED]));
 
         if (this.filteredAssignments().length === 0) {
-          Text(this.assignments().length === 0 ? '暂时没有作业' : '这个科目暂时没有作业')
+          Text(this.assignments().length === 0 ? '暂时没有作业' : '当前科目和日期下暂时没有作业')
             .width('100%').padding(AppTheme.CARD_PADDING)
             .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT)
             .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
