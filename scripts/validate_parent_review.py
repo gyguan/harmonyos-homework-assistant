@@ -34,6 +34,7 @@ remote_submission_cache = read("entry/src/main/ets/application/remote/RemoteSubm
 parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 assignment_card = read("entry/src/main/ets/components/assignment/AssignmentCard.ets")
+assignment_list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
 
 require("review_note" in migration, "V5 migration must persist parent review note")
@@ -58,12 +59,16 @@ require("this.onStoreChanged();" in parent_progress,
 require("ParentProgressPage({" in app_shell and "onStoreChanged: () => this.touchStore()" in app_shell,
         "AppShell must wire ParentProgressPage store changes back to the shell revision")
 require("家长订正说明" in assignment_card and "reviewNote" in assignment_card,
-        "student assignment list must show parent correction note")
+        "student assignment card must show parent correction note")
 require("家长请你订正" in countdown and "reviewNote" in countdown,
         "student study view must show parent correction note")
 
-for phrase in ["查看详情", "编辑任务", "保存修改", "删除任务", "确认删除"]:
+for phrase in ["编辑任务", "保存修改", "删除任务", "确认删除"]:
     require(phrase in parent_progress, f"parent assignment management missing action: {phrase}")
+require("AssignmentListItem" in parent_progress and "onOpen: () => this.openDetail(item)" in parent_progress,
+        "parent progress must open details by tapping the whole assignment row")
+require("export struct AssignmentListItem" in assignment_list_item,
+        "shared native assignment list item must exist")
 require("syncDirty: true" in parent_progress and "replaceAssignmentsForActiveStudent(next)" in parent_progress,
         "published assignment edits must persist locally and enter the existing sync pipeline")
 require("BackendSession.instance.isConnected()" in parent_progress and "HomeworkRemoteApi.instance.delete(item.id)" in parent_progress,
@@ -83,12 +88,12 @@ require("void delete(String storagePath)" in file_storage,
 
 require("@State private subjectFilter: string = 'ALL'" in parent_progress and "filteredAssignments()" in parent_progress,
         "parent progress must keep an explicit subject filter state")
-require("SubjectFilterChip('ALL', '全部')" in parent_progress and
-        "SubjectFilterChip(Subject.CHINESE, '语文')" in parent_progress and
-        "SubjectFilterChip(Subject.MATH, '数学')" in parent_progress and
-        "SubjectFilterChip(Subject.ENGLISH, '英语')" in parent_progress,
+require("SubjectTab('ALL', '全部')" in parent_progress and
+        "SubjectTab(Subject.CHINESE, '语文')" in parent_progress and
+        "SubjectTab(Subject.MATH, '数学')" in parent_progress and
+        "SubjectTab(Subject.ENGLISH, '英语')" in parent_progress,
         "parent progress must expose all/chinese/math/english filters")
-require("subjectCount(key)" in parent_progress and "this.filteredAssignments()" in parent_progress,
+require("this.subjectCount(key)" in parent_progress and "this.filteredAssignments()" in parent_progress,
         "parent subject filters must display counts and drive the progress list")
 require("@State private dateFilter: DueDateFilterKey = DueDateFilterKey.ALL" in parent_progress,
         "parent progress must keep an explicit due-date filter state")
@@ -98,8 +103,11 @@ for token in ["DueDateFilterKey.ALL", "DueDateFilterKey.TODAY", "DueDateFilterKe
 require("AssignmentDueDate.matches(item, this.dateFilter)" in parent_progress and
         "matchesSubject(item, this.subjectFilter)" in parent_progress,
         "parent progress must combine subject and due-date filtering")
-require("dateCount(key)" in parent_progress and "DateFilterBar()" in parent_progress and "FilterPanel()" in parent_progress,
-        "parent due-date filters must display counts in a dedicated filter row")
+require("this.dateCount(key)" in parent_progress and "private DateTab(" in parent_progress and "private FilterPanel()" in parent_progress,
+        "parent due-date filters must display counts in a dedicated lightweight filter row")
+require("private PhoneLayout()" in parent_progress and "private PadLayout()" in parent_progress and
+        "this.sizeClass === WindowSizeClass.COMPACT" in parent_progress,
+        "parent progress must use phone detail navigation and pad list-detail layout")
 require("this.AssignmentDetail(this.selectedAssignment()!)" in parent_progress,
         "subject/date filtering must not replace or block assignment detail rendering")
 
