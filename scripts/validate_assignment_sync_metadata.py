@@ -23,6 +23,7 @@ store = read("entry/src/main/ets/data/HomeworkStore.ets")
 mapper = read("entry/src/main/ets/application/remote/RemoteModels.ets")
 sync = read("entry/src/main/ets/application/remote/HomeworkSyncService.ets")
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
+controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 
 for field in ("remoteVersion: number", "syncDirty: boolean", "lastSyncedAtEpochMs: number"):
     require(field in models, f"Assignment must persist client sync field: {field}")
@@ -48,12 +49,20 @@ require("lastSyncedAtEpochMs: Date.now()" in mapper,
 require("observedVersions" not in sync,
         "HomeworkSyncService must not keep process-local observedVersions")
 require("assignment.syncDirty && assignment.remoteVersion === existing.version" in sync,
-        "server PATCH must require dirty local state and an exact version match")
+        "server update must require dirty local state and an exact version match")
 require("HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion)" in sync,
-        "PATCH must use the assignment's persisted remoteVersion")
+        "remote update must use the assignment's persisted remoteVersion")
 require("RemoteAssignmentMapper.toLocal" in sync and "replaceAssignmentsForActiveStudent(merged)" in sync,
         "final server refresh must remain authoritative after sync/conflict")
 
+require("http.RequestMethod.PUT" in remote_api,
+        "HarmonyOS assignment updates must use PUT for compatibleSdk 6.0.0(20)")
+require("http.RequestMethod.PATCH" not in remote_api,
+        "HarmonyOS client must not use PATCH because RequestMethod.PATCH requires SDK 26")
+require("@PutMapping(\"/assignments/{id}\")" in controller,
+        "backend must expose PUT for the compatible HarmonyOS client")
+require("@PatchMapping(\"/assignments/{id}\")" in controller,
+        "backend must retain the existing PATCH update endpoint")
 require("remoteVersion" not in remote_api and "syncDirty" not in remote_api and "lastSyncedAtEpochMs" not in remote_api,
         "client sync metadata must never be sent as backend assignment fields")
 
