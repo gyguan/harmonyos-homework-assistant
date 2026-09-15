@@ -53,6 +53,7 @@ export class MockData {
       startedAtEpochMs: Date.now() - 5 * 60 * 1000,
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
+      reviewNote: '',
       resourceLabels: ['讲解视频 03:24', '练习说明 PDF']
     },
     {
@@ -69,6 +70,7 @@ export class MockData {
       startedAtEpochMs: Date.now() - 18 * 60 * 1000,
       finishedAtEpochMs: Date.now() - 4 * 60 * 1000,
       elapsedSeconds: 14 * 60,
+      reviewNote: '朗读很认真，明天继续保持。',
       resourceLabels: ['老师示范音频']
     },
     {
@@ -85,6 +87,7 @@ export class MockData {
       startedAtEpochMs: 0,
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
+      reviewNote: '',
       resourceLabels: ['课文音频']
     },
     {
@@ -101,6 +104,7 @@ export class MockData {
       startedAtEpochMs: 0,
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
+      reviewNote: '',
       resourceLabels: []
     },
     {
@@ -117,6 +121,7 @@ export class MockData {
       startedAtEpochMs: 0,
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
+      reviewNote: '',
       resourceLabels: []
     },
     {
@@ -133,6 +138,7 @@ export class MockData {
       startedAtEpochMs: 0,
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
+      reviewNote: '',
       resourceLabels: []
     }
   ];
@@ -146,6 +152,7 @@ export class MockData {
   static readonly dashboard: DashboardSummary = {
     completed: 1,
     inProgress: 1,
+    paused: 0,
     notStarted: 1,
     overdue: 1,
     readyToSubmit: 0,
