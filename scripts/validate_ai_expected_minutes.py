@@ -40,7 +40,8 @@ require("expectedMinutes: this.expectedMinutes(remote.expectedMinutes)" in remot
         "HarmonyOS candidate must use AI suggested duration rather than hard-coded 20")
 require("return Math.max(5, Math.min(120" in remote,
         "HarmonyOS must defensively bound provider duration")
-require("updateExpectedMinutes" in confirmation and "预计完成时间" in confirmation,
+require("updateExpectedMinutes" in confirmation and
+        ("预计完成时间" in confirmation or "预计用时" in confirmation),
         "parent confirmation must keep manual duration override")
 require("expectedMinutes: candidate.expectedMinutes" in store,
         "published assignment must keep the parent-confirmed duration")
