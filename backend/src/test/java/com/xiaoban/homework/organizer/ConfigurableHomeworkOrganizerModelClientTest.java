@@ -37,8 +37,21 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void schemaKeepsAssignmentsRoot() {
+  void instructionsRequestGradeAwareFocusedDurationEstimate() {
+    String instructions = ConfigurableHomeworkOrganizerModelClient.instructions();
+    assertTrue(instructions.contains("expectedMinutes"));
+    assertTrue(instructions.contains("学生年级"));
+    assertTrue(instructions.contains("5 到 120 分钟"));
+    assertTrue(instructions.contains("不包含休息"));
+  }
+
+  @Test
+  void schemaKeepsAssignmentsRootAndBoundedExpectedMinutes() {
+    String schema = ConfigurableHomeworkOrganizerModelClient.structuredSchema().toString();
     assertTrue(ConfigurableHomeworkOrganizerModelClient.structuredSchema().containsKey("properties"));
-    assertTrue(ConfigurableHomeworkOrganizerModelClient.structuredSchema().toString().contains("assignments"));
+    assertTrue(schema.contains("assignments"));
+    assertTrue(schema.contains("expectedMinutes"));
+    assertTrue(schema.contains("minimum=5"));
+    assertTrue(schema.contains("maximum=120"));
   }
 }
