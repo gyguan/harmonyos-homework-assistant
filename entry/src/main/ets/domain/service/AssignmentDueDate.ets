@@ -13,16 +13,19 @@ export class AssignmentDueDate {
     if (filter === DueDateFilterKey.ALL) return true;
     if (filter === DueDateFilterKey.OVERDUE) return this.isOverdue(item, nowEpochMs);
 
-    let dueDay = this.resolveDayStart(item.dueText, nowEpochMs);
+    let dueDay = this.assignmentDayStart(item, nowEpochMs);
     if (dueDay < 0) return false;
 
     let today = this.startOfDay(nowEpochMs);
     if (filter === DueDateFilterKey.TODAY) return dueDay === today;
     if (filter === DueDateFilterKey.TOMORROW) return dueDay === this.addDays(today, 1);
-    if (filter === DueDateFilterKey.THIS_WEEK) {
-      return dueDay >= today && dueDay <= this.endOfWeek(today);
-    }
+    if (filter === DueDateFilterKey.THIS_WEEK) return dueDay >= today && dueDay <= this.endOfWeek(today);
     return false;
+  }
+
+  static resolveDateKey(dueText: string, nowEpochMs: number = Date.now()): string {
+    let dayStart = this.resolveDayStart(dueText, nowEpochMs);
+    return dayStart < 0 ? '' : this.formatDateKey(dayStart);
   }
 
   static resolveDayStart(dueText: string, nowEpochMs: number = Date.now()): number {
@@ -68,10 +71,19 @@ export class AssignmentDueDate {
     return -1;
   }
 
+  private static assignmentDayStart(item: Assignment, nowEpochMs: number): number {
+    let key = item.dueDateKey;
+    if (key !== undefined && key.length > 0) {
+      let frozen = this.dayStartFromKey(key);
+      if (frozen >= 0) return frozen;
+    }
+    return this.resolveDayStart(item.dueText, nowEpochMs);
+  }
+
   private static isOverdue(item: Assignment, nowEpochMs: number): boolean {
     if (item.status === AssignmentStatus.COMPLETED || item.status === AssignmentStatus.SUBMITTED) return false;
     if (item.status === AssignmentStatus.OVERDUE) return true;
-    let dueDay = this.resolveDayStart(item.dueText, nowEpochMs);
+    let dueDay = this.assignmentDayStart(item, nowEpochMs);
     return dueDay >= 0 && dueDay < this.startOfDay(nowEpochMs);
   }
 
@@ -99,6 +111,21 @@ export class AssignmentDueDate {
     let weekday = new Date(todayStart).getDay();
     let mondayBased = weekday === 0 ? 7 : weekday;
     return this.addDays(todayStart, 7 - mondayBased);
+  }
+
+  private static dayStartFromKey(key: string): number {
+    let match = key.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (match === null || match.length < 4) return -1;
+    return this.dateStart(Number(match[1]), Number(match[2]), Number(match[3]));
+  }
+
+  private static formatDateKey(dayStart: number): string {
+    let value = new Date(dayStart);
+    let month = value.getMonth() + 1;
+    let day = value.getDate();
+    let monthText = month < 10 ? `0${month}` : `${month}`;
+    let dayText = day < 10 ? `0${day}` : `${day}`;
+    return `${value.getFullYear()}-${monthText}-${dayText}`;
   }
 
   private static dateStart(year: number, month: number, day: number): number {
