@@ -23,6 +23,7 @@ export struct BackendConnectionPage {
   @State private editSemester: string = '';
   @State private editTextbooks: string = '';
   @State private cloudPanelOpen: boolean = false;
+  @State private deleteStudentConfirmId: string = '';
   onStoreChanged: () => void = () => {};
 
   aboutToAppear(): void {
@@ -89,6 +90,7 @@ export struct BackendConnectionPage {
   }
 
   private beginAdd(): void {
+    this.deleteStudentConfirmId = '';
     this.editingId = `student-${Date.now()}`;
     this.editName = '';
     this.editGrade = '';
@@ -98,6 +100,7 @@ export struct BackendConnectionPage {
   }
 
   private beginEdit(student: StudentProfile): void {
+    this.deleteStudentConfirmId = '';
     this.editingId = student.id;
     this.editName = student.name;
     this.editGrade = student.grade;
@@ -106,7 +109,10 @@ export struct BackendConnectionPage {
     this.editTextbooks = student.textbookSummary;
   }
 
-  private cancelEdit(): void { this.editingId = ''; }
+  private cancelEdit(): void {
+    this.deleteStudentConfirmId = '';
+    this.editingId = '';
+  }
 
   private editingExistingStudent(): boolean {
     for (let student of this.students()) {
@@ -130,6 +136,7 @@ export struct BackendConnectionPage {
     };
     if (await FamilyCloudService.instance.saveStudent(student)) {
       this.editingId = '';
+      this.deleteStudentConfirmId = '';
       this.pageRevision++;
       this.message = '孩子资料已保存并同步';
       this.onStoreChanged();
@@ -142,10 +149,12 @@ export struct BackendConnectionPage {
   private async deleteStudent(studentId: string): Promise<void> {
     if (await FamilyCloudService.instance.deleteStudent(studentId)) {
       this.editingId = '';
+      this.deleteStudentConfirmId = '';
       this.pageRevision++;
       this.message = '孩子资料已删除';
       this.onStoreChanged();
     } else {
+      this.deleteStudentConfirmId = '';
       this.message = '删除失败：已有作业的孩子或家庭最后一个孩子不能直接删除';
     }
   }
@@ -209,8 +218,12 @@ export struct BackendConnectionPage {
             .fontColor(AppTheme.TEXT);
           Blank();
           Text('取消')
+            .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
             .fontSize(13)
             .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('取消编辑孩子资料')
             .onClick(() => this.cancelEdit());
         }
         .width('100%');
@@ -221,21 +234,41 @@ export struct BackendConnectionPage {
           .backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.editName = value);
-        Row({ space: 8 }) {
-          TextInput({ placeholder: '年级，如 三年级', text: this.editGrade })
-            .layoutWeight(1)
-            .height(AppTheme.INPUT_HEIGHT)
-            .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.editGrade = value);
-          TextInput({ placeholder: '班级，如 三（2）班', text: this.editClassName })
-            .layoutWeight(1)
-            .height(AppTheme.INPUT_HEIGHT)
-            .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.editClassName = value);
+
+        if (this.sizeClass === WindowSizeClass.COMPACT) {
+          Column({ space: 8 }) {
+            TextInput({ placeholder: '年级，如 三年级', text: this.editGrade })
+              .width('100%')
+              .height(AppTheme.INPUT_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .onChange((value: string) => this.editGrade = value);
+            TextInput({ placeholder: '班级，如 三（2）班', text: this.editClassName })
+              .width('100%')
+              .height(AppTheme.INPUT_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .onChange((value: string) => this.editClassName = value);
+          }
+          .width('100%');
+        } else {
+          Row({ space: 8 }) {
+            TextInput({ placeholder: '年级，如 三年级', text: this.editGrade })
+              .layoutWeight(1)
+              .height(AppTheme.INPUT_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .onChange((value: string) => this.editGrade = value);
+            TextInput({ placeholder: '班级，如 三（2）班', text: this.editClassName })
+              .layoutWeight(1)
+              .height(AppTheme.INPUT_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .onChange((value: string) => this.editClassName = value);
+          }
+          .width('100%');
         }
-        .width('100%');
+
         TextInput({ placeholder: '学期', text: this.editSemester })
           .width('100%')
           .height(AppTheme.INPUT_HEIGHT)
@@ -249,25 +282,61 @@ export struct BackendConnectionPage {
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.editTextbooks = value);
 
-        Row({ space: 8 }) {
-          if (this.editingExistingStudent()) {
-            Button('删除', { type: ButtonType.Normal })
-              .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .padding({ left: 18, right: 18 })
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .backgroundColor(AppTheme.DANGER_SOFT)
-              .fontColor(AppTheme.DANGER)
-              .onClick(() => { void this.deleteStudent(this.editingId); });
+        if (this.deleteStudentConfirmId === this.editingId) {
+          Column({ space: 8 }) {
+            Text('确认删除这个孩子？')
+              .width('100%')
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.DANGER);
+            Text('删除家庭成员属于高风险操作。已有作业的孩子或家庭最后一个孩子仍会被服务端拒绝删除。')
+              .width('100%')
+              .fontSize(12)
+              .lineHeight(18)
+              .fontColor(AppTheme.SUBTEXT);
+            Row({ space: 8 }) {
+              Button('取消删除', { type: ButtonType.Normal })
+                .layoutWeight(1)
+                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                .fontColor(AppTheme.TEXT)
+                .onClick(() => this.deleteStudentConfirmId = '');
+              Button('确认删除', { type: ButtonType.Normal })
+                .layoutWeight(1)
+                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.DANGER)
+                .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => { void this.deleteStudent(this.editingId); });
+            }
+            .width('100%');
           }
-          Button('保存', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.PRIMARY)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .onClick(() => { void this.saveStudent(); });
+          .width('100%')
+          .padding(12)
+          .backgroundColor(AppTheme.DANGER_SOFT)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+        } else {
+          Row({ space: 8 }) {
+            if (this.editingExistingStudent()) {
+              Button('删除', { type: ButtonType.Normal })
+                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .padding({ left: 18, right: 18 })
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.DANGER_SOFT)
+                .fontColor(AppTheme.DANGER)
+                .onClick(() => this.deleteStudentConfirmId = this.editingId);
+            }
+            Button('保存', { type: ButtonType.Normal })
+              .layoutWeight(1)
+              .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .backgroundColor(AppTheme.PRIMARY)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .onClick(() => { void this.saveStudent(); });
+          }
+          .width('100%');
         }
-        .width('100%');
       }
       .width('100%')
       .padding(14)
@@ -309,7 +378,11 @@ export struct BackendConnectionPage {
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%')
+        .constraintSize({ minHeight: 60 })
         .padding({ top: 12, bottom: 12 })
+        .accessibilityGroup(true)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(`${student.name}，${student.grade}，${student.className}，编辑资料`)
         .onClick(() => this.beginEdit(student));
         Divider().color(AppTheme.DIVIDER);
       }, (student: StudentProfile) => student.id);
@@ -325,7 +398,11 @@ export struct BackendConnectionPage {
             .fontColor(AppTheme.PRIMARY);
         }
         .width('100%')
+        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
         .padding({ top: 13, bottom: 13 })
+        .accessibilityGroup(true)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('添加孩子')
         .onClick(() => this.beginAdd());
       } else {
         Text('连接家庭云端后可新增或修改家庭成员。')
@@ -380,7 +457,11 @@ export struct BackendConnectionPage {
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%')
+      .constraintSize({ minHeight: 52 })
       .padding({ top: 12, bottom: 12 })
+      .accessibilityGroup(true)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.cloudPanelOpen ? '家庭云端，已展开，点击收起' : '家庭云端，点击展开高级连接设置')
       .onClick(() => this.cloudPanelOpen = !this.cloudPanelOpen);
 
       if (this.cloudPanelOpen) {
