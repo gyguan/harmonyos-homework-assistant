@@ -1,6 +1,6 @@
-# 小伴作业 Backend V0.1
+# 小伴作业 Backend V0.2
 
-一个 Spring Boot 模块化单体：家庭/账号/孩子、已确认作业、提交照片，以及后续 Tutor 的服务端入口。第一阶段只使用 Spring Boot + PostgreSQL；不使用 Redis、MQ、网关、工作流或微服务。
+一个 Spring Boot 模块化单体，为家庭提供孩子资料、已确认作业、提交记录和 AI Tutor 的云端能力。继续坚持简单架构：一个 Spring Boot、一个 PostgreSQL，不使用 Redis、MQ、API Gateway、微服务或工作流引擎。
 
 ## 本地启动
 
@@ -11,46 +11,65 @@ docker compose -f backend/docker-compose.yml up -d
 ```
 
 ```powershell
+cd backend; mvn test
+```
+
+```powershell
 cd backend; mvn spring-boot:run
 ```
 
-默认开发账号：`parent / parent123`。部署环境必须通过 `BOOTSTRAP_PASSWORD` 修改密码，或设置 `BOOTSTRAP_ENABLED=false`。
-
-## 最小验证
+健康检查：
 
 ```powershell
 curl http://localhost:8080/api/v1/health
 ```
 
-登录：
+默认开发账号：`parent / parent123`。部署环境必须通过 `BOOTSTRAP_PASSWORD` 修改密码，或设置 `BOOTSTRAP_ENABLED=false`。
 
-```powershell
-curl -X POST http://localhost:8080/api/v1/auth/login -H "Content-Type: application/json" -d "{\"loginName\":\"parent\",\"password\":\"parent123\"}"
-```
+## 配置
 
-拿到 token 后，其余 API 均带 `Authorization: Bearer <token>`。
+- `DB_URL` / `DB_USERNAME` / `DB_PASSWORD`：PostgreSQL。
+- `AUTH_TOKEN_TTL_HOURS`：登录会话有效期，默认 168 小时。随机 Bearer token 保存于 PostgreSQL，后端重启后仍有效。
+- `APP_STORAGE_ROOT`：作业照片目录，默认 `./data/uploads`。
+- `OPENAI_API_KEY`：可选。未配置时 Tutor 明确降级，作业主流程不受影响。
+- `OPENAI_MODEL`：Tutor 模型，默认 `gpt-5.6-luna`。
+- `OPENAI_BASE_URL`：默认 `https://api.openai.com`。
 
-## HarmonyOS 端验证
+## 数据与 API 边界
 
-1. 启动 PostgreSQL 和 backend。
-2. DevEco 运行 App，入口选择“家长”。
-3. 打开“我的 → 云端连接”。
-4. 服务地址填写运行 backend 的电脑局域网地址，例如 `http://192.168.1.10:8080`；不要把手机/模拟器里的 `localhost` 当作电脑。
-5. 使用默认开发账号登录并同步当前孩子。
-6. 在“导入”中录入真实老师作业并确认发布；只有确认发布后的 Assignment 会上传，内置演示作业不会上传。
-7. 切换另一个孩子，确认两个孩子的云端作业仍然隔离。
-8. 学生提交真实作业照片后，本地提交立即成功；已连接云端时照片会异步镜像到 backend。
+端侧继续负责 OCR、老师消息解析、Candidate 家长确认；只有确认发布后的 Assignment 进入云端。
 
-## V0.1 同步策略
+核心 API：
 
-- UI 始终读取本地 `HomeworkStore`，网络不可用时保留已有本地数据。
-- 第一次连接或 App 进程重启后的首次对账，服务端已有 Assignment 优先，避免旧设备覆盖其他设备的新数据。
-- 同一 App 进程已观察过远端 `version` 后，本地更新只有在远端版本未变化时才允许 PATCH；否则重新拉取服务端数据。
-- 当前不做离线写队列、三方合并、CRDT 或事件总线；这些只有真实使用证明有必要时再增加。
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/session`
+- `POST /api/v1/auth/logout`
+- `GET /api/v1/students`
+- `PUT /api/v1/students`
+- `DELETE /api/v1/students/{id}`
+- `GET/POST /api/v1/students/{studentId}/assignments`
+- `PATCH /api/v1/assignments/{id}`
+- `GET/POST /api/v1/assignments/{id}/submissions`
+- `GET /api/v1/submission-photos/{photoId}`
+- `GET /api/v1/assignments/{id}/tutor`
+- `POST /api/v1/assignments/{id}/tutor/messages`
 
-## 当前边界
+## AI Tutor
 
-- OCR、老师消息解析、Candidate 家长确认继续留在 HarmonyOS 端。
-- RawImport / Candidate 不上传服务器。
-- 照片通过 `FileStorage` 接口保存，V0.1 默认落 backend 本机目录 `./data/uploads`，以后可无侵入替换成对象存储。
-- Bearer token 当前保存在服务进程内，backend 重启后重新登录；暂不引入 Redis 或复杂认证基础设施。
+Tutor 链路保持简单：`TutorController → TutorService → TutorModelClient → OpenAI Responses API`。Prompt、API Key 和模型选择都只在服务端；HarmonyOS App 不包含服务商凭证。
+
+对话历史由本项目 PostgreSQL 的 `tutor_session/tutor_message` 保存。调用 Responses API 时固定 `store=false`，不依赖服务商保存会话状态。默认策略是提示优先；未允许直接答案时，不输出可直接抄写的完整答案或作文成品。
+
+## 同步语义
+
+- HarmonyOS 本地 Store 仍是 UI 的缓存和离线读取来源。
+- 服务端是跨设备共享数据源。
+- 首次重连或没有已观察到远端版本时，服务端数据优先；不做 CRDT/复杂离线合并。
+- Demo/seed Assignment 不自动上传，只有家长确认发布后的真实 Assignment 自动进入云端。
+- 同设备提交保留本地照片预览；另一设备同步时显示云端提交元数据。云端照片下载端点仍要求 Bearer 鉴权，不为了图片预览暴露公开 URL。
+
+## HarmonyOS 端
+
+家长进入“我的”可配置后端地址、登录、同步、新增/编辑/删除孩子。登录 token 保存在 App 私有 Preferences，启动时自动恢复并向 `/auth/session` 校验。
+
+学生进入真实云端 Assignment 后，“问小伴”会读取/继续服务端 Tutor 对话。没有网络、未登录或模型未配置时，Tutor 只显示降级提示，作业查看、完成和本地提交仍然可用。

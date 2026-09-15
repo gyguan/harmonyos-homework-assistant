@@ -1,5 +1,6 @@
 package com.xiaoban.homework.student;
 
+import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.common.ApiExceptions;
 import java.time.Instant;
 import java.util.List;
@@ -10,7 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class StudentService {
   private final StudentRepository repository;
-  public StudentService(StudentRepository repository) { this.repository = repository; }
+  private final AssignmentRepository assignments;
+  public StudentService(StudentRepository repository, AssignmentRepository assignments) {
+    this.repository = repository; this.assignments = assignments;
+  }
 
   @Transactional(readOnly = true)
   public List<StudentDtos.Response> list(UUID familyId) {
@@ -27,6 +31,16 @@ public class StudentService {
     entity.className = input.className(); entity.semester = input.semester();
     entity.textbookSummary = input.textbookSummary() == null ? "" : input.textbookSummary(); entity.updatedAt = now;
     return StudentDtos.Response.from(repository.save(entity));
+  }
+
+  @Transactional
+  public void delete(UUID familyId, String id) {
+    StudentEntity student = requireOwned(familyId, id);
+    if (repository.countByFamilyId(familyId) <= 1) throw new ApiExceptions.Conflict("家庭至少保留一个孩子");
+    if (assignments.existsByFamilyIdAndStudentId(familyId, id)) {
+      throw new ApiExceptions.Conflict("该孩子已有作业记录，不能直接删除；可先保留资料或清理作业后再删除");
+    }
+    repository.delete(student);
   }
 
   @Transactional(readOnly = true)

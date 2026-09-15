@@ -28,6 +28,11 @@ app:
     password: ${BOOTSTRAP_PASSWORD:parent123}
     family-name: ${BOOTSTRAP_FAMILY_NAME:我的家庭}
   auth:
-    token-ttl-hours: ${AUTH_TOKEN_TTL_HOURS:24}
+    token-ttl-hours: ${AUTH_TOKEN_TTL_HOURS:168}
   storage:
     root: ${APP_STORAGE_ROOT:./data/uploads}
+  tutor:
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      model: ${OPENAI_MODEL:gpt-5.6-luna}
+      base-url: ${OPENAI_BASE_URL:https://api.openai.com}

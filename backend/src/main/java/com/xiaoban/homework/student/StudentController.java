@@ -4,7 +4,9 @@ import com.xiaoban.homework.auth.AuthInterceptor;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,4 +25,9 @@ public class StudentController {
   @PutMapping
   public StudentDtos.Response upsert(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @Valid @RequestBody StudentDtos.Upsert input) { return service.upsert(familyId, input); }
+
+  @DeleteMapping("/{id}")
+  public void delete(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String id) {
+    service.delete(familyId, id);
+  }
 }

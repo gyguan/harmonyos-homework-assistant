@@ -3,13 +3,13 @@ import { Assignment } from '../../domain/model/HomeworkModels';
 import { BackendSession } from './BackendSession';
 import { HomeworkRemoteApi } from './HomeworkRemoteApi';
 import { RemoteAssignment, RemoteAssignmentMapper } from './RemoteModels';
+import { RemoteSubmissionApi } from './RemoteSubmissionApi';
+import { RemoteSubmissionCache } from './RemoteSubmissionCache';
 
 export class HomeworkSyncService {
   static readonly instance: HomeworkSyncService = new HomeworkSyncService();
   private running: boolean = false;
   private requested: boolean = false;
-  // Sync metadata deliberately stays outside the domain model. If this app process has never
-  // observed a server version for an assignment, the server wins on first reconciliation.
   private observedVersions: Map<string, number> = new Map<string, number>();
   private constructor() {}
 
@@ -40,14 +40,14 @@ export class HomeworkSyncService {
         }
 
         let lastObserved = this.observedVersions.get(assignment.id);
-        // Only write when this process is still based on the same remote version it saw before.
-        // A missing/mismatched version means another device may be newer, so server data wins.
+        // Missing or stale sync metadata means the server wins. This is intentionally conservative:
+        // V0.x does not attempt CRDT/offline conflict merging.
         if (lastObserved !== undefined && lastObserved === existing.version) {
           try {
             let updated = await HomeworkRemoteApi.instance.update(assignment, lastObserved);
             this.observedVersions.set(updated.id, updated.version);
           } catch {
-            // A 409 or transient write failure is resolved by the final server refresh below.
+            // 409/transient failures are reconciled by the final server refresh.
           }
         }
       }
@@ -57,6 +57,11 @@ export class HomeworkSyncService {
       for (let item of finalRemote) {
         this.observedVersions.set(item.id, item.version);
         merged.push(RemoteAssignmentMapper.toLocal(item, HomeworkStore.instance.getAssignment(item.id)));
+        try {
+          RemoteSubmissionCache.instance.replace(item.id, await RemoteSubmissionApi.instance.list(item.id));
+        } catch {
+          // Submission metadata sync is best-effort and must never block homework sync.
+        }
       }
       HomeworkStore.instance.replaceAssignmentsForActiveStudent(merged);
       return true;

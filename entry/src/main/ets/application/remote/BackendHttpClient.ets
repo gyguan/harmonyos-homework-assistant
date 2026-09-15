@@ -23,6 +23,7 @@ export class BackendHttpClient {
       let options: http.HttpRequestOptions = { method: method, header: headers };
       if (body !== null) options.extraData = JSON.stringify(body);
       let response = await client.request(session.getBaseUrl() + path, options);
+      if (authenticated && response.responseCode === 401) session.disconnect();
       let text = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
       return { statusCode: response.responseCode, body: text };
     } finally {
