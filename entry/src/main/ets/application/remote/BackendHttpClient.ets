@@ -26,6 +26,8 @@ export class BackendHttpClient {
       if (authenticated && response.responseCode === 401) session.disconnect();
       let text = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
       return { statusCode: response.responseCode, body: text };
+    } catch {
+      throw new Error('后端请求失败，请检查网络或后端地址');
     } finally {
       try { client.destroy(); } catch {}
     }
