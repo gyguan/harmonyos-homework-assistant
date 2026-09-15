@@ -15,6 +15,7 @@ interface RemoteCandidate {
   instruction: string;
   textbookRef: string;
   dueText: string;
+  expectedMinutes: number;
   sourceExcerpt: string;
   confidence: number;
 }
@@ -64,7 +65,7 @@ export class HomeworkOrganizerRemoteApi {
           instruction: this.value(remote.instruction, remote.title),
           textbookRef: this.value(remote.textbookRef, '待家长确认'),
           dueText: this.value(remote.dueText, '今天'),
-          expectedMinutes: 20,
+          expectedMinutes: this.expectedMinutes(remote.expectedMinutes),
           sourceEvidence: {
             sourceLabel: input.sourceLabel,
             excerpt: this.value(remote.sourceExcerpt, remote.title)
@@ -83,6 +84,11 @@ export class HomeworkOrganizerRemoteApi {
     if (value === Subject.MATH) return Subject.MATH;
     if (value === Subject.ENGLISH) return Subject.ENGLISH;
     return null;
+  }
+
+  private expectedMinutes(value: number): number {
+    if (!Number.isFinite(value) || value <= 0) return 20;
+    return Math.max(5, Math.min(120, Math.round(value)));
   }
 
   private value(value: string, fallback: string): string {
