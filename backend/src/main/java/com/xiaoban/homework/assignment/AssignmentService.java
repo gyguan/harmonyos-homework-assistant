@@ -36,6 +36,7 @@ public class AssignmentService {
     e.startedAtEpochMs = nonNegative(input.startedAtEpochMs());
     e.finishedAtEpochMs = nonNegative(input.finishedAtEpochMs());
     e.elapsedSeconds = nonNegative(input.elapsedSeconds());
+    e.reviewNote = text(input.reviewNote());
     if ("IN_PROGRESS".equals(e.status)) {
       pauseOtherActive(familyId, studentId, e.id, nowMs);
       if (e.startedAtEpochMs == 0) e.startedAtEpochMs = nowMs;
@@ -71,6 +72,7 @@ public class AssignmentService {
     if (input.startedAtEpochMs() != null) e.startedAtEpochMs = nonNegative(input.startedAtEpochMs());
     if (input.finishedAtEpochMs() != null) e.finishedAtEpochMs = nonNegative(input.finishedAtEpochMs());
     if (input.elapsedSeconds() != null) e.elapsedSeconds = nonNegative(input.elapsedSeconds());
+    if (input.reviewNote() != null) e.reviewNote = input.reviewNote();
 
     long nowMs = System.currentTimeMillis();
     if (!"IN_PROGRESS".equals(previousStatus) && "IN_PROGRESS".equals(e.status)) {
