@@ -34,6 +34,15 @@ require("已提交 · 待家长验收" in page and "已完成" in page,
         "student assignments page must keep submitted/completed homework visible")
 require("this.onOpenStudy(item.id)" in page,
         "student assignments page must open the selected task by id")
+require("@State private subjectFilter: string = 'ALL'" in page and "filteredAssignments()" in page,
+        "student assignments page must keep an explicit subject filter state")
+require("SubjectFilterChip('ALL', '全部')" in page and "SubjectFilterChip(Subject.CHINESE, '语文')" in page and
+        "SubjectFilterChip(Subject.MATH, '数学')" in page and "SubjectFilterChip(Subject.ENGLISH, '英语')" in page,
+        "student assignments page must expose all/chinese/math/english filters")
+require("subjectCount(key)" in page and "this.filteredAssignments()" in page,
+        "student subject filters must show counts and drive the status sections")
+require("for (let item of this.filteredAssignments())" in page,
+        "student status grouping must run after subject filtering")
 require("HomeworkStore.instance.getAssignments()" in today,
         "Today must include overdue assignments instead of filtering them out")
 require("overdueAssignments" in today and "逾期" in today,
