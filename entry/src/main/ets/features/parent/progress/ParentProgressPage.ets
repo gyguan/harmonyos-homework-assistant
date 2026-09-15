@@ -5,6 +5,7 @@ import { RemoteSubmission } from '../../../application/remote/RemoteSubmissionAp
 import { RemoteSubmissionCache } from '../../../application/remote/RemoteSubmissionCache';
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { Assignment, AssignmentStatus, Subject, Submission } from '../../../domain/model/HomeworkModels';
@@ -297,38 +298,20 @@ export struct ParentProgressPage {
   }
 
   @Builder
-  private ProgressCard(item: Assignment) {
-    Column({ space: 11 }) {
-      Row() {
-        Text(item.subject).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-          .padding({ left: 9, right: 9, top: 5, bottom: 5 }).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
-        Blank();
-        Text(AssignmentStateMachine.label(item.status)).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-      }.width('100%');
-      Text(item.title).width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Row() {
-        Text(`截至 ${item.dueText}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-        Blank();
-        Text(this.timingText(item)).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.PRIMARY);
-      }.width('100%');
-      if (this.latestLocalSubmission(item.id) !== null) {
-        this.LocalSubmission(this.latestLocalSubmission(item.id)!);
-      } else if (this.remoteSubmissions(item.id).length > 0) {
-        this.CloudSubmission(this.remoteSubmissions(item.id)[0]);
-      }
-      this.ReviewPane(item);
-      Button('查看详情', { type: ButtonType.Normal }).width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-        .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
-        .onClick(() => this.openDetail(item));
-    }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-  }
-
-  @Builder
   private DetailValue(label: string, value: string) {
-    Column({ space: 5 }) {
-      Text(label).width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-      Text(value.length > 0 ? value : '未填写').width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(22).fontColor(AppTheme.TEXT);
-    }.width('100%');
+    Row({ space: 12 }) {
+      Text(label)
+        .width(86)
+        .fontSize(13)
+        .fontColor(AppTheme.SUBTEXT);
+      Text(value.length > 0 ? value : '未填写')
+        .layoutWeight(1)
+        .fontSize(14)
+        .lineHeight(21)
+        .fontColor(AppTheme.TEXT);
+    }
+    .width('100%')
+    .padding({ top: 9, bottom: 9 });
   }
 
   @Builder
@@ -381,7 +364,7 @@ export struct ParentProgressPage {
           .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
           .onClick(() => this.saveEdit(item));
       }.width('100%');
-    }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+    }.width('100%').padding(16).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
@@ -405,16 +388,17 @@ export struct ParentProgressPage {
 
   @Builder
   private AssignmentDetail(item: Assignment) {
-    Column({ space: AppTheme.SECTION_GAP }) {
+    Column({ space: 16 }) {
       Row() {
-        Text('‹ 返回作业进度').fontSize(14).fontColor(AppTheme.PRIMARY).onClick(() => this.closeDetail());
+        if (this.sizeClass === WindowSizeClass.COMPACT) {
+          Text('‹ 作业进度').fontSize(14).fontColor(AppTheme.PRIMARY).onClick(() => this.closeDetail());
+        }
         Blank();
         Text(AssignmentStateMachine.label(item.status)).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
       }.width('100%');
 
-      Column({ space: 8 }) {
-        Text(item.subject).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-          .padding({ left: 9, right: 9, top: 5, bottom: 5 }).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
+      Column({ space: 7 }) {
+        Text(item.subject).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
         Text(item.title).width('100%').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
         Text(`${HomeworkStore.instance.getStudent().name} · ${HomeworkStore.instance.getStudent().className}`)
           .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
@@ -423,21 +407,26 @@ export struct ParentProgressPage {
       if (this.editing) {
         this.EditPane(item);
       } else {
-        Column({ space: 14 }) {
+        Column({ space: 0 }) {
           this.DetailValue('作业说明', item.instruction);
+          Divider().color(AppTheme.DIVIDER);
           this.DetailValue('教材 / 页码', item.textbookRef);
+          Divider().color(AppTheme.DIVIDER);
           this.DetailValue('截止时间', item.dueText);
+          Divider().color(AppTheme.DIVIDER);
           this.DetailValue('完成时间', this.timingText(item));
+          Divider().color(AppTheme.DIVIDER);
           this.DetailValue('同步状态', item.syncDirty ? '本机有修改，待同步' : (item.remoteVersion > 0 ? '已同步家庭云端' : '仅本机'));
-          Row({ space: 8 }) {
-            Button('编辑任务', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
-              .onClick(() => this.beginEdit(item));
-            Button('删除任务', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.DANGER_SOFT).fontColor(AppTheme.DANGER)
-              .onClick(() => { this.deleteConfirm = true; this.operationNotice = ''; });
-          }.width('100%');
-        }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+        }.width('100%').padding({ left: 14, right: 14 }).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CONTROL_RADIUS);
+
+        Row({ space: 8 }) {
+          Button('编辑任务', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+            .onClick(() => this.beginEdit(item));
+          Button('删除任务', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.DANGER_SOFT).fontColor(AppTheme.DANGER)
+            .onClick(() => { this.deleteConfirm = true; this.operationNotice = ''; });
+        }.width('100%');
       }
 
       if (this.operationNotice.length > 0) {
@@ -457,111 +446,164 @@ export struct ParentProgressPage {
   }
 
   @Builder
-  private SubjectFilterChip(key: string, label: string) {
-    Text(`${label} ${this.subjectCount(key)}`)
-      .layoutWeight(1)
-      .height(36)
-      .textAlign(TextAlign.Center)
-      .fontSize(AppTheme.CAPTION_SIZE)
-      .fontWeight(this.subjectFilter === key ? FontWeight.Medium : FontWeight.Normal)
-      .fontColor(this.subjectFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .padding({ top: 9, bottom: 9 })
-      .backgroundColor(this.subjectFilter === key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .onClick(() => this.subjectFilter = key);
+  private SubjectTab(key: string, label: string) {
+    Column({ space: 5 }) {
+      Text(`${label} ${this.subjectCount(key)}`)
+        .fontSize(13)
+        .fontWeight(this.subjectFilter === key ? FontWeight.Medium : FontWeight.Normal)
+        .fontColor(this.subjectFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
+      Divider()
+        .width('100%')
+        .strokeWidth(this.subjectFilter === key ? 2 : 0)
+        .color(this.subjectFilter === key ? AppTheme.PRIMARY : Color.Transparent);
+    }
+    .height(36)
+    .padding({ left: 4, right: 4 })
+    .justifyContent(FlexAlign.End)
+    .onClick(() => this.subjectFilter = key);
   }
 
   @Builder
-  private SubjectFilterBar() {
-    Row({ space: 7 }) {
-      this.SubjectFilterChip('ALL', '全部');
-      this.SubjectFilterChip(Subject.CHINESE, '语文');
-      this.SubjectFilterChip(Subject.MATH, '数学');
-      this.SubjectFilterChip(Subject.ENGLISH, '英语');
-    }.width('100%');
-  }
-
-  @Builder
-  private DateFilterChip(key: DueDateFilterKey, label: string) {
+  private DateTab(key: DueDateFilterKey, label: string) {
     Text(`${label} ${this.dateCount(key)}`)
-      .layoutWeight(1)
-      .height(36)
-      .textAlign(TextAlign.Center)
-      .fontSize(AppTheme.CAPTION_SIZE)
+      .fontSize(12)
       .fontWeight(this.dateFilter === key ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(this.dateFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .padding({ top: 9, bottom: 9 })
-      .backgroundColor(this.dateFilter === key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      .backgroundColor(this.dateFilter === key ? AppTheme.PRIMARY_SOFT : Color.Transparent)
       .borderRadius(AppTheme.CHIP_RADIUS)
       .onClick(() => this.dateFilter = key);
   }
 
   @Builder
-  private DateFilterBar() {
-    Row({ space: 6 }) {
-      this.DateFilterChip(DueDateFilterKey.ALL, '全部');
-      this.DateFilterChip(DueDateFilterKey.TODAY, '今天');
-      this.DateFilterChip(DueDateFilterKey.TOMORROW, '明天');
-      this.DateFilterChip(DueDateFilterKey.THIS_WEEK, '本周');
-      this.DateFilterChip(DueDateFilterKey.OVERDUE, '逾期');
-    }.width('100%');
-  }
-
-  @Builder
   private FilterPanel() {
-    Column({ space: 7 }) {
-      Text('科目').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-      this.SubjectFilterBar();
-      Text('截止').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-      this.DateFilterBar();
+    Column({ space: 8 }) {
+      Scroll() {
+        Row({ space: 18 }) {
+          this.SubjectTab('ALL', '全部');
+          this.SubjectTab(Subject.CHINESE, '语文');
+          this.SubjectTab(Subject.MATH, '数学');
+          this.SubjectTab(Subject.ENGLISH, '英语');
+        }
+      }.width('100%').scrollable(ScrollDirection.Horizontal).scrollBar(BarState.Off);
+      Scroll() {
+        Row({ space: 4 }) {
+          this.DateTab(DueDateFilterKey.ALL, '全部日期');
+          this.DateTab(DueDateFilterKey.TODAY, '今天');
+          this.DateTab(DueDateFilterKey.TOMORROW, '明天');
+          this.DateTab(DueDateFilterKey.THIS_WEEK, '本周');
+          this.DateTab(DueDateFilterKey.OVERDUE, '逾期');
+        }
+      }.width('100%').scrollable(ScrollDirection.Horizontal).scrollBar(BarState.Off);
     }.width('100%');
   }
 
   @Builder
   private ProgressList() {
-    Column({ space: AppTheme.SECTION_GAP }) {
-      Column({ space: 5 }) {
+    Column({ space: 18 }) {
+      Column({ space: 4 }) {
         Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        Text(`${HomeworkStore.instance.getStudent().name} · 按科目和截止日期筛选后可查看详情、编辑或删除`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text(`${HomeworkStore.instance.getStudent().name} · 查看完成、提交和验收状态`).fontSize(13).fontColor(AppTheme.SUBTEXT);
       }.width('100%').alignItems(HorizontalAlign.Start);
 
       this.FilterPanel();
 
       if (this.filteredAssignments().length === 0) {
-        Text(this.assignments().length === 0 ? '暂时没有作业' : '当前科目和日期下暂时没有作业')
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT)
-          .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-      } else if (this.sizeClass === WindowSizeClass.EXPANDED) {
-        Row({ space: 16 }) {
-          Column({ space: AppTheme.ITEM_GAP }) {
-            ForEach(this.filteredAssignments().slice(0, Math.ceil(this.filteredAssignments().length / 2)), (item: Assignment) => {
-              this.ProgressCard(item);
-            }, (item: Assignment) => item.id);
-          }.layoutWeight(1);
-          Column({ space: AppTheme.ITEM_GAP }) {
-            ForEach(this.filteredAssignments().slice(Math.ceil(this.filteredAssignments().length / 2)), (item: Assignment) => {
-              this.ProgressCard(item);
-            }, (item: Assignment) => item.id);
-          }.layoutWeight(1);
-        }.width('100%').alignItems(VerticalAlign.Top);
+        Column({ space: 7 }) {
+          SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
+          Text(this.assignments().length === 0 ? '暂时没有作业' : '当前筛选下没有作业')
+            .fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        }.width('100%').padding({ top: 28, bottom: 28 });
       } else {
-        ForEach(this.filteredAssignments(), (item: Assignment) => {
-          this.ProgressCard(item);
-        }, (item: Assignment) => item.id);
+        Column({ space: 7 }) {
+          ForEach(this.filteredAssignments(), (item: Assignment) => {
+            AssignmentListItem({
+              assignment: item,
+              selected: this.selectedAssignmentId === item.id,
+              onOpen: () => this.openDetail(item)
+            });
+          }, (item: Assignment) => item.id);
+        }.width('100%');
       }
     }.width('100%');
   }
 
-  build() {
+  @Builder
+  private EmptyDetail() {
+    Column({ space: 9 }) {
+      SymbolGlyph($r('sys.symbol.checkmark_circle'))
+        .fontSize(34)
+        .fontColor([AppTheme.TERTIARY_TEXT]);
+      Text('选择一项作业')
+        .fontSize(20)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+      Text('在左侧选择后，可查看提交照片、验收、编辑或删除。')
+        .fontSize(13)
+        .lineHeight(20)
+        .fontColor(AppTheme.SUBTEXT)
+        .textAlign(TextAlign.Center);
+    }
+    .width('100%')
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
+    .padding(32);
+  }
+
+  @Builder
+  private PhoneLayout() {
     Scroll() {
-      Column({ space: AppTheme.SECTION_GAP }) {
+      Column() {
         if (this.selectedAssignment() !== null) {
           this.AssignmentDetail(this.selectedAssignment()!);
         } else {
           this.ProgressList();
         }
-      }.width('100%').padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING);
-    }.width('100%').height('100%').backgroundColor(AppTheme.BACKGROUND);
+      }
+      .width('100%')
+      .padding(AppTheme.PAGE_PADDING);
+    }
+    .width('100%')
+    .height('100%')
+    .scrollBar(BarState.Off);
+  }
+
+  @Builder
+  private PadLayout() {
+    Row() {
+      Scroll() {
+        this.ProgressList();
+      }
+      .width(this.sizeClass === WindowSizeClass.EXPANDED ? '38%' : '43%')
+      .height('100%')
+      .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
+      .scrollBar(BarState.Off);
+
+      Divider().vertical(true).height('100%').color(AppTheme.DIVIDER);
+
+      Scroll() {
+        if (this.selectedAssignment() !== null) {
+          this.AssignmentDetail(this.selectedAssignment()!);
+        } else {
+          this.EmptyDetail();
+        }
+      }
+      .layoutWeight(1)
+      .height('100%')
+      .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
+      .backgroundColor(AppTheme.SURFACE)
+      .scrollBar(BarState.Off);
+    }
+    .width('100%')
+    .height('100%');
+  }
+
+  build() {
+    if (this.sizeClass === WindowSizeClass.COMPACT) {
+      this.PhoneLayout();
+    } else {
+      this.PadLayout();
+    }
   }
 }
