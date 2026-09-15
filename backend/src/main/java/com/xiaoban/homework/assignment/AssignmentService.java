@@ -28,7 +28,7 @@ public class AssignmentService {
       if (!familyId.equals(existing.familyId) || !studentId.equals(existing.studentId)) throw new ApiExceptions.Conflict("作业 ID 冲突");
       return AssignmentDtos.Response.from(existing);
     }
-    AssignmentEntity e = new AssignmentEntity(); Instant now = Instant.now();
+    AssignmentEntity e = new AssignmentEntity(); Instant now = Instant.now(); long nowMs = System.currentTimeMillis();
     e.id = input.id(); e.familyId = familyId; e.studentId = studentId; e.subject = input.subject(); e.title = input.title();
     e.instruction = input.instruction(); e.textbookRef = text(input.textbookRef()); e.dueText = text(input.dueText());
     e.status = input.status(); e.sourceLabel = text(input.sourceLabel()); e.sourceExcerpt = text(input.sourceExcerpt());
@@ -36,7 +36,15 @@ public class AssignmentService {
     e.startedAtEpochMs = nonNegative(input.startedAtEpochMs());
     e.finishedAtEpochMs = nonNegative(input.finishedAtEpochMs());
     e.elapsedSeconds = nonNegative(input.elapsedSeconds());
-    if ("IN_PROGRESS".equals(e.status) && e.startedAtEpochMs == 0) e.startedAtEpochMs = System.currentTimeMillis();
+    if ("IN_PROGRESS".equals(e.status)) {
+      pauseOtherActive(familyId, studentId, e.id, nowMs);
+      if (e.startedAtEpochMs == 0) e.startedAtEpochMs = nowMs;
+      e.finishedAtEpochMs = 0;
+    }
+    if ("PAUSED".equals(e.status)) {
+      e.startedAtEpochMs = 0;
+      e.finishedAtEpochMs = 0;
+    }
     e.createdAt = now; e.updatedAt = now;
     return AssignmentDtos.Response.from(repository.saveAndFlush(e));
   }
@@ -46,6 +54,8 @@ public class AssignmentService {
     AssignmentEntity e = requireOwned(familyId, id);
     if (e.version != input.version()) throw new ApiExceptions.Conflict("作业已在其他设备更新，请刷新后重试");
     String previousStatus = e.status;
+    long previousStartedAt = e.startedAtEpochMs;
+    long previousElapsed = e.elapsedSeconds;
     if (input.status() != null && !AssignmentStatePolicy.canTransition(e.status, input.status())) {
       throw new ApiExceptions.BadRequest("不允许的作业状态流转: " + e.status + " -> " + input.status());
     }
@@ -63,17 +73,42 @@ public class AssignmentService {
     if (input.elapsedSeconds() != null) e.elapsedSeconds = nonNegative(input.elapsedSeconds());
 
     long nowMs = System.currentTimeMillis();
-    if (!"IN_PROGRESS".equals(previousStatus) && "IN_PROGRESS".equals(e.status) && e.startedAtEpochMs == 0) {
-      e.startedAtEpochMs = nowMs;
+    if (!"IN_PROGRESS".equals(previousStatus) && "IN_PROGRESS".equals(e.status)) {
+      if (!"PAUSED".equals(previousStatus) && input.elapsedSeconds() == null) e.elapsedSeconds = 0;
+      if (e.startedAtEpochMs == 0) e.startedAtEpochMs = nowMs;
       e.finishedAtEpochMs = 0;
-      e.elapsedSeconds = 0;
+      pauseOtherActive(familyId, e.studentId, e.id, nowMs);
+    } else if ("IN_PROGRESS".equals(e.status)) {
+      pauseOtherActive(familyId, e.studentId, e.id, nowMs);
     }
-    if ("IN_PROGRESS".equals(previousStatus) && !"IN_PROGRESS".equals(e.status) && e.startedAtEpochMs > 0) {
-      if (e.finishedAtEpochMs == 0) e.finishedAtEpochMs = nowMs;
-      if (e.elapsedSeconds == 0) e.elapsedSeconds = Math.max(0, (e.finishedAtEpochMs - e.startedAtEpochMs) / 1000);
+
+    if ("IN_PROGRESS".equals(previousStatus) && !"IN_PROGRESS".equals(e.status)) {
+      if (input.elapsedSeconds() == null && previousStartedAt > 0) {
+        e.elapsedSeconds = previousElapsed + Math.max(0, (nowMs - previousStartedAt) / 1000);
+      }
+      e.startedAtEpochMs = 0;
+      if ("PAUSED".equals(e.status)) {
+        e.finishedAtEpochMs = 0;
+      } else if (e.finishedAtEpochMs == 0) {
+        e.finishedAtEpochMs = nowMs;
+      }
     }
     e.updatedAt = Instant.now();
     return AssignmentDtos.Response.from(repository.saveAndFlush(e));
+  }
+
+  private void pauseOtherActive(UUID familyId, String studentId, String activeId, long nowMs) {
+    for (AssignmentEntity other : repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(familyId, studentId)) {
+      if (other.id.equals(activeId) || !"IN_PROGRESS".equals(other.status)) continue;
+      if (other.startedAtEpochMs > 0) {
+        other.elapsedSeconds += Math.max(0, (nowMs - other.startedAtEpochMs) / 1000);
+      }
+      other.startedAtEpochMs = 0;
+      other.finishedAtEpochMs = 0;
+      other.status = "PAUSED";
+      other.updatedAt = Instant.now();
+      repository.save(other);
+    }
   }
 
   @Transactional(readOnly = true)

@@ -44,6 +44,9 @@ export struct StudentTodayPage {
     if (assignment.status === AssignmentStatus.IN_PROGRESS) {
       return '继续完成';
     }
+    if (assignment.status === AssignmentStatus.PAUSED) {
+      return '继续作业';
+    }
     if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
       return '去提交';
     }
@@ -61,6 +64,7 @@ export struct StudentTodayPage {
       assignment.status === AssignmentStatus.OVERDUE ||
       assignment.status === AssignmentStatus.NEEDS_REWORK ||
       assignment.status === AssignmentStatus.IN_PROGRESS ||
+      assignment.status === AssignmentStatus.PAUSED ||
       assignment.status === AssignmentStatus.READY_TO_SUBMIT;
   }
 
@@ -123,7 +127,7 @@ export struct StudentTodayPage {
         .color(AppTheme.PRIMARY)
         .backgroundColor(AppTheme.PRIMARY_SOFT);
 
-      Text('小伴会推荐下一项，你也可以从作业列表里选择自己想先完成的任务。')
+      Text('小伴会推荐下一项，你也可以从作业列表里选择自己想先完成的任务。切换任务时，当前作业会自动暂停。')
         .width('100%')
         .fontSize(AppTheme.BODY_SIZE)
         .fontColor(AppTheme.SUBTEXT);

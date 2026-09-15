@@ -6,6 +6,8 @@ import org.junit.jupiter.api.Test;
 class AssignmentStatePolicyTest {
   @Test void allowsNormalLifecycle() {
     assertThat(AssignmentStatePolicy.canTransition("NOT_STARTED", "IN_PROGRESS")).isTrue();
+    assertThat(AssignmentStatePolicy.canTransition("IN_PROGRESS", "PAUSED")).isTrue();
+    assertThat(AssignmentStatePolicy.canTransition("PAUSED", "IN_PROGRESS")).isTrue();
     assertThat(AssignmentStatePolicy.canTransition("IN_PROGRESS", "READY_TO_SUBMIT")).isTrue();
     assertThat(AssignmentStatePolicy.canTransition("READY_TO_SUBMIT", "SUBMITTED")).isTrue();
     assertThat(AssignmentStatePolicy.canTransition("SUBMITTED", "COMPLETED")).isTrue();
@@ -13,5 +15,6 @@ class AssignmentStatePolicyTest {
 
   @Test void rejectsIllegalJump() {
     assertThat(AssignmentStatePolicy.canTransition("NOT_STARTED", "COMPLETED")).isFalse();
+    assertThat(AssignmentStatePolicy.canTransition("PAUSED", "SUBMITTED")).isFalse();
   }
 }

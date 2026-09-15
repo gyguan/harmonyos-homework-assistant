@@ -403,6 +403,7 @@ export class HomeworkStore {
   getNextAssignment(): Assignment | null {
     let priorities: AssignmentStatus[] = [
       AssignmentStatus.IN_PROGRESS,
+      AssignmentStatus.PAUSED,
       AssignmentStatus.NEEDS_REWORK,
       AssignmentStatus.NOT_STARTED,
       AssignmentStatus.OVERDUE,
@@ -537,19 +538,35 @@ export class HomeworkStore {
     let next = AssignmentStateMachine.transition(current, to);
     let now = Date.now();
     if (current !== AssignmentStatus.IN_PROGRESS && next === AssignmentStatus.IN_PROGRESS) {
+      if (current !== AssignmentStatus.PAUSED) {
+        this.assignments[index].elapsedSeconds = 0;
+      }
       this.assignments[index].startedAtEpochMs = now;
       this.assignments[index].finishedAtEpochMs = 0;
-      this.assignments[index].elapsedSeconds = 0;
     }
-    if (current === AssignmentStatus.IN_PROGRESS && next !== AssignmentStatus.IN_PROGRESS &&
-      this.assignments[index].startedAtEpochMs > 0) {
-      this.assignments[index].finishedAtEpochMs = now;
-      this.assignments[index].elapsedSeconds = Math.max(0,
-        Math.floor((now - this.assignments[index].startedAtEpochMs) / 1000));
+    if (current === AssignmentStatus.IN_PROGRESS && next !== AssignmentStatus.IN_PROGRESS) {
+      if (this.assignments[index].startedAtEpochMs > 0) {
+        this.assignments[index].elapsedSeconds += Math.max(0,
+          Math.floor((now - this.assignments[index].startedAtEpochMs) / 1000));
+      }
+      this.assignments[index].startedAtEpochMs = 0;
+      this.assignments[index].finishedAtEpochMs = next === AssignmentStatus.PAUSED ? 0 : now;
     }
     this.assignments[index].status = next;
     this.requestPersist();
     return true;
+  }
+
+  private pauseOtherAssignments(activeAssignmentId: string): void {
+    let ids: string[] = [];
+    for (let assignment of this.getAssignments()) {
+      if (assignment.id !== activeAssignmentId && assignment.status === AssignmentStatus.IN_PROGRESS) {
+        ids.push(assignment.id);
+      }
+    }
+    for (let id of ids) {
+      this.transitionAssignment(id, AssignmentStatus.PAUSED);
+    }
   }
 
   startAssignment(assignmentId: string): boolean {
@@ -557,12 +574,24 @@ export class HomeworkStore {
     if (assignment === null) {
       return false;
     }
-    if (assignment.status === AssignmentStatus.IN_PROGRESS ||
-      assignment.status === AssignmentStatus.READY_TO_SUBMIT ||
-      assignment.status === AssignmentStatus.SUBMITTED) {
+    if (assignment.status === AssignmentStatus.READY_TO_SUBMIT ||
+      assignment.status === AssignmentStatus.SUBMITTED ||
+      assignment.status === AssignmentStatus.COMPLETED) {
+      return true;
+    }
+    this.pauseOtherAssignments(assignmentId);
+    if (assignment.status === AssignmentStatus.IN_PROGRESS) {
       return true;
     }
     return this.transitionAssignment(assignmentId, AssignmentStatus.IN_PROGRESS);
+  }
+
+  pauseAssignment(assignmentId: string): boolean {
+    let assignment = this.getAssignment(assignmentId);
+    if (assignment === null || assignment.status !== AssignmentStatus.IN_PROGRESS) {
+      return false;
+    }
+    return this.transitionAssignment(assignmentId, AssignmentStatus.PAUSED);
   }
 
   markReadyToSubmit(assignmentId: string): boolean {
@@ -623,6 +652,7 @@ export class HomeworkStore {
     let summary: DashboardSummary = {
       completed: 0,
       inProgress: 0,
+      paused: 0,
       notStarted: 0,
       overdue: 0,
       readyToSubmit: 0,
@@ -636,6 +666,9 @@ export class HomeworkStore {
           break;
         case AssignmentStatus.IN_PROGRESS:
           summary.inProgress++;
+          break;
+        case AssignmentStatus.PAUSED:
+          summary.paused++;
           break;
         case AssignmentStatus.NOT_STARTED:
           summary.notStarted++;

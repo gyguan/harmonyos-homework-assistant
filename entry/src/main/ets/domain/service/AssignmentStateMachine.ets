@@ -6,7 +6,10 @@ export class AssignmentStateMachine {
       return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.OVERDUE;
     }
     if (from === AssignmentStatus.IN_PROGRESS) {
-      return to === AssignmentStatus.READY_TO_SUBMIT || to === AssignmentStatus.OVERDUE;
+      return to === AssignmentStatus.PAUSED || to === AssignmentStatus.READY_TO_SUBMIT || to === AssignmentStatus.OVERDUE;
+    }
+    if (from === AssignmentStatus.PAUSED) {
+      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.OVERDUE;
     }
     if (from === AssignmentStatus.READY_TO_SUBMIT) {
       return to === AssignmentStatus.SUBMITTED;
@@ -36,6 +39,8 @@ export class AssignmentStateMachine {
         return '未开始';
       case AssignmentStatus.IN_PROGRESS:
         return '正在做';
+      case AssignmentStatus.PAUSED:
+        return '已暂停';
       case AssignmentStatus.READY_TO_SUBMIT:
         return '待提交';
       case AssignmentStatus.SUBMITTED:
