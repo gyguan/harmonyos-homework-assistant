@@ -1,0 +1,94 @@
+import { http } from '@kit.NetworkKit';
+import { CandidateAssignment, Subject } from '../../domain/model/HomeworkModels';
+import { ExtractedHomeworkText } from '../../domain/model/ImportModels';
+import { BackendHttpClient } from './BackendHttpClient';
+import { BackendSession } from './BackendSession';
+
+interface OrganizePayload {
+  text: string;
+  sourceLabel: string;
+}
+
+interface RemoteCandidate {
+  subject: string;
+  title: string;
+  instruction: string;
+  textbookRef: string;
+  dueText: string;
+  sourceExcerpt: string;
+  confidence: number;
+}
+
+interface OrganizeResponse {
+  assignments: RemoteCandidate[];
+  mode: string;
+}
+
+export class HomeworkOrganizerRemoteApi {
+  static readonly instance: HomeworkOrganizerRemoteApi = new HomeworkOrganizerRemoteApi();
+  private constructor() {}
+
+  async organize(input: ExtractedHomeworkText): Promise<CandidateAssignment[] | null> {
+    if (!BackendSession.instance.isConnected()) {
+      return null;
+    }
+    try {
+      let payload: OrganizePayload = {
+        text: input.text,
+        sourceLabel: input.sourceLabel
+      };
+      let response = await BackendHttpClient.instance.request(
+        `/api/v1/students/${input.studentId}/homework/organize`,
+        http.RequestMethod.POST,
+        payload
+      );
+      if (response.statusCode < 200 || response.statusCode >= 300) {
+        return null;
+      }
+      let parsed = JSON.parse(response.body) as OrganizeResponse;
+      if (parsed.assignments === undefined || parsed.assignments === null) {
+        return null;
+      }
+      let result: CandidateAssignment[] = [];
+      for (let i = 0; i < parsed.assignments.length; i++) {
+        let remote = parsed.assignments[i];
+        let subject = this.subject(remote.subject);
+        if (subject === null || remote.title === undefined || remote.title.trim().length === 0) {
+          continue;
+        }
+        let confidence = remote.confidence;
+        if (confidence < 0) confidence = 0;
+        if (confidence > 1) confidence = 1;
+        result.push({
+          id: `ai-${input.importId}-${i + 1}`,
+          studentId: input.studentId,
+          subject: subject,
+          title: remote.title.trim(),
+          instruction: this.value(remote.instruction, remote.title),
+          textbookRef: this.value(remote.textbookRef, '待家长确认'),
+          dueText: this.value(remote.dueText, '今天'),
+          sourceEvidence: {
+            sourceLabel: input.sourceLabel,
+            excerpt: this.value(remote.sourceExcerpt, remote.title)
+          },
+          confidence: confidence
+        });
+      }
+      return result;
+    } catch {
+      return null;
+    }
+  }
+
+  private subject(value: string): Subject | null {
+    if (value === Subject.CHINESE) return Subject.CHINESE;
+    if (value === Subject.MATH) return Subject.MATH;
+    if (value === Subject.ENGLISH) return Subject.ENGLISH;
+    return null;
+  }
+
+  private value(value: string | undefined, fallback: string): string {
+    if (value === undefined || value === null || value.trim().length === 0) return fallback;
+    return value.trim();
+  }
+}
