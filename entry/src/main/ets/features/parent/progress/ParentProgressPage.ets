@@ -15,6 +15,7 @@ export struct ParentProgressPage {
   @State private localRevision: number = 0;
   @State private reviewAssignmentId: string = '';
   @State private reviewNoteDraft: string = '';
+  onStoreChanged: () => void = () => {};
 
   private assignments(): Assignment[] {
     let currentRevision = this.revision + this.localRevision;
@@ -67,6 +68,7 @@ export struct ParentProgressPage {
     if (HomeworkStore.instance.reviewAssignment(item.id, completed, note)) {
       this.closeReview();
       this.localRevision++;
+      this.onStoreChanged();
       HomeworkSyncService.instance.requestSync();
     }
   }
