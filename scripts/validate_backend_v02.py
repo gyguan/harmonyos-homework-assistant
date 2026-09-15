@@ -27,6 +27,7 @@ model_client = read("backend/src/main/java/com/xiaoban/homework/tutor/OpenAiTuto
 tutor_prompt = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorPromptBuilder.java")
 tutor_controller = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorController.java")
 app_yml = read("backend/src/main/resources/application.yml")
+app_config = read("entry/src/main/ets/common/config/AppConfig.ets")
 backend_session = read("entry/src/main/ets/application/remote/BackendSession.ets")
 session_storage = read("entry/src/main/ets/infrastructure/persistence/PreferencesBackendSessionStorage.ets")
 family_cloud = read("entry/src/main/ets/application/remote/FamilyCloudService.ets")
@@ -54,6 +55,8 @@ require('@PostMapping("/messages")' in tutor_controller,
         "Tutor API must support real persisted conversations")
 require("PreferencesBackendSessionStorage" in session_storage and "initialize(storage" in backend_session,
         "HarmonyOS must restore its backend session from app-private storage")
+require("AppConfig.BACKEND_BASE_URL" in backend_session and "http://10.37.255.92:8080" in app_config,
+        "HarmonyOS default cloud server must be centralized in AppConfig")
 require("FamilyCloudService" in settings_page and "StudentRemoteApi" in family_cloud,
         "parent settings must manage cloud-backed family members")
 require("TutorRemoteApi" in study and "/tutor/messages" in tutor_remote,
