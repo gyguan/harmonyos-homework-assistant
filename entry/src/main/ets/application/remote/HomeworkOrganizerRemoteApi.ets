@@ -64,6 +64,7 @@ export class HomeworkOrganizerRemoteApi {
           instruction: this.value(remote.instruction, remote.title),
           textbookRef: this.value(remote.textbookRef, '待家长确认'),
           dueText: this.value(remote.dueText, '今天'),
+          expectedMinutes: 20,
           sourceEvidence: {
             sourceLabel: input.sourceLabel,
             excerpt: this.value(remote.sourceExcerpt, remote.title)
