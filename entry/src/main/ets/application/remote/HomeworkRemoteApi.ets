@@ -39,7 +39,7 @@ export class HomeworkRemoteApi {
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
       elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote
     };
-    let response = await BackendHttpClient.instance.request(`/api/v1/assignments/${encodeURIComponent(assignment.id)}`, http.RequestMethod.PATCH, body);
+    let response = await BackendHttpClient.instance.request(`/api/v1/assignments/${encodeURIComponent(assignment.id)}`, http.RequestMethod.PUT, body);
     if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
     if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`更新作业失败: ${response.statusCode}`);
     return JSON.parse(response.body) as RemoteAssignment;
