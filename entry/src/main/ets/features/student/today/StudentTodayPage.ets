@@ -31,9 +31,18 @@ export struct StudentTodayPage {
     return HomeworkStore.instance.getNextAssignment();
   }
 
+  private isRecommended(assignment: Assignment): boolean {
+    let next = this.nextAssignment();
+    return next !== null && next.id === assignment.id;
+  }
+
   private actionLabel(assignment: Assignment): string {
-    if (assignment.status === AssignmentStatus.NOT_STARTED || assignment.status === AssignmentStatus.OVERDUE) {
+    if (assignment.status === AssignmentStatus.NOT_STARTED || assignment.status === AssignmentStatus.OVERDUE ||
+      assignment.status === AssignmentStatus.NEEDS_REWORK) {
       return '开始作业';
+    }
+    if (assignment.status === AssignmentStatus.IN_PROGRESS) {
+      return '继续完成';
     }
     if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
       return '去提交';
@@ -41,7 +50,18 @@ export struct StudentTodayPage {
     if (assignment.status === AssignmentStatus.SUBMITTED) {
       return '查看提交';
     }
-    return '继续完成';
+    if (assignment.status === AssignmentStatus.COMPLETED) {
+      return '查看作业';
+    }
+    return '查看作业';
+  }
+
+  private actionIsPrimary(assignment: Assignment): boolean {
+    return assignment.status === AssignmentStatus.NOT_STARTED ||
+      assignment.status === AssignmentStatus.OVERDUE ||
+      assignment.status === AssignmentStatus.NEEDS_REWORK ||
+      assignment.status === AssignmentStatus.IN_PROGRESS ||
+      assignment.status === AssignmentStatus.READY_TO_SUBMIT;
   }
 
   @Builder
@@ -103,7 +123,7 @@ export struct StudentTodayPage {
         .color(AppTheme.PRIMARY)
         .backgroundColor(AppTheme.PRIMARY_SOFT);
 
-      Text('只管完成下一项，其他事情交给小伴记住。')
+      Text('小伴会推荐下一项，你也可以从作业列表里选择自己想先完成的任务。')
         .width('100%')
         .fontSize(AppTheme.BODY_SIZE)
         .fontColor(AppTheme.SUBTEXT);
@@ -115,13 +135,49 @@ export struct StudentTodayPage {
   }
 
   @Builder
+  private AssignmentChoice(item: Assignment) {
+    Column({ space: 8 }) {
+      AssignmentCard({ assignment: item });
+      Row({ space: 8 }) {
+        if (this.isRecommended(item)) {
+          Text('小伴推荐')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .padding({ left: 9, right: 9, top: 5, bottom: 5 })
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .borderRadius(AppTheme.CHIP_RADIUS);
+        }
+        Blank();
+        Button(this.actionLabel(item), { type: ButtonType.Normal })
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .padding({ left: 18, right: 18 })
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .backgroundColor(this.actionIsPrimary(item) ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+          .fontColor(this.actionIsPrimary(item) ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+          .onClick(() => this.onOpenStudy(item.id));
+      }
+      .width('100%');
+    }
+    .width('100%');
+  }
+
+  @Builder
   private AssignmentListPane() {
     Column({ space: AppTheme.ITEM_GAP }) {
       Row() {
-        Text('今天的作业')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
+        Column({ space: 3 }) {
+          Text('今天的作业')
+            .fontSize(AppTheme.SECTION_TITLE_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('可以按推荐顺序，也可以自己选择')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .alignItems(HorizontalAlign.Start);
         Blank();
         Text(`${this.assignments().length} 项`)
           .fontSize(AppTheme.CAPTION_SIZE)
@@ -129,7 +185,7 @@ export struct StudentTodayPage {
       }
       .width('100%');
       ForEach(this.assignments(), (item: Assignment) => {
-        AssignmentCard({ assignment: item });
+        this.AssignmentChoice(item);
       }, (item: Assignment) => item.id);
     }
     .width('100%');
@@ -160,7 +216,7 @@ export struct StudentTodayPage {
     } else {
       Column({ space: 13 }) {
         Row() {
-          Text('下一项')
+          Text('推荐下一项')
             .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
