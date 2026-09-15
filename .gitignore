@@ -12,6 +12,7 @@ oh_modules/
 
 # Backend local secrets / overrides - never commit
 backend/config/application-local.yml
+backend/.e2e-session.json
 
 # Signing material - never commit
 *.p12

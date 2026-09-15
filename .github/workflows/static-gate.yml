@@ -49,6 +49,9 @@ jobs:
       - name: Validate backend V0.2 cloud and Tutor
         run: python scripts/validate_backend_v02.py
 
+      - name: Validate backend real E2E smoke harness
+        run: python scripts/validate_backend_e2e_smoke.py
+
       - name: Validate assignment countdown
         run: python scripts/validate_assignment_countdown.py
 
