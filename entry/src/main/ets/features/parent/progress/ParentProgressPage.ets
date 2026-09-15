@@ -72,6 +72,11 @@ export struct ParentProgressPage {
     return HomeworkStore.instance.getAssignment(this.selectedAssignmentId);
   }
 
+  private selectedAssignmentItems(): Assignment[] {
+    let selected = this.selectedAssignment();
+    return selected === null ? [] : [selected];
+  }
+
   private submissions(assignmentId: string): Submission[] {
     let currentRevision = this.revision + this.localRevision;
     return HomeworkStore.instance.getSubmissionsForAssignment(assignmentId);
@@ -107,6 +112,8 @@ export struct ParentProgressPage {
     this.editing = false;
     this.deleteConfirm = false;
     this.operationNotice = '';
+    this.reviewAssignmentId = '';
+    this.reviewNoteDraft = '';
   }
 
   private closeDetail(): void {
@@ -600,8 +607,10 @@ export struct ParentProgressPage {
 
       Scroll() {
         Column() {
-          if (this.selectedAssignment() !== null) {
-            this.AssignmentDetail(this.selectedAssignment()!);
+          if (this.selectedAssignmentItems().length > 0) {
+            ForEach(this.selectedAssignmentItems(), (item: Assignment) => {
+              this.AssignmentDetail(item);
+            }, (item: Assignment) => item.id);
           } else {
             this.EmptyDetail();
           }
