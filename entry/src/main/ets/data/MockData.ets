@@ -54,6 +54,9 @@ export class MockData {
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
       reviewNote: '',
+      remoteVersion: 0,
+      syncDirty: false,
+      lastSyncedAtEpochMs: 0,
       resourceLabels: ['讲解视频 03:24', '练习说明 PDF']
     },
     {
@@ -71,6 +74,9 @@ export class MockData {
       finishedAtEpochMs: Date.now() - 4 * 60 * 1000,
       elapsedSeconds: 14 * 60,
       reviewNote: '朗读很认真，明天继续保持。',
+      remoteVersion: 0,
+      syncDirty: false,
+      lastSyncedAtEpochMs: 0,
       resourceLabels: ['老师示范音频']
     },
     {
@@ -88,6 +94,9 @@ export class MockData {
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
       reviewNote: '',
+      remoteVersion: 0,
+      syncDirty: false,
+      lastSyncedAtEpochMs: 0,
       resourceLabels: ['课文音频']
     },
     {
@@ -105,6 +114,9 @@ export class MockData {
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
       reviewNote: '',
+      remoteVersion: 0,
+      syncDirty: false,
+      lastSyncedAtEpochMs: 0,
       resourceLabels: []
     },
     {
@@ -122,6 +134,9 @@ export class MockData {
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
       reviewNote: '',
+      remoteVersion: 0,
+      syncDirty: false,
+      lastSyncedAtEpochMs: 0,
       resourceLabels: []
     },
     {
@@ -139,6 +154,9 @@ export class MockData {
       finishedAtEpochMs: 0,
       elapsedSeconds: 0,
       reviewNote: '',
+      remoteVersion: 0,
+      syncDirty: false,
+      lastSyncedAtEpochMs: 0,
       resourceLabels: []
     }
   ];

@@ -84,6 +84,9 @@ export interface Assignment {
   finishedAtEpochMs: number;
   elapsedSeconds: number;
   reviewNote: string;
+  remoteVersion: number;
+  syncDirty: boolean;
+  lastSyncedAtEpochMs: number;
   resourceLabels: string[];
 }
 

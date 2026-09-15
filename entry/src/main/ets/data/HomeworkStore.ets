@@ -153,6 +153,9 @@ export class HomeworkStore {
       finishedAtEpochMs: source.finishedAtEpochMs > 0 ? source.finishedAtEpochMs : 0,
       elapsedSeconds: source.elapsedSeconds > 0 ? source.elapsedSeconds : 0,
       reviewNote: source.reviewNote === undefined ? '' : source.reviewNote,
+      remoteVersion: source.remoteVersion > 0 ? source.remoteVersion : 0,
+      syncDirty: source.syncDirty === true,
+      lastSyncedAtEpochMs: source.lastSyncedAtEpochMs > 0 ? source.lastSyncedAtEpochMs : 0,
       resourceLabels: source.resourceLabels.slice()
     };
   }
@@ -335,7 +338,8 @@ export class HomeworkStore {
         subject: candidate.subject, title: candidate.title, instruction: candidate.instruction,
         textbookRef: candidate.textbookRef, dueText: candidate.dueText, status: AssignmentStatus.NOT_STARTED,
         expectedMinutes: candidate.expectedMinutes > 0 ? candidate.expectedMinutes : 20,
-        startedAtEpochMs: 0, finishedAtEpochMs: 0, elapsedSeconds: 0, reviewNote: '', resourceLabels: []
+        startedAtEpochMs: 0, finishedAtEpochMs: 0, elapsedSeconds: 0, reviewNote: '',
+        remoteVersion: 0, syncDirty: true, lastSyncedAtEpochMs: 0, resourceLabels: []
       };
       this.assignments.push(assignment);
       published++;
@@ -365,6 +369,7 @@ export class HomeworkStore {
       this.assignments[index].finishedAtEpochMs = next === AssignmentStatus.PAUSED ? 0 : now;
     }
     this.assignments[index].status = next;
+    this.assignments[index].syncDirty = true;
     this.requestPersist();
     return true;
   }
