@@ -113,7 +113,7 @@ export struct ParentDashboardPage {
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('把老师发来的截图或文字交给小伴，整理后再确认发布。')
+        Text('导入老师作业：把截图或文字交给小伴，整理后再确认发布。')
           .width('100%')
           .fontSize(12)
           .lineHeight(18)
@@ -130,12 +130,6 @@ export struct ParentDashboardPage {
     .backgroundColor(AppTheme.PRIMARY_FAINT)
     .borderRadius(AppTheme.CONTROL_RADIUS)
     .onClick(() => this.onOpenImport());
-
-    Button('导入老师作业', { type: ButtonType.Normal })
-      .width(1)
-      .height(1)
-      .opacity(0)
-      .onClick(() => this.onOpenImport());
   }
 
   @Builder
