@@ -3,6 +3,7 @@ import { RemoteSubmission } from '../../../application/remote/RemoteSubmissionAp
 import { RemoteSubmissionCache } from '../../../application/remote/RemoteSubmissionCache';
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { Assignment, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
@@ -91,14 +92,15 @@ export struct ParentProgressPage {
 
   @Builder
   private CloudSubmission(submission: RemoteSubmission) {
-    Column({ space: 6 }) {
+    Column({ space: 8 }) {
       Row({ space: 7 }) {
         SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(17).fontColor([AppTheme.SUCCESS]);
         Text(`云端已提交 · ${submission.photos.length} 张照片`).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
       }.width('100%');
       Text(submission.submittedAt.replace('T', ' ').substring(0, 16))
         .width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
-      Text('照片保存在家庭云端；当前设备没有本地副本时，仅显示提交记录。')
+      CloudSubmissionPhotoStrip({ photos: submission.photos });
+      Text('照片通过家庭账号鉴权加载，并缓存在当前设备。')
         .width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
     }.width('100%').padding(12).backgroundColor(AppTheme.SUCCESS_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
   }
