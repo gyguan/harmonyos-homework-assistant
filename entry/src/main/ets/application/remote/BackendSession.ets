@@ -1,8 +1,9 @@
+import { AppConfig } from '../../common/config/AppConfig';
 import { BackendSessionStorage } from '../../domain/port/BackendSessionStorage';
 
 export class BackendSession {
   static readonly instance: BackendSession = new BackendSession();
-  private baseUrl: string = '';
+  private baseUrl: string = AppConfig.BACKEND_BASE_URL;
   private token: string = '';
   private displayName: string = '';
   private storage: BackendSessionStorage | null = null;
