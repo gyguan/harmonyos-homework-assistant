@@ -42,10 +42,9 @@ export class FamilyCloudService {
   }
 
   private apply(remote: RemoteStudent[]): void {
-    let settings = HomeworkStore.instance.getSettings();
-    settings.students.splice(0, settings.students.length);
+    let students: StudentProfile[] = [];
     for (let item of remote) {
-      settings.students.push({
+      students.push({
         id: item.id,
         name: item.name,
         grade: item.grade,
@@ -54,11 +53,6 @@ export class FamilyCloudService {
         textbookSummary: item.textbookSummary
       });
     }
-    let activeExists = false;
-    for (let student of settings.students) if (student.id === settings.activeStudentId) activeExists = true;
-    if (!activeExists && settings.students.length > 0) settings.activeStudentId = settings.students[0].id;
-    // Re-saving the current child import is an intentional lightweight persistence touch: it keeps
-    // HomeworkStore as the sole owner of the snapshot while persisting the updated settings object.
-    HomeworkStore.instance.replaceRawImport(HomeworkStore.instance.getRawImport());
+    HomeworkStore.instance.replaceStudents(students);
   }
 }
