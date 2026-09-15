@@ -61,6 +61,9 @@ jobs:
       - name: Validate parent review
         run: python scripts/validate_parent_review.py
 
+      - name: Validate student assignments navigation
+        run: python scripts/validate_student_assignments_navigation.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
