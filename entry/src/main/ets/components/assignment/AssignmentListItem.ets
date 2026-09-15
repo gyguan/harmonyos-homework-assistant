@@ -90,7 +90,6 @@ export struct AssignmentListItem {
       .alignItems(HorizontalAlign.End);
     }
     .width('100%')
-    .minHeight(68)
     .padding({ left: 12, right: 12, top: 11, bottom: 11 })
     .backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
     .borderRadius(AppTheme.CONTROL_RADIUS)
