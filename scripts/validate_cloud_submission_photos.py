@@ -35,6 +35,10 @@ require("photoCache" in api and "cachedPhotoUri" in api,
         "downloaded photos must be reused by photo id")
 require("downloadPhoto(photo)" in strip and "aboutToAppear" in strip,
         "photo strip must lazy-load missing photos when shown")
+require("sys.symbol.photo" not in strip,
+        "photo strip must not use unsupported sys.symbol.photo on the current HarmonyOS SDK")
+require("作业照片" in strip and "暂不可用" in strip,
+        "photo strip must retain a resource-free unavailable-photo placeholder")
 require("CloudSubmissionPhotoStrip" in progress,
         "parent progress page must render cloud photo thumbnails")
 require("@GetMapping(\"/submission-photos/{photoId}\")" in controller,
