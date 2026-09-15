@@ -49,6 +49,9 @@ jobs:
       - name: Validate backend V0.2 cloud and Tutor
         run: python scripts/validate_backend_v02.py
 
+      - name: Validate assignment countdown
+        run: python scripts/validate_assignment_countdown.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
