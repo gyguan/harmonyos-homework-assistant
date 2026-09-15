@@ -32,6 +32,7 @@ required_theme_tokens = [
     "SECTION_GAP",
     "CARD_RADIUS",
     "CONTROL_RADIUS",
+    "MIN_TOUCH_TARGET",
     "BUTTON_HEIGHT",
     "PAGE_TITLE_SIZE",
     "SECTION_TITLE_SIZE",
@@ -124,8 +125,10 @@ parent_dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDash
 require("onClick(() => this.onOpenImport())" in parent_dashboard and "AppTheme.CONTROL_RADIUS" in parent_dashboard,
         "parent dashboard import must be a rounded full-row action")
 
-require("export struct AssignmentListItem" in assignment_list_item and ".onClick(() => this.onOpen())" in assignment_list_item,
-        "assignment lists must provide a reusable full-row tap surface")
+require("export struct AssignmentListItem" in assignment_list_item and
+        "if (this.interactive) this.onOpen()" in assignment_list_item and
+        "accessibilityRole(AccessibilityRoleType.BUTTON)" in assignment_list_item,
+        "assignment lists must provide an accessible reusable full-row tap surface")
 
 require("sys.symbol.exclamationmark_triangle" not in read("entry/src/main/ets/features/student/today/StudentTodayPage.ets"),
         "unverified warning symbol must not be used")

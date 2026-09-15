@@ -145,9 +145,13 @@ export struct HomeworkImportPage {
       Text('›').fontSize(22).fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
+    .constraintSize({ minHeight: 60 })
     .padding(15)
     .backgroundColor(AppTheme.SURFACE)
     .borderRadius(AppTheme.CONTROL_RADIUS)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`${title}，${description}`)
     .onClick(action);
   }
 
@@ -164,6 +168,10 @@ export struct HomeworkImportPage {
           Text('收起')
             .fontSize(12)
             .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .textAlign(TextAlign.Center)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('收起作业文字输入')
             .onClick(() => this.textEntryOpen = false);
         }
       }
@@ -296,6 +304,10 @@ export struct HomeworkImportPage {
           Text('‹ 重新导入')
             .fontSize(14)
             .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 4, right: 8 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('返回重新导入')
             .onClick(() => this.showCompactCandidates = false);
           Blank();
           Text(`${this.candidates().length} 项`)

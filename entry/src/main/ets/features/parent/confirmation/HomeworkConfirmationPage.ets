@@ -125,9 +125,12 @@ export struct HomeworkConfirmationPage {
       .fontSize(13)
       .fontWeight(item.subject === subject ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(item.subject === subject ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .padding({ left: 14, right: 14, top: 9, bottom: 9 })
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 14, right: 14, top: 10, bottom: 10 })
       .backgroundColor(item.subject === subject ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
       .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(item.subject === subject ? `${subject}，已选择` : subject)
       .onClick(() => this.updateSubject(item, subject));
   }
 
@@ -137,9 +140,12 @@ export struct HomeworkConfirmationPage {
       .fontSize(12)
       .fontWeight(item.expectedMinutes === minutes ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .padding({ left: 10, right: 10, top: 8, bottom: 8 })
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 10, right: 10, top: 10, bottom: 10 })
       .backgroundColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
       .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(item.expectedMinutes === minutes ? `${minutes}分钟，已选择` : `${minutes}分钟`)
       .onClick(() => this.setExpectedMinutes(item, minutes));
   }
 
@@ -186,9 +192,13 @@ export struct HomeworkConfirmationPage {
       Text('›').fontSize(22).fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
+    .constraintSize({ minHeight: 60 })
     .padding(12)
     .backgroundColor(this.editingCandidateId === item.id ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
     .borderRadius(AppTheme.CONTROL_RADIUS)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`${item.subject}，${item.title}，${item.dueText}，预计${item.expectedMinutes}分钟`)
     .onClick(() => this.editingCandidateId = item.id);
   }
 
@@ -249,7 +259,11 @@ export struct HomeworkConfirmationPage {
         Text('删除')
           .fontSize(13)
           .fontColor(AppTheme.DANGER)
-          .padding({ left: 8, right: 8, top: 6, bottom: 6 })
+          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 8, top: 8, bottom: 8 })
+          .textAlign(TextAlign.Center)
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText(`删除${item.title}`)
           .onClick(() => this.removeCandidate(item.id));
       }
       .width('100%');
@@ -415,6 +429,10 @@ export struct HomeworkConfirmationPage {
         Text('‹ 返回作业列表')
           .fontSize(14)
           .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 4, right: 8 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('返回作业列表')
           .onClick(() => this.editingCandidateId = '');
         Column() {
           this.EditorPane();
@@ -480,9 +498,13 @@ export struct HomeworkConfirmationPage {
     Column({ space: 14 }) {
       Row() {
         Text('‹')
-          .width(32)
+          .width(AppTheme.MIN_TOUCH_TARGET)
+          .height(AppTheme.MIN_TOUCH_TARGET)
           .fontSize(30)
           .fontColor(AppTheme.TEXT)
+          .textAlign(TextAlign.Center)
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('返回收作业')
           .onClick(() => this.onBack());
         Column({ space: 2 }) {
           Text('确认老师作业')

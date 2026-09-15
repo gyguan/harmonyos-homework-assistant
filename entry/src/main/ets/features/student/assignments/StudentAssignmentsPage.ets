@@ -86,9 +86,12 @@ export struct StudentAssignmentsPage {
         .strokeWidth(this.subjectFilter === key ? 2 : 0)
         .color(this.subjectFilter === key ? AppTheme.PRIMARY : Color.Transparent);
     }
-    .height(36)
-    .padding({ left: 4, right: 4 })
+    .height(AppTheme.MIN_TOUCH_TARGET)
+    .padding({ left: 6, right: 6 })
     .justifyContent(FlexAlign.End)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(this.subjectFilter === key ? `${label}，已选择，${this.subjectCount(key)}项` : `${label}，${this.subjectCount(key)}项`)
     .onClick(() => this.subjectFilter = key);
   }
 
@@ -98,9 +101,12 @@ export struct StudentAssignmentsPage {
       .fontSize(12)
       .fontWeight(this.dateFilter === key ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(this.dateFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 12, right: 12, top: 10, bottom: 10 })
       .backgroundColor(this.dateFilter === key ? AppTheme.PRIMARY_SOFT : Color.Transparent)
       .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.dateFilter === key ? `${label}，已选择，${this.dateCount(key)}项` : `${label}，${this.dateCount(key)}项`)
       .onClick(() => this.dateFilter = key);
   }
 

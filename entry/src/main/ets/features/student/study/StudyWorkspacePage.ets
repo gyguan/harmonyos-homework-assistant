@@ -171,8 +171,13 @@ export struct StudyWorkspacePage {
               .backgroundColor(AppTheme.SURFACE_EMPHASIS);
             if (removable) {
               Text('移除')
-                .fontSize(11)
+                .width(64)
+                .height(AppTheme.MIN_TOUCH_TARGET)
+                .fontSize(12)
                 .fontColor(AppTheme.DANGER)
+                .textAlign(TextAlign.Center)
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText('移除这张作业照片')
                 .onClick(() => this.removeSubmissionPhoto(uri));
             }
           }
@@ -256,7 +261,6 @@ export struct StudyWorkspacePage {
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start);
-          Text('›').fontSize(20).fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%')
         .padding({ top: 12, bottom: 12 });
@@ -275,7 +279,6 @@ export struct StudyWorkspacePage {
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start);
-          Text('›').fontSize(20).fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%')
         .padding({ top: 12, bottom: 12 });
@@ -340,9 +343,12 @@ export struct StudyWorkspacePage {
             Row() {
               Blank();
               Text('暂停一下')
+                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
                 .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT)
-                .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+                .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText('暂停作业计时')
                 .onClick(() => this.pauseCurrentAssignment());
             }
             .width('100%');
@@ -484,9 +490,13 @@ export struct StudyWorkspacePage {
   private WorkspaceHeader() {
     Row({ space: 12 }) {
       Text('‹')
+        .width(AppTheme.MIN_TOUCH_TARGET)
+        .height(AppTheme.MIN_TOUCH_TARGET)
         .fontSize(30)
         .fontColor(AppTheme.TEXT)
-        .width(34)
+        .textAlign(TextAlign.Center)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen ? '返回学习任务' : '返回作业列表')
         .onClick(() => {
           if (this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen) {
             this.compactTutorOpen = false;

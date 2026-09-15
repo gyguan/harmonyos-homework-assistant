@@ -29,7 +29,7 @@ require("enterParent" in index and "AppRole.PARENT" in index,
         "entry page must provide an explicit parent persona")
 require("enterStudent(studentId: string)" in index and "setActiveStudent(studentId)" in index,
         "student persona selection must bind the selected child before entering")
-require("AppShell({ role: this.selectedRole })" in index,
+require("AppShell({" in index and "role: this.selectedRole" in index,
         "AppShell role must be supplied by the root entry gate")
 
 require("HomeworkStore.instance.getStudents()" in entry_page,

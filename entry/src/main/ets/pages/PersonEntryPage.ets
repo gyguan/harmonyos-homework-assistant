@@ -75,7 +75,11 @@ export struct PersonEntryPage {
       Text('›').fontSize(22).fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
-    .padding({ top: 13, bottom: 13 })
+    .constraintSize({ minHeight: 64 })
+    .padding({ top: 12, bottom: 12 })
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText('家长，收作业、确认任务、查看孩子完成情况')
     .onClick(() => this.onSelectParent());
   }
 
@@ -108,7 +112,11 @@ export struct PersonEntryPage {
       Text('›').fontSize(22).fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
-    .padding({ top: 13, bottom: 13 })
+    .constraintSize({ minHeight: 64 })
+    .padding({ top: 12, bottom: 12 })
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`${student.name}，${student.grade}，${student.className}`)
     .onClick(() => this.onSelectStudent(student.id));
   }
 

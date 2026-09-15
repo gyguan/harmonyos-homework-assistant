@@ -11,9 +11,15 @@ import { PersonEntryPage } from './PersonEntryPage';
 struct Index {
   @State private selectedRole: AppRole = AppRole.NONE;
   @State private cloudRevision: number = 0;
+  private shellBackHandler: () => boolean = () => false;
 
   aboutToAppear(): void {
     if (BackendSession.instance.isConnected()) void this.restoreCloud();
+  }
+
+  onBackPress(): boolean {
+    if (this.selectedRole === AppRole.NONE) return false;
+    return this.shellBackHandler();
   }
 
   private async restoreCloud(): Promise<void> {
@@ -43,7 +49,10 @@ struct Index {
           onSelectStudent: (studentId: string) => this.enterStudent(studentId)
         });
       } else {
-        AppShell({ role: this.selectedRole });
+        AppShell({
+          role: this.selectedRole,
+          onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
+        });
       }
     }.width('100%').height('100%');
   }
