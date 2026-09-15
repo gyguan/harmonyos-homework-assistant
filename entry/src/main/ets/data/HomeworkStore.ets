@@ -212,6 +212,16 @@ export class HomeworkStore {
     this.requestPersist();
   }
 
+  replaceStudents(students: StudentProfile[]): void {
+    let activeStudentId = this.settings.activeStudentId;
+    let next: StudentProfile[] = [];
+    for (let student of students) next.push(this.cloneStudent(student));
+    this.settings.students = next;
+    if (this.studentIndex(activeStudentId) >= 0) this.settings.activeStudentId = activeStudentId;
+    else if (this.settings.students.length > 0) this.settings.activeStudentId = this.settings.students[0].id;
+    this.requestPersist();
+  }
+
   getStudents(): StudentProfile[] { return this.settings.students; }
   getActiveStudentId(): string { return this.settings.activeStudentId; }
 

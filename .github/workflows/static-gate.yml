@@ -35,6 +35,9 @@ jobs:
       - name: Validate multi-child isolation
         run: python scripts/validate_multi_child_isolation.py
 
+      - name: Validate family cloud Store boundary
+        run: python scripts/validate_family_cloud_store_boundary.py
+
       - name: Validate responsive navigation
         run: python scripts/validate_responsive_navigation.py
 
