@@ -221,6 +221,10 @@ export struct HomeworkImportPage {
           .fontSize(14)
           .fontColor(AppTheme.PRIMARY)
           .onClick(() => this.showCompactCandidates = false);
+
+        if (this.parseMessage.length > 0) {
+          this.FeedbackBanner();
+        }
       }
 
       Row() {
