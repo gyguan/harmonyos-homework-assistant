@@ -159,7 +159,10 @@ export struct AppShell {
         onStoreChanged: () => this.touchStore()
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
-      BackendConnectionPage({ onStoreChanged: () => this.touchStore() });
+      BackendConnectionPage({
+        sizeClass: this.sizeClass,
+        onStoreChanged: () => this.touchStore()
+      });
     } else {
       ParentDashboardPage({
         sizeClass: this.sizeClass,
