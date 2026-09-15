@@ -77,6 +77,7 @@ export struct StudyWorkspacePage {
       case AssignmentStatus.NOT_STARTED:
       case AssignmentStatus.OVERDUE:
       case AssignmentStatus.NEEDS_REWORK: return '开始作业';
+      case AssignmentStatus.PAUSED: return '继续作业';
       case AssignmentStatus.IN_PROGRESS: return '我做完了，准备提交';
       case AssignmentStatus.READY_TO_SUBMIT:
         if (this.selectingPhotos) return '正在打开相册…';
@@ -98,7 +99,8 @@ export struct StudyWorkspacePage {
     let assignment = this.assignment();
     if (assignment === null) return;
     let changed: boolean = false;
-    if (assignment.status === AssignmentStatus.NOT_STARTED || assignment.status === AssignmentStatus.OVERDUE || assignment.status === AssignmentStatus.NEEDS_REWORK) {
+    if (assignment.status === AssignmentStatus.NOT_STARTED || assignment.status === AssignmentStatus.OVERDUE ||
+      assignment.status === AssignmentStatus.NEEDS_REWORK || assignment.status === AssignmentStatus.PAUSED) {
       changed = HomeworkStore.instance.startAssignment(assignment.id);
     } else if (assignment.status === AssignmentStatus.IN_PROGRESS) {
       changed = HomeworkStore.instance.markReadyToSubmit(assignment.id);
@@ -111,6 +113,12 @@ export struct StudyWorkspacePage {
       return;
     }
     if (changed) this.onStoreChanged();
+  }
+
+  private pauseCurrentAssignment(): void {
+    let assignment = this.assignment();
+    if (assignment === null || assignment.status !== AssignmentStatus.IN_PROGRESS) return;
+    if (HomeworkStore.instance.pauseAssignment(assignment.id)) this.onStoreChanged();
   }
 
   private async selectSubmissionPhotos(): Promise<void> {
@@ -227,6 +235,12 @@ export struct StudyWorkspacePage {
           Text(this.assignment()!.title).width('100%').fontSize(24).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
           Text(this.assignment()!.instruction).width('100%').fontSize(15).lineHeight(22).fontColor(AppTheme.SUBTEXT);
           AssignmentCountdownCard({ assignment: this.assignment()! });
+          if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
+            Button('暂停一下', { type: ButtonType.Normal })
+              .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.SUBTEXT)
+              .onClick(() => this.pauseCurrentAssignment());
+          }
           Column({ space: 8 }) {
             Text('教材 · ' + this.assignment()!.textbookRef).width('100%').fontSize(13).fontColor(AppTheme.PRIMARY);
             if (this.assignment()!.resourceLabels.length === 0) {
