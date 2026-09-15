@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,5 +30,9 @@ public class AssignmentController {
 
   @PatchMapping("/assignments/{id}")
   public AssignmentDtos.Response update(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String id, @Valid @RequestBody AssignmentDtos.Update input) { return service.update(familyId, id, input); }
+
+  @PutMapping("/assignments/{id}")
+  public AssignmentDtos.Response updateCompatible(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String id, @Valid @RequestBody AssignmentDtos.Update input) { return service.update(familyId, id, input); }
 }
