@@ -22,6 +22,7 @@ shell = read("entry/src/main/ets/pages/AppShell.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
 due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
+list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
 
 require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell, "student route must include ASSIGNMENTS")
 require("StudentAssignmentsPage" in shell, "AppShell must render StudentAssignmentsPage")
@@ -29,19 +30,32 @@ require("() => this.studentRoute = StudentRoute.ASSIGNMENTS" in shell,
         "student homework navigation must open assignments list instead of empty study workspace")
 require("studentStudyReturnRoute" in shell,
         "study detail must remember whether it was opened from Today or Assignments")
+
 require("我的作业" in page and "需要处理" in page and "待开始" in page,
         "student assignments page must organize active and not-started homework")
-require("已提交 · 待家长验收" in page and "已完成" in page,
+require("已提交" in page and "已完成" in page,
         "student assignments page must keep submitted/completed homework visible")
 require("this.onOpenStudy(item.id)" in page,
         "student assignments page must open the selected task by id")
+require("private openAssignment(item: Assignment)" in page,
+        "student assignments page must centralize phone/pad task opening behavior")
+require("this.sizeClass === WindowSizeClass.COMPACT" in page,
+        "phone task selection must use the COMPACT layout path")
+require("selectedAssignmentId" in page and "private DetailPane()" in page and "private PadLayout()" in page,
+        "pad assignments page must provide list-detail behavior instead of stretching the phone list")
+require("AssignmentListItem" in page and "onOpen: () => this.openAssignment(item)" in page,
+        "assignment rows must be fully tappable native-style list items")
+require("export struct AssignmentListItem" in list_item,
+        "shared native assignment list item must exist")
+
 require("@State private subjectFilter: string = 'ALL'" in page and "filteredAssignments()" in page,
         "student assignments page must keep an explicit subject filter state")
-require("SubjectFilterChip('ALL', '全部')" in page and "SubjectFilterChip(Subject.CHINESE, '语文')" in page and
-        "SubjectFilterChip(Subject.MATH, '数学')" in page and "SubjectFilterChip(Subject.ENGLISH, '英语')" in page,
+require("SubjectTab('ALL', '全部')" in page and "SubjectTab(Subject.CHINESE, '语文')" in page and
+        "SubjectTab(Subject.MATH, '数学')" in page and "SubjectTab(Subject.ENGLISH, '英语')" in page,
         "student assignments page must expose all/chinese/math/english filters")
-require("subjectCount(key)" in page and "this.filteredAssignments()" in page,
+require("this.subjectCount(key)" in page and "this.filteredAssignments()" in page,
         "student subject filters must show counts and drive the status sections")
+
 require("@State private dateFilter: DueDateFilterKey = DueDateFilterKey.ALL" in page,
         "student assignments page must keep an explicit due-date filter state")
 for token in ["DueDateFilterKey.ALL", "DueDateFilterKey.TODAY", "DueDateFilterKey.TOMORROW",
@@ -49,8 +63,8 @@ for token in ["DueDateFilterKey.ALL", "DueDateFilterKey.TODAY", "DueDateFilterKe
     require(token in page, f"student assignments page missing date filter: {token}")
 require("AssignmentDueDate.matches(item, this.dateFilter)" in page and "matchesSubject(item, this.subjectFilter)" in page,
         "student assignments must combine subject and due-date filters")
-require("dateCount(key)" in page and "DateFilterBar()" in page and "FilterPanel()" in page,
-        "student due-date filters must show counts in a dedicated filter row")
+require("this.dateCount(key)" in page and "private DateTab(" in page and "private FilterPanel()" in page,
+        "student due-date filters must show counts in a dedicated lightweight filter row")
 require("for (let item of this.filteredAssignments())" in page,
         "student status grouping must run after subject and date filtering")
 
