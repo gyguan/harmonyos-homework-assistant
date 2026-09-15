@@ -20,9 +20,17 @@ export class TutorQuestionCaptureService {
   async capture(context: common.UIAbilityContext, studentId: string): Promise<TutorQuestionCaptureResult> {
     let now = Date.now();
     let filePath = `${context.cacheDir}/tutor-question-${now}.jpg`;
-    let file = fileIo.openSync(filePath,
-      fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
-    fileIo.closeSync(file);
+    try {
+      let file = fileIo.openSync(filePath,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      try {
+        fileIo.closeSync(file);
+      } catch {
+        return { captured: false, imageUri: '', recognizedText: '' };
+      }
+    } catch {
+      return { captured: false, imageUri: '', recognizedText: '' };
+    }
     let saveUri = fileUri.getUriFromPath(filePath);
 
     let profile: cameraPicker.PickerProfile = {

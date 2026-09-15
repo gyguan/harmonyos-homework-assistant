@@ -30,6 +30,7 @@ store = read("entry/src/main/ets/data/HomeworkStore.ets")
 sync = read("entry/src/main/ets/application/remote/HomeworkSyncService.ets")
 settings = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 remote_submission = read("entry/src/main/ets/application/remote/RemoteSubmissionApi.ets")
+http_client = read("entry/src/main/ets/application/remote/BackendHttpClient.ets")
 
 require("<version>4.1.1</version>" in pom, "backend must pin Spring Boot 4.1.1")
 require("<java.version>21</java.version>" in pom, "backend must target Java 21")
@@ -63,6 +64,11 @@ require("云端连接" in settings and "BackendAuthService" in settings,
         "parent settings must provide an explicit backend connection surface")
 require("request.uploadFile" in remote_submission and "internal://cache/" in remote_submission,
         "remote photo submission must use the HarmonyOS cache-backed upload API")
+require("canIUse('SystemCapability.MiscServices.Upload')" in remote_submission,
+        "remote photo submission must guard uploadFile with the Upload system capability")
+require("await client.request" in http_client and "catch {" in http_client and
+        "后端请求失败，请检查网络或后端地址" in http_client,
+        "BackendHttpClient must explicitly guard request exceptions with a stable error")
 
 if errors:
     print("BACKEND_V01_GATE_FAIL")

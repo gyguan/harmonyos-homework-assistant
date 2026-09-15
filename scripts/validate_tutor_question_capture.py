@@ -29,6 +29,10 @@ require("cameraPicker.pick" in service and "PickerMediaType.PHOTO" in service,
         "tutor question capture must use the system CameraPicker photo flow")
 require("saveUri" in service and "context.cacheDir" in service,
         "camera result must be written into app cache instead of automatically polluting Gallery")
+require("fileIo.openSync" in service and "fileIo.closeSync" in service and service.count("catch {") >= 3,
+        "camera cache file open/close and CameraPicker calls must remain explicitly exception guarded")
+require("return { captured: false, imageUri: '', recognizedText: '' }" in service,
+        "capture failures must return the non-crashing empty result")
 require("CoreVisionHomeworkTextExtractor" in service,
         "captured question must reuse local CoreVision OCR")
 require("recognizedText" in service and "resourceUri: result.resultUri" in service,
