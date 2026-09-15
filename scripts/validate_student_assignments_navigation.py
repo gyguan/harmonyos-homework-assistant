@@ -61,8 +61,10 @@ for phrase in ["今天", "明天", "后天", "周日", "星期天", "月"]:
 require("AssignmentStatus.COMPLETED" in due_date and "AssignmentStatus.SUBMITTED" in due_date and
         "AssignmentStatus.OVERDUE" in due_date,
         "overdue filtering must respect completed/submitted/overdue assignment states")
-require("dueDay >= today && dueDay <= this.endOfWeek(today)" in due_date,
+require("dueDay >= today && dueDay <= AssignmentDueDate.endOfWeek(today)" in due_date,
         "this-week filtering must use the local week boundary")
+require("this." not in due_date,
+        "AssignmentDueDate static utility must not use standalone this; ArkTS requires explicit class references")
 
 require("HomeworkStore.instance.getAssignments()" in today,
         "Today must include overdue assignments instead of filtering them out")
