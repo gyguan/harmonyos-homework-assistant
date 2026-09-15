@@ -4,6 +4,7 @@ import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
+import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { Assignment, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
@@ -301,8 +302,15 @@ export struct StudyWorkspacePage {
           Text(this.tutorNotice).width('100%').fontSize(12).fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
         }
         Text('小伴默认提示优先，不直接替你完成作业。').width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+        TutorQuestionCapturePanel({
+          studentId: HomeworkStore.instance.getActiveStudentId(),
+          onRecognized: (text: string) => {
+            this.tutorDraft = `题目识别结果：\n${text}\n\n我卡住的地方：`;
+            this.tutorNotice = '识别文字已放入输入框，请确认或补充后再发送';
+          }
+        });
         TextArea({ placeholder: '输入问题，或者说说你做到哪一步…', text: this.tutorDraft })
-          .width('100%').height(82).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+          .width('100%').height(110).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.tutorDraft = value);
         Button(this.tutorSending ? '发送中…' : '发送给小伴', { type: ButtonType.Normal })
           .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS)
