@@ -2,12 +2,13 @@ import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCard } from '../../../components/assignment/AssignmentCard';
 import { HomeworkStore } from '../../../data/HomeworkStore';
-import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, Subject } from '../../../domain/model/HomeworkModels';
 
 @Component
 export struct StudentAssignmentsPage {
   @Prop sizeClass: WindowSizeClass;
   @Prop revision: number = 0;
+  @State private subjectFilter: string = 'ALL';
   onOpenStudy: (assignmentId: string) => void = () => {};
 
   private assignments(): Assignment[] {
@@ -15,9 +16,23 @@ export struct StudentAssignmentsPage {
     return HomeworkStore.instance.getAssignments();
   }
 
+  private filteredAssignments(): Assignment[] {
+    if (this.subjectFilter === 'ALL') return this.assignments();
+    let result: Assignment[] = [];
+    for (let item of this.assignments()) if (item.subject === this.subjectFilter) result.push(item);
+    return result;
+  }
+
+  private subjectCount(subject: string): number {
+    if (subject === 'ALL') return this.assignments().length;
+    let count = 0;
+    for (let item of this.assignments()) if (item.subject === subject) count++;
+    return count;
+  }
+
   private inStatuses(statuses: AssignmentStatus[]): Assignment[] {
     let result: Assignment[] = [];
-    for (let item of this.assignments()) {
+    for (let item of this.filteredAssignments()) {
       for (let status of statuses) {
         if (item.status === status) {
           result.push(item);
@@ -46,6 +61,31 @@ export struct StudentAssignmentsPage {
       default:
         return '查看';
     }
+  }
+
+  @Builder
+  private SubjectFilterChip(key: string, label: string) {
+    Text(`${label} ${this.subjectCount(key)}`)
+      .layoutWeight(1)
+      .height(36)
+      .textAlign(TextAlign.Center)
+      .fontSize(AppTheme.CAPTION_SIZE)
+      .fontWeight(this.subjectFilter === key ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(this.subjectFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .padding({ top: 9, bottom: 9 })
+      .backgroundColor(this.subjectFilter === key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .onClick(() => this.subjectFilter = key);
+  }
+
+  @Builder
+  private SubjectFilterBar() {
+    Row({ space: 7 }) {
+      this.SubjectFilterChip('ALL', '全部');
+      this.SubjectFilterChip(Subject.CHINESE, '语文');
+      this.SubjectFilterChip(Subject.MATH, '数学');
+      this.SubjectFilterChip(Subject.ENGLISH, '英语');
+    }.width('100%');
   }
 
   @Builder
@@ -87,9 +127,11 @@ export struct StudentAssignmentsPage {
       Column({ space: AppTheme.SECTION_GAP }) {
         Column({ space: 5 }) {
           Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('需要处理的放前面，已提交和已完成的也可以随时回来查看。')
+          Text('先按科目定位，再看需要处理、待开始、已提交和已完成。')
             .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
         }.width('100%').alignItems(HorizontalAlign.Start);
+
+        this.SubjectFilterBar();
 
         this.Section('需要处理', '正在做、已暂停、需要订正或已经逾期',
           this.inStatuses([AssignmentStatus.IN_PROGRESS, AssignmentStatus.PAUSED,
@@ -99,8 +141,9 @@ export struct StudentAssignmentsPage {
           this.inStatuses([AssignmentStatus.SUBMITTED]));
         this.Section('已完成', '家长已经确认完成', this.inStatuses([AssignmentStatus.COMPLETED]));
 
-        if (this.assignments().length === 0) {
-          Text('暂时没有作业').width('100%').padding(AppTheme.CARD_PADDING)
+        if (this.filteredAssignments().length === 0) {
+          Text(this.assignments().length === 0 ? '暂时没有作业' : '这个科目暂时没有作业')
+            .width('100%').padding(AppTheme.CARD_PADDING)
             .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT)
             .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
         }
