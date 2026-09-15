@@ -50,6 +50,7 @@ export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
       instruction: body,
       textbookRef: this.textbookRef(subject, body),
       dueText: this.dueText(body),
+      expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: input.sourceLabel,
         excerpt: sourceSegment
@@ -319,42 +320,25 @@ export class LocalHomeworkAssignmentParser implements HomeworkAssignmentParser {
     if (unitMatch !== null && unitMatch.length > 0) {
       return unitMatch[0];
     }
-    let pageMatch = body.match(/[Pp]\s*\d+(?:[-~—～至到]\d+)?/);
+    let pageMatch = body.match(/[Pp]?\d+([~～\-—至到]\d+)?页?/);
     if (pageMatch !== null && pageMatch.length > 0) {
-      return pageMatch[0].toUpperCase().split(' ').join('');
+      return pageMatch[0];
     }
-    let chinesePageMatch = body.match(/\d+(?:[-~—～至到]\d+)?页/);
-    if (chinesePageMatch !== null && chinesePageMatch.length > 0) {
-      return chinesePageMatch[0];
-    }
-    let unitEnglishMatch = body.match(/[Uu]\s*\d+/);
-    if (unitEnglishMatch !== null && unitEnglishMatch.length > 0) {
-      return unitEnglishMatch[0].toUpperCase().split(' ').join('');
+    let unitShort = body.match(/[Uu]\d+/);
+    if (unitShort !== null && unitShort.length > 0) {
+      return unitShort[0].toUpperCase();
     }
     return '';
   }
 
   private confidence(body: string, hasExplicitSubject: boolean): number {
-    if (body.length < 4) {
-      return 0.72;
+    let score = hasExplicitSubject ? 0.88 : 0.78;
+    if (this.learningLocation(body).length > 0) {
+      score += 0.06;
     }
-    let score = hasExplicitSubject ? 0.92 : 0.84;
-    if (this.hasHomeworkAction(body)) {
+    if (this.dueText(body) !== '今天') {
       score += 0.03;
     }
-    if (this.learningLocation(body).length > 0) {
-      score += 0.02;
-    }
-    return score > 0.97 ? 0.97 : score;
-  }
-
-  private hasHomeworkAction(body: string): boolean {
-    let actions: string[] = ['背诵', '听读', '口算', '订正', '默写', '预习', '复习', '抄写', '朗读', '阅读', '完成', '练习'];
-    for (let action of actions) {
-      if (body.indexOf(action) >= 0) {
-        return true;
-      }
-    }
-    return false;
+    return Math.min(score, 0.98);
   }
 }
