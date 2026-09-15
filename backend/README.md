@@ -4,7 +4,7 @@
 
 ## 本地启动
 
-前置：JDK 21、Maven 3.6.3+、Docker。
+前置：JDK 21、Maven 3.6.3+、Docker、Python 3.10+。
 
 ```powershell
 docker compose -f backend/docker-compose.yml up -d
@@ -25,6 +25,68 @@ curl http://localhost:8080/api/v1/health
 ```
 
 默认开发账号：`parent / parent123`。部署环境必须通过 `BOOTSTRAP_PASSWORD` 修改密码，或设置 `BOOTSTRAP_ENABLED=false`。
+
+## 真实 Backend E2E Smoke
+
+仓库提供 `backend/scripts/e2e_smoke.py`，直接验证正在运行的真实 PostgreSQL + Spring Boot，而不是 Mock 或 H2。脚本只使用 Python 标准库，会创建独立的 `e2e-*` 学生/作业数据并覆盖以下能力：
+
+- health、登录与 `/auth/session`；
+- Student 新增、修改、删除和查询；
+- Assignment 创建与更新；
+- 使用旧 version 更新时必须返回 `409`；
+- Assignment 状态流转；
+- Tutor 对话的 fallback 或真实模型模式；
+- multipart 作业照片上传；
+- 未鉴权照片读取必须返回 `401`，Bearer 鉴权后可正常下载；
+- Submission 查询以及提交后 Assignment 进入 `SUBMITTED`。
+
+### 1. 无模型配置：验证主链路 + Tutor 降级
+
+保持 PostgreSQL 与 backend 正常运行，在仓库根目录执行：
+
+```powershell
+python backend/scripts/e2e_smoke.py --expect-tutor-unavailable
+```
+
+成功结尾应看到 `BACKEND_E2E_SMOKE_PASS`。本次登录 token 会保存在 `backend/.e2e-session.json`；该文件已加入 `.gitignore`，不要复制到仓库或聊天中。
+
+### 2. 验证 backend 重启后 session 仍有效
+
+第一轮 smoke 成功后，仅重启 Spring Boot，不要删除 PostgreSQL volume，然后执行：
+
+```powershell
+python backend/scripts/e2e_smoke.py --session-only
+```
+
+成功结尾应看到 `BACKEND_SESSION_RESUME_PASS`。这一步直接验证 opaque Bearer token 确实持久化在 PostgreSQL，而不是进程内存。
+
+### 3. 配置真实模型：验证 OpenAI Responses 链路
+
+通过环境变量或 `backend/config/application-local.yml` 配置模型。PowerShell 单行启动示例：
+
+```powershell
+$env:OPENAI_API_KEY="你的Key"; $env:OPENAI_MODEL="你的可用模型"; cd backend; mvn spring-boot:run
+```
+
+随后在仓库根目录执行：
+
+```powershell
+python backend/scripts/e2e_smoke.py --expect-tutor-available
+```
+
+该模式要求 Tutor 返回 `available=true`，并至少产生一条 assistant 消息；否则 smoke 失败。服务端调用仍固定 `store=false`，API Key 不进入 HarmonyOS App。
+
+### 4. 非默认后端地址或账号
+
+```powershell
+python backend/scripts/e2e_smoke.py --base-url http://192.168.1.10:8080 --login-name parent --password parent123
+```
+
+如果使用自定义 token 文件：
+
+```powershell
+python backend/scripts/e2e_smoke.py --token-file D:\temp\xiaoban-e2e-session.json
+```
 
 ## 配置
 
