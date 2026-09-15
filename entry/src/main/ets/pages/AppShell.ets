@@ -11,6 +11,7 @@ import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
 import { StudentAssignmentsPage } from '../features/student/assignments/StudentAssignmentsPage';
+import { StudentProfilePage } from '../features/student/profile/StudentProfilePage';
 import { StudyWorkspacePage } from '../features/student/study/StudyWorkspacePage';
 import { StudentTodayPage } from '../features/student/today/StudentTodayPage';
 
@@ -23,6 +24,7 @@ export enum AppRole {
 enum StudentRoute {
   TODAY = 'TODAY',
   ASSIGNMENTS = 'ASSIGNMENTS',
+  PROFILE = 'PROFILE',
   STUDY = 'STUDY'
 }
 
@@ -114,6 +116,11 @@ export struct AppShell {
         sizeClass: this.sizeClass,
         revision: this.storeRevision,
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
+      });
+    } else if (this.studentRoute === StudentRoute.PROFILE) {
+      StudentProfilePage({
+        sizeClass: this.sizeClass,
+        revision: this.storeRevision
       });
     } else {
       StudentTodayPage({
@@ -240,7 +247,8 @@ export struct AppShell {
         this.BottomItem($r('sys.symbol.checkmark_square'), '作业',
           this.studentRoute === StudentRoute.ASSIGNMENTS || this.studentRoute === StudentRoute.STUDY,
           () => this.studentRoute = StudentRoute.ASSIGNMENTS);
-        this.BottomItem($r('sys.symbol.gearshape'), '我的', false, () => {});
+        this.BottomItem($r('sys.symbol.gearshape'), '我的', this.studentRoute === StudentRoute.PROFILE,
+          () => this.studentRoute = StudentRoute.PROFILE);
       } else {
         this.BottomItem($r('sys.symbol.house'), '首页', this.parentRoute === ParentRoute.DASHBOARD,
           () => this.parentRoute = ParentRoute.DASHBOARD);
@@ -282,7 +290,8 @@ export struct AppShell {
         this.SideItem($r('sys.symbol.checkmark_square'), '作业',
           this.studentRoute === StudentRoute.ASSIGNMENTS || this.studentRoute === StudentRoute.STUDY,
           () => this.studentRoute = StudentRoute.ASSIGNMENTS);
-        this.SideItem($r('sys.symbol.gearshape'), '我的', false, () => {});
+        this.SideItem($r('sys.symbol.gearshape'), '我的', this.studentRoute === StudentRoute.PROFILE,
+          () => this.studentRoute = StudentRoute.PROFILE);
       } else {
         this.SideItem($r('sys.symbol.house'), '首页', this.parentRoute === ParentRoute.DASHBOARD,
           () => this.parentRoute = ParentRoute.DASHBOARD);

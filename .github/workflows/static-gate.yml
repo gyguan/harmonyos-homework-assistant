@@ -64,6 +64,9 @@ jobs:
       - name: Validate student assignments navigation
         run: python scripts/validate_student_assignments_navigation.py
 
+      - name: Validate student profile navigation
+        run: python scripts/validate_student_profile_navigation.py
+
       - name: Validate AI suggested homework duration
         run: python scripts/validate_ai_expected_minutes.py
 
