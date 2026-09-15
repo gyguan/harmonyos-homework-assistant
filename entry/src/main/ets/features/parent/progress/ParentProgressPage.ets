@@ -27,11 +27,26 @@ export struct ParentProgressPage {
   @State private editExpectedMinutes: string = '20';
   @State private deleteConfirm: boolean = false;
   @State private operationNotice: string = '';
+  @State private subjectFilter: string = 'ALL';
   onStoreChanged: () => void = () => {};
 
   private assignments(): Assignment[] {
     let currentRevision = this.revision + this.localRevision;
     return HomeworkStore.instance.getAssignments();
+  }
+
+  private filteredAssignments(): Assignment[] {
+    if (this.subjectFilter === 'ALL') return this.assignments();
+    let result: Assignment[] = [];
+    for (let item of this.assignments()) if (item.subject === this.subjectFilter) result.push(item);
+    return result;
+  }
+
+  private subjectCount(subject: string): number {
+    if (subject === 'ALL') return this.assignments().length;
+    let count = 0;
+    for (let item of this.assignments()) if (item.subject === subject) count++;
+    return count;
   }
 
   private selectedAssignment(): Assignment | null {
@@ -426,27 +441,60 @@ export struct ParentProgressPage {
   }
 
   @Builder
+  private SubjectFilterChip(key: string, label: string) {
+    Text(`${label} ${this.subjectCount(key)}`)
+      .layoutWeight(1)
+      .height(36)
+      .textAlign(TextAlign.Center)
+      .fontSize(AppTheme.CAPTION_SIZE)
+      .fontWeight(this.subjectFilter === key ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(this.subjectFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .padding({ top: 9, bottom: 9 })
+      .backgroundColor(this.subjectFilter === key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .onClick(() => this.subjectFilter = key);
+  }
+
+  @Builder
+  private SubjectFilterBar() {
+    Row({ space: 7 }) {
+      this.SubjectFilterChip('ALL', '全部');
+      this.SubjectFilterChip(Subject.CHINESE, '语文');
+      this.SubjectFilterChip(Subject.MATH, '数学');
+      this.SubjectFilterChip(Subject.ENGLISH, '英语');
+    }.width('100%');
+  }
+
+  @Builder
   private ProgressList() {
     Column({ space: AppTheme.SECTION_GAP }) {
       Column({ space: 5 }) {
         Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        Text(`${HomeworkStore.instance.getStudent().name} · 点击任务查看详情、编辑或删除`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text(`${HomeworkStore.instance.getStudent().name} · 按科目筛选后可查看详情、编辑或删除`).fontSize(13).fontColor(AppTheme.SUBTEXT);
       }.width('100%').alignItems(HorizontalAlign.Start);
-      if (this.sizeClass === WindowSizeClass.EXPANDED) {
+
+      this.SubjectFilterBar();
+
+      if (this.filteredAssignments().length === 0) {
+        Text(this.assignments().length === 0 ? '暂时没有作业' : '这个科目暂时没有作业')
+          .width('100%').padding(AppTheme.CARD_PADDING)
+          .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT)
+          .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+      } else if (this.sizeClass === WindowSizeClass.EXPANDED) {
         Row({ space: 16 }) {
           Column({ space: AppTheme.ITEM_GAP }) {
-            ForEach(this.assignments().slice(0, Math.ceil(this.assignments().length / 2)), (item: Assignment) => {
+            ForEach(this.filteredAssignments().slice(0, Math.ceil(this.filteredAssignments().length / 2)), (item: Assignment) => {
               this.ProgressCard(item);
             }, (item: Assignment) => item.id);
           }.layoutWeight(1);
           Column({ space: AppTheme.ITEM_GAP }) {
-            ForEach(this.assignments().slice(Math.ceil(this.assignments().length / 2)), (item: Assignment) => {
+            ForEach(this.filteredAssignments().slice(Math.ceil(this.filteredAssignments().length / 2)), (item: Assignment) => {
               this.ProgressCard(item);
             }, (item: Assignment) => item.id);
           }.layoutWeight(1);
         }.width('100%').alignItems(VerticalAlign.Top);
       } else {
-        ForEach(this.assignments(), (item: Assignment) => {
+        ForEach(this.filteredAssignments(), (item: Assignment) => {
           this.ProgressCard(item);
         }, (item: Assignment) => item.id);
       }
