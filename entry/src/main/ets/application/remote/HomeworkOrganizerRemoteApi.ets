@@ -38,7 +38,7 @@ export class HomeworkOrganizerRemoteApi {
         sourceLabel: input.sourceLabel
       };
       let response = await BackendHttpClient.instance.request(
-        `/api/v1/students/${input.studentId}/homework/organize`,
+        `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize`,
         http.RequestMethod.POST,
         payload
       );
@@ -46,14 +46,11 @@ export class HomeworkOrganizerRemoteApi {
         return null;
       }
       let parsed = JSON.parse(response.body) as OrganizeResponse;
-      if (parsed.assignments === undefined || parsed.assignments === null) {
-        return null;
-      }
       let result: CandidateAssignment[] = [];
       for (let i = 0; i < parsed.assignments.length; i++) {
         let remote = parsed.assignments[i];
         let subject = this.subject(remote.subject);
-        if (subject === null || remote.title === undefined || remote.title.trim().length === 0) {
+        if (subject === null || remote.title.trim().length === 0) {
           continue;
         }
         let confidence = remote.confidence;
@@ -87,8 +84,8 @@ export class HomeworkOrganizerRemoteApi {
     return null;
   }
 
-  private value(value: string | undefined, fallback: string): string {
-    if (value === undefined || value === null || value.trim().length === 0) return fallback;
+  private value(value: string, fallback: string): string {
+    if (value.trim().length === 0) return fallback;
     return value.trim();
   }
 }
