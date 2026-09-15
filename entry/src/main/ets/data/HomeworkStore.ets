@@ -205,6 +205,13 @@ export class HomeworkStore {
   }
 
   getSettings(): AppSettings { return this.settings; }
+
+  updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean): void {
+    this.settings.tutorGuidanceFirst = tutorGuidanceFirst;
+    this.settings.directAnswerAllowed = directAnswerAllowed;
+    this.requestPersist();
+  }
+
   getStudents(): StudentProfile[] { return this.settings.students; }
   getActiveStudentId(): string { return this.settings.activeStudentId; }
 
