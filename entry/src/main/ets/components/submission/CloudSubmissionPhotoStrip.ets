@@ -44,9 +44,10 @@ export struct CloudSubmissionPhotoStrip {
                 .backgroundColor(AppTheme.SURFACE_EMPHASIS);
             } else {
               Column({ space: 5 }) {
-                SymbolGlyph($r('sys.symbol.photo'))
-                  .fontSize(22)
-                  .fontColor([AppTheme.TERTIARY_TEXT]);
+                Text('作业照片')
+                  .fontSize(12)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TERTIARY_TEXT);
                 Text(this.loading ? '下载中' : '暂不可用')
                   .fontSize(10)
                   .fontColor(AppTheme.SUBTEXT);
