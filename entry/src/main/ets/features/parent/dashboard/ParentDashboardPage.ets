@@ -93,7 +93,7 @@ export struct ParentDashboardPage {
 
       Column({ space: 7 }) {
         ForEach(this.assignments(), (item: Assignment) => {
-          AssignmentListItem({ assignment: item, showChevron: false });
+          AssignmentListItem({ assignment: item, showChevron: false, interactive: false });
         }, (item: Assignment) => item.id);
       }
       .width('100%');
@@ -126,9 +126,13 @@ export struct ParentDashboardPage {
         .fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
+    .constraintSize({ minHeight: 60 })
     .padding(15)
     .backgroundColor(AppTheme.PRIMARY_FAINT)
     .borderRadius(AppTheme.CONTROL_RADIUS)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`给 ${this.student().name} 收作业，导入老师作业`)
     .onClick(() => this.onOpenImport());
   }
 
