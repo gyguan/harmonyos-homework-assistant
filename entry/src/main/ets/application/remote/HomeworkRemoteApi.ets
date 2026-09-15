@@ -45,6 +45,12 @@ export class HomeworkRemoteApi {
     return JSON.parse(response.body) as RemoteAssignment;
   }
 
+  async delete(assignmentId: string): Promise<boolean> {
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/assignments/${encodeURIComponent(assignmentId)}`, http.RequestMethod.DELETE);
+    return response.statusCode === 200 || response.statusCode === 204 || response.statusCode === 404;
+  }
+
   private createBody(assignment: Assignment): CreateAssignmentBody {
     return { id: assignment.id, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
       textbookRef: assignment.textbookRef, dueText: assignment.dueText, status: assignment.status, sourceLabel: '', sourceExcerpt: '',
