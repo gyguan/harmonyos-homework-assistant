@@ -63,6 +63,16 @@ require('@ConfigurationProperties(prefix = "app.ai")' in ai_properties and
 require("responses" in ai_transport and "chatCompletion" in ai_transport and
         'body.put("store", false)' in ai_transport and '"json_schema"' in ai_transport,
         "AI transport must support responses/chat-completions and structured output without provider storage")
+require("[AI] config" in ai_transport and "[AI] request" in ai_transport and
+        "[AI] response error" in ai_transport and "RestClientResponseException" in ai_transport and
+        "sanitizeProviderError" in ai_transport and "keyConfigured" in ai_transport,
+        "AI transport must emit safe provider diagnostics for config/request/http errors")
+require("instructions" not in " ".join(
+        line for line in ai_transport.splitlines() if "log." in line or "log.info" in line or "log.warn" in line),
+        "AI diagnostic logs must not log prompt instructions")
+require("input" not in " ".join(
+        line for line in ai_transport.splitlines() if "log." in line or "log.info" in line or "log.warn" in line),
+        "AI diagnostic logs must not log user/model input")
 require("AiProviderProperties" in model_client and "OpenAiCompatibleTransport" in model_client,
         "Tutor business must use the generic configurable AI transport")
 require("AiProviderProperties" in organizer_model and "OpenAiCompatibleTransport" in organizer_model,
