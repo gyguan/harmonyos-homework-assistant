@@ -27,6 +27,10 @@ export struct ParentProgressPage {
   }
 
   private timingText(item: Assignment): string {
+    if (item.status === AssignmentStatus.PAUSED) {
+      let usedMinutes = item.elapsedSeconds > 0 ? Math.max(1, Math.round(item.elapsedSeconds / 60)) : 0;
+      return `已暂停 · 已用 ${usedMinutes} 分钟 / 预计 ${item.expectedMinutes} 分钟`;
+    }
     if (item.elapsedSeconds > 0 && item.status !== AssignmentStatus.IN_PROGRESS) {
       let actualMinutes = Math.max(1, Math.round(item.elapsedSeconds / 60));
       return `预计 ${item.expectedMinutes} 分钟 · 实际 ${actualMinutes} 分钟`;
