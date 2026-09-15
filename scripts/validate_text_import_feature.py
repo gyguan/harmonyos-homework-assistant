@@ -27,8 +27,17 @@ require("TextArea" in page, "parent import page must provide editable teacher-te
 require("智能整理作业" in page, "parent import page must expose text parsing action")
 require("parseTypedText" in page and "HomeworkImportService.instance.parseText" in page,
         "text input must flow through HomeworkImportService")
-require(page.count("this.FeedbackBanner();") >= 2 and "if (this.parseMessage.length > 0)" in page,
-        "compact candidate result page must keep organizer feedback visible after auto-navigation")
+require("selectScreenshot" in page and "HomeworkImportService.instance.selectImageAndParse" in page,
+        "screenshot import must continue through HomeworkImportService")
+require("showCompactCandidates" in page and "private CandidatePane()" in page,
+        "phone import must keep a dedicated result step instead of stacking source and result")
+require("WindowSizeClass.COMPACT" in page and "WindowSizeClass.EXPANDED" in page,
+        "import page must keep responsive phone/pad branches")
+require("this.FeedbackBanner();" in page and "if (this.parseMessage.length > 0)" in page,
+        "organizer feedback must remain visible in the import flow")
+require("AI 整理结果" in page and "确认 ${this.candidates().length} 项作业" in page,
+        "parsed candidates must remain reviewable before confirmation")
+
 require("async parseText(text: string)" in service,
         "HomeworkImportService must support direct text import")
 require("HomeworkImportSourceKind.TEXT" in service and "家长录入文字" in service,
