@@ -21,6 +21,9 @@ public class ApiExceptionHandler {
   @ExceptionHandler(ApiExceptions.BadRequest.class)
   ResponseEntity<Map<String, String>> badRequest(RuntimeException e) { return error(HttpStatus.BAD_REQUEST, e); }
 
+  @ExceptionHandler(ApiExceptions.ServiceUnavailable.class)
+  ResponseEntity<Map<String, String>> serviceUnavailable(RuntimeException e) { return error(HttpStatus.SERVICE_UNAVAILABLE, e); }
+
   @ExceptionHandler(MethodArgumentNotValidException.class)
   ResponseEntity<Map<String, String>> validation(MethodArgumentNotValidException e) {
     String message = e.getBindingResult().getFieldErrors().stream().findFirst()

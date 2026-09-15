@@ -7,4 +7,5 @@ public final class ApiExceptions {
   public static class Conflict extends RuntimeException { public Conflict(String message) { super(message); } }
   public static class Unauthorized extends RuntimeException { public Unauthorized(String message) { super(message); } }
   public static class BadRequest extends RuntimeException { public BadRequest(String message) { super(message); } }
+  public static class ServiceUnavailable extends RuntimeException { public ServiceUnavailable(String message) { super(message); } }
 }

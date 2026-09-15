@@ -2,7 +2,7 @@ import { HomeworkImportService } from '../../../application/import/HomeworkImpor
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkStore } from '../../../data/HomeworkStore';
-import { HomeworkImageImportResult } from '../../../domain/model/ImportModels';
+import { HomeworkImageImportResult, HomeworkOrganizerMode, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { CandidateAssignment, RawHomeworkImport } from '../../../domain/model/HomeworkModels';
 
 @Component
@@ -48,15 +48,19 @@ export struct HomeworkImportPage {
     this.parseMessage = '';
     this.parseError = false;
     try {
-      let count = await HomeworkImportService.instance.parseText(text);
-      if (count > 0) {
+      let result: HomeworkTextImportResult = await HomeworkImportService.instance.parseText(text);
+      if (result.candidateCount > 0) {
         this.onStoreChanged();
-        this.parseMessage = `已整理出 ${count} 项作业，请确认后发布`;
+        this.parseMessage = result.organizerMode === HomeworkOrganizerMode.AI
+          ? `AI 已整理出 ${result.candidateCount} 项作业，请确认后发布`
+          : `云端 AI 暂不可用，已用本地规则整理出 ${result.candidateCount} 项作业，请确认后发布`;
         if (this.sizeClass === WindowSizeClass.COMPACT) {
           this.showCompactCandidates = true;
         }
       } else {
-        this.parseMessage = '暂时没有拆出明确作业，请检查文字中是否包含学科和具体任务';
+        this.parseMessage = result.organizerMode === HomeworkOrganizerMode.AI
+          ? 'AI 暂未识别到明确作业，请检查原文后重试'
+          : '本地规则暂时没有拆出明确作业，请检查文字中是否包含学科和具体任务';
         this.parseError = true;
       }
     } catch (_error) {
@@ -83,12 +87,16 @@ export struct HomeworkImportPage {
       this.textDraft = result.recognizedText;
       this.onStoreChanged();
       if (result.candidateCount > 0) {
-        this.parseMessage = `已识别并整理出 ${result.candidateCount} 项作业，请确认后发布`;
+        this.parseMessage = result.organizerMode === HomeworkOrganizerMode.AI
+          ? `截图识别完成，AI 已整理出 ${result.candidateCount} 项作业，请确认后发布`
+          : `截图识别完成；云端 AI 暂不可用，已用本地规则整理出 ${result.candidateCount} 项作业`;
         if (this.sizeClass === WindowSizeClass.COMPACT) {
           this.showCompactCandidates = true;
         }
       } else {
-        this.parseMessage = '文字识别成功，但暂时没有拆出明确作业。你可以修改文字后重新整理。';
+        this.parseMessage = result.organizerMode === HomeworkOrganizerMode.AI
+          ? '文字识别成功，但 AI 暂未识别到明确作业。你可以修改文字后重新整理。'
+          : '文字识别成功，但本地规则暂时没有拆出明确作业。你可以修改文字后重新整理。';
         this.parseError = true;
       }
     } catch (_error) {
@@ -129,7 +137,7 @@ export struct HomeworkImportPage {
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('粘贴文字，或从相册选择截图。小伴会先整理，再由家长确认。')
+        Text('粘贴文字，或从相册选择截图。小伴优先用云端 AI 理解并拆分，失败时自动使用本地规则，再由家长确认。')
           .width('100%')
           .fontSize(13)
           .lineHeight(20)
@@ -307,7 +315,7 @@ export struct HomeworkImportPage {
             .fontSize(AppTheme.PAGE_TITLE_SIZE)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
-          Text('老师内容 → 智能整理 → 家长确认')
+          Text('老师内容 → AI 智能整理 → 家长确认')
             .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }

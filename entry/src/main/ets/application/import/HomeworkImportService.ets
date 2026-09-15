@@ -1,6 +1,13 @@
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
+import { HomeworkOrganizerRemoteApi } from '../remote/HomeworkOrganizerRemoteApi';
 import { HomeworkStore } from '../../data/HomeworkStore';
-import { HomeworkImageImportResult, HomeworkImportPipelineResult } from '../../domain/model/ImportModels';
+import {
+  ExtractedHomeworkText,
+  HomeworkImageImportResult,
+  HomeworkImportPipelineResult,
+  HomeworkOrganizerMode,
+  HomeworkTextImportResult
+} from '../../domain/model/ImportModels';
 import { HomeworkImportSourceKind, RawHomeworkImport } from '../../domain/model/HomeworkModels';
 import { HomeworkAssignmentParser } from '../../domain/port/HomeworkAssignmentParser';
 import { HomeworkTextExtractor } from '../../domain/port/HomeworkTextExtractor';
@@ -17,13 +24,33 @@ export class HomeworkImportService {
     this.pipeline = new HomeworkImportPipeline(extractor, parser);
   }
 
-  async parseText(text: string): Promise<number> {
+  private async runSmart(input: RawHomeworkImport): Promise<HomeworkImportPipelineResult> {
+    if (this.pipeline === null) {
+      throw new Error('作业导入能力尚未初始化');
+    }
+    let extracted: ExtractedHomeworkText = await this.pipeline.extract(input);
+    let remoteCandidates = await HomeworkOrganizerRemoteApi.instance.organize(extracted);
+    if (remoteCandidates !== null) {
+      return {
+        extracted: extracted,
+        candidates: remoteCandidates,
+        organizerMode: HomeworkOrganizerMode.AI
+      };
+    }
+    return {
+      extracted: extracted,
+      candidates: await this.pipeline.parse(extracted),
+      organizerMode: HomeworkOrganizerMode.LOCAL
+    };
+  }
+
+  async parseText(text: string): Promise<HomeworkTextImportResult> {
     if (this.pipeline === null) {
       throw new Error('作业导入能力尚未初始化');
     }
     let normalized = text.trim();
     if (normalized.length === 0) {
-      return 0;
+      return { candidateCount: 0, organizerMode: HomeworkOrganizerMode.LOCAL };
     }
 
     let studentId = HomeworkStore.instance.getActiveStudentId();
@@ -35,9 +62,9 @@ export class HomeworkImportService {
       resourceUri: '',
       rawText: normalized
     };
-    let output: HomeworkImportPipelineResult = await this.pipeline.run(rawImport);
+    let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
     if (output.candidates.length === 0) {
-      return 0;
+      return { candidateCount: 0, organizerMode: output.organizerMode };
     }
 
     HomeworkStore.instance.replaceRawImport({
@@ -49,7 +76,7 @@ export class HomeworkImportService {
       rawText: output.extracted.text
     });
     HomeworkStore.instance.replaceCandidates(output.candidates);
-    return output.candidates.length;
+    return { candidateCount: output.candidates.length, organizerMode: output.organizerMode };
   }
 
   async reparseCurrentImport(): Promise<number> {
@@ -57,7 +84,7 @@ export class HomeworkImportService {
       return 0;
     }
     let current = HomeworkStore.instance.getRawImport();
-    let output = await this.pipeline.run(current);
+    let output = await this.runSmart(current);
     if (output.candidates.length === 0) {
       return 0;
     }
@@ -94,7 +121,8 @@ export class HomeworkImportService {
       return {
         selected: false,
         candidateCount: 0,
-        recognizedText: ''
+        recognizedText: '',
+        organizerMode: HomeworkOrganizerMode.LOCAL
       };
     }
 
@@ -108,7 +136,7 @@ export class HomeworkImportService {
       rawText: ''
     };
 
-    let output: HomeworkImportPipelineResult = await this.pipeline.run(rawImport);
+    let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
     HomeworkStore.instance.replaceRawImport({
       id: rawImport.id,
       studentId: studentId,
@@ -124,7 +152,8 @@ export class HomeworkImportService {
     return {
       selected: true,
       candidateCount: output.candidates.length,
-      recognizedText: output.extracted.text
+      recognizedText: output.extracted.text,
+      organizerMode: output.organizerMode
     };
   }
 }
