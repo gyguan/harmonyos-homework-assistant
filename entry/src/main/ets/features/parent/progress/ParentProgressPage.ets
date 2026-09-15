@@ -3,7 +3,7 @@ import { RemoteSubmissionCache } from '../../../application/remote/RemoteSubmiss
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkStore } from '../../../data/HomeworkStore';
-import { Assignment, Submission } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
 
 @Component
@@ -24,6 +24,17 @@ export struct ParentProgressPage {
   private remoteSubmissions(assignmentId: string): RemoteSubmission[] {
     let currentRevision = this.revision;
     return RemoteSubmissionCache.instance.get(assignmentId);
+  }
+
+  private timingText(item: Assignment): string {
+    if (item.elapsedSeconds > 0 && item.status !== AssignmentStatus.IN_PROGRESS) {
+      let actualMinutes = Math.max(1, Math.round(item.elapsedSeconds / 60));
+      return `预计 ${item.expectedMinutes} 分钟 · 实际 ${actualMinutes} 分钟`;
+    }
+    if (item.status === AssignmentStatus.IN_PROGRESS && item.startedAtEpochMs > 0) {
+      return `进行中 · 预计 ${item.expectedMinutes} 分钟`;
+    }
+    return `预计 ${item.expectedMinutes} 分钟`;
   }
 
   @Builder
@@ -69,7 +80,11 @@ export struct ParentProgressPage {
         Text(AssignmentStateMachine.label(item.status)).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
       }.width('100%');
       Text(item.title).width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text(`截至 ${item.dueText}`).width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+      Row() {
+        Text(`截至 ${item.dueText}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+        Blank();
+        Text(this.timingText(item)).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.PRIMARY);
+      }.width('100%');
       if (this.submissions(item.id).length > 0) {
         this.LocalSubmission(this.submissions(item.id)[0]);
       } else if (this.remoteSubmissions(item.id).length > 0) {
