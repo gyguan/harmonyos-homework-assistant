@@ -52,6 +52,9 @@ jobs:
       - name: Validate assignment countdown
         run: python scripts/validate_assignment_countdown.py
 
+      - name: Validate student task selection
+        run: python scripts/validate_student_task_selection.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
