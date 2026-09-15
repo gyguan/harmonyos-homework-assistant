@@ -26,6 +26,9 @@ student_service = read("backend/src/main/java/com/xiaoban/homework/student/Stude
 model_client = read("backend/src/main/java/com/xiaoban/homework/tutor/OpenAiTutorModelClient.java")
 tutor_prompt = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorPromptBuilder.java")
 tutor_controller = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorController.java")
+organizer_controller = read("backend/src/main/java/com/xiaoban/homework/organizer/HomeworkOrganizerController.java")
+organizer_service = read("backend/src/main/java/com/xiaoban/homework/organizer/HomeworkOrganizerService.java")
+organizer_model = read("backend/src/main/java/com/xiaoban/homework/organizer/OpenAiHomeworkOrganizerModelClient.java")
 access_log = read("backend/src/main/java/com/xiaoban/homework/common/AccessLogFilter.java")
 app_yml = read("backend/src/main/resources/application.yml")
 app_config = read("entry/src/main/ets/common/config/AppConfig.ets")
@@ -34,6 +37,9 @@ session_storage = read("entry/src/main/ets/infrastructure/persistence/Preference
 family_cloud = read("entry/src/main/ets/application/remote/FamilyCloudService.ets")
 settings_page = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 tutor_remote = read("entry/src/main/ets/application/remote/TutorRemoteApi.ets")
+organizer_remote = read("entry/src/main/ets/application/remote/HomeworkOrganizerRemoteApi.ets")
+import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
+import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 submission_cache = read("entry/src/main/ets/application/remote/RemoteSubmissionCache.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
@@ -54,6 +60,27 @@ for phrase in ["不要直接给出", "个人信息", "可信成年人"]:
     require(phrase in tutor_prompt, f"Tutor safety/guidance prompt missing: {phrase}")
 require('@PostMapping("/messages")' in tutor_controller,
         "Tutor API must support real persisted conversations")
+
+require('@PostMapping("/organize")' in organizer_controller and "FAMILY_ID" in organizer_controller,
+        "homework organizer must expose an authenticated family-scoped API")
+require("familyId.equals(student.familyId)" in organizer_service and "ServiceUnavailable" in organizer_service,
+        "organizer must enforce child ownership and expose provider outage for app fallback")
+require('uri("/v1/responses")' in organizer_model and 'body.put("store", false)' in organizer_model and
+        '"json_schema"' in organizer_model and '"strict", true' in organizer_model,
+        "AI organizer must use Responses Structured Outputs with store=false")
+require("不得编造" in organizer_model and "不解答作业" in organizer_model,
+        "AI organizer prompt must avoid hallucinating or solving homework")
+require("OPENAI_ORGANIZER_MODEL" in app_yml,
+        "AI organizer model must be independently server-configurable")
+require("/homework/organize" in organizer_remote and "BackendHttpClient" in organizer_remote,
+        "HarmonyOS organizer must call the authenticated backend API rather than OpenAI directly")
+require("HomeworkOrganizerRemoteApi.instance.organize" in import_service and
+        "HomeworkOrganizerMode.AI" in import_service and "HomeworkOrganizerMode.LOCAL" in import_service and
+        "this.pipeline.parse(extracted)" in import_service,
+        "import pipeline must prefer cloud AI and preserve local parser fallback")
+require("AI 已整理出" in import_page and "本地规则" in import_page,
+        "parent import UI must make AI versus local fallback visible")
+
 require("OncePerRequestFilter" in access_log and "request.getMethod()" in access_log and
         "request.getRequestURI()" in access_log and "response.getStatus()" in access_log and
         "request.getRemoteAddr()" in access_log and "System.nanoTime()" in access_log,
