@@ -1,3 +1,4 @@
+import { HomeworkSyncService } from '../../../application/remote/HomeworkSyncService';
 import { RemoteSubmission } from '../../../application/remote/RemoteSubmissionApi';
 import { RemoteSubmissionCache } from '../../../application/remote/RemoteSubmissionCache';
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
@@ -10,19 +11,27 @@ import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateM
 export struct ParentProgressPage {
   @Prop sizeClass: WindowSizeClass;
   @Prop revision: number = 0;
+  @State private localRevision: number = 0;
+  @State private reviewAssignmentId: string = '';
+  @State private reviewNoteDraft: string = '';
 
   private assignments(): Assignment[] {
-    let currentRevision = this.revision;
+    let currentRevision = this.revision + this.localRevision;
     return HomeworkStore.instance.getAssignments();
   }
 
   private submissions(assignmentId: string): Submission[] {
-    let currentRevision = this.revision;
+    let currentRevision = this.revision + this.localRevision;
     return HomeworkStore.instance.getSubmissionsForAssignment(assignmentId);
   }
 
+  private latestLocalSubmission(assignmentId: string): Submission | null {
+    let items = this.submissions(assignmentId);
+    return items.length === 0 ? null : items[items.length - 1];
+  }
+
   private remoteSubmissions(assignmentId: string): RemoteSubmission[] {
-    let currentRevision = this.revision;
+    let currentRevision = this.revision + this.localRevision;
     return RemoteSubmissionCache.instance.get(assignmentId);
   }
 
@@ -41,12 +50,32 @@ export struct ParentProgressPage {
     return `预计 ${item.expectedMinutes} 分钟`;
   }
 
+  private openReview(item: Assignment): void {
+    this.reviewAssignmentId = item.id;
+    this.reviewNoteDraft = item.reviewNote;
+  }
+
+  private closeReview(): void {
+    this.reviewAssignmentId = '';
+    this.reviewNoteDraft = '';
+  }
+
+  private submitReview(item: Assignment, completed: boolean): void {
+    let note = this.reviewNoteDraft.trim();
+    if (!completed && note.length === 0) return;
+    if (HomeworkStore.instance.reviewAssignment(item.id, completed, note)) {
+      this.closeReview();
+      this.localRevision++;
+      HomeworkSyncService.instance.requestSync();
+    }
+  }
+
   @Builder
   private LocalSubmission(submission: Submission) {
     Column({ space: 10 }) {
       Row({ space: 7 }) {
         SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(17).fontColor([AppTheme.SUCCESS]);
-        Text(`已提交 · ${submission.fileLabel}`).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
+        Text(`最新提交 · ${submission.fileLabel}`).fontSize(AppTheme.CAPTION_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
         Blank();
         Text(submission.submittedAtText).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
       }.width('100%');
@@ -75,6 +104,46 @@ export struct ParentProgressPage {
   }
 
   @Builder
+  private ReviewPane(item: Assignment) {
+    if (item.status === AssignmentStatus.SUBMITTED) {
+      if (this.reviewAssignmentId === item.id) {
+        Column({ space: 10 }) {
+          Text('家长验收').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          TextArea({ placeholder: '可写一句鼓励；如果需要订正，请告诉孩子具体改哪里。', text: this.reviewNoteDraft })
+            .width('100%').height(86).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => this.reviewNoteDraft = value.substring(0, 1000));
+          Row({ space: 8 }) {
+            Button('取消', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.SUBTEXT)
+              .onClick(() => this.closeReview());
+            Button('需要订正', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS).enabled(this.reviewNoteDraft.trim().length > 0)
+              .backgroundColor(AppTheme.WARNING_SOFT).fontColor(AppTheme.WARNING)
+              .onClick(() => this.submitReview(item, false));
+            Button('确认完成', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .onClick(() => this.submitReview(item, true));
+          }.width('100%');
+        }.width('100%').padding(13).backgroundColor(AppTheme.PRIMARY_FAINT).borderRadius(AppTheme.CONTROL_RADIUS);
+      } else {
+        Button('验收作业', { type: ButtonType.Normal }).width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+          .onClick(() => this.openReview(item));
+      }
+    } else if (item.reviewNote.length > 0 &&
+      (item.status === AssignmentStatus.NEEDS_REWORK || item.status === AssignmentStatus.COMPLETED)) {
+      Column({ space: 4 }) {
+        Text(item.status === AssignmentStatus.NEEDS_REWORK ? '订正说明' : '家长留言')
+          .width('100%').fontSize(12).fontWeight(FontWeight.Medium)
+          .fontColor(item.status === AssignmentStatus.NEEDS_REWORK ? AppTheme.WARNING : AppTheme.SUCCESS);
+        Text(item.reviewNote).width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.TEXT);
+      }.width('100%').padding(12)
+        .backgroundColor(item.status === AssignmentStatus.NEEDS_REWORK ? AppTheme.WARNING_SOFT : AppTheme.SUCCESS_SOFT)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
+  }
+
+  @Builder
   private ProgressCard(item: Assignment) {
     Column({ space: 11 }) {
       Row() {
@@ -89,11 +158,12 @@ export struct ParentProgressPage {
         Blank();
         Text(this.timingText(item)).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.PRIMARY);
       }.width('100%');
-      if (this.submissions(item.id).length > 0) {
-        this.LocalSubmission(this.submissions(item.id)[0]);
+      if (this.latestLocalSubmission(item.id) !== null) {
+        this.LocalSubmission(this.latestLocalSubmission(item.id)!);
       } else if (this.remoteSubmissions(item.id).length > 0) {
         this.CloudSubmission(this.remoteSubmissions(item.id)[0]);
       }
+      this.ReviewPane(item);
     }.width('100%').padding(AppTheme.CARD_PADDING).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
   }
 
@@ -102,7 +172,7 @@ export struct ParentProgressPage {
       Column({ space: AppTheme.SECTION_GAP }) {
         Column({ space: 5 }) {
           Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text(`${HomeworkStore.instance.getStudent().name} · 今天做了什么、交了什么，一眼看到`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text(`${HomeworkStore.instance.getStudent().name} · 提交后由家长验收，完成或打回订正`).fontSize(13).fontColor(AppTheme.SUBTEXT);
         }.width('100%').alignItems(HorizontalAlign.Start);
         if (this.sizeClass === WindowSizeClass.EXPANDED) {
           Row({ space: 16 }) {
