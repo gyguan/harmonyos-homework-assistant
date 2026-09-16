@@ -45,17 +45,19 @@ V2 页面不再由各 Feature 私自实现返回按钮、标题栏和顶部留�
 
 ## 3. DeepPageHeader 规范
 
-统一结构：
+统一结构参考 HarmonyOS 系统“文件管理”进入文件夹后的 TitleBar：
 
 ```text
-[‹]  页面标题 / 可选副标题                         可选右侧信息
+(‹)  页面标题 / 可选副标题                         可选右侧信息
 ```
+
+其中返回入口采用浅色圆形容器 + 标准系统左箭头 Symbol，而不是裸字符或“返回”文字链接。
 
 规则：
 
-1. 返回区域固定使用至少 `MIN_TOUCH_TARGET` 的触控面积；
-2. 返回 glyph、字号、颜色通过 `AppTheme` 统一；
-3. 主标题固定使用 `DEEP_PAGE_HEADER_TITLE_SIZE`；
+1. 返回区域固定使用至少 `MIN_TOUCH_TARGET` 的触控面积，并使用圆形浅色容器表达可点击性；
+2. 返回图标统一使用 HarmonyOS Symbol `sys.symbol.chevron_left`，字号和颜色通过 `AppTheme` 统一；
+3. 主标题固定使用 `DEEP_PAGE_HEADER_TITLE_SIZE`，与返回控件垂直居中；
 4. 副标题和右侧 metadata 使用 `DEEP_PAGE_HEADER_META_SIZE`；
 5. 页面不得使用 `‹ 作业列表`、`返回学习任务` 等私有视觉写法作为 header；语义通过 accessibilityText 表达；
 6. 页面可根据当前子状态修改标题，例如 Study Workspace 内进入 Tutor 时标题由“学习空间”变为“问小伴”，但仍复用同一个 Header；
@@ -103,7 +105,8 @@ V2 页面不再由各 Feature 私自实现返回按钮、标题栏和顶部留�
 - 公共组件：`entry/src/main/ets/components/navigation/DeepPageHeader.ets`
 - 样式 token：`AppTheme.DEEP_PAGE_*`
 - 新深层页面不得声明私有 `WorkspaceHeader` / `DetailHeader` / `BackHeader` 来重复实现返回 chrome；
-- 新深层页面不得直接绘制 `Text('‹')` 作为页面返回入口；
+- 新深层页面不得直接绘制 `Text('‹')` 或其他裸字符作为页面返回入口；
+- 返回图标必须使用公共 Header 中的 `SymbolGlyph($r('sys.symbol.chevron_left'))`；
 - 页面级纵向 `Scroll` 必须 top anchored，默认关闭可见滚动条；
 - 深层页面 UI 变更必须保持 Navigation / NavPathStack 的返回语义，不恢复 AppShell returnRoute / selectedId 状态；
 - CI 的 V2 deep-page chrome gate 用于防止规范回退。
@@ -113,6 +116,7 @@ V2 页面不再由各 Feature 私自实现返回按钮、标题栏和顶部留�
 一个深层页面视为符合规范，需要同时满足：
 
 - 使用 `DeepPageHeader`；
+- 返回入口为系统化的圆形浅色按钮 + HarmonyOS 左箭头 Symbol；
 - 返回触控区与视觉样式一致；
 - 顶部只保留统一的紧凑留白；
 - 内容 top anchored，短内容不得出现上下居中；
