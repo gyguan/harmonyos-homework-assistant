@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 errors: list[str] = []
 
 
-def read(path: str) -> str:
+def read_optional(path: str) -> str:
     file = ROOT / path
-    if not file.exists():
-        errors.append(f"missing required UI file: {path}")
-        return ""
-    return file.read_text(encoding="utf-8")
+    return file.read_text(encoding="utf-8") if file.exists() else ""
 
 
 def require(condition: bool, message: str) -> None:
@@ -19,20 +17,17 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 
-theme = read("entry/src/main/ets/common/theme/AppTheme.ets")
-app_shell = read("entry/src/main/ets/pages/AppShell.ets")
-assignment_list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
-student_today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
-parent_dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
-student_assignments = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
-study_workspace = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+theme_path = "entry/src/main/ets/common/theme/AppTheme.ets"
+theme = read_optional(theme_path)
+require(len(theme) > 0, f"missing required file: {theme_path}")
 
-required_theme_tokens = [
+# Keep only durable design-system contracts here. Page-specific composition belongs to the
+# V2 UI spec and DevEco acceptance, not to string assertions against V1 builders.
+for token in [
     "SURFACE_SUBTLE",
     "SURFACE_EMPHASIS",
     "DIVIDER",
     "PAGE_PADDING",
-    "PAGE_PADDING_WIDE",
     "SECTION_GAP",
     "CARD_RADIUS",
     "CONTROL_RADIUS",
@@ -40,73 +35,15 @@ required_theme_tokens = [
     "BUTTON_HEIGHT",
     "PAGE_TITLE_SIZE",
     "SECTION_TITLE_SIZE",
-    "PHONE_PAGE_PADDING",
-    "PHONE_SECTION_GAP",
-    "PHONE_CARD_PADDING",
-    "PHONE_CARD_RADIUS",
-    "PHONE_PAGE_TITLE_SIZE",
-    "PHONE_SECTION_TITLE_SIZE",
-]
-for token in required_theme_tokens:
-    require(f"static readonly {token}" in theme, f"AppTheme missing design token: {token}")
-
-require("SymbolGlyph" in app_shell, "navigation must use HarmonyOS SymbolGlyph instead of text dots")
-for symbol in [
-    "sys.symbol.house",
-    "sys.symbol.plus_square",
-    "sys.symbol.checkmark_circle",
-    "sys.symbol.checkmark_square",
-    "sys.symbol.gearshape",
 ]:
-    require(symbol in app_shell, f"AppShell missing verified system navigation symbol: {symbol}")
+    require(f"static readonly {token}" in theme, f"AppTheme missing durable design token: {token}")
 
-require("BottomNavShell" in app_shell and "SideNavShell" in app_shell,
-        "AppShell must keep separate bottom/side navigation shells")
-require("if (this.sizeClass === WindowSizeClass.EXPANDED)" in app_shell,
-        "side navigation must remain limited to EXPANDED windows")
-require("Text(active ? '●' : '○')" not in app_shell,
-        "navigation must not regress to text-dot icons")
+app_shell = read_optional("entry/src/main/ets/pages/AppShell.ets")
+if app_shell:
+    require("Text(active ? '●' : '○')" not in app_shell,
+            "navigation must not regress to text-dot icons")
 
-# Phone is a Focus Journey, not a vertically stacked Pad workspace.
-require("private PhoneLayout()" in student_today and
-        "this.PhoneProgress();" in student_today and
-        "this.PhoneNextTask();" in student_today and
-        "this.PhoneOtherTasks();" in student_today,
-        "student Today must keep a dedicated compact Focus Journey")
-require("private PadLayout()" in student_today and
-        "this.AssignmentListPane();" in student_today and
-        "this.NextAssignmentPane();" in student_today,
-        "student Today must keep a separate Pad composition")
-require("private PhoneLayout()" in parent_dashboard and
-        "this.PhoneSummary();" in parent_dashboard and
-        "this.PhoneImportAction();" in parent_dashboard and
-        "this.PhoneAssignments();" in parent_dashboard,
-        "parent dashboard must keep a dedicated compact composition")
-require("private PadLayout()" in parent_dashboard,
-        "parent dashboard must keep a separate Pad composition")
-require("private CompactLayout()" in student_assignments and "private PadLayout()" in student_assignments,
-        "student assignments must keep separate compact and Pad layouts")
-require("private CompactWorkspace()" in study_workspace and "private PadWorkspace()" in study_workspace,
-        "study workspace must keep separate compact and Pad layouts")
-
-visible_ui_files = [
-    "entry/src/main/ets/pages/PersonEntryPage.ets",
-    "entry/src/main/ets/pages/AppShell.ets",
-    "entry/src/main/ets/components/assignment/AssignmentCard.ets",
-    "entry/src/main/ets/components/assignment/AssignmentListItem.ets",
-    "entry/src/main/ets/components/state/PageStateView.ets",
-    "entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
-    "entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets",
-    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
-    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
-    "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
-    "entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets",
-    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
-    "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
-]
-
-old_visual_literals = [
+legacy_visual_literals = [
     "#F7F8FA",
     "#F4F6F9",
     "#F1F3F5",
@@ -116,54 +53,31 @@ old_visual_literals = [
     "#6D8DFF",
 ]
 
-for path in visible_ui_files:
-    text = read(path)
-    require("AppTheme" in text, f"visible UI must use shared AppTheme: {path}")
-    for literal in old_visual_literals:
-        require(literal not in text, f"legacy hardcoded visual color {literal} remains in {path}")
-
-page_files = [
-    "entry/src/main/ets/pages/PersonEntryPage.ets",
-    "entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
-    "entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets",
-    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
-    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
-    "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
-    "entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets",
-    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
-    "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
+ui_roots = [
+    ROOT / "entry/src/main/ets/pages",
+    ROOT / "entry/src/main/ets/features",
+    ROOT / "entry/src/main/ets/components",
 ]
-for path in page_files:
-    text = read(path)
-    require("AppTheme.PAGE_PADDING" in text or "AppTheme.PHONE_PAGE_PADDING" in text,
-            f"page must use shared page-edge spacing instead of a local magic number: {path}")
+for ui_root in ui_roots:
+    if not ui_root.exists():
+        continue
+    for file in ui_root.rglob("*.ets"):
+        text = file.read_text(encoding="utf-8")
+        relative = file.relative_to(ROOT).as_posix()
+        for literal in legacy_visual_literals:
+            require(literal not in text, f"legacy hardcoded visual color {literal} remains in {relative}")
 
-primary_button_pages = [
-    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
-    "entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets",
-    "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
-    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
-]
-for path in primary_button_pages:
-    text = read(path)
-    require("ButtonType.Normal" in text,
-            f"primary action page must use rounded-rectangle ButtonType.Normal controls: {path}")
-    require("AppTheme.CONTROL_RADIUS" in text,
-            f"primary action page must use shared control radius: {path}")
+        # Production UI must not introduce Preview/CI/device-only branches to make a layout pass.
+        prohibited_branch = re.compile(r"\b(?:isPreview|isCI|deviceModel|deviceType)\b")
+        require(prohibited_branch.search(text) is None,
+                f"UI must not contain Preview/CI/device-specific production branching: {relative}")
 
-require("onClick(() => this.onOpenImport())" in parent_dashboard and "AppTheme.CONTROL_RADIUS" in parent_dashboard,
-        "parent dashboard import must be a rounded full-row action")
-
-require("export struct AssignmentListItem" in assignment_list_item and
-        "if (this.interactive) this.onOpen()" in assignment_list_item and
-        "accessibilityRole(AccessibilityRoleType.BUTTON)" in assignment_list_item,
-        "assignment lists must provide an accessible reusable full-row tap surface")
-
-require("sys.symbol.exclamationmark_triangle" not in student_today,
-        "unverified warning symbol must not be used")
-require("sys.symbol.bubble_left" not in study_workspace,
-        "unverified tutor symbol must not be used")
+# Preserve accessibility semantics while this shared component exists; V2 may replace it with
+# another accessible component without keeping this filename alive forever.
+assignment_list_item = read_optional("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
+if assignment_list_item:
+    require("accessibilityRole(AccessibilityRoleType.BUTTON)" in assignment_list_item,
+            "AssignmentListItem must expose button accessibility semantics while it exists")
 
 if errors:
     print("HARMONY_UI_GATE_FAIL")

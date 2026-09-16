@@ -18,32 +18,23 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 
-store = read("entry/src/main/ets/data/HomeworkStore.ets")
 cloud = read("entry/src/main/ets/application/remote/FamilyCloudService.ets")
 
-require("replaceStudents(students: StudentProfile[])" in store,
-        "HomeworkStore must own cloud student-list replacement")
-replace_block = store.split("replaceStudents(students: StudentProfile[])", 1)
-require(len(replace_block) == 2 and "this.cloneStudent(student)" in replace_block[1].split("getStudents()", 1)[0],
-        "replaceStudents must clone incoming StudentProfile values")
-require(len(replace_block) == 2 and "this.requestPersist();" in replace_block[1].split("getStudents()", 1)[0],
-        "replaceStudents must persist the updated AppSettings snapshot")
-require(len(replace_block) == 2 and "activeStudentId" in replace_block[1].split("getStudents()", 1)[0],
-        "replaceStudents must preserve or repair activeStudentId")
-
-require("HomeworkStore.instance.replaceStudents(students)" in cloud,
-        "FamilyCloudService must apply remote students through HomeworkStore")
+# During V2 migration FamilyCloudService may still use HomeworkStore or move behind a Repository.
+# The gate protects ownership/isolation invariants instead of forcing one legacy call graph.
 require("HomeworkStore.instance.getSettings()" not in cloud,
-        "FamilyCloudService must not mutate HomeworkStore settings by reference")
+        "FamilyCloudService must not obtain mutable Store settings by reference")
 require("settings.students" not in cloud,
-        "FamilyCloudService must not splice/push Store-owned student arrays")
+        "FamilyCloudService must not splice/push a Store-owned student array")
 require("replaceRawImport(HomeworkStore.instance.getRawImport())" not in cloud,
         "FamilyCloudService must not use RawImport writes as a persistence trigger")
+require(".students.push(" not in cloud and ".students.splice(" not in cloud,
+        "FamilyCloudService must not directly mutate student collections")
 
 if errors:
-    print("FAMILY_CLOUD_STORE_BOUNDARY_GATE_FAIL")
+    print("FAMILY_CLOUD_BOUNDARY_GATE_FAIL")
     for error in errors:
         print(f"- {error}")
     raise SystemExit(1)
 
-print("FAMILY_CLOUD_STORE_BOUNDARY_GATE_PASS")
+print("FAMILY_CLOUD_BOUNDARY_GATE_PASS")

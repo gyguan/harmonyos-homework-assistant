@@ -17,8 +17,10 @@ import {
 import { HomeworkSnapshot } from '../domain/model/PersistenceModels';
 import { HomeworkPersistence } from '../domain/port/HomeworkPersistence';
 import { AssignmentStateMachine } from '../domain/service/AssignmentStateMachine';
-
-const SNAPSHOT_SCHEMA_VERSION: number = 4;
+import {
+  HOMEWORK_SNAPSHOT_SCHEMA_VERSION,
+  HomeworkSnapshotMigrator
+} from '../domain/service/HomeworkSnapshotMigrator';
 
 export class HomeworkStore {
   static readonly instance: HomeworkStore = new HomeworkStore();
@@ -41,12 +43,18 @@ export class HomeworkStore {
   async initialize(persistence: HomeworkPersistence): Promise<void> {
     this.persistence = persistence;
     let snapshot = await persistence.load();
-    if (snapshot !== null && snapshot.schemaVersion === SNAPSHOT_SCHEMA_VERSION) {
-      this.restoreSnapshot(snapshot);
+    if (snapshot === null) {
+      this.seedFromMockData();
+      await persistence.save(this.createSnapshot());
       return;
     }
-    this.seedFromMockData();
-    await persistence.save(this.createSnapshot());
+
+    let originalVersion = snapshot.schemaVersion;
+    let migrated = HomeworkSnapshotMigrator.migrate(snapshot);
+    this.restoreSnapshot(migrated);
+    if (originalVersion !== migrated.schemaVersion) {
+      await persistence.save(this.createSnapshot());
+    }
   }
 
   private seedFromMockData(): void {
@@ -92,7 +100,7 @@ export class HomeworkStore {
     for (let submission of this.submissions) submissionCopies.push(this.cloneSubmission(submission));
     for (let session of this.tutorSessions) tutorSessionCopies.push(this.cloneTutorSession(session));
     return {
-      schemaVersion: SNAPSHOT_SCHEMA_VERSION,
+      schemaVersion: HOMEWORK_SNAPSHOT_SCHEMA_VERSION,
       settings: this.cloneSettings(this.settings),
       rawImports: rawImportCopies,
       assignments: assignmentCopies,

@@ -32,17 +32,26 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
       this.store = store;
       return store;
     } catch {
+      console.error('Homework local storage initialization failed');
       throw new Error('本地作业存储初始化失败');
     }
   }
 
   async load(): Promise<HomeworkSnapshot | null> {
+    let store = await this.getStore();
+    let value: preferences.ValueType;
     try {
-      let store = await this.getStore();
-      let value = await store.get(SNAPSHOT_KEY, '');
-      if (typeof value !== 'string' || value.length === 0) {
-        return null;
-      }
+      value = await store.get(SNAPSHOT_KEY, '');
+    } catch {
+      console.error('Homework snapshot read failed');
+      throw new Error('本地作业数据读取失败');
+    }
+
+    if (typeof value !== 'string' || value.length === 0) {
+      return null;
+    }
+
+    try {
       let parsed: Record<string, Object> = JSON.parse(value);
       let snapshot: HomeworkSnapshot = {
         schemaVersion: parsed.schemaVersion as number,
@@ -56,7 +65,8 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
       };
       return snapshot;
     } catch {
-      return null;
+      console.error('Homework snapshot exists but cannot be parsed; preserving stored value');
+      throw new Error('本地作业数据损坏，已停止覆盖原数据');
     }
   }
 
@@ -66,7 +76,7 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
       await store.put(SNAPSHOT_KEY, JSON.stringify(snapshot));
       await store.flush();
     } catch {
-      // Local persistence is best-effort. Keep in-memory state available even if disk persistence fails.
+      console.error('Homework snapshot save failed; in-memory state remains available');
     }
   }
 }

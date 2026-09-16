@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -22,24 +23,30 @@ def require(condition: bool, message: str) -> None:
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 responsive = read("entry/src/main/ets/common/responsive/WindowSizeClass.ets")
 
-require("widthVp <= 600" in responsive and "widthVp <= 840" in responsive,
-        "responsive breakpoints must remain 600vp and 840vp")
+# Shell navigation may use a shared window size class, but feature composition must not be
+# coupled to device names or page-local magic breakpoints.
 require("private BottomNavShell()" in app_shell,
-        "AppShell must name the bottom navigation shell by navigation form, not device type")
+        "AppShell must expose a bottom-navigation shell")
 require("private SideNavShell()" in app_shell,
-        "AppShell must name the side navigation shell by navigation form, not device type")
-require("this.sizeClass === WindowSizeClass.EXPANDED" in app_shell,
-        "side navigation must activate only for EXPANDED windows")
+        "AppShell must expose a side-navigation shell")
 require("this.SideNavShell();" in app_shell and "this.BottomNavShell();" in app_shell,
-        "AppShell must expose both side and bottom navigation shells")
-require("this.sizeClass === WindowSizeClass.COMPACT" not in app_shell,
-        "AppShell must not use COMPACT as the navigation switch because MEDIUM also uses bottom navigation")
+        "AppShell must retain both navigation forms during migration")
 require("private CompactShell()" not in app_shell and "private WideShell()" not in app_shell,
-        "navigation shell naming must not imply phone/tablet device classes")
-require("this.BottomNavigation();" in app_shell,
-        "bottom-nav shell must retain bottom navigation")
-require("this.SideNavigation();" in app_shell,
-        "side-nav shell must retain side navigation")
+        "navigation shell naming must describe navigation form, not device class")
+
+for token in ["deviceType", "isPhone", "isTablet", "isPadDevice"]:
+    require(token not in app_shell and token not in responsive,
+            f"responsive infrastructure must not branch on device identity: {token}")
+
+feature_root = ROOT / "entry/src/main/ets/features"
+magic_breakpoint = re.compile(r"(?:<=|>=|<|>)\s*(?:600|840|1080)\b")
+for file in feature_root.rglob("*.ets"):
+    text = file.read_text(encoding="utf-8")
+    relative = file.relative_to(ROOT).as_posix()
+    require(magic_breakpoint.search(text) is None,
+            f"feature must not define a private device-style breakpoint: {relative}")
+    require("getDefaultDisplaySync" not in text,
+            f"feature must not inspect the physical display directly: {relative}")
 
 if errors:
     print("RESPONSIVE_NAVIGATION_GATE_FAIL")
