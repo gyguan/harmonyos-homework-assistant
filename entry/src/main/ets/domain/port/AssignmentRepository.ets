@@ -1,3 +1,4 @@
+import { AssignmentAction } from '../model/AssignmentAction';
 import { AssignmentFilter } from '../model/AssignmentFilter';
 import { Assignment, StudentProfile, TodaySummary } from '../model/HomeworkModels';
 
@@ -7,5 +8,6 @@ export interface AssignmentRepository {
   query(filter: AssignmentFilter): Promise<Assignment[]>;
   getCached(assignmentId: string): Assignment | null;
   getCachedSummary(): TodaySummary;
+  performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment>;
   refresh(): Promise<boolean>;
 }
