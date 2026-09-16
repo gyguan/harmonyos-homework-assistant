@@ -163,21 +163,23 @@ export struct StudentAssignmentDetailPage {
     }
     .width('100%')
     .constraintSize({ maxWidth: 720 })
+    .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start)
     .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 12, bottom: 32 });
   }
 
   build() {
     Scroll() {
-      Row() {
+      Column() {
         this.DetailContent();
       }
       .width('100%')
-      .justifyContent(FlexAlign.Center)
-      .alignItems(VerticalAlign.Top);
+      .justifyContent(FlexAlign.Start)
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%')
     .height('100%')
+    .align(Alignment.TopStart)
     .scrollBar(BarState.Off);
   }
 }
