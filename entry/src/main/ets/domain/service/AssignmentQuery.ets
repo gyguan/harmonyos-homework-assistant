@@ -7,7 +7,7 @@ export class AssignmentQuery {
     for (let item of items) {
       if (!AssignmentQuery.matchesType(item, filter.assignmentType)) continue;
       if (filter.subjectCode !== 'ALL' && item.subjectCode !== filter.subjectCode) continue;
-      if (!AssignmentQuery.matchesDate(item, filter.fromEpochMs, filter.toEpochMs)) continue;
+      if (!AssignmentQuery.matchesDate(item, filter.fromEpochMs, filter.toEpochMs, filter.undatedOnly)) continue;
       if (!AssignmentQuery.matchesStatus(item, filter.statuses)) continue;
       AssignmentQuery.insertSorted(result, item);
     }
@@ -26,7 +26,8 @@ export class AssignmentQuery {
     return item.assignmentType === AssignmentType.EXTRA;
   }
 
-  private static matchesDate(item: Assignment, fromEpochMs: number, toEpochMs: number): boolean {
+  private static matchesDate(item: Assignment, fromEpochMs: number, toEpochMs: number, undatedOnly: boolean): boolean {
+    if (undatedOnly) return item.dueAtEpochMs <= 0;
     if (fromEpochMs <= 0 && toEpochMs <= 0) return true;
     if (item.dueAtEpochMs <= 0) return false;
     if (fromEpochMs > 0 && item.dueAtEpochMs < fromEpochMs) return false;
