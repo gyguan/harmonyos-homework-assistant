@@ -11,7 +11,10 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,9 +42,29 @@ public class AssignmentService {
 
   @Transactional(readOnly = true)
   public List<AssignmentDtos.Response> list(UUID familyId, String studentId) {
+    return list(familyId, studentId, null, null, null, null, null);
+  }
+
+  @Transactional(readOnly = true)
+  public List<AssignmentDtos.Response> list(UUID familyId, String studentId, String type, String subjectCode,
+      Long fromEpochMs, Long toEpochMs, String status) {
     students.requireOwned(familyId, studentId);
-    return repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(familyId, studentId).stream()
-        .map(AssignmentDtos.Response::from).toList();
+    String normalizedType = type == null || type.isBlank() ? null : assignmentType(type);
+    String normalizedSubject = subjectCode == null || subjectCode.isBlank() ? null : subjectCode.trim().toUpperCase();
+    Instant from = dueAt(fromEpochMs);
+    Instant to = dueAt(toEpochMs);
+    if (from != null && to != null && from.isAfter(to)) {
+      throw new ApiExceptions.BadRequest("作业筛选开始时间不能晚于结束时间");
+    }
+    Set<String> statuses = statusFilter(status);
+
+    List<AssignmentEntity> filtered = new ArrayList<>();
+    for (AssignmentEntity assignment : repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(familyId, studentId)) {
+      if (!matchesListFilter(assignment, normalizedType, normalizedSubject, from, to, statuses)) continue;
+      filtered.add(assignment);
+    }
+    filtered.sort(this::compareForList);
+    return filtered.stream().map(AssignmentDtos.Response::from).toList();
   }
 
   @Transactional(readOnly = true)
@@ -183,6 +206,50 @@ public class AssignmentService {
     repository.flush();
   }
 
+  private boolean matchesListFilter(AssignmentEntity assignment, String type, String subjectCode,
+      Instant from, Instant to, Set<String> statuses) {
+    if (type != null && !type.equals(assignment.assignmentType)) return false;
+    if (subjectCode != null && !subjectCode.equalsIgnoreCase(assignment.subjectCode)) return false;
+    if ((from != null || to != null) && assignment.dueAt == null) return false;
+    if (from != null && assignment.dueAt.isBefore(from)) return false;
+    if (to != null && assignment.dueAt.isAfter(to)) return false;
+    return statuses.isEmpty() || statuses.contains(assignment.status);
+  }
+
+  private int compareForList(AssignmentEntity left, AssignmentEntity right) {
+    int leftPriority = nextPriority(left.status);
+    int rightPriority = nextPriority(right.status);
+    if (leftPriority != rightPriority) return Integer.compare(leftPriority, rightPriority);
+    if (left.dueAt != null && right.dueAt == null) return -1;
+    if (left.dueAt == null && right.dueAt != null) return 1;
+    if (left.dueAt != null && right.dueAt != null && !left.dueAt.equals(right.dueAt)) {
+      return left.dueAt.compareTo(right.dueAt);
+    }
+    int titleCompare = text(left.title).compareTo(text(right.title));
+    if (titleCompare != 0) return titleCompare;
+    return left.id.compareTo(right.id);
+  }
+
+  private Set<String> statusFilter(String value) {
+    Set<String> result = new HashSet<>();
+    if (value == null || value.isBlank()) return result;
+    for (String raw : value.split(",")) {
+      String normalized = raw.trim().toUpperCase();
+      if (normalized.isEmpty()) continue;
+      if (!isSupportedStatus(normalized)) throw new ApiExceptions.BadRequest("不支持的作业状态: " + raw);
+      result.add(normalized);
+    }
+    return result;
+  }
+
+  private boolean isSupportedStatus(String status) {
+    return switch (status) {
+      case "NOT_STARTED", "IN_PROGRESS", "PAUSED", "READY_TO_SUBMIT", "SUBMITTED", "COMPLETED",
+          "NEEDS_REWORK", "OVERDUE" -> true;
+      default -> false;
+    };
+  }
+
   private void pauseOtherActive(UUID familyId, String studentId, String activeId, long nowMs) {
     for (AssignmentEntity other : repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(familyId, studentId)) {
       if (other.id.equals(activeId) || !"IN_PROGRESS".equals(other.status)) continue;
@@ -234,8 +301,10 @@ public class AssignmentService {
       case "PAUSED" -> 1;
       case "NEEDS_REWORK" -> 2;
       case "OVERDUE" -> 3;
-      case "NOT_STARTED" -> 4;
-      case "READY_TO_SUBMIT" -> 5;
+      case "READY_TO_SUBMIT" -> 4;
+      case "NOT_STARTED" -> 5;
+      case "SUBMITTED" -> 6;
+      case "COMPLETED" -> 7;
       default -> 100;
     };
   }
