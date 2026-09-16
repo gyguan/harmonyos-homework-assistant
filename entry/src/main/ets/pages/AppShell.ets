@@ -173,7 +173,6 @@ export struct AppShell {
     } else if (name === AppRoute.STUDENT_STUDY) {
       NavDestination() {
         StudyWorkspaceRoutePage({
-          sizeClass: this.contentSizeClass,
           tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
