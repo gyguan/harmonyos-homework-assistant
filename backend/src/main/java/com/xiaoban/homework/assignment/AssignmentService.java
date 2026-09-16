@@ -217,8 +217,8 @@ public class AssignmentService {
   }
 
   private int compareForList(AssignmentEntity left, AssignmentEntity right) {
-    int leftPriority = nextPriority(left.status);
-    int rightPriority = nextPriority(right.status);
+    int leftPriority = listPriority(left.status);
+    int rightPriority = listPriority(right.status);
     if (leftPriority != rightPriority) return Integer.compare(leftPriority, rightPriority);
     if (left.dueAt != null && right.dueAt == null) return -1;
     if (left.dueAt == null && right.dueAt != null) return 1;
@@ -296,6 +296,18 @@ public class AssignmentService {
   }
 
   private int nextPriority(String status) {
+    return switch (status) {
+      case "IN_PROGRESS" -> 0;
+      case "PAUSED" -> 1;
+      case "NEEDS_REWORK" -> 2;
+      case "OVERDUE" -> 3;
+      case "NOT_STARTED" -> 4;
+      case "READY_TO_SUBMIT" -> 5;
+      default -> 100;
+    };
+  }
+
+  private int listPriority(String status) {
     return switch (status) {
       case "IN_PROGRESS" -> 0;
       case "PAUSED" -> 1;
