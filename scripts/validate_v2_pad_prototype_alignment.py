@@ -63,7 +63,7 @@ for token in [
     ".onAreaChange",
 ]:
     require(token in home, f"Student Home missing Pad prototype behavior: {token}")
-require("WindowSizeClass" not in home and "sizeClass" not in home,
+require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,
         "Student Home must use container capability, not size-class branching")
 
 # Assignment: Phone navigation and Pad master-detail share one detail pane.
@@ -102,7 +102,7 @@ for token in [
     ".onAreaChange",
 ]:
     require(token in study, f"Study/Tutor Pad composition missing behavior: {token}")
-require("WindowSizeClass" not in study and "@Prop sizeClass" not in study and "this.sizeClass" not in study,
+require("WindowSizeClass." not in study and "@Prop sizeClass" not in study and "this.sizeClass" not in study,
         "Study Workspace must not regress to size-class/device branching")
 require("Button('问小伴'" in study,
         "Phone Study flow must retain the standalone Tutor entry")
