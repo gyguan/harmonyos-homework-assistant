@@ -14,7 +14,7 @@ export struct StudyWorkspacePage {
   @Prop tutorUnavailable: boolean = false;
   @Prop assignmentId: string = 'a-math-001';
   @Prop revision: number = 0;
-  @State private compactTutorOpen: boolean = false;
+  @State private tutorPanelOpen: boolean = false;
   @State private submissionPhotoUris: string[] = [];
   @State private selectingPhotos: boolean = false;
   @State private submittingPhotos: boolean = false;
@@ -251,13 +251,9 @@ export struct StudyWorkspacePage {
       Column({ space: 0 }) {
         Row() {
           Column({ space: 3 }) {
-            Text('教材 / 页码')
-              .fontSize(12)
-              .fontColor(AppTheme.TERTIARY_TEXT);
+            Text('教材 / 页码').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
             Text(this.assignment()!.textbookRef.length > 0 ? this.assignment()!.textbookRef : '未设置')
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
+              .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start);
@@ -269,13 +265,9 @@ export struct StudyWorkspacePage {
 
         Row() {
           Column({ space: 3 }) {
-            Text('老师附件')
-              .fontSize(12)
-              .fontColor(AppTheme.TERTIARY_TEXT);
+            Text('老师附件').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
             Text(this.assignment()!.resourceLabels.length === 0 ? '暂无附件' : `${this.assignment()!.resourceLabels.length} 项资料`)
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
+              .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start);
@@ -298,9 +290,7 @@ export struct StudyWorkspacePage {
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('这项作业可能已经被删除或切换。')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
+        Text('这项作业可能已经被删除或切换。').fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
       .height('100%')
@@ -319,9 +309,7 @@ export struct StudyWorkspacePage {
               .fontSize(AppTheme.CAPTION_SIZE)
               .fontColor(AppTheme.SUBTEXT);
             Blank();
-            Text(`截至 ${this.assignment()!.dueText}`)
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .fontColor(AppTheme.TERTIARY_TEXT);
+            Text(`截至 ${this.assignment()!.dueText}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
           }
           .width('100%');
 
@@ -371,12 +359,11 @@ export struct StudyWorkspacePage {
           }
         }
         .width('100%')
-        .padding(this.sizeClass === WindowSizeClass.COMPACT ? { top: 6, bottom: 16 } : 24);
+        .padding({ top: 6, bottom: 16 });
       }
       .width('100%')
       .height('100%')
-      .backgroundColor(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.BACKGROUND : AppTheme.SURFACE)
-      .borderRadius(this.sizeClass === WindowSizeClass.COMPACT ? 0 : AppTheme.CARD_RADIUS);
+      .backgroundColor(AppTheme.BACKGROUND);
     }
   }
 
@@ -418,9 +405,7 @@ export struct StudyWorkspacePage {
             }
             ForEach(this.tutorMessages, (message: TutorChatMessage) => {
               Row() {
-                if (message.role === 'USER') {
-                  Blank();
-                }
+                if (message.role === 'USER') Blank();
                 Text(message.content)
                   .constraintSize({ maxWidth: '86%' })
                   .padding(11)
@@ -429,9 +414,7 @@ export struct StudyWorkspacePage {
                   .fontColor(message.role === 'USER' ? AppTheme.TEXT_ON_PRIMARY : AppTheme.TEXT)
                   .backgroundColor(message.role === 'USER' ? AppTheme.PRIMARY : AppTheme.SURFACE_SUBTLE)
                   .borderRadius(AppTheme.CONTROL_RADIUS);
-                if (message.role !== 'USER') {
-                  Blank();
-                }
+                if (message.role !== 'USER') Blank();
               }
               .width('100%');
             }, (message: TutorChatMessage) => message.id);
@@ -496,23 +479,18 @@ export struct StudyWorkspacePage {
         .fontColor(AppTheme.TEXT)
         .textAlign(TextAlign.Center)
         .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen ? '返回学习任务' : '返回作业列表')
+        .accessibilityText(this.tutorPanelOpen ? '返回学习任务' : '返回作业详情')
         .onClick(() => {
-          if (this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen) {
-            this.compactTutorOpen = false;
-          } else {
-            this.onBack();
-          }
+          if (this.tutorPanelOpen) this.tutorPanelOpen = false;
+          else this.onBack();
         });
-      Text(this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen ? '问小伴' : '学习空间')
+      Text(this.tutorPanelOpen ? '问小伴' : '学习空间')
         .fontSize(17)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Blank();
-      if (!(this.sizeClass === WindowSizeClass.COMPACT && this.compactTutorOpen) && this.assignment() !== null) {
-        Text(this.assignment()!.dueText)
-          .fontSize(12)
-          .fontColor(AppTheme.SUBTEXT);
+      if (!this.tutorPanelOpen && this.assignment() !== null) {
+        Text(this.assignment()!.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
     }
     .width('100%')
@@ -520,8 +498,8 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
-  private CompactWorkspace() {
-    if (this.compactTutorOpen) {
+  private SingleColumnWorkspace() {
+    if (this.tutorPanelOpen) {
       Column() {
         this.TutorPane();
       }
@@ -537,13 +515,13 @@ export struct StudyWorkspacePage {
 
         Row({ space: 10 }) {
           Button('问小伴', { type: ButtonType.Normal })
-            .width('32%')
+            .width(120)
             .height(AppTheme.BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
             .onClick(() => {
-              this.compactTutorOpen = true;
+              this.tutorPanelOpen = true;
               void this.loadTutor();
             });
 
@@ -566,38 +544,21 @@ export struct StudyWorkspacePage {
     }
   }
 
-  @Builder
-  private PadWorkspace() {
-    Row({ space: 16 }) {
-      Column() {
-        this.StudyContent(true);
-      }
-      .width(this.sizeClass === WindowSizeClass.EXPANDED ? '62%' : '58%')
-      .height('100%');
-
-      Column() {
-        this.TutorPane();
-      }
-      .layoutWeight(1)
-      .height('100%');
-    }
-    .width('100%')
-    .layoutWeight(1)
-    .alignItems(VerticalAlign.Top);
-  }
-
   build() {
-    Column() {
-      this.WorkspaceHeader();
-      if (this.sizeClass === WindowSizeClass.COMPACT) {
-        this.CompactWorkspace();
-      } else {
-        this.PadWorkspace();
+    Row() {
+      Column() {
+        this.WorkspaceHeader();
+        this.SingleColumnWorkspace();
       }
+      .width('100%')
+      .height('100%')
+      .constraintSize({ maxWidth: 820 })
+      .padding(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PAGE_PADDING : AppTheme.PAGE_PADDING_WIDE);
     }
     .width('100%')
     .height('100%')
-    .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING)
+    .justifyContent(FlexAlign.Center)
+    .alignItems(VerticalAlign.Top)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }
