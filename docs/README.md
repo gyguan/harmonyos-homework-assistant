@@ -18,6 +18,11 @@
   - 科目 / 日期 / 状态过滤；
   - Phone / Pad 产品约束；
   - P0 / P1 / P2 范围。
+- `product/ui-page-spec-v2.md`
+  - V2 页面级信息层级、路由、状态、Phone/Pad 组合和验收规则；
+  - 学生首页、作业、详情、学习空间、Tutor、Submission；
+  - 家长首页、导入三步流、Progress、Parent Review、课外任务入口；
+  - Layout Capability 与 Slice 映射。
 
 ### 3. 总体技术设计
 
@@ -125,7 +130,7 @@
 3. `development/v2-refactor-readiness.md`（决定是否允许开工与迁移安全条件）；
 4. V2 system technical design；
 5. V2 frontend / backend technical design；
-6. V2 product feature baseline；
+6. V2 product feature baseline + `ui-page-spec-v2.md`；
 7. 当前专项架构文档；
 8. development 历史记录；
 9. V0.x / V1 历史设计。
