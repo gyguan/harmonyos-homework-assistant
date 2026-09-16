@@ -4,7 +4,7 @@ export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 5;
 
 export class HomeworkSnapshotMigrator {
   static migrate(snapshot: HomeworkSnapshot): HomeworkSnapshot {
-    this.validateSnapshot(snapshot);
+    HomeworkSnapshotMigrator.validateSnapshot(snapshot);
     if (snapshot.schemaVersion > HOMEWORK_SNAPSHOT_SCHEMA_VERSION) {
       throw new Error(`不支持的本地作业数据版本: ${snapshot.schemaVersion}`);
     }
@@ -15,12 +15,12 @@ export class HomeworkSnapshotMigrator {
     let current: HomeworkSnapshot = snapshot;
     while (current.schemaVersion < HOMEWORK_SNAPSHOT_SCHEMA_VERSION) {
       if (current.schemaVersion === 4) {
-        current = this.migrateV4ToV5(current);
+        current = HomeworkSnapshotMigrator.migrateV4ToV5(current);
         continue;
       }
       throw new Error(`缺少本地作业数据迁移步骤: ${current.schemaVersion}`);
     }
-    this.validateSnapshot(current);
+    HomeworkSnapshotMigrator.validateSnapshot(current);
     return current;
   }
 
