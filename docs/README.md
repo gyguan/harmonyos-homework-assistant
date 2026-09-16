@@ -7,7 +7,8 @@
 ### 1. 项目共享事实
 
 - `../CONTEXT.md`
-  - 产品边界、共享语言、技术方向、迁移顺序、clean-refactor rules。
+  - 产品边界、共享语言、技术方向、迁移顺序、clean-refactor rules；
+  - V2 数据迁移和新旧版本兼容的默认语义。
 
 ### 2. 产品基线
 
@@ -54,7 +55,7 @@
   - Progress Query；
   - Flyway V7+。
 
-### 6. 重构开工门禁
+### 6. 重构开工与迁移基线
 
 - `development/v2-refactor-readiness.md`
   - 正式进入 V2 业务编码前必须满足的 Go / No-Go 条件；
@@ -65,6 +66,16 @@
   - API compatibility window；
   - DevEco Phone / Pad / 分屏人工验收矩阵；
   - 每个 Slice 的 Definition of Ready / Definition of Done。
+- `development/v2-migration-inventory.md`
+  - V1 对象的 KEEP / EVOLVE / MIGRATE / DELETE 分类；
+  - 删除条件与最迟 Slice；
+  - 防止 V1/V2 双实现长期共存。
+- `development/v2-compatibility-and-data-migration.md`
+  - V1/V2 客户端与后端兼容矩阵；
+  - 兼容窗口结束 Slice；
+  - 历史 Assignment 的 SCHOOL / subjectCode / dueAt 确定性迁移规则；
+  - Snapshot V5+ 与 PostgreSQL V7+ 迁移、备份、验证和回滚原则；
+  - OVERDUE 后续派生化的精确转换规则。
 
 当前总跟踪 Issue：`#103`。Readiness Gate 未完成前，不进入 Slice 1 产品编码。
 
@@ -117,9 +128,9 @@
 
 ## 五、开发记录 / 历史验收
 
-`development/` 下除 `v2-refactor-readiness.md` 外的大部分文件属于具体 Issue、V0.x 阶段实现或验收记录。
+`development/` 中明确标记为 V2 Source of Truth 的文件属于当前实施基线；其余大部分文件属于具体 Issue、V0.x 阶段实现或验收记录。
 
-它们可以帮助理解某项能力为什么存在，但不是总体设计 Source of Truth。若开发记录与 V2 技术设计或 Accepted ADR 冲突，以 V2 文档和 ADR 为准。
+历史开发记录可以帮助理解某项能力为什么存在，但不是总体设计 Source of Truth。若历史记录与 V2 技术设计、迁移基线或 Accepted ADR 冲突，以当前 V2 文档和 ADR 为准。
 
 ## 六、冲突处理顺序
 
@@ -127,12 +138,14 @@
 
 1. 最新 Accepted ADR；
 2. `CONTEXT.md`；
-3. `development/v2-refactor-readiness.md`（决定是否允许开工与迁移安全条件）；
-4. V2 system technical design；
-5. V2 frontend / backend technical design；
-6. V2 product feature baseline + `ui-page-spec-v2.md`；
-7. 当前专项架构文档；
-8. development 历史记录；
-9. V0.x / V1 历史设计。
+3. `development/v2-refactor-readiness.md`（决定是否允许开工）；
+4. `development/v2-compatibility-and-data-migration.md`（决定数据与版本兼容语义）；
+5. `development/v2-migration-inventory.md`（决定旧代码删除边界）；
+6. V2 system technical design；
+7. V2 frontend / backend technical design；
+8. V2 product feature baseline + `ui-page-spec-v2.md`；
+9. 当前专项架构文档；
+10. development 历史记录；
+11. V0.x / V1 历史设计。
 
-如果当前实现确实需要改变 1～6 中的原则，应先更新设计 / ADR，再修改代码，不通过代码补丁绕过现行设计。
+如果当前实现确实需要改变 1～8 中的原则，应先更新设计 / ADR，再修改代码，不通过代码补丁绕过现行设计。
