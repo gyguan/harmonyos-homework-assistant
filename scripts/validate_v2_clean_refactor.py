@@ -11,7 +11,6 @@ errors: list[str] = []
 LEGACY_FEATURE_STORE_ALLOWLIST = {
     "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
     "entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets",
-    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
     "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
     "entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets",
     "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
