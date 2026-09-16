@@ -124,7 +124,8 @@ export class RemoteSubmissionApi {
       if (response.responseCode < 200 || response.responseCode >= 300) {
         throw new Error(`SUBMISSION_HTTP_${response.responseCode}`);
       }
-      return JSON.parse(response.result as string) as RemoteSubmissionCreateResponse;
+      let text = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
+      return JSON.parse(text) as RemoteSubmissionCreateResponse;
     } finally {
       try { client.destroy(); } catch {}
     }
