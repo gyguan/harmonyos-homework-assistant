@@ -31,7 +31,7 @@ public final class AssignmentDtos {
       String sourceLabel, String sourceExcerpt, int expectedMinutes,
       long startedAtEpochMs, long finishedAtEpochMs, long elapsedSeconds,
       String reviewNote, long version) {
-    static Response from(AssignmentEntity e) {
+    public static Response from(AssignmentEntity e) {
       return new Response(e.id, e.studentId, e.assignmentType, e.subjectCode, e.subject,
           e.title, e.instruction, e.textbookRef,
           e.dueAt == null ? 0L : e.dueAt.toEpochMilli(), e.dueTimezone, e.dueText,

@@ -347,12 +347,26 @@ def run_full(args: argparse.Namespace) -> None:
     else:
         print(f"PASS  Tutor mode observed -> available={tutor.get('available')} notice={tutor.get('notice')!r}")
 
-    body, content_type = multipart_png()
-    submission = expect(
+    stale_body, stale_content_type = multipart_png()
+    expect(
         http(
             base_url,
             "POST",
-            f"/api/v1/assignments/{assignment_id}/submissions",
+            f"/api/v1/assignments/{assignment_id}/submissions?version={int(in_progress['version'])}",
+            token=token,
+            raw=stale_body,
+            content_type=stale_content_type,
+        ),
+        (409,),
+        "stale submission version conflict",
+    )
+
+    body, content_type = multipart_png()
+    create_response = expect(
+        http(
+            base_url,
+            "POST",
+            f"/api/v1/assignments/{assignment_id}/submissions?version={int(ready['version'])}",
             token=token,
             raw=body,
             content_type=content_type,
@@ -360,6 +374,14 @@ def run_full(args: argparse.Namespace) -> None:
         (200,),
         "upload submission photo",
     ).json()
+    require(isinstance(create_response, dict), "submission create response must be an object")
+    submission = create_response.get("submission") or {}
+    authoritative = create_response.get("assignment") or {}
+    require(authoritative.get("status") == "SUBMITTED",
+            "submission response must include authoritative SUBMITTED assignment")
+    require(int(authoritative.get("version", -1)) > int(ready["version"]),
+            "submission response assignment version did not advance")
+
     photos = submission.get("photos") or []
     require(len(photos) == 1, "submission did not return exactly one photo")
     download_path = photos[0].get("downloadPath")
@@ -387,7 +409,8 @@ def run_full(args: argparse.Namespace) -> None:
     saved = next((item for item in assignments if item.get("id") == assignment_id), None)
     require(saved is not None, "created assignment missing from list")
     require(saved.get("status") == "SUBMITTED", "submission did not move assignment to SUBMITTED")
-    require(int(saved.get("version", -1)) >= int(ready["version"]), "assignment version regressed")
+    require(int(saved.get("version", -1)) == int(authoritative["version"]),
+            "persisted assignment version differs from authoritative submission response")
 
     print(f"BACKEND_E2E_SMOKE_PASS studentId={student_id} assignmentId={assignment_id} tokenFile={args.token_file}")
     print("NEXT  restart Spring Boot (keep PostgreSQL), then run with --session-only")
