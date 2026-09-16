@@ -19,6 +19,7 @@ def require(condition: bool, message: str) -> None:
 
 
 shell = read("entry/src/main/ets/pages/AppShell.ets")
+routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 filter_dialog = read("entry/src/main/ets/features/student/assignments/AssignmentFilterDialog.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
@@ -32,17 +33,24 @@ remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
 
-require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell and "ASSIGNMENT_DETAIL = 'ASSIGNMENT_DETAIL'" in shell,
-        "student routes must include list and standalone assignment detail")
-require("StudentAssignmentsPage" in shell and "StudentAssignmentDetailPage" in shell,
-        "AppShell must render V2 assignment list and detail pages")
+require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell and "ASSIGNMENT_DETAIL = 'ASSIGNMENT_DETAIL'" not in shell and
+        "STUDY = 'STUDY'" not in shell,
+        "student root routes must keep only top-level surfaces; detail/study belong to NavPathStack")
+require("STUDENT_ASSIGNMENT_DETAIL" in routes and "STUDENT_STUDY" in routes and "AssignmentRouteParam" in routes,
+        "typed student assignment routes and assignmentId params must be defined")
+require(".navDestination(this.AppNavDestination)" in shell and "NavDestination()" in shell,
+        "AppShell Navigation must build real NavDestination pages")
+require("pushPathByName" in shell and "AppRoute.STUDENT_ASSIGNMENT_DETAIL" in shell and
+        "AppRoute.STUDENT_STUDY" in shell,
+        "assignment detail/study must navigate through NavPathStack by route name")
+require("selectedAssignmentId" not in shell and "studentStudyReturnRoute" not in shell,
+        "AppShell must not retain selected assignment or manual study return-route state")
+require("this.navPathStack.size() > 0" in shell and "this.navPathStack.pop()" in shell,
+        "system back must pop Navigation stack before root-level fallback handling")
+require("StudentAssignmentsPage" in shell and "StudentAssignmentDetailPage" in shell and "StudyWorkspacePage" in shell,
+        "AppShell must retain V2 assignment list and build detail/study destinations")
 require("onOpenDetail" in shell and "openAssignmentDetail" in shell,
         "assignment list must navigate to standalone detail by assignment id")
-require("studentStudyReturnRoute = StudentRoute.ASSIGNMENT_DETAIL" in shell,
-        "study opened from assignment detail must return to that detail")
-require("if (this.isDetailFlow())" in shell and "this.BottomNavShell();" in shell and
-        "else if (this.sizeClass === WindowSizeClass.EXPANDED)" in shell,
-        "detail flows must bypass expanded SideNavigation and render as full-screen content")
 
 require("HomeworkStore.instance" not in page and "HomeworkStore.instance" not in detail and
         "HomeworkStore.instance" not in view_model,
