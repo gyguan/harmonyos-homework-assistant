@@ -2,169 +2,199 @@
 
 面向一个家庭的 HarmonyOS AI 作业管家。
 
-> 家长把老师消息交给小伴整理并确认发布；孩子只管完成作业、需要时问小伴；家长最后看进度和提交结果。
+> 家长负责把老师作业带进来并确认；孩子只需要知道下一项做什么、完成作业、需要时问小伴；家长最后关注异常、提交和验收结果。
 
-## 当前产品定位
+## 当前状态
 
-当前版本聚焦三件事：
+项目已经完成一轮 V1 前后端闭环验证，当前进入 **V2 产品与 UI 全面重构阶段**。
 
-1. **收作业**：老师文字 / 聊天截图 → OCR / 智能整理 → Candidate Assignment → 家长确认发布；
-2. **做作业**：孩子进入自己的空间，只看当前孩子的作业，选择任务、计时完成、拍照提交，需要时使用 AI Tutor；
-3. **看进度**：家长按孩子查看未开始、进行中、待提交、已提交、已完成、需重做等状态，并查看提交照片。
+V2 不继续围绕旧页面做局部样式修补，而采用：
 
-## 产品边界
+> **后端增量演进 + 前端平行替换 + 纵向切片迁移 + 切换即清理**
 
-当前按**单家庭、多孩子**设计，仍保持家庭工具的轻量边界：
+当前 V2 设计与迁移原则统一维护在仓库文档中。发生冲突时，请按以下顺序理解：
 
-- 不建设 School / Teacher / Organization 等学校组织体系；
+1. `docs/adr/` 中最新 Accepted ADR；
+2. `CONTEXT.md`；
+3. `docs/architecture/system-technical-design-v2.md`；
+4. `docs/architecture/frontend-technical-design-v2.md` / `backend-technical-design-v2.md`；
+5. `docs/product/product-feature-list-v2.md`；
+6. V0.x / V1 历史文档仅用于回溯，不作为当前实现依据。
+
+完整文档入口见 `docs/README.md`。
+
+## 产品定位
+
+产品范围保持 **单家庭、多孩子**，不扩展为学校、班级或教师 SaaS。
+
+核心闭环：
+
+`老师原始内容 → OCR / AI 整理 → Candidate Assignment → 家长确认 → Assignment → 学习 / AI Tutor → Submission → 家长验收 / Progress`
+
+课外任务复用同一个 Assignment 领域：
+
+`家长创建 EXTRA Assignment → 学习 / 完成 → Submission（可选）→ 验收 / Progress`
+
+核心原则：
+
+- 孩子少管理、多行动；
+- 家长少操作、多掌握；
+- AI 融入流程，不占据流程；
+- AI 整理结果默认经家长确认后再发布；
+- AI Tutor 默认引导优先，不替孩子直接完成作业；
+- SCHOOL / EXTRA 共用 Assignment，不建设两套平行业务体系；
 - 不做班级社交、排行榜、题库平台、在线课堂；
-- 不后台读取微信 / 钉钉，导入必须由用户主动截图、粘贴或选择内容；
-- AI 整理结果默认经过家长确认后才发布；
-- 学生进入后身份固定，不可切换到兄弟姐妹或家长空间；家长可切换当前查看的孩子；
-- AI Tutor 默认“引导优先”，是否允许直接答案由家长配置；
-- Raw Import / Candidate 等老师原文解析中间态保留在端侧；发布后的 Assignment / Submission 才进入可选家庭云端。
+- 不后台读取微信 / 钉钉，只处理用户主动提供的内容。
 
-## 核心业务链路
+## V2 信息架构
 
-`老师原始内容 → OCR/解析 → Candidate Assignment → 家长确认 → Assignment → 学生学习/AI Tutor → Submission → 家长验收/进度`
+学生端一级导航：
 
-核心端侧对象：
+- 首页
+- 作业
+- 学习
+- 我的
 
-- `StudentProfile`
-- `Assignment`
-- `CandidateAssignment`
-- `Submission`
-- `TutorSession`
-- `AppSettings`
+家长端一级导航：
 
-## 架构原则
+- 首页
+- 导入
+- 进度
+- 我的
 
-### HarmonyOS 端
+学生作业支持按 **课内 / 课外、科目、日期、状态** 组织和筛选。
 
-保持轻量边界：
+## V2 前端架构
 
-`ArkUI Pages → HomeworkStore / Application Service → Persistence / Remote API / AI Port`
+继续使用 ArkTS + ArkUI，不引入 Redux / MobX 等重型状态管理框架。
 
-页面不直接访问 Preferences、OCR SDK 或后端 HTTP 实现。主要可替换边界包括：
+目标结构：
 
-- `HomeworkPersistence`
-- `HomeworkTextExtractor`
-- `HomeworkAssignmentParser`
-- Remote API / Tutor API
+```text
+AppRoot / RoleShell
+        ↓
+Navigation / NavDestination
+        ↓
+Feature Page
+        ↓
+ViewModel
+        ↓
+Query / Command Service
+        ↓
+Repository
+     ↙       ↘
+Local Cache  Remote API
+```
 
-### 可选家庭云端
+关键约束：
 
-云端采用单体架构：
+- 新 V2 Feature 不直接访问 `HomeworkStore.instance`；
+- `HomeworkStore` 仅作为迁移期兼容数据源，职责只减不增；
+- `AppShell` 逐步退出业务路由中心职责；
+- Phone 核心流程保持单列；
+- 业务是否多栏由 **当前容器实际可用宽度 + 内容最小可读宽度** 判断；
+- Feature 页面不得自行硬编码 600 / 840 / 1080 等业务分栏断点；
+- Pad 只在空间足够时提供列表 + 详情、学习内容 + AI 小伴、进度 + 验收等增强组合。
 
-`HarmonyOS App → Spring Boot → PostgreSQL / FileStorage / TutorModelClient`
+## V2 后端架构
 
-约束：
+继续采用轻量模块化单体：
 
-- Spring Boot 模块化单体，不拆微服务；
-- PostgreSQL + Flyway；
-- 不引入 Redis、MQ、API Gateway、工作流引擎或 CQRS；
-- Assignment 使用 `version` 做乐观并发；
-- 客户端持久化 `remoteVersion / syncDirty / lastSyncedAtEpochMs`，重启后仍能正确判断是否需要上传；
-- 同步冲突时不静默覆盖较新的服务端版本，最终服务端刷新为准；
-- AI Provider 仅在服务端配置，App 不保存模型 API Key；
-- OpenAI Responses API 适配保持 `store=false`，不依赖模型服务商保存家庭对话状态。
+```text
+HarmonyOS App
+    ↓
+Spring Boot
+    ↓
+PostgreSQL / FileStorage / AI Provider
+```
+
+技术基线：
+
+- Java 21；
+- Spring Boot 4.1.x；
+- PostgreSQL；
+- JPA；
+- Flyway；
+- FileStorage 抽象；
+- OpenAI-compatible AI Provider。
+
+默认不引入：
+
+- Redis；
+- MQ；
+- 微服务；
+- API Gateway；
+- 工作流引擎；
+- CQRS。
+
+Assignment 是唯一作业主模型，V2 逐步增加 `assignmentType`、`subjectCode`、结构化 `dueAt`、resources、requirements 等能力。历史 Flyway migration 不修改，通过 V7+ 增量升级。
+
+## 干净重构规则
+
+V2 实现必须遵守 `docs/adr/0002-v2-clean-refactor-and-migration.md`。核心要求：
+
+- 不在旧 UI 上继续堆补丁；
+- 不写 Preview / CI / 测试数据 / 特定设备专用业务分支；
+- 不用 silent fallback、magic number、空 catch 掩盖真实问题；
+- 兼容逻辑只能集中在明确 adapter / legacy boundary，并写清删除条件；
+- 一个纵向切片切换到 V2 后，同功能旧路由、旧页面、旧适配和过时测试应同步清理；
+- main 始终保持可编译、可运行、可测试、可回退。
+
+## 默认迁移顺序
+
+1. Assignment V2 + Repository 基础 + 新学生首页；
+2. 作业列表 + 科目 / 日期 / 类型筛选；
+3. 作业详情 + 学习空间 + Tutor + Submission；
+4. 家长首页 + Progress + Parent Review；
+5. Homework Import + AI 整理 + Batch Publish；
+6. EXTRA Assignment + Calendar + Pad 增强；
+7. 删除剩余 V1 页面、旧 AppShell 业务路由、旧 Store 业务职责和迁移 adapter。
 
 ## 当前工程基线
 
 - DevEco Studio：26.0.0
 - `compileSdkVersion`: `26.0.0`
 - `compatibleSdkVersion`: `6.0.0(20)`
-- `targetSdkVersion`: 未显式设置
 - project `modelVersion`: `5.0.0`
 - Hvigor / `@ohos/hvigor-ohos-plugin`: `6.26.4`
 - UI：ArkTS + ArkUI，Stage model
 - Devices：Phone + Tablet
 - Backend：Java 21 + Spring Boot + PostgreSQL + Flyway
 
-## 当前已实现
+## 已有可复用能力
 
-### 家长端
+V1 已验证并计划在 V2 中保留/演进的能力包括：
 
-- 人员入口选择与身份锁定；
-- 多孩子资料管理与孩子上下文切换；
-- 粘贴老师文字并智能拆分作业；
-- 相册截图 + Core Vision OCR 导入；
-- Candidate Source Evidence、低置信度提示、增删改与确认发布；
-- Dashboard / Progress；
-- 云端 Submission 元数据和照片读取；
-- 对学生提交执行“通过 / 需要重做”验收；
-- 家庭云端连接、会话恢复与手动同步；
-- AI Tutor“引导优先 / 允许直接答案”家庭规则配置并本地持久化。
+- 角色入口与多孩子隔离；
+- 文字 / 截图 OCR 作业导入；
+- Candidate + Source Evidence + 家长确认；
+- Assignment 状态流转与单任务计时；
+- Submission 多照片上传和鉴权读取；
+- 家长通过 / 退回订正；
+- Tutor session / message 与模型 fallback；
+- opaque auth session；
+- PostgreSQL / Flyway；
+- 本地离线快照与远端同步基础；
+- backend real E2E smoke。
 
-### 学生端
+这些能力用于 V2 增量演进，不代表旧 V1 页面结构继续作为 UI 基线。
 
-- “今天 / 作业 / 我的”完整导航；
-- Phone / 中等窗口底部导航，Pad 大屏侧边导航；
-- 从作业列表自主选择任务；
-- 同一时间只允许一个进行中的作业；
-- 作业倒计时 / 已用时跟踪，暂停后再次进入可继续；
-- Study Workspace；
-- AI Tutor 文字对话；
-- 拍题图片选择 + OCR 后向 Tutor 提问；
-- 1～6 张真实作业照片选择、预览和提交；
-- “我的”只读展示当前学生资料、教材和家长设置的 Tutor 规则。
+## 常用验证
 
-### 数据与云端
-
-- ArkData Preferences 保存家庭端轻量快照；
-- 单家庭多孩子数据隔离；
-- Spring Boot + PostgreSQL 家庭 / Student / Assignment / Submission / Tutor 数据能力；
-- opaque auth session 持久化；
-- Student CRUD；
-- Assignment 乐观并发与客户端持久化同步基线；
-- Submission 图片上传、鉴权读取；
-- Tutor session / message 服务端保存；
-- OpenAI Responses API 适配与未配置模型时的 fallback。
-
-## CI / Static Gate
-
-GitHub Actions 会执行 HarmonyOS 静态约束、Java 自动化测试以及真实 PostgreSQL Backend E2E，包括：
-
-- 工程版本与轻量架构边界；
-- 文字导入、OCR / Parser / Confirmation；
-- 真实照片提交；
-- 多孩子隔离；
-- 响应式导航与身份锁定；
-- UI design-system；
-- Backend V0.1 / V0.2 边界；
-- 倒计时、任务选择、单任务计时；
-- 家长验收；
-- 学生“作业 / 我的”导航；
-- 家长 Tutor 设置；
-- AI 建议时长、Tutor 拍题、云端提交照片；
-- Assignment 持久化同步元数据；
-- Java 21 Maven tests；
-- `postgres:17-alpine` + 实际 Spring Boot Jar + Flyway 的真实启动；
-- 登录/session、Student CRUD、Assignment CRUD、stale version `409`；
-- multipart Submission、匿名照片读取 `401`、Bearer 鉴权照片下载；
-- 未配置模型时 Tutor fallback；
-- 仅重启 Spring Boot、保留 PostgreSQL 后，旧 Bearer token 继续通过 `/auth/session`。
-
-单独执行基础 HarmonyOS Gate：
+基础 HarmonyOS 静态门禁：
 
 `python scripts/validate_harmony_project.py`
 
-本地也可对正在运行的真实 backend 执行：
+后端单元测试：
+
+`cd backend; mvn test`
+
+真实 PostgreSQL + Spring Boot E2E：
 
 `python backend/scripts/e2e_smoke.py --expect-tutor-unavailable`
 
-真实模型配置完成后执行：
+配置真实模型后：
 
 `python backend/scripts/e2e_smoke.py --expect-tutor-available`
 
-## 当前剩余验收
-
-主链路代码已经进入 `main`。PostgreSQL/Flyway、后端 API 主链、冲突、Submission 鉴权、Tutor fallback 和 backend 重启后的 session 恢复已经由 CI 自动验证。现在只剩 **GitHub Actions 无法替代的本地真实体验验收**：
-
-1. **#24 DevEco 视觉验收**：Phone / Pad / 宽屏模拟器检查主要页面的布局、截断和交互；
-2. **#28 HarmonyOS ↔ 家庭云端 E2E**：App 连接局域网 backend，跑孩子管理、作业同步、真实照片提交和离线恢复；
-3. **#30 真实 AI Tutor E2E**：使用本地配置的真实 Provider 验证 Tutor 返回、规则生效、对话恢复和跨孩子/作业隔离。
-
-完整的逐步验收入口见：`docs/development/v01-release-acceptance.md`。
-
-#24、#28、#30 全部通过后即可关闭 V0.1 产品基线 Issue #1。
+> GitHub CI 不能替代 DevEco 对 ArkUI 的真实编译、Preview / Emulator 和 Phone / Pad 视觉验收。
