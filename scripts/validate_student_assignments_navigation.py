@@ -53,9 +53,9 @@ require("selectedAssignmentId" not in page and "DetailPane" not in page,
         "V2 assignment list must not retain embedded master-detail state")
 require("constraintSize({ maxWidth: 760 })" in page,
         "V2 list should control readable width without device-specific split logic")
-require("private AssignmentListPage()" in page and ".height('100%')" in page and
-        ".justifyContent(FlexAlign.Start)" in page and ".layoutWeight(1)" in page,
-        "assignment list must fill available height and explicitly anchor short content to the top")
+require("private AssignmentListPage()" in page and "Scroll()" in page and ".height('100%')" in page and
+        ".align(Alignment.TopStart)" in page and ".justifyContent(FlexAlign.Start)" in page,
+        "assignment list must use a full-height top-anchored Scroll composition for short content")
 require("constraintSize({ maxWidth: 720 })" in detail and "align(Alignment.TopStart)" in detail,
         "V2 detail must keep a readable width and explicit top-anchored reading flow")
 
@@ -100,9 +100,13 @@ require("FilterEntry('类型'" in page and "FilterEntry('截止'" in page and "F
 
 require("private Section(title: string, description: string, items: Assignment[])" not in page,
         "assignment groups must not pass observable arrays through generic Builder parameters")
+require("private SectionHeader(title: string, description: string, count: number)" not in page,
+        "assignment group counts must not pass observable lengths through generic Builder parameters")
 for state_array in ["needHandlingAssignments", "notStartedAssignments", "submittedAssignments", "completedAssignments"]:
     require(f"ForEach(this.{state_array}" in page,
             f"assignment group must render directly from observable state: {state_array}")
+    require(f"Text(`${{this.{state_array}.length}}`)" in page,
+            f"assignment group count must render directly from observable state: {state_array}")
 require("private NeedHandlingSection()" in page and "private NotStartedSection()" in page and
         "private SubmittedSection()" in page and "private CompletedSection()" in page,
         "assignment status groups must have direct reactive builders")

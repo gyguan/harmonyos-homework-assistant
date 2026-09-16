@@ -202,24 +202,21 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
-  private SectionHeader(title: string, description: string, count: number) {
-    Row() {
-      Column({ space: 2 }) {
-        Text(title).fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text(description).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
-      }
-      .alignItems(HorizontalAlign.Start);
-      Blank();
-      Text(`${count}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-    }
-    .width('100%');
-  }
-
-  @Builder
   private NeedHandlingSection() {
     if (this.needHandlingAssignments.length > 0) {
       Column({ space: 9 }) {
-        this.SectionHeader('需要处理', '进行中、待订正、逾期或待提交', this.needHandlingAssignments.length);
+        Row() {
+          Column({ space: 2 }) {
+            Text('需要处理').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('进行中、待订正、逾期或待提交').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+          Blank();
+          Text(`${this.needHandlingAssignments.length}`)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+        }
+        .width('100%');
         Column({ space: 6 }) {
           ForEach(this.needHandlingAssignments, (item: Assignment) => {
             AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
@@ -235,7 +232,18 @@ export struct StudentAssignmentsPage {
   private NotStartedSection() {
     if (this.notStartedAssignments.length > 0) {
       Column({ space: 9 }) {
-        this.SectionHeader('待开始', '还没有开始的作业', this.notStartedAssignments.length);
+        Row() {
+          Column({ space: 2 }) {
+            Text('待开始').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('还没有开始的作业').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+          Blank();
+          Text(`${this.notStartedAssignments.length}`)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+        }
+        .width('100%');
         Column({ space: 6 }) {
           ForEach(this.notStartedAssignments, (item: Assignment) => {
             AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
@@ -251,7 +259,18 @@ export struct StudentAssignmentsPage {
   private SubmittedSection() {
     if (this.submittedAssignments.length > 0) {
       Column({ space: 9 }) {
-        this.SectionHeader('已提交', '等待家长确认', this.submittedAssignments.length);
+        Row() {
+          Column({ space: 2 }) {
+            Text('已提交').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('等待家长确认').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+          Blank();
+          Text(`${this.submittedAssignments.length}`)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+        }
+        .width('100%');
         Column({ space: 6 }) {
           ForEach(this.submittedAssignments, (item: Assignment) => {
             AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
@@ -267,7 +286,18 @@ export struct StudentAssignmentsPage {
   private CompletedSection() {
     if (this.completedAssignments.length > 0) {
       Column({ space: 9 }) {
-        this.SectionHeader('已完成', '已经完成并验收', this.completedAssignments.length);
+        Row() {
+          Column({ space: 2 }) {
+            Text('已完成').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('已经完成并验收').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+          Blank();
+          Text(`${this.completedAssignments.length}`)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+        }
+        .width('100%');
         Column({ space: 6 }) {
           ForEach(this.completedAssignments, (item: Assignment) => {
             AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
@@ -315,35 +345,31 @@ export struct StudentAssignmentsPage {
 
   @Builder
   private AssignmentListPage() {
-    Column() {
-      Scroll() {
-        Column() {
-          Column({ space: 18 }) {
-            Column({ space: 4 }) {
-              Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-              Text('通过筛选快速找到要完成的任务。').fontSize(13).fontColor(AppTheme.SUBTEXT);
-            }
-            .width('100%')
-            .alignItems(HorizontalAlign.Start);
-
-            this.FilterBar();
-            this.AssignmentSections();
+    Scroll() {
+      Column() {
+        Column({ space: 18 }) {
+          Column({ space: 4 }) {
+            Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+            Text('通过筛选快速找到要完成的任务。').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .width('100%')
-          .constraintSize({ maxWidth: 760 })
-          .padding(AppTheme.PAGE_PADDING);
+          .alignItems(HorizontalAlign.Start);
+
+          this.FilterBar();
+          this.AssignmentSections();
         }
         .width('100%')
-        .alignItems(HorizontalAlign.Center);
+        .constraintSize({ maxWidth: 760 })
+        .padding(AppTheme.PAGE_PADDING);
       }
       .width('100%')
-      .layoutWeight(1)
-      .scrollBar(BarState.Off);
+      .justifyContent(FlexAlign.Start)
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Start)
-    .alignItems(HorizontalAlign.Center);
+    .align(Alignment.TopStart)
+    .scrollBar(BarState.Off);
   }
 
   build() {
