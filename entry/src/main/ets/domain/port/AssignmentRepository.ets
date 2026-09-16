@@ -1,8 +1,10 @@
+import { AssignmentFilter } from '../model/AssignmentFilter';
 import { Assignment, StudentProfile, TodaySummary } from '../model/HomeworkModels';
 
 export interface AssignmentRepository {
   getActiveStudent(): StudentProfile;
-  listCached(): Assignment[];
+  listCached(filter?: AssignmentFilter): Assignment[];
+  getCached(assignmentId: string): Assignment | null;
   getCachedSummary(): TodaySummary;
   refresh(): Promise<boolean>;
 }

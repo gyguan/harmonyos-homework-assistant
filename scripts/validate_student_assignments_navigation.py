@@ -20,79 +20,63 @@ def require(condition: bool, message: str) -> None:
 
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
-home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
-home_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
-due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
-list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
+detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
+view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
+filter_model = read("entry/src/main/ets/domain/model/AssignmentFilter.ets")
+query = read("entry/src/main/ets/domain/service/AssignmentQuery.ets")
+repository_port = read("entry/src/main/ets/domain/port/AssignmentRepository.ets")
+repository_impl = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
+controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
+service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
 
-require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell, "student route must include ASSIGNMENTS")
-require("StudentAssignmentsPage" in shell, "AppShell must render StudentAssignmentsPage")
-require("() => this.studentRoute = StudentRoute.ASSIGNMENTS" in shell,
-        "student homework navigation must open assignments list instead of empty study workspace")
-require("studentStudyReturnRoute" in shell,
-        "study detail must remember whether it was opened from Home or Assignments")
+require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell and "ASSIGNMENT_DETAIL = 'ASSIGNMENT_DETAIL'" in shell,
+        "student routes must include list and standalone assignment detail")
+require("StudentAssignmentsPage" in shell and "StudentAssignmentDetailPage" in shell,
+        "AppShell must render V2 assignment list and detail pages")
+require("onOpenDetail" in shell and "openAssignmentDetail" in shell,
+        "assignment list must navigate to standalone detail by assignment id")
+require("studentStudyReturnRoute = StudentRoute.ASSIGNMENT_DETAIL" in shell,
+        "study opened from assignment detail must return to that detail")
 
-require("我的作业" in page and "需要处理" in page and "待开始" in page,
-        "student assignments page must organize active and not-started homework")
-require("已提交" in page and "已完成" in page,
-        "student assignments page must keep submitted/completed homework visible")
-require("this.onOpenStudy(item.id)" in page,
-        "student assignments page must open the selected task by id")
-require("private openAssignment(item: Assignment)" in page,
-        "student assignments page must centralize phone/pad task opening behavior")
-require("this.sizeClass === WindowSizeClass.COMPACT" in page,
-        "existing assignment list must remain usable on compact layouts until Slice 2 replaces it")
-require("selectedAssignmentId" in page and "private DetailPane()" in page and "private PadLayout()" in page,
-        "existing pad assignments page must remain functional until Slice 2 replaces it")
-require("AssignmentListItem" in page and "onOpen: () => this.openAssignment(item)" in page,
-        "assignment rows must remain fully tappable")
-require("export struct AssignmentListItem" in list_item,
-        "shared assignment list item must exist while the V1 assignments page remains")
+require("HomeworkStore.instance" not in page and "HomeworkStore.instance" not in detail and
+        "HomeworkStore.instance" not in view_model,
+        "V2 assignment list/detail/view-model must not access HomeworkStore directly")
+require("WindowSizeClass" not in page and "PhoneLayout" not in page and "PadLayout" not in page,
+        "V2 assignment list must not branch on device/window classes")
+require("selectedAssignmentId" not in page and "DetailPane" not in page,
+        "V2 assignment list must not retain embedded master-detail state")
+require("constraintSize({ maxWidth: 760 })" in page,
+        "V2 list should control readable width without device-specific split logic")
+require("constraintSize({ maxWidth: 720 })" in detail,
+        "V2 detail should control readable width without device-specific split logic")
 
-require("@State private subjectFilter: string = 'ALL'" in page and "filteredAssignments()" in page,
-        "student assignments page must keep an explicit subject filter state")
-require("SubjectTab('ALL', '全部')" in page and "SubjectTab(Subject.CHINESE, '语文')" in page and
-        "SubjectTab(Subject.MATH, '数学')" in page and "SubjectTab(Subject.ENGLISH, '英语')" in page,
-        "student assignments page must expose all/chinese/math/english filters")
-require("this.subjectCount(key)" in page and "this.filteredAssignments()" in page,
-        "student subject filters must show counts and drive the status sections")
+for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
+    require(token in page, f"assignment list missing type filter: {token}")
+for token in ["AssignmentDateFilter.ALL", "AssignmentDateFilter.TODAY", "AssignmentDateFilter.TOMORROW",
+              "AssignmentDateFilter.THIS_WEEK"]:
+    require(token in page, f"assignment list missing date filter: {token}")
+for subject in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
+    require(subject in page, f"assignment list missing subject filter: {subject}")
+require("StudentAssignmentsViewModel" in page and "DefaultAssignmentRepository.instance" in page,
+        "assignment list must query through ViewModel + Repository")
+require("this.viewModel.assignments(this.typeFilter, this.subjectCode, this.dateFilter" in page,
+        "type/date/subject filters must compose into one query")
 
-require("@State private dateFilter: DueDateFilterKey = DueDateFilterKey.ALL" in page,
-        "student assignments page must keep an explicit due-date filter state")
-for token in ["DueDateFilterKey.ALL", "DueDateFilterKey.TODAY", "DueDateFilterKey.TOMORROW",
-              "DueDateFilterKey.THIS_WEEK", "DueDateFilterKey.OVERDUE"]:
-    require(token in page, f"student assignments page missing date filter: {token}")
-require("AssignmentDueDate.matches(item, this.dateFilter)" in page and "matchesSubject(item, this.subjectFilter)" in page,
-        "student assignments must combine subject and due-date filters")
-require("this.dateCount(key)" in page and "private DateTab(" in page and "private FilterPanel()" in page,
-        "student due-date filters must show counts in a dedicated lightweight filter row")
-require("for (let item of this.filteredAssignments())" in page,
-        "student status grouping must run after subject and date filtering")
+require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model,
+        "a shared AssignmentFilter model must define type/subject/date/status query state")
+require("dueAtEpochMs" in query and "dueText" not in query,
+        "V2 date filtering must use structured dueAt only and never infer dueText")
+require("AssignmentQuery.filter" in repository_impl and "filter?: AssignmentFilter" in repository_port,
+        "Repository boundary must own local AssignmentFilter execution")
+require("getCached(assignmentId: string)" in repository_port and "getCached(assignmentId: string)" in repository_impl,
+        "standalone detail must load through Repository instead of Store")
 
-require("export enum DueDateFilterKey" in due_date and "export class AssignmentDueDate" in due_date,
-        "a shared assignment due-date normalizer must back existing homework lists until Slice 2")
-for phrase in ["今天", "明天", "后天", "周日", "星期天", "月"]:
-    require(phrase in due_date, f"due-date normalizer missing supported expression: {phrase}")
-require("AssignmentStatus.COMPLETED" in due_date and "AssignmentStatus.SUBMITTED" in due_date and
-        "AssignmentStatus.OVERDUE" in due_date,
-        "overdue filtering must respect completed/submitted/overdue assignment states")
-require("dueDay >= today && dueDay <= AssignmentDueDate.endOfWeek(today)" in due_date,
-        "this-week filtering must use the local week boundary")
-require("this." not in due_date,
-        "AssignmentDueDate static utility must not use standalone this; ArkTS requires explicit class references")
-
-require("StudentHomePage" in shell and "StudentTodayPage" not in shell,
-        "V2 Student Home must replace the legacy Today surface")
-require("HomeworkStore.instance" not in home,
-        "V2 Student Home must not access HomeworkStore directly")
-require("AssignmentStatus.OVERDUE" in home_vm and "AssignmentStatus.NOT_STARTED" in home_vm,
-        "V2 Student Home recommendation must account for overdue and not-started work")
-over_pos = home_vm.find("AssignmentStatus.OVERDUE")
-not_started_pos = home_vm.find("AssignmentStatus.NOT_STARTED", over_pos)
-require(over_pos >= 0 and not_started_pos > over_pos,
-        "overdue work must rank ahead of ordinary not-started work in V2 recommendation order")
-require("attentionCount()" in home_vm and "需要优先处理" in home,
-        "V2 Student Home must explicitly surface attention work")
+for param in ["String type", "String subjectCode", "Long from", "Long to", "String status"]:
+    require(param in controller, f"backend assignment query missing parameter: {param}")
+require("matchesListFilter" in service and "statusFilter" in service and "compareForList" in service,
+        "backend must implement combined filters and stable ordering")
+require("assignment.dueAt == null" in service,
+        "backend structured date filters must keep undated historical assignments explicit")
 
 if errors:
     print("STUDENT_ASSIGNMENTS_NAVIGATION_GATE_FAIL")

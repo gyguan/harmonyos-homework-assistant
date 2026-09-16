@@ -27,7 +27,14 @@ public class AssignmentController {
 
   @GetMapping("/students/{studentId}/assignments")
   public List<AssignmentDtos.Response> list(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String studentId) { return service.list(familyId, studentId); }
+      @PathVariable String studentId,
+      @RequestParam(required = false) String type,
+      @RequestParam(required = false) String subjectCode,
+      @RequestParam(required = false) Long from,
+      @RequestParam(required = false) Long to,
+      @RequestParam(required = false) String status) {
+    return service.list(familyId, studentId, type, subjectCode, from, to, status);
+  }
 
   @GetMapping("/students/{studentId}/assignments/summary")
   public AssignmentDtos.TodaySummary todaySummary(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
