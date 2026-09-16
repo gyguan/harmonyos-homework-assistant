@@ -73,7 +73,7 @@ require("docs/product/v2-deep-page-chrome-standard.md" in agents and "DeepPageHe
         "Agent guide must require the shared deep-page chrome standard for future V2 refactors")
 require("深层页面必须复用 `DeepPageHeader`" in spec,
         "deep-page chrome spec must explicitly require DeepPageHeader reuse")
-require("页面级纵向 Scroll" in spec and "scrollBar(BarState.Off)" in spec,
+require("页面级纵向 `Scroll`" in spec and "scrollBar(BarState.Off)" in spec,
         "deep-page chrome spec must require top-anchored scrolling with hidden system scrollbars")
 
 if errors:
