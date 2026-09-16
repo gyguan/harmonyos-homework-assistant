@@ -91,6 +91,10 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     if (!replaced) assignments.push(updated);
     HomeworkStore.instance.replaceAssignmentsForActiveStudent(assignments);
     this.replaceQueryCacheItem(updated);
+    // Any authoritative assignment mutation can change nextAssignmentId/progress counters.
+    // Drop the remote summary immediately so hidden Home surfaces re-render from the updated
+    // local Assignment cache before the asynchronous background sync completes.
+    this.remoteSummary = null;
   }
 
   async refresh(): Promise<boolean> {
@@ -115,6 +119,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     let updated = HomeworkStore.instance.getAssignment(assignmentId);
     if (updated === null) throw new Error('作业不存在');
     this.replaceQueryCacheItem(updated);
+    this.remoteSummary = null;
     return updated;
   }
 

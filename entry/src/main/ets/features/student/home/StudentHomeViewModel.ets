@@ -24,13 +24,13 @@ export class StudentHomeViewModel {
     let summary = this.summary();
     if (summary.nextAssignmentId.length > 0) {
       for (let item of this.assignments()) {
-        if (item.id === summary.nextAssignmentId) return item;
+        if (item.id === summary.nextAssignmentId && StudentHomeViewModel.isActionable(item.status)) return item;
       }
     }
 
     let best: Assignment | null = null;
     for (let item of this.assignments()) {
-      if (StudentHomeViewModel.priority(item.status) >= 100) continue;
+      if (!StudentHomeViewModel.isActionable(item.status)) continue;
       if (best === null || StudentHomeViewModel.isBetter(item, best)) best = item;
     }
     return best;
@@ -40,7 +40,7 @@ export class StudentHomeViewModel {
     let next = this.nextAssignment();
     let result: Assignment[] = [];
     for (let item of this.assignments()) {
-      if (item.status === AssignmentStatus.COMPLETED || item.status === AssignmentStatus.SUBMITTED) continue;
+      if (!StudentHomeViewModel.isActionable(item.status)) continue;
       if (next !== null && item.id === next.id) continue;
       result.push(item);
     }
@@ -59,6 +59,8 @@ export class StudentHomeViewModel {
     if (assignment.status === AssignmentStatus.IN_PROGRESS || assignment.status === AssignmentStatus.PAUSED) return '继续完成';
     if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) return '去提交';
     if (assignment.status === AssignmentStatus.NEEDS_REWORK) return '继续订正';
+    if (assignment.status === AssignmentStatus.SUBMITTED) return '已提交';
+    if (assignment.status === AssignmentStatus.COMPLETED) return '已完成';
     return '开始作业';
   }
 
@@ -69,6 +71,10 @@ export class StudentHomeViewModel {
 
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
+  }
+
+  private static isActionable(status: AssignmentStatus): boolean {
+    return StudentHomeViewModel.priority(status) < 100;
   }
 
   private static priority(status: AssignmentStatus): number {
