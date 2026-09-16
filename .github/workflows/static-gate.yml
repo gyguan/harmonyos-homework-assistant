@@ -7,6 +7,7 @@ on:
       - main
       - 'feat/**'
       - 'ci/**'
+      - 'refactor/**'
 
 jobs:
   validate-project-invariants:
@@ -46,6 +47,9 @@ jobs:
 
       - name: Validate HarmonyOS UI design system
         run: python scripts/validate_harmony_ui_design.py
+
+      - name: Validate V2 deep-page chrome
+        run: python scripts/validate_v2_deep_page_chrome.py
 
       - name: Validate V2 clean-refactor rules
         run: python scripts/validate_v2_clean_refactor.py

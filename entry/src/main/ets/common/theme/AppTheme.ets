@@ -38,6 +38,17 @@ export class AppTheme {
   static readonly CONTROL_RADIUS: number = 14;
   static readonly CHIP_RADIUS: number = 12;
 
+  // Deep-page chrome. Assignment detail, study, Tutor, submission and future secondary pages
+  // share one compact top chrome instead of implementing page-private back/title layouts.
+  static readonly DEEP_PAGE_TOP_PADDING: number = 8;
+  static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
+  static readonly DEEP_PAGE_HEADER_HEIGHT: number = 44;
+  static readonly DEEP_PAGE_HEADER_GAP: number = 10;
+  static readonly DEEP_PAGE_HEADER_TITLE_SIZE: number = 17;
+  static readonly DEEP_PAGE_HEADER_META_SIZE: number = 12;
+  static readonly DEEP_PAGE_BACK_GLYPH_SIZE: number = 27;
+  static readonly DEEP_PAGE_CONTENT_GAP: number = 12;
+
   // Two-pane is a content capability, not a device breakpoint. These are minimum
   // readable pane constraints; the actual switch width is calculated from them.
   static readonly SPLIT_PRIMARY_MIN_WIDTH: number = 320;
