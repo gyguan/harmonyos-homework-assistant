@@ -13,13 +13,11 @@ export struct StudentAssignmentsPage {
   @Prop revision: number = 0;
   @State private refreshRevision: number = 0;
 
-  // Applied query state. The result list only changes after the user confirms with 查询.
   @State private typeFilter: AssignmentTypeFilter = AssignmentTypeFilter.ALL;
   @State private subjectCode: string = 'ALL';
   @State private dateFilter: AssignmentDateFilter = AssignmentDateFilter.ALL;
 
-  // Draft state lives inside the half-modal filter sheet.
-  @State private isFilterSheetVisible: boolean = false;
+  @State private isFilterOverlayVisible: boolean = false;
   @State private draftTypeFilter: AssignmentTypeFilter = AssignmentTypeFilter.ALL;
   @State private draftSubjectCode: string = 'ALL';
   @State private draftDateFilter: AssignmentDateFilter = AssignmentDateFilter.ALL;
@@ -82,11 +80,15 @@ export struct StudentAssignmentsPage {
     this.completedAssignments = completed;
   }
 
-  private openFilterSheet(): void {
+  private openFilterOverlay(): void {
     this.draftTypeFilter = this.typeFilter;
     this.draftSubjectCode = this.subjectCode;
     this.draftDateFilter = this.dateFilter;
-    this.isFilterSheetVisible = true;
+    this.isFilterOverlayVisible = true;
+  }
+
+  private closeFilterOverlay(): void {
+    this.isFilterOverlayVisible = false;
   }
 
   private resetDraftFilters(): void {
@@ -100,7 +102,7 @@ export struct StudentAssignmentsPage {
     this.subjectCode = this.draftSubjectCode;
     this.dateFilter = this.draftDateFilter;
     this.rebuildResults();
-    this.isFilterSheetVisible = false;
+    this.isFilterOverlayVisible = false;
   }
 
   private hasActiveFilters(): boolean {
@@ -133,17 +135,13 @@ export struct StudentAssignmentsPage {
   @Builder
   private FilterEntry(label: string, value: string, active: boolean) {
     Column({ space: 3 }) {
-      Text(label)
-        .fontSize(11)
-        .fontColor(AppTheme.TERTIARY_TEXT);
+      Text(label).fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
       Row({ space: 3 }) {
         Text(value)
           .fontSize(13)
           .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
           .fontColor(active ? AppTheme.PRIMARY : AppTheme.TEXT);
-        Text('⌄')
-          .fontSize(11)
-          .fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
+        Text('⌄').fontSize(11).fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
       }
     }
     .layoutWeight(1)
@@ -152,7 +150,7 @@ export struct StudentAssignmentsPage {
     .alignItems(HorizontalAlign.Center)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(`${label}：${value}，点击筛选`)
-    .onClick(() => this.openFilterSheet());
+    .onClick(() => this.openFilterOverlay());
   }
 
   @Builder
@@ -172,69 +170,82 @@ export struct StudentAssignmentsPage {
         .padding({ left: 14, right: 14 })
         .accessibilityRole(AccessibilityRoleType.BUTTON)
         .accessibilityText('打开筛选面板')
-        .onClick(() => this.openFilterSheet());
+        .onClick(() => this.openFilterOverlay());
     }
     .width('100%')
     .height(58)
     .padding({ left: 8, right: 8 })
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.CONTROL_RADIUS)
-    .bindSheet($$this.isFilterSheetVisible, this.FilterSheet(), {
-      detents: [SheetSize.MEDIUM, SheetSize.LARGE],
-      preferType: SheetType.BOTTOM,
-      showClose: false,
-      dragBar: true,
-      backgroundColor: AppTheme.SURFACE
-    });
+    .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
-  private OptionChip(label: string, selected: boolean, action: () => void) {
-    Text(label)
-      .fontSize(14)
-      .fontWeight(selected ? FontWeight.Medium : FontWeight.Normal)
-      .fontColor(selected ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .constraintSize({ minWidth: 86, minHeight: AppTheme.MIN_TOUCH_TARGET })
-      .textAlign(TextAlign.Center)
-      .padding({ left: 14, right: 14, top: 10, bottom: 10 })
-      .backgroundColor(selected ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .border({ width: selected ? 1 : 0, color: selected ? AppTheme.PRIMARY : Color.Transparent })
+  private TypeOption(label: string, value: AssignmentTypeFilter) {
+    Button(label, { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
       .borderRadius(AppTheme.CHIP_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(selected ? `${label}，已选择` : label)
-      .onClick(action);
+      .fontSize(14)
+      .fontWeight(this.draftTypeFilter === value ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.draftTypeFilter === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.draftTypeFilter === value ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.draftTypeFilter = value);
   }
 
   @Builder
-  private FilterSheet() {
+  private DateOption(label: string, value: AssignmentDateFilter) {
+    Button(label, { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(14)
+      .fontWeight(this.draftDateFilter === value ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.draftDateFilter === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.draftDateFilter === value ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.draftDateFilter = value);
+  }
+
+  @Builder
+  private SubjectOption(label: string, value: string) {
+    Button(label, { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(14)
+      .fontWeight(this.draftSubjectCode === value ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.draftSubjectCode === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.draftSubjectCode === value ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.draftSubjectCode = value);
+  }
+
+  @Builder
+  private FilterPanel() {
     Column() {
       Scroll() {
         Column({ space: 22 }) {
           Row() {
             Column({ space: 3 }) {
-              Text('筛选作业')
-                .fontSize(20)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(AppTheme.TEXT);
-              Text('选择条件后点击查询，列表才会更新。')
-                .fontSize(12)
-                .fontColor(AppTheme.SUBTEXT);
+              Text('筛选作业').fontSize(20).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Text('选择条件后点击查询，列表才会更新。').fontSize(12).fontColor(AppTheme.SUBTEXT);
             }
             .alignItems(HorizontalAlign.Start);
             Blank();
+            Text('关闭')
+              .fontSize(13)
+              .fontColor(AppTheme.SUBTEXT)
+              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+              .padding({ left: 10, right: 4 })
+              .onClick(() => this.closeFilterOverlay());
           }
           .width('100%');
 
           Column({ space: 10 }) {
             Text('类型').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
-              this.OptionChip('全部', this.draftTypeFilter === AssignmentTypeFilter.ALL,
-                () => this.draftTypeFilter = AssignmentTypeFilter.ALL);
-              this.OptionChip('课内', this.draftTypeFilter === AssignmentTypeFilter.SCHOOL,
-                () => this.draftTypeFilter = AssignmentTypeFilter.SCHOOL);
-              this.OptionChip('课外', this.draftTypeFilter === AssignmentTypeFilter.EXTRA,
-                () => this.draftTypeFilter = AssignmentTypeFilter.EXTRA);
+              this.TypeOption('全部', AssignmentTypeFilter.ALL);
+              this.TypeOption('课内', AssignmentTypeFilter.SCHOOL);
+              this.TypeOption('课外', AssignmentTypeFilter.EXTRA);
             }
             .width('100%');
           }
@@ -243,19 +254,15 @@ export struct StudentAssignmentsPage {
           Column({ space: 10 }) {
             Text('截止时间').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
-              this.OptionChip('全部日期', this.draftDateFilter === AssignmentDateFilter.ALL,
-                () => this.draftDateFilter = AssignmentDateFilter.ALL);
-              this.OptionChip('今天', this.draftDateFilter === AssignmentDateFilter.TODAY,
-                () => this.draftDateFilter = AssignmentDateFilter.TODAY);
-              this.OptionChip('明天', this.draftDateFilter === AssignmentDateFilter.TOMORROW,
-                () => this.draftDateFilter = AssignmentDateFilter.TOMORROW);
+              this.DateOption('全部日期', AssignmentDateFilter.ALL);
+              this.DateOption('今天', AssignmentDateFilter.TODAY);
+              this.DateOption('明天', AssignmentDateFilter.TOMORROW);
             }
             .width('100%');
             Row({ space: 8 }) {
-              this.OptionChip('本周', this.draftDateFilter === AssignmentDateFilter.THIS_WEEK,
-                () => this.draftDateFilter = AssignmentDateFilter.THIS_WEEK);
-              this.OptionChip('未定', this.draftDateFilter === AssignmentDateFilter.UNDATED,
-                () => this.draftDateFilter = AssignmentDateFilter.UNDATED);
+              this.DateOption('本周', AssignmentDateFilter.THIS_WEEK);
+              this.DateOption('未定', AssignmentDateFilter.UNDATED);
+              Blank().layoutWeight(1);
             }
             .width('100%');
           }
@@ -264,14 +271,15 @@ export struct StudentAssignmentsPage {
           Column({ space: 10 }) {
             Text('科目').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
-              this.OptionChip('全部科目', this.draftSubjectCode === 'ALL', () => this.draftSubjectCode = 'ALL');
-              this.OptionChip('语文', this.draftSubjectCode === 'CHINESE', () => this.draftSubjectCode = 'CHINESE');
-              this.OptionChip('数学', this.draftSubjectCode === 'MATH', () => this.draftSubjectCode = 'MATH');
+              this.SubjectOption('全部科目', 'ALL');
+              this.SubjectOption('语文', 'CHINESE');
+              this.SubjectOption('数学', 'MATH');
             }
             .width('100%');
             Row({ space: 8 }) {
-              this.OptionChip('英语', this.draftSubjectCode === 'ENGLISH', () => this.draftSubjectCode = 'ENGLISH');
-              this.OptionChip('其他', this.draftSubjectCode === 'OTHER', () => this.draftSubjectCode = 'OTHER');
+              this.SubjectOption('英语', 'ENGLISH');
+              this.SubjectOption('其他', 'OTHER');
+              Blank().layoutWeight(1);
             }
             .width('100%');
           }
@@ -279,7 +287,7 @@ export struct StudentAssignmentsPage {
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start)
-        .padding({ left: 20, right: 20, top: 8, bottom: 18 });
+        .padding({ left: 20, right: 20, top: 18, bottom: 18 });
       }
       .width('100%')
       .layoutWeight(1)
@@ -308,6 +316,22 @@ export struct StudentAssignmentsPage {
       .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
     }
     .width('100%')
+    .height('68%')
+    .backgroundColor(AppTheme.SURFACE)
+    .borderRadius(AppTheme.CARD_RADIUS)
+    .border({ width: 1, color: AppTheme.BORDER });
+  }
+
+  @Builder
+  private FilterOverlay() {
+    Column() {
+      Column()
+        .width('100%')
+        .layoutWeight(1)
+        .onClick(() => this.closeFilterOverlay());
+      this.FilterPanel();
+    }
+    .width('100%')
     .height('100%');
   }
 
@@ -328,11 +352,7 @@ export struct StudentAssignmentsPage {
 
         Column({ space: 6 }) {
           ForEach(items, (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              selected: false,
-              onOpen: () => this.onOpenDetail(item.id)
-            });
+            AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
           }, (item: Assignment) => item.id);
         }
         .width('100%');
@@ -345,13 +365,9 @@ export struct StudentAssignmentsPage {
   private EmptyState() {
     if (this.visibleTotal === 0) {
       Column({ space: 8 }) {
-        SymbolGlyph($r('sys.symbol.checkmark_square'))
-          .fontSize(30)
-          .fontColor([AppTheme.TERTIARY_TEXT]);
+        SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
         Text(this.totalCount === 0 ? '暂时没有作业' : '当前筛选下没有作业')
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
+          .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Text('调整筛选条件后点击查询。').fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
@@ -364,13 +380,9 @@ export struct StudentAssignmentsPage {
     Column({ space: 22 }) {
       Row() {
         Text(this.hasActiveFilters() ? '筛选结果' : '全部作业')
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
+          .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text(`${this.visibleTotal} 项`)
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
+        Text(`${this.visibleTotal} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -383,7 +395,8 @@ export struct StudentAssignmentsPage {
     .width('100%');
   }
 
-  build() {
+  @Builder
+  private PageContent() {
     Scroll() {
       Column() {
         Column({ space: 18 }) {
@@ -407,5 +420,16 @@ export struct StudentAssignmentsPage {
     .width('100%')
     .height('100%')
     .scrollBar(BarState.Off);
+  }
+
+  build() {
+    Stack({ alignContent: Alignment.Bottom }) {
+      this.PageContent();
+      if (this.isFilterOverlayVisible) {
+        this.FilterOverlay();
+      }
+    }
+    .width('100%')
+    .height('100%');
   }
 }
