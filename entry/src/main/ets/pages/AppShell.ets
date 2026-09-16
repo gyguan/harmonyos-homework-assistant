@@ -1,4 +1,5 @@
 import { HomeworkSyncService } from '../application/remote/HomeworkSyncService';
+import { AppRoute, AssignmentRouteParam } from '../app/navigation/AppRoutes';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
@@ -25,9 +26,7 @@ export enum AppRole {
 enum StudentRoute {
   HOME = 'HOME',
   ASSIGNMENTS = 'ASSIGNMENTS',
-  ASSIGNMENT_DETAIL = 'ASSIGNMENT_DETAIL',
-  PROFILE = 'PROFILE',
-  STUDY = 'STUDY'
+  PROFILE = 'PROFILE'
 }
 
 enum ParentRoute {
@@ -44,10 +43,8 @@ export struct AppShell {
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
   @State private studentRoute: StudentRoute = StudentRoute.HOME;
-  @State private studentStudyReturnRoute: StudentRoute = StudentRoute.HOME;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
-  @State private selectedAssignmentId: string = '';
   @State private storeRevision: number = 0;
   onRegisterBackHandler: (handler: () => boolean) => void = (_handler: () => boolean) => {};
 
@@ -75,19 +72,12 @@ export struct AppShell {
   }
 
   private isDetailFlow(): boolean {
-    if (this.role === AppRole.STUDENT) {
-      return this.studentRoute === StudentRoute.STUDY || this.studentRoute === StudentRoute.ASSIGNMENT_DETAIL;
-    }
-    return this.parentRoute === ParentRoute.CONFIRMATION;
+    return this.role === AppRole.PARENT && this.parentRoute === ParentRoute.CONFIRMATION;
   }
 
   private handleSystemBack(): boolean {
-    if (this.role === AppRole.STUDENT && this.studentRoute === StudentRoute.STUDY) {
-      this.studentRoute = this.studentStudyReturnRoute;
-      return true;
-    }
-    if (this.role === AppRole.STUDENT && this.studentRoute === StudentRoute.ASSIGNMENT_DETAIL) {
-      this.studentRoute = StudentRoute.ASSIGNMENTS;
+    if (this.navPathStack.size() > 0) {
+      this.navPathStack.pop();
       return true;
     }
     if (this.role === AppRole.PARENT && this.parentRoute === ParentRoute.CONFIRMATION) {
@@ -120,7 +110,7 @@ export struct AppShell {
     }
     let nextIndex = activeIndex < 0 || activeIndex + 1 >= students.length ? 0 : activeIndex + 1;
     if (HomeworkStore.instance.setActiveStudent(students[nextIndex].id)) {
-      this.selectedAssignmentId = '';
+      this.navPathStack.clear();
       this.studentRoute = StudentRoute.HOME;
       this.parentRoute = ParentRoute.DASHBOARD;
       this.touchStore();
@@ -128,22 +118,16 @@ export struct AppShell {
   }
 
   private openAssignmentDetail(assignmentId: string): void {
-    this.selectedAssignmentId = assignmentId;
-    this.studentRoute = StudentRoute.ASSIGNMENT_DETAIL;
+    this.navPathStack.pushPathByName(
+      AppRoute.STUDENT_ASSIGNMENT_DETAIL, new AssignmentRouteParam(assignmentId));
   }
 
   private openStudy(assignmentId: string): void {
-    HomeworkStore.instance.startAssignment(assignmentId);
-    this.selectedAssignmentId = assignmentId;
-    if (this.studentRoute === StudentRoute.ASSIGNMENT_DETAIL) {
-      this.studentStudyReturnRoute = StudentRoute.ASSIGNMENT_DETAIL;
-    } else if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
-      this.studentStudyReturnRoute = StudentRoute.ASSIGNMENTS;
-    } else {
-      this.studentStudyReturnRoute = StudentRoute.HOME;
-    }
-    this.touchStore();
-    this.studentRoute = StudentRoute.STUDY;
+    this.navPathStack.pushPathByName(AppRoute.STUDENT_STUDY, new AssignmentRouteParam(assignmentId));
+  }
+
+  private routeAssignmentId(param: Object): string {
+    return (param as AssignmentRouteParam).assignmentId;
   }
 
   private isBlockingPageState(): boolean {
@@ -154,23 +138,7 @@ export struct AppShell {
 
   @Builder
   private StudentContent() {
-    if (this.studentRoute === StudentRoute.STUDY) {
-      StudyWorkspacePage({
-        sizeClass: this.contentSizeClass,
-        tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
-        assignmentId: this.selectedAssignmentId,
-        revision: this.storeRevision,
-        onBack: () => this.studentRoute = this.studentStudyReturnRoute,
-        onStoreChanged: () => this.touchStore()
-      });
-    } else if (this.studentRoute === StudentRoute.ASSIGNMENT_DETAIL) {
-      StudentAssignmentDetailPage({
-        assignmentId: this.selectedAssignmentId,
-        revision: this.storeRevision,
-        onBack: () => this.studentRoute = StudentRoute.ASSIGNMENTS,
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
-      });
-    } else if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
+    if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
       StudentAssignmentsPage({
         revision: this.storeRevision,
         onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId)
@@ -186,6 +154,35 @@ export struct AppShell {
         revision: this.storeRevision,
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
       });
+    }
+  }
+
+  @Builder
+  private AppNavDestination(name: string, param: Object) {
+    if (name === AppRoute.STUDENT_ASSIGNMENT_DETAIL) {
+      NavDestination() {
+        StudentAssignmentDetailPage({
+          assignmentId: this.routeAssignmentId(param),
+          revision: this.storeRevision,
+          onBack: () => this.navPathStack.pop(),
+          onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.STUDENT_STUDY) {
+      NavDestination() {
+        StudyWorkspacePage({
+          sizeClass: this.contentSizeClass,
+          tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
+          assignmentId: this.routeAssignmentId(param),
+          revision: this.storeRevision,
+          onBack: () => this.navPathStack.pop(),
+          onStoreChanged: () => this.touchStore()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     }
   }
 
@@ -298,8 +295,7 @@ export struct AppShell {
       if (this.role === AppRole.STUDENT) {
         this.BottomItem($r('sys.symbol.house'), '首页', this.studentRoute === StudentRoute.HOME,
           () => this.studentRoute = StudentRoute.HOME);
-        this.BottomItem($r('sys.symbol.checkmark_square'), '作业',
-          this.studentRoute === StudentRoute.ASSIGNMENTS || this.studentRoute === StudentRoute.ASSIGNMENT_DETAIL,
+        this.BottomItem($r('sys.symbol.checkmark_square'), '作业', this.studentRoute === StudentRoute.ASSIGNMENTS,
           () => this.studentRoute = StudentRoute.ASSIGNMENTS);
         this.BottomItem($r('sys.symbol.gearshape'), '我的', this.studentRoute === StudentRoute.PROFILE,
           () => this.studentRoute = StudentRoute.PROFILE);
@@ -361,8 +357,7 @@ export struct AppShell {
       if (this.role === AppRole.STUDENT) {
         this.SideItem($r('sys.symbol.house'), '首页', this.studentRoute === StudentRoute.HOME,
           () => this.studentRoute = StudentRoute.HOME);
-        this.SideItem($r('sys.symbol.checkmark_square'), '作业',
-          this.studentRoute === StudentRoute.ASSIGNMENTS || this.studentRoute === StudentRoute.ASSIGNMENT_DETAIL,
+        this.SideItem($r('sys.symbol.checkmark_square'), '作业', this.studentRoute === StudentRoute.ASSIGNMENTS,
           () => this.studentRoute = StudentRoute.ASSIGNMENTS);
         this.SideItem($r('sys.symbol.gearshape'), '我的', this.studentRoute === StudentRoute.PROFILE,
           () => this.studentRoute = StudentRoute.PROFILE);
@@ -459,8 +454,6 @@ export struct AppShell {
   @Builder
   private ShellContent() {
     Stack() {
-      // Detail flows are full-screen compositions. Shell navigation must not create
-      // an accidental second column on Pad/expanded windows.
       if (this.isDetailFlow()) {
         this.BottomNavShell();
       } else if (this.sizeClass === WindowSizeClass.EXPANDED) {
@@ -485,6 +478,7 @@ export struct AppShell {
     }
     .mode(NavigationMode.Stack)
     .hideTitleBar(true)
+    .navDestination(this.AppNavDestination)
     .width('100%')
     .height('100%');
   }
