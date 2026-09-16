@@ -29,16 +29,19 @@ for field in ("remoteVersion: number", "syncDirty: boolean", "lastSyncedAtEpochM
     require(field in models, f"Assignment must persist client sync field: {field}")
 
 require("remoteVersion: source.remoteVersion > 0 ? source.remoteVersion : 0" in store,
-        "old snapshots must default remoteVersion to 0")
+        "snapshot clone must preserve/default remoteVersion")
 require("syncDirty: source.syncDirty === true" in store,
-        "old snapshots must default syncDirty to false")
+        "snapshot clone must preserve/default syncDirty")
 require("lastSyncedAtEpochMs: source.lastSyncedAtEpochMs > 0 ? source.lastSyncedAtEpochMs : 0" in store,
-        "old snapshots must default lastSyncedAtEpochMs to 0")
-require("remoteVersion: 0, syncDirty: true, lastSyncedAtEpochMs: 0" in store,
-        "newly published assignments must start dirty with remoteVersion 0")
+        "snapshot clone must preserve/default lastSyncedAtEpochMs")
+for token in ["remoteVersion: 0", "syncDirty: true", "lastSyncedAtEpochMs: 0"]:
+    require(token in store, f"newly published assignments must initialize sync metadata: {token}")
 require("this.assignments[index].syncDirty = true" in store,
         "local assignment transitions must mark the assignment dirty")
 
+for field in ("assignmentType", "subjectCode", "dueAtEpochMs", "dueTimezone"):
+    require(field in mapper and field in remote_api,
+            f"Assignment V2 field must survive remote sync: {field}")
 require("remoteVersion: remote.version" in mapper,
         "remote refresh must establish the persisted server version")
 require("syncDirty: false" in mapper,
@@ -62,7 +65,7 @@ require("http.RequestMethod.PATCH" not in remote_api,
 require("@PutMapping(\"/assignments/{id}\")" in controller,
         "backend must expose PUT for the compatible HarmonyOS client")
 require("@PatchMapping(\"/assignments/{id}\")" in controller,
-        "backend must retain the existing PATCH update endpoint")
+        "backend must retain the existing PATCH update endpoint during compatibility window")
 require("remoteVersion" not in remote_api and "syncDirty" not in remote_api and "lastSyncedAtEpochMs" not in remote_api,
         "client sync metadata must never be sent as backend assignment fields")
 

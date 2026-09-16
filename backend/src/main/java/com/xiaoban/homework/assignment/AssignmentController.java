@@ -2,6 +2,8 @@ package com.xiaoban.homework.assignment;
 
 import com.xiaoban.homework.auth.AuthInterceptor;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,17 +15,25 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1")
 public class AssignmentController {
+  private static final ZoneId DEFAULT_ZONE = ZoneId.of("Asia/Shanghai");
   private final AssignmentService service;
   public AssignmentController(AssignmentService service) { this.service = service; }
 
   @GetMapping("/students/{studentId}/assignments")
   public List<AssignmentDtos.Response> list(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String studentId) { return service.list(familyId, studentId); }
+
+  @GetMapping("/students/{studentId}/assignments/summary")
+  public AssignmentDtos.TodaySummary todaySummary(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId, @RequestParam(required = false) LocalDate date) {
+    return service.todaySummary(familyId, studentId, date == null ? LocalDate.now(DEFAULT_ZONE) : date);
+  }
 
   @PostMapping("/students/{studentId}/assignments")
   public AssignmentDtos.Response create(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,

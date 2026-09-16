@@ -1,15 +1,17 @@
 import { http } from '@kit.NetworkKit';
-import { Assignment } from '../../domain/model/HomeworkModels';
+import { Assignment, TodaySummary } from '../../domain/model/HomeworkModels';
 import { BackendHttpClient } from './BackendHttpClient';
 import { RemoteAssignment } from './RemoteModels';
 
 interface CreateAssignmentBody {
   id: string; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
+  assignmentType: string; subjectCode: string; dueAtEpochMs: number; dueTimezone: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
 interface UpdateAssignmentBody {
   version: number; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
+  assignmentType: string; subjectCode: string; dueAtEpochMs: number; dueTimezone: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
@@ -24,6 +26,13 @@ export class HomeworkRemoteApi {
     return JSON.parse(response.body) as RemoteAssignment[];
   }
 
+  async todaySummary(studentId: string): Promise<TodaySummary> {
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/students/${encodeURIComponent(studentId)}/assignments/summary`, http.RequestMethod.GET);
+    if (response.statusCode !== 200) throw new Error(`拉取今日作业摘要失败: ${response.statusCode}`);
+    return JSON.parse(response.body) as TodaySummary;
+  }
+
   async create(assignment: Assignment): Promise<RemoteAssignment> {
     let body: CreateAssignmentBody = this.createBody(assignment);
     let response = await BackendHttpClient.instance.request(`/api/v1/students/${encodeURIComponent(assignment.studentId)}/assignments`, http.RequestMethod.POST, body);
@@ -34,8 +43,10 @@ export class HomeworkRemoteApi {
   async update(assignment: Assignment, version: number): Promise<RemoteAssignment> {
     let body: UpdateAssignmentBody = {
       version: version, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
-      textbookRef: assignment.textbookRef, dueText: assignment.dueText, status: assignment.status,
-      sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
+      textbookRef: assignment.textbookRef, dueText: assignment.dueText,
+      assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
+      dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
+      status: assignment.status, sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
       elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote
     };
@@ -53,9 +64,11 @@ export class HomeworkRemoteApi {
 
   private createBody(assignment: Assignment): CreateAssignmentBody {
     return { id: assignment.id, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
-      textbookRef: assignment.textbookRef, dueText: assignment.dueText, status: assignment.status, sourceLabel: '', sourceExcerpt: '',
-      expectedMinutes: assignment.expectedMinutes, startedAtEpochMs: assignment.startedAtEpochMs,
-      finishedAtEpochMs: assignment.finishedAtEpochMs, elapsedSeconds: assignment.elapsedSeconds,
-      reviewNote: assignment.reviewNote };
+      textbookRef: assignment.textbookRef, dueText: assignment.dueText,
+      assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
+      dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
+      status: assignment.status, sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
+      startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
+      elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote };
   }
 }

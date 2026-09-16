@@ -4,6 +4,7 @@ import {
   Assignment,
   AssignmentProgress,
   AssignmentStatus,
+  AssignmentType,
   CandidateAssignment,
   DashboardSummary,
   HomeworkImportSourceKind,
@@ -150,11 +151,16 @@ export class HomeworkStore {
       id: source.id,
       studentId: source.studentId,
       candidateId: source.candidateId,
+      assignmentType: source.assignmentType,
+      subjectCode: source.subjectCode,
       subject: source.subject,
       title: source.title,
       instruction: source.instruction,
       textbookRef: source.textbookRef,
+      dueAtEpochMs: source.dueAtEpochMs > 0 ? source.dueAtEpochMs : 0,
+      dueTimezone: source.dueTimezone.length > 0 ? source.dueTimezone : 'Asia/Shanghai',
       dueText: source.dueText,
+      dueDateKey: source.dueDateKey,
       status: source.status,
       expectedMinutes: source.expectedMinutes > 0 ? source.expectedMinutes : 20,
       startedAtEpochMs: source.startedAtEpochMs > 0 ? source.startedAtEpochMs : 0,
@@ -184,6 +190,13 @@ export class HomeworkStore {
   private cloneTutorSession(source: TutorSession): TutorSession {
     return { id: source.id, studentId: source.studentId, assignmentId: source.assignmentId,
       startedAtText: source.startedAtText, questionCount: source.questionCount };
+  }
+
+  private subjectCode(subject: Subject): string {
+    if (subject === Subject.CHINESE) return 'CHINESE';
+    if (subject === Subject.MATH) return 'MATH';
+    if (subject === Subject.ENGLISH) return 'ENGLISH';
+    return 'OTHER';
   }
 
   private studentIndex(studentId: string): number {
@@ -292,7 +305,7 @@ export class HomeworkStore {
 
   getNextAssignment(): Assignment | null {
     let priorities: AssignmentStatus[] = [AssignmentStatus.IN_PROGRESS, AssignmentStatus.PAUSED,
-      AssignmentStatus.NEEDS_REWORK, AssignmentStatus.NOT_STARTED, AssignmentStatus.OVERDUE,
+      AssignmentStatus.NEEDS_REWORK, AssignmentStatus.OVERDUE, AssignmentStatus.NOT_STARTED,
       AssignmentStatus.READY_TO_SUBMIT];
     let activeAssignments = this.getAssignments();
     for (let status of priorities) for (let assignment of activeAssignments) if (assignment.status === status) return assignment;
@@ -359,12 +372,28 @@ export class HomeworkStore {
       if (candidate.studentId !== studentId) { retained.push(candidate); continue; }
       if (this.hasAssignmentForCandidate(candidate.id)) continue;
       let assignment: Assignment = {
-        id: `a-published-${candidate.id}`, studentId: studentId, candidateId: candidate.id,
-        subject: candidate.subject, title: candidate.title, instruction: candidate.instruction,
-        textbookRef: candidate.textbookRef, dueText: candidate.dueText, status: AssignmentStatus.NOT_STARTED,
+        id: `a-published-${candidate.id}`,
+        studentId: studentId,
+        candidateId: candidate.id,
+        assignmentType: AssignmentType.SCHOOL,
+        subjectCode: this.subjectCode(candidate.subject),
+        subject: candidate.subject,
+        title: candidate.title,
+        instruction: candidate.instruction,
+        textbookRef: candidate.textbookRef,
+        dueAtEpochMs: 0,
+        dueTimezone: 'Asia/Shanghai',
+        dueText: candidate.dueText,
+        status: AssignmentStatus.NOT_STARTED,
         expectedMinutes: candidate.expectedMinutes > 0 ? candidate.expectedMinutes : 20,
-        startedAtEpochMs: 0, finishedAtEpochMs: 0, elapsedSeconds: 0, reviewNote: '',
-        remoteVersion: 0, syncDirty: true, lastSyncedAtEpochMs: 0, resourceLabels: []
+        startedAtEpochMs: 0,
+        finishedAtEpochMs: 0,
+        elapsedSeconds: 0,
+        reviewNote: '',
+        remoteVersion: 0,
+        syncDirty: true,
+        lastSyncedAtEpochMs: 0,
+        resourceLabels: []
       };
       this.assignments.push(assignment);
       published++;
@@ -455,11 +484,26 @@ export class HomeworkStore {
   }
 
   getTodaySummary(): TodaySummary {
-    let today = this.getTodayAssignments();
+    let now = new Date();
     let completed = 0;
-    for (let assignment of today) if (assignment.status === AssignmentStatus.COMPLETED) completed++;
+    let total = 0;
+    let attention = 0;
+    let undated = 0;
+    for (let assignment of this.getAssignments()) {
+      if (assignment.status === AssignmentStatus.OVERDUE || assignment.status === AssignmentStatus.NEEDS_REWORK) attention++;
+      if (assignment.dueAtEpochMs <= 0) {
+        if (assignment.status !== AssignmentStatus.COMPLETED) undated++;
+        continue;
+      }
+      let due = new Date(assignment.dueAtEpochMs);
+      let isToday = due.getFullYear() === now.getFullYear() && due.getMonth() === now.getMonth() && due.getDate() === now.getDate();
+      if (!isToday) continue;
+      total++;
+      if (assignment.status === AssignmentStatus.COMPLETED) completed++;
+    }
     let next = this.getNextAssignment();
-    return { completed: completed, total: today.length, nextAssignmentId: next === null ? '' : next.id };
+    return { completed: completed, total: total, attention: attention, undated: undated,
+      nextAssignmentId: next === null ? '' : next.id };
   }
 
   getDashboardSummary(): DashboardSummary {

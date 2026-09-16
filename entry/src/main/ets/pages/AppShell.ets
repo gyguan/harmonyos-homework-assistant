@@ -11,9 +11,9 @@ import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
 import { StudentAssignmentsPage } from '../features/student/assignments/StudentAssignmentsPage';
+import { StudentHomePage } from '../features/student/home/StudentHomePage';
 import { StudentProfilePage } from '../features/student/profile/StudentProfilePage';
 import { StudyWorkspacePage } from '../features/student/study/StudyWorkspacePage';
-import { StudentTodayPage } from '../features/student/today/StudentTodayPage';
 
 export enum AppRole {
   NONE = 'NONE',
@@ -22,7 +22,7 @@ export enum AppRole {
 }
 
 enum StudentRoute {
-  TODAY = 'TODAY',
+  HOME = 'HOME',
   ASSIGNMENTS = 'ASSIGNMENTS',
   PROFILE = 'PROFILE',
   STUDY = 'STUDY'
@@ -41,8 +41,8 @@ export struct AppShell {
   @Prop role: AppRole = AppRole.STUDENT;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
-  @State private studentRoute: StudentRoute = StudentRoute.TODAY;
-  @State private studentStudyReturnRoute: StudentRoute = StudentRoute.TODAY;
+  @State private studentRoute: StudentRoute = StudentRoute.HOME;
+  @State private studentStudyReturnRoute: StudentRoute = StudentRoute.HOME;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
   @State private selectedAssignmentId: string = '';
@@ -113,7 +113,7 @@ export struct AppShell {
     let nextIndex = activeIndex < 0 || activeIndex + 1 >= students.length ? 0 : activeIndex + 1;
     if (HomeworkStore.instance.setActiveStudent(students[nextIndex].id)) {
       this.selectedAssignmentId = '';
-      this.studentRoute = StudentRoute.TODAY;
+      this.studentRoute = StudentRoute.HOME;
       this.parentRoute = ParentRoute.DASHBOARD;
       this.touchStore();
     }
@@ -122,7 +122,7 @@ export struct AppShell {
   private openStudy(assignmentId: string): void {
     HomeworkStore.instance.startAssignment(assignmentId);
     this.selectedAssignmentId = assignmentId;
-    this.studentStudyReturnRoute = this.studentRoute === StudentRoute.ASSIGNMENTS ? StudentRoute.ASSIGNMENTS : StudentRoute.TODAY;
+    this.studentStudyReturnRoute = this.studentRoute === StudentRoute.ASSIGNMENTS ? StudentRoute.ASSIGNMENTS : StudentRoute.HOME;
     this.touchStore();
     this.studentRoute = StudentRoute.STUDY;
   }
@@ -156,8 +156,7 @@ export struct AppShell {
         revision: this.storeRevision
       });
     } else {
-      StudentTodayPage({
-        sizeClass: this.contentSizeClass,
+      StudentHomePage({
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
@@ -272,8 +271,8 @@ export struct AppShell {
   private BottomNavigation() {
     Row() {
       if (this.role === AppRole.STUDENT) {
-        this.BottomItem($r('sys.symbol.checkmark_circle'), '今天', this.studentRoute === StudentRoute.TODAY,
-          () => this.studentRoute = StudentRoute.TODAY);
+        this.BottomItem($r('sys.symbol.house'), '首页', this.studentRoute === StudentRoute.HOME,
+          () => this.studentRoute = StudentRoute.HOME);
         this.BottomItem($r('sys.symbol.checkmark_square'), '作业', this.studentRoute === StudentRoute.ASSIGNMENTS,
           () => this.studentRoute = StudentRoute.ASSIGNMENTS);
         this.BottomItem($r('sys.symbol.gearshape'), '我的', this.studentRoute === StudentRoute.PROFILE,
@@ -334,8 +333,8 @@ export struct AppShell {
         .margin({ bottom: 14 });
 
       if (this.role === AppRole.STUDENT) {
-        this.SideItem($r('sys.symbol.checkmark_circle'), '今天', this.studentRoute === StudentRoute.TODAY,
-          () => this.studentRoute = StudentRoute.TODAY);
+        this.SideItem($r('sys.symbol.house'), '首页', this.studentRoute === StudentRoute.HOME,
+          () => this.studentRoute = StudentRoute.HOME);
         this.SideItem($r('sys.symbol.checkmark_square'), '作业', this.studentRoute === StudentRoute.ASSIGNMENTS,
           () => this.studentRoute = StudentRoute.ASSIGNMENTS);
         this.SideItem($r('sys.symbol.gearshape'), '我的', this.studentRoute === StudentRoute.PROFILE,
