@@ -1,102 +1,100 @@
-import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
-import { HomeworkStore } from '../../../data/HomeworkStore';
-import { Assignment, AssignmentStatus, Subject } from '../../../domain/model/HomeworkModels';
-import { AssignmentDueDate, DueDateFilterKey } from '../../../domain/service/AssignmentDueDate';
-import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
+import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
+import {
+  AssignmentDateFilter,
+  AssignmentTypeFilter
+} from '../../../domain/model/AssignmentFilter';
+import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
+import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 
 @Component
 export struct StudentAssignmentsPage {
-  @Prop sizeClass: WindowSizeClass;
   @Prop revision: number = 0;
-  @State private subjectFilter: string = 'ALL';
-  @State private dateFilter: DueDateFilterKey = DueDateFilterKey.ALL;
-  @State private selectedAssignmentId: string = '';
-  onOpenStudy: (assignmentId: string) => void = () => {};
+  @State private refreshRevision: number = 0;
+  @State private typeFilter: AssignmentTypeFilter = AssignmentTypeFilter.ALL;
+  @State private subjectCode: string = 'ALL';
+  @State private dateFilter: AssignmentDateFilter = AssignmentDateFilter.ALL;
+  onOpenDetail: (assignmentId: string) => void = (_assignmentId: string) => {};
 
-  private assignments(): Assignment[] {
-    let currentRevision = this.revision;
-    return HomeworkStore.instance.getAssignments();
+  private readonly viewModel: StudentAssignmentsViewModel =
+    new StudentAssignmentsViewModel(DefaultAssignmentRepository.instance);
+
+  aboutToAppear(): void {
+    void this.refresh();
   }
 
-  private matchesSubject(item: Assignment, subject: string): boolean {
-    return subject === 'ALL' || item.subject === subject;
+  private async refresh(): Promise<void> {
+    await this.viewModel.refresh();
+    this.refreshRevision++;
+  }
+
+  private touchRevision(): number {
+    return this.revision + this.refreshRevision;
   }
 
   private filteredAssignments(): Assignment[] {
-    let result: Assignment[] = [];
-    for (let item of this.assignments()) {
-      if (this.matchesSubject(item, this.subjectFilter) && AssignmentDueDate.matches(item, this.dateFilter)) result.push(item);
-    }
-    return result;
+    let currentRevision = this.touchRevision();
+    return this.viewModel.assignments(this.typeFilter, this.subjectCode, this.dateFilter);
   }
 
-  private selectedAssignment(): Assignment | null {
-    if (this.selectedAssignmentId.length === 0) return null;
-    return HomeworkStore.instance.getAssignment(this.selectedAssignmentId);
-  }
-
-  private subjectCount(subject: string): number {
-    let count = 0;
-    for (let item of this.assignments()) {
-      if (this.matchesSubject(item, subject) && AssignmentDueDate.matches(item, this.dateFilter)) count++;
-    }
-    return count;
-  }
-
-  private dateCount(dateFilter: DueDateFilterKey): number {
-    let count = 0;
-    for (let item of this.assignments()) {
-      if (this.matchesSubject(item, this.subjectFilter) && AssignmentDueDate.matches(item, dateFilter)) count++;
-    }
-    return count;
+  private allAssignments(): Assignment[] {
+    let currentRevision = this.touchRevision();
+    return this.viewModel.assignments(AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL);
   }
 
   private inStatuses(statuses: AssignmentStatus[]): Assignment[] {
-    let result: Assignment[] = [];
-    for (let item of this.filteredAssignments()) {
-      for (let status of statuses) {
-        if (item.status === status) {
-          result.push(item);
-          break;
-        }
-      }
-    }
-    return result;
+    let currentRevision = this.touchRevision();
+    return this.viewModel.assignments(this.typeFilter, this.subjectCode, this.dateFilter, statuses);
   }
 
-  private openAssignment(item: Assignment): void {
-    if (this.sizeClass === WindowSizeClass.COMPACT) {
-      this.onOpenStudy(item.id);
-      return;
-    }
-    this.selectedAssignmentId = item.id;
+  private typeCount(typeFilter: AssignmentTypeFilter): number {
+    let currentRevision = this.touchRevision();
+    return this.viewModel.count(typeFilter, this.subjectCode, this.dateFilter);
   }
 
-  @Builder
-  private SubjectTab(key: string, label: string) {
-    Column({ space: 5 }) {
-      Text(`${label} ${this.subjectCount(key)}`)
-        .fontSize(13)
-        .fontWeight(this.subjectFilter === key ? FontWeight.Medium : FontWeight.Normal)
-        .fontColor(this.subjectFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
-      Divider()
-        .width('100%')
-        .strokeWidth(this.subjectFilter === key ? 2 : 0)
-        .color(this.subjectFilter === key ? AppTheme.PRIMARY : Color.Transparent);
-    }
-    .height(AppTheme.MIN_TOUCH_TARGET)
-    .padding({ left: 6, right: 6 })
-    .justifyContent(FlexAlign.End)
-    .accessibilityGroup(true)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(this.subjectFilter === key ? `${label}，已选择，${this.subjectCount(key)}项` : `${label}，${this.subjectCount(key)}项`)
-    .onClick(() => this.subjectFilter = key);
+  private subjectCount(subjectCode: string): number {
+    let currentRevision = this.touchRevision();
+    return this.viewModel.count(this.typeFilter, subjectCode, this.dateFilter);
+  }
+
+  private dateCount(dateFilter: AssignmentDateFilter): number {
+    let currentRevision = this.touchRevision();
+    return this.viewModel.count(this.typeFilter, this.subjectCode, dateFilter);
   }
 
   @Builder
-  private DateTab(key: DueDateFilterKey, label: string) {
+  private TypeChip(key: AssignmentTypeFilter, label: string) {
+    Text(`${label} ${this.typeCount(key)}`)
+      .fontSize(13)
+      .fontWeight(this.typeFilter === key ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(this.typeFilter === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 14, right: 14, top: 10, bottom: 10 })
+      .backgroundColor(this.typeFilter === key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.typeFilter === key ? `${label}，已选择` : label)
+      .onClick(() => this.typeFilter = key);
+  }
+
+  @Builder
+  private SubjectChip(key: string, label: string) {
+    Text(`${label} ${this.subjectCount(key)}`)
+      .fontSize(13)
+      .fontWeight(this.subjectCode === key ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(this.subjectCode === key ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+      .backgroundColor(this.subjectCode === key ? AppTheme.PRIMARY_SOFT : Color.Transparent)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.subjectCode === key ? `${label}，已选择` : label)
+      .onClick(() => this.subjectCode = key);
+  }
+
+  @Builder
+  private DateChip(key: AssignmentDateFilter, label: string) {
     Text(`${label} ${this.dateCount(key)}`)
       .fontSize(12)
       .fontWeight(this.dateFilter === key ? FontWeight.Medium : FontWeight.Normal)
@@ -106,21 +104,19 @@ export struct StudentAssignmentsPage {
       .backgroundColor(this.dateFilter === key ? AppTheme.PRIMARY_SOFT : Color.Transparent)
       .borderRadius(AppTheme.CHIP_RADIUS)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(this.dateFilter === key ? `${label}，已选择，${this.dateCount(key)}项` : `${label}，${this.dateCount(key)}项`)
+      .accessibilityText(this.dateFilter === key ? `${label}，已选择` : label)
       .onClick(() => this.dateFilter = key);
   }
 
   @Builder
   private FilterPanel() {
-    Column({ space: 8 }) {
+    Column({ space: 10 }) {
       Scroll() {
-        Row({ space: 18 }) {
-          this.SubjectTab('ALL', '全部');
-          this.SubjectTab(Subject.CHINESE, '语文');
-          this.SubjectTab(Subject.MATH, '数学');
-          this.SubjectTab(Subject.ENGLISH, '英语');
+        Row({ space: 8 }) {
+          this.TypeChip(AssignmentTypeFilter.ALL, '全部');
+          this.TypeChip(AssignmentTypeFilter.SCHOOL, '课内');
+          this.TypeChip(AssignmentTypeFilter.EXTRA, '课外');
         }
-        .padding({ left: 2, right: 2 });
       }
       .width('100%')
       .scrollable(ScrollDirection.Horizontal)
@@ -128,19 +124,30 @@ export struct StudentAssignmentsPage {
 
       Scroll() {
         Row({ space: 4 }) {
-          this.DateTab(DueDateFilterKey.ALL, '全部日期');
-          this.DateTab(DueDateFilterKey.TODAY, '今天');
-          this.DateTab(DueDateFilterKey.TOMORROW, '明天');
-          this.DateTab(DueDateFilterKey.THIS_WEEK, '本周');
-          this.DateTab(DueDateFilterKey.OVERDUE, '逾期');
+          this.DateChip(AssignmentDateFilter.ALL, '全部日期');
+          this.DateChip(AssignmentDateFilter.TODAY, '今天');
+          this.DateChip(AssignmentDateFilter.TOMORROW, '明天');
+          this.DateChip(AssignmentDateFilter.THIS_WEEK, '本周');
+        }
+      }
+      .width('100%')
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off);
+
+      Scroll() {
+        Row({ space: 4 }) {
+          this.SubjectChip('ALL', '全部科目');
+          this.SubjectChip('CHINESE', '语文');
+          this.SubjectChip('MATH', '数学');
+          this.SubjectChip('ENGLISH', '英语');
+          this.SubjectChip('OTHER', '其他');
         }
       }
       .width('100%')
       .scrollable(ScrollDirection.Horizontal)
       .scrollBar(BarState.Off);
     }
-    .width('100%')
-    .padding({ top: 2, bottom: 4 });
+    .width('100%');
   }
 
   @Builder
@@ -149,19 +156,12 @@ export struct StudentAssignmentsPage {
       Column({ space: 9 }) {
         Row() {
           Column({ space: 2 }) {
-            Text(title)
-              .fontSize(17)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
-            Text(description)
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .fontColor(AppTheme.SUBTEXT);
+            Text(title).fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text(description).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
-          Text(`${items.length}`)
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.TERTIARY_TEXT);
+          Text(`${items.length}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%');
 
@@ -169,8 +169,8 @@ export struct StudentAssignmentsPage {
           ForEach(items, (item: Assignment) => {
             AssignmentListItem({
               assignment: item,
-              selected: this.selectedAssignmentId === item.id,
-              onOpen: () => this.openAssignment(item)
+              selected: false,
+              onOpen: () => this.onOpenDetail(item.id)
             });
           }, (item: Assignment) => item.id);
         }
@@ -187,16 +187,14 @@ export struct StudentAssignmentsPage {
         SymbolGlyph($r('sys.symbol.checkmark_square'))
           .fontSize(30)
           .fontColor([AppTheme.TERTIARY_TEXT]);
-        Text(this.assignments().length === 0 ? '暂时没有作业' : '当前筛选下没有作业')
+        Text(this.allAssignments().length === 0 ? '暂时没有作业' : '当前筛选下没有作业')
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('换一个科目或截止日期看看。')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
+        Text('换一个类型、日期或科目看看。').fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
-      .padding({ top: 28, bottom: 28 });
+      .padding({ top: 30, bottom: 30 });
     }
   }
 
@@ -214,182 +212,29 @@ export struct StudentAssignmentsPage {
     .width('100%');
   }
 
-  @Builder
-  private PageHeader() {
-    Column({ space: 4 }) {
-      Text('我的作业')
-        .fontSize(AppTheme.PAGE_TITLE_SIZE)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.TEXT);
-      Text('按科目和日期找到任务，点整行即可继续。')
-        .fontSize(13)
-        .fontColor(AppTheme.SUBTEXT);
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start);
-  }
-
-  @Builder
-  private DetailPane() {
-    if (this.selectedAssignment() === null) {
-      Column({ space: 10 }) {
-        SymbolGlyph($r('sys.symbol.checkmark_square'))
-          .fontSize(34)
-          .fontColor([AppTheme.TERTIARY_TEXT]);
-        Text('选择一项作业')
-          .fontSize(20)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Text('在左侧选择作业后，可在这里查看任务摘要并进入学习空间。')
-          .fontSize(14)
-          .lineHeight(21)
-          .fontColor(AppTheme.SUBTEXT)
-          .textAlign(TextAlign.Center);
-      }
-      .width('100%')
-      .height('100%')
-      .justifyContent(FlexAlign.Center)
-      .padding(32);
-    } else {
-      Scroll() {
+  build() {
+    Scroll() {
+      Column() {
         Column({ space: 18 }) {
-          Row() {
-            Text(this.selectedAssignment()!.subject)
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.PRIMARY);
-            Blank();
-            Text(AssignmentStateMachine.label(this.selectedAssignment()!.status))
-              .fontSize(13)
-              .fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%');
-
-          Text(this.selectedAssignment()!.title)
-            .width('100%')
-            .fontSize(28)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT);
-
-          Text(this.selectedAssignment()!.instruction)
-            .width('100%')
-            .fontSize(15)
-            .lineHeight(23)
-            .fontColor(AppTheme.SUBTEXT);
-
-          Column({ space: 12 }) {
-            Row() {
-              Text('截止时间').fontSize(13).fontColor(AppTheme.SUBTEXT);
-              Blank();
-              Text(this.selectedAssignment()!.dueText).fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            }.width('100%');
-            Divider().color(AppTheme.DIVIDER);
-            Row() {
-              Text('预计用时').fontSize(13).fontColor(AppTheme.SUBTEXT);
-              Blank();
-              Text(`${this.selectedAssignment()!.expectedMinutes} 分钟`).fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            }.width('100%');
-            Divider().color(AppTheme.DIVIDER);
-            Row() {
-              Text('教材 / 页码').fontSize(13).fontColor(AppTheme.SUBTEXT);
-              Blank();
-              Text(this.selectedAssignment()!.textbookRef.length > 0 ? this.selectedAssignment()!.textbookRef : '未设置')
-                .fontSize(14)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.TEXT);
-            }.width('100%');
+          Column({ space: 4 }) {
+            Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+            Text('按类型、日期和科目筛选，找到要完成的任务。').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .width('100%')
-          .padding(16)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
+          .alignItems(HorizontalAlign.Start);
 
-          if (this.selectedAssignment()!.reviewNote.length > 0) {
-            Column({ space: 4 }) {
-              Text('家长提醒')
-                .width('100%')
-                .fontSize(12)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.WARNING);
-              Text(this.selectedAssignment()!.reviewNote)
-                .width('100%')
-                .fontSize(14)
-                .lineHeight(21)
-                .fontColor(AppTheme.TEXT);
-            }
-            .width('100%')
-            .padding(14)
-            .backgroundColor(AppTheme.WARNING_SOFT)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
-          }
-
-          Button('进入学习空间', { type: ButtonType.Normal })
-            .width('100%')
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .fontSize(15)
-            .fontWeight(FontWeight.Medium)
-            .backgroundColor(AppTheme.PRIMARY)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .onClick(() => this.onOpenStudy(this.selectedAssignment()!.id));
-        }
-        .width('100%')
-        .padding(this.sizeClass === WindowSizeClass.EXPANDED ? 28 : 22);
-      }
-      .width('100%')
-      .height('100%');
-    }
-  }
-
-  @Builder
-  private CompactLayout() {
-    Scroll() {
-      Column({ space: 18 }) {
-        this.PageHeader();
-        this.FilterPanel();
-        this.AssignmentSections();
-      }
-      .width('100%')
-      .padding(AppTheme.PAGE_PADDING);
-    }
-    .width('100%')
-    .height('100%');
-  }
-
-  @Builder
-  private PadLayout() {
-    Row() {
-      Scroll() {
-        Column({ space: 18 }) {
-          this.PageHeader();
           this.FilterPanel();
           this.AssignmentSections();
         }
         .width('100%')
-        .padding(this.sizeClass === WindowSizeClass.EXPANDED ? AppTheme.PAGE_PADDING_WIDE : AppTheme.PAGE_PADDING);
+        .constraintSize({ maxWidth: 760 })
+        .padding(AppTheme.PAGE_PADDING);
       }
-      .width(this.sizeClass === WindowSizeClass.EXPANDED ? '38%' : '44%')
-      .height('100%')
-      .backgroundColor(AppTheme.BACKGROUND);
-
-      Divider().vertical(true).height('100%').color(AppTheme.DIVIDER);
-
-      Column() {
-        this.DetailPane();
-      }
-      .layoutWeight(1)
-      .height('100%')
-      .backgroundColor(AppTheme.SURFACE);
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%')
-    .height('100%');
-  }
-
-  build() {
-    if (this.sizeClass === WindowSizeClass.COMPACT) {
-      this.CompactLayout();
-    } else {
-      this.PadLayout();
-    }
+    .height('100%')
+    .scrollBar(BarState.Off);
   }
 }
