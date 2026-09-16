@@ -38,9 +38,14 @@ for token in [
     require(token in theme, f"AppTheme missing shared deep-page token: {token}")
 
 require("export struct DeepPageHeader" in header, "shared DeepPageHeader component is required")
-require("Text('‹')" in header, "the shared header must own the single back glyph implementation")
+require("SymbolGlyph($r('sys.symbol.chevron_left'))" in header,
+        "shared header must use the HarmonyOS chevron-left Symbol")
+require("Text('‹')" not in header,
+        "shared header must not fall back to a text-character back glyph")
 require("MIN_TOUCH_TARGET" in header and "accessibilityText" in header,
         "shared header back control must keep touch target and accessibility semantics")
+require("backgroundColor(AppTheme.SURFACE_EMPHASIS)" in header and "borderRadius" in header,
+        "shared header back control must keep the system-style subtle circular surface")
 
 for path, text in [
     ("StudentAssignmentDetailPage.ets", detail),
@@ -73,6 +78,8 @@ require("docs/product/v2-deep-page-chrome-standard.md" in agents and "DeepPageHe
         "Agent guide must require the shared deep-page chrome standard for future V2 refactors")
 require("深层页面必须复用 `DeepPageHeader`" in spec,
         "deep-page chrome spec must explicitly require DeepPageHeader reuse")
+require("sys.symbol.chevron_left" in spec and "圆形浅色" in spec,
+        "deep-page chrome spec must lock the system-style back control")
 require("页面级纵向 `Scroll`" in spec and "scrollBar(BarState.Off)" in spec,
         "deep-page chrome spec must require top-anchored scrolling with hidden system scrollbars")
 
