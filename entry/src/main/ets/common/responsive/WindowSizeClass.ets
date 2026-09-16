@@ -54,13 +54,17 @@ export class ResponsiveContext {
     return widthValue;
   }
 
-  static resolve(widthVp: number): WindowSizeClass {
-    let normalizedWidthVp = ResponsiveContext.normalizeWidthVp(widthVp);
-    if (normalizedWidthVp <= 600) {
+  static resolve(widthValue: number): WindowSizeClass {
+    let widthVp = ResponsiveContext.normalizeWidthVp(widthValue);
+    if (widthVp <= 600) {
       return WindowSizeClass.COMPACT;
     }
-    if (normalizedWidthVp <= 840) {
-      return WindowSizeClass.MEDIUM;
+    if (widthVp <= 840) {
+      // 600–840vp still uses the single-column content layout. This covers large
+      // phones, foldable narrow windows and tablet portrait without squeezing a
+      // Pad master-detail layout into a narrow viewport. Two-column content is
+      // reserved for EXPANDED windows only.
+      return WindowSizeClass.COMPACT;
     }
     return WindowSizeClass.EXPANDED;
   }
