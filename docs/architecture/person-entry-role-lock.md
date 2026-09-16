@@ -1,29 +1,54 @@
-# 入口人员选择与身份锁定
+# 人员入口与角色锁定设计
 
 ## 目标
 
-应用启动后先选择当前使用人员，再进入对应工作区。进入后不提供“家长/学生”角色切换。
+同一家庭 App 同时服务家长和孩子，但进入角色后，导航、权限和数据展示必须保持稳定，避免在业务页面里随意切换身份导致上下文混乱。
 
-## 人员模型
+## 核心规则
 
-- 家长：进入家长工作区，可在家庭内切换当前查看的孩子。
-- 孩子：每个 `StudentProfile` 都是独立入口。进入学生工作区后固定绑定该 `studentId`，不可切换到其他孩子，也不可切换为家长。
+- App 启动后先确定当前角色：`PARENT` 或 `STUDENT`；
+- Role 只由 `RoleShell` 管理，不由具体 Feature Page 修改；
+- StudentShell / ParentShell 使用同一套 Navigation 基础设施，但拥有不同一级导航；
+- 当前孩子由 `activeStudentId` 表示；
+- 家长可在 Shell 级切换孩子；
+- 学生模式默认锁定到当前孩子，不提供普通业务页内自由切换；
+- 切换孩子时必须清理当前详情页上下文，避免继续持有上一个孩子的 assignmentId；
+- 业务页面只拿到 `studentId / assignmentId` 等必要上下文，不负责角色判断。
 
-## 交互
+## V2 页面边界
 
 ```text
-启动
-  ↓
-选择谁在使用
-  ├─ 家长 → 家长首页 → 可切换查看小宇/小米
-  ├─ 小宇 → 小宇学生首页 → 身份固定
-  └─ 小米 → 小米学生首页 → 身份固定
+AppRoot
+  -> RoleShell
+      -> StudentShell
+          -> Navigation / NavDestination
+      -> ParentShell
+          -> Navigation / NavDestination
 ```
 
-## 约束
+RoleShell 负责：
 
-- AppShell 不再持有可变 role 状态；角色从入口作为只读参数传入。
-- AppShell 内不得出现“切换家长/切换学生”。
-- 学生模式不得调用 `switchStudent()`。
-- 家长模式保留当前孩子上下文切换，用于查看/导入不同班级的作业。
-- 每次冷启动重新进入人员选择页；V0.3 暂不持久化登录身份。
+- 当前角色；
+- 当前孩子上下文；
+- 一级导航；
+- Phone 底部导航 / Pad 侧边导航；
+- 系统返回的顶层边界。
+
+Feature Page 不负责：
+
+- 切换角色；
+- 判断 family；
+- 保存全局 selected assignment；
+- 自己维护跨页面 route enum。
+
+## 权限原则
+
+前端角色锁定只解决交互上下文，不承担安全边界。
+
+服务端仍必须通过 Bearer Session 得到 familyId，并对 Student / Assignment / Submission / Tutor 逐级校验归属关系。
+
+## 关联文档
+
+- `docs/product/product-feature-list-v2.md`
+- `docs/architecture/frontend-technical-design-v2.md`
+- `docs/architecture/backend-technical-design-v2.md`
