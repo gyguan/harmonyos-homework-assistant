@@ -2,33 +2,72 @@
 
 ## 目标
 
-家庭仍然是一个本地家庭空间，但允许多个孩子。不同孩子可以属于不同年级/班级，作业数据必须按孩子隔离。
+产品仍然只服务一个家庭空间，但允许家庭内存在多个孩子。不同孩子可以属于不同年级 / 班级，作业、提交、Tutor 和进度必须严格按孩子隔离。
 
 ## 核心规则
 
-- 不引入 familyId / tenant / organization 等多租户模型。
-- `StudentProfile` 是家庭内孩子身份，使用稳定 `studentId`。
-- `RawHomeworkImport`、`CandidateAssignment`、`Assignment` 显式携带 `studentId`。
-- `Submission` 通过 `assignmentId` 归属 Assignment；`TutorSession` 显式携带 `studentId`，避免未来辅导上下文串孩子。
-- `AppSettings.students[]` 保存家庭内孩子；`activeStudentId` 保存当前操作孩子。
-- 家长切换孩子后：首页、导入、确认、进度都只看到当前孩子数据。
-- 学生模式同样只展示当前孩子数据；切换孩子时离开当前作业详情，避免使用上一个孩子的 assignmentId。
-- 新导入的老师文字/截图永远绑定“当前孩子”，班级仅作为孩子资料和 UI 提示，不参与权限系统。
+### 前端
+
+- `StudentProfile` 使用稳定 `studentId`；
+- `activeStudentId` 是当前业务上下文；
+- RawHomeworkImport、CandidateAssignment、Assignment 都显式携带 studentId；
+- Submission 通过 Assignment 归属孩子；
+- TutorSession 显式绑定 studentId + assignmentId；
+- 家长切换孩子后，首页、导入、进度、验收全部切换到新孩子；
+- 切换孩子时退出当前详情 / 学习 / 验收页面，避免沿用上一个孩子的 assignmentId；
+- ViewModel / Repository 查询必须显式传 studentId，不允许依赖页面隐式全局变量。
+
+### 后端
+
+云端仍有一个轻量 `family` 安全边界，但不扩展为 SaaS 多租户平台。
+
+```text
+Account Session
+  -> familyId
+      -> Student A
+          -> Assignments
+          -> Submissions
+          -> Tutor Sessions
+      -> Student B
+          -> Assignments
+          -> Submissions
+          -> Tutor Sessions
+```
+
+规则：
+
+- familyId 只从服务端 Session / AuthInterceptor 获取；
+- 客户端不能传入 familyId 选择其他家庭；
+- Student 查询必须校验 `(familyId, studentId)`；
+- Assignment / Submission / Tutor 查询必须最终校验 familyId；
+- Repository 优先使用包含 familyId 的查询，不仅依赖前端隔离。
 
 ## 数据链路
 
 ```text
-Family App
-  ├─ Student A (三年级2班)
-  │    ├─ RawImport A
-  │    ├─ Candidates A
-  │    ├─ Assignments A
-  │    └─ Submissions A
-  └─ Student B (一年级5班)
-       ├─ RawImport B
-       ├─ Candidates B
-       ├─ Assignments B
-       └─ Submissions B
+Family
+  ├─ Student A
+  │    ├─ RawImport / Candidates（客户端确认前）
+  │    ├─ Assignments（云端权威）
+  │    ├─ Submissions
+  │    └─ Tutor Sessions
+  └─ Student B
+       ├─ RawImport / Candidates（客户端确认前）
+       ├─ Assignments（云端权威）
+       ├─ Submissions
+       └─ Tutor Sessions
 ```
 
-所有 Store 查询默认以 `activeStudentId` 为上下文过滤。
+## 非目标
+
+- 不建设 organization / school tenant；
+- 不建设班级管理员权限体系；
+- 不建设老师账号后台；
+- family 只是当前单家庭数据安全边界，不是 SaaS 商业租户模型。
+
+## 关联文档
+
+- `docs/product/product-feature-list-v2.md`
+- `docs/architecture/frontend-technical-design-v2.md`
+- `docs/architecture/backend-technical-design-v2.md`
+- `docs/architecture/system-technical-design-v2.md`
