@@ -72,7 +72,13 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
   }
 
   private async preservePreMigrationSnapshot(store: preferences.Preferences, snapshot: HomeworkSnapshot): Promise<void> {
-    let existing = await store.get(SNAPSHOT_KEY, '');
+    let existing: preferences.ValueType;
+    try {
+      existing = await store.get(SNAPSHOT_KEY, '');
+    } catch {
+      console.error('Existing homework snapshot cannot be read before migration save');
+      throw new Error('本地作业数据无法读取，已停止覆盖原数据');
+    }
     if (typeof existing !== 'string' || existing.length === 0) return;
 
     let existingVersion: number;
@@ -89,9 +95,21 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
 
     if (existingVersion === snapshot.schemaVersion) return;
 
-    let backup = await store.get(SNAPSHOT_BACKUP_KEY, '');
+    let backup: preferences.ValueType;
+    try {
+      backup = await store.get(SNAPSHOT_BACKUP_KEY, '');
+    } catch {
+      console.error('Homework pre-migration backup cannot be read');
+      throw new Error('本地作业迁移备份读取失败，已停止覆盖原数据');
+    }
     if (typeof backup === 'string' && backup.length > 0) return;
-    await store.put(SNAPSHOT_BACKUP_KEY, existing);
+
+    try {
+      await store.put(SNAPSHOT_BACKUP_KEY, existing);
+    } catch {
+      console.error('Homework pre-migration backup cannot be written');
+      throw new Error('本地作业迁移备份写入失败，已停止覆盖原数据');
+    }
   }
 
   async save(snapshot: HomeworkSnapshot): Promise<void> {
