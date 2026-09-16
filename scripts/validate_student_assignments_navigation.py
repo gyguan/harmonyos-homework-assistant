@@ -21,6 +21,7 @@ def require(condition: bool, message: str) -> None:
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
+study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
 filter_model = read("entry/src/main/ets/domain/model/AssignmentFilter.ets")
 query = read("entry/src/main/ets/domain/service/AssignmentQuery.ets")
@@ -68,21 +69,30 @@ require("StudentAssignmentsViewModel" in page and "DefaultAssignmentRepository.i
 require("@State private visibleTotal" in page and "@State private needHandlingAssignments" in page and
         "private rebuildResults(): void" in page and "this.visibleTotal = items.length" in page,
         "query confirmation must replace observable result state")
-require("@State private isFilterSheetVisible" in page and "@State private draftTypeFilter" in page and
+require("@State private isFilterOverlayVisible" in page and "@State private draftTypeFilter" in page and
         "@State private draftSubjectCode" in page and "@State private draftDateFilter" in page,
-        "filter sheet must keep draft state separate from applied query state")
-require(".bindSheet($$this.isFilterSheetVisible, this.FilterSheet()" in page and
-        "preferType: SheetType.BOTTOM" in page,
-        "filters must open in a bottom half-modal sheet rather than remain expanded on the page")
+        "filter overlay must keep draft state separate from applied query state")
+require(".bindSheet(" not in page and "private FilterOverlay()" in page and "private FilterPanel()" in page,
+        "filter interaction must use the in-page overlay rather than the non-interactive bindSheet implementation")
+require("Button(label, { type: ButtonType.Normal })" in page and "private TypeOption" in page and
+        "private DateOption" in page and "private SubjectOption" in page,
+        "filter choices must be real button controls with direct state updates")
 require("private applyFilters(): void" in page and "Button('查询'" in page and
-        "this.rebuildResults();" in page and "this.isFilterSheetVisible = false" in page,
+        "this.rebuildResults();" in page and "this.isFilterOverlayVisible = false" in page,
         "filter results must update only after the user confirms 查询")
 require("Button('重置'" in page and "resetDraftFilters" in page,
-        "filter sheet must provide reset without immediately mutating the applied query")
+        "filter overlay must provide reset without immediately mutating the applied query")
 require("FilterEntry('类型'" in page and "FilterEntry('截止'" in page and "FilterEntry('科目'" in page,
-        "assignment page must expose compact Meituan-style filter entry points")
+        "assignment page must expose compact result-page filter entry points")
 require("typeCount(" not in page and "subjectCount(" not in page and "dateCount(" not in page,
         "filter UI must not show noisy per-chip counts")
+
+require("PadWorkspace" not in study and "SingleColumnWorkspace" in study,
+        "study flow must not keep the legacy Pad two-column task+tutor composition")
+require("tutorPanelOpen" in study and "Button('问小伴'" in study,
+        "Tutor must open as a separate single-column study state until Pad enhancement is rebuilt")
+require("constraintSize({ maxWidth: 820 })" in study and "alignItems(VerticalAlign.Top)" in study,
+        "study content must remain readable and top-anchored on wide layouts")
 
 require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model and
         "undatedOnly: boolean" in filter_model and "UNDATED = 'UNDATED'" in filter_model,
