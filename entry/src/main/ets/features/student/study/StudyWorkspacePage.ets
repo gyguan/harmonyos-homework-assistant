@@ -390,10 +390,14 @@ export struct StudyWorkspacePage {
           }
         }
         .width('100%')
+        .justifyContent(FlexAlign.Start)
+        .alignItems(HorizontalAlign.Start)
         .padding({ top: 0, bottom: 16 });
       }
       .width('100%')
       .height('100%')
+      .align(Alignment.TopStart)
+      .scrollBar(BarState.Off)
       .backgroundColor(AppTheme.BACKGROUND);
     }
   }
@@ -521,14 +525,18 @@ export struct StudyWorkspacePage {
         this.TutorPane();
       }
       .width('100%')
-      .layoutWeight(1);
+      .layoutWeight(1)
+      .justifyContent(FlexAlign.Start)
+      .alignItems(HorizontalAlign.Start);
     } else {
       Column({ space: 10 }) {
         Column() {
           this.StudyContent(false);
         }
         .width('100%')
-        .layoutWeight(1);
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Start)
+        .alignItems(HorizontalAlign.Start);
 
         Row({ space: 10 }) {
           Button('问小伴', { type: ButtonType.Normal })
@@ -557,7 +565,9 @@ export struct StudyWorkspacePage {
         .padding({ top: 2, bottom: 4 });
       }
       .width('100%')
-      .layoutWeight(1);
+      .layoutWeight(1)
+      .justifyContent(FlexAlign.Start)
+      .alignItems(HorizontalAlign.Start);
     }
   }
 
@@ -570,6 +580,8 @@ export struct StudyWorkspacePage {
       .width('100%')
       .height('100%')
       .constraintSize({ maxWidth: 820 })
+      .justifyContent(FlexAlign.Start)
+      .alignItems(HorizontalAlign.Start)
       .padding({
         left: this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PAGE_PADDING : AppTheme.PAGE_PADDING_WIDE,
         right: this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PAGE_PADDING : AppTheme.PAGE_PADDING_WIDE,
