@@ -25,6 +25,9 @@ public final class AssignmentDtos {
 
   public record ActionRequest(@NotBlank String action, @NotNull Long version) {}
 
+  public record ReviewRequest(@NotBlank String decision, @NotNull Long version,
+      @Size(max = 1000) String note) {}
+
   public record Response(String id, String studentId, String assignmentType, String subjectCode,
       String subject, String title, String instruction, String textbookRef,
       long dueAtEpochMs, String dueTimezone, String dueText, String status,

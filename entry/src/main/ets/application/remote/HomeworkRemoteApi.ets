@@ -1,6 +1,7 @@
 import { http } from '@kit.NetworkKit';
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter, AssignmentTypeFilter } from '../../domain/model/AssignmentFilter';
+import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDecision';
 import { Assignment, TodaySummary } from '../../domain/model/HomeworkModels';
 import { BackendHttpClient } from './BackendHttpClient';
 import { RemoteAssignment } from './RemoteModels';
@@ -20,6 +21,11 @@ interface UpdateAssignmentBody {
 interface AssignmentActionBody {
   action: string;
   version: number;
+}
+interface AssignmentReviewBody {
+  decision: string;
+  version: number;
+  note: string;
 }
 
 export class HomeworkRemoteApi {
@@ -73,6 +79,17 @@ export class HomeworkRemoteApi {
     if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw new Error(`执行作业动作失败: ${response.statusCode}`);
+    }
+    return JSON.parse(response.body) as RemoteAssignment;
+  }
+
+  async review(assignmentId: string, version: number, decision: AssignmentReviewDecision, note: string): Promise<RemoteAssignment> {
+    let body: AssignmentReviewBody = { decision: decision, version: version, note: note };
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/assignments/${encodeURIComponent(assignmentId)}/review`, http.RequestMethod.POST, body);
+    if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`验收作业失败: ${response.statusCode}`);
     }
     return JSON.parse(response.body) as RemoteAssignment;
   }

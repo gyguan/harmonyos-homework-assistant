@@ -23,7 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AssignmentController {
   private static final ZoneId DEFAULT_ZONE = ZoneId.of("Asia/Shanghai");
   private final AssignmentService service;
-  public AssignmentController(AssignmentService service) { this.service = service; }
+  private final AssignmentReviewService reviewService;
+
+  public AssignmentController(AssignmentService service, AssignmentReviewService reviewService) {
+    this.service = service;
+    this.reviewService = reviewService;
+  }
 
   @GetMapping("/students/{studentId}/assignments")
   public List<AssignmentDtos.Response> list(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
@@ -51,6 +56,12 @@ public class AssignmentController {
   public AssignmentDtos.Response action(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String id, @Valid @RequestBody AssignmentDtos.ActionRequest input) {
     return service.action(familyId, id, input);
+  }
+
+  @PostMapping("/assignments/{id}/review")
+  public AssignmentDtos.Response review(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String id, @Valid @RequestBody AssignmentDtos.ReviewRequest input) {
+    return reviewService.review(familyId, id, input);
   }
 
   @PatchMapping("/assignments/{id}")

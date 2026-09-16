@@ -72,6 +72,9 @@ jobs:
       - name: Validate V2 Assignment Detail content
         run: python scripts/validate_v2_assignment_detail_content.py
 
+      - name: Validate V2 Slice 4 parent review authority
+        run: python scripts/validate_v2_slice4_parent_review.py
+
       - name: Validate backend V0.1 boundaries
         run: python scripts/validate_backend_v01.py
 
@@ -179,6 +182,9 @@ jobs:
 
       - name: Run assignment action command E2E
         run: python backend/scripts/assignment_action_e2e.py
+
+      - name: Run parent review command E2E
+        run: python backend/scripts/parent_review_e2e.py
 
       - name: Restart backend while keeping PostgreSQL
         run: |
