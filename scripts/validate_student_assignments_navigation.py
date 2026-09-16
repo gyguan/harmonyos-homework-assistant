@@ -65,8 +65,9 @@ require("WindowSizeClass" not in page and "PhoneLayout" not in page and "PadLayo
         "V2 assignment list must not branch on device/window classes")
 require("selectedAssignmentId" not in page and "DetailPane" not in page,
         "assignment list must not retain embedded detail selection")
-require("constraintSize({ maxWidth: 760 })" in page and "constraintSize({ maxWidth: 720 })" in detail,
-        "list/detail must keep readable-width constraints")
+require("AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH" in page and
+        "AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH" in detail,
+        "list/detail must keep shared readable-width constraints")
 require("private AssignmentListPage()" in page and ".align(Alignment.TopStart)" in page and
         ".align(Alignment.TopStart)" in detail,
         "list/detail must stay top-anchored")
