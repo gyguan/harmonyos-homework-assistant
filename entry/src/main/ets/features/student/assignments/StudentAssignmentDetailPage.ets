@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, AssignmentType } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
@@ -56,24 +57,17 @@ export struct StudentAssignmentDetailPage {
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-    .padding({ top: 20, bottom: 32 });
+    .padding({ top: 8, bottom: 24 });
   }
 
   @Builder
   private DetailContent() {
-    Column({ space: 18 }) {
-      Row() {
-        Text('‹ 作业列表')
-          .fontSize(14)
-          .fontColor(AppTheme.PRIMARY)
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 4, right: 8 })
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('返回作业列表')
-          .onClick(() => this.onBack());
-        Blank();
-      }
-      .width('100%');
+    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+      DeepPageHeader({
+        title: '作业详情',
+        backAccessibilityText: '返回作业列表',
+        onBack: () => this.onBack()
+      });
 
       if (this.assignment() === null) {
         this.MissingState();
@@ -165,7 +159,12 @@ export struct StudentAssignmentDetailPage {
     .constraintSize({ maxWidth: 720 })
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start)
-    .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 12, bottom: 32 });
+    .padding({
+      left: AppTheme.PAGE_PADDING,
+      right: AppTheme.PAGE_PADDING,
+      top: AppTheme.DEEP_PAGE_TOP_PADDING,
+      bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
+    });
   }
 
   build() {
