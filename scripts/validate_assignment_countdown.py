@@ -28,7 +28,7 @@ store = read("entry/src/main/ets/data/HomeworkStore.ets")
 remote_models = read("entry/src/main/ets/application/remote/RemoteModels.ets")
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
-student_today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
+student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
 parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
@@ -55,8 +55,8 @@ for duration in ["10", "15", "20", "30", "45"]:
             f"parent confirmation must expose quick duration option: {duration} minutes")
 require(("预计完成时间" in confirmation or "预计用时" in confirmation) and "updateExpectedMinutes" in confirmation,
         "parent must be able to edit expected completion time before publishing")
-require("预计 ${this.nextAssignment()!.expectedMinutes} 分钟" in student_today,
-        "student Today page must show the time budget before starting")
+require("预计 ${this.nextAssignment()!.expectedMinutes} 分钟" in student_home,
+        "V2 student home must show the time budget before starting")
 require("AssignmentCountdownCard" in study,
         "student study workspace must render the homework countdown")
 
