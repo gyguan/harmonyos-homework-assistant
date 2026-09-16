@@ -13,6 +13,7 @@ import { HomeworkPersistence } from '../../domain/port/HomeworkPersistence';
 
 const STORE_NAME: string = 'homework_assistant_state';
 const SNAPSHOT_KEY: string = 'homework_snapshot_v1';
+const SNAPSHOT_BACKUP_KEY: string = 'homework_snapshot_pre_migration_backup';
 
 export class PreferencesHomeworkPersistence implements HomeworkPersistence {
   private readonly context: common.UIAbilityContext;
@@ -70,13 +71,38 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
     }
   }
 
+  private async preservePreMigrationSnapshot(store: preferences.Preferences, snapshot: HomeworkSnapshot): Promise<void> {
+    let existing = await store.get(SNAPSHOT_KEY, '');
+    if (typeof existing !== 'string' || existing.length === 0) return;
+
+    let existingVersion: number;
+    try {
+      let parsed: Record<string, Object> = JSON.parse(existing);
+      existingVersion = parsed.schemaVersion as number;
+      if (!Number.isFinite(existingVersion) || existingVersion <= 0) {
+        throw new Error('invalid schema version');
+      }
+    } catch {
+      console.error('Existing homework snapshot cannot be validated before save; preserving original data');
+      throw new Error('本地作业数据无法验证，已停止覆盖原数据');
+    }
+
+    if (existingVersion === snapshot.schemaVersion) return;
+
+    let backup = await store.get(SNAPSHOT_BACKUP_KEY, '');
+    if (typeof backup === 'string' && backup.length > 0) return;
+    await store.put(SNAPSHOT_BACKUP_KEY, existing);
+  }
+
   async save(snapshot: HomeworkSnapshot): Promise<void> {
     try {
       let store = await this.getStore();
+      await this.preservePreMigrationSnapshot(store, snapshot);
       await store.put(SNAPSHOT_KEY, JSON.stringify(snapshot));
       await store.flush();
-    } catch {
-      console.error('Homework snapshot save failed; in-memory state remains available');
+    } catch (error) {
+      console.error(`Homework snapshot save failed; stored data was not intentionally replaced: ${error}`);
+      throw error;
     }
   }
 }
