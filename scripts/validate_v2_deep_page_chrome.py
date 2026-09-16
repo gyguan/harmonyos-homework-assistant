@@ -58,10 +58,23 @@ require("private WorkspaceHeader()" not in study,
         "StudyWorkspace must not reintroduce its legacy private WorkspaceHeader")
 require("top: 0" in study,
         "StudyWorkspace content should not add a second top padding below shared chrome")
+
+study_content = ""
+if "private StudyContent" in study and "private TutorPane" in study:
+    study_content = study.split("private StudyContent", 1)[1].split("private TutorPane", 1)[0]
+require(".align(Alignment.TopStart)" in study_content,
+        "StudyWorkspace page-level Scroll must be explicitly top anchored")
+require(".scrollBar(BarState.Off)" in study_content,
+        "StudyWorkspace page-level Scroll must keep scrolling but hide the system scrollbar")
+require(".justifyContent(FlexAlign.Start)" in study_content and ".alignItems(HorizontalAlign.Start)" in study_content,
+        "StudyWorkspace content column must be explicitly anchored to the top/start")
+
 require("docs/product/v2-deep-page-chrome-standard.md" in agents and "DeepPageHeader" in agents,
         "Agent guide must require the shared deep-page chrome standard for future V2 refactors")
 require("深层页面必须复用 `DeepPageHeader`" in spec,
         "deep-page chrome spec must explicitly require DeepPageHeader reuse")
+require("页面级纵向 Scroll" in spec and "scrollBar(BarState.Off)" in spec,
+        "deep-page chrome spec must require top-anchored scrolling with hidden system scrollbars")
 
 if errors:
     print("V2_DEEP_PAGE_CHROME_GATE_FAIL")
