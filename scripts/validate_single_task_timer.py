@@ -24,7 +24,7 @@ state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.e
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
-today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
+home_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 backend_policy = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentStatePolicy.java")
 backend_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
 
@@ -42,8 +42,8 @@ require("已暂停 · 还剩" in countdown and "assignment.elapsedSeconds" in co
         "countdown must render paused cumulative timing")
 require("暂停一下" in study and "AssignmentStatus.PAUSED" in study,
         "study workspace must expose pause/resume controls")
-require("继续作业" in today and "AssignmentStatus.PAUSED" in today,
-        "Today must expose paused tasks as resumable")
+require("AssignmentStatus.PAUSED" in home_vm and "return '继续完成'" in home_vm,
+        "V2 Student Home must expose paused tasks as resumable")
 require('"PAUSED"' in backend_policy,
         "backend state policy must support PAUSED")
 require("pauseOtherActive" in backend_service and 'other.status = "PAUSED"' in backend_service,
