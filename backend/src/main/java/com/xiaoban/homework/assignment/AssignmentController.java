@@ -47,6 +47,12 @@ public class AssignmentController {
   public AssignmentDtos.Response create(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String studentId, @Valid @RequestBody AssignmentDtos.Create input) { return service.create(familyId, studentId, input); }
 
+  @PostMapping("/assignments/{id}/actions")
+  public AssignmentDtos.Response action(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String id, @Valid @RequestBody AssignmentDtos.ActionRequest input) {
+    return service.action(familyId, id, input);
+  }
+
   @PatchMapping("/assignments/{id}")
   public AssignmentDtos.Response update(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String id, @Valid @RequestBody AssignmentDtos.Update input) { return service.update(familyId, id, input); }
