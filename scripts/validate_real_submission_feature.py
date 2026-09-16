@@ -20,6 +20,8 @@ def require(condition: bool, message: str) -> None:
 
 
 models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
+persistence_models = read("entry/src/main/ets/domain/model/PersistenceModels.ets")
+migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 service = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
@@ -29,8 +31,10 @@ entry_ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
 require("photoUris: string[]" in models, "Submission must persist photoUris")
 require("IMAGE = 'IMAGE'" in models and "MOCK_IMAGE" not in models, "Submission type must be real IMAGE only")
 require("submitImages" in store and "submitMockImage" not in store, "Store must use real image submission")
-require("SNAPSHOT_SCHEMA_VERSION: number = 4" in store,
-        "real submission must remain durable after the multi-child snapshot upgrade to v4")
+require("submissions: Submission[]" in persistence_models and "submissions: snapshot.submissions" in migrator,
+        "snapshot migrations must preserve durable submissions")
+require("schemaVersion: HOMEWORK_SNAPSHOT_SCHEMA_VERSION" in store,
+        "new snapshots must use the shared migration schema version")
 require("MAX_SUBMISSION_PHOTOS: number = 6" in service, "Submission service must cap selection at six photos")
 require("photoAccessHelper.PhotoViewPicker" in service, "Submission service must use PhotoViewPicker")
 require("fileIo.copyFile" in service and "fileUri.getUriFromPath" in service,
