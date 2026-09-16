@@ -15,6 +15,15 @@ export class LayoutRequirement {
 }
 
 export class LayoutPolicy {
+  static homeFocusSummaryRequirement(): LayoutRequirement {
+    return new LayoutRequirement(
+      AppTheme.HOME_PRIMARY_MIN_WIDTH,
+      AppTheme.HOME_SECONDARY_MIN_WIDTH,
+      AppTheme.SPLIT_PANE_GAP,
+      AppTheme.PAGE_PADDING_WIDE
+    );
+  }
+
   static assignmentMasterDetailRequirement(): LayoutRequirement {
     return new LayoutRequirement(
       AppTheme.SPLIT_PRIMARY_MIN_WIDTH,
