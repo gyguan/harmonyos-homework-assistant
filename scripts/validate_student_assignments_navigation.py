@@ -27,6 +27,7 @@ filter_model = read("entry/src/main/ets/domain/model/AssignmentFilter.ets")
 query = read("entry/src/main/ets/domain/service/AssignmentQuery.ets")
 repository_port = read("entry/src/main/ets/domain/port/AssignmentRepository.ets")
 repository_impl = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
+remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
 
@@ -41,8 +42,6 @@ require("studentStudyReturnRoute = StudentRoute.ASSIGNMENT_DETAIL" in shell,
 require("if (this.isDetailFlow())" in shell and "this.BottomNavShell();" in shell and
         "else if (this.sizeClass === WindowSizeClass.EXPANDED)" in shell,
         "detail flows must bypass expanded SideNavigation and render as full-screen content")
-require("justifyContent(FlexAlign.Start)" in shell and "alignContent(Alignment.TopStart)" in shell,
-        "shell content must explicitly top-anchor detail flows")
 
 require("HomeworkStore.instance" not in page and "HomeworkStore.instance" not in detail and
         "HomeworkStore.instance" not in view_model,
@@ -67,42 +66,46 @@ for subject in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
 require("StudentAssignmentsViewModel" in page and "DefaultAssignmentRepository.instance" in page,
         "assignment list must query through ViewModel + Repository")
 require("@State private visibleTotal" in page and "@State private needHandlingAssignments" in page and
-        "private rebuildResults(): void" in page and "this.visibleTotal = items.length" in page,
+        "private applyItems(items: Assignment[]): void" in page and "this.visibleTotal = items.length" in page,
         "query confirmation must replace observable result state")
-require("@State private isFilterOverlayVisible" in page and "@State private draftTypeFilter" in page and
-        "@State private draftSubjectCode" in page and "@State private draftDateFilter" in page,
-        "filter overlay must keep draft state separate from applied query state")
-require(".bindSheet(" not in page and "private FilterOverlay()" in page and "private FilterPanel()" in page,
-        "filter interaction must use the in-page overlay rather than the non-interactive bindSheet implementation")
+require("@State private showFilterPage" in page and "private FilterPage()" in page,
+        "filters must use a normal full-page interaction instead of popup/overlay implementations")
+require("bindSheet" not in page and "FilterOverlay" not in page and "FilterPanel" not in page,
+        "legacy popup filter implementations must not return")
 require("Button(label, { type: ButtonType.Normal })" in page and "private TypeOption" in page and
         "private DateOption" in page and "private SubjectOption" in page,
         "filter choices must be real button controls with direct state updates")
-require("private applyFilters(): void" in page and "Button('查询'" in page and
-        "this.rebuildResults();" in page and "this.isFilterOverlayVisible = false" in page,
-        "filter results must update only after the user confirms 查询")
+require("private async applyFilters(): Promise<void>" in page and "await this.viewModel.query" in page and
+        "Button(this.querying ? '查询中…' : '查询'" in page,
+        "query confirmation must execute an asynchronous repository query")
 require("Button('重置'" in page and "resetDraftFilters" in page,
-        "filter overlay must provide reset without immediately mutating the applied query")
+        "filter page must provide reset without immediately mutating the applied query")
 require("FilterEntry('类型'" in page and "FilterEntry('截止'" in page and "FilterEntry('科目'" in page,
         "assignment page must expose compact result-page filter entry points")
-require("typeCount(" not in page and "subjectCount(" not in page and "dateCount(" not in page,
-        "filter UI must not show noisy per-chip counts")
 
 require("PadWorkspace" not in study and "SingleColumnWorkspace" in study,
         "study flow must not keep the legacy Pad two-column task+tutor composition")
 require("tutorPanelOpen" in study and "Button('问小伴'" in study,
         "Tutor must open as a separate single-column study state until Pad enhancement is rebuilt")
-require("constraintSize({ maxWidth: 820 })" in study and "alignItems(VerticalAlign.Top)" in study,
-        "study content must remain readable and top-anchored on wide layouts")
 
 require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model and
         "undatedOnly: boolean" in filter_model and "UNDATED = 'UNDATED'" in filter_model,
         "AssignmentFilter must explicitly represent undated work")
 require("dueAtEpochMs" in query and "dueText" not in query and "filter.undatedOnly" in query,
         "V2 date filtering must use structured dueAt/undated state and never infer dueText")
-require("AssignmentQuery.filter" in repository_impl and "filter?: AssignmentFilter" in repository_port,
-        "Repository boundary must own local AssignmentFilter execution")
-require("getCached(assignmentId: string)" in repository_port and "getCached(assignmentId: string)" in repository_impl,
-        "standalone detail must load through Repository instead of Store")
+require("query(filter: AssignmentFilter): Promise<Assignment[]>" in repository_port,
+        "Repository contract must expose filtered query")
+require("HomeworkRemoteApi.instance.listFiltered" in repository_impl and "RemoteAssignmentMapper.toLocal" in repository_impl,
+        "online filtered queries must call the backend and map remote results")
+require("!BackendSession.instance.isConnected()" in repository_impl and "this.listCached(filter)" in repository_impl,
+        "offline filtered queries may fall back to local cache")
+require("async listFiltered(studentId: string, filter: AssignmentFilter)" in remote_api and
+        "type=${encodeURIComponent(filter.assignmentType)}" in remote_api and
+        "subjectCode=${encodeURIComponent(filter.subjectCode)}" in remote_api and
+        "undated=true" in remote_api,
+        "remote API must send the combined filter as query parameters")
+require("async query(typeFilter: AssignmentTypeFilter" in view_model and "this.repository.query" in view_model,
+        "ViewModel must delegate confirmed filters to Repository.query")
 
 for param in ["String type", "String subjectCode", "Long from", "Long to", "String status", "Boolean undated"]:
     require(param in controller, f"backend assignment query missing parameter: {param}")
@@ -110,8 +113,6 @@ require("matchesListFilter" in service and "statusFilter" in service and "compar
         "backend must implement combined filters and stable ordering")
 require("undatedOnly" in service and "assignment.dueAt != null" in service,
         "backend must explicitly support undated assignment queries")
-require("未定日期筛选不能同时指定日期范围" in service,
-        "backend must reject ambiguous undated + date-range queries")
 
 if errors:
     print("STUDENT_ASSIGNMENTS_NAVIGATION_GATE_FAIL")

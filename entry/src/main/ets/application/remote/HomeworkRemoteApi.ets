@@ -1,4 +1,5 @@
 import { http } from '@kit.NetworkKit';
+import { AssignmentFilter, AssignmentTypeFilter } from '../../domain/model/AssignmentFilter';
 import { Assignment, TodaySummary } from '../../domain/model/HomeworkModels';
 import { BackendHttpClient } from './BackendHttpClient';
 import { RemoteAssignment } from './RemoteModels';
@@ -23,6 +24,26 @@ export class HomeworkRemoteApi {
   async list(studentId: string): Promise<RemoteAssignment[]> {
     let response = await BackendHttpClient.instance.request(`/api/v1/students/${encodeURIComponent(studentId)}/assignments`, http.RequestMethod.GET);
     if (response.statusCode !== 200) throw new Error(`拉取作业失败: ${response.statusCode}`);
+    return JSON.parse(response.body) as RemoteAssignment[];
+  }
+
+  async listFiltered(studentId: string, filter: AssignmentFilter): Promise<RemoteAssignment[]> {
+    let params: string[] = [];
+    if (filter.assignmentType !== AssignmentTypeFilter.ALL) {
+      params.push(`type=${encodeURIComponent(filter.assignmentType)}`);
+    }
+    if (filter.subjectCode !== 'ALL') {
+      params.push(`subjectCode=${encodeURIComponent(filter.subjectCode)}`);
+    }
+    if (filter.fromEpochMs > 0) params.push(`from=${filter.fromEpochMs}`);
+    if (filter.toEpochMs > 0) params.push(`to=${filter.toEpochMs}`);
+    if (filter.undatedOnly) params.push('undated=true');
+    if (filter.statuses.length === 1) params.push(`status=${encodeURIComponent(filter.statuses[0])}`);
+
+    let suffix = params.length === 0 ? '' : `?${params.join('&')}`;
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/students/${encodeURIComponent(studentId)}/assignments${suffix}`, http.RequestMethod.GET);
+    if (response.statusCode !== 200) throw new Error(`筛选作业失败: ${response.statusCode}`);
     return JSON.parse(response.body) as RemoteAssignment[];
   }
 
