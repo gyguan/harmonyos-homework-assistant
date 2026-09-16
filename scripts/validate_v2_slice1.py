@@ -31,6 +31,8 @@ repository_impl = read("entry/src/main/ets/data/repository/DefaultAssignmentRepo
 view_model = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
+store = read("entry/src/main/ets/data/HomeworkStore.ets")
+parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 
 for column in ["assignment_type", "subject_code", "due_at", "due_timezone"]:
     require(column in migration, f"V7 missing Assignment V2 column: {column}")
@@ -57,6 +59,15 @@ require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 6" in migrator and "migrateV
         "Assignment V2 client fields must use an explicit V5 -> V6 snapshot migration")
 require("assignmentType: AssignmentType.SCHOOL" in migrator and "dueAtEpochMs: 0" in migrator,
         "V5 -> V6 must use deterministic historical defaults without guessing due time")
+
+require("Subject," in store and "private subjectCode(subject: Subject)" in store,
+        "HomeworkStore V2 subject mapper must import Subject explicitly for ArkTS compilation")
+for field in ["assignmentType: item.assignmentType", "subjectCode: this.subjectCode(this.editSubject)",
+              "dueAtEpochMs:", "dueTimezone: item.dueTimezone"]:
+    require(field in parent_progress,
+            f"parent assignment edit must preserve/update V2 field: {field}")
+require("dueChanged ? 0 : item.dueAtEpochMs" in parent_progress,
+        "editing legacy dueText must clear structured dueAt instead of keeping stale structured time")
 
 require("interface AssignmentRepository" in repository_port,
         "V2 Student Home must depend on an AssignmentRepository port")
