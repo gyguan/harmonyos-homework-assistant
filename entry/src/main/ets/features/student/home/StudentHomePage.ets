@@ -289,19 +289,25 @@ export struct StudentHomePage {
 
   build() {
     Scroll() {
-      Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-        this.Header();
-        this.OfflineBanner();
-        this.TodayProgress();
-        this.AttentionBanner();
-        this.NextAssignmentHero();
-        this.RemainingAssignments();
+      Column() {
+        Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+          this.Header();
+          this.OfflineBanner();
+          this.TodayProgress();
+          this.AttentionBanner();
+          this.NextAssignmentHero();
+          this.RemainingAssignments();
+        }
+        .width('100%')
+        .constraintSize({ maxWidth: AppTheme.HOME_READABLE_MAX_WIDTH })
+        .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
       }
       .width('100%')
-      .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%')
     .height('100%')
+    .align(Alignment.TopStart)
     .backgroundColor(AppTheme.BACKGROUND)
     .scrollBar(BarState.Off);
   }
