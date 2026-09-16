@@ -1,5 +1,5 @@
 import { http } from '@kit.NetworkKit';
-import { Assignment } from '../../domain/model/HomeworkModels';
+import { Assignment, TodaySummary } from '../../domain/model/HomeworkModels';
 import { BackendHttpClient } from './BackendHttpClient';
 import { RemoteAssignment } from './RemoteModels';
 
@@ -24,6 +24,13 @@ export class HomeworkRemoteApi {
     let response = await BackendHttpClient.instance.request(`/api/v1/students/${encodeURIComponent(studentId)}/assignments`, http.RequestMethod.GET);
     if (response.statusCode !== 200) throw new Error(`拉取作业失败: ${response.statusCode}`);
     return JSON.parse(response.body) as RemoteAssignment[];
+  }
+
+  async todaySummary(studentId: string): Promise<TodaySummary> {
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/students/${encodeURIComponent(studentId)}/assignments/summary`, http.RequestMethod.GET);
+    if (response.statusCode !== 200) throw new Error(`拉取今日作业摘要失败: ${response.statusCode}`);
+    return JSON.parse(response.body) as TodaySummary;
   }
 
   async create(assignment: Assignment): Promise<RemoteAssignment> {
