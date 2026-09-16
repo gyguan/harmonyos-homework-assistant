@@ -221,13 +221,18 @@ def run_full(args: argparse.Namespace) -> None:
     require(any(item.get("id") == student_id for item in students), "created student missing from list")
     require(not any(item.get("id") == delete_id for item in students), "deleted student still present")
 
+    due_at_ms = int(time.time() * 1000) + 24 * 60 * 60 * 1000
     assignment_payload = {
         "id": assignment_id,
+        "assignmentType": "SCHOOL",
         "subject": "数学",
+        "subjectCode": "MATH",
         "title": "E2E 作业",
         "instruction": "完成 1 道 E2E 验证题",
         "textbookRef": "E2E P1",
-        "dueText": "今天",
+        "dueText": "明天",
+        "dueAtEpochMs": due_at_ms,
+        "dueTimezone": "Asia/Shanghai",
         "status": "NOT_STARTED",
         "sourceLabel": "backend e2e smoke",
         "sourceExcerpt": "E2E source evidence",
@@ -249,6 +254,38 @@ def run_full(args: argparse.Namespace) -> None:
         "create assignment",
     ).json()
     require(assignment.get("id") == assignment_id, "created assignment id mismatch")
+    require(assignment.get("assignmentType") == "SCHOOL", "assignmentType not persisted")
+    require(assignment.get("subjectCode") == "MATH", "subjectCode not persisted")
+    require(int(assignment.get("dueAtEpochMs", 0)) == due_at_ms, "dueAtEpochMs not persisted")
+
+    filtered = expect(
+        http(base_url, "GET",
+             f"/api/v1/students/{student_id}/assignments?type=SCHOOL&subjectCode=MATH&status=NOT_STARTED",
+             token=token),
+        (200,),
+        "filter assignments by type subject and status",
+    ).json()
+    require(any(item.get("id") == assignment_id for item in filtered),
+            "combined assignment filter did not return matching assignment")
+
+    excluded = expect(
+        http(base_url, "GET", f"/api/v1/students/{student_id}/assignments?type=EXTRA", token=token),
+        (200,),
+        "filter assignments by non-matching type",
+    ).json()
+    require(not any(item.get("id") == assignment_id for item in excluded),
+            "type filter returned a SCHOOL assignment for EXTRA")
+
+    by_date = expect(
+        http(base_url, "GET",
+             f"/api/v1/students/{student_id}/assignments?from={due_at_ms - 1000}&to={due_at_ms + 1000}",
+             token=token),
+        (200,),
+        "filter assignments by structured dueAt range",
+    ).json()
+    require(any(item.get("id") == assignment_id for item in by_date),
+            "structured dueAt range filter did not return matching assignment")
+
     version0 = int(assignment["version"])
 
     updated = patch_assignment(base_url, token, assignment_id, version0, title="E2E 作业-已更新")
