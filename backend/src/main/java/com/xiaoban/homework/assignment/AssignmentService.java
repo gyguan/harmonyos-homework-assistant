@@ -42,25 +42,29 @@ public class AssignmentService {
 
   @Transactional(readOnly = true)
   public List<AssignmentDtos.Response> list(UUID familyId, String studentId) {
-    return list(familyId, studentId, null, null, null, null, null);
+    return list(familyId, studentId, null, null, null, null, null, false);
   }
 
   @Transactional(readOnly = true)
   public List<AssignmentDtos.Response> list(UUID familyId, String studentId, String type, String subjectCode,
-      Long fromEpochMs, Long toEpochMs, String status) {
+      Long fromEpochMs, Long toEpochMs, String status, Boolean undated) {
     students.requireOwned(familyId, studentId);
     String normalizedType = type == null || type.isBlank() ? null : assignmentType(type);
     String normalizedSubject = subjectCode == null || subjectCode.isBlank() ? null : subjectCode.trim().toUpperCase();
     Instant from = dueAt(fromEpochMs);
     Instant to = dueAt(toEpochMs);
+    boolean undatedOnly = Boolean.TRUE.equals(undated);
     if (from != null && to != null && from.isAfter(to)) {
       throw new ApiExceptions.BadRequest("作业筛选开始时间不能晚于结束时间");
+    }
+    if (undatedOnly && (from != null || to != null)) {
+      throw new ApiExceptions.BadRequest("未定日期筛选不能同时指定日期范围");
     }
     Set<String> statuses = statusFilter(status);
 
     List<AssignmentEntity> filtered = new ArrayList<>();
     for (AssignmentEntity assignment : repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(familyId, studentId)) {
-      if (!matchesListFilter(assignment, normalizedType, normalizedSubject, from, to, statuses)) continue;
+      if (!matchesListFilter(assignment, normalizedType, normalizedSubject, from, to, statuses, undatedOnly)) continue;
       filtered.add(assignment);
     }
     filtered.sort(this::compareForList);
@@ -207,10 +211,11 @@ public class AssignmentService {
   }
 
   private boolean matchesListFilter(AssignmentEntity assignment, String type, String subjectCode,
-      Instant from, Instant to, Set<String> statuses) {
+      Instant from, Instant to, Set<String> statuses, boolean undatedOnly) {
     if (type != null && !type.equals(assignment.assignmentType)) return false;
     if (subjectCode != null && !subjectCode.equalsIgnoreCase(assignment.subjectCode)) return false;
-    if ((from != null || to != null) && assignment.dueAt == null) return false;
+    if (undatedOnly && assignment.dueAt != null) return false;
+    if (!undatedOnly && (from != null || to != null) && assignment.dueAt == null) return false;
     if (from != null && assignment.dueAt.isBefore(from)) return false;
     if (to != null && assignment.dueAt.isAfter(to)) return false;
     return statuses.isEmpty() || statuses.contains(assignment.status);
