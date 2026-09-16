@@ -15,6 +15,23 @@ export class LayoutRequirement {
 }
 
 export class LayoutPolicy {
+  static areaLengthToVp(value: Length, fallbackVp: number): number {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) && value > 0 ? value : fallbackVp;
+    }
+    let parsed = Number.parseFloat(String(value));
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallbackVp;
+  }
+
+  static homeFocusSummaryRequirement(): LayoutRequirement {
+    return new LayoutRequirement(
+      AppTheme.HOME_PRIMARY_MIN_WIDTH,
+      AppTheme.HOME_SECONDARY_MIN_WIDTH,
+      AppTheme.SPLIT_PANE_GAP,
+      AppTheme.PAGE_PADDING_WIDE
+    );
+  }
+
   static assignmentMasterDetailRequirement(): LayoutRequirement {
     return new LayoutRequirement(
       AppTheme.SPLIT_PRIMARY_MIN_WIDTH,

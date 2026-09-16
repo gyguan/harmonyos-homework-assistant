@@ -77,8 +77,11 @@ require("HomeworkStore.instance" in repository_impl,
         "legacy Store access is allowed only inside the migration repository boundary")
 require("HomeworkStore.instance" not in view_model and "HomeworkStore.instance" not in home,
         "V2 ViewModel/Page must not directly access HomeworkStore")
-require("WindowSizeClass" not in home and "PhoneLayout" not in home and "PadLayout" not in home,
-        "V2 Student Home must stay single-column and free of device/breakpoint layout branches")
+require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,
+        "V2 Student Home must use LayoutPolicy/container capability instead of size-class business branching")
+require("private PhoneHome()" in home and "private PadHome()" in home and
+        "LayoutPolicy.homeFocusSummaryRequirement()" in home,
+        "V2 Student Home must keep the Phone single-column fallback and the approved Pad focus/summary composition")
 require("NextAssignmentHero" in home and "TodayProgress" in home and "RemainingAssignments" in home,
         "V2 Student Home must preserve the approved information hierarchy")
 require("StudentHomePage" in shell and "StudentTodayPage" not in shell,

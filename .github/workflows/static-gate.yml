@@ -45,6 +45,9 @@ jobs:
       - name: Validate V2 Phone/Pad baseline
         run: python scripts/validate_v2_phone_pad_baseline.py
 
+      - name: Validate V2 Pad prototype alignment
+        run: python scripts/validate_v2_pad_prototype_alignment.py
+
       - name: Validate person entry and locked roles
         run: python scripts/validate_person_entry_role_lock.py
 

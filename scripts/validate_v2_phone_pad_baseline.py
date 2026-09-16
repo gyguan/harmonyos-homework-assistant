@@ -55,24 +55,24 @@ for token in [
 require("LayoutPolicy" in responsive and "assignmentMasterDetailRequirement" in responsive,
         "responsive content capability must delegate to LayoutPolicy")
 require("AppTheme.HOME_READABLE_MAX_WIDTH" in home,
-        "Student Home must cap its readable width on wide containers")
+        "Student Home must keep a readable single-column fallback")
 require("alignItems(HorizontalAlign.Center)" in home,
-        "Student Home wide-container baseline must center the readable surface")
+        "Student Home must center its fallback/wide content surfaces")
 require("AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH" in assignments,
-        "Assignment List must use the shared readable-width token")
+        "Assignment List must keep the shared readable-width fallback token")
 require("AppTheme.FILTER_DIALOG_MAX_WIDTH" in filter_dialog,
         "Assignment filter dialog must be width-capped on wide containers")
 require("AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH" in detail,
         "Assignment Detail must use the shared readable-width token")
 require("AppTheme.STUDY_READABLE_MAX_WIDTH" in study and "AppTheme.STUDY_TITLE_SIZE" in study,
-        "Study Workspace must use shared readable-width and title tokens")
+        "Study Workspace must keep shared readable-width and title tokens")
 
 for text, path in [
     (study, "StudyWorkspacePage.ets"),
     (study_route, "StudyWorkspaceRoutePage.ets"),
 ]:
-    require("WindowSizeClass" not in text,
-            f"migrated Study surface must not depend on WindowSizeClass: {path}")
+    require("WindowSizeClass." not in text,
+            f"migrated Study surface must not branch on WindowSizeClass enum values: {path}")
     require("@Prop sizeClass" not in text and "this.sizeClass" not in text,
             f"migrated Study surface must not branch on sizeClass: {path}")
 
@@ -96,7 +96,7 @@ for text in feature_texts:
 require("LayoutPolicy" in spec and "基础适配不能延期" in spec,
         "Phone/Pad baseline spec must require LayoutPolicy and mandatory baseline adaptation")
 require("完整 Pad 增强" in spec,
-        "Phone/Pad baseline spec must distinguish deferred full Pad enhancement")
+        "Phone/Pad baseline spec must distinguish baseline from richer Pad composition work")
 
 if errors:
     print("V2_PHONE_PAD_BASELINE_FAIL")

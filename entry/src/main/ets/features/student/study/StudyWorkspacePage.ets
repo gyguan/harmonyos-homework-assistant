@@ -1,5 +1,7 @@
 import { TutorChatMessage, TutorConversation, TutorRemoteApi } from '../../../application/remote/TutorRemoteApi';
 import { HomeworkSubmissionService } from '../../../application/submission/HomeworkSubmissionService';
+import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
+import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
@@ -19,6 +21,7 @@ export struct StudyWorkspacePage {
   @State private actionRunning: boolean = false;
   @State private actionMessage: string = '';
   @State private tutorPanelOpen: boolean = false;
+  @State private availableWidthVp: number = 390;
   @State private submissionPhotoUris: string[] = [];
   @State private selectingPhotos: boolean = false;
   @State private submittingPhotos: boolean = false;
@@ -36,6 +39,14 @@ export struct StudyWorkspacePage {
     new StudyWorkspaceViewModel(DefaultAssignmentRepository.instance);
 
   aboutToAppear(): void { void this.loadTutor(); }
+
+  private canUseTutorSplit(): boolean {
+    return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.studyTutorRequirement());
+  }
+
+  private showTutorAsStandalone(): boolean {
+    return !this.canUseTutorSplit() && this.tutorPanelOpen;
+  }
 
   private assignment(): Assignment | null {
     let currentRevision = this.revision + this.actionRevision;
@@ -505,12 +516,12 @@ export struct StudyWorkspacePage {
   @Builder
   private PageHeader() {
     DeepPageHeader({
-      title: this.tutorPanelOpen ? '问小伴' : '学习空间',
+      title: this.showTutorAsStandalone() ? '问小伴' : '学习空间',
       subtitle: this.assignment() === null ? '' : this.assignment()!.subject,
-      trailingText: this.tutorPanelOpen || this.assignment() === null ? '' : this.assignment()!.dueText,
-      backAccessibilityText: this.tutorPanelOpen ? '返回学习任务' : '返回上一页',
+      trailingText: this.showTutorAsStandalone() || this.assignment() === null ? '' : this.assignment()!.dueText,
+      backAccessibilityText: this.showTutorAsStandalone() ? '返回学习任务' : '返回上一页',
       onBack: () => {
-        if (this.tutorPanelOpen) this.tutorPanelOpen = false;
+        if (this.showTutorAsStandalone()) this.tutorPanelOpen = false;
         else this.onBack();
       }
     });
@@ -569,28 +580,99 @@ export struct StudyWorkspacePage {
     }
   }
 
+  @Builder
+  private SplitWorkspace() {
+    Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+      Column({ space: 10 }) {
+        Column() {
+          this.StudyContent(false);
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Start)
+        .alignItems(HorizontalAlign.Start);
+
+        Button(this.primaryActionLabel(), { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(this.primaryActionEnabled())
+          .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .onClick(() => { void this.runPrimaryAction(); });
+      }
+      .layoutWeight(1)
+      .height('100%')
+      .constraintSize({ minWidth: AppTheme.STUDY_PRIMARY_MIN_WIDTH })
+      .alignItems(HorizontalAlign.Start);
+
+      Column() {
+        this.TutorPane();
+      }
+      .width(AppTheme.STUDY_TUTOR_MIN_WIDTH)
+      .height('100%')
+      .alignItems(HorizontalAlign.Start);
+    }
+    .width('100%')
+    .layoutWeight(1)
+    .alignItems(VerticalAlign.Top);
+  }
+
+  @Builder
+  private PhoneWorkspacePage() {
+    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+      this.PageHeader();
+      this.SingleColumnWorkspace();
+    }
+    .width('100%')
+    .height('100%')
+    .constraintSize({ maxWidth: AppTheme.STUDY_READABLE_MAX_WIDTH })
+    .justifyContent(FlexAlign.Start)
+    .alignItems(HorizontalAlign.Start)
+    .padding({
+      left: AppTheme.PAGE_PADDING,
+      right: AppTheme.PAGE_PADDING,
+      top: AppTheme.DEEP_PAGE_TOP_PADDING,
+      bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
+    });
+  }
+
+  @Builder
+  private PadWorkspacePage() {
+    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+      this.PageHeader();
+      this.SplitWorkspace();
+    }
+    .width('100%')
+    .height('100%')
+    .constraintSize({ maxWidth: AppTheme.STUDY_SPLIT_MAX_WIDTH })
+    .justifyContent(FlexAlign.Start)
+    .alignItems(HorizontalAlign.Start)
+    .padding({
+      left: AppTheme.PAGE_PADDING_WIDE,
+      right: AppTheme.PAGE_PADDING_WIDE,
+      top: AppTheme.DEEP_PAGE_TOP_PADDING,
+      bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
+    });
+  }
+
   build() {
     Row() {
-      Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
-        this.PageHeader();
-        this.SingleColumnWorkspace();
+      if (this.canUseTutorSplit()) {
+        this.PadWorkspacePage();
+      } else {
+        this.PhoneWorkspacePage();
       }
-      .width('100%')
-      .height('100%')
-      .constraintSize({ maxWidth: AppTheme.STUDY_READABLE_MAX_WIDTH })
-      .justifyContent(FlexAlign.Start)
-      .alignItems(HorizontalAlign.Start)
-      .padding({
-        left: AppTheme.PAGE_PADDING,
-        right: AppTheme.PAGE_PADDING,
-        top: AppTheme.DEEP_PAGE_TOP_PADDING,
-        bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
-      });
     }
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Center)
     .alignItems(VerticalAlign.Top)
-    .backgroundColor(AppTheme.BACKGROUND);
+    .backgroundColor(AppTheme.BACKGROUND)
+    .onAreaChange((_oldValue, newValue) => {
+      this.availableWidthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.availableWidthVp);
+    });
   }
 }

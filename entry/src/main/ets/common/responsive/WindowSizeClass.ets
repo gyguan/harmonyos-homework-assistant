@@ -20,12 +20,7 @@ export class ResponsiveContext {
   }
 
   static areaLengthToVp(value: Length, fallbackVp: number): number {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) && value > 0 ? value : fallbackVp;
-    }
-
-    let parsed = Number.parseFloat(String(value));
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : fallbackVp;
+    return LayoutPolicy.areaLengthToVp(value, fallbackVp);
   }
 
   static twoPaneRequiredWidthVp(): number {

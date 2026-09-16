@@ -23,6 +23,7 @@ routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 filter_dialog = read("entry/src/main/ets/features/student/assignments/AssignmentFilterDialog.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
+detail_pane = read("entry/src/main/ets/features/student/assignments/AssignmentDetailPane.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
@@ -34,7 +35,7 @@ remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
 
-# Navigation: root tabs remain in Shell; assignment detail/study are true deep destinations.
+# Navigation: root tabs remain in Shell; Phone assignment detail/study stay true deep destinations.
 require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell and "ASSIGNMENT_DETAIL = 'ASSIGNMENT_DETAIL'" not in shell and
         "STUDY = 'STUDY'" not in shell,
         "student root routes must contain only top-level surfaces")
@@ -56,21 +57,29 @@ require("AssignmentAction.START" in study_route and "StudyWorkspaceViewModel" in
         "study route boundary must preserve start/continue semantics through the ViewModel command path")
 require("HomeworkStore.instance.startAssignment" not in shell,
         "AppShell must not execute assignment business commands")
+require("onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)" in shell,
+        "embedded Pad assignment detail must keep the existing Study navigation action")
 
-# Slice 2 list/filter behavior remains protected while navigation changes.
+# Slice 2 list/filter behavior plus Pad master-detail composition.
 require("HomeworkStore.instance" not in page and "HomeworkStore.instance" not in detail and
-        "HomeworkStore.instance" not in view_model,
+        "HomeworkStore.instance" not in detail_pane and "HomeworkStore.instance" not in view_model,
         "V2 assignment list/detail/view-model must not access HomeworkStore directly")
-require("WindowSizeClass" not in page and "PhoneLayout" not in page and "PadLayout" not in page,
-        "V2 assignment list must not branch on device/window classes")
-require("selectedAssignmentId" not in page and "DetailPane" not in page,
-        "assignment list must not retain embedded detail selection")
+require("WindowSizeClass." not in page and "@Prop sizeClass" not in page and "this.sizeClass" not in page,
+        "V2 assignment list must use LayoutPolicy rather than window-class branching")
+require("@State private selectedAssignmentId" in page and "AssignmentDetailPane" in page,
+        "Assignment Feature must own local Pad master-detail selection and reusable detail pane")
+require("LayoutPolicy.assignmentMasterDetailRequirement()" in page and "private AssignmentMasterDetail()" in page,
+        "Assignment master-detail must be enabled by shared content capability")
+require("selected: this.isSelected(item.id)" in page and "showChevron: !this.canUseMasterDetail()" in page,
+        "Pad list items must expose local selection instead of Phone chevron navigation")
+require("AssignmentDetailPane" in detail and "DeepPageHeader" in detail,
+        "Phone detail must reuse the same AssignmentDetailPane under deep-page chrome")
 require("AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH" in page and
         "AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH" in detail,
-        "list/detail must keep shared readable-width constraints")
+        "list/detail must keep shared readable-width fallback constraints")
 require("private AssignmentListPage()" in page and ".align(Alignment.TopStart)" in page and
         ".align(Alignment.TopStart)" in detail,
-        "list/detail must stay top-anchored")
+        "Phone list/detail fallback must stay top-anchored")
 
 for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
     require(token in page or token in filter_dialog, f"missing type filter option: {token}")
@@ -97,8 +106,11 @@ for state_array in ["needHandlingAssignments", "notStartedAssignments", "submitt
             f"assignment group must render directly from observable state: {state_array}")
     require(f"Text(`${{this.{state_array}.length}}`)" in page,
             f"assignment group count must be reactive: {state_array}")
-require("PadWorkspace" not in study and "SingleColumnWorkspace" in study and "Button('问小伴'" in study,
-        "study workspace must keep the validated single-column Tutor flow")
+
+require("SingleColumnWorkspace" in study and "SplitWorkspace" in study and "Button('问小伴'" in study,
+        "Study must keep Phone standalone Tutor flow and add Pad Study+Tutor split composition")
+require("LayoutPolicy.studyTutorRequirement()" in study and "this.TutorPane();" in study,
+        "Study Pad split must use shared content capability and the existing Tutor pane")
 
 # Query contract remains shared by local cache and backend.
 require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model and

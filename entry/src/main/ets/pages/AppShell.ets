@@ -141,7 +141,8 @@ export struct AppShell {
     if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
       StudentAssignmentsPage({
         revision: this.storeRevision,
-        onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId)
+        onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
+        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
       });
     } else if (this.studentRoute === StudentRoute.PROFILE) {
       StudentProfilePage({
