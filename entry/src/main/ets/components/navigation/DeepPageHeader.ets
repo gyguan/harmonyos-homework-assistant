@@ -10,15 +10,20 @@ export struct DeepPageHeader {
 
   build() {
     Row({ space: AppTheme.DEEP_PAGE_HEADER_GAP }) {
-      Text('‹')
-        .width(AppTheme.MIN_TOUCH_TARGET)
-        .height(AppTheme.MIN_TOUCH_TARGET)
-        .fontSize(AppTheme.DEEP_PAGE_BACK_GLYPH_SIZE)
-        .fontColor(AppTheme.TEXT)
-        .textAlign(TextAlign.Center)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(this.backAccessibilityText)
-        .onClick(() => this.onBack());
+      Row() {
+        SymbolGlyph($r('sys.symbol.chevron_left'))
+          .fontSize(AppTheme.DEEP_PAGE_BACK_GLYPH_SIZE)
+          .fontColor([AppTheme.TEXT]);
+      }
+      .width(AppTheme.MIN_TOUCH_TARGET)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .justifyContent(FlexAlign.Center)
+      .alignItems(VerticalAlign.Center)
+      .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.MIN_TOUCH_TARGET / 2)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.backAccessibilityText)
+      .onClick(() => this.onBack());
 
       Column({ space: 1 }) {
         Text(this.title)
