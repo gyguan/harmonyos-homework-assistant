@@ -15,7 +15,7 @@ import { StudentAssignmentDetailPage } from '../features/student/assignments/Stu
 import { StudentAssignmentsPage } from '../features/student/assignments/StudentAssignmentsPage';
 import { StudentHomePage } from '../features/student/home/StudentHomePage';
 import { StudentProfilePage } from '../features/student/profile/StudentProfilePage';
-import { StudyWorkspacePage } from '../features/student/study/StudyWorkspacePage';
+import { StudyWorkspaceRoutePage } from '../features/student/study/StudyWorkspaceRoutePage';
 
 export enum AppRole {
   NONE = 'NONE',
@@ -172,7 +172,7 @@ export struct AppShell {
       .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.STUDENT_STUDY) {
       NavDestination() {
-        StudyWorkspacePage({
+        StudyWorkspaceRoutePage({
           sizeClass: this.contentSizeClass,
           tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
           assignmentId: this.routeAssignmentId(param),
