@@ -5,6 +5,7 @@ import { RemoteAssignmentMapper } from '../../application/remote/RemoteModels';
 import { HomeworkStore } from '../HomeworkStore';
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
+import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDecision';
 import { Assignment, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../domain/port/AssignmentRepository';
 import { AssignmentQuery } from '../../domain/service/AssignmentQuery';
@@ -74,6 +75,37 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     }
 
     let remote = await HomeworkRemoteApi.instance.performAction(assignmentId, current.remoteVersion, action);
+    let mapped = RemoteAssignmentMapper.toLocal(remote, HomeworkStore.instance.getAssignment(assignmentId));
+    this.applyAuthoritative(mapped);
+    return mapped;
+  }
+
+  async review(assignmentId: string, decision: AssignmentReviewDecision, note: string): Promise<Assignment> {
+    let current = this.getCached(assignmentId);
+    if (current === null) throw new Error('作业不存在');
+
+    // Keep the same narrow seed/demo compatibility boundary as student execution. A real
+    // published Assignment is reviewed only after the server accepts the current version.
+    if (current.remoteVersion <= 0 && current.candidateId.length === 0) {
+      let completed = decision === AssignmentReviewDecision.APPROVE;
+      if (!HomeworkStore.instance.reviewAssignment(assignmentId, completed, note)) {
+        throw new Error('当前作业状态不能验收');
+      }
+      let updated = HomeworkStore.instance.getAssignment(assignmentId);
+      if (updated === null) throw new Error('作业不存在');
+      this.replaceQueryCacheItem(updated);
+      this.remoteSummary = null;
+      return updated;
+    }
+    if (!BackendSession.instance.isConnected()) {
+      throw new Error('当前离线，只能查看已缓存提交；联网后才能验收作业');
+    }
+    if (current.remoteVersion <= 0) {
+      throw new Error('作业尚未完成云端同步，请刷新后重试');
+    }
+
+    let remote = await HomeworkRemoteApi.instance.review(
+      assignmentId, current.remoteVersion, decision, note.trim());
     let mapped = RemoteAssignmentMapper.toLocal(remote, HomeworkStore.instance.getAssignment(assignmentId));
     this.applyAuthoritative(mapped);
     return mapped;
