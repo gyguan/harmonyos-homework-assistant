@@ -40,6 +40,7 @@ V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发�
 
 - `CONTEXT.md`
 - `docs/product/product-feature-list-v2.md`
+- `docs/product/v2-deep-page-chrome-standard.md`
 - `docs/architecture/frontend-technical-design-v2.md`
 - `docs/architecture/backend-technical-design-v2.md`
 - `docs/architecture/system-technical-design-v2.md`
@@ -59,6 +60,7 @@ V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发�
 10. **main 始终可运行。** 按纵向切片迁移，每个切片都必须可编译、可测试、可回退；不允许先大面积拆毁后再一次性集成。
 11. **优先解决根因而非症状。** 遇到 UI / 同步 / 状态问题，先验证真实数据和调用链，再修改公共抽象；禁止连续增加 fallback、magic number、silent catch 来掩盖问题。
 12. **新增抽象必须有直接用途。** 不为了“未来可能需要”建设重型框架；保持家庭级产品需要的最小复杂度。
+13. **深层页面统一 page chrome。** Assignment Detail、Study Workspace、Tutor、Submission、Resource Detail、Parent Review 等二级/深层页面必须复用 `DeepPageHeader` 与 `AppTheme.DEEP_PAGE_*` token；不得在 Feature 内私有实现另一套返回 glyph、标题栏或大块顶部留白。一级 Tab / SideNav 页面不强制显示返回 Header。
 
 ## Required cleanup check before merge
 
@@ -70,3 +72,4 @@ V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发�
 - 是否产生 V1/V2 两套长期并存的领域模型、API 或状态机？如果是，必须收敛。
 - 已被 V2 替换的旧代码是否可以在当前 PR 一并删除？优先删除，不留“以后再清”。
 - 是否存在无说明的空 `catch`、fallback 或默认值掩盖真实错误？必须消除或明确限定为 best-effort 场景。
+- 如果新增或重构二级/深层页面，是否复用了 `DeepPageHeader` 和统一顶部 spacing token？如果没有，不得合并。
