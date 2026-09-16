@@ -13,6 +13,8 @@ V2 页面不再由各 Feature 私自实现返回按钮、标题栏和顶部留�
 - 不同详情页返回图标、返回文字和触控区域不一致；
 - 页面顶部重复 padding / header 导致大块空白；
 - 详情、学习、Tutor、Submission 等页面标题层级不统一；
+- 短内容因为全高容器默认布局而出现视觉上的上下居中；
+- 长内容使用页面级 Scroll 时暴露系统滚动条，破坏页面视觉一致性；
 - 后续页面重构时重复造一套 page header。
 
 ## 2. 页面分层
@@ -73,7 +75,8 @@ V2 页面不再由各 Feature 私自实现返回按钮、标题栏和顶部留�
 - Safe Area / NavDestination / 页面容器只允许一层承担顶部安全空间，Feature 页面不得再叠加大块 top padding；
 - Header 下方内容应在一个标准 gap 后直接开始；
 - 不为了“视觉居中”给短内容增加额外顶部空间；
-- 深层页面主体始终 top anchored；
+- 深层页面主体始终 top anchored；全高 `Column` / `Scroll` 必须显式使用 `FlexAlign.Start` / `Alignment.TopStart`，不能依赖默认布局；
+- 页面级纵向 Scroll 保留滚动能力，但默认隐藏系统滚动条（`scrollBar(BarState.Off)`）；只有滚动位置本身是重要导航信息时才例外；
 - Phone 与 Pad 可以采用不同水平可读宽度，但顶部 chrome 不因设备型号而变化。
 
 ## 5. 内容宽度
@@ -101,6 +104,7 @@ V2 页面不再由各 Feature 私自实现返回按钮、标题栏和顶部留�
 - 样式 token：`AppTheme.DEEP_PAGE_*`
 - 新深层页面不得声明私有 `WorkspaceHeader` / `DetailHeader` / `BackHeader` 来重复实现返回 chrome；
 - 新深层页面不得直接绘制 `Text('‹')` 作为页面返回入口；
+- 页面级纵向 `Scroll` 必须 top anchored，默认关闭可见滚动条；
 - 深层页面 UI 变更必须保持 Navigation / NavPathStack 的返回语义，不恢复 AppShell returnRoute / selectedId 状态；
 - CI 的 V2 deep-page chrome gate 用于防止规范回退。
 
@@ -111,7 +115,8 @@ V2 页面不再由各 Feature 私自实现返回按钮、标题栏和顶部留�
 - 使用 `DeepPageHeader`；
 - 返回触控区与视觉样式一致；
 - 顶部只保留统一的紧凑留白；
-- 内容 top anchored；
+- 内容 top anchored，短内容不得出现上下居中；
+- 长内容可以自然滚动，但页面级系统滚动条默认不可见；
 - 标题、metadata 字号来自 AppTheme token；
 - 不存在 Feature 私有返回 glyph/header；
 - Phone / Pad 页面 chrome 一致；
