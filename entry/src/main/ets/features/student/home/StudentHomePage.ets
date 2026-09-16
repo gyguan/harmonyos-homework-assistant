@@ -1,3 +1,5 @@
+import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
+import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, AssignmentType } from '../../../domain/model/HomeworkModels';
@@ -8,6 +10,7 @@ export struct StudentHomePage {
   @Prop offlineMode: boolean = false;
   @Prop revision: number = 0;
   @State private refreshRevision: number = 0;
+  @State private availableWidthVp: number = 390;
   onOpenStudy: (assignmentId: string) => void = () => {};
 
   private readonly viewModel: StudentHomeViewModel =
@@ -29,6 +32,10 @@ export struct StudentHomePage {
   private nextAssignment(): Assignment | null {
     let currentRevision = this.touchRevision();
     return this.viewModel.nextAssignment();
+  }
+
+  private canUsePadComposition(): boolean {
+    return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.homeFocusSummaryRequirement());
   }
 
   private dueLabel(assignment: Assignment): string {
@@ -287,23 +294,81 @@ export struct StudentHomePage {
     }
   }
 
+  @Builder
+  private PadSummaryEmpty() {
+    if (this.viewModel.attentionCount() === 0 && this.viewModel.remainingAssignments().length === 0) {
+      Column({ space: 6 }) {
+        SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(24).fontColor([AppTheme.SUCCESS]);
+        Text('今天余下安排已清空')
+          .fontSize(15)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Text('核心任务完成后，可以休息一下。').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+      .padding(16)
+      .backgroundColor(AppTheme.SUCCESS_SOFT)
+      .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    }
+  }
+
+  @Builder
+  private PhoneHome() {
+    Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+      this.Header();
+      this.OfflineBanner();
+      this.TodayProgress();
+      this.AttentionBanner();
+      this.NextAssignmentHero();
+      this.RemainingAssignments();
+    }
+    .width('100%')
+    .constraintSize({ maxWidth: AppTheme.HOME_READABLE_MAX_WIDTH })
+    .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
+  }
+
+  @Builder
+  private PadHome() {
+    Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+      Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+        this.Header();
+        this.OfflineBanner();
+        this.TodayProgress();
+        this.NextAssignmentHero();
+      }
+      .layoutWeight(1)
+      .constraintSize({ minWidth: AppTheme.HOME_PRIMARY_MIN_WIDTH })
+      .alignItems(HorizontalAlign.Start);
+
+      Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+        this.AttentionBanner();
+        this.RemainingAssignments();
+        this.PadSummaryEmpty();
+      }
+      .width(AppTheme.HOME_SECONDARY_MIN_WIDTH)
+      .alignItems(HorizontalAlign.Start);
+    }
+    .width('100%')
+    .constraintSize({ maxWidth: AppTheme.HOME_PAD_CONTENT_MAX_WIDTH })
+    .alignItems(VerticalAlign.Top)
+    .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 24 });
+  }
+
   build() {
     Scroll() {
       Column() {
-        Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-          this.Header();
-          this.OfflineBanner();
-          this.TodayProgress();
-          this.AttentionBanner();
-          this.NextAssignmentHero();
-          this.RemainingAssignments();
+        if (this.canUsePadComposition()) {
+          this.PadHome();
+        } else {
+          this.PhoneHome();
         }
-        .width('100%')
-        .constraintSize({ maxWidth: AppTheme.HOME_READABLE_MAX_WIDTH })
-        .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
       }
       .width('100%')
-      .alignItems(HorizontalAlign.Center);
+      .alignItems(HorizontalAlign.Center)
+      .onAreaChange((_oldValue, newValue) => {
+        this.availableWidthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.availableWidthVp);
+      });
     }
     .width('100%')
     .height('100%')
