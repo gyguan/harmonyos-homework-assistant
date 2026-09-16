@@ -53,6 +53,9 @@ require("selectedAssignmentId" not in page and "DetailPane" not in page,
         "V2 assignment list must not retain embedded master-detail state")
 require("constraintSize({ maxWidth: 760 })" in page,
         "V2 list should control readable width without device-specific split logic")
+require("private AssignmentListPage()" in page and ".height('100%')" in page and
+        ".justifyContent(FlexAlign.Start)" in page and ".layoutWeight(1)" in page,
+        "assignment list must fill available height and explicitly anchor short content to the top")
 require("constraintSize({ maxWidth: 720 })" in detail and "align(Alignment.TopStart)" in detail,
         "V2 detail must keep a readable width and explicit top-anchored reading flow")
 
@@ -82,11 +85,16 @@ require("showFilterPage" not in page and "FilterPage()" not in page and "bindShe
 require("Button(label, { type: ButtonType.Normal })" in filter_dialog and "private TypeOption" in filter_dialog and
         "private DateOption" in filter_dialog and "private SubjectOption" in filter_dialog,
         "filter choices must be real button controls with direct state updates")
-require("Button('重置'" in filter_dialog and "Button('查询'" in filter_dialog and "onQuery" in filter_dialog,
-        "bottom filter dialog must provide reset and confirmed query actions")
-require("private async applyFilters(): Promise<void>" in page and "await this.viewModel.query" in page and
+require("Button('重置'" in filter_dialog and "Button('查询'" in filter_dialog and
+        "this.onQuery(this.typeFilter, this.dateFilter, this.subjectCode)" in filter_dialog,
+        "bottom filter dialog must pass the exact selected values when query is confirmed")
+require("private async applyFilters(typeFilter: AssignmentTypeFilter" in page and
+        "dateFilter: AssignmentDateFilter, subjectCode: string): Promise<void>" in page and
+        "await this.viewModel.query(typeFilter, subjectCode, dateFilter)" in page and
         "this.filterDialogController.close()" in page,
-        "query confirmation must close the dialog and execute an asynchronous repository query")
+        "query confirmation must use explicit dialog values and execute the repository query")
+require("onQuery: (typeFilter: AssignmentTypeFilter, dateFilter: AssignmentDateFilter, subjectCode: string)" in page,
+        "dialog query callback must transfer selected values explicitly to the page")
 require("FilterEntry('类型'" in page and "FilterEntry('截止'" in page and "FilterEntry('科目'" in page,
         "assignment page must expose compact result-page filter entry points")
 
