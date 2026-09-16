@@ -4,6 +4,7 @@ import { Assignment, StudentProfile, TodaySummary } from '../model/HomeworkModel
 export interface AssignmentRepository {
   getActiveStudent(): StudentProfile;
   listCached(filter?: AssignmentFilter): Assignment[];
+  query(filter: AssignmentFilter): Promise<Assignment[]>;
   getCached(assignmentId: string): Assignment | null;
   getCachedSummary(): TodaySummary;
   refresh(): Promise<boolean>;
