@@ -38,20 +38,20 @@ for file in feature_root.rglob("*.ets"):
         if token in text:
             fail(f"feature contains prohibited Preview/CI/device branch {token}: {relative}")
 
-# AppShell is still a migration object, but it must not accumulate new feature-specific
-# selected-id / return-route state while Navigation/NavDestination is being introduced.
+# V2 deep-page state belongs to NavPathStack/NavDestination, never AppShell @State.
 app_shell_path = ROOT / "entry/src/main/ets/pages/AppShell.ets"
 if app_shell_path.exists():
     app_shell = app_shell_path.read_text(encoding="utf-8")
     state_names = set(re.findall(r"@State\s+private\s+(\w+)\s*:", app_shell))
-    legacy_business_state = {"selectedAssignmentId", "studentStudyReturnRoute"}
     suspicious = {
         name for name in state_names
-        if ("selected" in name.lower() or "returnroute" in name.lower() or name.lower().endswith("assignmentid"))
-        and name not in legacy_business_state
+        if "selected" in name.lower() or "returnroute" in name.lower() or name.lower().endswith("assignmentid")
     }
     if suspicious:
-        fail(f"AppShell gained new feature-specific navigation state: {sorted(suspicious)}")
+        fail(f"AppShell contains feature-specific navigation state: {sorted(suspicious)}")
+    for legacy in ["selectedAssignmentId", "studentStudyReturnRoute"]:
+        if legacy in app_shell:
+            fail(f"AppShell legacy navigation state must be deleted: {legacy}")
 
 # V2 keeps one Assignment aggregate. A parallel ExtraHomework domain is explicitly forbidden.
 for root in [ROOT / "entry/src/main/ets", ROOT / "backend/src/main/java"]:

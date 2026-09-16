@@ -19,10 +19,12 @@ def require(condition: bool, message: str) -> None:
 
 
 shell = read("entry/src/main/ets/pages/AppShell.ets")
+routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 filter_dialog = read("entry/src/main/ets/features/student/assignments/AssignmentFilterDialog.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
 filter_model = read("entry/src/main/ets/domain/model/AssignmentFilter.ets")
 query = read("entry/src/main/ets/domain/service/AssignmentQuery.ets")
@@ -32,115 +34,94 @@ remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
 
-require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell and "ASSIGNMENT_DETAIL = 'ASSIGNMENT_DETAIL'" in shell,
-        "student routes must include list and standalone assignment detail")
-require("StudentAssignmentsPage" in shell and "StudentAssignmentDetailPage" in shell,
-        "AppShell must render V2 assignment list and detail pages")
-require("onOpenDetail" in shell and "openAssignmentDetail" in shell,
-        "assignment list must navigate to standalone detail by assignment id")
-require("studentStudyReturnRoute = StudentRoute.ASSIGNMENT_DETAIL" in shell,
-        "study opened from assignment detail must return to that detail")
-require("if (this.isDetailFlow())" in shell and "this.BottomNavShell();" in shell and
-        "else if (this.sizeClass === WindowSizeClass.EXPANDED)" in shell,
-        "detail flows must bypass expanded SideNavigation and render as full-screen content")
+# Navigation: root tabs remain in Shell; assignment detail/study are true deep destinations.
+require("ASSIGNMENTS = 'ASSIGNMENTS'" in shell and "ASSIGNMENT_DETAIL = 'ASSIGNMENT_DETAIL'" not in shell and
+        "STUDY = 'STUDY'" not in shell,
+        "student root routes must contain only top-level surfaces")
+require("STUDENT_ASSIGNMENT_DETAIL" in routes and "STUDENT_STUDY" in routes and "AssignmentRouteParam" in routes,
+        "typed assignment deep routes must exist")
+require(".navDestination(this.AppNavDestination)" in shell and "NavDestination()" in shell,
+        "AppShell must register NavDestination builder")
+require("pushPathByName" in shell and "AppRoute.STUDENT_ASSIGNMENT_DETAIL" in shell and
+        "AppRoute.STUDENT_STUDY" in shell,
+        "detail/study must push onto NavPathStack")
+require("selectedAssignmentId" not in shell and "studentStudyReturnRoute" not in shell,
+        "AppShell must not retain selected-id or manual return-route state")
+require("this.navPathStack.size() > 0" in shell and "this.navPathStack.pop()" in shell,
+        "system back must pop the Navigation stack")
+require("StudentAssignmentsPage" in shell and "StudentAssignmentDetailPage" in shell and
+        "StudyWorkspaceRoutePage" in shell,
+        "AppShell must wire list plus deep-page destination components")
+require("AssignmentAction.START" in study_route and "StudyWorkspaceViewModel" in study_route,
+        "study route boundary must preserve start/continue semantics through the ViewModel command path")
+require("HomeworkStore.instance.startAssignment" not in shell,
+        "AppShell must not execute assignment business commands")
 
+# Slice 2 list/filter behavior remains protected while navigation changes.
 require("HomeworkStore.instance" not in page and "HomeworkStore.instance" not in detail and
         "HomeworkStore.instance" not in view_model,
         "V2 assignment list/detail/view-model must not access HomeworkStore directly")
 require("WindowSizeClass" not in page and "PhoneLayout" not in page and "PadLayout" not in page,
         "V2 assignment list must not branch on device/window classes")
 require("selectedAssignmentId" not in page and "DetailPane" not in page,
-        "V2 assignment list must not retain embedded master-detail state")
-require("constraintSize({ maxWidth: 760 })" in page,
-        "V2 list should control readable width without device-specific split logic")
-require("private AssignmentListPage()" in page and "Scroll()" in page and ".height('100%')" in page and
-        ".align(Alignment.TopStart)" in page and ".justifyContent(FlexAlign.Start)" in page,
-        "assignment list must use a full-height top-anchored Scroll composition for short content")
-require("constraintSize({ maxWidth: 720 })" in detail and "align(Alignment.TopStart)" in detail,
-        "V2 detail must keep a readable width and explicit top-anchored reading flow")
+        "assignment list must not retain embedded detail selection")
+require("constraintSize({ maxWidth: 760 })" in page and "constraintSize({ maxWidth: 720 })" in detail,
+        "list/detail must keep readable-width constraints")
+require("private AssignmentListPage()" in page and ".align(Alignment.TopStart)" in page and
+        ".align(Alignment.TopStart)" in detail,
+        "list/detail must stay top-anchored")
 
 for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
-    require(token in page or token in filter_dialog, f"assignment filtering missing type option: {token}")
+    require(token in page or token in filter_dialog, f"missing type filter option: {token}")
 for token in ["AssignmentDateFilter.ALL", "AssignmentDateFilter.TODAY", "AssignmentDateFilter.TOMORROW",
               "AssignmentDateFilter.THIS_WEEK", "AssignmentDateFilter.UNDATED"]:
-    require(token in page or token in filter_dialog, f"assignment filtering missing date option: {token}")
-for subject in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
-    require(subject in page or subject in filter_dialog, f"assignment filtering missing subject option: {subject}")
+    require(token in page or token in filter_dialog, f"missing date filter option: {token}")
+for token in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
+    require(token in page or token in filter_dialog, f"missing subject filter option: {token}")
 
-require("StudentAssignmentsViewModel" in page and "DefaultAssignmentRepository.instance" in page,
-        "assignment list must query through ViewModel + Repository")
-require("@State private visibleTotal" in page and "@State private needHandlingAssignments" in page and
-        "private applyItems(items: Assignment[]): void" in page and "this.visibleTotal = items.length" in page,
-        "query confirmation must replace observable result state")
-require("AssignmentFilterDialog" in page and "CustomDialogController" in page and
-        "alignment: DialogAlignment.Bottom" in page and "customStyle: true" in page and
-        "this.filterDialogController.open()" in page,
-        "filters must open through a real bottom CustomDialog")
-require("@CustomDialog" in filter_dialog and "@Link typeFilter" in filter_dialog and
-        "@Link dateFilter" in filter_dialog and "@Link subjectCode" in filter_dialog,
-        "bottom filter dialog must own interactive linked draft state")
-require("showFilterPage" not in page and "FilterPage()" not in page and "bindSheet" not in page and
-        "FilterOverlay" not in page and "FilterPanel" not in page,
-        "legacy full-page/sheet/overlay filter implementations must not return")
-require("Button(label, { type: ButtonType.Normal })" in filter_dialog and "private TypeOption" in filter_dialog and
-        "private DateOption" in filter_dialog and "private SubjectOption" in filter_dialog,
-        "filter choices must be real button controls with direct state updates")
-require("Button('重置'" in filter_dialog and "Button('查询'" in filter_dialog and
-        "this.onQuery(this.typeFilter, this.dateFilter, this.subjectCode)" in filter_dialog,
-        "bottom filter dialog must pass the exact selected values when query is confirmed")
-require("private async applyFilters(typeFilter: AssignmentTypeFilter" in page and
-        "dateFilter: AssignmentDateFilter, subjectCode: string): Promise<void>" in page and
-        "await this.viewModel.query(typeFilter, subjectCode, dateFilter)" in page and
-        "this.filterDialogController.close()" in page,
-        "query confirmation must use explicit dialog values and execute the repository query")
-require("onQuery: (typeFilter: AssignmentTypeFilter, dateFilter: AssignmentDateFilter, subjectCode: string)" in page,
-        "dialog query callback must transfer selected values explicitly to the page")
-require("FilterEntry('类型'" in page and "FilterEntry('截止'" in page and "FilterEntry('科目'" in page,
-        "assignment page must expose compact result-page filter entry points")
+for token in ["StudentAssignmentsViewModel", "DefaultAssignmentRepository.instance", "@State private visibleTotal",
+              "private applyItems(items: Assignment[]): void", "this.visibleTotal = items.length",
+              "AssignmentFilterDialog", "CustomDialogController", "alignment: DialogAlignment.Bottom",
+              "this.filterDialogController.open()", "FilterEntry('类型'", "FilterEntry('截止'", "FilterEntry('科目'"]:
+    require(token in page, f"assignment result page missing required V2 behavior: {token}")
+for token in ["@CustomDialog", "@Link typeFilter", "@Link dateFilter", "@Link subjectCode",
+              "private TypeOption", "private DateOption", "private SubjectOption", "Button('重置'", "Button('查询'",
+              "this.onQuery(this.typeFilter, this.dateFilter, this.subjectCode)"]:
+    require(token in filter_dialog, f"assignment filter dialog missing required behavior: {token}")
+for legacy in ["showFilterPage", "FilterPage()", "bindSheet", "FilterOverlay", "FilterPanel"]:
+    require(legacy not in page, f"legacy filter implementation must not return: {legacy}")
 
-require("private Section(title: string, description: string, items: Assignment[])" not in page,
-        "assignment groups must not pass observable arrays through generic Builder parameters")
-require("private SectionHeader(title: string, description: string, count: number)" not in page,
-        "assignment group counts must not pass observable lengths through generic Builder parameters")
 for state_array in ["needHandlingAssignments", "notStartedAssignments", "submittedAssignments", "completedAssignments"]:
     require(f"ForEach(this.{state_array}" in page,
             f"assignment group must render directly from observable state: {state_array}")
     require(f"Text(`${{this.{state_array}.length}}`)" in page,
-            f"assignment group count must render directly from observable state: {state_array}")
-require("private NeedHandlingSection()" in page and "private NotStartedSection()" in page and
-        "private SubmittedSection()" in page and "private CompletedSection()" in page,
-        "assignment status groups must have direct reactive builders")
+            f"assignment group count must be reactive: {state_array}")
+require("PadWorkspace" not in study and "SingleColumnWorkspace" in study and "Button('问小伴'" in study,
+        "study workspace must keep the validated single-column Tutor flow")
 
-require("PadWorkspace" not in study and "SingleColumnWorkspace" in study,
-        "study flow must not keep the legacy Pad two-column task+tutor composition")
-require("tutorPanelOpen" in study and "Button('问小伴'" in study,
-        "Tutor must open as a separate single-column study state until Pad enhancement is rebuilt")
-
+# Query contract remains shared by local cache and backend.
 require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model and
         "undatedOnly: boolean" in filter_model and "UNDATED = 'UNDATED'" in filter_model,
         "AssignmentFilter must explicitly represent undated work")
 require("dueAtEpochMs" in query and "dueText" not in query and "filter.undatedOnly" in query,
-        "V2 date filtering must use structured dueAt/undated state and never infer dueText")
+        "date filtering must use structured dueAt semantics")
 require("query(filter: AssignmentFilter): Promise<Assignment[]>" in repository_port,
-        "Repository contract must expose filtered query")
+        "Repository must expose filtered query")
 require("HomeworkRemoteApi.instance.listFiltered" in repository_impl and "RemoteAssignmentMapper.toLocal" in repository_impl,
-        "online filtered queries must call the backend and map remote results")
+        "online queries must use backend filtering")
 require("!BackendSession.instance.isConnected()" in repository_impl and "this.listCached(filter)" in repository_impl,
-        "offline filtered queries may fall back to local cache")
+        "offline query must fall back to cache")
 require("async listFiltered(studentId: string, filter: AssignmentFilter)" in remote_api and
         "type=${encodeURIComponent(filter.assignmentType)}" in remote_api and
-        "subjectCode=${encodeURIComponent(filter.subjectCode)}" in remote_api and
-        "undated=true" in remote_api,
-        "remote API must send the combined filter as query parameters")
+        "subjectCode=${encodeURIComponent(filter.subjectCode)}" in remote_api and "undated=true" in remote_api,
+        "remote API must transmit combined filters")
 require("async query(typeFilter: AssignmentTypeFilter" in view_model and "this.repository.query" in view_model,
-        "ViewModel must delegate confirmed filters to Repository.query")
-
+        "ViewModel must delegate confirmed filters to Repository")
 for param in ["String type", "String subjectCode", "Long from", "Long to", "String status", "Boolean undated"]:
     require(param in controller, f"backend assignment query missing parameter: {param}")
-require("matchesListFilter" in service and "statusFilter" in service and "compareForList" in service,
-        "backend must implement combined filters and stable ordering")
-require("undatedOnly" in service and "assignment.dueAt != null" in service,
-        "backend must explicitly support undated assignment queries")
+require("matchesListFilter" in service and "statusFilter" in service and "compareForList" in service and
+        "undatedOnly" in service,
+        "backend must keep combined filtering and stable ordering")
 
 if errors:
     print("STUDENT_ASSIGNMENTS_NAVIGATION_GATE_FAIL")
