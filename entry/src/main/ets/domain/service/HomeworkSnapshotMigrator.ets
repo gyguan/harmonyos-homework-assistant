@@ -1,6 +1,7 @@
+import { Assignment, AssignmentType, Subject } from '../model/HomeworkModels';
 import { HomeworkSnapshot } from '../model/PersistenceModels';
 
-export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 5;
+export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 6;
 
 export class HomeworkSnapshotMigrator {
   static migrate(snapshot: HomeworkSnapshot): HomeworkSnapshot {
@@ -18,6 +19,10 @@ export class HomeworkSnapshotMigrator {
         current = HomeworkSnapshotMigrator.migrateV4ToV5(current);
         continue;
       }
+      if (current.schemaVersion === 5) {
+        current = HomeworkSnapshotMigrator.migrateV5ToV6(current);
+        continue;
+      }
       throw new Error(`缺少本地作业数据迁移步骤: ${current.schemaVersion}`);
     }
     HomeworkSnapshotMigrator.validateSnapshot(current);
@@ -25,8 +30,6 @@ export class HomeworkSnapshotMigrator {
   }
 
   private static migrateV4ToV5(snapshot: HomeworkSnapshot): HomeworkSnapshot {
-    // V5 introduces the explicit migration framework. The persisted business shape is unchanged;
-    // future schema changes must add one deterministic step here instead of resetting local data.
     return {
       schemaVersion: 5,
       settings: snapshot.settings,
@@ -37,6 +40,54 @@ export class HomeworkSnapshotMigrator {
       tutorSessions: snapshot.tutorSessions,
       submissionSequence: snapshot.submissionSequence
     };
+  }
+
+  private static migrateV5ToV6(snapshot: HomeworkSnapshot): HomeworkSnapshot {
+    let assignments: Assignment[] = [];
+    for (let source of snapshot.assignments) {
+      assignments.push({
+        id: source.id,
+        studentId: source.studentId,
+        candidateId: source.candidateId,
+        assignmentType: AssignmentType.SCHOOL,
+        subjectCode: HomeworkSnapshotMigrator.subjectCode(source.subject),
+        subject: source.subject,
+        title: source.title,
+        instruction: source.instruction,
+        textbookRef: source.textbookRef,
+        dueAtEpochMs: 0,
+        dueTimezone: 'Asia/Shanghai',
+        dueText: source.dueText,
+        dueDateKey: source.dueDateKey,
+        status: source.status,
+        expectedMinutes: source.expectedMinutes,
+        startedAtEpochMs: source.startedAtEpochMs,
+        finishedAtEpochMs: source.finishedAtEpochMs,
+        elapsedSeconds: source.elapsedSeconds,
+        reviewNote: source.reviewNote,
+        remoteVersion: source.remoteVersion,
+        syncDirty: source.syncDirty,
+        lastSyncedAtEpochMs: source.lastSyncedAtEpochMs,
+        resourceLabels: source.resourceLabels.slice()
+      });
+    }
+    return {
+      schemaVersion: 6,
+      settings: snapshot.settings,
+      rawImports: snapshot.rawImports,
+      assignments: assignments,
+      candidates: snapshot.candidates,
+      submissions: snapshot.submissions,
+      tutorSessions: snapshot.tutorSessions,
+      submissionSequence: snapshot.submissionSequence
+    };
+  }
+
+  private static subjectCode(subject: Subject): string {
+    if (subject === Subject.CHINESE) return 'CHINESE';
+    if (subject === Subject.MATH) return 'MATH';
+    if (subject === Subject.ENGLISH) return 'ENGLISH';
+    return 'OTHER';
   }
 
   private static validateSnapshot(snapshot: HomeworkSnapshot): void {
