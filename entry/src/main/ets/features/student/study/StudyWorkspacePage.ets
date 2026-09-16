@@ -3,6 +3,7 @@ import { HomeworkSubmissionService } from '../../../application/submission/Homew
 import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
+import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
@@ -389,7 +390,7 @@ export struct StudyWorkspacePage {
           }
         }
         .width('100%')
-        .padding({ top: 6, bottom: 16 });
+        .padding({ top: 0, bottom: 16 });
       }
       .width('100%')
       .height('100%')
@@ -500,31 +501,17 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
-  private WorkspaceHeader() {
-    Row({ space: 12 }) {
-      Text('‹')
-        .width(AppTheme.MIN_TOUCH_TARGET)
-        .height(AppTheme.MIN_TOUCH_TARGET)
-        .fontSize(30)
-        .fontColor(AppTheme.TEXT)
-        .textAlign(TextAlign.Center)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(this.tutorPanelOpen ? '返回学习任务' : '返回作业详情')
-        .onClick(() => {
-          if (this.tutorPanelOpen) this.tutorPanelOpen = false;
-          else this.onBack();
-        });
-      Text(this.tutorPanelOpen ? '问小伴' : '学习空间')
-        .fontSize(17)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.TEXT);
-      Blank();
-      if (!this.tutorPanelOpen && this.assignment() !== null) {
-        Text(this.assignment()!.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
+  private PageHeader() {
+    DeepPageHeader({
+      title: this.tutorPanelOpen ? '问小伴' : '学习空间',
+      subtitle: this.assignment() === null ? '' : this.assignment()!.subject,
+      trailingText: this.tutorPanelOpen || this.assignment() === null ? '' : this.assignment()!.dueText,
+      backAccessibilityText: this.tutorPanelOpen ? '返回学习任务' : '返回上一页',
+      onBack: () => {
+        if (this.tutorPanelOpen) this.tutorPanelOpen = false;
+        else this.onBack();
       }
-    }
-    .width('100%')
-    .height(48);
+    });
   }
 
   @Builder
@@ -576,14 +563,19 @@ export struct StudyWorkspacePage {
 
   build() {
     Row() {
-      Column() {
-        this.WorkspaceHeader();
+      Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+        this.PageHeader();
         this.SingleColumnWorkspace();
       }
       .width('100%')
       .height('100%')
       .constraintSize({ maxWidth: 820 })
-      .padding(this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PAGE_PADDING : AppTheme.PAGE_PADDING_WIDE);
+      .padding({
+        left: this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PAGE_PADDING : AppTheme.PAGE_PADDING_WIDE,
+        right: this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PAGE_PADDING : AppTheme.PAGE_PADDING_WIDE,
+        top: AppTheme.DEEP_PAGE_TOP_PADDING,
+        bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
+      });
     }
     .width('100%')
     .height('100%')
