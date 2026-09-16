@@ -38,12 +38,15 @@ export class AppTheme {
   static readonly CONTROL_RADIUS: number = 14;
   static readonly CHIP_RADIUS: number = 12;
 
-  // V2 readable-width baseline. Phone remains fluid; Pad keeps a readable single-column
-  // surface until a feature explicitly opts into a LayoutPolicy multi-pane capability.
+  // V2 readable-width baseline. Phone remains fluid; Pad uses richer compositions only when
+  // all panes satisfy their minimum readable widths.
   static readonly HOME_READABLE_MAX_WIDTH: number = 760;
+  static readonly HOME_PAD_CONTENT_MAX_WIDTH: number = 1180;
   static readonly ASSIGNMENT_LIST_READABLE_MAX_WIDTH: number = 760;
   static readonly ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH: number = 720;
+  static readonly ASSIGNMENT_MASTER_DETAIL_MAX_WIDTH: number = 1180;
   static readonly STUDY_READABLE_MAX_WIDTH: number = 820;
+  static readonly STUDY_SPLIT_MAX_WIDTH: number = 1220;
   static readonly FILTER_DIALOG_MAX_WIDTH: number = 640;
   static readonly STUDY_TITLE_SIZE: number = 26;
 
@@ -59,15 +62,17 @@ export class AppTheme {
   static readonly DEEP_PAGE_CONTENT_GAP: number = 12;
 
   // Multi-pane capability is based on minimum readable content widths, not device identity.
-  static readonly SPLIT_PRIMARY_MIN_WIDTH: number = 320;
-  static readonly SPLIT_SECONDARY_MIN_WIDTH: number = 380;
+  // The sums intentionally stay above common Phone-landscape widths so a wide Phone does not
+  // become a compressed Pad workspace.
+  static readonly HOME_PRIMARY_MIN_WIDTH: number = 520;
+  static readonly HOME_SECONDARY_MIN_WIDTH: number = 300;
+  static readonly SPLIT_PRIMARY_MIN_WIDTH: number = 360;
+  static readonly SPLIT_SECONDARY_MIN_WIDTH: number = 420;
   static readonly STUDY_PRIMARY_MIN_WIDTH: number = 480;
-  static readonly STUDY_TUTOR_MIN_WIDTH: number = 320;
+  static readonly STUDY_TUTOR_MIN_WIDTH: number = 340;
   static readonly SPLIT_PANE_GAP: number = 18;
 
   // Compact Phone follows the Focus Journey composition instead of shrinking the Pad workspace.
-  // These tokens remain the compact composition density; Pad baseline centers that composition
-  // inside a readable max width until a dedicated LayoutPolicy enhancement is enabled.
   static readonly PHONE_PAGE_PADDING: number = 16;
   static readonly PHONE_SECTION_GAP: number = 14;
   static readonly PHONE_CARD_PADDING: number = 14;
