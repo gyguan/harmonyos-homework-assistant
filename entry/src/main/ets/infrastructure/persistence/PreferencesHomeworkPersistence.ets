@@ -95,14 +95,17 @@ export class PreferencesHomeworkPersistence implements HomeworkPersistence {
   }
 
   async save(snapshot: HomeworkSnapshot): Promise<void> {
+    let store = await this.getStore();
+    // Migration protection is strict: if the existing snapshot cannot be validated or backed up,
+    // do not write the new schema over it.
+    await this.preservePreMigrationSnapshot(store, snapshot);
+
     try {
-      let store = await this.getStore();
-      await this.preservePreMigrationSnapshot(store, snapshot);
       await store.put(SNAPSHOT_KEY, JSON.stringify(snapshot));
       await store.flush();
-    } catch (error) {
-      console.error(`Homework snapshot save failed; stored data was not intentionally replaced: ${error}`);
-      throw error;
+    } catch {
+      // Normal persistence remains best-effort so transient disk errors do not break in-memory use.
+      console.error('Homework snapshot save failed; in-memory state remains available');
     }
   }
 }
