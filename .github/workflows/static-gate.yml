@@ -42,6 +42,9 @@ jobs:
       - name: Validate responsive navigation
         run: python scripts/validate_responsive_navigation.py
 
+      - name: Validate V2 Phone/Pad baseline
+        run: python scripts/validate_v2_phone_pad_baseline.py
+
       - name: Validate person entry and locked roles
         run: python scripts/validate_person_entry_role_lock.py
 

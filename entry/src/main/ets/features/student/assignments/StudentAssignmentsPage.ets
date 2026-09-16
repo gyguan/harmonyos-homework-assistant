@@ -359,7 +359,7 @@ export struct StudentAssignmentsPage {
           this.AssignmentSections();
         }
         .width('100%')
-        .constraintSize({ maxWidth: 760 })
+        .constraintSize({ maxWidth: AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH })
         .padding(AppTheme.PAGE_PADDING);
       }
       .width('100%')

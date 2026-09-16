@@ -1,4 +1,3 @@
-import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
@@ -8,7 +7,6 @@ import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
 @Component
 export struct StudyWorkspaceRoutePage {
-  @Prop sizeClass: WindowSizeClass;
   @Prop tutorUnavailable: boolean = false;
   @Prop assignmentId: string = '';
   @Prop revision: number = 0;
@@ -55,7 +53,6 @@ export struct StudyWorkspaceRoutePage {
       }
       Column() {
         StudyWorkspacePage({
-          sizeClass: this.sizeClass,
           tutorUnavailable: this.tutorUnavailable,
           assignmentId: this.assignmentId,
           revision: this.revision + this.activationRevision,

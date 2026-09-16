@@ -41,6 +41,7 @@ V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发�
 - `CONTEXT.md`
 - `docs/product/product-feature-list-v2.md`
 - `docs/product/v2-deep-page-chrome-standard.md`
+- `docs/product/v2-phone-pad-baseline-standard.md`
 - `docs/architecture/frontend-technical-design-v2.md`
 - `docs/architecture/backend-technical-design-v2.md`
 - `docs/architecture/system-technical-design-v2.md`
@@ -61,6 +62,7 @@ V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发�
 11. **优先解决根因而非症状。** 遇到 UI / 同步 / 状态问题，先验证真实数据和调用链，再修改公共抽象；禁止连续增加 fallback、magic number、silent catch 来掩盖问题。
 12. **新增抽象必须有直接用途。** 不为了“未来可能需要”建设重型框架；保持家庭级产品需要的最小复杂度。
 13. **深层页面统一 page chrome。** Assignment Detail、Study Workspace、Tutor、Submission、Resource Detail、Parent Review 等二级/深层页面必须复用 `DeepPageHeader` 与 `AppTheme.DEEP_PAGE_*` token；不得在 Feature 内私有实现另一套返回 glyph、标题栏或大块顶部留白。一级 Tab / SideNav 页面不强制显示返回 Header。
+14. **Phone / Pad 基础适配必须随 V2 页面一起完成。** Phone 保持紧凑可用，宽容器必须限制内容可读宽度，弹层不得无意义铺满 Pad；已迁移 Feature 不得直接消费 `WindowSizeClass` 来决定业务组合、字号或密度。需要多栏时统一使用 `LayoutPolicy` + 实际容器可用宽度。完整 Pad master-detail / split-pane 可以后续增强，但基础可读性不得延期。
 
 ## Required cleanup check before merge
 
@@ -73,3 +75,4 @@ V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发�
 - 已被 V2 替换的旧代码是否可以在当前 PR 一并删除？优先删除，不留“以后再清”。
 - 是否存在无说明的空 `catch`、fallback 或默认值掩盖真实错误？必须消除或明确限定为 best-effort 场景。
 - 如果新增或重构二级/深层页面，是否复用了 `DeepPageHeader` 和统一顶部 spacing token？如果没有，不得合并。
+- 如果新增或重构 V2 页面，Phone 是否保持紧凑可用、Pad 是否限制可读宽度、弹层是否限制宽度？如果需要多栏，是否只通过 `LayoutPolicy` + 实际容器宽度判断？
