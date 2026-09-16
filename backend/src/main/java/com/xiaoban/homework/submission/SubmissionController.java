@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,9 +27,10 @@ public class SubmissionController {
   public SubmissionController(SubmissionService service) { this.service = service; }
 
   @PostMapping(value = "/assignments/{assignmentId}/submissions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public SubmissionDtos.Response create(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String assignmentId, @RequestPart("photos") List<MultipartFile> photos) {
-    return service.create(familyId, assignmentId, photos);
+  public SubmissionDtos.CreateResponse create(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String assignmentId, @RequestParam long version,
+      @RequestPart("photos") List<MultipartFile> photos) {
+    return service.create(familyId, assignmentId, version, photos);
   }
 
   @GetMapping("/assignments/{assignmentId}/submissions")
