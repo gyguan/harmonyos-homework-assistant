@@ -24,9 +24,15 @@ persistence_models = read("entry/src/main/ets/domain/model/PersistenceModels.ets
 migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 service = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
+remote_api = read("entry/src/main/ets/application/remote/RemoteSubmissionApi.ets")
+repository = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 entry_ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
+controller = read("backend/src/main/java/com/xiaoban/homework/submission/SubmissionController.java")
+backend_service = read("backend/src/main/java/com/xiaoban/homework/submission/SubmissionService.java")
+dtos = read("backend/src/main/java/com/xiaoban/homework/submission/SubmissionDtos.java")
+e2e = read("backend/scripts/e2e_smoke.py")
 
 require("photoUris: string[]" in models, "Submission must persist photoUris")
 require("IMAGE = 'IMAGE'" in models and "MOCK_IMAGE" not in models, "Submission type must be real IMAGE only")
@@ -51,6 +57,36 @@ require("Image(uri)" in study and "submission.photoUris" in progress,
         "Student and parent surfaces must render submitted images")
 require("MOCK_IMAGE" not in service + study + progress + store + models,
         "Mock submission path must not remain in the real submission flow")
+
+# V2 real assignments are server-authoritative: upload first, then update local cache from
+# the returned Assignment snapshot. Seed/demo compatibility may still use local submitImages.
+upload_pos = service.find("await RemoteSubmissionApi.instance.upload")
+local_submit_pos = service.find("HomeworkStore.instance.submitImages(\n        assignmentId", upload_pos)
+require(upload_pos >= 0, "real submissions must await the backend upload")
+require(local_submit_pos > upload_pos,
+        "real submissions must not mark local state SUBMITTED before backend success")
+require("assignment.remoteVersion" in service and "RemoteAssignmentMapper.toLocal(result.assignment" in service,
+        "submission service must send expected version and apply returned authoritative Assignment")
+require("applyAuthoritative(authoritative)" in service and "applyAuthoritative(updated: Assignment)" in repository,
+        "authoritative submission state must update the shared assignment repository cache")
+require("this.queryCache = []" in repository,
+        "repository refresh must invalidate stale query cache after conflict reconciliation")
+require("version: number" in remote_api and "/submissions?version=${version}" in remote_api,
+        "remote submission upload must carry the expected assignment version")
+require("RemoteSubmissionCreateResponse" in remote_api and "assignment: RemoteAssignment" in remote_api,
+        "remote submission upload must return the authoritative Assignment snapshot")
+require("@RequestParam long version" in controller,
+        "backend submission endpoint must require expected assignment version")
+require("assignment.version != expectedVersion" in backend_service and "ApiExceptions.Conflict" in backend_service,
+        "backend submission must reject stale assignment versions")
+require('!"READY_TO_SUBMIT".equals(assignment.status)' in backend_service,
+        "backend submission must only accept READY_TO_SUBMIT assignments")
+require("assignmentRepository.saveAndFlush(assignment)" in backend_service,
+        "backend must flush the Assignment version before returning submission success")
+require("CreateResponse(Response submission, AssignmentDtos.Response assignment)" in dtos,
+        "submission create response must include both submission and authoritative assignment")
+require("stale submission version conflict" in e2e and "authoritative SUBMITTED assignment" in e2e,
+        "real backend E2E must cover stale submission conflict and authoritative response")
 
 if errors:
     print("REAL_SUBMISSION_GATE_FAIL")
