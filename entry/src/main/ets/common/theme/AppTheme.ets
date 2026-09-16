@@ -56,9 +56,9 @@ export class AppTheme {
   static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
   static readonly DEEP_PAGE_HEADER_HEIGHT: number = 44;
   static readonly DEEP_PAGE_HEADER_GAP: number = 10;
-  static readonly DEEP_PAGE_HEADER_TITLE_SIZE: number = 17;
+  static readonly DEEP_PAGE_HEADER_TITLE_SIZE: number = 18;
   static readonly DEEP_PAGE_HEADER_META_SIZE: number = 12;
-  static readonly DEEP_PAGE_BACK_GLYPH_SIZE: number = 27;
+  static readonly DEEP_PAGE_BACK_GLYPH_SIZE: number = 20;
   static readonly DEEP_PAGE_CONTENT_GAP: number = 12;
 
   // Multi-pane capability is based on minimum readable content widths, not device identity.
