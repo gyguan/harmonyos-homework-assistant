@@ -49,7 +49,21 @@
   - Progress Query；
   - Flyway V7+。
 
-### 6. Accepted ADR
+### 6. 重构开工门禁
+
+- `development/v2-refactor-readiness.md`
+  - 正式进入 V2 业务编码前必须满足的 Go / No-Go 条件；
+  - CI Gate V2 化；
+  - HarmonyOS Snapshot migration；
+  - PostgreSQL V7 migration；
+  - 回归行为矩阵；
+  - API compatibility window；
+  - DevEco Phone / Pad / 分屏人工验收矩阵；
+  - 每个 Slice 的 Definition of Ready / Definition of Done。
+
+当前总跟踪 Issue：`#103`。Readiness Gate 未完成前，不进入 Slice 1 产品编码。
+
+### 7. Accepted ADR
 
 - `adr/0001-phone-pad-ui-composition.md`
   - 导航 size class 与业务内容布局解耦；
@@ -98,7 +112,7 @@
 
 ## 五、开发记录 / 历史验收
 
-`development/` 下的大部分文件属于具体 Issue、V0.x 阶段实现或验收记录。
+`development/` 下除 `v2-refactor-readiness.md` 外的大部分文件属于具体 Issue、V0.x 阶段实现或验收记录。
 
 它们可以帮助理解某项能力为什么存在，但不是总体设计 Source of Truth。若开发记录与 V2 技术设计或 Accepted ADR 冲突，以 V2 文档和 ADR 为准。
 
@@ -108,11 +122,12 @@
 
 1. 最新 Accepted ADR；
 2. `CONTEXT.md`；
-3. V2 system technical design；
-4. V2 frontend / backend technical design；
-5. V2 product feature baseline；
-6. 当前专项架构文档；
-7. development 历史记录；
-8. V0.x / V1 历史设计。
+3. `development/v2-refactor-readiness.md`（决定是否允许开工与迁移安全条件）；
+4. V2 system technical design；
+5. V2 frontend / backend technical design；
+6. V2 product feature baseline；
+7. 当前专项架构文档；
+8. development 历史记录；
+9. V0.x / V1 历史设计。
 
-如果当前实现确实需要改变 1～5 中的原则，应先更新设计 / ADR，再修改代码，不通过代码补丁绕过现行设计。
+如果当前实现确实需要改变 1～6 中的原则，应先更新设计 / ADR，再修改代码，不通过代码补丁绕过现行设计。
