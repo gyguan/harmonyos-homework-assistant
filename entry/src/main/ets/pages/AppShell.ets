@@ -63,6 +63,15 @@ export struct AppShell {
     return ResponsiveContext.resolve(this.widthVp);
   }
 
+  private get contentWidthVp(): number {
+    return this.sizeClass === WindowSizeClass.EXPANDED ?
+      Math.max(0, this.widthVp - AppTheme.SIDE_NAV_WIDTH) : this.widthVp;
+  }
+
+  private get contentSizeClass(): WindowSizeClass {
+    return ResponsiveContext.resolveContent(this.contentWidthVp);
+  }
+
   private isDetailFlow(): boolean {
     if (this.role === AppRole.STUDENT) return this.studentRoute === StudentRoute.STUDY;
     return this.parentRoute === ParentRoute.CONFIRMATION;
@@ -128,7 +137,7 @@ export struct AppShell {
   private StudentContent() {
     if (this.studentRoute === StudentRoute.STUDY) {
       StudyWorkspacePage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
         assignmentId: this.selectedAssignmentId,
         revision: this.storeRevision,
@@ -137,18 +146,18 @@ export struct AppShell {
       });
     } else if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
       StudentAssignmentsPage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
       });
     } else if (this.studentRoute === StudentRoute.PROFILE) {
       StudentProfilePage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         revision: this.storeRevision
       });
     } else {
       StudentTodayPage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
@@ -160,14 +169,14 @@ export struct AppShell {
   private ParentContent() {
     if (this.parentRoute === ParentRoute.IMPORT) {
       HomeworkImportPage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
         onOpenConfirmation: () => this.parentRoute = ParentRoute.CONFIRMATION,
         onStoreChanged: () => this.touchStore()
       });
     } else if (this.parentRoute === ParentRoute.CONFIRMATION) {
       HomeworkConfirmationPage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
         onBack: () => this.parentRoute = ParentRoute.IMPORT,
         onPublished: () => this.parentRoute = ParentRoute.DASHBOARD,
@@ -175,18 +184,18 @@ export struct AppShell {
       });
     } else if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
         onStoreChanged: () => this.touchStore()
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
       BackendConnectionPage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         onStoreChanged: () => this.touchStore()
       });
     } else {
       ParentDashboardPage({
-        sizeClass: this.sizeClass,
+        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
         onOpenImport: () => this.parentRoute = ParentRoute.IMPORT
       });
@@ -428,8 +437,8 @@ export struct AppShell {
     .height('100%')
     .backgroundColor(AppTheme.BACKGROUND)
     .onAreaChange((_oldValue, newValue) => {
-      this.widthVp = Number(newValue.width);
-      this.heightVp = Number(newValue.height);
+      this.widthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.widthVp);
+      this.heightVp = ResponsiveContext.areaLengthToVp(newValue.height, this.heightVp);
     });
   }
 
