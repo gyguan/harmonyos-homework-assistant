@@ -2,7 +2,9 @@ import { common } from '@kit.AbilityKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { HomeworkStore } from '../../data/HomeworkStore';
-import { Submission } from '../../domain/model/HomeworkModels';
+import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssignmentRepository';
+import { Assignment, Submission } from '../../domain/model/HomeworkModels';
+import { RemoteAssignmentMapper } from '../remote/RemoteModels';
 import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
 
 const MAX_SUBMISSION_PHOTOS: number = 6;
@@ -39,17 +41,44 @@ export class HomeworkSubmissionService {
     if (this.context === null || photoUris.length === 0 || photoUris.length > MAX_SUBMISSION_PHOTOS) {
       return false;
     }
+
+    let assignment = DefaultAssignmentRepository.instance.getCached(assignmentId);
+    if (assignment === null) return false;
+
     let durableUris: string[] = [];
     let groupId = Date.now();
     for (let i = 0; i < photoUris.length; i++) {
       let durableUri = await this.copyIntoSandbox(photoUris[i], groupId, i + 1);
       durableUris.push(durableUri);
     }
-    let submitted = HomeworkStore.instance.submitImages(assignmentId, durableUris, this.nowText());
-    if (submitted) {
-      void RemoteSubmissionApi.instance.upload(assignmentId, durableUris);
+
+    // Seed/demo assignments deliberately remain local. Any published/synced assignment must
+    // wait for the backend transaction before local state is allowed to become SUBMITTED.
+    if (assignment.remoteVersion <= 0 && assignment.candidateId.length === 0) {
+      return HomeworkStore.instance.submitImages(assignmentId, durableUris, this.nowText());
     }
-    return submitted;
+    if (assignment.remoteVersion <= 0) {
+      throw new Error('SUBMISSION_NOT_SYNCED');
+    }
+
+    try {
+      let result = await RemoteSubmissionApi.instance.upload(
+        assignmentId, assignment.remoteVersion, durableUris);
+
+      // Record the durable local photo copies only after the server accepted the submission.
+      // This local transition is immediately replaced by the authoritative server snapshot.
+      HomeworkStore.instance.submitImages(
+        assignmentId, durableUris, this.submittedAtText(result.submission.submittedAt));
+      let current: Assignment | null = HomeworkStore.instance.getAssignment(assignmentId);
+      let authoritative = RemoteAssignmentMapper.toLocal(result.assignment, current);
+      DefaultAssignmentRepository.instance.applyAuthoritative(authoritative);
+      return true;
+    } catch (error) {
+      if (error instanceof Error && error.message === 'REMOTE_CONFLICT') {
+        await DefaultAssignmentRepository.instance.refresh();
+      }
+      throw error;
+    }
   }
 
   private async copyIntoSandbox(sourceUri: string, groupId: number, index: number): Promise<string> {
@@ -73,6 +102,16 @@ export class HomeworkSubmissionService {
     } catch {
       throw new Error('读取或保存作业照片失败');
     }
+  }
+
+  private submittedAtText(value: string): string {
+    let parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return this.nowText();
+    let month = this.pad(parsed.getMonth() + 1);
+    let day = this.pad(parsed.getDate());
+    let hour = this.pad(parsed.getHours());
+    let minute = this.pad(parsed.getMinutes());
+    return `${parsed.getFullYear()}-${month}-${day} ${hour}:${minute}`;
   }
 
   private extension(uri: string): string {
