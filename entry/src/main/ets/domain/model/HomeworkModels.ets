@@ -9,6 +9,11 @@ export enum AssignmentStatus {
   OVERDUE = 'OVERDUE'
 }
 
+export enum AssignmentType {
+  SCHOOL = 'SCHOOL',
+  EXTRA = 'EXTRA'
+}
+
 export enum Subject {
   CHINESE = '语文',
   MATH = '数学',
@@ -73,10 +78,14 @@ export interface Assignment {
   id: string;
   studentId: string;
   candidateId: string;
+  assignmentType: AssignmentType;
+  subjectCode: string;
   subject: Subject;
   title: string;
   instruction: string;
   textbookRef: string;
+  dueAtEpochMs: number;
+  dueTimezone: string;
   dueText: string;
   dueDateKey?: string;
   status: AssignmentStatus;
@@ -118,6 +127,8 @@ export interface AssignmentProgress {
 export interface TodaySummary {
   completed: number;
   total: number;
+  attention: number;
+  undated: number;
   nextAssignmentId: string;
 }
 
