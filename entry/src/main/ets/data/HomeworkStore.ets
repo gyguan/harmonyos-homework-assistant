@@ -9,6 +9,7 @@ import {
   DashboardSummary,
   HomeworkImportSourceKind,
   RawHomeworkImport,
+  Subject,
   StudentProfile,
   Submission,
   SubmissionType,
