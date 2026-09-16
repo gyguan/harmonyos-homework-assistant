@@ -1,4 +1,5 @@
 import { http } from '@kit.NetworkKit';
+import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter, AssignmentTypeFilter } from '../../domain/model/AssignmentFilter';
 import { Assignment, TodaySummary } from '../../domain/model/HomeworkModels';
 import { BackendHttpClient } from './BackendHttpClient';
@@ -15,6 +16,10 @@ interface UpdateAssignmentBody {
   assignmentType: string; subjectCode: string; dueAtEpochMs: number; dueTimezone: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
+}
+interface AssignmentActionBody {
+  action: string;
+  version: number;
 }
 
 export class HomeworkRemoteApi {
@@ -58,6 +63,17 @@ export class HomeworkRemoteApi {
     let body: CreateAssignmentBody = this.createBody(assignment);
     let response = await BackendHttpClient.instance.request(`/api/v1/students/${encodeURIComponent(assignment.studentId)}/assignments`, http.RequestMethod.POST, body);
     if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`上传作业失败: ${response.statusCode}`);
+    return JSON.parse(response.body) as RemoteAssignment;
+  }
+
+  async performAction(assignmentId: string, version: number, action: AssignmentAction): Promise<RemoteAssignment> {
+    let body: AssignmentActionBody = { action: action, version: version };
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/assignments/${encodeURIComponent(assignmentId)}/actions`, http.RequestMethod.POST, body);
+    if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`执行作业动作失败: ${response.statusCode}`);
+    }
     return JSON.parse(response.body) as RemoteAssignment;
   }
 
