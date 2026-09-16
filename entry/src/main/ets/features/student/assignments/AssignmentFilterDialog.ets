@@ -10,7 +10,8 @@ export struct AssignmentFilterDialog {
   @Link typeFilter: AssignmentTypeFilter;
   @Link dateFilter: AssignmentDateFilter;
   @Link subjectCode: string;
-  onQuery: () => void = () => {};
+  onQuery: (typeFilter: AssignmentTypeFilter, dateFilter: AssignmentDateFilter, subjectCode: string) => void =
+    (_typeFilter: AssignmentTypeFilter, _dateFilter: AssignmentDateFilter, _subjectCode: string) => {};
 
   @Builder
   private TypeOption(label: string, value: AssignmentTypeFilter) {
@@ -55,6 +56,10 @@ export struct AssignmentFilterDialog {
     this.typeFilter = AssignmentTypeFilter.ALL;
     this.dateFilter = AssignmentDateFilter.ALL;
     this.subjectCode = 'ALL';
+  }
+
+  private confirmQuery(): void {
+    this.onQuery(this.typeFilter, this.dateFilter, this.subjectCode);
   }
 
   build() {
@@ -152,7 +157,7 @@ export struct AssignmentFilterDialog {
           .backgroundColor(AppTheme.PRIMARY)
           .fontColor(AppTheme.TEXT_ON_PRIMARY)
           .fontWeight(FontWeight.Medium)
-          .onClick(() => this.onQuery());
+          .onClick(() => this.confirmQuery());
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 12, bottom: 18 })
