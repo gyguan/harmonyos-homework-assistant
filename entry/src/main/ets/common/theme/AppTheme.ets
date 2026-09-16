@@ -38,6 +38,12 @@ export class AppTheme {
   static readonly CONTROL_RADIUS: number = 14;
   static readonly CHIP_RADIUS: number = 12;
 
+  // Two-pane is a content capability, not a device breakpoint. These are minimum
+  // readable pane constraints; the actual switch width is calculated from them.
+  static readonly SPLIT_PRIMARY_MIN_WIDTH: number = 320;
+  static readonly SPLIT_SECONDARY_MIN_WIDTH: number = 380;
+  static readonly SPLIT_PANE_GAP: number = 18;
+
   // Compact Phone follows the Focus Journey composition instead of shrinking the Pad workspace.
   static readonly PHONE_PAGE_PADDING: number = 16;
   static readonly PHONE_SECTION_GAP: number = 14;
