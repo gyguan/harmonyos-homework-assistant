@@ -1,3 +1,5 @@
+import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
+import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -6,6 +8,7 @@ import {
   AssignmentTypeFilter
 } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
+import { AssignmentDetailPane } from './AssignmentDetailPane';
 import { AssignmentFilterDialog } from './AssignmentFilterDialog';
 import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 
@@ -13,6 +16,8 @@ import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 export struct StudentAssignmentsPage {
   @Prop revision: number = 0;
   @State private refreshRevision: number = 0;
+  @State private availableWidthVp: number = 390;
+  @State private selectedAssignmentId: string = '';
 
   @State private typeFilter: AssignmentTypeFilter = AssignmentTypeFilter.ALL;
   @State private subjectCode: string = 'ALL';
@@ -30,6 +35,7 @@ export struct StudentAssignmentsPage {
   @State private totalCount: number = 0;
 
   onOpenDetail: (assignmentId: string) => void = (_assignmentId: string) => {};
+  onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
 
   private readonly viewModel: StudentAssignmentsViewModel =
     new StudentAssignmentsViewModel(DefaultAssignmentRepository.instance);
@@ -57,6 +63,10 @@ export struct StudentAssignmentsPage {
     await this.viewModel.refresh();
     this.refreshRevision++;
     this.rebuildView();
+  }
+
+  private canUseMasterDetail(): boolean {
+    return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.assignmentMasterDetailRequirement());
   }
 
   private rebuildView(): void {
@@ -95,6 +105,26 @@ export struct StudentAssignmentsPage {
     this.notStartedAssignments = notStarted;
     this.submittedAssignments = submitted;
     this.completedAssignments = completed;
+    this.syncSelectedAssignment(items);
+  }
+
+  private syncSelectedAssignment(items: Assignment[]): void {
+    for (let item of items) {
+      if (item.id === this.selectedAssignmentId) return;
+    }
+    this.selectedAssignmentId = items.length > 0 ? items[0].id : '';
+  }
+
+  private openAssignment(assignmentId: string): void {
+    if (this.canUseMasterDetail()) {
+      this.selectedAssignmentId = assignmentId;
+    } else {
+      this.onOpenDetail(assignmentId);
+    }
+  }
+
+  private isSelected(assignmentId: string): boolean {
+    return this.canUseMasterDetail() && this.selectedAssignmentId === assignmentId;
   }
 
   private openFilterDialog(): void {
@@ -219,7 +249,12 @@ export struct StudentAssignmentsPage {
         .width('100%');
         Column({ space: 6 }) {
           ForEach(this.needHandlingAssignments, (item: Assignment) => {
-            AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
+            AssignmentListItem({
+              assignment: item,
+              selected: this.isSelected(item.id),
+              showChevron: !this.canUseMasterDetail(),
+              onOpen: () => this.openAssignment(item.id)
+            });
           }, (item: Assignment) => item.id);
         }
         .width('100%');
@@ -246,7 +281,12 @@ export struct StudentAssignmentsPage {
         .width('100%');
         Column({ space: 6 }) {
           ForEach(this.notStartedAssignments, (item: Assignment) => {
-            AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
+            AssignmentListItem({
+              assignment: item,
+              selected: this.isSelected(item.id),
+              showChevron: !this.canUseMasterDetail(),
+              onOpen: () => this.openAssignment(item.id)
+            });
           }, (item: Assignment) => item.id);
         }
         .width('100%');
@@ -273,7 +313,12 @@ export struct StudentAssignmentsPage {
         .width('100%');
         Column({ space: 6 }) {
           ForEach(this.submittedAssignments, (item: Assignment) => {
-            AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
+            AssignmentListItem({
+              assignment: item,
+              selected: this.isSelected(item.id),
+              showChevron: !this.canUseMasterDetail(),
+              onOpen: () => this.openAssignment(item.id)
+            });
           }, (item: Assignment) => item.id);
         }
         .width('100%');
@@ -300,7 +345,12 @@ export struct StudentAssignmentsPage {
         .width('100%');
         Column({ space: 6 }) {
           ForEach(this.completedAssignments, (item: Assignment) => {
-            AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
+            AssignmentListItem({
+              assignment: item,
+              selected: this.isSelected(item.id),
+              showChevron: !this.canUseMasterDetail(),
+              onOpen: () => this.openAssignment(item.id)
+            });
           }, (item: Assignment) => item.id);
         }
         .width('100%');
@@ -344,19 +394,27 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
+  private ListContent() {
+    Column({ space: 18 }) {
+      Column({ space: 4 }) {
+        Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+        Text('通过筛选快速找到要完成的任务。').fontSize(13).fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start);
+
+      this.FilterBar();
+      this.AssignmentSections();
+    }
+    .width('100%');
+  }
+
+  @Builder
   private AssignmentListPage() {
     Scroll() {
       Column() {
-        Column({ space: 18 }) {
-          Column({ space: 4 }) {
-            Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-            Text('通过筛选快速找到要完成的任务。').fontSize(13).fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%')
-          .alignItems(HorizontalAlign.Start);
-
-          this.FilterBar();
-          this.AssignmentSections();
+        Column() {
+          this.ListContent();
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH })
@@ -372,7 +430,81 @@ export struct StudentAssignmentsPage {
     .scrollBar(BarState.Off);
   }
 
+  @Builder
+  private AssignmentMasterDetail() {
+    Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+      Scroll() {
+        Column() {
+          this.ListContent();
+        }
+        .width('100%')
+        .padding({ top: 4, bottom: 16 });
+      }
+      .width(AppTheme.SPLIT_PRIMARY_MIN_WIDTH)
+      .height('100%')
+      .align(Alignment.TopStart)
+      .scrollBar(BarState.Off);
+
+      Column({ space: 12 }) {
+        Row() {
+          Column({ space: 2 }) {
+            Text('作业详情')
+              .fontSize(AppTheme.SECTION_TITLE_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text('点击左侧作业即可切换，状态与操作保持同一数据源。')
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+        }
+        .width('100%');
+
+        Scroll() {
+          Column() {
+            AssignmentDetailPane({
+              assignmentId: this.selectedAssignmentId,
+              revision: this.revision + this.refreshRevision,
+              onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
+            });
+          }
+          .width('100%')
+          .padding({ bottom: 12 });
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .align(Alignment.TopStart)
+        .scrollBar(BarState.Off);
+      }
+      .layoutWeight(1)
+      .height('100%')
+      .constraintSize({ minWidth: AppTheme.SPLIT_SECONDARY_MIN_WIDTH })
+      .padding(AppTheme.CARD_PADDING)
+      .backgroundColor(AppTheme.SURFACE_SUBTLE)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CARD_RADIUS)
+      .alignItems(HorizontalAlign.Start);
+    }
+    .width('100%')
+    .height('100%')
+    .constraintSize({ maxWidth: AppTheme.ASSIGNMENT_MASTER_DETAIL_MAX_WIDTH })
+    .alignItems(VerticalAlign.Top)
+    .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 20 });
+  }
+
   build() {
-    this.AssignmentListPage();
+    Column() {
+      if (this.canUseMasterDetail()) {
+        this.AssignmentMasterDetail();
+      } else {
+        this.AssignmentListPage();
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .alignItems(HorizontalAlign.Center)
+    .onAreaChange((_oldValue, newValue) => {
+      this.availableWidthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.availableWidthVp);
+    });
   }
 }
