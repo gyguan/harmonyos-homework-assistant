@@ -55,6 +55,23 @@ require("本地作业数据损坏，已停止覆盖原数据" in persistence,
 require("Homework snapshot exists but cannot be parsed" in persistence,
         "corrupt snapshot failure must be observable in logs")
 
+# A schema-changing save must preserve the pre-migration payload once, and must not turn the
+# backup into a second write path.
+require("homework_snapshot_pre_migration_backup" in persistence,
+        "persistence must reserve a pre-migration snapshot backup key")
+require("existingVersion === snapshot.schemaVersion" in persistence,
+        "backup must only be considered when the schema version changes")
+require("await store.get(SNAPSHOT_BACKUP_KEY, '')" in persistence,
+        "migration save must check whether a backup already exists")
+require("await store.put(SNAPSHOT_BACKUP_KEY, existing)" in persistence,
+        "migration save must preserve the original snapshot before overwriting the main key")
+require(persistence.count("store.put(SNAPSHOT_BACKUP_KEY") == 1,
+        "migration backup must not become a general dual-write path")
+require(persistence.index("preservePreMigrationSnapshot") < persistence.index("store.put(SNAPSHOT_KEY"),
+        "pre-migration backup must happen before writing the new snapshot")
+require("本地作业数据无法验证，已停止覆盖原数据" in persistence,
+        "unverifiable existing data must block schema-changing overwrite")
+
 if errors:
     print("SNAPSHOT_MIGRATION_GATE_FAIL")
     for error in errors:
