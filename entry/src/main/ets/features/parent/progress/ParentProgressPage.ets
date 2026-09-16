@@ -107,6 +107,13 @@ export struct ParentProgressPage {
     return `预计 ${item.expectedMinutes} 分钟`;
   }
 
+  private subjectCode(subject: Subject): string {
+    if (subject === Subject.CHINESE) return 'CHINESE';
+    if (subject === Subject.MATH) return 'MATH';
+    if (subject === Subject.ENGLISH) return 'ENGLISH';
+    return 'OTHER';
+  }
+
   private openDetail(item: Assignment): void {
     this.selectedAssignmentId = item.id;
     this.editing = false;
@@ -138,6 +145,7 @@ export struct ParentProgressPage {
   private saveEdit(item: Assignment): void {
     let title = this.editTitle.trim();
     let minutes = Math.round(Number(this.editExpectedMinutes));
+    let dueText = this.editDueText.trim();
     if (title.length === 0) {
       this.operationNotice = '作业标题不能为空';
       return;
@@ -146,15 +154,21 @@ export struct ParentProgressPage {
       this.operationNotice = '预计时长请输入 1-240 分钟';
       return;
     }
+    let dueChanged = dueText !== item.dueText;
     let updated: Assignment = {
       id: item.id,
       studentId: item.studentId,
       candidateId: item.candidateId,
+      assignmentType: item.assignmentType,
+      subjectCode: this.subjectCode(this.editSubject),
       subject: this.editSubject,
       title: title,
       instruction: this.editInstruction.trim().length > 0 ? this.editInstruction.trim() : title,
       textbookRef: this.editTextbookRef.trim(),
-      dueText: this.editDueText.trim(),
+      dueAtEpochMs: dueChanged ? 0 : item.dueAtEpochMs,
+      dueTimezone: item.dueTimezone,
+      dueText: dueText,
+      dueDateKey: dueChanged ? '' : item.dueDateKey,
       status: item.status,
       expectedMinutes: minutes,
       startedAtEpochMs: item.startedAtEpochMs,
