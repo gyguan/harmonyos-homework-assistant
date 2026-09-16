@@ -1,6 +1,5 @@
 import { TutorChatMessage, TutorConversation, TutorRemoteApi } from '../../../application/remote/TutorRemoteApi';
 import { HomeworkSubmissionService } from '../../../application/submission/HomeworkSubmissionService';
-import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
@@ -13,7 +12,6 @@ import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
 @Component
 export struct StudyWorkspacePage {
-  @Prop sizeClass: WindowSizeClass;
   @Prop tutorUnavailable: boolean = false;
   @Prop assignmentId: string = 'a-math-001';
   @Prop revision: number = 0;
@@ -339,7 +337,7 @@ export struct StudyWorkspacePage {
 
           Text(this.assignment()!.title)
             .width('100%')
-            .fontSize(this.sizeClass === WindowSizeClass.COMPACT ? 25 : 30)
+            .fontSize(AppTheme.STUDY_TITLE_SIZE)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
 
@@ -579,12 +577,12 @@ export struct StudyWorkspacePage {
       }
       .width('100%')
       .height('100%')
-      .constraintSize({ maxWidth: 820 })
+      .constraintSize({ maxWidth: AppTheme.STUDY_READABLE_MAX_WIDTH })
       .justifyContent(FlexAlign.Start)
       .alignItems(HorizontalAlign.Start)
       .padding({
-        left: this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PAGE_PADDING : AppTheme.PAGE_PADDING_WIDE,
-        right: this.sizeClass === WindowSizeClass.COMPACT ? AppTheme.PAGE_PADDING : AppTheme.PAGE_PADDING_WIDE,
+        left: AppTheme.PAGE_PADDING,
+        right: AppTheme.PAGE_PADDING,
         top: AppTheme.DEEP_PAGE_TOP_PADDING,
         bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
       });
