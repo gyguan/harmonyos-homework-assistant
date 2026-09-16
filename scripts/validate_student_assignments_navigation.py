@@ -98,6 +98,15 @@ require("onQuery: (typeFilter: AssignmentTypeFilter, dateFilter: AssignmentDateF
 require("FilterEntry('类型'" in page and "FilterEntry('截止'" in page and "FilterEntry('科目'" in page,
         "assignment page must expose compact result-page filter entry points")
 
+require("private Section(title: string, description: string, items: Assignment[])" not in page,
+        "assignment groups must not pass observable arrays through generic Builder parameters")
+for state_array in ["needHandlingAssignments", "notStartedAssignments", "submittedAssignments", "completedAssignments"]:
+    require(f"ForEach(this.{state_array}" in page,
+            f"assignment group must render directly from observable state: {state_array}")
+require("private NeedHandlingSection()" in page and "private NotStartedSection()" in page and
+        "private SubmittedSection()" in page and "private CompletedSection()" in page,
+        "assignment status groups must have direct reactive builders")
+
 require("PadWorkspace" not in study and "SingleColumnWorkspace" in study,
         "study flow must not keep the legacy Pad two-column task+tutor composition")
 require("tutorPanelOpen" in study and "Button('问小伴'" in study,

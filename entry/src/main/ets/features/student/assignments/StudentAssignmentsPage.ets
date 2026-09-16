@@ -110,8 +110,6 @@ export struct StudentAssignmentsPage {
     if (this.querying) return;
     this.querying = true;
 
-    // Query values come directly from the dialog click event. Do not rely on
-    // @Link propagation being flushed before the CustomDialog is closed.
     this.draftTypeFilter = typeFilter;
     this.draftDateFilter = dateFilter;
     this.draftSubjectCode = subjectCode;
@@ -204,22 +202,74 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
-  private Section(title: string, description: string, items: Assignment[]) {
-    if (items.length > 0) {
+  private SectionHeader(title: string, description: string, count: number) {
+    Row() {
+      Column({ space: 2 }) {
+        Text(title).fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text(description).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
+      }
+      .alignItems(HorizontalAlign.Start);
+      Blank();
+      Text(`${count}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+    }
+    .width('100%');
+  }
+
+  @Builder
+  private NeedHandlingSection() {
+    if (this.needHandlingAssignments.length > 0) {
       Column({ space: 9 }) {
-        Row() {
-          Column({ space: 2 }) {
-            Text(title).fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text(description).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-          Blank();
-          Text(`${items.length}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+        this.SectionHeader('需要处理', '进行中、待订正、逾期或待提交', this.needHandlingAssignments.length);
+        Column({ space: 6 }) {
+          ForEach(this.needHandlingAssignments, (item: Assignment) => {
+            AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
+          }, (item: Assignment) => item.id);
         }
         .width('100%');
+      }
+      .width('100%');
+    }
+  }
 
+  @Builder
+  private NotStartedSection() {
+    if (this.notStartedAssignments.length > 0) {
+      Column({ space: 9 }) {
+        this.SectionHeader('待开始', '还没有开始的作业', this.notStartedAssignments.length);
         Column({ space: 6 }) {
-          ForEach(items, (item: Assignment) => {
+          ForEach(this.notStartedAssignments, (item: Assignment) => {
+            AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
+          }, (item: Assignment) => item.id);
+        }
+        .width('100%');
+      }
+      .width('100%');
+    }
+  }
+
+  @Builder
+  private SubmittedSection() {
+    if (this.submittedAssignments.length > 0) {
+      Column({ space: 9 }) {
+        this.SectionHeader('已提交', '等待家长确认', this.submittedAssignments.length);
+        Column({ space: 6 }) {
+          ForEach(this.submittedAssignments, (item: Assignment) => {
+            AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
+          }, (item: Assignment) => item.id);
+        }
+        .width('100%');
+      }
+      .width('100%');
+    }
+  }
+
+  @Builder
+  private CompletedSection() {
+    if (this.completedAssignments.length > 0) {
+      Column({ space: 9 }) {
+        this.SectionHeader('已完成', '已经完成并验收', this.completedAssignments.length);
+        Column({ space: 6 }) {
+          ForEach(this.completedAssignments, (item: Assignment) => {
             AssignmentListItem({ assignment: item, selected: false, onOpen: () => this.onOpenDetail(item.id) });
           }, (item: Assignment) => item.id);
         }
@@ -254,10 +304,10 @@ export struct StudentAssignmentsPage {
       }
       .width('100%');
 
-      this.Section('需要处理', '进行中、待订正、逾期或待提交', this.needHandlingAssignments);
-      this.Section('待开始', '还没有开始的作业', this.notStartedAssignments);
-      this.Section('已提交', '等待家长确认', this.submittedAssignments);
-      this.Section('已完成', '已经完成并验收', this.completedAssignments);
+      this.NeedHandlingSection();
+      this.NotStartedSection();
+      this.SubmittedSection();
+      this.CompletedSection();
       this.EmptyState();
     }
     .width('100%');
