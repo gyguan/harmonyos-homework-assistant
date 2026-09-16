@@ -20,6 +20,7 @@ def require(condition: bool, message: str) -> None:
 
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
+filter_dialog = read("entry/src/main/ets/features/student/assignments/AssignmentFilterDialog.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
@@ -56,30 +57,36 @@ require("constraintSize({ maxWidth: 720 })" in detail and "align(Alignment.TopSt
         "V2 detail must keep a readable width and explicit top-anchored reading flow")
 
 for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
-    require(token in page, f"assignment list missing type filter: {token}")
+    require(token in page or token in filter_dialog, f"assignment filtering missing type option: {token}")
 for token in ["AssignmentDateFilter.ALL", "AssignmentDateFilter.TODAY", "AssignmentDateFilter.TOMORROW",
               "AssignmentDateFilter.THIS_WEEK", "AssignmentDateFilter.UNDATED"]:
-    require(token in page, f"assignment list missing date filter: {token}")
+    require(token in page or token in filter_dialog, f"assignment filtering missing date option: {token}")
 for subject in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
-    require(subject in page, f"assignment list missing subject filter: {subject}")
+    require(subject in page or subject in filter_dialog, f"assignment filtering missing subject option: {subject}")
 
 require("StudentAssignmentsViewModel" in page and "DefaultAssignmentRepository.instance" in page,
         "assignment list must query through ViewModel + Repository")
 require("@State private visibleTotal" in page and "@State private needHandlingAssignments" in page and
         "private applyItems(items: Assignment[]): void" in page and "this.visibleTotal = items.length" in page,
         "query confirmation must replace observable result state")
-require("@State private showFilterPage" in page and "private FilterPage()" in page,
-        "filters must use a normal full-page interaction instead of popup/overlay implementations")
-require("bindSheet" not in page and "FilterOverlay" not in page and "FilterPanel" not in page,
-        "legacy popup filter implementations must not return")
-require("Button(label, { type: ButtonType.Normal })" in page and "private TypeOption" in page and
-        "private DateOption" in page and "private SubjectOption" in page,
+require("AssignmentFilterDialog" in page and "CustomDialogController" in page and
+        "alignment: DialogAlignment.Bottom" in page and "customStyle: true" in page and
+        "this.filterDialogController.open()" in page,
+        "filters must open through a real bottom CustomDialog")
+require("@CustomDialog" in filter_dialog and "@Link typeFilter" in filter_dialog and
+        "@Link dateFilter" in filter_dialog and "@Link subjectCode" in filter_dialog,
+        "bottom filter dialog must own interactive linked draft state")
+require("showFilterPage" not in page and "FilterPage()" not in page and "bindSheet" not in page and
+        "FilterOverlay" not in page and "FilterPanel" not in page,
+        "legacy full-page/sheet/overlay filter implementations must not return")
+require("Button(label, { type: ButtonType.Normal })" in filter_dialog and "private TypeOption" in filter_dialog and
+        "private DateOption" in filter_dialog and "private SubjectOption" in filter_dialog,
         "filter choices must be real button controls with direct state updates")
+require("Button('重置'" in filter_dialog and "Button('查询'" in filter_dialog and "onQuery" in filter_dialog,
+        "bottom filter dialog must provide reset and confirmed query actions")
 require("private async applyFilters(): Promise<void>" in page and "await this.viewModel.query" in page and
-        "Button(this.querying ? '查询中…' : '查询'" in page,
-        "query confirmation must execute an asynchronous repository query")
-require("Button('重置'" in page and "resetDraftFilters" in page,
-        "filter page must provide reset without immediately mutating the applied query")
+        "this.filterDialogController.close()" in page,
+        "query confirmation must close the dialog and execute an asynchronous repository query")
 require("FilterEntry('类型'" in page and "FilterEntry('截止'" in page and "FilterEntry('科目'" in page,
         "assignment page must expose compact result-page filter entry points")
 
