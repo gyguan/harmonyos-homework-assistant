@@ -1,19 +1,20 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-today = (ROOT / 'entry/src/main/ets/features/student/today/StudentTodayPage.ets').read_text(encoding='utf-8')
+home = (ROOT / 'entry/src/main/ets/features/student/home/StudentHomePage.ets').read_text(encoding='utf-8')
+view_model = (ROOT / 'entry/src/main/ets/features/student/home/StudentHomeViewModel.ets').read_text(encoding='utf-8')
 app_shell = (ROOT / 'entry/src/main/ets/pages/AppShell.ets').read_text(encoding='utf-8')
 
 checks = {
-    'list renders selectable task actions': 'private AssignmentChoice(item: Assignment)' in today,
-    'each task opens by its own id': 'this.onOpenStudy(item.id)' in today,
-    'recommendation remains visible': '推荐下一项' in today and '小伴推荐' in today,
-    'student is told free choice is allowed': '也可以自己选择' in today,
-    'not started task can start': "return '开始作业'" in today,
-    'in progress task can continue': "return '继续完成'" in today,
-    'ready task can submit': "return '去提交'" in today,
-    'submitted and completed tasks remain viewable': "return '查看提交'" in today and "return '查看作业'" in today,
-    'existing openStudy starts chosen assignment': 'HomeworkStore.instance.startAssignment(assignmentId);' in app_shell,
+    'home renders one primary next assignment action': 'private NextAssignmentHero()' in home,
+    'remaining tasks are individually selectable': 'this.onOpenStudy(item.id)' in home,
+    'next assignment opens by its own id': 'this.onOpenStudy(this.nextAssignment()!.id)' in home,
+    'not started task can start': "return '开始作业'" in view_model,
+    'in progress and paused task can continue': "return '继续完成'" in view_model,
+    'ready task can submit': "return '去提交'" in view_model,
+    'rework task has explicit action': "return '继续订正'" in view_model,
+    'existing study transition starts chosen assignment': 'HomeworkStore.instance.startAssignment(assignmentId);' in app_shell,
+    'V2 home is the default student surface': 'StudentHomePage({' in app_shell and 'StudentTodayPage' not in app_shell,
 }
 
 failed = [name for name, ok in checks.items() if not ok]
