@@ -29,6 +29,44 @@
 
 - 目标平台：HarmonyOS 6.0，ArkTS + ArkUI。
 - Phone 与 Pad 都是一等设备形态，禁止仅放大手机 UI 作为 Pad 适配。
-- 根据当前窗口宽度做响应式布局，不按具体设备型号硬编码。
+- 导航形态可以参考窗口尺寸；业务页面是否多栏必须根据当前容器真实可用宽度与内容最小可读宽度判断，不按设备型号硬编码。
 - 涉及未成年人数据时遵循最小采集、家长授权、家庭私有优先原则。
 - 微信/钉钉首版采用用户主动分享、截图识别、文本粘贴；不得依赖后台读取聊天记录。
+- 后端保持 Spring Boot 模块化单体 + PostgreSQL；除非新的 ADR 明确批准，不引入 Redis、MQ、微服务、API Gateway 或工作流引擎。
+
+## V2 refactor invariants
+
+V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发者在修改代码前必须阅读：
+
+- `CONTEXT.md`
+- `docs/product/product-feature-list-v2.md`
+- `docs/architecture/frontend-technical-design-v2.md`
+- `docs/architecture/backend-technical-design-v2.md`
+- `docs/architecture/system-technical-design-v2.md`
+- `docs/adr/0002-v2-clean-refactor-and-migration.md`
+
+必须遵守以下规则：
+
+1. **禁止在旧 UI 上继续堆补丁。** 已进入 V2 重构范围的页面，应通过新的页面组合 / ViewModel / Repository 实现解决根因，不新增只针对某设备、Preview、某页面或某测试用例的临时分支。
+2. **禁止测试特判。** 生产代码不得根据测试数据、测试 ID、CI 环境、Preview 环境等改变业务行为；测试失败必须修业务实现或测试本身的错误假设。
+3. **禁止页面私有断点。** Feature 页面不得自行硬编码 `600/840` 等设备断点来决定主从分栏；多栏必须通过统一 Layout Capability 基于真实容器空间判断。
+4. **新页面不得直接依赖 `HomeworkStore.instance`。** 新 V2 Feature 通过 ViewModel / Repository 访问数据。`HomeworkStore` 只作为迁移期兼容数据源，职责只减不增。
+5. **`AppShell` 职责只减不增。** 新业务路由使用 `Navigation / NavDestination`；不要再向 `AppShell` 添加业务详情状态、selectedId、返回页枚举或 Feature 特有状态。
+6. **不建设第二套作业领域。** SCHOOL / EXTRA 共用 Assignment；不得新建平行的 ExtraHomework 领域模型、状态机、提交链路或同步链路。
+7. **后端增量演进。** Flyway 历史 migration 不修改；通过 V7+ 增量升级数据结构。状态流转与权威计时逐步收敛到后端 Command API。
+8. **兼容代码必须可删除。** 必需的迁移适配只能集中在明确的 adapter / legacy 边界，必须有明确替换对象和删除条件；不得把临时兼容散落在页面、领域模型和 Service 中。
+9. **切换即清理。** 一个纵向切片切换到 V2 后，同一功能对应的旧路由、旧页面、无引用组件、旧适配分支和过时测试应在该切片或紧随其后的清理提交中删除，不长期保留 V1/V2 双实现。
+10. **main 始终可运行。** 按纵向切片迁移，每个切片都必须可编译、可测试、可回退；不允许先大面积拆毁后再一次性集成。
+11. **优先解决根因而非症状。** 遇到 UI / 同步 / 状态问题，先验证真实数据和调用链，再修改公共抽象；禁止连续增加 fallback、magic number、silent catch 来掩盖问题。
+12. **新增抽象必须有直接用途。** 不为了“未来可能需要”建设重型框架；保持家庭级产品需要的最小复杂度。
+
+## Required cleanup check before merge
+
+涉及 V2 重构的 PR，在合并前必须检查：
+
+- 是否新增了仅用于兼容旧页面的分支？如果是，能否直接删除旧实现而不是继续兼容？
+- 是否新增 magic width / device type / Preview 特判？如果是，应改为统一能力判断。
+- 是否让 `HomeworkStore` 或 `AppShell` 承担了更多职责？如果是，设计方向错误。
+- 是否产生 V1/V2 两套长期并存的领域模型、API 或状态机？如果是，必须收敛。
+- 已被 V2 替换的旧代码是否可以在当前 PR 一并删除？优先删除，不留“以后再清”。
+- 是否存在无说明的空 `catch`、fallback 或默认值掩盖真实错误？必须消除或明确限定为 best-effort 场景。
