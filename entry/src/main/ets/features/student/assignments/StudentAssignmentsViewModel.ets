@@ -46,6 +46,7 @@ export class StudentAssignmentsViewModel {
     dateFilter: AssignmentDateFilter, statuses: AssignmentStatus[]): AssignmentFilter {
     let fromEpochMs = 0;
     let toEpochMs = 0;
+    let undatedOnly = dateFilter === AssignmentDateFilter.UNDATED;
     let today = StudentAssignmentsViewModel.startOfDay(Date.now());
     if (dateFilter === AssignmentDateFilter.TODAY) {
       fromEpochMs = today;
@@ -64,6 +65,7 @@ export class StudentAssignmentsViewModel {
       dateFilter: dateFilter,
       fromEpochMs: fromEpochMs,
       toEpochMs: toEpochMs,
+      undatedOnly: undatedOnly,
       statuses: statuses
     };
   }
