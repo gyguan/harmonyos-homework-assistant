@@ -55,108 +55,126 @@ export struct StudentAssignmentDetailPage {
         .onClick(() => this.onBack());
     }
     .width('100%')
-    .padding({ top: 48, bottom: 48 });
+    .alignItems(HorizontalAlign.Start)
+    .padding({ top: 20, bottom: 32 });
+  }
+
+  @Builder
+  private DetailContent() {
+    Column({ space: 18 }) {
+      Row() {
+        Text('‹ 作业列表')
+          .fontSize(14)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 4, right: 8 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('返回作业列表')
+          .onClick(() => this.onBack());
+        Blank();
+      }
+      .width('100%');
+
+      if (this.assignment() === null) {
+        this.MissingState();
+      } else {
+        Column({ space: 14 }) {
+          Row({ space: 8 }) {
+            Text(this.typeLabel(this.assignment()!))
+              .fontSize(12)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY)
+              .padding({ left: 10, right: 10, top: 6, bottom: 6 })
+              .backgroundColor(AppTheme.PRIMARY_SOFT)
+              .borderRadius(AppTheme.CHIP_RADIUS);
+            Text(this.assignment()!.subject)
+              .fontSize(12)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.SUBTEXT);
+            Blank();
+            Text(AssignmentStateMachine.label(this.assignment()!.status))
+              .fontSize(12)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%');
+
+          Text(this.assignment()!.title)
+            .width('100%')
+            .fontSize(AppTheme.PAGE_TITLE_SIZE)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
+
+          Text(this.assignment()!.instruction)
+            .width('100%')
+            .fontSize(15)
+            .lineHeight(23)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start)
+        .padding(16)
+        .backgroundColor(AppTheme.SURFACE)
+        .border({ width: 1, color: AppTheme.BORDER })
+        .borderRadius(AppTheme.CARD_RADIUS);
+
+        Column({ space: 0 }) {
+          this.DetailRow('截止时间', this.assignment()!.dueText);
+          Divider().color(AppTheme.DIVIDER);
+          this.DetailRow('预计用时', `${this.assignment()!.expectedMinutes} 分钟`);
+          Divider().color(AppTheme.DIVIDER);
+          this.DetailRow('教材 / 页码', this.assignment()!.textbookRef);
+        }
+        .width('100%')
+        .padding({ left: 14, right: 14 })
+        .backgroundColor(AppTheme.SURFACE)
+        .border({ width: 1, color: AppTheme.BORDER })
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+
+        if (this.assignment()!.reviewNote.length > 0) {
+          Column({ space: 5 }) {
+            Text('家长提醒')
+              .width('100%')
+              .fontSize(12)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.WARNING);
+            Text(this.assignment()!.reviewNote)
+              .width('100%')
+              .fontSize(14)
+              .lineHeight(21)
+              .fontColor(AppTheme.TEXT);
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Start)
+          .padding(14)
+          .backgroundColor(AppTheme.WARNING_SOFT)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+        }
+
+        Button(this.actionLabel(this.assignment()!), { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .fontSize(15)
+          .fontWeight(FontWeight.Medium)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => this.onOpenStudy(this.assignment()!.id));
+      }
+    }
+    .width('100%')
+    .constraintSize({ maxWidth: 720 })
+    .alignItems(HorizontalAlign.Start)
+    .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 12, bottom: 32 });
   }
 
   build() {
     Scroll() {
-      Column() {
-        Column({ space: 18 }) {
-          Row() {
-            Text('‹ 作业列表')
-              .fontSize(14)
-              .fontColor(AppTheme.PRIMARY)
-              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-              .padding({ left: 4, right: 8 })
-              .accessibilityRole(AccessibilityRoleType.BUTTON)
-              .accessibilityText('返回作业列表')
-              .onClick(() => this.onBack());
-            Blank();
-          }
-          .width('100%');
-
-          if (this.assignment() === null) {
-            this.MissingState();
-          } else {
-            Row({ space: 8 }) {
-              Text(this.typeLabel(this.assignment()!))
-                .fontSize(12)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.PRIMARY)
-                .padding({ left: 10, right: 10, top: 6, bottom: 6 })
-                .backgroundColor(AppTheme.PRIMARY_SOFT)
-                .borderRadius(AppTheme.CHIP_RADIUS);
-              Text(this.assignment()!.subject)
-                .fontSize(12)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.SUBTEXT);
-              Blank();
-              Text(AssignmentStateMachine.label(this.assignment()!.status))
-                .fontSize(12)
-                .fontColor(AppTheme.SUBTEXT);
-            }
-            .width('100%');
-
-            Text(this.assignment()!.title)
-              .width('100%')
-              .fontSize(AppTheme.PAGE_TITLE_SIZE)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppTheme.TEXT);
-
-            Text(this.assignment()!.instruction)
-              .width('100%')
-              .fontSize(15)
-              .lineHeight(23)
-              .fontColor(AppTheme.SUBTEXT);
-
-            Column({ space: 0 }) {
-              this.DetailRow('截止时间', this.assignment()!.dueText);
-              Divider().color(AppTheme.DIVIDER);
-              this.DetailRow('预计用时', `${this.assignment()!.expectedMinutes} 分钟`);
-              Divider().color(AppTheme.DIVIDER);
-              this.DetailRow('教材 / 页码', this.assignment()!.textbookRef);
-            }
-            .width('100%')
-            .padding({ left: 14, right: 14 })
-            .backgroundColor(AppTheme.SURFACE_SUBTLE)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
-
-            if (this.assignment()!.reviewNote.length > 0) {
-              Column({ space: 5 }) {
-                Text('家长提醒')
-                  .width('100%')
-                  .fontSize(12)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.WARNING);
-                Text(this.assignment()!.reviewNote)
-                  .width('100%')
-                  .fontSize(14)
-                  .lineHeight(21)
-                  .fontColor(AppTheme.TEXT);
-              }
-              .width('100%')
-              .padding(14)
-              .backgroundColor(AppTheme.WARNING_SOFT)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
-            }
-
-            Button(this.actionLabel(this.assignment()!), { type: ButtonType.Normal })
-              .width('100%')
-              .height(AppTheme.BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .fontSize(15)
-              .fontWeight(FontWeight.Medium)
-              .backgroundColor(AppTheme.PRIMARY)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .onClick(() => this.onOpenStudy(this.assignment()!.id));
-          }
-        }
-        .width('100%')
-        .constraintSize({ maxWidth: 720 })
-        .padding(AppTheme.PAGE_PADDING);
+      Row() {
+        this.DetailContent();
       }
       .width('100%')
-      .alignItems(HorizontalAlign.Center);
+      .justifyContent(FlexAlign.Center)
+      .alignItems(VerticalAlign.Top);
     }
     .width('100%')
     .height('100%')

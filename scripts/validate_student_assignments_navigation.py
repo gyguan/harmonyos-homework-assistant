@@ -47,36 +47,48 @@ require("selectedAssignmentId" not in page and "DetailPane" not in page,
         "V2 assignment list must not retain embedded master-detail state")
 require("constraintSize({ maxWidth: 760 })" in page,
         "V2 list should control readable width without device-specific split logic")
-require("constraintSize({ maxWidth: 720 })" in detail,
-        "V2 detail should control readable width without device-specific split logic")
+require("constraintSize({ maxWidth: 720 })" in detail and "alignItems(VerticalAlign.Top)" in detail,
+        "V2 detail must keep a readable width and top-anchored reading flow")
 
 for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
     require(token in page, f"assignment list missing type filter: {token}")
 for token in ["AssignmentDateFilter.ALL", "AssignmentDateFilter.TODAY", "AssignmentDateFilter.TOMORROW",
-              "AssignmentDateFilter.THIS_WEEK"]:
+              "AssignmentDateFilter.THIS_WEEK", "AssignmentDateFilter.UNDATED"]:
     require(token in page, f"assignment list missing date filter: {token}")
 for subject in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
     require(subject in page, f"assignment list missing subject filter: {subject}")
+
 require("StudentAssignmentsViewModel" in page and "DefaultAssignmentRepository.instance" in page,
         "assignment list must query through ViewModel + Repository")
-require("this.viewModel.assignments(this.typeFilter, this.subjectCode, this.dateFilter" in page,
-        "type/date/subject filters must compose into one query")
+require("@State private visibleTotal" in page and "@State private needHandlingAssignments" in page and
+        "private rebuildResults(): void" in page and "this.visibleTotal = items.length" in page,
+        "filter changes must explicitly replace observable result state instead of relying on implicit method re-evaluation")
+require("this.rebuildResults();" in page and "selectType" in page and "selectDate" in page and "selectSubject" in page,
+        "every filter selection must rebuild visible assignment results")
+require("typeCount(typeFilter" in view_model and "subjectCount(subjectCode" in view_model and
+        "dateCount(dateFilter" in view_model,
+        "filter counts must be stable per dimension rather than depend on other active chips")
+require("筛选作业" in page and "筛选结果" in page and "重置" in page,
+        "assignment filters must have grouped visual hierarchy and a visible result summary")
 
-require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model,
-        "a shared AssignmentFilter model must define type/subject/date/status query state")
-require("dueAtEpochMs" in query and "dueText" not in query,
-        "V2 date filtering must use structured dueAt only and never infer dueText")
+require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model and
+        "undatedOnly: boolean" in filter_model and "UNDATED = 'UNDATED'" in filter_model,
+        "AssignmentFilter must explicitly represent undated work")
+require("dueAtEpochMs" in query and "dueText" not in query and "filter.undatedOnly" in query,
+        "V2 date filtering must use structured dueAt/undated state and never infer dueText")
 require("AssignmentQuery.filter" in repository_impl and "filter?: AssignmentFilter" in repository_port,
         "Repository boundary must own local AssignmentFilter execution")
 require("getCached(assignmentId: string)" in repository_port and "getCached(assignmentId: string)" in repository_impl,
         "standalone detail must load through Repository instead of Store")
 
-for param in ["String type", "String subjectCode", "Long from", "Long to", "String status"]:
+for param in ["String type", "String subjectCode", "Long from", "Long to", "String status", "Boolean undated"]:
     require(param in controller, f"backend assignment query missing parameter: {param}")
 require("matchesListFilter" in service and "statusFilter" in service and "compareForList" in service,
         "backend must implement combined filters and stable ordering")
-require("assignment.dueAt == null" in service,
-        "backend structured date filters must keep undated historical assignments explicit")
+require("undatedOnly" in service and "assignment.dueAt != null" in service,
+        "backend must explicitly support undated assignment queries")
+require("未定日期筛选不能同时指定日期范围" in service,
+        "backend must reject ambiguous undated + date-range queries")
 
 if errors:
     print("STUDENT_ASSIGNMENTS_NAVIGATION_GATE_FAIL")

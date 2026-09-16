@@ -32,8 +32,9 @@ public class AssignmentController {
       @RequestParam(required = false) String subjectCode,
       @RequestParam(required = false) Long from,
       @RequestParam(required = false) Long to,
-      @RequestParam(required = false) String status) {
-    return service.list(familyId, studentId, type, subjectCode, from, to, status);
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) Boolean undated) {
+    return service.list(familyId, studentId, type, subjectCode, from, to, status, undated);
   }
 
   @GetMapping("/students/{studentId}/assignments/summary")
