@@ -164,6 +164,7 @@ export struct AssignmentFilterDialog {
       .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
     }
     .width('100%')
+    .constraintSize({ maxWidth: AppTheme.FILTER_DIALOG_MAX_WIDTH })
     .height('68%')
     .backgroundColor(AppTheme.SURFACE)
     .borderRadius({ topLeft: 24, topRight: 24 });
