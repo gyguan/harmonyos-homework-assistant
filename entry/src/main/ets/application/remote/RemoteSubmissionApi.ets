@@ -3,6 +3,7 @@ import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { http } from '@kit.NetworkKit';
 import { BackendHttpClient } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
+import { RemoteAssignment } from './RemoteModels';
 
 export interface RemoteSubmissionPhoto {
   id: string;
@@ -17,6 +18,11 @@ export interface RemoteSubmission {
   assignmentId: string;
   submittedAt: string;
   photos: RemoteSubmissionPhoto[];
+}
+
+export interface RemoteSubmissionCreateResponse {
+  submission: RemoteSubmission;
+  assignment: RemoteAssignment;
 }
 
 interface MultipartPayload {
@@ -87,32 +93,40 @@ export class RemoteSubmissionApi {
     }
   }
 
-  async upload(assignmentId: string, sourceUris: string[]): Promise<boolean> {
-    if (this.context === null || !BackendSession.instance.isConnected() ||
-      sourceUris.length === 0 || sourceUris.length > 6) return false;
+  async upload(assignmentId: string, version: number,
+    sourceUris: string[]): Promise<RemoteSubmissionCreateResponse> {
+    if (this.context === null) throw new Error('SUBMISSION_CONTEXT_MISSING');
+    if (!BackendSession.instance.isConnected()) throw new Error('SUBMISSION_OFFLINE');
+    if (version < 0) throw new Error('SUBMISSION_VERSION_MISSING');
+    if (sourceUris.length === 0 || sourceUris.length > 6) throw new Error('SUBMISSION_PHOTO_COUNT');
+
+    let payload = await this.buildMultipartPayload(sourceUris);
+    let client = http.createHttp();
     try {
-      let payload = await this.buildMultipartPayload(sourceUris);
-      let client = http.createHttp();
-      try {
-        let response = await client.request(
-          `${BackendSession.instance.getBaseUrl()}/api/v1/assignments/${encodeURIComponent(assignmentId)}/submissions`,
-          {
-            method: http.RequestMethod.POST,
-            header: {
-              'Authorization': `Bearer ${BackendSession.instance.getToken()}`,
-              'Content-Type': `multipart/form-data; boundary=${payload.boundary}`
-            },
-            extraData: payload.body,
-            connectTimeout: 15000,
-            readTimeout: 60000
-          });
-        if (response.responseCode === 401) BackendSession.instance.disconnect();
-        return response.responseCode >= 200 && response.responseCode < 300;
-      } finally {
-        try { client.destroy(); } catch {}
+      let response = await client.request(
+        `${BackendSession.instance.getBaseUrl()}/api/v1/assignments/${encodeURIComponent(assignmentId)}` +
+          `/submissions?version=${version}`,
+        {
+          method: http.RequestMethod.POST,
+          header: {
+            'Authorization': `Bearer ${BackendSession.instance.getToken()}`,
+            'Content-Type': `multipart/form-data; boundary=${payload.boundary}`
+          },
+          extraData: payload.body,
+          connectTimeout: 15000,
+          readTimeout: 60000
+        });
+      if (response.responseCode === 401) {
+        BackendSession.instance.disconnect();
+        throw new Error('SUBMISSION_UNAUTHORIZED');
       }
-    } catch {
-      return false;
+      if (response.responseCode === 409) throw new Error('REMOTE_CONFLICT');
+      if (response.responseCode < 200 || response.responseCode >= 300) {
+        throw new Error(`SUBMISSION_HTTP_${response.responseCode}`);
+      }
+      return JSON.parse(response.result as string) as RemoteSubmissionCreateResponse;
+    } finally {
+      try { client.destroy(); } catch {}
     }
   }
 
