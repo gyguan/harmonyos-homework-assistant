@@ -426,14 +426,17 @@ export struct AppShell {
         this.PersonaContent();
       }
       .width('100%')
-      .layoutWeight(1);
+      .layoutWeight(1)
+      .justifyContent(FlexAlign.Start)
+      .alignItems(HorizontalAlign.Start);
 
       if (!this.isDetailFlow()) {
         this.BottomNavigation();
       }
     }
     .width('100%')
-    .height('100%');
+    .height('100%')
+    .justifyContent(FlexAlign.Start);
   }
 
   @Builder
@@ -444,16 +447,23 @@ export struct AppShell {
         this.PersonaContent();
       }
       .layoutWeight(1)
-      .height('100%');
+      .height('100%')
+      .justifyContent(FlexAlign.Start)
+      .alignItems(HorizontalAlign.Start);
     }
     .width('100%')
-    .height('100%');
+    .height('100%')
+    .alignItems(VerticalAlign.Top);
   }
 
   @Builder
   private ShellContent() {
     Stack() {
-      if (this.sizeClass === WindowSizeClass.EXPANDED) {
+      // Detail flows are full-screen compositions. Shell navigation must not create
+      // an accidental second column on Pad/expanded windows.
+      if (this.isDetailFlow()) {
+        this.BottomNavShell();
+      } else if (this.sizeClass === WindowSizeClass.EXPANDED) {
         this.SideNavShell();
       } else {
         this.BottomNavShell();
@@ -461,6 +471,7 @@ export struct AppShell {
     }
     .width('100%')
     .height('100%')
+    .alignContent(Alignment.TopStart)
     .backgroundColor(AppTheme.BACKGROUND)
     .onAreaChange((_oldValue, newValue) => {
       this.widthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.widthVp);

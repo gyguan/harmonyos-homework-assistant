@@ -37,6 +37,11 @@ require("onOpenDetail" in shell and "openAssignmentDetail" in shell,
         "assignment list must navigate to standalone detail by assignment id")
 require("studentStudyReturnRoute = StudentRoute.ASSIGNMENT_DETAIL" in shell,
         "study opened from assignment detail must return to that detail")
+require("if (this.isDetailFlow())" in shell and "this.BottomNavShell();" in shell and
+        "else if (this.sizeClass === WindowSizeClass.EXPANDED)" in shell,
+        "detail flows must bypass expanded SideNavigation and render as full-screen content")
+require("justifyContent(FlexAlign.Start)" in shell and "alignContent(Alignment.TopStart)" in shell,
+        "shell content must explicitly top-anchor detail flows")
 
 require("HomeworkStore.instance" not in page and "HomeworkStore.instance" not in detail and
         "HomeworkStore.instance" not in view_model,
@@ -47,8 +52,8 @@ require("selectedAssignmentId" not in page and "DetailPane" not in page,
         "V2 assignment list must not retain embedded master-detail state")
 require("constraintSize({ maxWidth: 760 })" in page,
         "V2 list should control readable width without device-specific split logic")
-require("constraintSize({ maxWidth: 720 })" in detail and "alignItems(VerticalAlign.Top)" in detail,
-        "V2 detail must keep a readable width and top-anchored reading flow")
+require("constraintSize({ maxWidth: 720 })" in detail and "align(Alignment.TopStart)" in detail,
+        "V2 detail must keep a readable width and explicit top-anchored reading flow")
 
 for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
     require(token in page, f"assignment list missing type filter: {token}")
@@ -62,14 +67,22 @@ require("StudentAssignmentsViewModel" in page and "DefaultAssignmentRepository.i
         "assignment list must query through ViewModel + Repository")
 require("@State private visibleTotal" in page and "@State private needHandlingAssignments" in page and
         "private rebuildResults(): void" in page and "this.visibleTotal = items.length" in page,
-        "filter changes must explicitly replace observable result state instead of relying on implicit method re-evaluation")
-require("this.rebuildResults();" in page and "selectType" in page and "selectDate" in page and "selectSubject" in page,
-        "every filter selection must rebuild visible assignment results")
-require("typeCount(typeFilter" in view_model and "subjectCount(subjectCode" in view_model and
-        "dateCount(dateFilter" in view_model,
-        "filter counts must be stable per dimension rather than depend on other active chips")
-require("筛选作业" in page and "筛选结果" in page and "重置" in page,
-        "assignment filters must have grouped visual hierarchy and a visible result summary")
+        "query confirmation must replace observable result state")
+require("@State private isFilterSheetVisible" in page and "@State private draftTypeFilter" in page and
+        "@State private draftSubjectCode" in page and "@State private draftDateFilter" in page,
+        "filter sheet must keep draft state separate from applied query state")
+require(".bindSheet($$this.isFilterSheetVisible, this.FilterSheet()" in page and
+        "preferType: SheetType.BOTTOM" in page,
+        "filters must open in a bottom half-modal sheet rather than remain expanded on the page")
+require("private applyFilters(): void" in page and "Button('查询'" in page and
+        "this.rebuildResults();" in page and "this.isFilterSheetVisible = false" in page,
+        "filter results must update only after the user confirms 查询")
+require("Button('重置'" in page and "resetDraftFilters" in page,
+        "filter sheet must provide reset without immediately mutating the applied query")
+require("FilterEntry('类型'" in page and "FilterEntry('截止'" in page and "FilterEntry('科目'" in page,
+        "assignment page must expose compact Meituan-style filter entry points")
+require("typeCount(" not in page and "subjectCount(" not in page and "dateCount(" not in page,
+        "filter UI must not show noisy per-chip counts")
 
 require("export interface AssignmentFilter" in filter_model and "statuses: AssignmentStatus[]" in filter_model and
         "undatedOnly: boolean" in filter_model and "UNDATED = 'UNDATED'" in filter_model,
