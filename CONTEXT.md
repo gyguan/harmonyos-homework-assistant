@@ -7,9 +7,13 @@
 当前产品与重构基线：
 
 - `docs/product/product-feature-list-v2.md`
+- `docs/product/ui-page-spec-v2.md`
 - `docs/architecture/frontend-technical-design-v2.md`
 - `docs/architecture/backend-technical-design-v2.md`
 - `docs/architecture/system-technical-design-v2.md`
+- `docs/development/v2-refactor-readiness.md`
+- `docs/development/v2-migration-inventory.md`
+- `docs/development/v2-compatibility-and-data-migration.md`
 - `docs/adr/0002-v2-clean-refactor-and-migration.md`
 
 V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先基线。
@@ -84,6 +88,23 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - Tutor：assignment context / teacher resources / textbook context / graded hints / parent policy。
 - 服务商密钥只存在后端；客户端不保存 AI Provider credential。
 
+## V2 migration and compatibility defaults
+
+以下结论是 Slice 1 起的默认迁移语义，不允许客户端、后端各自另行猜测：
+
+1. **历史 Assignment 全部归类为 `SCHOOL`**；只有 V2 以后显式创建的课外任务才为 `EXTRA`。
+2. 旧科目只做确定性映射：`语文 -> CHINESE`、`数学 -> MATH`、`英语 -> ENGLISH`，其他值统一 `OTHER`。
+3. **禁止从历史 `dueText` 猜测 `dueAt`**。历史 `dueText` 原值保留，无法确定的 `dueAt` 保持空值，默认 `dueTimezone=Asia/Shanghai`。
+4. V2 日期筛选只依据结构化 `dueAt`；历史未结构化日期不伪造成某个具体日期。
+5. 当前 HarmonyOS Snapshot schema 为 V5；任何后续版本升级必须增加显式逐版本 migration，不得 schema mismatch 后 seed MockData。
+6. schema-changing save 前保留一次 `homework_snapshot_pre_migration_backup`；迁移失败不得覆盖原主快照。
+7. PostgreSQL V1–V6 永不修改；V7 采用 add -> deterministic backfill -> verify -> tighten constraints，破坏性删除后置。
+8. API 升级顺序为 **backend first**：迁移期支持 `V1 Client -> V2 Backend`，最迟在 Slice 5 结束；**不支持 `V2 Client -> V1 Backend`**，避免在新客户端引入旧后端 fallback。
+9. Slice 3 再将 `OVERDUE` 从 canonical status 迁移为派生属性：历史 OVERDUE 且 `elapsedSeconds > 0` -> `PAUSED`，否则 -> `NOT_STARTED`；不塞入 V7。
+10. Flyway 与 Snapshot 均以 forward migration / forward-fix 为主，不建设自动 down migration。
+
+完整规则见 `docs/development/v2-compatibility-and-data-migration.md`。
+
 ## V2 clean-refactor rules
 
 这些规则是后续实现的硬约束，不因会话切换而失效：
@@ -113,6 +134,7 @@ V2 主链路：
 
 默认按纵向切片推进：
 
+0. Migration Safety + CI Gate V2 化；
 1. Assignment V2 + Repository 基础 + 新学生首页；
 2. 作业列表 + 科目/日期/类型筛选；
 3. 作业详情 + 学习空间 + Tutor + Submission；
