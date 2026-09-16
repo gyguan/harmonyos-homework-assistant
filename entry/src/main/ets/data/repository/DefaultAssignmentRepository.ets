@@ -3,6 +3,7 @@ import { BackendSession } from '../../application/remote/BackendSession';
 import { HomeworkRemoteApi } from '../../application/remote/HomeworkRemoteApi';
 import { RemoteAssignmentMapper } from '../../application/remote/RemoteModels';
 import { HomeworkStore } from '../HomeworkStore';
+import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
 import { Assignment, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../domain/port/AssignmentRepository';
@@ -56,6 +57,28 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     return HomeworkStore.instance.getTodaySummary();
   }
 
+  async performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment> {
+    let current = this.getCached(assignmentId);
+    if (current === null) throw new Error('作业不存在');
+
+    // Seed/demo assignments intentionally remain local. Published assignments must use the
+    // server command path so status and timing cannot be overwritten by a client clock.
+    if (current.remoteVersion <= 0 && current.candidateId.length === 0) {
+      return this.performLocalDemoAction(assignmentId, action);
+    }
+    if (!BackendSession.instance.isConnected()) {
+      throw new Error('当前离线，只能查看已缓存作业；联网后才能更新作业状态');
+    }
+    if (current.remoteVersion <= 0) {
+      throw new Error('作业尚未完成云端同步，请刷新后重试');
+    }
+
+    let remote = await HomeworkRemoteApi.instance.performAction(assignmentId, current.remoteVersion, action);
+    let mapped = RemoteAssignmentMapper.toLocal(remote, HomeworkStore.instance.getAssignment(assignmentId));
+    this.replaceCachedAssignment(mapped);
+    return mapped;
+  }
+
   async refresh(): Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;
     let synced = await HomeworkSyncService.instance.syncActiveStudent();
@@ -66,5 +89,39 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       this.remoteSummary = null;
     }
     return true;
+  }
+
+  private performLocalDemoAction(assignmentId: string, action: AssignmentAction): Assignment {
+    let changed = false;
+    if (action === AssignmentAction.START) changed = HomeworkStore.instance.startAssignment(assignmentId);
+    else if (action === AssignmentAction.PAUSE) changed = HomeworkStore.instance.pauseAssignment(assignmentId);
+    else if (action === AssignmentAction.READY_TO_SUBMIT) changed = HomeworkStore.instance.markReadyToSubmit(assignmentId);
+    if (!changed) throw new Error('当前作业状态不能执行这个动作');
+    let updated = HomeworkStore.instance.getAssignment(assignmentId);
+    if (updated === null) throw new Error('作业不存在');
+    this.replaceQueryCacheItem(updated);
+    return updated;
+  }
+
+  private replaceCachedAssignment(updated: Assignment): void {
+    let assignments = HomeworkStore.instance.getAssignments().slice();
+    let replaced = false;
+    for (let i = 0; i < assignments.length; i++) {
+      if (assignments[i].id !== updated.id) continue;
+      assignments[i] = updated;
+      replaced = true;
+      break;
+    }
+    if (!replaced) assignments.push(updated);
+    HomeworkStore.instance.replaceAssignmentsForActiveStudent(assignments);
+    this.replaceQueryCacheItem(updated);
+  }
+
+  private replaceQueryCacheItem(updated: Assignment): void {
+    for (let i = 0; i < this.queryCache.length; i++) {
+      if (this.queryCache[i].id !== updated.id) continue;
+      this.queryCache[i] = updated;
+      return;
+    }
   }
 }
