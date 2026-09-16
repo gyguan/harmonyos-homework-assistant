@@ -10,6 +10,7 @@ import { HomeworkConfirmationPage } from '../features/parent/confirmation/Homewo
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
 import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
+import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
 import { StudentAssignmentDetailPage } from '../features/student/assignments/StudentAssignmentDetailPage';
 import { StudentAssignmentsPage } from '../features/student/assignments/StudentAssignmentsPage';
@@ -126,6 +127,10 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.STUDENT_STUDY, new AssignmentRouteParam(assignmentId));
   }
 
+  private openParentReview(assignmentId: string): void {
+    this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
+  }
+
   private routeAssignmentId(param: Object): string {
     return (param as AssignmentRouteParam).assignmentId;
   }
@@ -183,6 +188,17 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_REVIEW) {
+      NavDestination() {
+        ParentReviewPage({
+          assignmentId: this.routeAssignmentId(param),
+          revision: this.storeRevision,
+          onBack: () => this.navPathStack.pop(),
+          onReviewed: () => this.touchStore()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     }
   }
 
@@ -205,8 +221,8 @@ export struct AppShell {
       });
     } else if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
-        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
+        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),
         onStoreChanged: () => this.touchStore()
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
@@ -216,9 +232,10 @@ export struct AppShell {
       });
     } else {
       ParentDashboardPage({
-        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
-        onOpenImport: () => this.parentRoute = ParentRoute.IMPORT
+        onOpenImport: () => this.parentRoute = ParentRoute.IMPORT,
+        onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
+        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
       });
     }
   }
