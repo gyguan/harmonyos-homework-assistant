@@ -1,4 +1,3 @@
-import { AppTheme } from '../theme/AppTheme';
 import { LayoutPolicy } from './LayoutPolicy';
 
 export enum WindowSizeClass {
