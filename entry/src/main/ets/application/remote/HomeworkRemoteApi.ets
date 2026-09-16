@@ -5,11 +5,13 @@ import { RemoteAssignment } from './RemoteModels';
 
 interface CreateAssignmentBody {
   id: string; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
+  assignmentType: string; subjectCode: string; dueAtEpochMs: number; dueTimezone: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
 interface UpdateAssignmentBody {
   version: number; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
+  assignmentType: string; subjectCode: string; dueAtEpochMs: number; dueTimezone: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
@@ -34,8 +36,10 @@ export class HomeworkRemoteApi {
   async update(assignment: Assignment, version: number): Promise<RemoteAssignment> {
     let body: UpdateAssignmentBody = {
       version: version, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
-      textbookRef: assignment.textbookRef, dueText: assignment.dueText, status: assignment.status,
-      sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
+      textbookRef: assignment.textbookRef, dueText: assignment.dueText,
+      assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
+      dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
+      status: assignment.status, sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
       elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote
     };
@@ -53,9 +57,11 @@ export class HomeworkRemoteApi {
 
   private createBody(assignment: Assignment): CreateAssignmentBody {
     return { id: assignment.id, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
-      textbookRef: assignment.textbookRef, dueText: assignment.dueText, status: assignment.status, sourceLabel: '', sourceExcerpt: '',
-      expectedMinutes: assignment.expectedMinutes, startedAtEpochMs: assignment.startedAtEpochMs,
-      finishedAtEpochMs: assignment.finishedAtEpochMs, elapsedSeconds: assignment.elapsedSeconds,
-      reviewNote: assignment.reviewNote };
+      textbookRef: assignment.textbookRef, dueText: assignment.dueText,
+      assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
+      dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
+      status: assignment.status, sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
+      startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
+      elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote };
   }
 }
