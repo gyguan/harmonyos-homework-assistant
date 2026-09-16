@@ -18,20 +18,13 @@ export class StudentAssignmentsViewModel {
     return this.repository.listCached(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
   }
 
+  async query(typeFilter: AssignmentTypeFilter, subjectCode: string,
+    dateFilter: AssignmentDateFilter, statuses: AssignmentStatus[] = []): Promise<Assignment[]> {
+    return this.repository.query(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
+  }
+
   allCount(): number {
     return this.assignments(AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL).length;
-  }
-
-  typeCount(typeFilter: AssignmentTypeFilter): number {
-    return this.assignments(typeFilter, 'ALL', AssignmentDateFilter.ALL).length;
-  }
-
-  subjectCount(subjectCode: string): number {
-    return this.assignments(AssignmentTypeFilter.ALL, subjectCode, AssignmentDateFilter.ALL).length;
-  }
-
-  dateCount(dateFilter: AssignmentDateFilter): number {
-    return this.assignments(AssignmentTypeFilter.ALL, 'ALL', dateFilter).length;
   }
 
   assignment(assignmentId: string): Assignment | null {
