@@ -23,20 +23,30 @@ migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets"
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 persistence = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkPersistence.ets")
 
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 5" in migrator,
-        "snapshot migration framework must advance the current schema from V4 to V5")
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 6" in migrator,
+        "snapshot migration framework must advance the current schema to V6")
 require("migrateV4ToV5" in migrator and "schemaVersion: 5" in migrator,
-        "snapshot migrator must contain an explicit V4 -> V5 step")
+        "snapshot migrator must retain the explicit V4 -> V5 step")
+require("migrateV5ToV6" in migrator and "schemaVersion: 6" in migrator,
+        "Assignment V2 must use an explicit V5 -> V6 migration step")
 for field in [
     "settings: snapshot.settings",
     "rawImports: snapshot.rawImports",
-    "assignments: snapshot.assignments",
     "candidates: snapshot.candidates",
     "submissions: snapshot.submissions",
     "tutorSessions: snapshot.tutorSessions",
     "submissionSequence: snapshot.submissionSequence",
 ]:
-    require(field in migrator, f"V4 -> V5 migration must preserve field: {field}")
+    require(field in migrator, f"snapshot migration must preserve field: {field}")
+for assignment_field in [
+    "assignmentType: AssignmentType.SCHOOL",
+    "subjectCode: HomeworkSnapshotMigrator.subjectCode(source.subject)",
+    "dueAtEpochMs: 0",
+    "dueTimezone: 'Asia/Shanghai'",
+    "resourceLabels: source.resourceLabels.slice()",
+]:
+    require(assignment_field in migrator,
+            f"V5 -> V6 migration must deterministically populate/preserve: {assignment_field}")
 
 require("HomeworkSnapshotMigrator.migrate(snapshot)" in store,
         "HomeworkStore must migrate an existing snapshot before restore")
@@ -46,6 +56,10 @@ require("snapshot.schemaVersion ===" not in store,
         "HomeworkStore must not reset state merely because a snapshot version differs")
 require("schemaVersion: HOMEWORK_SNAPSHOT_SCHEMA_VERSION" in store,
         "new snapshots must use the shared current schema version")
+require("assignmentType: source.assignmentType" in store and "subjectCode: source.subjectCode" in store,
+        "HomeworkStore clone must preserve Assignment V2 classification fields")
+require("dueAtEpochMs: source.dueAtEpochMs" in store and "dueTimezone:" in store,
+        "HomeworkStore clone must preserve Assignment V2 due-time fields")
 
 # An existing but corrupt snapshot must not be converted into a first-launch null result.
 require(persistence.count("return null;") == 1,
