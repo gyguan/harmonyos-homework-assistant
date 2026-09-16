@@ -3,7 +3,7 @@ import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { HomeworkStore } from '../../data/HomeworkStore';
 import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssignmentRepository';
-import { Assignment, Submission } from '../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, Submission } from '../../domain/model/HomeworkModels';
 import { RemoteAssignmentMapper } from '../remote/RemoteModels';
 import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
 
@@ -57,9 +57,7 @@ export class HomeworkSubmissionService {
     if (assignment.remoteVersion <= 0 && assignment.candidateId.length === 0) {
       return HomeworkStore.instance.submitImages(assignmentId, durableUris, this.nowText());
     }
-    if (assignment.remoteVersion <= 0) {
-      throw new Error('SUBMISSION_NOT_SYNCED');
-    }
+    if (assignment.remoteVersion <= 0) return false;
 
     try {
       let result = await RemoteSubmissionApi.instance.upload(
@@ -73,11 +71,13 @@ export class HomeworkSubmissionService {
       let authoritative = RemoteAssignmentMapper.toLocal(result.assignment, current);
       DefaultAssignmentRepository.instance.applyAuthoritative(authoritative);
       return true;
-    } catch (error) {
-      if (error instanceof Error && error.message === 'REMOTE_CONFLICT') {
-        await DefaultAssignmentRepository.instance.refresh();
-      }
-      throw error;
+    } catch {
+      // A lost success response is indistinguishable from a transport failure. Refreshing here
+      // makes a committed server submission visible and prevents an old client version from
+      // performing a second submission on retry.
+      await DefaultAssignmentRepository.instance.refresh();
+      let refreshed = DefaultAssignmentRepository.instance.getCached(assignmentId);
+      return refreshed !== null && refreshed.status === AssignmentStatus.SUBMITTED;
     }
   }
 
