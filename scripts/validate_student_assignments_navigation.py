@@ -20,7 +20,8 @@ def require(condition: bool, message: str) -> None:
 
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
-today = read("entry/src/main/ets/features/student/today/StudentTodayPage.ets")
+home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
+home_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
 
@@ -29,7 +30,7 @@ require("StudentAssignmentsPage" in shell, "AppShell must render StudentAssignme
 require("() => this.studentRoute = StudentRoute.ASSIGNMENTS" in shell,
         "student homework navigation must open assignments list instead of empty study workspace")
 require("studentStudyReturnRoute" in shell,
-        "study detail must remember whether it was opened from Today or Assignments")
+        "study detail must remember whether it was opened from Home or Assignments")
 
 require("我的作业" in page and "需要处理" in page and "待开始" in page,
         "student assignments page must organize active and not-started homework")
@@ -40,13 +41,13 @@ require("this.onOpenStudy(item.id)" in page,
 require("private openAssignment(item: Assignment)" in page,
         "student assignments page must centralize phone/pad task opening behavior")
 require("this.sizeClass === WindowSizeClass.COMPACT" in page,
-        "phone task selection must use the COMPACT layout path")
+        "existing assignment list must remain usable on compact layouts until Slice 2 replaces it")
 require("selectedAssignmentId" in page and "private DetailPane()" in page and "private PadLayout()" in page,
-        "pad assignments page must provide list-detail behavior instead of stretching the phone list")
+        "existing pad assignments page must remain functional until Slice 2 replaces it")
 require("AssignmentListItem" in page and "onOpen: () => this.openAssignment(item)" in page,
-        "assignment rows must be fully tappable native-style list items")
+        "assignment rows must remain fully tappable")
 require("export struct AssignmentListItem" in list_item,
-        "shared native assignment list item must exist")
+        "shared assignment list item must exist while the V1 assignments page remains")
 
 require("@State private subjectFilter: string = 'ALL'" in page and "filteredAssignments()" in page,
         "student assignments page must keep an explicit subject filter state")
@@ -69,7 +70,7 @@ require("for (let item of this.filteredAssignments())" in page,
         "student status grouping must run after subject and date filtering")
 
 require("export enum DueDateFilterKey" in due_date and "export class AssignmentDueDate" in due_date,
-        "a shared assignment due-date normalizer must back both homework lists")
+        "a shared assignment due-date normalizer must back existing homework lists until Slice 2")
 for phrase in ["今天", "明天", "后天", "周日", "星期天", "月"]:
     require(phrase in due_date, f"due-date normalizer missing supported expression: {phrase}")
 require("AssignmentStatus.COMPLETED" in due_date and "AssignmentStatus.SUBMITTED" in due_date and
@@ -80,16 +81,18 @@ require("dueDay >= today && dueDay <= AssignmentDueDate.endOfWeek(today)" in due
 require("this." not in due_date,
         "AssignmentDueDate static utility must not use standalone this; ArkTS requires explicit class references")
 
-require("HomeworkStore.instance.getAssignments()" in today,
-        "Today must include overdue assignments instead of filtering them out")
-require("overdueAssignments" in today and "逾期" in today,
-        "Today must explicitly surface overdue homework")
-require("AssignmentStatus.OVERDUE" in today and "AssignmentStatus.NOT_STARTED" in today,
-        "Today recommendation must account for overdue and not-started work")
-over_pos = today.find("AssignmentStatus.OVERDUE")
-not_started_pos = today.find("AssignmentStatus.NOT_STARTED", over_pos)
+require("StudentHomePage" in shell and "StudentTodayPage" not in shell,
+        "V2 Student Home must replace the legacy Today surface")
+require("HomeworkStore.instance" not in home,
+        "V2 Student Home must not access HomeworkStore directly")
+require("AssignmentStatus.OVERDUE" in home_vm and "AssignmentStatus.NOT_STARTED" in home_vm,
+        "V2 Student Home recommendation must account for overdue and not-started work")
+over_pos = home_vm.find("AssignmentStatus.OVERDUE")
+not_started_pos = home_vm.find("AssignmentStatus.NOT_STARTED", over_pos)
 require(over_pos >= 0 and not_started_pos > over_pos,
-        "overdue work must rank ahead of ordinary not-started work in recommendation order")
+        "overdue work must rank ahead of ordinary not-started work in V2 recommendation order")
+require("attentionCount()" in home_vm and "需要优先处理" in home,
+        "V2 Student Home must explicitly surface attention work")
 
 if errors:
     print("STUDENT_ASSIGNMENTS_NAVIGATION_GATE_FAIL")
