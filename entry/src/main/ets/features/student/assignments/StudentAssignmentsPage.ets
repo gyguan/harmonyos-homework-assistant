@@ -28,6 +28,7 @@ export struct StudentAssignmentsPage {
   @State private todayCount: number = 0;
   @State private tomorrowCount: number = 0;
   @State private weekCount: number = 0;
+  @State private undatedCount: number = 0;
   @State private chineseCount: number = 0;
   @State private mathCount: number = 0;
   @State private englishCount: number = 0;
@@ -62,6 +63,7 @@ export struct StudentAssignmentsPage {
     this.todayCount = this.viewModel.dateCount(AssignmentDateFilter.TODAY);
     this.tomorrowCount = this.viewModel.dateCount(AssignmentDateFilter.TOMORROW);
     this.weekCount = this.viewModel.dateCount(AssignmentDateFilter.THIS_WEEK);
+    this.undatedCount = this.viewModel.dateCount(AssignmentDateFilter.UNDATED);
     this.chineseCount = this.viewModel.subjectCount('CHINESE');
     this.mathCount = this.viewModel.subjectCount('MATH');
     this.englishCount = this.viewModel.subjectCount('ENGLISH');
@@ -144,6 +146,7 @@ export struct StudentAssignmentsPage {
     if (dateFilter === AssignmentDateFilter.TODAY) return this.todayCount;
     if (dateFilter === AssignmentDateFilter.TOMORROW) return this.tomorrowCount;
     if (dateFilter === AssignmentDateFilter.THIS_WEEK) return this.weekCount;
+    if (dateFilter === AssignmentDateFilter.UNDATED) return this.undatedCount;
     return this.totalCount;
   }
 
@@ -237,6 +240,7 @@ export struct StudentAssignmentsPage {
             this.DateChip(AssignmentDateFilter.TODAY, '今天');
             this.DateChip(AssignmentDateFilter.TOMORROW, '明天');
             this.DateChip(AssignmentDateFilter.THIS_WEEK, '本周');
+            this.DateChip(AssignmentDateFilter.UNDATED, '未定');
           }
         }
         .width('100%')
