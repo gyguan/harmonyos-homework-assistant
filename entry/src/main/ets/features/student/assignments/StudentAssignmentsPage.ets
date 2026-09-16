@@ -39,7 +39,9 @@ export struct StudentAssignmentsPage {
       typeFilter: $draftTypeFilter,
       dateFilter: $draftDateFilter,
       subjectCode: $draftSubjectCode,
-      onQuery: () => { void this.applyFilters(); }
+      onQuery: (typeFilter: AssignmentTypeFilter, dateFilter: AssignmentDateFilter, subjectCode: string) => {
+        void this.applyFilters(typeFilter, dateFilter, subjectCode);
+      }
     }),
     autoCancel: true,
     alignment: DialogAlignment.Bottom,
@@ -103,15 +105,23 @@ export struct StudentAssignmentsPage {
     this.filterDialogController.open();
   }
 
-  private async applyFilters(): Promise<void> {
+  private async applyFilters(typeFilter: AssignmentTypeFilter,
+    dateFilter: AssignmentDateFilter, subjectCode: string): Promise<void> {
     if (this.querying) return;
     this.querying = true;
+
+    // Query values come directly from the dialog click event. Do not rely on
+    // @Link propagation being flushed before the CustomDialog is closed.
+    this.draftTypeFilter = typeFilter;
+    this.draftDateFilter = dateFilter;
+    this.draftSubjectCode = subjectCode;
+    this.typeFilter = typeFilter;
+    this.dateFilter = dateFilter;
+    this.subjectCode = subjectCode;
     this.filterDialogController.close();
-    this.typeFilter = this.draftTypeFilter;
-    this.subjectCode = this.draftSubjectCode;
-    this.dateFilter = this.draftDateFilter;
+
     try {
-      let items = await this.viewModel.query(this.typeFilter, this.subjectCode, this.dateFilter);
+      let items = await this.viewModel.query(typeFilter, subjectCode, dateFilter);
       this.applyItems(items);
     } finally {
       this.querying = false;
@@ -255,29 +265,35 @@ export struct StudentAssignmentsPage {
 
   @Builder
   private AssignmentListPage() {
-    Scroll() {
-      Column() {
-        Column({ space: 18 }) {
-          Column({ space: 4 }) {
-            Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-            Text('通过筛选快速找到要完成的任务。').fontSize(13).fontColor(AppTheme.SUBTEXT);
+    Column() {
+      Scroll() {
+        Column() {
+          Column({ space: 18 }) {
+            Column({ space: 4 }) {
+              Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Text('通过筛选快速找到要完成的任务。').fontSize(13).fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%')
+            .alignItems(HorizontalAlign.Start);
+
+            this.FilterBar();
+            this.AssignmentSections();
           }
           .width('100%')
-          .alignItems(HorizontalAlign.Start);
-
-          this.FilterBar();
-          this.AssignmentSections();
+          .constraintSize({ maxWidth: 760 })
+          .padding(AppTheme.PAGE_PADDING);
         }
         .width('100%')
-        .constraintSize({ maxWidth: 760 })
-        .padding(AppTheme.PAGE_PADDING);
+        .alignItems(HorizontalAlign.Center);
       }
       .width('100%')
-      .alignItems(HorizontalAlign.Center);
+      .layoutWeight(1)
+      .scrollBar(BarState.Off);
     }
     .width('100%')
     .height('100%')
-    .scrollBar(BarState.Off);
+    .justifyContent(FlexAlign.Start)
+    .alignItems(HorizontalAlign.Center);
   }
 
   build() {
