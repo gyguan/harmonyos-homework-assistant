@@ -1,8 +1,9 @@
 import { common } from '@kit.AbilityKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
-import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
 import { HomeworkStore } from '../../data/HomeworkStore';
+import { Submission } from '../../domain/model/HomeworkModels';
+import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
 
 const MAX_SUBMISSION_PHOTOS: number = 6;
 
@@ -15,6 +16,10 @@ export class HomeworkSubmissionService {
 
   configure(context: common.UIAbilityContext): void {
     this.context = context;
+  }
+
+  listCached(assignmentId: string): Submission[] {
+    return HomeworkStore.instance.getSubmissionsForAssignment(assignmentId).slice();
   }
 
   async selectPhotos(): Promise<string[]> {

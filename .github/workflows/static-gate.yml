@@ -56,6 +56,9 @@ jobs:
       - name: Validate V2 Slice 1 architecture
         run: python scripts/validate_v2_slice1.py
 
+      - name: Validate V2 Slice 3 execution commands
+        run: python scripts/validate_v2_slice3_execution.py
+
       - name: Validate backend V0.1 boundaries
         run: python scripts/validate_backend_v01.py
 
@@ -160,6 +163,9 @@ jobs:
 
       - name: Run real backend E2E smoke with Tutor fallback
         run: python backend/scripts/e2e_smoke.py --expect-tutor-unavailable
+
+      - name: Run assignment action command E2E
+        run: python backend/scripts/assignment_action_e2e.py
 
       - name: Restart backend while keeping PostgreSQL
         run: |

@@ -4,9 +4,11 @@ import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
-import { HomeworkStore } from '../../../data/HomeworkStore';
+import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
+import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { Assignment, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
+import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
 @Component
 export struct StudyWorkspacePage {
@@ -14,6 +16,9 @@ export struct StudyWorkspacePage {
   @Prop tutorUnavailable: boolean = false;
   @Prop assignmentId: string = 'a-math-001';
   @Prop revision: number = 0;
+  @State private actionRevision: number = 0;
+  @State private actionRunning: boolean = false;
+  @State private actionMessage: string = '';
   @State private tutorPanelOpen: boolean = false;
   @State private submissionPhotoUris: string[] = [];
   @State private selectingPhotos: boolean = false;
@@ -28,16 +33,21 @@ export struct StudyWorkspacePage {
   onBack: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
+  private readonly viewModel: StudyWorkspaceViewModel =
+    new StudyWorkspaceViewModel(DefaultAssignmentRepository.instance);
+
   aboutToAppear(): void { void this.loadTutor(); }
 
   private assignment(): Assignment | null {
-    let currentRevision = this.revision;
-    return HomeworkStore.instance.getAssignment(this.assignmentId);
+    let currentRevision = this.revision + this.actionRevision;
+    if (currentRevision < 0) return null;
+    return this.viewModel.assignment(this.assignmentId);
   }
 
   private submissions(): Submission[] {
-    let currentRevision = this.revision;
-    return HomeworkStore.instance.getSubmissionsForAssignment(this.assignmentId);
+    let currentRevision = this.revision + this.actionRevision;
+    if (currentRevision < 0) return [];
+    return HomeworkSubmissionService.instance.listCached(this.assignmentId);
   }
 
   private async loadTutor(): Promise<void> {
@@ -66,6 +76,7 @@ export struct StudyWorkspacePage {
   }
 
   private primaryActionLabel(): string {
+    if (this.actionRunning) return '处理中…';
     let assignment = this.assignment();
     if (assignment === null) return '作业不存在';
     switch (assignment.status) {
@@ -86,34 +97,45 @@ export struct StudyWorkspacePage {
 
   private primaryActionEnabled(): boolean {
     let assignment = this.assignment();
-    if (assignment === null || this.selectingPhotos || this.submittingPhotos) return false;
+    if (assignment === null || this.actionRunning || this.selectingPhotos || this.submittingPhotos) return false;
     return assignment.status !== AssignmentStatus.SUBMITTED && assignment.status !== AssignmentStatus.COMPLETED;
   }
 
-  private runPrimaryAction(): void {
+  private async runPrimaryAction(): Promise<void> {
     let assignment = this.assignment();
-    if (assignment === null) return;
-    let changed: boolean = false;
+    if (assignment === null || this.actionRunning) return;
     if (assignment.status === AssignmentStatus.NOT_STARTED || assignment.status === AssignmentStatus.OVERDUE ||
       assignment.status === AssignmentStatus.NEEDS_REWORK || assignment.status === AssignmentStatus.PAUSED) {
-      changed = HomeworkStore.instance.startAssignment(assignment.id);
+      await this.executeAction(AssignmentAction.START);
     } else if (assignment.status === AssignmentStatus.IN_PROGRESS) {
-      changed = HomeworkStore.instance.markReadyToSubmit(assignment.id);
+      await this.executeAction(AssignmentAction.READY_TO_SUBMIT);
     } else if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
       if (this.submissionPhotoUris.length === 0) {
-        void this.selectSubmissionPhotos();
+        await this.selectSubmissionPhotos();
         return;
       }
-      void this.submitSelectedPhotos(assignment.id);
-      return;
+      await this.submitSelectedPhotos(assignment.id);
     }
-    if (changed) this.onStoreChanged();
   }
 
-  private pauseCurrentAssignment(): void {
+  private async pauseCurrentAssignment(): Promise<void> {
     let assignment = this.assignment();
-    if (assignment === null || assignment.status !== AssignmentStatus.IN_PROGRESS) return;
-    if (HomeworkStore.instance.pauseAssignment(assignment.id)) this.onStoreChanged();
+    if (assignment === null || assignment.status !== AssignmentStatus.IN_PROGRESS || this.actionRunning) return;
+    await this.executeAction(AssignmentAction.PAUSE);
+  }
+
+  private async executeAction(action: AssignmentAction): Promise<void> {
+    if (this.actionRunning) return;
+    this.actionRunning = true;
+    this.actionMessage = '';
+    try {
+      await this.viewModel.performAction(this.assignmentId, action);
+      this.actionRevision++;
+    } catch {
+      this.actionMessage = '状态更新失败，请检查网络并刷新后重试';
+    } finally {
+      this.actionRunning = false;
+    }
   }
 
   private async selectSubmissionPhotos(): Promise<void> {
@@ -142,6 +164,7 @@ export struct StudyWorkspacePage {
       }
       this.submissionPhotoUris = [];
       this.submissionMessage = '作业照片已提交';
+      this.actionRevision++;
       this.onStoreChanged();
     } catch {
       this.submissionMessage = '照片保存失败，请重新选择后再试';
@@ -327,6 +350,13 @@ export struct StudyWorkspacePage {
 
           AssignmentCountdownCard({ assignment: this.assignment()! });
 
+          if (this.actionMessage.length > 0) {
+            Text(this.actionMessage)
+              .width('100%')
+              .fontSize(12)
+              .fontColor(AppTheme.WARNING);
+          }
+
           if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
             Row() {
               Blank();
@@ -337,7 +367,7 @@ export struct StudyWorkspacePage {
                 .padding({ left: 12, right: 12, top: 10, bottom: 10 })
                 .accessibilityRole(AccessibilityRoleType.BUTTON)
                 .accessibilityText('暂停作业计时')
-                .onClick(() => this.pauseCurrentAssignment());
+                .onClick(() => { void this.pauseCurrentAssignment(); });
             }
             .width('100%');
           }
@@ -355,7 +385,7 @@ export struct StudyWorkspacePage {
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .fontSize(15)
               .fontWeight(FontWeight.Medium)
-              .onClick(() => this.runPrimaryAction());
+              .onClick(() => { void this.runPrimaryAction(); });
           }
         }
         .width('100%')
@@ -438,7 +468,7 @@ export struct StudyWorkspacePage {
           .fontColor(AppTheme.SUBTEXT);
 
         TutorQuestionCapturePanel({
-          studentId: HomeworkStore.instance.getActiveStudentId(),
+          studentId: this.viewModel.studentId(),
           onRecognized: (text: string) => {
             this.tutorDraft = `题目识别结果：\n${text}\n\n我卡住的地方：`;
             this.tutorNotice = '识别文字已放入输入框，请确认或补充后再发送';
@@ -534,7 +564,7 @@ export struct StudyWorkspacePage {
             .fontColor(AppTheme.TEXT_ON_PRIMARY)
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
-            .onClick(() => this.runPrimaryAction());
+            .onClick(() => { void this.runPrimaryAction(); });
         }
         .width('100%')
         .padding({ top: 2, bottom: 4 });

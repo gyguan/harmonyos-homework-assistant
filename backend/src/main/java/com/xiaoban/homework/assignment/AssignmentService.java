@@ -199,6 +199,23 @@ public class AssignmentService {
   }
 
   @Transactional
+  public AssignmentDtos.Response action(UUID familyId, String id, AssignmentDtos.ActionRequest input) {
+    AssignmentEntity e = requireOwned(familyId, id);
+    if (e.version != input.version()) throw new ApiExceptions.Conflict("作业已在其他设备更新，请刷新后重试");
+
+    String action = input.action().trim().toUpperCase();
+    long nowMs = System.currentTimeMillis();
+    switch (action) {
+      case "START" -> start(e, familyId, nowMs);
+      case "PAUSE" -> pause(e, nowMs);
+      case "READY_TO_SUBMIT" -> readyToSubmit(e, nowMs);
+      default -> throw new ApiExceptions.BadRequest("不支持的作业动作: " + input.action());
+    }
+    e.updatedAt = Instant.now();
+    return AssignmentDtos.Response.from(repository.saveAndFlush(e));
+  }
+
+  @Transactional
   public void delete(UUID familyId, String id) {
     AssignmentEntity assignment = requireOwned(familyId, id);
     for (SubmissionEntity submission : submissions.findByFamilyIdAndAssignmentIdOrderBySubmittedAtDesc(familyId, id)) {
@@ -208,6 +225,46 @@ public class AssignmentService {
     }
     repository.delete(assignment);
     repository.flush();
+  }
+
+  private void start(AssignmentEntity e, UUID familyId, long nowMs) {
+    if (!AssignmentStatePolicy.canTransition(e.status, "IN_PROGRESS")) {
+      throw new ApiExceptions.BadRequest("当前作业状态不能开始或继续: " + e.status);
+    }
+    String previousStatus = e.status;
+    if (!"IN_PROGRESS".equals(previousStatus)) {
+      if (!"PAUSED".equals(previousStatus)) e.elapsedSeconds = 0;
+      e.status = "IN_PROGRESS";
+      e.startedAtEpochMs = nowMs;
+      e.finishedAtEpochMs = 0;
+    } else if (e.startedAtEpochMs == 0) {
+      e.startedAtEpochMs = nowMs;
+    }
+    pauseOtherActive(familyId, e.studentId, e.id, nowMs);
+  }
+
+  private void pause(AssignmentEntity e, long nowMs) {
+    if (!AssignmentStatePolicy.canTransition(e.status, "PAUSED")) {
+      throw new ApiExceptions.BadRequest("当前作业状态不能暂停: " + e.status);
+    }
+    if ("IN_PROGRESS".equals(e.status) && e.startedAtEpochMs > 0) {
+      e.elapsedSeconds += Math.max(0, (nowMs - e.startedAtEpochMs) / 1000);
+    }
+    e.status = "PAUSED";
+    e.startedAtEpochMs = 0;
+    e.finishedAtEpochMs = 0;
+  }
+
+  private void readyToSubmit(AssignmentEntity e, long nowMs) {
+    if (!AssignmentStatePolicy.canTransition(e.status, "READY_TO_SUBMIT")) {
+      throw new ApiExceptions.BadRequest("当前作业状态不能进入待提交: " + e.status);
+    }
+    if ("IN_PROGRESS".equals(e.status) && e.startedAtEpochMs > 0) {
+      e.elapsedSeconds += Math.max(0, (nowMs - e.startedAtEpochMs) / 1000);
+    }
+    e.status = "READY_TO_SUBMIT";
+    e.startedAtEpochMs = 0;
+    if (e.finishedAtEpochMs == 0) e.finishedAtEpochMs = nowMs;
   }
 
   private boolean matchesListFilter(AssignmentEntity assignment, String type, String subjectCode,
