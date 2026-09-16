@@ -9,5 +9,6 @@ export interface AssignmentRepository {
   getCached(assignmentId: string): Assignment | null;
   getCachedSummary(): TodaySummary;
   performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment>;
+  applyAuthoritative(assignment: Assignment): void;
   refresh(): Promise<boolean>;
 }
