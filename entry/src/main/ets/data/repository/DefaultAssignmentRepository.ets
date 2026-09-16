@@ -75,14 +75,29 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
     let remote = await HomeworkRemoteApi.instance.performAction(assignmentId, current.remoteVersion, action);
     let mapped = RemoteAssignmentMapper.toLocal(remote, HomeworkStore.instance.getAssignment(assignmentId));
-    this.replaceCachedAssignment(mapped);
+    this.applyAuthoritative(mapped);
     return mapped;
+  }
+
+  applyAuthoritative(updated: Assignment): void {
+    let assignments = HomeworkStore.instance.getAssignments().slice();
+    let replaced = false;
+    for (let i = 0; i < assignments.length; i++) {
+      if (assignments[i].id !== updated.id) continue;
+      assignments[i] = updated;
+      replaced = true;
+      break;
+    }
+    if (!replaced) assignments.push(updated);
+    HomeworkStore.instance.replaceAssignmentsForActiveStudent(assignments);
+    this.replaceQueryCacheItem(updated);
   }
 
   async refresh(): Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;
     let synced = await HomeworkSyncService.instance.syncActiveStudent();
     if (!synced) return false;
+    this.queryCache = [];
     try {
       this.remoteSummary = await HomeworkRemoteApi.instance.todaySummary(HomeworkStore.instance.getActiveStudentId());
     } catch {
@@ -101,20 +116,6 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     if (updated === null) throw new Error('作业不存在');
     this.replaceQueryCacheItem(updated);
     return updated;
-  }
-
-  private replaceCachedAssignment(updated: Assignment): void {
-    let assignments = HomeworkStore.instance.getAssignments().slice();
-    let replaced = false;
-    for (let i = 0; i < assignments.length; i++) {
-      if (assignments[i].id !== updated.id) continue;
-      assignments[i] = updated;
-      replaced = true;
-      break;
-    }
-    if (!replaced) assignments.push(updated);
-    HomeworkStore.instance.replaceAssignmentsForActiveStudent(assignments);
-    this.replaceQueryCacheItem(updated);
   }
 
   private replaceQueryCacheItem(updated: Assignment): void {
