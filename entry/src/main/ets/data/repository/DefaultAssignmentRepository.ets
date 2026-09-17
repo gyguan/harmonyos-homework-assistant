@@ -61,6 +61,21 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     return HomeworkStore.instance.getTodaySummary();
   }
 
+  async create(assignment: Assignment): Promise<Assignment> {
+    if (!BackendSession.instance.isConnected()) {
+      throw new Error('当前离线，连接家庭云端后才能布置任务');
+    }
+    let activeStudent = this.getActiveStudent();
+    if (assignment.studentId !== activeStudent.id) {
+      throw new Error('任务不属于当前孩子');
+    }
+
+    let remote = await HomeworkRemoteApi.instance.create(assignment);
+    let mapped = RemoteAssignmentMapper.toLocal(remote, assignment);
+    this.applyAuthoritative(mapped);
+    return mapped;
+  }
+
   async performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment> {
     let current = this.getCached(assignmentId);
     if (current === null) throw new Error('作业不存在');
