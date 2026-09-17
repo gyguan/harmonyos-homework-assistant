@@ -310,10 +310,17 @@ export struct AppShell {
 
   @Builder
   private BottomItem(symbol: Resource, label: string, active: boolean, action: () => void) {
-    Column({ space: 4 }) {
-      SymbolGlyph(symbol)
-        .fontSize(22)
-        .fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
+    Column({ space: 3 }) {
+      Row() {
+        SymbolGlyph(symbol)
+          .fontSize(22)
+          .fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
+      }
+      .width(40)
+      .height(28)
+      .justifyContent(FlexAlign.Center)
+      .backgroundColor(active ? AppTheme.PRIMARY_SOFT : Color.Transparent)
+      .borderRadius(AppTheme.CHIP_RADIUS);
       Text(label)
         .fontSize(11)
         .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
