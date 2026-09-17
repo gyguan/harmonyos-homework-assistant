@@ -27,6 +27,29 @@ interface AssignmentReviewBody {
   version: number;
   note: string;
 }
+interface BatchPublishItemBody {
+  candidateId: string;
+  assignment: CreateAssignmentBody;
+}
+interface BatchPublishBody {
+  items: BatchPublishItemBody[];
+}
+
+export interface BatchPublishEntry {
+  candidateId: string;
+  assignment: Assignment;
+}
+
+export interface RemoteBatchPublishResult {
+  candidateId: string;
+  assignment: RemoteAssignment;
+}
+
+export interface RemoteBatchPublishResponse {
+  atomic: boolean;
+  publishedCount: number;
+  results: RemoteBatchPublishResult[];
+}
 
 export class HomeworkRemoteApi {
   static readonly instance: HomeworkRemoteApi = new HomeworkRemoteApi();
@@ -70,6 +93,21 @@ export class HomeworkRemoteApi {
     let response = await BackendHttpClient.instance.request(`/api/v1/students/${encodeURIComponent(assignment.studentId)}/assignments`, http.RequestMethod.POST, body);
     if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`上传作业失败: ${response.statusCode}`);
     return JSON.parse(response.body) as RemoteAssignment;
+  }
+
+  async batchPublish(studentId: string, entries: BatchPublishEntry[]): Promise<RemoteBatchPublishResponse> {
+    let items: BatchPublishItemBody[] = [];
+    for (let entry of entries) {
+      items.push({ candidateId: entry.candidateId, assignment: this.createBody(entry.assignment) });
+    }
+    let body: BatchPublishBody = { items: items };
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/students/${encodeURIComponent(studentId)}/assignments/batch`, http.RequestMethod.POST, body);
+    if (response.statusCode === 409) throw new Error('BATCH_PUBLISH_CONFLICT');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`批量发布失败: ${response.statusCode}`);
+    }
+    return JSON.parse(response.body) as RemoteBatchPublishResponse;
   }
 
   async performAction(assignmentId: string, version: number, action: AssignmentAction): Promise<RemoteAssignment> {
@@ -121,7 +159,8 @@ export class HomeworkRemoteApi {
       textbookRef: assignment.textbookRef, dueText: assignment.dueText,
       assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
       dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
-      status: assignment.status, sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
+      status: assignment.status, sourceLabel: assignment.candidateId.length > 0 ? '家长确认发布' : '',
+      sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
       elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote };
   }
