@@ -47,9 +47,18 @@ if app_shell_path.exists():
     }
     if suspicious:
         fail(f"AppShell contains feature-specific navigation state: {sorted(suspicious)}")
-    for legacy in ["selectedAssignmentId", "studentStudyReturnRoute"]:
+    for legacy in [
+        "selectedAssignmentId",
+        "studentStudyReturnRoute",
+        "ParentRoute.CONFIRMATION",
+        "CONFIRMATION = 'CONFIRMATION'",
+    ]:
         if legacy in app_shell:
             fail(f"AppShell legacy navigation state must be deleted: {legacy}")
+    if "AppRoute.PARENT_IMPORT_CONFIRMATION" not in app_shell:
+        fail("parent import confirmation must use AppRoute.PARENT_IMPORT_CONFIRMATION")
+    if "openParentImportConfirmation" not in app_shell or "NavDestination()" not in app_shell:
+        fail("parent import confirmation must use NavDestination instead of AppShell parent route state")
 
 # V2 keeps one Assignment aggregate. A parallel ExtraHomework domain is explicitly forbidden.
 for root in [ROOT / "entry/src/main/ets", ROOT / "backend/src/main/java"]:
