@@ -9,6 +9,7 @@ export interface AssignmentRepository {
   query(filter: AssignmentFilter): Promise<Assignment[]>;
   getCached(assignmentId: string): Assignment | null;
   getCachedSummary(): TodaySummary;
+  create(assignment: Assignment): Promise<Assignment>;
   performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment>;
   review(assignmentId: string, decision: AssignmentReviewDecision, note: string): Promise<Assignment>;
   applyAuthoritative(assignment: Assignment): void;
