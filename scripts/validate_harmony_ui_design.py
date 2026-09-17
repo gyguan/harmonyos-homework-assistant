@@ -113,6 +113,11 @@ for ui_root in ui_roots:
         require(prohibited_branch.search(text) is None,
                 f"UI must not contain Preview/CI/device-specific production branching: {relative}")
 
+        # ArkUI custom components inherit CommonAttribute.enabled(value). A custom @Prop named
+        # enabled collides with that method and fails CompileArkTS even though Python gates pass.
+        require("@Prop enabled:" not in text,
+                f"custom component prop must not shadow ArkUI enabled() attribute: {relative}")
+
 # Shared master-detail rows are persistent selections on wide layouts. A faint fill alone is too easy
 # to miss, so selected rows must combine a selected surface with a primary border.
 assignment_list_item = read_optional("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
@@ -208,20 +213,19 @@ require("backgroundColor(this.isSelected(dayEpochMs) ? AppTheme.PRIMARY" in day_
         "Calendar selected day must use a filled selected state with contrasting text")
 
 # Settings use the same reactive child-component rule as navigation and status selectors. The native
-# Toggle still owns the visual switch feedback, but isOn must subscribe through @Prop enabled and the
-# actual onChange value must be committed instead of toggling a potentially stale snapshot.
+# Toggle still owns the visual switch feedback, while isEnabled avoids ArkUI CommonAttribute.enabled.
 settings = read_optional("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 student_profile = read_optional("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
 require("private TutorRule(" not in settings,
         "Parent settings must not pass Tutor switch state through an ordinary @Builder boolean")
 require("SettingsToggleRow" in settings and "export struct SettingsToggleRow" in selection_controls,
         "Parent settings must use the shared reactive switch row")
-require("@Prop enabled: boolean = false;" in selection_controls and
-        "Toggle({ type: ToggleType.Switch, isOn: this.enabled })" in selection_controls,
-        "shared settings switch must bind native Toggle isOn to reactive @Prop enabled")
+require("@Prop isEnabled: boolean = false;" in selection_controls and
+        "Toggle({ type: ToggleType.Switch, isOn: this.isEnabled })" in selection_controls,
+        "shared settings switch must bind native Toggle isOn to reactive @Prop isEnabled")
 for expression in [
-    "enabled: this.tutorGuidanceFirst()",
-    "enabled: this.directAnswerAllowed()",
+    "isEnabled: this.tutorGuidanceFirst()",
+    "isEnabled: this.directAnswerAllowed()",
     "onToggle: (enabled: boolean) => this.updateTutorSettings(enabled, this.directAnswerAllowed())",
     "onToggle: (enabled: boolean) => this.updateTutorSettings(this.tutorGuidanceFirst(), enabled)",
 ]:
@@ -229,8 +233,8 @@ for expression in [
 require("private RuleRow(" not in student_profile and "ReadonlySettingStateRow" in student_profile,
         "Student profile Tutor rule display must use the reactive shared read-only state row")
 for expression in [
-    "enabled: this.settings().tutorGuidanceFirst",
-    "enabled: this.settings().directAnswerAllowed",
+    "isEnabled: this.settings().tutorGuidanceFirst",
+    "isEnabled: this.settings().directAnswerAllowed",
 ]:
     require(expression in student_profile,
             f"Student profile must bind displayed Tutor rule directly to current settings: {expression}")

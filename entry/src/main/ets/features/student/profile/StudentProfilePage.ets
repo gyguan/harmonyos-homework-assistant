@@ -114,14 +114,14 @@ export struct StudentProfilePage {
                 title: '引导优先',
                 description: this.settings().tutorGuidanceFirst ?
                   '先提示思路，再一步一步讲解。' : '可以更直接地解释解题方法。',
-                enabled: this.settings().tutorGuidanceFirst
+                isEnabled: this.settings().tutorGuidanceFirst
               });
               Divider().color(AppTheme.DIVIDER);
               ReadonlySettingStateRow({
                 title: '直接答案',
                 description: this.settings().directAnswerAllowed ?
                   '家长已允许在需要时展示直接答案。' : '默认不直接给答案，先帮助你自己想出来。',
-                enabled: this.settings().directAnswerAllowed
+                isEnabled: this.settings().directAnswerAllowed
               });
             }
             .width('100%')

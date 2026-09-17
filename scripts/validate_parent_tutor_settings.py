@@ -42,12 +42,15 @@ require("HomeworkStore.instance.updateTutorSettings" in parent,
 require("允许直接答案" in parent and "默认建议关闭" in parent,
         "parent UI must keep direct answers opt-in and explain the safer default")
 require("export struct SettingsToggleRow" in selection_controls and
-        "Toggle({ type: ToggleType.Switch, isOn: this.enabled })" in selection_controls and
+        "@Prop isEnabled: boolean = false;" in selection_controls and
+        "Toggle({ type: ToggleType.Switch, isOn: this.isEnabled })" in selection_controls and
         ".onChange((value: boolean) => this.onToggle(value))" in selection_controls,
-        "shared Tutor switch must bind and emit the real native Toggle value")
+        "shared Tutor switch must bind and emit the real native Toggle value through isEnabled")
+require("@Prop enabled:" not in selection_controls,
+        "custom ArkUI components must not shadow the inherited enabled() attribute with @Prop enabled")
 for expression in [
-    "enabled: this.tutorGuidanceFirst()",
-    "enabled: this.directAnswerAllowed()",
+    "isEnabled: this.tutorGuidanceFirst()",
+    "isEnabled: this.directAnswerAllowed()",
     "onToggle: (enabled: boolean) => this.updateTutorSettings(enabled, this.directAnswerAllowed())",
     "onToggle: (enabled: boolean) => this.updateTutorSettings(this.tutorGuidanceFirst(), enabled)",
 ]:
@@ -57,6 +60,9 @@ require("tutorGuidanceFirst" in student and "directAnswerAllowed" in student,
         "student 我的 must reflect the current parent Tutor rules")
 require("ReadonlySettingStateRow" in student and "private RuleRow(" not in student,
         "student 我的 must render Tutor rule state through the reactive read-only row")
+require("isEnabled: this.settings().tutorGuidanceFirst" in student and
+        "isEnabled: this.settings().directAnswerAllowed" in student,
+        "student 我的 must bind read-only Tutor state through non-conflicting isEnabled props")
 require("updateTutorSettings" not in student,
         "student 我的 must remain read-only for Tutor rules")
 

@@ -304,14 +304,14 @@ export struct BackendConnectionPage {
       SettingsToggleRow({
         title: '引导优先',
         description: '先提醒概念和下一步，再逐步讲解。',
-        enabled: this.tutorGuidanceFirst(),
+        isEnabled: this.tutorGuidanceFirst(),
         onToggle: (enabled: boolean) => this.updateTutorSettings(enabled, this.directAnswerAllowed())
       });
       Divider().color(AppTheme.DIVIDER);
       SettingsToggleRow({
         title: '允许直接答案',
         description: '默认建议关闭；开启后小伴才会在规则允许时直接展示答案。',
-        enabled: this.directAnswerAllowed(),
+        isEnabled: this.directAnswerAllowed(),
         onToggle: (enabled: boolean) => this.updateTutorSettings(this.tutorGuidanceFirst(), enabled)
       });
     }
