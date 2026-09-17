@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ReadonlySettingStateRow } from '../../../components/selection/SelectionControls';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { AppSettings, StudentProfile } from '../../../domain/model/HomeworkModels';
 
@@ -27,32 +28,6 @@ export struct StudentProfilePage {
         .layoutWeight(1)
         .fontSize(14)
         .fontColor(AppTheme.TEXT);
-    }
-    .width('100%')
-    .padding({ top: 12, bottom: 12 });
-  }
-
-  @Builder
-  private RuleRow(title: string, description: string, enabled: boolean) {
-    Row({ space: 12 }) {
-      Column({ space: 4 }) {
-        Text(title)
-          .width('100%')
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Text(description)
-          .width('100%')
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
-      Text(enabled ? '已开启' : '已关闭')
-        .fontSize(12)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(enabled ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
     }
     .width('100%')
     .padding({ top: 12, bottom: 12 });
@@ -135,17 +110,19 @@ export struct StudentProfilePage {
           Column({ space: 10 }) {
             this.SectionTitle('AI 辅导规则', '这些规则由家长设置，小伴会按规则陪你思考。');
             Column() {
-              this.RuleRow(
-                '引导优先',
-                this.settings().tutorGuidanceFirst ? '先提示思路，再一步一步讲解。' : '可以更直接地解释解题方法。',
-                this.settings().tutorGuidanceFirst
-              );
+              ReadonlySettingStateRow({
+                title: '引导优先',
+                description: this.settings().tutorGuidanceFirst ?
+                  '先提示思路，再一步一步讲解。' : '可以更直接地解释解题方法。',
+                enabled: this.settings().tutorGuidanceFirst
+              });
               Divider().color(AppTheme.DIVIDER);
-              this.RuleRow(
-                '直接答案',
-                this.settings().directAnswerAllowed ? '家长已允许在需要时展示直接答案。' : '默认不直接给答案，先帮助你自己想出来。',
-                this.settings().directAnswerAllowed
-              );
+              ReadonlySettingStateRow({
+                title: '直接答案',
+                description: this.settings().directAnswerAllowed ?
+                  '家长已允许在需要时展示直接答案。' : '默认不直接给答案，先帮助你自己想出来。',
+                enabled: this.settings().directAnswerAllowed
+              });
             }
             .width('100%')
             .padding({ left: 16, right: 16 })
