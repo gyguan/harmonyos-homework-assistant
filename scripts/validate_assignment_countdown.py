@@ -55,8 +55,10 @@ for duration in ["10", "15", "20", "30", "45"]:
             f"parent confirmation must expose quick duration option: {duration} minutes")
 require(("预计完成时间" in confirmation or "预计用时" in confirmation) and "updateExpectedMinutes" in confirmation,
         "parent must be able to edit expected completion time before publishing")
-require("预计 ${this.nextAssignment()!.expectedMinutes} 分钟" in student_home,
-        "V2 student home must show the time budget before starting")
+# Student Home now presents the time budget inside each expanded subject task row instead of a
+# single hero assignment. Preserve the capability rather than the old component structure.
+require("`预计 ${item.expectedMinutes} 分钟`" in student_home and "StudentSubjectTaskGroupCard" in student_home,
+        "V2 student home must show each task's time budget before starting")
 require("AssignmentCountdownCard" in study,
         "student study workspace must render the homework countdown")
 
