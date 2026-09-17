@@ -24,6 +24,8 @@ controller = read("backend/src/main/java/com/xiaoban/homework/assignment/Assignm
 batch_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentBatchPublishService.java")
 remote = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 client_service = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
+draft_port = read("entry/src/main/ets/domain/port/HomeworkImportDraftRepository.ets")
+draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraftRepository.ets")
 e2e = read("backend/scripts/batch_publish_e2e.py")
 workflow = read(".github/workflows/static-gate.yml")
 
@@ -51,10 +53,19 @@ require("HomeworkRemoteApi.instance.batchPublish" in client_service,
         "application service must call the authoritative batch endpoint")
 require("if (!response.atomic" in client_service and "response.publishedCount !== candidates.length" in client_service,
         "client must reject incomplete/non-atomic batch responses")
-require("HomeworkStore.instance.replaceCandidates([])" in client_service,
-        "Candidate drafts may be cleared only after a validated atomic success response")
-require(client_service.index("HomeworkStore.instance.replaceCandidates([])") > client_service.index("if (!response.atomic"),
-        "Candidate drafts must not be cleared before atomic response validation")
+require("HomeworkImportDraftRepository" in client_service and "DefaultHomeworkImportDraftRepository" in client_service,
+        "batch publish must access Candidate drafts through the draft repository boundary")
+require("HomeworkStore" not in client_service,
+        "batch publish application service must not access HomeworkStore directly")
+require("this.drafts.clearCandidates()" in client_service,
+        "Candidate drafts may be cleared only through the repository after validated atomic success")
+if "this.drafts.clearCandidates()" in client_service and "if (!response.atomic" in client_service:
+    require(client_service.index("this.drafts.clearCandidates()") > client_service.index("if (!response.atomic"),
+            "Candidate drafts must not be cleared before atomic response validation")
+require("clearCandidates(): void" in draft_port,
+        "draft repository port must expose explicit Candidate cleanup")
+require("clearCandidates(): void { HomeworkStore.instance.replaceCandidates([]); }" in draft_repo,
+        "migration adapter must isolate legacy Candidate cleanup behind the repository")
 
 for token in ["idempotent batch retry", "batch conflict must reject whole transaction",
               "failed batch leaked a partially published first assignment"]:
