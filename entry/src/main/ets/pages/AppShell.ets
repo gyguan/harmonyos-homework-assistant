@@ -239,7 +239,6 @@ export struct AppShell {
   private ParentContent() {
     if (this.parentRoute === ParentRoute.IMPORT) {
       HomeworkImportPage({
-        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
         onOpenConfirmation: () => this.openParentImportConfirmation(),
         onStoreChanged: () => this.touchStore()
