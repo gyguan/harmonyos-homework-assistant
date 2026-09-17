@@ -26,6 +26,8 @@ remote = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 client_service = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
 draft_port = read("entry/src/main/ets/domain/port/HomeworkImportDraftRepository.ets")
 draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraftRepository.ets")
+confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
+mock_parser = read("entry/src/main/ets/infrastructure/ai/MockHomeworkAssignmentParser.ets")
 e2e = read("backend/scripts/batch_publish_e2e.py")
 workflow = read(".github/workflows/static-gate.yml")
 
@@ -66,6 +68,28 @@ require("clearCandidates(): void" in draft_port,
         "draft repository port must expose explicit Candidate cleanup")
 require("clearCandidates(): void { HomeworkStore.instance.replaceCandidates([]); }" in draft_repo,
         "migration adapter must isolate legacy Candidate cleanup behind the repository")
+
+# Delivery P0: Candidate relative/free-text due dates are normalized exactly once at the
+# Candidate -> Assignment publication boundary. Downstream Home/filter/calendar continue to
+# consume structured dueAtEpochMs instead of re-parsing dueText.
+require("AssignmentDueDate" in client_service and "AssignmentDueDate.resolveDayStart" in client_service,
+        "batch publish must use the shared due-date resolver at the Candidate -> Assignment boundary")
+require("dueAtEpochMs: this.resolveCandidateDueAt(candidate)" in client_service,
+        "published Assignments must materialize structured dueAtEpochMs")
+require("dueAtEpochMs: 0" not in client_service,
+        "batch publish must not discard Candidate due dates by hard-coding dueAtEpochMs=0")
+require("candidateAnchor(candidate.id)" in client_service,
+        "relative due dates must be anchored to Candidate/import creation time when available")
+
+# Delivery P0: editing the title must preserve the independently editable teacher instruction.
+require("this.copy(item, item.subject, title, item.instruction)" in confirmation,
+        "confirmation title edit must preserve teacher instruction")
+require("this.copy(item, item.subject, title, title)" not in confirmation,
+        "confirmation title edit must never overwrite teacher instruction")
+
+# Real ArkTS compilation catches interface completeness that Python string gates previously missed.
+require("expectedMinutes: candidate.expectedMinutes" in mock_parser,
+        "mock Candidate parser must populate required expectedMinutes before real ArkTS compilation")
 
 for token in ["idempotent batch retry", "batch conflict must reject whole transaction",
               "failed batch leaked a partially published first assignment"]:

@@ -1,0 +1,21 @@
+name: harmony-client-build
+
+# Real ArkTS/HAP compilation requires Huawei Command Line Tools 26.0.0.
+# Keep this workflow manually runnable until a repository runner with the
+# self-hosted/windows/x64/harmonyos-26 labels is connected. Once that runner
+# exists, add pull_request/push triggers and make this workflow a required check.
+on:
+  workflow_dispatch:
+
+jobs:
+  compile-harmony-client:
+    name: Compile HarmonyOS client
+    runs-on: [self-hosted, windows, x64, harmonyos-26]
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compile ArkTS and assemble debug HAP
+        shell: powershell
+        run: ./scripts/verify_harmony_client.ps1

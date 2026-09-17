@@ -15,6 +15,7 @@ import {
   Subject
 } from '../../domain/model/HomeworkModels';
 import { HomeworkImportDraftRepository } from '../../domain/port/HomeworkImportDraftRepository';
+import { AssignmentDueDate } from '../../domain/service/AssignmentDueDate';
 
 export interface HomeworkBatchPublishResult {
   publishedCount: number;
@@ -76,7 +77,7 @@ export class HomeworkBatchPublishService {
       title: candidate.title,
       instruction: candidate.instruction,
       textbookRef: candidate.textbookRef,
-      dueAtEpochMs: 0,
+      dueAtEpochMs: this.resolveCandidateDueAt(candidate),
       dueTimezone: 'Asia/Shanghai',
       dueText: candidate.dueText,
       status: AssignmentStatus.NOT_STARTED,
@@ -90,6 +91,21 @@ export class HomeworkBatchPublishService {
       lastSyncedAtEpochMs: 0,
       resourceLabels: []
     };
+  }
+
+  private resolveCandidateDueAt(candidate: CandidateAssignment): number {
+    let dayStart = AssignmentDueDate.resolveDayStart(candidate.dueText, this.candidateAnchor(candidate.id));
+    return dayStart > 0 ? dayStart : 0;
+  }
+
+  private candidateAnchor(candidateId: string): number {
+    let parts = candidateId.split('-');
+    for (let part of parts) {
+      if (part.length !== 13) continue;
+      let value = Number(part);
+      if (Number.isFinite(value) && value > 0) return value;
+    }
+    return Date.now();
   }
 
   private subjectCode(subject: Subject): string {
