@@ -71,6 +71,33 @@ export struct StatusSelectionChip {
 }
 
 @Component
+export struct ChoiceSelectionChip {
+  @Prop label: string;
+  @Prop selected: boolean = false;
+  @Prop compact: boolean = false;
+  onSelect: () => void = () => {};
+
+  build() {
+    Text(this.label)
+      .fontSize(this.compact ? 12 : 13)
+      .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({
+        left: this.compact ? 10 : 13,
+        right: this.compact ? 10 : 13,
+        top: this.compact ? 8 : 9,
+        bottom: this.compact ? 8 : 9
+      })
+      .backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.selected ? `${this.label}，已选择` : this.label)
+      .onClick(() => this.onSelect());
+  }
+}
+
+@Component
 export struct SettingsToggleRow {
   @Prop title: string;
   @Prop description: string;
