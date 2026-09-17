@@ -5,6 +5,7 @@ import {
 } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
+import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
 export class StudentAssignmentsViewModel {
   private readonly repository: AssignmentRepository;
@@ -16,6 +17,21 @@ export class StudentAssignmentsViewModel {
   assignments(typeFilter: AssignmentTypeFilter, subjectCode: string,
     dateFilter: AssignmentDateFilter, statuses: AssignmentStatus[] = []): Assignment[] {
     return this.repository.listCached(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
+  }
+
+  calendarAssignments(typeFilter: AssignmentTypeFilter, subjectCode: string): Assignment[] {
+    return this.repository.listCached(
+      this.buildFilter(typeFilter, subjectCode, AssignmentDateFilter.ALL, []));
+  }
+
+  assignmentsOnDay(typeFilter: AssignmentTypeFilter, subjectCode: string, dayEpochMs: number): Assignment[] {
+    let source = this.calendarAssignments(typeFilter, subjectCode);
+    let targetDay = StudentAssignmentsViewModel.startOfDay(dayEpochMs);
+    let result: Assignment[] = [];
+    for (let item of source) {
+      if (AssignmentDueDate.dayStart(item) === targetDay) result.push(item);
+    }
+    return result;
   }
 
   async query(typeFilter: AssignmentTypeFilter, subjectCode: string,

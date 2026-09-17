@@ -84,6 +84,12 @@ jobs:
       - name: Validate V2 Slice 6 extracurricular create
         run: python scripts/validate_v2_slice6_extra_assignment.py
 
+      - name: Validate V2 Slice 6 calendar
+        run: python scripts/validate_v2_slice6_calendar.py
+
+      - name: Validate V2 Slice 6 Pad calendar composition
+        run: python scripts/validate_v2_slice6_pad_calendar.py
+
       - name: Validate backend V0.1 boundaries
         run: python scripts/validate_backend_v01.py
 
