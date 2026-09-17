@@ -40,8 +40,11 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
         let existing = HomeworkStore.instance.getAssignment(remote.id);
         mapped.push(RemoteAssignmentMapper.toLocal(remote, existing));
       }
-      this.queryCache = mapped;
-      return mapped.slice();
+      // The backend query can intentionally receive only filters it supports efficiently
+      // (for example a single status). Always apply the complete V2 filter locally too so
+      // multi-status views such as Parent "需关注" have exact semantics.
+      this.queryCache = AssignmentQuery.filter(mapped, filter);
+      return this.queryCache.slice();
     } catch {
       this.queryCache = this.listCached(filter);
       return this.queryCache.slice();

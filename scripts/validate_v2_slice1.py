@@ -28,11 +28,11 @@ models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets")
 repository_port = read("entry/src/main/ets/domain/port/AssignmentRepository.ets")
 repository_impl = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
+remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 view_model = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
-parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 
 for column in ["assignment_type", "subject_code", "due_at", "due_timezone"]:
     require(column in migration, f"V7 missing Assignment V2 column: {column}")
@@ -62,12 +62,14 @@ require("assignmentType: AssignmentType.SCHOOL" in migrator and "dueAtEpochMs: 0
 
 require("Subject," in store and "private subjectCode(subject: Subject)" in store,
         "HomeworkStore V2 subject mapper must import Subject explicitly for ArkTS compilation")
-for field in ["assignmentType: item.assignmentType", "subjectCode: this.subjectCode(this.editSubject)",
-              "dueAtEpochMs:", "dueTimezone: item.dueTimezone"]:
-    require(field in parent_progress,
-            f"parent assignment edit must preserve/update V2 field: {field}")
-require("dueChanged ? 0 : item.dueAtEpochMs" in parent_progress,
-        "editing legacy dueText must clear structured dueAt instead of keeping stale structured time")
+# Parent Progress no longer owns assignment editing in Slice 4. Preserve the original Slice 1
+# invariant at the durable API boundary instead of requiring old page-local edit state.
+for field in ["assignmentType: assignment.assignmentType", "subjectCode: assignment.subjectCode",
+              "dueAtEpochMs: assignment.dueAtEpochMs", "dueTimezone: assignment.dueTimezone"]:
+    require(field in remote_api,
+            f"Assignment remote update/create must preserve V2 field: {field}")
+require("dueAtEpochMs: number" in remote_api and "dueTimezone: string" in remote_api,
+        "remote Assignment request DTOs must keep structured due fields")
 
 require("interface AssignmentRepository" in repository_port,
         "V2 Student Home must depend on an AssignmentRepository port")

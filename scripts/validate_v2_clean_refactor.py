@@ -12,10 +12,8 @@ LEGACY_FEATURE_STORE_ALLOWLIST = {
     "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
     "entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets",
     "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
-    "entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets",
     "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
     "entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets",
-    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
     "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
 }
 

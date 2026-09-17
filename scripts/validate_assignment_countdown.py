@@ -31,7 +31,7 @@ confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkCon
 student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
-parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
+parent_review = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 
 for column in ["expected_minutes", "started_at_epoch_ms", "finished_at_epoch_ms", "elapsed_seconds"]:
     require(column in migration, f"assignment timing migration missing column: {column}")
@@ -66,8 +66,12 @@ require("this.nowEpochMs - this.assignment.startedAtEpochMs" in countdown,
         "countdown must derive remaining time from timestamps so it survives page/background gaps")
 require("setInterval" in countdown and "clearInterval" in countdown,
         "countdown component must refresh while visible and release its timer when hidden")
-require("预计 ${item.expectedMinutes} 分钟 · 实际 ${actualMinutes} 分钟" in parent_progress,
-        "parent progress must compare planned and actual homework time")
+# Slice 4 moved planned-vs-actual timing from the old all-in-one Progress detail into the
+# dedicated Parent Review surface where submission evidence and acceptance decisions live.
+require("private actualMinutes(item: Assignment)" in parent_review and
+        "`实际 ${this.actualMinutes(this.assignment()!)} 分钟`" in parent_review and
+        "`预计 ${this.assignment()!.expectedMinutes} 分钟`" in parent_review,
+        "parent review must compare planned and actual homework time")
 
 if errors:
     print("ASSIGNMENT_COUNTDOWN_GATE_FAIL")

@@ -32,10 +32,28 @@ export class LayoutPolicy {
     );
   }
 
+  static parentHomeRequirement(): LayoutRequirement {
+    return new LayoutRequirement(
+      AppTheme.PARENT_HOME_PRIMARY_MIN_WIDTH,
+      AppTheme.PARENT_HOME_SECONDARY_MIN_WIDTH,
+      AppTheme.SPLIT_PANE_GAP,
+      AppTheme.PAGE_PADDING_WIDE
+    );
+  }
+
   static assignmentMasterDetailRequirement(): LayoutRequirement {
     return new LayoutRequirement(
       AppTheme.SPLIT_PRIMARY_MIN_WIDTH,
       AppTheme.SPLIT_SECONDARY_MIN_WIDTH,
+      AppTheme.SPLIT_PANE_GAP,
+      AppTheme.PAGE_PADDING_WIDE
+    );
+  }
+
+  static parentProgressReviewRequirement(): LayoutRequirement {
+    return new LayoutRequirement(
+      AppTheme.PARENT_PROGRESS_LIST_MIN_WIDTH,
+      AppTheme.PARENT_REVIEW_MIN_WIDTH,
       AppTheme.SPLIT_PANE_GAP,
       AppTheme.PAGE_PADDING_WIDE
     );

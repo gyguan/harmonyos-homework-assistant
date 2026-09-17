@@ -49,6 +49,11 @@ export class AppTheme {
   static readonly STUDY_SPLIT_MAX_WIDTH: number = 1220;
   static readonly FILTER_DIALOG_MAX_WIDTH: number = 640;
   static readonly STUDY_TITLE_SIZE: number = 26;
+  static readonly PARENT_HOME_READABLE_MAX_WIDTH: number = 820;
+  static readonly PARENT_HOME_PAD_CONTENT_MAX_WIDTH: number = 1180;
+  static readonly PARENT_PROGRESS_READABLE_MAX_WIDTH: number = 800;
+  static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1220;
+  static readonly PARENT_REVIEW_READABLE_MAX_WIDTH: number = 760;
 
   // Deep-page chrome. Assignment detail, study, Tutor, submission and future secondary pages
   // share one compact top chrome instead of implementing page-private back/title layouts.
@@ -70,6 +75,10 @@ export class AppTheme {
   static readonly SPLIT_SECONDARY_MIN_WIDTH: number = 420;
   static readonly STUDY_PRIMARY_MIN_WIDTH: number = 480;
   static readonly STUDY_TUTOR_MIN_WIDTH: number = 340;
+  static readonly PARENT_HOME_PRIMARY_MIN_WIDTH: number = 500;
+  static readonly PARENT_HOME_SECONDARY_MIN_WIDTH: number = 320;
+  static readonly PARENT_PROGRESS_LIST_MIN_WIDTH: number = 360;
+  static readonly PARENT_REVIEW_MIN_WIDTH: number = 440;
   static readonly SPLIT_PANE_GAP: number = 18;
 
   // Compact Phone follows the Focus Journey composition instead of shrinking the Pad workspace.
