@@ -2,13 +2,14 @@ import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, StudentProfile } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
 import { ParentHomeViewModel } from './ParentHomeViewModel';
 
 @Component
 export struct ParentDashboardPage {
   @Prop revision: number = 0;
+  @Prop activeStudentId: string = '';
   @State private refreshRevision: number = 0;
   @State private availableWidthVp: number = 390;
   onOpenImport: () => void = () => {};
@@ -30,6 +31,14 @@ export struct ParentDashboardPage {
 
   private touchRevision(): number {
     return this.revision + this.refreshRevision;
+  }
+
+  private student(): StudentProfile {
+    let currentRevision = this.touchRevision();
+    let student = this.viewModel.student();
+    if (currentRevision < 0) return student;
+    if (this.activeStudentId.length > 0 && student.id !== this.activeStudentId) return student;
+    return student;
   }
 
   private canUseWideComposition(): boolean {
@@ -60,11 +69,11 @@ export struct ParentDashboardPage {
   @Builder
   private Header() {
     Column({ space: 3 }) {
-      Text(`${this.viewModel.student().name} 的今天`)
+      Text(`${this.student().name} 的今天`)
         .fontSize(AppTheme.PHONE_PAGE_TITLE_SIZE)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.TEXT);
-      Text(`${this.viewModel.student().grade} · ${this.viewModel.student().className}`)
+      Text(`${this.student().grade} · ${this.student().className}`)
         .fontSize(12)
         .fontColor(AppTheme.SUBTEXT);
     }
@@ -204,7 +213,7 @@ export struct ParentDashboardPage {
     .backgroundColor(AppTheme.PRIMARY_FAINT)
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`给 ${this.viewModel.student().name} 导入老师作业`)
+    .accessibilityText(`给 ${this.student().name} 导入老师作业`)
     .onClick(() => this.onOpenImport());
   }
 
@@ -226,7 +235,7 @@ export struct ParentDashboardPage {
     .backgroundColor(AppTheme.SUCCESS_SOFT)
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`给 ${this.viewModel.student().name} 布置课外任务`)
+    .accessibilityText(`给 ${this.student().name} 布置课外任务`)
     .onClick(() => this.onOpenExtra());
   }
 
