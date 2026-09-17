@@ -1,7 +1,7 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
-import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, AssignmentType } from '../../../domain/model/HomeworkModels';
 import { StudyWorkspacePage } from './StudyWorkspacePage';
 import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
@@ -20,6 +20,17 @@ export struct StudyWorkspaceRoutePage {
 
   aboutToAppear(): void {
     void this.activateAssignment();
+  }
+
+  private assignment(): Assignment | null {
+    let currentRevision = this.revision + this.activationRevision;
+    if (currentRevision < 0) return null;
+    return this.viewModel.assignment(this.assignmentId);
+  }
+
+  private isExtraAssignment(): boolean {
+    let assignment = this.assignment();
+    return assignment !== null && assignment.assignmentType === AssignmentType.EXTRA;
   }
 
   private shouldActivate(assignment: Assignment): boolean {
@@ -41,6 +52,34 @@ export struct StudyWorkspaceRoutePage {
     }
   }
 
+  @Builder
+  private ExtraAssignmentContext() {
+    if (this.isExtraAssignment() && this.assignment() !== null) {
+      Row({ space: 10 }) {
+        SymbolGlyph($r('sys.symbol.star_fill'))
+          .fontSize(18)
+          .fontColor([AppTheme.PRIMARY]);
+        Column({ space: 2 }) {
+          Text(`课外任务 · ${this.assignment()!.subject}`)
+            .width('100%')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('与课内作业共用计时、AI 辅导、提交和同步链路，不建立第二套任务流程。')
+            .width('100%')
+            .fontSize(11)
+            .lineHeight(17)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+      }
+      .width('100%')
+      .padding({ left: 14, right: 14, top: 10, bottom: 10 })
+      .backgroundColor(AppTheme.PRIMARY_FAINT);
+    }
+  }
+
   build() {
     Column({ space: 0 }) {
       if (this.activationMessage.length > 0) {
@@ -51,6 +90,7 @@ export struct StudyWorkspaceRoutePage {
           .fontColor(AppTheme.WARNING)
           .backgroundColor(AppTheme.WARNING_SOFT);
       }
+      this.ExtraAssignmentContext();
       Column() {
         StudyWorkspacePage({
           tutorUnavailable: this.tutorUnavailable,
