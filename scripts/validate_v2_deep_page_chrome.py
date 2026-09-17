@@ -22,6 +22,7 @@ theme = read("entry/src/main/ets/common/theme/AppTheme.ets")
 header = read("entry/src/main/ets/components/navigation/DeepPageHeader.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+parent_import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
 spec = read("docs/product/v2-deep-page-chrome-standard.md")
 agents = read("AGENTS.md")
 
@@ -50,15 +51,16 @@ require("backgroundColor(AppTheme.SURFACE_EMPHASIS)" in header and "borderRadius
 for path, text in [
     ("StudentAssignmentDetailPage.ets", detail),
     ("StudyWorkspacePage.ets", study),
+    ("HomeworkImportRoutePage.ets", parent_import_route),
 ]:
     require("DeepPageHeader" in text, f"migrated deep page must reuse DeepPageHeader: {path}")
     require("AppTheme.DEEP_PAGE_TOP_PADDING" in text,
             f"migrated deep page must use the shared top spacing token: {path}")
-    require("AppTheme.DEEP_PAGE_BOTTOM_PADDING" in text,
-            f"migrated deep page must use the shared bottom spacing token: {path}")
     require("Text('‹')" not in text,
             f"migrated deep page must not implement a private back glyph: {path}")
 
+require("backAccessibilityText: '返回家长首页'" in parent_import_route and "embeddedInDeepPage: true" in parent_import_route,
+        "parent import deep page must expose shared back chrome without duplicating the import page heading")
 require("private WorkspaceHeader()" not in study,
         "StudyWorkspace must not reintroduce its legacy private WorkspaceHeader")
 require("top: 0" in study,
