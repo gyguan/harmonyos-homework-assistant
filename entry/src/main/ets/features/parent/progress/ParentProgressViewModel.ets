@@ -17,14 +17,14 @@ export class ParentProgressViewModel {
     return this.repository.getActiveStudent();
   }
 
-  assignments(subjectCode: string, dateFilter: AssignmentDateFilter,
+  assignments(typeFilter: AssignmentTypeFilter, subjectCode: string, dateFilter: AssignmentDateFilter,
     statuses: AssignmentStatus[] = []): Assignment[] {
-    return this.repository.listCached(this.buildFilter(subjectCode, dateFilter, statuses));
+    return this.repository.listCached(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
   }
 
-  async query(subjectCode: string, dateFilter: AssignmentDateFilter,
+  async query(typeFilter: AssignmentTypeFilter, subjectCode: string, dateFilter: AssignmentDateFilter,
     statuses: AssignmentStatus[] = []): Promise<Assignment[]> {
-    return this.repository.query(this.buildFilter(subjectCode, dateFilter, statuses));
+    return this.repository.query(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
   }
 
   assignment(assignmentId: string): Assignment | null {
@@ -35,7 +35,7 @@ export class ParentProgressViewModel {
     return this.repository.refresh();
   }
 
-  private buildFilter(subjectCode: string, dateFilter: AssignmentDateFilter,
+  private buildFilter(typeFilter: AssignmentTypeFilter, subjectCode: string, dateFilter: AssignmentDateFilter,
     statuses: AssignmentStatus[]): AssignmentFilter {
     let fromEpochMs = 0;
     let toEpochMs = 0;
@@ -53,7 +53,7 @@ export class ParentProgressViewModel {
       toEpochMs = ParentProgressViewModel.endOfWeek(today);
     }
     return {
-      assignmentType: AssignmentTypeFilter.ALL,
+      assignmentType: typeFilter,
       subjectCode: subjectCode,
       dateFilter: dateFilter,
       fromEpochMs: fromEpochMs,

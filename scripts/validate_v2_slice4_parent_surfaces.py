@@ -27,6 +27,8 @@ home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.et
 home_vm = read("entry/src/main/ets/features/parent/dashboard/ParentHomeViewModel.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 progress_vm = read("entry/src/main/ets/features/parent/progress/ParentProgressViewModel.ets")
+student_assignments = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
+shared_filter = read("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 review_page = read("entry/src/main/ets/features/parent/review/ParentReviewPage.ets")
 review_pane = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 review_vm = read("entry/src/main/ets/features/parent/review/ParentReviewViewModel.ets")
@@ -91,9 +93,18 @@ require("LayoutPolicy.parentProgressReviewRequirement()" in progress and "availa
 require("AppTheme.PARENT_PROGRESS_READABLE_MAX_WIDTH" in progress and
         "AppTheme.PARENT_PROGRESS_REVIEW_MAX_WIDTH" in progress,
         "Parent Progress must keep readable fallback and capped list-review split")
-for phrase in ["全部日期", "今天", "明天", "本周", "全部科目", "语文", "数学", "英语",
+require("components/assignment/AssignmentFilterDialog" in progress and
+        "components/assignment/AssignmentFilterDialog" in student_assignments,
+        "Parent Progress and Student Assignments must reuse the same shared assignment filter dialog")
+for token in ["FilterEntry('类型'", "FilterEntry('截止'", "FilterEntry('科目'",
+              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusFilterBar"]:
+    require(token in progress, f"Parent Progress must align common filter interaction with Student Assignments: {token}")
+for phrase in ["全部日期", "今天", "明天", "本周", "未定", "全部科目", "语文", "数学", "英语", "其他",
                "全部状态", "需关注", "待验收", "已完成"]:
-    require(phrase in progress, f"Parent Progress missing required filter/summary content: {phrase}")
+    require(phrase in progress or phrase in shared_filter,
+            f"Parent Progress missing required filter/summary content: {phrase}")
+require("AssignmentTypeFilter" in progress_vm and "assignmentType: typeFilter" in progress_vm,
+        "Parent Progress query must support the same Assignment type dimension as Student Assignments")
 require("ParentReviewPane({" in progress and "selectedAssignmentId" in progress,
         "wide Parent Progress must reuse ParentReviewPane instead of a duplicate detail model")
 require("this.onOpenReview(item.id)" in progress,

@@ -21,7 +21,7 @@ def require(condition: bool, message: str) -> None:
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
-filter_dialog = read("entry/src/main/ets/features/student/assignments/AssignmentFilterDialog.ets")
+filter_dialog = read("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 detail_pane = read("entry/src/main/ets/features/student/assignments/AssignmentDetailPane.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
@@ -80,6 +80,8 @@ require("AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH" in page and
 require("private AssignmentListPage()" in page and ".align(Alignment.TopStart)" in page and
         ".align(Alignment.TopStart)" in detail,
         "Phone list/detail fallback must stay top-anchored")
+require("components/assignment/AssignmentFilterDialog" in page,
+        "student assignment page must use the shared assignment filter dialog")
 
 for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
     require(token in page or token in filter_dialog, f"missing type filter option: {token}")
