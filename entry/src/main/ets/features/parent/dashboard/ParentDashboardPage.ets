@@ -57,6 +57,19 @@ export struct ParentDashboardPage {
     return this.viewModel.assignments();
   }
 
+  private pendingTodayCount(): number {
+    let pending = this.viewModel.summary().total - this.viewModel.summary().completed;
+    return pending > 0 ? pending : 0;
+  }
+
+  private submittedCount(): number {
+    let count = 0;
+    for (let item of this.assignments()) {
+      if (item.status === AssignmentStatus.SUBMITTED) count++;
+    }
+    return count;
+  }
+
   private openAttention(item: Assignment): void {
     if (item.status === AssignmentStatus.SUBMITTED || item.status === AssignmentStatus.COMPLETED ||
       item.status === AssignmentStatus.NEEDS_REWORK) {
@@ -67,58 +80,66 @@ export struct ParentDashboardPage {
   }
 
   @Builder
-  private Header() {
-    Column({ space: 3 }) {
-      Text(`${this.student().name} 的今天`)
-        .fontSize(AppTheme.PHONE_PAGE_TITLE_SIZE)
+  private MetricCard(label: string, value: number, tone: string) {
+    Column({ space: 5 }) {
+      Text(`${value}`)
+        .fontSize(24)
         .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.TEXT);
-      Text(`${this.student().grade} · ${this.student().className}`)
-        .fontSize(12)
+        .fontColor(tone === 'attention' ? AppTheme.WARNING : tone === 'done' ? AppTheme.SUCCESS : AppTheme.PRIMARY);
+      Text(label)
+        .fontSize(11)
         .fontColor(AppTheme.SUBTEXT);
     }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start);
+    .layoutWeight(1)
+    .constraintSize({ minHeight: 76 })
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor(tone === 'attention' ? AppTheme.WARNING_SOFT :
+      tone === 'done' ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_FAINT)
+    .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
-  private TodaySummary() {
-    Column({ space: 9 }) {
+  private TodayOverview() {
+    Column({ space: 12 }) {
       Row() {
         Column({ space: 2 }) {
-          Text('今日完成').fontSize(12).fontColor(AppTheme.SUBTEXT);
-          Row({ space: 5 }) {
-            Text(`${this.viewModel.summary().completed}`)
-              .fontSize(29).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-            Text(`/ ${this.viewModel.summary().total}`)
-              .fontSize(13).fontColor(AppTheme.SUBTEXT).margin({ top: 9 });
-          }
+          Text('今日概览')
+            .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('先看结果，再处理需要家长介入的事项')
+            .fontSize(11)
+            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        if (this.attentionAssignments().length > 0) {
-          Text(`${this.attentionAssignments().length} 项需关注`)
-            .fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER)
-            .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-            .backgroundColor(AppTheme.DANGER_SOFT)
-            .borderRadius(AppTheme.CHIP_RADIUS);
-        } else {
-          Text('今天正常')
-            .fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS)
-            .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-            .backgroundColor(AppTheme.SUCCESS_SOFT)
-            .borderRadius(AppTheme.CHIP_RADIUS);
-        }
+        Text(this.attentionAssignments().length > 0 ? '有待处理' : '进展正常')
+          .fontSize(11)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.attentionAssignments().length > 0 ? AppTheme.WARNING : AppTheme.SUCCESS)
+          .padding({ left: 9, right: 9, top: 6, bottom: 6 })
+          .backgroundColor(this.attentionAssignments().length > 0 ? AppTheme.WARNING_SOFT : AppTheme.SUCCESS_SOFT)
+          .borderRadius(AppTheme.CHIP_RADIUS);
       }
       .width('100%');
+
+      Row({ space: 8 }) {
+        this.MetricCard('待完成', this.pendingTodayCount(), 'primary');
+        this.MetricCard('需关注', this.attentionAssignments().length, 'attention');
+        this.MetricCard('已完成', this.viewModel.summary().completed, 'done');
+      }
+      .width('100%');
+
       Progress({
         value: this.viewModel.summary().completed,
         total: this.viewModel.summary().total > 0 ? this.viewModel.summary().total : 1,
         type: ProgressType.Linear
       })
-        .width('100%').height(7).color(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT);
-      Text(this.viewModel.summary().total > 0 ? '只关注需要家长处理的事项，其余让孩子自己完成。' : '今天暂时没有结构化作业。')
-        .width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+        .width('100%')
+        .height(6)
+        .color(AppTheme.PRIMARY)
+        .backgroundColor(AppTheme.PRIMARY_SOFT);
     }
     .width('100%')
     .padding(AppTheme.PHONE_CARD_PADDING)
@@ -131,28 +152,43 @@ export struct ParentDashboardPage {
     if (this.attentionAssignments().length > 0) {
       Column({ space: 9 }) {
         Row() {
-          Text('需要我处理').fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-            .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('需要我处理')
+            .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
           Blank();
-          Text(`${this.attentionAssignments().length} 项`).fontSize(11).fontColor(AppTheme.SUBTEXT);
+          Text(`${this.attentionAssignments().length} 项`)
+            .fontSize(11)
+            .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
+
         Column({ space: 7 }) {
           ForEach(this.attentionAssignments(), (item: Assignment) => {
             Row({ space: 10 }) {
               Column({ space: 3 }) {
                 Row({ space: 6 }) {
-                  Text(item.subject).fontSize(11).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+                  Text(item.subject)
+                    .fontSize(11)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.PRIMARY);
                   Text(item.status === AssignmentStatus.SUBMITTED ? '待验收' : AssignmentStateMachine.label(item.status))
                     .fontSize(10)
                     .fontColor(item.status === AssignmentStatus.SUBMITTED ? AppTheme.WARNING : AppTheme.DANGER);
                 }
-                Text(item.title).width('100%').fontSize(14).fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT).maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis });
+                Text(item.title)
+                  .width('100%')
+                  .fontSize(14)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis });
               }
               .layoutWeight(1)
               .alignItems(HorizontalAlign.Start);
-              SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).fontColor([AppTheme.TERTIARY_TEXT]);
+              SymbolGlyph($r('sys.symbol.chevron_right'))
+                .fontSize(15)
+                .fontColor([AppTheme.TERTIARY_TEXT]);
             }
             .width('100%')
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -171,93 +207,34 @@ export struct ParentDashboardPage {
   }
 
   @Builder
-  private RecentSubmission() {
-    if (this.viewModel.recentSubmitted() !== null) {
-      Row({ space: 10 }) {
-        SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(21).fontColor([AppTheme.SUCCESS]);
-        Column({ space: 3 }) {
-          Text('最近提交').fontSize(12).fontColor(AppTheme.SUBTEXT);
-          Text(`${this.viewModel.recentSubmitted()!.subject} · ${this.viewModel.recentSubmitted()!.title}`)
-            .width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT)
-            .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis });
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-        SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).fontColor([AppTheme.TERTIARY_TEXT]);
-      }
-      .width('100%')
-      .padding(13)
-      .backgroundColor(AppTheme.SUCCESS_SOFT)
-      .borderRadius(AppTheme.CONTROL_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText('查看最近提交')
-      .onClick(() => this.onOpenReview(this.viewModel.recentSubmitted()!.id));
-    }
-  }
-
-  @Builder
-  private ImportAction() {
-    Row({ space: 11 }) {
-      SymbolGlyph($r('sys.symbol.plus_square')).fontSize(22).fontColor([AppTheme.PRIMARY]);
-      Column({ space: 2 }) {
-        Text('导入老师作业').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text('截图或文字，整理后再确认发布').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
-      SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).fontColor([AppTheme.TERTIARY_TEXT]);
-    }
-    .width('100%')
-    .constraintSize({ minHeight: 58 })
-    .padding({ left: 13, right: 13, top: 11, bottom: 11 })
-    .backgroundColor(AppTheme.PRIMARY_FAINT)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`给 ${this.student().name} 导入老师作业`)
-    .onClick(() => this.onOpenImport());
-  }
-
-  @Builder
-  private ExtraAction() {
-    Row({ space: 11 }) {
-      SymbolGlyph($r('sys.symbol.plus_square')).fontSize(22).fontColor([AppTheme.SUCCESS]);
-      Column({ space: 2 }) {
-        Text('布置课外任务').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text('阅读、朗读、体育、实践或兴趣任务').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
-      SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).fontColor([AppTheme.TERTIARY_TEXT]);
-    }
-    .width('100%')
-    .constraintSize({ minHeight: 58 })
-    .padding({ left: 13, right: 13, top: 11, bottom: 11 })
-    .backgroundColor(AppTheme.SUCCESS_SOFT)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`给 ${this.student().name} 布置课外任务`)
-    .onClick(() => this.onOpenExtra());
-  }
-
-  @Builder
-  private TodayAssignments() {
+  private RecentActivity() {
     Column({ space: 9 }) {
       Row() {
-        Text('作业进度').fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('最近动态')
+          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
         Blank();
-        Text('查看全部').fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+        Text('查看作业进度')
+          .fontSize(12)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 8, right: 4 })
           .onClick(() => this.onOpenProgress());
       }
       .width('100%');
+
       if (this.assignments().length === 0) {
-        Text('还没有发布作业').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT)
-          .padding({ top: 18, bottom: 18 }).textAlign(TextAlign.Center);
+        Text('还没有发布作业')
+          .width('100%')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT)
+          .padding({ top: 18, bottom: 18 })
+          .textAlign(TextAlign.Center);
       } else {
         Column({ space: 6 }) {
-          ForEach(this.assignments(), (item: Assignment) => {
+          ForEach(this.assignments().slice(0, 3), (item: Assignment) => {
             AssignmentListItem({
               assignment: item,
               showChevron: true,
@@ -267,8 +244,120 @@ export struct ParentDashboardPage {
         }
         .width('100%');
       }
+
+      if (this.viewModel.recentSubmitted() !== null) {
+        Row({ space: 8 }) {
+          SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
+            .fontSize(18)
+            .fontColor([AppTheme.SUCCESS]);
+          Text('最近提交')
+            .fontSize(11)
+            .fontColor(AppTheme.SUBTEXT);
+          Text(`${this.viewModel.recentSubmitted()!.subject} · ${this.viewModel.recentSubmitted()!.title}`)
+            .layoutWeight(1)
+            .fontSize(12)
+            .fontColor(AppTheme.TEXT)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis });
+        }
+        .width('100%')
+        .padding({ left: 11, right: 11, top: 9, bottom: 9 })
+        .backgroundColor(AppTheme.SUCCESS_SOFT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('查看最近提交')
+        .onClick(() => this.onOpenReview(this.viewModel.recentSubmitted()!.id));
+      }
     }
     .width('100%');
+  }
+
+  @Builder
+  private QuickActions() {
+    Column({ space: 9 }) {
+      Text('快捷操作')
+        .width('100%')
+        .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+
+      Row({ space: 8 }) {
+        Row({ space: 8 }) {
+          SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.PRIMARY]);
+          Column({ space: 2 }) {
+            Text('导入作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('老师截图或文字').fontSize(10).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+        }
+        .layoutWeight(1)
+        .constraintSize({ minHeight: 64 })
+        .padding(11)
+        .backgroundColor(AppTheme.PRIMARY_FAINT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(`给 ${this.student().name} 导入老师作业`)
+        .onClick(() => this.onOpenImport());
+
+        Row({ space: 8 }) {
+          SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.SUCCESS]);
+          Column({ space: 2 }) {
+            Text('课外任务').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('阅读、体育、实践').fontSize(10).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+        }
+        .layoutWeight(1)
+        .constraintSize({ minHeight: 64 })
+        .padding(11)
+        .backgroundColor(AppTheme.SUCCESS_SOFT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(`给 ${this.student().name} 布置课外任务`)
+        .onClick(() => this.onOpenExtra());
+      }
+      .width('100%');
+    }
+    .width('100%');
+  }
+
+  @Builder
+  private ChildPerformance() {
+    Column({ space: 12 }) {
+      Text('孩子表现')
+        .width('100%')
+        .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+      Row() {
+        Text('今日完成').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Blank();
+        Text(`${this.viewModel.summary().completed} / ${this.viewModel.summary().total}`)
+          .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
+      }
+      .width('100%');
+      Divider().color(AppTheme.DIVIDER);
+      Row() {
+        Text('待家长验收').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Blank();
+        Text(`${this.submittedCount()} 项`)
+          .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.WARNING);
+      }
+      .width('100%');
+      Divider().color(AppTheme.DIVIDER);
+      Row() {
+        Text('需关注').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Blank();
+        Text(`${this.attentionAssignments().length} 项`)
+          .fontSize(13).fontWeight(FontWeight.Medium)
+          .fontColor(this.attentionAssignments().length > 0 ? AppTheme.DANGER : AppTheme.SUCCESS);
+      }
+      .width('100%');
+    }
+    .width('100%')
+    .padding(AppTheme.PHONE_CARD_PADDING)
+    .backgroundColor(AppTheme.SURFACE)
+    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
   }
 
   @Builder
@@ -276,13 +365,10 @@ export struct ParentDashboardPage {
     Scroll() {
       Column() {
         Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-          this.Header();
-          this.TodaySummary();
+          this.TodayOverview();
           this.AttentionSection();
-          this.RecentSubmission();
-          this.ImportAction();
-          this.ExtraAction();
-          this.TodayAssignments();
+          this.RecentActivity();
+          this.QuickActions();
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.PARENT_HOME_READABLE_MAX_WIDTH })
@@ -291,38 +377,40 @@ export struct ParentDashboardPage {
       .width('100%')
       .alignItems(HorizontalAlign.Center);
     }
-    .width('100%').height('100%').align(Alignment.TopStart).scrollBar(BarState.Off);
+    .width('100%')
+    .height('100%')
+    .align(Alignment.TopStart)
+    .scrollBar(BarState.Off);
   }
 
   @Builder
   private WideHome() {
     Scroll() {
-      Column({ space: 18 }) {
-        this.Header();
-        Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-          Column({ space: 16 }) {
-            this.TodaySummary();
-            this.TodayAssignments();
-          }
-          .layoutWeight(1)
-          .alignItems(HorizontalAlign.Start);
-          Column({ space: 14 }) {
-            this.AttentionSection();
-            this.RecentSubmission();
-            this.ImportAction();
-            this.ExtraAction();
-          }
-          .width(AppTheme.PARENT_HOME_SECONDARY_MIN_WIDTH)
-          .alignItems(HorizontalAlign.Start);
+      Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+        Column({ space: 18 }) {
+          this.TodayOverview();
+          this.AttentionSection();
+          this.RecentActivity();
         }
-        .width('100%')
-        .alignItems(VerticalAlign.Top);
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+
+        Column({ space: 14 }) {
+          this.ChildPerformance();
+          this.QuickActions();
+        }
+        .width(AppTheme.PARENT_HOME_SECONDARY_MIN_WIDTH)
+        .alignItems(HorizontalAlign.Start);
       }
       .width('100%')
       .constraintSize({ maxWidth: AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH })
-      .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 20 });
+      .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 20, bottom: 20 })
+      .alignItems(VerticalAlign.Top);
     }
-    .width('100%').height('100%').align(Alignment.TopStart).scrollBar(BarState.Off);
+    .width('100%')
+    .height('100%')
+    .align(Alignment.TopStart)
+    .scrollBar(BarState.Off);
   }
 
   build() {
