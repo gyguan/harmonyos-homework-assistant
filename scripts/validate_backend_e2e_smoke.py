@@ -4,6 +4,7 @@ import py_compile
 
 ROOT = Path(__file__).resolve().parents[1]
 SMOKE = ROOT / "backend/scripts/e2e_smoke.py"
+HEALTH = ROOT / "backend/src/main/java/com/xiaoban/homework/common/HealthController.java"
 README = ROOT / "backend/README.md"
 GITIGNORE = ROOT / ".gitignore"
 errors: list[str] = []
@@ -24,6 +25,7 @@ else:
     except py_compile.PyCompileError as exc:
         errors.append(f"backend e2e smoke must compile: {exc}")
 
+health = HEALTH.read_text(encoding="utf-8") if HEALTH.exists() else ""
 readme = README.read_text(encoding="utf-8") if README.exists() else ""
 gitignore = GITIGNORE.read_text(encoding="utf-8") if GITIGNORE.exists() else ""
 
@@ -46,6 +48,10 @@ for token in [
 ]:
     require(token in smoke, f"backend e2e smoke missing contract marker: {token}")
 
+require("ApplicationAvailability" in health and "ReadinessState.ACCEPTING_TRAFFIC" in health,
+        "health endpoint must wait for Spring application readiness before E2E starts")
+require("HttpStatus.SERVICE_UNAVAILABLE" in health,
+        "health endpoint must reject startup probes until bootstrap runners finish")
 require("backend/.e2e-session.json" in gitignore, "local e2e bearer token file must be ignored")
 require("真实 Backend E2E Smoke" in readme, "backend README must document real E2E smoke")
 require("--session-only" in readme, "backend README must document post-restart session validation")
