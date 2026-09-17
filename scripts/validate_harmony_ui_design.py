@@ -48,22 +48,41 @@ for token in [
     require(f"static readonly {token}" in theme, f"AppTheme missing durable design token: {token}")
 
 app_shell = read_optional("entry/src/main/ets/pages/AppShell.ets")
+primary_nav = read_optional("entry/src/main/ets/components/navigation/PrimaryNavItem.ets")
 if app_shell:
     require("Text(active ? '●' : '○')" not in app_shell,
             "navigation must not regress to text-dot icons")
 
-    # Persistent primary navigation must not communicate selection through foreground color alone.
-    # Both Phone bottom navigation and wide side navigation need a selected surface plus foreground cue.
-    bottom_item = between(app_shell, "private BottomItem(", "private BottomNavigation()")
-    side_item = between(app_shell, "private SideItem(", "private SideNavigation()")
-    for block, label in [(bottom_item, "Phone bottom navigation"), (side_item, "wide side navigation")]:
-        require("active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT" in block and
-                "active ? AppTheme.PRIMARY : AppTheme.SUBTEXT" in block,
-                f"{label} must keep active icon/text foreground feedback")
-        require("backgroundColor(active ? AppTheme.PRIMARY_SOFT : Color.Transparent)" in block,
-                f"{label} must expose a visible selected surface, not color-only selection")
-        require("accessibilityText(active ? `${label}，当前页面` : label)" in block,
-                f"{label} must expose the current-page state to accessibility")
+    # Route content and primary-nav visuals must subscribe to the same route state. Do not pass the
+    # selected flag through ordinary @Builder value parameters: the page may switch while the visual
+    # node keeps its old value. A child @Component with @Prop selected gives ArkUI an explicit state
+    # dependency and keeps Phone and wide navigation consistent.
+    require("private BottomItem(" not in app_shell and "private SideItem(" not in app_shell,
+            "primary navigation selection must not use ordinary @Builder boolean parameters")
+    require("BottomPrimaryNavItem" in app_shell and "SidePrimaryNavItem" in app_shell,
+            "AppShell must use reactive primary navigation components")
+    for expression in [
+        "selected: this.studentRoute === StudentRoute.HOME",
+        "selected: this.studentRoute === StudentRoute.ASSIGNMENTS",
+        "selected: this.studentRoute === StudentRoute.PROFILE",
+        "selected: this.parentRoute === ParentRoute.DASHBOARD",
+        "selected: this.parentRoute === ParentRoute.PROGRESS",
+        "selected: this.parentRoute === ParentRoute.SETTINGS",
+    ]:
+        require(expression in app_shell,
+                f"primary navigation must bind selection directly to route state: {expression}")
+
+require(len(primary_nav) > 0, "missing reactive primary navigation component")
+if primary_nav:
+    require(primary_nav.count("@Prop selected: boolean = false;") >= 2,
+            "Phone and side primary navigation items must receive selected as reactive @Prop")
+    require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : Color.Transparent)" in primary_nav,
+            "primary navigation must expose a visible selected surface")
+    require("fontColor([this.selected ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT])" in primary_nav and
+            "fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT)" in primary_nav,
+            "primary navigation must keep selected icon/text foreground feedback")
+    require("accessibilityText(this.selected ? `${this.label}，当前页面` : this.label)" in primary_nav,
+            "primary navigation must expose current-page state to accessibility")
 
 legacy_visual_literals = [
     "#F7F8FA",
