@@ -29,6 +29,7 @@ progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.
 progress_vm = read("entry/src/main/ets/features/parent/progress/ParentProgressViewModel.ets")
 student_assignments = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 shared_filter = read("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
+selection_controls = read("entry/src/main/ets/components/selection/SelectionControls.ets")
 review_page = read("entry/src/main/ets/features/parent/review/ParentReviewPage.ets")
 review_pane = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 review_vm = read("entry/src/main/ets/features/parent/review/ParentReviewViewModel.ets")
@@ -96,9 +97,15 @@ require("AppTheme.PARENT_PROGRESS_READABLE_MAX_WIDTH" in progress and
 require("components/assignment/AssignmentFilterDialog" in progress and
         "components/assignment/AssignmentFilterDialog" in student_assignments,
         "Parent Progress and Student Assignments must reuse the same shared assignment filter dialog")
-for token in ["FilterEntry('类型'", "FilterEntry('截止'", "FilterEntry('科目'",
-              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusFilterBar"]:
+require("components/selection/SelectionControls" in progress and
+        "components/selection/SelectionControls" in student_assignments,
+        "Parent Progress and Student Assignments must reuse shared reactive selection controls")
+for token in ["FilterSummaryEntry({", "label: '类型'", "label: '截止'", "label: '科目'",
+              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusSelectionChip", "StatusFilterBar"]:
     require(token in progress, f"Parent Progress must align common filter interaction with Student Assignments: {token}")
+require("@Prop active: boolean = false;" in selection_controls and
+        "@Prop selected: boolean = false;" in selection_controls,
+        "shared selection controls must expose reactive active/selected props")
 for phrase in ["全部日期", "今天", "明天", "本周", "未定", "全部科目", "语文", "数学", "英语", "其他",
                "全部状态", "需关注", "待验收", "已完成"]:
     require(phrase in progress or phrase in shared_filter,
