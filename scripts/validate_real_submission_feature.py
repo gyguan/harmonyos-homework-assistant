@@ -24,10 +24,11 @@ persistence_models = read("entry/src/main/ets/domain/model/PersistenceModels.ets
 migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 service = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
+parent_evidence = read("entry/src/main/ets/application/submission/ParentSubmissionEvidenceService.ets")
 remote_api = read("entry/src/main/ets/application/remote/RemoteSubmissionApi.ets")
 repository = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
-progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
+review_pane = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 entry_ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/submission/SubmissionController.java")
 backend_service = read("backend/src/main/java/com/xiaoban/homework/submission/SubmissionService.java")
@@ -53,9 +54,15 @@ require("submissionPhotoUris" in study and "选择作业照片" in study and "�
         "Student workspace must select, preview and confirm real photos")
 require("removeSubmissionPhoto" in study and "重新选择照片" in study,
         "Student must be able to remove/reselect photos before submitting")
-require("Image(uri)" in study and "submission.photoUris" in progress,
-        "Student and parent surfaces must render submitted images")
-require("MOCK_IMAGE" not in service + study + progress + store + models,
+require("Image(uri)" in study,
+        "Student workspace must render selected/submitted local photos")
+require("ParentSubmissionEvidenceService" in review_pane and "CloudSubmissionPhotoStrip" in review_pane and
+        "private LocalPhotos(uris: string[])" in review_pane and "Image(uri)" in review_pane,
+        "V2 Parent Review must render remote submission photos and local seed/demo evidence")
+require("RemoteSubmissionApi.instance.list" in parent_evidence and
+        "HomeworkSubmissionService.instance.listCached" in parent_evidence,
+        "Parent evidence boundary must prefer remote submissions with local persisted fallback")
+require("MOCK_IMAGE" not in service + study + review_pane + parent_evidence + store + models,
         "Mock submission path must not remain in the real submission flow")
 
 # V2 real assignments are server-authoritative: upload first, then update local cache from
