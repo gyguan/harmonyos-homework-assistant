@@ -7,6 +7,7 @@ import { HomeworkImportViewModel } from './HomeworkImportViewModel';
 @Component
 export struct HomeworkImportPage {
   @Prop revision: number = 0;
+  @Prop embeddedInDeepPage: boolean = false;
   @State private localRevision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private showCandidatesStep: boolean = false;
@@ -317,19 +318,22 @@ export struct HomeworkImportPage {
     Scroll() {
       Column() {
         Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-          Column({ space: 3 }) {
-            Text('收作业').fontSize(AppTheme.PHONE_PAGE_TITLE_SIZE)
-              .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-            Text('老师原文 → 小伴整理 → 家长确认发布').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          if (!this.embeddedInDeepPage) {
+            Column({ space: 3 }) {
+              Text('收作业').fontSize(AppTheme.PHONE_PAGE_TITLE_SIZE)
+                .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Text('老师原文 → 小伴整理 → 家长确认发布').fontSize(12).fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%')
+            .alignItems(HorizontalAlign.Start);
           }
-          .width('100%')
-          .alignItems(HorizontalAlign.Start);
           if (this.showCandidatesStep) this.CandidatePane(true);
           else this.SourcePane();
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
-        .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
+        .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING,
+          top: this.embeddedInDeepPage ? 0 : 14, bottom: 20 });
       }
       .width('100%')
       .alignItems(HorizontalAlign.Center);
@@ -343,12 +347,14 @@ export struct HomeworkImportPage {
   @Builder
   private WideFlow() {
     Column({ space: 14 }) {
-      Column({ space: 3 }) {
-        Text('收作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        Text('老师原文 → 小伴整理 → 家长确认发布').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      if (!this.embeddedInDeepPage) {
+        Column({ space: 3 }) {
+          Text('收作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          Text('老师原文 → 小伴整理 → 家长确认发布').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%')
+        .alignItems(HorizontalAlign.Start);
       }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start);
       Row({ space: AppTheme.SPLIT_PANE_GAP }) {
         Scroll() { this.SourcePane(); }
           .width(AppTheme.IMPORT_SOURCE_MIN_WIDTH)
@@ -369,7 +375,8 @@ export struct HomeworkImportPage {
     .width('100%')
     .height('100%')
     .constraintSize({ maxWidth: AppTheme.IMPORT_SPLIT_MAX_WIDTH })
-    .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 20 });
+    .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE,
+      top: this.embeddedInDeepPage ? 0 : 18, bottom: 20 });
   }
 
   build() {
