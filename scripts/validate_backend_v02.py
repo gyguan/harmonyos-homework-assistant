@@ -46,7 +46,8 @@ import_service = read("entry/src/main/ets/application/import/HomeworkImportServi
 import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 submission_cache = read("entry/src/main/ets/application/remote/RemoteSubmissionCache.ets")
-progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
+parent_evidence = read("entry/src/main/ets/application/submission/ParentSubmissionEvidenceService.ets")
+parent_review = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 
 for table in ["auth_session", "tutor_session", "tutor_message"]:
     require(f"create table {table}" in v3.lower(), f"missing V0.2 table: {table}")
@@ -123,8 +124,10 @@ require("FamilyCloudService" in settings_page and "StudentRemoteApi" in family_c
         "parent settings must manage cloud-backed family members")
 require("TutorRemoteApi" in study and "/tutor/messages" in tutor_remote,
         "student workspace must use the real backend Tutor API")
-require("RemoteSubmissionCache" in progress and "RemoteSubmissionCache" in submission_cache,
-        "parent progress must expose cross-device cloud submission metadata")
+require("RemoteSubmissionCache" in parent_evidence and "RemoteSubmissionCache" in submission_cache and
+        "RemoteSubmissionApi.instance.list" in parent_evidence and
+        "ParentSubmissionEvidenceService" in parent_review and "CloudSubmissionPhotoStrip" in parent_review,
+        "V2 Parent Review must expose cross-device cloud submission metadata through the evidence boundary")
 
 ets_root = ROOT / "entry" / "src" / "main" / "ets"
 if ets_root.exists():
