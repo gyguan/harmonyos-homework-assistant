@@ -99,9 +99,10 @@ export class HomeworkBatchPublishService {
   }
 
   private candidateAnchor(candidateId: string): number {
-    let match = candidateId.match(/(?:text|image|manual)-(\d{13})/);
-    if (match !== null && match.length >= 2) {
-      let value = Number(match[1]);
+    let parts = candidateId.split('-');
+    for (let part of parts) {
+      if (part.length !== 13) continue;
+      let value = Number(part);
       if (Number.isFinite(value) && value > 0) return value;
     }
     return Date.now();
