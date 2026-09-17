@@ -9,6 +9,7 @@ import {
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
+import { BottomPrimaryNavItem, SidePrimaryNavItem } from '../components/navigation/PrimaryNavItem';
 import { PageStateView } from '../components/state/PageStateView';
 import { HomeworkStore } from '../data/HomeworkStore';
 import { StudentProfile } from '../domain/model/HomeworkModels';
@@ -309,49 +310,34 @@ export struct AppShell {
   }
 
   @Builder
-  private BottomItem(symbol: Resource, label: string, active: boolean, action: () => void) {
-    Column({ space: 3 }) {
-      Row() {
-        SymbolGlyph(symbol)
-          .fontSize(22)
-          .fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
-      }
-      .width(40)
-      .height(28)
-      .justifyContent(FlexAlign.Center)
-      .backgroundColor(active ? AppTheme.PRIMARY_SOFT : Color.Transparent)
-      .borderRadius(AppTheme.CHIP_RADIUS);
-      Text(label)
-        .fontSize(11)
-        .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
-        .fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
-    }
-    .layoutWeight(1)
-    .height('100%')
-    .justifyContent(FlexAlign.Center)
-    .accessibilityGroup(true)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(active ? `${label}，当前页面` : label)
-    .onClick(action);
-  }
-
-  @Builder
   private BottomNavigation() {
     Row() {
       if (this.role === AppRole.STUDENT) {
-        this.BottomItem($r('sys.symbol.house'), '首页', this.studentRoute === StudentRoute.HOME,
-          () => this.studentRoute = StudentRoute.HOME);
-        this.BottomItem($r('sys.symbol.checkmark_square'), '作业', this.studentRoute === StudentRoute.ASSIGNMENTS,
-          () => this.studentRoute = StudentRoute.ASSIGNMENTS);
-        this.BottomItem($r('sys.symbol.gearshape'), '我的', this.studentRoute === StudentRoute.PROFILE,
-          () => this.studentRoute = StudentRoute.PROFILE);
+        BottomPrimaryNavItem({
+          symbol: $r('sys.symbol.house'), label: '首页', selected: this.studentRoute === StudentRoute.HOME,
+          onSelect: () => this.studentRoute = StudentRoute.HOME
+        }).layoutWeight(1).height('100%');
+        BottomPrimaryNavItem({
+          symbol: $r('sys.symbol.checkmark_square'), label: '作业', selected: this.studentRoute === StudentRoute.ASSIGNMENTS,
+          onSelect: () => this.studentRoute = StudentRoute.ASSIGNMENTS
+        }).layoutWeight(1).height('100%');
+        BottomPrimaryNavItem({
+          symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.studentRoute === StudentRoute.PROFILE,
+          onSelect: () => this.studentRoute = StudentRoute.PROFILE
+        }).layoutWeight(1).height('100%');
       } else {
-        this.BottomItem($r('sys.symbol.house'), '首页', this.parentRoute === ParentRoute.DASHBOARD,
-          () => this.parentRoute = ParentRoute.DASHBOARD);
-        this.BottomItem($r('sys.symbol.checkmark_circle'), '进度', this.parentRoute === ParentRoute.PROGRESS,
-          () => this.parentRoute = ParentRoute.PROGRESS);
-        this.BottomItem($r('sys.symbol.gearshape'), '我的', this.parentRoute === ParentRoute.SETTINGS,
-          () => this.parentRoute = ParentRoute.SETTINGS);
+        BottomPrimaryNavItem({
+          symbol: $r('sys.symbol.house'), label: '首页', selected: this.parentRoute === ParentRoute.DASHBOARD,
+          onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
+        }).layoutWeight(1).height('100%');
+        BottomPrimaryNavItem({
+          symbol: $r('sys.symbol.checkmark_circle'), label: '进度', selected: this.parentRoute === ParentRoute.PROGRESS,
+          onSelect: () => this.parentRoute = ParentRoute.PROGRESS
+        }).layoutWeight(1).height('100%');
+        BottomPrimaryNavItem({
+          symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.parentRoute === ParentRoute.SETTINGS,
+          onSelect: () => this.parentRoute = ParentRoute.SETTINGS
+        }).layoutWeight(1).height('100%');
       }
     }
     .width('100%')
@@ -359,28 +345,6 @@ export struct AppShell {
     .padding({ left: 8, right: 8 })
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
-  }
-
-  @Builder
-  private SideItem(symbol: Resource, label: string, active: boolean, action: () => void) {
-    Column({ space: 5 }) {
-      SymbolGlyph(symbol)
-        .fontSize(23)
-        .fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
-      Text(label)
-        .fontSize(11)
-        .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
-        .fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
-    }
-    .width(68)
-    .height(58)
-    .justifyContent(FlexAlign.Center)
-    .backgroundColor(active ? AppTheme.PRIMARY_SOFT : Color.Transparent)
-    .borderRadius(AppTheme.CONTROL_RADIUS)
-    .accessibilityGroup(true)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(active ? `${label}，当前页面` : label)
-    .onClick(action);
   }
 
   @Builder
@@ -399,19 +363,31 @@ export struct AppShell {
         .margin({ bottom: 14 });
 
       if (this.role === AppRole.STUDENT) {
-        this.SideItem($r('sys.symbol.house'), '首页', this.studentRoute === StudentRoute.HOME,
-          () => this.studentRoute = StudentRoute.HOME);
-        this.SideItem($r('sys.symbol.checkmark_square'), '作业', this.studentRoute === StudentRoute.ASSIGNMENTS,
-          () => this.studentRoute = StudentRoute.ASSIGNMENTS);
-        this.SideItem($r('sys.symbol.gearshape'), '我的', this.studentRoute === StudentRoute.PROFILE,
-          () => this.studentRoute = StudentRoute.PROFILE);
+        SidePrimaryNavItem({
+          symbol: $r('sys.symbol.house'), label: '首页', selected: this.studentRoute === StudentRoute.HOME,
+          onSelect: () => this.studentRoute = StudentRoute.HOME
+        });
+        SidePrimaryNavItem({
+          symbol: $r('sys.symbol.checkmark_square'), label: '作业', selected: this.studentRoute === StudentRoute.ASSIGNMENTS,
+          onSelect: () => this.studentRoute = StudentRoute.ASSIGNMENTS
+        });
+        SidePrimaryNavItem({
+          symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.studentRoute === StudentRoute.PROFILE,
+          onSelect: () => this.studentRoute = StudentRoute.PROFILE
+        });
       } else {
-        this.SideItem($r('sys.symbol.house'), '首页', this.parentRoute === ParentRoute.DASHBOARD,
-          () => this.parentRoute = ParentRoute.DASHBOARD);
-        this.SideItem($r('sys.symbol.checkmark_circle'), '进度', this.parentRoute === ParentRoute.PROGRESS,
-          () => this.parentRoute = ParentRoute.PROGRESS);
-        this.SideItem($r('sys.symbol.gearshape'), '我的', this.parentRoute === ParentRoute.SETTINGS,
-          () => this.parentRoute = ParentRoute.SETTINGS);
+        SidePrimaryNavItem({
+          symbol: $r('sys.symbol.house'), label: '首页', selected: this.parentRoute === ParentRoute.DASHBOARD,
+          onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
+        });
+        SidePrimaryNavItem({
+          symbol: $r('sys.symbol.checkmark_circle'), label: '进度', selected: this.parentRoute === ParentRoute.PROGRESS,
+          onSelect: () => this.parentRoute = ParentRoute.PROGRESS
+        });
+        SidePrimaryNavItem({
+          symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.parentRoute === ParentRoute.SETTINGS,
+          onSelect: () => this.parentRoute = ParentRoute.SETTINGS
+        });
       }
 
       Blank();

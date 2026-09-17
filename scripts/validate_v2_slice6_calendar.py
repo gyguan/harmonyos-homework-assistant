@@ -22,12 +22,17 @@ def require(condition: bool, message: str) -> None:
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 panel = read("entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets")
 view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
+selection_controls = read("entry/src/main/ets/components/selection/SelectionControls.ets")
 workflow = read(".github/workflows/static-gate.yml")
 
 require("AssignmentCalendarPanel" in page and "calendarMode" in page,
         "Student Assignments must expose a calendar view without creating a second feature page")
-require("ViewModeButton('列表'" in page and "ViewModeButton('日历'" in page,
-        "Student Assignments must offer an explicit list/calendar switch")
+require("SegmentedSelectionButton({ label: '列表', selected: !this.calendarMode" in page and
+        "SegmentedSelectionButton({ label: '日历', selected: this.calendarMode" in page,
+        "Student Assignments must offer an explicit reactive list/calendar switch")
+require("export struct SegmentedSelectionButton" in selection_controls and
+        "@Prop selected: boolean = false;" in selection_controls,
+        "list/calendar switch must keep selected state in a reactive child-component prop")
 require("AssignmentDateFilter.CUSTOM" in page and "assignmentsOnDay" in page,
         "calendar day selection must reuse Assignment filtering semantics")
 require("$selectedCalendarDayEpochMs" in page and "$calendarMonthEpochMs" in page,

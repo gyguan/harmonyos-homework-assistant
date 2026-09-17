@@ -22,6 +22,7 @@ shell = read("entry/src/main/ets/pages/AppShell.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 filter_dialog = read("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
+selection_controls = read("entry/src/main/ets/components/selection/SelectionControls.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 detail_pane = read("entry/src/main/ets/features/student/assignments/AssignmentDetailPane.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
@@ -82,6 +83,8 @@ require("private AssignmentListPage()" in page and ".align(Alignment.TopStart)" 
         "Phone list/detail fallback must stay top-anchored")
 require("components/assignment/AssignmentFilterDialog" in page,
         "student assignment page must use the shared assignment filter dialog")
+require("components/selection/SelectionControls" in page,
+        "student assignment page must use shared reactive selection controls")
 
 for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
     require(token in page or token in filter_dialog, f"missing type filter option: {token}")
@@ -94,8 +97,17 @@ for token in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
 for token in ["StudentAssignmentsViewModel", "DefaultAssignmentRepository.instance", "@State private visibleTotal",
               "private applyItems(items: Assignment[]): void", "this.visibleTotal = items.length",
               "AssignmentFilterDialog", "CustomDialogController", "alignment: DialogAlignment.Bottom",
-              "this.filterDialogController.open()", "FilterEntry('类型'", "FilterEntry('截止'", "FilterEntry('科目'"]:
+              "this.filterDialogController.open()", "FilterSummaryEntry({", "label: '类型'", "label: '截止'", "label: '科目'"]:
     require(token in page, f"assignment result page missing required V2 behavior: {token}")
+require("@Prop active: boolean = false;" in selection_controls and
+        "export struct FilterSummaryEntry" in selection_controls,
+        "assignment filter summary must keep active state in a reactive shared component")
+for expression in [
+    "active: this.typeFilter !== AssignmentTypeFilter.ALL",
+    "active: this.dateFilter !== AssignmentDateFilter.ALL",
+    "active: this.subjectCode !== 'ALL'",
+]:
+    require(expression in page, f"assignment filter summary must bind directly to page state: {expression}")
 for token in ["@CustomDialog", "@Link typeFilter", "@Link dateFilter", "@Link subjectCode",
               "private TypeOption", "private DateOption", "private SubjectOption", "Button('重置'", "Button('查询'",
               "this.onQuery(this.typeFilter, this.dateFilter, this.subjectCode)"]:
