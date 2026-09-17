@@ -1,6 +1,7 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import {
@@ -10,7 +11,6 @@ import {
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentCalendarPanel } from './AssignmentCalendarPanel';
 import { AssignmentDetailPane } from './AssignmentDetailPane';
-import { AssignmentFilterDialog } from './AssignmentFilterDialog';
 import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 
 @Component
