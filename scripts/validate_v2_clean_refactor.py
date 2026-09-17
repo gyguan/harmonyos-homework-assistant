@@ -57,15 +57,25 @@ if app_shell_path.exists():
         "studentStudyReturnRoute",
         "ParentRoute.CONFIRMATION",
         "CONFIRMATION = 'CONFIRMATION'",
+        "ParentRoute.IMPORT",
+        "IMPORT = 'IMPORT'",
         "contentSizeClass",
         "resolveContent(",
     ]:
         if legacy in app_shell:
             fail(f"AppShell legacy navigation/layout state must be deleted: {legacy}")
+    if "AppRoute.PARENT_IMPORT" not in app_shell or "HomeworkImportRoutePage" not in app_shell:
+        fail("parent import must be a NavDestination deep page opened from the parent home action")
+    if "onOpenImport: () => this.openParentImport()" not in app_shell:
+        fail("parent home import action must push the parent import deep route")
+    if "'导入', this.parentRoute" in app_shell:
+        fail("parent primary navigation must not expose import as a persistent tab/rail item")
     if "AppRoute.PARENT_IMPORT_CONFIRMATION" not in app_shell:
         fail("parent import confirmation must use AppRoute.PARENT_IMPORT_CONFIRMATION")
     if "openParentImportConfirmation" not in app_shell or "NavDestination()" not in app_shell:
         fail("parent import confirmation must use NavDestination instead of AppShell parent route state")
+    if "this.navPathStack.clear();" not in app_shell:
+        fail("successful batch publish must clear the import/confirmation deep-page stack and return home")
 
 settings_path = ROOT / "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets"
 if settings_path.exists():

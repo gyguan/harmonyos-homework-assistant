@@ -3,7 +3,8 @@ import {
   AppRoute,
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
-  ParentImportConfirmationRouteParam
+  ParentImportConfirmationRouteParam,
+  ParentImportRouteParam
 } from '../app/navigation/AppRoutes';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
@@ -14,7 +15,7 @@ import { StudentProfile } from '../domain/model/HomeworkModels';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
 import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
-import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage';
+import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
@@ -38,7 +39,6 @@ enum StudentRoute {
 
 enum ParentRoute {
   DASHBOARD = 'DASHBOARD',
-  IMPORT = 'IMPORT',
   PROGRESS = 'PROGRESS',
   SETTINGS = 'SETTINGS'
 }
@@ -119,6 +119,10 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
   }
 
+  private openParentImport(): void {
+    this.navPathStack.pushPathByName(AppRoute.PARENT_IMPORT, new ParentImportRouteParam());
+  }
+
   private openParentImportConfirmation(): void {
     this.navPathStack.pushPathByName(
       AppRoute.PARENT_IMPORT_CONFIRMATION, new ParentImportConfirmationRouteParam());
@@ -195,6 +199,17 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_IMPORT) {
+      NavDestination() {
+        HomeworkImportRoutePage({
+          revision: this.storeRevision,
+          onBack: () => this.navPathStack.pop(),
+          onOpenConfirmation: () => this.openParentImportConfirmation(),
+          onStoreChanged: () => this.touchStore()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_IMPORT_CONFIRMATION) {
       NavDestination() {
         HomeworkConfirmationPage({
@@ -202,7 +217,7 @@ export struct AppShell {
           onBack: () => this.navPathStack.pop(),
           onPublished: () => {
             this.parentRoute = ParentRoute.DASHBOARD;
-            this.navPathStack.pop();
+            this.navPathStack.clear();
           },
           onStoreChanged: () => this.touchStore()
         });
@@ -226,13 +241,7 @@ export struct AppShell {
 
   @Builder
   private ParentContent() {
-    if (this.parentRoute === ParentRoute.IMPORT) {
-      HomeworkImportPage({
-        revision: this.storeRevision,
-        onOpenConfirmation: () => this.openParentImportConfirmation(),
-        onStoreChanged: () => this.touchStore()
-      });
-    } else if (this.parentRoute === ParentRoute.PROGRESS) {
+    if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
         revision: this.storeRevision,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),
@@ -245,7 +254,7 @@ export struct AppShell {
     } else {
       ParentDashboardPage({
         revision: this.storeRevision,
-        onOpenImport: () => this.parentRoute = ParentRoute.IMPORT,
+        onOpenImport: () => this.openParentImport(),
         onOpenExtra: () => this.openParentExtraCreate(),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
@@ -332,8 +341,6 @@ export struct AppShell {
       } else {
         this.BottomItem($r('sys.symbol.house'), '首页', this.parentRoute === ParentRoute.DASHBOARD,
           () => this.parentRoute = ParentRoute.DASHBOARD);
-        this.BottomItem($r('sys.symbol.plus_square'), '导入', this.parentRoute === ParentRoute.IMPORT,
-          () => this.parentRoute = ParentRoute.IMPORT);
         this.BottomItem($r('sys.symbol.checkmark_circle'), '进度', this.parentRoute === ParentRoute.PROGRESS,
           () => this.parentRoute = ParentRoute.PROGRESS);
         this.BottomItem($r('sys.symbol.gearshape'), '我的', this.parentRoute === ParentRoute.SETTINGS,
@@ -394,8 +401,6 @@ export struct AppShell {
       } else {
         this.SideItem($r('sys.symbol.house'), '首页', this.parentRoute === ParentRoute.DASHBOARD,
           () => this.parentRoute = ParentRoute.DASHBOARD);
-        this.SideItem($r('sys.symbol.plus_square'), '导入', this.parentRoute === ParentRoute.IMPORT,
-          () => this.parentRoute = ParentRoute.IMPORT);
         this.SideItem($r('sys.symbol.checkmark_circle'), '进度', this.parentRoute === ParentRoute.PROGRESS,
           () => this.parentRoute = ParentRoute.PROGRESS);
         this.SideItem($r('sys.symbol.gearshape'), '我的', this.parentRoute === ParentRoute.SETTINGS,
