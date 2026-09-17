@@ -74,7 +74,7 @@ export struct StatusSelectionChip {
 export struct SettingsToggleRow {
   @Prop title: string;
   @Prop description: string;
-  @Prop enabled: boolean = false;
+  @Prop isEnabled: boolean = false;
   onToggle: (enabled: boolean) => void = (_enabled: boolean) => {};
 
   build() {
@@ -85,8 +85,8 @@ export struct SettingsToggleRow {
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
-      Toggle({ type: ToggleType.Switch, isOn: this.enabled })
-        .accessibilityText(this.enabled ? `${this.title}，已开启` : `${this.title}，已关闭`)
+      Toggle({ type: ToggleType.Switch, isOn: this.isEnabled })
+        .accessibilityText(this.isEnabled ? `${this.title}，已开启` : `${this.title}，已关闭`)
         .onChange((value: boolean) => this.onToggle(value));
     }
     .width('100%')
@@ -98,7 +98,7 @@ export struct SettingsToggleRow {
 export struct ReadonlySettingStateRow {
   @Prop title: string;
   @Prop description: string;
-  @Prop enabled: boolean = false;
+  @Prop isEnabled: boolean = false;
 
   build() {
     Row({ space: 12 }) {
@@ -116,10 +116,10 @@ export struct ReadonlySettingStateRow {
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
-      Text(this.enabled ? '已开启' : '已关闭')
+      Text(this.isEnabled ? '已开启' : '已关闭')
         .fontSize(12)
         .fontWeight(FontWeight.Medium)
-        .fontColor(this.enabled ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+        .fontColor(this.isEnabled ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
     }
     .width('100%')
     .padding({ top: 12, bottom: 12 });
