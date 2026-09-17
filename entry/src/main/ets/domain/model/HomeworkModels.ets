@@ -17,7 +17,13 @@ export enum AssignmentType {
 export enum Subject {
   CHINESE = '语文',
   MATH = '数学',
-  ENGLISH = '英语'
+  ENGLISH = '英语',
+  READING = '阅读',
+  READ_ALOUD = '朗读',
+  SPORTS = '体育',
+  PRACTICE = '实践',
+  INTEREST = '兴趣',
+  OTHER = '其他'
 }
 
 export enum SubmissionType {
