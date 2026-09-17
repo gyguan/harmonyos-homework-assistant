@@ -3,6 +3,7 @@ import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
+import { FilterSummaryEntry, SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import {
   AssignmentDateFilter,
@@ -243,23 +244,10 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
-  private ViewModeButton(label: string, active: boolean, action: () => void) {
-    Button(label, { type: ButtonType.Normal })
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .padding({ left: 13, right: 13 })
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(13)
-      .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(active ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(active ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(action);
-  }
-
-  @Builder
   private ViewModeToggle() {
     Row({ space: 4 }) {
-      this.ViewModeButton('列表', !this.calendarMode, () => this.showList());
-      this.ViewModeButton('日历', this.calendarMode, () => this.showCalendar());
+      SegmentedSelectionButton({ label: '列表', selected: !this.calendarMode, onSelect: () => this.showList() });
+      SegmentedSelectionButton({ label: '日历', selected: this.calendarMode, onSelect: () => this.showCalendar() });
     }
     .padding(3)
     .backgroundColor(AppTheme.SURFACE)
@@ -268,34 +256,24 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
-  private FilterEntry(label: string, value: string, active: boolean) {
-    Column({ space: 3 }) {
-      Text(label).fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
-      Row({ space: 3 }) {
-        Text(value)
-          .fontSize(13)
-          .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
-          .fontColor(active ? AppTheme.PRIMARY : AppTheme.TEXT);
-        Text('⌄').fontSize(11).fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
-      }
-    }
-    .layoutWeight(1)
-    .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`${label}：${value}，打开筛选`)
-    .onClick(() => this.openFilterDialog());
-  }
-
-  @Builder
   private FilterBar() {
     Row() {
-      this.FilterEntry('类型', this.typeLabel(this.typeFilter), this.typeFilter !== AssignmentTypeFilter.ALL);
+      FilterSummaryEntry({
+        label: '类型', value: this.typeLabel(this.typeFilter),
+        active: this.typeFilter !== AssignmentTypeFilter.ALL,
+        onOpen: () => this.openFilterDialog()
+      });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      this.FilterEntry('截止', this.dateLabel(this.dateFilter), this.dateFilter !== AssignmentDateFilter.ALL);
+      FilterSummaryEntry({
+        label: '截止', value: this.dateLabel(this.dateFilter),
+        active: this.dateFilter !== AssignmentDateFilter.ALL,
+        onOpen: () => this.openFilterDialog()
+      });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      this.FilterEntry('科目', this.subjectLabel(this.subjectCode), this.subjectCode !== 'ALL');
+      FilterSummaryEntry({
+        label: '科目', value: this.subjectLabel(this.subjectCode), active: this.subjectCode !== 'ALL',
+        onOpen: () => this.openFilterDialog()
+      });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
       Text(this.querying ? '查询中…' : (this.hasActiveFilters() ? '筛选中' : '筛选'))
         .fontSize(13)
