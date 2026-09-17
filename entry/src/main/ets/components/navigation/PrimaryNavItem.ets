@@ -1,20 +1,13 @@
 import { AppTheme } from '../../common/theme/AppTheme';
 
-export enum PrimaryNavPlacement {
-  BOTTOM = 'BOTTOM',
-  SIDE = 'SIDE'
-}
-
 @Component
-export struct PrimaryNavItem {
+export struct BottomPrimaryNavItem {
   @Prop symbol: Resource;
   @Prop label: string;
   @Prop selected: boolean = false;
-  @Prop placement: PrimaryNavPlacement = PrimaryNavPlacement.BOTTOM;
   onSelect: () => void = () => {};
 
-  @Builder
-  private BottomContent() {
+  build() {
     Column({ space: 3 }) {
       Row() {
         SymbolGlyph(this.symbol)
@@ -33,11 +26,22 @@ export struct PrimaryNavItem {
     }
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Center);
+    .justifyContent(FlexAlign.Center)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(this.selected ? `${this.label}，当前页面` : this.label)
+    .onClick(() => this.onSelect());
   }
+}
 
-  @Builder
-  private SideContent() {
+@Component
+export struct SidePrimaryNavItem {
+  @Prop symbol: Resource;
+  @Prop label: string;
+  @Prop selected: boolean = false;
+  onSelect: () => void = () => {};
+
+  build() {
     Column({ space: 5 }) {
       SymbolGlyph(this.symbol)
         .fontSize(23)
@@ -51,19 +55,7 @@ export struct PrimaryNavItem {
     .height(58)
     .justifyContent(FlexAlign.Center)
     .backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : Color.Transparent)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
-  }
-
-  build() {
-    Column() {
-      if (this.placement === PrimaryNavPlacement.BOTTOM) {
-        this.BottomContent();
-      } else {
-        this.SideContent();
-      }
-    }
-    .width(this.placement === PrimaryNavPlacement.BOTTOM ? '100%' : 68)
-    .height(this.placement === PrimaryNavPlacement.BOTTOM ? '100%' : 58)
+    .borderRadius(AppTheme.CONTROL_RADIUS)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(this.selected ? `${this.label}，当前页面` : this.label)
