@@ -57,7 +57,7 @@ export struct HomeworkConfirmationPage {
   }
 
   private updateTitle(item: CandidateAssignment, title: string): void {
-    this.saveCandidate(this.copy(item, item.subject, title, title));
+    this.saveCandidate(this.copy(item, item.subject, title, item.instruction));
   }
 
   private updateInstruction(item: CandidateAssignment, instruction: string): void {

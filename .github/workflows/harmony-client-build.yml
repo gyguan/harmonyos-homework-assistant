@@ -1,0 +1,39 @@
+name: harmony-client-build
+
+on:
+  pull_request:
+    paths:
+      - 'entry/**'
+      - 'AppScope/**'
+      - 'build-profile.json5'
+      - 'oh-package.json5'
+      - 'hvigor/**'
+      - 'hvigorfile.ts'
+      - 'scripts/verify_harmony_client.ps1'
+      - '.github/workflows/harmony-client-build.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'entry/**'
+      - 'AppScope/**'
+      - 'build-profile.json5'
+      - 'oh-package.json5'
+      - 'hvigor/**'
+      - 'hvigorfile.ts'
+      - 'scripts/verify_harmony_client.ps1'
+      - '.github/workflows/harmony-client-build.yml'
+  workflow_dispatch:
+
+jobs:
+  compile-harmony-client:
+    name: Compile HarmonyOS client
+    runs-on: [self-hosted, windows, x64, harmonyos-26]
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Compile ArkTS and assemble debug HAP
+        shell: powershell
+        run: ./scripts/verify_harmony_client.ps1
