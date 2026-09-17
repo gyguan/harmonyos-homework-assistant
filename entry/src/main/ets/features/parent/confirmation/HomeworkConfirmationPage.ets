@@ -1,4 +1,3 @@
-import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
@@ -6,8 +5,6 @@ import { HomeworkConfirmationViewModel } from './HomeworkConfirmationViewModel';
 
 @Component
 export struct HomeworkConfirmationPage {
-  // Compatibility prop from AppShell. Confirmation layout no longer branches on this value.
-  @Prop sizeClass: WindowSizeClass;
   @Prop revision: number = 0;
   @State private localRevision: number = 0;
   @State private editingCandidateId: string = '';
