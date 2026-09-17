@@ -101,10 +101,15 @@ require("this.queryCache = [];" in assignment_repository and
         "this.remoteSummary = null;" in assignment_repository,
         "Repository refresh must clear previous-child in-memory caches synchronously")
 
+# Parent Home must still subscribe to the active child so all home data/actions re-evaluate when the
+# family context changes. The visible child identity itself is intentionally owned by AppShell's
+# persistent FamilyContextBar to avoid duplicating name/class information inside Parent Home.
 require("@Prop activeStudentId: string = '';" in parent_home and "private student(): StudentProfile" in parent_home,
-        "Parent Home identity must explicitly depend on active child context")
-require("Text(`${this.student().name} 的今天`)" in parent_home,
-        "Parent Home header must render the current child identity")
+        "Parent Home data/actions must explicitly depend on active child context")
+require("this.activeStudentId.length > 0" in parent_home and "student.id !== this.activeStudentId" in parent_home,
+        "Parent Home must re-evaluate its active-student dependency after child switching")
+require("FamilyContextBar" in app_shell and "currentStudent()" in app_shell,
+        "Persistent family context surface must own the visible current-child identity")
 
 if errors:
     print("MULTI_CHILD_ISOLATION_GATE_FAIL")
