@@ -98,6 +98,10 @@ export struct AssignmentListItem {
     .constraintSize({ minHeight: 60 })
     .padding({ left: 12, right: 12, top: 11, bottom: 11 })
     .backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+    .border({
+      width: this.selected ? 1 : 0,
+      color: this.selected ? AppTheme.PRIMARY : Color.Transparent
+    })
     .borderRadius(AppTheme.CONTROL_RADIUS)
     .enabled(this.interactive)
     .accessibilityGroup(true)
