@@ -1,5 +1,4 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
-import { WindowSizeClass } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkImageImportResult, HomeworkOrganizerMode, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
@@ -7,8 +6,6 @@ import { HomeworkImportViewModel } from './HomeworkImportViewModel';
 
 @Component
 export struct HomeworkImportPage {
-  // Compatibility prop from AppShell. Layout composition no longer branches on this value.
-  @Prop sizeClass: WindowSizeClass;
   @Prop revision: number = 0;
   @State private localRevision: number = 0;
   @State private availableWidthVp: number = 390;
