@@ -29,7 +29,9 @@ for file in feature_root.rglob("*.ets"):
     if "HomeworkStore.instance" in text and relative not in LEGACY_FEATURE_STORE_ALLOWLIST:
         fail(f"new/migrated feature must use Repository/ViewModel instead of HomeworkStore.instance: {relative}")
 
-    if "WindowSizeClass" in text:
+    direct_size_class_import = re.search(r"import\s*\{[^}]*\bWindowSizeClass\b[^}]*\}", text) is not None
+    direct_size_class_branch = re.search(r"\bWindowSizeClass\.(?:COMPACT|MEDIUM|EXPANDED)\b", text) is not None
+    if direct_size_class_import or direct_size_class_branch:
         fail(f"feature must not branch on WindowSizeClass; use LayoutPolicy with actual available width: {relative}")
 
     if re.search(r"(?:<=|>=|<|>)\s*(?:600|840|1080)\b", text):
@@ -80,6 +82,14 @@ if study_route_path.exists():
         fail("study workspace must surface EXTRA assignment context")
     if "StudyWorkspacePage" not in study_route or "AssignmentAction.START" not in study_route:
         fail("EXTRA context must reuse the standard study execution chain")
+
+student_home_path = ROOT / "entry/src/main/ets/features/student/home/StudentHomePage.ets"
+if student_home_path.exists():
+    student_home = student_home_path.read_text(encoding="utf-8")
+    if "HOME_PAD_PRIMARY_ACTION_MAX_WIDTH" not in student_home or "canUsePadComposition()" not in student_home:
+        fail("Pad student-home primary action must use capability-based width density")
+    if ".width(this.canUsePadComposition() ? AppTheme.HOME_PAD_PRIMARY_ACTION_MAX_WIDTH : '100%')" not in student_home:
+        fail("Pad primary action width must be constrained without changing Phone full-width behavior")
 
 responsive_path = ROOT / "entry/src/main/ets/common/responsive/WindowSizeClass.ets"
 if responsive_path.exists():
