@@ -103,19 +103,24 @@ export class RemoteSubmissionApi {
     let payload = await this.buildMultipartPayload(sourceUris);
     let client = http.createHttp();
     try {
-      let response = await client.request(
-        `${BackendSession.instance.getBaseUrl()}/api/v1/assignments/${encodeURIComponent(assignmentId)}` +
-          `/submissions?version=${version}`,
-        {
-          method: http.RequestMethod.POST,
-          header: {
-            'Authorization': `Bearer ${BackendSession.instance.getToken()}`,
-            'Content-Type': `multipart/form-data; boundary=${payload.boundary}`
-          },
-          extraData: payload.body,
-          connectTimeout: 15000,
-          readTimeout: 60000
-        });
+      let response: http.HttpResponse;
+      try {
+        response = await client.request(
+          `${BackendSession.instance.getBaseUrl()}/api/v1/assignments/${encodeURIComponent(assignmentId)}` +
+            `/submissions?version=${version}`,
+          {
+            method: http.RequestMethod.POST,
+            header: {
+              'Authorization': `Bearer ${BackendSession.instance.getToken()}`,
+              'Content-Type': `multipart/form-data; boundary=${payload.boundary}`
+            },
+            extraData: payload.body,
+            connectTimeout: 15000,
+            readTimeout: 60000
+          });
+      } catch {
+        throw new Error('SUBMISSION_NETWORK_ERROR');
+      }
       if (response.responseCode === 401) {
         BackendSession.instance.disconnect();
         throw new Error('SUBMISSION_UNAUTHORIZED');

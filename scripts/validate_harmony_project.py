@@ -64,6 +64,8 @@ persistence_port = read("entry/src/main/ets/domain/port/HomeworkPersistence.ets"
 persistence_adapter = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkPersistence.ets")
 core_ocr = read("entry/src/main/ets/infrastructure/ai/CoreVisionHomeworkTextExtractor.ets")
 state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.ets")
+parent_dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+remote_submission = read("entry/src/main/ets/application/remote/RemoteSubmissionApi.ets")
 
 require("interface HomeworkPersistence" in persistence_port,
         "local persistence must stay behind HomeworkPersistence")
@@ -77,6 +79,15 @@ require("PreferencesHomeworkPersistence" in entry_ability and "CoreVisionHomewor
         "EntryAbility must compose production adapters")
 require("MockHomeworkTextExtractor" not in entry_ability and "MockHomeworkAssignmentParser" not in entry_ability,
         "production composition root must not use mock import adapters")
+
+# DevEco-only compile regressions that are not covered by the Linux static gate.
+require("sys.symbol.add_circle" not in parent_dashboard,
+        "Parent Dashboard must not use unsupported sys.symbol.add_circle on the pinned HarmonyOS toolchain")
+require("sys.symbol.plus_square" in parent_dashboard,
+        "Parent Dashboard extracurricular action must use a compile-verified system symbol")
+require("SUBMISSION_NETWORK_ERROR" in remote_submission and
+        "response = await client.request(" in remote_submission,
+        "Remote submission upload must explicitly handle exceptions from http client.request")
 
 # Keep the backend intentionally lightweight during the family-product refactor.
 for forbidden_dependency in ["spring-data-redis", "spring-kafka", "spring-cloud-gateway", "camunda", "flowable"]:
