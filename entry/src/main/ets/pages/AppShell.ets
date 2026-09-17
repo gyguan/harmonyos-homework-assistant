@@ -208,7 +208,6 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_IMPORT_CONFIRMATION) {
       NavDestination() {
         HomeworkConfirmationPage({
-          sizeClass: this.contentSizeClass,
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
           onPublished: () => {
