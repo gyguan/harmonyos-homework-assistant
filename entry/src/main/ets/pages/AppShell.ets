@@ -1,7 +1,7 @@
 import { HomeworkSyncService } from '../application/remote/HomeworkSyncService';
 import { AppRoute, AssignmentRouteParam } from '../app/navigation/AppRoutes';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
-import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
+import { DemoScenario } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
 import { PageStateView } from '../components/state/PageStateView';
 import { HomeworkStore } from '../data/HomeworkStore';
@@ -33,7 +33,6 @@ enum StudentRoute {
 enum ParentRoute {
   DASHBOARD = 'DASHBOARD',
   IMPORT = 'IMPORT',
-  CONFIRMATION = 'CONFIRMATION',
   PROGRESS = 'PROGRESS',
   SETTINGS = 'SETTINGS'
 }
@@ -72,24 +71,12 @@ export struct AppShell {
     return ResponsiveContext.resolveContent(this.contentWidthVp);
   }
 
-  private isDetailFlow(): boolean {
-    return this.role === AppRole.PARENT && this.parentRoute === ParentRoute.CONFIRMATION;
-  }
-
   private handleSystemBack(): boolean {
     if (this.navPathStack.size() > 0) {
       this.navPathStack.pop();
       return true;
     }
-    if (this.role === AppRole.PARENT && this.parentRoute === ParentRoute.CONFIRMATION) {
-      this.parentRoute = ParentRoute.IMPORT;
-      return true;
-    }
     return false;
-  }
-
-  private nextDemoScenario(): void {
-    this.demoScenario = DemoScenarioHelper.next(this.demoScenario);
   }
 
   private touchStore(): void {
@@ -119,8 +106,7 @@ export struct AppShell {
   }
 
   private openAssignmentDetail(assignmentId: string): void {
-    this.navPathStack.pushPathByName(
-      AppRoute.STUDENT_ASSIGNMENT_DETAIL, new AssignmentRouteParam(assignmentId));
+    this.navPathStack.pushPathByName(AppRoute.STUDENT_ASSIGNMENT_DETAIL, new AssignmentRouteParam(assignmentId));
   }
 
   private openStudy(assignmentId: string): void {
@@ -129,6 +115,16 @@ export struct AppShell {
 
   private openParentReview(assignmentId: string): void {
     this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
+  }
+
+  private openImportConfirmation(): void {
+    this.navPathStack.pushPathByName(AppRoute.PARENT_IMPORT_CONFIRMATION, undefined);
+  }
+
+  private finishImportPublish(): void {
+    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    this.parentRoute = ParentRoute.DASHBOARD;
+    this.touchStore();
   }
 
   private routeAssignmentId(param: Object): string {
@@ -150,10 +146,7 @@ export struct AppShell {
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
       });
     } else if (this.studentRoute === StudentRoute.PROFILE) {
-      StudentProfilePage({
-        sizeClass: this.contentSizeClass,
-        revision: this.storeRevision
-      });
+      StudentProfilePage({ sizeClass: this.contentSizeClass, revision: this.storeRevision });
     } else {
       StudentHomePage({
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
@@ -199,6 +192,17 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_IMPORT_CONFIRMATION) {
+      NavDestination() {
+        HomeworkConfirmationPage({
+          revision: this.storeRevision,
+          onBack: () => this.navPathStack.pop(),
+          onPublished: () => this.finishImportPublish(),
+          onStoreChanged: () => this.storeRevision++
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     }
   }
 
@@ -206,18 +210,9 @@ export struct AppShell {
   private ParentContent() {
     if (this.parentRoute === ParentRoute.IMPORT) {
       HomeworkImportPage({
-        sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
-        onOpenConfirmation: () => this.parentRoute = ParentRoute.CONFIRMATION,
-        onStoreChanged: () => this.touchStore()
-      });
-    } else if (this.parentRoute === ParentRoute.CONFIRMATION) {
-      HomeworkConfirmationPage({
-        sizeClass: this.contentSizeClass,
-        revision: this.storeRevision,
-        onBack: () => this.parentRoute = ParentRoute.IMPORT,
-        onPublished: () => this.parentRoute = ParentRoute.DASHBOARD,
-        onStoreChanged: () => this.touchStore()
+        onOpenConfirmation: () => this.openImportConfirmation(),
+        onStoreChanged: () => this.storeRevision++
       });
     } else if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
@@ -226,10 +221,7 @@ export struct AppShell {
         onStoreChanged: () => this.touchStore()
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
-      BackendConnectionPage({
-        sizeClass: this.contentSizeClass,
-        onStoreChanged: () => this.touchStore()
-      });
+      BackendConnectionPage({ sizeClass: this.contentSizeClass, onStoreChanged: () => this.touchStore() });
     } else {
       ParentDashboardPage({
         revision: this.storeRevision,
@@ -289,12 +281,8 @@ export struct AppShell {
   @Builder
   private BottomItem(symbol: Resource, label: string, active: boolean, action: () => void) {
     Column({ space: 4 }) {
-      SymbolGlyph(symbol)
-        .fontSize(22)
-        .fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
-      Text(label)
-        .fontSize(11)
-        .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
+      SymbolGlyph(symbol).fontSize(22).fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
+      Text(label).fontSize(11).fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
         .fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
@@ -337,12 +325,8 @@ export struct AppShell {
   @Builder
   private SideItem(symbol: Resource, label: string, active: boolean, action: () => void) {
     Column({ space: 5 }) {
-      SymbolGlyph(symbol)
-        .fontSize(23)
-        .fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
-      Text(label)
-        .fontSize(11)
-        .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
+      SymbolGlyph(symbol).fontSize(23).fontColor([active ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
+      Text(label).fontSize(11).fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
         .fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
     }
     .width(68)
@@ -393,13 +377,8 @@ export struct AppShell {
 
       if (this.role === AppRole.PARENT) {
         Column({ space: 2 }) {
-          Text(HomeworkStore.instance.getStudent().name)
-            .fontSize(11)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.PRIMARY);
-          Text(HomeworkStore.instance.getStudent().className)
-            .fontSize(10)
-            .fontColor(AppTheme.SUBTEXT);
+          Text(HomeworkStore.instance.getStudent().name).fontSize(11).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+          Text(HomeworkStore.instance.getStudent().className).fontSize(10).fontColor(AppTheme.SUBTEXT);
         }
         .width(68)
         .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -412,12 +391,8 @@ export struct AppShell {
         .onClick(() => this.switchStudent());
       } else {
         Text(HomeworkStore.instance.getStudent().name)
-          .width(68)
-          .fontSize(11)
-          .fontWeight(FontWeight.Medium)
-          .textAlign(TextAlign.Center)
-          .fontColor(AppTheme.TEXT)
-          .padding({ top: 8, bottom: 8 });
+          .width(68).fontSize(11).fontWeight(FontWeight.Medium).textAlign(TextAlign.Center)
+          .fontColor(AppTheme.TEXT).padding({ top: 8, bottom: 8 });
       }
     }
     .width(AppTheme.SIDE_NAV_WIDTH)
@@ -431,20 +406,10 @@ export struct AppShell {
   @Builder
   private BottomNavShell() {
     Column() {
-      if (this.role === AppRole.PARENT && !this.isDetailFlow()) {
-        this.FamilyContextBar();
-      }
-      Column() {
-        this.PersonaContent();
-      }
-      .width('100%')
-      .layoutWeight(1)
-      .justifyContent(FlexAlign.Start)
-      .alignItems(HorizontalAlign.Start);
-
-      if (!this.isDetailFlow()) {
-        this.BottomNavigation();
-      }
+      if (this.role === AppRole.PARENT) this.FamilyContextBar();
+      Column() { this.PersonaContent(); }
+        .width('100%').layoutWeight(1).justifyContent(FlexAlign.Start).alignItems(HorizontalAlign.Start);
+      this.BottomNavigation();
     }
     .width('100%')
     .height('100%')
@@ -455,13 +420,8 @@ export struct AppShell {
   private SideNavShell() {
     Row() {
       this.SideNavigation();
-      Column() {
-        this.PersonaContent();
-      }
-      .layoutWeight(1)
-      .height('100%')
-      .justifyContent(FlexAlign.Start)
-      .alignItems(HorizontalAlign.Start);
+      Column() { this.PersonaContent(); }
+        .layoutWeight(1).height('100%').justifyContent(FlexAlign.Start).alignItems(HorizontalAlign.Start);
     }
     .width('100%')
     .height('100%')
@@ -471,13 +431,8 @@ export struct AppShell {
   @Builder
   private ShellContent() {
     Stack() {
-      if (this.isDetailFlow()) {
-        this.BottomNavShell();
-      } else if (this.sizeClass === WindowSizeClass.EXPANDED) {
-        this.SideNavShell();
-      } else {
-        this.BottomNavShell();
-      }
+      if (this.sizeClass === WindowSizeClass.EXPANDED) this.SideNavShell();
+      else this.BottomNavShell();
     }
     .width('100%')
     .height('100%')
