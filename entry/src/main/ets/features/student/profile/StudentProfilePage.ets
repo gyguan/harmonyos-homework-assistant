@@ -4,8 +4,6 @@ import { AppSettings, StudentProfile } from '../../../domain/model/HomeworkModel
 
 @Component
 export struct StudentProfilePage {
-  // Temporary AppShell compatibility input. Profile composition no longer depends on window size classes.
-  @Prop sizeClass: string = '';
   @Prop revision: number = 0;
 
   private student(): StudentProfile {

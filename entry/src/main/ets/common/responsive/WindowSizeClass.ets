@@ -23,26 +23,12 @@ export class ResponsiveContext {
     return LayoutPolicy.areaLengthToVp(value, fallbackVp);
   }
 
-  static twoPaneRequiredWidthVp(): number {
-    return LayoutPolicy.requiredWidth(LayoutPolicy.assignmentMasterDetailRequirement());
-  }
-
-  static canUseTwoPane(availableWidthVp: number): boolean {
-    return LayoutPolicy.canSplit(availableWidthVp, LayoutPolicy.assignmentMasterDetailRequirement());
-  }
-
-  // Window size class is retained only for navigation form. Content layout uses
-  // LayoutPolicy with the actual remaining content width.
+  // Window size class is retained only for the application navigation form.
+  // Feature composition must use LayoutPolicy with actual available width.
   static resolve(widthVp: number): WindowSizeClass {
     if (!Number.isFinite(widthVp) || widthVp <= 0) return WindowSizeClass.COMPACT;
     if (widthVp <= 600) return WindowSizeClass.COMPACT;
     if (widthVp <= 840) return WindowSizeClass.MEDIUM;
     return WindowSizeClass.EXPANDED;
-  }
-
-  // Migration helper for legacy surfaces that still accept a size class. New V2 Feature
-  // composition must consume LayoutPolicy directly instead of branching on this value.
-  static resolveContent(availableWidthVp: number): WindowSizeClass {
-    return ResponsiveContext.canUseTwoPane(availableWidthVp) ? WindowSizeClass.EXPANDED : WindowSizeClass.COMPACT;
   }
 }

@@ -51,6 +51,11 @@ export class LayoutPolicy {
       AppTheme.SPLIT_PANE_GAP, AppTheme.PAGE_PADDING_WIDE);
   }
 
+  static settingsInlineFieldsRequirement(): LayoutRequirement {
+    return new LayoutRequirement(AppTheme.SETTINGS_INLINE_FIELD_MIN_WIDTH, AppTheme.SETTINGS_INLINE_FIELD_MIN_WIDTH,
+      8, AppTheme.PAGE_PADDING);
+  }
+
   static requiredWidth(requirement: LayoutRequirement): number {
     return requirement.primaryMinWidth + requirement.secondaryMinWidth + requirement.gap +
       requirement.horizontalPadding * 2;

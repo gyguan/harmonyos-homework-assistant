@@ -68,15 +68,6 @@ export struct AppShell {
     return ResponsiveContext.resolve(this.widthVp);
   }
 
-  private get contentWidthVp(): number {
-    return this.sizeClass === WindowSizeClass.EXPANDED ?
-      Math.max(0, this.widthVp - AppTheme.SIDE_NAV_WIDTH) : this.widthVp;
-  }
-
-  private get contentSizeClass(): WindowSizeClass {
-    return ResponsiveContext.resolveContent(this.contentWidthVp);
-  }
-
   private handleSystemBack(): boolean {
     if (this.navPathStack.size() > 0) {
       this.navPathStack.pop();
@@ -157,7 +148,6 @@ export struct AppShell {
       });
     } else if (this.studentRoute === StudentRoute.PROFILE) {
       StudentProfilePage({
-        sizeClass: this.contentSizeClass,
         revision: this.storeRevision
       });
     } else {
@@ -250,7 +240,6 @@ export struct AppShell {
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
       BackendConnectionPage({
-        sizeClass: this.contentSizeClass,
         onStoreChanged: () => this.touchStore()
       });
     } else {

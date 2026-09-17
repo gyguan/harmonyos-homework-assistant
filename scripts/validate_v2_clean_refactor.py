@@ -29,6 +29,11 @@ for file in feature_root.rglob("*.ets"):
     if "HomeworkStore.instance" in text and relative not in LEGACY_FEATURE_STORE_ALLOWLIST:
         fail(f"new/migrated feature must use Repository/ViewModel instead of HomeworkStore.instance: {relative}")
 
+    direct_size_class_import = re.search(r"import\s*\{[^}]*\bWindowSizeClass\b[^}]*\}", text) is not None
+    direct_size_class_branch = re.search(r"\bWindowSizeClass\.(?:COMPACT|MEDIUM|EXPANDED)\b", text) is not None
+    if direct_size_class_import or direct_size_class_branch:
+        fail(f"feature must not branch on WindowSizeClass; use LayoutPolicy with actual available width: {relative}")
+
     if re.search(r"(?:<=|>=|<|>)\s*(?:600|840|1080)\b", text):
         fail(f"feature contains private device-style layout breakpoint: {relative}")
 
@@ -52,13 +57,46 @@ if app_shell_path.exists():
         "studentStudyReturnRoute",
         "ParentRoute.CONFIRMATION",
         "CONFIRMATION = 'CONFIRMATION'",
+        "contentSizeClass",
+        "resolveContent(",
     ]:
         if legacy in app_shell:
-            fail(f"AppShell legacy navigation state must be deleted: {legacy}")
+            fail(f"AppShell legacy navigation/layout state must be deleted: {legacy}")
     if "AppRoute.PARENT_IMPORT_CONFIRMATION" not in app_shell:
         fail("parent import confirmation must use AppRoute.PARENT_IMPORT_CONFIRMATION")
     if "openParentImportConfirmation" not in app_shell or "NavDestination()" not in app_shell:
         fail("parent import confirmation must use NavDestination instead of AppShell parent route state")
+
+settings_path = ROOT / "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets"
+if settings_path.exists():
+    settings = settings_path.read_text(encoding="utf-8")
+    if "LayoutPolicy.settingsInlineFieldsRequirement()" not in settings or "availableWidthVp" not in settings:
+        fail("parent settings form must use LayoutPolicy and actual available width")
+    if "WindowSizeClass" in settings or "sizeClass" in settings:
+        fail("parent settings must not keep WindowSizeClass compatibility layout state")
+
+study_route_path = ROOT / "entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets"
+if study_route_path.exists():
+    study_route = study_route_path.read_text(encoding="utf-8")
+    if "AssignmentType.EXTRA" not in study_route or "课外任务" not in study_route:
+        fail("study workspace must surface EXTRA assignment context")
+    if "StudyWorkspacePage" not in study_route or "AssignmentAction.START" not in study_route:
+        fail("EXTRA context must reuse the standard study execution chain")
+
+student_home_path = ROOT / "entry/src/main/ets/features/student/home/StudentHomePage.ets"
+if student_home_path.exists():
+    student_home = student_home_path.read_text(encoding="utf-8")
+    if "HOME_PAD_PRIMARY_ACTION_MAX_WIDTH" not in student_home or "canUsePadComposition()" not in student_home:
+        fail("Pad student-home primary action must use capability-based width density")
+    if ".width(this.canUsePadComposition() ? AppTheme.HOME_PAD_PRIMARY_ACTION_MAX_WIDTH : '100%')" not in student_home:
+        fail("Pad primary action width must be constrained without changing Phone full-width behavior")
+
+responsive_path = ROOT / "entry/src/main/ets/common/responsive/WindowSizeClass.ets"
+if responsive_path.exists():
+    responsive = responsive_path.read_text(encoding="utf-8")
+    for legacy_helper in ["resolveContent", "canUseTwoPane", "twoPaneRequiredWidthVp"]:
+        if legacy_helper in responsive:
+            fail(f"legacy responsive helper must be removed after Slice 6: {legacy_helper}")
 
 # V2 keeps one Assignment aggregate. A parallel ExtraHomework domain is explicitly forbidden.
 for root in [ROOT / "entry/src/main/ets", ROOT / "backend/src/main/java"]:

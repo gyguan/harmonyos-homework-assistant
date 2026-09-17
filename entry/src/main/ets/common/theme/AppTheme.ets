@@ -32,6 +32,7 @@ export class AppTheme {
 
   static readonly HOME_READABLE_MAX_WIDTH: number = 760;
   static readonly HOME_PAD_CONTENT_MAX_WIDTH: number = 1180;
+  static readonly HOME_PAD_PRIMARY_ACTION_MAX_WIDTH: number = 320;
   static readonly ASSIGNMENT_LIST_READABLE_MAX_WIDTH: number = 760;
   static readonly ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH: number = 720;
   static readonly ASSIGNMENT_MASTER_DETAIL_MAX_WIDTH: number = 1180;
@@ -48,6 +49,7 @@ export class AppTheme {
   static readonly IMPORT_SPLIT_MAX_WIDTH: number = 1180;
   static readonly CONFIRMATION_READABLE_MAX_WIDTH: number = 920;
   static readonly PROFILE_READABLE_MAX_WIDTH: number = 680;
+  static readonly SETTINGS_READABLE_MAX_WIDTH: number = 760;
 
   static readonly DEEP_PAGE_TOP_PADDING: number = 8;
   static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
@@ -70,6 +72,7 @@ export class AppTheme {
   static readonly PARENT_REVIEW_MIN_WIDTH: number = 440;
   static readonly IMPORT_SOURCE_MIN_WIDTH: number = 400;
   static readonly IMPORT_CANDIDATE_MIN_WIDTH: number = 420;
+  static readonly SETTINGS_INLINE_FIELD_MIN_WIDTH: number = 220;
   static readonly SPLIT_PANE_GAP: number = 18;
 
   static readonly PHONE_PAGE_PADDING: number = 16;
