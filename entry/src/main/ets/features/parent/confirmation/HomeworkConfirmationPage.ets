@@ -80,6 +80,10 @@ export struct HomeworkConfirmationPage {
     if (!Number.isFinite(minutes)) return;
     if (minutes < 1) minutes = 1;
     if (minutes > 240) minutes = 240;
+    this.setExpectedMinutes(item, minutes);
+  }
+
+  private setExpectedMinutes(item: CandidateAssignment, minutes: number): void {
     this.saveCandidate(this.copy(item, item.subject, item.title, item.instruction,
       item.dueText, item.textbookRef, minutes));
   }
@@ -134,6 +138,21 @@ export struct HomeworkConfirmationPage {
       .accessibilityRole(AccessibilityRoleType.BUTTON)
       .accessibilityText(item.subject === subject ? `${subject}，已选择` : subject)
       .onClick(() => this.updateSubject(item, subject));
+  }
+
+  @Builder
+  private TimeChip(item: CandidateAssignment, minutes: number) {
+    Text(`${minutes} 分钟`)
+      .fontSize(12)
+      .fontWeight(item.expectedMinutes === minutes ? FontWeight.Medium : FontWeight.Normal)
+      .fontColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 10, right: 10, top: 8, bottom: 8 })
+      .backgroundColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(`预计用时 ${minutes} 分钟`)
+      .onClick(() => this.setExpectedMinutes(item, minutes));
   }
 
   @Builder
@@ -215,6 +234,14 @@ export struct HomeworkConfirmationPage {
         .onChange((value: string) => this.updateDueText(item, value));
 
       Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Row({ space: 6 }) {
+        this.TimeChip(item, 10);
+        this.TimeChip(item, 15);
+        this.TimeChip(item, 20);
+        this.TimeChip(item, 30);
+        this.TimeChip(item, 45);
+      }
+      .width('100%');
       TextInput({ text: `${item.expectedMinutes}` }).width('100%').height(AppTheme.INPUT_HEIGHT)
         .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.updateExpectedMinutes(item, value));
