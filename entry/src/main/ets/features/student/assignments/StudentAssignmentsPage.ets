@@ -95,6 +95,19 @@ export struct StudentAssignmentsPage {
     return this.viewModel.calendarAssignments(this.typeFilter, this.subjectCode);
   }
 
+  private padExtraAssignments(): Assignment[] {
+    let currentRevision = this.revision + this.refreshRevision;
+    if (currentRevision < 0) return [];
+    let source = this.viewModel.calendarAssignments(AssignmentTypeFilter.EXTRA, 'ALL');
+    let active: Assignment[] = [];
+    let completed: Assignment[] = [];
+    for (let item of source) {
+      if (item.status === AssignmentStatus.COMPLETED) completed.push(item);
+      else active.push(item);
+    }
+    return active.length > 0 ? active : completed;
+  }
+
   private applyItems(items: Assignment[]): void {
     let needHandling: Assignment[] = [];
     let notStarted: Assignment[] = [];
@@ -131,7 +144,7 @@ export struct StudentAssignmentsPage {
   }
 
   private openAssignment(assignmentId: string): void {
-    if (this.canUseMasterDetail()) {
+    if (this.canUseMasterDetail() && !this.calendarMode) {
       this.selectedAssignmentId = assignmentId;
     } else {
       this.onOpenDetail(assignmentId);
@@ -139,7 +152,7 @@ export struct StudentAssignmentsPage {
   }
 
   private isSelected(assignmentId: string): boolean {
-    return this.canUseMasterDetail() && this.selectedAssignmentId === assignmentId;
+    return this.canUseMasterDetail() && !this.calendarMode && this.selectedAssignmentId === assignmentId;
   }
 
   private openFilterDialog(): void {
@@ -323,7 +336,7 @@ export struct StudentAssignmentsPage {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail(),
+              showChevron: !this.canUseMasterDetail() || this.calendarMode,
               onOpen: () => this.openAssignment(item.id)
             });
           }, (item: Assignment) => item.id);
@@ -355,7 +368,7 @@ export struct StudentAssignmentsPage {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail(),
+              showChevron: !this.canUseMasterDetail() || this.calendarMode,
               onOpen: () => this.openAssignment(item.id)
             });
           }, (item: Assignment) => item.id);
@@ -387,7 +400,7 @@ export struct StudentAssignmentsPage {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail(),
+              showChevron: !this.canUseMasterDetail() || this.calendarMode,
               onOpen: () => this.openAssignment(item.id)
             });
           }, (item: Assignment) => item.id);
@@ -419,7 +432,7 @@ export struct StudentAssignmentsPage {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail(),
+              showChevron: !this.canUseMasterDetail() || this.calendarMode,
               onOpen: () => this.openAssignment(item.id)
             });
           }, (item: Assignment) => item.id);
@@ -498,6 +511,95 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
+  private AssignmentDetailSidePane() {
+    Column({ space: 12 }) {
+      Row() {
+        Column({ space: 2 }) {
+          Text('作业详情')
+            .fontSize(AppTheme.SECTION_TITLE_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('点击左侧作业即可切换，状态与操作保持同一数据源。')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .alignItems(HorizontalAlign.Start);
+      }
+      .width('100%');
+
+      Scroll() {
+        Column() {
+          AssignmentDetailPane({
+            assignmentId: this.selectedAssignmentId,
+            revision: this.revision + this.refreshRevision,
+            onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
+          });
+        }
+        .width('100%')
+        .padding({ bottom: 12 });
+      }
+      .width('100%')
+      .layoutWeight(1)
+      .align(Alignment.TopStart)
+      .scrollBar(BarState.Off);
+    }
+    .width('100%')
+    .height('100%');
+  }
+
+  @Builder
+  private PadExtraAssignmentsPane() {
+    Column({ space: 12 }) {
+      Row() {
+        Column({ space: 2 }) {
+          Text('课外任务')
+            .fontSize(AppTheme.SECTION_TITLE_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('阅读、运动、实践等任务独立汇总，和学校作业仍共用 Assignment。')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(18)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .alignItems(HorizontalAlign.Start);
+        Blank();
+        Text(`${this.padExtraAssignments().length} 项`).fontSize(12).fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%');
+
+      if (this.padExtraAssignments().length === 0) {
+        Column({ space: 7 }) {
+          SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
+          Text('暂无课外任务').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('家长布置的课外任务会出现在这里。').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%')
+        .padding({ top: 34, bottom: 34 });
+      } else {
+        Scroll() {
+          Column({ space: 7 }) {
+            ForEach(this.padExtraAssignments(), (item: Assignment) => {
+              AssignmentListItem({
+                assignment: item,
+                showChevron: true,
+                onOpen: () => this.onOpenDetail(item.id)
+              });
+            }, (item: Assignment) => item.id);
+          }
+          .width('100%')
+          .padding({ bottom: 12 });
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .align(Alignment.TopStart)
+        .scrollBar(BarState.Off);
+      }
+    }
+    .width('100%')
+    .height('100%');
+  }
+
+  @Builder
   private AssignmentListPage() {
     Scroll() {
       Column() {
@@ -533,36 +635,12 @@ export struct StudentAssignmentsPage {
       .align(Alignment.TopStart)
       .scrollBar(BarState.Off);
 
-      Column({ space: 12 }) {
-        Row() {
-          Column({ space: 2 }) {
-            Text('作业详情')
-              .fontSize(AppTheme.SECTION_TITLE_SIZE)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
-            Text(this.calendarMode ? '选择日期和任务后在这里查看详情。' : '点击左侧作业即可切换，状态与操作保持同一数据源。')
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .fontColor(AppTheme.SUBTEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
+      Column() {
+        if (this.calendarMode) {
+          this.PadExtraAssignmentsPane();
+        } else {
+          this.AssignmentDetailSidePane();
         }
-        .width('100%');
-
-        Scroll() {
-          Column() {
-            AssignmentDetailPane({
-              assignmentId: this.selectedAssignmentId,
-              revision: this.revision + this.refreshRevision,
-              onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
-            });
-          }
-          .width('100%')
-          .padding({ bottom: 12 });
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .align(Alignment.TopStart)
-        .scrollBar(BarState.Off);
       }
       .layoutWeight(1)
       .height('100%')
