@@ -21,6 +21,7 @@ def require(condition: bool, message: str) -> None:
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 parent = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 student = read("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
+selection_controls = read("entry/src/main/ets/components/selection/SelectionControls.ets")
 tutor = read("entry/src/main/ets/application/remote/TutorRemoteApi.ets")
 
 require("updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean)" in store,
@@ -32,15 +33,30 @@ store_method = store.split("updateTutorSettings(tutorGuidanceFirst: boolean, dir
 require(len(store_method) == 2 and "this.requestPersist();" in store_method[1].split("getStudents()", 1)[0],
         "Tutor settings mutation must request Preferences snapshot persistence")
 
-require("AI 辅导规则" in parent and "toggleGuidanceFirst" in parent and "toggleDirectAnswer" in parent,
-        "parent 我的 must expose both Tutor rule controls")
+require("AI 辅导规则" in parent and "SettingsToggleRow" in parent,
+        "parent 我的 must expose both Tutor rule controls through reactive switch rows")
+require("private TutorRule(" not in parent and "toggleGuidanceFirst" not in parent and "toggleDirectAnswer" not in parent,
+        "parent 我的 must not keep stale boolean Builder/toggle wrappers")
 require("HomeworkStore.instance.updateTutorSettings" in parent,
         "parent page must mutate Tutor rules only through HomeworkStore")
 require("允许直接答案" in parent and "默认建议关闭" in parent,
         "parent UI must keep direct answers opt-in and explain the safer default")
+require("export struct SettingsToggleRow" in selection_controls and
+        "Toggle({ type: ToggleType.Switch, isOn: this.enabled })" in selection_controls and
+        ".onChange((value: boolean) => this.onToggle(value))" in selection_controls,
+        "shared Tutor switch must bind and emit the real native Toggle value")
+for expression in [
+    "enabled: this.tutorGuidanceFirst()",
+    "enabled: this.directAnswerAllowed()",
+    "onToggle: (enabled: boolean) => this.updateTutorSettings(enabled, this.directAnswerAllowed())",
+    "onToggle: (enabled: boolean) => this.updateTutorSettings(this.tutorGuidanceFirst(), enabled)",
+]:
+    require(expression in parent, f"parent Tutor rule must bind current state directly: {expression}")
 
 require("tutorGuidanceFirst" in student and "directAnswerAllowed" in student,
         "student 我的 must reflect the current parent Tutor rules")
+require("ReadonlySettingStateRow" in student and "private RuleRow(" not in student,
+        "student 我的 must render Tutor rule state through the reactive read-only row")
 require("updateTutorSettings" not in student,
         "student 我的 must remain read-only for Tutor rules")
 
