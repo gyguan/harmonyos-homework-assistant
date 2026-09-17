@@ -62,16 +62,11 @@ export struct AssignmentCalendarPanel {
     return this.startOfDay(dayEpochMs) === this.startOfDay(Date.now());
   }
 
-  private assignmentDayStart(item: Assignment): number {
-    if (item.dueAtEpochMs > 0) return this.startOfDay(item.dueAtEpochMs);
-    return AssignmentDueDate.resolveDayStart(item.dueText);
-  }
-
   private dayAssignments(dayEpochMs: number): Assignment[] {
     let dayStart = this.startOfDay(dayEpochMs);
     let result: Assignment[] = [];
     for (let item of this.assignments) {
-      if (this.assignmentDayStart(item) === dayStart) result.push(item);
+      if (AssignmentDueDate.dayStart(item) === dayStart) result.push(item);
     }
     return result;
   }
