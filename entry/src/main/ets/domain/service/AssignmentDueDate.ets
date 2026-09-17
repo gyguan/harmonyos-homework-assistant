@@ -13,7 +13,7 @@ export class AssignmentDueDate {
     if (filter === DueDateFilterKey.ALL) return true;
     if (filter === DueDateFilterKey.OVERDUE) return AssignmentDueDate.isOverdue(item, nowEpochMs);
 
-    let dueDay = AssignmentDueDate.assignmentDayStart(item, nowEpochMs);
+    let dueDay = AssignmentDueDate.dayStart(item, nowEpochMs);
     if (dueDay < 0) return false;
 
     let today = AssignmentDueDate.startOfDay(nowEpochMs);
@@ -23,6 +23,19 @@ export class AssignmentDueDate {
       return dueDay >= today && dueDay <= AssignmentDueDate.endOfWeek(today);
     }
     return false;
+  }
+
+  static dayStart(item: Assignment, nowEpochMs: number = Date.now()): number {
+    if (item.dueAtEpochMs > 0) return AssignmentDueDate.startOfDay(item.dueAtEpochMs);
+
+    let key = item.dueDateKey;
+    if (key !== undefined && key.length > 0) {
+      let frozen = AssignmentDueDate.dayStartFromKey(key);
+      if (frozen >= 0) return frozen;
+    }
+
+    let anchor = AssignmentDueDate.assignmentCreatedAt(item.id);
+    return AssignmentDueDate.resolveDayStart(item.dueText, anchor > 0 ? anchor : nowEpochMs);
   }
 
   static resolveDateKey(dueText: string, nowEpochMs: number = Date.now()): string {
@@ -73,16 +86,6 @@ export class AssignmentDueDate {
     return -1;
   }
 
-  private static assignmentDayStart(item: Assignment, nowEpochMs: number): number {
-    let key = item.dueDateKey;
-    if (key !== undefined && key.length > 0) {
-      let frozen = AssignmentDueDate.dayStartFromKey(key);
-      if (frozen >= 0) return frozen;
-    }
-    let anchor = AssignmentDueDate.assignmentCreatedAt(item.id);
-    return AssignmentDueDate.resolveDayStart(item.dueText, anchor > 0 ? anchor : nowEpochMs);
-  }
-
   private static assignmentCreatedAt(assignmentId: string): number {
     let match = assignmentId.match(/(?:text|image)-(\d{13})/);
     if (match === null || match.length < 2) return -1;
@@ -93,7 +96,7 @@ export class AssignmentDueDate {
   private static isOverdue(item: Assignment, nowEpochMs: number): boolean {
     if (item.status === AssignmentStatus.COMPLETED || item.status === AssignmentStatus.SUBMITTED) return false;
     if (item.status === AssignmentStatus.OVERDUE) return true;
-    let dueDay = AssignmentDueDate.assignmentDayStart(item, nowEpochMs);
+    let dueDay = AssignmentDueDate.dayStart(item, nowEpochMs);
     return dueDay >= 0 && dueDay < AssignmentDueDate.startOfDay(nowEpochMs);
   }
 
