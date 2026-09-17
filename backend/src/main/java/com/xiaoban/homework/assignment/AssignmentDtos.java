@@ -1,10 +1,12 @@
 package com.xiaoban.homework.assignment;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 public final class AssignmentDtos {
   private AssignmentDtos() {}
@@ -27,6 +29,14 @@ public final class AssignmentDtos {
 
   public record ReviewRequest(@NotBlank String decision, @NotNull Long version,
       @Size(max = 1000) String note) {}
+
+  public record BatchPublishItem(@NotBlank String candidateId, @Valid @NotNull Create assignment) {}
+
+  public record BatchPublishRequest(@NotNull @Size(min = 1, max = 50) List<@Valid BatchPublishItem> items) {}
+
+  public record BatchPublishResult(String candidateId, Response assignment) {}
+
+  public record BatchPublishResponse(boolean atomic, int publishedCount, List<BatchPublishResult> results) {}
 
   public record Response(String id, String studentId, String assignmentType, String subjectCode,
       String subject, String title, String instruction, String textbookRef,
