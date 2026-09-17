@@ -75,6 +75,9 @@ jobs:
       - name: Validate V2 Slice 4 parent review authority
         run: python scripts/validate_v2_slice4_parent_review.py
 
+      - name: Validate V2 Slice 4 parent surfaces
+        run: python scripts/validate_v2_slice4_parent_surfaces.py
+
       - name: Validate backend V0.1 boundaries
         run: python scripts/validate_backend_v01.py
 
@@ -93,7 +96,7 @@ jobs:
       - name: Validate single task timer
         run: python scripts/validate_single_task_timer.py
 
-      - name: Validate parent review
+      - name: Validate parent review compatibility
         run: python scripts/validate_parent_review.py
 
       - name: Validate student assignments navigation
