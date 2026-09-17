@@ -52,8 +52,14 @@ for token in [
 ]:
     require(token in layout_policy, f"LayoutPolicy missing required capability: {token}")
 
-require("LayoutPolicy" in responsive and "assignmentMasterDetailRequirement" in responsive,
-        "responsive content capability must delegate to LayoutPolicy")
+require("static resolve(widthVp: number): WindowSizeClass" in responsive,
+        "WindowSizeClass must remain available for application navigation form")
+for legacy_helper in ["resolveContent", "canUseTwoPane", "twoPaneRequiredWidthVp"]:
+    require(legacy_helper not in responsive,
+            f"responsive migration helper must be removed after V2 content adopts LayoutPolicy: {legacy_helper}")
+
+require("LayoutPolicy" in home and "homeFocusSummaryRequirement" in home,
+        "Student Home content capability must use LayoutPolicy directly")
 require("AppTheme.HOME_READABLE_MAX_WIDTH" in home,
         "Student Home must keep a readable single-column fallback")
 require("alignItems(HorizontalAlign.Center)" in home,
