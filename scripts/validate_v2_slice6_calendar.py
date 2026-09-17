@@ -22,7 +22,6 @@ def require(condition: bool, message: str) -> None:
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 panel = read("entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets")
 view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
-due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 workflow = read(".github/workflows/static-gate.yml")
 
 require("AssignmentCalendarPanel" in page and "calendarMode" in page,
@@ -46,20 +45,20 @@ require("AssignmentType.SCHOOL" in panel and "AssignmentType.EXTRA" in panel,
         "calendar must visibly distinguish school and extracurricular Assignment types")
 require("AssignmentStatus.COMPLETED" in panel,
         "calendar must expose completed-state markers")
-require("AssignmentDueDate.dayStart(item)" in panel,
-        "calendar markers must use the shared stable Assignment due-day resolver")
+require("item.dueAtEpochMs <= 0" in panel and "this.startOfDay(item.dueAtEpochMs)" in panel,
+        "calendar markers must use structured dueAt only")
+require("AssignmentDueDate" not in panel and "dueText" not in panel and "dueDateKey" not in panel,
+        "calendar UI must not infer a concrete date from legacy dueText or dueDateKey")
 
 require("calendarAssignments" in view_model and "assignmentsOnDay" in view_model,
         "StudentAssignmentsViewModel must own calendar/day query semantics")
-require("AssignmentDueDate.dayStart(item)" in view_model,
-        "calendar query must use the shared stable Assignment due-day resolver")
+require("item.dueAtEpochMs <= 0" in view_model and
+        "StudentAssignmentsViewModel.startOfDay(item.dueAtEpochMs)" in view_model,
+        "calendar day query must use structured dueAt only")
+require("AssignmentDueDate" not in view_model and "dueText" not in view_model and "dueDateKey" not in view_model,
+        "calendar query must not infer a concrete date from legacy dueText or dueDateKey")
 require("CalendarRepository" not in view_model and "CalendarService" not in view_model,
         "calendar view must not introduce a parallel Calendar domain/repository")
-
-require("static dayStart(item: Assignment" in due_date,
-        "AssignmentDueDate must expose one stable resolver for list and calendar consumers")
-require("if (item.dueAtEpochMs > 0)" in due_date and "item.dueDateKey" in due_date,
-        "stable due-day resolver must prefer structured dueAt and preserve frozen dueDateKey fallback")
 
 require("Validate V2 Slice 6 calendar" in workflow and "validate_v2_slice6_calendar.py" in workflow,
         "CI must run the Slice 6 calendar gate")

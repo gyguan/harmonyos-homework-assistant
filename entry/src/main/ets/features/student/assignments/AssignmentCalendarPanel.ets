@@ -1,6 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { Assignment, AssignmentStatus, AssignmentType } from '../../../domain/model/HomeworkModels';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
 @Component
 export struct AssignmentCalendarPanel {
@@ -66,7 +65,8 @@ export struct AssignmentCalendarPanel {
     let dayStart = this.startOfDay(dayEpochMs);
     let result: Assignment[] = [];
     for (let item of this.assignments) {
-      if (AssignmentDueDate.dayStart(item) === dayStart) result.push(item);
+      if (item.dueAtEpochMs <= 0) continue;
+      if (this.startOfDay(item.dueAtEpochMs) === dayStart) result.push(item);
     }
     return result;
   }
