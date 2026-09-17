@@ -29,8 +29,7 @@ export class StudentAssignmentsViewModel {
     let targetDay = StudentAssignmentsViewModel.startOfDay(dayEpochMs);
     let result: Assignment[] = [];
     for (let item of source) {
-      let itemDay = this.assignmentDayStart(item);
-      if (itemDay === targetDay) result.push(item);
+      if (AssignmentDueDate.dayStart(item) === targetDay) result.push(item);
     }
     return result;
   }
@@ -50,11 +49,6 @@ export class StudentAssignmentsViewModel {
 
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
-  }
-
-  private assignmentDayStart(item: Assignment): number {
-    if (item.dueAtEpochMs > 0) return StudentAssignmentsViewModel.startOfDay(item.dueAtEpochMs);
-    return AssignmentDueDate.resolveDayStart(item.dueText);
   }
 
   private buildFilter(typeFilter: AssignmentTypeFilter, subjectCode: string,
