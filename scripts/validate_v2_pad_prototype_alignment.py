@@ -50,7 +50,8 @@ for token in [
 ]:
     require(token in policy, f"LayoutPolicy missing Pad prototype capability: {token}")
 
-# Home: wide composition must be materially different from Phone single column.
+# Home: wide composition must be materially different from Phone single column. The current
+# Student Home uses a summary rail plus the subject-first Today task surface on wide containers.
 for token in [
     "@State private availableWidthVp",
     "LayoutPolicy.homeFocusSummaryRequirement()",
@@ -58,8 +59,10 @@ for token in [
     "private PadHome()",
     "AppTheme.HOME_PRIMARY_MIN_WIDTH",
     "AppTheme.HOME_SECONDARY_MIN_WIDTH",
-    "this.AttentionBanner();",
-    "this.RemainingAssignments();",
+    "this.TodayOverview();",
+    "this.TodayScopeNote();",
+    "this.TodaySubjects();",
+    "StudentSubjectTaskGroupCard",
     ".onAreaChange",
 ]:
     require(token in home, f"Student Home missing Pad prototype behavior: {token}")

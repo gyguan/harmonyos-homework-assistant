@@ -84,8 +84,13 @@ require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "th
 require("private PhoneHome()" in home and "private PadHome()" in home and
         "LayoutPolicy.homeFocusSummaryRequirement()" in home,
         "V2 Student Home must keep the Phone single-column fallback and the approved Pad focus/summary composition")
-require("NextAssignmentHero" in home and "TodayProgress" in home and "RemainingAssignments" in home,
-        "V2 Student Home must preserve the approved information hierarchy")
+# The approved Student Home hierarchy is now a strict Today surface organized by subject. The
+# earlier hero + remaining-list structure is intentionally superseded rather than preserved.
+require("TodayOverview" in home and "TodaySubjects" in home and "StudentSubjectTaskGroupCard" in home and
+        "todayActionableAssignments()" in view_model and "todaySubjectGroups()" in view_model,
+        "V2 Student Home must preserve the approved Today + subject-group information hierarchy")
+require("dueAtEpochMs <= 0" in view_model and "dueText" not in view_model,
+        "V2 Student Home must use structured dueAt for Today and leave undated work to Assignments")
 require("StudentHomePage" in shell and "StudentTodayPage" not in shell,
         "AppShell must cut over to V2 Student Home")
 require("HOME = 'HOME'" in shell and "TODAY = 'TODAY'" not in shell,

@@ -24,6 +24,7 @@ state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.e
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 home_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 backend_policy = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentStatePolicy.java")
 backend_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
@@ -42,7 +43,11 @@ require("已暂停 · 还剩" in countdown and "assignment.elapsedSeconds" in co
         "countdown must render paused cumulative timing")
 require("暂停一下" in study and "AssignmentStatus.PAUSED" in study,
         "study workspace must expose pause/resume controls")
-require("AssignmentStatus.PAUSED" in home_vm and "return '继续完成'" in home_vm,
+# Student Home action labels now live with the subject task-row presentation, while PAUSED remains
+# part of the ViewModel's actionable ordering.
+require("AssignmentStatus.PAUSED" in home_vm and "return 1;" in home_vm and
+        "item.status === AssignmentStatus.IN_PROGRESS || item.status === AssignmentStatus.PAUSED" in home and
+        "return '继续'" in home,
         "V2 Student Home must expose paused tasks as resumable")
 require('"PAUSED"' in backend_policy,
         "backend state policy must support PAUSED")
