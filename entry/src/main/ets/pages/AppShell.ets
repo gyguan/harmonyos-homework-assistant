@@ -9,9 +9,11 @@ import {
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
+import { StudentSwitcherDialog } from '../components/family/StudentSwitcherDialog';
 import { BottomPrimaryNavItem, SidePrimaryNavItem } from '../components/navigation/PrimaryNavItem';
 import { PageStateView } from '../components/state/PageStateView';
 import { HomeworkStore } from '../data/HomeworkStore';
+import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
@@ -53,11 +55,36 @@ export struct AppShell {
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
   @State private storeRevision: number = 0;
+  @State private activeStudentId: string = '';
+  @State private familyStudents: StudentProfile[] = [];
   onRegisterBackHandler: (handler: () => boolean) => void = (_handler: () => boolean) => {};
 
   @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
 
+  private phoneStudentSwitcherController: CustomDialogController = new CustomDialogController({
+    builder: StudentSwitcherDialog({
+      students: $familyStudents,
+      activeStudentId: $activeStudentId,
+      onSelect: (studentId: string) => this.selectStudent(studentId)
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Bottom,
+    customStyle: true
+  });
+
+  private wideStudentSwitcherController: CustomDialogController = new CustomDialogController({
+    builder: StudentSwitcherDialog({
+      students: $familyStudents,
+      activeStudentId: $activeStudentId,
+      onSelect: (studentId: string) => this.selectStudent(studentId)
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
+
   aboutToAppear(): void {
+    this.syncFamilyContext();
     this.onRegisterBackHandler(() => this.handleSystemBack());
   }
 
@@ -81,30 +108,60 @@ export struct AppShell {
     this.demoScenario = DemoScenarioHelper.next(this.demoScenario);
   }
 
+  private syncFamilyContext(): void {
+    let students: StudentProfile[] = HomeworkStore.instance.getStudents();
+    let next: StudentProfile[] = [];
+    for (let student of students) {
+      next.push({
+        id: student.id,
+        name: student.name,
+        grade: student.grade,
+        className: student.className,
+        semester: student.semester,
+        textbookSummary: student.textbookSummary
+      });
+    }
+    this.familyStudents = next;
+    this.activeStudentId = HomeworkStore.instance.getActiveStudentId();
+  }
+
+  private currentStudent(): StudentProfile {
+    for (let student of this.familyStudents) {
+      if (student.id === this.activeStudentId) return student;
+    }
+    return HomeworkStore.instance.getStudent();
+  }
+
   private touchStore(): void {
+    this.syncFamilyContext();
     this.storeRevision++;
     HomeworkSyncService.instance.requestSync();
   }
 
-  private switchStudent(): void {
-    if (this.role !== AppRole.PARENT) return;
-    let students: StudentProfile[] = HomeworkStore.instance.getStudents();
-    if (students.length <= 1) return;
-    let activeId = HomeworkStore.instance.getActiveStudentId();
-    let activeIndex = -1;
-    for (let i = 0; i < students.length; i++) {
-      if (students[i].id === activeId) {
-        activeIndex = i;
-        break;
-      }
-    }
-    let nextIndex = activeIndex < 0 || activeIndex + 1 >= students.length ? 0 : activeIndex + 1;
-    if (HomeworkStore.instance.setActiveStudent(students[nextIndex].id)) {
-      this.navPathStack.clear();
-      this.studentRoute = StudentRoute.HOME;
-      this.parentRoute = ParentRoute.DASHBOARD;
-      this.touchStore();
-    }
+  private openStudentSwitcher(): void {
+    if (this.role !== AppRole.PARENT || this.familyStudents.length <= 1) return;
+    if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideStudentSwitcherController.open();
+    else this.phoneStudentSwitcherController.open();
+  }
+
+  private selectStudent(studentId: string): void {
+    if (this.role !== AppRole.PARENT || studentId.length === 0 || studentId === this.activeStudentId) return;
+    if (!HomeworkStore.instance.setActiveStudent(studentId)) return;
+
+    // A child switch is a family-context boundary. Drop any detail route that may still point to
+    // the previous child, return to Parent Home, update visible identity immediately, then refresh.
+    this.navPathStack.clear();
+    this.studentRoute = StudentRoute.HOME;
+    this.parentRoute = ParentRoute.DASHBOARD;
+    this.syncFamilyContext();
+    this.storeRevision++;
+    void this.refreshActiveStudent();
+  }
+
+  private async refreshActiveStudent(): Promise<void> {
+    await DefaultAssignmentRepository.instance.refresh();
+    this.syncFamilyContext();
+    this.storeRevision++;
   }
 
   private openAssignmentDetail(assignmentId: string): void {
@@ -255,6 +312,7 @@ export struct AppShell {
     } else {
       ParentDashboardPage({
         revision: this.storeRevision,
+        activeStudentId: this.activeStudentId,
         onOpenImport: () => this.openParentImport(),
         onOpenExtra: () => this.openParentExtraCreate(),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
@@ -278,17 +336,17 @@ export struct AppShell {
   private FamilyContextBar() {
     Row({ space: 10 }) {
       Column({ space: 1 }) {
-        Text(HomeworkStore.instance.getStudent().name)
+        Text(this.currentStudent().name)
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text(HomeworkStore.instance.getStudent().className)
+        Text(this.currentStudent().className)
           .fontSize(11)
           .fontColor(AppTheme.SUBTEXT);
       }
       .alignItems(HorizontalAlign.Start);
       Blank();
-      if (HomeworkStore.instance.getStudents().length > 1) {
+      if (this.familyStudents.length > 1) {
         Row({ space: 4 }) {
           Text('切换孩子').fontSize(12).fontColor(AppTheme.PRIMARY);
           Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
@@ -299,8 +357,8 @@ export struct AppShell {
         .borderRadius(AppTheme.CHIP_RADIUS)
         .accessibilityGroup(true)
         .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('切换孩子')
-        .onClick(() => this.switchStudent());
+        .accessibilityText(`当前孩子 ${this.currentStudent().name}，点击选择孩子`)
+        .onClick(() => this.openStudentSwitcher());
       }
     }
     .width('100%')
@@ -394,11 +452,11 @@ export struct AppShell {
 
       if (this.role === AppRole.PARENT) {
         Column({ space: 2 }) {
-          Text(HomeworkStore.instance.getStudent().name)
+          Text(this.currentStudent().name)
             .fontSize(11)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
-          Text(HomeworkStore.instance.getStudent().className)
+          Text(this.currentStudent().className)
             .fontSize(10)
             .fontColor(AppTheme.SUBTEXT);
         }
@@ -409,10 +467,10 @@ export struct AppShell {
         .borderRadius(AppTheme.CHIP_RADIUS)
         .accessibilityGroup(true)
         .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('切换孩子')
-        .onClick(() => this.switchStudent());
+        .accessibilityText(`当前孩子 ${this.currentStudent().name}，点击选择孩子`)
+        .onClick(() => this.openStudentSwitcher());
       } else {
-        Text(HomeworkStore.instance.getStudent().name)
+        Text(this.currentStudent().name)
           .width(68)
           .fontSize(11)
           .fontWeight(FontWeight.Medium)
