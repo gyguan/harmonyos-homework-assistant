@@ -4,7 +4,7 @@ import { StudentProfile } from '../../domain/model/HomeworkModels';
 @CustomDialog
 export struct StudentSwitcherDialog {
   controller: CustomDialogController;
-  @Prop students: StudentProfile[] = [];
+  @Link students: StudentProfile[];
   @Link activeStudentId: string;
   onSelect: (studentId: string) => void = (_studentId: string) => {};
 
