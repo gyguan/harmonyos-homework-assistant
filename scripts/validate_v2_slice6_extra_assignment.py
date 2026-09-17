@@ -61,8 +61,9 @@ require("PARENT_EXTRA_CREATE" in routes and "parent/extra/create" in routes,
         "new create page must have a Navigation route")
 require("ParentExtraAssignmentPage" in shell and "AppRoute.PARENT_EXTRA_CREATE" in shell,
         "AppShell must only host the new NavDestination, not feature state")
-require("onOpenExtra" in dashboard and "ExtraAction" in dashboard,
-        "Parent Home must expose the extracurricular task entry")
+require("onOpenExtra" in dashboard and "课外任务" in dashboard and
+        ".onClick(() => this.onOpenExtra())" in dashboard,
+        "Parent Home must expose an actionable extracurricular task entry")
 require("Validate V2 Slice 6 extracurricular create" in workflow,
         "CI must run the Slice 6 extracurricular create gate")
 
