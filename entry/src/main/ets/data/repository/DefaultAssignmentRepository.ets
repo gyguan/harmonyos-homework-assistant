@@ -13,6 +13,7 @@ import { AssignmentQuery } from '../../domain/service/AssignmentQuery';
 export class DefaultAssignmentRepository implements AssignmentRepository {
   static readonly instance: DefaultAssignmentRepository = new DefaultAssignmentRepository();
   private remoteSummary: TodaySummary | null = null;
+  private remoteSummaryStudentId: string = '';
   private queryCache: Assignment[] = [];
 
   private constructor() {}
@@ -57,7 +58,8 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   }
 
   getCachedSummary(): TodaySummary {
-    if (this.remoteSummary !== null) return this.remoteSummary;
+    let activeStudentId = HomeworkStore.instance.getActiveStudentId();
+    if (this.remoteSummary !== null && this.remoteSummaryStudentId === activeStudentId) return this.remoteSummary;
     return HomeworkStore.instance.getTodaySummary();
   }
 
@@ -113,6 +115,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       if (updated === null) throw new Error('作业不存在');
       this.replaceQueryCacheItem(updated);
       this.remoteSummary = null;
+      this.remoteSummaryStudentId = '';
       return updated;
     }
     if (!BackendSession.instance.isConnected()) {
@@ -145,17 +148,25 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     // Drop the remote summary immediately so hidden Home surfaces re-render from the updated
     // local Assignment cache before the asynchronous background sync completes.
     this.remoteSummary = null;
+    this.remoteSummaryStudentId = '';
   }
 
   async refresh(): Promise<boolean> {
+    // A refresh always starts a new active-child context. Clear in-memory query/summary caches
+    // synchronously so the newly selected child can never render a sibling's cached summary.
+    this.queryCache = [];
+    this.remoteSummary = null;
+    this.remoteSummaryStudentId = '';
     if (!BackendSession.instance.isConnected()) return false;
     let synced = await HomeworkSyncService.instance.syncActiveStudent();
     if (!synced) return false;
-    this.queryCache = [];
+    let activeStudentId = HomeworkStore.instance.getActiveStudentId();
     try {
-      this.remoteSummary = await HomeworkRemoteApi.instance.todaySummary(HomeworkStore.instance.getActiveStudentId());
+      this.remoteSummary = await HomeworkRemoteApi.instance.todaySummary(activeStudentId);
+      this.remoteSummaryStudentId = activeStudentId;
     } catch {
       this.remoteSummary = null;
+      this.remoteSummaryStudentId = '';
     }
     return true;
   }
@@ -170,6 +181,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     if (updated === null) throw new Error('作业不存在');
     this.replaceQueryCacheItem(updated);
     this.remoteSummary = null;
+    this.remoteSummaryStudentId = '';
     return updated;
   }
 
