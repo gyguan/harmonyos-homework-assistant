@@ -2,6 +2,7 @@ import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
+import { FilterSummaryEntry, StatusSelectionChip } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import {
   AssignmentDateFilter,
@@ -196,34 +197,24 @@ export struct ParentProgressPage {
   }
 
   @Builder
-  private FilterEntry(label: string, value: string, active: boolean) {
-    Column({ space: 3 }) {
-      Text(label).fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
-      Row({ space: 3 }) {
-        Text(value)
-          .fontSize(13)
-          .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
-          .fontColor(active ? AppTheme.PRIMARY : AppTheme.TEXT);
-        Text('⌄').fontSize(11).fontColor(active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
-      }
-    }
-    .layoutWeight(1)
-    .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`${label}：${value}，打开筛选`)
-    .onClick(() => this.openFilterDialog());
-  }
-
-  @Builder
   private FilterBar() {
     Row() {
-      this.FilterEntry('类型', this.typeLabel(this.typeFilter), this.typeFilter !== AssignmentTypeFilter.ALL);
+      FilterSummaryEntry({
+        label: '类型', value: this.typeLabel(this.typeFilter),
+        active: this.typeFilter !== AssignmentTypeFilter.ALL,
+        onOpen: () => this.openFilterDialog()
+      });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      this.FilterEntry('截止', this.dateLabel(this.dateFilter), this.dateFilter !== AssignmentDateFilter.ALL);
+      FilterSummaryEntry({
+        label: '截止', value: this.dateLabel(this.dateFilter),
+        active: this.dateFilter !== AssignmentDateFilter.ALL,
+        onOpen: () => this.openFilterDialog()
+      });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      this.FilterEntry('科目', this.subjectLabel(this.subjectCode), this.subjectCode !== 'ALL');
+      FilterSummaryEntry({
+        label: '科目', value: this.subjectLabel(this.subjectCode), active: this.subjectCode !== 'ALL',
+        onOpen: () => this.openFilterDialog()
+      });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
       Text(this.querying ? '查询中…' : (this.hasActiveFilters() ? '筛选中' : '筛选'))
         .fontSize(13)
@@ -244,33 +235,25 @@ export struct ParentProgressPage {
   }
 
   @Builder
-  private FilterChip(label: string, active: boolean, action: () => void) {
-    Text(label)
-      .fontSize(12)
-      .fontWeight(active ? FontWeight.Medium : FontWeight.Normal)
-      .fontColor(active ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-      .padding({ left: 13, right: 13, top: 8, bottom: 8 })
-      .backgroundColor(active ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE)
-      .border({ width: 1, color: active ? AppTheme.PRIMARY : AppTheme.BORDER })
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(label)
-      .onClick(action);
-  }
-
-  @Builder
   private StatusFilterBar() {
     Scroll() {
       Row({ space: 8 }) {
-        this.FilterChip('全部状态', this.statusFilter === ParentProgressStatusFilter.ALL,
-          () => this.chooseStatus(ParentProgressStatusFilter.ALL));
-        this.FilterChip('需关注', this.statusFilter === ParentProgressStatusFilter.ATTENTION,
-          () => this.chooseStatus(ParentProgressStatusFilter.ATTENTION));
-        this.FilterChip('待验收', this.statusFilter === ParentProgressStatusFilter.SUBMITTED,
-          () => this.chooseStatus(ParentProgressStatusFilter.SUBMITTED));
-        this.FilterChip('已完成', this.statusFilter === ParentProgressStatusFilter.COMPLETED,
-          () => this.chooseStatus(ParentProgressStatusFilter.COMPLETED));
+        StatusSelectionChip({
+          label: '全部状态', selected: this.statusFilter === ParentProgressStatusFilter.ALL,
+          onSelect: () => this.chooseStatus(ParentProgressStatusFilter.ALL)
+        });
+        StatusSelectionChip({
+          label: '需关注', selected: this.statusFilter === ParentProgressStatusFilter.ATTENTION,
+          onSelect: () => this.chooseStatus(ParentProgressStatusFilter.ATTENTION)
+        });
+        StatusSelectionChip({
+          label: '待验收', selected: this.statusFilter === ParentProgressStatusFilter.SUBMITTED,
+          onSelect: () => this.chooseStatus(ParentProgressStatusFilter.SUBMITTED)
+        });
+        StatusSelectionChip({
+          label: '已完成', selected: this.statusFilter === ParentProgressStatusFilter.COMPLETED,
+          onSelect: () => this.chooseStatus(ParentProgressStatusFilter.COMPLETED)
+        });
       }
     }
     .width('100%')
