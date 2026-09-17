@@ -47,6 +47,7 @@ export class AppTheme {
   static readonly IMPORT_READABLE_MAX_WIDTH: number = 820;
   static readonly IMPORT_SPLIT_MAX_WIDTH: number = 1180;
   static readonly CONFIRMATION_READABLE_MAX_WIDTH: number = 920;
+  static readonly PROFILE_READABLE_MAX_WIDTH: number = 680;
 
   static readonly DEEP_PAGE_TOP_PADDING: number = 8;
   static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
