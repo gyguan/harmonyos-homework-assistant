@@ -5,7 +5,6 @@ import {
 } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
 export class StudentAssignmentsViewModel {
   private readonly repository: AssignmentRepository;
@@ -29,7 +28,8 @@ export class StudentAssignmentsViewModel {
     let targetDay = StudentAssignmentsViewModel.startOfDay(dayEpochMs);
     let result: Assignment[] = [];
     for (let item of source) {
-      if (AssignmentDueDate.dayStart(item) === targetDay) result.push(item);
+      if (item.dueAtEpochMs <= 0) continue;
+      if (StudentAssignmentsViewModel.startOfDay(item.dueAtEpochMs) === targetDay) result.push(item);
     }
     return result;
   }
