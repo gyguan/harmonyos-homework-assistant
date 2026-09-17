@@ -1,5 +1,10 @@
 import { HomeworkSyncService } from '../application/remote/HomeworkSyncService';
-import { AppRoute, AssignmentRouteParam, ParentExtraCreateRouteParam } from '../app/navigation/AppRoutes';
+import {
+  AppRoute,
+  AssignmentRouteParam,
+  ParentExtraCreateRouteParam,
+  ParentImportConfirmationRouteParam
+} from '../app/navigation/AppRoutes';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
@@ -34,7 +39,6 @@ enum StudentRoute {
 enum ParentRoute {
   DASHBOARD = 'DASHBOARD',
   IMPORT = 'IMPORT',
-  CONFIRMATION = 'CONFIRMATION',
   PROGRESS = 'PROGRESS',
   SETTINGS = 'SETTINGS'
 }
@@ -73,17 +77,9 @@ export struct AppShell {
     return ResponsiveContext.resolveContent(this.contentWidthVp);
   }
 
-  private isDetailFlow(): boolean {
-    return this.role === AppRole.PARENT && this.parentRoute === ParentRoute.CONFIRMATION;
-  }
-
   private handleSystemBack(): boolean {
     if (this.navPathStack.size() > 0) {
       this.navPathStack.pop();
-      return true;
-    }
-    if (this.role === AppRole.PARENT && this.parentRoute === ParentRoute.CONFIRMATION) {
-      this.parentRoute = ParentRoute.IMPORT;
       return true;
     }
     return false;
@@ -130,6 +126,11 @@ export struct AppShell {
 
   private openParentReview(assignmentId: string): void {
     this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
+  }
+
+  private openParentImportConfirmation(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_IMPORT_CONFIRMATION, new ParentImportConfirmationRouteParam());
   }
 
   private openParentExtraCreate(): void {
@@ -204,6 +205,21 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_IMPORT_CONFIRMATION) {
+      NavDestination() {
+        HomeworkConfirmationPage({
+          sizeClass: this.contentSizeClass,
+          revision: this.storeRevision,
+          onBack: () => this.navPathStack.pop(),
+          onPublished: () => {
+            this.parentRoute = ParentRoute.DASHBOARD;
+            this.navPathStack.pop();
+          },
+          onStoreChanged: () => this.touchStore()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_EXTRA_CREATE) {
       NavDestination() {
         ParentExtraAssignmentPage({
@@ -225,15 +241,7 @@ export struct AppShell {
       HomeworkImportPage({
         sizeClass: this.contentSizeClass,
         revision: this.storeRevision,
-        onOpenConfirmation: () => this.parentRoute = ParentRoute.CONFIRMATION,
-        onStoreChanged: () => this.touchStore()
-      });
-    } else if (this.parentRoute === ParentRoute.CONFIRMATION) {
-      HomeworkConfirmationPage({
-        sizeClass: this.contentSizeClass,
-        revision: this.storeRevision,
-        onBack: () => this.parentRoute = ParentRoute.IMPORT,
-        onPublished: () => this.parentRoute = ParentRoute.DASHBOARD,
+        onOpenConfirmation: () => this.openParentImportConfirmation(),
         onStoreChanged: () => this.touchStore()
       });
     } else if (this.parentRoute === ParentRoute.PROGRESS) {
@@ -449,7 +457,7 @@ export struct AppShell {
   @Builder
   private BottomNavShell() {
     Column() {
-      if (this.role === AppRole.PARENT && !this.isDetailFlow()) {
+      if (this.role === AppRole.PARENT) {
         this.FamilyContextBar();
       }
       Column() {
@@ -460,9 +468,7 @@ export struct AppShell {
       .justifyContent(FlexAlign.Start)
       .alignItems(HorizontalAlign.Start);
 
-      if (!this.isDetailFlow()) {
-        this.BottomNavigation();
-      }
+      this.BottomNavigation();
     }
     .width('100%')
     .height('100%')
@@ -489,9 +495,7 @@ export struct AppShell {
   @Builder
   private ShellContent() {
     Stack() {
-      if (this.isDetailFlow()) {
-        this.BottomNavShell();
-      } else if (this.sizeClass === WindowSizeClass.EXPANDED) {
+      if (this.sizeClass === WindowSizeClass.EXPANDED) {
         this.SideNavShell();
       } else {
         this.BottomNavShell();
