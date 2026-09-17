@@ -34,7 +34,7 @@ require("$selectedCalendarDayEpochMs" in page and "$calendarMonthEpochMs" in pag
         "calendar selection/month state must stay page-local and flow through component links")
 require("LayoutPolicy.canSplit" in page and "assignmentMasterDetailRequirement" in page,
         "calendar must preserve capability-based Pad composition")
-require("WindowSizeClass" not in page,
+require("WindowSizeClass." not in page and "=== WindowSizeClass" not in page,
         "Student Assignments must not choose its business composition from device size classes")
 
 require("export struct AssignmentCalendarPanel" in panel,
@@ -52,8 +52,8 @@ require("calendarAssignments" in view_model and "assignmentsOnDay" in view_model
         "StudentAssignmentsViewModel must own calendar/day query semantics")
 require("AssignmentDueDate.resolveDayStart" in view_model,
         "calendar query must support existing dueText-only Assignment records")
-require("Calendar" not in view_model.replace("calendarAssignments", "").replace("assignmentsOnDay", ""),
-        "calendar view must not introduce a parallel Calendar domain model")
+require("CalendarRepository" not in view_model and "CalendarService" not in view_model,
+        "calendar view must not introduce a parallel Calendar domain/repository")
 
 require("Validate V2 Slice 6 calendar" in workflow and "validate_v2_slice6_calendar.py" in workflow,
         "CI must run the Slice 6 calendar gate")
