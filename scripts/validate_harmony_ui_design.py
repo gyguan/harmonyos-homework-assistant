@@ -207,11 +207,33 @@ require("backgroundColor(this.isSelected(dayEpochMs) ? AppTheme.PRIMARY" in day_
         "this.isSelected(dayEpochMs) ? AppTheme.TEXT_ON_PRIMARY" in day_cell,
         "Calendar selected day must use a filled selected state with contrasting text")
 
-# Settings are intentionally handled in the next reactive-selection batch. Until then keep the native
-# switch and prevent a visual regression while the old Builder wrapper remains.
+# Settings use the same reactive child-component rule as navigation and status selectors. The native
+# Toggle still owns the visual switch feedback, but isOn must subscribe through @Prop enabled and the
+# actual onChange value must be committed instead of toggling a potentially stale snapshot.
 settings = read_optional("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
-require("Toggle({ type: ToggleType.Switch, isOn: enabled })" in settings,
-        "Parent settings boolean rules must keep native switch state feedback before reactive migration")
+student_profile = read_optional("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
+require("private TutorRule(" not in settings,
+        "Parent settings must not pass Tutor switch state through an ordinary @Builder boolean")
+require("SettingsToggleRow" in settings and "export struct SettingsToggleRow" in selection_controls,
+        "Parent settings must use the shared reactive switch row")
+require("@Prop enabled: boolean = false;" in selection_controls and
+        "Toggle({ type: ToggleType.Switch, isOn: this.enabled })" in selection_controls,
+        "shared settings switch must bind native Toggle isOn to reactive @Prop enabled")
+for expression in [
+    "enabled: this.tutorGuidanceFirst()",
+    "enabled: this.directAnswerAllowed()",
+    "onToggle: (enabled: boolean) => this.updateTutorSettings(enabled, this.directAnswerAllowed())",
+    "onToggle: (enabled: boolean) => this.updateTutorSettings(this.tutorGuidanceFirst(), enabled)",
+]:
+    require(expression in settings, f"Parent settings must bind Tutor rule directly to current state: {expression}")
+require("private RuleRow(" not in student_profile and "ReadonlySettingStateRow" in student_profile,
+        "Student profile Tutor rule display must use the reactive shared read-only state row")
+for expression in [
+    "enabled: this.settings().tutorGuidanceFirst",
+    "enabled: this.settings().directAnswerAllowed",
+]:
+    require(expression in student_profile,
+            f"Student profile must bind displayed Tutor rule directly to current settings: {expression}")
 
 if errors:
     print("HARMONY_UI_GATE_FAIL")
