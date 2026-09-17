@@ -4,6 +4,7 @@ import { FamilyCloudService } from '../../../application/remote/FamilyCloudServi
 import { HomeworkSyncService } from '../../../application/remote/HomeworkSyncService';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { SettingsToggleRow } from '../../../components/selection/SelectionControls';
 import { HomeworkStore } from '../../../data/HomeworkStore';
 import { StudentProfile } from '../../../domain/model/HomeworkModels';
 
@@ -55,14 +56,6 @@ export struct BackendConnectionPage {
     this.pageRevision++;
     this.message = 'AI 辅导规则已保存';
     this.onStoreChanged();
-  }
-
-  private toggleGuidanceFirst(): void {
-    this.updateTutorSettings(!this.tutorGuidanceFirst(), this.directAnswerAllowed());
-  }
-
-  private toggleDirectAnswer(): void {
-    this.updateTutorSettings(this.tutorGuidanceFirst(), !this.directAnswerAllowed());
   }
 
   private async connect(): Promise<void> {
@@ -175,21 +168,6 @@ export struct BackendConnectionPage {
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start);
-  }
-
-  @Builder
-  private TutorRule(title: string, description: string, enabled: boolean, action: () => void) {
-    Row({ space: 14 }) {
-      Column({ space: 4 }) {
-        Text(title).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text(description).width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
-      Toggle({ type: ToggleType.Switch, isOn: enabled }).onChange((_value: boolean) => action());
-    }
-    .width('100%')
-    .padding({ top: 12, bottom: 12 });
   }
 
   @Builder
@@ -323,10 +301,19 @@ export struct BackendConnectionPage {
   @Builder
   private TutorSection() {
     Column({ space: 0 }) {
-      this.TutorRule('引导优先', '先提醒概念和下一步，再逐步讲解。', this.tutorGuidanceFirst(), () => this.toggleGuidanceFirst());
+      SettingsToggleRow({
+        title: '引导优先',
+        description: '先提醒概念和下一步，再逐步讲解。',
+        enabled: this.tutorGuidanceFirst(),
+        onToggle: (enabled: boolean) => this.updateTutorSettings(enabled, this.directAnswerAllowed())
+      });
       Divider().color(AppTheme.DIVIDER);
-      this.TutorRule('允许直接答案', '默认建议关闭；开启后小伴才会在规则允许时直接展示答案。', this.directAnswerAllowed(),
-        () => this.toggleDirectAnswer());
+      SettingsToggleRow({
+        title: '允许直接答案',
+        description: '默认建议关闭；开启后小伴才会在规则允许时直接展示答案。',
+        enabled: this.directAnswerAllowed(),
+        onToggle: (enabled: boolean) => this.updateTutorSettings(this.tutorGuidanceFirst(), enabled)
+      });
     }
     .width('100%').padding({ left: 16, right: 16 }).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CONTROL_RADIUS);
   }
