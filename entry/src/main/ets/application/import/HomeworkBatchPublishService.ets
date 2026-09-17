@@ -5,8 +5,8 @@ import {
   RemoteBatchPublishResponse
 } from '../remote/HomeworkRemoteApi';
 import { RemoteAssignmentMapper } from '../remote/RemoteModels';
-import { HomeworkStore } from '../../data/HomeworkStore';
 import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssignmentRepository';
+import { DefaultHomeworkImportDraftRepository } from '../../data/repository/DefaultHomeworkImportDraftRepository';
 import {
   Assignment,
   AssignmentStatus,
@@ -14,6 +14,7 @@ import {
   CandidateAssignment,
   Subject
 } from '../../domain/model/HomeworkModels';
+import { HomeworkImportDraftRepository } from '../../domain/port/HomeworkImportDraftRepository';
 
 export interface HomeworkBatchPublishResult {
   publishedCount: number;
@@ -21,6 +22,8 @@ export interface HomeworkBatchPublishResult {
 
 export class HomeworkBatchPublishService {
   static readonly instance: HomeworkBatchPublishService = new HomeworkBatchPublishService();
+
+  private readonly drafts: HomeworkImportDraftRepository = DefaultHomeworkImportDraftRepository.instance;
 
   private constructor() {}
 
@@ -30,7 +33,7 @@ export class HomeworkBatchPublishService {
       throw new Error('当前离线，连接家庭云端后才能发布作业');
     }
 
-    let studentId = HomeworkStore.instance.getActiveStudentId();
+    let studentId = this.drafts.getActiveStudentId();
     let entries: BatchPublishEntry[] = [];
     let localByCandidateId: Map<string, Assignment> = new Map<string, Assignment>();
     for (let candidate of candidates) {
@@ -57,9 +60,8 @@ export class HomeworkBatchPublishService {
     }
     if (seen.size !== candidates.length) throw new Error('云端批量发布响应不完整');
 
-    // Only after the full atomic response has been validated may local Assignment/Candidate state move.
     for (let assignment of mapped) DefaultAssignmentRepository.instance.applyAuthoritative(assignment);
-    HomeworkStore.instance.replaceCandidates([]);
+    this.drafts.clearCandidates();
     return { publishedCount: mapped.length };
   }
 
