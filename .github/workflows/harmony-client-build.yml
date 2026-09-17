@@ -1,28 +1,10 @@
 name: harmony-client-build
 
+# Real ArkTS/HAP compilation requires Huawei Command Line Tools 26.0.0.
+# Keep this workflow manually runnable until a repository runner with the
+# self-hosted/windows/x64/harmonyos-26 labels is connected. Once that runner
+# exists, add pull_request/push triggers and make this workflow a required check.
 on:
-  pull_request:
-    paths:
-      - 'entry/**'
-      - 'AppScope/**'
-      - 'build-profile.json5'
-      - 'oh-package.json5'
-      - 'hvigor/**'
-      - 'hvigorfile.ts'
-      - 'scripts/verify_harmony_client.ps1'
-      - '.github/workflows/harmony-client-build.yml'
-  push:
-    branches:
-      - main
-    paths:
-      - 'entry/**'
-      - 'AppScope/**'
-      - 'build-profile.json5'
-      - 'oh-package.json5'
-      - 'hvigor/**'
-      - 'hvigorfile.ts'
-      - 'scripts/verify_harmony_client.ps1'
-      - '.github/workflows/harmony-client-build.yml'
   workflow_dispatch:
 
 jobs:
