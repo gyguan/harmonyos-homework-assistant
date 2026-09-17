@@ -22,6 +22,7 @@ def require(condition: bool, message: str) -> None:
 index = read("entry/src/main/ets/pages/Index.ets")
 entry_page = read("entry/src/main/ets/pages/PersonEntryPage.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+switcher = read("entry/src/main/ets/components/family/StudentSwitcherDialog.ets")
 
 require("PersonEntryPage" in index and "AppRole.NONE" in index,
         "Index must show a person entry page before creating AppShell")
@@ -45,16 +46,19 @@ require("@State private role" not in app_shell,
         "AppShell must not keep a mutable role state")
 require("切换家长" not in app_shell and "切换学生" not in app_shell,
         "in-app parent/student role switching must be removed")
-require("if (this.role !== AppRole.PARENT)" in app_shell,
+require("if (this.role !== AppRole.PARENT" in app_shell,
         "child context switching must be guarded to parent role only")
-require("private switchStudent()" in app_shell and "HomeworkStore.instance.setActiveStudent" in app_shell,
+require("private openStudentSwitcher()" in app_shell and "private selectStudent(studentId: string)" in app_shell and
+        "HomeworkStore.instance.setActiveStudent(studentId)" in app_shell,
         "parent shell must retain explicit child context switching")
 require("private FamilyContextBar()" in app_shell and "this.role === AppRole.PARENT" in app_shell,
         "phone parent shell must show family context without exposing role switching")
-require("this.role === AppRole.PARENT" in app_shell and "this.switchStudent()" in app_shell,
-        "child switching actions must remain inside parent-only UI branches")
-require("onClick(() => this.switchStudent())" in app_shell,
-        "parent child switch control must remain actionable")
+require("StudentSwitcherDialog" in app_shell and "@CustomDialog" in switcher,
+        "child switching must use an explicit selector instead of cycling to the next child")
+require(app_shell.count(".onClick(() => this.openStudentSwitcher())") >= 2,
+        "phone and wide parent child switch controls must remain actionable")
+require("activeStudentId: $activeStudentId" in app_shell and "students: $familyStudents" in app_shell,
+        "child selector must bind to the reactive family context")
 
 if errors:
     print("PERSON_ENTRY_ROLE_LOCK_GATE_FAIL")
