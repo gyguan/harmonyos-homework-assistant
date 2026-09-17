@@ -24,10 +24,13 @@ public class AssignmentController {
   private static final ZoneId DEFAULT_ZONE = ZoneId.of("Asia/Shanghai");
   private final AssignmentService service;
   private final AssignmentReviewService reviewService;
+  private final AssignmentBatchPublishService batchPublishService;
 
-  public AssignmentController(AssignmentService service, AssignmentReviewService reviewService) {
+  public AssignmentController(AssignmentService service, AssignmentReviewService reviewService,
+      AssignmentBatchPublishService batchPublishService) {
     this.service = service;
     this.reviewService = reviewService;
+    this.batchPublishService = batchPublishService;
   }
 
   @GetMapping("/students/{studentId}/assignments")
@@ -50,7 +53,17 @@ public class AssignmentController {
 
   @PostMapping("/students/{studentId}/assignments")
   public AssignmentDtos.Response create(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String studentId, @Valid @RequestBody AssignmentDtos.Create input) { return service.create(familyId, studentId, input); }
+      @PathVariable String studentId, @Valid @RequestBody AssignmentDtos.Create input) {
+    return service.create(familyId, studentId, input);
+  }
+
+  @PostMapping("/students/{studentId}/assignments/batch")
+  public AssignmentDtos.BatchPublishResponse batchPublish(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId,
+      @Valid @RequestBody AssignmentDtos.BatchPublishRequest input) {
+    return batchPublishService.publish(familyId, studentId, input);
+  }
 
   @PostMapping("/assignments/{id}/actions")
   public AssignmentDtos.Response action(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
@@ -66,11 +79,15 @@ public class AssignmentController {
 
   @PatchMapping("/assignments/{id}")
   public AssignmentDtos.Response update(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String id, @Valid @RequestBody AssignmentDtos.Update input) { return service.update(familyId, id, input); }
+      @PathVariable String id, @Valid @RequestBody AssignmentDtos.Update input) {
+    return service.update(familyId, id, input);
+  }
 
   @PutMapping("/assignments/{id}")
   public AssignmentDtos.Response updateCompatible(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String id, @Valid @RequestBody AssignmentDtos.Update input) { return service.update(familyId, id, input); }
+      @PathVariable String id, @Valid @RequestBody AssignmentDtos.Update input) {
+    return service.update(familyId, id, input);
+  }
 
   @DeleteMapping("/assignments/{id}")
   public void delete(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId, @PathVariable String id) {
