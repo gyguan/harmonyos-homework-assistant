@@ -12,6 +12,7 @@ export struct ParentDashboardPage {
   @State private refreshRevision: number = 0;
   @State private availableWidthVp: number = 390;
   onOpenImport: () => void = () => {};
+  onOpenExtra: () => void = () => {};
   onOpenProgress: () => void = () => {};
   onOpenReview: (assignmentId: string) => void = (_assignmentId: string) => {};
 
@@ -208,6 +209,28 @@ export struct ParentDashboardPage {
   }
 
   @Builder
+  private ExtraAction() {
+    Row({ space: 11 }) {
+      SymbolGlyph($r('sys.symbol.add_circle')).fontSize(22).fontColor([AppTheme.SUCCESS]);
+      Column({ space: 2 }) {
+        Text('布置课外任务').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('阅读、朗读、体育、实践或兴趣任务').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      }
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start);
+      SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).fontColor([AppTheme.TERTIARY_TEXT]);
+    }
+    .width('100%')
+    .constraintSize({ minHeight: 58 })
+    .padding({ left: 13, right: 13, top: 11, bottom: 11 })
+    .backgroundColor(AppTheme.SUCCESS_SOFT)
+    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`给 ${this.viewModel.student().name} 布置课外任务`)
+    .onClick(() => this.onOpenExtra());
+  }
+
+  @Builder
   private TodayAssignments() {
     Column({ space: 9 }) {
       Row() {
@@ -249,6 +272,7 @@ export struct ParentDashboardPage {
           this.AttentionSection();
           this.RecentSubmission();
           this.ImportAction();
+          this.ExtraAction();
           this.TodayAssignments();
         }
         .width('100%')
@@ -277,6 +301,7 @@ export struct ParentDashboardPage {
             this.AttentionSection();
             this.RecentSubmission();
             this.ImportAction();
+            this.ExtraAction();
           }
           .width(AppTheme.PARENT_HOME_SECONDARY_MIN_WIDTH)
           .alignItems(HorizontalAlign.Start);
