@@ -1,5 +1,5 @@
 import { HomeworkSyncService } from '../application/remote/HomeworkSyncService';
-import { AppRoute, AssignmentRouteParam } from '../app/navigation/AppRoutes';
+import { AppRoute, AssignmentRouteParam, ParentExtraCreateRouteParam } from '../app/navigation/AppRoutes';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
@@ -8,6 +8,7 @@ import { HomeworkStore } from '../data/HomeworkStore';
 import { StudentProfile } from '../domain/model/HomeworkModels';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
+import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
 import { HomeworkImportPage } from '../features/parent/import/HomeworkImportPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
@@ -131,6 +132,10 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
   }
 
+  private openParentExtraCreate(): void {
+    this.navPathStack.pushPathByName(AppRoute.PARENT_EXTRA_CREATE, new ParentExtraCreateRouteParam());
+  }
+
   private routeAssignmentId(param: Object): string {
     return (param as AssignmentRouteParam).assignmentId;
   }
@@ -199,6 +204,18 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_EXTRA_CREATE) {
+      NavDestination() {
+        ParentExtraAssignmentPage({
+          onBack: () => this.navPathStack.pop(),
+          onCreated: () => {
+            this.touchStore();
+            this.navPathStack.pop();
+          }
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     }
   }
 
@@ -234,6 +251,7 @@ export struct AppShell {
       ParentDashboardPage({
         revision: this.storeRevision,
         onOpenImport: () => this.parentRoute = ParentRoute.IMPORT,
+        onOpenExtra: () => this.openParentExtraCreate(),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
       });
