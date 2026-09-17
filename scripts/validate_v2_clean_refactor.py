@@ -96,10 +96,12 @@ if study_route_path.exists():
 student_home_path = ROOT / "entry/src/main/ets/features/student/home/StudentHomePage.ets"
 if student_home_path.exists():
     student_home = student_home_path.read_text(encoding="utf-8")
-    if "HOME_PAD_PRIMARY_ACTION_MAX_WIDTH" not in student_home or "canUsePadComposition()" not in student_home:
-        fail("Pad student-home primary action must use capability-based width density")
-    if ".width(this.canUsePadComposition() ? AppTheme.HOME_PAD_PRIMARY_ACTION_MAX_WIDTH : '100%')" not in student_home:
-        fail("Pad primary action width must be constrained without changing Phone full-width behavior")
+    if "canUsePadComposition()" not in student_home or "LayoutPolicy.homeFocusSummaryRequirement()" not in student_home:
+        fail("Student Home wide composition must remain capability-based")
+    if "AppTheme.HOME_SECONDARY_MIN_WIDTH" not in student_home or "AppTheme.HOME_PRIMARY_MIN_WIDTH" not in student_home:
+        fail("Pad Student Home must preserve distinct summary and primary task widths")
+    if "this.TodayOverview();" not in student_home or "this.TodaySubjects();" not in student_home:
+        fail("Pad Student Home must preserve Today summary + subject-task composition")
 
 responsive_path = ROOT / "entry/src/main/ets/common/responsive/WindowSizeClass.ets"
 if responsive_path.exists():
