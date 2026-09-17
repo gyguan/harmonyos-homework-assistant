@@ -20,6 +20,7 @@ export struct HomeworkImportRoutePage {
       Column() {
         HomeworkImportPage({
           revision: this.revision,
+          embeddedInDeepPage: true,
           onOpenConfirmation: () => this.onOpenConfirmation(),
           onStoreChanged: () => this.onStoreChanged()
         });
