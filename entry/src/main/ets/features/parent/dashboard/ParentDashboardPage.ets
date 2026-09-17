@@ -211,7 +211,7 @@ export struct ParentDashboardPage {
   @Builder
   private ExtraAction() {
     Row({ space: 11 }) {
-      SymbolGlyph($r('sys.symbol.add_circle')).fontSize(22).fontColor([AppTheme.SUCCESS]);
+      SymbolGlyph($r('sys.symbol.plus_square')).fontSize(22).fontColor([AppTheme.SUCCESS]);
       Column({ space: 2 }) {
         Text('布置课外任务').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Text('阅读、朗读、体育、实践或兴趣任务').fontSize(12).fontColor(AppTheme.SUBTEXT);
