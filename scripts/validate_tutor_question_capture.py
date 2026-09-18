@@ -46,7 +46,7 @@ require("TutorQuestionCapturePanel" in study and "题目识别结果" in study,
 require(study.find("TextArea({ placeholder: '输入问题") < study.find("TutorQuestionCapturePanel({") <
         study.find("Button(this.tutorSending ? '发送中…' : '发送给小伴'"),
         "Tutor capture must live in the input area after text entry and before send, not between history and input")
-require("本机识别 · 识别后可编辑" in panel and ".padding(12)" not in panel,
+require("只在本机识别 · 识别后可编辑" in panel and ".padding(12)" not in panel,
         "Tutor capture must stay a compact input accessory instead of a standalone card")
 require("请确认或补充后再发送" in study,
         "captured question must require student review before sending instead of auto-submit")
