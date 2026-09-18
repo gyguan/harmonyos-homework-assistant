@@ -1,1 +1,55 @@
-<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><rect width="128" height="128" rx="30" fill="#2F6BFF"/><path d="M32 36h64v56H32z" fill="#fff" opacity=".95"/><path d="M44 50h40M44 64h40M44 78h24" stroke="#2F6BFF" stroke-width="6" stroke-linecap="round"/></svg>
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="40" y1="36" x2="462" y2="478" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#37B9F3"/>
+      <stop offset="0.48" stop-color="#176EEA"/>
+      <stop offset="1" stop-color="#35D8C4"/>
+    </linearGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#8EF0E7"/>
+      <stop offset="1" stop-color="#37D987"/>
+    </linearGradient>
+    <linearGradient id="book" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E7F1FF"/>
+    </linearGradient>
+    <linearGradient id="tick" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#38E59B"/>
+      <stop offset="1" stop-color="#00BBD0"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="110" fill="url(#bg)"/>
+  <circle cx="430" cy="92" r="76" fill="#FFFFFF" opacity="0.06"/>
+  <circle cx="82" cy="418" r="92" fill="#FFFFFF" opacity="0.05"/>
+  <path d="M64 310C124 364 252 380 382 330C422 314 452 290 470 262" fill="none" stroke="#72F0DC" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+  <path d="M447 222L454 240L473 247L455 255L448 274L440 256L421 248L439 240L447 222Z" fill="#FFE66B"/>
+  <g fill="#FFFFFF" opacity="0.98">
+    <rect x="294" y="88" width="30" height="132" rx="15" transform="rotate(35 294 88)"/>
+    <rect x="312" y="141" width="32" height="126" rx="16"/>
+    <rect x="381" y="103" width="30" height="164" rx="15"/>
+    <rect x="354" y="149" width="86" height="28" rx="14"/>
+    <rect x="344" y="199" width="105" height="28" rx="14"/>
+    <rect x="355" y="112" width="22" height="42" rx="11" transform="rotate(-31 355 112)"/>
+    <rect x="420" y="112" width="22" height="42" rx="11" transform="rotate(31 420 112)"/>
+  </g>
+  <ellipse cx="151" cy="112" rx="26" ry="48" transform="rotate(-27 151 112)" fill="url(#leaf)"/>
+  <ellipse cx="112" cy="126" rx="20" ry="38" transform="rotate(-50 112 126)" fill="#77E9E7"/>
+  <path d="M141 152C137 132 128 118 113 107" fill="none" stroke="#DFFBFF" stroke-width="8" stroke-linecap="round"/>
+  <path d="M75 226C75 174 116 143 174 143C232 143 270 176 270 229C270 278 238 311 181 318C128 324 81 296 75 245C74 238 74 232 75 226Z" fill="#F8FBFF"/>
+  <path d="M96 226C97 189 126 169 174 169C220 169 247 191 248 228C250 267 224 290 180 295C137 300 100 279 96 241C95 236 95 231 96 226Z" fill="#EAF3FF"/>
+  <ellipse cx="135" cy="229" rx="14" ry="21" fill="#123B85"/>
+  <ellipse cx="212" cy="222" rx="14" ry="21" fill="#123B85"/>
+  <circle cx="140" cy="222" r="4" fill="#FFFFFF"/>
+  <circle cx="217" cy="215" r="4" fill="#FFFFFF"/>
+  <path d="M158 249C171 261 187 260 199 246C197 269 164 274 158 249Z" fill="#F05D79"/>
+  <ellipse cx="119" cy="258" rx="14" ry="9" fill="#FFB6C2" opacity="0.8"/>
+  <ellipse cx="227" cy="251" rx="14" ry="9" fill="#FFB6C2" opacity="0.8"/>
+  <path d="M88 274C67 284 61 304 71 321C83 336 104 326 114 307" fill="#F8FBFF"/>
+  <path d="M247 274C268 282 276 301 268 320C258 336 238 327 226 308" fill="#F8FBFF"/>
+  <path d="M75 340C111 318 156 316 214 335C231 341 244 349 256 360C268 349 281 341 298 335C356 316 401 318 437 340L449 423C393 409 333 411 268 437L256 447L244 437C179 411 119 409 63 423L75 340Z" fill="#0E59C8" opacity="0.82"/>
+  <path d="M76 327C119 305 164 307 218 326C235 332 248 341 256 352V425C204 398 144 392 82 405L76 327Z" fill="url(#book)"/>
+  <path d="M436 327C393 305 348 307 294 326C277 332 264 341 256 352V425C308 398 368 392 430 405L436 327Z" fill="url(#book)"/>
+  <path d="M256 352V425" stroke="#C8DCF7" stroke-width="5"/>
+  <path d="M106 349H205M106 370H191M106 391H174" stroke="#BCD1EC" stroke-width="10" stroke-linecap="round"/>
+  <path d="M321 372L346 395L397 343" fill="none" stroke="url(#tick)" stroke-width="18" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
