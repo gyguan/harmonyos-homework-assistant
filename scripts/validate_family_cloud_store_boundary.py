@@ -19,9 +19,17 @@ def require(condition: bool, message: str) -> None:
 
 
 cloud = read("entry/src/main/ets/application/remote/FamilyCloudService.ets")
+family_context_port = read("entry/src/main/ets/domain/port/FamilyContextRepository.ets")
+family_context_adapter = read("entry/src/main/ets/data/repository/DefaultFamilyContextRepository.ets")
 
-# During V2 migration FamilyCloudService may still use HomeworkStore or move behind a Repository.
-# The gate protects ownership/isolation invariants instead of forcing one legacy call graph.
+require("HomeworkStore" not in cloud and "FamilyContextRepository" in cloud,
+        "FamilyCloudService must use FamilyContextRepository instead of accessing HomeworkStore directly")
+require("setActiveStudent(studentId: string): boolean" in family_context_port and
+        "replaceStudents(students: StudentProfile[]): void" in family_context_port,
+        "FamilyContextRepository must own active-student and synced-student mutations")
+require("HomeworkStore.instance.setActiveStudent(studentId)" in family_context_adapter and
+        "HomeworkStore.instance.replaceStudents(copies)" in family_context_adapter,
+        "legacy FamilyContext adapter must preserve Store-backed persistence semantics")
 require("HomeworkStore.instance.getSettings()" not in cloud,
         "FamilyCloudService must not obtain mutable Store settings by reference")
 require("settings.students" not in cloud,
