@@ -94,8 +94,8 @@ export class HomeworkBatchPublishService {
   }
 
   private resolveCandidateDueAt(candidate: CandidateAssignment): number {
-    let dayStart = AssignmentDueDate.resolveDayStart(candidate.dueText, this.candidateAnchor(candidate.id));
-    return dayStart > 0 ? dayStart : 0;
+    let dueAt = AssignmentDueDate.resolveDueAtEpochMs(candidate.dueText, this.candidateAnchor(candidate.id));
+    return dueAt > 0 ? dueAt : 0;
   }
 
   private candidateAnchor(candidateId: string): number {
