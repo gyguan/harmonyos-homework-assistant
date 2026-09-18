@@ -2,19 +2,19 @@ import { http } from '@kit.NetworkKit';
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter, AssignmentTypeFilter } from '../../domain/model/AssignmentFilter';
 import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDecision';
-import { Assignment, TodaySummary } from '../../domain/model/HomeworkModels';
+import { Assignment, AssignmentContentType, TodaySummary } from '../../domain/model/HomeworkModels';
 import { BackendHttpClient } from './BackendHttpClient';
 import { RemoteAssignment } from './RemoteModels';
 
 interface CreateAssignmentBody {
   id: string; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
-  assignmentType: string; subjectCode: string; dueAtEpochMs: number; dueTimezone: string;
+  assignmentType: string; subjectCode: string; contentType: string; dueAtEpochMs: number; dueTimezone: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
 interface UpdateAssignmentBody {
   version: number; subject: string; title: string; instruction: string; textbookRef: string; dueText: string;
-  assignmentType: string; subjectCode: string; dueAtEpochMs: number; dueTimezone: string;
+  assignmentType: string; subjectCode: string; contentType: string; dueAtEpochMs: number; dueTimezone: string;
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
@@ -260,6 +260,8 @@ export class HomeworkRemoteApi {
       version: version, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
       textbookRef: assignment.textbookRef, dueText: assignment.dueText,
       assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
+      contentType: assignment.contentType === AssignmentContentType.AUDIO_IMAGE ?
+        AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
       dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
       status: assignment.status, sourceLabel: '', sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
@@ -271,6 +273,8 @@ export class HomeworkRemoteApi {
     return { id: assignment.id, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
       textbookRef: assignment.textbookRef, dueText: assignment.dueText,
       assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
+      contentType: assignment.contentType === AssignmentContentType.AUDIO_IMAGE ?
+        AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
       dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
       status: assignment.status, sourceLabel: assignment.candidateId.length > 0 ? '家长确认发布' : '',
       sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,

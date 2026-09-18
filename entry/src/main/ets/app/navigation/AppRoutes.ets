@@ -22,4 +22,9 @@ export class ParentImportConfirmationRouteParam {
 }
 
 export class ParentExtraCreateRouteParam {
+  voice: boolean;
+
+  constructor(voice: boolean = false) {
+    this.voice = voice;
+  }
 }

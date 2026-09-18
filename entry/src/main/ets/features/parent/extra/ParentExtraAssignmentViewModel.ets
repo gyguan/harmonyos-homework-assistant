@@ -1,5 +1,6 @@
 import {
   Assignment,
+  AssignmentContentType,
   AssignmentStatus,
   AssignmentType,
   StudentProfile,
@@ -35,6 +36,7 @@ export class ParentExtraAssignmentViewModel {
       candidateId: '',
       assignmentType: AssignmentType.EXTRA,
       subjectCode: this.subjectCode(draft.category),
+      contentType: AssignmentContentType.NORMAL,
       subject: draft.category,
       title: draft.title.trim(),
       instruction: draft.instruction.trim(),

@@ -14,6 +14,16 @@ export enum AssignmentType {
   EXTRA = 'EXTRA'
 }
 
+export enum AssignmentContentType {
+  NORMAL = 'NORMAL',
+  AUDIO_IMAGE = 'AUDIO_IMAGE'
+}
+
+export enum AssignmentResourceType {
+  AUDIO = 'AUDIO',
+  IMAGE = 'IMAGE'
+}
+
 export enum Subject {
   CHINESE = '语文',
   MATH = '数学',
@@ -35,6 +45,17 @@ export enum HomeworkImportSourceKind {
   IMAGE = 'IMAGE',
   FILE = 'FILE',
   SHARE = 'SHARE'
+}
+
+export interface AssignmentResource {
+  id: string;
+  resourceType: AssignmentResourceType;
+  originalName: string;
+  contentType: string;
+  sizeBytes: number;
+  sortOrder: number;
+  durationMs: number;
+  downloadPath: string;
 }
 
 export interface StudentProfile {
@@ -86,6 +107,7 @@ export interface Assignment {
   candidateId: string;
   assignmentType: AssignmentType;
   subjectCode: string;
+  contentType?: AssignmentContentType;
   subject: Subject;
   title: string;
   instruction: string;

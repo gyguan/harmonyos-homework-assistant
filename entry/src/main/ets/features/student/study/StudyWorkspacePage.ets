@@ -4,13 +4,14 @@ import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
+import { VoiceAssignmentPane } from '../../../components/assignment/VoiceAssignmentPane';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
-import { Assignment, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentContentType, AssignmentStatus, Submission } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
 import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
@@ -50,6 +51,7 @@ export struct StudyWorkspacePage {
 
   private readonly viewModel: StudyWorkspaceViewModel =
     new StudyWorkspaceViewModel(DefaultAssignmentRepository.instance);
+  private pauseEmbeddedMedia: () => void = () => {};
 
   aboutToAppear(): void { void this.loadTutor(); }
 
@@ -162,6 +164,7 @@ export struct StudyWorkspacePage {
       assignment.status === AssignmentStatus.NEEDS_REWORK || assignment.status === AssignmentStatus.PAUSED) {
       await this.executeAction(AssignmentAction.START);
     } else if (assignment.status === AssignmentStatus.IN_PROGRESS) {
+      this.pauseEmbeddedMedia();
       await this.executeAction(AssignmentAction.READY_TO_SUBMIT);
     } else if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
       if (this.submissionPhotoUris.length === 0) {
@@ -175,6 +178,7 @@ export struct StudyWorkspacePage {
   private async pauseCurrentAssignment(): Promise<void> {
     let assignment = this.assignment();
     if (assignment === null || assignment.status !== AssignmentStatus.IN_PROGRESS || this.actionRunning) return;
+    this.pauseEmbeddedMedia();
     await this.executeAction(AssignmentAction.PAUSE);
   }
 
@@ -425,6 +429,14 @@ export struct StudyWorkspacePage {
             .fontSize(15)
             .lineHeight(23)
             .fontColor(AppTheme.SUBTEXT);
+
+          if (this.assignment()!.contentType === AssignmentContentType.AUDIO_IMAGE) {
+            VoiceAssignmentPane({
+              assignmentId: this.assignment()!.id,
+              playbackEnabled: this.assignment()!.status === AssignmentStatus.IN_PROGRESS,
+              onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause
+            });
+          }
 
           AssignmentCountdownCard({ assignment: this.assignment()! });
 

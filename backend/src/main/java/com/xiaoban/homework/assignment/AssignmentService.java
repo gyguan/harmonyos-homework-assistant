@@ -28,20 +28,24 @@ import org.springframework.transaction.annotation.Transactional;
 public class AssignmentService {
   private static final String DEFAULT_ASSIGNMENT_TYPE = "SCHOOL";
   private static final String DEFAULT_SUBJECT_CODE = "OTHER";
+  private static final String DEFAULT_CONTENT_TYPE = "NORMAL";
   private static final String DEFAULT_DUE_TIMEZONE = "Asia/Shanghai";
 
   private final AssignmentRepository repository;
   private final StudentService students;
   private final SubmissionRepository submissions;
   private final SubmissionPhotoRepository photos;
+  private final AssignmentResourceRepository resources;
   private final FileStorage storage;
 
   public AssignmentService(AssignmentRepository repository, StudentService students,
-      SubmissionRepository submissions, SubmissionPhotoRepository photos, FileStorage storage) {
+      SubmissionRepository submissions, SubmissionPhotoRepository photos,
+      AssignmentResourceRepository resources, FileStorage storage) {
     this.repository = repository;
     this.students = students;
     this.submissions = submissions;
     this.photos = photos;
+    this.resources = resources;
     this.storage = storage;
   }
 
@@ -124,6 +128,7 @@ public class AssignmentService {
     e.assignmentType = assignmentType(input.assignmentType());
     e.subject = input.subject();
     e.subjectCode = subjectCode(input.subjectCode(), input.subject());
+    e.contentType = contentType(input.contentType());
     e.title = input.title();
     e.instruction = input.instruction();
     e.textbookRef = text(input.textbookRef());
@@ -168,6 +173,7 @@ public class AssignmentService {
       if (input.subjectCode() == null) e.subjectCode = subjectCode(null, input.subject());
     }
     if (input.subjectCode() != null) e.subjectCode = subjectCode(input.subjectCode(), e.subject);
+    if (input.contentType() != null) e.contentType = contentType(input.contentType());
     if (input.title() != null) e.title = input.title();
     if (input.instruction() != null) e.instruction = input.instruction();
     if (input.textbookRef() != null) e.textbookRef = input.textbookRef();
@@ -271,6 +277,10 @@ public class AssignmentService {
         storage.delete(photo.storagePath);
       }
     }
+    for (AssignmentResourceEntity resource : resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, id)) {
+      storage.delete(resource.storagePath);
+    }
+    resources.deleteByFamilyIdAndAssignmentId(familyId, id);
     repository.delete(assignment);
     repository.flush();
   }
@@ -462,6 +472,14 @@ public class AssignmentService {
     String normalized = value == null || value.isBlank() ? DEFAULT_ASSIGNMENT_TYPE : value.trim().toUpperCase();
     if (!"SCHOOL".equals(normalized) && !"EXTRA".equals(normalized)) {
       throw new ApiExceptions.BadRequest("不支持的作业类型: " + value);
+    }
+    return normalized;
+  }
+
+  private String contentType(String value) {
+    String normalized = value == null || value.isBlank() ? DEFAULT_CONTENT_TYPE : value.trim().toUpperCase();
+    if (!"NORMAL".equals(normalized) && !"AUDIO_IMAGE".equals(normalized)) {
+      throw new ApiExceptions.BadRequest("不支持的作业内容类型: " + value);
     }
     return normalized;
   }
