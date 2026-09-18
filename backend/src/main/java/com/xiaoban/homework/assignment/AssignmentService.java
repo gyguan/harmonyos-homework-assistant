@@ -281,7 +281,7 @@ public class AssignmentService {
     }
     String previousStatus = e.status;
     if (!"IN_PROGRESS".equals(previousStatus)) {
-      if (!"PAUSED".equals(previousStatus)) e.elapsedSeconds = 0;
+      if (!"PAUSED".equals(previousStatus) && !"READY_TO_SUBMIT".equals(previousStatus)) e.elapsedSeconds = 0;
       e.status = "IN_PROGRESS";
       e.startedAtEpochMs = nowMs;
       e.finishedAtEpochMs = 0;
