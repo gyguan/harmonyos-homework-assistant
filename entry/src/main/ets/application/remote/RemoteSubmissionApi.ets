@@ -45,6 +45,16 @@ export class RemoteSubmissionApi {
     return JSON.parse(response.body) as RemoteSubmission[];
   }
 
+  async latest(assignmentId: string): Promise<RemoteSubmission | null> {
+    if (!BackendSession.instance.isConnected()) return null;
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/assignments/${encodeURIComponent(assignmentId)}/submissions/latest`,
+      http.RequestMethod.GET);
+    if (response.statusCode === 204) return null;
+    if (response.statusCode !== 200) throw new Error('读取最新提交记录失败');
+    return JSON.parse(response.body) as RemoteSubmission;
+  }
+
   cachedPhotoUri(photoId: string): string {
     let cached = this.photoCache.get(photoId);
     return cached === undefined ? '' : cached;
