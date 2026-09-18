@@ -9,6 +9,7 @@ import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssign
 import { DefaultHomeworkImportDraftRepository } from '../../data/repository/DefaultHomeworkImportDraftRepository';
 import {
   Assignment,
+  AssignmentContentType,
   AssignmentStatus,
   AssignmentType,
   CandidateAssignment,
@@ -73,6 +74,7 @@ export class HomeworkBatchPublishService {
       candidateId: candidate.id,
       assignmentType: AssignmentType.SCHOOL,
       subjectCode: this.subjectCode(candidate.subject),
+      contentType: AssignmentContentType.NORMAL,
       subject: candidate.subject,
       title: candidate.title,
       instruction: candidate.instruction,

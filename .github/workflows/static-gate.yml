@@ -66,6 +66,9 @@ jobs:
       - name: Validate snapshot migration safety
         run: python scripts/validate_snapshot_migration.py
 
+      - name: Validate voice assignment content type retention
+        run: python scripts/validate_voice_assignment_content_type.py
+
       - name: Validate V2 Slice 1 architecture
         run: python scripts/validate_v2_slice1.py
 

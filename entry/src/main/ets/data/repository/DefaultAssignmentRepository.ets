@@ -4,7 +4,7 @@ import { RemoteAssignment, RemoteAssignmentMapper } from '../../application/remo
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
 import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDecision';
-import { Assignment, AssignmentStatus, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
+import { Assignment, AssignmentContentType, AssignmentStatus, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../domain/port/AssignmentRepository';
 import { AssignmentQuery } from '../../domain/service/AssignmentQuery';
 import { AssignmentLocalDataSource, DefaultAssignmentLocalDataSource } from '../local/AssignmentLocalDataSource';
@@ -308,6 +308,8 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       candidateId: base.candidateId,
       assignmentType: base.assignmentType,
       subjectCode: base.subjectCode,
+      contentType: base.contentType === AssignmentContentType.AUDIO_IMAGE ?
+        AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
       subject: base.subject,
       title: draft.title,
       instruction: draft.instruction,
