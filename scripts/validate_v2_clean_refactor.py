@@ -111,6 +111,13 @@ if student_home_path.exists():
     if "this.TodayOverview();" not in student_home or "this.TodaySubjects();" not in student_home:
         fail("Pad Student Home must preserve Today summary + subject-task composition")
 
+repository_root = ROOT / "entry/src/main/ets/data/repository"
+if repository_root.exists():
+    for repository_file in repository_root.rglob("*.ets"):
+        repository_text = repository_file.read_text(encoding="utf-8")
+        if "HomeworkStore.instance" in repository_text or "../HomeworkStore" in repository_text:
+            fail(f"Repository must use a local data source instead of HomeworkStore: {repository_file.relative_to(ROOT)}")
+
 assignment_repository_path = ROOT / "entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets"
 assignment_local_path = ROOT / "entry/src/main/ets/data/local/AssignmentLocalDataSource.ets"
 if assignment_repository_path.exists():

@@ -20,16 +20,19 @@ def require(condition: bool, message: str) -> None:
 
 cloud = read("entry/src/main/ets/application/remote/FamilyCloudService.ets")
 family_context_port = read("entry/src/main/ets/domain/port/FamilyContextRepository.ets")
-family_context_adapter = read("entry/src/main/ets/data/repository/DefaultFamilyContextRepository.ets")
+family_context_repository = read("entry/src/main/ets/data/repository/DefaultFamilyContextRepository.ets")
+family_context_local = read("entry/src/main/ets/data/local/FamilyContextLocalDataSource.ets")
 
 require("HomeworkStore" not in cloud and "FamilyContextRepository" in cloud,
         "FamilyCloudService must use FamilyContextRepository instead of accessing HomeworkStore directly")
 require("setActiveStudent(studentId: string): boolean" in family_context_port and
         "replaceStudents(students: StudentProfile[]): void" in family_context_port,
         "FamilyContextRepository must own active-student and synced-student mutations")
-require("HomeworkStore.instance.setActiveStudent(studentId)" in family_context_adapter and
-        "HomeworkStore.instance.replaceStudents(copies)" in family_context_adapter,
-        "legacy FamilyContext adapter must preserve Store-backed persistence semantics")
+require("HomeworkStore" not in family_context_repository and "FamilyContextLocalDataSource" in family_context_repository,
+        "FamilyContextRepository implementation must use the local data source boundary")
+require("HomeworkStore.instance.setActiveStudent(studentId)" in family_context_local and
+        "HomeworkStore.instance.replaceStudents(students)" in family_context_local,
+        "legacy FamilyContext local adapter must preserve Store-backed persistence semantics")
 require("HomeworkStore.instance.getSettings()" not in cloud,
         "FamilyCloudService must not obtain mutable Store settings by reference")
 require("settings.students" not in cloud,
