@@ -63,7 +63,7 @@
 | `HomeworkStore` assignment query | MIGRATE（边界完成） | `AssignmentRepository` + `AssignmentLocalDataSource` | Repository 不再直接调用 Store；待 legacy local adapter 删除 | Final Cleanup |
 | `HomeworkStore` assignment transition/timer | MIGRATE（仅 demo 兼容） | backend Action Command + `AssignmentLocalDataSource` seed/demo adapter | 真实作业已走服务端 Command；移除 demo Store transition 后删除 | Final Cleanup |
 | `HomeworkStore` candidate/import | MIGRATE（边界完成） | `HomeworkImportDraftRepository` + `HomeworkImportLocalDataSource` | Repository/ViewModel 已不直接访问 Store；待 local adapter 删除 | Final Cleanup |
-| `HomeworkStore` submission/tutor cache | MIGRATE | Submission/Tutor repository | Slice 3 闭环完成 | Slice 3/Final |
+| `HomeworkStore` submission/tutor cache | MIGRATE（submission 边界完成） | `SubmissionLocalDataSource` / Tutor remote context | Submission application 层不再直接访问 Store；待 tutor/local snapshot legacy 清理 | Final Cleanup |
 | `data/MockData.ets` | EVOLVE | 仅测试/fixture/demo seed | 不再作为 schema mismatch 恢复策略 | Slice 0 |
 
 ### 强约束
