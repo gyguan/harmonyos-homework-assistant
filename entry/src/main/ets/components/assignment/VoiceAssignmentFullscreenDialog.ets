@@ -8,9 +8,8 @@ export struct VoiceAssignmentFullscreenDialog {
   @Link playing: boolean;
   @Link currentTimeMs: number;
   @Link durationMs: number;
-  @Link playbackEnabled: boolean;
-  @Link prepared: boolean;
 
+  onClose: () => void = () => {};
   onToggleAudio: () => void = () => {};
   onSeek: (value: number) => void = (_value: number) => {};
 
@@ -47,25 +46,28 @@ export struct VoiceAssignmentFullscreenDialog {
 
       if (this.imageUris.length > 1) {
         Row() {
-          Button('‹', { type: ButtonType.Circle })
+          Button('←', { type: ButtonType.Circle })
             .width(48)
             .height(48)
-            .fontSize(30)
-            .backgroundColor('#CCFFFFFF')
+            .fontSize(22)
+            .fontWeight(FontWeight.Medium)
+            .backgroundColor('#E6FFFFFF')
             .fontColor(AppTheme.TEXT)
             .accessibilityText('上一张情景图片')
             .onClick(() => this.previousImage());
           Blank();
-          Button('›', { type: ButtonType.Circle })
+          Button('→', { type: ButtonType.Circle })
             .width(48)
             .height(48)
-            .fontSize(30)
-            .backgroundColor('#CCFFFFFF')
+            .fontSize(22)
+            .fontWeight(FontWeight.Medium)
+            .backgroundColor('#E6FFFFFF')
             .fontColor(AppTheme.TEXT)
             .accessibilityText('下一张情景图片')
             .onClick(() => this.nextImage());
         }
         .width('100%')
+        .alignItems(VerticalAlign.Center)
         .padding({ left: 12, right: 12 });
       }
     }
@@ -108,8 +110,7 @@ export struct VoiceAssignmentFullscreenDialog {
         .width(52)
         .height(52)
         .fontSize(this.playing ? 19 : 17)
-        .enabled(this.playbackEnabled && this.prepared)
-        .backgroundColor(this.playbackEnabled && this.prepared ? AppTheme.PRIMARY : '#555555')
+        .backgroundColor(AppTheme.PRIMARY)
         .fontColor(AppTheme.TEXT_ON_PRIMARY)
         .accessibilityText(this.playing ? '暂停语音' : '播放语音')
         .onClick(() => this.onToggleAudio());
@@ -125,7 +126,7 @@ export struct VoiceAssignmentFullscreenDialog {
           .width('100%')
           .selectedColor(AppTheme.PRIMARY)
           .trackColor('#4A4A4A')
-          .enabled(this.playbackEnabled && this.prepared)
+          .enabled(this.durationMs > 0)
           .onChange((value: number, mode: SliderChangeMode) => {
             this.currentTimeMs = value;
             if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
@@ -149,23 +150,25 @@ export struct VoiceAssignmentFullscreenDialog {
 
   build() {
     Column({ space: 10 }) {
-      Row() {
+      Row({ space: 12 }) {
         Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor('#FFFFFF');
         Blank();
-        Text('关闭')
+        Button('关闭', { type: ButtonType.Normal })
+          .width(72)
+          .height(40)
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
           .fontColor('#FFFFFF')
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 14, right: 4 })
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .backgroundColor('#3A3A3A')
+          .borderRadius(20)
           .accessibilityText('退出全屏')
-          .onClick(() => this.controller.close());
+          .onClick(() => this.onClose());
       }
-      .width('100%');
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
 
       this.FullscreenImage();
       this.ThumbnailStrip();

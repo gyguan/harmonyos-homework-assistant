@@ -21,24 +21,31 @@ fullscreen = read("entry/src/main/ets/components/assignment/VoiceAssignmentFulls
 
 require("private previousImage()" in pane and "private nextImage()" in pane,
         "normal voice workspace must retain previous/next image navigation")
-require("accessibilityText('上一张情景图片')" in pane and
-        "accessibilityText('下一张情景图片')" in pane,
-        "normal voice workspace must expose both image navigation buttons")
-require("Text('全屏')" in pane and "this.fullscreenController.open()" in pane,
-        "voice workspace must expose a fullscreen entry")
+require("Button('←'" in pane and "Button('→'" in pane,
+        "normal voice workspace must use visually centered arrow buttons")
+require("Button('全屏查看'" in pane and "this.fullscreenController.open()" in pane,
+        "voice workspace must expose a prominent fullscreen entry")
 require("VoiceAssignmentFullscreenDialog" in pane and
         "AssignmentAudioPlayerService" not in fullscreen,
         "fullscreen view must reuse the pane player instead of creating a second AVPlayer service")
 for state in ["imageUris: $imageUris", "imageIndex: $imageIndex", "playing: $playing",
               "currentTimeMs: $currentTimeMs", "durationMs: $durationMs"]:
     require(state in pane, f"fullscreen must share media state through @Link: {state}")
-require("onToggleAudio" in fullscreen and "onSeek" in fullscreen,
-        "fullscreen must delegate play/pause and seek to the existing player")
-require("controller.close()" in fullscreen,
-        "fullscreen media view must provide an explicit exit")
-require("accessibilityText('上一张情景图片')" in fullscreen and
-        "accessibilityText('下一张情景图片')" in fullscreen,
-        "fullscreen media view must support previous/next image navigation")
+require("fullscreenPlaybackEnabled" not in pane and "fullscreenPrepared" not in pane,
+        "fullscreen must not keep duplicated playback readiness state")
+require("onClose: () => this.closeFullscreen()" in pane and
+        "this.fullscreenController.close()" in pane,
+        "fullscreen close must be owned by the parent controller")
+require("Button('关闭'" in fullscreen and ".onClick(() => this.onClose())" in fullscreen,
+        "fullscreen must use an explicit button that delegates close to the parent")
+require("Button(this.playing ? 'Ⅱ' : '▶'" in fullscreen and
+        ".onClick(() => this.onToggleAudio())" in fullscreen,
+        "fullscreen play/pause must delegate directly to the existing player")
+require("playbackEnabled" not in fullscreen and "prepared" not in fullscreen,
+        "fullscreen controls must not be blocked by copied readiness links")
+require("Button('←'" in fullscreen and "Button('→'" in fullscreen and
+        ".alignItems(VerticalAlign.Center)" in fullscreen,
+        "fullscreen image arrows must be visually centered")
 require("ForEach(this.imageUris" in fullscreen,
         "fullscreen media view must keep thumbnail switching")
 require("Slider({" in fullscreen and "this.onSeek(value)" in fullscreen,
