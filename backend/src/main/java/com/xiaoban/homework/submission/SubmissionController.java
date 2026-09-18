@@ -37,6 +37,14 @@ public class SubmissionController {
   public List<SubmissionDtos.Response> list(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String assignmentId) { return service.list(familyId, assignmentId); }
 
+  @GetMapping("/assignments/{assignmentId}/submissions/latest")
+  public ResponseEntity<SubmissionDtos.Response> latest(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String assignmentId) {
+    SubmissionDtos.Response latest = service.latest(familyId, assignmentId);
+    return latest == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(latest);
+  }
+
   @GetMapping("/submission-photos/{photoId}")
   public ResponseEntity<Resource> photo(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable UUID photoId) throws MalformedURLException {
