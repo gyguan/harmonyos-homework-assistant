@@ -3,19 +3,20 @@ import { HomeworkRemoteApi } from '../../application/remote/HomeworkRemoteApi';
 import { RemoteAssignment, RemoteAssignmentMapper } from '../../application/remote/RemoteModels';
 import { RemoteSubmissionApi } from '../../application/remote/RemoteSubmissionApi';
 import { RemoteSubmissionCache } from '../../application/remote/RemoteSubmissionCache';
-import { HomeworkStore } from '../HomeworkStore';
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
 import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDecision';
 import { Assignment, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../domain/port/AssignmentRepository';
 import { AssignmentQuery } from '../../domain/service/AssignmentQuery';
+import { AssignmentLocalDataSource, DefaultAssignmentLocalDataSource } from '../local/AssignmentLocalDataSource';
 
 export class DefaultAssignmentRepository implements AssignmentRepository {
   static readonly instance: DefaultAssignmentRepository = new DefaultAssignmentRepository();
   private remoteSummary: TodaySummary | null = null;
   private remoteSummaryStudentId: string = '';
   private queryCache: Assignment[] = [];
+  private readonly local: AssignmentLocalDataSource = DefaultAssignmentLocalDataSource.instance;
   private syncRunning: boolean = false;
   private syncRequested: boolean = false;
 
@@ -28,11 +29,11 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   }
 
   getActiveStudent(): StudentProfile {
-    return HomeworkStore.instance.getStudent();
+    return this.local.getActiveStudent();
   }
 
   listCached(filter?: AssignmentFilter): Assignment[] {
-    let items = HomeworkStore.instance.getAssignments().slice();
+    let items = this.local.listAssignments();
     if (filter === undefined) return AssignmentQuery.sort(items);
     return AssignmentQuery.filter(items, filter);
   }
@@ -43,11 +44,11 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       return this.queryCache.slice();
     }
     try {
-      let studentId = HomeworkStore.instance.getActiveStudentId();
+      let studentId = this.local.getActiveStudentId();
       let remoteItems = await HomeworkRemoteApi.instance.listFiltered(studentId, filter);
       let mapped: Assignment[] = [];
       for (let remote of remoteItems) {
-        let existing = HomeworkStore.instance.getAssignment(remote.id);
+        let existing = this.local.getAssignment(remote.id);
         mapped.push(RemoteAssignmentMapper.toLocal(remote, existing));
       }
       // The backend query can intentionally receive only filters it supports efficiently
@@ -63,13 +64,13 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
   getCached(assignmentId: string): Assignment | null {
     for (let item of this.queryCache) if (item.id === assignmentId) return item;
-    return HomeworkStore.instance.getAssignment(assignmentId);
+    return this.local.getAssignment(assignmentId);
   }
 
   getCachedSummary(): TodaySummary {
-    let activeStudentId = HomeworkStore.instance.getActiveStudentId();
+    let activeStudentId = this.local.getActiveStudentId();
     if (this.remoteSummary !== null && this.remoteSummaryStudentId === activeStudentId) return this.remoteSummary;
-    return HomeworkStore.instance.getTodaySummary();
+    return this.local.getTodaySummary();
   }
 
   async create(assignment: Assignment): Promise<Assignment> {
@@ -104,7 +105,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     }
 
     let remote = await HomeworkRemoteApi.instance.performAction(assignmentId, current.remoteVersion, action);
-    let mapped = RemoteAssignmentMapper.toLocal(remote, HomeworkStore.instance.getAssignment(assignmentId));
+    let mapped = RemoteAssignmentMapper.toLocal(remote, this.local.getAssignment(assignmentId));
     this.applyAuthoritative(mapped);
     return mapped;
   }
@@ -117,10 +118,10 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     // published Assignment is reviewed only after the server accepts the current version.
     if (current.remoteVersion <= 0 && current.candidateId.length === 0) {
       let completed = decision === AssignmentReviewDecision.APPROVE;
-      if (!HomeworkStore.instance.reviewAssignment(assignmentId, completed, note)) {
+      if (!this.local.reviewAssignment(assignmentId, completed, note)) {
         throw new Error('当前作业状态不能验收');
       }
-      let updated = HomeworkStore.instance.getAssignment(assignmentId);
+      let updated = this.local.getAssignment(assignmentId);
       if (updated === null) throw new Error('作业不存在');
       this.replaceQueryCacheItem(updated);
       this.remoteSummary = null;
@@ -136,13 +137,13 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
     let remote = await HomeworkRemoteApi.instance.review(
       assignmentId, current.remoteVersion, decision, note.trim());
-    let mapped = RemoteAssignmentMapper.toLocal(remote, HomeworkStore.instance.getAssignment(assignmentId));
+    let mapped = RemoteAssignmentMapper.toLocal(remote, this.local.getAssignment(assignmentId));
     this.applyAuthoritative(mapped);
     return mapped;
   }
 
   applyAuthoritative(updated: Assignment): void {
-    let assignments = HomeworkStore.instance.getAssignments().slice();
+    let assignments = this.local.listAssignments();
     let replaced = false;
     for (let i = 0; i < assignments.length; i++) {
       if (assignments[i].id !== updated.id) continue;
@@ -151,7 +152,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       break;
     }
     if (!replaced) assignments.push(updated);
-    HomeworkStore.instance.replaceAssignmentsForActiveStudent(assignments);
+    this.local.replaceAssignmentsForActiveStudent(assignments);
     this.replaceQueryCacheItem(updated);
     // Any authoritative assignment mutation can change nextAssignmentId/progress counters.
     // Drop the remote summary immediately so hidden Home surfaces re-render from the updated
@@ -169,7 +170,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     if (!BackendSession.instance.isConnected()) return false;
     let synced = await this.syncActiveStudentAssignments();
     if (!synced) return false;
-    let activeStudentId = HomeworkStore.instance.getActiveStudentId();
+    let activeStudentId = this.local.getActiveStudentId();
     try {
       this.remoteSummary = await HomeworkRemoteApi.instance.todaySummary(activeStudentId);
       this.remoteSummaryStudentId = activeStudentId;
@@ -182,14 +183,14 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
   private async syncActiveStudentAssignments(): Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;
-    let studentId = HomeworkStore.instance.getActiveStudentId();
+    let studentId = this.local.getActiveStudentId();
     try {
       let remote = await HomeworkRemoteApi.instance.list(studentId);
       let remoteById: Map<string, RemoteAssignment> = new Map<string, RemoteAssignment>();
       for (let item of remote) remoteById.set(item.id, item);
 
-      let local = HomeworkStore.instance.getAssignments().slice();
-      for (let assignment of local) {
+      let localAssignments = this.local.listAssignments();
+      for (let assignment of localAssignments) {
         let existing = remoteById.get(assignment.id);
         if (existing === undefined) {
           // Only real assignments published from Candidate drafts are uploaded automatically.
@@ -213,14 +214,14 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       let finalRemote = await HomeworkRemoteApi.instance.list(studentId);
       let merged: Assignment[] = [];
       for (let item of finalRemote) {
-        merged.push(RemoteAssignmentMapper.toLocal(item, HomeworkStore.instance.getAssignment(item.id)));
+        merged.push(RemoteAssignmentMapper.toLocal(item, this.local.getAssignment(item.id)));
         try {
           RemoteSubmissionCache.instance.replace(item.id, await RemoteSubmissionApi.instance.list(item.id));
         } catch {
           // Submission metadata is best-effort and must not block Assignment reconciliation.
         }
       }
-      HomeworkStore.instance.replaceAssignmentsForActiveStudent(merged);
+      this.local.replaceAssignmentsForActiveStudent(merged);
       return true;
     } catch {
       return false;
@@ -238,11 +239,11 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
   private performLocalDemoAction(assignmentId: string, action: AssignmentAction): Assignment {
     let changed = false;
-    if (action === AssignmentAction.START) changed = HomeworkStore.instance.startAssignment(assignmentId);
-    else if (action === AssignmentAction.PAUSE) changed = HomeworkStore.instance.pauseAssignment(assignmentId);
-    else if (action === AssignmentAction.READY_TO_SUBMIT) changed = HomeworkStore.instance.markReadyToSubmit(assignmentId);
+    if (action === AssignmentAction.START) changed = this.local.startAssignment(assignmentId);
+    else if (action === AssignmentAction.PAUSE) changed = this.local.pauseAssignment(assignmentId);
+    else if (action === AssignmentAction.READY_TO_SUBMIT) changed = this.local.markReadyToSubmit(assignmentId);
     if (!changed) throw new Error('当前作业状态不能执行这个动作');
-    let updated = HomeworkStore.instance.getAssignment(assignmentId);
+    let updated = this.local.getAssignment(assignmentId);
     if (updated === null) throw new Error('作业不存在');
     this.replaceQueryCacheItem(updated);
     this.remoteSummary = null;
