@@ -138,6 +138,9 @@ jobs:
       - name: Validate API efficiency P0 invariants
         run: python scripts/validate_api_efficiency_p0.py
 
+      - name: Validate API efficiency P1 invariants
+        run: python scripts/validate_api_efficiency_p1.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v5
         with:
