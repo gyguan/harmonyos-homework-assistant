@@ -161,7 +161,9 @@ export struct HomeworkConfirmationPage {
                   ConfirmationCandidateCard({
                     item: item,
                     selected: this.editingCandidateId === item.id,
-                    onSelect: () => this.editingCandidateId = item.id
+                    onSelect: () => this.editingCandidateId = item.id,
+                    onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
+                      this.setExpectedMinutes(candidate, minutes)
                   });
                 }, (item: CandidateAssignment) => item.id);
               }
