@@ -28,6 +28,7 @@ draft_port = read("entry/src/main/ets/domain/port/HomeworkImportDraftRepository.
 draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraftRepository.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 mock_parser = read("entry/src/main/ets/infrastructure/ai/MockHomeworkAssignmentParser.ets")
+due_date_service = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 e2e = read("backend/scripts/batch_publish_e2e.py")
 workflow = read(".github/workflows/static-gate.yml")
 
@@ -72,8 +73,17 @@ require("clearCandidates(): void { HomeworkStore.instance.replaceCandidates([]);
 # Delivery P0: Candidate relative/free-text due dates are normalized exactly once at the
 # Candidate -> Assignment publication boundary. Downstream Home/filter/calendar continue to
 # consume structured dueAtEpochMs instead of re-parsing dueText.
-require("AssignmentDueDate" in client_service and "AssignmentDueDate.resolveDayStart" in client_service,
-        "batch publish must use the shared due-date resolver at the Candidate -> Assignment boundary")
+require("AssignmentDueDate" in client_service and "AssignmentDueDate.resolveDueAtEpochMs" in client_service,
+        "batch publish must materialize the full due timestamp at the Candidate -> Assignment boundary")
+require("AssignmentDueDate.resolveDayStart" not in client_service,
+        "batch publish must not use the day-grouping helper as the authoritative deadline timestamp")
+require("DEFAULT_DUE_HOUR: number = 23" in due_date_service and
+        "DEFAULT_DUE_MINUTE: number = 59" in due_date_service,
+        "date-only homework deadlines must use the explicit 23:59 end-of-day policy")
+require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date_service and "Date.UTC" in due_date_service,
+        "deadline materialization must be anchored to Asia/Shanghai rather than the device timezone")
+require("resolveTimeMinutes" in due_date_service and "[:：]" in due_date_service and "点半" in due_date_service,
+        "deadline resolver must preserve explicit clock times from teacher text")
 require("dueAtEpochMs: this.resolveCandidateDueAt(candidate)" in client_service,
         "published Assignments must materialize structured dueAtEpochMs")
 require("dueAtEpochMs: 0" not in client_service,
