@@ -17,6 +17,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class AccessLogFilter extends OncePerRequestFilter {
   private static final Logger log = LoggerFactory.getLogger(AccessLogFilter.class);
+  static final String ATTR_REQUEST_ID = AccessLogFilter.class.getName() + ".requestId";
+  static final String ATTR_CLIENT_SCENE = AccessLogFilter.class.getName() + ".clientScene";
   private static final String REQUEST_ID_HEADER = "X-Request-Id";
   private static final String CLIENT_SCENE_HEADER = "X-Client-Scene";
   private static final String CLIENT_REQUEST_KEY_HEADER = "X-Client-Request-Key";
@@ -24,6 +26,11 @@ public class AccessLogFilter extends OncePerRequestFilter {
   private static final long RECENT_RETENTION_MS = 60000L;
   private static final int MAX_RECENT_KEYS = 2048;
   private final Map<String, Long> recentRequests = new ConcurrentHashMap<>();
+  private final HttpLogProperties httpLogProperties;
+
+  public AccessLogFilter(HttpLogProperties httpLogProperties) {
+    this.httpLogProperties = httpLogProperties;
+  }
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -35,7 +42,14 @@ public class AccessLogFilter extends OncePerRequestFilter {
     String scene = safeHeader(request.getHeader(CLIENT_SCENE_HEADER), 80);
     String requestKey = request.getHeader(CLIENT_REQUEST_KEY_HEADER);
     boolean duplicate = isDuplicate(sanitize(request.getRemoteAddr()), requestKey, startedAtEpochMs);
+    request.setAttribute(ATTR_REQUEST_ID, requestId);
+    request.setAttribute(ATTR_CLIENT_SCENE, scene);
     response.setHeader(REQUEST_ID_HEADER, requestId);
+    if (httpLogProperties.isLogPayloads()) {
+      log.info("[HTTP-REQUEST] requestId={} scene={} {} {} query={} contentType={} contentLength={}",
+          requestId, scene, request.getMethod(), sanitize(request.getRequestURI()),
+          payloadText(request.getQueryString()), sanitize(request.getContentType()), request.getContentLengthLong());
+    }
     try {
       filterChain.doFilter(request, response);
     } finally {
@@ -73,6 +87,13 @@ public class AccessLogFilter extends OncePerRequestFilter {
     String sanitized = sanitize(value).replaceAll("[^A-Za-z0-9._:-]", "_");
     if (sanitized.length() > maxLength) sanitized = sanitized.substring(0, maxLength);
     return sanitized;
+  }
+
+  private String payloadText(String value) {
+    if (value == null || value.isBlank()) return "-";
+    String compact = value.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').trim();
+    int max = httpLogProperties.getMaxPayloadChars();
+    return compact.length() <= max ? compact : compact.substring(0, max) + "...";
   }
 
   private String sanitize(String value) {
