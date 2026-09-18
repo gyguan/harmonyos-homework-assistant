@@ -27,7 +27,7 @@ assignment_service = read("backend/src/main/java/com/xiaoban/homework/assignment
 submission_service = read("backend/src/main/java/com/xiaoban/homework/submission/SubmissionService.java")
 module = read("entry/src/main/module.json5")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
-sync = read("entry/src/main/ets/application/remote/HomeworkSyncService.ets")
+sync = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
 settings = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 remote_submission = read("entry/src/main/ets/application/remote/RemoteSubmissionApi.ets")
 http_client = read("entry/src/main/ets/application/remote/BackendHttpClient.ets")
@@ -52,12 +52,16 @@ require('"ohos.permission.INTERNET"' in module, "HarmonyOS module must declare I
 require("replaceAssignmentsForActiveStudent" in store,
         "HomeworkStore must expose a child-scoped remote snapshot replacement method")
 require("HomeworkRemoteApi.instance.list" in sync and "replaceAssignmentsForActiveStudent" in sync,
-        "sync service must push/pull through HomeworkRemoteApi and update HomeworkStore")
+        "Assignment Repository sync must push/pull through HomeworkRemoteApi and update the local cache")
 require("assignment.syncDirty && assignment.remoteVersion === existing.version" in sync and
         "HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion)" in sync,
         "sync must only overwrite remote data from a dirty assignment with the persisted matching version")
 require("observedVersions" not in sync,
         "sync ownership metadata must survive process restarts instead of living in an in-memory map")
+require("requestSync(): void" in sync and "syncRequested" in sync and "syncRunning" in sync,
+        "Assignment Repository must preserve coalesced background sync semantics")
+require(not (ROOT / "entry/src/main/ets/application/remote/HomeworkSyncService.ets").exists(),
+        "legacy HomeworkSyncService must remain deleted after Repository migration")
 require("assignment.candidateId.length === 0" in sync,
         "demo/seed assignments must remain local instead of polluting the backend")
 require("云端连接" in settings and "BackendAuthService" in settings,
