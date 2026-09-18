@@ -38,6 +38,10 @@ require("performAction(assignmentId: string, action: AssignmentAction): Promise<
         "AssignmentRepository must expose execution commands")
 require("HomeworkRemoteApi.instance.performAction" in repository_impl,
         "real V2 assignment actions must execute through remote command API")
+require("HomeworkRemoteApi.instance.get(assignmentId)" in repository_impl and
+        "latest.version === current.remoteVersion" in repository_impl and
+        "HomeworkRemoteApi.instance.performAction(assignmentId, latest.version, action)" in repository_impl,
+        "assignment actions must recover a stale optimistic version with one single-assignment read and one retry")
 require("current.remoteVersion <= 0 && current.candidateId.length === 0" in repository_impl,
         "local action fallback must be explicitly limited to seed/demo assignments")
 require("当前离线，只能查看已缓存作业" in repository_impl,
@@ -45,6 +49,9 @@ require("当前离线，只能查看已缓存作业" in repository_impl,
 require("/actions`" in remote_api and "http.RequestMethod.POST" in remote_api and
         "action: action, version: version" in remote_api,
         "HomeworkRemoteApi must POST action + optimistic version to /actions")
+require("async get(assignmentId: string): Promise<RemoteAssignment>" in remote_api and
+        "'assignment.get'" in remote_api,
+        "HomeworkRemoteApi must support a single-assignment recovery read")
 
 require("class StudyWorkspaceViewModel" in study_vm and "this.repository.performAction" in study_vm,
         "Study Workspace must delegate execution to AssignmentRepository")
@@ -63,6 +70,8 @@ require("listCached(assignmentId: string): Submission[]" in submission,
 require('@PostMapping("/assignments/{id}/actions")' in controller and
         "AssignmentDtos.ActionRequest" in controller and "service.action" in controller,
         "backend must expose assignment action command endpoint")
+require('@GetMapping("/assignments/{id}")' in controller and "service.get" in controller,
+        "backend must expose a single-assignment recovery read")
 require("record ActionRequest(@NotBlank String action, @NotNull Long version)" in dtos,
         "assignment action command must carry action and optimistic version")
 require("public AssignmentDtos.Response action" in service and "System.currentTimeMillis()" in service,
@@ -77,7 +86,9 @@ require("e.elapsedSeconds += Math.max(0, (nowMs - e.startedAtEpochMs) / 1000)" i
         "PAUSE/READY commands must accumulate elapsed time on the server")
 
 for token in ["START", "PAUSE", "READY_TO_SUBMIT", "stale action version conflict",
-              "starting second assignment did not server-pause"]:
+              "starting second assignment did not server-pause",
+              "auto-paused assignment stale resume conflict",
+              "load single assignment for conflict recovery"]:
     require(token in e2e, f"real action E2E missing coverage: {token}")
 
 if errors:
