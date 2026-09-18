@@ -13,6 +13,10 @@ export class ParentReviewViewModel {
     return this.repository.getCached(assignmentId);
   }
 
+  updateDetails(assignment: Assignment): Promise<Assignment> {
+    return this.repository.updateDetails(assignment);
+  }
+
   approve(assignmentId: string, note: string): Promise<Assignment> {
     return this.repository.review(assignmentId, AssignmentReviewDecision.APPROVE, note.trim());
   }
