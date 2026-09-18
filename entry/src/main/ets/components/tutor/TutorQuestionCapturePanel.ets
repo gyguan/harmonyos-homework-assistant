@@ -30,8 +30,17 @@ export struct TutorQuestionCapturePanel {
       this.imageUri = result.imageUri;
       this.onRecognized(result.recognizedText);
       this.notice = '题目已在本机识别，请检查文字后再发送';
-    } catch {
-      this.notice = '题目识别失败，请拍清楚一些再试';
+    } catch (error) {
+      let message = error instanceof Error ? error.message : '题目识别失败';
+      if (message.indexOf('初始化失败') >= 0) {
+        this.notice = '本机文字识别暂不可用，可先使用文字提问';
+      } else if (message.indexOf('无法打开系统相机') >= 0) {
+        this.notice = '无法打开系统相机，请稍后重试';
+      } else if (message.indexOf('无法准备拍题缓存') >= 0 || message.indexOf('无法读取') >= 0) {
+        this.notice = '照片读取失败，请重新拍题';
+      } else {
+        this.notice = `${message}，请重新拍题或改用文字提问`;
+      }
     } finally {
       this.capturing = false;
     }

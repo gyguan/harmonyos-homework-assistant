@@ -178,19 +178,31 @@ export struct StudyWorkspacePage {
     await this.executeAction(AssignmentAction.PAUSE);
   }
 
-  private async executeAction(action: AssignmentAction): Promise<void> {
-    if (this.actionRunning) return;
+  private async executeAction(action: AssignmentAction): Promise<boolean> {
+    if (this.actionRunning) return false;
     this.actionRunning = true;
     this.actionMessage = '';
     try {
       await this.viewModel.performAction(this.assignmentId, action);
       this.actionRevision++;
       this.onStoreChanged();
+      return true;
     } catch {
       this.actionMessage = '状态更新失败，请刷新作业状态后重试';
+      return false;
     } finally {
       this.actionRunning = false;
     }
+  }
+
+  private async resumeFromSubmission(): Promise<void> {
+    let assignment = this.assignment();
+    if (assignment === null || assignment.status !== AssignmentStatus.READY_TO_SUBMIT ||
+      this.actionRunning || this.submittingPhotos) return;
+    let resumed = await this.executeAction(AssignmentAction.START);
+    if (!resumed) return;
+    this.submissionPhotoUris = [];
+    this.submissionMessage = '已返回作业，可继续完成后再提交';
   }
 
   private async selectSubmissionPhotos(): Promise<void> {
@@ -297,7 +309,9 @@ export struct StudyWorkspacePage {
             .fontColor(AppTheme.PRIMARY)
             .onClick(() => { void this.selectSubmissionPhotos(); });
         }
-        Text(this.submissionPhotoUris.length === 0 ? '从系统相册选择已经拍好的作业照片，最多 6 张。' : '请确认照片清晰、完整，页数和顺序无误。')
+        Text(this.submissionPhotoUris.length === 0 ?
+          '从系统相册选择已经拍好的作业照片，最多 6 张；如果还没做完，可点击底部“继续作业”。' :
+          '请确认照片清晰、完整，页数和顺序无误；需要继续完成时可点击底部“继续作业”。')
           .width('100%')
           .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
@@ -455,7 +469,9 @@ export struct StudyWorkspacePage {
     Row({ space: 10 }) {
       if (showTutorEntry) {
         Button('问小伴', { type: ButtonType.Normal })
-          .width(this.assignment() !== null && this.assignment()!.status === AssignmentStatus.IN_PROGRESS ? 88 : 112)
+          .width(this.assignment() !== null &&
+            (this.assignment()!.status === AssignmentStatus.IN_PROGRESS ||
+              this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) ? 88 : 112)
           .height(AppTheme.BUTTON_HEIGHT)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .backgroundColor(AppTheme.PRIMARY_SOFT)
@@ -473,11 +489,24 @@ export struct StudyWorkspacePage {
           .height(AppTheme.BUTTON_HEIGHT)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .enabled(!this.actionRunning)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .fontColor(AppTheme.SUBTEXT)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
           .fontSize(13)
           .accessibilityText('暂停作业计时')
           .onClick(() => { void this.pauseCurrentAssignment(); });
+      }
+
+      if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
+        Button('继续作业', { type: ButtonType.Normal })
+          .width(showTutorEntry ? 88 : 112)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.actionRunning && !this.submittingPhotos)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .fontSize(13)
+          .accessibilityText('返回作业继续完成')
+          .onClick(() => { void this.resumeFromSubmission(); });
       }
 
       Button(this.primaryActionLabel(), { type: ButtonType.Normal })

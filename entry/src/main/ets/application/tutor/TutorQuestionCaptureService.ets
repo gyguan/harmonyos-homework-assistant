@@ -26,10 +26,11 @@ export class TutorQuestionCaptureService {
       try {
         fileIo.closeSync(file);
       } catch {
-        return { captured: false, imageUri: '', recognizedText: '' };
+        throw new Error('无法关闭拍题缓存文件');
       }
-    } catch {
-      return { captured: false, imageUri: '', recognizedText: '' };
+    } catch (error) {
+      if (error instanceof Error && error.message === '无法关闭拍题缓存文件') throw error;
+      throw new Error('无法准备拍题缓存');
     }
     let saveUri = fileUri.getUriFromPath(filePath);
 
@@ -42,26 +43,38 @@ export class TutorQuestionCaptureService {
     try {
       result = await cameraPicker.pick(context, [cameraPicker.PickerMediaType.PHOTO], profile);
     } catch {
+      throw new Error('无法打开系统相机');
+    }
+
+    if (result.resultCode !== 0) {
       return { captured: false, imageUri: '', recognizedText: '' };
     }
 
-    if (result.resultCode !== 0 || result.resultUri.length === 0) {
-      return { captured: false, imageUri: '', recognizedText: '' };
-    }
+    let candidates: string[] = [];
+    candidates.push(saveUri);
+    if (result.resultUri.length > 0 && result.resultUri !== saveUri) candidates.push(result.resultUri);
 
-    let rawImport: RawHomeworkImport = {
-      id: `tutor-question-${now}`,
-      studentId: studentId,
-      sourceKind: HomeworkImportSourceKind.IMAGE,
-      sourceLabel: '拍题',
-      resourceUri: result.resultUri,
-      rawText: ''
-    };
-    let extracted = await this.extractor.extract(rawImport);
-    return {
-      captured: true,
-      imageUri: result.resultUri,
-      recognizedText: extracted.text
-    };
+    let lastError = '题目图片无法识别';
+    for (let uri of candidates) {
+      let rawImport: RawHomeworkImport = {
+        id: `tutor-question-${now}`,
+        studentId: studentId,
+        sourceKind: HomeworkImportSourceKind.IMAGE,
+        sourceLabel: '拍题',
+        resourceUri: uri,
+        rawText: ''
+      };
+      try {
+        let extracted = await this.extractor.extract(rawImport);
+        return {
+          captured: true,
+          imageUri: uri,
+          recognizedText: extracted.text
+        };
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : '题目图片无法识别';
+      }
+    }
+    throw new Error(lastError);
   }
 }

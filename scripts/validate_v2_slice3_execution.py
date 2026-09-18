@@ -72,6 +72,13 @@ require("private WorkspaceActionBar(showTutorEntry: boolean)" in study and
         "Button('暂停一下'" in study and "this.WorkspaceActionBar(true)" in study and
         "this.WorkspaceActionBar(false)" in study,
         "Study Workspace must keep pause beside the primary submit/progress action on Phone and Pad")
+require("Button('继续作业'" in study and "resumeFromSubmission" in study and
+        "AssignmentStatus.READY_TO_SUBMIT" in study,
+        "submit preparation must expose a reversible continue-working action")
+require("AppTheme.PRIMARY_SOFT" in study and "AppTheme.PRIMARY" in study,
+        "Study Workspace secondary actions must use soft-primary styling")
+require('!"READY_TO_SUBMIT".equals(previousStatus)' in service,
+        "server START from READY_TO_SUBMIT must preserve accumulated elapsed time")
 require(study.find("private StudyContent(") < study.find("private WorkspaceActionBar(") and
         study.find("Text('暂停一下')") == -1,
         "Study content must not keep a detached pause text action above resources/submission")
@@ -103,7 +110,9 @@ require("e.elapsedSeconds += Math.max(0, (nowMs - e.startedAtEpochMs) / 1000)" i
 for token in ["START", "PAUSE", "READY_TO_SUBMIT", "stale action version conflict",
               "starting second assignment did not server-pause",
               "auto-paused assignment stale resume conflict",
-              "load single assignment for conflict recovery"]:
+              "load single assignment for conflict recovery",
+              "START did not return READY_TO_SUBMIT assignment to active work",
+              "continuing from submission preparation reset accumulated work time"]:
     require(token in e2e, f"real action E2E missing coverage: {token}")
 
 if errors:
