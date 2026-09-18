@@ -28,13 +28,16 @@ require("PersonEntryPage" in index and "AppRole.NONE" in index,
         "Index must show a person entry page before creating AppShell")
 require("enterParent" in index and "AppRole.PARENT" in index,
         "entry page must provide an explicit parent persona")
-require("enterStudent(studentId: string)" in index and "setActiveStudent(studentId)" in index,
-        "student persona selection must bind the selected child before entering")
+require("enterStudent(studentId: string)" in index and "this.familyContext.setActiveStudent(studentId)" in index,
+        "student persona selection must bind the selected child through FamilyContextRepository before entering")
 require("AppShell({" in index and "role: this.selectedRole" in index,
         "AppShell role must be supplied by the root entry gate")
+require("HomeworkSyncService" not in index and "DefaultAssignmentRepository.instance.requestSync()" in index,
+        "root entry must use AssignmentRepository background sync instead of legacy HomeworkSyncService")
 
-require("HomeworkStore.instance.getStudents()" in entry_page,
-        "person entry page must render the current family children")
+require("HomeworkStore" not in entry_page and "FamilyContextRepository" in entry_page and
+        "this.familyContext.getStudents()" in entry_page,
+        "person entry page must render family children through FamilyContextRepository")
 require("家长" in entry_page and "孩子" in entry_page and "谁在使用" in entry_page,
         "person entry page must clearly expose parent and child choices")
 require("onSelectStudent(student.id)" in entry_page,
@@ -49,8 +52,8 @@ require("切换家长" not in app_shell and "切换学生" not in app_shell,
 require("if (this.role !== AppRole.PARENT" in app_shell,
         "child context switching must be guarded to parent role only")
 require("private openStudentSwitcher()" in app_shell and "private selectStudent(studentId: string)" in app_shell and
-        "HomeworkStore.instance.setActiveStudent(studentId)" in app_shell,
-        "parent shell must retain explicit child context switching")
+        "this.familyContext.setActiveStudent(studentId)" in app_shell,
+        "parent shell must retain explicit child context switching through FamilyContextRepository")
 require("private FamilyContextBar()" in app_shell and "this.role === AppRole.PARENT" in app_shell,
         "phone parent shell must show family context without exposing role switching")
 require("StudentSwitcherDialog" in app_shell and "@CustomDialog" in switcher,
