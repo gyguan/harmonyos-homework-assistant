@@ -54,8 +54,11 @@ require("this.navPathStack.size() > 0" in shell and "this.navPathStack.pop()" in
 require("StudentAssignmentsPage" in shell and "StudentAssignmentDetailPage" in shell and
         "StudyWorkspaceRoutePage" in shell,
         "AppShell must wire list plus deep-page destination components")
-require("AssignmentAction.START" in study_route and "StudyWorkspaceViewModel" in study_route,
-        "study route boundary must preserve start/continue semantics through the ViewModel command path")
+require("AssignmentAction.START" in study and "StudyWorkspaceViewModel" in study_route and
+        "this.viewModel.performAction(this.assignmentId, action)" in study,
+        "Study Workspace must preserve explicit start/continue semantics through the ViewModel command path")
+require("AssignmentAction.START" not in study_route and "activateAssignment" not in study_route,
+        "study route boundary must never auto-start timing on page entry")
 require("HomeworkStore.instance.startAssignment" not in shell,
         "AppShell must not execute assignment business commands")
 require("onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)" in shell,
