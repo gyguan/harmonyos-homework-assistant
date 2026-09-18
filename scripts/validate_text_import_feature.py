@@ -24,6 +24,7 @@ view_model = read("entry/src/main/ets/features/parent/import/HomeworkImportViewM
 service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
 draft_port = read("entry/src/main/ets/domain/port/HomeworkImportDraftRepository.ets")
 draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraftRepository.ets")
+draft_local = read("entry/src/main/ets/data/local/HomeworkImportLocalDataSource.ets")
 parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
 
 require("TextArea" in page, "parent import page must provide editable teacher-text input")
@@ -63,8 +64,10 @@ require("if (output.candidates.length === 0)" in service,
 require("getRawImport" in draft_port and "getCandidates" in draft_port and
         "replaceRawImport" in draft_port and "replaceCandidates" in draft_port,
         "draft repository port must own import draft reads and writes")
-require("HomeworkStore.instance" in draft_repo,
-        "migration adapter must isolate the remaining HomeworkStore access")
+require("HomeworkStore" not in draft_repo and "HomeworkImportLocalDataSource" in draft_repo,
+        "draft repository must depend on HomeworkImportLocalDataSource instead of HomeworkStore")
+require("HomeworkStore.instance" in draft_local,
+        "legacy import local adapter must isolate the remaining HomeworkStore access")
 
 require("splitSegments" in parser and "stripListMarker" in parser,
         "local parser must split teacher text into task-level segments")
