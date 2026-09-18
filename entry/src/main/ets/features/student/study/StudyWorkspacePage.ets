@@ -179,7 +179,7 @@ export struct StudyWorkspacePage {
       await this.viewModel.performAction(this.assignmentId, action);
       this.actionRevision++;
     } catch {
-      this.actionMessage = '状态更新失败，请检查网络并刷新后重试';
+      this.actionMessage = '状态更新失败，请刷新作业状态后重试';
     } finally {
       this.actionRunning = false;
     }
