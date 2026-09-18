@@ -50,16 +50,17 @@ export struct PersonEntryPage {
   @Builder
   private ParentRow() {
     Row({ space: 13 }) {
-      Text('家')
-        .width(40)
-        .height(40)
-        .fontSize(15)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .textAlign(TextAlign.Center)
-        .padding({ top: 10 })
-        .backgroundColor(AppTheme.PRIMARY)
-        .borderRadius(12);
+      Stack() {
+        Text('家')
+          .fontSize(15)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY);
+      }
+      .width(40)
+      .height(40)
+      .alignContent(Alignment.Center)
+      .backgroundColor(AppTheme.PRIMARY)
+      .borderRadius(12);
       Column({ space: 3 }) {
         Text('家长')
           .width('100%')
