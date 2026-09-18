@@ -88,6 +88,7 @@ export struct AppShell {
   aboutToAppear(): void {
     this.syncFamilyContext();
     this.onRegisterBackHandler(() => this.handleSystemBack());
+    void this.refreshActiveStudent();
   }
 
   aboutToDisappear(): void {
@@ -122,10 +123,11 @@ export struct AppShell {
     return this.familyContext.getStudent();
   }
 
-  private touchStore(): void {
+  private notifyUiChanged(): void {
+    // Child commands already apply the authoritative server response to repositories.
+    // UI invalidation must not implicitly trigger another full assignment synchronization.
     this.syncFamilyContext();
     this.storeRevision++;
-    DefaultAssignmentRepository.instance.requestSync();
   }
 
   private openStudentSwitcher(): void {
@@ -231,7 +233,7 @@ export struct AppShell {
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
-          onStoreChanged: () => this.touchStore()
+          onStoreChanged: () => this.notifyUiChanged()
         });
       }
       .hideTitleBar(true)
@@ -242,7 +244,7 @@ export struct AppShell {
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
-          onReviewed: () => this.touchStore()
+          onReviewed: () => this.notifyUiChanged()
         });
       }
       .hideTitleBar(true)
@@ -253,7 +255,7 @@ export struct AppShell {
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => this.openParentImportConfirmation(),
-          onStoreChanged: () => this.touchStore()
+          onStoreChanged: () => this.notifyUiChanged()
         });
       }
       .hideTitleBar(true)
@@ -267,7 +269,7 @@ export struct AppShell {
             this.parentRoute = ParentRoute.DASHBOARD;
             this.navPathStack.clear();
           },
-          onStoreChanged: () => this.touchStore()
+          onStoreChanged: () => this.notifyUiChanged()
         });
       }
       .hideTitleBar(true)
@@ -277,7 +279,7 @@ export struct AppShell {
         ParentExtraAssignmentPage({
           onBack: () => this.navPathStack.pop(),
           onCreated: () => {
-            this.touchStore();
+            this.notifyUiChanged();
             this.navPathStack.pop();
           }
         });
@@ -293,11 +295,11 @@ export struct AppShell {
       ParentProgressPage({
         revision: this.storeRevision,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),
-        onStoreChanged: () => this.touchStore()
+        onStoreChanged: () => this.notifyUiChanged()
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
       BackendConnectionPage({
-        onStoreChanged: () => this.touchStore()
+        onStoreChanged: () => this.notifyUiChanged()
       });
     } else {
       ParentDashboardPage({
