@@ -69,7 +69,8 @@ export struct ParentReviewPane {
   }
 
   private canEdit(item: Assignment): boolean {
-    return item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED;
+    let persisted = item.remoteVersion > 0 || item.candidateId.length > 0;
+    return persisted && item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED;
   }
 
   private startEditing(item: Assignment): void {
@@ -144,7 +145,7 @@ export struct ParentReviewPane {
   private EmptyState() {
     Column({ space: 8 }) {
       SymbolGlyph($r('sys.symbol.doc_text')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
-      Text(this.assignmentId.length === 0 ? '选择一项作业查看验收详情' : '这项作业暂时找不到')
+      Text(this.assignmentId.length === 0 ? '选择一项作业查看详情' : '这项作业暂时找不到')
         .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       Text('提交证据、实际用时和家长验收都会在这里显示。')
         .fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
@@ -315,6 +316,16 @@ export struct ParentReviewPane {
               .fontSize(12)
               .fontColor(AppTheme.DANGER);
           }
+        }
+
+        if (this.operationNotice.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
+          Text(this.operationNotice)
+            .width('100%')
+            .fontSize(12)
+            .fontColor(AppTheme.SUCCESS)
+            .padding({ left: 12, right: 12, top: 9, bottom: 9 })
+            .backgroundColor(AppTheme.SUCCESS_SOFT)
+            .borderRadius(AppTheme.CONTROL_RADIUS);
         }
 
         this.EvidenceSection();
