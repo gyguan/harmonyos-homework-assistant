@@ -1,10 +1,11 @@
-import { Assignment, AssignmentStatus, AssignmentType, Subject } from '../../domain/model/HomeworkModels';
+import { Assignment, AssignmentContentType, AssignmentStatus, AssignmentType, Subject } from '../../domain/model/HomeworkModels';
 
 export interface RemoteAssignment {
   id: string;
   studentId: string;
   assignmentType: string;
   subjectCode: string;
+  contentType: string;
   subject: string;
   title: string;
   instruction: string;
@@ -32,6 +33,8 @@ export class RemoteAssignmentMapper {
       assignmentType: remote.assignmentType === AssignmentType.EXTRA ? AssignmentType.EXTRA : AssignmentType.SCHOOL,
       subjectCode: remote.subjectCode === undefined || remote.subjectCode.length === 0 ?
         RemoteAssignmentMapper.subjectCode(remote.subject as Subject) : remote.subjectCode,
+      contentType: remote.contentType === AssignmentContentType.AUDIO_IMAGE ?
+        AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
       subject: remote.subject as Subject,
       title: remote.title,
       instruction: remote.instruction,
