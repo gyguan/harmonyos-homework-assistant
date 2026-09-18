@@ -14,9 +14,9 @@ export interface AssignmentLocalDataSource {
   markReadyToSubmit(assignmentId: string): boolean;
 }
 
-export class HomeworkStoreAssignmentLocalDataSource implements AssignmentLocalDataSource {
-  static readonly instance: HomeworkStoreAssignmentLocalDataSource =
-    new HomeworkStoreAssignmentLocalDataSource();
+export class DefaultAssignmentLocalDataSource implements AssignmentLocalDataSource {
+  static readonly instance: DefaultAssignmentLocalDataSource =
+    new DefaultAssignmentLocalDataSource();
 
   private constructor() {}
 
