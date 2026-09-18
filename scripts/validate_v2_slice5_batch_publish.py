@@ -31,6 +31,11 @@ mock_parser = read("entry/src/main/ets/infrastructure/ai/MockHomeworkAssignmentP
 due_date_service = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 e2e = read("backend/scripts/batch_publish_e2e.py")
 workflow = read(".github/workflows/static-gate.yml")
+shanghai_resolver = ""
+if "private static resolveShanghaiDate" in due_date_service and "private static resolveTimeMinutes" in due_date_service:
+    start = due_date_service.index("private static resolveShanghaiDate")
+    end = due_date_service.index("private static resolveTimeMinutes", start)
+    shanghai_resolver = due_date_service[start:end]
 
 require("BatchPublishRequest" in dtos and "BatchPublishResponse" in dtos and "boolean atomic" in dtos,
         "batch publish DTO must make atomic semantics explicit")
@@ -86,8 +91,8 @@ require("resolveTimeMinutes" in due_date_service and "[:：]" in due_date_servic
         "deadline resolver must preserve explicit clock times from teacher text")
 require("normalizeChineseHour(text, Number(colon[2]))" in due_date_service,
         "colon-form times such as 晚上8:30 must honor Chinese day-period hints")
-require(due_date_service.index("let chineseFull = text.match") <
-        due_date_service.index("text.indexOf('今晚')"),
+require("let chineseFull = text.match" in shanghai_resolver and "text.indexOf('今晚')" in shanghai_resolver and
+        shanghai_resolver.index("let chineseFull = text.match") < shanghai_resolver.index("text.indexOf('今晚')"),
         "explicit calendar dates must take precedence over relative/evening hints")
 require("dueAtEpochMs: this.resolveCandidateDueAt(candidate)" in client_service,
         "published Assignments must materialize structured dueAtEpochMs")
