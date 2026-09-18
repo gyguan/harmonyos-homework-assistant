@@ -8,6 +8,7 @@ import {
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
+import { CenteredTextBadge } from '../components/family/CenteredTextBadge';
 import { StudentSwitcherDialog } from '../components/family/StudentSwitcherDialog';
 import { BottomPrimaryNavItem, SidePrimaryNavItem } from '../components/navigation/PrimaryNavItem';
 import { PageStateView } from '../components/state/PageStateView';
@@ -397,16 +398,16 @@ export struct AppShell {
   @Builder
   private SideNavigation() {
     Column({ space: 8 }) {
-      Text('伴')
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .width(46)
-        .height(46)
-        .textAlign(TextAlign.Center)
-        .padding({ top: 11 })
-        .backgroundColor(AppTheme.PRIMARY)
-        .borderRadius(15)
+      CenteredTextBadge({
+        text: '伴',
+        width: 46,
+        height: 46,
+        fontSize: 20,
+        radius: 15,
+        bold: true,
+        foreground: AppTheme.TEXT_ON_PRIMARY,
+        background: AppTheme.PRIMARY
+      })
         .margin({ bottom: 14 });
 
       if (this.role === AppRole.STUDENT) {
