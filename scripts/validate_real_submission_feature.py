@@ -57,6 +57,9 @@ require("removeSubmissionPhoto" in study and "重新选择照片" in study,
         "Student must be able to remove/reselect photos before submitting")
 require("Image(uri)" in study,
         "Student workspace must render selected/submitted local photos")
+require("PhotoPreviewDialog" in study and "private openPhotoPreview(uri: string)" in study and
+        ".onClick(() => this.openPhotoPreview(uri))" in study,
+        "Student workspace thumbnails must open the shared large photo preview")
 require("ParentSubmissionEvidenceService" in review_pane and "CloudSubmissionPhotoStrip" in review_pane and
         "private LocalPhotos(uris: string[])" in review_pane and "Image(uri)" in review_pane,
         "V2 Parent Review must render remote submission photos and local seed/demo evidence")
