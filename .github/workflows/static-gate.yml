@@ -72,6 +72,9 @@ jobs:
       - name: Validate voice workspace media focus
         run: python scripts/validate_voice_workspace_media_focus.py
 
+      - name: Validate voice workspace fullscreen
+        run: python scripts/validate_voice_workspace_fullscreen.py
+
       - name: Validate V2 Slice 1 architecture
         run: python scripts/validate_v2_slice1.py
 
