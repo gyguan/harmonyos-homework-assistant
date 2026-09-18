@@ -98,8 +98,14 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     if (!BackendSession.instance.isConnected()) {
       throw new Error('当前离线，只能查看已缓存作业；联网后才能更新作业状态');
     }
+
+    // Phone can enter Study Workspace before AppShell's asynchronous initial refresh has
+    // hydrated remoteVersion. Do not fail locally without an HTTP request: hydrate only this
+    // assignment from the server first, then execute the user command.
     if (current.remoteVersion <= 0) {
-      throw new Error('作业尚未完成云端同步，请刷新后重试');
+      let latest = await HomeworkRemoteApi.instance.get(assignmentId);
+      current = RemoteAssignmentMapper.toLocal(latest, this.local.getAssignment(assignmentId));
+      this.applyAuthoritative(current);
     }
 
     try {
@@ -108,8 +114,8 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       this.applyAuthoritative(mapped);
       return mapped;
     } catch {
-      // START can server-pause another active assignment, and AppShell refresh is asynchronous.
-      // Recover a stale local version by fetching only this assignment and retrying the command once.
+      // START can server-pause another active assignment. Recover a stale local version by
+      // fetching only this assignment and retrying the command once.
       let latest = await HomeworkRemoteApi.instance.get(assignmentId);
       let refreshed = RemoteAssignmentMapper.toLocal(latest, this.local.getAssignment(assignmentId));
       this.applyAuthoritative(refreshed);
