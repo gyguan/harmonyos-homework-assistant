@@ -83,6 +83,15 @@ require("AiProviderProperties" in organizer_model and "OpenAiCompatibleTransport
         "Organizer business must use the generic configurable AI transport")
 require("不得编造" in organizer_model and "不解答作业" in organizer_model and "JSON" in organizer_model,
         "AI organizer prompt must avoid hallucinating/solving homework and support JSON fallback")
+require("normalizeSubject" in organizer_model and 'normalized.contains("语文")' in organizer_model and
+        'normalized.contains("数学")' in organizer_model and 'normalized.contains("英语")' in organizer_model,
+        "AI organizer must normalize common provider subject labels before filtering")
+require("[AI] organizer parsed" in organizer_model and "unsupportedSubject" in organizer_model and
+        "blankTitle" in organizer_model,
+        "AI organizer must log privacy-safe conversion counts when model output is filtered")
+require("converted.sourceCount() > 0 && converted.candidates().isEmpty()" in organizer_model and
+        "return Optional.empty();" in organizer_model,
+        "AI organizer must fall back instead of returning a misleading empty AI result when all model assignments are rejected")
 for phrase in ["不要直接给出", "个人信息", "可信成年人"]:
     require(phrase in tutor_prompt, f"Tutor safety/guidance prompt missing: {phrase}")
 require('@PostMapping("/messages")' in tutor_controller,
