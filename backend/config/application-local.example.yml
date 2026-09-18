@@ -12,6 +12,12 @@ app:
     login-name: parent
     password: parent123
 
+  http:
+    # API request/response payload logging. Business payloads are printed; credential-like fields are redacted.
+    # Binary/multipart contents are represented by metadata rather than raw bytes.
+    log-payloads: true
+    max-payload-chars: 20000
+
   ai:
     # OpenAI-compatible transport. Most hosted/private model gateways can expose one of these protocols.
     # Supported values: responses | chat-completions
