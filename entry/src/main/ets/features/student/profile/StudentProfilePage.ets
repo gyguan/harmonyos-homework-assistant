@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { ReadonlySettingStateRow } from '../../../components/selection/SelectionControls';
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { AppSettings, StudentProfile } from '../../../domain/model/HomeworkModels';
@@ -70,16 +71,16 @@ export struct StudentProfilePage {
           .alignItems(HorizontalAlign.Start);
 
           Row({ space: 14 }) {
-            Text(this.student().name.length > 0 ? this.student().name.substring(0, 1) : '伴')
-              .width(52)
-              .height(52)
-              .padding({ top: 13 })
-              .textAlign(TextAlign.Center)
-              .fontSize(20)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .backgroundColor(AppTheme.PRIMARY)
-              .borderRadius(18);
+            CenteredTextBadge({
+              text: this.student().name.length > 0 ? this.student().name.substring(0, 1) : '伴',
+              width: 52,
+              height: 52,
+              fontSize: 20,
+              radius: 18,
+              bold: true,
+              foreground: AppTheme.TEXT_ON_PRIMARY,
+              background: AppTheme.PRIMARY
+            });
             Column({ space: 4 }) {
               Text(this.student().name)
                 .fontSize(AppTheme.SECTION_TITLE_SIZE)

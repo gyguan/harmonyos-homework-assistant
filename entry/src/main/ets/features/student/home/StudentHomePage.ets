@@ -1,6 +1,7 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, AssignmentType, Subject } from '../../../domain/model/HomeworkModels';
 import { StudentHomeSubjectGroup, StudentHomeViewModel } from './StudentHomeViewModel';
@@ -174,16 +175,16 @@ struct StudentSubjectTaskGroupCard {
   build() {
     Column({ space: 0 }) {
       Row({ space: 10 }) {
-        Text(this.group.subject.substring(0, 1))
-          .width(40)
-          .height(40)
-          .fontSize(17)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(this.subjectColor())
-          .textAlign(TextAlign.Center)
-          .padding({ top: 9 })
-          .backgroundColor(this.subjectBackground())
-          .borderRadius(12);
+        CenteredTextBadge({
+          text: this.group.subject.substring(0, 1),
+          width: 40,
+          height: 40,
+          fontSize: 17,
+          radius: 12,
+          bold: true,
+          foreground: this.subjectColor(),
+          background: this.subjectBackground()
+        });
         Text(this.group.subject)
           .fontSize(17)
           .fontWeight(FontWeight.Bold)
@@ -286,16 +287,16 @@ export struct StudentHomePage {
   @Builder
   private Header() {
     Row({ space: 11 }) {
-      Text(this.viewModel.student().name.substring(0, 1))
-        .width(46)
-        .height(46)
-        .fontSize(18)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.PRIMARY)
-        .textAlign(TextAlign.Center)
-        .padding({ top: 11 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(23);
+      CenteredTextBadge({
+        text: this.viewModel.student().name.substring(0, 1),
+        width: 46,
+        height: 46,
+        fontSize: 18,
+        radius: 23,
+        bold: true,
+        foreground: AppTheme.PRIMARY,
+        background: AppTheme.PRIMARY_SOFT
+      });
       Column({ space: 2 }) {
         Text(this.viewModel.student().name)
           .fontSize(18)

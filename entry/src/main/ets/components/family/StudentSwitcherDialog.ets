@@ -1,4 +1,5 @@
 import { AppTheme } from '../../common/theme/AppTheme';
+import { CenteredTextBadge } from './CenteredTextBadge';
 import { StudentProfile } from '../../domain/model/HomeworkModels';
 
 @CustomDialog
@@ -43,16 +44,15 @@ export struct StudentSwitcherDialog {
         Column({ space: 8 }) {
           ForEach(this.students, (student: StudentProfile) => {
             Row({ space: 12 }) {
-              Text(student.name.length > 0 ? student.name.substring(0, 1) : '伴')
-                .width(42)
-                .height(42)
-                .padding({ top: 10 })
-                .textAlign(TextAlign.Center)
-                .fontSize(16)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(this.activeStudentId === student.id ? AppTheme.TEXT_ON_PRIMARY : AppTheme.PRIMARY)
-                .backgroundColor(this.activeStudentId === student.id ? AppTheme.PRIMARY : AppTheme.PRIMARY_SOFT)
-                .borderRadius(14);
+              CenteredTextBadge({
+                text: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
+                width: 42,
+                height: 42,
+                fontSize: 16,
+                radius: 14,
+                foreground: this.activeStudentId === student.id ? AppTheme.TEXT_ON_PRIMARY : AppTheme.PRIMARY,
+                background: this.activeStudentId === student.id ? AppTheme.PRIMARY : AppTheme.PRIMARY_SOFT
+              });
               Column({ space: 3 }) {
                 Text(student.name)
                   .width('100%')
