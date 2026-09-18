@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
@@ -104,6 +105,7 @@ public class OpenAiCompatibleTransport {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("model", model);
     body.put("store", false);
+    body.put("stream", false);
     body.put("instructions", instructions);
     body.put("input", input);
     body.put("max_output_tokens", maxTokens);
@@ -118,6 +120,7 @@ public class OpenAiCompatibleTransport {
       String schemaName, Map<String, Object> schema) {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("model", model);
+    body.put("stream", false);
     body.put("messages", List.of(
         Map.of("role", "system", "content", instructions),
         Map.of("role", "user", "content", input)));
@@ -135,7 +138,7 @@ public class OpenAiCompatibleTransport {
   }
 
   private <T> T post(String path, Map<String, Object> body, Class<T> responseType) {
-    RestClient.RequestBodySpec request = client.post().uri(path);
+    RestClient.RequestBodySpec request = client.post().uri(path).accept(MediaType.APPLICATION_JSON);
     if (properties.getApiKey() != null && !properties.getApiKey().isBlank()) {
       request.header(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getApiKey());
     }
