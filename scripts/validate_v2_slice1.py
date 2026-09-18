@@ -75,8 +75,12 @@ require("interface AssignmentRepository" in repository_port,
         "V2 Student Home must depend on an AssignmentRepository port")
 require("implements AssignmentRepository" in repository_impl,
         "a local-first AssignmentRepository implementation must exist")
-require("HomeworkStore.instance" in repository_impl,
-        "legacy Store access is allowed only inside the migration repository boundary")
+local_data_source = read("entry/src/main/ets/data/local/AssignmentLocalDataSource.ets")
+require("HomeworkStore" not in repository_impl and "AssignmentLocalDataSource" in repository_impl,
+        "AssignmentRepository must depend on the local data source boundary instead of HomeworkStore")
+require("HomeworkStoreAssignmentLocalDataSource" in local_data_source and
+        "HomeworkStore.instance" in local_data_source,
+        "legacy Store access must be isolated inside AssignmentLocalDataSource")
 require("HomeworkStore.instance" not in view_model and "HomeworkStore.instance" not in home,
         "V2 ViewModel/Page must not directly access HomeworkStore")
 require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,
