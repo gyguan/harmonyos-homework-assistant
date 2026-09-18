@@ -20,14 +20,14 @@ export struct PersonEntryPage {
   private BrandHeader() {
     Column({ space: 10 }) {
       CenteredTextBadge({
-        text: '伴',
-        width: 52,
-        height: 52,
-        fontSize: 22,
-        radius: 16,
-        bold: true,
-        foreground: AppTheme.TEXT_ON_PRIMARY,
-        background: AppTheme.PRIMARY
+        badgeText: '伴',
+        badgeWidth: 52,
+        badgeHeight: 52,
+        badgeFontSize: 22,
+        badgeRadius: 16,
+        badgeBold: true,
+        badgeForeground: AppTheme.TEXT_ON_PRIMARY,
+        badgeBackground: AppTheme.PRIMARY
       });
       Text('小伴作业')
         .fontSize(28)
@@ -52,14 +52,14 @@ export struct PersonEntryPage {
   private ParentRow() {
     Row({ space: 13 }) {
       CenteredTextBadge({
-        text: '家',
-        width: 40,
-        height: 40,
-        fontSize: 15,
-        radius: 12,
-        bold: true,
-        foreground: AppTheme.TEXT_ON_PRIMARY,
-        background: AppTheme.PRIMARY
+        badgeText: '家',
+        badgeWidth: 40,
+        badgeHeight: 40,
+        badgeFontSize: 15,
+        badgeRadius: 12,
+        badgeBold: true,
+        badgeForeground: AppTheme.TEXT_ON_PRIMARY,
+        badgeBackground: AppTheme.PRIMARY
       });
       Column({ space: 3 }) {
         Text('家长')
@@ -90,13 +90,13 @@ export struct PersonEntryPage {
   private StudentRow(student: StudentProfile) {
     Row({ space: 13 }) {
       CenteredTextBadge({
-        text: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
-        width: 40,
-        height: 40,
-        fontSize: 15,
-        radius: 12,
-        foreground: AppTheme.PRIMARY,
-        background: AppTheme.PRIMARY_SOFT
+        badgeText: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
+        badgeWidth: 40,
+        badgeHeight: 40,
+        badgeFontSize: 15,
+        badgeRadius: 12,
+        badgeForeground: AppTheme.PRIMARY,
+        badgeBackground: AppTheme.PRIMARY_SOFT
       });
       Column({ space: 3 }) {
         Text(student.name)
