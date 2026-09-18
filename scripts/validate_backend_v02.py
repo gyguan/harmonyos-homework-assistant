@@ -64,6 +64,9 @@ require('@ConfigurationProperties(prefix = "app.ai")' in ai_properties and
 require("responses" in ai_transport and "chatCompletion" in ai_transport and
         'body.put("store", false)' in ai_transport and '"json_schema"' in ai_transport,
         "AI transport must support responses/chat-completions and structured output without provider storage")
+require(ai_transport.count('body.put("stream", false)') >= 2 and
+        ".accept(MediaType.APPLICATION_JSON)" in ai_transport,
+        "AI transport must explicitly request non-streaming JSON responses for OpenAI-compatible providers")
 require("[AI] config" in ai_transport and "[AI] request" in ai_transport and
         "[AI] response error" in ai_transport and "RestClientResponseException" in ai_transport and
         "sanitizeProviderError" in ai_transport and "keyConfigured" in ai_transport,
