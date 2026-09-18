@@ -54,8 +54,9 @@ require("replaceAssignmentsForActiveStudent" in store,
 require("HomeworkRemoteApi.instance.list" in sync and "replaceAssignmentsForActiveStudent" in sync,
         "Assignment Repository sync must push/pull through HomeworkRemoteApi and update the local cache")
 require("assignment.syncDirty && assignment.remoteVersion === existing.version" in sync and
-        "HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion)" in sync,
-        "sync must only overwrite remote data from a dirty assignment with the persisted matching version")
+        "dirtyEntries.push({ assignment: assignment, version: assignment.remoteVersion })" in sync and
+        "HomeworkRemoteApi.instance.sync(studentId, chunk)" in sync,
+        "sync must batch only dirty assignments whose persisted version matches the server snapshot")
 require("observedVersions" not in sync,
         "sync ownership metadata must survive process restarts instead of living in an in-memory map")
 require("requestSync(): void" in sync and "syncRequested" in sync and "syncRunning" in sync,
