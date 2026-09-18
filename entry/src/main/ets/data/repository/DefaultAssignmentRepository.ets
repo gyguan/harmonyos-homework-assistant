@@ -9,14 +9,14 @@ import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDec
 import { Assignment, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../domain/port/AssignmentRepository';
 import { AssignmentQuery } from '../../domain/service/AssignmentQuery';
-import { AssignmentLocalDataSource, HomeworkStoreAssignmentLocalDataSource } from '../local/AssignmentLocalDataSource';
+import { AssignmentLocalDataSource, DefaultAssignmentLocalDataSource } from '../local/AssignmentLocalDataSource';
 
 export class DefaultAssignmentRepository implements AssignmentRepository {
   static readonly instance: DefaultAssignmentRepository = new DefaultAssignmentRepository();
   private remoteSummary: TodaySummary | null = null;
   private remoteSummaryStudentId: string = '';
   private queryCache: Assignment[] = [];
-  private readonly local: AssignmentLocalDataSource = HomeworkStoreAssignmentLocalDataSource.instance;
+  private readonly local: AssignmentLocalDataSource = DefaultAssignmentLocalDataSource.instance;
   private syncRunning: boolean = false;
   private syncRequested: boolean = false;
 
