@@ -37,17 +37,26 @@ require("CoreVisionHomeworkTextExtractor" in service,
         "captured question must reuse local CoreVision OCR")
 require("recognizedText" in service and "resourceUri: result.resultUri" in service,
         "camera result must be converted to recognized text locally")
-require("拍题问小伴" in panel and "只在本机识别" in panel,
-        "Tutor UI must expose camera capture and clearly explain local-only image recognition")
+require("Button(this.capturing ? '识别中…' : '拍题'" in panel and "只在本机识别" in panel,
+        "Tutor composer must expose compact camera capture and clearly explain local-only image recognition")
 require("onRecognized" in panel and "this.onRecognized(result.recognizedText)" in panel,
         "recognized question text must be handed back to the editable Tutor draft")
 require("TutorQuestionCapturePanel" in study and "题目识别结果" in study,
         "study workspace must put OCR text into the Tutor draft")
-require(study.find("TextArea({ placeholder: '输入问题") < study.find("TutorQuestionCapturePanel({") <
-        study.find("Button(this.tutorSending ? '发送中…' : '发送给小伴'"),
-        "Tutor capture must live in the input area after text entry and before send, not between history and input")
-require("只在本机识别 · 识别后可编辑" in panel and ".padding(12)" not in panel,
+require(study.find("TextArea({ placeholder: '说说你卡在哪一步") < study.find("TutorQuestionCapturePanel({") <
+        study.find("Button(this.tutorSending ? '发送中…' : '发送'"),
+        "Tutor capture must live inside the bottom composer after text entry and before send")
+require("只在本机识别" in panel and ".padding(12)" not in panel,
         "Tutor capture must stay a compact input accessory instead of a standalone card")
+require("小伴学习助手" in study and "先帮你理思路，再给下一步提示" in study,
+        "Tutor panel must present a clear learning-assistant identity instead of a generic chat title")
+for suggestion in ["怎么开始？", "检查思路", "提示下一步"]:
+    require(suggestion in study, f"Tutor empty state missing quick prompt: {suggestion}")
+require("CenteredTextBadge" in study and "badgeText: '伴'" in study,
+        "Tutor assistant messages must keep a visible assistant identity")
+require("Text('你的问题')" in study and "文字提问或拍题" in study and
+        "backgroundColor(AppTheme.SURFACE_SUBTLE)" in study,
+        "Tutor composer must group text, camera and send actions into one input surface")
 require("请确认或补充后再发送" in study,
         "captured question must require student review before sending instead of auto-submit")
 require("TutorRemoteApi.instance.ask(this.assignmentId, text)" in study,
