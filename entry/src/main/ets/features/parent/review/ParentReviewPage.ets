@@ -13,8 +13,8 @@ export struct ParentReviewPage {
     Column() {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
-          title: '作业验收',
-          subtitle: '查看提交证据并决定通过或退回订正',
+          title: '作业详情',
+          subtitle: '查看任务、调整计划，提交后可在这里验收',
           backAccessibilityText: '返回进度',
           onBack: () => this.onBack()
         });
