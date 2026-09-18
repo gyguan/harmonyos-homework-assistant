@@ -1,5 +1,6 @@
 import { http } from '@kit.NetworkKit';
-import { HomeworkStore } from '../../data/HomeworkStore';
+import { DefaultFamilyContextRepository } from '../../data/repository/DefaultFamilyContextRepository';
+import { FamilyContextRepository } from '../../domain/port/FamilyContextRepository';
 import { BackendHttpClient } from './BackendHttpClient';
 import { BackendSession } from './BackendSession';
 
@@ -25,6 +26,7 @@ interface AskPayload {
 
 export class TutorRemoteApi {
   static readonly instance: TutorRemoteApi = new TutorRemoteApi();
+  private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   private constructor() {}
 
   async load(assignmentId: string): Promise<TutorConversation> {
@@ -40,7 +42,7 @@ export class TutorRemoteApi {
 
   async ask(assignmentId: string, text: string): Promise<TutorConversation> {
     if (!BackendSession.instance.isConnected()) return this.disconnected();
-    let settings = HomeworkStore.instance.getSettings();
+    let settings = this.familyContext.getSettings();
     let payload: AskPayload = {
       text: text,
       guidanceFirst: settings.tutorGuidanceFirst,

@@ -77,10 +77,11 @@ require("isEnabled: this.settings().tutorGuidanceFirst" in student and
 require("updateTutorSettings" not in student,
         "student 我的 must remain read-only for Tutor rules")
 
-require("let settings = HomeworkStore.instance.getSettings()" in tutor and
+require("HomeworkStore" not in tutor and "FamilyContextRepository" in tutor and
+        "let settings = this.familyContext.getSettings()" in tutor and
         "guidanceFirst: settings.tutorGuidanceFirst" in tutor and
         "directAnswerAllowed: settings.directAnswerAllowed" in tutor,
-        "Tutor requests must use the latest persisted AppSettings values")
+        "Tutor requests must read the latest persisted AppSettings through FamilyContextRepository")
 
 if errors:
     print("PARENT_TUTOR_SETTINGS_GATE_FAIL")
