@@ -83,7 +83,7 @@ export class HomeworkRemoteApi {
   private constructor() {}
 
   async list(studentId: string): Promise<RemoteAssignment[]> {
-    return this.listPaged(studentId, []);
+    return this.listPaged(studentId, [], 'assignment.sync.snapshot');
   }
 
   async listFiltered(studentId: string, filter: AssignmentFilter): Promise<RemoteAssignment[]> {
@@ -99,11 +99,12 @@ export class HomeworkRemoteApi {
     if (filter.undatedOnly) params.push('undated=true');
     if (filter.statuses.length === 1) params.push(`status=${encodeURIComponent(filter.statuses[0])}`);
 
-    return this.listPaged(studentId, params);
+    return this.listPaged(studentId, params, 'assignment.query');
   }
 
   async todaySummary(studentId: string): Promise<TodaySummary> {
-    let response = await BackendHttpClient.instance.request(
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.summary',
       `/api/v1/students/${encodeURIComponent(studentId)}/assignments/summary`, http.RequestMethod.GET);
     if (response.statusCode !== 200) throw new Error(`拉取今日作业摘要失败: ${response.statusCode}`);
     return JSON.parse(response.body) as TodaySummary;
@@ -111,7 +112,10 @@ export class HomeworkRemoteApi {
 
   async create(assignment: Assignment): Promise<RemoteAssignment> {
     let body: CreateAssignmentBody = this.createBody(assignment);
-    let response = await BackendHttpClient.instance.request(`/api/v1/students/${encodeURIComponent(assignment.studentId)}/assignments`, http.RequestMethod.POST, body);
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.create',
+      `/api/v1/students/${encodeURIComponent(assignment.studentId)}/assignments`,
+      http.RequestMethod.POST, body);
     if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`上传作业失败: ${response.statusCode}`);
     return JSON.parse(response.body) as RemoteAssignment;
   }
@@ -122,7 +126,8 @@ export class HomeworkRemoteApi {
       items.push({ candidateId: entry.candidateId, assignment: this.createBody(entry.assignment) });
     }
     let body: BatchPublishBody = { items: items };
-    let response = await BackendHttpClient.instance.request(
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.batchPublish',
       `/api/v1/students/${encodeURIComponent(studentId)}/assignments/batch`, http.RequestMethod.POST, body);
     if (response.statusCode === 409) throw new Error('BATCH_PUBLISH_CONFLICT');
     if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -133,7 +138,8 @@ export class HomeworkRemoteApi {
 
   async performAction(assignmentId: string, version: number, action: AssignmentAction): Promise<RemoteAssignment> {
     let body: AssignmentActionBody = { action: action, version: version };
-    let response = await BackendHttpClient.instance.request(
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.action',
       `/api/v1/assignments/${encodeURIComponent(assignmentId)}/actions`, http.RequestMethod.POST, body);
     if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
     if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -144,7 +150,8 @@ export class HomeworkRemoteApi {
 
   async review(assignmentId: string, version: number, decision: AssignmentReviewDecision, note: string): Promise<RemoteAssignment> {
     let body: AssignmentReviewBody = { decision: decision, version: version, note: note };
-    let response = await BackendHttpClient.instance.request(
+    let response = await BackendHttpClient.instance.requestFor(
+      'parent.review',
       `/api/v1/assignments/${encodeURIComponent(assignmentId)}/review`, http.RequestMethod.POST, body);
     if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
     if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -155,7 +162,9 @@ export class HomeworkRemoteApi {
 
   async update(assignment: Assignment, version: number): Promise<RemoteAssignment> {
     let body: UpdateAssignmentBody = this.updateBody(assignment, version);
-    let response = await BackendHttpClient.instance.request(`/api/v1/assignments/${encodeURIComponent(assignment.id)}`, http.RequestMethod.PUT, body);
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.update',
+      `/api/v1/assignments/${encodeURIComponent(assignment.id)}`, http.RequestMethod.PUT, body);
     if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
     if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`更新作业失败: ${response.statusCode}`);
     return JSON.parse(response.body) as RemoteAssignment;
@@ -167,7 +176,8 @@ export class HomeworkRemoteApi {
       items.push({ id: entry.assignment.id, assignment: this.updateBody(entry.assignment, entry.version) });
     }
     let body: BatchSyncBody = { items: items };
-    let response = await BackendHttpClient.instance.request(
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.sync.dirty',
       `/api/v1/students/${encodeURIComponent(studentId)}/assignments/sync`,
       http.RequestMethod.POST, body);
     if (response.statusCode < 200 || response.statusCode >= 300) {
@@ -177,19 +187,21 @@ export class HomeworkRemoteApi {
   }
 
   async delete(assignmentId: string): Promise<boolean> {
-    let response = await BackendHttpClient.instance.request(
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.delete',
       `/api/v1/assignments/${encodeURIComponent(assignmentId)}`, http.RequestMethod.DELETE);
     return response.statusCode === 200 || response.statusCode === 204 || response.statusCode === 404;
   }
 
-  private async listPaged(studentId: string, baseParams: string[]): Promise<RemoteAssignment[]> {
+  private async listPaged(studentId: string, baseParams: string[], scene: string): Promise<RemoteAssignment[]> {
     let all: RemoteAssignment[] = [];
     let page: number = 0;
     while (page < 100) {
       let params = baseParams.slice();
       params.push(`page=${page}`);
       params.push('limit=100');
-      let response = await BackendHttpClient.instance.request(
+      let response = await BackendHttpClient.instance.requestFor(
+        scene,
         `/api/v1/students/${encodeURIComponent(studentId)}/assignments/page?${params.join('&')}`,
         http.RequestMethod.GET);
       if (response.statusCode !== 200) throw new Error(`拉取作业失败: ${response.statusCode}`);
