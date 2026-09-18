@@ -120,24 +120,6 @@ export class AssignmentDueDate {
 
   private static resolveShanghaiDate(text: string, anchorEpochMs: number): DueDateParts | null {
     let anchor = AssignmentDueDate.shanghaiDateParts(anchorEpochMs);
-    if (text.indexOf('今天') >= 0 || text.indexOf('今日') >= 0 ||
-      text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0) {
-      return anchor;
-    }
-    if (text.indexOf('明天') >= 0 || text.indexOf('明日') >= 0) {
-      return AssignmentDueDate.addCalendarDays(anchor, 1);
-    }
-    if (text.indexOf('后天') >= 0) {
-      return AssignmentDueDate.addCalendarDays(anchor, 2);
-    }
-
-    let weekday = AssignmentDueDate.weekdayNumber(text);
-    if (weekday > 0) {
-      let current = new Date(Date.UTC(anchor.year, anchor.month - 1, anchor.day)).getUTCDay();
-      let currentMondayBased = current === 0 ? 7 : current;
-      let delta = (weekday - currentMondayBased + 7) % 7;
-      return AssignmentDueDate.addCalendarDays(anchor, delta);
-    }
 
     let chineseFull = text.match(/(\d{4})年(\d{1,2})月(\d{1,2})[日号]?/);
     if (chineseFull !== null && chineseFull.length >= 4) {
@@ -162,15 +144,35 @@ export class AssignmentDueDate {
       return AssignmentDueDate.validDateParts(
         anchor.year, Number(numericMonthDay[2]), Number(numericMonthDay[3]));
     }
+
+    if (text.indexOf('今天') >= 0 || text.indexOf('今日') >= 0 || text.indexOf('今晚') >= 0) {
+      return anchor;
+    }
+    if (text.indexOf('明天') >= 0 || text.indexOf('明日') >= 0) {
+      return AssignmentDueDate.addCalendarDays(anchor, 1);
+    }
+    if (text.indexOf('后天') >= 0) {
+      return AssignmentDueDate.addCalendarDays(anchor, 2);
+    }
+
+    let weekday = AssignmentDueDate.weekdayNumber(text);
+    if (weekday > 0) {
+      let current = new Date(Date.UTC(anchor.year, anchor.month - 1, anchor.day)).getUTCDay();
+      let currentMondayBased = current === 0 ? 7 : current;
+      let delta = (weekday - currentMondayBased + 7) % 7;
+      return AssignmentDueDate.addCalendarDays(anchor, delta);
+    }
+
+    if (text.indexOf('晚上') >= 0) return anchor;
     return null;
   }
 
   private static resolveTimeMinutes(text: string): number {
     let colon = text.match(/(^|[^\d])(\d{1,2})[:：]([0-5]\d)($|[^\d])/);
     if (colon !== null && colon.length >= 4) {
-      let hour = Number(colon[2]);
+      let hour = AssignmentDueDate.normalizeChineseHour(text, Number(colon[2]));
       let minute = Number(colon[3]);
-      if (hour >= 0 && hour <= 23) return hour * 60 + minute;
+      if (hour >= 0) return hour * 60 + minute;
     }
 
     let half = text.match(/(\d{1,2})点半/);
