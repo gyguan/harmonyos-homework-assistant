@@ -24,6 +24,7 @@ port = read("entry/src/main/ets/domain/port/AssignmentRepository.ets")
 repository = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
 view_model = read("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentViewModel.ets")
 page = read("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
+deadline_picker = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
@@ -57,6 +58,16 @@ require("HomeworkStore.instance" not in page,
         "new V2 parent create page must not access HomeworkStore directly")
 require("ParentExtraAssignmentViewModel" in page and "布置课外任务" in page,
         "parent extracurricular create page is missing")
+require("DeadlinePickerField" in page and "onChange: (value: string) => this.dueText = value" in page,
+        "extracurricular create must use the shared date/time picker for its deadline")
+require("placeholder: 'YYYY-MM-DD'" not in page and "placeholder: '20:00'" not in page and
+        "@State private dueDate:" not in page and "@State private dueTime:" not in page,
+        "extracurricular deadline must not regress to manual date/time text entry")
+require("AssignmentDueDate.resolveDueAtEpochMs" in page,
+        "extracurricular create must materialize the selected deadline through the shared due-date policy")
+require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker and
+        ".onDateChange((value: Date)" in deadline_picker and ".onChange((value: TimePickerResult)" in deadline_picker,
+        "shared deadline field must use native ArkUI date and time pickers")
 require("PARENT_EXTRA_CREATE" in routes and "parent/extra/create" in routes,
         "new create page must have a Navigation route")
 require("ParentExtraAssignmentPage" in shell and "AppRoute.PARENT_EXTRA_CREATE" in shell,
