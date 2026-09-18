@@ -32,7 +32,10 @@ export struct StudyWorkspacePage {
   @State private tutorMessages: TutorChatMessage[] = [];
   @State private tutorNotice: string = '';
   @State private tutorAvailable: boolean = false;
+  @State private tutorHasMore: boolean = false;
+  @State private tutorNextBeforeEpochMs: number = 0;
   @State private tutorLoading: boolean = false;
+  @State private tutorLoadingOlder: boolean = false;
   @State private tutorSending: boolean = false;
   onBack: () => void = () => {};
   onStoreChanged: () => void = () => {};
@@ -81,6 +84,31 @@ export struct StudyWorkspacePage {
     this.tutorMessages = conversation.messages.slice();
     this.tutorAvailable = conversation.available;
     this.tutorNotice = conversation.notice;
+    this.tutorHasMore = conversation.hasMore;
+    this.tutorNextBeforeEpochMs = conversation.nextBeforeEpochMs;
+  }
+
+  private async loadOlderTutor(): Promise<void> {
+    if (!this.tutorHasMore || this.tutorNextBeforeEpochMs <= 0 || this.tutorLoadingOlder) return;
+    this.tutorLoadingOlder = true;
+    let older = await TutorRemoteApi.instance.load(this.assignmentId, this.tutorNextBeforeEpochMs);
+    let merged: TutorChatMessage[] = [];
+    let seen: Set<string> = new Set<string>();
+    for (let item of older.messages) {
+      if (seen.has(item.id)) continue;
+      seen.add(item.id);
+      merged.push(item);
+    }
+    for (let item of this.tutorMessages) {
+      if (seen.has(item.id)) continue;
+      seen.add(item.id);
+      merged.push(item);
+    }
+    this.tutorMessages = merged;
+    this.tutorHasMore = older.hasMore;
+    this.tutorNextBeforeEpochMs = older.nextBeforeEpochMs;
+    if (older.notice.length > 0) this.tutorNotice = older.notice;
+    this.tutorLoadingOlder = false;
   }
 
   private async askTutor(): Promise<void> {
@@ -455,6 +483,17 @@ export struct StudyWorkspacePage {
       } else {
         Scroll() {
           Column({ space: 9 }) {
+            if (this.tutorHasMore) {
+              Text(this.tutorLoadingOlder ? '正在加载更早记录…' : '加载更早记录')
+                .width('100%')
+                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .fontSize(12)
+                .fontColor(AppTheme.PRIMARY)
+                .textAlign(TextAlign.Center)
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText('加载更早的小伴对话')
+                .onClick(() => { void this.loadOlderTutor(); });
+            }
             if (this.tutorMessages.length === 0) {
               Text('你现在卡在哪一步？先告诉小伴你已经尝试了什么。')
                 .width('100%')
