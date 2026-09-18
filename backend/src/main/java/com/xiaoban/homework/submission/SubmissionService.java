@@ -92,6 +92,13 @@ public class SubmissionService {
   }
 
   @Transactional(readOnly = true)
+  public SubmissionDtos.Response latest(UUID familyId, String assignmentId) {
+    assignments.requireOwned(familyId, assignmentId);
+    return submissions.findFirstByFamilyIdAndAssignmentIdOrderBySubmittedAtDesc(familyId, assignmentId)
+        .map(this::toDto).orElse(null);
+  }
+
+  @Transactional(readOnly = true)
   public PhotoDownload photo(UUID familyId, UUID photoId) {
     SubmissionPhotoEntity photo = photos.findById(photoId)
         .orElseThrow(() -> new ApiExceptions.NotFound("照片不存在"));
