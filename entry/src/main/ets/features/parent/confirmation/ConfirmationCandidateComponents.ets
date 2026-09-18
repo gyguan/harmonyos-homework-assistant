@@ -8,6 +8,8 @@ export struct ConfirmationCandidateCard {
   @Prop item: CandidateAssignment;
   @Prop selected: boolean = false;
   onSelect: () => void = () => {};
+  onMinutesChange: (candidate: CandidateAssignment, minutes: number) => void =
+    (_candidate: CandidateAssignment, _minutes: number) => {};
 
   build() {
     Column({ space: 8 }) {
@@ -44,6 +46,40 @@ export struct ConfirmationCandidateCard {
         .fontSize(12)
         .fontColor(AppTheme.SUBTEXT)
         .maxLines(1);
+
+      Row({ space: 6 }) {
+        Text('预计用时')
+          .fontSize(11)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+        ChoiceSelectionChip({
+          label: '10',
+          selected: this.item.expectedMinutes === 10,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 10)
+        });
+        ChoiceSelectionChip({
+          label: '20',
+          selected: this.item.expectedMinutes === 20,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 20)
+        });
+        ChoiceSelectionChip({
+          label: '30',
+          selected: this.item.expectedMinutes === 30,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 30)
+        });
+        ChoiceSelectionChip({
+          label: '45',
+          selected: this.item.expectedMinutes === 45,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 45)
+        });
+        Text('分钟')
+          .fontSize(11)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+      }
+      .width('100%');
 
       Text(`来源证据 · ${this.item.sourceEvidence.excerpt}`)
         .width('100%')
