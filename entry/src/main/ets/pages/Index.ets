@@ -1,8 +1,9 @@
 import { BackendAuthService } from '../application/remote/BackendAuthService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { FamilyCloudService } from '../application/remote/FamilyCloudService';
-import { HomeworkSyncService } from '../application/remote/HomeworkSyncService';
-import { HomeworkStore } from '../data/HomeworkStore';
+import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
+import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
+import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { AppRole, AppShell } from './AppShell';
 import { PersonEntryPage } from './PersonEntryPage';
 
@@ -10,6 +11,7 @@ import { PersonEntryPage } from './PersonEntryPage';
 @Component
 struct Index {
   @State private selectedRole: AppRole = AppRole.NONE;
+  private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private cloudRevision: number = 0;
   private shellBackHandler: () => boolean = () => false;
 
@@ -30,11 +32,11 @@ struct Index {
 
   private enterParent(): void {
     this.selectedRole = AppRole.PARENT;
-    HomeworkSyncService.instance.requestSync();
+    DefaultAssignmentRepository.instance.requestSync();
   }
 
   private enterStudent(studentId: string): void {
-    if (HomeworkStore.instance.setActiveStudent(studentId)) {
+    if (this.familyContext.setActiveStudent(studentId)) {
       this.selectedRole = AppRole.STUDENT;
       HomeworkSyncService.instance.requestSync();
     }
