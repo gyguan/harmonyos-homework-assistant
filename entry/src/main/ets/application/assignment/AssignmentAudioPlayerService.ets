@@ -77,7 +77,7 @@ export class AssignmentAudioPlayerService {
     let duration = player.duration > 0 ? player.duration : 0;
     let target = Math.floor(Math.max(0, duration > 0 ? Math.min(timeMs, duration) : timeMs));
     try {
-      player.seek(target, media.SeekMode.SEEK_CLOSEST);
+      player.seek(target, media.SeekMode.SEEK_PREV_SYNC);
     } catch {
       if (this.callbacks !== null) this.callbacks.onError('无法跳转到该播放位置');
     }
