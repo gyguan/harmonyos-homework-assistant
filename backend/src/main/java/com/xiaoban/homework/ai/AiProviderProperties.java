@@ -15,6 +15,7 @@ public class AiProviderProperties {
   private String organizerModel = "gpt-5.6-luna";
   private boolean allowUnauthenticated = false;
   private boolean structuredOutput = true;
+  private boolean logPayloads = false;
 
   public String getProtocol() { return protocol; }
   public void setProtocol(String protocol) { this.protocol = value(protocol, "responses"); }
@@ -34,6 +35,8 @@ public class AiProviderProperties {
   public void setAllowUnauthenticated(boolean allowUnauthenticated) { this.allowUnauthenticated = allowUnauthenticated; }
   public boolean isStructuredOutput() { return structuredOutput; }
   public void setStructuredOutput(boolean structuredOutput) { this.structuredOutput = structuredOutput; }
+  public boolean isLogPayloads() { return logPayloads; }
+  public void setLogPayloads(boolean logPayloads) { this.logPayloads = logPayloads; }
 
   public boolean available(String model) {
     return !blank(baseUrl) && !blank(model) && (allowUnauthenticated || !blank(apiKey));

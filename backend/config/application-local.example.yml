@@ -37,3 +37,7 @@ app:
     # Set false if the provider does not support json_schema structured output.
     # The organizer will still ask for JSON and validate the returned structure locally.
     structured-output: true
+
+    # Local troubleshooting only. When enabled, request/response payloads sent to the AI provider
+    # are logged after secret redaction and length limiting. Do not enable in production.
+    log-payloads: false

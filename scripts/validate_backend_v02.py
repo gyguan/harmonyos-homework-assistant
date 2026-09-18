@@ -71,6 +71,9 @@ require("[AI] config" in ai_transport and "[AI] request" in ai_transport and
         "[AI] response error" in ai_transport and "RestClientResponseException" in ai_transport and
         "sanitizeProviderError" in ai_transport and "keyConfigured" in ai_transport,
         "AI transport must emit safe provider diagnostics for config/request/http errors")
+require("isLogPayloads()" in ai_transport and "[AI-PAYLOAD] request" in ai_transport and
+        "[AI-PAYLOAD] response" in ai_transport and "sanitizePayloadForLog" in ai_transport,
+        "AI transport must support opt-in redacted request/response payload diagnostics")
 require("instructions" not in " ".join(
         line for line in ai_transport.splitlines() if "log." in line or "log.info" in line or "log.warn" in line),
         "AI diagnostic logs must not log prompt instructions")
@@ -107,6 +110,9 @@ require("app:" in local_example and "ai:" in local_example and "api-key:" in loc
 require("app:\n" in app_yml and "  ai:" in app_yml and "AI_PROTOCOL" in app_yml and
         "AI_BASE_URL" in app_yml and "AI_TUTOR_MODEL" in app_yml and "AI_ORGANIZER_MODEL" in app_yml,
         "public configuration must expose provider-neutral AI settings")
+require("AI_LOG_PAYLOADS" in app_yml and "log-payloads: false" in local_example and
+        "private boolean logPayloads = false;" in ai_properties,
+        "AI payload logging must be explicitly opt-in and documented for local troubleshooting")
 
 require('@PostMapping("/organize")' in organizer_controller and "FAMILY_ID" in organizer_controller,
         "homework organizer must expose an authenticated family-scoped API")

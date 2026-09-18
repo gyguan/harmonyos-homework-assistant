@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
+import tools.jackson.databind.json.JsonMapper;
 
 @Component
 public class OpenAiCompatibleTransport {
@@ -23,8 +24,10 @@ public class OpenAiCompatibleTransport {
       "\\\"(message|type|code|param)\\\"\\s*:\\s*(\\\"((?:\\\\.|[^\\\"])*)\\\"|null|true|false|-?\\d+(?:\\.\\d+)?)",
       Pattern.CASE_INSENSITIVE);
   private static final int MAX_ERROR_LOG_CHARS = 500;
+  private static final int MAX_PAYLOAD_LOG_CHARS = 20000;
 
   private final AiProviderProperties properties;
+  private final JsonMapper jsonMapper;
   private final RestClient client;
 
   public record ResponsesContent(String type, String text) {}
@@ -34,18 +37,20 @@ public class OpenAiCompatibleTransport {
   public record ChatChoice(ChatMessage message) {}
   public record ChatResponse(List<ChatChoice> choices) {}
 
-  public OpenAiCompatibleTransport(AiProviderProperties properties) {
+  public OpenAiCompatibleTransport(AiProviderProperties properties, JsonMapper jsonMapper) {
     this.properties = properties;
+    this.jsonMapper = jsonMapper;
     this.client = RestClient.builder()
         .baseUrl(properties.getBaseUrl())
         .defaultHeader(HttpHeaders.CONTENT_TYPE, "application/json")
         .build();
 
     log.info(
-        "[AI] config protocol={} baseUrl={} responsesPath={} chatCompletionsPath={} tutorModel={} organizerModel={} structuredOutput={} keyConfigured={} allowUnauthenticated={}",
+        "[AI] config protocol={} baseUrl={} responsesPath={} chatCompletionsPath={} tutorModel={} organizerModel={} structuredOutput={} logPayloads={} keyConfigured={} allowUnauthenticated={}",
         properties.getProtocol(), safeBaseUrl(properties.getBaseUrl()), properties.getResponsesPath(),
         properties.getChatCompletionsPath(), properties.getTutorModel(), properties.getOrganizerModel(),
-        properties.isStructuredOutput(), keyConfigured(), properties.isAllowUnauthenticated());
+        properties.isStructuredOutput(), properties.isLogPayloads(), keyConfigured(),
+        properties.isAllowUnauthenticated());
   }
 
   public boolean available(String model) {
@@ -101,7 +106,7 @@ public class OpenAiCompatibleTransport {
   }
 
   private Optional<String> responses(String model, String instructions, String input, int maxTokens,
-      String schemaName, Map<String, Object> schema) {
+      String schemaName, Map<String, Object> schema) throws Exception {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("model", model);
     body.put("store", false);
@@ -117,7 +122,7 @@ public class OpenAiCompatibleTransport {
   }
 
   private Optional<String> chatCompletion(String model, String instructions, String input, int maxTokens,
-      String schemaName, Map<String, Object> schema) {
+      String schemaName, Map<String, Object> schema) throws Exception {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("model", model);
     body.put("stream", false);
@@ -137,12 +142,31 @@ public class OpenAiCompatibleTransport {
     return extractChatText(response);
   }
 
-  private <T> T post(String path, Map<String, Object> body, Class<T> responseType) {
+  private <T> T post(String path, Map<String, Object> body, Class<T> responseType) throws Exception {
     RestClient.RequestBodySpec request = client.post().uri(path).accept(MediaType.APPLICATION_JSON);
     if (properties.getApiKey() != null && !properties.getApiKey().isBlank()) {
       request.header(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getApiKey());
     }
-    return request.body(body).retrieve().body(responseType);
+
+    if (properties.isLogPayloads()) {
+      log.info("[AI-PAYLOAD] request path={} body={}", path, payloadForLog(body));
+    }
+
+    String rawResponse = request.body(body).retrieve().body(String.class);
+    if (properties.isLogPayloads()) {
+      log.info("[AI-PAYLOAD] response path={} body={}", path,
+          sanitizePayloadForLog(rawResponse, properties.getApiKey()));
+    }
+    if (rawResponse == null || rawResponse.isBlank()) return null;
+    return jsonMapper.readValue(rawResponse, responseType);
+  }
+
+  private String payloadForLog(Object value) {
+    try {
+      return sanitizePayloadForLog(jsonMapper.writeValueAsString(value), properties.getApiKey());
+    } catch (Exception error) {
+      return "<payload-serialization-failed:" + error.getClass().getSimpleName() + ">";
+    }
   }
 
   static Optional<String> extractResponsesText(ResponsesResponse response) {
@@ -167,6 +191,18 @@ public class OpenAiCompatibleTransport {
       if (!text.isEmpty()) return Optional.of(text);
     }
     return Optional.empty();
+  }
+
+  static String sanitizePayloadForLog(String rawBody, String secret) {
+    if (rawBody == null || rawBody.isBlank()) return "<empty>";
+    String safe = rawBody.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').trim();
+    safe = redactExact(safe, secret);
+    safe = safe.replaceAll("(?i)Bearer\\s+[A-Za-z0-9._~+\\-/=]+", "Bearer ***");
+    safe = safe.replaceAll("(?i)sk-[A-Za-z0-9_-]{6,}", "sk-***");
+    safe = safe.replaceAll(
+        "(?i)([\\\"']?(?:api[-_]?key|authorization|access[-_]?token)[\\\"']?\\s*[:=]\\s*[\\\"']?)[^\\s,}\\]\\\"']+",
+        "$1***");
+    return truncate(safe, MAX_PAYLOAD_LOG_CHARS);
   }
 
   static String sanitizeProviderError(String rawBody) {
