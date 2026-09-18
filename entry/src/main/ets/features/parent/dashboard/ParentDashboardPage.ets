@@ -13,6 +13,7 @@ export struct ParentDashboardPage {
   @State private availableWidthVp: number = 390;
   onOpenImport: () => void = () => {};
   onOpenExtra: () => void = () => {};
+  onOpenVoice: () => void = () => {};
   onOpenProgress: () => void = () => {};
   onOpenReview: (assignmentId: string) => void = (_assignmentId: string) => {};
 
@@ -307,6 +308,30 @@ export struct ParentDashboardPage {
         .onClick(() => this.onOpenExtra());
       }
       .width('100%');
+
+      Row({ space: 8 }) {
+        Text('♪')
+          .width(24)
+          .fontSize(22)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.PRIMARY)
+          .textAlign(TextAlign.Center);
+        Column({ space: 2 }) {
+          Text('语音作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('上传语音和情景图片，孩子边听边看').fontSize(10).fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).fontColor([AppTheme.TERTIARY_TEXT]);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: 58 })
+      .padding(11)
+      .backgroundColor(AppTheme.PRIMARY_FAINT)
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(`给 ${this.student().name} 布置语音作业`)
+      .onClick(() => this.onOpenVoice());
     }
     .width('100%');
   }

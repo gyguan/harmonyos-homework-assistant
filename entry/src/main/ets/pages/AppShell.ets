@@ -19,6 +19,7 @@ import { FamilyContextRepository } from '../domain/port/FamilyContextRepository'
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
 import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
+import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceAssignmentPage';
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
@@ -178,8 +179,8 @@ export struct AppShell {
       AppRoute.PARENT_IMPORT_CONFIRMATION, new ParentImportConfirmationRouteParam());
   }
 
-  private openParentExtraCreate(): void {
-    this.navPathStack.pushPathByName(AppRoute.PARENT_EXTRA_CREATE, new ParentExtraCreateRouteParam());
+  private openParentExtraCreate(voice: boolean = false): void {
+    this.navPathStack.pushPathByName(AppRoute.PARENT_EXTRA_CREATE, new ParentExtraCreateRouteParam(voice));
   }
 
   private routeAssignmentId(param: Object): string {
@@ -276,13 +277,23 @@ export struct AppShell {
       .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_EXTRA_CREATE) {
       NavDestination() {
-        ParentExtraAssignmentPage({
-          onBack: () => this.navPathStack.pop(),
-          onCreated: () => {
-            this.notifyUiChanged();
-            this.navPathStack.pop();
-          }
-        });
+        if ((param as ParentExtraCreateRouteParam).voice) {
+          ParentVoiceAssignmentPage({
+            onBack: () => this.navPathStack.pop(),
+            onCreated: () => {
+              this.notifyUiChanged();
+              this.navPathStack.pop();
+            }
+          });
+        } else {
+          ParentExtraAssignmentPage({
+            onBack: () => this.navPathStack.pop(),
+            onCreated: () => {
+              this.notifyUiChanged();
+              this.navPathStack.pop();
+            }
+          });
+        }
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
@@ -306,7 +317,8 @@ export struct AppShell {
         revision: this.storeRevision,
         activeStudentId: this.activeStudentId,
         onOpenImport: () => this.openParentImport(),
-        onOpenExtra: () => this.openParentExtraCreate(),
+        onOpenExtra: () => this.openParentExtraCreate(false),
+        onOpenVoice: () => this.openParentExtraCreate(true),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
       });
