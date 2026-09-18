@@ -22,6 +22,7 @@ models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 mapper = read("entry/src/main/ets/application/remote/RemoteModels.ets")
 sync = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
+local_data_source = read("entry/src/main/ets/data/local/AssignmentLocalDataSource.ets")
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 
@@ -49,6 +50,10 @@ require("syncDirty: false" in mapper,
 require("lastSyncedAtEpochMs: Date.now()" in mapper,
         "remote refresh must record the last sync time")
 
+require("HomeworkStore" not in sync and "AssignmentLocalDataSource" in sync,
+        "Assignment Repository sync must use AssignmentLocalDataSource instead of HomeworkStore")
+require("HomeworkStore.instance" in local_data_source,
+        "legacy Store access must be isolated in AssignmentLocalDataSource during Final Cleanup")
 require("observedVersions" not in sync,
         "Assignment Repository sync must not keep process-local observedVersions")
 require("assignment.syncDirty && assignment.remoteVersion === existing.version" in sync,
