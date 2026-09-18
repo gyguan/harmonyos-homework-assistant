@@ -49,7 +49,8 @@ require("onMinutesChange" in confirmation_components and "预计用时" in confi
         "parent confirmation must keep a bounded custom duration override in the reactive editor")
 require("onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "confirmation page must persist duration changes from the reactive editor")
-require(".bindSheet($this.showEditorSheet" in confirmation and
+require(".bindSheet($$this.showEditorSheet" in confirmation and
+        ".bindSheet($this.showEditorSheet" not in confirmation and
         "private CandidateEditorSheet()" in confirmation and
         "onSelect: () => this.openEditor(item.id)" in confirmation,
         "candidate editing must open in a bottom sheet instead of an inline editor at page bottom")
