@@ -1,6 +1,8 @@
 package com.xiaoban.homework.organizer;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.xiaoban.homework.student.StudentEntity;
@@ -43,6 +45,31 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(instructions.contains("学生年级"));
     assertTrue(instructions.contains("5 到 120 分钟"));
     assertTrue(instructions.contains("不包含休息"));
+  }
+
+  @Test
+  void normalizesCommonProviderSubjectLabelsWithoutBroadeningSupportedSubjects() {
+    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("语文作业"));
+    assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("数学练习"));
+    assertEquals("英语", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("英语听读"));
+    assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Math"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("科学"));
+  }
+
+  @Test
+  void conversionReportsRejectedAssignmentsInsteadOfSilentlyDroppingThem() {
+    var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "科学", "观察植物", "观察并记录", "", "今天", 20, "观察植物", 0.9),
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "语文作业", "背诵第12课", "背诵课文", "", "明天", 15, "背诵第12课", 0.95))));
+
+    assertEquals(2, result.sourceCount());
+    assertEquals(1, result.candidates().size());
+    assertEquals("语文", result.candidates().getFirst().subject());
+    assertEquals(1, result.unsupportedSubjectCount());
+    assertEquals(0, result.blankTitleCount());
   }
 
   @Test
