@@ -34,7 +34,7 @@ public class AccessLogFilter extends OncePerRequestFilter {
     if ("-".equals(requestId)) requestId = UUID.randomUUID().toString();
     String scene = safeHeader(request.getHeader(CLIENT_SCENE_HEADER), 80);
     String requestKey = request.getHeader(CLIENT_REQUEST_KEY_HEADER);
-    boolean duplicate = isDuplicate(request, requestKey, startedAtEpochMs);
+    boolean duplicate = isDuplicate(sanitize(request.getRemoteAddr()), requestKey, startedAtEpochMs);
     response.setHeader(REQUEST_ID_HEADER, requestId);
     try {
       filterChain.doFilter(request, response);
@@ -55,10 +55,10 @@ public class AccessLogFilter extends OncePerRequestFilter {
     }
   }
 
-  private boolean isDuplicate(HttpServletRequest request, String requestKey, long nowMs) {
+  boolean isDuplicate(String client, String requestKey, long nowMs) {
     if (requestKey == null || requestKey.isBlank()) return false;
     String boundedKey = requestKey.length() > 512 ? requestKey.substring(0, 512) : requestKey;
-    String key = sanitize(request.getRemoteAddr()) + "|" + boundedKey;
+    String key = client + "|" + boundedKey;
     Long previous = recentRequests.put(key, nowMs);
     if (recentRequests.size() > MAX_RECENT_KEYS) cleanupRecent(nowMs);
     return previous != null && nowMs - previous >= 0 && nowMs - previous <= DUPLICATE_WINDOW_MS;
@@ -68,7 +68,7 @@ public class AccessLogFilter extends OncePerRequestFilter {
     recentRequests.entrySet().removeIf(entry -> nowMs - entry.getValue() > RECENT_RETENTION_MS);
   }
 
-  private String safeHeader(String value, int maxLength) {
+  String safeHeader(String value, int maxLength) {
     if (value == null || value.isBlank()) return "-";
     String sanitized = sanitize(value).replaceAll("[^A-Za-z0-9._:-]", "_");
     if (sanitized.length() > maxLength) sanitized = sanitized.substring(0, maxLength);
