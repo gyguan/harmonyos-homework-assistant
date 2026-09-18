@@ -43,3 +43,4 @@ app:
     organizer-model: ${AI_ORGANIZER_MODEL:${OPENAI_ORGANIZER_MODEL:gpt-5.6-luna}}
     allow-unauthenticated: ${AI_ALLOW_UNAUTHENTICATED:false}
     structured-output: ${AI_STRUCTURED_OUTPUT:true}
+    log-payloads: ${AI_LOG_PAYLOADS:false}
