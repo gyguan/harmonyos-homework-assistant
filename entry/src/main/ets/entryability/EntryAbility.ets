@@ -4,7 +4,7 @@ import { HomeworkImportService } from '../application/import/HomeworkImportServi
 import { BackendSession } from '../application/remote/BackendSession';
 import { RemoteSubmissionApi } from '../application/remote/RemoteSubmissionApi';
 import { HomeworkSubmissionService } from '../application/submission/HomeworkSubmissionService';
-import { HomeworkStore } from '../data/HomeworkStore';
+import { HomeworkLocalBootstrap } from '../data/local/HomeworkLocalBootstrap';
 import { CoreVisionHomeworkTextExtractor } from '../infrastructure/ai/CoreVisionHomeworkTextExtractor';
 import { LocalHomeworkAssignmentParser } from '../infrastructure/ai/LocalHomeworkAssignmentParser';
 import { PreferencesBackendSessionStorage } from '../infrastructure/persistence/PreferencesBackendSessionStorage';
@@ -33,7 +33,7 @@ export default class EntryAbility extends UIAbility {
     }
 
     try {
-      await HomeworkStore.instance.initialize(new PreferencesHomeworkPersistence(this.context));
+      await HomeworkLocalBootstrap.instance.initialize(new PreferencesHomeworkPersistence(this.context));
     } catch {
       console.error('Homework store initialization failed; continuing with in-memory state');
     }
