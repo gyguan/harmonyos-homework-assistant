@@ -101,8 +101,17 @@ require("components/selection/SelectionControls" in progress and
         "components/selection/SelectionControls" in student_assignments,
         "Parent Progress and Student Assignments must reuse shared reactive selection controls")
 for token in ["FilterSummaryEntry({", "label: '类型'", "label: '截止'", "label: '科目'",
-              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusSelectionChip", "StatusFilterBar"]:
+              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusMetricCard", "StatusSummary"]:
     require(token in progress, f"Parent Progress must align common filter interaction with Student Assignments: {token}")
+require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progress,
+        "Parent Progress status cards must own status filtering without duplicate status chips")
+require("this.StatusMetricCard('全部'" in progress and
+        "this.StatusMetricCard('需关注'" in progress and
+        "this.StatusMetricCard('待验收'" in progress and
+        "this.StatusMetricCard('已完成'" in progress,
+        "Parent Progress must expose all four clickable status summary cards")
+require(".onClick(() => this.chooseStatus(filter))" in progress,
+        "Parent Progress summary cards must filter the assignment list directly")
 require("@Prop active: boolean = false;" in selection_controls and
         "@Prop selected: boolean = false;" in selection_controls,
         "shared selection controls must expose reactive active/selected props")
