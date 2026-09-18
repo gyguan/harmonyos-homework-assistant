@@ -17,35 +17,33 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 pane = read("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
-legacy = ROOT / "entry/src/main/ets/components/assignment/VoiceAssignmentFullscreenDialog.ets"
+study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 
-require("private previousImage()" in pane and "private nextImage()" in pane,
-        "normal voice workspace must retain previous/next image navigation")
-require("Button('←'" in pane and "Button('→'" in pane,
-        "voice workspace must use visually centered arrow buttons")
-require("Button('全屏查看'" in pane,
-        "voice workspace must expose a prominent fullscreen entry")
-require("@State private fullscreenOpen: boolean = false" in pane,
-        "fullscreen visibility must be state-driven")
-require("this.fullscreenOpen = true" in pane and "this.fullscreenOpen = false" in pane,
-        "fullscreen open/close must directly update local state")
-require(".bindContentCover($this.fullscreenOpen, this.FullscreenMediaView())" in pane,
-        "BindContentCover.isShow must use ArkUI V1 $ two-way binding")
-require("CustomDialogController" not in pane and "VoiceAssignmentFullscreenDialog" not in pane,
-        "voice fullscreen must not depend on the legacy CustomDialog path")
-require(".bindContentCover(this.fullscreenOpen" not in pane,
-        "BindContentCover must not regress to one-way isShow binding")
-require("Button('关闭'" in pane and ".onClick(() => this.closeFullscreen())" in pane,
-        "fullscreen close button must directly close the local state-driven modal")
-require("Button(this.playing ? 'Ⅱ' : '▶'" in pane and
-        ".onClick(() => { void this.toggleAudio(); })" in pane,
-        "fullscreen play/pause must call the same pane player directly")
-require("this.player.seek(value)" in pane,
-        "fullscreen progress slider must seek on the same player")
-require("ForEach(this.imageUris" in pane,
-        "fullscreen media view must keep thumbnail switching")
-require(not legacy.exists(),
-        "legacy VoiceAssignmentFullscreenDialog must be removed after state-modal migration")
+require("Button('全屏查看'" in pane and "this.onFullscreenRequest()" in pane,
+        "voice pane must request fullscreen from the workspace")
+require("onMediaStateChanged" in pane and "onFullscreenControlsReady" in pane,
+        "voice pane must expose media state and controls while retaining its player")
+require("AssignmentAudioPlayerService" in pane,
+        "voice pane must remain the single audio player owner")
+require("bindContentCover" not in pane and "bindContentCover" not in study,
+        "voice fullscreen must not use bindContentCover on the current compiler baseline")
+require("$this" not in pane and "$this" not in study,
+        "voice fullscreen must not contain invalid $this syntax")
+require("CustomDialogController" not in pane,
+        "voice pane fullscreen must not use CustomDialogController")
+require("@State private voiceFullscreenOpen: boolean = false" in study,
+        "study workspace must own fullscreen visibility")
+require("Stack({ alignContent: Alignment.TopStart })" in study and
+        "this.VoiceFullscreenOverlay()" in study,
+        "study workspace must render fullscreen as a root Stack overlay")
+require("this.voiceFullscreenOpen = false" in study and
+        ".onClick(() => this.closeVoiceFullscreen())" in study,
+        "fullscreen close must be a normal parent state update")
+require("this.voiceToggleAudio()" in study and "this.voiceSeek(value)" in study,
+        "fullscreen audio must control the still-mounted pane player")
+require("this.voicePreviousImage()" in study and "this.voiceNextImage()" in study and
+        "this.voiceSelectImage(index)" in study,
+        "fullscreen image controls must delegate to the still-mounted pane")
 
 if errors:
     print("VOICE_WORKSPACE_FULLSCREEN_GATE_FAIL")

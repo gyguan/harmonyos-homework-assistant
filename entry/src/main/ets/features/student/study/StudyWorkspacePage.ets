@@ -39,6 +39,14 @@ export struct StudyWorkspacePage {
   @State private tutorLoading: boolean = false;
   @State private tutorLoadingOlder: boolean = false;
   @State private tutorSending: boolean = false;
+  @State private voiceFullscreenOpen: boolean = false;
+  @State private voiceImageUris: string[] = [];
+  @State private voiceImageIndex: number = 0;
+  @State private voicePlaying: boolean = false;
+  @State private voiceCurrentTimeMs: number = 0;
+  @State private voiceDurationMs: number = 0;
+  @State private voicePlaybackEnabled: boolean = false;
+  @State private voicePrepared: boolean = false;
   onBack: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
@@ -52,8 +60,42 @@ export struct StudyWorkspacePage {
   private readonly viewModel: StudyWorkspaceViewModel =
     new StudyWorkspaceViewModel(DefaultAssignmentRepository.instance);
   private pauseEmbeddedMedia: () => void = () => {};
+  private voiceToggleAudio: () => void = () => {};
+  private voiceSeek: (value: number) => void = (_value: number) => {};
+  private voicePreviousImage: () => void = () => {};
+  private voiceNextImage: () => void = () => {};
+  private voiceSelectImage: (index: number) => void = (_index: number) => {};
 
   aboutToAppear(): void { void this.loadTutor(); }
+
+  private applyVoiceMediaState(
+    imageUris: string[],
+    imageIndex: number,
+    playing: boolean,
+    currentTimeMs: number,
+    durationMs: number,
+    playbackEnabled: boolean,
+    prepared: boolean
+  ): void {
+    this.voiceImageUris = imageUris.slice();
+    this.voiceImageIndex = imageIndex;
+    this.voicePlaying = playing;
+    this.voiceCurrentTimeMs = currentTimeMs;
+    this.voiceDurationMs = durationMs;
+    this.voicePlaybackEnabled = playbackEnabled;
+    this.voicePrepared = prepared;
+  }
+
+  private closeVoiceFullscreen(): void {
+    this.voiceFullscreenOpen = false;
+  }
+
+  private formatVoiceTime(ms: number): string {
+    let totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
 
   private canUseTutorSplit(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.studyTutorRequirement());
@@ -434,7 +476,32 @@ export struct StudyWorkspacePage {
             VoiceAssignmentPane({
               assignmentId: this.assignment()!.id,
               playbackEnabled: this.assignment()!.status === AssignmentStatus.IN_PROGRESS,
-              onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause
+              onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause,
+              onFullscreenRequest: () => this.voiceFullscreenOpen = true,
+              onFullscreenDismissed: () => this.voiceFullscreenOpen = false,
+              onMediaStateChanged: (
+                imageUris: string[],
+                imageIndex: number,
+                playing: boolean,
+                currentTimeMs: number,
+                durationMs: number,
+                playbackEnabled: boolean,
+                prepared: boolean
+              ) => this.applyVoiceMediaState(
+                imageUris, imageIndex, playing, currentTimeMs, durationMs, playbackEnabled, prepared),
+              onFullscreenControlsReady: (
+                toggleAudio: () => void,
+                seek: (value: number) => void,
+                previousImage: () => void,
+                nextImage: () => void,
+                selectImage: (index: number) => void
+              ) => {
+                this.voiceToggleAudio = toggleAudio;
+                this.voiceSeek = seek;
+                this.voicePreviousImage = previousImage;
+                this.voiceNextImage = nextImage;
+                this.voiceSelectImage = selectImage;
+              }
             });
           }
 
@@ -770,6 +837,153 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
+  private VoiceFullscreenImage() {
+    Stack({ alignContent: Alignment.Center }) {
+      Image(this.voiceImageUris[this.voiceImageIndex])
+        .width('100%')
+        .height('100%')
+        .objectFit(ImageFit.Contain)
+        .backgroundColor('#111111');
+
+      if (this.voiceImageUris.length > 1) {
+        Row() {
+          Button('←', { type: ButtonType.Circle })
+            .width(48)
+            .height(48)
+            .fontSize(22)
+            .fontWeight(FontWeight.Medium)
+            .backgroundColor('#E6FFFFFF')
+            .fontColor(AppTheme.TEXT)
+            .accessibilityText('上一张情景图片')
+            .onClick(() => this.voicePreviousImage());
+          Blank();
+          Button('→', { type: ButtonType.Circle })
+            .width(48)
+            .height(48)
+            .fontSize(22)
+            .fontWeight(FontWeight.Medium)
+            .backgroundColor('#E6FFFFFF')
+            .fontColor(AppTheme.TEXT)
+            .accessibilityText('下一张情景图片')
+            .onClick(() => this.voiceNextImage());
+        }
+        .width('100%')
+        .alignItems(VerticalAlign.Center)
+        .padding({ left: 12, right: 12 });
+      }
+    }
+    .width('100%')
+    .layoutWeight(1);
+  }
+
+  @Builder
+  private VoiceFullscreenThumbnails() {
+    if (this.voiceImageUris.length > 1) {
+      Scroll() {
+        Row({ space: 8 }) {
+          ForEach(this.voiceImageUris, (uri: string, index: number) => {
+            Image(uri)
+              .width(68)
+              .height(56)
+              .objectFit(ImageFit.Cover)
+              .border({
+                width: index === this.voiceImageIndex ? 2 : 1,
+                color: index === this.voiceImageIndex ? AppTheme.PRIMARY : '#666666'
+              })
+              .borderRadius(10)
+              .backgroundColor('#242424')
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText(`查看第 ${index + 1} 张情景图片`)
+              .onClick(() => this.voiceSelectImage(index));
+          }, (uri: string, index: number) => `${index}-${uri}`);
+        }
+      }
+      .width('100%')
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off);
+    }
+  }
+
+  @Builder
+  private VoiceFullscreenAudio() {
+    Row({ space: 12 }) {
+      Button(this.voicePlaying ? 'Ⅱ' : '▶', { type: ButtonType.Circle })
+        .width(52)
+        .height(52)
+        .fontSize(this.voicePlaying ? 19 : 17)
+        .enabled(this.voicePlaybackEnabled && this.voicePrepared)
+        .backgroundColor(this.voicePlaybackEnabled && this.voicePrepared ? AppTheme.PRIMARY : AppTheme.DISABLED)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .accessibilityText(this.voicePlaying ? '暂停语音' : '播放语音')
+        .onClick(() => this.voiceToggleAudio());
+
+      Column({ space: 2 }) {
+        Slider({
+          value: this.voiceCurrentTimeMs,
+          min: 0,
+          max: this.voiceDurationMs > 0 ? this.voiceDurationMs : 1,
+          step: 1000,
+          style: SliderStyle.InSet
+        })
+          .width('100%')
+          .selectedColor(AppTheme.PRIMARY)
+          .trackColor('#4A4A4A')
+          .enabled(this.voicePlaybackEnabled && this.voicePrepared)
+          .onChange((value: number, mode: SliderChangeMode) => {
+            this.voiceCurrentTimeMs = value;
+            if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
+              this.voiceSeek(value);
+            }
+          });
+
+        Row() {
+          Text(this.formatVoiceTime(this.voiceCurrentTimeMs)).fontSize(11).fontColor('#D8D8D8');
+          Blank();
+          Text(this.formatVoiceTime(this.voiceDurationMs)).fontSize(11).fontColor('#D8D8D8');
+        }
+        .width('100%');
+      }
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start);
+    }
+    .width('100%')
+    .padding({ top: 8, bottom: 4 });
+  }
+
+  @Builder
+  private VoiceFullscreenOverlay() {
+    Column({ space: 10 }) {
+      Row({ space: 12 }) {
+        Text(`${this.voiceImageIndex + 1} / ${this.voiceImageUris.length}`)
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor('#FFFFFF');
+        Blank();
+        Button('关闭', { type: ButtonType.Normal })
+          .width(72)
+          .height(40)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .fontColor('#FFFFFF')
+          .backgroundColor('#3A3A3A')
+          .borderRadius(20)
+          .accessibilityText('退出全屏')
+          .onClick(() => this.closeVoiceFullscreen());
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
+
+      this.VoiceFullscreenImage();
+      this.VoiceFullscreenThumbnails();
+      this.VoiceFullscreenAudio();
+    }
+    .width('100%')
+    .height('100%')
+    .padding({ left: 14, right: 14, top: 14, bottom: 14 })
+    .backgroundColor('#111111');
+  }
+
+  @Builder
   private PageHeader() {
     DeepPageHeader({
       title: this.showTutorAsStandalone() ? '问小伴' : '学习空间',
@@ -882,17 +1096,26 @@ export struct StudyWorkspacePage {
   }
 
   build() {
-    Row() {
-      if (this.canUseTutorSplit()) {
-        this.PadWorkspacePage();
-      } else {
-        this.PhoneWorkspacePage();
+    Stack({ alignContent: Alignment.TopStart }) {
+      Row() {
+        if (this.canUseTutorSplit()) {
+          this.PadWorkspacePage();
+        } else {
+          this.PhoneWorkspacePage();
+        }
+      }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .alignItems(VerticalAlign.Top)
+      .backgroundColor(AppTheme.BACKGROUND);
+
+      if (this.voiceFullscreenOpen && this.voiceImageUris.length > 0) {
+        this.VoiceFullscreenOverlay();
       }
     }
     .width('100%')
     .height('100%')
-    .justifyContent(FlexAlign.Center)
-    .alignItems(VerticalAlign.Top)
     .backgroundColor(AppTheme.BACKGROUND)
     .onAreaChange((_oldValue, newValue) => {
       this.availableWidthVp = ResponsiveContext.areaLengthToVp(newValue.width, this.availableWidthVp);
