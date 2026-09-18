@@ -8,6 +8,7 @@ import {
   AssignmentAudioPlayerCallbacks,
   AssignmentAudioPlayerService
 } from '../../application/assignment/AssignmentAudioPlayerService';
+import { VoiceAssignmentFullscreenDialog } from './VoiceAssignmentFullscreenDialog';
 
 @Component
 export struct VoiceAssignmentPane {
@@ -22,9 +23,28 @@ export struct VoiceAssignmentPane {
   @State private playing: boolean = false;
   @State private currentTimeMs: number = 0;
   @State private durationMs: number = 0;
+  @State private fullscreenPlaybackEnabled: boolean = false;
+  @State private fullscreenPrepared: boolean = false;
 
   onPauseReady: (pause: () => void) => void = (_pause: () => void) => {};
   private readonly player: AssignmentAudioPlayerService = new AssignmentAudioPlayerService();
+
+  private fullscreenController: CustomDialogController = new CustomDialogController({
+    builder: VoiceAssignmentFullscreenDialog({
+      imageUris: $imageUris,
+      imageIndex: $imageIndex,
+      playing: $playing,
+      currentTimeMs: $currentTimeMs,
+      durationMs: $durationMs,
+      playbackEnabled: $fullscreenPlaybackEnabled,
+      prepared: $fullscreenPrepared,
+      onToggleAudio: () => { void this.toggleAudio(); },
+      onSeek: (value: number) => this.player.seek(value)
+    }),
+    autoCancel: false,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
 
   aboutToAppear(): void {
     this.onPauseReady(() => { void this.pauseAudio(); });
@@ -75,6 +95,7 @@ export struct VoiceAssignmentPane {
       let callbacks: AssignmentAudioPlayerCallbacks = {
         onPrepared: (durationMs: number) => {
           this.prepared = true;
+          this.fullscreenPrepared = true;
           this.durationMs = durationMs;
           this.currentTimeMs = 0;
         },
@@ -109,9 +130,26 @@ export struct VoiceAssignmentPane {
     await this.player.pause();
   }
 
+  private previousImage(): void {
+    if (this.imageUris.length <= 1) return;
+    this.imageIndex = this.imageIndex <= 0 ? this.imageUris.length - 1 : this.imageIndex - 1;
+  }
+
+  private nextImage(): void {
+    if (this.imageUris.length <= 1) return;
+    this.imageIndex = this.imageIndex >= this.imageUris.length - 1 ? 0 : this.imageIndex + 1;
+  }
+
   private selectImage(index: number): void {
     if (index < 0 || index >= this.imageUris.length || index === this.imageIndex) return;
     this.imageIndex = index;
+  }
+
+  private openFullscreen(): void {
+    if (this.imageUris.length === 0 || this.audioUri.length === 0) return;
+    this.fullscreenPlaybackEnabled = this.playbackEnabled;
+    this.fullscreenPrepared = this.prepared;
+    this.fullscreenController.open();
   }
 
   private formatTime(ms: number): string {
@@ -124,7 +162,7 @@ export struct VoiceAssignmentPane {
   @Builder
   private ImageViewer() {
     Column({ space: 8 }) {
-      Stack({ alignContent: Alignment.TopEnd }) {
+      Stack({ alignContent: Alignment.Center }) {
         Image(this.imageUris[this.imageIndex])
           .width('100%')
           .height(286)
@@ -132,14 +170,57 @@ export struct VoiceAssignmentPane {
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .backgroundColor(AppTheme.SURFACE_EMPHASIS);
 
-        Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
-          .margin({ top: 10, right: 10 })
-          .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-          .fontSize(11)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .backgroundColor('#66000000')
-          .borderRadius(12);
+        if (this.imageUris.length > 1) {
+          Row() {
+            Button('‹', { type: ButtonType.Circle })
+              .width(42)
+              .height(42)
+              .fontSize(28)
+              .backgroundColor('#CCFFFFFF')
+              .fontColor(AppTheme.TEXT)
+              .accessibilityText('上一张情景图片')
+              .onClick(() => this.previousImage());
+            Blank();
+            Button('›', { type: ButtonType.Circle })
+              .width(42)
+              .height(42)
+              .fontSize(28)
+              .backgroundColor('#CCFFFFFF')
+              .fontColor(AppTheme.TEXT)
+              .accessibilityText('下一张情景图片')
+              .onClick(() => this.nextImage());
+          }
+          .width('100%')
+          .padding({ left: 10, right: 10 });
+        }
+
+        Column() {
+          Row({ space: 6 }) {
+            Blank();
+            Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
+              .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+              .fontSize(11)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .backgroundColor('#66000000')
+              .borderRadius(12);
+            Text('全屏')
+              .padding({ left: 9, right: 9, top: 4, bottom: 4 })
+              .fontSize(11)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .backgroundColor('#66000000')
+              .borderRadius(12)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('全屏查看图片和语音')
+              .onClick(() => this.openFullscreen());
+          }
+          .width('100%')
+          .padding({ top: 10, right: 10 });
+          Blank();
+        }
+        .width('100%')
+        .height(286);
       }
       .width('100%');
 
