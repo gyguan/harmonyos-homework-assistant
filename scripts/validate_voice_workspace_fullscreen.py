@@ -29,10 +29,12 @@ require("@State private fullscreenOpen: boolean = false" in pane,
         "fullscreen visibility must be state-driven")
 require("this.fullscreenOpen = true" in pane and "this.fullscreenOpen = false" in pane,
         "fullscreen open/close must directly update local state")
-require(".bindContentCover(this.fullscreenOpen, this.FullscreenMediaView())" in pane,
-        "fullscreen must use a state-driven full modal instead of CustomDialogController")
-require("CustomDialogController" not in pane and "VoiceAssignmentFullscreenDialog" not in pane and "$this" not in pane,
-        "voice fullscreen must use standard state binding without the legacy CustomDialog or invalid $this syntax")
+require(".bindContentCover($this.fullscreenOpen, this.FullscreenMediaView())" in pane,
+        "BindContentCover.isShow must use ArkUI V1 $ two-way binding")
+require("CustomDialogController" not in pane and "VoiceAssignmentFullscreenDialog" not in pane,
+        "voice fullscreen must not depend on the legacy CustomDialog path")
+require(".bindContentCover(this.fullscreenOpen" not in pane,
+        "BindContentCover must not regress to one-way isShow binding")
 require("Button('关闭'" in pane and ".onClick(() => this.closeFullscreen())" in pane,
         "fullscreen close button must directly close the local state-driven modal")
 require("Button(this.playing ? 'Ⅱ' : '▶'" in pane and

@@ -477,6 +477,6 @@ export struct VoiceAssignmentPane {
       }
     }
     .width('100%')
-    .bindContentCover(this.fullscreenOpen, this.FullscreenMediaView());
+    .bindContentCover($this.fullscreenOpen, this.FullscreenMediaView());
   }
 }
