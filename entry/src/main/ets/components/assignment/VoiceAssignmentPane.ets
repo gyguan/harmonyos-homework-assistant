@@ -194,28 +194,33 @@ export struct VoiceAssignmentPane {
           .padding({ left: 10, right: 10 });
         }
 
-        Row({ space: 6 }) {
-          Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
-            .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-            .fontSize(11)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .backgroundColor('#66000000')
-            .borderRadius(12);
-          Text('全屏')
-            .padding({ left: 9, right: 9, top: 4, bottom: 4 })
-            .fontSize(11)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .backgroundColor('#66000000')
-            .borderRadius(12)
-            .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText('全屏查看图片和语音')
-            .onClick(() => this.openFullscreen());
+        Column() {
+          Row({ space: 6 }) {
+            Blank();
+            Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
+              .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+              .fontSize(11)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .backgroundColor('#66000000')
+              .borderRadius(12);
+            Text('全屏')
+              .padding({ left: 9, right: 9, top: 4, bottom: 4 })
+              .fontSize(11)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .backgroundColor('#66000000')
+              .borderRadius(12)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('全屏查看图片和语音')
+              .onClick(() => this.openFullscreen());
+          }
+          .width('100%')
+          .padding({ top: 10, right: 10 });
+          Blank();
         }
-        .position({ x: '100%', y: 10 })
-        .translate({ x: '-100%' })
-        .padding({ right: 10 });
+        .width('100%')
+        .height(286);
       }
       .width('100%');
 
