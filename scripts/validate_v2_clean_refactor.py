@@ -9,11 +9,8 @@ errors: list[str] = []
 # Temporary migration allowlist. Entries must be removed when the corresponding V2 slice
 # switches its default route. New feature files are never added here casually.
 LEGACY_FEATURE_STORE_ALLOWLIST = {
-    "entry/src/main/ets/features/student/today/StudentTodayPage.ets",
-    "entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets",
+    # Final-cleanup debt only. Remove each entry as its context/settings boundary migrates.
     "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
-    "entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets",
     "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
 }
 
