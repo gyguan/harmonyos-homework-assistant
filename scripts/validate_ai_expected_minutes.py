@@ -22,6 +22,8 @@ dtos = read("backend/src/main/java/com/xiaoban/homework/organizer/HomeworkOrgani
 client = read("backend/src/main/java/com/xiaoban/homework/organizer/ConfigurableHomeworkOrganizerModelClient.java")
 remote = read("entry/src/main/ets/application/remote/HomeworkOrganizerRemoteApi.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
+confirmation_components = read(
+    "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 
 require("int expectedMinutes" in dtos,
@@ -40,9 +42,11 @@ require("expectedMinutes: this.expectedMinutes(remote.expectedMinutes)" in remot
         "HarmonyOS candidate must use AI suggested duration rather than hard-coded 20")
 require("return Math.max(5, Math.min(120" in remote,
         "HarmonyOS must defensively bound provider duration")
-require("updateExpectedMinutes" in confirmation and
-        ("预计完成时间" in confirmation or "预计用时" in confirmation),
-        "parent confirmation must keep manual duration override")
+require("onMinutesChange" in confirmation_components and "预计用时" in confirmation_components and
+        "TextInput({ text: `${this.item.expectedMinutes}` })" in confirmation_components,
+        "parent confirmation must keep manual duration override in the reactive editor")
+require("onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
+        "confirmation page must persist duration changes from the reactive editor")
 require("expectedMinutes: candidate.expectedMinutes" in store,
         "published assignment must keep the parent-confirmed duration")
 
