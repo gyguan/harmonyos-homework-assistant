@@ -352,7 +352,7 @@ export struct StudyWorkspacePage {
 
   @Builder
   private ResourcePane() {
-    if (this.assignment() !== null) {
+    if (this.assignment() !== null && this.assignment()!.contentType !== AssignmentContentType.AUDIO_IMAGE) {
       Column({ space: 0 }) {
         Row() {
           Column({ space: 3 }) {
