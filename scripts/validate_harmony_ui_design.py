@@ -176,13 +176,12 @@ for state_expr, label in [
 parent_progress = read_optional("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 require("private FilterChip(" not in parent_progress and "private FilterEntry(" not in parent_progress,
         "Parent Progress must not keep runtime selection in ordinary @Builder boolean parameters")
-require("StatusSelectionChip" in parent_progress and "FilterSummaryEntry" in parent_progress,
-        "Parent Progress must use shared reactive selection controls")
+require("FilterSummaryEntry" in parent_progress,
+        "Parent Progress must reuse shared reactive filter summary controls")
+require("StatusSelectionChip" not in parent_progress and "StatusMetricCard" in parent_progress and
+        "this.statusFilter === filter" in parent_progress and ".onClick(() => this.chooseStatus(filter))" in parent_progress,
+        "Parent Progress status selection must live in clickable metric cards without duplicate chips")
 for expression in [
-    "selected: this.statusFilter === ParentProgressStatusFilter.ALL",
-    "selected: this.statusFilter === ParentProgressStatusFilter.ATTENTION",
-    "selected: this.statusFilter === ParentProgressStatusFilter.SUBMITTED",
-    "selected: this.statusFilter === ParentProgressStatusFilter.COMPLETED",
     "active: this.typeFilter !== AssignmentTypeFilter.ALL",
     "active: this.dateFilter !== AssignmentDateFilter.ALL",
     "active: this.subjectCode !== 'ALL'",
