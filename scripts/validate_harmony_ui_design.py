@@ -237,7 +237,7 @@ require("DeadlinePickerField" in confirmation_components and
 require("selected: this.showEditorSheet && this.editingCandidateId === item.id" in confirmation,
         "Confirmation selected Candidate must reflect both the active editor id and bottom-sheet visibility")
 require(".bindSheet($$this.showEditorSheet" in confirmation and
-        "$this.showEditorSheet" not in confirmation and
+        ".bindSheet($this.showEditorSheet" not in confirmation and
         "private CandidateEditorSheet()" in confirmation,
         "Confirmation editing must use a reactive bottom sheet")
 require(confirmation_components.count("@Prop item: CandidateAssignment;") >= 2 and
