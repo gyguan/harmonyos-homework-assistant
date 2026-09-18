@@ -109,14 +109,9 @@ export struct VoiceAssignmentPane {
     await this.player.pause();
   }
 
-  private previousImage(): void {
-    if (this.imageUris.length <= 1) return;
-    this.imageIndex = this.imageIndex <= 0 ? this.imageUris.length - 1 : this.imageIndex - 1;
-  }
-
-  private nextImage(): void {
-    if (this.imageUris.length <= 1) return;
-    this.imageIndex = this.imageIndex >= this.imageUris.length - 1 ? 0 : this.imageIndex + 1;
+  private selectImage(index: number): void {
+    if (index < 0 || index >= this.imageUris.length || index === this.imageIndex) return;
+    this.imageIndex = index;
   }
 
   private formatTime(ms: number): string {
@@ -128,54 +123,61 @@ export struct VoiceAssignmentPane {
 
   @Builder
   private ImageViewer() {
-    Column({ space: 9 }) {
-      Row() {
-        Text('情景图片').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Blank();
-        Text(`${this.imageIndex + 1} / ${this.imageUris.length}`).fontSize(11).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%');
-
-      Stack({ alignContent: Alignment.Center }) {
+    Column({ space: 8 }) {
+      Stack({ alignContent: Alignment.TopEnd }) {
         Image(this.imageUris[this.imageIndex])
           .width('100%')
-          .height(248)
+          .height(286)
           .objectFit(ImageFit.Contain)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .backgroundColor(AppTheme.SURFACE_EMPHASIS);
 
-        if (this.imageUris.length > 1) {
-          Row() {
-            Button('‹', { type: ButtonType.Circle })
-              .width(44).height(44).fontSize(27)
-              .backgroundColor('#CCFFFFFF').fontColor(AppTheme.TEXT)
-              .accessibilityText('上一张情景图片')
-              .onClick(() => this.previousImage());
-            Blank();
-            Button('›', { type: ButtonType.Circle })
-              .width(44).height(44).fontSize(27)
-              .backgroundColor('#CCFFFFFF').fontColor(AppTheme.TEXT)
-              .accessibilityText('下一张情景图片')
-              .onClick(() => this.nextImage());
-          }
-          .width('100%')
-          .padding({ left: 10, right: 10 });
-        }
+        Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
+          .margin({ top: 10, right: 10 })
+          .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+          .fontSize(11)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .backgroundColor('#66000000')
+          .borderRadius(12);
       }
       .width('100%');
+
+      if (this.imageUris.length > 1) {
+        Scroll() {
+          Row({ space: 8 }) {
+            ForEach(this.imageUris, (uri: string, index: number) => {
+              Image(uri)
+                .width(64)
+                .height(54)
+                .objectFit(ImageFit.Cover)
+                .border({
+                  width: index === this.imageIndex ? 2 : 1,
+                  color: index === this.imageIndex ? AppTheme.PRIMARY : AppTheme.BORDER
+                })
+                .borderRadius(10)
+                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText(`查看第 ${index + 1} 张情景图片`)
+                .onClick(() => this.selectImage(index));
+            }, (uri: string, index: number) => `${index}-${uri}`);
+          }
+        }
+        .width('100%')
+        .scrollable(ScrollDirection.Horizontal)
+        .scrollBar(BarState.Off);
+      }
     }
     .width('100%');
   }
 
   @Builder
   private AudioControls() {
-    Column({ space: 9 }) {
-      Text('情景对话语音')
-        .width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-
+    Column({ space: 5 }) {
       Row({ space: 10 }) {
         Button(this.playing ? 'Ⅱ' : '▶', { type: ButtonType.Circle })
-          .width(48).height(48)
+          .width(48)
+          .height(48)
           .fontSize(this.playing ? 18 : 16)
           .enabled(this.playbackEnabled && this.prepared)
           .backgroundColor(this.playbackEnabled && this.prepared ? AppTheme.PRIMARY : AppTheme.DISABLED)
@@ -183,7 +185,7 @@ export struct VoiceAssignmentPane {
           .accessibilityText(this.playing ? '暂停语音' : '播放语音')
           .onClick(() => { void this.toggleAudio(); });
 
-        Column({ space: 3 }) {
+        Column({ space: 2 }) {
           Slider({
             value: this.currentTimeMs,
             min: 0,
@@ -215,18 +217,20 @@ export struct VoiceAssignmentPane {
       .width('100%');
 
       if (!this.playbackEnabled) {
-        Text('先点击底部“开始作业 / 继续作业”，再播放语音。')
-          .width('100%').fontSize(11).fontColor(AppTheme.SUBTEXT);
+        Text('开始或继续作业后可播放语音')
+          .width('100%')
+          .fontSize(11)
+          .fontColor(AppTheme.SUBTEXT);
       }
     }
     .width('100%')
-    .padding(12)
+    .padding(10)
     .backgroundColor(AppTheme.PRIMARY_FAINT)
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   build() {
-    Column({ space: 12 }) {
+    Column({ space: 10 }) {
       if (this.loading) {
         Row({ space: 8 }) {
           LoadingProgress().width(20).height(20).color(AppTheme.PRIMARY);
@@ -250,12 +254,12 @@ export struct VoiceAssignmentPane {
         .backgroundColor(AppTheme.WARNING_SOFT)
         .borderRadius(AppTheme.CONTROL_RADIUS);
       } else if (this.imageUris.length > 0 && this.audioUri.length > 0) {
-        Column({ space: 14 }) {
+        Column({ space: 10 }) {
           this.ImageViewer();
           this.AudioControls();
         }
         .width('100%')
-        .padding(AppTheme.PHONE_CARD_PADDING)
+        .padding(10)
         .backgroundColor(AppTheme.SURFACE)
         .borderRadius(AppTheme.PHONE_CARD_RADIUS);
       }

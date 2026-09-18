@@ -1,6 +1,6 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import { Assignment, AssignmentType } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentContentType, AssignmentType } from '../../../domain/model/HomeworkModels';
 import { StudyWorkspacePage } from './StudyWorkspacePage';
 import { StudyWorkspaceViewModel } from './StudyWorkspaceViewModel';
 
@@ -21,14 +21,16 @@ export struct StudyWorkspaceRoutePage {
     return this.viewModel.assignment(this.assignmentId);
   }
 
-  private isExtraAssignment(): boolean {
+  private shouldShowExtraAssignmentContext(): boolean {
     let assignment = this.assignment();
-    return assignment !== null && assignment.assignmentType === AssignmentType.EXTRA;
+    return assignment !== null &&
+      assignment.assignmentType === AssignmentType.EXTRA &&
+      assignment.contentType !== AssignmentContentType.AUDIO_IMAGE;
   }
 
   @Builder
   private ExtraAssignmentContext() {
-    if (this.isExtraAssignment() && this.assignment() !== null) {
+    if (this.shouldShowExtraAssignmentContext() && this.assignment() !== null) {
       Row({ space: 10 }) {
         SymbolGlyph($r('sys.symbol.star_fill'))
           .fontSize(18)
