@@ -104,12 +104,22 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
           + " size=" + file.getSize() + ">";
     }
     if (value instanceof byte[] bytes) return "<binary bytes=" + bytes.length + ">";
-    if (value instanceof String text) return truncate(compact(text));
+    if (value instanceof String text) return sanitizeAndTruncate(text);
     try {
-      return truncate(compact(jsonMapper.writeValueAsString(value)));
+      return sanitizeAndTruncate(jsonMapper.writeValueAsString(value));
     } catch (Exception error) {
       return "<payload-serialization-failed:" + error.getClass().getSimpleName() + ">";
     }
+  }
+
+  private String sanitizeAndTruncate(String value) {
+    String compact = compact(value);
+    compact = compact.replaceAll(
+        "(?i)(\\\"(?:password|token|api[-_]?key|authorization)\\\"\\s*:\\s*\\\")[^\\\"]*(\\\")",
+        "$1***$2");
+    compact = compact.replaceAll("(?i)Bearer\\s+[A-Za-z0-9._~+\\-/=]+", "Bearer ***");
+    compact = compact.replaceAll("(?i)sk-[A-Za-z0-9_-]{6,}", "sk-***");
+    return truncate(compact);
   }
 
   private String compact(String value) {
