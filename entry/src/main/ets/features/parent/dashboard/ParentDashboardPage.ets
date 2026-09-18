@@ -10,7 +10,6 @@ import { ParentHomeViewModel } from './ParentHomeViewModel';
 export struct ParentDashboardPage {
   @Prop revision: number = 0;
   @Prop activeStudentId: string = '';
-  @State private refreshRevision: number = 0;
   @State private availableWidthVp: number = 390;
   onOpenImport: () => void = () => {};
   onOpenExtra: () => void = () => {};
@@ -20,17 +19,8 @@ export struct ParentDashboardPage {
   private readonly viewModel: ParentHomeViewModel =
     new ParentHomeViewModel(DefaultAssignmentRepository.instance);
 
-  aboutToAppear(): void {
-    void this.refresh();
-  }
-
-  private async refresh(): Promise<void> {
-    await this.viewModel.refresh();
-    this.refreshRevision++;
-  }
-
   private touchRevision(): number {
-    return this.revision + this.refreshRevision;
+    return this.revision;
   }
 
   private student(): StudentProfile {
