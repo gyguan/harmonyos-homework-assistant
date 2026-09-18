@@ -73,14 +73,6 @@ export struct HomeworkConfirmationPage {
     this.saveCandidate(this.copy(item, item.subject, item.title, item.instruction, item.dueText, textbookRef));
   }
 
-  private updateExpectedMinutes(item: CandidateAssignment, value: string): void {
-    let minutes = Math.round(Number(value));
-    if (!Number.isFinite(minutes)) return;
-    if (minutes < 1) minutes = 1;
-    if (minutes > 240) minutes = 240;
-    this.setExpectedMinutes(item, minutes);
-  }
-
   private setExpectedMinutes(item: CandidateAssignment, minutes: number): void {
     this.saveCandidate(this.copy(item, item.subject, item.title, item.instruction,
       item.dueText, item.textbookRef, minutes));
