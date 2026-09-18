@@ -17,6 +17,20 @@ export class DefaultFamilyContextRepository implements FamilyContextRepository {
     return result;
   }
 
+  getActiveStudentId(): string {
+    return HomeworkStore.instance.getActiveStudentId();
+  }
+
+  setActiveStudent(studentId: string): boolean {
+    return HomeworkStore.instance.setActiveStudent(studentId);
+  }
+
+  replaceStudents(students: StudentProfile[]): void {
+    let copies: StudentProfile[] = [];
+    for (let student of students) copies.push(this.cloneStudent(student));
+    HomeworkStore.instance.replaceStudents(copies);
+  }
+
   getSettings(): AppSettings {
     let settings = HomeworkStore.instance.getSettings();
     return {
