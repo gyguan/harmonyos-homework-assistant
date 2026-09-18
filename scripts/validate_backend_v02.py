@@ -32,6 +32,8 @@ organizer_controller = read("backend/src/main/java/com/xiaoban/homework/organize
 organizer_service = read("backend/src/main/java/com/xiaoban/homework/organizer/HomeworkOrganizerService.java")
 organizer_model = read("backend/src/main/java/com/xiaoban/homework/organizer/ConfigurableHomeworkOrganizerModelClient.java")
 access_log = read("backend/src/main/java/com/xiaoban/homework/common/AccessLogFilter.java")
+payload_log = read("backend/src/main/java/com/xiaoban/homework/common/ApiPayloadLogAdvice.java")
+http_log_properties = read("backend/src/main/java/com/xiaoban/homework/common/HttpLogProperties.java")
 app_yml = read("backend/src/main/resources/application.yml")
 local_example = read("backend/config/application-local.example.yml")
 gitignore = read(".gitignore")
@@ -142,15 +144,27 @@ require("OncePerRequestFilter" in access_log and "request.getMethod()" in access
         "request.getRequestURI()" in access_log and "response.getStatus()" in access_log and
         "request.getRemoteAddr()" in access_log and "System.nanoTime()" in access_log,
         "backend must emit lightweight method/path/status/duration/client access logs")
-for forbidden_log_data in ["Authorization", "getQueryString()", "getInputStream()", "getReader()"]:
+for forbidden_log_data in ["Authorization", "getInputStream()", "getReader()"]:
     require(forbidden_log_data not in access_log,
-            f"access log must not capture sensitive/request-body data: {forbidden_log_data}")
+            f"access log must not directly capture sensitive/request-body data: {forbidden_log_data}")
 for safe_header in ["X-Request-Id", "X-Client-Scene", "X-Client-Request-Key"]:
     require(safe_header in access_log, f"access log missing safe observability header: {safe_header}")
 require("request.getHeader(REQUEST_ID_HEADER)" in access_log and
         "request.getHeader(CLIENT_SCENE_HEADER)" in access_log and
         "request.getHeader(CLIENT_REQUEST_KEY_HEADER)" in access_log,
         "access log may read only the declared correlation/scene/request-key headers")
+require("[HTTP-REQUEST]" in access_log and "request.getQueryString()" in access_log,
+        "HTTP request logs must include request metadata and query parameters")
+require("[HTTP-REQUEST-BODY]" in payload_log and "[HTTP-RESPONSE]" in payload_log and
+        "jsonMapper.writeValueAsString" in payload_log,
+        "API payload advice must log JSON request and response bodies")
+require("password|token|api[-_]?key|authorization" in payload_log and
+        "Bearer ***" in payload_log and "sk-***" in payload_log,
+        "API payload logs must redact credential-like fields")
+require('@ConfigurationProperties(prefix = "app.http")' in http_log_properties and
+        "private boolean logPayloads = true;" in http_log_properties and
+        "HTTP_LOG_PAYLOADS:true" in app_yml and "HTTP_MAX_PAYLOAD_CHARS:20000" in app_yml,
+        "HTTP request/response payload logging must be enabled and bounded by configuration")
 require("PreferencesBackendSessionStorage" in session_storage and "initialize(storage" in backend_session,
         "HarmonyOS must restore its backend session from app-private storage")
 require("AppConfig.BACKEND_BASE_URL" in backend_session and "http://10.37.255.92:8080" in app_config,

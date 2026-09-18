@@ -223,6 +223,10 @@ jobs:
         run: |
           python backend/scripts/api_observability_e2e.py
           grep -q "\[HTTP-DUPLICATE\].*scene=e2e.duplicate" backend-e2e-first.log
+          grep -q "\[HTTP-REQUEST-BODY\].*body={" backend-e2e-first.log
+          grep -q "\[HTTP-RESPONSE\].*body={" backend-e2e-first.log
+          grep -q '"password":"\*\*\*"' backend-e2e-first.log
+          if grep -q '"password":"parent123"' backend-e2e-first.log; then exit 1; fi
 
       - name: Restart backend while keeping PostgreSQL
         run: |

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 class AccessLogFilterTest {
   @Test
   void detectsOnlySameRequestKeyInsideDuplicateWindow() {
-    AccessLogFilter filter = new AccessLogFilter();
+    AccessLogFilter filter = new AccessLogFilter(new HttpLogProperties());
 
     assertFalse(filter.isDuplicate("10.0.0.1", "GET%7C%2Fapi%2Fv1%2Fstudents", 1000));
     assertTrue(filter.isDuplicate("10.0.0.1", "GET%7C%2Fapi%2Fv1%2Fstudents", 2000));
@@ -20,7 +20,7 @@ class AccessLogFilterTest {
 
   @Test
   void sanitizesCorrelationHeadersBeforeLogging() {
-    AccessLogFilter filter = new AccessLogFilter();
+    AccessLogFilter filter = new AccessLogFilter(new HttpLogProperties());
 
     assertEquals("assignment.sync", filter.safeHeader("assignment.sync", 80));
     assertEquals("bad__scene", filter.safeHeader("bad\r\nscene", 80));

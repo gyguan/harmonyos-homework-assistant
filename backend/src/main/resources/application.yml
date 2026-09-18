@@ -33,6 +33,9 @@ app:
     token-ttl-hours: ${AUTH_TOKEN_TTL_HOURS:168}
   storage:
     root: ${APP_STORAGE_ROOT:./data/uploads}
+  http:
+    log-payloads: ${HTTP_LOG_PAYLOADS:true}
+    max-payload-chars: ${HTTP_MAX_PAYLOAD_CHARS:20000}
   ai:
     protocol: ${AI_PROTOCOL:responses}
     api-key: ${AI_API_KEY:${OPENAI_API_KEY:}}
