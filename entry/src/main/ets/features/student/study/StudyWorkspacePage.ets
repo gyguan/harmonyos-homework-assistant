@@ -414,21 +414,6 @@ export struct StudyWorkspacePage {
               .fontColor(AppTheme.WARNING);
           }
 
-          if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
-            Row() {
-              Blank();
-              Text('暂停一下')
-                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .fontSize(13)
-                .fontColor(AppTheme.SUBTEXT)
-                .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-                .accessibilityRole(AccessibilityRoleType.BUTTON)
-                .accessibilityText('暂停作业计时')
-                .onClick(() => { void this.pauseCurrentAssignment(); });
-            }
-            .width('100%');
-          }
-
           this.ResourcePane();
           this.SubmissionPane();
 
@@ -456,6 +441,51 @@ export struct StudyWorkspacePage {
       .scrollBar(BarState.Off)
       .backgroundColor(AppTheme.BACKGROUND);
     }
+  }
+
+  @Builder
+  private WorkspaceActionBar(showTutorEntry: boolean) {
+    Row({ space: 10 }) {
+      if (showTutorEntry) {
+        Button('问小伴', { type: ButtonType.Normal })
+          .width(this.assignment() !== null && this.assignment()!.status === AssignmentStatus.IN_PROGRESS ? 88 : 112)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .fontSize(13)
+          .onClick(() => {
+            this.tutorPanelOpen = true;
+            void this.loadTutor();
+          });
+      }
+
+      if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
+        Button('暂停一下', { type: ButtonType.Normal })
+          .width(showTutorEntry ? 88 : 112)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.actionRunning)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .fontColor(AppTheme.SUBTEXT)
+          .fontSize(13)
+          .accessibilityText('暂停作业计时')
+          .onClick(() => { void this.pauseCurrentAssignment(); });
+      }
+
+      Button(this.primaryActionLabel(), { type: ButtonType.Normal })
+        .layoutWeight(1)
+        .height(AppTheme.BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(this.primaryActionEnabled())
+        .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .fontSize(14)
+        .fontWeight(FontWeight.Medium)
+        .onClick(() => { void this.runPrimaryAction(); });
+    }
+    .width('100%')
+    .padding({ top: 2, bottom: 4 });
   }
 
   @Builder
@@ -539,6 +569,13 @@ export struct StudyWorkspacePage {
           .fontSize(AppTheme.CAPTION_SIZE)
           .fontColor(AppTheme.SUBTEXT);
 
+        TextArea({ placeholder: '输入问题，或者说说你做到哪一步…', text: this.tutorDraft })
+          .width('100%')
+          .height(110)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => this.tutorDraft = value);
+
         TutorQuestionCapturePanel({
           studentId: this.viewModel.studentId(),
           onRecognized: (text: string) => {
@@ -546,13 +583,6 @@ export struct StudyWorkspacePage {
             this.tutorNotice = '识别文字已放入输入框，请确认或补充后再发送';
           }
         });
-
-        TextArea({ placeholder: '输入问题，或者说说你做到哪一步…', text: this.tutorDraft })
-          .width('100%')
-          .height(110)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.tutorDraft = value);
 
         Button(this.tutorSending ? '发送中…' : '发送给小伴', { type: ButtonType.Normal })
           .width('100%')
@@ -605,31 +635,7 @@ export struct StudyWorkspacePage {
         .justifyContent(FlexAlign.Start)
         .alignItems(HorizontalAlign.Start);
 
-        Row({ space: 10 }) {
-          Button('问小伴', { type: ButtonType.Normal })
-            .width(120)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .onClick(() => {
-              this.tutorPanelOpen = true;
-              void this.loadTutor();
-            });
-
-          Button(this.primaryActionLabel(), { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(this.primaryActionEnabled())
-            .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .fontSize(14)
-            .fontWeight(FontWeight.Medium)
-            .onClick(() => { void this.runPrimaryAction(); });
-        }
-        .width('100%')
-        .padding({ top: 2, bottom: 4 });
+        this.WorkspaceActionBar(true);
       }
       .width('100%')
       .layoutWeight(1)
@@ -650,16 +656,7 @@ export struct StudyWorkspacePage {
         .justifyContent(FlexAlign.Start)
         .alignItems(HorizontalAlign.Start);
 
-        Button(this.primaryActionLabel(), { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(this.primaryActionEnabled())
-          .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .onClick(() => { void this.runPrimaryAction(); });
+        this.WorkspaceActionBar(false);
       }
       .layoutWeight(1)
       .height('100%')
