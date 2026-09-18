@@ -58,8 +58,9 @@ require("observedVersions" not in sync,
         "Assignment Repository sync must not keep process-local observedVersions")
 require("assignment.syncDirty && assignment.remoteVersion === existing.version" in sync,
         "server update must require dirty local state and an exact version match")
-require("HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion)" in sync,
-        "remote update must use the assignment's persisted remoteVersion")
+require("dirtyEntries.push({ assignment: assignment, version: assignment.remoteVersion })" in sync and
+        "HomeworkRemoteApi.instance.sync(studentId, chunk)" in sync,
+        "dirty remote updates must use persisted versions through bounded batch sync")
 require("RemoteAssignmentMapper.toLocal" in sync and "replaceAssignmentsForActiveStudent(merged)" in sync,
         "final server refresh must remain authoritative after sync/conflict")
 require("requestSync(): void" in sync and "syncRequested" in sync and "syncRunning" in sync and
