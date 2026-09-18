@@ -4,6 +4,82 @@ import { ChoiceSelectionChip } from '../../../components/selection/SelectionCont
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
 
 @Component
+export struct CandidateDurationControl {
+  @Prop item: CandidateAssignment;
+  @Prop compact: boolean = false;
+  onMinutesChange: (candidate: CandidateAssignment, minutes: number) => void =
+    (_candidate: CandidateAssignment, _minutes: number) => {};
+
+  private applyCustom(value: string): void {
+    if (value.trim().length === 0) return;
+    let minutes = Math.round(Number(value));
+    if (!Number.isFinite(minutes)) return;
+    if (minutes < 1) minutes = 1;
+    if (minutes > 240) minutes = 240;
+    this.onMinutesChange(this.item, minutes);
+  }
+
+  build() {
+    Column({ space: 7 }) {
+      Row({ space: 6 }) {
+        ChoiceSelectionChip({
+          label: '10',
+          selected: this.item.expectedMinutes === 10,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 10)
+        });
+        ChoiceSelectionChip({
+          label: '15',
+          selected: this.item.expectedMinutes === 15,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 15)
+        });
+        ChoiceSelectionChip({
+          label: '20',
+          selected: this.item.expectedMinutes === 20,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 20)
+        });
+        Text('分钟')
+          .fontSize(11)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+        Blank();
+      }
+      .width('100%');
+
+      Row({ space: 6 }) {
+        ChoiceSelectionChip({
+          label: '30',
+          selected: this.item.expectedMinutes === 30,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 30)
+        });
+        ChoiceSelectionChip({
+          label: '45',
+          selected: this.item.expectedMinutes === 45,
+          compact: true,
+          onSelect: () => this.onMinutesChange(this.item, 45)
+        });
+        TextInput({ text: `${this.item.expectedMinutes}`, placeholder: '自定义' })
+          .width(this.compact ? 82 : 100)
+          .height(40)
+          .fontSize(12)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CHIP_RADIUS)
+          .textAlign(TextAlign.Center)
+          .onChange((value: string) => this.applyCustom(value));
+        Text('分钟')
+          .fontSize(11)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+        Blank();
+      }
+      .width('100%');
+    }
+    .width('100%');
+  }
+}
+
+@Component
 export struct ConfirmationCandidateCard {
   @Prop item: CandidateAssignment;
   @Prop selected: boolean = false;
@@ -47,37 +123,17 @@ export struct ConfirmationCandidateCard {
         .fontColor(AppTheme.SUBTEXT)
         .maxLines(1);
 
-      Row({ space: 6 }) {
+      Column({ space: 5 }) {
         Text('预计用时')
+          .width('100%')
           .fontSize(11)
           .fontColor(AppTheme.TERTIARY_TEXT);
-        ChoiceSelectionChip({
-          label: '10',
-          selected: this.item.expectedMinutes === 10,
+        CandidateDurationControl({
+          item: this.item,
           compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 10)
+          onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
+            this.onMinutesChange(candidate, minutes)
         });
-        ChoiceSelectionChip({
-          label: '20',
-          selected: this.item.expectedMinutes === 20,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 20)
-        });
-        ChoiceSelectionChip({
-          label: '30',
-          selected: this.item.expectedMinutes === 30,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 30)
-        });
-        ChoiceSelectionChip({
-          label: '45',
-          selected: this.item.expectedMinutes === 45,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 45)
-        });
-        Text('分钟')
-          .fontSize(11)
-          .fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%');
 
@@ -190,52 +246,15 @@ export struct ConfirmationCandidateEditor {
       });
 
       Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      Row({ space: 6 }) {
-        ChoiceSelectionChip({
-          label: '10 分钟',
-          selected: this.item.expectedMinutes === 10,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 10)
-        });
-        ChoiceSelectionChip({
-          label: '15 分钟',
-          selected: this.item.expectedMinutes === 15,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 15)
-        });
-        ChoiceSelectionChip({
-          label: '20 分钟',
-          selected: this.item.expectedMinutes === 20,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 20)
-        });
-        ChoiceSelectionChip({
-          label: '30 分钟',
-          selected: this.item.expectedMinutes === 30,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 30)
-        });
-        ChoiceSelectionChip({
-          label: '45 分钟',
-          selected: this.item.expectedMinutes === 45,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 45)
-        });
-      }
-      .width('100%');
-
-      TextInput({ text: `${this.item.expectedMinutes}` })
+      CandidateDurationControl({
+        item: this.item,
+        onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
+          this.onMinutesChange(candidate, minutes)
+      });
+      Text('可选择常用时间，也可以直接输入 1–240 分钟。')
         .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => {
-          let minutes = Math.round(Number(value));
-          if (!Number.isFinite(minutes)) return;
-          if (minutes < 1) minutes = 1;
-          if (minutes > 240) minutes = 240;
-          this.onMinutesChange(this.item, minutes);
-        });
+        .fontSize(11)
+        .fontColor(AppTheme.TERTIARY_TEXT);
 
       Text('教材 / 页码').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
       TextInput({ text: this.item.textbookRef })
