@@ -115,13 +115,13 @@ assignment_repository_path = ROOT / "entry/src/main/ets/data/repository/DefaultA
 assignment_local_path = ROOT / "entry/src/main/ets/data/local/AssignmentLocalDataSource.ets"
 if assignment_repository_path.exists():
     assignment_repository = assignment_repository_path.read_text(encoding="utf-8")
-    if "HomeworkStore" in assignment_repository:
+    if "HomeworkStore.instance" in assignment_repository or "../HomeworkStore" in assignment_repository:
         fail("DefaultAssignmentRepository must use AssignmentLocalDataSource instead of HomeworkStore")
     if "AssignmentLocalDataSource" not in assignment_repository:
         fail("DefaultAssignmentRepository must depend on AssignmentLocalDataSource")
 if assignment_local_path.exists():
     assignment_local = assignment_local_path.read_text(encoding="utf-8")
-    if "HomeworkStoreAssignmentLocalDataSource" not in assignment_local or "HomeworkStore.instance" not in assignment_local:
+    if "DefaultAssignmentLocalDataSource" not in assignment_local or "HomeworkStore.instance" not in assignment_local:
         fail("legacy Assignment local adapter must isolate HomeworkStore access")
 else:
     fail("missing AssignmentLocalDataSource migration boundary")
