@@ -1,10 +1,12 @@
-import { HomeworkStore } from '../../data/HomeworkStore';
+import { DefaultFamilyContextRepository } from '../../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../../domain/model/HomeworkModels';
+import { FamilyContextRepository } from '../../domain/port/FamilyContextRepository';
 import { BackendSession } from './BackendSession';
 import { RemoteStudent, StudentRemoteApi } from './StudentRemoteApi';
 
 export class FamilyCloudService {
   static readonly instance: FamilyCloudService = new FamilyCloudService();
+  private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   private constructor() {}
 
   async syncStudents(): Promise<boolean> {
@@ -24,7 +26,7 @@ export class FamilyCloudService {
     try {
       await StudentRemoteApi.instance.save(student);
       let synced = await this.syncStudents();
-      if (synced) HomeworkStore.instance.setActiveStudent(student.id);
+      if (synced) this.familyContext.setActiveStudent(student.id);
       return synced;
     } catch {
       return false;
@@ -53,6 +55,6 @@ export class FamilyCloudService {
         textbookSummary: item.textbookSummary
       });
     }
-    HomeworkStore.instance.replaceStudents(students);
+    this.familyContext.replaceStudents(students);
   }
 }
