@@ -21,6 +21,8 @@ def require(condition: bool, message: str) -> None:
 
 parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
+confirmation_components = read(
+    "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 cases = read("docs/development/v0.2-parser-confirmation-cases.md")
 
@@ -37,8 +39,11 @@ for due in ["周五", "星期五", "月\\d{1,2}"]:
 require("updateCandidate(candidate" in store, "HomeworkStore must support full candidate updates")
 require("addCandidate(candidate" in store, "HomeworkStore must support manually adding a candidate")
 
-for capability in ["updateSubject", "updateTitle", "updateDueText", "updateTextbookRef", "addCandidate", "SubjectChip"]:
+for capability in ["updateSubject", "updateTitle", "updateDueText", "updateTextbookRef", "addCandidate",
+                   "ConfirmationCandidateEditor"]:
     require(capability in confirmation, f"confirmation page missing capability: {capability}")
+require("ChoiceSelectionChip" in confirmation_components,
+        "confirmation editor must expose reactive subject/duration choices")
 require("手工新增一项" in confirmation, "confirmation page must expose manual candidate creation")
 require(cases.count("### CASE-") >= 20, "V0.2 regression catalog must contain at least 20 cases")
 
