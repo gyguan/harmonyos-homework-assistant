@@ -60,6 +60,13 @@ require("HomeworkStore.instance" not in study,
 require("this.viewModel.performAction" in study and "AssignmentAction.START" in study and
         "AssignmentAction.PAUSE" in study and "AssignmentAction.READY_TO_SUBMIT" in study,
         "Study Workspace must use explicit server-backed assignment actions")
+require("private WorkspaceActionBar(showTutorEntry: boolean)" in study and
+        "Button('暂停一下'" in study and "this.WorkspaceActionBar(true)" in study and
+        "this.WorkspaceActionBar(false)" in study,
+        "Study Workspace must keep pause beside the primary submit/progress action on Phone and Pad")
+require(study.find("private StudyContent(") < study.find("private WorkspaceActionBar(") and
+        study.find("Text('暂停一下')") == -1,
+        "Study content must not keep a detached pause text action above resources/submission")
 require("HomeworkSubmissionService.instance.listCached" in study,
         "Study Workspace submission reads must stay behind the submission application service")
 require("TutorRemoteApi.instance" in study and "HomeworkSubmissionService.instance.submit" in study,
