@@ -17,7 +17,6 @@ import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 @Component
 export struct StudentAssignmentsPage {
   @Prop revision: number = 0;
-  @State private refreshRevision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
 
@@ -61,13 +60,6 @@ export struct StudentAssignmentsPage {
 
   aboutToAppear(): void {
     this.rebuildView();
-    void this.refresh();
-  }
-
-  private async refresh(): Promise<void> {
-    await this.viewModel.refresh();
-    this.refreshRevision++;
-    this.rebuildView();
   }
 
   private canUseMasterDetail(): boolean {
@@ -75,7 +67,7 @@ export struct StudentAssignmentsPage {
   }
 
   private rebuildView(): void {
-    let currentRevision = this.revision + this.refreshRevision;
+    let currentRevision = this.revision;
     if (currentRevision < 0) return;
     this.totalCount = this.viewModel.allCount();
     this.rebuildResults();
@@ -91,13 +83,13 @@ export struct StudentAssignmentsPage {
   }
 
   private calendarAssignments(): Assignment[] {
-    let currentRevision = this.revision + this.refreshRevision;
+    let currentRevision = this.revision;
     if (currentRevision < 0) return [];
     return this.viewModel.calendarAssignments(this.typeFilter, this.subjectCode);
   }
 
   private padExtraAssignments(): Assignment[] {
-    let currentRevision = this.revision + this.refreshRevision;
+    let currentRevision = this.revision;
     if (currentRevision < 0) return [];
     let source = this.viewModel.calendarAssignments(AssignmentTypeFilter.EXTRA, 'ALL');
     let active: Assignment[] = [];
@@ -509,7 +501,7 @@ export struct StudentAssignmentsPage {
         Column() {
           AssignmentDetailPane({
             assignmentId: this.selectedAssignmentId,
-            revision: this.revision + this.refreshRevision,
+            revision: this.revision,
             onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
           });
         }
