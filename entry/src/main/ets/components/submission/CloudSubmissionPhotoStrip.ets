@@ -1,11 +1,20 @@
 import { RemoteSubmissionApi, RemoteSubmissionPhoto } from '../../application/remote/RemoteSubmissionApi';
 import { AppTheme } from '../../common/theme/AppTheme';
+import { PhotoPreviewDialog } from './PhotoPreviewDialog';
 
 @Component
 export struct CloudSubmissionPhotoStrip {
   @Prop photos: RemoteSubmissionPhoto[];
   @State private cacheRevision: number = 0;
   @State private loading: boolean = false;
+  @State private previewUri: string = '';
+
+  private previewController: CustomDialogController = new CustomDialogController({
+    builder: PhotoPreviewDialog({ uri: $previewUri }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
 
   aboutToAppear(): void {
     void this.loadMissingPhotos();
@@ -14,6 +23,12 @@ export struct CloudSubmissionPhotoStrip {
   private photoUri(photoId: string): string {
     let currentRevision = this.cacheRevision;
     return RemoteSubmissionApi.instance.cachedPhotoUri(photoId);
+  }
+
+  private openPreview(uri: string): void {
+    if (uri.length === 0) return;
+    this.previewUri = uri;
+    this.previewController.open();
   }
 
   private async loadMissingPhotos(): Promise<void> {
@@ -41,7 +56,10 @@ export struct CloudSubmissionPhotoStrip {
                 .height(86)
                 .objectFit(ImageFit.Cover)
                 .borderRadius(12)
-                .backgroundColor(AppTheme.SURFACE_EMPHASIS);
+                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText('查看作业照片大图')
+                .onClick(() => this.openPreview(this.photoUri(photo.id)));
             } else {
               Column({ space: 5 }) {
                 Text('作业照片')
