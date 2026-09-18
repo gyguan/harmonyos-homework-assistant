@@ -35,12 +35,16 @@ require("return { captured: false, imageUri: '', recognizedText: '' }" in servic
         "capture failures must return the non-crashing empty result")
 require("CoreVisionHomeworkTextExtractor" in service,
         "captured question must reuse local CoreVision OCR")
-require("recognizedText" in service and "resourceUri: result.resultUri" in service,
-        "camera result must be converted to recognized text locally")
+require("recognizedText" in service and "candidates.push(saveUri)" in service and
+        "result.resultUri !== saveUri" in service and "resourceUri: uri" in service,
+        "camera OCR must prefer the app-cache saveUri and fall back to the Picker result URI")
 require("Button(this.capturing ? '识别中…' : '拍题'" in panel and "只在本机识别" in panel,
         "Tutor composer must expose compact camera capture and clearly explain local-only image recognition")
 require("onRecognized" in panel and "this.onRecognized(result.recognizedText)" in panel,
         "recognized question text must be handed back to the editable Tutor draft")
+require("本机文字识别暂不可用" in panel and "照片读取失败" in panel and
+        "无法打开系统相机" in panel,
+        "Tutor capture failures must distinguish OCR, camera and image-read problems")
 require("TutorQuestionCapturePanel" in study and "题目识别结果" in study,
         "study workspace must put OCR text into the Tutor draft")
 require(study.find("TextArea({ placeholder: '说说你卡在哪一步") < study.find("TutorQuestionCapturePanel({") <
