@@ -4,7 +4,7 @@ import { RemoteAssignment, RemoteAssignmentMapper } from '../../application/remo
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
 import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDecision';
-import { Assignment, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../domain/port/AssignmentRepository';
 import { AssignmentQuery } from '../../domain/service/AssignmentQuery';
 import { AssignmentLocalDataSource, DefaultAssignmentLocalDataSource } from '../local/AssignmentLocalDataSource';
@@ -84,6 +84,50 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     let mapped = RemoteAssignmentMapper.toLocal(remote, assignment);
     this.applyAuthoritative(mapped);
     return mapped;
+  }
+
+  async updateDetails(assignment: Assignment): Promise<Assignment> {
+    let current = this.getCached(assignment.id);
+    if (current === null) throw new Error('作业不存在');
+    if (current.status === AssignmentStatus.SUBMITTED || current.status === AssignmentStatus.COMPLETED) {
+      throw new Error('已提交或已完成的作业不能再修改任务内容');
+    }
+    if (!BackendSession.instance.isConnected()) {
+      throw new Error('当前离线，联网后才能编辑作业');
+    }
+    if (current.remoteVersion <= 0 && current.candidateId.length === 0) {
+      throw new Error('示例作业不支持家长编辑');
+    }
+
+    if (current.remoteVersion <= 0) {
+      let latestRemote = await HomeworkRemoteApi.instance.get(assignment.id);
+      current = RemoteAssignmentMapper.toLocal(latestRemote, this.local.getAssignment(assignment.id));
+      this.applyAuthoritative(current);
+    }
+    if (current.status === AssignmentStatus.SUBMITTED || current.status === AssignmentStatus.COMPLETED) {
+      throw new Error('作业已进入提交或完成状态，不能再修改任务内容');
+    }
+
+    let draft = this.mergeEditableDetails(current, assignment);
+    try {
+      let remote = await HomeworkRemoteApi.instance.updateDetails(draft, current.remoteVersion);
+      let mapped = RemoteAssignmentMapper.toLocal(remote, this.local.getAssignment(assignment.id));
+      this.applyAuthoritative(mapped);
+      return mapped;
+    } catch {
+      let latestRemote = await HomeworkRemoteApi.instance.get(assignment.id);
+      let latest = RemoteAssignmentMapper.toLocal(latestRemote, this.local.getAssignment(assignment.id));
+      this.applyAuthoritative(latest);
+      if (latest.remoteVersion === current.remoteVersion) throw new Error('REMOTE_EDIT_FAILED');
+      if (latest.status === AssignmentStatus.SUBMITTED || latest.status === AssignmentStatus.COMPLETED) {
+        throw new Error('作业已进入提交或完成状态，不能再修改任务内容');
+      }
+      let retriedDraft = this.mergeEditableDetails(latest, assignment);
+      let retried = await HomeworkRemoteApi.instance.updateDetails(retriedDraft, latest.remoteVersion);
+      let mapped = RemoteAssignmentMapper.toLocal(retried, this.local.getAssignment(assignment.id));
+      this.applyAuthoritative(mapped);
+      return mapped;
+    }
   }
 
   async performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment> {
@@ -255,6 +299,34 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     } catch {
       return false;
     }
+  }
+
+  private mergeEditableDetails(base: Assignment, draft: Assignment): Assignment {
+    return {
+      id: base.id,
+      studentId: base.studentId,
+      candidateId: base.candidateId,
+      assignmentType: base.assignmentType,
+      subjectCode: base.subjectCode,
+      subject: base.subject,
+      title: draft.title,
+      instruction: draft.instruction,
+      textbookRef: draft.textbookRef,
+      dueAtEpochMs: draft.dueAtEpochMs,
+      dueTimezone: draft.dueTimezone,
+      dueText: draft.dueText,
+      dueDateKey: draft.dueDateKey,
+      status: base.status,
+      expectedMinutes: draft.expectedMinutes,
+      startedAtEpochMs: base.startedAtEpochMs,
+      finishedAtEpochMs: base.finishedAtEpochMs,
+      elapsedSeconds: base.elapsedSeconds,
+      reviewNote: base.reviewNote,
+      remoteVersion: base.remoteVersion,
+      syncDirty: false,
+      lastSyncedAtEpochMs: base.lastSyncedAtEpochMs,
+      resourceLabels: base.resourceLabels.slice()
+    };
   }
 
   private async flushSync(): Promise<void> {
