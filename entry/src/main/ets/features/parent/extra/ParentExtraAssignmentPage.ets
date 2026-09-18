@@ -1,7 +1,9 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Subject } from '../../../domain/model/HomeworkModels';
+import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 import { ExtraAssignmentDraft, ParentExtraAssignmentViewModel } from './ParentExtraAssignmentViewModel';
 
 @Component
@@ -9,8 +11,7 @@ export struct ParentExtraAssignmentPage {
   @State private category: Subject = Subject.READING;
   @State private title: string = '';
   @State private instruction: string = '';
-  @State private dueDate: string = '';
-  @State private dueTime: string = '20:00';
+  @State private dueText: string = '';
   @State private expectedMinutesText: string = '20';
   @State private busy: boolean = false;
   @State private message: string = '';
@@ -28,12 +29,10 @@ export struct ParentExtraAssignmentPage {
   }
 
   private dueAtEpochMs(): number {
-    let date = this.dueDate.trim();
-    if (date.length === 0) return 0;
-    let time = this.dueTime.trim().length > 0 ? this.dueTime.trim() : '20:00';
-    if (date.length !== 10 || date.charAt(4) !== '-' || date.charAt(7) !== '-') return -1;
-    let value = Date.parse(`${date}T${time}:00+08:00`);
-    return Number.isFinite(value) ? value : -1;
+    let text = this.dueText.trim();
+    if (text.length === 0) return 0;
+    let value = AssignmentDueDate.resolveDueAtEpochMs(text, Date.now());
+    return value > 0 ? value : -1;
   }
 
   private async createTask(): Promise<void> {
@@ -55,7 +54,7 @@ export struct ParentExtraAssignmentPage {
     }
     let dueAt = this.dueAtEpochMs();
     if (dueAt < 0) {
-      this.showError('截止时间格式应为 YYYY-MM-DD 和 HH:mm');
+      this.showError('请选择有效的截止日期和时间');
       return;
     }
 
@@ -63,7 +62,7 @@ export struct ParentExtraAssignmentPage {
     this.message = '';
     this.messageError = false;
     try {
-      let dueText = dueAt > 0 ? `${this.dueDate.trim()} ${this.dueTime.trim()}前` : '未定';
+      let dueText = dueAt > 0 ? this.dueText.trim() : '未定';
       let draft: ExtraAssignmentDraft = {
         category: this.category,
         title: title,
@@ -141,27 +140,13 @@ export struct ParentExtraAssignmentPage {
   private TimingSection() {
     Column({ space: 10 }) {
       Text('时间安排').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text('截止日期可不填；填写时使用北京时间。').width('100%')
+      Text('截止时间可不设置；需要时直接选择日期和时间，统一按北京时间保存。').width('100%')
         .fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
-      Row({ space: 10 }) {
-        Column({ space: 5 }) {
-          Text('日期').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-          TextInput({ placeholder: 'YYYY-MM-DD', text: this.dueDate })
-            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
-            .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.dueDate = value);
-        }
-        .layoutWeight(2).alignItems(HorizontalAlign.Start);
-        Column({ space: 5 }) {
-          Text('时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-          TextInput({ placeholder: '20:00', text: this.dueTime })
-            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
-            .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.dueTime = value);
-        }
-        .layoutWeight(1).alignItems(HorizontalAlign.Start);
-      }
-      .width('100%');
+      DeadlinePickerField({
+        value: this.dueText,
+        allowClear: true,
+        onChange: (value: string) => this.dueText = value
+      });
       Column({ space: 5 }) {
         Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '20', text: this.expectedMinutesText })
