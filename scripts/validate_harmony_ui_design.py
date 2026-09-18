@@ -72,6 +72,22 @@ if app_shell:
         require(expression in app_shell,
                 f"primary navigation must bind selection directly to route state: {expression}")
 
+centered_badge = read_optional("entry/src/main/ets/components/family/CenteredTextBadge.ets")
+require("export struct CenteredTextBadge" in centered_badge and
+        "Stack() {" in centered_badge and ".alignContent(Alignment.Center)" in centered_badge,
+        "shared text badges must use real container centering instead of top padding")
+for badge_path in [
+    "entry/src/main/ets/pages/PersonEntryPage.ets",
+    "entry/src/main/ets/pages/AppShell.ets",
+    "entry/src/main/ets/components/family/StudentSwitcherDialog.ets",
+    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
+    "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
+    "entry/src/main/ets/features/student/home/StudentHomePage.ets",
+]:
+    badge_user = read_optional(badge_path)
+    require("CenteredTextBadge" in badge_user,
+            f"text/avatar badges must reuse centered badge component: {badge_path}")
+
 require(len(primary_nav) > 0, "missing reactive primary navigation component")
 if primary_nav:
     require(primary_nav.count("@Prop selected: boolean = false;") >= 2,
