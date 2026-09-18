@@ -213,6 +213,9 @@ jobs:
       - name: Run batch publish E2E
         run: python backend/scripts/batch_publish_e2e.py
 
+      - name: Run API efficiency P1 E2E
+        run: python backend/scripts/api_efficiency_p1_e2e.py
+
       - name: Restart backend while keeping PostgreSQL
         run: |
           kill "$(cat backend-e2e.pid)" || true
