@@ -21,6 +21,8 @@ def require(condition: bool, message: str) -> None:
 
 client = read("entry/src/main/ets/application/remote/BackendHttpClient.ets")
 access = read("backend/src/main/java/com/xiaoban/homework/common/AccessLogFilter.java")
+payload = read("backend/src/main/java/com/xiaoban/homework/common/ApiPayloadLogAdvice.java")
+http_config = read("backend/src/main/java/com/xiaoban/homework/common/HttpLogProperties.java")
 assignment = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 tutor = read("entry/src/main/ets/application/remote/TutorRemoteApi.ets")
 organizer = read("entry/src/main/ets/application/remote/HomeworkOrganizerRemoteApi.ets")
@@ -40,8 +42,17 @@ for token in ["REQUEST_ID_HEADER", "CLIENT_SCENE_HEADER", "CLIENT_REQUEST_KEY_HE
               "response.setHeader(REQUEST_ID_HEADER", "[HTTP] requestId={}", "[HTTP-DUPLICATE]",
               "DUPLICATE_WINDOW_MS = 1500L"]:
     require(token in access, f"backend access logging missing observability behavior: {token}")
-for forbidden in ["getQueryString()", "getInputStream()", "getReader()", 'getHeader("Authorization")']:
-    require(forbidden not in access, f"access logging must not capture sensitive data: {forbidden}")
+for forbidden in ["getInputStream()", "getReader()", 'getHeader("Authorization")']:
+    require(forbidden not in access, f"access logging must not directly capture sensitive data: {forbidden}")
+require("[HTTP-REQUEST]" in access and "getQueryString()" in access,
+        "access logging must expose query parameters for request diagnosis")
+require("[HTTP-REQUEST-BODY]" in payload and "[HTTP-RESPONSE]" in payload,
+        "API observability must include request and response payload logs")
+require("sanitizeAndTruncate" in payload and "password|token|api[-_]?key|authorization" in payload,
+        "payload logs must redact credential-like fields before output")
+require("private boolean logPayloads = true;" in http_config and
+        "private int maxPayloadChars = 20000;" in http_config,
+        "HTTP payload logging must be enabled by default with a bounded payload size")
 
 for scene in [
     "assignment.sync.snapshot", "assignment.query", "assignment.create", "assignment.batchPublish",
