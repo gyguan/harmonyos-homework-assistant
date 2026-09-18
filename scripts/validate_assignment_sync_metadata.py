@@ -21,7 +21,7 @@ def require(condition: bool, message: str) -> None:
 models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 mapper = read("entry/src/main/ets/application/remote/RemoteModels.ets")
-sync = read("entry/src/main/ets/application/remote/HomeworkSyncService.ets")
+sync = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 
@@ -50,13 +50,18 @@ require("lastSyncedAtEpochMs: Date.now()" in mapper,
         "remote refresh must record the last sync time")
 
 require("observedVersions" not in sync,
-        "HomeworkSyncService must not keep process-local observedVersions")
+        "Assignment Repository sync must not keep process-local observedVersions")
 require("assignment.syncDirty && assignment.remoteVersion === existing.version" in sync,
         "server update must require dirty local state and an exact version match")
 require("HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion)" in sync,
         "remote update must use the assignment's persisted remoteVersion")
 require("RemoteAssignmentMapper.toLocal" in sync and "replaceAssignmentsForActiveStudent(merged)" in sync,
         "final server refresh must remain authoritative after sync/conflict")
+require("requestSync(): void" in sync and "syncRequested" in sync and "syncRunning" in sync and
+        "await this.refresh()" in sync,
+        "Assignment Repository must preserve coalesced background sync semantics")
+require(not (ROOT / "entry/src/main/ets/application/remote/HomeworkSyncService.ets").exists(),
+        "legacy HomeworkSyncService must be deleted after Repository owns sync/reconcile")
 
 require("http.RequestMethod.PUT" in remote_api,
         "HarmonyOS assignment updates must use PUT for compatibleSdk 6.0.0(20)")
