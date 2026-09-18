@@ -70,6 +70,8 @@
 
 `HomeworkStore.initialize()` 当前 schema 不匹配时 seed MockData 的行为必须在 Slice 0 删除。
 
+Final Cleanup 期间增加结构约束：除 `data/HomeworkStore.ets` 自身外，`HomeworkStore` 只允许由 `data/local/*.ets` legacy adapter 访问；Feature、Shell、application/remote、Repository 均禁止直接依赖。
+
 ---
 
 # 5. Persistence
