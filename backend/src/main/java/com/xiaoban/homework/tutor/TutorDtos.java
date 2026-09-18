@@ -20,5 +20,6 @@ public final class TutorDtos {
     }
   }
 
-  public record Conversation(UUID sessionId, boolean available, String notice, List<Message> messages) {}
+  public record Conversation(UUID sessionId, boolean available, String notice, List<Message> messages,
+      boolean hasMore, long nextBeforeEpochMs) {}
 }
