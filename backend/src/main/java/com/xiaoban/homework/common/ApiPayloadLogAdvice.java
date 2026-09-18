@@ -112,7 +112,7 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
     }
   }
 
-  private String sanitizeAndTruncate(String value) {
+  String sanitizeAndTruncate(String value) {
     String compact = compact(value);
     compact = compact.replaceAll(
         "(?i)(\\\"(?:password|token|api[-_]?key|authorization)\\\"\\s*:\\s*\\\")[^\\\"]*(\\\")",
