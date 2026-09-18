@@ -3,6 +3,7 @@ import { BackendSession } from '../../../application/remote/BackendSession';
 import { FamilyCloudService } from '../../../application/remote/FamilyCloudService';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { SettingsToggleRow } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
@@ -275,9 +276,15 @@ export struct BackendConnectionPage {
     Column({ space: 0 }) {
       ForEach(this.students(), (student: StudentProfile) => {
         Row({ space: 12 }) {
-          Text(student.name.length > 0 ? student.name.substring(0, 1) : '伴')
-            .width(38).height(38).padding({ top: 9 }).textAlign(TextAlign.Center).fontSize(15)
-            .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(12);
+          CenteredTextBadge({
+            text: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
+            width: 38,
+            height: 38,
+            fontSize: 15,
+            radius: 12,
+            foreground: AppTheme.PRIMARY,
+            background: AppTheme.PRIMARY_SOFT
+          });
           Column({ space: 3 }) {
             Text(student.name).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Text(`${student.grade} · ${student.className} · ${student.semester}`).width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
