@@ -8,11 +8,7 @@ errors: list[str] = []
 
 # Temporary migration allowlist. Entries must be removed when the corresponding V2 slice
 # switches its default route. New feature files are never added here casually.
-LEGACY_FEATURE_STORE_ALLOWLIST = {
-    # Final-cleanup debt only. Remove each entry as its context/settings boundary migrates.
-    "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
-    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
-}
+LEGACY_FEATURE_STORE_ALLOWLIST: set[str] = set()
 
 
 def fail(message: str) -> None:
@@ -23,8 +19,8 @@ feature_root = ROOT / "entry/src/main/ets/features"
 for file in feature_root.rglob("*.ets"):
     relative = file.relative_to(ROOT).as_posix()
     text = file.read_text(encoding="utf-8")
-    if "HomeworkStore.instance" in text and relative not in LEGACY_FEATURE_STORE_ALLOWLIST:
-        fail(f"new/migrated feature must use Repository/ViewModel instead of HomeworkStore.instance: {relative}")
+    if "HomeworkStore.instance" in text:
+        fail(f"Feature must use Repository/ViewModel instead of HomeworkStore.instance: {relative}")
 
     direct_size_class_import = re.search(r"import\s*\{[^}]*\bWindowSizeClass\b[^}]*\}", text) is not None
     direct_size_class_branch = re.search(r"\bWindowSizeClass\.(?:COMPACT|MEDIUM|EXPANDED)\b", text) is not None
