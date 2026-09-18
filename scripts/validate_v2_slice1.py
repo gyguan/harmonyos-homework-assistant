@@ -76,9 +76,10 @@ require("interface AssignmentRepository" in repository_port,
 require("implements AssignmentRepository" in repository_impl,
         "a local-first AssignmentRepository implementation must exist")
 local_data_source = read("entry/src/main/ets/data/local/AssignmentLocalDataSource.ets")
-require("HomeworkStore" not in repository_impl and "AssignmentLocalDataSource" in repository_impl,
+require("HomeworkStore.instance" not in repository_impl and "../HomeworkStore" not in repository_impl and
+        "AssignmentLocalDataSource" in repository_impl,
         "AssignmentRepository must depend on the local data source boundary instead of HomeworkStore")
-require("HomeworkStoreAssignmentLocalDataSource" in local_data_source and
+require("DefaultAssignmentLocalDataSource" in local_data_source and
         "HomeworkStore.instance" in local_data_source,
         "legacy Store access must be isolated inside AssignmentLocalDataSource")
 require("HomeworkStore.instance" not in view_model and "HomeworkStore.instance" not in home,
