@@ -28,6 +28,8 @@ store = read("entry/src/main/ets/data/HomeworkStore.ets")
 remote_models = read("entry/src/main/ets/application/remote/RemoteModels.ets")
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
+confirmation_components = read(
+    "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
@@ -51,9 +53,12 @@ require("expectedMinutes: candidate.expectedMinutes" in store,
         "published assignments must retain the parent-selected expected duration")
 
 for duration in ["10", "15", "20", "30", "45"]:
-    require(f"this.TimeChip(item, {duration})" in confirmation,
-            f"parent confirmation must expose quick duration option: {duration} minutes")
-require(("预计完成时间" in confirmation or "预计用时" in confirmation) and "updateExpectedMinutes" in confirmation,
+    require(f"selected: this.item.expectedMinutes === {duration}" in confirmation_components and
+            f"this.onMinutesChange(this.item, {duration})" in confirmation_components,
+            f"parent confirmation must expose reactive quick duration option: {duration} minutes")
+require("预计用时" in confirmation_components and
+        "TextInput({ text: `${this.item.expectedMinutes}` })" in confirmation_components and
+        "onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "parent must be able to edit expected completion time before publishing")
 # Student Home now presents the time budget inside each expanded subject task row instead of a
 # single hero assignment. Preserve the capability rather than the old component structure.

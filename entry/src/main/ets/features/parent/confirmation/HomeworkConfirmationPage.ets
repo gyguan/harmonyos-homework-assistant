@@ -2,6 +2,7 @@ import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
 import { HomeworkConfirmationViewModel } from './HomeworkConfirmationViewModel';
+import { ConfirmationCandidateCard, ConfirmationCandidateEditor } from './ConfirmationCandidateComponents';
 
 @Component
 export struct HomeworkConfirmationPage {
@@ -72,14 +73,6 @@ export struct HomeworkConfirmationPage {
     this.saveCandidate(this.copy(item, item.subject, item.title, item.instruction, item.dueText, textbookRef));
   }
 
-  private updateExpectedMinutes(item: CandidateAssignment, value: string): void {
-    let minutes = Math.round(Number(value));
-    if (!Number.isFinite(minutes)) return;
-    if (minutes < 1) minutes = 1;
-    if (minutes > 240) minutes = 240;
-    this.setExpectedMinutes(item, minutes);
-  }
-
   private setExpectedMinutes(item: CandidateAssignment, minutes: number): void {
     this.saveCandidate(this.copy(item, item.subject, item.title, item.instruction,
       item.dueText, item.textbookRef, minutes));
@@ -120,145 +113,6 @@ export struct HomeworkConfirmationPage {
     } finally {
       this.publishing = false;
     }
-  }
-
-  @Builder
-  private SubjectChip(item: CandidateAssignment, subject: Subject) {
-    Text(subject)
-      .fontSize(13)
-      .fontWeight(item.subject === subject ? FontWeight.Medium : FontWeight.Normal)
-      .fontColor(item.subject === subject ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-      .padding({ left: 13, right: 13, top: 9, bottom: 9 })
-      .backgroundColor(item.subject === subject ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(item.subject === subject ? `${subject}，已选择` : subject)
-      .onClick(() => this.updateSubject(item, subject));
-  }
-
-  @Builder
-  private TimeChip(item: CandidateAssignment, minutes: number) {
-    Text(`${minutes} 分钟`)
-      .fontSize(12)
-      .fontWeight(item.expectedMinutes === minutes ? FontWeight.Medium : FontWeight.Normal)
-      .fontColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
-      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-      .padding({ left: 10, right: 10, top: 8, bottom: 8 })
-      .backgroundColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_EMPHASIS)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(`预计用时 ${minutes} 分钟`)
-      .onClick(() => this.setExpectedMinutes(item, minutes));
-  }
-
-  @Builder
-  private CandidateCard(item: CandidateAssignment) {
-    Column({ space: 8 }) {
-      Row() {
-        Row({ space: 7 }) {
-          Text(item.subject).fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-          if (item.confidence < 0.8) {
-            Text('重点确认').fontSize(10).fontColor(AppTheme.WARNING)
-              .padding({ left: 7, right: 7, top: 3, bottom: 3 })
-              .backgroundColor(AppTheme.WARNING_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
-          }
-        }
-        Blank();
-        Text(item.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%');
-      Text(item.title).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT).maxLines(2);
-      Text(`预计 ${item.expectedMinutes} 分钟 · ${item.textbookRef.length > 0 ? item.textbookRef : '未设置教材页码'}`)
-        .width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT).maxLines(1);
-      Text(`来源证据 · ${item.sourceEvidence.excerpt}`)
-        .width('100%').fontSize(11).lineHeight(17)
-        .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.TERTIARY_TEXT).maxLines(2);
-    }
-    .width('100%')
-    .padding(12)
-    .backgroundColor(this.editingCandidateId === item.id ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
-    .border({ width: this.editingCandidateId === item.id ? 1 : 0,
-      color: this.editingCandidateId === item.id ? AppTheme.PRIMARY : Color.Transparent })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
-    .accessibilityGroup(true)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`${item.subject}，${item.title}，打开编辑`)
-    .onClick(() => this.editingCandidateId = item.id);
-  }
-
-  @Builder
-  private CandidateEditor(item: CandidateAssignment) {
-    Column({ space: 12 }) {
-      Row() {
-        Column({ space: 2 }) {
-          Text(item.confidence < 0.8 ? '重点确认' : '核对作业')
-            .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text(item.confidence < 0.8 ? '识别置信度较低，请对照老师原文逐项核对。' : '发布前确认任务内容与时间。')
-            .fontSize(12).fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-        Text('删除').fontSize(13).fontColor(AppTheme.DANGER)
-          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .textAlign(TextAlign.Center)
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText(`删除${item.title}`)
-          .onClick(() => this.removeCandidate(item.id));
-      }
-      .width('100%');
-
-      Row({ space: 8 }) {
-        this.SubjectChip(item, Subject.CHINESE);
-        this.SubjectChip(item, Subject.MATH);
-        this.SubjectChip(item, Subject.ENGLISH);
-      }
-      .width('100%');
-
-      Text('作业标题').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: item.title }).width('100%').height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.updateTitle(item, value));
-
-      Text('老师要求').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextArea({ text: item.instruction }).width('100%').height(92)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.updateInstruction(item, value));
-
-      Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: item.dueText }).width('100%').height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.updateDueText(item, value));
-
-      Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      Row({ space: 6 }) {
-        this.TimeChip(item, 10);
-        this.TimeChip(item, 15);
-        this.TimeChip(item, 20);
-        this.TimeChip(item, 30);
-        this.TimeChip(item, 45);
-      }
-      .width('100%');
-      TextInput({ text: `${item.expectedMinutes}` }).width('100%').height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.updateExpectedMinutes(item, value));
-
-      Text('教材 / 页码').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: item.textbookRef }).width('100%').height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.updateTextbookRef(item, value));
-
-      Column({ space: 5 }) {
-        Text(item.sourceEvidence.sourceLabel.length > 0 ? item.sourceEvidence.sourceLabel : '老师原文')
-          .width('100%').fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text(item.sourceEvidence.excerpt).width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%')
-      .padding(13)
-      .backgroundColor(item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE_SUBTLE)
-      .borderRadius(AppTheme.CONTROL_RADIUS);
-    }
-    .width('100%');
   }
 
   @Builder
@@ -303,8 +157,13 @@ export struct HomeworkConfirmationPage {
               .padding({ top: 30, bottom: 30 });
             } else {
               Column({ space: 7 }) {
-                ForEach(this.candidates(), (item: CandidateAssignment) => { this.CandidateCard(item); },
-                  (item: CandidateAssignment) => item.id);
+                ForEach(this.candidates(), (item: CandidateAssignment) => {
+                  ConfirmationCandidateCard({
+                    item: item,
+                    selected: this.editingCandidateId === item.id,
+                    onSelect: () => this.editingCandidateId = item.id
+                  });
+                }, (item: CandidateAssignment) => item.id);
               }
               .width('100%');
 
@@ -315,9 +174,28 @@ export struct HomeworkConfirmationPage {
                 .onClick(() => this.addCandidate());
 
               if (this.editingCandidate() !== null) {
-                Column() { this.CandidateEditor(this.editingCandidate()!); }
-                  .width('100%').padding(AppTheme.PHONE_CARD_PADDING)
-                  .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.PHONE_CARD_RADIUS);
+                Column() {
+                  ConfirmationCandidateEditor({
+                    item: this.editingCandidate()!,
+                    onDelete: (candidateId: string) => this.removeCandidate(candidateId),
+                    onSubjectChange: (candidate: CandidateAssignment, subject: Subject) =>
+                      this.updateSubject(candidate, subject),
+                    onTitleChange: (candidate: CandidateAssignment, value: string) =>
+                      this.updateTitle(candidate, value),
+                    onInstructionChange: (candidate: CandidateAssignment, value: string) =>
+                      this.updateInstruction(candidate, value),
+                    onDueTextChange: (candidate: CandidateAssignment, value: string) =>
+                      this.updateDueText(candidate, value),
+                    onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
+                      this.setExpectedMinutes(candidate, minutes),
+                    onTextbookRefChange: (candidate: CandidateAssignment, value: string) =>
+                      this.updateTextbookRef(candidate, value)
+                  });
+                }
+                .width('100%')
+                .padding(AppTheme.PHONE_CARD_PADDING)
+                .backgroundColor(AppTheme.SURFACE)
+                .borderRadius(AppTheme.PHONE_CARD_RADIUS);
               }
 
               this.PublishFeedback();

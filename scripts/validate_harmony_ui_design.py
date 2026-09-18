@@ -137,9 +137,10 @@ require(len(selection_controls) > 0, "missing shared reactive selection controls
 if selection_controls:
     require("export struct SegmentedSelectionButton" in selection_controls and
             "export struct StatusSelectionChip" in selection_controls and
-            "export struct FilterSummaryEntry" in selection_controls,
+            "export struct FilterSummaryEntry" in selection_controls and
+            "export struct ChoiceSelectionChip" in selection_controls,
             "shared reactive selection controls are incomplete")
-    require(selection_controls.count("@Prop selected: boolean = false;") >= 2,
+    require(selection_controls.count("@Prop selected: boolean = false;") >= 3,
             "persistent selection controls must receive selected as reactive @Prop")
     require("@Prop active: boolean = false;" in selection_controls,
             "filter summary active state must be a reactive @Prop")
@@ -195,16 +196,36 @@ require("backgroundColor(this.category === value ? AppTheme.PRIMARY_SOFT : AppTh
         "Extra assignment category selection must have an active surface")
 
 confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
-subject_chip = between(confirmation, "private SubjectChip(", "private TimeChip(")
-time_chip = between(confirmation, "private TimeChip(", "private CandidateCard(")
-candidate_card = between(confirmation, "private CandidateCard(", "private CandidateEditor(")
-require("backgroundColor(item.subject === subject ? AppTheme.PRIMARY_SOFT" in subject_chip,
-        "Confirmation subject selection must have an active surface")
-require("backgroundColor(item.expectedMinutes === minutes ? AppTheme.PRIMARY_SOFT" in time_chip,
-        "Confirmation duration selection must have an active surface")
-require("backgroundColor(this.editingCandidateId === item.id ? AppTheme.PRIMARY_FAINT" in candidate_card and
-        "color: this.editingCandidateId === item.id ? AppTheme.PRIMARY : Color.Transparent" in candidate_card,
-        "Confirmation selected candidate must combine active surface and border")
+confirmation_components = read_optional(
+    "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+require("private SubjectChip(" not in confirmation and "private TimeChip(" not in confirmation and
+        "private CandidateCard(" not in confirmation and "private CandidateEditor(" not in confirmation,
+        "Confirmation persistent selection must not depend on ordinary @Builder object snapshots")
+require("ConfirmationCandidateCard" in confirmation and "ConfirmationCandidateEditor" in confirmation,
+        "Confirmation page must render reactive Candidate child components")
+require("selected: this.editingCandidateId === item.id" in confirmation,
+        "Confirmation selected Candidate must bind directly to editingCandidateId")
+require(confirmation_components.count("@Prop item: CandidateAssignment;") >= 2 and
+        "@Prop selected: boolean = false;" in confirmation_components,
+        "Confirmation Candidate components must receive current item/selection through reactive props")
+require("backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)" in confirmation_components and
+        "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in confirmation_components,
+        "Confirmation selected Candidate must combine active surface and border")
+for expression in [
+    "selected: this.item.subject === Subject.CHINESE",
+    "selected: this.item.subject === Subject.MATH",
+    "selected: this.item.subject === Subject.ENGLISH",
+    "selected: this.item.expectedMinutes === 10",
+    "selected: this.item.expectedMinutes === 15",
+    "selected: this.item.expectedMinutes === 20",
+    "selected: this.item.expectedMinutes === 30",
+    "selected: this.item.expectedMinutes === 45",
+]:
+    require(expression in confirmation_components,
+            f"Confirmation choice state must bind directly to current Candidate prop: {expression}")
+require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_controls and
+        "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in selection_controls,
+        "shared choice selection must combine active surface and border")
 
 calendar = read_optional("entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets")
 day_cell = between(calendar, "private DayCell(", "private WeekdayHeader()")
