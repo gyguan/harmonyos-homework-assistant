@@ -5,11 +5,13 @@ import { HomeworkSyncService } from '../../../application/remote/HomeworkSyncSer
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { SettingsToggleRow } from '../../../components/selection/SelectionControls';
-import { HomeworkStore } from '../../../data/HomeworkStore';
+import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../../../domain/model/HomeworkModels';
+import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 
 @Component
 export struct BackendConnectionPage {
+  private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private availableWidthVp: number = 390;
   @State private baseUrl: string = '';
   @State private loginName: string = 'parent';
@@ -38,21 +40,21 @@ export struct BackendConnectionPage {
 
   private students(): StudentProfile[] {
     let currentRevision = this.pageRevision;
-    return HomeworkStore.instance.getStudents();
+    return this.familyContext.getStudents();
   }
 
   private tutorGuidanceFirst(): boolean {
     let currentRevision = this.pageRevision;
-    return HomeworkStore.instance.getSettings().tutorGuidanceFirst;
+    return this.familyContext.getSettings().tutorGuidanceFirst;
   }
 
   private directAnswerAllowed(): boolean {
     let currentRevision = this.pageRevision;
-    return HomeworkStore.instance.getSettings().directAnswerAllowed;
+    return this.familyContext.getSettings().directAnswerAllowed;
   }
 
   private updateTutorSettings(guidanceFirst: boolean, directAnswerAllowed: boolean): void {
-    HomeworkStore.instance.updateTutorSettings(guidanceFirst, directAnswerAllowed);
+    this.familyContext.updateTutorSettings(guidanceFirst, directAnswerAllowed);
     this.pageRevision++;
     this.message = 'AI 辅导规则已保存';
     this.onStoreChanged();

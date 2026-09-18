@@ -30,6 +30,9 @@ require(shell.count("() => this.studentRoute = StudentRoute.PROFILE") >= 2,
 require("'我的', false, () => {}" not in shell,
         "student 我的 must never regress to an empty navigation action")
 
+require("HomeworkStore" not in profile and "FamilyContextRepository" in profile and
+        "DefaultFamilyContextRepository.instance" in profile,
+        "student profile must use the FamilyContextRepository boundary instead of HomeworkStore")
 for token in ["getStudent()", "grade", "className", "semester", "textbookSummary"]:
     require(token in profile, f"student profile must show current student field: {token}")
 for token in ["getSettings()", "tutorGuidanceFirst", "directAnswerAllowed", "AI 辅导规则"]:
