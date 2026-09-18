@@ -16,6 +16,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import jakarta.persistence.criteria.Predicate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,26 +54,26 @@ public class AssignmentService {
   public List<AssignmentDtos.Response> list(UUID familyId, String studentId, String type, String subjectCode,
       Long fromEpochMs, Long toEpochMs, String status, Boolean undated) {
     students.requireOwned(familyId, studentId);
-    String normalizedType = type == null || type.isBlank() ? null : assignmentType(type);
-    String normalizedSubject = subjectCode == null || subjectCode.isBlank() ? null : subjectCode.trim().toUpperCase();
-    Instant from = dueAt(fromEpochMs);
-    Instant to = dueAt(toEpochMs);
-    boolean undatedOnly = Boolean.TRUE.equals(undated);
-    if (from != null && to != null && from.isAfter(to)) {
-      throw new ApiExceptions.BadRequest("作业筛选开始时间不能晚于结束时间");
-    }
-    if (undatedOnly && (from != null || to != null)) {
-      throw new ApiExceptions.BadRequest("未定日期筛选不能同时指定日期范围");
-    }
-    Set<String> statuses = statusFilter(status);
-
-    List<AssignmentEntity> filtered = new ArrayList<>();
-    for (AssignmentEntity assignment : repository.findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(familyId, studentId)) {
-      if (!matchesListFilter(assignment, normalizedType, normalizedSubject, from, to, statuses, undatedOnly)) continue;
-      filtered.add(assignment);
-    }
+    ListFilters filters = listFilters(type, subjectCode, fromEpochMs, toEpochMs, status, undated);
+    List<AssignmentEntity> filtered = repository.findAll(listSpecification(familyId, studentId, filters));
     filtered.sort(this::compareForList);
     return filtered.stream().map(AssignmentDtos.Response::from).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public AssignmentDtos.PageResponse page(UUID familyId, String studentId, String type, String subjectCode,
+      Long fromEpochMs, Long toEpochMs, String status, Boolean undated, int page, int limit) {
+    students.requireOwned(familyId, studentId);
+    if (page < 0) throw new ApiExceptions.BadRequest("page 不能小于 0");
+    if (limit < 1 || limit > 100) throw new ApiExceptions.BadRequest("limit 必须在 1 到 100 之间");
+
+    ListFilters filters = listFilters(type, subjectCode, fromEpochMs, toEpochMs, status, undated);
+    PageRequest pageable = PageRequest.of(page, limit,
+        Sort.by(Sort.Order.desc("updatedAt"), Sort.Order.asc("id")));
+    Page<AssignmentEntity> result = repository.findAll(listSpecification(familyId, studentId, filters), pageable);
+    return new AssignmentDtos.PageResponse(
+        result.getContent().stream().map(AssignmentDtos.Response::from).toList(),
+        page, limit, result.hasNext(), result.getTotalElements());
   }
 
   @Transactional(readOnly = true)
@@ -199,6 +204,25 @@ public class AssignmentService {
   }
 
   @Transactional
+  public AssignmentDtos.BatchSyncResponse syncBatch(UUID familyId, String studentId,
+      AssignmentDtos.BatchSyncRequest input) {
+    students.requireOwned(familyId, studentId);
+    List<AssignmentDtos.BatchSyncResult> results = new ArrayList<>();
+    for (AssignmentDtos.BatchSyncItem item : input.items()) {
+      AssignmentEntity current = requireOwned(familyId, item.id());
+      if (!studentId.equals(current.studentId)) throw new ApiExceptions.NotFound("作业不存在");
+      if (current.version != item.assignment().version()) {
+        results.add(new AssignmentDtos.BatchSyncResult(
+            item.id(), false, AssignmentDtos.Response.from(current)));
+        continue;
+      }
+      AssignmentDtos.Response updated = update(familyId, item.id(), item.assignment());
+      results.add(new AssignmentDtos.BatchSyncResult(item.id(), true, updated));
+    }
+    return new AssignmentDtos.BatchSyncResponse(results.size(), results);
+  }
+
+  @Transactional
   public AssignmentDtos.Response action(UUID familyId, String id, AssignmentDtos.ActionRequest input) {
     AssignmentEntity e = requireOwned(familyId, id);
     if (e.version != input.version()) throw new ApiExceptions.Conflict("作业已在其他设备更新，请刷新后重试");
@@ -267,15 +291,42 @@ public class AssignmentService {
     if (e.finishedAtEpochMs == 0) e.finishedAtEpochMs = nowMs;
   }
 
-  private boolean matchesListFilter(AssignmentEntity assignment, String type, String subjectCode,
-      Instant from, Instant to, Set<String> statuses, boolean undatedOnly) {
-    if (type != null && !type.equals(assignment.assignmentType)) return false;
-    if (subjectCode != null && !subjectCode.equalsIgnoreCase(assignment.subjectCode)) return false;
-    if (undatedOnly && assignment.dueAt != null) return false;
-    if (!undatedOnly && (from != null || to != null) && assignment.dueAt == null) return false;
-    if (from != null && assignment.dueAt.isBefore(from)) return false;
-    if (to != null && assignment.dueAt.isAfter(to)) return false;
-    return statuses.isEmpty() || statuses.contains(assignment.status);
+  private record ListFilters(String type, String subjectCode, Instant from, Instant to,
+      Set<String> statuses, boolean undatedOnly) {}
+
+  private ListFilters listFilters(String type, String subjectCode, Long fromEpochMs, Long toEpochMs,
+      String status, Boolean undated) {
+    String normalizedType = type == null || type.isBlank() ? null : assignmentType(type);
+    String normalizedSubject = subjectCode == null || subjectCode.isBlank() ? null : subjectCode.trim().toUpperCase();
+    Instant from = dueAt(fromEpochMs);
+    Instant to = dueAt(toEpochMs);
+    boolean undatedOnly = Boolean.TRUE.equals(undated);
+    if (from != null && to != null && from.isAfter(to)) {
+      throw new ApiExceptions.BadRequest("作业筛选开始时间不能晚于结束时间");
+    }
+    if (undatedOnly && (from != null || to != null)) {
+      throw new ApiExceptions.BadRequest("未定日期筛选不能同时指定日期范围");
+    }
+    return new ListFilters(normalizedType, normalizedSubject, from, to, statusFilter(status), undatedOnly);
+  }
+
+  private Specification<AssignmentEntity> listSpecification(UUID familyId, String studentId, ListFilters filters) {
+    return (root, query, builder) -> {
+      List<Predicate> predicates = new ArrayList<>();
+      predicates.add(builder.equal(root.get("familyId"), familyId));
+      predicates.add(builder.equal(root.get("studentId"), studentId));
+      if (filters.type() != null) predicates.add(builder.equal(root.get("assignmentType"), filters.type()));
+      if (filters.subjectCode() != null) predicates.add(builder.equal(root.get("subjectCode"), filters.subjectCode()));
+      if (filters.undatedOnly()) {
+        predicates.add(builder.isNull(root.get("dueAt")));
+      } else if (filters.from() != null || filters.to() != null) {
+        predicates.add(builder.isNotNull(root.get("dueAt")));
+      }
+      if (filters.from() != null) predicates.add(builder.greaterThanOrEqualTo(root.get("dueAt"), filters.from()));
+      if (filters.to() != null) predicates.add(builder.lessThanOrEqualTo(root.get("dueAt"), filters.to()));
+      if (!filters.statuses().isEmpty()) predicates.add(root.get("status").in(filters.statuses()));
+      return builder.and(predicates.toArray(Predicate[]::new));
+    };
   }
 
   private int compareForList(AssignmentEntity left, AssignmentEntity right) {
