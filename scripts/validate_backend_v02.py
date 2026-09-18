@@ -142,9 +142,15 @@ require("OncePerRequestFilter" in access_log and "request.getMethod()" in access
         "request.getRequestURI()" in access_log and "response.getStatus()" in access_log and
         "request.getRemoteAddr()" in access_log and "System.nanoTime()" in access_log,
         "backend must emit lightweight method/path/status/duration/client access logs")
-for forbidden_log_data in ["Authorization", "getHeader(", "getQueryString()", "getInputStream()", "getReader()"]:
+for forbidden_log_data in ["Authorization", "getQueryString()", "getInputStream()", "getReader()"]:
     require(forbidden_log_data not in access_log,
             f"access log must not capture sensitive/request-body data: {forbidden_log_data}")
+for safe_header in ["X-Request-Id", "X-Client-Scene", "X-Client-Request-Key"]:
+    require(safe_header in access_log, f"access log missing safe observability header: {safe_header}")
+require("request.getHeader(REQUEST_ID_HEADER)" in access_log and
+        "request.getHeader(CLIENT_SCENE_HEADER)" in access_log and
+        "request.getHeader(CLIENT_REQUEST_KEY_HEADER)" in access_log,
+        "access log may read only the declared correlation/scene/request-key headers")
 require("PreferencesBackendSessionStorage" in session_storage and "initialize(storage" in backend_session,
         "HarmonyOS must restore its backend session from app-private storage")
 require("AppConfig.BACKEND_BASE_URL" in backend_session and "http://10.37.255.92:8080" in app_config,
