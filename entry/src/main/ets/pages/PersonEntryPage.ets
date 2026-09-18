@@ -1,16 +1,18 @@
 import { AppTheme } from '../common/theme/AppTheme';
-import { HomeworkStore } from '../data/HomeworkStore';
+import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 
 @Component
 export struct PersonEntryPage {
   @Prop revision: number = 0;
+  private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   onSelectParent: () => void = () => {};
   onSelectStudent: (studentId: string) => void = () => {};
 
   private students(): StudentProfile[] {
     let currentRevision = this.revision;
-    return HomeworkStore.instance.getStudents();
+    return this.familyContext.getStudents();
   }
 
   @Builder

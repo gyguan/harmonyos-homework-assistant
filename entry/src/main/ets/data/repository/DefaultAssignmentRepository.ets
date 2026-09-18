@@ -1,7 +1,8 @@
-import { HomeworkSyncService } from '../../application/remote/HomeworkSyncService';
 import { BackendSession } from '../../application/remote/BackendSession';
 import { HomeworkRemoteApi } from '../../application/remote/HomeworkRemoteApi';
-import { RemoteAssignmentMapper } from '../../application/remote/RemoteModels';
+import { RemoteAssignment, RemoteAssignmentMapper } from '../../application/remote/RemoteModels';
+import { RemoteSubmissionApi } from '../../application/remote/RemoteSubmissionApi';
+import { RemoteSubmissionCache } from '../../application/remote/RemoteSubmissionCache';
 import { HomeworkStore } from '../HomeworkStore';
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
@@ -15,8 +16,16 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   private remoteSummary: TodaySummary | null = null;
   private remoteSummaryStudentId: string = '';
   private queryCache: Assignment[] = [];
+  private syncRunning: boolean = false;
+  private syncRequested: boolean = false;
 
   private constructor() {}
+
+  requestSync(): void {
+    if (!BackendSession.instance.isConnected()) return;
+    this.syncRequested = true;
+    if (!this.syncRunning) void this.flushSync();
+  }
 
   getActiveStudent(): StudentProfile {
     return HomeworkStore.instance.getStudent();
@@ -158,7 +167,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
     if (!BackendSession.instance.isConnected()) return false;
-    let synced = await HomeworkSyncService.instance.syncActiveStudent();
+    let synced = await this.syncActiveStudentAssignments();
     if (!synced) return false;
     let activeStudentId = HomeworkStore.instance.getActiveStudentId();
     try {
@@ -169,6 +178,62 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       this.remoteSummaryStudentId = '';
     }
     return true;
+  }
+
+  private async syncActiveStudentAssignments(): Promise<boolean> {
+    if (!BackendSession.instance.isConnected()) return false;
+    let studentId = HomeworkStore.instance.getActiveStudentId();
+    try {
+      let remote = await HomeworkRemoteApi.instance.list(studentId);
+      let remoteById: Map<string, RemoteAssignment> = new Map<string, RemoteAssignment>();
+      for (let item of remote) remoteById.set(item.id, item);
+
+      let local = HomeworkStore.instance.getAssignments().slice();
+      for (let assignment of local) {
+        let existing = remoteById.get(assignment.id);
+        if (existing === undefined) {
+          // Only real assignments published from Candidate drafts are uploaded automatically.
+          // Demo/seed assignments remain local fixtures.
+          if (assignment.candidateId.length === 0) continue;
+          await HomeworkRemoteApi.instance.create(assignment);
+          continue;
+        }
+
+        // A client may update only from the exact server version it last persisted. If another
+        // device advanced the version, the authoritative refresh below deliberately wins.
+        if (assignment.syncDirty && assignment.remoteVersion === existing.version) {
+          try {
+            await HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion);
+          } catch {
+            // Conflict/transient failures are reconciled by the authoritative final refresh.
+          }
+        }
+      }
+
+      let finalRemote = await HomeworkRemoteApi.instance.list(studentId);
+      let merged: Assignment[] = [];
+      for (let item of finalRemote) {
+        merged.push(RemoteAssignmentMapper.toLocal(item, HomeworkStore.instance.getAssignment(item.id)));
+        try {
+          RemoteSubmissionCache.instance.replace(item.id, await RemoteSubmissionApi.instance.list(item.id));
+        } catch {
+          // Submission metadata is best-effort and must not block Assignment reconciliation.
+        }
+      }
+      HomeworkStore.instance.replaceAssignmentsForActiveStudent(merged);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  private async flushSync(): Promise<void> {
+    this.syncRunning = true;
+    while (this.syncRequested) {
+      this.syncRequested = false;
+      await this.refresh();
+    }
+    this.syncRunning = false;
   }
 
   private performLocalDemoAction(assignmentId: string, action: AssignmentAction): Assignment {

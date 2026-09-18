@@ -93,7 +93,7 @@ V2 不通过“默认值兼容”替代显式 snapshot migration。
 | `BackendSession.ets` | KEEP/EVOLVE | auth/session 基础 | 无 | KEEP |
 | `BackendAuthService.ets` | KEEP | auth service | 无 | KEEP |
 | `HomeworkRemoteApi.ets` | MIGRATE | `AssignmentRemoteDataSource` | Repository 完整接管并旧 API wrapper 无调用 | Slice 3/Final |
-| `HomeworkSyncService.ets` | MIGRATE | Repository sync/reconcile | V2 Repository 完成跨设备刷新和冲突处理 | Slice 3/Final |
+| `HomeworkSyncService.ets` | DELETE（已完成） | sync/reconcile 已收敛到 `DefaultAssignmentRepository` | Repository 已接管跨设备刷新、冲突处理与后台合并同步 | Final Cleanup |
 | `RemoteModels.ets` | MIGRATE | domain-specific DTO mapper | 新 DTO/mapper 分层稳定 | Slice 3 |
 | `FamilyCloudService.ets` | MIGRATE | Student/Family repository | 家长/学生上下文迁移完 | Slice 4 |
 | `StudentRemoteApi.ets` | KEEP/EVOLVE | StudentRemoteDataSource | 可原地重命名/移动，不建平行实现 | Slice 4 |

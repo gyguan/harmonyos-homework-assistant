@@ -1,4 +1,3 @@
-import { HomeworkSyncService } from '../application/remote/HomeworkSyncService';
 import {
   AppRoute,
   AssignmentRouteParam,
@@ -12,9 +11,10 @@ import { AppTheme } from '../common/theme/AppTheme';
 import { StudentSwitcherDialog } from '../components/family/StudentSwitcherDialog';
 import { BottomPrimaryNavItem, SidePrimaryNavItem } from '../components/navigation/PrimaryNavItem';
 import { PageStateView } from '../components/state/PageStateView';
-import { HomeworkStore } from '../data/HomeworkStore';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
+import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
 import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
@@ -49,6 +49,7 @@ enum ParentRoute {
 @Component
 export struct AppShell {
   @Prop role: AppRole = AppRole.STUDENT;
+  private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
   @State private studentRoute: StudentRoute = StudentRoute.HOME;
@@ -109,33 +110,21 @@ export struct AppShell {
   }
 
   private syncFamilyContext(): void {
-    let students: StudentProfile[] = HomeworkStore.instance.getStudents();
-    let next: StudentProfile[] = [];
-    for (let student of students) {
-      next.push({
-        id: student.id,
-        name: student.name,
-        grade: student.grade,
-        className: student.className,
-        semester: student.semester,
-        textbookSummary: student.textbookSummary
-      });
-    }
-    this.familyStudents = next;
-    this.activeStudentId = HomeworkStore.instance.getActiveStudentId();
+    this.familyStudents = this.familyContext.getStudents();
+    this.activeStudentId = this.familyContext.getActiveStudentId();
   }
 
   private currentStudent(): StudentProfile {
     for (let student of this.familyStudents) {
       if (student.id === this.activeStudentId) return student;
     }
-    return HomeworkStore.instance.getStudent();
+    return this.familyContext.getStudent();
   }
 
   private touchStore(): void {
     this.syncFamilyContext();
     this.storeRevision++;
-    HomeworkSyncService.instance.requestSync();
+    DefaultAssignmentRepository.instance.requestSync();
   }
 
   private openStudentSwitcher(): void {
@@ -146,7 +135,7 @@ export struct AppShell {
 
   private selectStudent(studentId: string): void {
     if (this.role !== AppRole.PARENT || studentId.length === 0 || studentId === this.activeStudentId) return;
-    if (!HomeworkStore.instance.setActiveStudent(studentId)) return;
+    if (!this.familyContext.setActiveStudent(studentId)) return;
 
     // A child switch is a family-context boundary. Drop any detail route that may still point to
     // the previous child, return to Parent Home, update visible identity immediately, then refresh.

@@ -34,6 +34,21 @@ for file in feature_root.rglob("*.ets"):
         if token in text:
             fail(f"feature contains prohibited Preview/CI/device branch {token}: {relative}")
 
+legacy_sync_path = ROOT / "entry/src/main/ets/application/remote/HomeworkSyncService.ets"
+if legacy_sync_path.exists():
+    fail("legacy HomeworkSyncService must be deleted after AssignmentRepository owns sync/reconcile")
+
+for shell_path in [
+    ROOT / "entry/src/main/ets/pages/AppShell.ets",
+    ROOT / "entry/src/main/ets/pages/Index.ets",
+]:
+    if shell_path.exists():
+        shell_text = shell_path.read_text(encoding="utf-8")
+        if "HomeworkStore.instance" in shell_text:
+            fail(f"App-level shell must use repository/context boundaries instead of HomeworkStore.instance: {shell_path.relative_to(ROOT)}")
+        if "HomeworkSyncService" in shell_text:
+            fail(f"App-level shell must use AssignmentRepository sync instead of HomeworkSyncService: {shell_path.relative_to(ROOT)}")
+
 # V2 deep-page state belongs to NavPathStack/NavDestination, never AppShell @State.
 app_shell_path = ROOT / "entry/src/main/ets/pages/AppShell.ets"
 if app_shell_path.exists():
