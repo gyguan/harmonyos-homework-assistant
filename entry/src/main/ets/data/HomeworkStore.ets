@@ -2,6 +2,7 @@ import { MockData } from './MockData';
 import {
   AppSettings,
   Assignment,
+  AssignmentContentType,
   AssignmentProgress,
   AssignmentStatus,
   AssignmentType,
@@ -154,6 +155,8 @@ export class HomeworkStore {
       candidateId: source.candidateId,
       assignmentType: source.assignmentType,
       subjectCode: source.subjectCode,
+      contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE ?
+        AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
       subject: source.subject,
       title: source.title,
       instruction: source.instruction,
@@ -378,6 +381,7 @@ export class HomeworkStore {
         candidateId: candidate.id,
         assignmentType: AssignmentType.SCHOOL,
         subjectCode: this.subjectCode(candidate.subject),
+        contentType: AssignmentContentType.NORMAL,
         subject: candidate.subject,
         title: candidate.title,
         instruction: candidate.instruction,

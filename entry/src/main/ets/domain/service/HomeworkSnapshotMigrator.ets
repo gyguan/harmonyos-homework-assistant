@@ -1,7 +1,7 @@
-import { Assignment, AssignmentType, Subject } from '../model/HomeworkModels';
+import { Assignment, AssignmentContentType, AssignmentType, Subject } from '../model/HomeworkModels';
 import { HomeworkSnapshot } from '../model/PersistenceModels';
 
-export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 6;
+export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 7;
 
 export class HomeworkSnapshotMigrator {
   static migrate(snapshot: HomeworkSnapshot): HomeworkSnapshot {
@@ -21,6 +21,10 @@ export class HomeworkSnapshotMigrator {
       }
       if (current.schemaVersion === 5) {
         current = HomeworkSnapshotMigrator.migrateV5ToV6(current);
+        continue;
+      }
+      if (current.schemaVersion === 6) {
+        current = HomeworkSnapshotMigrator.migrateV6ToV7(current);
         continue;
       }
       throw new Error(`缺少本地作业数据迁移步骤: ${current.schemaVersion}`);
@@ -51,6 +55,7 @@ export class HomeworkSnapshotMigrator {
         candidateId: source.candidateId,
         assignmentType: AssignmentType.SCHOOL,
         subjectCode: HomeworkSnapshotMigrator.subjectCode(source.subject),
+        contentType: AssignmentContentType.NORMAL,
         subject: source.subject,
         title: source.title,
         instruction: source.instruction,
@@ -73,6 +78,49 @@ export class HomeworkSnapshotMigrator {
     }
     return {
       schemaVersion: 6,
+      settings: snapshot.settings,
+      rawImports: snapshot.rawImports,
+      assignments: assignments,
+      candidates: snapshot.candidates,
+      submissions: snapshot.submissions,
+      tutorSessions: snapshot.tutorSessions,
+      submissionSequence: snapshot.submissionSequence
+    };
+  }
+
+  private static migrateV6ToV7(snapshot: HomeworkSnapshot): HomeworkSnapshot {
+    let assignments: Assignment[] = [];
+    for (let source of snapshot.assignments) {
+      assignments.push({
+        id: source.id,
+        studentId: source.studentId,
+        candidateId: source.candidateId,
+        assignmentType: source.assignmentType,
+        subjectCode: source.subjectCode,
+        contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE ?
+          AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
+        subject: source.subject,
+        title: source.title,
+        instruction: source.instruction,
+        textbookRef: source.textbookRef,
+        dueAtEpochMs: source.dueAtEpochMs,
+        dueTimezone: source.dueTimezone,
+        dueText: source.dueText,
+        dueDateKey: source.dueDateKey,
+        status: source.status,
+        expectedMinutes: source.expectedMinutes,
+        startedAtEpochMs: source.startedAtEpochMs,
+        finishedAtEpochMs: source.finishedAtEpochMs,
+        elapsedSeconds: source.elapsedSeconds,
+        reviewNote: source.reviewNote,
+        remoteVersion: source.remoteVersion,
+        syncDirty: source.syncDirty,
+        lastSyncedAtEpochMs: source.lastSyncedAtEpochMs,
+        resourceLabels: source.resourceLabels.slice()
+      });
+    }
+    return {
+      schemaVersion: 7,
       settings: snapshot.settings,
       rawImports: snapshot.rawImports,
       assignments: assignments,
