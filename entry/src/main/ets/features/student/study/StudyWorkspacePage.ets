@@ -4,6 +4,7 @@ import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
+import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
@@ -121,6 +122,12 @@ export struct StudyWorkspacePage {
     if (conversation.available) this.tutorDraft = '';
     this.tutorSending = false;
   }
+
+  private fillTutorPrompt(prompt: string): void {
+    this.tutorDraft = prompt;
+    this.tutorNotice = '';
+  }
+
 
   private primaryActionLabel(): string {
     if (this.actionRunning) return '处理中…';
@@ -489,33 +496,76 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
+  private TutorSuggestion(label: string, prompt: string) {
+    Button(label, { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(36)
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .backgroundColor(AppTheme.SURFACE)
+      .fontColor(AppTheme.PRIMARY)
+      .fontSize(12)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .onClick(() => this.fillTutorPrompt(prompt));
+  }
+
+  @Builder
   private TutorPane() {
-    Column({ space: 12 }) {
-      Row() {
-        Text('问小伴')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Blank();
+    Column({ space: 0 }) {
+      Row({ space: 10 }) {
+        CenteredTextBadge({
+          badgeText: '伴',
+          badgeWidth: 40,
+          badgeHeight: 40,
+          badgeFontSize: 15,
+          badgeRadius: 20,
+          badgeBold: true,
+          badgeForeground: AppTheme.PRIMARY,
+          badgeBackground: AppTheme.PRIMARY_SOFT
+        });
+
+        Column({ space: 2 }) {
+          Text('小伴学习助手')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('先帮你理思路，再给下一步提示')
+            .fontSize(11)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+
         if (this.tutorLoading) {
-          Text('同步中').fontSize(11).fontColor(AppTheme.SUBTEXT);
+          Text('同步中')
+            .fontSize(11)
+            .fontColor(AppTheme.SUBTEXT);
         }
       }
-      .width('100%');
+      .width('100%')
+      .padding({ bottom: 12 });
+
+      Divider().color(AppTheme.DIVIDER);
 
       if (this.tutorUnavailable) {
-        Text('AI 辅导暂时不可用，但作业查看与提交不受影响。')
-          .width('100%')
-          .padding(14)
-          .fontSize(13)
-          .fontColor(AppTheme.WARNING)
-          .backgroundColor(AppTheme.WARNING_SOFT)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
+        Column({ space: 8 }) {
+          Text('小伴暂时休息一下')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('AI 辅导暂时不可用，但作业查看、计时和提交都不受影响。')
+            .fontSize(13)
+            .lineHeight(20)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%')
+        .padding({ top: 24, bottom: 24, left: 14, right: 14 })
+        .backgroundColor(AppTheme.WARNING_SOFT)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       } else {
         Scroll() {
-          Column({ space: 9 }) {
+          Column({ space: 12 }) {
             if (this.tutorHasMore) {
-              Text(this.tutorLoadingOlder ? '正在加载更早记录…' : '加载更早记录')
+              Text(this.tutorLoadingOlder ? '正在加载更早记录…' : '查看更早的对话')
                 .width('100%')
                 .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
                 .fontSize(12)
@@ -525,33 +575,86 @@ export struct StudyWorkspacePage {
                 .accessibilityText('加载更早的小伴对话')
                 .onClick(() => { void this.loadOlderTutor(); });
             }
-            if (this.tutorMessages.length === 0) {
-              Text('你现在卡在哪一步？先告诉小伴你已经尝试了什么。')
-                .width('100%')
-                .padding(13)
-                .fontSize(14)
-                .lineHeight(21)
-                .fontColor(AppTheme.TEXT)
-                .backgroundColor(AppTheme.PRIMARY_FAINT)
-                .borderRadius(AppTheme.CONTROL_RADIUS);
-            }
-            ForEach(this.tutorMessages, (message: TutorChatMessage) => {
-              Row() {
-                if (message.role === 'USER') Blank();
-                Text(message.content)
-                  .constraintSize({ maxWidth: '86%' })
-                  .padding(11)
-                  .fontSize(14)
-                  .lineHeight(21)
-                  .fontColor(message.role === 'USER' ? AppTheme.TEXT_ON_PRIMARY : AppTheme.TEXT)
-                  .backgroundColor(message.role === 'USER' ? AppTheme.PRIMARY : AppTheme.SURFACE_SUBTLE)
-                  .borderRadius(AppTheme.CONTROL_RADIUS);
-                if (message.role !== 'USER') Blank();
+
+            if (this.tutorMessages.length === 0 && !this.tutorLoading) {
+              Column({ space: 12 }) {
+                CenteredTextBadge({
+                  badgeText: '伴',
+                  badgeWidth: 48,
+                  badgeHeight: 48,
+                  badgeFontSize: 17,
+                  badgeRadius: 24,
+                  badgeBold: true,
+                  badgeForeground: AppTheme.PRIMARY,
+                  badgeBackground: AppTheme.PRIMARY_SOFT
+                });
+                Text('有哪里卡住了？')
+                  .fontSize(17)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                Text('先说说你已经做到哪一步，小伴会给提示，不会直接替你完成。')
+                  .width('100%')
+                  .fontSize(13)
+                  .lineHeight(20)
+                  .textAlign(TextAlign.Center)
+                  .fontColor(AppTheme.SUBTEXT);
+
+                Row({ space: 8 }) {
+                  this.TutorSuggestion('怎么开始？', '这题我不知道怎么开始，请先给我一个提示。');
+                  this.TutorSuggestion('检查思路', '我已经有一个思路了，请帮我检查哪里需要调整。');
+                  this.TutorSuggestion('提示下一步', '我做到一半卡住了，请只提示我下一步怎么想。');
+                }
+                .width('100%');
               }
-              .width('100%');
+              .width('100%')
+              .padding({ top: 28, bottom: 24, left: 8, right: 8 })
+              .alignItems(HorizontalAlign.Center);
+            }
+
+            ForEach(this.tutorMessages, (message: TutorChatMessage) => {
+              if (message.role === 'USER') {
+                Row({ space: 8 }) {
+                  Blank();
+                  Text(message.content)
+                    .constraintSize({ maxWidth: '82%' })
+                    .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+                    .fontSize(14)
+                    .lineHeight(21)
+                    .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                    .backgroundColor(AppTheme.PRIMARY)
+                    .borderRadius(14);
+                }
+                .width('100%')
+                .alignItems(VerticalAlign.Bottom);
+              } else {
+                Row({ space: 8 }) {
+                  CenteredTextBadge({
+                    badgeText: '伴',
+                    badgeWidth: 28,
+                    badgeHeight: 28,
+                    badgeFontSize: 11,
+                    badgeRadius: 14,
+                    badgeBold: true,
+                    badgeForeground: AppTheme.PRIMARY,
+                    badgeBackground: AppTheme.PRIMARY_SOFT
+                  });
+                  Text(message.content)
+                    .constraintSize({ maxWidth: '82%' })
+                    .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+                    .fontSize(14)
+                    .lineHeight(21)
+                    .fontColor(AppTheme.TEXT)
+                    .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                    .borderRadius(14);
+                  Blank();
+                }
+                .width('100%')
+                .alignItems(VerticalAlign.Top);
+              }
             }, (message: TutorChatMessage) => message.id);
           }
-          .width('100%');
+          .width('100%')
+          .padding({ top: 14, bottom: 14 });
         }
         .width('100%')
         .layoutWeight(1)
@@ -560,38 +663,62 @@ export struct StudyWorkspacePage {
         if (this.tutorNotice.length > 0) {
           Text(this.tutorNotice)
             .width('100%')
-            .fontSize(12)
+            .padding({ top: 6, bottom: 6 })
+            .fontSize(11)
             .fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
         }
 
-        Text('小伴默认提示优先，不直接替你完成作业。')
-          .width('100%')
-          .fontSize(AppTheme.CAPTION_SIZE)
-          .fontColor(AppTheme.SUBTEXT);
-
-        TextArea({ placeholder: '输入问题，或者说说你做到哪一步…', text: this.tutorDraft })
-          .width('100%')
-          .height(110)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.tutorDraft = value);
-
-        TutorQuestionCapturePanel({
-          studentId: this.viewModel.studentId(),
-          onRecognized: (text: string) => {
-            this.tutorDraft = `题目识别结果：\n${text}\n\n我卡住的地方：`;
-            this.tutorNotice = '识别文字已放入输入框，请确认或补充后再发送';
+        Column({ space: 8 }) {
+          Row() {
+            Text('你的问题')
+              .fontSize(12)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Blank();
+            Text('文字提问或拍题')
+              .fontSize(11)
+              .fontColor(AppTheme.SUBTEXT);
           }
-        });
+          .width('100%');
 
-        Button(this.tutorSending ? '发送中…' : '发送给小伴', { type: ButtonType.Normal })
+          TextArea({ placeholder: '说说你卡在哪一步…', text: this.tutorDraft })
+            .width('100%')
+            .height(82)
+            .backgroundColor(AppTheme.SURFACE)
+            .border({ width: 1, color: AppTheme.BORDER })
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => this.tutorDraft = value);
+
+          Row({ space: 10 }) {
+            TutorQuestionCapturePanel({
+              studentId: this.viewModel.studentId(),
+              onRecognized: (text: string) => {
+                this.tutorDraft = `题目识别结果：\n${text}\n\n我卡住的地方：`;
+                this.tutorNotice = '识别文字已填入，请确认或补充后再发送';
+              }
+            })
+            .layoutWeight(1);
+
+            Button(this.tutorSending ? '发送中…' : '发送', { type: ButtonType.Normal })
+              .width(88)
+              .height(38)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.tutorSending && this.tutorDraft.trim().length > 0)
+              .backgroundColor(!this.tutorSending && this.tutorDraft.trim().length > 0 ?
+                AppTheme.PRIMARY : AppTheme.DISABLED)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .fontSize(13)
+              .fontWeight(FontWeight.Medium)
+              .onClick(() => { void this.askTutor(); });
+          }
           .width('100%')
-          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(!this.tutorSending && this.tutorDraft.trim().length > 0)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .fontColor(AppTheme.PRIMARY)
-          .onClick(() => { void this.askTutor(); });
+          .alignItems(VerticalAlign.Center);
+        }
+        .width('100%')
+        .padding(10)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .border({ width: 1, color: AppTheme.BORDER })
+        .borderRadius(AppTheme.CARD_RADIUS);
       }
     }
     .width('100%')

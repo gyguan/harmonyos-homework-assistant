@@ -39,27 +39,30 @@ export struct TutorQuestionCapturePanel {
 
   build() {
     Row({ space: 8 }) {
-      Button(this.capturing ? '识别中…' : '拍题问小伴', { type: ButtonType.Normal })
-        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+      Button(this.capturing ? '识别中…' : '拍题', { type: ButtonType.Normal })
+        .height(38)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .enabled(!this.capturing)
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .backgroundColor(AppTheme.SURFACE)
         .fontColor(AppTheme.PRIMARY)
+        .fontSize(13)
+        .border({ width: 1, color: AppTheme.BORDER })
         .onClick(() => { void this.capture(); });
 
       if (this.imageUri.length > 0) {
         Image(this.imageUri)
-          .width(40)
-          .height(40)
+          .width(36)
+          .height(36)
           .objectFit(ImageFit.Cover)
           .borderRadius(8)
           .backgroundColor(AppTheme.SURFACE_EMPHASIS);
       }
 
-      Text(this.notice.length > 0 ? this.notice : '只在本机识别 · 识别后可编辑')
+      Text(this.notice.length > 0 ? this.notice : '只在本机识别')
         .layoutWeight(1)
-        .fontSize(AppTheme.CAPTION_SIZE)
-        .lineHeight(18)
+        .maxLines(2)
+        .fontSize(11)
+        .lineHeight(16)
         .fontColor(this.imageUri.length > 0 ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
     }
     .width('100%')
