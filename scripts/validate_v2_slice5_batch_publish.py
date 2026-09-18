@@ -26,6 +26,7 @@ remote = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 client_service = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
 draft_port = read("entry/src/main/ets/domain/port/HomeworkImportDraftRepository.ets")
 draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraftRepository.ets")
+draft_local = read("entry/src/main/ets/data/local/HomeworkImportLocalDataSource.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 mock_parser = read("entry/src/main/ets/infrastructure/ai/MockHomeworkAssignmentParser.ets")
 due_date_service = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
@@ -72,8 +73,11 @@ if "this.drafts.clearCandidates()" in client_service and "if (!response.atomic" 
             "Candidate drafts must not be cleared before atomic response validation")
 require("clearCandidates(): void" in draft_port,
         "draft repository port must expose explicit Candidate cleanup")
-require("clearCandidates(): void { HomeworkStore.instance.replaceCandidates([]); }" in draft_repo,
-        "migration adapter must isolate legacy Candidate cleanup behind the repository")
+require("HomeworkStore" not in draft_repo and "HomeworkImportLocalDataSource" in draft_repo and
+        "clearCandidates(): void { this.local.replaceCandidates([]); }" in draft_repo,
+        "draft repository must isolate legacy Candidate cleanup behind HomeworkImportLocalDataSource")
+require("HomeworkStore.instance.replaceCandidates(candidates)" in draft_local,
+        "legacy import local adapter must preserve Candidate persistence")
 
 # Delivery P0: Candidate relative/free-text due dates are normalized exactly once at the
 # Candidate -> Assignment publication boundary. Downstream Home/filter/calendar continue to
