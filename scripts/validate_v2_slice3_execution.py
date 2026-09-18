@@ -25,6 +25,7 @@ repository_impl = read("entry/src/main/ets/data/repository/DefaultAssignmentRepo
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 study_vm = read("entry/src/main/ets/features/student/study/StudyWorkspaceViewModel.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 submission = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
 controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 dtos = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentDtos.java")
@@ -42,6 +43,10 @@ require("HomeworkRemoteApi.instance.get(assignmentId)" in repository_impl and
         "latest.version === current.remoteVersion" in repository_impl and
         "HomeworkRemoteApi.instance.performAction(assignmentId, latest.version, action)" in repository_impl,
         "assignment actions must recover a stale optimistic version with one single-assignment read and one retry")
+require("if (current.remoteVersion <= 0)" in repository_impl and
+        "current = RemoteAssignmentMapper.toLocal(latest" in repository_impl and
+        "this.applyAuthoritative(current)" in repository_impl,
+        "real assignments with an unhydrated remoteVersion must fetch the single server assignment before action")
 require("current.remoteVersion <= 0 && current.candidateId.length === 0" in repository_impl,
         "local action fallback must be explicitly limited to seed/demo assignments")
 require("当前离线，只能查看已缓存作业" in repository_impl,
@@ -60,6 +65,9 @@ require("HomeworkStore.instance" not in study,
 require("this.viewModel.performAction" in study and "AssignmentAction.START" in study and
         "AssignmentAction.PAUSE" in study and "AssignmentAction.READY_TO_SUBMIT" in study,
         "Study Workspace must use explicit server-backed assignment actions")
+require("aboutToAppear(): void" not in study_route and
+        "AssignmentAction.START" not in study_route and "activateAssignment" not in study_route,
+        "entering Study Workspace must never auto-start timing before the student presses the action button")
 require("private WorkspaceActionBar(showTutorEntry: boolean)" in study and
         "Button('暂停一下'" in study and "this.WorkspaceActionBar(true)" in study and
         "this.WorkspaceActionBar(false)" in study,
