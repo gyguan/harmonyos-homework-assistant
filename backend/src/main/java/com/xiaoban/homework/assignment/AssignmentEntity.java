@@ -13,6 +13,7 @@ public class AssignmentEntity {
   public String studentId;
   public String assignmentType;
   public String subjectCode;
+  public String contentType;
   public String subject;
   public String title;
   public String instruction;

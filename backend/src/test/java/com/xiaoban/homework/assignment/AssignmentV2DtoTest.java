@@ -13,6 +13,7 @@ class AssignmentV2DtoTest {
     entity.studentId = "student-1";
     entity.assignmentType = "SCHOOL";
     entity.subjectCode = "MATH";
+    entity.contentType = "AUDIO_IMAGE";
     entity.subject = "数学";
     entity.title = "口算 20 题";
     entity.instruction = "独立完成";
@@ -31,6 +32,7 @@ class AssignmentV2DtoTest {
 
     assertEquals("SCHOOL", response.assignmentType());
     assertEquals("MATH", response.subjectCode());
+    assertEquals("AUDIO_IMAGE", response.contentType());
     assertEquals(1_800_000L, response.dueAtEpochMs());
     assertEquals("Asia/Shanghai", response.dueTimezone());
     assertEquals("数学", response.subject());
