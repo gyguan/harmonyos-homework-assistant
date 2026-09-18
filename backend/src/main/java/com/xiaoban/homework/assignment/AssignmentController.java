@@ -33,6 +33,12 @@ public class AssignmentController {
     this.batchPublishService = batchPublishService;
   }
 
+  @GetMapping("/assignments/{id}")
+  public AssignmentDtos.Response get(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String id) {
+    return service.get(familyId, id);
+  }
+
   @GetMapping("/students/{studentId}/assignments")
   public List<AssignmentDtos.Response> list(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String studentId,
