@@ -47,6 +47,9 @@ require("onMinutesChange" in confirmation_components and "预计用时" in confi
         "parent confirmation must keep manual duration override in the reactive editor")
 require("onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "confirmation page must persist duration changes from the reactive editor")
+require("预计用时" in confirmation_components and
+        confirmation_components.count("onMinutesChange(this.item") >= 4,
+        "each confirmation task card must expose its own quick duration controls")
 require("expectedMinutes: candidate.expectedMinutes" in store,
         "published assignment must keep the parent-confirmed duration")
 

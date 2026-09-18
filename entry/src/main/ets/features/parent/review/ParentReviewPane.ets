@@ -9,6 +9,7 @@ import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAss
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
 import { ParentReviewViewModel } from './ParentReviewViewModel';
+import { ParentAssignmentEditPanel } from './ParentAssignmentEditPanel';
 
 @Component
 export struct ParentReviewPane {
@@ -18,6 +19,9 @@ export struct ParentReviewPane {
   @State private reviewNoteDraft: string = '';
   @State private operationNotice: string = '';
   @State private submitting: boolean = false;
+  @State private editingAssignmentId: string = '';
+  @State private editSaving: boolean = false;
+  @State private editNotice: string = '';
   @State private previewUri: string = '';
 
   private previewController: CustomDialogController = new CustomDialogController({
@@ -64,6 +68,40 @@ export struct ParentReviewPane {
     return Math.max(1, Math.round(item.elapsedSeconds / 60));
   }
 
+  private canEdit(item: Assignment): boolean {
+    let persisted = item.remoteVersion > 0 || item.candidateId.length > 0;
+    return persisted && item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED;
+  }
+
+  private startEditing(item: Assignment): void {
+    if (!this.canEdit(item)) return;
+    this.editingAssignmentId = item.id;
+    this.editNotice = '';
+  }
+
+  private cancelEditing(): void {
+    this.editingAssignmentId = '';
+    this.editNotice = '';
+  }
+
+  private async saveAssignmentEdit(updated: Assignment): Promise<void> {
+    if (this.editSaving || this.assignment() === null) return;
+    this.editSaving = true;
+    this.editNotice = '';
+    try {
+      await this.viewModel.updateDetails(updated);
+      this.editingAssignmentId = '';
+      this.editNotice = '';
+      this.operationNotice = '任务信息已更新';
+      this.localRevision++;
+      this.onReviewed();
+    } catch (error) {
+      this.editNotice = `${error}`;
+    } finally {
+      this.editSaving = false;
+    }
+  }
+
   private async approve(): Promise<void> {
     if (this.submitting || this.assignment() === null) return;
     this.submitting = true;
@@ -107,7 +145,7 @@ export struct ParentReviewPane {
   private EmptyState() {
     Column({ space: 8 }) {
       SymbolGlyph($r('sys.symbol.doc_text')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
-      Text(this.assignmentId.length === 0 ? '选择一项作业查看验收详情' : '这项作业暂时找不到')
+      Text(this.assignmentId.length === 0 ? '选择一项作业查看详情' : '这项作业暂时找不到')
         .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       Text('提交证据、实际用时和家长验收都会在这里显示。')
         .fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
@@ -235,6 +273,24 @@ export struct ParentReviewPane {
               .fontSize(12).fontColor(AppTheme.SUBTEXT);
           }
           .width('100%');
+
+          if (this.canEdit(this.assignment()!) && this.editingAssignmentId !== this.assignment()!.id) {
+            Row() {
+              Text('编辑任务')
+                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .fontSize(13)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.PRIMARY)
+                .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+                .backgroundColor(AppTheme.PRIMARY_SOFT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText('编辑这项作业')
+                .onClick(() => this.startEditing(this.assignment()!));
+              Blank();
+            }
+            .width('100%');
+          }
           if (this.assignment()!.reviewNote.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
             Text(`家长备注：${this.assignment()!.reviewNote}`)
               .width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
@@ -246,6 +302,31 @@ export struct ParentReviewPane {
         .backgroundColor(AppTheme.SURFACE)
         .border({ width: 1, color: AppTheme.BORDER })
         .borderRadius(AppTheme.CONTROL_RADIUS);
+
+        if (this.editingAssignmentId === this.assignment()!.id) {
+          ParentAssignmentEditPanel({
+            item: this.assignment()!,
+            saving: this.editSaving,
+            onCancel: () => this.cancelEditing(),
+            onSave: (assignment: Assignment) => { void this.saveAssignmentEdit(assignment); }
+          });
+          if (this.editNotice.length > 0) {
+            Text(this.editNotice)
+              .width('100%')
+              .fontSize(12)
+              .fontColor(AppTheme.DANGER);
+          }
+        }
+
+        if (this.operationNotice.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
+          Text(this.operationNotice)
+            .width('100%')
+            .fontSize(12)
+            .fontColor(AppTheme.SUCCESS)
+            .padding({ left: 12, right: 12, top: 9, bottom: 9 })
+            .backgroundColor(AppTheme.SUCCESS_SOFT)
+            .borderRadius(AppTheme.CONTROL_RADIUS);
+        }
 
         this.EvidenceSection();
 

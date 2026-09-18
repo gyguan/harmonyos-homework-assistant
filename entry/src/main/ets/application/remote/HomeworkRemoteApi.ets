@@ -18,6 +18,16 @@ interface UpdateAssignmentBody {
   status: string; sourceLabel: string; sourceExcerpt: string; expectedMinutes: number;
   startedAtEpochMs: number; finishedAtEpochMs: number; elapsedSeconds: number; reviewNote: string;
 }
+interface AssignmentDetailsUpdateBody {
+  version: number;
+  title: string;
+  instruction: string;
+  textbookRef: string;
+  dueText: string;
+  dueAtEpochMs: number;
+  dueTimezone: string;
+  expectedMinutes: number;
+}
 interface AssignmentActionBody {
   action: string;
   version: number;
@@ -166,6 +176,28 @@ export class HomeworkRemoteApi {
     if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw new Error(`验收作业失败: ${response.statusCode}`);
+    }
+    return JSON.parse(response.body) as RemoteAssignment;
+  }
+
+  async updateDetails(assignment: Assignment, version: number): Promise<RemoteAssignment> {
+    let body: AssignmentDetailsUpdateBody = {
+      version: version,
+      title: assignment.title,
+      instruction: assignment.instruction,
+      textbookRef: assignment.textbookRef,
+      dueText: assignment.dueText,
+      dueAtEpochMs: assignment.dueAtEpochMs,
+      dueTimezone: assignment.dueTimezone,
+      expectedMinutes: assignment.expectedMinutes
+    };
+    let response = await BackendHttpClient.instance.requestFor(
+      'parent.assignment.edit',
+      `/api/v1/assignments/${encodeURIComponent(assignment.id)}/details`,
+      http.RequestMethod.PUT, body);
+    if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`编辑作业失败: ${response.statusCode}`);
     }
     return JSON.parse(response.body) as RemoteAssignment;
   }

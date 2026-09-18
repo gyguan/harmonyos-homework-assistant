@@ -89,6 +89,66 @@ def main() -> int:
         rework_source = create_assignment(base_url, token, student_id, rework_id, "SUBMITTED")
         invalid_source = create_assignment(base_url, token, student_id, invalid_id, "NOT_STARTED")
 
+        edited = expect(
+            http(
+                base_url,
+                "PUT",
+                f"/api/v1/assignments/{invalid_id}/details",
+                token=token,
+                payload={
+                    "version": int(invalid_source["version"]),
+                    "title": "家长已调整任务标题",
+                    "instruction": "完成第 1-3 题，注意验算",
+                    "textbookRef": "P18",
+                    "dueText": "明天 20:30",
+                    "dueAtEpochMs": int(time.time() * 1000) + 86400000,
+                    "dueTimezone": "Asia/Shanghai",
+                    "expectedMinutes": 35,
+                },
+            ),
+            (200,),
+            "parent edit assignment details",
+        ).json()
+        require(edited.get("title") == "家长已调整任务标题", "parent edit did not persist title")
+        require(edited.get("instruction") == "完成第 1-3 题，注意验算", "parent edit did not persist instruction")
+        require(edited.get("textbookRef") == "P18", "parent edit did not persist textbook ref")
+        require(int(edited.get("expectedMinutes", 0)) == 35, "parent edit did not persist expected minutes")
+        require(edited.get("status") == "NOT_STARTED", "parent edit must not alter assignment status")
+        require(int(edited.get("version", -1)) > int(invalid_source["version"]),
+                "parent edit did not advance optimistic version")
+
+        expect(
+            http(
+                base_url,
+                "PUT",
+                f"/api/v1/assignments/{invalid_id}/details",
+                token=token,
+                payload={
+                    "version": int(invalid_source["version"]),
+                    "title": "过期版本",
+                    "expectedMinutes": 20,
+                },
+            ),
+            (409,),
+            "stale parent assignment edit version conflict",
+        )
+
+        expect(
+            http(
+                base_url,
+                "PUT",
+                f"/api/v1/assignments/{approve_id}/details",
+                token=token,
+                payload={
+                    "version": int(approve_source["version"]),
+                    "title": "提交后不应允许修改",
+                    "expectedMinutes": 20,
+                },
+            ),
+            (400,),
+            "reject parent edit after submission",
+        )
+
         expect(
             http(
                 base_url,
@@ -131,7 +191,7 @@ def main() -> int:
                 "POST",
                 f"/api/v1/assignments/{invalid_id}/review",
                 token=token,
-                payload={"decision": "APPROVE", "version": int(invalid_source["version"]), "note": ""},
+                payload={"decision": "APPROVE", "version": int(edited["version"]), "note": ""},
             ),
             (400,),
             "reject review outside SUBMITTED",

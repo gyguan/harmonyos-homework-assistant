@@ -56,7 +56,7 @@ require("private boolean logPayloads = true;" in http_config and
 
 for scene in [
     "assignment.sync.snapshot", "assignment.query", "assignment.get", "assignment.create", "assignment.batchPublish",
-    "assignment.action", "assignment.sync.dirty", "parent.review",
+    "assignment.action", "assignment.sync.dirty", "parent.assignment.edit", "parent.review",
 ]:
     require(scene in assignment, f"assignment API scene missing: {scene}")
 for scene in ["tutor.history.latest", "tutor.history.more", "tutor.ask"]:

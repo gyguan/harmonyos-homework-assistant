@@ -209,6 +209,25 @@ public class AssignmentService {
   }
 
   @Transactional
+  public AssignmentDtos.Response updateDetails(UUID familyId, String id, AssignmentDtos.DetailsUpdate input) {
+    AssignmentEntity e = requireOwned(familyId, id);
+    if (e.version != input.version()) throw new ApiExceptions.Conflict("作业已在其他设备更新，请刷新后重试");
+    if ("SUBMITTED".equals(e.status) || "COMPLETED".equals(e.status)) {
+      throw new ApiExceptions.BadRequest("已提交或已完成的作业不能再修改任务内容");
+    }
+
+    e.title = input.title().trim();
+    if (input.instruction() != null) e.instruction = input.instruction();
+    if (input.textbookRef() != null) e.textbookRef = input.textbookRef();
+    if (input.dueText() != null) e.dueText = input.dueText();
+    if (input.dueAtEpochMs() != null) e.dueAt = dueAt(input.dueAtEpochMs());
+    if (input.dueTimezone() != null) e.dueTimezone = dueTimezone(input.dueTimezone());
+    if (input.expectedMinutes() != null) e.expectedMinutes = expectedMinutes(input.expectedMinutes());
+    e.updatedAt = Instant.now();
+    return AssignmentDtos.Response.from(repository.saveAndFlush(e));
+  }
+
+  @Transactional
   public AssignmentDtos.BatchSyncResponse syncBatch(UUID familyId, String studentId,
       AssignmentDtos.BatchSyncRequest input) {
     students.requireOwned(familyId, studentId);

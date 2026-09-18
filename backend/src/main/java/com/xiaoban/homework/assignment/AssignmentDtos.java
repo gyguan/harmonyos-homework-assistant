@@ -25,6 +25,10 @@ public final class AssignmentDtos {
       @Min(1) @Max(240) Integer expectedMinutes, Long startedAtEpochMs,
       Long finishedAtEpochMs, Long elapsedSeconds, @Size(max = 1000) String reviewNote) {}
 
+  public record DetailsUpdate(@NotNull Long version, @NotBlank String title, String instruction,
+      String textbookRef, String dueText, Long dueAtEpochMs, String dueTimezone,
+      @Min(1) @Max(240) Integer expectedMinutes) {}
+
   public record ActionRequest(@NotBlank String action, @NotNull Long version) {}
 
   public record ReviewRequest(@NotBlank String decision, @NotNull Long version,
