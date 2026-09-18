@@ -43,8 +43,10 @@ require("expectedMinutes: this.expectedMinutes(remote.expectedMinutes)" in remot
 require("return Math.max(5, Math.min(120" in remote,
         "HarmonyOS must defensively bound provider duration")
 require("onMinutesChange" in confirmation_components and "预计用时" in confirmation_components and
-        "TextInput({ text: `${this.item.expectedMinutes}` })" in confirmation_components,
-        "parent confirmation must keep manual duration override in the reactive editor")
+        "placeholder: '自定义'" in confirmation_components and
+        "if (minutes < 1) minutes = 1;" in confirmation_components and
+        "if (minutes > 240) minutes = 240;" in confirmation_components,
+        "parent confirmation must keep a bounded custom duration override in the reactive editor")
 require("onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "confirmation page must persist duration changes from the reactive editor")
 require(".bindSheet($this.showEditorSheet" in confirmation and
