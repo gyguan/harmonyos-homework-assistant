@@ -7,10 +7,6 @@ import { AssignmentCapability } from './AssignmentCapability';
  */
 export class AssignmentCapabilityResolver {
   static resolve(assignment: Assignment): AssignmentCapability {
-    if (assignment.capability !== undefined) {
-      return assignment.capability;
-    }
-
     switch (assignment.contentType) {
       case AssignmentContentType.AUDIO_IMAGE:
         return {
