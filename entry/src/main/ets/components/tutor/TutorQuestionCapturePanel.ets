@@ -38,43 +38,31 @@ export struct TutorQuestionCapturePanel {
   }
 
   build() {
-    Column({ space: 9 }) {
-      Row({ space: 10 }) {
-        Button(this.capturing ? '识别中…' : '拍题问小伴', { type: ButtonType.Normal })
-          .layoutWeight(1)
-          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(!this.capturing)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .fontColor(AppTheme.PRIMARY)
-          .onClick(() => { void this.capture(); });
-        if (this.imageUri.length > 0) {
-          Image(this.imageUri)
-            .width(54)
-            .height(54)
-            .objectFit(ImageFit.Cover)
-            .borderRadius(10)
-            .backgroundColor(AppTheme.SURFACE_EMPHASIS);
-        }
-      }
-      .width('100%');
+    Row({ space: 8 }) {
+      Button(this.capturing ? '识别中…' : '拍题问小伴', { type: ButtonType.Normal })
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.capturing)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .fontColor(AppTheme.PRIMARY)
+        .onClick(() => { void this.capture(); });
 
-      Text('题目图片只在本机识别；发送给小伴的是你检查、修改后的识别文字。')
-        .width('100%')
+      if (this.imageUri.length > 0) {
+        Image(this.imageUri)
+          .width(40)
+          .height(40)
+          .objectFit(ImageFit.Cover)
+          .borderRadius(8)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS);
+      }
+
+      Text(this.notice.length > 0 ? this.notice : '只在本机识别 · 识别后可编辑')
+        .layoutWeight(1)
         .fontSize(AppTheme.CAPTION_SIZE)
         .lineHeight(18)
-        .fontColor(AppTheme.SUBTEXT);
-
-      if (this.notice.length > 0) {
-        Text(this.notice)
-          .width('100%')
-          .fontSize(AppTheme.CAPTION_SIZE)
-          .fontColor(this.imageUri.length > 0 ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
-      }
+        .fontColor(this.imageUri.length > 0 ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
     }
     .width('100%')
-    .padding(12)
-    .backgroundColor(AppTheme.SURFACE_SUBTLE)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+    .alignItems(VerticalAlign.Center);
   }
 }
