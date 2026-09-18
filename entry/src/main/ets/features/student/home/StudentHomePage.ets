@@ -239,6 +239,10 @@ export struct StudentHomePage {
   private readonly viewModel: StudentHomeViewModel =
     new StudentHomeViewModel(DefaultAssignmentRepository.instance);
 
+  aboutToAppear(): void {
+    this.initializeSubjectExpansion();
+  }
+
   private initializeSubjectExpansion(): void {
     if (this.subjectExpansionInitialized) return;
     let groups = this.viewModel.todaySubjectGroups();
@@ -249,7 +253,7 @@ export struct StudentHomePage {
   }
 
   private touchRevision(): number {
-    return this.revision + this.refreshRevision;
+    return this.revision;
   }
 
   private subjectGroups(): StudentHomeSubjectGroup[] {
