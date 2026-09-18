@@ -1,10 +1,10 @@
 import { BackendAuthService } from '../../../application/remote/BackendAuthService';
 import { BackendSession } from '../../../application/remote/BackendSession';
 import { FamilyCloudService } from '../../../application/remote/FamilyCloudService';
-import { HomeworkSyncService } from '../../../application/remote/HomeworkSyncService';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { SettingsToggleRow } from '../../../components/selection/SelectionControls';
+import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
@@ -70,7 +70,7 @@ export struct BackendConnectionPage {
     try {
       let displayName = await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
       let familySynced = await FamilyCloudService.instance.syncStudents();
-      let homeworkSynced = await HomeworkSyncService.instance.syncActiveStudent();
+      let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
       this.pageRevision++;
       this.message = familySynced && homeworkSynced ? `已连接：${displayName}，家庭数据已同步` : `已登录：${displayName}，部分数据稍后再同步`;
       this.onStoreChanged();
@@ -137,7 +137,7 @@ export struct BackendConnectionPage {
       this.pageRevision++;
       this.message = '孩子资料已保存并同步';
       this.onStoreChanged();
-      HomeworkSyncService.instance.requestSync();
+      DefaultAssignmentRepository.instance.requestSync();
     } else {
       this.message = '保存失败，请确认云端连接';
     }
@@ -361,7 +361,7 @@ export struct BackendConnectionPage {
           Row({ space: 8 }) {
             Button('立即同步', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
               .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
-              .onClick(() => { void this.refreshStudents(); HomeworkSyncService.instance.requestSync(); });
+              .onClick(() => { void this.refreshStudents(); DefaultAssignmentRepository.instance.requestSync(); });
             Button('断开连接', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
               .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
               .onClick(() => { void this.disconnect(); });
