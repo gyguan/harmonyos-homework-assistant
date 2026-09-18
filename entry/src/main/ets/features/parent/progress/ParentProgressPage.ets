@@ -58,13 +58,6 @@ export struct ParentProgressPage {
 
   aboutToAppear(): void {
     this.rebuildView();
-    void this.refresh();
-  }
-
-  private async refresh(): Promise<void> {
-    await this.viewModel.refresh();
-    this.refreshRevision++;
-    this.rebuildView();
   }
 
   private canUseReviewPane(): boolean {

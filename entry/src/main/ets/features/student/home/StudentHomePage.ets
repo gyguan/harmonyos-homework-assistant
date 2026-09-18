@@ -231,7 +231,6 @@ struct StudentSubjectTaskGroupCard {
 export struct StudentHomePage {
   @Prop offlineMode: boolean = false;
   @Prop revision: number = 0;
-  @State private refreshRevision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private expandedSubjectKey: string = '';
   @State private subjectExpansionInitialized: boolean = false;
@@ -241,12 +240,6 @@ export struct StudentHomePage {
     new StudentHomeViewModel(DefaultAssignmentRepository.instance);
 
   aboutToAppear(): void {
-    void this.refresh();
-  }
-
-  private async refresh(): Promise<void> {
-    await this.viewModel.refresh();
-    this.refreshRevision++;
     this.initializeSubjectExpansion();
   }
 
@@ -260,7 +253,7 @@ export struct StudentHomePage {
   }
 
   private touchRevision(): number {
-    return this.revision + this.refreshRevision;
+    return this.revision;
   }
 
   private subjectGroups(): StudentHomeSubjectGroup[] {

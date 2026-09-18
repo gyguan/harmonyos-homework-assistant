@@ -1,8 +1,6 @@
 import { BackendSession } from '../../application/remote/BackendSession';
 import { HomeworkRemoteApi } from '../../application/remote/HomeworkRemoteApi';
 import { RemoteAssignment, RemoteAssignmentMapper } from '../../application/remote/RemoteModels';
-import { RemoteSubmissionApi } from '../../application/remote/RemoteSubmissionApi';
-import { RemoteSubmissionCache } from '../../application/remote/RemoteSubmissionCache';
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
 import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDecision';
@@ -162,22 +160,19 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   }
 
   async refresh(): Promise<boolean> {
-    // A refresh always starts a new active-child context. Clear in-memory query/summary caches
-    // synchronously so the newly selected child can never render a sibling's cached summary.
+    // One authoritative assignment snapshot is enough to rebuild every cached home/progress metric.
+    // Submission evidence is deliberately loaded on demand by ParentSubmissionEvidenceService;
+    // never fan out one submissions request per assignment during a general refresh.
     this.queryCache = [];
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
     if (!BackendSession.instance.isConnected()) return false;
     let synced = await this.syncActiveStudentAssignments();
     if (!synced) return false;
+
     let activeStudentId = this.local.getActiveStudentId();
-    try {
-      this.remoteSummary = await HomeworkRemoteApi.instance.todaySummary(activeStudentId);
-      this.remoteSummaryStudentId = activeStudentId;
-    } catch {
-      this.remoteSummary = null;
-      this.remoteSummaryStudentId = '';
-    }
+    this.remoteSummary = this.local.getTodaySummary();
+    this.remoteSummaryStudentId = activeStudentId;
     return true;
   }
 
@@ -185,9 +180,15 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     if (!BackendSession.instance.isConnected()) return false;
     let studentId = this.local.getActiveStudentId();
     try {
+      // Fetch the server snapshot exactly once. Mutating commands below already return the
+      // authoritative Assignment, so there is no reason to GET the same list a second time.
       let remote = await HomeworkRemoteApi.instance.list(studentId);
       let remoteById: Map<string, RemoteAssignment> = new Map<string, RemoteAssignment>();
-      for (let item of remote) remoteById.set(item.id, item);
+      let remoteOrder: string[] = [];
+      for (let item of remote) {
+        remoteById.set(item.id, item);
+        remoteOrder.push(item.id);
+      }
 
       let localAssignments = this.local.listAssignments();
       for (let assignment of localAssignments) {
@@ -196,30 +197,29 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
           // Only real assignments published from Candidate drafts are uploaded automatically.
           // Demo/seed assignments remain local fixtures.
           if (assignment.candidateId.length === 0) continue;
-          await HomeworkRemoteApi.instance.create(assignment);
+          let created = await HomeworkRemoteApi.instance.create(assignment);
+          remoteById.set(created.id, created);
+          remoteOrder.push(created.id);
           continue;
         }
 
         // A client may update only from the exact server version it last persisted. If another
-        // device advanced the version, the authoritative refresh below deliberately wins.
+        // device advanced the version, the server snapshot deliberately wins.
         if (assignment.syncDirty && assignment.remoteVersion === existing.version) {
           try {
-            await HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion);
+            let updated = await HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion);
+            remoteById.set(updated.id, updated);
           } catch {
-            // Conflict/transient failures are reconciled by the authoritative final refresh.
+            // Conflict/transient failures keep the already fetched authoritative server version.
           }
         }
       }
 
-      let finalRemote = await HomeworkRemoteApi.instance.list(studentId);
       let merged: Assignment[] = [];
-      for (let item of finalRemote) {
+      for (let assignmentId of remoteOrder) {
+        let item = remoteById.get(assignmentId);
+        if (item === undefined) continue;
         merged.push(RemoteAssignmentMapper.toLocal(item, this.local.getAssignment(item.id)));
-        try {
-          RemoteSubmissionCache.instance.replace(item.id, await RemoteSubmissionApi.instance.list(item.id));
-        } catch {
-          // Submission metadata is best-effort and must not block Assignment reconciliation.
-        }
       }
       this.local.replaceAssignmentsForActiveStudent(merged);
       return true;

@@ -97,6 +97,15 @@ export struct BackendConnectionPage {
     }
   }
 
+  private async syncCloudData(): Promise<void> {
+    let familySynced = await FamilyCloudService.instance.syncStudents();
+    let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
+    this.syncLocalStudents();
+    this.pageRevision++;
+    this.message = familySynced && homeworkSynced ? '家庭数据已同步' : '部分数据同步失败，请稍后重试';
+    this.onStoreChanged();
+  }
+
   private beginAdd(): void {
     this.deleteStudentConfirmId = '';
     this.editingId = `student-${Date.now()}`;
@@ -147,7 +156,6 @@ export struct BackendConnectionPage {
       this.pageRevision++;
       this.message = '孩子资料已保存并同步';
       this.onStoreChanged();
-      DefaultAssignmentRepository.instance.requestSync();
     } else {
       this.message = '保存失败，请确认云端连接';
     }
@@ -379,7 +387,7 @@ export struct BackendConnectionPage {
           Row({ space: 8 }) {
             Button('立即同步', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
               .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
-              .onClick(() => { void this.refreshStudents(); DefaultAssignmentRepository.instance.requestSync(); });
+              .onClick(() => { void this.syncCloudData(); });
             Button('断开连接', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
               .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
               .onClick(() => { void this.disconnect(); });
