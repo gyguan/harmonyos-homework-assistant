@@ -1,5 +1,5 @@
 import { BackendSession } from '../../application/remote/BackendSession';
-import { HomeworkRemoteApi } from '../../application/remote/HomeworkRemoteApi';
+import { AssignmentSyncEntry, HomeworkRemoteApi } from '../../application/remote/HomeworkRemoteApi';
 import { RemoteAssignment, RemoteAssignmentMapper } from '../../application/remote/RemoteModels';
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
@@ -191,6 +191,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       }
 
       let localAssignments = this.local.listAssignments();
+      let dirtyEntries: AssignmentSyncEntry[] = [];
       for (let assignment of localAssignments) {
         let existing = remoteById.get(assignment.id);
         if (existing === undefined) {
@@ -203,15 +204,22 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
           continue;
         }
 
-        // A client may update only from the exact server version it last persisted. If another
-        // device advanced the version, the server snapshot deliberately wins.
+        // Dirty updates are collected first and sent in bounded batches below. A version mismatch
+        // deliberately keeps the already fetched authoritative server snapshot.
         if (assignment.syncDirty && assignment.remoteVersion === existing.version) {
-          try {
-            let updated = await HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion);
-            remoteById.set(updated.id, updated);
-          } catch {
-            // Conflict/transient failures keep the already fetched authoritative server version.
+          dirtyEntries.push({ assignment: assignment, version: assignment.remoteVersion });
+        }
+      }
+
+      for (let offset = 0; offset < dirtyEntries.length; offset += 50) {
+        let chunk = dirtyEntries.slice(offset, Math.min(offset + 50, dirtyEntries.length));
+        try {
+          let batch = await HomeworkRemoteApi.instance.sync(studentId, chunk);
+          for (let result of batch.results) {
+            remoteById.set(result.assignment.id, result.assignment);
           }
+        } catch {
+          // Keep the original server snapshot when a transient batch sync fails.
         }
       }
 
