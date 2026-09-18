@@ -17,39 +17,33 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 pane = read("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
-fullscreen = read("entry/src/main/ets/components/assignment/VoiceAssignmentFullscreenDialog.ets")
+legacy = ROOT / "entry/src/main/ets/components/assignment/VoiceAssignmentFullscreenDialog.ets"
 
 require("private previousImage()" in pane and "private nextImage()" in pane,
         "normal voice workspace must retain previous/next image navigation")
 require("Button('←'" in pane and "Button('→'" in pane,
-        "normal voice workspace must use visually centered arrow buttons")
-require("Button('全屏查看'" in pane and "this.fullscreenController.open()" in pane,
+        "voice workspace must use visually centered arrow buttons")
+require("Button('全屏查看'" in pane,
         "voice workspace must expose a prominent fullscreen entry")
-require("VoiceAssignmentFullscreenDialog" in pane and
-        "AssignmentAudioPlayerService" not in fullscreen,
-        "fullscreen view must reuse the pane player instead of creating a second AVPlayer service")
-for state in ["imageUris: $imageUris", "imageIndex: $imageIndex", "playing: $playing",
-              "currentTimeMs: $currentTimeMs", "durationMs: $durationMs"]:
-    require(state in pane, f"fullscreen must share media state through @Link: {state}")
-require("fullscreenPlaybackEnabled" not in pane and "fullscreenPrepared" not in pane,
-        "fullscreen must not keep duplicated playback readiness state")
-require("onClose: () => this.closeFullscreen()" in pane and
-        "this.fullscreenController.close()" in pane,
-        "fullscreen close must be owned by the parent controller")
-require("Button('关闭'" in fullscreen and ".onClick(() => this.onClose())" in fullscreen,
-        "fullscreen must use an explicit button that delegates close to the parent")
-require("Button(this.playing ? 'Ⅱ' : '▶'" in fullscreen and
-        ".onClick(() => this.onToggleAudio())" in fullscreen,
-        "fullscreen play/pause must delegate directly to the existing player")
-require("playbackEnabled" not in fullscreen and "prepared" not in fullscreen,
-        "fullscreen controls must not be blocked by copied readiness links")
-require("Button('←'" in fullscreen and "Button('→'" in fullscreen and
-        ".alignItems(VerticalAlign.Center)" in fullscreen,
-        "fullscreen image arrows must be visually centered")
-require("ForEach(this.imageUris" in fullscreen,
+require("@State private fullscreenOpen: boolean = false" in pane,
+        "fullscreen visibility must be state-driven")
+require("this.fullscreenOpen = true" in pane and "this.fullscreenOpen = false" in pane,
+        "fullscreen open/close must directly update local state")
+require(".bindContentCover(this.fullscreenOpen, this.FullscreenMediaView())" in pane,
+        "fullscreen must use a state-driven full modal instead of CustomDialogController")
+require("CustomDialogController" not in pane and "VoiceAssignmentFullscreenDialog" not in pane and "$this" not in pane,
+        "voice fullscreen must use standard state binding without the legacy CustomDialog or invalid $this syntax")
+require("Button('关闭'" in pane and ".onClick(() => this.closeFullscreen())" in pane,
+        "fullscreen close button must directly close the local state-driven modal")
+require("Button(this.playing ? 'Ⅱ' : '▶'" in pane and
+        ".onClick(() => { void this.toggleAudio(); })" in pane,
+        "fullscreen play/pause must call the same pane player directly")
+require("this.player.seek(value)" in pane,
+        "fullscreen progress slider must seek on the same player")
+require("ForEach(this.imageUris" in pane,
         "fullscreen media view must keep thumbnail switching")
-require("Slider({" in fullscreen and "this.onSeek(value)" in fullscreen,
-        "fullscreen media view must keep the audio progress slider")
+require(not legacy.exists(),
+        "legacy VoiceAssignmentFullscreenDialog must be removed after state-modal migration")
 
 if errors:
     print("VOICE_WORKSPACE_FULLSCREEN_GATE_FAIL")
