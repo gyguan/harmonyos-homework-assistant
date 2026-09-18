@@ -45,6 +45,20 @@ public class AssignmentController {
     return service.list(familyId, studentId, type, subjectCode, from, to, status, undated);
   }
 
+  @GetMapping("/students/{studentId}/assignments/page")
+  public AssignmentDtos.PageResponse page(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId,
+      @RequestParam(required = false) String type,
+      @RequestParam(required = false) String subjectCode,
+      @RequestParam(required = false) Long from,
+      @RequestParam(required = false) Long to,
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) Boolean undated,
+      @RequestParam(defaultValue = "0") int page,
+      @RequestParam(defaultValue = "50") int limit) {
+    return service.page(familyId, studentId, type, subjectCode, from, to, status, undated, page, limit);
+  }
+
   @GetMapping("/students/{studentId}/assignments/summary")
   public AssignmentDtos.TodaySummary todaySummary(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String studentId, @RequestParam(required = false) LocalDate date) {
@@ -63,6 +77,14 @@ public class AssignmentController {
       @PathVariable String studentId,
       @Valid @RequestBody AssignmentDtos.BatchPublishRequest input) {
     return batchPublishService.publish(familyId, studentId, input);
+  }
+
+  @PostMapping("/students/{studentId}/assignments/sync")
+  public AssignmentDtos.BatchSyncResponse sync(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId,
+      @Valid @RequestBody AssignmentDtos.BatchSyncRequest input) {
+    return service.syncBatch(familyId, studentId, input);
   }
 
   @PostMapping("/assignments/{id}/actions")
