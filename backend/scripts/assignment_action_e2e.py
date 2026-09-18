@@ -125,10 +125,23 @@ def main() -> int:
         require(first_after_second is not None and first_after_second.get("status") == "PAUSED",
                 "starting second assignment did not server-pause the first active assignment")
 
+        time.sleep(1.1)
         ready = action(base_url, token, second_id, int(second_started["version"]), "READY_TO_SUBMIT")
         require(ready.get("status") == "READY_TO_SUBMIT", "READY_TO_SUBMIT action failed")
         require(int(ready.get("startedAtEpochMs", -1)) == 0, "READY_TO_SUBMIT did not close active timer")
         require(int(ready.get("finishedAtEpochMs", 0)) > 0, "READY_TO_SUBMIT did not set server finish time")
+        require(int(ready.get("elapsedSeconds", 0)) >= 1,
+                "READY_TO_SUBMIT did not preserve accumulated work time")
+
+        second_resumed = action(base_url, token, second_id, int(ready["version"]), "START")
+        require(second_resumed.get("status") == "IN_PROGRESS",
+                "START did not return READY_TO_SUBMIT assignment to active work")
+        require(int(second_resumed.get("elapsedSeconds", -1)) >= int(ready.get("elapsedSeconds", 0)),
+                "continuing from submission preparation reset accumulated work time")
+        ready_again = action(
+            base_url, token, second_id, int(second_resumed["version"]), "READY_TO_SUBMIT")
+        require(ready_again.get("status") == "READY_TO_SUBMIT",
+                "second READY_TO_SUBMIT after continue failed")
 
         # Starting B auto-paused A and advanced A's optimistic version. Simulate the HarmonyOS
         # cache still holding A's pre-pause version, then recover with one single-assignment GET.
@@ -162,7 +175,7 @@ def main() -> int:
                 "POST",
                 f"/api/v1/assignments/{second_id}/actions",
                 token=token,
-                payload={"action": "UNKNOWN_ACTION", "version": int(ready["version"])},
+                payload={"action": "UNKNOWN_ACTION", "version": int(ready_again["version"])},
             ),
             (400,),
             "reject unsupported assignment action",
