@@ -23,8 +23,6 @@ export struct VoiceAssignmentPane {
   @State private playing: boolean = false;
   @State private currentTimeMs: number = 0;
   @State private durationMs: number = 0;
-  @State private fullscreenPlaybackEnabled: boolean = false;
-  @State private fullscreenPrepared: boolean = false;
 
   onPauseReady: (pause: () => void) => void = (_pause: () => void) => {};
   private readonly player: AssignmentAudioPlayerService = new AssignmentAudioPlayerService();
@@ -36,8 +34,7 @@ export struct VoiceAssignmentPane {
       playing: $playing,
       currentTimeMs: $currentTimeMs,
       durationMs: $durationMs,
-      playbackEnabled: $fullscreenPlaybackEnabled,
-      prepared: $fullscreenPrepared,
+      onClose: () => this.closeFullscreen(),
       onToggleAudio: () => { void this.toggleAudio(); },
       onSeek: (value: number) => this.player.seek(value)
     }),
@@ -95,7 +92,6 @@ export struct VoiceAssignmentPane {
       let callbacks: AssignmentAudioPlayerCallbacks = {
         onPrepared: (durationMs: number) => {
           this.prepared = true;
-          this.fullscreenPrepared = true;
           this.durationMs = durationMs;
           this.currentTimeMs = 0;
         },
@@ -147,9 +143,11 @@ export struct VoiceAssignmentPane {
 
   private openFullscreen(): void {
     if (this.imageUris.length === 0 || this.audioUri.length === 0) return;
-    this.fullscreenPlaybackEnabled = this.playbackEnabled;
-    this.fullscreenPrepared = this.prepared;
     this.fullscreenController.open();
+  }
+
+  private closeFullscreen(): void {
+    this.fullscreenController.close();
   }
 
   private formatTime(ms: number): string {
@@ -172,19 +170,19 @@ export struct VoiceAssignmentPane {
 
         if (this.imageUris.length > 1) {
           Row() {
-            Button('‹', { type: ButtonType.Circle })
+            Button('←', { type: ButtonType.Circle })
               .width(42)
               .height(42)
-              .fontSize(28)
+              .fontSize(22)
               .backgroundColor('#CCFFFFFF')
               .fontColor(AppTheme.TEXT)
               .accessibilityText('上一张情景图片')
               .onClick(() => this.previousImage());
             Blank();
-            Button('›', { type: ButtonType.Circle })
+            Button('→', { type: ButtonType.Circle })
               .width(42)
               .height(42)
-              .fontSize(28)
+              .fontSize(22)
               .backgroundColor('#CCFFFFFF')
               .fontColor(AppTheme.TEXT)
               .accessibilityText('下一张情景图片')
@@ -204,14 +202,15 @@ export struct VoiceAssignmentPane {
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .backgroundColor('#66000000')
               .borderRadius(12);
-            Text('全屏')
-              .padding({ left: 9, right: 9, top: 4, bottom: 4 })
-              .fontSize(11)
+            Button('全屏查看', { type: ButtonType.Normal })
+              .width(88)
+              .height(36)
+              .padding({ left: 10, right: 10 })
+              .fontSize(12)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .backgroundColor('#66000000')
-              .borderRadius(12)
-              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .backgroundColor(AppTheme.PRIMARY)
+              .borderRadius(18)
               .accessibilityText('全屏查看图片和语音')
               .onClick(() => this.openFullscreen());
           }
