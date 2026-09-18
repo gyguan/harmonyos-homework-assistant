@@ -20,7 +20,8 @@ def require(condition: bool, message: str) -> None:
 
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 family_context_port = read("entry/src/main/ets/domain/port/FamilyContextRepository.ets")
-family_context_adapter = read("entry/src/main/ets/data/repository/DefaultFamilyContextRepository.ets")
+family_context_repository = read("entry/src/main/ets/data/repository/DefaultFamilyContextRepository.ets")
+family_context_local = read("entry/src/main/ets/data/local/FamilyContextLocalDataSource.ets")
 parent = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 student = read("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
 selection_controls = read("entry/src/main/ets/components/selection/SelectionControls.ets")
@@ -44,8 +45,10 @@ require("HomeworkStore" not in parent and "FamilyContextRepository" in parent an
         "parent page must mutate Tutor rules through the FamilyContextRepository boundary")
 require("updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean)" in family_context_port,
         "FamilyContextRepository must expose the Tutor settings mutation")
-require("HomeworkStore.instance.updateTutorSettings(tutorGuidanceFirst, directAnswerAllowed)" in family_context_adapter,
-        "legacy FamilyContext adapter must preserve Store-backed persistence during Final Cleanup")
+require("HomeworkStore" not in family_context_repository and "FamilyContextLocalDataSource" in family_context_repository,
+        "FamilyContextRepository implementation must not access HomeworkStore directly")
+require("HomeworkStore.instance.updateTutorSettings(tutorGuidanceFirst, directAnswerAllowed)" in family_context_local,
+        "legacy FamilyContext local adapter must preserve Store-backed persistence during Final Cleanup")
 require("getStudents(): StudentProfile[]" in family_context_port and "getSettings(): AppSettings" in family_context_port,
         "FamilyContextRepository must own family/settings reads used by Feature pages")
 require("允许直接答案" in parent and "默认建议关闭" in parent,
