@@ -38,10 +38,9 @@ export struct TutorQuestionCapturePanel {
   }
 
   build() {
-    Column({ space: 9 }) {
-      Row({ space: 10 }) {
+    Column({ space: 6 }) {
+      Row({ space: 8 }) {
         Button(this.capturing ? '识别中…' : '拍题问小伴', { type: ButtonType.Normal })
-          .layoutWeight(1)
           .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .enabled(!this.capturing)
@@ -50,31 +49,32 @@ export struct TutorQuestionCapturePanel {
           .onClick(() => { void this.capture(); });
         if (this.imageUri.length > 0) {
           Image(this.imageUri)
-            .width(54)
-            .height(54)
+            .width(44)
+            .height(44)
             .objectFit(ImageFit.Cover)
-            .borderRadius(10)
+            .borderRadius(9)
             .backgroundColor(AppTheme.SURFACE_EMPHASIS);
         }
+        Blank();
+        Text('本机识别')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
-
-      Text('题目图片只在本机识别；发送给小伴的是你检查、修改后的识别文字。')
-        .width('100%')
-        .fontSize(AppTheme.CAPTION_SIZE)
-        .lineHeight(18)
-        .fontColor(AppTheme.SUBTEXT);
 
       if (this.notice.length > 0) {
         Text(this.notice)
           .width('100%')
           .fontSize(AppTheme.CAPTION_SIZE)
           .fontColor(this.imageUri.length > 0 ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+      } else {
+        Text('题目图片只在本机识别，识别文字可继续编辑后再发送。')
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(18)
+          .fontColor(AppTheme.SUBTEXT);
       }
     }
-    .width('100%')
-    .padding(12)
-    .backgroundColor(AppTheme.SURFACE_SUBTLE)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+    .width('100%');
   }
 }
