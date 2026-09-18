@@ -105,6 +105,11 @@ for phrase in ["不要直接给出", "个人信息", "可信成年人"]:
     require(phrase in tutor_prompt, f"Tutor safety/guidance prompt missing: {phrase}")
 require('@PostMapping("/messages")' in tutor_controller,
         "Tutor API must support real persisted conversations")
+require("@RequestParam(required = false) Long before" in tutor_controller and
+        '@RequestParam(defaultValue = "40") int limit' in tutor_controller,
+        "Tutor history API must expose bounded backward pagination")
+require("MODEL_CONTEXT_MESSAGES = 20" in read("backend/src/main/java/com/xiaoban/homework/tutor/TutorService.java"),
+        "Tutor model context must stay bounded independently from persisted history")
 
 require("optional:file:./config/application-local.yml" in app_yml,
         "backend must automatically load the external local override file")
@@ -149,9 +154,9 @@ require("FamilyCloudService" in settings_page and "StudentRemoteApi" in family_c
 require("TutorRemoteApi" in study and "/tutor/messages" in tutor_remote,
         "student workspace must use the real backend Tutor API")
 require("RemoteSubmissionCache" in parent_evidence and "RemoteSubmissionCache" in submission_cache and
-        "RemoteSubmissionApi.instance.list" in parent_evidence and
+        "RemoteSubmissionApi.instance.latest" in parent_evidence and
         "ParentSubmissionEvidenceService" in parent_review and "CloudSubmissionPhotoStrip" in parent_review,
-        "V2 Parent Review must expose cross-device cloud submission metadata through the evidence boundary")
+        "V2 Parent Review must fetch only the latest cross-device submission through the evidence boundary")
 
 ets_root = ROOT / "entry" / "src" / "main" / "ets"
 if ets_root.exists():

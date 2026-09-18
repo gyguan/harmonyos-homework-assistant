@@ -34,6 +34,33 @@ interface BatchPublishItemBody {
 interface BatchPublishBody {
   items: BatchPublishItemBody[];
 }
+interface RemoteAssignmentPage {
+  items: RemoteAssignment[];
+  page: number;
+  limit: number;
+  hasMore: boolean;
+  total: number;
+}
+interface BatchSyncItemBody {
+  id: string;
+  assignment: UpdateAssignmentBody;
+}
+interface BatchSyncBody {
+  items: BatchSyncItemBody[];
+}
+export interface AssignmentSyncEntry {
+  assignment: Assignment;
+  version: number;
+}
+export interface RemoteBatchSyncResult {
+  id: string;
+  applied: boolean;
+  assignment: RemoteAssignment;
+}
+export interface RemoteBatchSyncResponse {
+  processedCount: number;
+  results: RemoteBatchSyncResult[];
+}
 
 export interface BatchPublishEntry {
   candidateId: string;
@@ -56,9 +83,7 @@ export class HomeworkRemoteApi {
   private constructor() {}
 
   async list(studentId: string): Promise<RemoteAssignment[]> {
-    let response = await BackendHttpClient.instance.request(`/api/v1/students/${encodeURIComponent(studentId)}/assignments`, http.RequestMethod.GET);
-    if (response.statusCode !== 200) throw new Error(`拉取作业失败: ${response.statusCode}`);
-    return JSON.parse(response.body) as RemoteAssignment[];
+    return this.listPaged(studentId, []);
   }
 
   async listFiltered(studentId: string, filter: AssignmentFilter): Promise<RemoteAssignment[]> {
@@ -74,11 +99,7 @@ export class HomeworkRemoteApi {
     if (filter.undatedOnly) params.push('undated=true');
     if (filter.statuses.length === 1) params.push(`status=${encodeURIComponent(filter.statuses[0])}`);
 
-    let suffix = params.length === 0 ? '' : `?${params.join('&')}`;
-    let response = await BackendHttpClient.instance.request(
-      `/api/v1/students/${encodeURIComponent(studentId)}/assignments${suffix}`, http.RequestMethod.GET);
-    if (response.statusCode !== 200) throw new Error(`筛选作业失败: ${response.statusCode}`);
-    return JSON.parse(response.body) as RemoteAssignment[];
+    return this.listPaged(studentId, params);
   }
 
   async todaySummary(studentId: string): Promise<TodaySummary> {
@@ -133,7 +154,55 @@ export class HomeworkRemoteApi {
   }
 
   async update(assignment: Assignment, version: number): Promise<RemoteAssignment> {
-    let body: UpdateAssignmentBody = {
+    let body: UpdateAssignmentBody = this.updateBody(assignment, version);
+    let response = await BackendHttpClient.instance.request(`/api/v1/assignments/${encodeURIComponent(assignment.id)}`, http.RequestMethod.PUT, body);
+    if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
+    if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`更新作业失败: ${response.statusCode}`);
+    return JSON.parse(response.body) as RemoteAssignment;
+  }
+
+  async sync(studentId: string, entries: AssignmentSyncEntry[]): Promise<RemoteBatchSyncResponse> {
+    let items: BatchSyncItemBody[] = [];
+    for (let entry of entries) {
+      items.push({ id: entry.assignment.id, assignment: this.updateBody(entry.assignment, entry.version) });
+    }
+    let body: BatchSyncBody = { items: items };
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/students/${encodeURIComponent(studentId)}/assignments/sync`,
+      http.RequestMethod.POST, body);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`批量同步作业失败: ${response.statusCode}`);
+    }
+    return JSON.parse(response.body) as RemoteBatchSyncResponse;
+  }
+
+  async delete(assignmentId: string): Promise<boolean> {
+    let response = await BackendHttpClient.instance.request(
+      `/api/v1/assignments/${encodeURIComponent(assignmentId)}`, http.RequestMethod.DELETE);
+    return response.statusCode === 200 || response.statusCode === 204 || response.statusCode === 404;
+  }
+
+  private async listPaged(studentId: string, baseParams: string[]): Promise<RemoteAssignment[]> {
+    let all: RemoteAssignment[] = [];
+    let page: number = 0;
+    while (page < 100) {
+      let params = baseParams.slice();
+      params.push(`page=${page}`);
+      params.push('limit=100');
+      let response = await BackendHttpClient.instance.request(
+        `/api/v1/students/${encodeURIComponent(studentId)}/assignments/page?${params.join('&')}`,
+        http.RequestMethod.GET);
+      if (response.statusCode !== 200) throw new Error(`拉取作业失败: ${response.statusCode}`);
+      let result = JSON.parse(response.body) as RemoteAssignmentPage;
+      for (let item of result.items) all.push(item);
+      if (!result.hasMore) return all;
+      page++;
+    }
+    throw new Error('作业分页超过安全上限');
+  }
+
+  private updateBody(assignment: Assignment, version: number): UpdateAssignmentBody {
+    return {
       version: version, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
       textbookRef: assignment.textbookRef, dueText: assignment.dueText,
       assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
@@ -142,16 +211,6 @@ export class HomeworkRemoteApi {
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
       elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote
     };
-    let response = await BackendHttpClient.instance.request(`/api/v1/assignments/${encodeURIComponent(assignment.id)}`, http.RequestMethod.PUT, body);
-    if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
-    if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`更新作业失败: ${response.statusCode}`);
-    return JSON.parse(response.body) as RemoteAssignment;
-  }
-
-  async delete(assignmentId: string): Promise<boolean> {
-    let response = await BackendHttpClient.instance.request(
-      `/api/v1/assignments/${encodeURIComponent(assignmentId)}`, http.RequestMethod.DELETE);
-    return response.statusCode === 200 || response.statusCode === 204 || response.statusCode === 404;
   }
 
   private createBody(assignment: Assignment): CreateAssignmentBody {

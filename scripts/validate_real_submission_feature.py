@@ -63,9 +63,9 @@ require("PhotoPreviewDialog" in study and "private openPhotoPreview(uri: string)
 require("ParentSubmissionEvidenceService" in review_pane and "CloudSubmissionPhotoStrip" in review_pane and
         "private LocalPhotos(uris: string[])" in review_pane and "Image(uri)" in review_pane,
         "V2 Parent Review must render remote submission photos and local seed/demo evidence")
-require("RemoteSubmissionApi.instance.list" in parent_evidence and
+require("RemoteSubmissionApi.instance.latest" in parent_evidence and
         "HomeworkSubmissionService.instance.listCached" in parent_evidence,
-        "Parent evidence boundary must prefer remote submissions with local persisted fallback")
+        "Parent evidence boundary must fetch only the latest remote submission with local persisted fallback")
 require("MOCK_IMAGE" not in service + study + review_pane + parent_evidence + store + models,
         "Mock submission path must not remain in the real submission flow")
 

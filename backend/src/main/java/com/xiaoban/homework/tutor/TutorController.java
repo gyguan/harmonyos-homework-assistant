@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -19,8 +20,10 @@ public class TutorController {
 
   @GetMapping
   public TutorDtos.Conversation conversation(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String assignmentId) {
-    return service.conversation(familyId, assignmentId);
+      @PathVariable String assignmentId,
+      @RequestParam(required = false) Long before,
+      @RequestParam(defaultValue = "40") int limit) {
+    return service.conversation(familyId, assignmentId, before, limit);
   }
 
   @PostMapping("/messages")

@@ -31,8 +31,9 @@ require(repository.count("HomeworkRemoteApi.instance.list(studentId)") == 1,
 require("HomeworkRemoteApi.instance.todaySummary" not in repository,
         "Assignment refresh must derive summary from the synchronized local snapshot")
 require("let created = await HomeworkRemoteApi.instance.create(assignment)" in repository and
-        "let updated = await HomeworkRemoteApi.instance.update(assignment, assignment.remoteVersion)" in repository,
-        "sync commands must reuse authoritative create/update responses instead of re-fetching the list")
+        "HomeworkRemoteApi.instance.sync(studentId, chunk)" in repository and
+        "remoteById.set(result.assignment.id, result.assignment)" in repository,
+        "sync commands must reuse authoritative create/batch-sync responses instead of re-fetching the list")
 
 # AppShell owns broad freshness. Child UI invalidation must never mean network synchronization.
 require("void this.refreshActiveStudent();" in app_shell,

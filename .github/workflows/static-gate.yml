@@ -138,6 +138,9 @@ jobs:
       - name: Validate API efficiency P0 invariants
         run: python scripts/validate_api_efficiency_p0.py
 
+      - name: Validate API efficiency P1 invariants
+        run: python scripts/validate_api_efficiency_p1.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v5
         with:
@@ -209,6 +212,9 @@ jobs:
 
       - name: Run batch publish E2E
         run: python backend/scripts/batch_publish_e2e.py
+
+      - name: Run API efficiency P1 E2E
+        run: python backend/scripts/api_efficiency_p1_e2e.py
 
       - name: Restart backend while keeping PostgreSQL
         run: |

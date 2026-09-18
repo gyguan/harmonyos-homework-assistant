@@ -146,9 +146,9 @@ require("async query(typeFilter: AssignmentTypeFilter" in view_model and "this.r
         "ViewModel must delegate confirmed filters to Repository")
 for param in ["String type", "String subjectCode", "Long from", "Long to", "String status", "Boolean undated"]:
     require(param in controller, f"backend assignment query missing parameter: {param}")
-require("matchesListFilter" in service and "statusFilter" in service and "compareForList" in service and
-        "undatedOnly" in service,
-        "backend must keep combined filtering and stable ordering")
+require("listSpecification" in service and "statusFilter" in service and "compareForList" in service and
+        "undatedOnly" in service and "repository.findAll(listSpecification" in service,
+        "backend must push combined filtering to the database while preserving stable legacy ordering")
 
 if errors:
     print("STUDENT_ASSIGNMENTS_NAVIGATION_GATE_FAIL")

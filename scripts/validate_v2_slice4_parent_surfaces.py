@@ -136,8 +136,8 @@ require("AssignmentStatus.SUBMITTED" in review_pane and "退回订正" in review
         "Parent Review must expose review actions only around submitted work")
 require("this.viewModel.approve" in review_pane and "this.viewModel.returnForRework" in review_pane,
         "Parent Review UI must delegate decisions to ParentReviewViewModel")
-require("RemoteSubmissionApi.instance.list" in evidence and "HomeworkSubmissionService.instance.listCached" in evidence,
-        "Parent evidence service must support remote evidence with local fallback")
+require("RemoteSubmissionApi.instance.latest" in evidence and "HomeworkSubmissionService.instance.listCached" in evidence,
+        "Parent evidence service must fetch only the latest remote evidence with local fallback")
 
 require("PARENT_REVIEW = 'parent/review'" in routes,
         "Parent Review must have a formal Navigation route")
