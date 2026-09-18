@@ -15,6 +15,17 @@ def fail(message: str) -> None:
     errors.append(message)
 
 
+ets_root = ROOT / "entry/src/main/ets"
+store_owner = "entry/src/main/ets/data/HomeworkStore.ets"
+local_prefix = "entry/src/main/ets/data/local/"
+for source_file in ets_root.rglob("*.ets"):
+    relative = source_file.relative_to(ROOT).as_posix()
+    if relative == store_owner or relative.startswith(local_prefix):
+        continue
+    source_text = source_file.read_text(encoding="utf-8")
+    if "HomeworkStore.instance" in source_text or "import { HomeworkStore }" in source_text:
+        fail(f"HomeworkStore access is restricted to data/local legacy adapters: {relative}")
+
 feature_root = ROOT / "entry/src/main/ets/features"
 for file in feature_root.rglob("*.ets"):
     relative = file.relative_to(ROOT).as_posix()

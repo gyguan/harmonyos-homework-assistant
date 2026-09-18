@@ -60,6 +60,7 @@ for path in required_paths:
     require((ROOT / path).exists(), f"missing durable project boundary: {path}")
 
 entry_ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
+local_bootstrap = read("entry/src/main/ets/data/local/HomeworkLocalBootstrap.ets")
 persistence_port = read("entry/src/main/ets/domain/port/HomeworkPersistence.ets")
 persistence_adapter = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkPersistence.ets")
 core_ocr = read("entry/src/main/ets/infrastructure/ai/CoreVisionHomeworkTextExtractor.ets")
@@ -77,6 +78,10 @@ require("class CoreVisionHomeworkTextExtractor" in core_ocr and "@kit.CoreVision
         "production OCR must remain behind the Core Vision adapter")
 require("PreferencesHomeworkPersistence" in entry_ability and "CoreVisionHomeworkTextExtractor" in entry_ability,
         "EntryAbility must compose production adapters")
+require("HomeworkStore" not in entry_ability and "HomeworkLocalBootstrap.instance.initialize" in entry_ability,
+        "EntryAbility must initialize local homework state through the data/local bootstrap boundary")
+require("HomeworkStore.instance.initialize(persistence)" in local_bootstrap,
+        "HomeworkLocalBootstrap must remain the only composition boundary that initializes HomeworkStore")
 require("MockHomeworkTextExtractor" not in entry_ability and "MockHomeworkAssignmentParser" not in entry_ability,
         "production composition root must not use mock import adapters")
 

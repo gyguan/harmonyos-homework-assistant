@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
-import { HomeworkStore } from '../../data/HomeworkStore';
+import { DefaultSubmissionLocalDataSource, SubmissionLocalDataSource } from '../../data/local/SubmissionLocalDataSource';
 import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, Submission } from '../../domain/model/HomeworkModels';
 import { RemoteAssignmentMapper } from '../remote/RemoteModels';
@@ -13,6 +13,7 @@ export class HomeworkSubmissionService {
   static readonly instance: HomeworkSubmissionService = new HomeworkSubmissionService();
 
   private context: common.UIAbilityContext | null = null;
+  private readonly local: SubmissionLocalDataSource = DefaultSubmissionLocalDataSource.instance;
 
   private constructor() {}
 
@@ -21,7 +22,7 @@ export class HomeworkSubmissionService {
   }
 
   listCached(assignmentId: string): Submission[] {
-    return HomeworkStore.instance.getSubmissionsForAssignment(assignmentId).slice();
+    return this.local.listSubmissions(assignmentId);
   }
 
   async selectPhotos(): Promise<string[]> {
@@ -55,7 +56,7 @@ export class HomeworkSubmissionService {
     // Seed/demo assignments deliberately remain local. Any published/synced assignment must
     // wait for the backend transaction before local state is allowed to become SUBMITTED.
     if (assignment.remoteVersion <= 0 && assignment.candidateId.length === 0) {
-      return HomeworkStore.instance.submitImages(assignmentId, durableUris, this.nowText());
+      return this.local.submitImages(assignmentId, durableUris, this.nowText());
     }
     if (assignment.remoteVersion <= 0) return false;
 
@@ -65,10 +66,9 @@ export class HomeworkSubmissionService {
 
       // Record the durable local photo copies only after the server accepted the submission.
       // This local transition is immediately replaced by the authoritative server snapshot.
-      HomeworkStore.instance.submitImages(
+      this.local.submitImages(
         assignmentId, durableUris, this.submittedAtText(result.submission.submittedAt));
-      let current: Assignment | null = HomeworkStore.instance.getAssignment(assignmentId);
-      let authoritative = RemoteAssignmentMapper.toLocal(result.assignment, current);
+      let authoritative = RemoteAssignmentMapper.toLocal(result.assignment, assignment);
       DefaultAssignmentRepository.instance.applyAuthoritative(authoritative);
       return true;
     } catch {
