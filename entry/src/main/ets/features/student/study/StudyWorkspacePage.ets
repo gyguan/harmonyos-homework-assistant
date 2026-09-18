@@ -694,7 +694,7 @@ export struct StudyWorkspacePage {
               studentId: this.viewModel.studentId(),
               onRecognized: (text: string) => {
                 this.tutorDraft = `题目识别结果：\n${text}\n\n我卡住的地方：`;
-                this.tutorNotice = '识别文字已填入，请检查后发送';
+                this.tutorNotice = '识别文字已填入，请确认或补充后再发送';
               }
             })
             .layoutWeight(1);
