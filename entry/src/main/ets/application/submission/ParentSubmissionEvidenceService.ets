@@ -33,8 +33,8 @@ export class ParentSubmissionEvidenceService {
   async refreshLatest(assignmentId: string): Promise<ParentSubmissionEvidence | null> {
     if (BackendSession.instance.isConnected()) {
       try {
-        let remote = await RemoteSubmissionApi.instance.list(assignmentId);
-        RemoteSubmissionCache.instance.replace(assignmentId, remote);
+        let remote = await RemoteSubmissionApi.instance.latest(assignmentId);
+        RemoteSubmissionCache.instance.replace(assignmentId, remote === null ? [] : [remote]);
       } catch {
         // Evidence refresh is best-effort. Keep the last synchronized submission metadata.
       }
