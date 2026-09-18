@@ -47,9 +47,24 @@ require("onMinutesChange" in confirmation_components and "预计用时" in confi
         "parent confirmation must keep manual duration override in the reactive editor")
 require("onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "confirmation page must persist duration changes from the reactive editor")
-require("预计用时" in confirmation_components and
-        confirmation_components.count("onMinutesChange(this.item") >= 4,
-        "each confirmation task card must expose its own quick duration controls")
+require(".bindSheet($this.showEditorSheet" in confirmation and
+        "private CandidateEditorSheet()" in confirmation and
+        "onSelect: () => this.openEditor(item.id)" in confirmation,
+        "candidate editing must open in a bottom sheet instead of an inline editor at page bottom")
+require("if (this.editingCandidate() !== null) {" not in
+        confirmation.split("Button('＋ 手工新增一项'")[1].split("this.PublishFeedback();")[0],
+        "confirmation page must not render the candidate editor inline below the list")
+require("CandidateDurationControl" in confirmation_components and
+        confirmation_components.count("onMinutesChange(this.item") >= 5,
+        "confirmation duration controls must expose common preset durations")
+require("placeholder: '自定义'" in confirmation_components and
+        "if (minutes < 1) minutes = 1;" in confirmation_components and
+        "if (minutes > 240) minutes = 240;" in confirmation_components,
+        "confirmation duration controls must support a bounded custom minute value")
+require("label: '10'" in confirmation_components and "label: '15'" in confirmation_components and
+        "label: '20'" in confirmation_components and "label: '30'" in confirmation_components and
+        "label: '45'" in confirmation_components,
+        "duration presets must remain split-friendly instead of long labelled chips")
 require("expectedMinutes: candidate.expectedMinutes" in store,
         "published assignment must keep the parent-confirmed duration")
 
