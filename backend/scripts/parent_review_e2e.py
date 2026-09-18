@@ -191,7 +191,7 @@ def main() -> int:
                 "POST",
                 f"/api/v1/assignments/{invalid_id}/review",
                 token=token,
-                payload={"decision": "APPROVE", "version": int(invalid_source["version"]), "note": ""},
+                payload={"decision": "APPROVE", "version": int(edited["version"]), "note": ""},
             ),
             (400,),
             "reject review outside SUBMITTED",
