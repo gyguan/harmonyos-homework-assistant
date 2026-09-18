@@ -38,7 +38,7 @@ struct Index {
   private enterStudent(studentId: string): void {
     if (this.familyContext.setActiveStudent(studentId)) {
       this.selectedRole = AppRole.STUDENT;
-      HomeworkSyncService.instance.requestSync();
+      DefaultAssignmentRepository.instance.requestSync();
     }
   }
 
