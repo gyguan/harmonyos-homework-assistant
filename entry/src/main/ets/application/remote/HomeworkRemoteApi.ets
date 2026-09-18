@@ -193,7 +193,7 @@ export class HomeworkRemoteApi {
     };
     let response = await BackendHttpClient.instance.requestFor(
       'parent.assignment.edit',
-      `/api/v1/assignments/${encodeURIComponent(assignment.id)}`,
+      `/api/v1/assignments/${encodeURIComponent(assignment.id)}/details`,
       http.RequestMethod.PUT, body);
     if (response.statusCode === 409) throw new Error('REMOTE_CONFLICT');
     if (response.statusCode < 200 || response.statusCode >= 300) {
