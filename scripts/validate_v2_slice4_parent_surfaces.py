@@ -33,6 +33,10 @@ selection_controls = read("entry/src/main/ets/components/selection/SelectionCont
 review_page = read("entry/src/main/ets/features/parent/review/ParentReviewPage.ets")
 review_pane = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 review_vm = read("entry/src/main/ets/features/parent/review/ParentReviewViewModel.ets")
+review_editor = read("entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets")
+remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
+assignment_controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
+assignment_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
 evidence = read("entry/src/main/ets/application/submission/ParentSubmissionEvidenceService.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
@@ -136,6 +140,24 @@ require("AssignmentStatus.SUBMITTED" in review_pane and "退回订正" in review
         "Parent Review must expose review actions only around submitted work")
 require("this.viewModel.approve" in review_pane and "this.viewModel.returnForRework" in review_pane,
         "Parent Review UI must delegate decisions to ParentReviewViewModel")
+require("ParentAssignmentEditPanel" in review_pane and "编辑任务" in review_pane and
+        "this.viewModel.updateDetails(updated)" in review_pane,
+        "Parent task detail must expose editable task definition before submission")
+require("DeadlinePickerField" in review_editor and "预计用时（分钟）" in review_editor and
+        "保存修改" in review_editor and "不会修改作业状态和计时" in review_editor,
+        "Parent assignment editor must cover deadline/duration and explain status isolation")
+require("AssignmentStatus.SUBMITTED" in review_pane and "AssignmentStatus.COMPLETED" in review_pane and
+        "private canEdit(item: Assignment)" in review_pane,
+        "submitted/completed assignments must lock task-definition editing")
+require("async updateDetails(assignment: Assignment" in remote_api and
+        "'parent.assignment.edit'" in remote_api and "/details" in remote_api,
+        "HarmonyOS parent edit must use the narrow assignment details API")
+require('@PutMapping("/assignments/{id}/details")' in assignment_controller and
+        "service.updateDetails" in assignment_controller,
+        "backend must expose owned assignment details editing")
+require("public AssignmentDtos.Response updateDetails" in assignment_service and
+        '"SUBMITTED".equals(e.status)' in assignment_service and '"COMPLETED".equals(e.status)' in assignment_service,
+        "backend must preserve status boundaries when editing task details")
 require("RemoteSubmissionApi.instance.latest" in evidence and "HomeworkSubmissionService.instance.listCached" in evidence,
         "Parent evidence service must fetch only the latest remote evidence with local fallback")
 
