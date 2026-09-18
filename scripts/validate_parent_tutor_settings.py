@@ -53,6 +53,14 @@ require("getStudents(): StudentProfile[]" in family_context_port and "getSetting
         "FamilyContextRepository must own family/settings reads used by Feature pages")
 require("允许直接答案" in parent and "默认建议关闭" in parent,
         "parent UI must keep direct answers opt-in and explain the safer default")
+require("@State private familyStudents: StudentProfile[] = [];" in parent and
+        "private syncLocalStudents(): void" in parent and
+        "this.familyStudents = this.familyContext.getStudents();" in parent,
+        "parent 我的 must keep family members in reactive local page state")
+require(parent.count("this.syncLocalStudents();") >= 5,
+        "parent 我的 must refresh reactive family state on appear, sync, save and delete paths")
+require("${student.id}:${student.name}:${student.grade}:${student.className}:${student.semester}:${student.textbookSummary}" in parent,
+        "parent family list key must change when edited student profile fields change")
 require("export struct SettingsToggleRow" in selection_controls and
         "@Prop isEnabled: boolean = false;" in selection_controls and
         "Toggle({ type: ToggleType.Switch, isOn: this.isEnabled })" in selection_controls and
