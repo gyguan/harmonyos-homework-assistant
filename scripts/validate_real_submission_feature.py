@@ -24,6 +24,7 @@ persistence_models = read("entry/src/main/ets/domain/model/PersistenceModels.ets
 migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 service = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
+submission_local = read("entry/src/main/ets/data/local/SubmissionLocalDataSource.ets")
 parent_evidence = read("entry/src/main/ets/application/submission/ParentSubmissionEvidenceService.ets")
 remote_api = read("entry/src/main/ets/application/remote/RemoteSubmissionApi.ets")
 repository = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
@@ -68,7 +69,12 @@ require("MOCK_IMAGE" not in service + study + review_pane + parent_evidence + st
 # V2 real assignments are server-authoritative: upload first, then update local cache from
 # the returned Assignment snapshot. Seed/demo compatibility may still use local submitImages.
 upload_pos = service.find("await RemoteSubmissionApi.instance.upload")
-local_submit_pos = service.find("HomeworkStore.instance.submitImages(\n        assignmentId", upload_pos)
+local_submit_pos = service.find("this.local.submitImages(\n        assignmentId", upload_pos)
+require("HomeworkStore" not in service and "SubmissionLocalDataSource" in service,
+        "submission application service must use SubmissionLocalDataSource instead of HomeworkStore")
+require("HomeworkStore.instance.getSubmissionsForAssignment" in submission_local and
+        "HomeworkStore.instance.submitImages" in submission_local,
+        "legacy submission local adapter must isolate persisted Store submission access")
 require(upload_pos >= 0, "real submissions must await the backend upload")
 require(local_submit_pos > upload_pos,
         "real submissions must not mark local state SUBMITTED before backend success")
