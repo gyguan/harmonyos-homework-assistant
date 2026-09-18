@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
 
@@ -146,12 +147,11 @@ export struct ConfirmationCandidateEditor {
         .onChange((value: string) => this.onInstructionChange(this.item, value));
 
       Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: this.item.dueText })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.onDueTextChange(this.item, value));
+      DeadlinePickerField({
+        value: this.item.dueText,
+        allowClear: true,
+        onChange: (value: string) => this.onDueTextChange(this.item, value)
+      });
 
       Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
       Row({ space: 6 }) {

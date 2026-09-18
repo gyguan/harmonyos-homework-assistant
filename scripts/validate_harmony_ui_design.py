@@ -189,10 +189,18 @@ for expression in [
     require(expression in parent_progress,
             f"Parent Progress must bind selection directly to page state: {expression}")
 
+deadline_picker = read_optional("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
+require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker,
+        "shared deadline input must use native ArkUI date and time pickers")
+require("AssignmentDueDate.resolveDueAtEpochMs" in deadline_picker,
+        "shared deadline picker must understand existing AI/free-text due values before editing")
+
 extra_assignment = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 category_option = between(extra_assignment, "private CategoryOption(", "private CategorySection()")
 require("backgroundColor(this.category === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)" in category_option,
         "Extra assignment category selection must have an active surface")
+require("DeadlinePickerField" in extra_assignment and "placeholder: 'YYYY-MM-DD'" not in extra_assignment,
+        "Extra assignment deadline must use the shared native picker instead of a manual date field")
 
 confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read_optional(
@@ -202,6 +210,9 @@ require("private SubjectChip(" not in confirmation and "private TimeChip(" not i
         "Confirmation persistent selection must not depend on ordinary @Builder object snapshots")
 require("ConfirmationCandidateCard" in confirmation and "ConfirmationCandidateEditor" in confirmation,
         "Confirmation page must render reactive Candidate child components")
+require("DeadlinePickerField" in confirmation_components and
+        "TextInput({ text: this.item.dueText })" not in confirmation_components,
+        "Confirmation deadline edit must reuse the shared native deadline picker")
 require("selected: this.editingCandidateId === item.id" in confirmation,
         "Confirmation selected Candidate must bind directly to editingCandidateId")
 require(confirmation_components.count("@Prop item: CandidateAssignment;") >= 2 and
