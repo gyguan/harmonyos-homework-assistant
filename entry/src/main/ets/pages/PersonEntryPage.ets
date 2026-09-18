@@ -1,4 +1,5 @@
 import { AppTheme } from '../common/theme/AppTheme';
+import { CenteredTextBadge } from '../components/family/CenteredTextBadge';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
@@ -18,16 +19,16 @@ export struct PersonEntryPage {
   @Builder
   private BrandHeader() {
     Column({ space: 10 }) {
-      Text('伴')
-        .width(52)
-        .height(52)
-        .fontSize(22)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .textAlign(TextAlign.Center)
-        .padding({ top: 12 })
-        .backgroundColor(AppTheme.PRIMARY)
-        .borderRadius(16);
+      CenteredTextBadge({
+        text: '伴',
+        width: 52,
+        height: 52,
+        fontSize: 22,
+        radius: 16,
+        bold: true,
+        foreground: AppTheme.TEXT_ON_PRIMARY,
+        background: AppTheme.PRIMARY
+      });
       Text('小伴作业')
         .fontSize(28)
         .fontWeight(FontWeight.Bold)
@@ -50,17 +51,16 @@ export struct PersonEntryPage {
   @Builder
   private ParentRow() {
     Row({ space: 13 }) {
-      Stack() {
-        Text('家')
-          .fontSize(15)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY);
-      }
-      .width(40)
-      .height(40)
-      .alignContent(Alignment.Center)
-      .backgroundColor(AppTheme.PRIMARY)
-      .borderRadius(12);
+      CenteredTextBadge({
+        text: '家',
+        width: 40,
+        height: 40,
+        fontSize: 15,
+        radius: 12,
+        bold: true,
+        foreground: AppTheme.TEXT_ON_PRIMARY,
+        background: AppTheme.PRIMARY
+      });
       Column({ space: 3 }) {
         Text('家长')
           .width('100%')
@@ -89,16 +89,15 @@ export struct PersonEntryPage {
   @Builder
   private StudentRow(student: StudentProfile) {
     Row({ space: 13 }) {
-      Text(student.name.length > 0 ? student.name.substring(0, 1) : '伴')
-        .width(40)
-        .height(40)
-        .fontSize(15)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.PRIMARY)
-        .textAlign(TextAlign.Center)
-        .padding({ top: 10 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(12);
+      CenteredTextBadge({
+        text: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
+        width: 40,
+        height: 40,
+        fontSize: 15,
+        radius: 12,
+        foreground: AppTheme.PRIMARY,
+        background: AppTheme.PRIMARY_SOFT
+      });
       Column({ space: 3 }) {
         Text(student.name)
           .width('100%')
