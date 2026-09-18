@@ -399,14 +399,14 @@ export struct AppShell {
   private SideNavigation() {
     Column({ space: 8 }) {
       CenteredTextBadge({
-        text: '伴',
-        width: 46,
-        height: 46,
-        fontSize: 20,
-        radius: 15,
-        bold: true,
-        foreground: AppTheme.TEXT_ON_PRIMARY,
-        background: AppTheme.PRIMARY
+        badgeText: '伴',
+        badgeWidth: 46,
+        badgeHeight: 46,
+        badgeFontSize: 20,
+        badgeRadius: 15,
+        badgeBold: true,
+        badgeForeground: AppTheme.TEXT_ON_PRIMARY,
+        badgeBackground: AppTheme.PRIMARY
       })
         .margin({ bottom: 14 });
 

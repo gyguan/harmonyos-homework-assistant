@@ -2,26 +2,26 @@ import { AppTheme } from '../../common/theme/AppTheme';
 
 @Component
 export struct CenteredTextBadge {
-  @Prop text: string = '';
-  @Prop width: number = 40;
-  @Prop height: number = 40;
-  @Prop fontSize: number = 15;
-  @Prop radius: number = 12;
-  @Prop bold: boolean = false;
-  @Prop foreground: ResourceColor = AppTheme.TEXT;
-  @Prop background: ResourceColor = AppTheme.SURFACE;
+  @Prop badgeText: string = '';
+  @Prop badgeWidth: number = 40;
+  @Prop badgeHeight: number = 40;
+  @Prop badgeFontSize: number = 15;
+  @Prop badgeRadius: number = 12;
+  @Prop badgeBold: boolean = false;
+  @Prop badgeForeground: ResourceColor = AppTheme.TEXT;
+  @Prop badgeBackground: ResourceColor = AppTheme.SURFACE;
 
   build() {
     Stack() {
-      Text(this.text)
-        .fontSize(this.fontSize)
-        .fontWeight(this.bold ? FontWeight.Bold : FontWeight.Medium)
-        .fontColor(this.foreground);
+      Text(this.badgeText)
+        .fontSize(this.badgeFontSize)
+        .fontWeight(this.badgeBold ? FontWeight.Bold : FontWeight.Medium)
+        .fontColor(this.badgeForeground);
     }
-    .width(this.width)
-    .height(this.height)
+    .width(this.badgeWidth)
+    .height(this.badgeHeight)
     .alignContent(Alignment.Center)
-    .backgroundColor(this.background)
-    .borderRadius(this.radius);
+    .backgroundColor(this.badgeBackground)
+    .borderRadius(this.badgeRadius);
   }
 }

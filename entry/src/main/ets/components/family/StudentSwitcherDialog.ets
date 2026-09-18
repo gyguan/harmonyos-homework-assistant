@@ -45,13 +45,13 @@ export struct StudentSwitcherDialog {
           ForEach(this.students, (student: StudentProfile) => {
             Row({ space: 12 }) {
               CenteredTextBadge({
-                text: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
-                width: 42,
-                height: 42,
-                fontSize: 16,
-                radius: 14,
-                foreground: this.activeStudentId === student.id ? AppTheme.TEXT_ON_PRIMARY : AppTheme.PRIMARY,
-                background: this.activeStudentId === student.id ? AppTheme.PRIMARY : AppTheme.PRIMARY_SOFT
+                badgeText: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
+                badgeWidth: 42,
+                badgeHeight: 42,
+                badgeFontSize: 16,
+                badgeRadius: 14,
+                badgeForeground: this.activeStudentId === student.id ? AppTheme.TEXT_ON_PRIMARY : AppTheme.PRIMARY,
+                badgeBackground: this.activeStudentId === student.id ? AppTheme.PRIMARY : AppTheme.PRIMARY_SOFT
               });
               Column({ space: 3 }) {
                 Text(student.name)

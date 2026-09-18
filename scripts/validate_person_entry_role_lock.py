@@ -42,7 +42,7 @@ require("家长" in entry_page and "孩子" in entry_page and "谁在使用" in 
         "person entry page must clearly expose parent and child choices")
 require("onSelectStudent(student.id)" in entry_page,
         "each child choice must enter with its own studentId")
-require("CenteredTextBadge" in entry_page and "text: '家'" in entry_page,
+require("CenteredTextBadge" in entry_page and "badgeText: '家'" in entry_page,
         "parent entry badge must reuse the shared real-centering component")
 
 require("@Prop role: AppRole" in app_shell,

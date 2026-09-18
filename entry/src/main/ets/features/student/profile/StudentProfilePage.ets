@@ -72,14 +72,14 @@ export struct StudentProfilePage {
 
           Row({ space: 14 }) {
             CenteredTextBadge({
-              text: this.student().name.length > 0 ? this.student().name.substring(0, 1) : '伴',
-              width: 52,
-              height: 52,
-              fontSize: 20,
-              radius: 18,
-              bold: true,
-              foreground: AppTheme.TEXT_ON_PRIMARY,
-              background: AppTheme.PRIMARY
+              badgeText: this.student().name.length > 0 ? this.student().name.substring(0, 1) : '伴',
+              badgeWidth: 52,
+              badgeHeight: 52,
+              badgeFontSize: 20,
+              badgeRadius: 18,
+              badgeBold: true,
+              badgeForeground: AppTheme.TEXT_ON_PRIMARY,
+              badgeBackground: AppTheme.PRIMARY
             });
             Column({ space: 4 }) {
               Text(this.student().name)

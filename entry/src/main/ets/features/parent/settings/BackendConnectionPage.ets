@@ -277,13 +277,13 @@ export struct BackendConnectionPage {
       ForEach(this.students(), (student: StudentProfile) => {
         Row({ space: 12 }) {
           CenteredTextBadge({
-            text: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
-            width: 38,
-            height: 38,
-            fontSize: 15,
-            radius: 12,
-            foreground: AppTheme.PRIMARY,
-            background: AppTheme.PRIMARY_SOFT
+            badgeText: student.name.length > 0 ? student.name.substring(0, 1) : '伴',
+            badgeWidth: 38,
+            badgeHeight: 38,
+            badgeFontSize: 15,
+            badgeRadius: 12,
+            badgeForeground: AppTheme.PRIMARY,
+            badgeBackground: AppTheme.PRIMARY_SOFT
           });
           Column({ space: 3 }) {
             Text(student.name).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);

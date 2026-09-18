@@ -176,14 +176,14 @@ struct StudentSubjectTaskGroupCard {
     Column({ space: 0 }) {
       Row({ space: 10 }) {
         CenteredTextBadge({
-          text: this.group.subject.substring(0, 1),
-          width: 40,
-          height: 40,
-          fontSize: 17,
-          radius: 12,
-          bold: true,
-          foreground: this.subjectColor(),
-          background: this.subjectBackground()
+          badgeText: this.group.subject.substring(0, 1),
+          badgeWidth: 40,
+          badgeHeight: 40,
+          badgeFontSize: 17,
+          badgeRadius: 12,
+          badgeBold: true,
+          badgeForeground: this.subjectColor(),
+          badgeBackground: this.subjectBackground()
         });
         Text(this.group.subject)
           .fontSize(17)
@@ -288,14 +288,14 @@ export struct StudentHomePage {
   private Header() {
     Row({ space: 11 }) {
       CenteredTextBadge({
-        text: this.viewModel.student().name.substring(0, 1),
-        width: 46,
-        height: 46,
-        fontSize: 18,
-        radius: 23,
-        bold: true,
-        foreground: AppTheme.PRIMARY,
-        background: AppTheme.PRIMARY_SOFT
+        badgeText: this.viewModel.student().name.substring(0, 1),
+        badgeWidth: 46,
+        badgeHeight: 46,
+        badgeFontSize: 18,
+        badgeRadius: 23,
+        badgeBold: true,
+        badgeForeground: AppTheme.PRIMARY,
+        badgeBackground: AppTheme.PRIMARY_SOFT
       });
       Column({ space: 2 }) {
         Text(this.viewModel.student().name)

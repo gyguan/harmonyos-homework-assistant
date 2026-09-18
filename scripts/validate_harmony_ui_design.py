@@ -76,6 +76,10 @@ centered_badge = read_optional("entry/src/main/ets/components/family/CenteredTex
 require("export struct CenteredTextBadge" in centered_badge and
         "Stack() {" in centered_badge and ".alignContent(Alignment.Center)" in centered_badge,
         "shared text badges must use real container centering instead of top padding")
+for safe_prop in ["badgeText", "badgeWidth", "badgeHeight", "badgeFontSize", "badgeRadius",
+                  "badgeBold", "badgeForeground", "badgeBackground"]:
+    require(f"@Prop {safe_prop}:" in centered_badge,
+            f"CenteredTextBadge missing ArkUI-safe prop name: {safe_prop}")
 for badge_path in [
     "entry/src/main/ets/pages/PersonEntryPage.ets",
     "entry/src/main/ets/pages/AppShell.ets",
@@ -131,8 +135,9 @@ for ui_root in ui_roots:
 
         # ArkUI custom components inherit CommonAttribute.enabled(value). A custom @Prop named
         # enabled collides with that method and fails CompileArkTS even though Python gates pass.
-        require("@Prop enabled:" not in text,
-                f"custom component prop must not shadow ArkUI enabled() attribute: {relative}")
+        for forbidden_prop in ["enabled", "width", "height", "background"]:
+            require(f"@Prop {forbidden_prop}:" not in text,
+                    f"custom component prop must not shadow ArkUI CommonAttribute.{forbidden_prop}: {relative}")
 
 # Shared master-detail rows are persistent selections on wide layouts. A faint fill alone is too easy
 # to miss, so selected rows must combine a selected surface with a primary border.
