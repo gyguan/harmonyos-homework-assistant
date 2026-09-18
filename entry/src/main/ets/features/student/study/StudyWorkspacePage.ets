@@ -5,6 +5,7 @@ import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
+import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
@@ -26,6 +27,7 @@ export struct StudyWorkspacePage {
   @State private selectingPhotos: boolean = false;
   @State private submittingPhotos: boolean = false;
   @State private submissionMessage: string = '';
+  @State private previewUri: string = '';
   @State private tutorDraft: string = '';
   @State private tutorMessages: TutorChatMessage[] = [];
   @State private tutorNotice: string = '';
@@ -34,6 +36,13 @@ export struct StudyWorkspacePage {
   @State private tutorSending: boolean = false;
   onBack: () => void = () => {};
   onStoreChanged: () => void = () => {};
+
+  private previewController: CustomDialogController = new CustomDialogController({
+    builder: PhotoPreviewDialog({ uri: $previewUri }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
 
   private readonly viewModel: StudyWorkspaceViewModel =
     new StudyWorkspaceViewModel(DefaultAssignmentRepository.instance);
@@ -183,6 +192,12 @@ export struct StudyWorkspacePage {
     }
   }
 
+  private openPhotoPreview(uri: string): void {
+    if (uri.length === 0) return;
+    this.previewUri = uri;
+    this.previewController.open();
+  }
+
   private removeSubmissionPhoto(uri: string): void {
     let next: string[] = [];
     for (let item of this.submissionPhotoUris) if (item !== uri) next.push(item);
@@ -201,7 +216,10 @@ export struct StudyWorkspacePage {
               .height(96)
               .objectFit(ImageFit.Cover)
               .borderRadius(12)
-              .backgroundColor(AppTheme.SURFACE_EMPHASIS);
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('查看作业照片大图')
+              .onClick(() => this.openPhotoPreview(uri));
             if (removable) {
               Text('移除')
                 .width(64)
