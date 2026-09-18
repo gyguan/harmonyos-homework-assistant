@@ -178,6 +178,7 @@ export struct StudyWorkspacePage {
     try {
       await this.viewModel.performAction(this.assignmentId, action);
       this.actionRevision++;
+      this.onStoreChanged();
     } catch {
       this.actionMessage = '状态更新失败，请刷新作业状态后重试';
     } finally {
