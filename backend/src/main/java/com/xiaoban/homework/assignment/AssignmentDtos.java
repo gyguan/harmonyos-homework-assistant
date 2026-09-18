@@ -38,6 +38,16 @@ public final class AssignmentDtos {
 
   public record BatchPublishResponse(boolean atomic, int publishedCount, List<BatchPublishResult> results) {}
 
+  public record PageResponse(List<Response> items, int page, int limit, boolean hasMore, long total) {}
+
+  public record BatchSyncItem(@NotBlank String id, @Valid @NotNull Update assignment) {}
+
+  public record BatchSyncRequest(@NotNull @Size(min = 1, max = 50) List<@Valid BatchSyncItem> items) {}
+
+  public record BatchSyncResult(String id, boolean applied, Response assignment) {}
+
+  public record BatchSyncResponse(int processedCount, List<BatchSyncResult> results) {}
+
   public record Response(String id, String studentId, String assignmentType, String subjectCode,
       String subject, String title, String instruction, String textbookRef,
       long dueAtEpochMs, String dueTimezone, String dueText, String status,
