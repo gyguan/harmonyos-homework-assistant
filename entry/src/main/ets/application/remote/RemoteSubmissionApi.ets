@@ -39,7 +39,8 @@ export class RemoteSubmissionApi {
 
   async list(assignmentId: string): Promise<RemoteSubmission[]> {
     if (!BackendSession.instance.isConnected()) return [];
-    let response = await BackendHttpClient.instance.request(
+    let response = await BackendHttpClient.instance.requestFor(
+      'submission.history',
       `/api/v1/assignments/${encodeURIComponent(assignmentId)}/submissions`, http.RequestMethod.GET);
     if (response.statusCode !== 200) throw new Error('读取云端提交记录失败');
     return JSON.parse(response.body) as RemoteSubmission[];
@@ -47,7 +48,8 @@ export class RemoteSubmissionApi {
 
   async latest(assignmentId: string): Promise<RemoteSubmission | null> {
     if (!BackendSession.instance.isConnected()) return null;
-    let response = await BackendHttpClient.instance.request(
+    let response = await BackendHttpClient.instance.requestFor(
+      'parent.review.evidence',
       `/api/v1/assignments/${encodeURIComponent(assignmentId)}/submissions/latest`,
       http.RequestMethod.GET);
     if (response.statusCode === 204) return null;
@@ -67,11 +69,14 @@ export class RemoteSubmissionApi {
 
     let client = http.createHttp();
     try {
+      let path = `/api/v1/submission-photos/${encodeURIComponent(photo.id)}`;
+      let headers = BackendHttpClient.instance.traceHeaders(path, http.RequestMethod.GET, 'submission.photo.download');
+      headers['Authorization'] = `Bearer ${BackendSession.instance.getToken()}`;
       let response = await client.request(
-        `${BackendSession.instance.getBaseUrl()}/api/v1/submission-photos/${encodeURIComponent(photo.id)}`,
+        `${BackendSession.instance.getBaseUrl()}${path}`,
         {
           method: http.RequestMethod.GET,
-          header: { 'Authorization': `Bearer ${BackendSession.instance.getToken()}` },
+          header: headers,
           connectTimeout: 10000,
           readTimeout: 20000,
           maxLimit: 15 * 1024 * 1024,
@@ -115,15 +120,15 @@ export class RemoteSubmissionApi {
     try {
       let response: http.HttpResponse;
       try {
+        let path = `/api/v1/assignments/${encodeURIComponent(assignmentId)}/submissions?version=${version}`;
+        let headers = BackendHttpClient.instance.traceHeaders(path, http.RequestMethod.POST, 'submission.upload');
+        headers['Authorization'] = `Bearer ${BackendSession.instance.getToken()}`;
+        headers['Content-Type'] = `multipart/form-data; boundary=${payload.boundary}`;
         response = await client.request(
-          `${BackendSession.instance.getBaseUrl()}/api/v1/assignments/${encodeURIComponent(assignmentId)}` +
-            `/submissions?version=${version}`,
+          `${BackendSession.instance.getBaseUrl()}${path}`,
           {
             method: http.RequestMethod.POST,
-            header: {
-              'Authorization': `Bearer ${BackendSession.instance.getToken()}`,
-              'Content-Type': `multipart/form-data; boundary=${payload.boundary}`
-            },
+            header: headers,
             extraData: payload.body,
             connectTimeout: 15000,
             readTimeout: 60000

@@ -35,7 +35,8 @@ export class TutorRemoteApi {
     if (!BackendSession.instance.isConnected()) return this.disconnected();
     try {
       let suffix = beforeEpochMs > 0 ? `?limit=40&before=${beforeEpochMs}` : '?limit=40';
-      let response = await BackendHttpClient.instance.request(
+      let response = await BackendHttpClient.instance.requestFor(
+        beforeEpochMs > 0 ? 'tutor.history.more' : 'tutor.history.latest',
         `/api/v1/assignments/${encodeURIComponent(assignmentId)}/tutor${suffix}`,
         http.RequestMethod.GET);
       if (response.statusCode !== 200) return this.unavailable('AI Tutor 暂时不可用');
@@ -54,7 +55,10 @@ export class TutorRemoteApi {
       directAnswerAllowed: settings.directAnswerAllowed
     };
     try {
-      let response = await BackendHttpClient.instance.request(`/api/v1/assignments/${encodeURIComponent(assignmentId)}/tutor/messages`, http.RequestMethod.POST, payload);
+      let response = await BackendHttpClient.instance.requestFor(
+        'tutor.ask',
+        `/api/v1/assignments/${encodeURIComponent(assignmentId)}/tutor/messages`,
+        http.RequestMethod.POST, payload);
       if (response.statusCode !== 200) return this.unavailable('AI Tutor 暂时不可用');
       return JSON.parse(response.body) as TutorConversation;
     } catch {

@@ -38,7 +38,8 @@ export class HomeworkOrganizerRemoteApi {
         text: input.text,
         sourceLabel: input.sourceLabel
       };
-      let response = await BackendHttpClient.instance.request(
+      let response = await BackendHttpClient.instance.requestFor(
+        'homework.organize',
         `/api/v1/students/${encodeURIComponent(input.studentId)}/homework/organize`,
         http.RequestMethod.POST,
         payload

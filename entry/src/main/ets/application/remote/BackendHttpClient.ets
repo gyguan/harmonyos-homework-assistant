@@ -8,12 +8,30 @@ export interface BackendResponse {
 
 export class BackendHttpClient {
   static readonly instance: BackendHttpClient = new BackendHttpClient();
+  private requestSequence: number = 0;
   private constructor() {}
 
-  async request(path: string, method: http.RequestMethod, body: Object | null = null, authenticated: boolean = true): Promise<BackendResponse> {
+  async requestFor(scene: string, path: string, method: http.RequestMethod,
+    body: Object | null = null, authenticated: boolean = true): Promise<BackendResponse> {
+    return this.request(path, method, body, authenticated, scene);
+  }
+
+  traceHeaders(path: string, method: http.RequestMethod, scene: string): Record<string, string> {
+    this.requestSequence++;
+    let requestId = `harmony-${Date.now()}-${this.requestSequence}`;
+    return {
+      'X-Request-Id': requestId,
+      'X-Client-Scene': this.safeScene(scene),
+      'X-Client-Request-Key': encodeURIComponent(`${method}|${path}`)
+    };
+  }
+
+  async request(path: string, method: http.RequestMethod, body: Object | null = null,
+    authenticated: boolean = true, scene: string = 'unclassified'): Promise<BackendResponse> {
     let session = BackendSession.instance;
     if (session.getBaseUrl().length === 0) throw new Error('请先配置后端地址');
-    let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    let headers: Record<string, string> = this.traceHeaders(path, method, scene);
+    headers['Content-Type'] = 'application/json';
     if (authenticated) {
       if (!session.isConnected()) throw new Error('请先登录后端');
       headers['Authorization'] = `Bearer ${session.getToken()}`;
@@ -31,5 +49,12 @@ export class BackendHttpClient {
     } finally {
       try { client.destroy(); } catch {}
     }
+  }
+
+  private safeScene(value: string): string {
+    let normalized = value.trim();
+    if (normalized.length === 0) return 'unclassified';
+    if (normalized.length > 80) normalized = normalized.substring(0, 80);
+    return normalized;
   }
 }

@@ -61,8 +61,11 @@ def http(
     raw: bytes | None = None,
     content_type: str | None = None,
     timeout: float = 30.0,
+    extra_headers: dict[str, str] | None = None,
 ) -> Resp:
     headers = {"Accept": "application/json"}
+    if extra_headers:
+        headers.update(extra_headers)
     if token:
         headers["Authorization"] = f"Bearer {token}"
     body = raw
