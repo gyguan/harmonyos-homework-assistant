@@ -93,6 +93,14 @@ public class AssignmentController {
     return service.syncBatch(familyId, studentId, input);
   }
 
+  @PutMapping("/assignments/{id}/details")
+  public AssignmentDtos.Response updateDetails(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String id,
+      @Valid @RequestBody AssignmentDtos.DetailsUpdate input) {
+    return service.updateDetails(familyId, id, input);
+  }
+
   @PostMapping("/assignments/{id}/actions")
   public AssignmentDtos.Response action(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String id, @Valid @RequestBody AssignmentDtos.ActionRequest input) {
