@@ -84,6 +84,11 @@ require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date_service and "Date.UTC" i
         "deadline materialization must be anchored to Asia/Shanghai rather than the device timezone")
 require("resolveTimeMinutes" in due_date_service and "[:：]" in due_date_service and "点半" in due_date_service,
         "deadline resolver must preserve explicit clock times from teacher text")
+require("normalizeChineseHour(text, Number(colon[2]))" in due_date_service,
+        "colon-form times such as 晚上8:30 must honor Chinese day-period hints")
+require(due_date_service.index("let chineseFull = text.match") <
+        due_date_service.index("text.indexOf('今晚')"),
+        "explicit calendar dates must take precedence over relative/evening hints")
 require("dueAtEpochMs: this.resolveCandidateDueAt(candidate)" in client_service,
         "published Assignments must materialize structured dueAtEpochMs")
 require("dueAtEpochMs: 0" not in client_service,
