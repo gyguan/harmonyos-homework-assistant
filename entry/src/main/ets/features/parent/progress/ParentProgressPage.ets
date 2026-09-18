@@ -2,7 +2,7 @@ import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
-import { FilterSummaryEntry, StatusSelectionChip } from '../../../components/selection/SelectionControls';
+import { FilterSummaryEntry } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import {
   AssignmentDateFilter,
@@ -73,7 +73,7 @@ export struct ParentProgressPage {
 
   private statuses(): AssignmentStatus[] {
     if (this.statusFilter === ParentProgressStatusFilter.ATTENTION) {
-      return [AssignmentStatus.OVERDUE, AssignmentStatus.NEEDS_REWORK, AssignmentStatus.SUBMITTED];
+      return [AssignmentStatus.OVERDUE, AssignmentStatus.NEEDS_REWORK];
     }
     if (this.statusFilter === ParentProgressStatusFilter.SUBMITTED) return [AssignmentStatus.SUBMITTED];
     if (this.statusFilter === ParentProgressStatusFilter.COMPLETED) return [AssignmentStatus.COMPLETED];
@@ -146,10 +146,14 @@ export struct ParentProgressPage {
     let count = 0;
     for (let item of this.viewModel.assignments(
       AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL)) {
-      if (item.status === AssignmentStatus.OVERDUE || item.status === AssignmentStatus.NEEDS_REWORK ||
-        item.status === AssignmentStatus.SUBMITTED) count++;
+      if (item.status === AssignmentStatus.OVERDUE || item.status === AssignmentStatus.NEEDS_REWORK) count++;
     }
     return count;
+  }
+
+  private allCount(): number {
+    return this.viewModel.assignments(
+      AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL).length;
   }
 
   private submittedCount(): number {
@@ -235,55 +239,47 @@ export struct ParentProgressPage {
   }
 
   @Builder
-  private StatusFilterBar() {
-    Scroll() {
-      Row({ space: 8 }) {
-        StatusSelectionChip({
-          label: '全部状态', selected: this.statusFilter === ParentProgressStatusFilter.ALL,
-          onSelect: () => this.chooseStatus(ParentProgressStatusFilter.ALL)
-        });
-        StatusSelectionChip({
-          label: '需关注', selected: this.statusFilter === ParentProgressStatusFilter.ATTENTION,
-          onSelect: () => this.chooseStatus(ParentProgressStatusFilter.ATTENTION)
-        });
-        StatusSelectionChip({
-          label: '待验收', selected: this.statusFilter === ParentProgressStatusFilter.SUBMITTED,
-          onSelect: () => this.chooseStatus(ParentProgressStatusFilter.SUBMITTED)
-        });
-        StatusSelectionChip({
-          label: '已完成', selected: this.statusFilter === ParentProgressStatusFilter.COMPLETED,
-          onSelect: () => this.chooseStatus(ParentProgressStatusFilter.COMPLETED)
-        });
-      }
+  private StatusMetricCard(label: string, value: number, filter: ParentProgressStatusFilter, tone: string) {
+    Column({ space: 5 }) {
+      Text(`${value}`)
+        .fontSize(24)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(tone === 'attention' ? AppTheme.DANGER :
+          tone === 'review' ? AppTheme.WARNING :
+            tone === 'done' ? AppTheme.SUCCESS : AppTheme.PRIMARY);
+      Text(label)
+        .fontSize(11)
+        .fontColor(AppTheme.SUBTEXT);
     }
-    .width('100%')
-    .scrollable(ScrollDirection.Horizontal)
-    .scrollBar(BarState.Off);
+    .layoutWeight(1)
+    .constraintSize({ minHeight: 76 })
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor(tone === 'attention' ? AppTheme.DANGER_SOFT :
+      tone === 'review' ? AppTheme.WARNING_SOFT :
+        tone === 'done' ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_FAINT)
+    .border({
+      width: this.statusFilter === filter ? 2 : 0,
+      color: this.statusFilter === filter ?
+        (tone === 'attention' ? AppTheme.DANGER :
+          tone === 'review' ? AppTheme.WARNING :
+            tone === 'done' ? AppTheme.SUCCESS : AppTheme.PRIMARY) : AppTheme.BORDER
+    })
+    .borderRadius(AppTheme.CONTROL_RADIUS)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`${label} ${value} 项，点击筛选`)
+    .onClick(() => this.chooseStatus(filter));
   }
 
   @Builder
   private StatusSummary() {
     Row({ space: 8 }) {
-      Column({ space: 2 }) {
-        Text(`${this.attentionCount()}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor(AppTheme.DANGER);
-        Text('需关注').fontSize(11).fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1).alignItems(HorizontalAlign.Start);
-      Column({ space: 2 }) {
-        Text(`${this.submittedCount()}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor(AppTheme.WARNING);
-        Text('待验收').fontSize(11).fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1).alignItems(HorizontalAlign.Start);
-      Column({ space: 2 }) {
-        Text(`${this.completedCount()}`).fontSize(20).fontWeight(FontWeight.Bold).fontColor(AppTheme.SUCCESS);
-        Text('已完成').fontSize(11).fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1).alignItems(HorizontalAlign.Start);
+      this.StatusMetricCard('全部', this.allCount(), ParentProgressStatusFilter.ALL, 'primary');
+      this.StatusMetricCard('需关注', this.attentionCount(), ParentProgressStatusFilter.ATTENTION, 'attention');
+      this.StatusMetricCard('待验收', this.submittedCount(), ParentProgressStatusFilter.SUBMITTED, 'review');
+      this.StatusMetricCard('已完成', this.completedCount(), ParentProgressStatusFilter.COMPLETED, 'done');
     }
-    .width('100%')
-    .padding(14)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+    .width('100%');
   }
 
   @Builder
@@ -298,7 +294,6 @@ export struct ParentProgressPage {
 
       this.StatusSummary();
       this.FilterBar();
-      this.StatusFilterBar();
 
       Row() {
         Text(this.querying ? '查询中…' :
