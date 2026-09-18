@@ -58,10 +58,10 @@
 
 | 当前对象 | V2 处理 | 目标 | 删除条件 | 最迟 Slice |
 |---|---|---|---|---|
-| `data/HomeworkStore.ets` | MIGRATE | 迁移期 legacy data source | 所有 V2 Feature/Repository 不再调用 Store 业务方法 | Final Cleanup |
+| `data/HomeworkStore.ets` | MIGRATE | 仅保留迁移期 persistence / legacy adapter 数据源 | V2 Feature/Repository 已不直接调用 Store；继续拆除各 adapter 后删除 | Final Cleanup |
 | `HomeworkStore` settings/student context | MIGRATE | `Session / StudentContext` | RoleShell/Repository 接管上下文 | Slice 4 |
-| `HomeworkStore` assignment query | MIGRATE | `AssignmentRepository` | Home/List/Detail 全部使用 Repository | Slice 3 |
-| `HomeworkStore` assignment transition/timer | DELETE | backend Action Command + local projection | Slice 3 command 闭环完成 | Slice 3 |
+| `HomeworkStore` assignment query | MIGRATE（边界完成） | `AssignmentRepository` + `AssignmentLocalDataSource` | Repository 不再直接调用 Store；待 legacy local adapter 删除 | Final Cleanup |
+| `HomeworkStore` assignment transition/timer | MIGRATE（仅 demo 兼容） | backend Action Command + `AssignmentLocalDataSource` seed/demo adapter | 真实作业已走服务端 Command；移除 demo Store transition 后删除 | Final Cleanup |
 | `HomeworkStore` candidate/import | MIGRATE | Import Repository/ViewModel | Import 三步流切换 | Slice 5 |
 | `HomeworkStore` submission/tutor cache | MIGRATE | Submission/Tutor repository | Slice 3 闭环完成 | Slice 3/Final |
 | `data/MockData.ets` | EVOLVE | 仅测试/fixture/demo seed | 不再作为 schema mismatch 恢复策略 | Slice 0 |
