@@ -102,6 +102,16 @@ export class HomeworkRemoteApi {
     return this.listPaged(studentId, params, 'assignment.query');
   }
 
+  async get(assignmentId: string): Promise<RemoteAssignment> {
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.get',
+      `/api/v1/assignments/${encodeURIComponent(assignmentId)}`,
+      http.RequestMethod.GET);
+    if (response.statusCode === 404) throw new Error('REMOTE_NOT_FOUND');
+    if (response.statusCode !== 200) throw new Error(`读取作业失败: ${response.statusCode}`);
+    return JSON.parse(response.body) as RemoteAssignment;
+  }
+
   async todaySummary(studentId: string): Promise<TodaySummary> {
     let response = await BackendHttpClient.instance.requestFor(
       'assignment.summary',

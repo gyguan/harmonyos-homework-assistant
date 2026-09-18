@@ -102,10 +102,25 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       throw new Error('作业尚未完成云端同步，请刷新后重试');
     }
 
-    let remote = await HomeworkRemoteApi.instance.performAction(assignmentId, current.remoteVersion, action);
-    let mapped = RemoteAssignmentMapper.toLocal(remote, this.local.getAssignment(assignmentId));
-    this.applyAuthoritative(mapped);
-    return mapped;
+    try {
+      let remote = await HomeworkRemoteApi.instance.performAction(assignmentId, current.remoteVersion, action);
+      let mapped = RemoteAssignmentMapper.toLocal(remote, this.local.getAssignment(assignmentId));
+      this.applyAuthoritative(mapped);
+      return mapped;
+    } catch {
+      // START can server-pause another active assignment, and AppShell refresh is asynchronous.
+      // Recover a stale local version by fetching only this assignment and retrying the command once.
+      let latest = await HomeworkRemoteApi.instance.get(assignmentId);
+      let refreshed = RemoteAssignmentMapper.toLocal(latest, this.local.getAssignment(assignmentId));
+      this.applyAuthoritative(refreshed);
+      if (latest.version === current.remoteVersion) {
+        throw new Error('REMOTE_ACTION_FAILED');
+      }
+      let retried = await HomeworkRemoteApi.instance.performAction(assignmentId, latest.version, action);
+      let mapped = RemoteAssignmentMapper.toLocal(retried, this.local.getAssignment(assignmentId));
+      this.applyAuthoritative(mapped);
+      return mapped;
+    }
   }
 
   async review(assignmentId: string, decision: AssignmentReviewDecision, note: string): Promise<Assignment> {

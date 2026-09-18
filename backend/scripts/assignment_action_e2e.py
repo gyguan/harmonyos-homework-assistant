@@ -130,6 +130,32 @@ def main() -> int:
         require(int(ready.get("startedAtEpochMs", -1)) == 0, "READY_TO_SUBMIT did not close active timer")
         require(int(ready.get("finishedAtEpochMs", 0)) > 0, "READY_TO_SUBMIT did not set server finish time")
 
+        # Starting B auto-paused A and advanced A's optimistic version. Simulate the HarmonyOS
+        # cache still holding A's pre-pause version, then recover with one single-assignment GET.
+        expect(
+            http(
+                base_url,
+                "POST",
+                f"/api/v1/assignments/{first_id}/actions",
+                token=token,
+                payload={"action": "START", "version": int(first_resumed["version"])},
+            ),
+            (409,),
+            "auto-paused assignment stale resume conflict",
+        )
+        first_latest = expect(
+            http(base_url, "GET", f"/api/v1/assignments/{first_id}", token=token),
+            (200,),
+            "load single assignment for conflict recovery",
+        ).json()
+        require(first_latest.get("status") == "PAUSED",
+                "single-assignment recovery read must observe server auto-pause")
+        require(int(first_latest.get("version", 0)) > int(first_resumed["version"]),
+                "server auto-pause must advance the assignment version")
+        first_recovered = action(base_url, token, first_id, int(first_latest["version"]), "START")
+        require(first_recovered.get("status") == "IN_PROGRESS",
+                "retry with refreshed single-assignment version must succeed")
+
         expect(
             http(
                 base_url,

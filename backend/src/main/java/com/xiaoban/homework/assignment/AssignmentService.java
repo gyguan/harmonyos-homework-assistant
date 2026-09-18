@@ -51,6 +51,11 @@ public class AssignmentService {
   }
 
   @Transactional(readOnly = true)
+  public AssignmentDtos.Response get(UUID familyId, String id) {
+    return AssignmentDtos.Response.from(requireOwned(familyId, id));
+  }
+
+  @Transactional(readOnly = true)
   public List<AssignmentDtos.Response> list(UUID familyId, String studentId, String type, String subjectCode,
       Long fromEpochMs, Long toEpochMs, String status, Boolean undated) {
     students.requireOwned(familyId, studentId);

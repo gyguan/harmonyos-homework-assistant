@@ -55,7 +55,7 @@ require("private boolean logPayloads = true;" in http_config and
         "HTTP payload logging must be enabled by default with a bounded payload size")
 
 for scene in [
-    "assignment.sync.snapshot", "assignment.query", "assignment.create", "assignment.batchPublish",
+    "assignment.sync.snapshot", "assignment.query", "assignment.get", "assignment.create", "assignment.batchPublish",
     "assignment.action", "assignment.sync.dirty", "parent.review",
 ]:
     require(scene in assignment, f"assignment API scene missing: {scene}")
