@@ -87,8 +87,14 @@ require("AiProviderProperties" in organizer_model and "OpenAiCompatibleTransport
 require("不得编造" in organizer_model and "不解答作业" in organizer_model and "JSON" in organizer_model,
         "AI organizer prompt must avoid hallucinating/solving homework and support JSON fallback")
 require("normalizeSubject" in organizer_model and 'normalized.contains("语文")' in organizer_model and
-        'normalized.contains("数学")' in organizer_model and 'normalized.contains("英语")' in organizer_model,
+        'normalized.contains("数学")' in organizer_model and 'normalized.contains("英语")' in organizer_model and
+        'lower.contains("chinese")' in organizer_model and 'lower.contains("math")' in organizer_model and
+        'lower.contains("english")' in organizer_model,
         "AI organizer must normalize common provider subject labels before filtering")
+require("unsupportedValues" in organizer_model and "safeSubjectForLog" in organizer_model,
+        "AI organizer must expose bounded unsupported subject values for diagnosis")
+require("subject 字段必须严格只填写语文、数学或英语之一" in organizer_model,
+        "AI organizer prompt must explicitly constrain subject to the supported vocabulary")
 require("[AI] organizer parsed" in organizer_model and "unsupportedSubject" in organizer_model and
         "blankTitle" in organizer_model,
         "AI organizer must log privacy-safe conversion counts when model output is filtered")

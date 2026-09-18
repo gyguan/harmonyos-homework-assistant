@@ -36,6 +36,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(instructions.contains("不解答作业"));
     assertTrue(instructions.contains("不得编造"));
     assertTrue(instructions.contains("JSON"));
+    assertTrue(instructions.contains("subject 字段必须严格只填写语文、数学或英语之一"));
   }
 
   @Test
@@ -53,7 +54,10 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("数学练习"));
     assertEquals("英语", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("英语听读"));
     assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Math"));
-    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("科学"));
+    assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Chinese Language Arts"));
+    assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Mathematics Homework"));
+    assertEquals("英语", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("English Reading"));
+    assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Science"));
   }
 
   @Test
@@ -70,6 +74,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals("语文", result.candidates().getFirst().subject());
     assertEquals(1, result.unsupportedSubjectCount());
     assertEquals(0, result.blankTitleCount());
+    assertEquals(java.util.List.of("科学"), result.unsupportedSubjects());
   }
 
   @Test

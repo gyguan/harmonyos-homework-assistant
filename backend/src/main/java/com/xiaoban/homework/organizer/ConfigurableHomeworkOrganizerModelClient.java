@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       String dueText, int expectedMinutes, String sourceExcerpt, double confidence) {}
   record StructuredResult(List<StructuredCandidate> assignments) {}
   record ConversionResult(List<HomeworkOrganizerDtos.Candidate> candidates, int sourceCount,
-      int unsupportedSubjectCount, int blankTitleCount) {}
+      int unsupportedSubjectCount, int blankTitleCount, List<String> unsupportedSubjects) {}
 
   public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
       OpenAiCompatibleTransport transport, JsonMapper jsonMapper) {
@@ -53,14 +55,14 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       StructuredResult structured = jsonMapper.readValue(stripCodeFence(outputText.get()), StructuredResult.class);
       ConversionResult converted = toCandidates(structured);
       log.info(
-          "[AI] organizer parsed model={} assignments={} accepted={} unsupportedSubject={} blankTitle={}",
+          "[AI] organizer parsed model={} assignments={} accepted={} unsupportedSubject={} blankTitle={} unsupportedValues={}",
           properties.getOrganizerModel(), converted.sourceCount(), converted.candidates().size(),
-          converted.unsupportedSubjectCount(), converted.blankTitleCount());
+          converted.unsupportedSubjectCount(), converted.blankTitleCount(), converted.unsupportedSubjects());
       if (converted.sourceCount() > 0 && converted.candidates().isEmpty()) {
         log.warn(
-            "[AI] organizer rejected all model assignments model={} assignments={} unsupportedSubject={} blankTitle={}",
+            "[AI] organizer rejected all model assignments model={} assignments={} unsupportedSubject={} blankTitle={} unsupportedValues={}",
             properties.getOrganizerModel(), converted.sourceCount(), converted.unsupportedSubjectCount(),
-            converted.blankTitleCount());
+            converted.blankTitleCount(), converted.unsupportedSubjects());
         return Optional.empty();
       }
       return Optional.of(converted.candidates());
@@ -74,6 +76,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   static String instructions() {
     return "你是深圳小学家庭作业整理助手。只做结构化整理，不解答作业。"
         + "把老师原文拆成可以逐项完成的作业，当前仅保留语文、数学、英语。"
+        + "每个 assignment 的 subject 字段必须严格只填写语文、数学或英语之一，不要写语文作业、Chinese Language、Mathematics Homework等扩展标签。"
         + "同一学科一句话里有多个独立动作时要拆开；通知、缴费、带物品、家长会、值日等非作业内容忽略。"
         + "不得编造原文没有的页码、课次、截止时间或教材版本。"
         + "若原文未说明截止时间，dueText 使用今天；没有明确教材位置时 textbookRef 使用待家长确认。"
@@ -96,16 +99,18 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   static ConversionResult toCandidates(StructuredResult result) {
     List<HomeworkOrganizerDtos.Candidate> output = new ArrayList<>();
     if (result == null || result.assignments() == null) {
-      return new ConversionResult(output, 0, 0, 0);
+      return new ConversionResult(output, 0, 0, 0, List.of());
     }
 
     int unsupportedSubjectCount = 0;
     int blankTitleCount = 0;
+    Set<String> unsupportedSubjects = new LinkedHashSet<>();
     for (StructuredCandidate item : result.assignments()) {
       if (item == null) continue;
       String subject = normalizeSubject(item.subject());
       if (subject == null) {
         unsupportedSubjectCount++;
+        if (unsupportedSubjects.size() < 8) unsupportedSubjects.add(safeSubjectForLog(item.subject()));
         continue;
       }
       if (blank(item.title())) {
@@ -119,7 +124,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
           clamp(item.confidence())));
       if (output.size() >= 30) break;
     }
-    return new ConversionResult(output, result.assignments().size(), unsupportedSubjectCount, blankTitleCount);
+    return new ConversionResult(output, result.assignments().size(), unsupportedSubjectCount, blankTitleCount,
+        List.copyOf(unsupportedSubjects));
   }
 
   static Map<String, Object> structuredSchema() {
@@ -170,10 +176,17 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     if (normalized.contains("英语")) return "英语";
 
     String lower = normalized.toLowerCase();
-    if ("chinese".equals(lower)) return "语文";
-    if ("math".equals(lower) || "mathematics".equals(lower)) return "数学";
-    if ("english".equals(lower)) return "英语";
+    if (lower.contains("chinese")) return "语文";
+    if (lower.contains("math")) return "数学";
+    if (lower.contains("english")) return "英语";
     return null;
+  }
+
+  private static String safeSubjectForLog(String subject) {
+    if (subject == null) return "<null>";
+    String compact = subject.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').trim();
+    if (compact.length() > 80) compact = compact.substring(0, 80) + "...";
+    return compact;
   }
 
   private static boolean blank(String value) { return value == null || value.isBlank(); }
