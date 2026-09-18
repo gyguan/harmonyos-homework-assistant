@@ -4,6 +4,7 @@ import {
 } from '../../../application/submission/ParentSubmissionEvidenceService';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
+import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
@@ -17,6 +18,14 @@ export struct ParentReviewPane {
   @State private reviewNoteDraft: string = '';
   @State private operationNotice: string = '';
   @State private submitting: boolean = false;
+  @State private previewUri: string = '';
+
+  private previewController: CustomDialogController = new CustomDialogController({
+    builder: PhotoPreviewDialog({ uri: $previewUri }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
   onReviewed: () => void = () => {};
 
   private readonly viewModel: ParentReviewViewModel =
@@ -42,6 +51,12 @@ export struct ParentReviewPane {
     if (this.assignmentId.length === 0) return;
     await ParentSubmissionEvidenceService.instance.refreshLatest(this.assignmentId);
     this.localRevision++;
+  }
+
+  private openPreview(uri: string): void {
+    if (uri.length === 0) return;
+    this.previewUri = uri;
+    this.previewController.open();
   }
 
   private actualMinutes(item: Assignment): number {
@@ -112,7 +127,10 @@ export struct ParentReviewPane {
             .height(86)
             .objectFit(ImageFit.Cover)
             .borderRadius(12)
-            .backgroundColor(AppTheme.SURFACE_EMPHASIS);
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('查看作业照片大图')
+            .onClick(() => this.openPreview(uri));
         }, (uri: string) => uri);
       }
     }

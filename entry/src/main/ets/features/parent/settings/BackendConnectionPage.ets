@@ -19,6 +19,7 @@ export struct BackendConnectionPage {
   @State private message: string = '';
   @State private connecting: boolean = false;
   @State private pageRevision: number = 0;
+  @State private familyStudents: StudentProfile[] = [];
   @State private editingId: string = '';
   @State private editName: string = '';
   @State private editGrade: string = '';
@@ -31,6 +32,7 @@ export struct BackendConnectionPage {
 
   aboutToAppear(): void {
     this.baseUrl = BackendSession.instance.getBaseUrl();
+    this.syncLocalStudents();
     if (BackendSession.instance.isConnected()) void this.refreshStudents();
   }
 
@@ -38,9 +40,13 @@ export struct BackendConnectionPage {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.settingsInlineFieldsRequirement());
   }
 
+  private syncLocalStudents(): void {
+    this.familyStudents = this.familyContext.getStudents();
+  }
+
   private students(): StudentProfile[] {
     let currentRevision = this.pageRevision;
-    return this.familyContext.getStudents();
+    return this.familyStudents;
   }
 
   private tutorGuidanceFirst(): boolean {
@@ -71,6 +77,7 @@ export struct BackendConnectionPage {
       let displayName = await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
       let familySynced = await FamilyCloudService.instance.syncStudents();
       let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
+      this.syncLocalStudents();
       this.pageRevision++;
       this.message = familySynced && homeworkSynced ? `已连接：${displayName}，家庭数据已同步` : `已登录：${displayName}，部分数据稍后再同步`;
       this.onStoreChanged();
@@ -83,6 +90,7 @@ export struct BackendConnectionPage {
 
   private async refreshStudents(): Promise<void> {
     if (await FamilyCloudService.instance.syncStudents()) {
+      this.syncLocalStudents();
       this.pageRevision++;
       this.onStoreChanged();
     }
@@ -134,6 +142,7 @@ export struct BackendConnectionPage {
     if (await FamilyCloudService.instance.saveStudent(student)) {
       this.editingId = '';
       this.deleteStudentConfirmId = '';
+      this.syncLocalStudents();
       this.pageRevision++;
       this.message = '孩子资料已保存并同步';
       this.onStoreChanged();
@@ -147,6 +156,7 @@ export struct BackendConnectionPage {
     if (await FamilyCloudService.instance.deleteStudent(studentId)) {
       this.editingId = '';
       this.deleteStudentConfirmId = '';
+      this.syncLocalStudents();
       this.pageRevision++;
       this.message = '孩子资料已删除';
       this.onStoreChanged();
@@ -280,7 +290,8 @@ export struct BackendConnectionPage {
         .accessibilityText(`${student.name}，${student.grade}，${student.className}，编辑资料`)
         .onClick(() => this.beginEdit(student));
         Divider().color(AppTheme.DIVIDER);
-      }, (student: StudentProfile) => student.id);
+      }, (student: StudentProfile) =>
+        `${student.id}:${student.name}:${student.grade}:${student.className}:${student.semester}:${student.textbookSummary}`);
 
       if (BackendSession.instance.isConnected()) {
         Row({ space: 10 }) {

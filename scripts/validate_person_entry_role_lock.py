@@ -42,6 +42,9 @@ require("家长" in entry_page and "孩子" in entry_page and "谁在使用" in 
         "person entry page must clearly expose parent and child choices")
 require("onSelectStudent(student.id)" in entry_page,
         "each child choice must enter with its own studentId")
+require("Stack() {" in entry_page and "Text('家')" in entry_page and
+        ".alignContent(Alignment.Center)" in entry_page,
+        "parent entry badge must use real container centering instead of top-padding text")
 
 require("@Prop role: AppRole" in app_shell,
         "AppShell role must be read-only input from the entry page")
