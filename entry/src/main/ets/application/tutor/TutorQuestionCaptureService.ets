@@ -26,10 +26,11 @@ export class TutorQuestionCaptureService {
       try {
         fileIo.closeSync(file);
       } catch {
-        return { captured: false, imageUri: '', recognizedText: '' };
+        throw new Error('无法关闭拍题缓存文件');
       }
-    } catch {
-      return { captured: false, imageUri: '', recognizedText: '' };
+    } catch (error) {
+      if (error instanceof Error && error.message === '无法关闭拍题缓存文件') throw error;
+      throw new Error('无法准备拍题缓存');
     }
     let saveUri = fileUri.getUriFromPath(filePath);
 
@@ -42,7 +43,7 @@ export class TutorQuestionCaptureService {
     try {
       result = await cameraPicker.pick(context, [cameraPicker.PickerMediaType.PHOTO], profile);
     } catch {
-      return { captured: false, imageUri: '', recognizedText: '' };
+      throw new Error('无法打开系统相机');
     }
 
     if (result.resultCode !== 0) {
