@@ -56,7 +56,7 @@ export struct TutorQuestionCapturePanel {
           .backgroundColor(AppTheme.SURFACE_EMPHASIS);
       }
 
-      Text(this.notice.length > 0 ? this.notice : '本机识别 · 识别后可编辑')
+      Text(this.notice.length > 0 ? this.notice : '只在本机识别 · 识别后可编辑')
         .layoutWeight(1)
         .fontSize(AppTheme.CAPTION_SIZE)
         .lineHeight(18)
