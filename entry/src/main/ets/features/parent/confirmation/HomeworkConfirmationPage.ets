@@ -9,6 +9,7 @@ export struct HomeworkConfirmationPage {
   @Prop revision: number = 0;
   @State private localRevision: number = 0;
   @State private editingCandidateId: string = '';
+  @State private showEditorSheet: boolean = false;
   @State private publishing: boolean = false;
   @State private publishMessage: string = '';
   @State private publishError: boolean = false;
@@ -17,11 +18,6 @@ export struct HomeworkConfirmationPage {
   onStoreChanged: () => void = () => {};
 
   private readonly viewModel: HomeworkConfirmationViewModel = new HomeworkConfirmationViewModel();
-
-  aboutToAppear(): void {
-    let items = this.candidates();
-    if (items.length > 0 && this.editingCandidateId.length === 0) this.editingCandidateId = items[0].id;
-  }
 
   private touchRevision(): number { return this.revision + this.localRevision; }
 
@@ -34,6 +30,15 @@ export struct HomeworkConfirmationPage {
   private editingCandidate(): CandidateAssignment | null {
     for (let item of this.candidates()) if (item.id === this.editingCandidateId) return item;
     return null;
+  }
+
+  private openEditor(candidateId: string): void {
+    this.editingCandidateId = candidateId;
+    this.showEditorSheet = true;
+  }
+
+  private closeEditor(): void {
+    this.showEditorSheet = false;
   }
 
   private saveCandidate(candidate: CandidateAssignment): void {
@@ -81,16 +86,18 @@ export struct HomeworkConfirmationPage {
   private addCandidate(): void {
     let candidate = this.viewModel.addCandidate();
     if (candidate === null) return;
-    this.editingCandidateId = candidate.id;
     this.localRevision++;
     this.onStoreChanged();
+    this.openEditor(candidate.id);
   }
 
   private removeCandidate(candidateId: string): void {
     if (!this.viewModel.removeCandidate(candidateId)) return;
     this.localRevision++;
-    let items = this.candidates();
-    this.editingCandidateId = items.length > 0 ? items[0].id : '';
+    if (this.editingCandidateId === candidateId) {
+      this.editingCandidateId = '';
+      this.showEditorSheet = false;
+    }
     this.onStoreChanged();
   }
 
@@ -113,6 +120,70 @@ export struct HomeworkConfirmationPage {
     } finally {
       this.publishing = false;
     }
+  }
+
+  @Builder
+  private CandidateEditorSheet() {
+    Column({ space: 10 }) {
+      Row() {
+        Column({ space: 2 }) {
+          Text('编辑作业')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          if (this.editingCandidate() !== null) {
+            Text(`${this.editingCandidate()!.subject} · ${this.editingCandidate()!.title}`)
+              .maxLines(1)
+              .fontSize(12)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+
+        Text('完成')
+          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .textAlign(TextAlign.Center)
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('完成编辑')
+          .onClick(() => this.closeEditor());
+      }
+      .width('100%')
+      .padding({ left: 16, right: 16, top: 4, bottom: 8 });
+
+      Divider().color(AppTheme.DIVIDER);
+
+      if (this.editingCandidate() !== null) {
+        Scroll() {
+          ConfirmationCandidateEditor({
+            item: this.editingCandidate()!,
+            onDelete: (candidateId: string) => this.removeCandidate(candidateId),
+            onSubjectChange: (candidate: CandidateAssignment, subject: Subject) =>
+              this.updateSubject(candidate, subject),
+            onTitleChange: (candidate: CandidateAssignment, value: string) =>
+              this.updateTitle(candidate, value),
+            onInstructionChange: (candidate: CandidateAssignment, value: string) =>
+              this.updateInstruction(candidate, value),
+            onDueTextChange: (candidate: CandidateAssignment, value: string) =>
+              this.updateDueText(candidate, value),
+            onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
+              this.setExpectedMinutes(candidate, minutes),
+            onTextbookRefChange: (candidate: CandidateAssignment, value: string) =>
+              this.updateTextbookRef(candidate, value)
+          })
+          .padding({ left: 16, right: 16, top: 12, bottom: 28 });
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .scrollBar(BarState.Auto);
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(AppTheme.SURFACE);
   }
 
   @Builder
@@ -160,8 +231,8 @@ export struct HomeworkConfirmationPage {
                 ForEach(this.candidates(), (item: CandidateAssignment) => {
                   ConfirmationCandidateCard({
                     item: item,
-                    selected: this.editingCandidateId === item.id,
-                    onSelect: () => this.editingCandidateId = item.id,
+                    selected: this.showEditorSheet && this.editingCandidateId === item.id,
+                    onSelect: () => this.openEditor(item.id),
                     onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
                       this.setExpectedMinutes(candidate, minutes)
                   });
@@ -174,31 +245,6 @@ export struct HomeworkConfirmationPage {
                 .borderRadius(AppTheme.CONTROL_RADIUS)
                 .backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
                 .onClick(() => this.addCandidate());
-
-              if (this.editingCandidate() !== null) {
-                Column() {
-                  ConfirmationCandidateEditor({
-                    item: this.editingCandidate()!,
-                    onDelete: (candidateId: string) => this.removeCandidate(candidateId),
-                    onSubjectChange: (candidate: CandidateAssignment, subject: Subject) =>
-                      this.updateSubject(candidate, subject),
-                    onTitleChange: (candidate: CandidateAssignment, value: string) =>
-                      this.updateTitle(candidate, value),
-                    onInstructionChange: (candidate: CandidateAssignment, value: string) =>
-                      this.updateInstruction(candidate, value),
-                    onDueTextChange: (candidate: CandidateAssignment, value: string) =>
-                      this.updateDueText(candidate, value),
-                    onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
-                      this.setExpectedMinutes(candidate, minutes),
-                    onTextbookRefChange: (candidate: CandidateAssignment, value: string) =>
-                      this.updateTextbookRef(candidate, value)
-                  });
-                }
-                .width('100%')
-                .padding(AppTheme.PHONE_CARD_PADDING)
-                .backgroundColor(AppTheme.SURFACE)
-                .borderRadius(AppTheme.PHONE_CARD_RADIUS);
-              }
 
               this.PublishFeedback();
 
@@ -227,6 +273,11 @@ export struct HomeworkConfirmationPage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor(AppTheme.BACKGROUND);
+    .backgroundColor(AppTheme.BACKGROUND)
+    .bindSheet($this.showEditorSheet, this.CandidateEditorSheet(), {
+      height: '82%',
+      showClose: false,
+      preferType: SheetType.BOTTOM
+    });
   }
 }

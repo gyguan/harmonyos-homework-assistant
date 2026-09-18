@@ -234,8 +234,11 @@ require("ConfirmationCandidateCard" in confirmation and "ConfirmationCandidateEd
 require("DeadlinePickerField" in confirmation_components and
         "TextInput({ text: this.item.dueText })" not in confirmation_components,
         "Confirmation deadline edit must reuse the shared native deadline picker")
-require("selected: this.editingCandidateId === item.id" in confirmation,
-        "Confirmation selected Candidate must bind directly to editingCandidateId")
+require("selected: this.showEditorSheet && this.editingCandidateId === item.id" in confirmation,
+        "Confirmation selected Candidate must reflect both the active editor id and bottom-sheet visibility")
+require(".bindSheet($this.showEditorSheet" in confirmation and
+        "private CandidateEditorSheet()" in confirmation,
+        "Confirmation editing must use a reactive bottom sheet")
 require(confirmation_components.count("@Prop item: CandidateAssignment;") >= 2 and
         "@Prop selected: boolean = false;" in confirmation_components,
         "Confirmation Candidate components must receive current item/selection through reactive props")
