@@ -45,23 +45,35 @@ export class TutorQuestionCaptureService {
       return { captured: false, imageUri: '', recognizedText: '' };
     }
 
-    if (result.resultCode !== 0 || result.resultUri.length === 0) {
+    if (result.resultCode !== 0) {
       return { captured: false, imageUri: '', recognizedText: '' };
     }
 
-    let rawImport: RawHomeworkImport = {
-      id: `tutor-question-${now}`,
-      studentId: studentId,
-      sourceKind: HomeworkImportSourceKind.IMAGE,
-      sourceLabel: '拍题',
-      resourceUri: result.resultUri,
-      rawText: ''
-    };
-    let extracted = await this.extractor.extract(rawImport);
-    return {
-      captured: true,
-      imageUri: result.resultUri,
-      recognizedText: extracted.text
-    };
+    let candidates: string[] = [];
+    candidates.push(saveUri);
+    if (result.resultUri.length > 0 && result.resultUri !== saveUri) candidates.push(result.resultUri);
+
+    let lastError = '题目图片无法识别';
+    for (let uri of candidates) {
+      let rawImport: RawHomeworkImport = {
+        id: `tutor-question-${now}`,
+        studentId: studentId,
+        sourceKind: HomeworkImportSourceKind.IMAGE,
+        sourceLabel: '拍题',
+        resourceUri: uri,
+        rawText: ''
+      };
+      try {
+        let extracted = await this.extractor.extract(rawImport);
+        return {
+          captured: true,
+          imageUri: uri,
+          recognizedText: extracted.text
+        };
+      } catch (error) {
+        lastError = error instanceof Error ? error.message : '题目图片无法识别';
+      }
+    }
+    throw new Error(lastError);
   }
 }
