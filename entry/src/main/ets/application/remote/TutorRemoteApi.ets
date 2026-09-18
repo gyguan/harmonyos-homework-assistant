@@ -16,6 +16,8 @@ export interface TutorConversation {
   available: boolean;
   notice: string;
   messages: TutorChatMessage[];
+  hasMore: boolean;
+  nextBeforeEpochMs: number;
 }
 
 interface AskPayload {
@@ -29,10 +31,13 @@ export class TutorRemoteApi {
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   private constructor() {}
 
-  async load(assignmentId: string): Promise<TutorConversation> {
+  async load(assignmentId: string, beforeEpochMs: number = 0): Promise<TutorConversation> {
     if (!BackendSession.instance.isConnected()) return this.disconnected();
     try {
-      let response = await BackendHttpClient.instance.request(`/api/v1/assignments/${encodeURIComponent(assignmentId)}/tutor`, http.RequestMethod.GET);
+      let suffix = beforeEpochMs > 0 ? `?limit=40&before=${beforeEpochMs}` : '?limit=40';
+      let response = await BackendHttpClient.instance.request(
+        `/api/v1/assignments/${encodeURIComponent(assignmentId)}/tutor${suffix}`,
+        http.RequestMethod.GET);
       if (response.statusCode !== 200) return this.unavailable('AI Tutor 暂时不可用');
       return JSON.parse(response.body) as TutorConversation;
     } catch {
@@ -62,6 +67,9 @@ export class TutorRemoteApi {
   }
 
   private unavailable(notice: string): TutorConversation {
-    return { sessionId: null, available: false, notice: notice, messages: [] };
+    return {
+      sessionId: null, available: false, notice: notice, messages: [],
+      hasMore: false, nextBeforeEpochMs: 0
+    };
   }
 }
