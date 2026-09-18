@@ -1,20 +1,22 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { ReadonlySettingStateRow } from '../../../components/selection/SelectionControls';
-import { HomeworkStore } from '../../../data/HomeworkStore';
+import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { AppSettings, StudentProfile } from '../../../domain/model/HomeworkModels';
+import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 
 @Component
 export struct StudentProfilePage {
   @Prop revision: number = 0;
+  private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
 
   private student(): StudentProfile {
     let currentRevision = this.revision;
-    return HomeworkStore.instance.getStudent();
+    return this.familyContext.getStudent();
   }
 
   private settings(): AppSettings {
     let currentRevision = this.revision;
-    return HomeworkStore.instance.getSettings();
+    return this.familyContext.getSettings();
   }
 
   @Builder
