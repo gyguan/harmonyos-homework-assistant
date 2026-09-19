@@ -4,7 +4,9 @@
 >
 > 适用版本：DevEco Studio 26.0.0 及以上（已确认当前环境为 26.0.0.821）。
 >
-> 路线：用 DevEco Studio 的 **Build > Upload Product** 让 AGC 自动完成发布签名，然后在 AGC 创建外部邀请测试并开启公开链接。
+> 路线：用 DevEco Studio 的 **构建 > 上传产品**（Build > Upload Product）让 AGC 自动完成发布签名，然后在 AGC 创建外部邀请测试并开启公开链接。
+>
+> ⚠️ 本机 IDE 界面语言为**中文**，菜单名请对照第三节的「中英文菜单名对照表」，按英文找是找不到的。
 
 ---
 
@@ -59,18 +61,50 @@
 
 DevEco 26.0.0+ 支持在上传时由 AGC 云端自动签名，因此**无需手动申请发布证书**。
 
+### 3.1 ⚠️ 中英文菜单名对照（最容易卡住的地方）
+
+DevEco Studio 默认安装带**中文语言包**，菜单显示的是中文，按英文找一定找不到。
+下面左列是官方文档里的英文写法，右列是你在 IDE 里实际看到的中文：
+
+| 官方文档（英文） | 你的 IDE 实际显示（中文） |
+| --- | --- |
+| **Build** 菜单 | **构建** 菜单 |
+| Build Hap(s)/APP(s) | **编译 Hap(s)/APP(s)** ← 注意是「编译」不是「构建」 |
+| Build APP(s) | **编译 APP(s)** |
+| **Upload Product** | **上传产品** ← 不叫「上传软件包」 |
+
+英文版 IDE 的路径：`Build > Build Hap(s)/APP(s) > Build APP(s)`，然后 `Build > Upload Product`。
+**中文版 IDE 的路径**：`构建 > 编译 Hap(s)/APP(s) > 编译 APP(s)`，然后 `构建 > 上传产品`。
+
+> 💡 最快的方式：按 **Shift + Shift** 打开 Search Everywhere，直接输入 **`上传产品`**（或 `Upload Product`），
+> 回车即可执行，完全不用在菜单里翻。
+
+### 3.2 操作步骤
+
 1. 打开 DevEco Studio，打开本项目 `D:\code\harmonyos-homework-assistant`。
-2. 菜单栏 → **Build > Build Hap(s)/APP(s) > Build APP(s)**，等待构建完成。
+   （必须从 IDE 里打开这个工程，「上传产品」是**工程级**菜单项，没有打开工程时不会出现。）
+2. 菜单栏 → **构建 > 编译 Hap(s)/APP(s) > 编译 APP(s)**，等待构建完成。
    - 构建产物路径：`build\outputs\default\harmonyos-homework-assistant-default-signed.app`
-3. 菜单栏 → **Build > Upload Product**。
+   - **必须先构建出 .app**，「上传产品」只列出 `build/outputs` 下的软件包，没有包时列表是空的。
+3. 菜单栏 → **构建 > 上传产品**（在「构建」菜单里，位置偏下）。
 4. 如果未登录，点击 **Sign in**，用同一个已实名的华为开发者账号登录。
+   - ⚠️ 必须用**已实名认证**的账号；且该功能**仅支持中国境内**（港澳台除外）。
 5. 登录成功后，确认用户名和团队信息；在 App 包列表中选择刚才构建出的 `harmonyos-homework-assistant-default-signed.app`。
 6. 点击 **Distribute App** → 上传类型选择 **AppGallery Connect**。
 7. 签名方式保持默认 **Automatically manage signing**（使用 AGC 云管理证书自动重签名）。
-8. 检查软件包信息，确认包名、版本号无误后，点击 **Upload** 上传。
+8. 检查软件包信息，确认包名（`com.gyguan.homeworkassistant`）、版本号无误后，点击 **Upload** 上传。
 9. 上传成功后，点击 **AppGallery Connect** 跳转到后台查看上传记录。
+   - 上传完成后 `build/outputs` 下会多出一个 `re-signed.app`，这是 AGC 云管理证书重签名的产物，属**正常现象**，原 `.app` 不受影响。
 
-> 如果 DevEco 里没有 **Build > Upload Product** 菜单，说明该 IDE 版本不支持云管理证书。请切到本指南最后的「备选方案：手动发布证书路线」。
+### 3.3 「找不到菜单」自查表
+
+| 现象 | 原因 | 解决 |
+| --- | --- | --- |
+| 「构建」菜单里只有「编译 Hap(s)/APP(s)」，没有「上传产品」 | IDE 版本低于 5.0.5.200 | 升级 DevEco Studio（26.0.0+ 才有云管理证书） |
+| 整个「构建」菜单都找不到 | IDE 界面是中文，在找英文 "Build" | 认准**「构建」**菜单 |
+| 「上传产品」是灰的 / 点了没反应 | 没打开工程，或工程未同步完成 | 先打开工程并等待 Sync 完成 |
+| 上传界面 App 包列表是空的 | `build/outputs` 下没有 .app | 先执行「编译 APP(s)」 |
+| 登录后提示无可用团队 | 账号未实名认证 | 到华为开发者联盟补实名认证 |
 
 ---
 
@@ -161,9 +195,9 @@ DevEco 26.0.0+ 支持在上传时由 AGC 云端自动签名，因此**无需手�
 
 ## 七、备选方案：手动发布证书路线
 
-如果 DevEco Studio 没有 **Build > Upload Product** 或云管理证书上传失败，可按以下路线：
+如果 DevEco Studio 没有 **构建 > 上传产品**（Build > Upload Product），或云管理证书上传失败，可按以下路线：
 
-1. 在 DevEco Studio 生成 Key 和 CSR：`Build > Generate Key and CSR`，得到 `.p12` 和 `.csr`。
+1. 在 DevEco Studio 生成 Key 和 CSR：**构建 > 生成私钥和证书请求文件**（Build > Generate Key and CSR），得到 `.p12` 和 `.csr`。
 2. 在 AGC → **用户与访问 > 证书管理** → 新增证书 → 类型选 **发布证书** → 上传 `.csr` → 下载 `.cer`。
 3. 在 AGC → 项目 → 应用 → **HarmonyOS 应用 > HAP Provision Profile 管理** → 添加 → 类型选 **发布** → 关联证书和应用 → 下载 `.p7b`。
 4. 在本地 `build-profile.json5` 中配置发布签名（文件已加入 Git 忽略，不会入库）。
