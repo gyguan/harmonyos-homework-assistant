@@ -1,0 +1,24 @@
+# 统一换行符：仓库内一律存 LF，检出也用 LF
+# 原因：backend/ 下的 shell 脚本要上传到 Linux 运行，
+# 若检出为 CRLF 会报 `bad interpreter: /usr/bin/env bash^M: no such file or directory`
+* text=auto eol=lf
+
+# Windows 专用脚本保持 CRLF
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制文件不做换行符转换
+*.hap binary
+*.p12 binary
+*.p7b binary
+*.cer binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.jar binary
+*.gz binary
+*.zip binary

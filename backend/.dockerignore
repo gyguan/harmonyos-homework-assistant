@@ -1,0 +1,11 @@
+# 构建上下文只需要 pom.xml 和 src，其他一律排除
+# 尤其是本地密钥文件，绝不能进镜像
+config/
+data/
+target/
+scripts/
+.env
+.env.*
+!.env.example
+*.log
+.e2e-session.json

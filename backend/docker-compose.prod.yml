@@ -1,0 +1,84 @@
+name: homework-backend
+
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: homework
+      POSTGRES_USER: ${DB_USERNAME:?set in .env}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?set in .env}
+      TZ: Asia/Shanghai
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d homework"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    # 默认不把 5432 暴露到宿主机。需要在本机做备份/维护时再取消注释：
+    # ports:
+    #   - "127.0.0.1:5432:5432"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/homework
+      DB_USERNAME: ${DB_USERNAME:?set in .env}
+      DB_PASSWORD: ${DB_PASSWORD:?set in .env}
+      BOOTSTRAP_ENABLED: ${BOOTSTRAP_ENABLED:-true}
+      BOOTSTRAP_LOGIN: ${BOOTSTRAP_LOGIN:-parent}
+      BOOTSTRAP_PASSWORD: ${BOOTSTRAP_PASSWORD:?set in .env}
+      AUTH_TOKEN_TTL_HOURS: ${AUTH_TOKEN_TTL_HOURS:-168}
+      APP_STORAGE_ROOT: /data/uploads
+      # 生产环境关闭业务报文日志
+      HTTP_LOG_PAYLOADS: "false"
+      # AI 能力（可选；不配则 Tutor 降级，作业主流程不受影响）
+      # 注意：国内厂商（智谱/百炼/硅基流动/火山/混元/千帆）都必须用 chat-completions 协议，
+      # 默认的 responses 协议只有 OpenAI 支持，照默认值配国内地址会拿到 404 并静默降级。
+      AI_PROTOCOL: ${AI_PROTOCOL:-responses}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com}
+      AI_RESPONSES_PATH: ${AI_RESPONSES_PATH:-/v1/responses}
+      AI_CHAT_COMPLETIONS_PATH: ${AI_CHAT_COMPLETIONS_PATH:-/v1/chat/completions}
+      AI_TUTOR_MODEL: ${AI_TUTOR_MODEL:-}
+      AI_ORGANIZER_MODEL: ${AI_ORGANIZER_MODEL:-}
+      AI_ALLOW_UNAUTHENTICATED: ${AI_ALLOW_UNAUTHENTICATED:-false}
+      AI_STRUCTURED_OUTPUT: ${AI_STRUCTURED_OUTPUT:-true}
+      AI_LOG_PAYLOADS: ${AI_LOG_PAYLOADS:-false}
+      TZ: Asia/Shanghai
+    ports:
+      - "${APP_PORT:-8080}:8080"
+    volumes:
+      - uploads:/data/uploads
+
+  # ---------- HTTPS 反向代理（Caddy 自动签发 Let's Encrypt 证书）----------
+  # 需要：服务器 80/443 已放行 + 域名 A 记录指向本机（默认用 sslip.io 免费域名）
+  # 不需要 HTTPS 时可整段删除，或 `docker compose -f docker-compose.prod.yml up -d` 时用 --scale 忽略
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      SITE_ADDRESS: ${SITE_ADDRESS:-192-144-143-141.sslip.io}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:
