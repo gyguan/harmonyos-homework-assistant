@@ -74,6 +74,9 @@ services:
       - "443:443"
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # 客户端安装包（.hap）下载目录：宿主机 <部署根>/releases，即 backend 的上一级
+      # 放包路径：<部署根>/releases/homework-assistant-<版本>.hap
+      - ../releases:/srv/releases:ro
       - caddy_data:/data
       - caddy_config:/config
 

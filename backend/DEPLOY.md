@@ -311,3 +311,109 @@ AI_STRUCTURED_OUTPUT=false
 
 `glm-4-flash` 单价 0 元，但**免费档有并发与速率限制**（智谱免费模型并发很低），适合家庭单用户场景，**不要用于多用户并发**。
 
+
+---
+
+## 十、客户端安装包分发（HTTP 下载站，2026-09-19 实测）
+
+给家长/家人装 App 不需要数据线，走服务器上的下载站即可。
+
+### 10.1 下载地址
+
+| 用途 | 地址 |
+| --- | --- |
+| 下载页（推荐，含安装步骤） | `http://192.144.143.141/` |
+| 安装包直链 | `http://192.144.143.141/homework-assistant-0.1.0.hap` |
+
+### 10.2 为什么是 HTTP 而不是 HTTPS
+
+本机在大陆节点、使用 `sslip.io` 免费域名（**未备案**）。实测：
+
+- 443 端口在云防火墙放行后，TLS 握手仍被 **SNI 级 RST**；
+- Let's Encrypt 的 `http-01` 校验拿到的是腾讯 DNSPod 的拦截页（`webblock.html`），证书根本签不下来；
+- 而 **80 端口完全正常**。
+
+所以下载站固定走 `http://<公网IP>/`，用 Caddy 的一个**纯 HTTP 站点块**承载（`http://` 前缀会让 Caddy 跳过自动 HTTPS）。这与原有的 HTTPS 反代站点块共存，互不影响。
+
+### 10.3 部署结构
+
+```
+/home/ubuntu/homework-app/src/            <- 部署根
+├── backend/                              <- 后端（docker compose 所在）
+│   ├── Caddyfile                         <- 末尾新增 http://192.144.143.141 站点块
+│   └── docker-compose.prod.yml           <- caddy 服务新增 ../releases 只读挂载
+└── releases/                             <- 安装包 + index.html 放这里
+    ├── index.html
+    └── homework-assistant-0.1.0.hap
+```
+
+⚠️ 挂载源写的是 `../releases` 而不是 `./releases`：compose 的相对路径是**相对 compose 文件所在目录**（`backend/`），
+写成 `./releases` 会落到 `backend/releases`，静默生成一个空目录，页面直接 404。
+
+生效命令（`--no-deps` 避免顺带重建后端容器）：
+
+```bash
+cd /home/ubuntu/homework-app/src/backend
+sudo docker compose -f docker-compose.prod.yml up -d --no-deps caddy
+sudo docker exec homework-backend-caddy-1 ls -la /srv/releases/   # 确认包可见
+```
+
+替换配置前先校验语法（Caddyfile 写错会导致开机启动失败）：
+
+```bash
+sudo docker run --rm -v $PWD/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2-alpine \
+  caddy validate --config /etc/caddy/Caddyfile
+```
+
+### 10.4 发布新版本
+
+**方式一：一键脚本**（仓库根目录，Git Bash；已实测通过）
+
+```bash
+./scripts/publish_hap_release.sh          # 构建 + 签名校验 + 上传 + 回抓比对哈希
+./scripts/publish_hap_release.sh -s       # 跳过构建，只上传现有包
+./scripts/publish_hap_release.sh -v 0.2.0 # 指定版本号（默认读 AppScope/app.json5）
+```
+
+版本号变了记得同步改 `releases/index.html` 里的链接和哈希，脚本结尾会提醒。
+
+**方式二：手工四步**
+
+```bash
+# 1) 本机打 release 包（约 1 MB）
+hvigorw assembleHap --mode module -p product=default -p buildMode=release
+
+# 2) 上传（文件名带版本号）
+scp entry/build/default/outputs/default/entry-default-signed.hap \
+    ubuntu@192.144.143.141:/home/ubuntu/homework-app/src/releases/homework-assistant-0.1.0.hap
+
+# 3) 校验抓下来的哈希和本地一致
+curl -s -o dl.hap http://192.144.143.141/homework-assistant-0.1.0.hap && sha256sum dl.hap
+```
+
+> Git Bash 里 `curl` 是 Windows 原生程序，`-o /tmp/xxx` 会报 `client returned ERROR on write`，
+> 输出路径要用盘符路径（脚本里用 `cygpath -w` 转过）。
+
+⚠️ 注意 `buildMode`：`release` 出 **976 KB**，`debug` 出 **2.3 MB**，两者用的是同一个调试证书，
+都能装，但对外分发用 `release`。
+
+### 10.5 手机端安装流程
+
+1. 系统浏览器打开 `http://192.144.143.141/`（**不要用微信内置浏览器**）；
+2. 点「立即下载安装包」；
+3. 「文件管理 → 下载」找到 `.hap`，点击 → 继续安装；
+4. 提示"不受信任"时到「设置 → 安全 → 更多安全设置」打开"外部来源应用安装"。
+
+### 10.6 ⚠️ 安装包只能在白名单设备上装
+
+当前用的是 DevEco **调试证书**自动签名，profile 里 `debug-info.device-ids` 只登记了**一台**设备，
+其它机器会报「签名校验失败 / 应用安装失败」。要换设备：
+
+1. 目标设备开启「开发者选项 → USB 调试」，用数据线连电脑；
+2. DevEco Studio 里重新走一次自动签名（会把该设备的 UDID 加进白名单，上限 100 台）；
+3. 重新打包上传。
+
+**证书有效期到 2026-10-03**，过期后需重新签名再发包。
+
+要让任意华为设备都能装，只有上架 AppGallery 或走 AGC 内部测试（需要企业/开发者实名账号 + 审核），
+调试证书做不到；真机长期分发建议直接改用 AGC 内部测试邀请链接。

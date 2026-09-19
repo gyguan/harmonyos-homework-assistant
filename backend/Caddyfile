@@ -26,3 +26,26 @@
 		max_size 20MB
 	}
 }
+
+# ---------- 客户端安装包下载站（纯 HTTP）----------
+# 为什么不用 HTTPS：本机在大陆节点、未备案域名，443 上 TLS 握手会被 SNI 级重置，
+# 而 80 端口正常。故下载站固定走 http://<公网IP>/，供手机浏览器直接下载 .hap。
+# 静态目录：/srv/releases（宿主机 ../releases，即 <部署根>/releases，见 docker-compose.prod.yml）
+http://192.144.143.141 {
+	encode gzip
+
+	log {
+		output file /data/download.log {
+			roll_size 5mb
+			roll_keep 3
+		}
+	}
+
+	root * /srv/releases
+	file_server
+
+	header {
+		Cache-Control "no-store"
+		X-Content-Type-Options "nosniff"
+	}
+}
