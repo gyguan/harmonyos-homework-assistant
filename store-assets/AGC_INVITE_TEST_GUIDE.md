@@ -14,7 +14,7 @@
 |---|---|---|
 | 华为开发者账号 | 需已完成实名认证 | 用户已确认完成 |
 | 应用名称 | 小伴作业 | ✅ |
-| 应用包名 | `com.gyguan.homework-assistant` | ✅ 已在 `AppScope/app.json5` 固定 |
+| 应用包名 | `com.gyguan.homeworkassistant` | ✅ 已在 `AppScope/app.json5` 固定 |
 | 应用版本 | `0.1.0`（versionCode `1000000`） | ✅ 已构建 |
 | 支持设备 | phone + tablet | ✅ `.app` 包已声明 |
 | 应用图标 | `store-assets/app_icon_1024.png`（1024×1024）<br>`store-assets/app_icon_216.png`（216×216） | ✅ 已生成 |
@@ -22,7 +22,11 @@
 | 审核测试账号 | `parent` / `parent123` | 后端已内置，仅用于审核测试 |
 | 后端服务地址 | `http://192.144.143.141:8080` | 已预置在 App 中 |
 
-> **重要提醒**：`com.gyguan.homework-assistant` 包名在 AGC 创建应用后**不可更改**，填写时务必一字不差。
+> **重要提醒**：包名是 **`com.gyguan.homeworkassistant`**，在 AGC 创建应用后**不可更改**。
+>
+> ⚠️ 注意**中间没有连字符**（不是 `homework-assistant`）。HarmonyOS 包名只允许**字母、数字、下划线、点**，不允许连字符 `-`，填成带连字符的会被 AGC 直接拒绝。
+>
+> 填写时必须与 `AppScope/app.json5` 的 `bundleName` **完全一致**（大小写敏感）。
 
 ---
 
@@ -36,6 +40,14 @@
    - **平台**：APP（HarmonyOS）
    - **应用名称**：`小伴作业`
    - **应用包名**：`com.gyguan.homeworkassistant`
+
+     > ⚠️ **中间没有连字符**！不要写成 `com.gyguan.homework-assistant`，AGC 会直接报「应用包名不符合规范」。
+     >
+     > HarmonyOS 包名规则（官方）：以点号分隔、**至少三段**，每段**只允许英文字母、数字、下划线 `_`**；
+     > 首段以字母开头，每段以字母或数字结尾；长度 7~128 字符；
+     > 且不能把保留字符单独作为一段（`oh` / `ohos` / `harmony` / `harmonyos` / `openharmony` / `system`）。
+     >
+     > 这里填的值必须与 `AppScope/app.json5` 里的 `bundleName` **完全一致**。
    - **支持设备**：勾选 **手机**、**平板**
    - **应用分类**：一级 `教育` → 二级 `学习工具`（或最接近的）
    - **默认语言**：简体中文
@@ -162,6 +174,11 @@ DevEco 26.0.0+ 支持在上传时由 AGC 云端自动签名，因此**无需手�
 ---
 
 ## 八、常见问题
+
+**Q0：AGC 提示「应用包名不符合规范」怎么办？**
+最常见的原因是**误用了连字符**。本项目的正确包名是 `com.gyguan.homeworkassistant`，
+不是 `com.gyguan.homework-assistant`。HarmonyOS 包名每段只允许字母、数字、下划线，
+不允许 `-`。另外还要确认：至少三段、总长度 7~128、没有把 `harmony`/`system` 等保留字单独作为一段。
 
 **Q1：审核需要多久？**
 外部邀请测试通常为分钟级基本审核；若为企业开发者首个构建版本可能需要标准审核。可在 AGC 版本列表查看状态。
