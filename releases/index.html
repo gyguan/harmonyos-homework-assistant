@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>作业陪伴助手 · 安装包下载</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1a2233; --sub:#5b6880;
+    --brand:#2f6bff; --brand2:#5b8bff; --line:#e6eaf3;
+    --warn-bg:#fff8e8; --warn-line:#f5d58a; --warn-ink:#8a5a00;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    margin:0;padding:20px 16px 48px;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"HarmonyOS Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+    line-height:1.6;
+  }
+  .wrap{max-width:560px;margin:0 auto}
+  .hero{
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);
+    border-radius:20px;padding:26px 22px;color:#fff;
+    box-shadow:0 10px 26px rgba(47,107,255,.28);
+  }
+  .hero h1{margin:0 0 6px;font-size:23px;letter-spacing:.5px}
+  .hero p{margin:0;font-size:14px;opacity:.92}
+  .meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .chip{
+    background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);
+    border-radius:999px;padding:4px 12px;font-size:12px;
+  }
+  .card{
+    background:var(--card);border-radius:18px;padding:20px;margin-top:16px;
+    box-shadow:0 2px 10px rgba(20,40,90,.06);
+  }
+  .btn{
+    display:block;text-align:center;text-decoration:none;
+    background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);
+    color:#fff;font-size:17px;font-weight:600;
+    padding:15px 18px;border-radius:14px;
+    box-shadow:0 6px 16px rgba(47,107,255,.3);
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn small{display:block;font-weight:400;font-size:12px;opacity:.85;margin-top:2px}
+  .btn.ghost{
+    background:#fff;color:var(--brand);border:1.5px solid var(--brand);
+    box-shadow:none;margin-top:10px;font-size:15px;
+  }
+  h2{font-size:15px;margin:0 0 12px;color:var(--ink)}
+  ol{margin:0;padding-left:20px;color:var(--sub);font-size:14px}
+  ol li{margin-bottom:9px}
+  ol li b{color:var(--ink)}
+  .warn{
+    background:var(--warn-bg);border:1px solid var(--warn-line);
+    border-radius:14px;padding:14px 16px;font-size:13px;color:var(--warn-ink);
+  }
+  .warn b{display:block;margin-bottom:5px;font-size:13.5px}
+  .warn ul{margin:6px 0 0;padding-left:18px}
+  .warn li{margin-bottom:4px}
+  .hash{
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;color:var(--sub);
+    word-break:break-all;background:#f7f9fd;border:1px solid var(--line);
+    border-radius:10px;padding:10px 12px;margin-top:10px;
+  }
+  .foot{text-align:center;font-size:12px;color:#9aa6bd;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <h1>作业陪伴助手</h1>
+    <p>HarmonyOS 客户端安装包</p>
+    <div class="meta">
+      <span class="chip">版本 0.1.0</span>
+      <span class="chip">约 1 MB</span>
+      <span class="chip">支持手机 / 平板</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <a class="btn" href="homework-assistant-0.1.0.hap" download>
+      立即下载安装包
+      <small>homework-assistant-0.1.0.hap · 977 KB</small>
+    </a>
+    <a class="btn ghost" href="homework-assistant-0.1.0.hap" download>直接下载（备用链接）</a>
+    <div class="hash">SHA-256: 01253934bb0fdac5f763e3a2c71911b6f5c7724e2734d5b31133593bdbebbd48</div>
+  </div>
+
+  <div class="card">
+    <h2>安装步骤</h2>
+    <ol>
+      <li>在本机<b>系统浏览器</b>中打开本页面（不要用微信内置浏览器）。</li>
+      <li>点上面的按钮下载 <b>.hap</b> 安装包，等下载完成。</li>
+      <li>打开<b>「文件管理」→「下载」</b>，找到 <b>homework-assistant-0.1.0.hap</b>，点击它。</li>
+      <li>系统弹出安装确认后，点击<b>「继续安装」</b>，完成。</li>
+      <li>首次打开若提示"不受信任"，进入<b>设置 → 安全 → 更多安全设置</b>，允许"外部来源应用安装"。</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div class="warn">
+      <b>⚠️ 关于设备白名单</b>
+      当前安装包使用华为开发者<b>调试证书</b>签名，只能安装在本开发账号已注册的设备上。
+      <ul>
+        <li>已被授权的设备：平板 MatePad（已注册）</li>
+        <li>如果换成其它手机安装失败，需要先用数据线连接电脑、开启「开发者选项 → USB 调试」，再重新签名一次，把该手机的设备号加入白名单。</li>
+        <li>证书有效期至 2026-10-03，到期后需重新签名。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>连接云端</h2>
+    <ol>
+      <li>安装后打开 App，进入<b>「设置 → 后端连接」</b>。</li>
+      <li>服务器地址：<b>http://192.144.143.141:8080</b>（已内置为默认值）。</li>
+      <li>用家长账号登录：<b>parent / parent123</b>。</li>
+    </ol>
+  </div>
+
+  <div class="foot">
+    构建时间 2026-09-19 · 包名 com.gyguan.homeworkassistant
+  </div>
+
+</div>
+</body>
+</html>
