@@ -15,6 +15,7 @@ public final class PracticeDtos {
       int version,
       String grade,
       String subject,
+      String semester,
       String title,
       String description,
       String difficulty,

@@ -31,7 +31,8 @@ public class LocalBootstrap implements ApplicationRunner {
     Instant now = Instant.now(); UUID familyId = UUID.randomUUID();
     families.save(new FamilyEntity(familyId, familyName, now));
     accounts.save(new AccountEntity(UUID.randomUUID(), familyId, login, encoder.encode(password), "家长", now));
-    students.upsert(familyId, new StudentDtos.Upsert("student-xiaoyu-001", "小宇", "三年级", "三（2）班", "2026秋", ""));
+    students.upsert(familyId, new StudentDtos.Upsert("student-xiaoyu-001", "小宇", "二年级", "二（2）班", "2026秋",
+        "语文部编版 · 数学北师大版 · 英语沪教版"));
     students.upsert(familyId, new StudentDtos.Upsert("student-xiaomi-002", "小米", "一年级", "一（5）班", "2026秋", ""));
   }
 }

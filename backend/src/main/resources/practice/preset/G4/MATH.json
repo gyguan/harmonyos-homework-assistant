@@ -1,0 +1,399 @@
+{
+  "schemaVersion": 1,
+  "grade": "G4",
+  "subject": "MATH",
+  "papers": [
+    {
+      "id": "MATH-G4-STARTER-001",
+      "version": 1,
+      "grade": "G4",
+      "subject": "MATH",
+      "title": "数学基础训练卷",
+      "description": "四年级数学首批练习套卷，用于建立稳定的套卷练习入口。",
+      "difficulty": "L1",
+      "questionCount": 10,
+      "estimatedMinutes": 15,
+      "tags": [
+        "计算",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G4-STARTER-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "13 × 3 = ?",
+          "options": [],
+          "answerSpec": "39",
+          "explanation": "按运算顺序计算，结果是 39。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "14 × 4 = ?",
+          "options": [],
+          "answerSpec": "56",
+          "explanation": "按运算顺序计算，结果是 56。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "15 × 5 = ?",
+          "options": [],
+          "answerSpec": "75",
+          "explanation": "按运算顺序计算，结果是 75。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "16 × 2 = ?",
+          "options": [],
+          "answerSpec": "32",
+          "explanation": "按运算顺序计算，结果是 32。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "17 × 3 = ?",
+          "options": [],
+          "answerSpec": "51",
+          "explanation": "按运算顺序计算，结果是 51。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "18 × 4 = ?",
+          "options": [],
+          "answerSpec": "72",
+          "explanation": "按运算顺序计算，结果是 72。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "19 × 5 = ?",
+          "options": [],
+          "answerSpec": "95",
+          "explanation": "按运算顺序计算，结果是 95。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "20 × 2 = ?",
+          "options": [],
+          "answerSpec": "40",
+          "explanation": "按运算顺序计算，结果是 40。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "21 × 3 = ?",
+          "options": [],
+          "answerSpec": "63",
+          "explanation": "按运算顺序计算，结果是 63。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-STARTER-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "22 × 4 = ?",
+          "options": [],
+          "answerSpec": "88",
+          "explanation": "按运算顺序计算，结果是 88。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "MATH-G4-CORE-001",
+      "version": 1,
+      "grade": "G4",
+      "subject": "MATH",
+      "title": "四年级数学综合基础卷（一）",
+      "description": "覆盖四年级计算与基础应用题，强化稳定计算和数量关系。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "计算",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G4-CORE-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "1250 + 3786 = ?",
+          "options": [],
+          "answerSpec": "5036",
+          "explanation": "计算可得 5036。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "8000 - 2745 = ?",
+          "options": [],
+          "answerSpec": "5255",
+          "explanation": "计算可得 5255。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "36 × 24 = ?",
+          "options": [],
+          "answerSpec": "864",
+          "explanation": "计算可得 864。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "936 ÷ 18 = ?",
+          "options": [],
+          "answerSpec": "52",
+          "explanation": "计算可得 52。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "125 × 16 = ?",
+          "options": [],
+          "answerSpec": "2000",
+          "explanation": "计算可得 2000。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "1680 ÷ 24 = ?",
+          "options": [],
+          "answerSpec": "70",
+          "explanation": "计算可得 70。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "小明有 48 张卡片，又得到 11 张，现在有多少张？",
+          "options": [],
+          "answerSpec": "55",
+          "explanation": "计算可得 55。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "一盒有 7 支笔，6 盒共有多少支？",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "计算可得 42。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "把 60 个苹果平均分给 5 人，每人多少个？",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "计算可得 12。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "一段绳子长 60 米，用去 13 米，还剩多少米？",
+          "options": [],
+          "answerSpec": "51",
+          "explanation": "计算可得 51。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "每本练习册 8 元，买 4 本需要多少元？",
+          "options": [],
+          "answerSpec": "32",
+          "explanation": "计算可得 32。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G4-CORE-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "上午读了 16 页，下午读了 19 页，一共读了多少页？",
+          "options": [],
+          "answerSpec": "35",
+          "explanation": "计算可得 35。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    }
+  ]
+}

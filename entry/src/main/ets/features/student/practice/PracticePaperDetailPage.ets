@@ -103,7 +103,7 @@ export struct PracticePaperDetailPage {
                 .fontSize(AppTheme.PAGE_TITLE_SIZE)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(AppTheme.TEXT);
-              Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${PracticeTaxonomy.difficultyLabel(this.paper.difficulty)}`)
+              Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.semesterLabel(this.paper.semester)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${PracticeTaxonomy.difficultyLabel(this.paper.difficulty)}`)
                 .width('100%')
                 .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT);

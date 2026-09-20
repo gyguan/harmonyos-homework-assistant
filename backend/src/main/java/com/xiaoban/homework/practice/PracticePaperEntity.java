@@ -13,6 +13,7 @@ public class PracticePaperEntity {
   public int version;
   public String grade;
   public String subject;
+  public String semester;
   public String title;
   public String description;
   public String difficulty;

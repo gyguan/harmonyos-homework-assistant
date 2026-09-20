@@ -8,6 +8,7 @@ import {
   PracticeNote,
   PracticePaper,
   PracticeResult,
+  PracticeSemester,
   PracticeSubject
 } from '../../domain/model/practice/PracticeModels';
 import { PracticeContentProvider } from '../../domain/port/PracticeContentProvider';
@@ -26,8 +27,12 @@ export class DefaultPracticeRepository implements PracticeRepository {
     this.remoteApi = remoteApi;
   }
 
-  listPapers(grade: PracticeGrade, subject: PracticeSubject): Promise<PracticePaper[]> {
-    return this.contentProvider.listPapers(grade, subject);
+  listPapers(
+    grade: PracticeGrade,
+    subject: PracticeSubject,
+    semester: PracticeSemester
+  ): Promise<PracticePaper[]> {
+    return this.contentProvider.listPapers(grade, subject, semester);
   }
 
   getPaper(paperId: string, version: number): Promise<PracticePaper | null> {

@@ -1,14 +1,14 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://xiaoban.local/schema/practice-preset-catalog.schema.json",
-  "title": "Xiaoban Practice Preset Catalog",
+  "$id": "https://xiaoban.local/schema/practice-preset-shard.schema.json",
+  "title": "Xiaoban Practice Grade Subject Shard",
   "type": "object",
-  "required": ["schemaVersion", "catalogId", "generatedBy", "papers"],
   "additionalProperties": false,
+  "required": ["schemaVersion", "grade", "subject", "papers"],
   "properties": {
     "schemaVersion": { "const": 1 },
-    "catalogId": { "type": "string", "minLength": 1 },
-    "generatedBy": { "type": "string", "minLength": 1 },
+    "grade": { "enum": ["G1", "G2", "G3", "G4", "G5", "G6"] },
+    "subject": { "enum": ["CHINESE", "MATH", "ENGLISH"] },
     "papers": {
       "type": "array",
       "minItems": 1,
@@ -20,14 +20,15 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "id", "version", "grade", "subject", "title", "description", "difficulty",
-        "questionCount", "estimatedMinutes", "tags", "sourceType", "status", "questions"
+        "id", "version", "grade", "subject", "semester", "title", "description",
+        "difficulty", "questionCount", "estimatedMinutes", "tags", "sourceType", "status", "questions"
       ],
       "properties": {
         "id": { "type": "string", "minLength": 1 },
         "version": { "type": "integer", "minimum": 1 },
         "grade": { "enum": ["G1", "G2", "G3", "G4", "G5", "G6"] },
         "subject": { "enum": ["CHINESE", "MATH", "ENGLISH", "THINKING"] },
+        "semester": { "enum": ["ALL", "S1", "S2"] },
         "title": { "type": "string", "minLength": 1 },
         "description": { "type": "string", "minLength": 1 },
         "difficulty": { "enum": ["L1", "L2", "L3"] },

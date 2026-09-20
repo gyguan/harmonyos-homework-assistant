@@ -5,6 +5,18 @@ import java.util.List;
 public final class PracticeContentCatalog {
   private PracticeContentCatalog() {}
 
+  public record Manifest(
+      int schemaVersion,
+      String catalogId,
+      String generatedBy,
+      List<String> files) {}
+
+  public record Shard(
+      int schemaVersion,
+      String grade,
+      String subject,
+      List<Paper> papers) {}
+
   public record Catalog(
       int schemaVersion,
       String catalogId,
@@ -16,6 +28,7 @@ public final class PracticeContentCatalog {
       int version,
       String grade,
       String subject,
+      String semester,
       String title,
       String description,
       String difficulty,

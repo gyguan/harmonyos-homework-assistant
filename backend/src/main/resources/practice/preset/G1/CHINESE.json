@@ -1,0 +1,698 @@
+{
+  "schemaVersion": 1,
+  "grade": "G1",
+  "subject": "CHINESE",
+  "papers": [
+    {
+      "id": "CHINESE-G1-STARTER-001",
+      "version": 1,
+      "grade": "G1",
+      "subject": "CHINESE",
+      "title": "语文基础训练卷",
+      "description": "一年级语文首批练习套卷，用于建立稳定的套卷练习入口。",
+      "difficulty": "L1",
+      "questionCount": 10,
+      "estimatedMinutes": 20,
+      "tags": [
+        "字词",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G1-STARTER-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“认真”的近义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "仔细"
+            },
+            {
+              "key": "B",
+              "label": "马虎"
+            },
+            {
+              "key": "C",
+              "label": "忘记"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词表示一种颜色？",
+          "options": [
+            {
+              "key": "A",
+              "label": "奔跑"
+            },
+            {
+              "key": "B",
+              "label": "金黄"
+            },
+            {
+              "key": "C",
+              "label": "读书"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“安静”的反义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "平整"
+            },
+            {
+              "key": "B",
+              "label": "清楚"
+            },
+            {
+              "key": "C",
+              "label": "吵闹"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词语搭配更自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "明亮的教室"
+            },
+            {
+              "key": "B",
+              "label": "明亮的声音"
+            },
+            {
+              "key": "C",
+              "label": "明亮的味道"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“春风吹绿了小草”主要写的是哪个季节？",
+          "options": [
+            {
+              "key": "A",
+              "label": "冬天"
+            },
+            {
+              "key": "B",
+              "label": "春天"
+            },
+            {
+              "key": "C",
+              "label": "秋天"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词表示动作？",
+          "options": [
+            {
+              "key": "A",
+              "label": "蓝色"
+            },
+            {
+              "key": "B",
+              "label": "学校"
+            },
+            {
+              "key": "C",
+              "label": "奔跑"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我把书放进书包。”中的“书包”是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "物品"
+            },
+            {
+              "key": "B",
+              "label": "动作"
+            },
+            {
+              "key": "C",
+              "label": "时间"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句标点使用更合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "你好吗。"
+            },
+            {
+              "key": "B",
+              "label": "你好吗？"
+            },
+            {
+              "key": "C",
+              "label": "你好吗！。"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“太阳慢慢升起来了”中的“慢慢”表示什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "地点"
+            },
+            {
+              "key": "B",
+              "label": "人物"
+            },
+            {
+              "key": "C",
+              "label": "速度"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-STARTER-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词可以形容天空？",
+          "options": [
+            {
+              "key": "A",
+              "label": "晴朗"
+            },
+            {
+              "key": "B",
+              "label": "香甜"
+            },
+            {
+              "key": "C",
+              "label": "响亮"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "CHINESE-G1-CORE-001",
+      "version": 1,
+      "grade": "G1",
+      "subject": "CHINESE",
+      "title": "一年级语文综合基础卷（一）",
+      "description": "覆盖一年级字词、句意、标点与基础阅读理解。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 22,
+      "tags": [
+        "字词",
+        "句意",
+        "阅读理解"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G1-CORE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“高兴”的近义词是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "开心"
+            },
+            {
+              "key": "B",
+              "label": "难过"
+            },
+            {
+              "key": "C",
+              "label": "生气"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“大”的反义词是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "长"
+            },
+            {
+              "key": "B",
+              "label": "小"
+            },
+            {
+              "key": "C",
+              "label": "多"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪个词表示人物？",
+          "options": [
+            {
+              "key": "A",
+              "label": "跑步"
+            },
+            {
+              "key": "B",
+              "label": "红色"
+            },
+            {
+              "key": "C",
+              "label": "老师"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "“小鸟在天空飞。”谁在飞？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小鸟"
+            },
+            {
+              "key": "B",
+              "label": "天空"
+            },
+            {
+              "key": "C",
+              "label": "云朵"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪一句是完整的句子？",
+          "options": [
+            {
+              "key": "A",
+              "label": "美丽的"
+            },
+            {
+              "key": "B",
+              "label": "我喜欢读书。"
+            },
+            {
+              "key": "C",
+              "label": "在操场"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "“一朵花”中的“朵”是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "动词"
+            },
+            {
+              "key": "B",
+              "label": "形容词"
+            },
+            {
+              "key": "C",
+              "label": "量词"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪个词可以形容苹果？",
+          "options": [
+            {
+              "key": "A",
+              "label": "红红的"
+            },
+            {
+              "key": "B",
+              "label": "响亮的"
+            },
+            {
+              "key": "C",
+              "label": "飞快的"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "“早上好！”适合在什么时候说？",
+          "options": [
+            {
+              "key": "A",
+              "label": "晚上"
+            },
+            {
+              "key": "B",
+              "label": "早晨"
+            },
+            {
+              "key": "C",
+              "label": "中午以后"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“弟弟正在画画。”表示动作的词是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "弟弟"
+            },
+            {
+              "key": "B",
+              "label": "正在"
+            },
+            {
+              "key": "C",
+              "label": "画画"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪组词属于同一类？",
+          "options": [
+            {
+              "key": "A",
+              "label": "猫、狗、兔"
+            },
+            {
+              "key": "B",
+              "label": "书、跑、蓝"
+            },
+            {
+              "key": "C",
+              "label": "大、桌、唱"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我爱我的家。”句末应使用？",
+          "options": [
+            {
+              "key": "A",
+              "label": "？"
+            },
+            {
+              "key": "B",
+              "label": "。"
+            },
+            {
+              "key": "C",
+              "label": "！"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G1-CORE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "“雨停了，太阳出来了。”天气发生了什么变化？",
+          "options": [
+            {
+              "key": "A",
+              "label": "更冷了"
+            },
+            {
+              "key": "B",
+              "label": "下雪了"
+            },
+            {
+              "key": "C",
+              "label": "由雨转晴"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    }
+  ]
+}

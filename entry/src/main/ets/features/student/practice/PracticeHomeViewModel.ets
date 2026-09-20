@@ -3,6 +3,7 @@ import { DefaultPracticeRepository } from '../../../data/repository/DefaultPract
 import {
   PracticeGrade,
   PracticePaper,
+  PracticeSemester,
   PracticeSubject,
   PracticeTaxonomy
 } from '../../../domain/model/practice/PracticeModels';
@@ -25,6 +26,10 @@ export class PracticeHomeViewModel {
     return PracticeTaxonomy.gradeFromStudentProfile(this.familyContext.getStudent().grade);
   }
 
+  defaultSemester(): PracticeSemester {
+    return PracticeTaxonomy.semesterFromStudentProfile(this.familyContext.getStudent().semester);
+  }
+
   grades(): PracticeGrade[] {
     return PracticeTaxonomy.grades();
   }
@@ -41,11 +46,19 @@ export class PracticeHomeViewModel {
     return PracticeTaxonomy.subjectLabel(subject);
   }
 
+  semesterLabel(semester: PracticeSemester): string {
+    return PracticeTaxonomy.semesterLabel(semester);
+  }
+
   difficultyLabel(paper: PracticePaper): string {
     return PracticeTaxonomy.difficultyLabel(paper.difficulty);
   }
 
-  listPapers(grade: PracticeGrade, subject: PracticeSubject): Promise<PracticePaper[]> {
-    return this.practiceRepository.listPapers(grade, subject);
+  listPapers(
+    grade: PracticeGrade,
+    subject: PracticeSubject,
+    semester: PracticeSemester
+  ): Promise<PracticePaper[]> {
+    return this.practiceRepository.listPapers(grade, subject, semester);
   }
 }

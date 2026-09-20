@@ -13,6 +13,7 @@ public class PracticeContentValidator {
   private static final Set<String> GRADES = Set.of("G1", "G2", "G3", "G4", "G5", "G6");
   private static final Set<String> SUBJECTS = Set.of("CHINESE", "MATH", "ENGLISH", "THINKING");
   private static final Set<String> DIFFICULTIES = Set.of("L1", "L2", "L3");
+  private static final Set<String> SEMESTERS = Set.of("ALL", "S1", "S2");
   private static final Set<String> SOURCE_TYPES =
       Set.of("PRESET", "AI_GENERATED", "PARENT_CREATED", "IMPORTED");
   private static final Set<String> STATUSES = Set.of("PUBLISHED", "ARCHIVED");
@@ -54,6 +55,7 @@ public class PracticeContentValidator {
     if (paper.version() < 1) errors.add(path + ".version 必须 >= 1");
     if (!GRADES.contains(paper.grade())) errors.add(path + ".grade 非法: " + paper.grade());
     if (!SUBJECTS.contains(paper.subject())) errors.add(path + ".subject 非法: " + paper.subject());
+    if (!SEMESTERS.contains(paper.semester())) errors.add(path + ".semester 非法: " + paper.semester());
     if (!DIFFICULTIES.contains(paper.difficulty())) errors.add(path + ".difficulty 非法: " + paper.difficulty());
     if (!SOURCE_TYPES.contains(paper.sourceType())) errors.add(path + ".sourceType 非法: " + paper.sourceType());
     if (!STATUSES.contains(paper.status())) errors.add(path + ".status 非法: " + paper.status());

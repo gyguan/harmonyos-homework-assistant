@@ -1,0 +1,698 @@
+{
+  "schemaVersion": 1,
+  "grade": "G1",
+  "subject": "ENGLISH",
+  "papers": [
+    {
+      "id": "ENGLISH-G1-STARTER-001",
+      "version": 1,
+      "grade": "G1",
+      "subject": "ENGLISH",
+      "title": "英语基础训练卷",
+      "description": "一年级英语首批练习套卷，用于建立稳定的套卷练习入口。",
+      "difficulty": "L1",
+      "questionCount": 10,
+      "estimatedMinutes": 15,
+      "tags": [
+        "词汇",
+        "句型"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “苹果”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "apple"
+            },
+            {
+              "key": "B",
+              "label": "book"
+            },
+            {
+              "key": "C",
+              "label": "dog"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose the greeting used in the morning.",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good night"
+            },
+            {
+              "key": "B",
+              "label": "Good morning"
+            },
+            {
+              "key": "C",
+              "label": "Goodbye"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word is a color?",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "desk"
+            },
+            {
+              "key": "C",
+              "label": "blue"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "I ___ a student.",
+          "options": [
+            {
+              "key": "A",
+              "label": "am"
+            },
+            {
+              "key": "B",
+              "label": "is"
+            },
+            {
+              "key": "C",
+              "label": "are"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “学校”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "family"
+            },
+            {
+              "key": "B",
+              "label": "school"
+            },
+            {
+              "key": "C",
+              "label": "water"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose the plural form of “book”.",
+          "options": [
+            {
+              "key": "A",
+              "label": "bookes"
+            },
+            {
+              "key": "B",
+              "label": "book's"
+            },
+            {
+              "key": "C",
+              "label": "books"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "She ___ my friend.",
+          "options": [
+            {
+              "key": "A",
+              "label": "is"
+            },
+            {
+              "key": "B",
+              "label": "am"
+            },
+            {
+              "key": "C",
+              "label": "are"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which one is an animal?",
+          "options": [
+            {
+              "key": "A",
+              "label": "pencil"
+            },
+            {
+              "key": "B",
+              "label": "cat"
+            },
+            {
+              "key": "C",
+              "label": "yellow"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose the correct answer: How are you?",
+          "options": [
+            {
+              "key": "A",
+              "label": "I'm ten."
+            },
+            {
+              "key": "B",
+              "label": "It's red."
+            },
+            {
+              "key": "C",
+              "label": "I'm fine."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-STARTER-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “快乐的”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "happy"
+            },
+            {
+              "key": "B",
+              "label": "small"
+            },
+            {
+              "key": "C",
+              "label": "cold"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "根据词义或句型选择正确答案。",
+          "hints": [
+            "先读题干中的关键词。",
+            "再比较三个选项。"
+          ],
+          "tags": [
+            "英语基础"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "ENGLISH-G1-CORE-001",
+      "version": 1,
+      "grade": "G1",
+      "subject": "ENGLISH",
+      "title": "一年级英语综合基础卷（一）",
+      "description": "覆盖一年级核心词汇、基础语法与日常表达。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "词汇",
+        "句型",
+        "语法"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G1-CORE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “猫”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "cat"
+            },
+            {
+              "key": "B",
+              "label": "book"
+            },
+            {
+              "key": "C",
+              "label": "red"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "The correct choice is A. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose a color.",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "green"
+            },
+            {
+              "key": "C",
+              "label": "desk"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "The correct choice is B. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Hello! — ___",
+          "options": [
+            {
+              "key": "A",
+              "label": "Ten"
+            },
+            {
+              "key": "B",
+              "label": "Blue"
+            },
+            {
+              "key": "C",
+              "label": "Hello!"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "The correct choice is C. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "I ___ Tom.",
+          "options": [
+            {
+              "key": "A",
+              "label": "am"
+            },
+            {
+              "key": "B",
+              "label": "is"
+            },
+            {
+              "key": "C",
+              "label": "are"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "The correct choice is A. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “书”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "dog"
+            },
+            {
+              "key": "B",
+              "label": "book"
+            },
+            {
+              "key": "C",
+              "label": "milk"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "The correct choice is B. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "Good ___! (早上好)",
+          "options": [
+            {
+              "key": "A",
+              "label": "night"
+            },
+            {
+              "key": "B",
+              "label": "bye"
+            },
+            {
+              "key": "C",
+              "label": "morning"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "The correct choice is C. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "This is ___ apple.",
+          "options": [
+            {
+              "key": "A",
+              "label": "an"
+            },
+            {
+              "key": "B",
+              "label": "a"
+            },
+            {
+              "key": "C",
+              "label": "two"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "The correct choice is A. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which one is a number?",
+          "options": [
+            {
+              "key": "A",
+              "label": "pen"
+            },
+            {
+              "key": "B",
+              "label": "three"
+            },
+            {
+              "key": "C",
+              "label": "happy"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "The correct choice is B. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "How are you? — ___",
+          "options": [
+            {
+              "key": "A",
+              "label": "It's a cat."
+            },
+            {
+              "key": "B",
+              "label": "I'm six."
+            },
+            {
+              "key": "C",
+              "label": "I'm fine."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "The correct choice is C. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “红色”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "red"
+            },
+            {
+              "key": "B",
+              "label": "read"
+            },
+            {
+              "key": "C",
+              "label": "run"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "The correct choice is A. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "I have two ___.",
+          "options": [
+            {
+              "key": "A",
+              "label": "book"
+            },
+            {
+              "key": "B",
+              "label": "books"
+            },
+            {
+              "key": "C",
+              "label": "bookes"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "The correct choice is B. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        },
+        {
+          "id": "ENGLISH-G1-CORE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which one is a school thing?",
+          "options": [
+            {
+              "key": "A",
+              "label": "banana"
+            },
+            {
+              "key": "B",
+              "label": "dog"
+            },
+            {
+              "key": "C",
+              "label": "pencil"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "The correct choice is C. Read the vocabulary or sentence pattern in context.",
+          "hints": [
+            "Read the whole sentence first.",
+            "Compare grammar and meaning."
+          ],
+          "tags": [
+            "词汇",
+            "句型"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    }
+  ]
+}
