@@ -205,27 +205,19 @@ export struct ParentReviewPane {
   private AssignmentEditorSheet() {
     Column() {
       if (this.assignment() !== null && this.editingAssignmentId === this.assignment()!.id) {
-        Scroll() {
-          Column({ space: 10 }) {
-            ParentAssignmentEditPanel({
-              item: this.assignment()!,
-              saving: this.editSaving,
-              onCancel: () => this.cancelEditing(),
-              onSave: (assignment: Assignment) => { void this.saveAssignmentEdit(assignment); }
-            });
-            if (this.editNotice.length > 0) {
-              Text(this.editNotice)
-                .width('100%')
-                .fontSize(12)
-                .fontColor(AppTheme.DANGER);
-            }
-          }
-          .width('100%')
-          .padding({ left: 16, right: 16, top: 16, bottom: 28 });
+        ParentAssignmentEditPanel({
+          item: this.assignment()!,
+          saving: this.editSaving,
+          onCancel: () => this.cancelEditing(),
+          onSave: (assignment: Assignment) => { void this.saveAssignmentEdit(assignment); }
+        });
+        if (this.editNotice.length > 0) {
+          Text(this.editNotice)
+            .width('100%')
+            .fontSize(12)
+            .fontColor(AppTheme.DANGER)
+            .padding({ left: 16, right: 16, bottom: 10 });
         }
-        .width('100%')
-        .height('100%')
-        .scrollBar(BarState.Auto);
       }
     }
     .width('100%')
