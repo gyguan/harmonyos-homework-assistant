@@ -15,5 +15,6 @@ export interface AssignmentRepository {
   review(assignmentId: string, decision: AssignmentReviewDecision, note: string): Promise<Assignment>;
   deleteAssignments(assignmentIds: string[]): Promise<number>;
   applyAuthoritative(assignment: Assignment): void;
+  applyAuthoritativeBatch(assignments: Assignment[]): void;
   refresh(): Promise<boolean>;
 }
