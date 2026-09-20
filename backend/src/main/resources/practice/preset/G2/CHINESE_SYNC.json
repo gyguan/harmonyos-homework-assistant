@@ -6,7 +6,7 @@
   "papers": [
     {
       "id": "CHINESE-G2-S1-SYNC-WORDS-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -25,7 +25,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q01",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "放学时，天空下起雨。和“晴朗”意思相反的词更接近哪一个？",
@@ -54,25 +54,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q02",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "社区花园里有一___小路，应该填哪个量词？",
           "options": [
             {
               "key": "A",
-              "label": "条"
+              "label": "本"
             },
             {
               "key": "B",
-              "label": "本"
+              "label": "条"
             },
             {
               "key": "C",
               "label": "只"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -83,25 +83,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q03",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "妈妈提醒小乐“仔细检查书包”。“仔细”的反义词更接近？",
           "options": [
             {
               "key": "A",
-              "label": "马虎"
-            },
-            {
-              "key": "B",
               "label": "认真"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "安静"
+            },
+            {
+              "key": "C",
+              "label": "马虎"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -112,7 +112,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q04",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "图书馆里大家轻轻翻书。“安静”的近义词更接近？",
@@ -141,25 +141,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q05",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "早晨，阳光照进教室。“明亮”主要是在说什么？",
           "options": [
             {
               "key": "A",
-              "label": "光线充足"
+              "label": "声音很大"
             },
             {
               "key": "B",
-              "label": "声音很大"
+              "label": "光线充足"
             },
             {
               "key": "C",
               "label": "速度很快"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -170,25 +170,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q06",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "小区门口停着一___公交车，应该填？",
           "options": [
             {
               "key": "A",
-              "label": "辆"
-            },
-            {
-              "key": "B",
               "label": "张"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "棵"
+            },
+            {
+              "key": "C",
+              "label": "辆"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -199,7 +199,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q07",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "爷爷在阳台上种了几___花，应该填？",
@@ -228,25 +228,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q08",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "“同学们陆续走进教室”中的“陆续”更接近？",
           "options": [
             {
               "key": "A",
-              "label": "一个接一个"
+              "label": "一起睡着"
             },
             {
               "key": "B",
-              "label": "一起睡着"
+              "label": "一个接一个"
             },
             {
               "key": "C",
               "label": "完全不动"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -257,25 +257,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q09",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "“温暖的阳光”中“温暖”最适合形容什么感受？",
           "options": [
             {
               "key": "A",
-              "label": "暖和舒服"
-            },
-            {
-              "key": "B",
               "label": "非常吵闹"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "跑得很快"
+            },
+            {
+              "key": "C",
+              "label": "暖和舒服"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -286,7 +286,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q10",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪组词都是表示动作的？",
@@ -315,25 +315,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q11",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "“弯弯的小路”中的“弯弯”主要写出了小路的什么？",
           "options": [
             {
               "key": "A",
-              "label": "形状"
+              "label": "声音"
             },
             {
               "key": "B",
-              "label": "声音"
+              "label": "形状"
             },
             {
               "key": "C",
               "label": "味道"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -344,25 +344,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q12",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "周末公园里很“热闹”。下面哪个场景最符合“热闹”？",
           "options": [
             {
               "key": "A",
-              "label": "很多人在活动和交谈"
-            },
-            {
-              "key": "B",
               "label": "一个人安静看书"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "夜里大家都睡着了"
+            },
+            {
+              "key": "C",
+              "label": "很多人在活动和交谈"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -376,7 +376,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-SENTENCE-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -395,7 +395,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q01",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "老师问：“你今天带水杯了吗___”应填什么标点？",
@@ -424,25 +424,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q02",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "运动会上，小华跑得很快。下面哪一句最完整？",
           "options": [
             {
               "key": "A",
-              "label": "小华在操场上快速奔跑。"
+              "label": "小华快速。"
             },
             {
               "key": "B",
-              "label": "小华快速。"
+              "label": "小华在操场上快速奔跑。"
             },
             {
               "key": "C",
               "label": "操场上。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -453,25 +453,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q03",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "“因为今天下雨，___我们带了雨伞。”横线上填什么最合适？",
           "options": [
             {
               "key": "A",
-              "label": "所以"
-            },
-            {
-              "key": "B",
               "label": "但是"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "或者"
+            },
+            {
+              "key": "C",
+              "label": "所以"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -482,7 +482,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q04",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "妈妈说：“先洗手，再吃饭。”这句话表示什么？",
@@ -511,25 +511,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q05",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句语序最自然？",
           "options": [
             {
               "key": "A",
-              "label": "小鸟在树枝上唱歌。"
+              "label": "在唱歌小鸟树枝上。"
             },
             {
               "key": "B",
-              "label": "在唱歌小鸟树枝上。"
+              "label": "小鸟在树枝上唱歌。"
             },
             {
               "key": "C",
               "label": "树枝上唱歌在小鸟。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -540,25 +540,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q06",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "“我把书放回书架。”谁做了动作？",
           "options": [
             {
               "key": "A",
-              "label": "我"
-            },
-            {
-              "key": "B",
               "label": "书架"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "书"
+            },
+            {
+              "key": "C",
+              "label": "我"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -569,7 +569,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q07",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "“足球被小明踢进球门。”什么东西被踢进了球门？",
@@ -598,25 +598,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q08",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "看到同学获得奖状，最合适的一句话是？",
           "options": [
             {
               "key": "A",
-              "label": "祝贺你！"
+              "label": "你去哪儿？"
             },
             {
               "key": "B",
-              "label": "你去哪儿？"
+              "label": "祝贺你！"
             },
             {
               "key": "C",
               "label": "天气真冷。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -627,25 +627,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q09",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "“教室里很安静，同学们都在认真阅读。”可以知道？",
           "options": [
             {
               "key": "A",
-              "label": "大家正在安静看书"
-            },
-            {
-              "key": "B",
               "label": "大家正在唱歌"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "教室里没人"
+            },
+            {
+              "key": "C",
+              "label": "大家正在安静看书"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -656,7 +656,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q10",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "“小树长高了。”如果补充时间，哪一句更自然？",
@@ -685,25 +685,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q11",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "放学前老师提醒：“请把桌面整理好___”最合适的标点是？",
           "options": [
             {
               "key": "A",
-              "label": "。"
+              "label": "？"
             },
             {
               "key": "B",
-              "label": "？"
+              "label": "。"
             },
             {
               "key": "C",
               "label": "，"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -714,25 +714,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q12",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句用了合适的词语搭配？",
           "options": [
             {
               "key": "A",
-              "label": "认真地写字"
-            },
-            {
-              "key": "B",
               "label": "香甜地跑步"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "明亮地吃饭"
+            },
+            {
+              "key": "C",
+              "label": "认真地写字"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -746,7 +746,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -765,7 +765,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q01",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周五放学后，乐乐先把课桌里的纸屑收好，再和值日同学一起扫地。离开教室前，他还检查了窗户有没有关好。\n乐乐放学后先做了什么？",
@@ -794,25 +794,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q02",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周五放学后，乐乐先把课桌里的纸屑收好，再和值日同学一起扫地。离开教室前，他还检查了窗户有没有关好。\n乐乐后来和谁一起扫地？",
           "options": [
             {
               "key": "A",
-              "label": "值日同学"
+              "label": "门卫叔叔"
             },
             {
               "key": "B",
-              "label": "门卫叔叔"
+              "label": "值日同学"
             },
             {
               "key": "C",
               "label": "家长"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "文中写和值日同学一起扫地。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -823,25 +823,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q03",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周五放学后，乐乐先把课桌里的纸屑收好，再和值日同学一起扫地。离开教室前，他还检查了窗户有没有关好。\n离开教室前，他还检查了什么？",
           "options": [
             {
               "key": "A",
-              "label": "窗户"
-            },
-            {
-              "key": "B",
               "label": "书包颜色"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "操场"
+            },
+            {
+              "key": "C",
+              "label": "窗户"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "最后写他检查窗户。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -852,7 +852,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q04",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周五放学后，乐乐先把课桌里的纸屑收好，再和值日同学一起扫地。离开教室前，他还检查了窗户有没有关好。\n乐乐做事给人的感觉更接近？",
@@ -881,25 +881,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q05",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周末，妈妈带小雨去社区图书馆。小雨挑了一本童话书，找到靠窗的位置安静阅读。看完后，她把书放回原处，又向管理员阿姨说了谢谢。\n小雨去了哪里？",
           "options": [
             {
               "key": "A",
-              "label": "社区图书馆"
+              "label": "游泳馆"
             },
             {
               "key": "B",
-              "label": "游泳馆"
+              "label": "社区图书馆"
             },
             {
               "key": "C",
               "label": "菜市场"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "短文开头说明去了社区图书馆。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -910,25 +910,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q06",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周末，妈妈带小雨去社区图书馆。小雨挑了一本童话书，找到靠窗的位置安静阅读。看完后，她把书放回原处，又向管理员阿姨说了谢谢。\n她挑了什么书？",
           "options": [
             {
               "key": "A",
-              "label": "童话书"
-            },
-            {
-              "key": "B",
               "label": "地图册"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "菜谱"
+            },
+            {
+              "key": "C",
+              "label": "童话书"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "文中写挑了一本童话书。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -939,7 +939,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q07",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周末，妈妈带小雨去社区图书馆。小雨挑了一本童话书，找到靠窗的位置安静阅读。看完后，她把书放回原处，又向管理员阿姨说了谢谢。\n看完书后她怎么做？",
@@ -968,25 +968,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q08",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周末，妈妈带小雨去社区图书馆。小雨挑了一本童话书，找到靠窗的位置安静阅读。看完后，她把书放回原处，又向管理员阿姨说了谢谢。\n从她的做法可以看出？",
           "options": [
             {
               "key": "A",
-              "label": "爱护图书又有礼貌"
+              "label": "不喜欢阅读"
             },
             {
               "key": "B",
-              "label": "不喜欢阅读"
+              "label": "爱护图书又有礼貌"
             },
             {
               "key": "C",
               "label": "做事很急躁"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "爱护图书并主动道谢。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -997,25 +997,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q09",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：早晨下起小雨，爸爸提醒安安带伞。到了学校，安安发现同桌没有伞，就和同桌一起撑伞走到教学楼。\n谁提醒安安带伞？",
           "options": [
             {
               "key": "A",
-              "label": "爸爸"
-            },
-            {
-              "key": "B",
               "label": "老师"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "同桌"
+            },
+            {
+              "key": "C",
+              "label": "爸爸"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "爸爸提醒安安带伞。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1026,7 +1026,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q10",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：早晨下起小雨，爸爸提醒安安带伞。到了学校，安安发现同桌没有伞，就和同桌一起撑伞走到教学楼。\n同桌遇到了什么问题？",
@@ -1055,25 +1055,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q11",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：早晨下起小雨，爸爸提醒安安带伞。到了学校，安安发现同桌没有伞，就和同桌一起撑伞走到教学楼。\n安安怎么帮助同桌？",
           "options": [
             {
               "key": "A",
-              "label": "一起撑伞"
+              "label": "把伞藏起来"
             },
             {
               "key": "B",
-              "label": "把伞藏起来"
+              "label": "一起撑伞"
             },
             {
               "key": "C",
               "label": "让同桌淋雨"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "安安和同桌一起撑伞。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1084,25 +1084,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q12",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：早晨下起小雨，爸爸提醒安安带伞。到了学校，安安发现同桌没有伞，就和同桌一起撑伞走到教学楼。\n安安是个怎样的孩子？",
           "options": [
             {
               "key": "A",
-              "label": "愿意帮助别人"
-            },
-            {
-              "key": "B",
               "label": "只顾自己"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "不爱上学"
+            },
+            {
+              "key": "C",
+              "label": "愿意帮助别人"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "他主动和同桌共用雨伞。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1116,7 +1116,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -1135,7 +1135,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q01",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，校园里的木棉树叶有的变黄了。风一吹，几片叶子轻轻落到草地上。小朋友捡起完整的叶子，夹进旧杂志里做标本。\n短文写的是哪个季节？",
@@ -1164,25 +1164,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q02",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，校园里的木棉树叶有的变黄了。风一吹，几片叶子轻轻落到草地上。小朋友捡起完整的叶子，夹进旧杂志里做标本。\n风吹来后发生了什么？",
           "options": [
             {
               "key": "A",
-              "label": "叶子落到草地"
+              "label": "树开满花"
             },
             {
               "key": "B",
-              "label": "树开满花"
+              "label": "叶子落到草地"
             },
             {
               "key": "C",
               "label": "天空下雪"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "文中写叶子轻轻落下。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1193,25 +1193,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q03",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，校园里的木棉树叶有的变黄了。风一吹，几片叶子轻轻落到草地上。小朋友捡起完整的叶子，夹进旧杂志里做标本。\n小朋友捡叶子做什么？",
           "options": [
             {
               "key": "A",
-              "label": "做标本"
-            },
-            {
-              "key": "B",
               "label": "做饭"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "做风筝"
+            },
+            {
+              "key": "C",
+              "label": "做标本"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "他们把叶子夹进杂志做标本。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1222,7 +1222,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q04",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，校园里的木棉树叶有的变黄了。风一吹，几片叶子轻轻落到草地上。小朋友捡起完整的叶子，夹进旧杂志里做标本。\n“轻轻落到草地”中的“轻轻”让人感觉叶子？",
@@ -1251,25 +1251,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q05",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：清晨，草叶上挂着小水珠。太阳出来后，水珠越来越小，过了一会儿就看不见了。小杰觉得很有趣，蹲下来观察了很久。\n草叶上开始有什么？",
           "options": [
             {
               "key": "A",
-              "label": "小水珠"
+              "label": "小石头"
             },
             {
               "key": "B",
-              "label": "小石头"
+              "label": "小水珠"
             },
             {
               "key": "C",
               "label": "小花盆"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "第一句写草叶上挂着小水珠。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1280,25 +1280,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q06",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：清晨，草叶上挂着小水珠。太阳出来后，水珠越来越小，过了一会儿就看不见了。小杰觉得很有趣，蹲下来观察了很久。\n太阳出来后水珠怎样变化？",
           "options": [
             {
               "key": "A",
-              "label": "越来越小"
-            },
-            {
-              "key": "B",
               "label": "越来越大"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "变成石头"
+            },
+            {
+              "key": "C",
+              "label": "越来越小"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "文中写水珠越来越小。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1309,7 +1309,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q07",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：清晨，草叶上挂着小水珠。太阳出来后，水珠越来越小，过了一会儿就看不见了。小杰觉得很有趣，蹲下来观察了很久。\n小杰为什么蹲下来很久？",
@@ -1338,25 +1338,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q08",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：清晨，草叶上挂着小水珠。太阳出来后，水珠越来越小，过了一会儿就看不见了。小杰觉得很有趣，蹲下来观察了很久。\n这段话主要写？",
           "options": [
             {
               "key": "A",
-              "label": "清晨水珠的变化和观察"
+              "label": "晚上看星星"
             },
             {
               "key": "B",
-              "label": "晚上看星星"
+              "label": "清晨水珠的变化和观察"
             },
             {
               "key": "C",
               "label": "小杰去买东西"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "整段围绕水珠变化和观察。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1367,25 +1367,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q09",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：傍晚，天空中出现大片乌云，风也比刚才大了。妈妈把阳台上的衣服收进屋。没过多久，雨点就落了下来。\n妈妈先看到什么天气变化？",
           "options": [
             {
               "key": "A",
-              "label": "乌云和大风"
-            },
-            {
-              "key": "B",
               "label": "大雪"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "彩虹"
+            },
+            {
+              "key": "C",
+              "label": "乌云和大风"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "短文先写乌云和风变大。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1396,7 +1396,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q10",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：傍晚，天空中出现大片乌云，风也比刚才大了。妈妈把阳台上的衣服收进屋。没过多久，雨点就落了下来。\n妈妈为什么收衣服？",
@@ -1425,25 +1425,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q11",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：傍晚，天空中出现大片乌云，风也比刚才大了。妈妈把阳台上的衣服收进屋。没过多久，雨点就落了下来。\n后来真的发生了什么？",
           "options": [
             {
               "key": "A",
-              "label": "下雨"
+              "label": "下雪"
             },
             {
               "key": "B",
-              "label": "下雪"
+              "label": "下雨"
             },
             {
               "key": "C",
               "label": "太阳更亮"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "最后写雨点落下。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1454,25 +1454,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q12",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：傍晚，天空中出现大片乌云，风也比刚才大了。妈妈把阳台上的衣服收进屋。没过多久，雨点就落了下来。\n事情顺序正确的是？",
           "options": [
             {
               "key": "A",
-              "label": "乌云大风→收衣服→下雨"
-            },
-            {
-              "key": "B",
               "label": "下雨→收衣服→乌云"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "收衣服→晴天→下雨"
+            },
+            {
+              "key": "C",
+              "label": "乌云大风→收衣服→下雨"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "按短文发生顺序排列。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1486,7 +1486,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -1505,7 +1505,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q01",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "情境：体育课后，小明把篮球放回器材架。哪句话表达最完整？",
@@ -1534,25 +1534,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q02",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "情境：奶奶提着两袋菜回家，小乐走过去帮忙。最合适的话是？",
           "options": [
             {
               "key": "A",
-              "label": "奶奶，我来帮您拿一袋吧！"
+              "label": "我不认识你。"
             },
             {
               "key": "B",
-              "label": "我不认识你。"
+              "label": "奶奶，我来帮您拿一袋吧！"
             },
             {
               "key": "C",
               "label": "今天没有作业。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1563,25 +1563,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q03",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "情境：同学不小心碰掉了你的橡皮，并马上道歉。你可以说？",
           "options": [
             {
               "key": "A",
-              "label": "没关系。"
-            },
-            {
-              "key": "B",
               "label": "快走开！"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "我再也不理你。"
+            },
+            {
+              "key": "C",
+              "label": "没关系。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1592,7 +1592,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q04",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "早晨的顺序最合理的是？",
@@ -1621,25 +1621,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q05",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "情境：社区志愿者正在给花草浇水。哪一句更生动？",
           "options": [
             {
               "key": "A",
-              "label": "志愿者认真地给花草浇水。"
+              "label": "志愿者花草。"
             },
             {
               "key": "B",
-              "label": "志愿者花草。"
+              "label": "志愿者认真地给花草浇水。"
             },
             {
               "key": "C",
               "label": "花草很方。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1650,25 +1650,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q06",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "情境：小猫听到门口有声音，轻轻走过去。哪一句最合理？",
           "options": [
             {
               "key": "A",
-              "label": "小猫轻轻走到门口看看。"
-            },
-            {
-              "key": "B",
               "label": "小猫飞上天空。"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "小猫变成书包。"
+            },
+            {
+              "key": "C",
+              "label": "小猫轻轻走到门口看看。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1679,7 +1679,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q07",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "请给“深圳的秋天”补一句较完整的话。",
@@ -1708,25 +1708,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q08",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "情境：图书角的书有些乱，三位同学一起整理。可以怎样概括？",
           "options": [
             {
               "key": "A",
-              "label": "同学们合作整理图书角。"
+              "label": "书都不见了。"
             },
             {
               "key": "B",
-              "label": "书都不见了。"
+              "label": "同学们合作整理图书角。"
             },
             {
               "key": "C",
               "label": "大家在游泳。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1737,25 +1737,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q09",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "放学时你想向老师告别，最合适的是？",
           "options": [
             {
               "key": "A",
-              "label": "老师再见！"
-            },
-            {
-              "key": "B",
               "label": "老师早上好！"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "请给我一把尺子。"
+            },
+            {
+              "key": "C",
+              "label": "老师再见！"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1766,7 +1766,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q10",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "情境：小树苗刚种下，需要每天照顾。哪句话最合适？",
@@ -1795,25 +1795,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q11",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "“公园里开着花。”怎样扩充更具体？",
           "options": [
             {
               "key": "A",
-              "label": "周末的公园里开着许多漂亮的花。"
+              "label": "花公园。"
             },
             {
               "key": "B",
-              "label": "花公园。"
+              "label": "周末的公园里开着许多漂亮的花。"
             },
             {
               "key": "C",
               "label": "开着。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1824,25 +1824,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q12",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "情境：运动会上同学跑完比赛很累。你最适合说？",
           "options": [
             {
               "key": "A",
-              "label": "辛苦了，休息一下吧。"
-            },
-            {
-              "key": "B",
               "label": "你为什么不睡觉？"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "快把书借给我。"
+            },
+            {
+              "key": "C",
+              "label": "辛苦了，休息一下吧。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1856,7 +1856,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-REVIEW-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -1875,7 +1875,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q01",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "“一___红领巾”最合适的量词是？",
@@ -1904,25 +1904,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q02",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "“高兴”的近义词更接近？",
           "options": [
             {
               "key": "A",
-              "label": "开心"
+              "label": "寒冷"
             },
             {
               "key": "B",
-              "label": "寒冷"
+              "label": "开心"
             },
             {
               "key": "C",
               "label": "安静"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1933,25 +1933,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q03",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "下面标点正确的是？",
           "options": [
             {
               "key": "A",
-              "label": "你今天值日吗？"
-            },
-            {
-              "key": "B",
               "label": "你今天值日吗。"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "你今天值日吗，"
+            },
+            {
+              "key": "C",
+              "label": "你今天值日吗？"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -1962,7 +1962,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q04",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "“先整理书包，再出门”主要表示？",
@@ -1991,25 +1991,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q05",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "“操场上，同学们正在做早操。”这句话说清了？",
           "options": [
             {
               "key": "A",
-              "label": "地点和人物动作"
+              "label": "食物味道"
             },
             {
               "key": "B",
-              "label": "食物味道"
+              "label": "地点和人物动作"
             },
             {
               "key": "C",
               "label": "天气温度"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -2020,25 +2020,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q06",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "短句“风来了，树叶轻轻摇动。”中“轻轻”写出了？",
           "options": [
             {
               "key": "A",
-              "label": "动作比较柔和"
-            },
-            {
-              "key": "B",
               "label": "颜色很鲜艳"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "声音特别大"
+            },
+            {
+              "key": "C",
+              "label": "动作比较柔和"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -2049,7 +2049,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q07",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "同学借给你橡皮，你应该说？",
@@ -2078,25 +2078,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q08",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "“教室被同学们打扫干净了。”什么变干净了？",
           "options": [
             {
               "key": "A",
-              "label": "教室"
+              "label": "同学们"
             },
             {
               "key": "B",
-              "label": "同学们"
+              "label": "教室"
             },
             {
               "key": "C",
               "label": "扫把"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -2107,25 +2107,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q09",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "周末图书馆里大家都轻声说话，说明大家？",
           "options": [
             {
               "key": "A",
-              "label": "注意保持安静"
-            },
-            {
-              "key": "B",
               "label": "正在举行运动会"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "准备大声唱歌"
+            },
+            {
+              "key": "C",
+              "label": "注意保持安静"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -2136,7 +2136,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q10",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "看到乌云越来越多，最可能发生什么？",
@@ -2165,25 +2165,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q11",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪句最完整？",
           "options": [
             {
               "key": "A",
-              "label": "妹妹在客厅认真画画。"
+              "label": "妹妹认真。"
             },
             {
               "key": "B",
-              "label": "妹妹认真。"
+              "label": "妹妹在客厅认真画画。"
             },
             {
               "key": "C",
               "label": "客厅。"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
@@ -2194,25 +2194,25 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q12",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "“大家分工合作，很快完成值日。”这句话告诉我们？",
           "options": [
             {
               "key": "A",
-              "label": "合作能提高效率"
-            },
-            {
-              "key": "B",
               "label": "做事越慢越好"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "值日不需要分工"
+            },
+            {
+              "key": "C",
+              "label": "合作能提高效率"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "圈出题目中的关键词，再结合生活经验判断。"
