@@ -36,6 +36,11 @@ export struct HomeworkImportBatchDetailPage {
     return this.viewModel.candidates(this.batchId);
   }
 
+  private sourceMessageIds(item: CandidateAssignment): string[] {
+    return item.sourceEvidence.sourceMessageIds === undefined ?
+      [] : item.sourceEvidence.sourceMessageIds;
+  }
+
   private statusLabel(status: ImportBatchStatus): string {
     if (status === ImportBatchStatus.READY) return '待确认';
     if (status === ImportBatchStatus.PUBLISHED) return '已发布';
@@ -117,9 +122,8 @@ export struct HomeworkImportBatchDetailPage {
         .fontSize(11)
         .lineHeight(17)
         .fontColor(AppTheme.SUBTEXT);
-      if (item.sourceEvidence.sourceMessageIds !== undefined &&
-        item.sourceEvidence.sourceMessageIds!.length > 0) {
-        Text(`证据消息：${item.sourceEvidence.sourceMessageIds!.join(', ')}`)
+      if (this.sourceMessageIds(item).length > 0) {
+        Text(`证据消息：${this.sourceMessageIds(item).join(', ')}`)
           .width('100%')
           .fontSize(10)
           .fontColor(AppTheme.TERTIARY_TEXT);
