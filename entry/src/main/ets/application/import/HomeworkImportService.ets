@@ -49,6 +49,10 @@ export class HomeworkImportService {
     };
   }
 
+  async parseImportedSource(input: RawHomeworkImport): Promise<HomeworkImportPipelineResult> {
+    return await this.runSmart(input);
+  }
+
   async parseText(text: string): Promise<HomeworkTextImportResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let normalized = text.trim();
