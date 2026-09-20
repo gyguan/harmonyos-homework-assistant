@@ -154,8 +154,7 @@ export class HomeworkStore {
       id: source.id,
       studentId: source.studentId,
       candidateId: source.candidateId,
-      backing: source.backing === AssignmentBacking.REMOTE ?
-        AssignmentBacking.REMOTE : AssignmentBacking.LOCAL_SEED,
+      backing: source.backing,
       assignmentType: source.assignmentType,
       subjectCode: source.subjectCode,
       contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE ?
