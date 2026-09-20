@@ -1,6 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
-import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
+import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { Assignment } from '../../../domain/model/HomeworkModels';
 import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
@@ -96,58 +95,20 @@ export struct ParentAssignmentEditPanel {
       }
       .width('100%');
 
-      Text('作业标题').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: this.titleDraft })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.titleDraft = value);
-
-      Text('老师要求').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextArea({ text: this.instructionDraft })
-        .width('100%')
-        .height(88)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.instructionDraft = value);
-
-      Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      DeadlinePickerField({
-        value: this.dueTextDraft,
-        allowClear: true,
-        onChange: (value: string) => this.dueTextDraft = value
+      AssignmentEditForm({
+        subject: this.item.subject,
+        subjectEditable: false,
+        title: this.titleDraft,
+        instruction: this.instructionDraft,
+        dueText: this.dueTextDraft,
+        expectedMinutes: this.parsedMinutes() > 0 ? this.parsedMinutes() : 20,
+        textbookRef: this.textbookRefDraft,
+        onTitleChange: (value: string) => this.titleDraft = value,
+        onInstructionChange: (value: string) => this.instructionDraft = value,
+        onDueTextChange: (value: string) => this.dueTextDraft = value,
+        onMinutesChange: (minutes: number) => this.setMinutes(minutes),
+        onTextbookRefChange: (value: string) => this.textbookRefDraft = value
       });
-
-      Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      Row({ space: 6 }) {
-        ChoiceSelectionChip({ label: '10', selected: this.parsedMinutes() === 10, compact: true,
-          onSelect: () => this.setMinutes(10) });
-        ChoiceSelectionChip({ label: '15', selected: this.parsedMinutes() === 15, compact: true,
-          onSelect: () => this.setMinutes(15) });
-        ChoiceSelectionChip({ label: '20', selected: this.parsedMinutes() === 20, compact: true,
-          onSelect: () => this.setMinutes(20) });
-        ChoiceSelectionChip({ label: '30', selected: this.parsedMinutes() === 30, compact: true,
-          onSelect: () => this.setMinutes(30) });
-        ChoiceSelectionChip({ label: '45', selected: this.parsedMinutes() === 45, compact: true,
-          onSelect: () => this.setMinutes(45) });
-      }
-      .width('100%');
-
-      TextInput({ text: this.minutesDraft })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.minutesDraft = value);
-
-      Text('教材 / 页码').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: this.textbookRefDraft })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.textbookRefDraft = value);
 
       Button(this.saving ? '保存中…' : '保存修改', { type: ButtonType.Normal })
         .width('100%')
@@ -160,10 +121,6 @@ export struct ParentAssignmentEditPanel {
         .fontWeight(FontWeight.Medium)
         .onClick(() => this.onSave(this.buildAssignment()));
     }
-    .width('100%')
-    .padding(15)
-    .backgroundColor(AppTheme.SURFACE)
-    .border({ width: 1, color: AppTheme.PRIMARY })
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+    .width('100%');
   }
 }
