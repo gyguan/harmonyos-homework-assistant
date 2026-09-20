@@ -227,16 +227,18 @@ export class RemoteAssignmentResourceApi {
     let multipartPath = `${this.context.cacheDir}/voice-assignment-${Date.now()}.bin`;
 
     try {
-      let writer = await fileIo.open(multipartPath,
-        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      let writer = await this.openFile(
+        multipartPath,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC,
+        '无法创建语音作业上传缓存');
       let totalBytes = 0;
       try {
         let metadataText = JSON.stringify(this.metadata(assignment));
         let metadataHeader = `--${boundary}\r\nContent-Disposition: form-data; name="metadata"\r\n` +
           'Content-Type: application/json; charset=UTF-8\r\n\r\n';
-        totalBytes += await fileIo.write(writer.fd, metadataHeader);
-        totalBytes += await fileIo.write(writer.fd, metadataText);
-        totalBytes += await fileIo.write(writer.fd, '\r\n');
+        totalBytes += await this.writeText(writer.fd, metadataHeader, '无法写入语音作业元数据头');
+        totalBytes += await this.writeText(writer.fd, metadataText, '无法写入语音作业元数据');
+        totalBytes += await this.writeText(writer.fd, '\r\n', '无法结束语音作业元数据');
 
         totalBytes += await this.writeFilePart(
           writer.fd, boundary, 'audio', audioUri, this.fileName(audioUri, 'voice.mp3'),
@@ -246,19 +248,22 @@ export class RemoteAssignmentResourceApi {
             writer.fd, boundary, 'images', imageUris[i],
             this.fileName(imageUris[i], `scene-${i + 1}.jpg`), this.imageContentType(imageUris[i]));
         }
-        totalBytes += await fileIo.write(writer.fd, `--${boundary}--\r\n`);
+        totalBytes += await this.writeText(
+          writer.fd, `--${boundary}--\r\n`, '无法结束语音作业上传请求');
       } finally {
         try { await fileIo.close(writer); } catch {}
       }
 
       let body = new ArrayBuffer(totalBytes);
       let target = new Uint8Array(body);
-      let reader = await fileIo.open(multipartPath, fileIo.OpenMode.READ_ONLY);
+      let reader = await this.openFile(
+        multipartPath, fileIo.OpenMode.READ_ONLY, '无法读取语音作业上传缓存');
       let offset = 0;
       try {
         let chunk = new ArrayBuffer(64 * 1024);
         while (offset < totalBytes) {
-          let readLength = await fileIo.read(reader.fd, chunk);
+          let readLength = await this.readBuffer(
+            reader.fd, chunk, '读取语音作业上传缓存失败');
           if (readLength <= 0) break;
           target.set(new Uint8Array(chunk, 0, readLength), offset);
           offset += readLength;
@@ -278,22 +283,56 @@ export class RemoteAssignmentResourceApi {
     let total = 0;
     let header = `--${boundary}\r\nContent-Disposition: form-data; name="${fieldName}"; filename="${fileName}"\r\n` +
       `Content-Type: ${contentType}\r\n\r\n`;
-    total += await fileIo.write(fd, header);
-    let source = await fileIo.open(uri, fileIo.OpenMode.READ_ONLY);
+    total += await this.writeText(fd, header, '无法写入媒体文件上传头');
+    let source = await this.openFile(uri, fileIo.OpenMode.READ_ONLY, '无法读取待上传媒体文件');
     try {
       let chunk = new ArrayBuffer(64 * 1024);
       while (true) {
-        let readLength = await fileIo.read(source.fd, chunk);
+        let readLength = await this.readBuffer(source.fd, chunk, '读取待上传媒体文件失败');
         if (readLength <= 0) break;
-        let written = await fileIo.write(fd, chunk, { length: readLength });
+        let written = await this.writeBuffer(
+          fd, chunk, readLength, '写入媒体文件上传内容失败');
         if (written !== readLength) throw new Error('媒体文件写入上传请求失败');
         total += written;
       }
     } finally {
       try { await fileIo.close(source); } catch {}
     }
-    total += await fileIo.write(fd, '\r\n');
+    total += await this.writeText(fd, '\r\n', '无法结束媒体文件上传内容');
     return total;
+  }
+
+  private async openFile(path: string, mode: number, errorMessage: string): Promise<fileIo.File> {
+    try {
+      return await fileIo.open(path, mode);
+    } catch {
+      throw new Error(errorMessage);
+    }
+  }
+
+  private async writeText(fd: number, value: string, errorMessage: string): Promise<number> {
+    try {
+      return await fileIo.write(fd, value);
+    } catch {
+      throw new Error(errorMessage);
+    }
+  }
+
+  private async readBuffer(fd: number, buffer: ArrayBuffer, errorMessage: string): Promise<number> {
+    try {
+      return await fileIo.read(fd, buffer);
+    } catch {
+      throw new Error(errorMessage);
+    }
+  }
+
+  private async writeBuffer(fd: number, buffer: ArrayBuffer, length: number,
+    errorMessage: string): Promise<number> {
+    try {
+      return await fileIo.write(fd, buffer, { length: length });
+    } catch {
+      throw new Error(errorMessage);
+    }
   }
 
   private fileName(uri: string, fallback: string): string {
