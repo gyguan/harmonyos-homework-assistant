@@ -882,19 +882,30 @@ export struct StudyWorkspacePage {
       Scroll() {
         Row({ space: 8 }) {
           ForEach(this.voiceImageUris, (uri: string, index: number) => {
-            Image(uri)
-              .width(68)
-              .height(56)
-              .objectFit(ImageFit.Cover)
-              .border({
-                width: index === this.voiceImageIndex ? 2 : 1,
-                color: index === this.voiceImageIndex ? AppTheme.PRIMARY : '#666666'
-              })
-              .borderRadius(10)
-              .backgroundColor('#242424')
-              .accessibilityRole(AccessibilityRoleType.BUTTON)
-              .accessibilityText(`查看第 ${index + 1} 张情景图片`)
-              .onClick(() => this.voiceSelectImage(index));
+            Stack({ alignContent: Alignment.Center }) {
+              if (uri.length > 0) {
+                Image(uri)
+                  .width(68)
+                  .height(56)
+                  .objectFit(ImageFit.Cover);
+              } else {
+                Text(`${index + 1}`)
+                  .fontSize(12)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor('#D8D8D8');
+              }
+            }
+            .width(68)
+            .height(56)
+            .border({
+              width: index === this.voiceImageIndex ? 2 : 1,
+              color: index === this.voiceImageIndex ? AppTheme.PRIMARY : '#666666'
+            })
+            .borderRadius(10)
+            .backgroundColor('#242424')
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText(`查看第 ${index + 1} 张情景图片`)
+            .onClick(() => this.voiceSelectImage(index));
           }, (uri: string, index: number) => `${index}-${uri}`);
         }
       }
