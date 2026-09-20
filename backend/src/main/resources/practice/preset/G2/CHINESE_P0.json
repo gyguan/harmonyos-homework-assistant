@@ -5,11 +5,11 @@
   "papers": [
     {
       "id": "CHINESE-G2-S1-P0-C03-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
-      "title": "二上语文图文阅读（一）",
+      "title": "二上语文阅读理解（一）",
       "description": "三篇原创短文配场景图，训练信息提取、顺序理解和简单推断。",
       "difficulty": "L1",
       "questionCount": 12,
@@ -19,13 +19,13 @@
         "阅读理解",
         "教材同步",
         "P0",
-        "图文题"
+        "文字题"
       ],
       "sourceType": "PRESET",
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q01",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：星期六上午，小雨和妈妈去了社区图书馆。小雨先在书架前挑了一本故事书，又坐在窗边安静地读书。回家前，她把书放回原来的位置，还向管理员阿姨说了“谢谢”。\n小雨什么时候去图书馆？",
@@ -46,21 +46,15 @@
           "answerSpec": "A",
           "explanation": "短文开头写了“星期六上午”。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_library_rainy",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "社区图书馆：小雨和妈妈、书架、窗边阅读"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q02",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：星期六上午，小雨和妈妈去了社区图书馆。小雨先在书架前挑了一本故事书，又坐在窗边安静地读书。回家前，她把书放回原来的位置，还向管理员阿姨说了“谢谢”。\n小雨先做了什么？",
@@ -81,21 +75,15 @@
           "answerSpec": "B",
           "explanation": "她先在书架前挑了一本故事书。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_library_rainy",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "社区图书馆：小雨和妈妈、书架、窗边阅读"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q03",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：星期六上午，小雨和妈妈去了社区图书馆。小雨先在书架前挑了一本故事书，又坐在窗边安静地读书。回家前，她把书放回原来的位置，还向管理员阿姨说了“谢谢”。\n读完书后，小雨做了什么？",
@@ -116,21 +104,15 @@
           "answerSpec": "A",
           "explanation": "她把书放回原来的位置。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_library_rainy",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "社区图书馆：小雨把书放回书架"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q04",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：星期六上午，小雨和妈妈去了社区图书馆。小雨先在书架前挑了一本故事书，又坐在窗边安静地读书。回家前，她把书放回原来的位置，还向管理员阿姨说了“谢谢”。\n从短文中可以看出，小雨是个怎样的孩子？",
@@ -151,21 +133,15 @@
           "answerSpec": "A",
           "explanation": "她说谢谢并把书放回原位，说明有礼貌。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_library_rainy",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "社区图书馆中的文明阅读场景"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q05",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：放学后，值日小队开始打扫教室。明明扫地，小芳擦黑板，小军整理图书角。大家分工合作，不一会儿，教室就变得干干净净了。\n这件事发生在什么时候？",
@@ -186,21 +162,15 @@
           "answerSpec": "B",
           "explanation": "第一句写“放学后”。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_cleaning_classroom",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "放学后的教室值日场景"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q06",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：放学后，值日小队开始打扫教室。明明扫地，小芳擦黑板，小军整理图书角。大家分工合作，不一会儿，教室就变得干干净净了。\n谁在擦黑板？",
@@ -221,21 +191,15 @@
           "answerSpec": "C",
           "explanation": "文中写“小芳擦黑板”。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_cleaning_classroom",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "明明扫地、小芳擦黑板、小军整理图书角"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q07",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：放学后，值日小队开始打扫教室。明明扫地，小芳擦黑板，小军整理图书角。大家分工合作，不一会儿，教室就变得干干净净了。\n大家为什么很快把教室整理干净？",
@@ -256,21 +220,15 @@
           "answerSpec": "A",
           "explanation": "因为大家分工合作。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_cleaning_classroom",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "同学们分工合作做值日"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q08",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：放学后，值日小队开始打扫教室。明明扫地，小芳擦黑板，小军整理图书角。大家分工合作，不一会儿，教室就变得干干净净了。\n下面哪一句最能概括这段话？",
@@ -291,21 +249,15 @@
           "answerSpec": "A",
           "explanation": "整段写同学们合作做值日。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_cleaning_classroom",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "同学们合作打扫教室"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q09",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，公园里的树叶有的变黄了，有的变红了。小朋友们在草地上捡落叶，有的做书签，有的做贴画。大家一边说笑，一边欣赏美丽的秋景。\n短文写的是哪个季节？",
@@ -326,21 +278,15 @@
           "answerSpec": "C",
           "explanation": "第一句写“秋天到了”。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_autumn_park",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "秋天公园：红黄树叶、小朋友捡落叶"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q10",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，公园里的树叶有的变黄了，有的变红了。小朋友们在草地上捡落叶，有的做书签，有的做贴画。大家一边说笑，一边欣赏美丽的秋景。\n小朋友们捡落叶做什么？",
@@ -361,21 +307,15 @@
           "answerSpec": "A",
           "explanation": "文中写做书签和贴画。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_autumn_park",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "小朋友用落叶做书签和贴画"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q11",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，公园里的树叶有的变黄了，有的变红了。小朋友们在草地上捡落叶，有的做书签，有的做贴画。大家一边说笑，一边欣赏美丽的秋景。\n树叶变成了什么颜色？",
@@ -396,21 +336,15 @@
           "answerSpec": "A",
           "explanation": "短文写有的变黄，有的变红。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_autumn_park",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "秋天公园的红黄树叶"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C03-001-Q12",
+          "id": "CHINESE-G2-S1-P0-C03-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，公园里的树叶有的变黄了，有的变红了。小朋友们在草地上捡落叶，有的做书签，有的做贴画。大家一边说笑，一边欣赏美丽的秋景。\n从短文中可以看出，小朋友们的心情怎么样？",
@@ -431,29 +365,23 @@
           "answerSpec": "A",
           "explanation": "“一边说笑，一边欣赏”说明很开心。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先从短文中找关键信息，再比较选项。"
           ],
           "tags": [
             "图文阅读",
             "阅读理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_reading_autumn_park",
-            "layout": "PASSAGE_WITH_SCENE",
-            "accessibilityText": "小朋友在秋天公园开心活动"
-          }
+          ]
         }
       ]
     },
     {
       "id": "CHINESE-G2-S1-P0-C04-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
-      "title": "二上语文看图表达（一）",
-      "description": "看图理解、句子表达、图序和对话补充的图文练习。",
+      "title": "二上语文情境表达（一）",
+      "description": "情境理解、句子表达、图序和对话补充的文字练习。",
       "difficulty": "L1",
       "questionCount": 12,
       "estimatedMinutes": 20,
@@ -462,16 +390,16 @@
         "句子理解",
         "教材同步",
         "P0",
-        "图文题"
+        "文字题"
       ],
       "sourceType": "PRESET",
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q01",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
-          "stem": "下面哪句话最适合这幅图？",
+          "stem": "情境：小朋友在花坛旁认真浇花。下面哪句话最适合描述这个情境？",
           "options": [
             {
               "key": "A",
@@ -489,24 +417,18 @@
           "answerSpec": "A",
           "explanation": "图中动作是浇花。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_scene_watering_flowers",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "小朋友在花坛旁认真浇花"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q02",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
-          "stem": "看图，哪一句最合适？",
+          "stem": "情境：两个小朋友排队洗手。哪一句最合适？",
           "options": [
             {
               "key": "A",
@@ -524,24 +446,18 @@
           "answerSpec": "A",
           "explanation": "图意是排队洗手。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_scene_washing_hands_line",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "两个小朋友排队洗手"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q03",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
-          "stem": "下面哪句话最能表达图意？",
+          "stem": "情境：下雨天，一个同学给另一个同学撑伞。下面哪句话最能表达这个情境？",
           "options": [
             {
               "key": "A",
@@ -559,24 +475,18 @@
           "answerSpec": "A",
           "explanation": "图中是帮别人撑伞。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_scene_share_umbrella",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "下雨天，一个同学给另一个同学撑伞"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q04",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
-          "stem": "下面哪个顺序是正确的？",
+          "stem": "早晨，小朋友依次起床、刷牙、背上书包出门。下面哪个顺序是正确的？",
           "options": [
             {
               "key": "A",
@@ -594,24 +504,18 @@
           "answerSpec": "A",
           "explanation": "按照生活顺序判断。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "IMAGE_SEQUENCE",
-            "assetId": "asset_seq_morning_routine",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "三图：起床→刷牙→背书包出门"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q05",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
-          "stem": "这组图主要告诉我们什么？",
+          "stem": "一个小朋友先捡起地上的纸屑，再把纸屑扔进垃圾桶，地面变干净了。这个过程主要告诉我们什么？",
           "options": [
             {
               "key": "A",
@@ -629,24 +533,18 @@
           "answerSpec": "A",
           "explanation": "画面强调捡垃圾、爱护环境。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "IMAGE_SEQUENCE",
-            "assetId": "asset_seq_pickup_trash",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "三图：捡起纸屑→扔进垃圾桶→地面变干净"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q06",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
-          "stem": "给这幅图补一句话，最合适的是：",
+          "stem": "情境：教室里，同学们正在认真听讲。补一句话，最合适的是：",
           "options": [
             {
               "key": "A",
@@ -664,24 +562,18 @@
           "answerSpec": "A",
           "explanation": "图中是教室听课情境。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_scene_listening_class",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "教室里同学认真听讲"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q07",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
-          "stem": "哪一句表达更完整？",
+          "stem": "情境：妈妈和孩子一起整理书桌。哪一句表达更完整？",
           "options": [
             {
               "key": "A",
@@ -699,24 +591,18 @@
           "answerSpec": "B",
           "explanation": "B句最完整。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_scene_tidy_desk_family",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "妈妈和孩子一起整理书桌"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q08",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
-          "stem": "如果给图片配一句话，下面最合适的是：",
+          "stem": "情境：小猫趴在窗边看雨。下面哪句话最合适？",
           "options": [
             {
               "key": "A",
@@ -734,24 +620,18 @@
           "answerSpec": "A",
           "explanation": "符合画面内容。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_scene_cat_look_rain",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "小猫趴在窗边看雨"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q09",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
-          "stem": "图中的变化顺序是什么？",
+          "stem": "植物生长经历“种子→发芽→长高”。下面哪个顺序正确？",
           "options": [
             {
               "key": "A",
@@ -769,24 +649,18 @@
           "answerSpec": "A",
           "explanation": "植物生长有先后顺序。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "IMAGE_SEQUENCE",
-            "assetId": "asset_seq_seed_sprout_grow",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "三图：种子→发芽→长高"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q10",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
-          "stem": "下面哪句话最适合放进对话框？",
+          "stem": "情境：一个小朋友摔倒了，另一个小朋友来扶他。下面哪句话最适合帮助者说？",
           "options": [
             {
               "key": "A",
@@ -804,24 +678,18 @@
           "answerSpec": "A",
           "explanation": "符合帮助同学的情境。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "DIALOGUE",
-            "assetId": "asset_dialog_help_friend_fall",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "一个小朋友摔倒，另一个扶起他"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q11",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
-          "stem": "看图，哪一句更生动？",
+          "stem": "情境：小朋友在公园认真观察蝴蝶。哪一句表达更生动？",
           "options": [
             {
               "key": "A",
@@ -839,24 +707,18 @@
           "answerSpec": "B",
           "explanation": "B句更完整、生动。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_scene_observe_butterfly",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "小朋友在公园认真观察蝴蝶"
-          }
+          ]
         },
         {
-          "id": "CHINESE-G2-S1-P0-C04-001-Q12",
+          "id": "CHINESE-G2-S1-P0-C04-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
-          "stem": "下面哪一句最能表达图意？",
+          "stem": "情境：晚饭后，全家人坐在一起聊天。下面哪一句最能表达这个情境？",
           "options": [
             {
               "key": "A",
@@ -874,18 +736,12 @@
           "answerSpec": "A",
           "explanation": "图中是家庭温馨场景。",
           "hints": [
-            "先观察图片，再从短文或画面中找到关键信息。"
+            "先读清情境和句子，再比较选项。"
           ],
           "tags": [
             "看图表达",
             "句子理解"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_scene_family_chat_dinner",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "晚饭后全家坐在一起聊天"
-          }
+          ]
         }
       ]
     }
