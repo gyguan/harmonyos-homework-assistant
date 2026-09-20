@@ -48,6 +48,9 @@ export struct HomeworkConfirmationPage {
 
   private closeEditor(): void {
     this.showEditorSheet = false;
+  }
+
+  private completeEditorDismiss(): void {
     this.editingCandidateId = '';
   }
 
@@ -382,10 +385,11 @@ export struct HomeworkConfirmationPage {
     .width('100%')
     .height('100%')
     .backgroundColor(AppTheme.BACKGROUND)
-    .bindSheet($$this.showEditorSheet, this.CandidateEditorSheet(), {
+    .bindSheet($this.showEditorSheet, this.CandidateEditorSheet(), {
       height: '82%',
       showClose: false,
-      preferType: SheetType.BOTTOM
+      preferType: SheetType.BOTTOM,
+      onDisappear: () => this.completeEditorDismiss()
     });
   }
 }
