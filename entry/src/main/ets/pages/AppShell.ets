@@ -2,6 +2,7 @@ import {
   AppRoute,
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
+  ParentCaptureSpikeRouteParam,
   ParentImportConfirmationRouteParam,
   ParentImportRouteParam,
   PracticeAttemptRouteParam,
@@ -24,6 +25,7 @@ import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboar
 import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
 import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceAssignmentPage';
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
+import { HomeworkCaptureSpikePage } from '../experimental/homeworkcapture/HomeworkCaptureSpikePage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
@@ -209,6 +211,11 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.PARENT_IMPORT, new ParentImportRouteParam());
   }
 
+  private openParentCaptureSpike(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_CAPTURE_SPIKE, new ParentCaptureSpikeRouteParam());
+  }
+
   private openParentImportConfirmation(): void {
     this.navPathStack.pushPathByName(
       AppRoute.PARENT_IMPORT_CONFIRMATION, new ParentImportConfirmationRouteParam());
@@ -338,7 +345,16 @@ export struct AppShell {
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => this.openParentImportConfirmation(),
+          onOpenCaptureSpike: () => this.openParentCaptureSpike(),
           onStoreChanged: () => this.notifyUiChanged()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_CAPTURE_SPIKE) {
+      NavDestination() {
+        HomeworkCaptureSpikePage({
+          onBack: () => this.navPathStack.pop()
         });
       }
       .hideTitleBar(true)
