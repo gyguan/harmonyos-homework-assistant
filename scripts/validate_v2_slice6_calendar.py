@@ -33,8 +33,8 @@ require("SegmentedSelectionButton({ label: '列表', selected: !this.calendarMod
 require("export struct SegmentedSelectionButton" in selection_controls and
         "@Prop selected: boolean = false;" in selection_controls,
         "list/calendar switch must keep selected state in a reactive child-component prop")
-require("AssignmentDateFilter.CUSTOM" in page and "assignmentsOnDay" in page,
-        "calendar day selection must reuse Assignment filtering semantics")
+require("assignmentsOnDay" in page and "queryOnDay" in view_model,
+        "calendar day selection must reuse selected-day Assignment query semantics")
 require("$selectedCalendarDayEpochMs" in page and "$calendarMonthEpochMs" in page,
         "calendar selection/month state must stay page-local and flow through component links")
 require("LayoutPolicy.canSplit" in page and "assignmentMasterDetailRequirement" in page,
