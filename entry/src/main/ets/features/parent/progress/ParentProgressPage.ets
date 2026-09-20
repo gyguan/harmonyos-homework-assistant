@@ -576,6 +576,11 @@ export struct ParentProgressPage {
                 this.refreshRevision++;
                 this.rebuildView();
                 this.onStoreChanged();
+              },
+              onDeleted: () => {
+                this.refreshRevision++;
+                this.rebuildView();
+                this.onStoreChanged();
               }
             });
           }
