@@ -19,6 +19,10 @@ def require(condition: bool, message: str) -> None:
 route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 pane = read("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
+parent = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+media_picker = read("entry/src/main/ets/application/assignment/VoiceAssignmentMediaService.ets")
+remote_resource = read("entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets")
+backend_resource = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentResourceService.java")
 
 require("assignment.contentType !== AssignmentContentType.AUDIO_IMAGE" in route,
         "voice assignments must hide the duplicated extracurricular context banner")
@@ -30,6 +34,27 @@ require(".height(286)" in pane,
         "voice media pane must give the main image more visual space")
 require("ForEach(this.imageUris" in pane and "this.selectImage(index)" in pane,
         "voice media pane must provide direct thumbnail image switching")
+require("let merged = this.imageUris.slice()" in parent and
+        "existing: Set<string>" in parent and
+        "＋ 继续添加图片" in parent,
+        "parent voice assignment must append and deduplicate image selections")
+require("MAX_VOICE_IMAGES_PER_PICK" in media_picker and
+        "maxSelectNumber: MAX_VOICE_IMAGES_PER_PICK" in media_picker,
+        "nine images must remain only a per-picker selection limit")
+require("imageUris.length > 9" not in remote_resource and
+        "MAX_IMAGES" not in backend_resource,
+        "voice assignment publishing must not impose a total nine-image limit")
+require("images.sort(" in pane and "compareImageResources" in pane and
+        "originalName.toLowerCase()" in pane,
+        "student voice images must use natural filename ordering")
+require("loadImage(index: number)" in pane and "prefetchNextImage" in pane and
+        "void this.prefetchNextImage(0)" in pane,
+        "student voice images must load on demand and prefetch the next image")
+require("pendingDownloads" in remote_resource,
+        "resource downloads must deduplicate concurrent prefetch and foreground requests")
+require("void this.loadAudio(audio)" in pane and "正在加载语音…" in pane,
+        "voice audio must load independently after the first image becomes visible")
+
 require("Slider({" in pane and "this.player.seek(value)" in pane,
         "voice media pane must retain audio progress seeking")
 require("this.toggleAudio()" in pane and "this.pauseAudio()" in pane,
