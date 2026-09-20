@@ -417,9 +417,6 @@ export struct StudentHomePage {
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
-          Text('按学科完成，一次专注一个学科')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
@@ -441,9 +438,6 @@ export struct StudentHomePage {
               .fontSize(15)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            Text('其他日期的作业可以在「作业」页查看。')
-              .fontSize(11)
-              .fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start);
@@ -476,7 +470,6 @@ export struct StudentHomePage {
       this.Header();
       this.OfflineBanner();
       this.TodayOverview();
-      this.TodayScopeNote();
       this.TodaySubjects();
     }
     .width('100%')
