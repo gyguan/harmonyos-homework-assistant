@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
+import { camera, cameraPicker } from '@kit.CameraKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { DefaultSubmissionLocalDataSource, SubmissionLocalDataSource } from '../../data/local/SubmissionLocalDataSource';
 import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssignmentRepository';
@@ -25,16 +26,48 @@ export class HomeworkSubmissionService {
     return this.local.listSubmissions(assignmentId);
   }
 
-  async selectPhotos(): Promise<string[]> {
+  async selectPhotos(maxSelectNumber: number = MAX_SUBMISSION_PHOTOS): Promise<string[]> {
     try {
+      let safeMax = Math.max(1, Math.min(MAX_SUBMISSION_PHOTOS, maxSelectNumber));
       let picker = new photoAccessHelper.PhotoViewPicker();
       let selection = await picker.select({
         MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
-        maxSelectNumber: MAX_SUBMISSION_PHOTOS
+        maxSelectNumber: safeMax
       });
-      return selection.photoUris.slice();
+      return selection.photoUris.slice(0, safeMax);
     } catch {
       return [];
+    }
+  }
+
+  async capturePhoto(): Promise<string> {
+    if (this.context === null) return '';
+    let now = Date.now();
+    let filePath = `${this.context.cacheDir}/homework-submission-camera-${now}.jpg`;
+    try {
+      let file = fileIo.openSync(filePath,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      try {
+        fileIo.closeSync(file);
+      } catch {
+        return '';
+      }
+    } catch {
+      return '';
+    }
+
+    let saveUri = fileUri.getUriFromPath(filePath);
+    let profile: cameraPicker.PickerProfile = {
+      cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK,
+      saveUri: saveUri
+    };
+    try {
+      let result = await cameraPicker.pick(
+        this.context, [cameraPicker.PickerMediaType.PHOTO], profile);
+      if (result.resultCode !== 0) return '';
+      return saveUri;
+    } catch {
+      return '';
     }
   }
 
