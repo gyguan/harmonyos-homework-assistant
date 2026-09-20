@@ -48,7 +48,7 @@ export struct PracticeHistoryPage {
             .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text(`${PracticeTaxonomy.gradeLabel(item.grade)} · ${PracticeTaxonomy.subjectLabel(item.subject)} · 第 ${item.attemptNo} 次`)
+          Text(`${PracticeTaxonomy.gradeLabel(item.grade)} · ${PracticeTaxonomy.subjectLabel(item.subject)} · ${this.viewModel.modeLabel(item)} · 第 ${item.attemptNo} 次`)
             .width('100%')
             .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
@@ -79,6 +79,12 @@ export struct PracticeHistoryPage {
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
           Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
           Text(this.viewModel.elapsedText(item.elapsedSeconds))
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        if (item.noteCount > 0) {
+          Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+          Text(`${item.noteCount} 条笔记`)
             .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
         }
