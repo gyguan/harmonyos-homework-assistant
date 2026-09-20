@@ -61,7 +61,8 @@ export struct ParentVoiceAssignmentPage {
     if (uris.length === 0) return;
 
     let merged = this.imageUris.slice();
-    let existing: Set<string> = new Set<string>(merged);
+    let existing: Set<string> = new Set<string>();
+    for (let uri of merged) existing.add(uri);
     for (let uri of uris) {
       if (existing.has(uri)) continue;
       existing.add(uri);
