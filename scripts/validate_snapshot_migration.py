@@ -23,14 +23,17 @@ migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets"
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 persistence = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkPersistence.ets")
 
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 7" in migrator,
-        "snapshot migration framework must advance the current schema to V7")
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 8" in migrator,
+        "snapshot migration framework must advance the current schema to V8")
 require("migrateV4ToV5" in migrator and "schemaVersion: 5" in migrator,
         "snapshot migrator must retain the explicit V4 -> V5 step")
 require("migrateV5ToV6" in migrator and "schemaVersion: 6" in migrator,
         "Assignment V2 must use an explicit V5 -> V6 migration step")
 require("migrateV6ToV7" in migrator and "schemaVersion: 7" in migrator,
         "Assignment content type must use an explicit V6 -> V7 migration step")
+require("migrateV7ToV8" in migrator and "schemaVersion: 8" in migrator and
+        "legacyBacking" in migrator and "AssignmentBacking.REMOTE" in migrator,
+        "Assignment backing must use an explicit V7 -> V8 migration step")
 for field in [
     "settings: snapshot.settings",
     "rawImports: snapshot.rawImports",
@@ -67,6 +70,8 @@ require("contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE" 
         "V6 -> V7 migration must preserve AUDIO_IMAGE and default missing contentType to NORMAL")
 require("dueAtEpochMs: source.dueAtEpochMs" in store and "dueTimezone:" in store,
         "HomeworkStore clone must preserve Assignment V2 due-time fields")
+require("backing: source.backing === AssignmentBacking.REMOTE" in store,
+        "HomeworkStore clone must preserve explicit Assignment backing after migration")
 
 # An existing but corrupt snapshot must not be converted into a first-launch null result.
 require(persistence.count("return null;") == 1,
