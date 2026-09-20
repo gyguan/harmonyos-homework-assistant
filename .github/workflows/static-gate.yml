@@ -30,6 +30,9 @@ jobs:
       - name: Validate V0.2 parser and confirmation
         run: python scripts/validate_v02_parser_confirmation.py
 
+      - name: Validate assignment editor consistency
+        run: python scripts/validate_assignment_editor_consistency.py
+
       - name: Validate real homework submission
         run: python scripts/validate_real_submission_feature.py
 

@@ -34,6 +34,8 @@ review_page = read("entry/src/main/ets/features/parent/review/ParentReviewPage.e
 review_pane = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 review_vm = read("entry/src/main/ets/features/parent/review/ParentReviewViewModel.ets")
 review_editor = read("entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets")
+shared_editor = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
+confirmation_editor = read("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 assignment_controller = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentController.java")
 assignment_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
@@ -143,9 +145,16 @@ require("this.viewModel.approve" in review_pane and "this.viewModel.returnForRew
 require("ParentAssignmentEditPanel" in review_pane and "编辑任务" in review_pane and
         "this.viewModel.updateDetails(updated)" in review_pane,
         "Parent task detail must expose editable task definition before submission")
-require("DeadlinePickerField" in review_editor and "预计用时（分钟）" in review_editor and
-        "保存修改" in review_editor and "不会修改作业状态和计时" in review_editor,
-        "Parent assignment editor must cover deadline/duration and explain status isolation")
+require("AssignmentEditForm" in review_editor and "保存修改" in review_editor and
+        "不会修改作业状态和计时" in review_editor,
+        "Parent assignment editor must reuse the shared assignment form and explain status isolation")
+require("AssignmentEditForm" in confirmation_editor,
+        "confirmation editing must reuse the same shared assignment form as published assignment editing")
+require("DeadlinePickerField" in shared_editor and "预计用时（分钟）" in shared_editor and
+        "教材 / 页码" in shared_editor and "作业标题" in shared_editor,
+        "shared assignment editor must own the common title/deadline/duration/textbook fields")
+require("bindSheet($$this.showEditSheet" in review_pane and "AssignmentEditorSheet" in review_pane,
+        "published assignment editing must open in a bottom sheet rather than inline")
 require("AssignmentStatus.SUBMITTED" in review_pane and "AssignmentStatus.COMPLETED" in review_pane and
         "private canEdit(item: Assignment)" in review_pane,
         "submitted/completed assignments must lock task-definition editing")

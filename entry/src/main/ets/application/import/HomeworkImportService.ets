@@ -8,7 +8,7 @@ import {
   HomeworkOrganizerMode,
   HomeworkTextImportResult
 } from '../../domain/model/ImportModels';
-import { HomeworkImportSourceKind, RawHomeworkImport } from '../../domain/model/HomeworkModels';
+import { CandidateAssignment, HomeworkImportSourceKind, RawHomeworkImport } from '../../domain/model/HomeworkModels';
 import { HomeworkAssignmentParser } from '../../domain/port/HomeworkAssignmentParser';
 import { HomeworkImportDraftRepository } from '../../domain/port/HomeworkImportDraftRepository';
 import { HomeworkTextExtractor } from '../../domain/port/HomeworkTextExtractor';
@@ -26,16 +26,23 @@ export class HomeworkImportService {
     this.pipeline = new HomeworkImportPipeline(extractor, parser);
   }
 
+  private normalizeCandidateDates(candidates: CandidateAssignment[]): CandidateAssignment[] {
+    for (let candidate of candidates) {
+      if (candidate.dueText.trim().length === 0) candidate.dueText = '今天';
+    }
+    return candidates;
+  }
+
   private async runSmart(input: RawHomeworkImport): Promise<HomeworkImportPipelineResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let extracted: ExtractedHomeworkText = await this.pipeline.extract(input);
     let remoteCandidates = await HomeworkOrganizerRemoteApi.instance.organize(extracted);
     if (remoteCandidates !== null) {
-      return { extracted: extracted, candidates: remoteCandidates, organizerMode: HomeworkOrganizerMode.AI };
+      return { extracted: extracted, candidates: this.normalizeCandidateDates(remoteCandidates), organizerMode: HomeworkOrganizerMode.AI };
     }
     return {
       extracted: extracted,
-      candidates: await this.pipeline.parse(extracted),
+      candidates: this.normalizeCandidateDates(await this.pipeline.parse(extracted)),
       organizerMode: HomeworkOrganizerMode.LOCAL
     };
   }

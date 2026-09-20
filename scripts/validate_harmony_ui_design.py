@@ -226,14 +226,17 @@ require("DeadlinePickerField" in extra_assignment and "placeholder: 'YYYY-MM-DD'
 confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read_optional(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+assignment_edit_form = read_optional(
+    "entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 require("private SubjectChip(" not in confirmation and "private TimeChip(" not in confirmation and
         "private CandidateCard(" not in confirmation and "private CandidateEditor(" not in confirmation,
         "Confirmation persistent selection must not depend on ordinary @Builder object snapshots")
 require("ConfirmationCandidateCard" in confirmation and "ConfirmationCandidateEditor" in confirmation,
         "Confirmation page must render reactive Candidate child components")
-require("DeadlinePickerField" in confirmation_components and
+require("AssignmentEditForm" in confirmation_components and
+        "DeadlinePickerField" in assignment_edit_form and
         "TextInput({ text: this.item.dueText })" not in confirmation_components,
-        "Confirmation deadline edit must reuse the shared native deadline picker")
+        "Confirmation deadline edit must reuse the shared assignment form and native deadline picker")
 require("selected: this.showEditorSheet && this.editingCandidateId === item.id" in confirmation,
         "Confirmation selected Candidate must reflect both the active editor id and bottom-sheet visibility")
 require(".bindSheet($$this.showEditorSheet" in confirmation and
@@ -247,9 +250,13 @@ require("backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFA
         "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in confirmation_components,
         "Confirmation selected Candidate must combine active surface and border")
 for expression in [
-    "selected: this.item.subject === Subject.CHINESE",
-    "selected: this.item.subject === Subject.MATH",
-    "selected: this.item.subject === Subject.ENGLISH",
+    "selected: this.subject === Subject.CHINESE",
+    "selected: this.subject === Subject.MATH",
+    "selected: this.subject === Subject.ENGLISH",
+]:
+    require(expression in assignment_edit_form,
+            f"Shared assignment editor subject state must bind directly to current prop: {expression}")
+for expression in [
     "selected: this.item.expectedMinutes === 10",
     "selected: this.item.expectedMinutes === 15",
     "selected: this.item.expectedMinutes === 20",
@@ -257,7 +264,7 @@ for expression in [
     "selected: this.item.expectedMinutes === 45",
 ]:
     require(expression in confirmation_components,
-            f"Confirmation choice state must bind directly to current Candidate prop: {expression}")
+            f"Confirmation duration state must bind directly to current Candidate prop: {expression}")
 require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_controls and
         "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in selection_controls,
         "shared choice selection must combine active surface and border")

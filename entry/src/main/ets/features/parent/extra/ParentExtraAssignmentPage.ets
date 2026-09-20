@@ -11,7 +11,7 @@ export struct ParentExtraAssignmentPage {
   @State private category: Subject = Subject.READING;
   @State private title: string = '';
   @State private instruction: string = '';
-  @State private dueText: string = '';
+  @State private dueText: string = '今天';
   @State private expectedMinutesText: string = '20';
   @State private busy: boolean = false;
   @State private message: string = '';

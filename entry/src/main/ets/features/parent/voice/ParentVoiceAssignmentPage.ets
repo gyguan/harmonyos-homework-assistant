@@ -12,7 +12,7 @@ export struct ParentVoiceAssignmentPage {
   @State private subject: Subject = Subject.ENGLISH;
   @State private title: string = '';
   @State private instruction: string = '';
-  @State private dueText: string = '';
+  @State private dueText: string = '今天';
   @State private expectedMinutesText: string = '15';
   @State private audioUri: string = '';
   @State private audioName: string = '';
