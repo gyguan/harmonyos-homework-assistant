@@ -43,7 +43,6 @@ export struct AssignmentMetricSummary {
           tone === 'done' ? AppTheme.SUCCESS : AppTheme.PRIMARY) : AppTheme.BORDER
     })
     .borderRadius(AppTheme.CONTROL_RADIUS)
-    .accessibilityRole(this.interactive ? AccessibilityRoleType.BUTTON : AccessibilityRoleType.TEXT)
     .accessibilityText(this.interactive ? `${label} ${value} 项，点击筛选` : `${label} ${value} 项`)
     .onClick(() => {
       if (this.interactive) this.onSelect(key);
