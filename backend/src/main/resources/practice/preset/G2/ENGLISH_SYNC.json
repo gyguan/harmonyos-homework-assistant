@@ -6,7 +6,7 @@
   "papers": [
     {
       "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -26,7 +26,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q01",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "早上8点，你遇到同学，应该怎么打招呼？",
@@ -55,7 +55,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q02",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "新同学问你“What’s your name?”，你应该怎样回答？",
@@ -84,7 +84,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q03",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "“七”用英语怎么说？",
@@ -113,7 +113,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q04",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "“蓝色”用英语怎么说？",
@@ -142,7 +142,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q05",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "朋友对你说“Nice to meet you.”，你应该怎样回答？",
@@ -171,7 +171,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q06",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "根据对话，选择合适的回答：\nA: How are you?\nB: ______",
@@ -200,7 +200,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q07",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "“三”用英语怎么说？",
@@ -229,7 +229,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q08",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "“黄色”用英语怎么说？",
@@ -258,7 +258,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q09",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "放学了，你应该怎样和老师告别？",
@@ -287,7 +287,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q10",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "要介绍Ben，应该选择哪一句英语？",
@@ -316,7 +316,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q11",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "“同学”用英语怎么说？",
@@ -345,7 +345,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q12",
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "同学帮你捡起铅笔，你应该说什么？",
@@ -377,7 +377,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-SYNC-FAMILY-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -396,7 +396,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q01",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "“爸爸”用英语怎么说？",
@@ -425,7 +425,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q02",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "“妈妈”用英语怎么说？",
@@ -454,7 +454,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q03",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "“哥哥/弟弟”用英语怎么说？",
@@ -483,7 +483,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q04",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "“姐姐/妹妹”用英语怎么说？",
@@ -512,7 +512,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q05",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "“她留着长头发。” 请选择正确的英语句子。",
@@ -541,7 +541,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q06",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "“我的头发很短。” 请选择正确的英语句子。",
@@ -570,7 +570,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q07",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句英语可以正确介绍自己的家人？",
@@ -599,7 +599,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q08",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "句子“He is my father.”中，哪个词表示说的是男性？",
@@ -628,7 +628,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q09",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "要表达“她是我的姐姐/妹妹”，句子开头应该用哪个词？",
@@ -657,7 +657,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q10",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "“这是我的妈妈。” 请选择正确的英语句子。",
@@ -686,7 +686,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q11",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪个英语单词可以描述头发？",
@@ -715,7 +715,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q12",
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "在家里，你想向朋友介绍自己的哥哥/弟弟，可以怎么说？",
@@ -747,7 +747,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -766,7 +766,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q01",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "“我会游泳。” 请选择正确的英语句子。",
@@ -795,7 +795,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q02",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "根据对话，选择合适的回答：\nA: Can you run?\nB: ______",
@@ -824,7 +824,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q03",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "“跑”用英语怎么说？",
@@ -853,7 +853,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q04",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "“跳”用英语怎么说？",
@@ -882,7 +882,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q05",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "体育课上，老师问“Can you hop?”，你可以怎样回答？",
@@ -911,7 +911,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q06",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "“他会画画。” 请选择正确的英语句子。",
@@ -940,7 +940,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q07",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪个英语单词表示一种可以和球一起做的动作？",
@@ -969,7 +969,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q08",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "根据对话，选择合适的回答：\nA: Can she sing?\nB: ______",
@@ -998,7 +998,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q09",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句英语是正确的？",
@@ -1027,7 +1027,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q10",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "在家帮忙收拾玩具，下面哪个英语动作词最合适？",
@@ -1056,7 +1056,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q11",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句英语是在询问“会不会做某件事”？",
@@ -1085,7 +1085,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q12",
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "朋友说“I can ride a bike.”，这里的“can”表示什么？",
@@ -1117,7 +1117,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-SYNC-ROOM-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -1136,7 +1136,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q01",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "“书在桌子上。”请选择合适的英语单词填空：The book is ______ the desk.",
@@ -1165,7 +1165,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q02",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "“球在盒子里。”请选择合适的英语单词填空：The ball is ______ the box.",
@@ -1194,7 +1194,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q03",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "“床”用英语怎么说？",
@@ -1223,7 +1223,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q04",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "“椅子”用英语怎么说？",
@@ -1252,7 +1252,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q05",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "“门”用英语怎么说？",
@@ -1281,7 +1281,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q06",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "“房间”用英语怎么说？",
@@ -1310,7 +1310,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q07",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "句子“The pencil is in the schoolbag.”中，铅笔在哪里？",
@@ -1339,7 +1339,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q08",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "句子“The cup is on the table.”中，哪个词表示位置？",
@@ -1368,7 +1368,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q09",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句英语是正确的？",
@@ -1397,7 +1397,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q10",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "在家里，鞋子放在盒子里面，英语中应该用哪个位置词？",
@@ -1426,7 +1426,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q11",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "房间里的哪件物品可以坐？",
@@ -1455,7 +1455,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q12",
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "房间里的哪件物品可以睡觉？",
@@ -1487,7 +1487,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -1506,7 +1506,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q01",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "“天空”用英语怎么说？",
@@ -1535,7 +1535,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q02",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "“太阳”用英语怎么说？",
@@ -1564,7 +1564,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q03",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "“树”用英语怎么说？",
@@ -1593,7 +1593,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q04",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "“鸟”用英语怎么说？",
@@ -1622,7 +1622,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q05",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "“公园”用英语怎么说？",
@@ -1651,7 +1651,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q06",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "“学校”用英语怎么说？",
@@ -1680,7 +1680,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q07",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "请选择合适的英语单词填空：A bird can fly in the ______.",
@@ -1709,7 +1709,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q08",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "请选择合适的英语单词填空：We can read books in the ______.",
@@ -1738,7 +1738,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q09",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "放学后我们可以在哪里玩？请选择合适的英语单词填空：We can play in the ______ after school.",
@@ -1767,7 +1767,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q10",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句英语是正确的？",
@@ -1796,7 +1796,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q11",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "在公园里，下面哪一种东西最可能看到？",
@@ -1825,7 +1825,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q12",
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "借书通常要去哪个地方？",
@@ -1857,7 +1857,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-SYNC-REVIEW-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -1876,7 +1876,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q01",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "早晨见面时，应该怎么打招呼？",
@@ -1905,7 +1905,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q02",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "“我是Tom。” 请选择正确的英语句子。",
@@ -1934,7 +1934,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q03",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "“妈妈”用英语怎么说？",
@@ -1963,7 +1963,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q04",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "根据对话，选择合适的回答：\nA: Can you jump?\nB: ______",
@@ -1992,7 +1992,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q05",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "“书在桌子上。”请选择合适的英语单词填空：The book is ______ the desk.",
@@ -2021,7 +2021,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q06",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "“蓝色”用英语怎么说？",
@@ -2050,7 +2050,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q07",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "“七”用英语怎么说？",
@@ -2079,7 +2079,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q08",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "“图书馆”用英语怎么说？",
@@ -2108,7 +2108,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q09",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句英语是正确的？",
@@ -2137,7 +2137,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q10",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪个英语单词表示动作？",
@@ -2166,7 +2166,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q11",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "放学了，应该说哪一句英语？",
@@ -2195,7 +2195,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q12",
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句英语是正确的？",
