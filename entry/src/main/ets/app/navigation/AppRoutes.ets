@@ -19,6 +19,9 @@ export class AssignmentRouteParam {
   }
 }
 
+export class PracticeHistoryRouteParam {
+}
+
 export class PracticePaperRouteParam {
   paperId: string;
   version: number;
