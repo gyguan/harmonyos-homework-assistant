@@ -3,6 +3,7 @@ import { PracticeRemoteApi } from '../../application/remote/PracticeRemoteApi';
 import {
   PracticeAnswer,
   PracticeAttempt,
+  PracticeAttemptSummary,
   PracticeGrade,
   PracticePaper,
   PracticeResult,
@@ -40,6 +41,16 @@ export class DefaultPracticeRepository implements PracticeRepository {
   getAttempt(attemptId: string): Promise<PracticeAttempt> {
     this.requireConnected();
     return this.remoteApi.getAttempt(attemptId);
+  }
+
+  listAttempts(studentId: string, paperId: string = ''): Promise<PracticeAttemptSummary[]> {
+    this.requireConnected();
+    return this.remoteApi.listAttempts(studentId, paperId);
+  }
+
+  repeatAttempt(attemptId: string): Promise<PracticeAttempt> {
+    this.requireConnected();
+    return this.remoteApi.repeatAttempt(attemptId);
   }
 
   saveAnswer(attemptId: string, questionId: string, answerValue: string): Promise<PracticeAnswer> {
