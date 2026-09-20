@@ -1,5 +1,6 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
+import { PracticeFilterDialog } from '../../../components/practice/PracticeFilterDialog';
+import { FilterSummaryEntry } from '../../../components/selection/SelectionControls';
 import {
   PracticeGrade,
   PracticePaper,
@@ -82,14 +83,31 @@ export struct PracticeHomePage {
   @Prop revision: number = 0;
   @State private selectedGrade: PracticeGrade = PracticeGrade.G3;
   @State private selectedSubject: PracticeSubject = PracticeSubject.MATH;
+  @State private draftSelectedGrade: PracticeGrade = PracticeGrade.G3;
+  @State private draftSelectedSubject: PracticeSubject = PracticeSubject.MATH;
   @State private papers: PracticePaper[] = [];
   @State private loading: boolean = false;
   @State private errorMessage: string = '';
   private loadSequence: number = 0;
   private readonly viewModel: PracticeHomeViewModel = new PracticeHomeViewModel();
 
+  private filterDialogController: CustomDialogController = new CustomDialogController({
+    builder: PracticeFilterDialog({
+      selectedGrade: $draftSelectedGrade,
+      selectedSubject: $draftSelectedSubject,
+      onApply: (grade: PracticeGrade, subject: PracticeSubject) => {
+        this.applyFilters(grade, subject);
+      }
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Bottom,
+    customStyle: true
+  });
+
   aboutToAppear(): void {
     this.selectedGrade = this.viewModel.defaultGrade();
+    this.draftSelectedGrade = this.selectedGrade;
+    this.draftSelectedSubject = this.selectedSubject;
     void this.reloadPapers();
   }
 
@@ -110,65 +128,54 @@ export struct PracticeHomePage {
     }
   }
 
-  private selectGrade(grade: PracticeGrade): void {
-    if (grade === this.selectedGrade) return;
+  private openFilterDialog(): void {
+    if (this.loading) return;
+    this.draftSelectedGrade = this.selectedGrade;
+    this.draftSelectedSubject = this.selectedSubject;
+    this.filterDialogController.open();
+  }
+
+  private applyFilters(grade: PracticeGrade, subject: PracticeSubject): void {
+    let changed = grade !== this.selectedGrade || subject !== this.selectedSubject;
     this.selectedGrade = grade;
-    void this.reloadPapers();
-  }
-
-  private selectSubject(subject: PracticeSubject): void {
-    if (subject === this.selectedSubject) return;
     this.selectedSubject = subject;
-    void this.reloadPapers();
+    this.filterDialogController.close();
+    if (changed) void this.reloadPapers();
   }
 
   @Builder
-  private GradeSelector() {
-    Column({ space: 8 }) {
-      Text('年级')
-        .width('100%')
+  private FilterBar() {
+    Row() {
+      FilterSummaryEntry({
+        label: '年级',
+        value: this.viewModel.gradeLabel(this.selectedGrade),
+        active: true,
+        onOpen: () => this.openFilterDialog()
+      });
+      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
+      FilterSummaryEntry({
+        label: '科目',
+        value: this.viewModel.subjectLabel(this.selectedSubject),
+        active: true,
+        onOpen: () => this.openFilterDialog()
+      });
+      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
+      Text('筛选')
         .fontSize(13)
         .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.SUBTEXT);
-      Scroll() {
-        Row({ space: 8 }) {
-          ForEach(this.viewModel.grades(), (grade: PracticeGrade) => {
-            ChoiceSelectionChip({
-              label: this.viewModel.gradeLabel(grade),
-              selected: this.selectedGrade === grade,
-              compact: true,
-              onSelect: () => this.selectGrade(grade)
-            });
-          }, (grade: PracticeGrade) => grade);
-        }
-      }
-      .width('100%')
-      .scrollable(ScrollDirection.Horizontal)
-      .scrollBar(BarState.Off);
+        .fontColor(AppTheme.PRIMARY)
+        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+        .padding({ left: 18, right: 18 })
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('打开练习筛选')
+        .onClick(() => this.openFilterDialog());
     }
-    .width('100%');
-  }
-
-  @Builder
-  private SubjectSelector() {
-    Column({ space: 8 }) {
-      Text('科目')
-        .width('100%')
-        .fontSize(13)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.SUBTEXT);
-      Row({ space: 8 }) {
-        ForEach(this.viewModel.subjects(), (subject: PracticeSubject) => {
-          ChoiceSelectionChip({
-            label: this.viewModel.subjectLabel(subject),
-            selected: this.selectedSubject === subject,
-            onSelect: () => this.selectSubject(subject)
-          });
-        }, (subject: PracticeSubject) => subject);
-      }
-      .width('100%');
-    }
-    .width('100%');
+    .width('100%')
+    .height(58)
+    .padding({ left: 8, right: 8 })
+    .backgroundColor(AppTheme.SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
   @Builder
@@ -242,15 +249,7 @@ export struct PracticeHomePage {
           .width('100%')
           .alignItems(HorizontalAlign.Start);
 
-          Column({ space: 14 }) {
-            this.GradeSelector();
-            Divider().color(AppTheme.DIVIDER);
-            this.SubjectSelector();
-          }
-          .width('100%')
-          .padding(AppTheme.PHONE_CARD_PADDING)
-          .backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+          this.FilterBar();
 
           this.PaperList();
 
