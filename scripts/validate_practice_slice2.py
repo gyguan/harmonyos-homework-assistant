@@ -50,6 +50,10 @@ require("开始练习" in detail and "viewModel.start" in detail,
         "paper detail must create server attempt")
 require("下一题" in attempt_page and "交卷" in attempt_page and "saveCurrent" in attempt_page,
         "attempt page must save answers and support navigation")
+require("${question.id}:${option.key}" in attempt_page,
+        "choice option nodes must be keyed by question identity; option.key alone causes ArkUI to reuse stale options")
+require("}, (option: PracticeQuestionOption) => option.key);" not in attempt_page,
+        "choice option ForEach must not use A/B/C alone as the node key")
 require("PracticeQuestionVisual" not in attempt_page and "visualSpec" not in attempt_page,
         "attempt page must stay text-only")
 require("PracticeSubmitConfirmDialog" in attempt_page and "unansweredCount" in attempt_page,

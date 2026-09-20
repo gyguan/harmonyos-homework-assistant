@@ -268,7 +268,7 @@ export struct PracticeAttemptPage {
       Column({ space: 10 }) {
         ForEach(question.options, (option: PracticeQuestionOption) => {
           this.OptionButton(option);
-        }, (option: PracticeQuestionOption) => option.key);
+        }, (option: PracticeQuestionOption) => `${question.id}:${option.key}`);
       }
       .width('100%');
     } else {
