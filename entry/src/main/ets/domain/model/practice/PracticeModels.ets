@@ -20,6 +20,17 @@ export enum PracticeSemester {
   S2 = 'S2'
 }
 
+export enum PracticeTrack {
+  TEXTBOOK_SYNC = 'TEXTBOOK_SYNC',
+  EXTRACURRICULAR = 'EXTRACURRICULAR'
+}
+
+export enum PracticeTrackFilter {
+  ALL = 'ALL',
+  TEXTBOOK_SYNC = 'TEXTBOOK_SYNC',
+  EXTRACURRICULAR = 'EXTRACURRICULAR'
+}
+
 export enum PracticeDifficulty {
   L1 = 'L1',
   L2 = 'L2',
@@ -52,6 +63,7 @@ export interface PracticePaper {
   grade: PracticeGrade;
   subject: PracticeSubject;
   semester: PracticeSemester;
+  track: PracticeTrack;
   title: string;
   description: string;
   difficulty: PracticeDifficulty;
@@ -67,13 +79,6 @@ export interface PracticeQuestionOption {
   label: string;
 }
 
-export interface PracticeVisualSpec {
-  type: string;
-  assetId: string;
-  layout: string;
-  accessibilityText: string;
-}
-
 export interface PracticeQuestion {
   id: string;
   paperId: string;
@@ -86,7 +91,6 @@ export interface PracticeQuestion {
   explanation: string;
   hints: string[];
   tags: string[];
-  visualSpec: PracticeVisualSpec;
 }
 
 export enum PracticeAttemptMode {
@@ -241,6 +245,17 @@ export class PracticeTaxonomy {
     return PracticeSemester.ALL;
   }
 
+  static trackLabel(track: PracticeTrack): string {
+    if (track === PracticeTrack.TEXTBOOK_SYNC) return '教材同步';
+    return '课外拓展';
+  }
+
+  static trackFilterLabel(track: PracticeTrackFilter): string {
+    if (track === PracticeTrackFilter.TEXTBOOK_SYNC) return '教材同步';
+    if (track === PracticeTrackFilter.EXTRACURRICULAR) return '课外拓展';
+    return '全部';
+  }
+
   static difficultyLabel(difficulty: PracticeDifficulty): string {
     if (difficulty === PracticeDifficulty.L1) return '基础';
     if (difficulty === PracticeDifficulty.L2) return '提升';
@@ -254,6 +269,6 @@ export class PracticeTaxonomy {
     if (label.indexOf('四年级') >= 0 || label.indexOf('四（') >= 0) return PracticeGrade.G4;
     if (label.indexOf('五年级') >= 0 || label.indexOf('五（') >= 0) return PracticeGrade.G5;
     if (label.indexOf('六年级') >= 0 || label.indexOf('六（') >= 0) return PracticeGrade.G6;
-    return PracticeGrade.G3;
+    return PracticeGrade.G2;
   }
 }
