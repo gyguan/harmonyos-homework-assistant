@@ -613,7 +613,7 @@ export struct ParentProgressPage {
     .height('100%')
     .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND)
-    .bindSheet($this.showDeleteSheet, this.DeleteConfirmSheet(), {
+    .bindSheet($$this.showDeleteSheet, this.DeleteConfirmSheet(), {
       height: '32%',
       showClose: false,
       preferType: SheetType.BOTTOM
