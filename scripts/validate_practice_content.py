@@ -59,6 +59,9 @@ def validate_question(paper: dict, question: dict, index: int, global_ids: set[s
     if isinstance(stem, str):
         for phrase in IMAGE_DEPENDENT_PHRASES:
             require(phrase not in stem, f"{path}.stem still depends on retired visual content: {phrase}")
+        if paper.get("subject") == "ENGLISH":
+            require(re.search(r"[\u3400-\u9fff]", stem) is not None,
+                    f"{path}.English stem must contain a Chinese instruction")
     require("visualSpec" not in question, f"{path} must be text-only and contain no visualSpec")
     require(isinstance(question.get("answerSpec"), str) and question["answerSpec"].strip(),
             f"{path}.answerSpec blank")
