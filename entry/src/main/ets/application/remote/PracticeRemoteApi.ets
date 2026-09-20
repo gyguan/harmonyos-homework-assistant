@@ -11,6 +11,7 @@ import {
   PracticeQuestionOption,
   PracticeQuestionResult,
   PracticeQuestionType,
+  PracticeVisualSpec,
   PracticePreviousAnswer,
   PracticePreviousNote,
   PracticeResult,
@@ -19,9 +20,13 @@ import {
 import { BackendHttpClient } from './BackendHttpClient';
 
 interface RemotePracticeOption { key: string; label: string; }
+interface RemotePracticeVisualSpec {
+  type: string; assetId: string; layout: string; accessibilityText: string;
+}
 interface RemotePracticeQuestion {
   id: string; orderNo: number; type: string; stem: string;
   options: RemotePracticeOption[]; hints: string[]; tags: string[];
+  visualSpec: RemotePracticeVisualSpec;
 }
 interface RemotePracticeAnswer { questionId: string; answerValue: string; answeredAtEpochMs: number; }
 interface RemotePracticeNote {
@@ -174,10 +179,17 @@ export class PracticeRemoteApi {
     for (let source of remote.questions) {
       let options: PracticeQuestionOption[] = [];
       for (let option of source.options) options.push({ key: option.key, label: option.label });
+      let visualSpec: PracticeVisualSpec = {
+        type: source.visualSpec.type,
+        assetId: source.visualSpec.assetId,
+        layout: source.visualSpec.layout,
+        accessibilityText: source.visualSpec.accessibilityText
+      };
       questions.push({
         id: source.id, paperId: remote.paperId, paperVersion: remote.paperVersion, orderNo: source.orderNo,
         type: source.type as PracticeQuestionType, stem: source.stem, options: options,
-        answerSpec: '', explanation: '', hints: source.hints.slice(), tags: source.tags.slice()
+        answerSpec: '', explanation: '', hints: source.hints.slice(), tags: source.tags.slice(),
+        visualSpec: visualSpec
       });
     }
     let answers: PracticeAnswer[] = [];

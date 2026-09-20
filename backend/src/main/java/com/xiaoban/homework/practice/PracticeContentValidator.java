@@ -19,6 +19,9 @@ public class PracticeContentValidator {
   private static final Set<String> STATUSES = Set.of("PUBLISHED", "ARCHIVED");
   private static final Set<String> QUESTION_TYPES =
       Set.of("SINGLE_CHOICE", "MULTIPLE_CHOICE", "FILL_BLANK", "NUMBER", "SHORT_TEXT");
+  private static final Set<String> VISUAL_TYPES =
+      Set.of("NONE", "SCENE", "ARRAY", "DOT_ARRAY", "IMAGE_PAIR", "IMAGE_SEQUENCE",
+          "DIALOGUE", "ROOM_SCENE", "FAMILY_SCENE", "CHARACTER", "ILLUSTRATION");
 
   public void validateCatalog(PracticeContentCatalog.Catalog catalog) {
     List<String> errors = new ArrayList<>();
@@ -116,7 +119,26 @@ public class PracticeContentValidator {
     requireText(question.explanation(), path + ".explanation", errors);
     validateStringList(question.hints(), path + ".hints", 1, 3, errors);
     validateStringList(question.tags(), path + ".tags", 1, 8, errors);
+    validateVisualSpec(paper, question, path, errors);
     validateAnswerSpec(question, path, errors);
+  }
+
+  private void validateVisualSpec(PracticeContentCatalog.Paper paper,
+      PracticeContentCatalog.Question question, String path, List<String> errors) {
+    PracticeContentCatalog.VisualSpec visual = question.visualSpec();
+    boolean p0 = paper.id() != null && paper.id().contains("-P0-");
+    if (visual == null) {
+      if (p0) errors.add(path + ".visualSpec P0 图文题不能为空");
+      return;
+    }
+    if (!VISUAL_TYPES.contains(visual.type())) {
+      errors.add(path + ".visualSpec.type 非法: " + visual.type());
+    }
+    if (p0 || !"NONE".equals(visual.type())) {
+      requireText(visual.assetId(), path + ".visualSpec.assetId", errors);
+      requireText(visual.layout(), path + ".visualSpec.layout", errors);
+      requireText(visual.accessibilityText(), path + ".visualSpec.accessibilityText", errors);
+    }
   }
 
   private void validateAnswerSpec(PracticeContentCatalog.Question question, String path, List<String> errors) {

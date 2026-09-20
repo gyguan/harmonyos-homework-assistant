@@ -1,0 +1,1052 @@
+{
+  "schemaVersion": 1,
+  "grade": "G2",
+  "subject": "MATH",
+  "papers": [
+    {
+      "id": "MATH-G2-S1-P0-M01-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "100以内加减·生活计算（一）",
+      "description": "100以内加减、连加连减和生活应用的图文练习。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "100以内加减",
+        "生活计算",
+        "教材同步",
+        "P0",
+        "图文题"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "图书角原来有36本书，又放上18本，现在一共有多少本？",
+          "options": [],
+          "answerSpec": "54",
+          "explanation": "36 + 18 = 54。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "100以内加法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_library_books_01",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "图书角原有36本书，又新增18本"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "树上原来有52个橘子，摘下27个，还剩多少个？",
+          "options": [],
+          "answerSpec": "25",
+          "explanation": "52 - 27 = 25。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "100以内减法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_oranges_tree_01",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "橘子树原有52个橘子，摘下27个"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "图中一共有48个小方块，又增加了12个，正确算式是哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "48 + 12"
+            },
+            {
+              "key": "B",
+              "label": "48 - 12"
+            },
+            {
+              "key": "C",
+              "label": "12 - 48"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“又增加”表示加法。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "加法算式"
+          ],
+          "visualSpec": {
+            "type": "DOT_ARRAY",
+            "assetId": "asset_math_tenframes_48_plus_12",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "48个方块，再增加12个"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "小明原来有25张贴纸，小红送给他16张，现在有多少张？",
+          "options": [],
+          "answerSpec": "41",
+          "explanation": "25 + 16 = 41。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "100以内加法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_stickers_01",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "25张贴纸，又得到16张"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "操场上原来有63名同学，回教室了24名，还剩多少名？",
+          "options": [],
+          "answerSpec": "39",
+          "explanation": "63 - 24 = 39。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "100以内减法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_playground_students_01",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "操场原有63名同学，24名回教室"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "要算“现在一共有多少支铅笔”，下面哪道算式正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "28 + 34"
+            },
+            {
+              "key": "B",
+              "label": "34 - 28"
+            },
+            {
+              "key": "C",
+              "label": "28 - 34"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "求总数，用加法。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "加法算式"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_pencils_28_34",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "28支铅笔，又买34支"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "三个篮子里分别有18个、25个、12个苹果，一共有多少个？",
+          "options": [],
+          "answerSpec": "55",
+          "explanation": "18 + 25 + 12 = 55。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "连加"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_three_baskets_apples",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "三个篮子分别有18、25、12个苹果"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "美术课有90张彩纸，先用掉26张，又用掉14张，还剩多少张？",
+          "options": [],
+          "answerSpec": "50",
+          "explanation": "90 - 26 - 14 = 50。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "连减"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_colored_papers_90",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "90张彩纸，先用26张，再用14张"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "图中面包原来有16个，卖出9个，还剩多少个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "7"
+            },
+            {
+              "key": "B",
+              "label": "8"
+            },
+            {
+              "key": "C",
+              "label": "9"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "16 - 9 = 7。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "减法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_breads_16_minus_9",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "16个面包，卖出9个"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "校车上原来有27人，下一站又上来15人，现在有多少人？",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "27 + 15 = 42。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "加法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_schoolbus_27_15",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "校车原有27人，又上来15人"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "练习本原来有45本，上午卖出18本，下午又卖出7本，还剩多少本？",
+          "options": [],
+          "answerSpec": "20",
+          "explanation": "45 - 18 - 7 = 20。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "连减"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_notebooks_store_45",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "45本练习本，上午卖18本，下午卖7本"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M01-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "两盒彩笔分别有32支和19支，一共有多少支？",
+          "options": [
+            {
+              "key": "A",
+              "label": "41"
+            },
+            {
+              "key": "B",
+              "label": "51"
+            },
+            {
+              "key": "C",
+              "label": "61"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "32 + 19 = 51。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "加法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_colored_pens_32_19",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "两盒彩笔分别32支和19支"
+          }
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-P0-M03-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "乘法的认识（一）",
+      "description": "几个几、相同加数和乘法意义的图文练习。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "乘法认识",
+        "几个几",
+        "教材同步",
+        "P0",
+        "图文题"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "图中有3盘苹果，每盘4个，下面哪道算式正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3 × 4"
+            },
+            {
+              "key": "B",
+              "label": "3 + 4"
+            },
+            {
+              "key": "C",
+              "label": "4 - 3"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "3个4，用3 × 4表示。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法意义"
+          ],
+          "visualSpec": {
+            "type": "ARRAY",
+            "assetId": "asset_array_apples_3x4",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "3盘苹果，每盘4个"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "图中有2排气球，每排5个，一共有多少个？",
+          "options": [],
+          "answerSpec": "10",
+          "explanation": "2 × 5 = 10。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法意义"
+          ],
+          "visualSpec": {
+            "type": "ARRAY",
+            "assetId": "asset_array_balloons_2x5",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "2排气球，每排5个"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "下列哪句话最能表示这幅图？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4个3"
+            },
+            {
+              "key": "B",
+              "label": "3个4"
+            },
+            {
+              "key": "C",
+              "label": "4和3"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "有4行，每行3个，是4个3。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "几个几"
+          ],
+          "visualSpec": {
+            "type": "DOT_ARRAY",
+            "assetId": "asset_dotarray_4x3",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "4行点子，每行3个"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "图中一共有多少个梨？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6"
+            },
+            {
+              "key": "B",
+              "label": "8"
+            },
+            {
+              "key": "C",
+              "label": "10"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "4 × 2 = 8。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法计算"
+          ],
+          "visualSpec": {
+            "type": "ARRAY",
+            "assetId": "asset_array_pears_4x2",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "4只篮子，每只2个梨"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "5个小朋友，每人有3支铅笔，一共有多少支？",
+          "options": [],
+          "answerSpec": "15",
+          "explanation": "5 × 3 = 15。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法应用"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_kids_pencils_5x3",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "5个小朋友，每人3支铅笔"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "看到图中的座位，可以列出哪道算式？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3 × 6"
+            },
+            {
+              "key": "B",
+              "label": "3 + 6"
+            },
+            {
+              "key": "C",
+              "label": "6 - 3"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "3排，每排6个，用乘法。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法意义"
+          ],
+          "visualSpec": {
+            "type": "ARRAY",
+            "assetId": "asset_array_seats_3x6",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "3排座位，每排6个"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "4束花，每束5朵，一共有多少朵？",
+          "options": [],
+          "answerSpec": "20",
+          "explanation": "4 × 5 = 20。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法计算"
+          ],
+          "visualSpec": {
+            "type": "ARRAY",
+            "assetId": "asset_array_flowers_4x5",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "4束花，每束5朵"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪道乘法算式和图中的“2+2+2+2”意思一样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4 × 2"
+            },
+            {
+              "key": "B",
+              "label": "2 × 4"
+            },
+            {
+              "key": "C",
+              "label": "4 + 2"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "4个2，可以写成4 × 2。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法与加法"
+          ],
+          "visualSpec": {
+            "type": "IMAGE_PAIR",
+            "assetId": "asset_pair_4groups_of2",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "4组，每组2个"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "6个盒子，每盒2支雪糕，一共有多少支？",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "6 × 2 = 12。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法应用"
+          ],
+          "visualSpec": {
+            "type": "ARRAY",
+            "assetId": "asset_array_icecream_6x2",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "6个盒子，每盒2支雪糕"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪句话是对的？",
+          "options": [
+            {
+              "key": "A",
+              "label": "图中有3个5"
+            },
+            {
+              "key": "B",
+              "label": "图中有5个3"
+            },
+            {
+              "key": "C",
+              "label": "图中有8个星星"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "3行，每行5个，是3个5。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "几个几"
+          ],
+          "visualSpec": {
+            "type": "ARRAY",
+            "assetId": "asset_array_stars_3x5",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "3行星星，每行5颗"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "2辆玩具车，每辆装7个积木，一共有多少个积木？",
+          "options": [],
+          "answerSpec": "14",
+          "explanation": "2 × 7 = 14。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法应用"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_toycars_blocks_2x7",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "2辆玩具车，每辆7个积木"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M03-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "图中小旗一共有多少面？",
+          "options": [
+            {
+              "key": "A",
+              "label": "9"
+            },
+            {
+              "key": "B",
+              "label": "20"
+            },
+            {
+              "key": "C",
+              "label": "25"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "5 × 4 = 20。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "乘法计算"
+          ],
+          "visualSpec": {
+            "type": "ARRAY",
+            "assetId": "asset_array_flags_5x4",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "5排小旗，每排4面"
+          }
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-P0-M05-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "平均分与除法（一）",
+      "description": "平均分、分组和除法意义的图文练习。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "平均分",
+        "除法",
+        "教材同步",
+        "P0",
+        "图文题"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "12个草莓平均放在3个盘子里，每个盘子放几个？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "12 ÷ 3 = 4。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_strawberries_12_3plates",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "12个草莓，3个盘子"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "16支铅笔平均放进4个笔筒里，每个笔筒几支？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3"
+            },
+            {
+              "key": "B",
+              "label": "4"
+            },
+            {
+              "key": "C",
+              "label": "5"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "16 ÷ 4 = 4。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_pencils_16_4cups",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "16支铅笔，4个笔筒"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "18颗糖平均分给6个小朋友，每人几颗？",
+          "options": [],
+          "answerSpec": "3",
+          "explanation": "18 ÷ 6 = 3。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_candies_18_6kids",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "18颗糖，6个小朋友"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪道算式能表示“15个苹果平均放进5个篮子”？",
+          "options": [
+            {
+              "key": "A",
+              "label": "15 + 5"
+            },
+            {
+              "key": "B",
+              "label": "15 - 5"
+            },
+            {
+              "key": "C",
+              "label": "15 ÷ 5"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "平均分，用除法。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_apples_15_5baskets",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "15个苹果，5个篮子"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "20个气球，每4个扎一束，可以扎几束？",
+          "options": [],
+          "answerSpec": "5",
+          "explanation": "20 ÷ 4 = 5。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_balloons_20_group4",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "20个气球，每4个一束"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "24本书平均放在6层书架上，每层放几本？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "24 ÷ 6 = 4。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_bookshelf_24_6",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "24本书，6层书架"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "21个小球平均放进7个盒子里，每个盒子几个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "2"
+            },
+            {
+              "key": "B",
+              "label": "3"
+            },
+            {
+              "key": "C",
+              "label": "4"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "21 ÷ 7 = 3。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_balls_21_7boxes",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "21个小球，7个盒子"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "8只小鸭，2只一组，可以分成几组？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "8 ÷ 2 = 4。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_ducks_8_group2",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "8只小鸭，2只一组"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "12个面包平均分给4人，每人得到多少个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "2"
+            },
+            {
+              "key": "B",
+              "label": "3"
+            },
+            {
+              "key": "C",
+              "label": "4"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "12 ÷ 4 = 3。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_breads_12_4kids",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "12个面包，4个人"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "27朵花，每3朵插一瓶，可以插几瓶？",
+          "options": [],
+          "answerSpec": "9",
+          "explanation": "27 ÷ 3 = 9。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_flowers_27_group3",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "27朵花，每3朵一瓶"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "每个盘子放几个苹果？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4"
+            },
+            {
+              "key": "B",
+              "label": "5"
+            },
+            {
+              "key": "C",
+              "label": "6"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "10 ÷ 2 = 5。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_apples_10_2plates",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "10个苹果，2个盘子"
+          }
+        },
+        {
+          "id": "MATH-G2-S1-P0-M05-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "32张卡片，每8张一份，可以分成几份？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "32 ÷ 8 = 4。",
+          "hints": [
+            "先观察图片中的关键信息，再选择合适的运算或答案。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ],
+          "visualSpec": {
+            "type": "SCENE",
+            "assetId": "asset_scene_cards_32_group8",
+            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+            "accessibilityText": "32张卡片，每8张一份"
+          }
+        }
+      ]
+    }
+  ]
+}

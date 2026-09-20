@@ -54,8 +54,15 @@ def semester_sort_key(paper: dict) -> tuple:
 
 def ordered_papers(papers: list[dict]) -> list[dict]:
     legacy = sorted((p for p in papers if p["semester"] == "ALL"), key=legacy_sort_key)
-    semester = sorted((p for p in papers if p["semester"] != "ALL"), key=semester_sort_key)
-    return legacy + semester
+    semester = sorted(
+        (p for p in papers if p["semester"] != "ALL" and "-P0-" not in p["id"]),
+        key=semester_sort_key,
+    )
+    visual_p0 = sorted(
+        (p for p in papers if p["semester"] != "ALL" and "-P0-" in p["id"]),
+        key=semester_sort_key,
+    )
+    return legacy + semester + visual_p0
 
 
 def render(papers: list[dict]) -> str:

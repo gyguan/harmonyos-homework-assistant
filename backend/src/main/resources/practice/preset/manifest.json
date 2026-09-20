@@ -4,22 +4,25 @@
   "generatedBy": "curated-split-v2",
   "files": [
     "G1/CHINESE.json",
-    "G1/MATH.json",
     "G1/ENGLISH.json",
+    "G1/MATH.json",
     "G2/CHINESE.json",
-    "G2/MATH.json",
+    "G2/CHINESE_P0.json",
     "G2/ENGLISH.json",
+    "G2/ENGLISH_P0.json",
+    "G2/MATH.json",
+    "G2/MATH_P0.json",
     "G3/CHINESE.json",
-    "G3/MATH.json",
     "G3/ENGLISH.json",
+    "G3/MATH.json",
     "G4/CHINESE.json",
-    "G4/MATH.json",
     "G4/ENGLISH.json",
+    "G4/MATH.json",
     "G5/CHINESE.json",
-    "G5/MATH.json",
     "G5/ENGLISH.json",
+    "G5/MATH.json",
     "G6/CHINESE.json",
-    "G6/MATH.json",
-    "G6/ENGLISH.json"
+    "G6/ENGLISH.json",
+    "G6/MATH.json"
   ]
 }

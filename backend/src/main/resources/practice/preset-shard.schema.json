@@ -4,15 +4,39 @@
   "title": "Xiaoban Practice Grade Subject Shard",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "grade", "subject", "papers"],
+  "required": [
+    "schemaVersion",
+    "grade",
+    "subject",
+    "papers"
+  ],
   "properties": {
-    "schemaVersion": { "const": 1 },
-    "grade": { "enum": ["G1", "G2", "G3", "G4", "G5", "G6"] },
-    "subject": { "enum": ["CHINESE", "MATH", "ENGLISH"] },
+    "schemaVersion": {
+      "const": 1
+    },
+    "grade": {
+      "enum": [
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "G5",
+        "G6"
+      ]
+    },
+    "subject": {
+      "enum": [
+        "CHINESE",
+        "MATH",
+        "ENGLISH"
+      ]
+    },
     "papers": {
       "type": "array",
       "minItems": 1,
-      "items": { "$ref": "#/$defs/paper" }
+      "items": {
+        "$ref": "#/$defs/paper"
+      }
     }
   },
   "$defs": {
@@ -20,34 +44,111 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "id", "version", "grade", "subject", "semester", "title", "description",
-        "difficulty", "questionCount", "estimatedMinutes", "tags", "sourceType", "status", "questions"
+        "id",
+        "version",
+        "grade",
+        "subject",
+        "semester",
+        "title",
+        "description",
+        "difficulty",
+        "questionCount",
+        "estimatedMinutes",
+        "tags",
+        "sourceType",
+        "status",
+        "questions"
       ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "version": { "type": "integer", "minimum": 1 },
-        "grade": { "enum": ["G1", "G2", "G3", "G4", "G5", "G6"] },
-        "subject": { "enum": ["CHINESE", "MATH", "ENGLISH", "THINKING"] },
-        "semester": { "enum": ["ALL", "S1", "S2"] },
-        "title": { "type": "string", "minLength": 1 },
-        "description": { "type": "string", "minLength": 1 },
-        "difficulty": { "enum": ["L1", "L2", "L3"] },
-        "questionCount": { "type": "integer", "minimum": 5, "maximum": 50 },
-        "estimatedMinutes": { "type": "integer", "minimum": 1, "maximum": 120 },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "version": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "grade": {
+          "enum": [
+            "G1",
+            "G2",
+            "G3",
+            "G4",
+            "G5",
+            "G6"
+          ]
+        },
+        "subject": {
+          "enum": [
+            "CHINESE",
+            "MATH",
+            "ENGLISH",
+            "THINKING"
+          ]
+        },
+        "semester": {
+          "enum": [
+            "ALL",
+            "S1",
+            "S2"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "difficulty": {
+          "enum": [
+            "L1",
+            "L2",
+            "L3"
+          ]
+        },
+        "questionCount": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 50
+        },
+        "estimatedMinutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120
+        },
         "tags": {
           "type": "array",
           "minItems": 1,
           "maxItems": 8,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
-        "sourceType": { "enum": ["PRESET", "AI_GENERATED", "PARENT_CREATED", "IMPORTED"] },
-        "status": { "enum": ["PUBLISHED", "ARCHIVED"] },
+        "sourceType": {
+          "enum": [
+            "PRESET",
+            "AI_GENERATED",
+            "PARENT_CREATED",
+            "IMPORTED"
+          ]
+        },
+        "status": {
+          "enum": [
+            "PUBLISHED",
+            "ARCHIVED"
+          ]
+        },
         "questions": {
           "type": "array",
           "minItems": 5,
           "maxItems": 50,
-          "items": { "$ref": "#/$defs/question" }
+          "items": {
+            "$ref": "#/$defs/question"
+          }
         }
       }
     },
@@ -55,46 +156,130 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "id", "orderNo", "type", "stem", "options", "answerSpec",
-        "explanation", "hints", "tags"
+        "id",
+        "orderNo",
+        "type",
+        "stem",
+        "options",
+        "answerSpec",
+        "explanation",
+        "hints",
+        "tags"
       ],
       "properties": {
-        "id": { "type": "string", "minLength": 1 },
-        "orderNo": { "type": "integer", "minimum": 1 },
-        "type": {
-          "enum": ["SINGLE_CHOICE", "MULTIPLE_CHOICE", "FILL_BLANK", "NUMBER", "SHORT_TEXT"]
+        "id": {
+          "type": "string",
+          "minLength": 1
         },
-        "stem": { "type": "string", "minLength": 1 },
+        "orderNo": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "type": {
+          "enum": [
+            "SINGLE_CHOICE",
+            "MULTIPLE_CHOICE",
+            "FILL_BLANK",
+            "NUMBER",
+            "SHORT_TEXT"
+          ]
+        },
+        "stem": {
+          "type": "string",
+          "minLength": 1
+        },
         "options": {
           "type": "array",
           "maxItems": 6,
-          "items": { "$ref": "#/$defs/option" }
+          "items": {
+            "$ref": "#/$defs/option"
+          }
         },
-        "answerSpec": { "type": "string", "minLength": 1 },
-        "explanation": { "type": "string", "minLength": 1 },
+        "answerSpec": {
+          "type": "string",
+          "minLength": 1
+        },
+        "explanation": {
+          "type": "string",
+          "minLength": 1
+        },
         "hints": {
           "type": "array",
           "minItems": 1,
           "maxItems": 3,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
         },
         "tags": {
           "type": "array",
           "minItems": 1,
           "maxItems": 8,
           "uniqueItems": true,
-          "items": { "type": "string", "minLength": 1 }
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "visualSpec": {
+          "$ref": "#/$defs/visualSpec"
         }
       }
     },
     "option": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["key", "label"],
+      "required": [
+        "key",
+        "label"
+      ],
       "properties": {
-        "key": { "type": "string", "minLength": 1 },
-        "label": { "type": "string", "minLength": 1 }
+        "key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "visualSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "assetId",
+        "layout",
+        "accessibilityText"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "NONE",
+            "SCENE",
+            "ARRAY",
+            "DOT_ARRAY",
+            "IMAGE_PAIR",
+            "IMAGE_SEQUENCE",
+            "DIALOGUE",
+            "ROOM_SCENE",
+            "FAMILY_SCENE",
+            "CHARACTER",
+            "ILLUSTRATION"
+          ]
+        },
+        "assetId": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "string"
+        },
+        "accessibilityText": {
+          "type": "string"
+        }
       }
     }
   }

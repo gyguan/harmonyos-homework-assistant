@@ -19,6 +19,7 @@ VALIDATOR = ROOT / "backend/src/main/java/com/xiaoban/homework/practice/Practice
 ATTEMPT_SERVICE = ROOT / "backend/src/main/java/com/xiaoban/homework/practice/PracticeAttemptService.java"
 AUDIENCE_POLICY = ROOT / "backend/src/main/java/com/xiaoban/homework/practice/PracticeAudiencePolicy.java"
 LEGACY_CATALOG = ROOT / "backend/src/main/resources/practice/preset-catalog.json"
+P0_ASSETS = ROOT / "backend/src/main/resources/practice/visual/G2_S1_P0_assets.json"
 
 GRADES = {f"G{i}" for i in range(1, 7)}
 SUBJECTS = {"CHINESE", "MATH", "ENGLISH"}
@@ -68,6 +69,17 @@ def validate_question(paper: dict, question: dict, index: int, global_ids: set[s
     nonempty_list(question.get("hints"), f"{path}.hints", 1, 3)
     nonempty_list(question.get("tags"), f"{path}.tags", 1, 8)
 
+    if "-P0-" in str(paper.get("id", "")):
+        visual = question.get("visualSpec")
+        require(isinstance(visual, dict), f"{path}.visualSpec must be an object for P0 visual papers")
+        if isinstance(visual, dict):
+            require(bool(str(visual.get("type", "")).strip()) and visual.get("type") != "NONE",
+                    f"{path}.visualSpec.type must be visual for P0 papers")
+            require(bool(str(visual.get("assetId", "")).strip()), f"{path}.visualSpec.assetId blank")
+            require(bool(str(visual.get("layout", "")).strip()), f"{path}.visualSpec.layout blank")
+            require(bool(str(visual.get("accessibilityText", "")).strip()),
+                    f"{path}.visualSpec.accessibilityText blank")
+
     options = question.get("options")
     require(isinstance(options, list), f"{path}.options must be a list")
     options = options if isinstance(options, list) else []
@@ -107,12 +119,12 @@ def validate_g2_s1(papers: list[dict]) -> None:
     for paper in g2_s1:
         by_subject[paper.get("subject", "")].append(paper)
 
-    require(len(g2_s1) >= 17, "G2/S1 must contain at least 17 semester-specific papers")
-    require(sum(len(p.get("questions", [])) for p in g2_s1) >= 204,
-            "G2/S1 must contain at least 204 semester-specific questions")
-    require(len(by_subject["CHINESE"]) >= 5, "G2/S1 Chinese must contain at least 5 papers")
-    require(len(by_subject["MATH"]) >= 7, "G2/S1 Math must contain at least 7 papers")
-    require(len(by_subject["ENGLISH"]) >= 5, "G2/S1 English must contain at least 5 papers")
+    require(len(g2_s1) >= 24, "G2/S1 must contain at least 24 semester-specific papers")
+    require(sum(len(p.get("questions", [])) for p in g2_s1) >= 288,
+            "G2/S1 must contain at least 288 semester-specific questions")
+    require(len(by_subject["CHINESE"]) >= 7, "G2/S1 Chinese must contain at least 7 papers")
+    require(len(by_subject["MATH"]) >= 10, "G2/S1 Math must contain at least 10 papers")
+    require(len(by_subject["ENGLISH"]) >= 7, "G2/S1 English must contain at least 7 papers")
 
     require({
         "MATH-G2-S1-ADD-SUB-001", "MATH-G2-S1-SHOPPING-001",
@@ -132,6 +144,14 @@ def validate_g2_s1(papers: list[dict]) -> None:
         "ENGLISH-G2-S1-ROOM-001", "ENGLISH-G2-S1-NATURE-001",
         "ENGLISH-G2-S1-REVIEW-001"
     }.issubset({p["id"] for p in by_subject["ENGLISH"]}), "G2/S1 English required topic papers missing")
+
+    required_p0 = {
+        "MATH-G2-S1-P0-M01-001", "MATH-G2-S1-P0-M03-001", "MATH-G2-S1-P0-M05-001",
+        "CHINESE-G2-S1-P0-C03-001", "CHINESE-G2-S1-P0-C04-001",
+        "ENGLISH-G2-S1-P0-E01-001", "ENGLISH-G2-S1-P0-E02-001"
+    }
+    require(required_p0.issubset({p["id"] for p in g2_s1}),
+            "G2/S1 visual P0 papers missing")
 
     math_forbidden = [
         r"\d+\.\d+", "分数", "小数", "方程", "面积", "周长", "体积",
@@ -185,16 +205,18 @@ def main() -> int:
     require("paper" in shard_schema.get("$defs", {}) and "question" in shard_schema.get("$defs", {}),
             "shard JSON Schema missing paper/question definitions")
 
-    expected_files = {
+    base_files = {
         f"{grade}/{subject}.json"
         for grade in sorted(GRADES)
         for subject in sorted(SUBJECTS)
     }
+    p0_files = {"G2/CHINESE_P0.json", "G2/MATH_P0.json", "G2/ENGLISH_P0.json"}
+    expected_files = base_files | p0_files
     files = manifest.get("files")
     require(isinstance(files, list), "manifest files must be a list")
     files = files if isinstance(files, list) else []
     require(set(files) == expected_files,
-            f"manifest must declare exactly 18 grade/subject files; got={sorted(files)}")
+            f"manifest must declare 18 base files + 3 G2 P0 files; got={sorted(files)}")
     require(len(files) == len(set(files)), "manifest files contain duplicates")
 
     papers: list[dict] = []
@@ -210,7 +232,7 @@ def main() -> int:
             continue
 
         expected_grade = path.parent.name
-        expected_subject = path.stem
+        expected_subject = path.stem.removesuffix("_P0")
         require(shard.get("schemaVersion") == 1, f"{relative}.schemaVersion must be 1")
         require(shard.get("grade") == expected_grade, f"{relative}.grade must match path")
         require(shard.get("subject") == expected_subject, f"{relative}.subject must match path")
@@ -223,7 +245,7 @@ def main() -> int:
             require(paper.get("subject") == expected_subject, f"{paper.get('id')} subject does not match shard")
             papers.append(paper)
 
-    require(len(papers) >= 53, "split preset catalog must contain at least 53 papers")
+    require(len(papers) >= 60, "split preset catalog must contain at least 60 papers")
     paper_keys: set[str] = set()
     global_question_ids: set[str] = set()
     coverage: dict[tuple[str, str], list[dict]] = defaultdict(list)
@@ -271,7 +293,7 @@ def main() -> int:
         if grade in GRADES and subject in SUBJECTS:
             coverage[(grade, subject)].append(paper)
 
-    require(total_questions >= 600, "split preset catalog must contain at least 600 questions")
+    require(total_questions >= 684, "split preset catalog must contain at least 684 questions")
     for grade in sorted(GRADES):
         for subject in sorted(SUBJECTS):
             ids = {item["id"] for item in coverage[(grade, subject)]}
@@ -300,6 +322,14 @@ def main() -> int:
             "backend must own grade/semester audience matching")
     require("audiencePolicy.requireFreshStartAllowed(student, paper)" in attempt_service,
             "fresh practice attempts must enforce grade/semester matching on the server")
+
+    try:
+        p0_assets = json.loads(P0_ASSETS.read_text(encoding="utf-8"))
+        require(p0_assets.get("paperCount") == 7, "P0 asset manifest must describe 7 papers")
+        require(p0_assets.get("questionCount") == 84, "P0 asset manifest must describe 84 questions")
+        require(int(p0_assets.get("assetCount", 0)) >= 70, "P0 asset manifest must contain reusable visual assets")
+    except Exception as exc:
+        errors.append(f"P0 visual asset manifest invalid: {exc}")
 
     generated_check = subprocess.run(
         [sys.executable, str(ROOT / "scripts/generate_practice_catalog.py"), "--check"],

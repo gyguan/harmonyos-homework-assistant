@@ -809,6 +809,111 @@ export class PresetPracticeCatalog {
       sourceType: PracticeSourceType.PRESET,
       status: PracticePaperStatus.PUBLISHED
     });
+    result.push({
+      id: 'CHINESE-G2-S1-P0-C03-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      title: '二上语文图文阅读（一）',
+      description: '三篇原创短文配场景图，训练信息提取、顺序理解和简单推断。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['图文阅读', '阅读理解', '教材同步', 'P0', '图文题'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'CHINESE-G2-S1-P0-C04-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      title: '二上语文看图表达（一）',
+      description: '看图理解、句子表达、图序和对话补充的图文练习。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['看图表达', '句子理解', '教材同步', 'P0', '图文题'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'MATH-G2-S1-P0-M01-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      title: '100以内加减·生活计算（一）',
+      description: '100以内加减、连加连减和生活应用的图文练习。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['100以内加减', '生活计算', '教材同步', 'P0', '图文题'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'MATH-G2-S1-P0-M03-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      title: '乘法的认识（一）',
+      description: '几个几、相同加数和乘法意义的图文练习。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['乘法认识', '几个几', '教材同步', 'P0', '图文题'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'MATH-G2-S1-P0-M05-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      title: '平均分与除法（一）',
+      description: '平均分、分组和除法意义的图文练习。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['平均分', '除法', '教材同步', 'P0', '图文题'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'ENGLISH-G2-S1-P0-E01-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      title: 'Hello! My friends（一）',
+      description: '问候、自我介绍、数字和颜色的图文英语练习。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 15,
+      tags: ['问候', '自我介绍', '数字', '颜色', '教材同步', 'P0', '图文题'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'ENGLISH-G2-S1-P0-E02-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      title: 'My family & My room（一）',
+      description: '家庭成员、外貌、房间和位置关系的图文英语练习。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 15,
+      tags: ['family', 'room', 'positions', '教材同步', 'P0', '图文题'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
     return result;
   }
 }

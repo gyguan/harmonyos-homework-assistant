@@ -1,5 +1,6 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { PracticeSubmitConfirmDialog } from '../../../components/practice/PracticeSubmitConfirmDialog';
+import { PracticeQuestionVisual } from '../../../components/practice/PracticeQuestionVisual';
 import {
   PracticeAnswer,
   PracticeAttempt,
@@ -372,6 +373,14 @@ export struct PracticeAttemptPage {
                 .width('100%')
                 .fontSize(12)
                 .fontColor(AppTheme.PRIMARY);
+              if (this.currentQuestion()!.visualSpec.type !== 'NONE' &&
+                this.currentQuestion()!.visualSpec.assetId.length > 0) {
+                PracticeQuestionVisual({
+                  visualType: this.currentQuestion()!.visualSpec.type,
+                  assetId: this.currentQuestion()!.visualSpec.assetId,
+                  accessibilityText: this.currentQuestion()!.visualSpec.accessibilityText
+                });
+              }
               Text(this.currentQuestion()!.stem)
                 .width('100%')
                 .fontSize(20)

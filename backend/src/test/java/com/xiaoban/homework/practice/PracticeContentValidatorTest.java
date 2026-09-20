@@ -48,14 +48,14 @@ class PracticeContentValidatorTest {
         List.of(
             new PracticeContentCatalog.Option("A", "3"),
             new PracticeContentCatalog.Option("B", "4")),
-        "Z", "选择正确结果。", List.of("计算 2 + 2。"), List.of("计算"));
+        "Z", "选择正确结果。", List.of("计算 2 + 2。"), List.of("计算"), null);
 
     List<PracticeContentCatalog.Question> questions = new ArrayList<>();
     questions.add(invalid);
     for (int i = 2; i <= 5; i++) {
       questions.add(new PracticeContentCatalog.Question(
           "MATH-G3-TEST-001-Q0" + i, i, "NUMBER", i + " + 1 = ?",
-          List.of(), Integer.toString(i + 1), "直接计算。", List.of("先做加法。"), List.of("计算")));
+          List.of(), Integer.toString(i + 1), "直接计算。", List.of("先做加法。"), List.of("计算"), null));
     }
 
     PracticeContentCatalog.Paper paper = new PracticeContentCatalog.Paper(

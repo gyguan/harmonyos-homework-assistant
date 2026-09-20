@@ -51,6 +51,37 @@ def main() -> int:
         require(len(core_attempt.get("questions") or []) == 12,
                 "formal practice attempt did not load catalog questions")
 
+        visual_paper_id = "MATH-G2-S1-P0-M01-001"
+        visual_paper = expect(
+            http(base_url, "GET", f"/api/v1/practice/papers/{visual_paper_id}?version=1", token=token),
+            (200,),
+            "load G2 S1 visual P0 paper",
+        ).json()
+        require(visual_paper.get("id") == visual_paper_id, "visual P0 paper id mismatch")
+        require(int(visual_paper.get("questionCount", 0)) == 12, "visual P0 paper must expose 12 questions")
+        require(visual_paper.get("semester") == "S1", "visual P0 paper must be scoped to first semester")
+        visual_attempt = expect(
+            http(
+                base_url,
+                "POST",
+                f"/api/v1/students/{student_id}/practice/attempts",
+                token=token,
+                payload={"paperId": visual_paper_id, "paperVersion": 1},
+            ),
+            (200,),
+            "start G2 S1 visual P0 attempt",
+        ).json()
+        visual_questions = visual_attempt.get("questions") or []
+        require(len(visual_questions) == 12, "visual P0 attempt did not load 12 questions")
+        first_visual = (visual_questions[0].get("visualSpec") or {})
+        require(first_visual.get("type") == "SCENE", "visual P0 question type was not persisted")
+        require(first_visual.get("assetId") == "asset_scene_library_books_01",
+                "visual P0 assetId was not persisted")
+        require(bool(first_visual.get("accessibilityText")),
+                "visual P0 accessibility text must reach the app API")
+        require("answerSpec" not in visual_questions[0] and "explanation" not in visual_questions[0],
+                "visual P0 attempt leaked answer or explanation before submission")
+
         expect(
             http(
                 base_url,
