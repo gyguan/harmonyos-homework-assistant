@@ -1,7 +1,6 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkImageImportResult, HomeworkOrganizerMode, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
-import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
 import { HomeworkImportViewModel } from './HomeworkImportViewModel';
 
 @Component
@@ -10,7 +9,6 @@ export struct HomeworkImportPage {
   @Prop embeddedInDeepPage: boolean = false;
   @State private localRevision: number = 0;
   @State private availableWidthVp: number = 390;
-  @State private showCandidatesStep: boolean = false;
   @State private textEntryOpen: boolean = false;
   @State private parseBusy: boolean = false;
   @State private parseMessage: string = '';
@@ -23,19 +21,14 @@ export struct HomeworkImportPage {
 
   aboutToAppear(): void {
     this.syncDraft();
-    if (this.candidates().length > 0) this.showCandidatesStep = true;
   }
 
   private touchRevision(): number { return this.revision + this.localRevision; }
 
-  private candidates(): CandidateAssignment[] {
+  private pendingCandidateCount(): number {
     let currentRevision = this.touchRevision();
-    if (currentRevision < 0) return [];
-    return this.viewModel.candidates();
-  }
-
-  private shouldShowCandidatesStep(): boolean {
-    return this.showCandidatesStep && this.candidates().length > 0;
+    if (currentRevision < 0) return 0;
+    return this.viewModel.candidates().length;
   }
 
   private canUseSplit(): boolean {
@@ -53,7 +46,7 @@ export struct HomeworkImportPage {
   private afterOrganized(candidateCount: number): void {
     this.localRevision++;
     this.onStoreChanged();
-    if (candidateCount > 0) this.showCandidatesStep = true;
+    if (candidateCount > 0) this.onOpenConfirmation();
   }
 
   private async parseTypedText(): Promise<void> {
@@ -104,10 +97,10 @@ export struct HomeworkImportPage {
       this.localRevision++;
       this.onStoreChanged();
       if (result.candidateCount > 0) {
-        this.showCandidatesStep = true;
         this.parseMessage = result.organizerMode === HomeworkOrganizerMode.AI ?
           `截图识别完成，AI 已整理出 ${result.candidateCount} 项作业` :
           `截图识别完成；云端 AI 暂不可用，已用本地规则整理出 ${result.candidateCount} 项作业`;
+        this.afterOrganized(result.candidateCount);
       } else {
         this.parseMessage = '文字识别成功，但还没有整理出明确作业；可以修改文字后重新整理。';
         this.parseError = true;
@@ -217,6 +210,33 @@ export struct HomeworkImportPage {
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
+      if (this.pendingCandidateCount() > 0) {
+        Row({ space: 10 }) {
+          Column({ space: 2 }) {
+            Text(`已有 ${this.pendingCandidateCount()} 项待发布作业`)
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text('继续编辑后可直接发布')
+              .fontSize(11)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+          Text('继续编辑')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY);
+        }
+        .width('100%')
+        .constraintSize({ minHeight: 56 })
+        .padding({ left: 13, right: 13, top: 10, bottom: 10 })
+        .backgroundColor(AppTheme.PRIMARY_FAINT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('继续编辑待发布作业')
+        .onClick(() => this.onOpenConfirmation());
+      }
       this.ImportAction($r('sys.symbol.plus_square'), this.parseBusy ? '正在识别截图…' : '选择作业截图并识别',
         '从系统相册选择老师发来的作业截图', () => { void this.selectScreenshot(); });
       this.ImportAction($r('sys.symbol.checkmark_square'), '粘贴或输入作业文字',
@@ -226,87 +246,6 @@ export struct HomeworkImportPage {
       if (this.viewModel.rawImport().sourceLabel.length > 0) {
         Text('最近来源 · ' + this.viewModel.rawImport().sourceLabel)
           .width('100%').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-      }
-    }
-    .width('100%');
-  }
-
-  @Builder
-  private CandidateItem(item: CandidateAssignment) {
-    Column({ space: 7 }) {
-      Row() {
-        Row({ space: 7 }) {
-          Text(item.subject).fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-          if (item.confidence < 0.8) {
-            Text('低置信').fontSize(10).fontColor(AppTheme.WARNING)
-              .padding({ left: 7, right: 7, top: 3, bottom: 3 })
-              .backgroundColor(AppTheme.WARNING_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
-          }
-        }
-        Blank();
-        Text(item.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%');
-      Text(item.title).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT).maxLines(2);
-      Text(item.instruction).width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT).maxLines(2);
-      Text(`来源证据 · ${item.sourceEvidence.excerpt}`)
-        .width('100%').fontSize(11).lineHeight(17)
-        .fontColor(item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.TERTIARY_TEXT).maxLines(2);
-    }
-    .width('100%')
-    .padding(12)
-    .backgroundColor(item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
-  }
-
-  @Builder
-  private CandidatePane(showBack: boolean) {
-    Column({ space: 12 }) {
-      if (showBack) {
-        Row() {
-          Text('‹ 返回老师原文').fontSize(14).fontColor(AppTheme.PRIMARY)
-            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .padding({ left: 4, right: 8 })
-            .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText('返回老师原文')
-            .onClick(() => this.showCandidatesStep = false);
-          Blank();
-          Text(`${this.candidates().length} 项`).fontSize(12).fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%');
-      }
-      Column({ space: 4 }) {
-        Text('AI 整理结果').width('100%')
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start);
-      if (this.candidates().length === 0) {
-        Column({ space: 8 }) {
-          SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
-          Text('还没有待确认作业').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('返回老师原文，选择截图或输入文字后再整理。')
-            .fontSize(13).lineHeight(20).fontColor(AppTheme.SUBTEXT).textAlign(TextAlign.Center);
-        }
-        .width('100%')
-        .padding({ top: 34, bottom: 34 });
-      } else {
-        Column({ space: 7 }) {
-          ForEach(this.candidates(), (item: CandidateAssignment) => { this.CandidateItem(item); },
-            (item: CandidateAssignment) => item.id);
-        }
-        .width('100%');
-        Button(`继续确认 ${this.candidates().length} 项作业`, { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .backgroundColor(AppTheme.PRIMARY)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .onClick(() => this.onOpenConfirmation());
       }
     }
     .width('100%');
@@ -325,8 +264,7 @@ export struct HomeworkImportPage {
             .width('100%')
             .alignItems(HorizontalAlign.Start);
           }
-          if (this.shouldShowCandidatesStep()) this.CandidatePane(true);
-          else this.SourcePane();
+          this.SourcePane();
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
@@ -344,36 +282,30 @@ export struct HomeworkImportPage {
 
   @Builder
   private WideFlow() {
-    Column({ space: 14 }) {
-      if (!this.embeddedInDeepPage) {
-        Column({ space: 3 }) {
-          Text('收作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+    Scroll() {
+      Column() {
+        Column({ space: 14 }) {
+          if (!this.embeddedInDeepPage) {
+            Text('收作业')
+              .width('100%')
+              .fontSize(AppTheme.PAGE_TITLE_SIZE)
+              .fontWeight(FontWeight.Bold)
+              .fontColor(AppTheme.TEXT);
+          }
+          this.SourcePane();
         }
         .width('100%')
-        .alignItems(HorizontalAlign.Start);
-      }
-      Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-        Scroll() { this.SourcePane(); }
-          .width(AppTheme.IMPORT_SOURCE_MIN_WIDTH)
-          .height('100%')
-          .align(Alignment.TopStart)
-          .scrollBar(BarState.Off);
-        Scroll() { this.CandidatePane(false); }
-          .layoutWeight(1)
-          .height('100%')
-          .constraintSize({ minWidth: AppTheme.IMPORT_CANDIDATE_MIN_WIDTH })
-          .align(Alignment.TopStart)
-          .scrollBar(BarState.Off);
+        .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+        .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE,
+          top: this.embeddedInDeepPage ? 0 : 18, bottom: 20 });
       }
       .width('100%')
-      .layoutWeight(1)
-      .alignItems(VerticalAlign.Top);
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.IMPORT_SPLIT_MAX_WIDTH })
-    .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE,
-      top: this.embeddedInDeepPage ? 0 : 18, bottom: 20 });
+    .align(Alignment.TopStart)
+    .scrollBar(BarState.Off);
   }
 
   build() {

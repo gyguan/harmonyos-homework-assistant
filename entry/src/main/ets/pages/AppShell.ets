@@ -245,7 +245,11 @@ export struct AppShell {
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
-          onReviewed: () => this.notifyUiChanged()
+          onReviewed: () => this.notifyUiChanged(),
+          onDeleted: () => {
+            this.notifyUiChanged();
+            this.navPathStack.pop();
+          }
         });
       }
       .hideTitleBar(true)

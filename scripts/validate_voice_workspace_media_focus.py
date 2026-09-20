@@ -34,6 +34,8 @@ require(".height(286)" in pane,
         "voice media pane must give the main image more visual space")
 require("ForEach(this.imageUris" in pane and "this.selectImage(index)" in pane,
         "voice media pane must provide direct thumbnail image switching")
+require("Swiper()" in pane and ".onChange((index: number) => { void this.showImage(index); })" in pane,
+        "voice media pane must support direct touch swipe paging")
 require("let merged = this.imageUris.slice()" in parent and
         "existing: Set<string>" in parent and
         "＋ 继续添加图片" in parent,

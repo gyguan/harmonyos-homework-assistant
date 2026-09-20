@@ -8,6 +8,7 @@ export struct ParentReviewPage {
   @Prop revision: number = 0;
   onBack: () => void = () => {};
   onReviewed: () => void = () => {};
+  onDeleted: () => void = () => {};
 
   build() {
     Column() {
@@ -23,7 +24,8 @@ export struct ParentReviewPage {
             ParentReviewPane({
               assignmentId: this.assignmentId,
               revision: this.revision,
-              onReviewed: () => this.onReviewed()
+              onReviewed: () => this.onReviewed(),
+              onDeleted: () => this.onDeleted()
             });
           }
           .width('100%')

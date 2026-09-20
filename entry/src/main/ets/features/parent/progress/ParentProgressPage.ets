@@ -36,6 +36,11 @@ export struct ParentProgressPage {
   @State private visibleAssignments: Assignment[] = [];
   @State private snapshotRevision: number = -1;
   @State private querying: boolean = false;
+  @State private bulkMode: boolean = false;
+  @State private selectedDeleteIds: string[] = [];
+  @State private deleteBusy: boolean = false;
+  @State private deleteMessage: string = '';
+  @State private showDeleteSheet: boolean = false;
 
   onOpenReview: (assignmentId: string) => void = (_assignmentId: string) => {};
   onStoreChanged: () => void = () => {};
@@ -100,6 +105,154 @@ export struct ParentProgressPage {
     return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
+  private canDelete(item: Assignment): boolean {
+    return item.status !== AssignmentStatus.COMPLETED;
+  }
+
+  private isDeleteSelected(assignmentId: string): boolean {
+    for (let id of this.selectedDeleteIds) if (id === assignmentId) return true;
+    return false;
+  }
+
+  private toggleDeleteSelection(item: Assignment): void {
+    if (!this.canDelete(item) || this.deleteBusy) return;
+    let next: string[] = [];
+    let removed = false;
+    for (let id of this.selectedDeleteIds) {
+      if (id === item.id) removed = true;
+      else next.push(id);
+    }
+    if (!removed) next.push(item.id);
+    this.selectedDeleteIds = next;
+    this.deleteMessage = '';
+  }
+
+  private deletableVisibleAssignments(): Assignment[] {
+    let result: Assignment[] = [];
+    for (let item of this.currentVisibleAssignments()) {
+      if (this.canDelete(item)) result.push(item);
+    }
+    return result;
+  }
+
+  private enterBulkMode(): void {
+    this.bulkMode = true;
+    this.selectedDeleteIds = [];
+    this.deleteMessage = '';
+  }
+
+  private exitBulkMode(): void {
+    if (this.deleteBusy) return;
+    this.bulkMode = false;
+    this.selectedDeleteIds = [];
+    this.deleteMessage = '';
+  }
+
+  private selectAllDeletable(): void {
+    let ids: string[] = [];
+    for (let item of this.deletableVisibleAssignments()) ids.push(item.id);
+    this.selectedDeleteIds = ids;
+    this.deleteMessage = '';
+  }
+
+  private openDeleteConfirm(): void {
+    if (this.selectedDeleteIds.length === 0 || this.deleteBusy) return;
+    this.showDeleteSheet = true;
+  }
+
+  private async deleteSelectedAssignments(): Promise<void> {
+    if (this.deleteBusy || this.selectedDeleteIds.length === 0) return;
+    let ids = this.selectedDeleteIds.slice();
+    this.deleteBusy = true;
+    this.deleteMessage = '';
+    try {
+      await this.viewModel.deleteAssignments(ids);
+      this.showDeleteSheet = false;
+      this.selectedDeleteIds = [];
+      this.bulkMode = false;
+      this.refreshRevision++;
+      this.rebuildView();
+      this.onStoreChanged();
+    } catch (error) {
+      this.showDeleteSheet = false;
+      this.deleteMessage = `${error}`;
+      this.refreshRevision++;
+      this.rebuildView();
+      this.onStoreChanged();
+    } finally {
+      this.deleteBusy = false;
+    }
+  }
+
+  @Builder
+  private DeleteConfirmSheet() {
+    Column({ space: 16 }) {
+      Text('删除作业')
+        .width('100%')
+        .fontSize(20)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT);
+      Text(`确定删除选中的 ${this.selectedDeleteIds.length} 项未完成作业？删除后无法恢复。`)
+        .width('100%')
+        .fontSize(14)
+        .lineHeight(21)
+        .fontColor(AppTheme.SUBTEXT);
+      Row({ space: 10 }) {
+        Button('取消', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .enabled(!this.deleteBusy)
+          .onClick(() => this.showDeleteSheet = false);
+        Button(this.deleteBusy ? '正在删除…' : '确认删除', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.DANGER)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .enabled(!this.deleteBusy)
+          .onClick(() => { void this.deleteSelectedAssignments(); });
+      }
+      .width('100%');
+    }
+    .width('100%')
+    .padding({ left: 18, right: 18, top: 20, bottom: 28 })
+    .backgroundColor(AppTheme.SURFACE);
+  }
+
+  @Builder
+  private BulkDeleteToolbar() {
+    if (this.bulkMode) {
+      Row({ space: 10 }) {
+        Text(`已选 ${this.selectedDeleteIds.length} 项`)
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Text('全选当前')
+          .fontSize(13)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 8 })
+          .onClick(() => this.selectAllDeletable());
+        Blank();
+        Button(`删除${this.selectedDeleteIds.length > 0 ? ' ' + this.selectedDeleteIds.length : ''}`, { type: ButtonType.Normal })
+          .height(38)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(this.selectedDeleteIds.length > 0 && !this.deleteBusy)
+          .backgroundColor(this.selectedDeleteIds.length > 0 ? AppTheme.DANGER : AppTheme.DISABLED)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => this.openDeleteConfirm());
+      }
+      .width('100%')
+      .padding({ left: 10, right: 8, top: 6, bottom: 6 })
+      .backgroundColor(AppTheme.SURFACE)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
+  }
+
   private openFilterDialog(): void {
     if (this.querying) return;
     this.draftTypeFilter = this.typeFilter;
@@ -117,6 +270,7 @@ export struct ParentProgressPage {
     this.typeFilter = typeFilter;
     this.dateFilter = dateFilter;
     this.subjectCode = subjectCode;
+    if (this.bulkMode) this.selectedDeleteIds = [];
     this.filterDialogController.close();
     await this.queryCurrent();
   }
@@ -136,10 +290,15 @@ export struct ParentProgressPage {
   private chooseStatus(value: ParentProgressStatusFilter): void {
     if (this.statusFilter === value || this.querying) return;
     this.statusFilter = value;
+    if (this.bulkMode) this.selectedDeleteIds = [];
     void this.queryCurrent();
   }
 
   private openAssignment(item: Assignment): void {
+    if (this.bulkMode) {
+      this.toggleDeleteSelection(item);
+      return;
+    }
     if (this.canUseReviewPane()) this.selectedAssignmentId = item.id;
     else this.onOpenReview(item.id);
   }
@@ -291,15 +450,36 @@ export struct ParentProgressPage {
   @Builder
   private ListContent() {
     Column({ space: 16 }) {
-      Column({ space: 3 }) {
-        Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        Text(`${this.viewModel.student().name} · ${this.viewModel.student().grade} · ${this.viewModel.student().className}`)
-          .fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Row({ space: 10 }) {
+        Column({ space: 3 }) {
+          Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          Text(`${this.viewModel.student().name} · ${this.viewModel.student().grade} · ${this.viewModel.student().className}`)
+            .fontSize(12).fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        if (this.deletableVisibleAssignments().length > 0 || this.bulkMode) {
+          Text(this.bulkMode ? '完成' : '管理')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 10, right: 10 })
+            .onClick(() => {
+              if (this.bulkMode) this.exitBulkMode();
+              else this.enterBulkMode();
+            });
+        }
       }
-      .width('100%').alignItems(HorizontalAlign.Start);
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
 
       this.StatusSummary();
       this.FilterBar();
+      this.BulkDeleteToolbar();
+      if (this.deleteMessage.length > 0) {
+        Text(this.deleteMessage).width('100%').fontSize(12).fontColor(AppTheme.DANGER);
+      }
 
       Row() {
         Text(this.querying ? '查询中…' :
@@ -320,12 +500,34 @@ export struct ParentProgressPage {
       } else {
         Column({ space: 7 }) {
           ForEach(this.currentVisibleAssignments(), (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              selected: this.isSelected(item),
-              showChevron: !this.canUseReviewPane(),
-              onOpen: () => this.openAssignment(item)
-            });
+            Row({ space: 8 }) {
+              if (this.bulkMode) {
+                Text(this.canDelete(item) ? (this.isDeleteSelected(item.id) ? '✓' : '') : '—')
+                  .width(28)
+                  .height(28)
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(this.isDeleteSelected(item.id) ? AppTheme.TEXT_ON_PRIMARY : AppTheme.SUBTEXT)
+                  .textAlign(TextAlign.Center)
+                  .backgroundColor(this.isDeleteSelected(item.id) ? AppTheme.PRIMARY : AppTheme.SURFACE_EMPHASIS)
+                  .border({ width: 1, color: this.isDeleteSelected(item.id) ? AppTheme.PRIMARY : AppTheme.BORDER })
+                  .borderRadius(14)
+                  .accessibilityRole(AccessibilityRoleType.BUTTON)
+                  .accessibilityText(this.canDelete(item) ?
+                    (this.isDeleteSelected(item.id) ? '取消选择这项作业' : '选择这项作业') : '已完成作业不能删除')
+                  .onClick(() => this.toggleDeleteSelection(item));
+              }
+              AssignmentListItem({
+                assignment: item,
+                selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item),
+                showChevron: !this.bulkMode && !this.canUseReviewPane(),
+                interactive: !this.bulkMode || this.canDelete(item),
+                onOpen: () => this.openAssignment(item)
+              })
+              .layoutWeight(1);
+            }
+            .width('100%')
+            .alignItems(VerticalAlign.Center);
           }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
@@ -376,6 +578,11 @@ export struct ParentProgressPage {
                 this.refreshRevision++;
                 this.rebuildView();
                 this.onStoreChanged();
+              },
+              onDeleted: () => {
+                this.refreshRevision++;
+                this.rebuildView();
+                this.onStoreChanged();
               }
             });
           }
@@ -408,6 +615,11 @@ export struct ParentProgressPage {
     .height('100%')
     .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND)
+    .bindSheet($$this.showDeleteSheet, this.DeleteConfirmSheet(), {
+      height: '32%',
+      showClose: false,
+      preferType: SheetType.BOTTOM
+    })
     .onAreaChange((_oldValue, newValue) => {
       this.availableWidthVp = LayoutPolicy.areaLengthToVp(newValue.width, this.availableWidthVp);
     });

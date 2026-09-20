@@ -27,6 +27,7 @@ export struct StudyWorkspacePage {
   @State private availableWidthVp: number = 390;
   @State private submissionPhotoUris: string[] = [];
   @State private selectingPhotos: boolean = false;
+  @State private capturingPhoto: boolean = false;
   @State private submittingPhotos: boolean = false;
   @State private submissionMessage: string = '';
   @State private previewUri: string = '';
@@ -184,9 +185,10 @@ export struct StudyWorkspacePage {
       case AssignmentStatus.PAUSED: return '继续作业';
       case AssignmentStatus.IN_PROGRESS: return '我做完了，准备提交';
       case AssignmentStatus.READY_TO_SUBMIT:
-        if (this.selectingPhotos) return '正在打开相册…';
+        if (this.selectingPhotos) return '正在打开图库…';
+        if (this.capturingPhoto) return '正在打开相机…';
         if (this.submittingPhotos) return '正在保存并提交…';
-        return this.submissionPhotoUris.length === 0 ? '选择作业照片' : `确认提交 ${this.submissionPhotoUris.length} 张照片`;
+        return this.submissionPhotoUris.length === 0 ? '请先添加照片' : `确认提交 ${this.submissionPhotoUris.length} 张照片`;
       case AssignmentStatus.SUBMITTED: return '已提交';
       case AssignmentStatus.COMPLETED: return '已完成';
       default: return '继续';
@@ -195,7 +197,9 @@ export struct StudyWorkspacePage {
 
   private primaryActionEnabled(): boolean {
     let assignment = this.assignment();
-    if (assignment === null || this.actionRunning || this.selectingPhotos || this.submittingPhotos) return false;
+    if (assignment === null || this.actionRunning || this.selectingPhotos ||
+      this.capturingPhoto || this.submittingPhotos) return false;
+    if (assignment.status === AssignmentStatus.READY_TO_SUBMIT && this.submissionPhotoUris.length === 0) return false;
     return assignment.status !== AssignmentStatus.SUBMITTED && assignment.status !== AssignmentStatus.COMPLETED;
   }
 
@@ -209,10 +213,7 @@ export struct StudyWorkspacePage {
       this.pauseEmbeddedMedia();
       await this.executeAction(AssignmentAction.READY_TO_SUBMIT);
     } else if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
-      if (this.submissionPhotoUris.length === 0) {
-        await this.selectSubmissionPhotos();
-        return;
-      }
+      if (this.submissionPhotoUris.length === 0) return;
       await this.submitSelectedPhotos(assignment.id);
     }
   }
@@ -251,18 +252,39 @@ export struct StudyWorkspacePage {
     this.submissionMessage = '';
   }
 
+  private appendSubmissionPhotos(uris: string[]): void {
+    let next = this.submissionPhotoUris.slice();
+    for (let uri of uris) {
+      if (uri.length === 0 || next.length >= 6) continue;
+      let exists = false;
+      for (let existing of next) if (existing === uri) exists = true;
+      if (!exists) next.push(uri);
+    }
+    this.submissionPhotoUris = next;
+    this.submissionMessage = next.length > 0 ? `已选择 ${next.length} 张，请确认后提交` : '';
+  }
+
   private async selectSubmissionPhotos(): Promise<void> {
-    if (this.selectingPhotos || this.submittingPhotos) return;
+    if (this.selectingPhotos || this.capturingPhoto || this.submittingPhotos ||
+      this.submissionPhotoUris.length >= 6) return;
     this.selectingPhotos = true;
     this.submissionMessage = '';
-    let selected = await HomeworkSubmissionService.instance.selectPhotos();
+    let remaining = 6 - this.submissionPhotoUris.length;
+    let selected = await HomeworkSubmissionService.instance.selectPhotos(remaining);
     this.selectingPhotos = false;
-    if (selected.length === 0) {
-      this.submissionMessage = '未选择照片，原有选择保持不变';
-      return;
-    }
-    this.submissionPhotoUris = selected;
-    this.submissionMessage = `已选择 ${selected.length} 张，请确认后提交`;
+    if (selected.length === 0) return;
+    this.appendSubmissionPhotos(selected);
+  }
+
+  private async captureSubmissionPhoto(): Promise<void> {
+    if (this.capturingPhoto || this.selectingPhotos || this.submittingPhotos ||
+      this.submissionPhotoUris.length >= 6) return;
+    this.capturingPhoto = true;
+    this.submissionMessage = '';
+    let captured = await HomeworkSubmissionService.instance.capturePhoto();
+    this.capturingPhoto = false;
+    if (captured.length === 0) return;
+    this.appendSubmissionPhotos([captured]);
   }
 
   private async submitSelectedPhotos(assignmentId: string): Promise<void> {
@@ -346,18 +368,31 @@ export struct StudyWorkspacePage {
           .fontColor(AppTheme.TEXT);
         if (this.submissionPhotoUris.length > 0) {
           this.PhotoStrip(this.submissionPhotoUris, true);
-          Button('重新选择照片', { type: ButtonType.Normal })
-            .width('100%')
+        }
+        Row({ space: 10 }) {
+          Button(this.selectingPhotos ? '正在打开图库…' : '从图库选择', { type: ButtonType.Normal })
+            .layoutWeight(1)
             .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.submittingPhotos)
+            .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
+              this.submissionPhotoUris.length < 6)
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
             .onClick(() => { void this.selectSubmissionPhotos(); });
+          Button(this.capturingPhoto ? '正在打开相机…' : '拍照', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
+              this.submissionPhotoUris.length < 6)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .onClick(() => { void this.captureSubmissionPhoto(); });
         }
+        .width('100%');
         Text(this.submissionPhotoUris.length === 0 ?
-          '从系统相册选择已经拍好的作业照片，最多 6 张；如果还没做完，可点击底部“继续作业”。' :
-          '请确认照片清晰、完整，页数和顺序无误；需要继续完成时可点击底部“继续作业”。')
+          '可从图库选择或直接拍照，最多 6 张。' :
+          '请确认照片清晰、完整，页数和顺序无误。')
           .width('100%')
           .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
@@ -580,7 +615,7 @@ export struct StudyWorkspacePage {
           .width(showTutorEntry ? 88 : 112)
           .height(AppTheme.BUTTON_HEIGHT)
           .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(!this.actionRunning && !this.submittingPhotos)
+          .enabled(!this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos)
           .backgroundColor(AppTheme.PRIMARY_SOFT)
           .fontColor(AppTheme.PRIMARY)
           .fontSize(13)
@@ -836,11 +871,35 @@ export struct StudyWorkspacePage {
   @Builder
   private VoiceFullscreenImage() {
     Stack({ alignContent: Alignment.Center }) {
-      Image(this.voiceImageUris[this.voiceImageIndex])
-        .width('100%')
-        .height('100%')
-        .objectFit(ImageFit.Contain)
-        .backgroundColor('#111111');
+      Swiper() {
+        ForEach(this.voiceImageUris, (uri: string, index: number) => {
+          Stack({ alignContent: Alignment.Center }) {
+            if (uri.length > 0) {
+              Image(uri)
+                .width('100%')
+                .height('100%')
+                .objectFit(ImageFit.Contain);
+            } else {
+              LoadingProgress()
+                .width(32)
+                .height(32)
+                .color(AppTheme.PRIMARY);
+            }
+          }
+          .width('100%')
+          .height('100%')
+          .backgroundColor('#111111');
+        }, (uri: string, index: number) => `${index}-${uri}`);
+      }
+      .width('100%')
+      .height('100%')
+      .index(this.voiceImageIndex)
+      .indicator(false)
+      .loop(true)
+      .onChange((index: number) => {
+        this.voiceImageIndex = index;
+        this.voiceSelectImage(index);
+      });
 
       if (this.voiceImageUris.length > 1) {
         Row() {

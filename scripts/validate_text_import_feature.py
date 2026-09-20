@@ -36,8 +36,11 @@ require("this.viewModel.selectImageAndParse()" in page,
         "screenshot import must continue through the import ViewModel")
 require("HomeworkStore" not in page,
         "V2 import page must not access HomeworkStore directly")
-require("showCandidatesStep" in page and "private CandidatePane(showBack: boolean)" in page,
-        "phone import must keep a dedicated result step instead of stacking source and result")
+require("private afterOrganized(candidateCount: number)" in page and
+        "this.onOpenConfirmation()" in page,
+        "successful organization must navigate directly to the single confirmation page")
+require("CandidatePane" not in page and "继续确认" not in page,
+        "import flow must not retain a redundant intermediate confirmation step")
 require("LayoutPolicy.importOrganizeRequirement()" in page and "private canUseSplit()" in page and
         "this.availableWidthVp" in page,
         "import composition must use actual container width and LayoutPolicy")
@@ -45,8 +48,8 @@ require("WindowSizeClass.COMPACT" not in page and "WindowSizeClass.EXPANDED" not
         "import page must not choose business composition from size-class breakpoints")
 require("this.FeedbackBanner();" in page and "if (this.parseMessage.length > 0)" in page,
         "organizer feedback must remain visible in the import flow")
-require("AI 整理结果" in page and "继续确认 ${this.candidates().length} 项作业" in page,
-        "parsed candidates must remain reviewable before confirmation")
+require("HomeworkConfirmationPage" not in page,
+        "import page must navigate to confirmation rather than duplicate confirmation UI")
 
 require("HomeworkImportService.instance.parseText(text)" in view_model and
         "HomeworkImportService.instance.selectImageAndParse()" in view_model,

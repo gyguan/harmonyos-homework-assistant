@@ -261,6 +261,50 @@ def run_full(args: argparse.Namespace) -> None:
     require(assignment.get("subjectCode") == "MATH", "subjectCode not persisted")
     require(int(assignment.get("dueAtEpochMs", 0)) == due_at_ms, "dueAtEpochMs not persisted")
 
+    deletable_assignment_id = f"e2e-delete-assignment-{run_id}"
+    deletable_payload = dict(assignment_payload)
+    deletable_payload.update({"id": deletable_assignment_id, "title": "E2E 待删除作业"})
+    expect(
+        http(base_url, "POST", f"/api/v1/students/{student_id}/assignments",
+             token=token, payload=deletable_payload),
+        (200,),
+        "create deletable unfinished assignment",
+    )
+    expect(
+        http(base_url, "DELETE", f"/api/v1/assignments/{deletable_assignment_id}", token=token),
+        (200, 204),
+        "delete unfinished assignment",
+    )
+    expect(
+        http(base_url, "GET", f"/api/v1/assignments/{deletable_assignment_id}", token=token),
+        (404,),
+        "deleted unfinished assignment is gone",
+    )
+
+    completed_assignment_id = f"e2e-completed-assignment-{run_id}"
+    completed_payload = dict(assignment_payload)
+    completed_payload.update({
+        "id": completed_assignment_id,
+        "title": "E2E 已完成作业",
+        "status": "COMPLETED",
+    })
+    expect(
+        http(base_url, "POST", f"/api/v1/students/{student_id}/assignments",
+             token=token, payload=completed_payload),
+        (200,),
+        "create completed assignment for delete guard",
+    )
+    expect(
+        http(base_url, "DELETE", f"/api/v1/assignments/{completed_assignment_id}", token=token),
+        (400,),
+        "completed assignment delete rejection",
+    )
+    expect(
+        http(base_url, "GET", f"/api/v1/assignments/{completed_assignment_id}", token=token),
+        (200,),
+        "completed assignment remains after rejected delete",
+    )
+
     filtered = expect(
         http(base_url, "GET",
              f"/api/v1/students/{student_id}/assignments?type=SCHOOL&subjectCode=MATH&status=NOT_STARTED",

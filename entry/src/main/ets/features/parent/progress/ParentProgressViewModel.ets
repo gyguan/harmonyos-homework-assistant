@@ -31,6 +31,10 @@ export class ParentProgressViewModel {
     return this.repository.getCached(assignmentId);
   }
 
+  deleteAssignments(assignmentIds: string[]): Promise<number> {
+    return this.repository.deleteAssignments(assignmentIds);
+  }
+
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
   }
