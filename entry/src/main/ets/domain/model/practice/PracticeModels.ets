@@ -96,6 +96,18 @@ export interface PracticePreviousAnswer {
   correct: boolean;
 }
 
+export interface PracticeNote {
+  questionId: string;
+  content: string;
+  createdAtEpochMs: number;
+  updatedAtEpochMs: number;
+}
+
+export interface PracticePreviousNote {
+  questionId: string;
+  content: string;
+}
+
 export interface PracticeAttemptSummary {
   id: string;
   paperId: string;
@@ -112,6 +124,7 @@ export interface PracticeAttemptSummary {
   elapsedSeconds: number;
   answeredCount: number;
   questionCount: number;
+  noteCount: number;
   score: number;
   maxScore: number;
   correctCount: number;
@@ -132,9 +145,12 @@ export interface PracticeAttempt {
   elapsedSeconds: number;
   answeredCount: number;
   questionCount: number;
+  noteCount: number;
   questions: PracticeQuestion[];
   answers: PracticeAnswer[];
+  notes: PracticeNote[];
   previousAnswers: PracticePreviousAnswer[];
+  previousNotes: PracticePreviousNote[];
 }
 
 export interface PracticeQuestionResult {
@@ -146,6 +162,7 @@ export interface PracticeQuestionResult {
   correct: boolean;
   score: number;
   explanation: string;
+  noteContent: string;
 }
 
 export interface PracticeResult {
@@ -153,10 +170,12 @@ export interface PracticeResult {
   paperId: string;
   paperVersion: number;
   attemptNo: number;
+  mode: PracticeAttemptMode;
   score: number;
   maxScore: number;
   correctCount: number;
   wrongCount: number;
+  noteCount: number;
   elapsedSeconds: number;
   questions: PracticeQuestionResult[];
 }
