@@ -96,7 +96,6 @@ export struct ParentReviewPane {
       this.showEditSheet = false;
       this.editingAssignmentId = '';
       this.editNotice = '';
-      this.operationNotice = '任务信息已更新';
       this.localRevision++;
       this.onReviewed();
     } catch (error) {
@@ -113,7 +112,6 @@ export struct ParentReviewPane {
     try {
       await this.viewModel.approve(this.assignmentId, this.reviewNoteDraft);
       this.reviewNoteDraft = '';
-      this.operationNotice = '已通过验收';
       this.localRevision++;
       this.onReviewed();
     } catch (error) {
@@ -135,7 +133,6 @@ export struct ParentReviewPane {
     try {
       await this.viewModel.returnForRework(this.assignmentId, note);
       this.reviewNoteDraft = '';
-      this.operationNotice = '已退回订正';
       this.localRevision++;
       this.onReviewed();
     } catch (error) {
