@@ -10,12 +10,6 @@ public final class PracticeDtos {
 
   public record Option(String key, String label) {}
 
-  public record VisualSpecResponse(
-      String type,
-      String assetId,
-      String layout,
-      String accessibilityText) {}
-
   public record PaperResponse(
       String id,
       int version,
@@ -37,8 +31,7 @@ public final class PracticeDtos {
       String stem,
       List<Option> options,
       List<String> hints,
-      List<String> tags,
-      VisualSpecResponse visualSpec) {}
+      List<String> tags) {}
 
   public record StartRequest(@NotBlank String paperId, @Min(1) int paperVersion) {}
 
