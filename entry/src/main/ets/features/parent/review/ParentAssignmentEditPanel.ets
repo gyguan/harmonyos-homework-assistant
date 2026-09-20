@@ -1,3 +1,4 @@
+import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
@@ -13,7 +14,6 @@ export struct ParentAssignmentEditPanel {
   @State private textbookRefDraft: string = '';
   @State private dueTextDraft: string = '';
   @State private minutesDraft: string = '20';
-  @State private dirty: boolean = false;
   @State private confirmDiscard: boolean = false;
 
   onCancel: () => void = () => {};
@@ -25,7 +25,6 @@ export struct ParentAssignmentEditPanel {
     this.textbookRefDraft = this.item.textbookRef;
     this.dueTextDraft = this.item.dueText;
     this.minutesDraft = `${this.item.expectedMinutes}`;
-    this.dirty = false;
     this.confirmDiscard = false;
   }
 
@@ -40,18 +39,43 @@ export struct ParentAssignmentEditPanel {
     return !this.saving && this.titleDraft.trim().length > 0 && minutes >= 1 && minutes <= 240;
   }
 
-  private markDirty(): void {
-    this.dirty = true;
+  private originalEditValues(): AssignmentEditValues {
+    return {
+      subject: this.item.subject,
+      title: this.item.title,
+      instruction: this.item.instruction,
+      dueText: this.item.dueText,
+      expectedMinutes: this.item.expectedMinutes,
+      textbookRef: this.item.textbookRef
+    };
+  }
+
+  private currentEditValues(): AssignmentEditValues {
+    return {
+      subject: this.item.subject,
+      title: this.titleDraft,
+      instruction: this.instructionDraft,
+      dueText: this.dueTextDraft,
+      expectedMinutes: this.parsedMinutes(),
+      textbookRef: this.textbookRefDraft
+    };
+  }
+
+  private hasChanges(): boolean {
+    return AssignmentEditChangeDetector.hasChanges(this.originalEditValues(), this.currentEditValues());
+  }
+
+  private markChanged(): void {
     this.confirmDiscard = false;
   }
 
   private setMinutes(minutes: number): void {
     this.minutesDraft = `${minutes}`;
-    this.markDirty();
+    this.markChanged();
   }
 
   private requestClose(): void {
-    if (this.dirty) {
+    if (this.hasChanges()) {
       this.confirmDiscard = true;
       return;
     }
@@ -114,7 +138,6 @@ export struct ParentAssignmentEditPanel {
             .backgroundColor(AppTheme.DANGER_SOFT)
             .fontColor(AppTheme.DANGER)
             .onClick(() => {
-              this.dirty = false;
               this.onCancel();
             });
         }
@@ -160,20 +183,20 @@ export struct ParentAssignmentEditPanel {
           textbookRef: this.textbookRefDraft,
           onTitleChange: (value: string) => {
             this.titleDraft = value;
-            this.markDirty();
+            this.markChanged();
           },
           onInstructionChange: (value: string) => {
             this.instructionDraft = value;
-            this.markDirty();
+            this.markChanged();
           },
           onDueTextChange: (value: string) => {
             this.dueTextDraft = value;
-            this.markDirty();
+            this.markChanged();
           },
           onMinutesChange: (minutes: number) => this.setMinutes(minutes),
           onTextbookRefChange: (value: string) => {
             this.textbookRefDraft = value;
-            this.markDirty();
+            this.markChanged();
           }
         })
         .padding({ left: 16, right: 16, top: 12, bottom: 16 });

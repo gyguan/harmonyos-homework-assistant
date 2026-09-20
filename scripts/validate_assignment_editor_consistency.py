@@ -29,6 +29,7 @@ deadline = read("entry/src/main/ets/components/assignment/DeadlinePickerField.et
 import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
 extra_page = read("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 voice_page = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+change_detector = read("entry/src/main/ets/common/state/AssignmentEditChangeDetector.ets")
 
 for token in ["作业标题", "老师要求", "截止时间", "预计用时（分钟）", "教材 / 页码"]:
     require(token in shared, f"shared assignment editor missing field: {token}")
@@ -40,6 +41,20 @@ require("bindSheet($$this.showEditSheet" in review_pane and "preferType: SheetTy
         "published assignment editing must use a bottom sheet")
 require("ParentAssignmentEditPanel({" in review_pane and "AssignmentEditorSheet" in review_pane,
         "published edit sheet must host the same published editor wrapper")
+
+require("AssignmentEditChangeDetector.hasChanges" in confirmation_components and
+        "AssignmentEditChangeDetector.hasChanges" in review_editor and
+        "static hasChanges" in change_detector,
+        "all assignment editors must share value-based dirty detection")
+require("Button('保存'" in confirmation_components and "Button('完成'" not in confirmation_components,
+        "confirmation task editor must use Save as the business action")
+require("onDisappear: () => this.completeEditorDismiss()" in confirmation_page and
+        "onDisappear: () => this.completeEditingDismiss()" in review_pane,
+        "assignment edit sheets must clean editing context only after sheet disappearance")
+duration = shared.split("private DurationSection()", 1)[1].split("build()", 1)[0]
+require("Scroll() {" in duration and ".scrollable(ScrollDirection.Horizontal)" in duration and
+        duration.count("Row({ space: 6 })") == 1,
+        "shared expected-duration choices must stay on one horizontal row")
 
 require("let today = new Date();" in deadline and "this.selectedDate = today;" in deadline,
         "empty deadline picker must default to today")

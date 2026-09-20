@@ -25,6 +25,8 @@ parent_editor = read("entry/src/main/ets/features/parent/review/ParentAssignment
 parent_review = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 deadline = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 sheet_header = read("entry/src/main/ets/components/navigation/EditSheetHeader.ets")
+shared_editor = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
+change_detector = read("entry/src/main/ets/common/state/AssignmentEditChangeDetector.ets")
 
 # AI result cards: duration presets remain on one horizontal line and card height stays compact.
 require("CandidateDurationControl" in components and "Scroll() {" in components and
@@ -45,8 +47,8 @@ require("private BottomActionBar()" in page and "this.BottomActionBar();" in pag
 candidate_editor = components.split("export struct ConfirmationCandidateEditor", 1)[1]
 candidate_actions = candidate_editor.split("private BottomActions()", 1)[1].split("build()", 1)[0]
 require("private BottomActions()" in candidate_editor and "this.BottomActions();" in candidate_editor and
-        "Button('删除'" in candidate_actions and "Button('完成'" in candidate_actions,
-        "candidate editor must keep Complete/Delete in its fixed bottom action area")
+        "Button('删除'" in candidate_actions and "Button('保存'" in candidate_actions,
+        "candidate editor must keep Save/Delete in its fixed bottom action area")
 require("private BottomActions()" in parent_editor and "this.BottomActions();" in parent_editor and
         parent_editor.index("Scroll() {") < parent_editor.index("this.BottomActions();"),
         "published-task editor must keep Save outside the scroll area")
@@ -63,8 +65,24 @@ require("confirmDiscard" in components and "放弃修改" in components and "继
         "candidate editor must warn before closing dirty edits")
 require("confirmDiscard" in parent_editor and "放弃修改" in parent_editor and "继续编辑" in parent_editor,
         "published-task editor must warn before closing dirty edits")
-require("Button('完成'" in candidate_actions and "saveAndClose()" in candidate_actions,
-        "Complete must be a bottom business action that saves and exits")
+
+require("AssignmentEditChangeDetector.hasChanges" in components and
+        "AssignmentEditChangeDetector.hasChanges" in parent_editor and
+        "@State private dirty: boolean" not in components and
+        "@State private dirty: boolean" not in parent_editor and
+        "static hasChanges" in change_detector,
+        "editors must derive dirty state by comparing original and current values instead of event flags")
+require("private DurationSection()" in shared_editor and "Scroll() {" in shared_editor and
+        ".scrollable(ScrollDirection.Horizontal)" in shared_editor and ".maxLines(1)" in shared_editor,
+        "shared assignment duration choices must remain on one horizontal row")
+require("private closeEditor(): void" in page and "this.showEditorSheet = false;" in page and
+        "onDisappear: () => this.completeEditorDismiss()" in page,
+        "confirmation sheet must close first and clean editor context after disappearance")
+require("private cancelEditing(): void" in parent_review and "this.showEditSheet = false;" in parent_review and
+        "onDisappear: () => this.completeEditingDismiss()" in parent_review,
+        "published-task sheet must use the same two-phase dismissal lifecycle")
+require("Button('保存'" in candidate_actions and "saveAndClose()" in candidate_actions,
+        "Save must be a bottom business action that persists and exits")
 
 # Manual add belongs with list management, not after all cards.
 require("private CandidateListHeader()" in page and "Text('＋ 新增')" in page and
