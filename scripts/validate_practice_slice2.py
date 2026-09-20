@@ -80,13 +80,16 @@ require("answerSpec" not in dtos.split("public record QuestionResponse", 1)[1].s
         "QuestionResponse must not leak answerSpec before submission")
 require("explanation" not in dtos.split("public record QuestionResponse", 1)[1].split("public record StartRequest", 1)[0],
         "QuestionResponse must not leak explanation before submission")
-require("preset-catalog.json" in bootstrap and "validator.validateCatalog(catalog)" in bootstrap,
-        "server Practice content must come from the validated canonical catalog")
+require("PRESET_MANIFEST" in bootstrap and "PracticeContentCatalog.Shard" in bootstrap and
+        "validator.validateCatalog(catalog)" in bootstrap,
+        "server Practice content must come from validated grade/subject shards")
 require("mathQuestions(" not in bootstrap and "chineseQuestions(" not in bootstrap and
         "englishQuestions(" not in bootstrap,
         "server Practice bootstrap must not regenerate paper questions in Java")
 require("PRACTICE_E2E_PASS" in e2e and "reject answer mutation after practice submission" in e2e,
         "real Practice E2E must cover immutable submitted attempts")
+require("reject cross-grade practice attempt" in e2e and "audiencePolicy.requireFreshStartAllowed" in service,
+        "Practice fresh-start E2E must reject cross-grade papers")
 
 if errors:
     print("PRACTICE_SLICE2_GATE_FAIL")
