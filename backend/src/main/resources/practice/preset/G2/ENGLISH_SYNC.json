@@ -2111,7 +2111,7 @@
           "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
-          "stem": "下面哪一句英语是正确的？",
+          "stem": "下面哪一句关于家庭成员的英语表达正确？",
           "options": [
             {
               "key": "A",
@@ -2198,7 +2198,7 @@
           "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
-          "stem": "下面哪一句英语是正确的？",
+          "stem": "下面哪一句关于位置关系的英语表达正确？",
           "options": [
             {
               "key": "A",
