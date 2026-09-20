@@ -156,9 +156,11 @@ require("AssignmentStatus.SUBMITTED" in review_pane and "AssignmentStatus.COMPLE
 require("let persisted = item.remoteVersion > 0 || item.candidateId.length > 0" not in review_pane and
         "return item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED" in review_pane,
         "all unfinished assignments, including NOT_STARTED, must expose parent editing")
-require("let remoteBacked = current.remoteVersion > 0 || current.candidateId.length > 0" in repo and
-        "if (!remoteBacked)" in repo and "this.applyAuthoritative(localDraft)" in repo,
-        "parent edit must support local unfinished tasks while hydrating real cloud tasks when possible")
+require("current.backing === AssignmentBacking.LOCAL_SEED" in repo and
+        "ensureRemoteCurrent" in repo and "this.applyAuthoritative(localDraft)" in repo,
+        "parent edit must use explicit Assignment backing and hydrate remote work centrally")
+require("remoteVersion > 0 || current.candidateId.length > 0" not in repo,
+        "parent edit must not infer remote identity from sync metadata")
 require("async updateDetails(assignment: Assignment" in remote_api and
         "'parent.assignment.edit'" in remote_api and "/details" in remote_api,
         "HarmonyOS parent edit must use the narrow assignment details API")
