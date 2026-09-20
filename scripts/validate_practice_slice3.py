@@ -57,6 +57,14 @@ require("STUDENT_PRACTICE_HISTORY" in routes and "STUDENT_PRACTICE_HISTORY" in s
 require("onRepeatStarted" in result_page and "onRepeatStarted" in shell,
         "repeat result flow must navigate to the new attempt instance")
 
+# ArkTS declarations/routes must stay explicitly typed.
+require("listAttempts(studentId: string, paperId: string = '')" not in repo,
+        "PracticeRepository interface methods must not use parameter initializers")
+require("PracticeHistoryRouteParam" in routes and "new PracticeHistoryRouteParam()" in shell,
+        "Practice history route must use an explicitly declared parameter class")
+require("STUDENT_PRACTICE_HISTORY, {})" not in shell,
+        "Practice navigation must not pass untyped object literals")
+
 require("source_attempt_id" in migration and "sourceAttemptId" in attempt_entity,
         "practice attempt lineage must be persisted")
 require('/students/{studentId}/practice/attempts' in controller and
