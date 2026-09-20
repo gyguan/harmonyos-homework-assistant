@@ -30,6 +30,9 @@ jobs:
       - name: Validate issue 241 capture spike
         run: python scripts/validate_issue241_capture_spike.py
 
+      - name: Validate issue 242 import inbox
+        run: python scripts/validate_issue242_import_inbox.py
+
       - name: Validate pasted teacher text import
         run: python scripts/validate_text_import_feature.py
 
