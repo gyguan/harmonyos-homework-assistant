@@ -24,6 +24,7 @@ confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkCon
 confirmation_components = read(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
+confirmation_vm = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationViewModel.ets")
 cases = read("docs/development/v0.2-parser-confirmation-cases.md")
 
 require("splitTaskBodies" in parser, "parser must split multiple tasks inside one subject segment")
@@ -48,6 +49,10 @@ for capability in ["subjectDraft", "titleDraft", "dueTextDraft", "textbookRefDra
 require("ChoiceSelectionChip" in confirmation_components,
         "confirmation editor must expose reactive subject/duration choices")
 require("手工新增一项" in confirmation, "confirmation page must expose manual candidate creation")
+require("createManualCandidateDraft" in confirmation_vm and
+        "addCandidate(candidate: CandidateAssignment): boolean" in confirmation_vm and
+        "@State private manualCandidateDraft: CandidateAssignment | null = null;" in confirmation,
+        "manual candidate creation must remain transient until explicit Save")
 require(cases.count("### CASE-") >= 20, "V0.2 regression catalog must contain at least 20 cases")
 
 if errors:
