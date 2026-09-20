@@ -61,8 +61,13 @@ require("ensureRemoteCurrent" in repo and "reloadRemote" in repo and
 require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 8" in migrator and
         "migrateV7ToV8" in migrator and "legacyBacking" in migrator,
         "snapshot V8 must migrate legacy identity heuristics once")
-require("backing: source.backing === AssignmentBacking.REMOTE" in store,
-        "snapshot clone must retain explicit backing after migration")
+require("backing: source.backing," in store and
+        "source.backing === AssignmentBacking.REMOTE ?" not in store,
+        "snapshot clone must preserve explicit backing without post-migration guessing")
+require("snapshot.schemaVersion >= 8" in migrator and
+        "assignment.backing !== AssignmentBacking.LOCAL_SEED" in migrator and
+        "assignment.backing !== AssignmentBacking.REMOTE" in migrator,
+        "snapshot V8 must reject missing or invalid explicit assignment backing")
 
 # Date/query construction lives in domain services rather than diverging in ViewModels.
 require("export class AssignmentDateRange" in date_range and "forDay" in date_range,
