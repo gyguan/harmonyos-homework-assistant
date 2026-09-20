@@ -111,6 +111,19 @@ require("onSave: (candidate: CandidateAssignment) => boolean" in components and
         "if (!this.onSave(this.buildCandidate())) return;" in components,
         "candidate editor must remain open if Save fails")
 
+remove_candidate = page.split("private removeCandidate(candidateId: string): void", 1)[1].split(
+    "private commitCandidateRemoval", 1)[0]
+dismiss = page.split("private completeEditorDismiss(): void", 1)[1].split(
+    "private saveCandidate", 1)[0]
+require("@State private pendingDeleteCandidateId: string = '';" in page and
+        "this.pendingDeleteCandidateId = candidateId;" in remove_candidate and
+        "this.closeEditor();" in remove_candidate and
+        "this.viewModel.removeCandidate(candidateId)" not in remove_candidate,
+        "single-candidate delete must close the editor before mutating the candidate repository")
+require("this.commitCandidateRemoval(pendingDeleteCandidateId)" in dismiss and
+        "this.viewModel.removeCandidate(candidateId)" in page.split("private commitCandidateRemoval", 1)[1],
+        "single-candidate delete must commit only after the sheet disappears")
+
 # AI organized tasks support batch selection, select-all, confirmation, and deletion.
 for token in [
     "@State private bulkMode",
