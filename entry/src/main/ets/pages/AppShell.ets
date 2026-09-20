@@ -5,6 +5,7 @@ import {
   ParentImportConfirmationRouteParam,
   ParentImportRouteParam,
   PracticeAttemptRouteParam,
+  PracticeHistoryRouteParam,
   PracticePaperRouteParam
 } from '../app/navigation/AppRoutes';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
@@ -176,7 +177,8 @@ export struct AppShell {
   }
 
   private openPracticeHistory(): void {
-    this.navPathStack.pushPathByName(AppRoute.STUDENT_PRACTICE_HISTORY, {});
+    this.navPathStack.pushPathByName(
+      AppRoute.STUDENT_PRACTICE_HISTORY, new PracticeHistoryRouteParam());
   }
 
   private openPracticePaper(paperId: string, version: number): void {
