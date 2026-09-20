@@ -5,6 +5,61 @@ export enum HomeworkOrganizerMode {
   LOCAL = 'LOCAL'
 }
 
+export enum HomeworkImportSourceType {
+  CLIPBOARD = 'CLIPBOARD',
+  SCREENSHOT = 'SCREENSHOT',
+  SHARE = 'SHARE',
+  SCREEN_CAPTURE = 'SCREEN_CAPTURE'
+}
+
+export enum ImportBatchStatus {
+  RECEIVED = 'RECEIVED',
+  READY = 'READY',
+  EMPTY = 'EMPTY',
+  PUBLISHED = 'PUBLISHED',
+  ABANDONED = 'ABANDONED'
+}
+
+export interface ImportSourceEvidence {
+  sourceType: HomeworkImportSourceType;
+  sourceMessageIds: string[];
+  rawText: string;
+  imageRef: string;
+  capturedAtEpochMs: number;
+}
+
+export interface ImportedMessage {
+  id: string;
+  batchId: string;
+  sender: string;
+  timestampEpochMs: number;
+  text: string;
+  attachments: string[];
+  sourceEvidence: ImportSourceEvidence;
+  fingerprint: string;
+  orderNo: number;
+}
+
+export interface ImportBatch {
+  id: string;
+  studentId: string;
+  sourceType: HomeworkImportSourceType;
+  sourceLabel: string;
+  sourceProfileId: string;
+  createdAtEpochMs: number;
+  status: ImportBatchStatus;
+  messageCount: number;
+  candidateCount: number;
+}
+
+export interface HomeworkImportInboxSnapshot {
+  schemaVersion: number;
+  activeBatchId: string;
+  batches: ImportBatch[];
+  messages: ImportedMessage[];
+  candidates: CandidateAssignment[];
+}
+
 export interface ExtractedHomeworkText {
   importId: string;
   studentId: string;
