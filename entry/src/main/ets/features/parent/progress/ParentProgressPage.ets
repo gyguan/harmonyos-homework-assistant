@@ -361,8 +361,6 @@ export struct ParentProgressPage {
       Column({ space: 10 }) {
         Column({ space: 2 }) {
           Text('作业详情').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('选择左侧作业查看任务与进度；未提交任务可编辑，待验收任务可通过或退回。')
-            .fontSize(AppTheme.CAPTION_SIZE).lineHeight(18).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').alignItems(HorizontalAlign.Start);
         Scroll() {
