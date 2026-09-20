@@ -25,6 +25,7 @@ persistence_port = read("entry/src/main/ets/domain/port/HomeworkImportInboxPersi
 repo_port = read("entry/src/main/ets/domain/port/HomeworkImportInboxRepository.ets")
 persistence = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkImportInboxPersistence.ets")
 store = read("entry/src/main/ets/data/local/HomeworkImportInboxStore.ets")
+legacy_store = read("entry/src/main/ets/data/HomeworkStore.ets")
 repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportInboxRepository.ets")
 draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraftRepository.ets")
 service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
@@ -80,6 +81,12 @@ require("commitParsedImport" in import_service,
         "existing text/image import flow must persist ImportBatch data")
 require("syncInboxCandidates" in draft_repo,
         "Candidate edits must update the active ImportBatch snapshot")
+for field in ["batchId: source.sourceEvidence.batchId",
+              "sourceMessageIds: source.sourceEvidence.sourceMessageIds",
+              "rawText: source.sourceEvidence.rawText",
+              "imageRef: source.sourceEvidence.imageRef"]:
+    require(field in legacy_store,
+            f"legacy HomeworkStore clone must preserve Import V2 provenance: {field}")
 require("markActiveBatchPublished" in publish and
         publish.index("markActiveBatchPublished") < publish.index("clearCandidates()"),
         "successful atomic publish must preserve and mark batch history before clearing active drafts")
