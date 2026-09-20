@@ -29,6 +29,8 @@ entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
 index = read("entry/src/main/ets/pages/Index.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 status = read("entry/src/main/ets/features/parent/import/HomeworkShareImportStatusPage.ets")
+receiving_page = read("entry/src/main/ets/pages/HomeworkShareReceivingPage.ets")
+pages = read("entry/src/main/resources/base/profile/main_pages.json")
 import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
 
@@ -47,8 +49,12 @@ require("shareImportToken" in extension and "EntryAbility" in extension,
         "share extension must hand off a token to the main EntryAbility")
 require("this.context.startAbility" in extension,
         "share extension must open the main app after durable handoff")
+require("session.loadContent('pages/HomeworkShareReceivingPage')" in extension,
+        "share extension must load a lightweight sharing details page")
 require("session.terminateSelf()" in extension,
         "share extension must release its transient UI session")
+require("HomeworkShareReceivingPage" in pages and "正在接收分享内容" in receiving_page,
+        "sharing details receiving page must be registered and visible")
 
 require("context.filesDir" in receiver, "shared images must be copied into app sandbox")
 require("fileIo.openSync(sourceUri" in receiver, "receiver must read the temporary external URI")
