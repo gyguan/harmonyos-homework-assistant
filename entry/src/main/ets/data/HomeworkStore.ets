@@ -184,7 +184,17 @@ export class HomeworkStore {
     return { id: source.id, studentId: source.studentId, subject: source.subject, title: source.title,
       instruction: source.instruction, textbookRef: source.textbookRef, dueText: source.dueText,
       expectedMinutes: source.expectedMinutes > 0 ? source.expectedMinutes : 20,
-      sourceEvidence: { sourceLabel: source.sourceEvidence.sourceLabel, excerpt: source.sourceEvidence.excerpt },
+      sourceEvidence: {
+        sourceLabel: source.sourceEvidence.sourceLabel,
+        excerpt: source.sourceEvidence.excerpt,
+        batchId: source.sourceEvidence.batchId,
+        sourceType: source.sourceEvidence.sourceType,
+        sourceMessageIds: source.sourceEvidence.sourceMessageIds === undefined ?
+          undefined : source.sourceEvidence.sourceMessageIds.slice(),
+        rawText: source.sourceEvidence.rawText,
+        imageRef: source.sourceEvidence.imageRef,
+        capturedAtEpochMs: source.sourceEvidence.capturedAtEpochMs
+      },
       confidence: source.confidence };
   }
 
