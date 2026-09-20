@@ -3,7 +3,9 @@ import {
   PracticePaper,
   PracticePaperStatus,
   PracticeSemester,
-  PracticeSubject
+  PracticeSubject,
+  PracticeTrack,
+  PracticeTrackFilter
 } from '../../domain/model/practice/PracticeModels';
 import { PracticeContentProvider } from '../../domain/port/PracticeContentProvider';
 import { PresetPracticeCatalog } from './PresetPracticeCatalog';
@@ -16,7 +18,8 @@ export class PresetPracticeContentProvider implements PracticeContentProvider {
   async listPapers(
     grade: PracticeGrade,
     subject: PracticeSubject,
-    semester: PracticeSemester
+    semester: PracticeSemester,
+    track: PracticeTrackFilter
   ): Promise<PracticePaper[]> {
     let result: PracticePaper[] = [];
     for (let paper of PresetPracticeCatalog.papers()) {
@@ -25,6 +28,10 @@ export class PresetPracticeContentProvider implements PracticeContentProvider {
       if (semester !== PracticeSemester.ALL &&
         paper.semester !== PracticeSemester.ALL &&
         paper.semester !== semester) continue;
+      if (track === PracticeTrackFilter.TEXTBOOK_SYNC &&
+        paper.track !== PracticeTrack.TEXTBOOK_SYNC) continue;
+      if (track === PracticeTrackFilter.EXTRACURRICULAR &&
+        paper.track !== PracticeTrack.EXTRACURRICULAR) continue;
       result.push(this.clonePaper(paper));
     }
     return result;
@@ -46,6 +53,7 @@ export class PresetPracticeContentProvider implements PracticeContentProvider {
       grade: source.grade,
       subject: source.subject,
       semester: source.semester,
+      track: source.track,
       title: source.title,
       description: source.description,
       difficulty: source.difficulty,
