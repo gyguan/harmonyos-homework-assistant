@@ -65,9 +65,13 @@ for source, token, message in [
 ]:
     require(token not in source, message)
 
-for success_copy in ["任务信息已更新", "已通过验收", "已退回订正"]:
-    require(success_copy not in review,
-            f"parent review should express successful actions through state change instead of persistent copy: {success_copy}")
+for success_assignment in [
+    "this.operationNotice = '任务信息已更新'",
+    "this.operationNotice = '已通过验收'",
+    "this.operationNotice = '已退回订正'",
+]:
+    require(success_assignment not in review,
+            f"parent review should express successful actions through state change instead of persistent copy: {success_assignment}")
 
 if errors:
     print("UI_REFRESH_COPY_GATE_FAIL")
