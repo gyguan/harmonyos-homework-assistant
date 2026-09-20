@@ -33,6 +33,9 @@ jobs:
       - name: Validate assignment editor consistency
         run: python scripts/validate_assignment_editor_consistency.py
 
+      - name: Validate UI refresh and copy consistency
+        run: python scripts/validate_ui_refresh_copy.py
+
       - name: Validate real homework submission
         run: python scripts/validate_real_submission_feature.py
 
