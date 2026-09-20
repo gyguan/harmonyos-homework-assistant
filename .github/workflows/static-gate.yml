@@ -36,6 +36,9 @@ jobs:
       - name: Validate UI refresh and copy consistency
         run: python scripts/validate_ui_refresh_copy.py
 
+      - name: Validate parent delete and study media enhancements
+        run: python scripts/validate_parent_delete_study_media.py
+
       - name: Validate real homework submission
         run: python scripts/validate_real_submission_feature.py
 
