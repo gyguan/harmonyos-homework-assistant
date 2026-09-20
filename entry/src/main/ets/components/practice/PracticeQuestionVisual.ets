@@ -4,7 +4,7 @@ import { AppTheme } from '../../common/theme/AppTheme';
 export struct PracticeQuestionVisual {
   @Prop visualType: string = 'NONE';
   @Prop assetId: string = '';
-  @Prop accessibilityText: string = '';
+  @Prop accessibilityLabel: string = '';
 
   @Builder
   private VisualImage() {
@@ -44,8 +44,8 @@ export struct PracticeQuestionVisual {
   build() {
     Column({ space: 8 }) {
       this.VisualImage();
-      if (this.accessibilityText.length > 0) {
-        Text(this.accessibilityText)
+      if (this.accessibilityLabel.length > 0) {
+        Text(this.accessibilityLabel)
           .width('100%')
           .fontSize(12)
           .lineHeight(18)
@@ -57,6 +57,6 @@ export struct PracticeQuestionVisual {
     .padding(10)
     .backgroundColor(AppTheme.SURFACE_SUBTLE)
     .borderRadius(AppTheme.CONTROL_RADIUS)
-    .accessibilityText(this.accessibilityText.length > 0 ? this.accessibilityText : '题目配图');
+    .accessibilityText(this.accessibilityLabel.length > 0 ? this.accessibilityLabel : '题目配图');
   }
 }
