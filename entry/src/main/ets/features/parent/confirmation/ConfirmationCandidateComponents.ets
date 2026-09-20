@@ -178,30 +178,20 @@ export struct ConfirmationCandidateEditor {
 
   build() {
     Column({ space: 12 }) {
-      Row() {
-        Column({ space: 2 }) {
-          Text(this.item.confidence < 0.8 ? '重点确认' : '核对作业')
-            .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text(this.item.confidence < 0.8 ?
-            '识别置信度较低，请对照老师原文逐项核对。' : '发布前确认任务内容与时间。')
-            .fontSize(12)
-            .fontColor(this.item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-
-        Text('删除')
-          .fontSize(13)
-          .fontColor(AppTheme.DANGER)
-          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .textAlign(TextAlign.Center)
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText(`删除${this.item.title}`)
-          .onClick(() => this.onDelete(this.item.id));
+      Column({ space: 2 }) {
+        Text(this.item.confidence < 0.8 ? '重点确认' : '核对作业')
+          .width('100%')
+          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Text(this.item.confidence < 0.8 ?
+          '识别置信度较低，请对照老师原文逐项核对。' : '发布前确认任务内容与时间。')
+          .width('100%')
+          .fontSize(12)
+          .fontColor(this.item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT);
       }
-      .width('100%');
+      .width('100%')
+      .alignItems(HorizontalAlign.Start);
 
       AssignmentEditForm({
         subject: this.item.subject,
@@ -236,6 +226,15 @@ export struct ConfirmationCandidateEditor {
       .padding(13)
       .backgroundColor(this.item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE_SUBTLE)
       .borderRadius(AppTheme.CONTROL_RADIUS);
+
+      Button('删除这项作业', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.DANGER_SOFT)
+        .fontColor(AppTheme.DANGER)
+        .accessibilityText(`删除${this.item.title}`)
+        .onClick(() => this.onDelete(this.item.id));
     }
     .width('100%');
   }
