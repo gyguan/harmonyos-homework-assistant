@@ -11,6 +11,7 @@ import { PersonEntryPage } from './PersonEntryPage';
 @Component
 struct Index {
   @State private selectedRole: AppRole = AppRole.NONE;
+  @StorageLink('shareImportForceParent') private shareImportForceParent: boolean = false;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private cloudRevision: number = 0;
   private shellBackHandler: () => boolean = () => false;
@@ -44,7 +45,7 @@ struct Index {
 
   build() {
     Stack() {
-      if (this.selectedRole === AppRole.NONE) {
+      if (this.selectedRole === AppRole.NONE && !this.shareImportForceParent) {
         PersonEntryPage({
           revision: this.cloudRevision,
           onSelectParent: () => this.enterParent(),
@@ -52,7 +53,7 @@ struct Index {
         });
       } else {
         AppShell({
-          role: this.selectedRole,
+          role: this.shareImportForceParent ? AppRole.PARENT : this.selectedRole,
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
         });
       }
