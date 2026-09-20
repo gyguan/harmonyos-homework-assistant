@@ -378,7 +378,7 @@ export struct PracticeAttemptPage {
                 PracticeQuestionVisual({
                   visualType: this.currentQuestion()!.visualSpec.type,
                   assetId: this.currentQuestion()!.visualSpec.assetId,
-                  accessibilityText: this.currentQuestion()!.visualSpec.accessibilityText
+                  accessibilityLabel: this.currentQuestion()!.visualSpec.accessibilityText
                 });
               }
               Text(this.currentQuestion()!.stem)
