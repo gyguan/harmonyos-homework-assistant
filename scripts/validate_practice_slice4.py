@@ -78,7 +78,7 @@ require("requireEditable" in service and "saveNote" in service and "deleteNote" 
         "note mutations must be limited to IN_PROGRESS attempts")
 require("previousNotes(attempt)" in service,
         "repeat/wrong-only attempt response must expose source notes separately")
-require("note == null ? "" : note.content" in service,
+require("noteMap(attempt.id)" in service and "note.content" in service,
         "submitted results must include the note stored on that attempt")
 require("NoteResponse" in dtos and "PreviousNoteResponse" in dtos,
         "Practice DTOs must separate current and previous notes")
