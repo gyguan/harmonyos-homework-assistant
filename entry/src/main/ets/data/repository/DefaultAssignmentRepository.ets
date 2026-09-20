@@ -184,6 +184,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       this.replaceQueryCacheItem(updated);
       this.remoteSummary = null;
       this.remoteSummaryStudentId = '';
+      this.emitChanged();
       return updated;
     }
     current = await this.ensureRemoteCurrent(
@@ -259,20 +260,25 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   }
 
   applyAuthoritative(updated: Assignment): void {
+    this.applyAuthoritativeBatch([updated]);
+  }
+
+  applyAuthoritativeBatch(updatedItems: Assignment[]): void {
+    if (updatedItems.length === 0) return;
     let assignments = this.local.listAssignments();
-    let replaced = false;
-    for (let i = 0; i < assignments.length; i++) {
-      if (assignments[i].id !== updated.id) continue;
-      assignments[i] = updated;
-      replaced = true;
-      break;
+    for (let updated of updatedItems) {
+      let replaced = false;
+      for (let i = 0; i < assignments.length; i++) {
+        if (assignments[i].id !== updated.id) continue;
+        assignments[i] = updated;
+        replaced = true;
+        break;
+      }
+      if (!replaced) assignments.push(updated);
+      this.replaceQueryCacheItem(updated);
     }
-    if (!replaced) assignments.push(updated);
     this.local.replaceAssignmentsForActiveStudent(assignments);
-    this.replaceQueryCacheItem(updated);
-    // Any authoritative assignment mutation can change nextAssignmentId/progress counters.
-    // Drop the remote summary immediately so hidden Home surfaces re-render from the updated
-    // local Assignment cache before the asynchronous background sync completes.
+    // Any authoritative mutation can change nextAssignmentId/progress counters.
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
     this.emitChanged();
@@ -292,6 +298,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     let activeStudentId = this.local.getActiveStudentId();
     this.remoteSummary = this.local.getTodaySummary();
     this.remoteSummaryStudentId = activeStudentId;
+    this.emitChanged();
     return true;
   }
 
