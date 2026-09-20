@@ -5,10 +5,7 @@ import { AssignmentFilterDialog } from '../../../components/assignment/Assignmen
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { FilterSummaryEntry, SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import {
-  AssignmentDateFilter,
-  AssignmentTypeFilter
-} from '../../../domain/model/AssignmentFilter';
+import { AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentCalendarPanel } from './AssignmentCalendarPanel';
 import { AssignmentDetailPane } from './AssignmentDetailPane';
@@ -20,15 +17,12 @@ export struct StudentAssignmentsPage {
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
 
-  @State private typeFilter: AssignmentTypeFilter = AssignmentTypeFilter.ALL;
   @State private subjectCode: string = 'ALL';
-  @State private dateFilter: AssignmentDateFilter = AssignmentDateFilter.ALL;
-  @State private draftTypeFilter: AssignmentTypeFilter = AssignmentTypeFilter.ALL;
   @State private draftSubjectCode: string = 'ALL';
-  @State private draftDateFilter: AssignmentDateFilter = AssignmentDateFilter.ALL;
+  @State private selectedCalendarDayEpochMs: number = Date.now();
+  @State private draftSelectedDayEpochMs: number = Date.now();
   @State private querying: boolean = false;
   @State private calendarMode: boolean = false;
-  @State private selectedCalendarDayEpochMs: number = Date.now();
   @State private calendarMonthEpochMs: number = Date.now();
 
   @State private needHandlingAssignments: Assignment[] = [];
@@ -47,11 +41,10 @@ export struct StudentAssignmentsPage {
 
   private filterDialogController: CustomDialogController = new CustomDialogController({
     builder: AssignmentFilterDialog({
-      typeFilter: $draftTypeFilter,
-      dateFilter: $draftDateFilter,
+      selectedDayEpochMs: $draftSelectedDayEpochMs,
       subjectCode: $draftSubjectCode,
-      onQuery: (typeFilter: AssignmentTypeFilter, dateFilter: AssignmentDateFilter, subjectCode: string) => {
-        void this.applyFilters(typeFilter, dateFilter, subjectCode);
+      onQuery: (selectedDayEpochMs: number, subjectCode: string) => {
+        void this.applyFilters(selectedDayEpochMs, subjectCode);
       }
     }),
     autoCancel: true,
@@ -75,18 +68,14 @@ export struct StudentAssignmentsPage {
   }
 
   private rebuildResults(): void {
-    if (this.calendarMode && this.dateFilter === AssignmentDateFilter.CUSTOM) {
-      this.applyItems(this.viewModel.assignmentsOnDay(
-        this.typeFilter, this.subjectCode, this.selectedCalendarDayEpochMs));
-      return;
-    }
-    this.applyItems(this.viewModel.assignments(this.typeFilter, this.subjectCode, this.dateFilter));
+    this.applyItems(this.viewModel.assignmentsOnDay(
+      AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs));
   }
 
   private calendarAssignments(): Assignment[] {
     let currentRevision = this.revision;
     if (currentRevision < 0) return [];
-    return this.viewModel.calendarAssignments(this.typeFilter, this.subjectCode);
+    return this.viewModel.calendarAssignments(AssignmentTypeFilter.ALL, this.subjectCode);
   }
 
   private padExtraAssignments(): Assignment[] {
@@ -140,11 +129,8 @@ export struct StudentAssignmentsPage {
       for (let item of this.completedAssignments) items.push(item);
       return items;
     }
-    if (this.calendarMode && this.dateFilter === AssignmentDateFilter.CUSTOM) {
-      return this.viewModel.assignmentsOnDay(
-        this.typeFilter, this.subjectCode, this.selectedCalendarDayEpochMs);
-    }
-    return this.viewModel.assignments(this.typeFilter, this.subjectCode, this.dateFilter);
+    return this.viewModel.assignmentsOnDay(
+      AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs);
   }
 
   private currentNeedHandlingAssignments(): Assignment[] {
@@ -220,29 +206,22 @@ export struct StudentAssignmentsPage {
 
   private openFilterDialog(): void {
     if (this.querying) return;
-    this.draftTypeFilter = this.typeFilter;
+    this.draftSelectedDayEpochMs = this.selectedCalendarDayEpochMs;
     this.draftSubjectCode = this.subjectCode;
-    this.draftDateFilter = this.dateFilter === AssignmentDateFilter.CUSTOM ?
-      AssignmentDateFilter.ALL : this.dateFilter;
     this.filterDialogController.open();
   }
 
-  private async applyFilters(typeFilter: AssignmentTypeFilter,
-    dateFilter: AssignmentDateFilter, subjectCode: string): Promise<void> {
+  private async applyFilters(selectedDayEpochMs: number, subjectCode: string): Promise<void> {
     if (this.querying) return;
     this.querying = true;
-
-    this.draftTypeFilter = typeFilter;
-    this.draftDateFilter = dateFilter;
+    this.draftSelectedDayEpochMs = selectedDayEpochMs;
     this.draftSubjectCode = subjectCode;
-    this.typeFilter = typeFilter;
-    this.dateFilter = dateFilter;
+    this.selectedCalendarDayEpochMs = selectedDayEpochMs;
+    this.calendarMonthEpochMs = selectedDayEpochMs;
     this.subjectCode = subjectCode;
-    this.calendarMode = false;
     this.filterDialogController.close();
-
     try {
-      let items = await this.viewModel.query(typeFilter, subjectCode, dateFilter);
+      let items = await this.viewModel.queryOnDay(subjectCode, selectedDayEpochMs);
       this.applyItems(items);
     } finally {
       this.querying = false;
@@ -252,49 +231,40 @@ export struct StudentAssignmentsPage {
   private showCalendar(): void {
     if (this.calendarMode) return;
     this.calendarMode = true;
-    this.selectedCalendarDayEpochMs = Date.now();
     this.calendarMonthEpochMs = this.selectedCalendarDayEpochMs;
-    this.dateFilter = AssignmentDateFilter.CUSTOM;
-    this.rebuildResults();
   }
 
   private showList(): void {
     if (!this.calendarMode) return;
     this.calendarMode = false;
-    if (this.dateFilter === AssignmentDateFilter.CUSTOM) {
-      this.dateFilter = AssignmentDateFilter.ALL;
-      this.draftDateFilter = AssignmentDateFilter.ALL;
-    }
-    this.rebuildResults();
   }
 
   private selectCalendarDay(dayEpochMs: number): void {
     this.selectedCalendarDayEpochMs = dayEpochMs;
-    this.dateFilter = AssignmentDateFilter.CUSTOM;
-    this.applyItems(this.viewModel.assignmentsOnDay(this.typeFilter, this.subjectCode, dayEpochMs));
+    this.draftSelectedDayEpochMs = dayEpochMs;
+    this.applyItems(this.viewModel.assignmentsOnDay(
+      AssignmentTypeFilter.ALL, this.subjectCode, dayEpochMs));
+  }
+
+  private isSelectedDayToday(): boolean {
+    let now = new Date();
+    let today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    let selected = new Date(this.selectedCalendarDayEpochMs);
+    let selectedStart = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate()).getTime();
+    return selectedStart === today;
   }
 
   private hasActiveFilters(): boolean {
-    return this.typeFilter !== AssignmentTypeFilter.ALL || this.subjectCode !== 'ALL' ||
-      this.dateFilter !== AssignmentDateFilter.ALL;
+    return !this.isSelectedDayToday() || this.subjectCode !== 'ALL';
   }
 
-  private typeLabel(value: AssignmentTypeFilter): string {
-    if (value === AssignmentTypeFilter.SCHOOL) return '课内';
-    if (value === AssignmentTypeFilter.EXTRA) return '课外';
-    return '全部';
-  }
-
-  private dateLabel(value: AssignmentDateFilter): string {
-    if (value === AssignmentDateFilter.TODAY) return '今天';
-    if (value === AssignmentDateFilter.TOMORROW) return '明天';
-    if (value === AssignmentDateFilter.THIS_WEEK) return '本周';
-    if (value === AssignmentDateFilter.UNDATED) return '未定';
-    if (value === AssignmentDateFilter.CUSTOM) {
-      let selected = new Date(this.selectedCalendarDayEpochMs);
-      return `${selected.getMonth() + 1}月${selected.getDate()}日`;
-    }
-    return '全部日期';
+  private dateLabel(): string {
+    let selected = new Date(this.selectedCalendarDayEpochMs);
+    let month = selected.getMonth() + 1;
+    let day = selected.getDate();
+    let monthText = month < 10 ? `0${month}` : `${month}`;
+    let dayText = day < 10 ? `0${day}` : `${day}`;
+    return `${selected.getFullYear()}-${monthText}-${dayText}`;
   }
 
   private subjectLabel(value: string): string {
@@ -321,30 +291,25 @@ export struct StudentAssignmentsPage {
   private FilterBar() {
     Row() {
       FilterSummaryEntry({
-        label: '类型', value: this.typeLabel(this.typeFilter),
-        active: this.typeFilter !== AssignmentTypeFilter.ALL,
+        label: '日期', value: this.dateLabel(),
+        active: !this.isSelectedDayToday(),
         onOpen: () => this.openFilterDialog()
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
       FilterSummaryEntry({
-        label: '截止', value: this.dateLabel(this.dateFilter),
-        active: this.dateFilter !== AssignmentDateFilter.ALL,
+        label: '科目', value: this.subjectLabel(this.subjectCode),
+        active: this.subjectCode !== 'ALL',
         onOpen: () => this.openFilterDialog()
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      FilterSummaryEntry({
-        label: '科目', value: this.subjectLabel(this.subjectCode), active: this.subjectCode !== 'ALL',
-        onOpen: () => this.openFilterDialog()
-      });
-      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      Text(this.querying ? '查询中…' : (this.hasActiveFilters() ? '筛选中' : '筛选'))
+      Text(this.querying ? '查询中…' : '查询')
         .fontSize(13)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.hasActiveFilters() ? AppTheme.PRIMARY : AppTheme.TEXT)
         .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ left: 14, right: 14 })
+        .padding({ left: 18, right: 18 })
         .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('打开筛选面板')
+        .accessibilityText('打开作业查询')
         .onClick(() => this.openFilterDialog());
     }
     .width('100%')
@@ -484,10 +449,9 @@ export struct StudentAssignmentsPage {
     if (this.currentVisibleTotal() === 0) {
       Column({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
-        Text(this.currentTotalCount() === 0 ? '暂时没有作业' :
-          (this.calendarMode ? '这一天没有安排任务' : '当前筛选下没有作业'))
+        Text(this.currentTotalCount() === 0 ? '暂时没有作业' : '这一天没有安排任务')
           .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text(this.calendarMode ? '选择其他日期，或切回列表查看全部任务。' : '打开筛选面板调整条件后重新查询。')
+        Text('可选择其他日期或科目后重新查询。')
           .fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
@@ -499,8 +463,7 @@ export struct StudentAssignmentsPage {
   private AssignmentSections() {
     Column({ space: 22 }) {
       Row() {
-        Text(this.calendarMode ? `${this.dateLabel(AssignmentDateFilter.CUSTOM)}任务` :
-          (this.hasActiveFilters() ? '筛选结果' : '全部作业'))
+        Text(`${this.dateLabel()} 任务`)
           .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
         Text(`${this.currentVisibleTotal()} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);

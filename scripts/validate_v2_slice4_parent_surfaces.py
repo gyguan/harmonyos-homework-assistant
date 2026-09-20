@@ -106,25 +106,20 @@ require("components/assignment/AssignmentFilterDialog" in progress and
 require("components/selection/SelectionControls" in progress and
         "components/selection/SelectionControls" in student_assignments,
         "Parent Progress and Student Assignments must reuse shared reactive selection controls")
-for token in ["FilterSummaryEntry({", "label: '类型'", "label: '截止'", "label: '科目'",
-              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusMetricCard", "StatusSummary"]:
-    require(token in progress, f"Parent Progress must align common filter interaction with Student Assignments: {token}")
+for token in ["FilterSummaryEntry({", "label: '日期'", "label: '科目'",
+              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusSummary",
+              "AssignmentMetricSummary", "AssignmentMetricKey"]:
+    require(token in progress, f"Parent Progress must align common query/metric interaction: {token}")
 require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progress,
-        "Parent Progress status cards must own status filtering without duplicate status chips")
-require("this.StatusMetricCard('全部'" in progress and
-        "this.StatusMetricCard('需关注'" in progress and
-        "this.StatusMetricCard('待验收'" in progress and
-        "this.StatusMetricCard('已完成'" in progress,
-        "Parent Progress must expose all four clickable status summary cards")
-require(".onClick(() => this.chooseStatus(filter))" in progress,
-        "Parent Progress summary cards must filter the assignment list directly")
-require("@Prop active: boolean = false;" in selection_controls and
-        "@Prop selected: boolean = false;" in selection_controls,
-        "shared selection controls must expose reactive active/selected props")
-for phrase in ["全部日期", "今天", "明天", "本周", "未定", "全部科目", "语文", "数学", "英语", "其他",
-               "全部状态", "需关注", "待验收", "已完成"]:
-    require(phrase in progress or phrase in shared_filter,
-            f"Parent Progress missing required filter/summary content: {phrase}")
+        "Parent Progress status selection must remain in metric cards without duplicate chips")
+for phrase in ["全部任务", "待完成", "待验收", "已完成"]:
+    require(phrase in progress or phrase in read("entry/src/main/ets/components/assignment/AssignmentMetricSummary.ets"),
+            f"Parent Progress missing unified metric: {phrase}")
+for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode", "Button('查询'"]:
+    require(token in shared_filter, f"shared task query missing date+subject behavior: {token}")
+for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
+    require(removed not in shared_filter,
+            f"Parent/Student task query must not retain preset type/relative-date option: {removed}")
 require("AssignmentTypeFilter" in progress_vm and "assignmentType: typeFilter" in progress_vm,
         "Parent Progress query must support the same Assignment type dimension as Student Assignments")
 require("ParentReviewPane({" in progress and "selectedAssignmentId" in progress,

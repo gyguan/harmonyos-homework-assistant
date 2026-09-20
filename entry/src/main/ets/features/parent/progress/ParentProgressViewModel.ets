@@ -27,6 +27,17 @@ export class ParentProgressViewModel {
     return this.repository.query(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
   }
 
+  assignmentsOnDay(subjectCode: string, dayEpochMs: number,
+    statuses: AssignmentStatus[] = []): Assignment[] {
+    return this.repository.listCached(
+      this.dayFilter(subjectCode, dayEpochMs, statuses));
+  }
+
+  queryOnDay(subjectCode: string, dayEpochMs: number,
+    statuses: AssignmentStatus[] = []): Promise<Assignment[]> {
+    return this.repository.query(this.dayFilter(subjectCode, dayEpochMs, statuses));
+  }
+
   assignment(assignmentId: string): Assignment | null {
     return this.repository.getCached(assignmentId);
   }
@@ -37,6 +48,20 @@ export class ParentProgressViewModel {
 
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
+  }
+
+  private dayFilter(subjectCode: string, dayEpochMs: number,
+    statuses: AssignmentStatus[]): AssignmentFilter {
+    let day = ParentProgressViewModel.startOfDay(dayEpochMs);
+    return {
+      assignmentType: AssignmentTypeFilter.ALL,
+      subjectCode: subjectCode,
+      dateFilter: AssignmentDateFilter.CUSTOM,
+      fromEpochMs: day,
+      toEpochMs: ParentProgressViewModel.endOfDay(day),
+      undatedOnly: false,
+      statuses: statuses
+    };
   }
 
   private buildFilter(typeFilter: AssignmentTypeFilter, subjectCode: string, dateFilter: AssignmentDateFilter,

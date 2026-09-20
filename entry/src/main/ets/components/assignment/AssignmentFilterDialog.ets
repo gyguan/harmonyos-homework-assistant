@@ -1,43 +1,12 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import {
-  AssignmentDateFilter,
-  AssignmentTypeFilter
-} from '../../domain/model/AssignmentFilter';
 
 @CustomDialog
 export struct AssignmentFilterDialog {
   controller: CustomDialogController;
-  @Link typeFilter: AssignmentTypeFilter;
-  @Link dateFilter: AssignmentDateFilter;
+  @Link selectedDayEpochMs: number;
   @Link subjectCode: string;
-  onQuery: (typeFilter: AssignmentTypeFilter, dateFilter: AssignmentDateFilter, subjectCode: string) => void =
-    (_typeFilter: AssignmentTypeFilter, _dateFilter: AssignmentDateFilter, _subjectCode: string) => {};
-
-  @Builder
-  private TypeOption(label: string, value: AssignmentTypeFilter) {
-    Button(label, { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(14)
-      .fontWeight(this.typeFilter === value ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(this.typeFilter === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(this.typeFilter === value ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(() => this.typeFilter = value);
-  }
-
-  @Builder
-  private DateOption(label: string, value: AssignmentDateFilter) {
-    Button(label, { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(14)
-      .fontWeight(this.dateFilter === value ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(this.dateFilter === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(this.dateFilter === value ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(() => this.dateFilter = value);
-  }
+  onQuery: (selectedDayEpochMs: number, subjectCode: string) => void =
+    (_selectedDayEpochMs: number, _subjectCode: string) => {};
 
   @Builder
   private SubjectOption(label: string, value: string) {
@@ -53,25 +22,22 @@ export struct AssignmentFilterDialog {
   }
 
   private reset(): void {
-    this.typeFilter = AssignmentTypeFilter.ALL;
-    this.dateFilter = AssignmentDateFilter.ALL;
+    let now = new Date();
+    this.selectedDayEpochMs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     this.subjectCode = 'ALL';
   }
 
   private confirmQuery(): void {
-    this.onQuery(this.typeFilter, this.dateFilter, this.subjectCode);
+    this.onQuery(this.selectedDayEpochMs, this.subjectCode);
   }
 
   build() {
     Column() {
       Row() {
-        Column({ space: 3 }) {
-          Text('筛选作业')
-            .fontSize(20)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT);
-        }
-        .alignItems(HorizontalAlign.Start);
+        Text('查询作业')
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT);
         Blank();
         Text('关闭')
           .fontSize(13)
@@ -79,7 +45,7 @@ export struct AssignmentFilterDialog {
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 12, right: 4 })
           .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('关闭筛选')
+          .accessibilityText('关闭作业查询')
           .onClick(() => this.controller.close());
       }
       .width('100%')
@@ -88,30 +54,15 @@ export struct AssignmentFilterDialog {
       Scroll() {
         Column({ space: 22 }) {
           Column({ space: 10 }) {
-            Text('类型').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Row({ space: 8 }) {
-              this.TypeOption('全部', AssignmentTypeFilter.ALL);
-              this.TypeOption('课内', AssignmentTypeFilter.SCHOOL);
-              this.TypeOption('课外', AssignmentTypeFilter.EXTRA);
-            }
-            .width('100%');
-          }
-          .width('100%');
-
-          Column({ space: 10 }) {
-            Text('截止时间').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Row({ space: 8 }) {
-              this.DateOption('全部日期', AssignmentDateFilter.ALL);
-              this.DateOption('今天', AssignmentDateFilter.TODAY);
-              this.DateOption('明天', AssignmentDateFilter.TOMORROW);
-            }
-            .width('100%');
-            Row({ space: 8 }) {
-              this.DateOption('本周', AssignmentDateFilter.THIS_WEEK);
-              this.DateOption('未定', AssignmentDateFilter.UNDATED);
-              Blank().layoutWeight(1);
-            }
-            .width('100%');
+            Text('日期').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            DatePicker({ selected: new Date(this.selectedDayEpochMs) })
+              .width('100%')
+              .height(170)
+              .lunar(false)
+              .onDateChange((value: Date) => {
+                this.selectedDayEpochMs =
+                  new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+              });
           }
           .width('100%');
 
@@ -162,7 +113,7 @@ export struct AssignmentFilterDialog {
     }
     .width('100%')
     .constraintSize({ maxWidth: AppTheme.FILTER_DIALOG_MAX_WIDTH })
-    .height('68%')
+    .height('62%')
     .backgroundColor(AppTheme.SURFACE)
     .borderRadius({ topLeft: 24, topRight: 24 });
   }
