@@ -234,7 +234,7 @@ require("AssignmentEditForm" in confirmation_components and
         "DeadlinePickerField" in assignment_edit_form and
         "TextInput({ text: this.item.dueText })" not in confirmation_components,
         "Confirmation deadline edit must reuse the shared assignment form and native deadline picker")
-require("selected: this.showEditorSheet && this.editingCandidateId === item.id" in confirmation,
+require("this.showEditorSheet && this.editingCandidateId === item.id" in confirmation,
         "Confirmation selected Candidate must reflect both the active editor id and bottom-sheet visibility")
 require(".bindSheet($$this.showEditorSheet" in confirmation and
         ".bindSheet($this.showEditorSheet" not in confirmation and

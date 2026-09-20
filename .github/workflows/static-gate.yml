@@ -39,6 +39,9 @@ jobs:
       - name: Validate unified task UI consistency
         run: python scripts/validate_task_ui_consistency.py
 
+      - name: Validate confirmation interaction
+        run: python scripts/validate_confirmation_interaction.py
+
       - name: Validate parent delete and study media enhancements
         run: python scripts/validate_parent_delete_study_media.py
 

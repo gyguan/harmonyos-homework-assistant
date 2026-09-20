@@ -92,11 +92,27 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     if (current.status === AssignmentStatus.SUBMITTED || current.status === AssignmentStatus.COMPLETED) {
       throw new Error('已提交或已完成的作业不能再修改任务内容');
     }
-    if (!BackendSession.instance.isConnected()) {
-      throw new Error('当前离线，联网后才能编辑作业');
+
+    let remoteBacked = current.remoteVersion > 0 || current.candidateId.length > 0;
+    if (!remoteBacked && BackendSession.instance.isConnected()) {
+      try {
+        let latestRemote = await HomeworkRemoteApi.instance.get(assignment.id);
+        current = RemoteAssignmentMapper.toLocal(latestRemote, this.local.getAssignment(assignment.id));
+        this.applyAuthoritative(current);
+        remoteBacked = true;
+      } catch (error) {
+        if (`${error}`.indexOf('REMOTE_NOT_FOUND') < 0) throw new Error(`${error}`);
+      }
     }
-    if (current.remoteVersion <= 0 && current.candidateId.length === 0) {
-      throw new Error('示例作业不支持家长编辑');
+
+    if (!remoteBacked) {
+      let localDraft = this.mergeEditableDetails(current, assignment);
+      this.applyAuthoritative(localDraft);
+      return localDraft;
+    }
+
+    if (!BackendSession.instance.isConnected()) {
+      throw new Error('当前离线，联网后才能编辑已发布作业');
     }
 
     if (current.remoteVersion <= 0) {

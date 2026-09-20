@@ -24,6 +24,7 @@ remote = read("entry/src/main/ets/application/remote/HomeworkOrganizerRemoteApi.
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+shared_editor = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 
 require("int expectedMinutes" in dtos,
@@ -43,27 +44,30 @@ require("expectedMinutes: this.expectedMinutes(remote.expectedMinutes)" in remot
 require("return Math.max(5, Math.min(120" in remote,
         "HarmonyOS must defensively bound provider duration")
 require("onMinutesChange" in confirmation_components and "预计用时" in confirmation_components and
-        "placeholder: '自定义'" in confirmation_components and
-        "if (minutes < 1) minutes = 1;" in confirmation_components and
-        "if (minutes > 240) minutes = 240;" in confirmation_components,
-        "parent confirmation must keep a bounded custom duration override in the reactive editor")
+        "AssignmentEditForm({" in confirmation_components and
+        "placeholder: '自定义'" in shared_editor and
+        "if (minutes < 1) minutes = 1;" in shared_editor and
+        "if (minutes > 240) minutes = 240;" in shared_editor,
+        "parent confirmation must keep quick presets on cards and a bounded custom duration in the editor")
 require("onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "confirmation page must persist duration changes from the reactive editor")
-require(".bindSheet($$this.showEditorSheet" in confirmation and
-        ".bindSheet($this.showEditorSheet" not in confirmation and
+sheet_binding = ".bindSheet(" + "$" + "$" + "this.showEditorSheet"
+single_dollar_binding = ".bindSheet(" + "$" + "this.showEditorSheet"
+require(sheet_binding in confirmation and
+        single_dollar_binding not in confirmation and
         "private CandidateEditorSheet()" in confirmation and
-        "onSelect: () => this.openEditor(item.id)" in confirmation,
-        "candidate editing must open in a bottom sheet instead of an inline editor at page bottom")
-require("if (this.editingCandidate() !== null) {" not in
-        confirmation.split("Button('＋ 手工新增一项'")[1].split("this.PublishFeedback();")[0],
-        "confirmation page must not render the candidate editor inline below the list")
+        "else this.openEditor(item.id);" in confirmation,
+        "candidate editing must open in a bottom sheet outside batch-management mode")
+require("private CandidateListHeader()" in confirmation and "Text('＋ 新增')" in confirmation and
+        "Button('＋ 手工新增一项'" not in confirmation,
+        "manual add must live in the candidate-list header instead of below the list")
 require("CandidateDurationControl" in confirmation_components and
         confirmation_components.count("onMinutesChange(this.item") >= 5,
         "confirmation duration controls must expose common preset durations")
-require("placeholder: '自定义'" in confirmation_components and
-        "if (minutes < 1) minutes = 1;" in confirmation_components and
-        "if (minutes > 240) minutes = 240;" in confirmation_components,
-        "confirmation duration controls must support a bounded custom minute value")
+require("placeholder: '自定义'" in shared_editor and
+        "if (minutes < 1) minutes = 1;" in shared_editor and
+        "if (minutes > 240) minutes = 240;" in shared_editor,
+        "confirmation editor must support a bounded custom minute value")
 require("label: '10'" in confirmation_components and "label: '15'" in confirmation_components and
         "label: '20'" in confirmation_components and "label: '30'" in confirmation_components and
         "label: '45'" in confirmation_components,

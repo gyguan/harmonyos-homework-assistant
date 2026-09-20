@@ -6,74 +6,56 @@ import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkMode
 @Component
 export struct CandidateDurationControl {
   @Prop item: CandidateAssignment;
-  @Prop compact: boolean = false;
   onMinutesChange: (candidate: CandidateAssignment, minutes: number) => void =
     (_candidate: CandidateAssignment, _minutes: number) => {};
 
-  private applyCustom(value: string): void {
-    if (value.trim().length === 0) return;
-    let minutes = Math.round(Number(value));
-    if (!Number.isFinite(minutes)) return;
-    if (minutes < 1) minutes = 1;
-    if (minutes > 240) minutes = 240;
-    this.onMinutesChange(this.item, minutes);
-  }
-
   build() {
-    Column({ space: 7 }) {
-      Row({ space: 6 }) {
-        ChoiceSelectionChip({
-          label: '10',
-          selected: this.item.expectedMinutes === 10,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 10)
-        });
-        ChoiceSelectionChip({
-          label: '15',
-          selected: this.item.expectedMinutes === 15,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 15)
-        });
-        ChoiceSelectionChip({
-          label: '20',
-          selected: this.item.expectedMinutes === 20,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 20)
-        });
-        Text('分钟')
-          .fontSize(11)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-        Blank();
-      }
-      .width('100%');
+    Column({ space: 5 }) {
+      Text('预计用时')
+        .width('100%')
+        .fontSize(11)
+        .fontColor(AppTheme.TERTIARY_TEXT);
 
-      Row({ space: 6 }) {
-        ChoiceSelectionChip({
-          label: '30',
-          selected: this.item.expectedMinutes === 30,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 30)
-        });
-        ChoiceSelectionChip({
-          label: '45',
-          selected: this.item.expectedMinutes === 45,
-          compact: true,
-          onSelect: () => this.onMinutesChange(this.item, 45)
-        });
-        TextInput({ text: `${this.item.expectedMinutes}`, placeholder: '自定义' })
-          .width(this.compact ? 82 : 100)
-          .height(40)
-          .fontSize(12)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CHIP_RADIUS)
-          .textAlign(TextAlign.Center)
-          .onChange((value: string) => this.applyCustom(value));
-        Text('分钟')
-          .fontSize(11)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-        Blank();
+      Scroll() {
+        Row({ space: 6 }) {
+          ChoiceSelectionChip({
+            label: '10',
+            selected: this.item.expectedMinutes === 10,
+            compact: true,
+            onSelect: () => this.onMinutesChange(this.item, 10)
+          });
+          ChoiceSelectionChip({
+            label: '15',
+            selected: this.item.expectedMinutes === 15,
+            compact: true,
+            onSelect: () => this.onMinutesChange(this.item, 15)
+          });
+          ChoiceSelectionChip({
+            label: '20',
+            selected: this.item.expectedMinutes === 20,
+            compact: true,
+            onSelect: () => this.onMinutesChange(this.item, 20)
+          });
+          ChoiceSelectionChip({
+            label: '30',
+            selected: this.item.expectedMinutes === 30,
+            compact: true,
+            onSelect: () => this.onMinutesChange(this.item, 30)
+          });
+          ChoiceSelectionChip({
+            label: '45',
+            selected: this.item.expectedMinutes === 45,
+            compact: true,
+            onSelect: () => this.onMinutesChange(this.item, 45)
+          });
+          Text('分钟')
+            .fontSize(11)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+        }
       }
-      .width('100%');
+      .width('100%')
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off);
     }
     .width('100%');
   }
@@ -88,7 +70,7 @@ export struct ConfirmationCandidateCard {
     (_candidate: CandidateAssignment, _minutes: number) => {};
 
   build() {
-    Column({ space: 8 }) {
+    Column({ space: 7 }) {
       Row() {
         Row({ space: 7 }) {
           Text(this.item.subject)
@@ -105,7 +87,10 @@ export struct ConfirmationCandidateCard {
           }
         }
         Blank();
-        Text(this.item.dueText).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text(this.item.dueText)
+          .fontSize(12)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(1);
       }
       .width('100%');
 
@@ -116,36 +101,30 @@ export struct ConfirmationCandidateCard {
         .fontColor(AppTheme.TEXT)
         .maxLines(2);
 
-      Text(`预计 ${this.item.expectedMinutes} 分钟 · ${this.item.textbookRef.length > 0 ?
-        this.item.textbookRef : '未设置教材页码'}`)
-        .width('100%')
-        .fontSize(12)
-        .fontColor(AppTheme.SUBTEXT)
-        .maxLines(1);
-
-      Column({ space: 5 }) {
-        Text('预计用时')
+      if (this.item.textbookRef.length > 0) {
+        Text(this.item.textbookRef)
           .width('100%')
           .fontSize(11)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-        CandidateDurationControl({
-          item: this.item,
-          compact: true,
-          onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
-            this.onMinutesChange(candidate, minutes)
-        });
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
       }
-      .width('100%');
 
-      Text(`来源证据 · ${this.item.sourceEvidence.excerpt}`)
+      CandidateDurationControl({
+        item: this.item,
+        onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
+          this.onMinutesChange(candidate, minutes)
+      });
+
+      Text(`来源 · ${this.item.sourceEvidence.excerpt}`)
         .width('100%')
         .fontSize(11)
-        .lineHeight(17)
         .fontColor(this.item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.TERTIARY_TEXT)
-        .maxLines(2);
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.Ellipsis });
     }
     .width('100%')
-    .padding(12)
+    .padding(11)
     .backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
     .border({ width: this.selected ? 1 : 0,
       color: this.selected ? AppTheme.PRIMARY : Color.Transparent })
@@ -162,80 +141,243 @@ export struct ConfirmationCandidateCard {
 @Component
 export struct ConfirmationCandidateEditor {
   @Prop item: CandidateAssignment;
+  @State private subjectDraft: Subject = Subject.CHINESE;
+  @State private titleDraft: string = '';
+  @State private instructionDraft: string = '';
+  @State private dueTextDraft: string = '';
+  @State private expectedMinutesDraft: number = 20;
+  @State private textbookRefDraft: string = '';
+  @State private dirty: boolean = false;
+  @State private confirmDiscard: boolean = false;
+  @State private confirmDelete: boolean = false;
+
+  onClose: () => void = () => {};
+  onSave: (candidate: CandidateAssignment) => void = (_candidate: CandidateAssignment) => {};
   onDelete: (candidateId: string) => void = (_candidateId: string) => {};
-  onSubjectChange: (candidate: CandidateAssignment, subject: Subject) => void =
-    (_candidate: CandidateAssignment, _subject: Subject) => {};
-  onTitleChange: (candidate: CandidateAssignment, value: string) => void =
-    (_candidate: CandidateAssignment, _value: string) => {};
-  onInstructionChange: (candidate: CandidateAssignment, value: string) => void =
-    (_candidate: CandidateAssignment, _value: string) => {};
-  onDueTextChange: (candidate: CandidateAssignment, value: string) => void =
-    (_candidate: CandidateAssignment, _value: string) => {};
-  onMinutesChange: (candidate: CandidateAssignment, minutes: number) => void =
-    (_candidate: CandidateAssignment, _minutes: number) => {};
-  onTextbookRefChange: (candidate: CandidateAssignment, value: string) => void =
-    (_candidate: CandidateAssignment, _value: string) => {};
+
+  aboutToAppear(): void {
+    this.subjectDraft = this.item.subject;
+    this.titleDraft = this.item.title;
+    this.instructionDraft = this.item.instruction;
+    this.dueTextDraft = this.item.dueText;
+    this.expectedMinutesDraft = this.item.expectedMinutes;
+    this.textbookRefDraft = this.item.textbookRef;
+    this.dirty = false;
+    this.confirmDiscard = false;
+    this.confirmDelete = false;
+  }
+
+  private markDirty(): void {
+    this.dirty = true;
+    this.confirmDiscard = false;
+    this.confirmDelete = false;
+  }
+
+  private buildCandidate(): CandidateAssignment {
+    return {
+      id: this.item.id,
+      studentId: this.item.studentId,
+      subject: this.subjectDraft,
+      title: this.titleDraft,
+      instruction: this.instructionDraft,
+      textbookRef: this.textbookRefDraft,
+      dueText: this.dueTextDraft,
+      expectedMinutes: this.expectedMinutesDraft,
+      sourceEvidence: {
+        sourceLabel: this.item.sourceEvidence.sourceLabel,
+        excerpt: this.item.sourceEvidence.excerpt
+      },
+      confidence: this.item.confidence
+    };
+  }
+
+  private requestClose(): void {
+    if (this.dirty) {
+      this.confirmDiscard = true;
+      this.confirmDelete = false;
+      return;
+    }
+    this.onClose();
+  }
+
+  private saveAndClose(): void {
+    this.onSave(this.buildCandidate());
+    this.dirty = false;
+    this.onClose();
+  }
+
+  @Builder
+  private BottomActions() {
+    Column({ space: 8 }) {
+      if (this.confirmDiscard) {
+        Text('当前修改尚未完成，关闭将放弃这些修改。')
+          .width('100%')
+          .fontSize(12)
+          .fontColor(AppTheme.WARNING);
+        Row({ space: 10 }) {
+          Button('继续编辑', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT)
+            .onClick(() => this.confirmDiscard = false);
+          Button('放弃修改', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.DANGER_SOFT)
+            .fontColor(AppTheme.DANGER)
+            .onClick(() => {
+              this.dirty = false;
+              this.onClose();
+            });
+        }
+        .width('100%');
+      } else if (this.confirmDelete) {
+        Text('删除后无法恢复，确定删除这项待确认作业？')
+          .width('100%')
+          .fontSize(12)
+          .fontColor(AppTheme.DANGER);
+        Row({ space: 10 }) {
+          Button('取消', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT)
+            .onClick(() => this.confirmDelete = false);
+          Button('确认删除', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.DANGER)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => this.onDelete(this.item.id));
+        }
+        .width('100%');
+      } else {
+        Row({ space: 10 }) {
+          Button('删除', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.DANGER_SOFT)
+            .fontColor(AppTheme.DANGER)
+            .onClick(() => this.confirmDelete = true);
+          Button('完成', { type: ButtonType.Normal })
+            .layoutWeight(2)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .fontWeight(FontWeight.Medium)
+            .onClick(() => this.saveAndClose());
+        }
+        .width('100%');
+      }
+    }
+    .width('100%')
+    .padding({ left: 16, right: 16, top: 10, bottom: 18 })
+    .backgroundColor(AppTheme.SURFACE)
+    .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
+  }
 
   build() {
-    Column({ space: 12 }) {
-      Column({ space: 2 }) {
-        Text(this.item.confidence < 0.8 ? '重点确认' : '核对作业')
-          .width('100%')
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Text(this.item.confidence < 0.8 ?
-          '识别置信度较低，请对照老师原文逐项核对。' : '发布前确认任务内容与时间。')
-          .width('100%')
-          .fontSize(12)
-          .fontColor(this.item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.SUBTEXT);
+    Column() {
+      Row() {
+        Column({ space: 2 }) {
+          Text('编辑作业')
+            .fontSize(18)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text(`${this.item.subject} · ${this.item.title}`)
+            .maxLines(1)
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+
+        Text('关闭')
+          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .fontSize(14)
+          .fontColor(AppTheme.SUBTEXT)
+          .textAlign(TextAlign.Center)
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('关闭编辑')
+          .onClick(() => this.requestClose());
       }
       .width('100%')
-      .alignItems(HorizontalAlign.Start);
+      .padding({ left: 16, right: 16, top: 12, bottom: 10 });
 
-      AssignmentEditForm({
-        subject: this.item.subject,
-        subjectEditable: true,
-        title: this.item.title,
-        instruction: this.item.instruction,
-        dueText: this.item.dueText,
-        expectedMinutes: this.item.expectedMinutes,
-        textbookRef: this.item.textbookRef,
-        onSubjectChange: (subject: Subject) => this.onSubjectChange(this.item, subject),
-        onTitleChange: (value: string) => this.onTitleChange(this.item, value),
-        onInstructionChange: (value: string) => this.onInstructionChange(this.item, value),
-        onDueTextChange: (value: string) => this.onDueTextChange(this.item, value),
-        onMinutesChange: (minutes: number) => this.onMinutesChange(this.item, minutes),
-        onTextbookRefChange: (value: string) => this.onTextbookRefChange(this.item, value)
-      });
+      Divider().color(AppTheme.DIVIDER);
 
-      Column({ space: 5 }) {
-        Text(this.item.sourceEvidence.sourceLabel.length > 0 ?
-          this.item.sourceEvidence.sourceLabel : '老师原文')
+      Scroll() {
+        Column({ space: 12 }) {
+          AssignmentEditForm({
+            subject: this.subjectDraft,
+            subjectEditable: true,
+            title: this.titleDraft,
+            instruction: this.instructionDraft,
+            dueText: this.dueTextDraft,
+            expectedMinutes: this.expectedMinutesDraft,
+            textbookRef: this.textbookRefDraft,
+            onSubjectChange: (subject: Subject) => {
+              this.subjectDraft = subject;
+              this.markDirty();
+            },
+            onTitleChange: (value: string) => {
+              this.titleDraft = value;
+              this.markDirty();
+            },
+            onInstructionChange: (value: string) => {
+              this.instructionDraft = value;
+              this.markDirty();
+            },
+            onDueTextChange: (value: string) => {
+              this.dueTextDraft = value;
+              this.markDirty();
+            },
+            onMinutesChange: (minutes: number) => {
+              this.expectedMinutesDraft = minutes;
+              this.markDirty();
+            },
+            onTextbookRefChange: (value: string) => {
+              this.textbookRefDraft = value;
+              this.markDirty();
+            }
+          });
+
+          Column({ space: 5 }) {
+            Text(this.item.sourceEvidence.sourceLabel.length > 0 ?
+              this.item.sourceEvidence.sourceLabel : '老师原文')
+              .width('100%')
+              .fontSize(12)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text(this.item.sourceEvidence.excerpt)
+              .width('100%')
+              .fontSize(13)
+              .lineHeight(19)
+              .fontColor(AppTheme.SUBTEXT);
+          }
           .width('100%')
-          .fontSize(12)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Text(this.item.sourceEvidence.excerpt)
-          .width('100%')
-          .fontSize(13)
-          .lineHeight(19)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%')
-      .padding(13)
-      .backgroundColor(this.item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE_SUBTLE)
-      .borderRadius(AppTheme.CONTROL_RADIUS);
-
-      Button('删除这项作业', { type: ButtonType.Normal })
+          .padding(13)
+          .backgroundColor(this.item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+        }
         .width('100%')
-        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .backgroundColor(AppTheme.DANGER_SOFT)
-        .fontColor(AppTheme.DANGER)
-        .accessibilityText(`删除${this.item.title}`)
-        .onClick(() => this.onDelete(this.item.id));
+        .padding({ left: 16, right: 16, top: 12, bottom: 16 });
+      }
+      .width('100%')
+      .layoutWeight(1)
+      .scrollBar(BarState.Auto);
+
+      this.BottomActions();
     }
-    .width('100%');
+    .width('100%')
+    .height('100%')
+    .backgroundColor(AppTheme.SURFACE);
   }
 }

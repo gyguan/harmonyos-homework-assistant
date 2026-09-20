@@ -19,13 +19,13 @@ export struct DeadlinePickerDialog {
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        Text('取消')
+        Text('关闭')
           .fontSize(13)
           .fontColor(AppTheme.SUBTEXT)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 12, right: 4 })
           .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('取消选择截止时间')
+          .accessibilityText('关闭截止时间选择')
           .onClick(() => this.controller.close());
       }
       .width('100%');
