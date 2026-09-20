@@ -8,7 +8,7 @@
 - Main 基线（PR #222 创建时）: `0855a61d9fd68f139f4ba0c1789493b923401c8c`
 - 当前进行中的 PR: **#222 — refactor: 收敛作业身份、查询与交互基础能力**
 - 工作分支: `refactor/sustainable-assignment-foundation`
-- 合并策略: 功能分支完成 → CI 全绿 → 真实 HarmonyOS Build 验证 → 合入 `main`
+- 合并策略: 功能分支完成 → GitHub CI 全绿 → 直接合入 `main` → 用户从 `main` 做真实 DevEco/HarmonyOS Build；如发现 CompileArkTS 问题，立即从最新 `main` 修复
 - 当前没有 open issue；不要另起重复 issue/分支。
 
 PR #222 目标不是继续叠页面补丁，而是把最近多轮问题提升为可复用的基础机制。
@@ -92,19 +92,19 @@ PR #222 目标不是继续叠页面补丁，而是把最近多轮问题提升为
 
 每次继续提交后都以最新 head 的 workflow 为准，不要引用旧 run 的 PASS。
 
-### B. 真实 HarmonyOS / ArkTS Build
+### B. 真实 HarmonyOS / ArkTS Build（合入 main 后验证）
 
-当前 GitHub 普通 PR workflow 不能替代真实 HarmonyOS Build。
+当前 GitHub 普通 PR workflow 不能替代真实 HarmonyOS Build；`.github/workflows/harmony-client-build.yml` 仍是手工触发的 self-hosted Windows runner。
 
-本地 DevEco Studio 必须对 PR #222 最新代码执行一次完整 Build，重点确认：
+按当前协作约定，PR 的 GitHub CI 全绿后直接合入 `main`，然后用户从最新 `main` 在 DevEco Studio 做完整 Build，重点确认：
 
 1. 新增 `AssignmentBacking` 后没有遗漏的 Assignment object literal。
 2. `EditSheetHeader` 可通过当前 modelVersion 5.0.0 ArkTS 编译。
 3. `SelectionIds`、日期服务新增接口可通过 CompileArkTS。
 4. Snapshot V8 migration / load 路径没有 ArkTS 类型错误。
-5. 既有 `bindSheet($$this...)` 修复没有回退。
+5. 既有 `bindSheet($this...)` 修复没有回退。
 
-如果真实 CompileArkTS 失败，以编译器错误为最终依据，继续在 **同一个 PR #222 分支** 修复，不另起临时补丁分支。
+如果真实 CompileArkTS 失败，以编译器错误为最终依据，从最新 `main` 拉修复分支处理并在 CI 通过后继续合入，不通过页面级临时补丁绕过。
 
 ## 5. 建议人工回归
 
@@ -126,5 +126,6 @@ Build 通过后重点回归：
 1. 读取 `CONTEXT.md` 和本文件。
 2. 检查 PR #222 最新 head 与 CI。
 3. 如果用户提供 DevEco Build 错误，直接在 `refactor/sustainable-assignment-foundation` 修复。
-4. GitHub CI + 本地 Build 都通过后，合并 PR #222 到 `main`。
-5. 合并后以 `main` 为唯一继续开发基线。
+4. GitHub CI 全绿后直接合并 PR #222 到 `main`。
+5. 用户从最新 `main` 做 DevEco 完整 Build；如有真实 CompileArkTS 错误，基于 `main` 修复后继续合入。
+6. 后续始终以 `main` 为唯一继续开发基线。
