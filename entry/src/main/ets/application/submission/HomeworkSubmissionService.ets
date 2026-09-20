@@ -65,7 +65,7 @@ export class HomeworkSubmissionService {
       let result = await cameraPicker.pick(
         this.context, [cameraPicker.PickerMediaType.PHOTO], profile);
       if (result.resultCode !== 0) return '';
-      return result.resultUri.length > 0 ? result.resultUri : saveUri;
+      return saveUri;
     } catch {
       return '';
     }
