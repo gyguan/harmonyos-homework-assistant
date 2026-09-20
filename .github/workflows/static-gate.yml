@@ -33,6 +33,9 @@ jobs:
       - name: Validate issue 242 import inbox
         run: python scripts/validate_issue242_import_inbox.py
 
+      - name: Validate issue 243 share import
+        run: python scripts/validate_issue243_share_import.py
+
       - name: Validate pasted teacher text import
         run: python scripts/validate_text_import_feature.py
 
