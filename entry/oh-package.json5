@@ -5,5 +5,7 @@
   "main": "",
   "author": "gyguan",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "libhomeworkcapture.so": "file:./src/main/cpp/types/libhomeworkcapture"
+  }
 }
