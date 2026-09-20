@@ -39,6 +39,9 @@ jobs:
       - name: Validate unified task UI consistency
         run: python scripts/validate_task_ui_consistency.py
 
+      - name: Validate sustainable assignment foundation
+        run: python scripts/validate_sustainable_assignment_foundation.py
+
       - name: Validate confirmation interaction
         run: python scripts/validate_confirmation_interaction.py
 
