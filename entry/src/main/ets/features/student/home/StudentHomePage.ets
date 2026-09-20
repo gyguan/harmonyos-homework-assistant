@@ -97,6 +97,10 @@ struct StudentSubjectTaskGroupCard {
     return AppTheme.WARNING_SOFT;
   }
 
+  private assignmentRenderKey(item: Assignment): string {
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+  }
+
   @Builder
   private TaskRow(item: Assignment) {
     Row({ space: 10 }) {
@@ -211,7 +215,7 @@ struct StudentSubjectTaskGroupCard {
         Column({ space: 7 }) {
           ForEach(this.group.items, (item: Assignment) => {
             this.TaskRow(item);
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%')
         .padding({ left: 8, right: 8, top: 8, bottom: 8 });
