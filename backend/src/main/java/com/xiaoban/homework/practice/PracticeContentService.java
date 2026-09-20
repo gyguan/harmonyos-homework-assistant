@@ -1,7 +1,7 @@
 package com.xiaoban.homework.practice;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 import com.xiaoban.homework.common.ApiExceptions;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -11,10 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class PracticeContentService {
   private final PracticePaperRepository papers;
   private final PracticeQuestionRepository questions;
-  private final ObjectMapper mapper;
+  private final JsonMapper mapper;
 
   public PracticeContentService(PracticePaperRepository papers, PracticeQuestionRepository questions,
-      ObjectMapper mapper) {
+      JsonMapper mapper) {
     this.papers = papers;
     this.questions = questions;
     this.mapper = mapper;
