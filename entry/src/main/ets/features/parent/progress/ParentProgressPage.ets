@@ -34,6 +34,7 @@ export struct ParentProgressPage {
   @State private draftDateFilter: AssignmentDateFilter = AssignmentDateFilter.ALL;
   @State private draftSubjectCode: string = 'ALL';
   @State private visibleAssignments: Assignment[] = [];
+  @State private snapshotRevision: number = -1;
   @State private querying: boolean = false;
 
   onOpenReview: (assignmentId: string) => void = (_assignmentId: string) => {};
@@ -82,9 +83,17 @@ export struct ParentProgressPage {
 
   private applyItems(items: Assignment[]): void {
     this.visibleAssignments = items.slice();
+    this.snapshotRevision = this.revision + this.refreshRevision;
     let stillVisible = false;
     for (let item of items) if (item.id === this.selectedAssignmentId) stillVisible = true;
     if (!stillVisible) this.selectedAssignmentId = items.length > 0 ? items[0].id : '';
+  }
+
+  private currentVisibleAssignments(): Assignment[] {
+    let currentRevision = this.revision + this.refreshRevision;
+    if (this.snapshotRevision === currentRevision) return this.visibleAssignments;
+    return this.viewModel.assignments(
+      this.typeFilter, this.subjectCode, this.dateFilter, this.statuses());
   }
 
   private openFilterDialog(): void {
@@ -293,11 +302,11 @@ export struct ParentProgressPage {
           `${this.typeLabel(this.typeFilter)} · ${this.dateLabel(this.dateFilter)} · ${this.subjectLabel(this.subjectCode)} · ${this.statusLabel(this.statusFilter)}`)
           .fontSize(12).fontColor(AppTheme.SUBTEXT);
         Blank();
-        Text(`${this.visibleAssignments.length} 项`).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text(`${this.currentVisibleAssignments().length} 项`).fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
-      if (this.visibleAssignments.length === 0) {
+      if (this.currentVisibleAssignments().length === 0) {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
           Text('当前筛选下没有作业').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
@@ -306,7 +315,7 @@ export struct ParentProgressPage {
         .width('100%').padding({ top: 30, bottom: 30 });
       } else {
         Column({ space: 7 }) {
-          ForEach(this.visibleAssignments, (item: Assignment) => {
+          ForEach(this.currentVisibleAssignments(), (item: Assignment) => {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item),
