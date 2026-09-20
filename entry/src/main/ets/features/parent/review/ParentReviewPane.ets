@@ -73,8 +73,7 @@ export struct ParentReviewPane {
   }
 
   private canEdit(item: Assignment): boolean {
-    let persisted = item.remoteVersion > 0 || item.candidateId.length > 0;
-    return persisted && item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED;
+    return item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED;
   }
 
   private canDelete(item: Assignment): boolean {
