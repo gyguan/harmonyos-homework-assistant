@@ -25,6 +25,12 @@ export struct HomeworkImportPage {
 
   private touchRevision(): number { return this.revision + this.localRevision; }
 
+  private pendingCandidateCount(): number {
+    let currentRevision = this.touchRevision();
+    if (currentRevision < 0) return 0;
+    return this.viewModel.candidates().length;
+  }
+
   private canUseSplit(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.importOrganizeRequirement());
   }
@@ -204,6 +210,33 @@ export struct HomeworkImportPage {
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
+      if (this.pendingCandidateCount() > 0) {
+        Row({ space: 10 }) {
+          Column({ space: 2 }) {
+            Text(`已有 ${this.pendingCandidateCount()} 项待发布作业`)
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text('继续编辑后可直接发布')
+              .fontSize(11)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+          Text('继续编辑')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY);
+        }
+        .width('100%')
+        .constraintSize({ minHeight: 56 })
+        .padding({ left: 13, right: 13, top: 10, bottom: 10 })
+        .backgroundColor(AppTheme.PRIMARY_FAINT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('继续编辑待发布作业')
+        .onClick(() => this.onOpenConfirmation());
+      }
       this.ImportAction($r('sys.symbol.plus_square'), this.parseBusy ? '正在识别截图…' : '选择作业截图并识别',
         '从系统相册选择老师发来的作业截图', () => { void this.selectScreenshot(); });
       this.ImportAction($r('sys.symbol.checkmark_square'), '粘贴或输入作业文字',
