@@ -48,6 +48,8 @@ require("this.assignmentRenderKey(item)" in student_assignments,
 
 require("effectiveExpandedSubjectKey" in student_home,
         "student home must recover when the expanded subject disappears after an action")
+require("TodayScopeNote" not in student_home,
+        "student home must not reference the removed TodayScopeNote builder")
 require("this.assignmentRenderKey(item)" in student_home,
         "student home task rows must use content-aware assignment keys")
 
