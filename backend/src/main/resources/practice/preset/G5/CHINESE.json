@@ -1,0 +1,698 @@
+{
+  "schemaVersion": 1,
+  "grade": "G5",
+  "subject": "CHINESE",
+  "papers": [
+    {
+      "id": "CHINESE-G5-STARTER-001",
+      "version": 1,
+      "grade": "G5",
+      "subject": "CHINESE",
+      "title": "语文基础训练卷",
+      "description": "五年级语文首批练习套卷，用于建立稳定的套卷练习入口。",
+      "difficulty": "L1",
+      "questionCount": 10,
+      "estimatedMinutes": 20,
+      "tags": [
+        "字词",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G5-STARTER-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“认真”的近义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "仔细"
+            },
+            {
+              "key": "B",
+              "label": "马虎"
+            },
+            {
+              "key": "C",
+              "label": "忘记"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词表示一种颜色？",
+          "options": [
+            {
+              "key": "A",
+              "label": "奔跑"
+            },
+            {
+              "key": "B",
+              "label": "金黄"
+            },
+            {
+              "key": "C",
+              "label": "读书"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“安静”的反义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "平整"
+            },
+            {
+              "key": "B",
+              "label": "清楚"
+            },
+            {
+              "key": "C",
+              "label": "吵闹"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词语搭配更自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "明亮的教室"
+            },
+            {
+              "key": "B",
+              "label": "明亮的声音"
+            },
+            {
+              "key": "C",
+              "label": "明亮的味道"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“春风吹绿了小草”主要写的是哪个季节？",
+          "options": [
+            {
+              "key": "A",
+              "label": "冬天"
+            },
+            {
+              "key": "B",
+              "label": "春天"
+            },
+            {
+              "key": "C",
+              "label": "秋天"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词表示动作？",
+          "options": [
+            {
+              "key": "A",
+              "label": "蓝色"
+            },
+            {
+              "key": "B",
+              "label": "学校"
+            },
+            {
+              "key": "C",
+              "label": "奔跑"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我把书放进书包。”中的“书包”是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "物品"
+            },
+            {
+              "key": "B",
+              "label": "动作"
+            },
+            {
+              "key": "C",
+              "label": "时间"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句标点使用更合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "你好吗。"
+            },
+            {
+              "key": "B",
+              "label": "你好吗？"
+            },
+            {
+              "key": "C",
+              "label": "你好吗！。"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“太阳慢慢升起来了”中的“慢慢”表示什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "地点"
+            },
+            {
+              "key": "B",
+              "label": "人物"
+            },
+            {
+              "key": "C",
+              "label": "速度"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-STARTER-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词可以形容天空？",
+          "options": [
+            {
+              "key": "A",
+              "label": "晴朗"
+            },
+            {
+              "key": "B",
+              "label": "香甜"
+            },
+            {
+              "key": "C",
+              "label": "响亮"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "CHINESE-G5-CORE-001",
+      "version": 1,
+      "grade": "G5",
+      "subject": "CHINESE",
+      "title": "五年级语文综合基础卷（一）",
+      "description": "覆盖五年级字词、句意、标点与基础阅读理解。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 22,
+      "tags": [
+        "字词",
+        "句意",
+        "阅读理解"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G5-CORE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“沉着”的近义词是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "镇定"
+            },
+            {
+              "key": "B",
+              "label": "慌乱"
+            },
+            {
+              "key": "C",
+              "label": "急躁"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“络绎不绝”形容？",
+          "options": [
+            {
+              "key": "A",
+              "label": "完全停止"
+            },
+            {
+              "key": "B",
+              "label": "来往不断"
+            },
+            {
+              "key": "C",
+              "label": "非常安静"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“时间像流水，一去不返。”主要说明？",
+          "options": [
+            {
+              "key": "A",
+              "label": "水很多"
+            },
+            {
+              "key": "B",
+              "label": "时间很慢"
+            },
+            {
+              "key": "C",
+              "label": "时间宝贵且不可逆"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "“只有认真准备，才能取得好成绩。”表示？",
+          "options": [
+            {
+              "key": "A",
+              "label": "条件关系"
+            },
+            {
+              "key": "B",
+              "label": "转折关系"
+            },
+            {
+              "key": "C",
+              "label": "并列关系"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪项更接近事实说明？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我最喜欢秋天。"
+            },
+            {
+              "key": "B",
+              "label": "水在标准大气压下约100℃沸腾。"
+            },
+            {
+              "key": "C",
+              "label": "这朵花太美了！"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "“他像一棵松树一样站得笔直。”突出？",
+          "options": [
+            {
+              "key": "A",
+              "label": "年龄大"
+            },
+            {
+              "key": "B",
+              "label": "衣服绿"
+            },
+            {
+              "key": "C",
+              "label": "站姿挺拔"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读议论文片段时应寻找？",
+          "options": [
+            {
+              "key": "A",
+              "label": "观点和理由"
+            },
+            {
+              "key": "B",
+              "label": "押韵和节奏"
+            },
+            {
+              "key": "C",
+              "label": "人物外貌"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪一句用词更准确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "气温猛烈下降。"
+            },
+            {
+              "key": "B",
+              "label": "气温明显下降。"
+            },
+            {
+              "key": "C",
+              "label": "气温大声下降。"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“不仅……还……”表示？",
+          "options": [
+            {
+              "key": "A",
+              "label": "转折"
+            },
+            {
+              "key": "B",
+              "label": "选择"
+            },
+            {
+              "key": "C",
+              "label": "递进"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "“面对失败，他重新整理思路再出发。”体现？",
+          "options": [
+            {
+              "key": "A",
+              "label": "不轻易放弃"
+            },
+            {
+              "key": "B",
+              "label": "害怕困难"
+            },
+            {
+              "key": "C",
+              "label": "逃避问题"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "说明方法“列数字”的主要作用？",
+          "options": [
+            {
+              "key": "A",
+              "label": "增加想象"
+            },
+            {
+              "key": "B",
+              "label": "使说明更具体准确"
+            },
+            {
+              "key": "C",
+              "label": "制造悬念"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G5-CORE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "概括长文时应优先保留？",
+          "options": [
+            {
+              "key": "A",
+              "label": "所有细节"
+            },
+            {
+              "key": "B",
+              "label": "所有形容词"
+            },
+            {
+              "key": "C",
+              "label": "核心观点和关键事实"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    }
+  ]
+}

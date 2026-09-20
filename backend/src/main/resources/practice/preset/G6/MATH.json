@@ -1,0 +1,399 @@
+{
+  "schemaVersion": 1,
+  "grade": "G6",
+  "subject": "MATH",
+  "papers": [
+    {
+      "id": "MATH-G6-STARTER-001",
+      "version": 1,
+      "grade": "G6",
+      "subject": "MATH",
+      "title": "数学基础训练卷",
+      "description": "六年级数学首批练习套卷，用于建立稳定的套卷练习入口。",
+      "difficulty": "L1",
+      "questionCount": 10,
+      "estimatedMinutes": 15,
+      "tags": [
+        "计算",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G6-STARTER-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "93 ÷ 3 = ?",
+          "options": [],
+          "answerSpec": "31",
+          "explanation": "按运算顺序计算，结果是 31。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "128 ÷ 4 = ?",
+          "options": [],
+          "answerSpec": "32",
+          "explanation": "按运算顺序计算，结果是 32。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "66 ÷ 2 = ?",
+          "options": [],
+          "answerSpec": "33",
+          "explanation": "按运算顺序计算，结果是 33。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "102 ÷ 3 = ?",
+          "options": [],
+          "answerSpec": "34",
+          "explanation": "按运算顺序计算，结果是 34。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "140 ÷ 4 = ?",
+          "options": [],
+          "answerSpec": "35",
+          "explanation": "按运算顺序计算，结果是 35。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "72 ÷ 2 = ?",
+          "options": [],
+          "answerSpec": "36",
+          "explanation": "按运算顺序计算，结果是 36。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "111 ÷ 3 = ?",
+          "options": [],
+          "answerSpec": "37",
+          "explanation": "按运算顺序计算，结果是 37。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "152 ÷ 4 = ?",
+          "options": [],
+          "answerSpec": "38",
+          "explanation": "按运算顺序计算，结果是 38。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "78 ÷ 2 = ?",
+          "options": [],
+          "answerSpec": "39",
+          "explanation": "按运算顺序计算，结果是 39。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-STARTER-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "120 ÷ 3 = ?",
+          "options": [],
+          "answerSpec": "40",
+          "explanation": "按运算顺序计算，结果是 40。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "MATH-G6-CORE-001",
+      "version": 1,
+      "grade": "G6",
+      "subject": "MATH",
+      "title": "六年级数学综合基础卷（一）",
+      "description": "覆盖六年级计算与基础应用题，强化稳定计算和数量关系。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "计算",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G6-CORE-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "3.5 + 2.75 = ?",
+          "options": [],
+          "answerSpec": "6.25",
+          "explanation": "计算可得 6.25。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "10 - 3.68 = ?",
+          "options": [],
+          "answerSpec": "6.32",
+          "explanation": "计算可得 6.32。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "2.4 × 1.5 = ?",
+          "options": [],
+          "answerSpec": "3.6",
+          "explanation": "计算可得 3.6。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "8.4 ÷ 1.2 = ?",
+          "options": [],
+          "answerSpec": "7",
+          "explanation": "计算可得 7。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "75 × 0.8 = ?",
+          "options": [],
+          "answerSpec": "60",
+          "explanation": "计算可得 60。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "4.5 ÷ 0.15 = ?",
+          "options": [],
+          "answerSpec": "30",
+          "explanation": "计算可得 30。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "小明有 68 张卡片，又得到 13 张，现在有多少张？",
+          "options": [],
+          "answerSpec": "75",
+          "explanation": "计算可得 75。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "一盒有 9 支笔，8 盒共有多少支？",
+          "options": [],
+          "answerSpec": "72",
+          "explanation": "计算可得 72。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "把 84 个苹果平均分给 7 人，每人多少个？",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "计算可得 12。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "一段绳子长 80 米，用去 15 米，还剩多少米？",
+          "options": [],
+          "answerSpec": "71",
+          "explanation": "计算可得 71。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "每本练习册 10 元，买 4 本需要多少元？",
+          "options": [],
+          "answerSpec": "40",
+          "explanation": "计算可得 40。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G6-CORE-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "上午读了 18 页，下午读了 21 页，一共读了多少页？",
+          "options": [],
+          "answerSpec": "39",
+          "explanation": "计算可得 39。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    }
+  ]
+}

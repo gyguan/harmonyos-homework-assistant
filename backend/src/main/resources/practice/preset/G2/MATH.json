@@ -1,0 +1,2149 @@
+{
+  "schemaVersion": 1,
+  "grade": "G2",
+  "subject": "MATH",
+  "papers": [
+    {
+      "id": "MATH-G2-STARTER-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "title": "数学基础训练卷",
+      "description": "二年级数学首批练习套卷，用于建立稳定的套卷练习入口。",
+      "difficulty": "L1",
+      "questionCount": 10,
+      "estimatedMinutes": 15,
+      "tags": [
+        "计算",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-STARTER-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "7 + 3 = ?",
+          "options": [],
+          "answerSpec": "10",
+          "explanation": "按运算顺序计算，结果是 10。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "8 + 4 = ?",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "按运算顺序计算，结果是 12。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "9 + 5 = ?",
+          "options": [],
+          "answerSpec": "14",
+          "explanation": "按运算顺序计算，结果是 14。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "10 + 6 = ?",
+          "options": [],
+          "answerSpec": "16",
+          "explanation": "按运算顺序计算，结果是 16。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "11 + 7 = ?",
+          "options": [],
+          "answerSpec": "18",
+          "explanation": "按运算顺序计算，结果是 18。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "12 + 8 = ?",
+          "options": [],
+          "answerSpec": "20",
+          "explanation": "按运算顺序计算，结果是 20。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "13 + 9 = ?",
+          "options": [],
+          "answerSpec": "22",
+          "explanation": "按运算顺序计算，结果是 22。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "14 + 10 = ?",
+          "options": [],
+          "answerSpec": "24",
+          "explanation": "按运算顺序计算，结果是 24。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "15 + 11 = ?",
+          "options": [],
+          "answerSpec": "26",
+          "explanation": "按运算顺序计算，结果是 26。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-STARTER-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "16 + 12 = ?",
+          "options": [],
+          "answerSpec": "28",
+          "explanation": "按运算顺序计算，结果是 28。",
+          "hints": [
+            "先确认运算符。",
+            "可以分步口算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "MATH-G2-CORE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "title": "二年级数学综合基础卷（一）",
+      "description": "覆盖二年级计算与基础应用题，强化稳定计算和数量关系。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "计算",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-CORE-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "36 + 27 = ?",
+          "options": [],
+          "answerSpec": "63",
+          "explanation": "计算可得 63。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "72 - 38 = ?",
+          "options": [],
+          "answerSpec": "34",
+          "explanation": "计算可得 34。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "6 × 7 = ?",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "计算可得 42。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "45 ÷ 5 = ?",
+          "options": [],
+          "answerSpec": "9",
+          "explanation": "计算可得 9。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "8 × 9 = ?",
+          "options": [],
+          "answerSpec": "72",
+          "explanation": "计算可得 72。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "64 ÷ 8 = ?",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "计算可得 8。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "小明有 28 张卡片，又得到 9 张，现在有多少张？",
+          "options": [],
+          "answerSpec": "35",
+          "explanation": "计算可得 35。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "一盒有 5 支笔，4 盒共有多少支？",
+          "options": [],
+          "answerSpec": "20",
+          "explanation": "计算可得 20。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "把 36 个苹果平均分给 3 人，每人多少个？",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "计算可得 12。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "一段绳子长 40 米，用去 11 米，还剩多少米？",
+          "options": [],
+          "answerSpec": "31",
+          "explanation": "计算可得 31。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "每本练习册 6 元，买 4 本需要多少元？",
+          "options": [],
+          "answerSpec": "24",
+          "explanation": "计算可得 24。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-CORE-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "上午读了 14 页，下午读了 17 页，一共读了多少页？",
+          "options": [],
+          "answerSpec": "31",
+          "explanation": "计算可得 31。",
+          "hints": [
+            "先明确运算关系。",
+            "必要时分步计算。"
+          ],
+          "tags": [
+            "应用"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "MATH-G2-S1-ADD-SUB-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "二上数学100以内加减（一）",
+      "description": "二年级上学期100以内两位数加减、连加连减和简单应用。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "100以内加减",
+        "连加连减",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "37 + 25 = ?",
+          "options": [],
+          "answerSpec": "62",
+          "explanation": "按题意计算，结果是 62。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "64 - 28 = ?",
+          "options": [],
+          "answerSpec": "36",
+          "explanation": "按题意计算，结果是 36。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "46 + 18 = ?",
+          "options": [],
+          "answerSpec": "64",
+          "explanation": "按题意计算，结果是 64。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "80 - 37 = ?",
+          "options": [],
+          "answerSpec": "43",
+          "explanation": "按题意计算，结果是 43。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "29 + 34 = ?",
+          "options": [],
+          "answerSpec": "63",
+          "explanation": "按题意计算，结果是 63。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "72 - 45 = ?",
+          "options": [],
+          "answerSpec": "27",
+          "explanation": "按题意计算，结果是 27。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "18 + 27 + 15 = ?",
+          "options": [],
+          "answerSpec": "60",
+          "explanation": "按题意计算，结果是 60。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "连加连减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "90 - 26 - 34 = ?",
+          "options": [],
+          "answerSpec": "30",
+          "explanation": "按题意计算，结果是 30。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "连加连减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "45 + 16 - 20 = ?",
+          "options": [],
+          "answerSpec": "41",
+          "explanation": "按题意计算，结果是 41。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "连加连减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "63 - 18 + 25 = ?",
+          "options": [],
+          "answerSpec": "70",
+          "explanation": "按题意计算，结果是 70。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "连加连减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "小华有38张卡片，又得到24张，现在有多少张？",
+          "options": [],
+          "answerSpec": "62",
+          "explanation": "按题意计算，结果是 62。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-ADD-SUB-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "图书角有75本书，借出29本，还剩多少本？",
+          "options": [],
+          "answerSpec": "46",
+          "explanation": "按题意计算，结果是 46。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减",
+            "应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SHOPPING-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "二上数学购物与人民币（一）",
+      "description": "二年级上学期购物情境：元角认识、付钱找钱和简单总价。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "购物",
+        "人民币",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "3元 + 5元 = ?（填元数）",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "按题意计算，结果是 8。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "人民币"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "10元 - 4元 = ?（填元数）",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "按题意计算，结果是 6。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "人民币"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "一盒彩笔8元，一本练习本6元，一共多少元？",
+          "options": [],
+          "answerSpec": "14",
+          "explanation": "按题意计算，结果是 14。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "妈妈付20元买一件12元的物品，应找回多少元？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "按题意计算，结果是 8。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "1元等于多少角？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10角"
+            },
+            {
+              "key": "B",
+              "label": "5角"
+            },
+            {
+              "key": "C",
+              "label": "100角"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "购物",
+            "人民币"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪种付法正好是6元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "5元+1元"
+            },
+            {
+              "key": "B",
+              "label": "2元+2元"
+            },
+            {
+              "key": "C",
+              "label": "10元+1元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "购物",
+            "人民币"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "一个文具盒15元，两支铅笔共4元，一共多少元？",
+          "options": [],
+          "answerSpec": "19",
+          "explanation": "按题意计算，结果是 19。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "有30元，买书用去18元，还剩多少元？",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "按题意计算，结果是 12。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "买9元的本子，付10元，应找回？",
+          "options": [
+            {
+              "key": "A",
+              "label": "1元"
+            },
+            {
+              "key": "B",
+              "label": "2元"
+            },
+            {
+              "key": "C",
+              "label": "9元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "购物",
+            "人民币"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "两盒彩泥每盒7元，一共多少元？",
+          "options": [],
+          "answerSpec": "14",
+          "explanation": "按题意计算，结果是 14。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "乘法启蒙"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "一盒彩笔9元，3盒彩笔共多少元？",
+          "options": [],
+          "answerSpec": "27",
+          "explanation": "按题意计算，结果是 27。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "乘法启蒙"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SHOPPING-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "小明有25元，买了8元和6元的两件物品，还剩多少元？",
+          "options": [],
+          "answerSpec": "11",
+          "explanation": "按题意计算，结果是 11。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-MULTIPLY-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "二上数学乘法入门与2～5口诀（一）",
+      "description": "二年级上学期理解乘法意义，熟练2～5的乘法口诀。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "乘法意义",
+        "2-5乘法口诀",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "2 × 4 = ?",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "按题意计算，结果是 8。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "乘法意义",
+            "2-5乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "3 × 5 = ?",
+          "options": [],
+          "answerSpec": "15",
+          "explanation": "按题意计算，结果是 15。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "乘法意义",
+            "2-5乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "4 × 4 = ?",
+          "options": [],
+          "answerSpec": "16",
+          "explanation": "按题意计算，结果是 16。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "2-5乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "5 × 3 = ?",
+          "options": [],
+          "answerSpec": "15",
+          "explanation": "按题意计算，结果是 15。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "2-5乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“4个3相加”可以写成哪个乘法算式？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4×3"
+            },
+            {
+              "key": "B",
+              "label": "4+3"
+            },
+            {
+              "key": "C",
+              "label": "4-3"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "乘法意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "3+3+3+3可以写成？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4×3"
+            },
+            {
+              "key": "B",
+              "label": "3×3"
+            },
+            {
+              "key": "C",
+              "label": "4+3"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "乘法意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "每盘4个苹果，3盘一共有多少个？",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "按题意计算，结果是 12。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "乘法意义",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "每盒彩笔5支，4盒一共有多少支？",
+          "options": [],
+          "answerSpec": "20",
+          "explanation": "按题意计算，结果是 20。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "2-5乘法口诀",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "2 × 5 = ?",
+          "options": [],
+          "answerSpec": "10",
+          "explanation": "按题意计算，结果是 10。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "2-5乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "5 × 5 = ?",
+          "options": [],
+          "answerSpec": "25",
+          "explanation": "按题意计算，结果是 25。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "2-5乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "4 × 2 = ?",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "按题意计算，结果是 8。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "2-5乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "3 × 4 = ?",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "按题意计算，结果是 12。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "2-5乘法口诀"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-MULTIPLY-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "二上数学6～9乘法口诀（一）",
+      "description": "二年级上学期6～9乘法口诀与一步乘法应用。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "6-9乘法口诀",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "6 × 4 = ?",
+          "options": [],
+          "answerSpec": "24",
+          "explanation": "按题意计算，结果是 24。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "7 × 3 = ?",
+          "options": [],
+          "answerSpec": "21",
+          "explanation": "按题意计算，结果是 21。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "8 × 5 = ?",
+          "options": [],
+          "answerSpec": "40",
+          "explanation": "按题意计算，结果是 40。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "9 × 4 = ?",
+          "options": [],
+          "answerSpec": "36",
+          "explanation": "按题意计算，结果是 36。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "6 × 6 = ?",
+          "options": [],
+          "answerSpec": "36",
+          "explanation": "按题意计算，结果是 36。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "7 × 7 = ?",
+          "options": [],
+          "answerSpec": "49",
+          "explanation": "按题意计算，结果是 49。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "8 × 8 = ?",
+          "options": [],
+          "answerSpec": "64",
+          "explanation": "按题意计算，结果是 64。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "9 × 6 = ?",
+          "options": [],
+          "answerSpec": "54",
+          "explanation": "按题意计算，结果是 54。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "每排6人，5排共有多少人？",
+          "options": [],
+          "answerSpec": "30",
+          "explanation": "按题意计算，结果是 30。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "一周7天，4周有多少天？",
+          "options": [],
+          "answerSpec": "28",
+          "explanation": "按题意计算，结果是 28。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "每盒彩笔8支，3盒共有多少支？",
+          "options": [],
+          "answerSpec": "24",
+          "explanation": "按题意计算，结果是 24。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MULTIPLY-002-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "9个小组，每组5人，共有多少人？",
+          "options": [],
+          "answerSpec": "45",
+          "explanation": "按题意计算，结果是 45。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "6-9乘法口诀",
+            "应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-MEASURE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "二上数学长度测量（一）",
+      "description": "二年级上学期厘米、米、长度比较和生活中的简单测量。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "长度测量",
+        "估测",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "1米等于多少厘米？",
+          "options": [
+            {
+              "key": "A",
+              "label": "100厘米"
+            },
+            {
+              "key": "B",
+              "label": "10厘米"
+            },
+            {
+              "key": "C",
+              "label": "1000厘米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "测量铅笔长度更适合用什么单位？",
+          "options": [
+            {
+              "key": "A",
+              "label": "厘米"
+            },
+            {
+              "key": "B",
+              "label": "米"
+            },
+            {
+              "key": "C",
+              "label": "千米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "测量教室长度更适合用什么单位？",
+          "options": [
+            {
+              "key": "A",
+              "label": "米"
+            },
+            {
+              "key": "B",
+              "label": "厘米"
+            },
+            {
+              "key": "C",
+              "label": "毫米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "一根绳子长80厘米，剪去25厘米，还剩多少厘米？",
+          "options": [],
+          "answerSpec": "55",
+          "explanation": "按题意计算，结果是 55。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "长度测量",
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "一张桌子长60厘米，另一张长35厘米，两张合起来多少厘米？",
+          "options": [],
+          "answerSpec": "95",
+          "explanation": "按题意计算，结果是 95。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "长度测量",
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个长度最接近门的高度？",
+          "options": [
+            {
+              "key": "A",
+              "label": "2米"
+            },
+            {
+              "key": "B",
+              "label": "2厘米"
+            },
+            {
+              "key": "C",
+              "label": "20厘米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量",
+            "估测"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "50厘米和1米相比，哪个更长？",
+          "options": [
+            {
+              "key": "A",
+              "label": "1米"
+            },
+            {
+              "key": "B",
+              "label": "50厘米"
+            },
+            {
+              "key": "C",
+              "label": "一样长"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量",
+            "比较"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "1米减去30厘米，还剩多少厘米？",
+          "options": [],
+          "answerSpec": "70",
+          "explanation": "按题意计算，结果是 70。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "长度测量"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "测量课桌宽度时，应从哪里开始？",
+          "options": [
+            {
+              "key": "A",
+              "label": "尺子的0刻度"
+            },
+            {
+              "key": "B",
+              "label": "尺子的任意位置"
+            },
+            {
+              "key": "C",
+              "label": "只看尺子颜色"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量",
+            "测量方法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "两根绳子分别长40厘米和35厘米，一共多少厘米？",
+          "options": [],
+          "answerSpec": "75",
+          "explanation": "按题意计算，结果是 75。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "长度测量"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "一根1米长的绳子用去45厘米，还剩多少厘米？",
+          "options": [],
+          "answerSpec": "55",
+          "explanation": "按题意计算，结果是 55。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "长度测量"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-MEASURE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个说法更合理？",
+          "options": [
+            {
+              "key": "A",
+              "label": "一支铅笔大约15厘米长"
+            },
+            {
+              "key": "B",
+              "label": "一支铅笔大约15米长"
+            },
+            {
+              "key": "C",
+              "label": "教室门大约2厘米高"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量",
+            "估测"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-DIVIDE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "二上数学平均分与除法（一）",
+      "description": "二年级上学期平均分、基础除法和一步应用。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "平均分",
+        "基础除法",
+        "应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "把12个苹果平均分给3人，每人几个？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "按题意计算，结果是 4。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "平均分",
+            "基础除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "把20颗糖平均分成4份，每份几颗？",
+          "options": [],
+          "answerSpec": "5",
+          "explanation": "按题意计算，结果是 5。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "平均分",
+            "基础除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "18 ÷ 3 = ?",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "按题意计算，结果是 6。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "24 ÷ 4 = ?",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "按题意计算，结果是 6。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“把15个苹果平均分给5人”中的“平均分”表示？",
+          "options": [
+            {
+              "key": "A",
+              "label": "每人分得同样多"
+            },
+            {
+              "key": "B",
+              "label": "随便分"
+            },
+            {
+              "key": "C",
+              "label": "只给一个人"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "16个小球，每4个装一盒，可以装几盒？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "按题意计算，结果是 4。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "21名同学，每3人一组，可以分成几组？",
+          "options": [],
+          "answerSpec": "7",
+          "explanation": "按题意计算，结果是 7。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "27 ÷ 9 = ?",
+          "options": [],
+          "answerSpec": "3",
+          "explanation": "按题意计算，结果是 3。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "32 ÷ 8 = ?",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "按题意计算，结果是 4。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "有36本书，平均放在6层，每层放几本？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "按题意计算，结果是 6。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一道算式表示“18平均分成6份”？",
+          "options": [
+            {
+              "key": "A",
+              "label": "18÷6"
+            },
+            {
+              "key": "B",
+              "label": "18+6"
+            },
+            {
+              "key": "C",
+              "label": "18-6"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "基础除法",
+            "算式意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-DIVIDE-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "40个气球，每5个一束，可以扎几束？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "按题意计算，结果是 8。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法",
+            "应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-REVIEW-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "title": "二上数学阶段复习（一）",
+      "description": "二年级上学期加减、购物、乘除法和测量综合复习。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "100以内加减",
+        "乘除法",
+        "测量",
+        "购物"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "58 + 26 = ?",
+          "options": [],
+          "answerSpec": "84",
+          "explanation": "按题意计算，结果是 84。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "73 - 39 = ?",
+          "options": [],
+          "answerSpec": "34",
+          "explanation": "按题意计算，结果是 34。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "100以内加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "5 × 6 = ?",
+          "options": [],
+          "answerSpec": "30",
+          "explanation": "按题意计算，结果是 30。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "7 × 8 = ?",
+          "options": [],
+          "answerSpec": "56",
+          "explanation": "按题意计算，结果是 56。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "乘法口诀"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "24 ÷ 6 = ?",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "按题意计算，结果是 4。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "基础除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "1米等于多少厘米？",
+          "options": [
+            {
+              "key": "A",
+              "label": "100厘米"
+            },
+            {
+              "key": "B",
+              "label": "10厘米"
+            },
+            {
+              "key": "C",
+              "label": "50厘米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "一本书12元，一支笔5元，一共多少元？",
+          "options": [],
+          "answerSpec": "17",
+          "explanation": "按题意计算，结果是 17。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "购物",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "每组4人，6组共有多少人？",
+          "options": [],
+          "answerSpec": "24",
+          "explanation": "按题意计算，结果是 24。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "乘法",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "30个苹果平均放进5个篮子，每篮几个？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "按题意计算，结果是 6。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "除法",
+            "应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "90 - 28 - 32 = ?",
+          "options": [],
+          "answerSpec": "30",
+          "explanation": "按题意计算，结果是 30。",
+          "hints": [
+            "先看清数量关系。",
+            "可以分步口算或列式。"
+          ],
+          "tags": [
+            "连加连减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个算式表示“3个5”？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3×5"
+            },
+            {
+              "key": "B",
+              "label": "3+5"
+            },
+            {
+              "key": "C",
+              "label": "5-3"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "乘法意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-REVIEW-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "测量课桌长度更适合用？",
+          "options": [
+            {
+              "key": "A",
+              "label": "厘米"
+            },
+            {
+              "key": "B",
+              "label": "千米"
+            },
+            {
+              "key": "C",
+              "label": "吨"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "长度测量"
+          ]
+        }
+      ]
+    }
+  ]
+}

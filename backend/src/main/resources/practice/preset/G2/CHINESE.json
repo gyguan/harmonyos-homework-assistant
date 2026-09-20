@@ -1,0 +1,2603 @@
+{
+  "schemaVersion": 1,
+  "grade": "G2",
+  "subject": "CHINESE",
+  "papers": [
+    {
+      "id": "CHINESE-G2-STARTER-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "title": "语文基础训练卷",
+      "description": "二年级语文首批练习套卷，用于建立稳定的套卷练习入口。",
+      "difficulty": "L1",
+      "questionCount": 10,
+      "estimatedMinutes": 20,
+      "tags": [
+        "字词",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-STARTER-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“认真”的近义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "仔细"
+            },
+            {
+              "key": "B",
+              "label": "马虎"
+            },
+            {
+              "key": "C",
+              "label": "忘记"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词表示一种颜色？",
+          "options": [
+            {
+              "key": "A",
+              "label": "奔跑"
+            },
+            {
+              "key": "B",
+              "label": "金黄"
+            },
+            {
+              "key": "C",
+              "label": "读书"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“安静”的反义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "平整"
+            },
+            {
+              "key": "B",
+              "label": "清楚"
+            },
+            {
+              "key": "C",
+              "label": "吵闹"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词语搭配更自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "明亮的教室"
+            },
+            {
+              "key": "B",
+              "label": "明亮的声音"
+            },
+            {
+              "key": "C",
+              "label": "明亮的味道"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“春风吹绿了小草”主要写的是哪个季节？",
+          "options": [
+            {
+              "key": "A",
+              "label": "冬天"
+            },
+            {
+              "key": "B",
+              "label": "春天"
+            },
+            {
+              "key": "C",
+              "label": "秋天"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词表示动作？",
+          "options": [
+            {
+              "key": "A",
+              "label": "蓝色"
+            },
+            {
+              "key": "B",
+              "label": "学校"
+            },
+            {
+              "key": "C",
+              "label": "奔跑"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我把书放进书包。”中的“书包”是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "物品"
+            },
+            {
+              "key": "B",
+              "label": "动作"
+            },
+            {
+              "key": "C",
+              "label": "时间"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句标点使用更合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "你好吗。"
+            },
+            {
+              "key": "B",
+              "label": "你好吗？"
+            },
+            {
+              "key": "C",
+              "label": "你好吗！。"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“太阳慢慢升起来了”中的“慢慢”表示什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "地点"
+            },
+            {
+              "key": "B",
+              "label": "人物"
+            },
+            {
+              "key": "C",
+              "label": "速度"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-STARTER-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词可以形容天空？",
+          "options": [
+            {
+              "key": "A",
+              "label": "晴朗"
+            },
+            {
+              "key": "B",
+              "label": "香甜"
+            },
+            {
+              "key": "C",
+              "label": "响亮"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "选择最符合题意的选项。",
+          "hints": [
+            "先读完整题目。",
+            "逐个比较三个选项。"
+          ],
+          "tags": [
+            "语文基础"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "CHINESE-G2-CORE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "title": "二年级语文综合基础卷（一）",
+      "description": "覆盖二年级字词、句意、标点与基础阅读理解。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 22,
+      "tags": [
+        "字词",
+        "句意",
+        "阅读理解"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-CORE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“温暖”的反义词是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "寒冷"
+            },
+            {
+              "key": "B",
+              "label": "舒服"
+            },
+            {
+              "key": "C",
+              "label": "明亮"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“仔细”可以和哪个词搭配？",
+          "options": [
+            {
+              "key": "A",
+              "label": "颜色"
+            },
+            {
+              "key": "B",
+              "label": "观察"
+            },
+            {
+              "key": "C",
+              "label": "味道"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“小河唱着歌向前跑”使用了什么写法？",
+          "options": [
+            {
+              "key": "A",
+              "label": "列数字"
+            },
+            {
+              "key": "B",
+              "label": "反问"
+            },
+            {
+              "key": "C",
+              "label": "拟人"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "“妈妈买了苹果和梨。”有几种水果？",
+          "options": [
+            {
+              "key": "A",
+              "label": "两种"
+            },
+            {
+              "key": "B",
+              "label": "一种"
+            },
+            {
+              "key": "C",
+              "label": "三种"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪个词表示时间？",
+          "options": [
+            {
+              "key": "A",
+              "label": "跑步"
+            },
+            {
+              "key": "B",
+              "label": "昨天"
+            },
+            {
+              "key": "C",
+              "label": "学校"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我们高高兴兴地回家。”哪个词写心情？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我们"
+            },
+            {
+              "key": "B",
+              "label": "回家"
+            },
+            {
+              "key": "C",
+              "label": "高高兴兴"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪一句标点正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "你去哪里？"
+            },
+            {
+              "key": "B",
+              "label": "你去哪里。"
+            },
+            {
+              "key": "C",
+              "label": "你去哪里，"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "“雪白的云朵”中“雪白”说明什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "动作"
+            },
+            {
+              "key": "B",
+              "label": "颜色"
+            },
+            {
+              "key": "C",
+              "label": "声音"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪个词与“寻找”意思接近？",
+          "options": [
+            {
+              "key": "A",
+              "label": "丢失"
+            },
+            {
+              "key": "B",
+              "label": "休息"
+            },
+            {
+              "key": "C",
+              "label": "查找"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "“教室里很安静。”最可能是什么时候？",
+          "options": [
+            {
+              "key": "A",
+              "label": "大家认真阅读时"
+            },
+            {
+              "key": "B",
+              "label": "下课追逐时"
+            },
+            {
+              "key": "C",
+              "label": "运动会时"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "正确选项为 A，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "“一边……一边……”适合表示？",
+          "options": [
+            {
+              "key": "A",
+              "label": "只做一件事"
+            },
+            {
+              "key": "B",
+              "label": "同时做两件事"
+            },
+            {
+              "key": "C",
+              "label": "还没开始"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正确选项为 B，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-CORE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "“春天，小树长出了嫩芽。”主要写？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小树很高"
+            },
+            {
+              "key": "B",
+              "label": "冬天下雪"
+            },
+            {
+              "key": "C",
+              "label": "春天植物生长"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "正确选项为 C，依据题干语义判断。",
+          "hints": [
+            "先圈出题干关键词。",
+            "再比较各选项与题意是否一致。"
+          ],
+          "tags": [
+            "字词",
+            "阅读理解"
+          ]
+        }
+      ],
+      "semester": "ALL"
+    },
+    {
+      "id": "CHINESE-G2-S1-WORDS-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "title": "二上语文字词基础（一）",
+      "description": "二年级上学期字词专项：近反义词、量词、词语分类和词义理解。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "字词",
+        "近反义词",
+        "量词"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“安静”的反义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "热闹"
+            },
+            {
+              "key": "B",
+              "label": "整齐"
+            },
+            {
+              "key": "C",
+              "label": "明亮"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "近反义词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个量词搭配最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "一条小河"
+            },
+            {
+              "key": "B",
+              "label": "一张小河"
+            },
+            {
+              "key": "C",
+              "label": "一只小河"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "量词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“著名”的近义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "有名"
+            },
+            {
+              "key": "B",
+              "label": "奇怪"
+            },
+            {
+              "key": "C",
+              "label": "安静"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "近反义词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词表示动作？",
+          "options": [
+            {
+              "key": "A",
+              "label": "整理"
+            },
+            {
+              "key": "B",
+              "label": "蓝色"
+            },
+            {
+              "key": "C",
+              "label": "教室"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "词语分类"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“高兴”的近义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "开心"
+            },
+            {
+              "key": "B",
+              "label": "生气"
+            },
+            {
+              "key": "C",
+              "label": "疲劳"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "近反义词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "“弯弯的月亮”中哪个词写出了月亮的形状？",
+          "options": [
+            {
+              "key": "A",
+              "label": "弯弯"
+            },
+            {
+              "key": "B",
+              "label": "月亮"
+            },
+            {
+              "key": "C",
+              "label": "的"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "词语理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪组词都可以表示颜色？",
+          "options": [
+            {
+              "key": "A",
+              "label": "雪白、金黄"
+            },
+            {
+              "key": "B",
+              "label": "奔跑、跳跃"
+            },
+            {
+              "key": "C",
+              "label": "学校、操场"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "词语分类"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个量词搭配最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "一座山"
+            },
+            {
+              "key": "B",
+              "label": "一条山"
+            },
+            {
+              "key": "C",
+              "label": "一双山"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "量词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“仔细”的反义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "马虎"
+            },
+            {
+              "key": "B",
+              "label": "认真"
+            },
+            {
+              "key": "C",
+              "label": "认真地看"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "近反义词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "“一片树叶”中的“片”是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "量词"
+            },
+            {
+              "key": "B",
+              "label": "动作"
+            },
+            {
+              "key": "C",
+              "label": "地点"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "量词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "“小兔跑得很快”中的“快”主要说明什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "速度"
+            },
+            {
+              "key": "B",
+              "label": "颜色"
+            },
+            {
+              "key": "C",
+              "label": "声音"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "词语理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-WORDS-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "“温暖”的近义词更接近哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "暖和"
+            },
+            {
+              "key": "B",
+              "label": "寒冷"
+            },
+            {
+              "key": "C",
+              "label": "凉快"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "近反义词"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-SENTENCE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "title": "二上语文句子与标点（一）",
+      "description": "二年级上学期句子专项：标点、语序、简单关联词和常见句式。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "句子",
+        "标点",
+        "语序"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句标点使用正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "你今天开心吗？"
+            },
+            {
+              "key": "B",
+              "label": "你今天开心吗。"
+            },
+            {
+              "key": "C",
+              "label": "你今天开心吗，"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "标点"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“因为下雨，___我们带了雨伞。”横线上最合适的是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "所以"
+            },
+            {
+              "key": "B",
+              "label": "但是"
+            },
+            {
+              "key": "C",
+              "label": "或者"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "关联词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我一边听音乐，一边画画。”说明什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "两件事同时进行"
+            },
+            {
+              "key": "B",
+              "label": "只做一件事"
+            },
+            {
+              "key": "C",
+              "label": "两件事都没做"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "句意"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句语序最自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小鸟在树上唱歌。"
+            },
+            {
+              "key": "B",
+              "label": "在唱歌小鸟树上。"
+            },
+            {
+              "key": "C",
+              "label": "树上小鸟唱歌在。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "语序"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词语搭配最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "认真地写字"
+            },
+            {
+              "key": "B",
+              "label": "香甜地跑步"
+            },
+            {
+              "key": "C",
+              "label": "明亮地吃饭"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "词语搭配"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句是完整的句子？",
+          "options": [
+            {
+              "key": "A",
+              "label": "同学们在操场上做游戏。"
+            },
+            {
+              "key": "B",
+              "label": "美丽的花朵"
+            },
+            {
+              "key": "C",
+              "label": "在学校里"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "完整句"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "看到精彩的表演，最适合用哪一句？",
+          "options": [
+            {
+              "key": "A",
+              "label": "真精彩呀！"
+            },
+            {
+              "key": "B",
+              "label": "真精彩呀。"
+            },
+            {
+              "key": "C",
+              "label": "真精彩呀？"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "标点"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "“先洗手，再吃饭。”表示什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "事情的先后顺序"
+            },
+            {
+              "key": "B",
+              "label": "两件事同时做"
+            },
+            {
+              "key": "C",
+              "label": "两件事没有关系"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "顺序"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句“把”字句更通顺？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我把书放进书包。"
+            },
+            {
+              "key": "B",
+              "label": "把我书包放进书。"
+            },
+            {
+              "key": "C",
+              "label": "书把我放进书包。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "句式"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句“被”字句更通顺？",
+          "options": [
+            {
+              "key": "A",
+              "label": "风筝被风吹高了。"
+            },
+            {
+              "key": "B",
+              "label": "被风筝风吹高了。"
+            },
+            {
+              "key": "C",
+              "label": "风被高了风筝。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "句式"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "“小树长高了。”如果补充时间，哪一句最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "春天来了，小树长高了。"
+            },
+            {
+              "key": "B",
+              "label": "小树颜色长高了。"
+            },
+            {
+              "key": "C",
+              "label": "长高了小树春天。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "扩句"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SENTENCE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "“教室里很安静，同学们都在认真看书。”可以知道什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "大家正在安静阅读"
+            },
+            {
+              "key": "B",
+              "label": "大家正在大声唱歌"
+            },
+            {
+              "key": "C",
+              "label": "教室里没有人"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "句意"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-READING-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "title": "二上语文短文阅读（一）",
+      "description": "原创短文阅读，训练找信息、理解原因和做简单推断。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "阅读",
+        "信息提取",
+        "简单推断"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：秋天到了，公园里的树叶有的变黄了，有的变红了。小朋友们捡起落叶做成漂亮的贴画。\n短文写的是哪个季节？",
+          "options": [
+            {
+              "key": "A",
+              "label": "秋天"
+            },
+            {
+              "key": "B",
+              "label": "春天"
+            },
+            {
+              "key": "C",
+              "label": "夏天"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：秋天到了，公园里的树叶有的变黄了，有的变红了。小朋友们捡起落叶做成漂亮的贴画。\n小朋友们用落叶做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "做贴画"
+            },
+            {
+              "key": "B",
+              "label": "做饭"
+            },
+            {
+              "key": "C",
+              "label": "搭积木"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：秋天到了，公园里的树叶有的变黄了，有的变红了。小朋友们捡起落叶做成漂亮的贴画。\n从短文可以看出，小朋友们最可能是什么心情？",
+          "options": [
+            {
+              "key": "A",
+              "label": "开心"
+            },
+            {
+              "key": "B",
+              "label": "害怕"
+            },
+            {
+              "key": "C",
+              "label": "生气"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：放学后，小明去图书角借了一本故事书。他轻轻翻页，看完后把书整齐地放回原处。\n小明去了哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "图书角"
+            },
+            {
+              "key": "B",
+              "label": "操场"
+            },
+            {
+              "key": "C",
+              "label": "食堂"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：放学后，小明去图书角借了一本故事书。他轻轻翻页，看完后把书整齐地放回原处。\n看完书后，小明怎么做？",
+          "options": [
+            {
+              "key": "A",
+              "label": "把书放回原处"
+            },
+            {
+              "key": "B",
+              "label": "把书带回家不还"
+            },
+            {
+              "key": "C",
+              "label": "把书扔在桌上"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：放学后，小明去图书角借了一本故事书。他轻轻翻页，看完后把书整齐地放回原处。\n小明的做法说明他怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "爱护图书"
+            },
+            {
+              "key": "B",
+              "label": "不喜欢读书"
+            },
+            {
+              "key": "C",
+              "label": "很粗心"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：几只小蚂蚁发现了一块面包屑。它们一起用力，慢慢把面包屑搬回了洞里。\n小蚂蚁发现了什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "面包屑"
+            },
+            {
+              "key": "B",
+              "label": "树叶"
+            },
+            {
+              "key": "C",
+              "label": "小石头"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：几只小蚂蚁发现了一块面包屑。它们一起用力，慢慢把面包屑搬回了洞里。\n它们怎样把食物搬回去？",
+          "options": [
+            {
+              "key": "A",
+              "label": "一起用力"
+            },
+            {
+              "key": "B",
+              "label": "各走各的"
+            },
+            {
+              "key": "C",
+              "label": "等别人来拿"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：几只小蚂蚁发现了一块面包屑。它们一起用力，慢慢把面包屑搬回了洞里。\n这个小故事让人想到什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "合作能帮助完成事情"
+            },
+            {
+              "key": "B",
+              "label": "做事要拖延"
+            },
+            {
+              "key": "C",
+              "label": "看到食物要丢掉"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：早晨，太阳从窗外照进来。小雨把窗台上的花盆转了一个方向，让叶子都能晒到阳光。\n故事发生在什么时候？",
+          "options": [
+            {
+              "key": "A",
+              "label": "早晨"
+            },
+            {
+              "key": "B",
+              "label": "深夜"
+            },
+            {
+              "key": "C",
+              "label": "中午以后"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：早晨，太阳从窗外照进来。小雨把窗台上的花盆转了一个方向，让叶子都能晒到阳光。\n小雨为什么转动花盆？",
+          "options": [
+            {
+              "key": "A",
+              "label": "让叶子都能晒到阳光"
+            },
+            {
+              "key": "B",
+              "label": "让花盆更重"
+            },
+            {
+              "key": "C",
+              "label": "让窗台变黑"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "原因理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：早晨，太阳从窗外照进来。小雨把窗台上的花盆转了一个方向，让叶子都能晒到阳光。\n小雨是一个怎样的孩子？",
+          "options": [
+            {
+              "key": "A",
+              "label": "细心"
+            },
+            {
+              "key": "B",
+              "label": "马虎"
+            },
+            {
+              "key": "C",
+              "label": "懒惰"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-READING-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "title": "二上语文短文阅读（二）",
+      "description": "原创生活短文，训练顺序、概括和联系生活经验进行简单推断。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 22,
+      "tags": [
+        "阅读",
+        "顺序理解",
+        "概括"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：下课铃响了，大家先收好文具，再排队去操场。小华发现同桌的铅笔掉在地上，便捡起来放回桌上。\n大家去操场前先做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "收好文具"
+            },
+            {
+              "key": "B",
+              "label": "吃午饭"
+            },
+            {
+              "key": "C",
+              "label": "回家"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：下课铃响了，大家先收好文具，再排队去操场。小华发现同桌的铅笔掉在地上，便捡起来放回桌上。\n小华做了什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "帮同桌捡起铅笔"
+            },
+            {
+              "key": "B",
+              "label": "拿走同桌的铅笔"
+            },
+            {
+              "key": "C",
+              "label": "没有看到铅笔"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：下课铃响了，大家先收好文具，再排队去操场。小华发现同桌的铅笔掉在地上，便捡起来放回桌上。\n小华的做法说明他怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "乐于帮助别人"
+            },
+            {
+              "key": "B",
+              "label": "喜欢破坏东西"
+            },
+            {
+              "key": "C",
+              "label": "不关心同学"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：周末，爸爸带小青去菜市场。小青先帮爸爸拿购物袋，又认真数了找回来的零钱。\n小青去哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "菜市场"
+            },
+            {
+              "key": "B",
+              "label": "图书馆"
+            },
+            {
+              "key": "C",
+              "label": "游泳馆"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：周末，爸爸带小青去菜市场。小青先帮爸爸拿购物袋，又认真数了找回来的零钱。\n小青做了哪两件事？",
+          "options": [
+            {
+              "key": "A",
+              "label": "拿购物袋、数零钱"
+            },
+            {
+              "key": "B",
+              "label": "跑步、踢球"
+            },
+            {
+              "key": "C",
+              "label": "画画、唱歌"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：周末，爸爸带小青去菜市场。小青先帮爸爸拿购物袋，又认真数了找回来的零钱。\n从短文看，小青做事怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "认真又愿意帮忙"
+            },
+            {
+              "key": "B",
+              "label": "总是忘记事情"
+            },
+            {
+              "key": "C",
+              "label": "很害怕买东西"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：傍晚，天边出现了大片乌云。妈妈提醒小乐把阳台上的衣服收进屋。不一会儿，雨就下起来了。\n妈妈看到什么后提醒小乐？",
+          "options": [
+            {
+              "key": "A",
+              "label": "大片乌云"
+            },
+            {
+              "key": "B",
+              "label": "彩虹"
+            },
+            {
+              "key": "C",
+              "label": "星星"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：傍晚，天边出现了大片乌云。妈妈提醒小乐把阳台上的衣服收进屋。不一会儿，雨就下起来了。\n为什么要收衣服？",
+          "options": [
+            {
+              "key": "A",
+              "label": "可能要下雨"
+            },
+            {
+              "key": "B",
+              "label": "衣服太轻"
+            },
+            {
+              "key": "C",
+              "label": "要去上学"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：傍晚，天边出现了大片乌云。妈妈提醒小乐把阳台上的衣服收进屋。不一会儿，雨就下起来了。\n事情的先后顺序是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "乌云—收衣服—下雨"
+            },
+            {
+              "key": "B",
+              "label": "下雨—乌云—收衣服"
+            },
+            {
+              "key": "C",
+              "label": "收衣服—下雨—乌云"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "顺序理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：班里要做值日。有人扫地，有人擦桌子，还有人倒垃圾。大家很快把教室整理干净了。\n大家在做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "值日"
+            },
+            {
+              "key": "B",
+              "label": "考试"
+            },
+            {
+              "key": "C",
+              "label": "午睡"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：班里要做值日。有人扫地，有人擦桌子，还有人倒垃圾。大家很快把教室整理干净了。\n为什么很快整理干净？",
+          "options": [
+            {
+              "key": "A",
+              "label": "大家分工合作"
+            },
+            {
+              "key": "B",
+              "label": "只有一个人在做"
+            },
+            {
+              "key": "C",
+              "label": "大家都在玩"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-READING-002-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：班里要做值日。有人扫地，有人擦桌子，还有人倒垃圾。大家很快把教室整理干净了。\n这段话主要写什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "同学合作做值日"
+            },
+            {
+              "key": "B",
+              "label": "教室里有很多桌子"
+            },
+            {
+              "key": "C",
+              "label": "有人喜欢倒垃圾"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "概括"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-REVIEW-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "title": "二上语文阶段复习（一）",
+      "description": "二年级上学期字词、句子、标点和基础阅读综合复习。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "字词",
+        "句子",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词可以形容冬天的风？",
+          "options": [
+            {
+              "key": "A",
+              "label": "寒冷"
+            },
+            {
+              "key": "B",
+              "label": "香甜"
+            },
+            {
+              "key": "C",
+              "label": "方方正正"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "词语搭配"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“一___铅笔”应填哪个量词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "支"
+            },
+            {
+              "key": "B",
+              "label": "座"
+            },
+            {
+              "key": "C",
+              "label": "片"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "量词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“忙碌”的反义词更接近？",
+          "options": [
+            {
+              "key": "A",
+              "label": "清闲"
+            },
+            {
+              "key": "B",
+              "label": "认真"
+            },
+            {
+              "key": "C",
+              "label": "热闹"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "近反义词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句标点正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "快看，彩虹出来了！"
+            },
+            {
+              "key": "B",
+              "label": "快看彩虹出来了？"
+            },
+            {
+              "key": "C",
+              "label": "快看。彩虹出来了，"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "标点"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“先整理书包，再出门。”表示？",
+          "options": [
+            {
+              "key": "A",
+              "label": "先后顺序"
+            },
+            {
+              "key": "B",
+              "label": "同时发生"
+            },
+            {
+              "key": "C",
+              "label": "没有关系"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "顺序"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "哪一句更通顺？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我们在操场上跑步。"
+            },
+            {
+              "key": "B",
+              "label": "操场我们跑步上。"
+            },
+            {
+              "key": "C",
+              "label": "跑步操场上我们。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "语序"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“小雨把窗户关好了。”谁关了窗户？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小雨"
+            },
+            {
+              "key": "B",
+              "label": "窗户"
+            },
+            {
+              "key": "C",
+              "label": "雨点"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "句子",
+            "句意"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "“天色暗下来，路灯亮了。”最可能是什么时候？",
+          "options": [
+            {
+              "key": "A",
+              "label": "傍晚"
+            },
+            {
+              "key": "B",
+              "label": "清晨"
+            },
+            {
+              "key": "C",
+              "label": "中午"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“小猫躲到屋檐下，因为外面下雨了。”小猫为什么躲起来？",
+          "options": [
+            {
+              "key": "A",
+              "label": "因为下雨"
+            },
+            {
+              "key": "B",
+              "label": "因为天亮"
+            },
+            {
+              "key": "C",
+              "label": "因为饿了"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "原因理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "“同学们排好队，一个接一个走进教室。”说明队伍怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "有秩序"
+            },
+            {
+              "key": "B",
+              "label": "很混乱"
+            },
+            {
+              "key": "C",
+              "label": "没有人"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "阅读",
+            "句意"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "“红红的苹果挂满枝头。”主要写苹果的什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "颜色"
+            },
+            {
+              "key": "B",
+              "label": "声音"
+            },
+            {
+              "key": "C",
+              "label": "动作"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "词语理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-REVIEW-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个词最适合补充“___地听老师讲课”？",
+          "options": [
+            {
+              "key": "A",
+              "label": "认真"
+            },
+            {
+              "key": "B",
+              "label": "香甜"
+            },
+            {
+              "key": "C",
+              "label": "弯弯"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "读清题意，结合二年级上学期所学基础知识判断。",
+          "hints": [
+            "先圈出题目中的关键词。",
+            "再逐个比较三个选项。"
+          ],
+          "tags": [
+            "字词",
+            "词语搭配"
+          ]
+        }
+      ]
+    }
+  ]
+}
