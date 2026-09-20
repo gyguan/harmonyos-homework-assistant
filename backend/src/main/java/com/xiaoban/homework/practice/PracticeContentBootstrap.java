@@ -1,6 +1,6 @@
 package com.xiaoban.homework.practice;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 public class PracticeContentBootstrap implements ApplicationRunner {
   private final PracticePaperRepository papers;
   private final PracticeQuestionRepository questions;
-  private final ObjectMapper mapper;
+  private final JsonMapper mapper;
 
   public PracticeContentBootstrap(PracticePaperRepository papers, PracticeQuestionRepository questions,
-      ObjectMapper mapper) {
+      JsonMapper mapper) {
     this.papers = papers;
     this.questions = questions;
     this.mapper = mapper;
