@@ -1,5 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
+import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
 
@@ -203,66 +203,21 @@ export struct ConfirmationCandidateEditor {
       }
       .width('100%');
 
-      Row({ space: 8 }) {
-        ChoiceSelectionChip({
-          label: Subject.CHINESE,
-          selected: this.item.subject === Subject.CHINESE,
-          onSelect: () => this.onSubjectChange(this.item, Subject.CHINESE)
-        });
-        ChoiceSelectionChip({
-          label: Subject.MATH,
-          selected: this.item.subject === Subject.MATH,
-          onSelect: () => this.onSubjectChange(this.item, Subject.MATH)
-        });
-        ChoiceSelectionChip({
-          label: Subject.ENGLISH,
-          selected: this.item.subject === Subject.ENGLISH,
-          onSelect: () => this.onSubjectChange(this.item, Subject.ENGLISH)
-        });
-      }
-      .width('100%');
-
-      Text('作业标题').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: this.item.title })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.onTitleChange(this.item, value));
-
-      Text('老师要求').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextArea({ text: this.item.instruction })
-        .width('100%')
-        .height(92)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.onInstructionChange(this.item, value));
-
-      Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      DeadlinePickerField({
-        value: this.item.dueText,
-        allowClear: true,
-        onChange: (value: string) => this.onDueTextChange(this.item, value)
+      AssignmentEditForm({
+        subject: this.item.subject,
+        subjectEditable: true,
+        title: this.item.title,
+        instruction: this.item.instruction,
+        dueText: this.item.dueText,
+        expectedMinutes: this.item.expectedMinutes,
+        textbookRef: this.item.textbookRef,
+        onSubjectChange: (subject: Subject) => this.onSubjectChange(this.item, subject),
+        onTitleChange: (value: string) => this.onTitleChange(this.item, value),
+        onInstructionChange: (value: string) => this.onInstructionChange(this.item, value),
+        onDueTextChange: (value: string) => this.onDueTextChange(this.item, value),
+        onMinutesChange: (minutes: number) => this.onMinutesChange(this.item, minutes),
+        onTextbookRefChange: (value: string) => this.onTextbookRefChange(this.item, value)
       });
-
-      Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      CandidateDurationControl({
-        item: this.item,
-        onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
-          this.onMinutesChange(candidate, minutes)
-      });
-      Text('可选择常用时间，也可以直接输入 1–240 分钟。')
-        .width('100%')
-        .fontSize(11)
-        .fontColor(AppTheme.TERTIARY_TEXT);
-
-      Text('教材 / 页码').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: this.item.textbookRef })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.onTextbookRefChange(this.item, value));
 
       Column({ space: 5 }) {
         Text(this.item.sourceEvidence.sourceLabel.length > 0 ?
