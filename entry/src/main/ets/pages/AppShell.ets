@@ -29,6 +29,7 @@ import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceA
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
 import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImportInboxPage';
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
+import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
 import { HomeworkCaptureSpikePage } from '../experimental/homeworkcapture/HomeworkCaptureSpikePage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
@@ -75,6 +76,7 @@ export struct AppShell {
   @State private storeRevision: number = 0;
   @State private activeStudentId: string = '';
   @State private familyStudents: StudentProfile[] = [];
+  @StorageLink('shareImportToken') private shareImportToken: string = '';
   onRegisterBackHandler: (handler: () => boolean) => void = (_handler: () => boolean) => {};
 
   @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
@@ -213,6 +215,24 @@ export struct AppShell {
 
   private openParentImport(): void {
     this.navPathStack.pushPathByName(AppRoute.PARENT_IMPORT, new ParentImportRouteParam());
+  }
+
+  private finishShareImportReady(): void {
+    this.parentRoute = ParentRoute.DASHBOARD;
+    this.navPathStack.clear();
+    this.openParentImportConfirmation();
+    this.shareImportToken = '';
+  }
+
+  private finishShareImportEmpty(): void {
+    this.parentRoute = ParentRoute.DASHBOARD;
+    this.navPathStack.clear();
+    this.openParentImportInbox();
+    this.shareImportToken = '';
+  }
+
+  private cancelShareImport(): void {
+    this.shareImportToken = '';
   }
 
   private openParentImportInbox(): void {
@@ -665,7 +685,21 @@ export struct AppShell {
   @Builder
   private ShellContent() {
     Stack() {
-      if (this.sizeClass === WindowSizeClass.EXPANDED) {
+      if (this.shareImportToken.length > 0) {
+        Column() {
+          HomeworkShareImportStatusPage({
+            token: this.shareImportToken,
+            onReady: () => this.finishShareImportReady(),
+            onOpenInbox: () => this.finishShareImportEmpty(),
+            onCancel: () => this.cancelShareImport()
+          });
+        }
+        .width('100%')
+        .height('100%')
+        .padding(AppTheme.PAGE_PADDING)
+        .justifyContent(FlexAlign.Center)
+        .alignItems(HorizontalAlign.Center);
+      } else if (this.sizeClass === WindowSizeClass.EXPANDED) {
         this.SideNavShell();
       } else {
         this.BottomNavShell();
