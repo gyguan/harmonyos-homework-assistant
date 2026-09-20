@@ -140,8 +140,6 @@ export struct ParentExtraAssignmentPage {
   private TimingSection() {
     Column({ space: 10 }) {
       Text('时间安排').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text('截止时间可不设置；需要时直接选择日期和时间，统一按北京时间保存。').width('100%')
-        .fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
       DeadlinePickerField({
         value: this.dueText,
         allowClear: true,
