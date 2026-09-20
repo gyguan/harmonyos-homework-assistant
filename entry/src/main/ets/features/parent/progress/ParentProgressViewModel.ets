@@ -5,6 +5,7 @@ import {
 } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus, StudentProfile } from '../../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
+import { AssignmentFilterFactory } from '../../../domain/service/AssignmentFilterFactory';
 
 export class ParentProgressViewModel {
   private readonly repository: AssignmentRepository;
@@ -19,23 +20,22 @@ export class ParentProgressViewModel {
 
   assignments(typeFilter: AssignmentTypeFilter, subjectCode: string, dateFilter: AssignmentDateFilter,
     statuses: AssignmentStatus[] = []): Assignment[] {
-    return this.repository.listCached(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
+    return this.repository.listCached(AssignmentFilterFactory.create(typeFilter, subjectCode, dateFilter, statuses));
   }
 
   async query(typeFilter: AssignmentTypeFilter, subjectCode: string, dateFilter: AssignmentDateFilter,
     statuses: AssignmentStatus[] = []): Promise<Assignment[]> {
-    return this.repository.query(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
+    return this.repository.query(AssignmentFilterFactory.create(typeFilter, subjectCode, dateFilter, statuses));
   }
 
   assignmentsOnDay(subjectCode: string, dayEpochMs: number,
     statuses: AssignmentStatus[] = []): Assignment[] {
-    return this.repository.listCached(
-      this.dayFilter(subjectCode, dayEpochMs, statuses));
+    return this.repository.listCached(AssignmentFilterFactory.forDay(subjectCode, dayEpochMs, statuses));
   }
 
   queryOnDay(subjectCode: string, dayEpochMs: number,
     statuses: AssignmentStatus[] = []): Promise<Assignment[]> {
-    return this.repository.query(this.dayFilter(subjectCode, dayEpochMs, statuses));
+    return this.repository.query(AssignmentFilterFactory.forDay(subjectCode, dayEpochMs, statuses));
   }
 
   assignment(assignmentId: string): Assignment | null {
@@ -50,65 +50,5 @@ export class ParentProgressViewModel {
     return this.repository.refresh();
   }
 
-  private dayFilter(subjectCode: string, dayEpochMs: number,
-    statuses: AssignmentStatus[]): AssignmentFilter {
-    let day = ParentProgressViewModel.startOfDay(dayEpochMs);
-    return {
-      assignmentType: AssignmentTypeFilter.ALL,
-      subjectCode: subjectCode,
-      dateFilter: AssignmentDateFilter.CUSTOM,
-      fromEpochMs: day,
-      toEpochMs: ParentProgressViewModel.endOfDay(day),
-      undatedOnly: false,
-      statuses: statuses
-    };
-  }
 
-  private buildFilter(typeFilter: AssignmentTypeFilter, subjectCode: string, dateFilter: AssignmentDateFilter,
-    statuses: AssignmentStatus[]): AssignmentFilter {
-    let fromEpochMs = 0;
-    let toEpochMs = 0;
-    let undatedOnly = dateFilter === AssignmentDateFilter.UNDATED;
-    let today = ParentProgressViewModel.startOfDay(Date.now());
-    if (dateFilter === AssignmentDateFilter.TODAY) {
-      fromEpochMs = today;
-      toEpochMs = ParentProgressViewModel.endOfDay(today);
-    } else if (dateFilter === AssignmentDateFilter.TOMORROW) {
-      let tomorrow = ParentProgressViewModel.addDays(today, 1);
-      fromEpochMs = tomorrow;
-      toEpochMs = ParentProgressViewModel.endOfDay(tomorrow);
-    } else if (dateFilter === AssignmentDateFilter.THIS_WEEK) {
-      fromEpochMs = today;
-      toEpochMs = ParentProgressViewModel.endOfWeek(today);
-    }
-    return {
-      assignmentType: typeFilter,
-      subjectCode: subjectCode,
-      dateFilter: dateFilter,
-      fromEpochMs: fromEpochMs,
-      toEpochMs: toEpochMs,
-      undatedOnly: undatedOnly,
-      statuses: statuses
-    };
-  }
-
-  private static startOfDay(epochMs: number): number {
-    let value = new Date(epochMs);
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
-  }
-
-  private static endOfDay(dayStart: number): number {
-    return ParentProgressViewModel.addDays(dayStart, 1) - 1;
-  }
-
-  private static addDays(dayStart: number, days: number): number {
-    let value = new Date(dayStart);
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate() + days).getTime();
-  }
-
-  private static endOfWeek(todayStart: number): number {
-    let weekday = new Date(todayStart).getDay();
-    let mondayBased = weekday === 0 ? 7 : weekday;
-    return ParentProgressViewModel.addDays(todayStart, 8 - mondayBased) - 1;
-  }
 }
