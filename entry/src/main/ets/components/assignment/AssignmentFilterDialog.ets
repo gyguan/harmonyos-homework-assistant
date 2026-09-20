@@ -70,9 +70,6 @@ export struct AssignmentFilterDialog {
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
-          Text('选择条件后点击查询')
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
