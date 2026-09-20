@@ -109,13 +109,10 @@ export struct ParentDashboardPage {
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        Text(this.attentionAssignments().length > 0 ? '有待处理' : '进展正常')
+        Text(`${this.todayAssignments().length} 项`)
           .fontSize(11)
           .fontWeight(FontWeight.Medium)
-          .fontColor(this.attentionAssignments().length > 0 ? AppTheme.WARNING : AppTheme.SUCCESS)
-          .padding({ left: 9, right: 9, top: 6, bottom: 6 })
-          .backgroundColor(this.attentionAssignments().length > 0 ? AppTheme.WARNING_SOFT : AppTheme.SUCCESS_SOFT)
-          .borderRadius(AppTheme.CHIP_RADIUS);
+          .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -127,8 +124,8 @@ export struct ParentDashboardPage {
       });
 
       Progress({
-        value: this.viewModel.summary().completed,
-        total: this.viewModel.summary().total > 0 ? this.viewModel.summary().total : 1,
+        value: this.todayCompletedCount(),
+        total: this.todayAssignments().length > 0 ? this.todayAssignments().length : 1,
         type: ProgressType.Linear
       })
         .width('100%')
