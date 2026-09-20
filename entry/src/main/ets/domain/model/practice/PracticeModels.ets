@@ -14,6 +14,12 @@ export enum PracticeSubject {
   THINKING = 'THINKING'
 }
 
+export enum PracticeSemester {
+  ALL = 'ALL',
+  S1 = 'S1',
+  S2 = 'S2'
+}
+
 export enum PracticeDifficulty {
   L1 = 'L1',
   L2 = 'L2',
@@ -45,6 +51,7 @@ export interface PracticePaper {
   version: number;
   grade: PracticeGrade;
   subject: PracticeSubject;
+  semester: PracticeSemester;
   title: string;
   description: string;
   difficulty: PracticeDifficulty;
@@ -210,6 +217,20 @@ export class PracticeTaxonomy {
     if (subject === PracticeSubject.MATH) return '数学';
     if (subject === PracticeSubject.ENGLISH) return '英语';
     return '思维拓展';
+  }
+
+  static semesterLabel(semester: PracticeSemester): string {
+    if (semester === PracticeSemester.S1) return '上学期';
+    if (semester === PracticeSemester.S2) return '下学期';
+    return '全年基础';
+  }
+
+  static semesterFromStudentProfile(label: string): PracticeSemester {
+    if (label.indexOf('上学期') >= 0 || label.indexOf('第一学期') >= 0 ||
+      label.indexOf('秋') >= 0 || label.toUpperCase() === 'S1') return PracticeSemester.S1;
+    if (label.indexOf('下学期') >= 0 || label.indexOf('第二学期') >= 0 ||
+      label.indexOf('春') >= 0 || label.toUpperCase() === 'S2') return PracticeSemester.S2;
+    return PracticeSemester.ALL;
   }
 
   static difficultyLabel(difficulty: PracticeDifficulty): string {
