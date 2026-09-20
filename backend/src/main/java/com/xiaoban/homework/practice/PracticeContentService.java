@@ -35,7 +35,7 @@ public class PracticeContentService {
 
   public PracticeDtos.PaperResponse response(PracticePaperEntity paper) {
     return new PracticeDtos.PaperResponse(
-        paper.paperId, paper.version, paper.grade, paper.subject, paper.title, paper.description,
+        paper.paperId, paper.version, paper.grade, paper.subject, paper.semester, paper.title, paper.description,
         paper.difficulty, paper.questionCount, paper.estimatedMinutes,
         strings(paper.tagsJson), paper.sourceType);
   }
