@@ -463,7 +463,6 @@ export struct StudentHomePage {
         this.Header();
         this.OfflineBanner();
         this.TodayOverview();
-        this.TodayScopeNote();
       }
       .width(AppTheme.HOME_SECONDARY_MIN_WIDTH)
       .alignItems(HorizontalAlign.Start);
