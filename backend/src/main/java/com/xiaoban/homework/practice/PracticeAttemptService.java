@@ -1,7 +1,7 @@
 package com.xiaoban.homework.practice;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Duration;
@@ -21,12 +21,12 @@ public class PracticeAttemptService {
   private final PracticeQuestionRepository questionRepository;
   private final PracticeContentService content;
   private final StudentService students;
-  private final ObjectMapper mapper;
+  private final JsonMapper mapper;
   private final PracticeJudgeEngine judge = new PracticeJudgeEngine();
 
   public PracticeAttemptService(PracticeAttemptRepository attempts, PracticeAnswerRepository answers,
       PracticeQuestionRepository questionRepository, PracticeContentService content,
-      StudentService students, ObjectMapper mapper) {
+      StudentService students, JsonMapper mapper) {
     this.attempts = attempts;
     this.answers = answers;
     this.questionRepository = questionRepository;
