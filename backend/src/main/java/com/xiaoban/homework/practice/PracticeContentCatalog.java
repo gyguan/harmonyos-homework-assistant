@@ -48,14 +48,7 @@ public final class PracticeContentCatalog {
       String answerSpec,
       String explanation,
       List<String> hints,
-      List<String> tags,
-      VisualSpec visualSpec) {}
-
-  public record VisualSpec(
-      String type,
-      String assetId,
-      String layout,
-      String accessibilityText) {}
+      List<String> tags) {}
 
   public record Option(String key, String label) {}
 }
