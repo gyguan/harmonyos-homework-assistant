@@ -15,6 +15,7 @@ public final class PracticeContentCatalog {
       int schemaVersion,
       String grade,
       String subject,
+      String track,
       List<Paper> papers) {}
 
   public record Catalog(
@@ -29,6 +30,7 @@ public final class PracticeContentCatalog {
       String grade,
       String subject,
       String semester,
+      String track,
       String title,
       String description,
       String difficulty,
@@ -48,14 +50,7 @@ public final class PracticeContentCatalog {
       String answerSpec,
       String explanation,
       List<String> hints,
-      List<String> tags,
-      VisualSpec visualSpec) {}
-
-  public record VisualSpec(
-      String type,
-      String assetId,
-      String layout,
-      String accessibilityText) {}
+      List<String> tags) {}
 
   public record Option(String key, String label) {}
 }
