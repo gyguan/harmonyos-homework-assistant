@@ -17,6 +17,7 @@ public class PracticeAttemptEntity {
   public int attemptNo;
   public String mode;
   public String status;
+  public UUID sourceAttemptId;
   public String questionIdsJson;
   public Instant startedAt;
   public Instant submittedAt;

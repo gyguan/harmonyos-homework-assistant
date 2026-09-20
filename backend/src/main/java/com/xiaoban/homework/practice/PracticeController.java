@@ -2,6 +2,7 @@ package com.xiaoban.homework.practice;
 
 import com.xiaoban.homework.auth.AuthInterceptor;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +36,21 @@ public class PracticeController {
       @PathVariable String studentId,
       @Valid @RequestBody PracticeDtos.StartRequest input) {
     return attempts.start(familyId, studentId, input);
+  }
+
+  @GetMapping("/students/{studentId}/practice/attempts")
+  public List<PracticeDtos.AttemptSummary> history(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId,
+      @RequestParam(required = false) String paperId) {
+    return attempts.history(familyId, studentId, paperId);
+  }
+
+  @PostMapping("/practice/attempts/{attemptId}/repeat")
+  public PracticeDtos.AttemptResponse repeat(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID attemptId) {
+    return attempts.repeat(familyId, attemptId);
   }
 
   @GetMapping("/practice/attempts/{attemptId}")

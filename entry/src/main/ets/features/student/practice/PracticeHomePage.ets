@@ -86,6 +86,7 @@ struct PracticePaperCard {
 export struct PracticeHomePage {
   @Prop revision: number = 0;
   onOpenPaper: (paperId: string, version: number) => void = (_paperId: string, _version: number) => {};
+  onOpenHistory: () => void = () => {};
   @State private selectedGrade: PracticeGrade = PracticeGrade.G3;
   @State private selectedSubject: PracticeSubject = PracticeSubject.MATH;
   @State private draftSelectedGrade: PracticeGrade = PracticeGrade.G3;
@@ -241,11 +242,23 @@ export struct PracticeHomePage {
       Column() {
         Column({ space: 18 }) {
           Column({ space: 5 }) {
-            Text('练习')
-              .width('100%')
-              .fontSize(AppTheme.PAGE_TITLE_SIZE)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppTheme.TEXT);
+            Row() {
+              Text('练习')
+                .fontSize(AppTheme.PAGE_TITLE_SIZE)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(AppTheme.TEXT);
+              Blank();
+              Text('练习记录')
+                .fontSize(13)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.PRIMARY)
+                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .padding({ left: 12, right: 2 })
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText('查看练习记录')
+                .onClick(() => this.onOpenHistory());
+            }
+            .width('100%');
             Text('按年级和科目选择一套卷，反复练习并保留每次学习记录。')
               .width('100%')
               .fontSize(13)

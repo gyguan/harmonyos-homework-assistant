@@ -90,6 +90,34 @@ export interface PracticeAnswer {
   answeredAtEpochMs: number;
 }
 
+export interface PracticePreviousAnswer {
+  questionId: string;
+  answerValue: string;
+  correct: boolean;
+}
+
+export interface PracticeAttemptSummary {
+  id: string;
+  paperId: string;
+  paperVersion: number;
+  paperTitle: string;
+  grade: PracticeGrade;
+  subject: PracticeSubject;
+  attemptNo: number;
+  mode: PracticeAttemptMode;
+  status: PracticeAttemptStatus;
+  sourceAttemptId: string;
+  startedAtEpochMs: number;
+  submittedAtEpochMs: number;
+  elapsedSeconds: number;
+  answeredCount: number;
+  questionCount: number;
+  score: number;
+  maxScore: number;
+  correctCount: number;
+  wrongCount: number;
+}
+
 export interface PracticeAttempt {
   id: string;
   studentId: string;
@@ -98,6 +126,7 @@ export interface PracticeAttempt {
   attemptNo: number;
   mode: PracticeAttemptMode;
   status: PracticeAttemptStatus;
+  sourceAttemptId: string;
   startedAtEpochMs: number;
   submittedAtEpochMs: number;
   elapsedSeconds: number;
@@ -105,6 +134,7 @@ export interface PracticeAttempt {
   questionCount: number;
   questions: PracticeQuestion[];
   answers: PracticeAnswer[];
+  previousAnswers: PracticePreviousAnswer[];
 }
 
 export interface PracticeQuestionResult {

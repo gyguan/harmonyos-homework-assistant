@@ -7,7 +7,9 @@ export struct PracticeResultPage {
   @Prop attemptId: string = '';
   @State private result: PracticeResult | null = null;
   @State private errorMessage: string = '';
+  @State private repeating: boolean = false;
   onDone: () => void = () => {};
+  onRepeatStarted: (attemptId: string) => void = (_attemptId: string) => {};
   private readonly viewModel: PracticeResultViewModel = new PracticeResultViewModel();
 
   aboutToAppear(): void {
@@ -20,6 +22,20 @@ export struct PracticeResultPage {
       this.result = await this.viewModel.load(this.attemptId);
     } catch {
       this.errorMessage = '结果加载失败，请检查网络后重试。';
+    }
+  }
+
+  private async repeat(): Promise<void> {
+    if (this.repeating || this.result === null) return;
+    this.repeating = true;
+    this.errorMessage = '';
+    try {
+      let repeated = await this.viewModel.repeat(this.attemptId);
+      this.onRepeatStarted(repeated.id);
+    } catch {
+      this.errorMessage = '再次练习创建失败，请检查网络后重试。';
+    } finally {
+      this.repeating = false;
     }
   }
 
@@ -151,15 +167,24 @@ export struct PracticeResultPage {
       .scrollBar(BarState.Off);
 
       if (this.result !== null) {
-        Row() {
+        Row({ space: 10 }) {
           Button('返回练习', { type: ButtonType.Normal })
-            .width('100%')
+            .layoutWeight(1)
             .height(AppTheme.BUTTON_HEIGHT)
-            .backgroundColor(AppTheme.PRIMARY)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT)
             .fontWeight(FontWeight.Medium)
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .onClick(() => this.onDone());
+          Button(this.repeating ? '正在创建…' : '再练一遍', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .backgroundColor(this.repeating ? AppTheme.DISABLED : AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .fontWeight(FontWeight.Medium)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.repeating)
+            .onClick(() => void this.repeat());
         }
         .width('100%')
         .padding({ left: 20, right: 20, top: 10, bottom: 14 })

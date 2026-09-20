@@ -8,4 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface PracticeAnswerRepository extends JpaRepository<PracticeAnswerEntity, UUID> {
   Optional<PracticeAnswerEntity> findByAttemptIdAndQuestionId(UUID attemptId, String questionId);
   List<PracticeAnswerEntity> findByAttemptId(UUID attemptId);
+  long countByAttemptId(UUID attemptId);
 }
