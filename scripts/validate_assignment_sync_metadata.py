@@ -28,6 +28,8 @@ controller = read("backend/src/main/java/com/xiaoban/homework/assignment/Assignm
 
 for field in ("remoteVersion: number", "syncDirty: boolean", "lastSyncedAtEpochMs: number"):
     require(field in models, f"Assignment must persist client sync field: {field}")
+require("export enum AssignmentBacking" in models and "backing: AssignmentBacking" in models,
+        "Assignment must persist explicit local/remote backing independently of sync metadata")
 
 require("remoteVersion: source.remoteVersion > 0 ? source.remoteVersion : 0" in store,
         "snapshot clone must preserve/default remoteVersion")
@@ -43,8 +45,8 @@ require("this.assignments[index].syncDirty = true" in store,
 for field in ("assignmentType", "subjectCode", "dueAtEpochMs", "dueTimezone"):
     require(field in mapper and field in remote_api,
             f"Assignment V2 field must survive remote sync: {field}")
-require("remoteVersion: remote.version" in mapper,
-        "remote refresh must establish the persisted server version")
+require("remoteVersion: remote.version" in mapper and "backing: AssignmentBacking.REMOTE" in mapper,
+        "remote refresh must establish server version and explicit remote backing")
 require("syncDirty: false" in mapper,
         "remote refresh must clear local dirty state")
 require("lastSyncedAtEpochMs: Date.now()" in mapper,
@@ -56,6 +58,8 @@ require("HomeworkStore.instance" in local_data_source,
         "legacy Store access must be isolated in AssignmentLocalDataSource during Final Cleanup")
 require("observedVersions" not in sync,
         "Assignment Repository sync must not keep process-local observedVersions")
+require("assignment.backing === AssignmentBacking.LOCAL_SEED" in sync,
+        "sync must keep seed/demo assignments behind the explicit local backing boundary")
 require("assignment.syncDirty && assignment.remoteVersion === existing.version" in sync,
         "server update must require dirty local state and an exact version match")
 require("dirtyEntries.push({ assignment: assignment, version: assignment.remoteVersion })" in sync and
@@ -77,8 +81,9 @@ require("@PutMapping(\"/assignments/{id}\")" in controller,
         "backend must expose PUT for the compatible HarmonyOS client")
 require("@PatchMapping(\"/assignments/{id}\")" in controller,
         "backend must retain the existing PATCH update endpoint during compatibility window")
-require("remoteVersion" not in remote_api and "syncDirty" not in remote_api and "lastSyncedAtEpochMs" not in remote_api,
-        "client sync metadata must never be sent as backend assignment fields")
+require("backing" not in remote_api and "remoteVersion" not in remote_api and
+        "syncDirty" not in remote_api and "lastSyncedAtEpochMs" not in remote_api,
+        "client backing/sync metadata must never be sent as backend assignment fields")
 
 if errors:
     print("ASSIGNMENT_SYNC_METADATA_GATE_FAIL")
