@@ -41,11 +41,6 @@ export struct StudyWorkspaceRoutePage {
             .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('与课内作业共用计时、AI 辅导、提交和同步链路，不建立第二套任务流程。')
-            .width('100%')
-            .fontSize(11)
-            .lineHeight(17)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
