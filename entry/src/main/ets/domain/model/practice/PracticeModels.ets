@@ -67,6 +67,13 @@ export interface PracticeQuestionOption {
   label: string;
 }
 
+export interface PracticeVisualSpec {
+  type: string;
+  assetId: string;
+  layout: string;
+  accessibilityText: string;
+}
+
 export interface PracticeQuestion {
   id: string;
   paperId: string;
@@ -79,6 +86,7 @@ export interface PracticeQuestion {
   explanation: string;
   hints: string[];
   tags: string[];
+  visualSpec: PracticeVisualSpec;
 }
 
 export enum PracticeAttemptMode {
