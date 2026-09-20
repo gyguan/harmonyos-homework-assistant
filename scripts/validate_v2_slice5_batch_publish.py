@@ -29,6 +29,7 @@ draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraft
 draft_local = read("entry/src/main/ets/data/local/HomeworkImportLocalDataSource.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+shared_editor = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 assignment_edit_form = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 deadline_picker = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 mock_parser = read("entry/src/main/ets/infrastructure/ai/MockHomeworkAssignmentParser.ets")
