@@ -388,31 +388,6 @@ export struct StudentHomePage {
   }
 
   @Builder
-  private TodayScopeNote() {
-    Row({ space: 8 }) {
-      Text('i')
-        .width(20)
-        .height(20)
-        .fontSize(12)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.PRIMARY)
-        .textAlign(TextAlign.Center)
-        .padding({ top: 2 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(10);
-      Text('首页只显示今天要做的任务，其他日期和未定时间作业请到「作业」页筛选。')
-        .layoutWeight(1)
-        .fontSize(11)
-        .lineHeight(17)
-        .fontColor(AppTheme.SUBTEXT);
-    }
-    .width('100%')
-    .padding({ left: 11, right: 11, top: 9, bottom: 9 })
-    .backgroundColor(AppTheme.PRIMARY_FAINT)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
-  }
-
-  @Builder
   private TodaySubjects() {
     Column({ space: 10 }) {
       Row() {
