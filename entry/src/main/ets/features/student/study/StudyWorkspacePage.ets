@@ -871,11 +871,35 @@ export struct StudyWorkspacePage {
   @Builder
   private VoiceFullscreenImage() {
     Stack({ alignContent: Alignment.Center }) {
-      Image(this.voiceImageUris[this.voiceImageIndex])
-        .width('100%')
-        .height('100%')
-        .objectFit(ImageFit.Contain)
-        .backgroundColor('#111111');
+      Swiper() {
+        ForEach(this.voiceImageUris, (uri: string, index: number) => {
+          Stack({ alignContent: Alignment.Center }) {
+            if (uri.length > 0) {
+              Image(uri)
+                .width('100%')
+                .height('100%')
+                .objectFit(ImageFit.Contain);
+            } else {
+              LoadingProgress()
+                .width(32)
+                .height(32)
+                .color(AppTheme.PRIMARY);
+            }
+          }
+          .width('100%')
+          .height('100%')
+          .backgroundColor('#111111');
+        }, (uri: string, index: number) => `${index}-${uri}`);
+      }
+      .width('100%')
+      .height('100%')
+      .index(this.voiceImageIndex)
+      .indicator(false)
+      .loop(true)
+      .onChange((index: number) => {
+        this.voiceImageIndex = index;
+        this.voiceSelectImage(index);
+      });
 
       if (this.voiceImageUris.length > 1) {
         Row() {
