@@ -125,10 +125,6 @@ export struct AssignmentEditForm {
         Blank();
       }
       .width('100%');
-      Text('可选择常用时间，也可以直接输入 1–240 分钟。')
-        .width('100%')
-        .fontSize(11)
-        .fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%');
   }
