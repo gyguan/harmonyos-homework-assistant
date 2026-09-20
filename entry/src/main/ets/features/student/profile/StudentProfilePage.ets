@@ -63,9 +63,6 @@ export struct StudentProfilePage {
               .fontSize(AppTheme.PAGE_TITLE_SIZE)
               .fontWeight(FontWeight.Bold)
               .fontColor(AppTheme.TEXT);
-            Text('这里展示你的学习资料和家长设置。')
-              .fontSize(AppTheme.BODY_SIZE)
-              .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%')
           .alignItems(HorizontalAlign.Start);

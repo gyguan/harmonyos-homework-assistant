@@ -186,7 +186,6 @@ export struct ParentVoiceAssignmentPage {
           Column({ space: 2 }) {
             Text(this.audioName).fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT)
               .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis });
-            Text('发布后孩子可播放、暂停和拖动进度').fontSize(10).fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1).alignItems(HorizontalAlign.Start);
           Text('更换')
@@ -246,8 +245,6 @@ export struct ParentVoiceAssignmentPage {
         .enabled(!this.selectingImages && !this.busy)
         .onClick(() => { void this.selectImages(); });
 
-      Text('单次最多选择 9 张，可分多次继续添加；学生端会按图片文件名排序。')
-        .width('100%').fontSize(11).lineHeight(17).fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
   }

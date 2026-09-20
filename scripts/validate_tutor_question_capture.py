@@ -52,7 +52,7 @@ require(study.find("TextArea({ placeholder: '说说你卡在哪一步") < study.
         "Tutor capture must live inside the bottom composer after text entry and before send")
 require("只在本机识别" in panel and ".padding(12)" not in panel,
         "Tutor capture must stay a compact input accessory instead of a standalone card")
-require("小伴学习助手" in study and "先帮你理思路，再给下一步提示" in study,
+require("小伴学习助手" in study and "有哪里卡住了？" in study,
         "Tutor panel must present a clear learning-assistant identity instead of a generic chat title")
 for suggestion in ["怎么开始？", "检查思路", "提示下一步"]:
     require(suggestion in study, f"Tutor empty state missing quick prompt: {suggestion}")

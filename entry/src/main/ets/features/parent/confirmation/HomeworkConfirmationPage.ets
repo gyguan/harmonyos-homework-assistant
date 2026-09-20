@@ -216,8 +216,6 @@ export struct HomeworkConfirmationPage {
             Column({ space: 4 }) {
               Text('发布前最后核对').width('100%')
                 .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-              Text('低置信字段和来源证据优先确认；发布采用整批原子提交，不会出现只发布一半。')
-                .width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.SUBTEXT);
             }
             .width('100%')
             .alignItems(HorizontalAlign.Start);

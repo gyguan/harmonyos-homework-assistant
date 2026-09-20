@@ -47,11 +47,11 @@ for token in [
     "StudentSubjectTaskGroupCard",
     "@State private expandedSubjectKey: string = '';",
     "toggleSubject(key: string)",
-    "expanded: this.expandedSubjectKey === group.key",
+    "effectiveExpandedSubjectKey()",
+    "expanded: this.effectiveExpandedSubjectKey() === group.key",
     "今天要做",
-    "按学科完成，一次专注一个学科",
-    "首页只显示今天要做的任务",
-    "其他日期和未定时间作业请到「作业」页筛选",
+    "todaySubjectCount()",
+    "todayPendingCount()",
 ]:
     require(token in page, f"Student Home missing subject-first Today UX: {token}")
 require("@Prop expanded: boolean = false;" in page,

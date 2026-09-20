@@ -34,6 +34,10 @@ export struct HomeworkImportPage {
     return this.viewModel.candidates();
   }
 
+  private shouldShowCandidatesStep(): boolean {
+    return this.showCandidatesStep && this.candidates().length > 0;
+  }
+
   private canUseSplit(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.importOrganizeRequirement());
   }
@@ -210,8 +214,6 @@ export struct HomeworkImportPage {
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('从截图或文字获取老师原始内容，整理结果不会自动发布。')
-          .width('100%').fontSize(13).lineHeight(20).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
@@ -278,9 +280,6 @@ export struct HomeworkImportPage {
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text(this.candidates().length > 0 ? '逐项核对老师要求、时间与来源证据，再进入确认发布。' :
-          '整理后，待确认作业会显示在这里。')
-          .width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
@@ -322,12 +321,11 @@ export struct HomeworkImportPage {
             Column({ space: 3 }) {
               Text('收作业').fontSize(AppTheme.PHONE_PAGE_TITLE_SIZE)
                 .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-              Text('老师原文 → 小伴整理 → 家长确认发布').fontSize(12).fontColor(AppTheme.SUBTEXT);
             }
             .width('100%')
             .alignItems(HorizontalAlign.Start);
           }
-          if (this.showCandidatesStep) this.CandidatePane(true);
+          if (this.shouldShowCandidatesStep()) this.CandidatePane(true);
           else this.SourcePane();
         }
         .width('100%')
@@ -350,7 +348,6 @@ export struct HomeworkImportPage {
       if (!this.embeddedInDeepPage) {
         Column({ space: 3 }) {
           Text('收作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('老师原文 → 小伴整理 → 家长确认发布').fontSize(12).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start);

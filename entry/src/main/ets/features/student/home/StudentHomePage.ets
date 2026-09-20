@@ -97,6 +97,10 @@ struct StudentSubjectTaskGroupCard {
     return AppTheme.WARNING_SOFT;
   }
 
+  private assignmentRenderKey(item: Assignment): string {
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+  }
+
   @Builder
   private TaskRow(item: Assignment) {
     Row({ space: 10 }) {
@@ -211,7 +215,7 @@ struct StudentSubjectTaskGroupCard {
         Column({ space: 7 }) {
           ForEach(this.group.items, (item: Assignment) => {
             this.TaskRow(item);
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%')
         .padding({ left: 8, right: 8, top: 8, bottom: 8 });
@@ -267,6 +271,18 @@ export struct StudentHomePage {
     if (currentRevision < 0) return '';
     let next = this.viewModel.nextAssignment();
     return next === null ? '' : next.id;
+  }
+
+  private effectiveExpandedSubjectKey(): string {
+    let currentRevision = this.touchRevision();
+    if (currentRevision < 0 || this.expandedSubjectKey.length === 0) return this.expandedSubjectKey;
+    let groups = this.viewModel.todaySubjectGroups();
+    for (let group of groups) {
+      if (group.key === this.expandedSubjectKey) return this.expandedSubjectKey;
+    }
+    let next = this.viewModel.nextAssignment();
+    if (next !== null) return next.subject;
+    return groups.length > 0 ? groups[0].key : '';
   }
 
   private canUsePadComposition(): boolean {
@@ -372,31 +388,6 @@ export struct StudentHomePage {
   }
 
   @Builder
-  private TodayScopeNote() {
-    Row({ space: 8 }) {
-      Text('i')
-        .width(20)
-        .height(20)
-        .fontSize(12)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.PRIMARY)
-        .textAlign(TextAlign.Center)
-        .padding({ top: 2 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(10);
-      Text('首页只显示今天要做的任务，其他日期和未定时间作业请到「作业」页筛选。')
-        .layoutWeight(1)
-        .fontSize(11)
-        .lineHeight(17)
-        .fontColor(AppTheme.SUBTEXT);
-    }
-    .width('100%')
-    .padding({ left: 11, right: 11, top: 9, bottom: 9 })
-    .backgroundColor(AppTheme.PRIMARY_FAINT)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
-  }
-
-  @Builder
   private TodaySubjects() {
     Column({ space: 10 }) {
       Row() {
@@ -405,9 +396,6 @@ export struct StudentHomePage {
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
-          Text('按学科完成，一次专注一个学科')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
@@ -429,9 +417,6 @@ export struct StudentHomePage {
               .fontSize(15)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            Text('其他日期的作业可以在「作业」页查看。')
-              .fontSize(11)
-              .fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start);
@@ -445,7 +430,7 @@ export struct StudentHomePage {
           ForEach(this.subjectGroups(), (group: StudentHomeSubjectGroup) => {
             StudentSubjectTaskGroupCard({
               group: group,
-              expanded: this.expandedSubjectKey === group.key,
+              expanded: this.effectiveExpandedSubjectKey() === group.key,
               focusAssignmentId: this.focusAssignmentId(),
               onToggle: () => this.toggleSubject(group.key),
               onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
@@ -464,7 +449,6 @@ export struct StudentHomePage {
       this.Header();
       this.OfflineBanner();
       this.TodayOverview();
-      this.TodayScopeNote();
       this.TodaySubjects();
     }
     .width('100%')

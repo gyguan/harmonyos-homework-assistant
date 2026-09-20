@@ -99,9 +99,6 @@ export struct ParentDashboardPage {
             .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('先看结果，再处理需要家长介入的事项')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
@@ -136,6 +133,10 @@ export struct ParentDashboardPage {
     .padding(AppTheme.PHONE_CARD_PADDING)
     .backgroundColor(AppTheme.SURFACE)
     .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+  }
+
+  private assignmentRenderKey(item: Assignment): string {
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   @Builder
@@ -189,7 +190,7 @@ export struct ParentDashboardPage {
             .accessibilityRole(AccessibilityRoleType.BUTTON)
             .accessibilityText(`${item.subject}，${item.title}，${AssignmentStateMachine.label(item.status)}`)
             .onClick(() => this.openAttention(item));
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
       }

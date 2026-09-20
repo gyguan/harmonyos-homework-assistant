@@ -63,7 +63,7 @@ export struct BackendConnectionPage {
   private updateTutorSettings(guidanceFirst: boolean, directAnswerAllowed: boolean): void {
     this.familyContext.updateTutorSettings(guidanceFirst, directAnswerAllowed);
     this.pageRevision++;
-    this.message = 'AI 辅导规则已保存';
+    this.message = '';
     this.onStoreChanged();
   }
 
@@ -75,12 +75,12 @@ export struct BackendConnectionPage {
     this.connecting = true;
     this.message = '正在连接…';
     try {
-      let displayName = await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
+      await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
       let familySynced = await FamilyCloudService.instance.syncStudents();
       let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
       this.syncLocalStudents();
       this.pageRevision++;
-      this.message = familySynced && homeworkSynced ? `已连接：${displayName}，家庭数据已同步` : `已登录：${displayName}，部分数据稍后再同步`;
+      this.message = familySynced && homeworkSynced ? '' : '已登录，部分数据稍后再同步';
       this.onStoreChanged();
     } catch {
       this.message = '连接失败，请检查电脑局域网地址、后端服务和账号密码';
@@ -102,7 +102,7 @@ export struct BackendConnectionPage {
     let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
     this.syncLocalStudents();
     this.pageRevision++;
-    this.message = familySynced && homeworkSynced ? '家庭数据已同步' : '部分数据同步失败，请稍后重试';
+    this.message = familySynced && homeworkSynced ? '' : '部分数据同步失败，请稍后重试';
     this.onStoreChanged();
   }
 
@@ -154,7 +154,7 @@ export struct BackendConnectionPage {
       this.deleteStudentConfirmId = '';
       this.syncLocalStudents();
       this.pageRevision++;
-      this.message = '孩子资料已保存并同步';
+      this.message = '';
       this.onStoreChanged();
     } else {
       this.message = '保存失败，请确认云端连接';
@@ -167,7 +167,7 @@ export struct BackendConnectionPage {
       this.deleteStudentConfirmId = '';
       this.syncLocalStudents();
       this.pageRevision++;
-      this.message = '孩子资料已删除';
+      this.message = '';
       this.onStoreChanged();
     } else {
       this.deleteStudentConfirmId = '';
@@ -177,7 +177,7 @@ export struct BackendConnectionPage {
 
   private async disconnect(): Promise<void> {
     await BackendAuthService.instance.logout();
-    this.message = '已断开云端连接，本地作业仍可继续使用';
+    this.message = '';
     this.pageRevision++;
   }
 

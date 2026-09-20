@@ -16,9 +16,6 @@ export struct DeadlinePickerDialog {
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
-          Text('日期和时间均使用北京时间')
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
@@ -149,10 +146,6 @@ export struct DeadlinePickerField {
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.value.length > 0 ? AppTheme.TEXT : AppTheme.SUBTEXT);
-          Text(this.value.length > 0 ? '点击修改日期和时间' : '点击选择日期和时间')
-            .width('100%')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
