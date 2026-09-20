@@ -263,7 +263,7 @@ export struct VoiceAssignmentPane {
 
   private async showImage(index: number): Promise<void> {
     if (index < 0 || index >= this.imageResources.length) return;
-    if (index === this.imageIndex) {
+    if (index === this.imageIndex && index < this.imageUris.length && this.imageUris[index].length > 0) {
       void this.prefetchNextImage(index);
       return;
     }
@@ -330,12 +330,33 @@ export struct VoiceAssignmentPane {
   private ImageViewer() {
     Column({ space: 8 }) {
       Stack({ alignContent: Alignment.Center }) {
-        Image(this.imageUris[this.imageIndex])
-          .width('100%')
-          .height(286)
-          .objectFit(ImageFit.Contain)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.SURFACE_EMPHASIS);
+        Swiper() {
+          ForEach(this.imageUris, (uri: string, index: number) => {
+            Stack({ alignContent: Alignment.Center }) {
+              if (uri.length > 0) {
+                Image(uri)
+                  .width('100%')
+                  .height(286)
+                  .objectFit(ImageFit.Contain);
+              } else {
+                LoadingProgress()
+                  .width(28)
+                  .height(28)
+                  .color(AppTheme.PRIMARY);
+              }
+            }
+            .width('100%')
+            .height(286)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS);
+          }, (uri: string, index: number) => `${index}-${uri}`);
+        }
+        .width('100%')
+        .height(286)
+        .index(this.imageIndex)
+        .indicator(false)
+        .loop(true)
+        .onChange((index: number) => { void this.showImage(index); })
+        .borderRadius(AppTheme.CONTROL_RADIUS);
 
         if (this.imageUris.length > 1) {
           Row() {
