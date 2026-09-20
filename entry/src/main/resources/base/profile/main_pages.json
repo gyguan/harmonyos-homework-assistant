@@ -1,6 +1,7 @@
 {
   "src": [
     "pages/Index",
-    "pages/HomeworkCaptureFloatView"
+    "pages/HomeworkCaptureFloatView",
+    "pages/HomeworkShareReceivingPage"
   ]
 }
