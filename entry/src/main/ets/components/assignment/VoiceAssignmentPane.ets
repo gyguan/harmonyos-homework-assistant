@@ -54,8 +54,10 @@ export struct VoiceAssignmentPane {
   private imageResources: AssignmentResource[] = [];
   private audioResource: AssignmentResource | null = null;
   private imageRequestVersion: number = 0;
+  private lifecycleVersion: number = 0;
 
   aboutToAppear(): void {
+    this.lifecycleVersion++;
     this.onPauseReady(() => { void this.pauseAudio(); });
     this.onFullscreenControlsReady(
       () => { void this.toggleAudio(); },
@@ -64,10 +66,12 @@ export struct VoiceAssignmentPane {
       () => this.nextImage(),
       (index: number) => this.selectImage(index)
     );
-    void this.load();
+    void this.load(this.lifecycleVersion);
   }
 
   aboutToDisappear(): void {
+    this.lifecycleVersion++;
+    this.imageRequestVersion++;
     this.onFullscreenDismissed();
     this.onPauseReady(() => {});
     void this.player.release();
@@ -85,19 +89,24 @@ export struct VoiceAssignmentPane {
     );
   }
 
-  private async load(): Promise<void> {
+  private async load(lifecycleVersion: number): Promise<void> {
     this.loading = true;
     this.message = '';
     this.imageLoadMessage = '';
     this.audioLoadMessage = '';
     this.audioUri = '';
     this.audioResource = null;
+    this.audioLoading = false;
     this.prepared = false;
+    this.playing = false;
+    this.currentTimeMs = 0;
+    this.durationMs = 0;
     this.imageResources = [];
     this.imageUris = [];
     this.imageIndex = 0;
     try {
       let resources = await RemoteAssignmentResourceApi.instance.list(this.assignmentId);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
       let audio: AssignmentResource | null = null;
       let images: AssignmentResource[] = [];
       for (let resource of resources) {
@@ -119,6 +128,7 @@ export struct VoiceAssignmentPane {
       this.imageUris = slots;
 
       let firstImageUri = await this.loadImage(0);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
       if (firstImageUri.length === 0) {
         this.message = '情景图片加载失败，请检查网络后重试';
         return;
@@ -138,6 +148,7 @@ export struct VoiceAssignmentPane {
 
   private async loadAudio(resource: AssignmentResource): Promise<void> {
     if (this.audioLoading) return;
+    let lifecycleVersion = this.lifecycleVersion;
     this.audioLoading = true;
     this.audioLoadMessage = '';
     this.prepared = false;
@@ -145,6 +156,7 @@ export struct VoiceAssignmentPane {
     this.notifyMediaState();
 
     let audioUri = await RemoteAssignmentResourceApi.instance.download(resource);
+    if (lifecycleVersion !== this.lifecycleVersion) return;
     if (audioUri.length === 0) {
       this.audioLoading = false;
       this.audioLoadMessage = '语音加载失败，请检查网络后重试';
@@ -180,8 +192,9 @@ export struct VoiceAssignmentPane {
   }
 
   private retryAudio(): void {
-    if (this.audioResource === null || this.audioLoading) return;
-    void this.loadAudio(this.audioResource);
+    let resource = this.audioResource;
+    if (resource === null || this.audioLoading) return;
+    void this.loadAudio(resource);
   }
 
   private compareImageResources(left: AssignmentResource, right: AssignmentResource): number {
@@ -231,8 +244,9 @@ export struct VoiceAssignmentPane {
     if (index < 0 || index >= this.imageResources.length) return '';
     if (index < this.imageUris.length && this.imageUris[index].length > 0) return this.imageUris[index];
 
+    let lifecycleVersion = this.lifecycleVersion;
     let uri = await RemoteAssignmentResourceApi.instance.download(this.imageResources[index]);
-    if (uri.length === 0) return '';
+    if (lifecycleVersion !== this.lifecycleVersion || uri.length === 0) return '';
 
     let next = this.imageUris.slice();
     next[index] = uri;
