@@ -80,8 +80,11 @@ require("answerSpec" not in dtos.split("public record QuestionResponse", 1)[1].s
         "QuestionResponse must not leak answerSpec before submission")
 require("explanation" not in dtos.split("public record QuestionResponse", 1)[1].split("public record StartRequest", 1)[0],
         "QuestionResponse must not leak explanation before submission")
-require('sourceType = "PRESET"' in bootstrap and 'paper.questionCount = 10' in bootstrap,
-        "server starter papers must match Slice 1 PRESET metadata")
+require("preset-catalog.json" in bootstrap and "validator.validateCatalog(catalog)" in bootstrap,
+        "server Practice content must come from the validated canonical catalog")
+require("mathQuestions(" not in bootstrap and "chineseQuestions(" not in bootstrap and
+        "englishQuestions(" not in bootstrap,
+        "server Practice bootstrap must not regenerate paper questions in Java")
 require("PRACTICE_E2E_PASS" in e2e and "reject answer mutation after practice submission" in e2e,
         "real Practice E2E must cover immutable submitted attempts")
 

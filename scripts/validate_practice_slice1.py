@@ -106,12 +106,15 @@ for token in ["PracticePaper", "PracticeQuestion", "PracticeAttempt", "PracticeA
 require("Practice" not in homework_models,
         "HomeworkModels must remain independent from Practice domain")
 
-# Seed coverage: every G1-G6 grade receives the three required subjects through one provider.
-require("for (let grade of PracticeTaxonomy.grades())" in preset_catalog and
-        "PracticeSubject.CHINESE" in preset_catalog and
-        "PracticeSubject.MATH" in preset_catalog and
-        "PracticeSubject.ENGLISH" in preset_catalog,
-        "preset catalog must provide browseable seed papers for every grade and required subject")
+# Seed coverage now comes from the canonical JSON-generated client catalog.
+require("GENERATED from backend/src/main/resources/practice/preset-catalog.json" in preset_catalog,
+        "client preset catalog must be generated from the canonical JSON source")
+for grade in ["G1", "G2", "G3", "G4", "G5", "G6"]:
+    for subject in ["CHINESE", "MATH", "ENGLISH"]:
+        require(f"id: '{subject}-{grade}-STARTER-001'" in preset_catalog,
+                f"generated preset catalog missing starter paper: {subject}/{grade}")
+        require(f"id: '{subject}-{grade}-CORE-001'" in preset_catalog,
+                f"generated preset catalog missing formal paper: {subject}/{grade}")
 
 if errors:
     print("PRACTICE_SLICE1_GATE_FAIL")

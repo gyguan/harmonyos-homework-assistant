@@ -24,6 +24,31 @@ def main() -> int:
             (200,),
             "load practice paper",
         ).json()
+        core_paper_id = "MATH-G3-CORE-001"
+        core_paper = expect(
+            http(base_url, "GET", f"/api/v1/practice/papers/{core_paper_id}?version=1", token=token),
+            (200,),
+            "load formal practice paper from JSON catalog",
+        ).json()
+        require(core_paper.get("id") == core_paper_id, "formal practice paper id mismatch")
+        require(int(core_paper.get("questionCount", 0)) == 12,
+                "formal practice paper must expose 12 curated questions")
+        require(core_paper.get("sourceType") == "PRESET",
+                "formal practice paper must retain PRESET source type")
+        core_attempt = expect(
+            http(
+                base_url,
+                "POST",
+                f"/api/v1/students/{student_id}/practice/attempts",
+                token=token,
+                payload={"paperId": core_paper_id, "paperVersion": 1},
+            ),
+            (200,),
+            "start formal practice attempt from JSON catalog",
+        ).json()
+        require(len(core_attempt.get("questions") or []) == 12,
+                "formal practice attempt did not load catalog questions")
+
         require(paper.get("id") == paper_id, "practice paper id mismatch")
         require(int(paper.get("questionCount", 0)) == 10, "practice paper must expose 10 starter questions")
         require(paper.get("sourceType") == "PRESET", "starter practice paper must be PRESET")
