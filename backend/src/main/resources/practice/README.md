@@ -1,116 +1,159 @@
-# Practice preset content
+# Practice preset content V2
 
-Built-in Practice content is split by **grade × subject** under:
+The active built-in Practice catalog is intentionally scoped to the current product baseline:
 
-`backend/src/main/resources/practice/preset/`
+- Region: Shenzhen
+- Grade: G2 / 二年级
+- Semester: S1 / 上学期
+- Subjects: Chinese / Math / English
+- Catalog types: TEXTBOOK_SYNC / EXTRACURRICULAR
+- Content form: text-only, life-like scenarios; no Practice image assets
 
-The manifest is the entry point:
+The manifest is the only catalog entry point:
 
-`preset/manifest.json`
+`backend/src/main/resources/practice/preset/manifest.json`
 
-It declares exactly one JSON shard for every supported grade and required subject, for example:
+It declares exactly six shards:
 
 ```text
 preset/
   manifest.json
-  G1/
-    CHINESE.json
-    MATH.json
-    ENGLISH.json
   G2/
-    CHINESE.json
-    MATH.json
-    ENGLISH.json
-  ...
-  G6/
-    CHINESE.json
-    MATH.json
-    ENGLISH.json
+    CHINESE_SYNC.json
+    CHINESE_EXTRA.json
+    MATH_SYNC.json
+    MATH_EXTRA.json
+    ENGLISH_SYNC.json
+    ENGLISH_EXTRA.json
 ```
 
-Each shard owns all PRESET papers for that grade and subject. Do not recreate a monolithic
-`preset-catalog.json`.
+Current active baseline:
 
-## Audience metadata
+- 27 papers
+- 324 questions
+- each subject: 6 TEXTBOOK_SYNC papers + 3 EXTRACURRICULAR papers
+- each paper: 12 questions
 
-Every Paper declares:
+## Catalog type
 
-- `grade`: `G1` ... `G6`
-- `subject`: `CHINESE` / `MATH` / `ENGLISH`
-- `semester`: `ALL` / `S1` / `S2`
+Every active Paper declares:
 
-`ALL` means a stable grade-level foundation paper that can be used in either semester.
-`S1` and `S2` are semester-specific.
+- `grade = G2`
+- `semester = S1`
+- `subject = CHINESE | MATH | ENGLISH`
+- `track = TEXTBOOK_SYNC | EXTRACURRICULAR`
 
-The client defaults from the active student's `grade + semester`. The backend independently
-enforces the same audience rule when a fresh PracticeAttempt is created, so a client or API caller
-cannot start a paper from the wrong grade or semester.
+`TEXTBOOK_SYNC` follows the G2 first-semester learning progression and core ability scope.
+`EXTRACURRICULAR` stays age-appropriate but emphasizes reading, daily-life application,
+language use, patterns, logic, science and Shenzhen-life contexts.
 
-Historical repeat / wrong-only attempts remain bound to their original Paper version and are not
-blocked if the student later advances to another grade.
+The App exposes the catalog type as a first-class filter:
+
+`全部 / 教材同步 / 课外拓展`
+
+The default filter is `教材同步`.
+
+## Content positioning
+
+The questions are original and do not copy commercial exercise books or textbook exercises.
+
+The content uses familiar situations so a G2 student can understand the question without an image,
+for example:
+
+- school routines, class duty, PE, reading corners and sports day
+- family organization, meals and weekend activities
+- community libraries, parks, metro travel and local community activities
+- simple Shenzhen contexts such as rainy weather, parks and public transport
+
+A question must remain fully answerable from its text. Do not add stems such as
+`看图`, `图中`, `图片` or `画面` unless a future product version explicitly restores
+an audited visual-question contract.
+
+## Subject baseline
+
+### Chinese
+
+TEXTBOOK_SYNC:
+- words, quantifiers, synonyms/antonyms and vocabulary understanding
+- sentence order, punctuation, simple 把/被 sentences
+- original life and nature reading
+- complete-sentence and situational expression
+- stage review
+
+EXTRACURRICULAR:
+- Shenzhen life reading
+- child-friendly science reading
+- story comprehension and simple reasoning
+
+### Math
+
+TEXTBOOK_SYNC:
+- addition/subtraction within 100
+- centimetres/metres and simple measurement
+- meaning of multiplication
+- multiplication facts in life situations
+- equal sharing and basic division
+- intuitive symmetry/translation/rotation and multiplication/division application
+
+EXTRACURRICULAR:
+- daily-life math
+- number/pattern discovery and simple equivalence
+- queue/order/position logic and basic geometry thinking
+
+The quality gate rejects clearly advanced content such as decimals, fractions, equations,
+volume, percentages and other out-of-scope topics.
+
+### English
+
+TEXTBOOK_SYNC:
+- greetings, names, numbers and colours
+- family and basic appearance
+- simple `can` + actions
+- room vocabulary and `in/on`
+- places and natural-world vocabulary
+- stage review
+
+EXTRACURRICULAR:
+- school daily English
+- Shenzhen-life situations
+- very short reading passages
+
+## Immutable history and retiring old catalogs
+
+Source JSON is the active catalog, but PostgreSQL also contains historical Practice data.
+
+When the active catalog changes:
+
+1. new active PRESET papers are imported;
+2. old PRESET papers that are no longer in the manifest are marked `ARCHIVED`;
+3. their questions are retained in PostgreSQL;
+4. historical Attempt / Result / repeat / wrong-only records remain traceable.
+
+Do **not** physically delete historical paper/question rows that may already be referenced by an
+Attempt. “Delete the old question bank” means remove it from the active catalog and archive its
+persisted PRESET versions, not break immutable learning history.
 
 ## Content workflow
 
-1. Edit the matching grade/subject shard, such as `preset/G2/MATH.json`.
-2. Add a **new paper ID or a new immutable version**.
-3. Keep published versions immutable. If a released question, answer, explanation, audience, or
-   other semantic content changes, increment `version` instead of overwriting history.
-4. Regenerate client metadata:
+1. Edit the correct typed shard, for example `G2/MATH_SYNC.json`.
+2. Use a new paper ID, or increment a released paper's immutable `version`.
+3. Run:
    `python scripts/generate_practice_catalog.py`
-5. Run the content gate:
+4. Run:
    `python scripts/validate_practice_content.py`
-6. Commit the shard and generated `PresetPracticeCatalog.ets` together.
+5. Commit the JSON shard and generated `PresetPracticeCatalog.ets` together.
+6. Run backend tests and the real PostgreSQL Practice E2E.
 
-The backend loads `manifest.json`, merges every shard, validates the merged catalog, and imports
-missing immutable Paper versions into PostgreSQL.
+Do not recreate the old G1-G6 Starter/Core catalog, P0 visual catalog, visual asset manifest,
+PracticeQuestionVisual component, or `practice_visual_*` media resources.
 
-## G2 first-semester baseline
+## Future extension
 
-The active demo/student profile is currently **二年级上学期**. G2/S1 therefore has deeper coverage
-than other grades.
+The domain still reserves `sourceType = AI_GENERATED`.
 
-Current semester-specific coverage includes:
+Future generated content must use the same Paper/Question contract, declare `track`, pass
+`PracticeContentValidator.validatePaper(...)`, remain within the target audience scope, and be
+published as an immutable version.
 
-- Chinese: words and phrases, quantifiers, sentence order, punctuation, simple sentence patterns,
-  original short reading passages, information extraction, simple inference, and review.
-- Math: addition/subtraction within 100, chained operations, shopping/RMB, multiplication meaning,
-  2–5 and 6–9 multiplication facts, centimetres/metres, equal sharing/basic division, one-step
-  applications, and review.
-- English: greetings, self-introduction, classmates, numbers/colors, family, simple `can`,
-  basic appearance words, rooms/kitchen, `in/on`, nature/place vocabulary, and review.
-
-These are original Practice questions. They are not copied textbook exercises.
-
-The quality gate also contains explicit G2/S1 scope checks and rejects clearly advanced content
-such as decimals, fractions, equations, area/volume topics, or advanced English grammar.
-
-## Quality rules
-
-The gate validates:
-
-- manifest contains exactly 18 grade/subject shard files
-- shard path, declared grade/subject, and every Paper agree
-- globally unique question IDs
-- unique `paperId + version`
-- legal grade / subject / semester / difficulty / question type
-- contiguous question order and declared question count
-- non-empty explanations, hints, and tags
-- no duplicate stems inside one paper
-- choice answers reference declared options
-- numeric answers are parseable
-- G1–G6 baseline Starter + Core coverage for Chinese, Math, and English
-- enhanced G2/S1 paper and question minimums
-- G2/S1 age/semester scope guardrails
-- generated client metadata stays synchronized with all shards
-- fresh Attempt creation is protected by the backend grade/semester audience policy
-
-## AI-generated extension
-
-The domain already reserves `sourceType = AI_GENERATED`.
-
-Future AI paper generation should produce the same `PracticeContentCatalog.Paper` contract and
-call `PracticeContentValidator.validatePaper(...)` before publication. AI-generated content must
-declare `grade`, `subject`, and `semester`, pass the same quality rules, and be persisted as a
-new immutable Paper version.
-
-Do not create a second AI-only question model and do not bypass the validator or audience policy.
+Do not create a parallel AI-only model or bypass content validation, audience policy, or history
+immutability.
