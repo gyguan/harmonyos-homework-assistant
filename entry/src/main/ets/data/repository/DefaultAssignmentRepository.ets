@@ -101,7 +101,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
         this.applyAuthoritative(current);
         remoteBacked = true;
       } catch (error) {
-        if (`${error}`.indexOf('REMOTE_NOT_FOUND') < 0) throw error;
+        if (`${error}`.indexOf('REMOTE_NOT_FOUND') < 0) throw new Error(`${error}`);
       }
     }
 
