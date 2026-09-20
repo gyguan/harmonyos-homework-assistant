@@ -1,6 +1,9 @@
 export enum AppRoute {
   STUDENT_ASSIGNMENT_DETAIL = 'student/assignment/detail',
   STUDENT_STUDY = 'student/study',
+  STUDENT_PRACTICE_PAPER = 'student/practice/paper',
+  STUDENT_PRACTICE_ATTEMPT = 'student/practice/attempt',
+  STUDENT_PRACTICE_RESULT = 'student/practice/result',
   PARENT_REVIEW = 'parent/review',
   PARENT_IMPORT = 'parent/import',
   PARENT_IMPORT_CONFIRMATION = 'parent/import/confirmation',
@@ -12,6 +15,24 @@ export class AssignmentRouteParam {
 
   constructor(assignmentId: string) {
     this.assignmentId = assignmentId;
+  }
+}
+
+export class PracticePaperRouteParam {
+  paperId: string;
+  version: number;
+
+  constructor(paperId: string, version: number) {
+    this.paperId = paperId;
+    this.version = version;
+  }
+}
+
+export class PracticeAttemptRouteParam {
+  attemptId: string;
+
+  constructor(attemptId: string) {
+    this.attemptId = attemptId;
   }
 }
 
