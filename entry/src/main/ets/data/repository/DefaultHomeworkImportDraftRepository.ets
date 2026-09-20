@@ -43,6 +43,8 @@ export class DefaultHomeworkImportDraftRepository implements HomeworkImportDraft
     let inbox = DefaultHomeworkImportInboxRepository.instance;
     let batchId = inbox.getActiveBatchId();
     if (batchId.length === 0) return;
+    let batch = inbox.getBatch(batchId);
+    if (batch === null || batch.studentId !== this.local.getActiveStudentId()) return;
     inbox.syncCandidates(batchId, this.local.getCandidates());
   }
 }
