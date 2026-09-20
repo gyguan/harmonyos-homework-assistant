@@ -272,7 +272,7 @@ export struct PracticeAttemptPage {
                 .onClick(() => this.currentAnswer = option.key);
             },
             (option: PracticeQuestionOption) =>
-              `${this.currentIndex}:${this.attempt!.questions[this.currentIndex].id}:${option.key}:${option.label}`
+              `${this.currentIndex}:${option.key}:${option.label}`
           );
         }
         .width('100%');
