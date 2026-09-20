@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PracticeAttemptRepository extends JpaRepository<PracticeAttemptEntity, UUID> {
   long countByFamilyIdAndStudentIdAndPaperId(UUID familyId, String studentId, String paperId);
+  boolean existsByFamilyIdAndStudentId(UUID familyId, String studentId);
   List<PracticeAttemptEntity> findByFamilyIdAndStudentIdOrderByStartedAtDesc(UUID familyId, String studentId);
 }
