@@ -1,0 +1,695 @@
+{
+  "schemaVersion": 1,
+  "grade": "G2",
+  "semester": "S1",
+  "pack": "P0",
+  "paperCount": 7,
+  "questionCount": 84,
+  "assetCount": 75,
+  "assets": [
+    {
+      "assetId": "asset_scene_library_books_01",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "图书角原有36本书，又新增18本",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q01"
+      ]
+    },
+    {
+      "assetId": "asset_scene_oranges_tree_01",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "橘子树原有52个橘子，摘下27个",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q02"
+      ]
+    },
+    {
+      "assetId": "asset_math_tenframes_48_plus_12",
+      "type": "DOT_ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "48个方块，再增加12个",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q03"
+      ]
+    },
+    {
+      "assetId": "asset_scene_stickers_01",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "25张贴纸，又得到16张",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q04"
+      ]
+    },
+    {
+      "assetId": "asset_scene_playground_students_01",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "操场原有63名同学，24名回教室",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q05"
+      ]
+    },
+    {
+      "assetId": "asset_scene_pencils_28_34",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "28支铅笔，又买34支",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q06"
+      ]
+    },
+    {
+      "assetId": "asset_scene_three_baskets_apples",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "三个篮子分别有18、25、12个苹果",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q07"
+      ]
+    },
+    {
+      "assetId": "asset_scene_colored_papers_90",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "90张彩纸，先用26张，再用14张",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q08"
+      ]
+    },
+    {
+      "assetId": "asset_scene_breads_16_minus_9",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "16个面包，卖出9个",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q09"
+      ]
+    },
+    {
+      "assetId": "asset_scene_schoolbus_27_15",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "校车原有27人，又上来15人",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q10"
+      ]
+    },
+    {
+      "assetId": "asset_scene_notebooks_store_45",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "45本练习本，上午卖18本，下午卖7本",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q11"
+      ]
+    },
+    {
+      "assetId": "asset_scene_colored_pens_32_19",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "两盒彩笔分别32支和19支",
+      "usedBy": [
+        "MATH-G2-S1-P0-M01-001-Q12"
+      ]
+    },
+    {
+      "assetId": "asset_array_apples_3x4",
+      "type": "ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "3盘苹果，每盘4个",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q01"
+      ]
+    },
+    {
+      "assetId": "asset_array_balloons_2x5",
+      "type": "ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "2排气球，每排5个",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q02"
+      ]
+    },
+    {
+      "assetId": "asset_dotarray_4x3",
+      "type": "DOT_ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "4行点子，每行3个",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q03"
+      ]
+    },
+    {
+      "assetId": "asset_array_pears_4x2",
+      "type": "ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "4只篮子，每只2个梨",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q04"
+      ]
+    },
+    {
+      "assetId": "asset_scene_kids_pencils_5x3",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "5个小朋友，每人3支铅笔",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q05"
+      ]
+    },
+    {
+      "assetId": "asset_array_seats_3x6",
+      "type": "ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "3排座位，每排6个",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q06"
+      ]
+    },
+    {
+      "assetId": "asset_array_flowers_4x5",
+      "type": "ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "4束花，每束5朵",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q07"
+      ]
+    },
+    {
+      "assetId": "asset_pair_4groups_of2",
+      "type": "IMAGE_PAIR",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "4组，每组2个",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q08"
+      ]
+    },
+    {
+      "assetId": "asset_array_icecream_6x2",
+      "type": "ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "6个盒子，每盒2支雪糕",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q09"
+      ]
+    },
+    {
+      "assetId": "asset_array_stars_3x5",
+      "type": "ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "3行星星，每行5颗",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q10"
+      ]
+    },
+    {
+      "assetId": "asset_scene_toycars_blocks_2x7",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "2辆玩具车，每辆7个积木",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q11"
+      ]
+    },
+    {
+      "assetId": "asset_array_flags_5x4",
+      "type": "ARRAY",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "5排小旗，每排4面",
+      "usedBy": [
+        "MATH-G2-S1-P0-M03-001-Q12"
+      ]
+    },
+    {
+      "assetId": "asset_scene_strawberries_12_3plates",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "12个草莓，3个盘子",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q01"
+      ]
+    },
+    {
+      "assetId": "asset_scene_pencils_16_4cups",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "16支铅笔，4个笔筒",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q02"
+      ]
+    },
+    {
+      "assetId": "asset_scene_candies_18_6kids",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "18颗糖，6个小朋友",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q03"
+      ]
+    },
+    {
+      "assetId": "asset_scene_apples_15_5baskets",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "15个苹果，5个篮子",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q04"
+      ]
+    },
+    {
+      "assetId": "asset_scene_balloons_20_group4",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "20个气球，每4个一束",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q05"
+      ]
+    },
+    {
+      "assetId": "asset_scene_bookshelf_24_6",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "24本书，6层书架",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q06"
+      ]
+    },
+    {
+      "assetId": "asset_scene_balls_21_7boxes",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "21个小球，7个盒子",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q07"
+      ]
+    },
+    {
+      "assetId": "asset_scene_ducks_8_group2",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "8只小鸭，2只一组",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q08"
+      ]
+    },
+    {
+      "assetId": "asset_scene_breads_12_4kids",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "12个面包，4个人",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q09"
+      ]
+    },
+    {
+      "assetId": "asset_scene_flowers_27_group3",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "27朵花，每3朵一瓶",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q10"
+      ]
+    },
+    {
+      "assetId": "asset_scene_apples_10_2plates",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "10个苹果，2个盘子",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q11"
+      ]
+    },
+    {
+      "assetId": "asset_scene_cards_32_group8",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "32张卡片，每8张一份",
+      "usedBy": [
+        "MATH-G2-S1-P0-M05-001-Q12"
+      ]
+    },
+    {
+      "assetId": "asset_reading_library_rainy",
+      "type": "SCENE",
+      "layout": "PASSAGE_WITH_SCENE",
+      "accessibilityText": "社区图书馆：小雨和妈妈、书架、窗边阅读",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C03-001-Q01",
+        "CHINESE-G2-S1-P0-C03-001-Q02",
+        "CHINESE-G2-S1-P0-C03-001-Q03",
+        "CHINESE-G2-S1-P0-C03-001-Q04"
+      ]
+    },
+    {
+      "assetId": "asset_reading_cleaning_classroom",
+      "type": "SCENE",
+      "layout": "PASSAGE_WITH_SCENE",
+      "accessibilityText": "放学后的教室值日场景",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C03-001-Q05",
+        "CHINESE-G2-S1-P0-C03-001-Q06",
+        "CHINESE-G2-S1-P0-C03-001-Q07",
+        "CHINESE-G2-S1-P0-C03-001-Q08"
+      ]
+    },
+    {
+      "assetId": "asset_reading_autumn_park",
+      "type": "SCENE",
+      "layout": "PASSAGE_WITH_SCENE",
+      "accessibilityText": "秋天公园：红黄树叶、小朋友捡落叶",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C03-001-Q09",
+        "CHINESE-G2-S1-P0-C03-001-Q10",
+        "CHINESE-G2-S1-P0-C03-001-Q11",
+        "CHINESE-G2-S1-P0-C03-001-Q12"
+      ]
+    },
+    {
+      "assetId": "asset_scene_watering_flowers",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "小朋友在花坛旁认真浇花",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q01"
+      ]
+    },
+    {
+      "assetId": "asset_scene_washing_hands_line",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "两个小朋友排队洗手",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q02"
+      ]
+    },
+    {
+      "assetId": "asset_scene_share_umbrella",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "下雨天，一个同学给另一个同学撑伞",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q03"
+      ]
+    },
+    {
+      "assetId": "asset_seq_morning_routine",
+      "type": "IMAGE_SEQUENCE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "三图：起床→刷牙→背书包出门",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q04"
+      ]
+    },
+    {
+      "assetId": "asset_seq_pickup_trash",
+      "type": "IMAGE_SEQUENCE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "三图：捡起纸屑→扔进垃圾桶→地面变干净",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q05"
+      ]
+    },
+    {
+      "assetId": "asset_scene_listening_class",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "教室里同学认真听讲",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q06"
+      ]
+    },
+    {
+      "assetId": "asset_scene_tidy_desk_family",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "妈妈和孩子一起整理书桌",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q07"
+      ]
+    },
+    {
+      "assetId": "asset_scene_cat_look_rain",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "小猫趴在窗边看雨",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q08"
+      ]
+    },
+    {
+      "assetId": "asset_seq_seed_sprout_grow",
+      "type": "IMAGE_SEQUENCE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "三图：种子→发芽→长高",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q09"
+      ]
+    },
+    {
+      "assetId": "asset_dialog_help_friend_fall",
+      "type": "DIALOGUE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "一个小朋友摔倒，另一个扶起他",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q10"
+      ]
+    },
+    {
+      "assetId": "asset_scene_observe_butterfly",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "小朋友在公园认真观察蝴蝶",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q11"
+      ]
+    },
+    {
+      "assetId": "asset_scene_family_chat_dinner",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "晚饭后全家坐在一起聊天",
+      "usedBy": [
+        "CHINESE-G2-S1-P0-C04-001-Q12"
+      ]
+    },
+    {
+      "assetId": "asset_eng_morning_greeting",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "早晨两个同学见面打招呼",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q01"
+      ]
+    },
+    {
+      "assetId": "asset_eng_boy_self_intro",
+      "type": "CHARACTER",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "男孩指着自己微笑",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q02"
+      ]
+    },
+    {
+      "assetId": "asset_eng_meet_handshake",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "两个孩子握手认识",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q03"
+      ]
+    },
+    {
+      "assetId": "asset_eng_yellow_balloon",
+      "type": "ILLUSTRATION",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "黄色气球",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q04"
+      ]
+    },
+    {
+      "assetId": "asset_eng_pencils_7",
+      "type": "ILLUSTRATION",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "7支铅笔",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q05"
+      ]
+    },
+    {
+      "assetId": "asset_eng_girl_answer_name",
+      "type": "CHARACTER",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "女孩微笑回答自己的名字",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q06"
+      ]
+    },
+    {
+      "assetId": "asset_eng_classmates_classroom",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "教室里的同学",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q07"
+      ]
+    },
+    {
+      "assetId": "asset_eng_how_are_you",
+      "type": "DIALOGUE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "老师问候学生",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q08"
+      ]
+    },
+    {
+      "assetId": "asset_eng_red_apple",
+      "type": "ILLUSTRATION",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "红色苹果",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q09"
+      ]
+    },
+    {
+      "assetId": "asset_eng_balls_3",
+      "type": "ILLUSTRATION",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "3个球",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q10"
+      ]
+    },
+    {
+      "assetId": "asset_eng_goodbye_afterschool",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "放学挥手再见",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q11"
+      ]
+    },
+    {
+      "assetId": "asset_eng_new_classmate",
+      "type": "SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "新同学入班介绍",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E01-001-Q12"
+      ]
+    },
+    {
+      "assetId": "asset_eng_father_portrait",
+      "type": "FAMILY_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "爸爸人物图",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q01"
+      ]
+    },
+    {
+      "assetId": "asset_eng_mother_portrait",
+      "type": "FAMILY_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "妈妈人物图",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q02"
+      ]
+    },
+    {
+      "assetId": "asset_eng_girl_long_hair",
+      "type": "CHARACTER",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "女孩长头发",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q03"
+      ]
+    },
+    {
+      "assetId": "asset_eng_boy_short_hair",
+      "type": "CHARACTER",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "男孩短头发",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q04"
+      ]
+    },
+    {
+      "assetId": "asset_eng_book_on_desk",
+      "type": "ROOM_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "一本书在桌子上",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q05"
+      ]
+    },
+    {
+      "assetId": "asset_eng_ball_in_box",
+      "type": "ROOM_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "球在盒子里",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q06"
+      ]
+    },
+    {
+      "assetId": "asset_eng_room_with_bed",
+      "type": "ROOM_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "房间里有床、桌子、椅子",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q07"
+      ]
+    },
+    {
+      "assetId": "asset_eng_family_photo",
+      "type": "FAMILY_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "家庭合照",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q08"
+      ]
+    },
+    {
+      "assetId": "asset_eng_chair",
+      "type": "ROOM_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "椅子",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q09"
+      ]
+    },
+    {
+      "assetId": "asset_eng_door",
+      "type": "ROOM_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "门",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q10"
+      ]
+    },
+    {
+      "assetId": "asset_eng_pencil_in_bag",
+      "type": "ROOM_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "铅笔在书包里",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q11"
+      ]
+    },
+    {
+      "assetId": "asset_eng_brother_sister",
+      "type": "FAMILY_SCENE",
+      "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
+      "accessibilityText": "哥哥和妹妹站在一起",
+      "usedBy": [
+        "ENGLISH-G2-S1-P0-E02-001-Q12"
+      ]
+    }
+  ]
+}
