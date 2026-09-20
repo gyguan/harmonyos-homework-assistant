@@ -45,16 +45,18 @@ require("schemaVersion: HOMEWORK_SNAPSHOT_SCHEMA_VERSION" in store,
         "new snapshots must use the shared migration schema version")
 require("MAX_SUBMISSION_PHOTOS: number = 6" in service, "Submission service must cap selection at six photos")
 require("photoAccessHelper.PhotoViewPicker" in service, "Submission service must use PhotoViewPicker")
+require("cameraPicker.pick" in service and "PickerMediaType.PHOTO" in service,
+        "Submission service must support system camera capture")
 require("fileIo.copyFile" in service and "fileUri.getUriFromPath" in service,
         "Selected picker photos must be copied into the app sandbox before persistence")
 require("configure(context: common.UIAbilityContext)" in service,
         "Submission service must receive UIAbilityContext for sandbox storage")
 require("HomeworkSubmissionService.instance.configure(this.context)" in entry_ability,
         "EntryAbility must initialize the submission service")
-require("submissionPhotoUris" in study and "选择作业照片" in study and "确认提交" in study,
-        "Student workspace must select, preview and confirm real photos")
-require("removeSubmissionPhoto" in study and "重新选择照片" in study,
-        "Student must be able to remove/reselect photos before submitting")
+require("submissionPhotoUris" in study and "从图库选择" in study and "拍照" in study and "确认提交" in study,
+        "Student workspace must support gallery/camera selection, preview and confirmation")
+require("removeSubmissionPhoto" in study and "appendSubmissionPhotos" in study,
+        "Student must be able to remove and append photos from multiple sources before submitting")
 require("Image(uri)" in study,
         "Student workspace must render selected/submitted local photos")
 require("PhotoPreviewDialog" in study and "private openPhotoPreview(uri: string)" in study and
