@@ -1,4 +1,4 @@
-import { Assignment, AssignmentContentType, AssignmentStatus, AssignmentType, Subject } from '../../domain/model/HomeworkModels';
+import { Assignment, AssignmentBacking, AssignmentContentType, AssignmentStatus, AssignmentType, Subject } from '../../domain/model/HomeworkModels';
 
 export interface RemoteAssignment {
   id: string;
@@ -30,6 +30,7 @@ export class RemoteAssignmentMapper {
       id: remote.id,
       studentId: remote.studentId,
       candidateId: existing === null ? '' : existing.candidateId,
+      backing: AssignmentBacking.REMOTE,
       assignmentType: remote.assignmentType === AssignmentType.EXTRA ? AssignmentType.EXTRA : AssignmentType.SCHOOL,
       subjectCode: remote.subjectCode === undefined || remote.subjectCode.length === 0 ?
         RemoteAssignmentMapper.subjectCode(remote.subject as Subject) : remote.subjectCode,
