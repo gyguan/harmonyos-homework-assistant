@@ -3,6 +3,7 @@ package com.xiaoban.homework.practice;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import com.xiaoban.homework.common.ApiExceptions;
+import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Duration;
 import java.time.Instant;
@@ -23,13 +24,14 @@ public class PracticeAttemptService {
   private final PracticePaperRepository paperRepository;
   private final PracticeContentService content;
   private final StudentService students;
+  private final PracticeAudiencePolicy audiencePolicy;
   private final JsonMapper mapper;
   private final PracticeJudgeEngine judge = new PracticeJudgeEngine();
 
   public PracticeAttemptService(PracticeAttemptRepository attempts, PracticeAnswerRepository answers,
       PracticeNoteRepository notes, PracticeQuestionRepository questionRepository,
       PracticePaperRepository paperRepository, PracticeContentService content,
-      StudentService students, JsonMapper mapper) {
+      StudentService students, PracticeAudiencePolicy audiencePolicy, JsonMapper mapper) {
     this.attempts = attempts;
     this.answers = answers;
     this.notes = notes;
@@ -37,13 +39,15 @@ public class PracticeAttemptService {
     this.paperRepository = paperRepository;
     this.content = content;
     this.students = students;
+    this.audiencePolicy = audiencePolicy;
     this.mapper = mapper;
   }
 
   @Transactional
   public PracticeDtos.AttemptResponse start(UUID familyId, String studentId, PracticeDtos.StartRequest input) {
-    students.requireOwned(familyId, studentId);
+    StudentEntity student = students.requireOwned(familyId, studentId);
     PracticePaperEntity paper = content.requirePaper(input.paperId(), input.paperVersion());
+    audiencePolicy.requireFreshStartAllowed(student, paper);
     List<PracticeQuestionEntity> questions = content.questions(paper);
     if (questions.isEmpty()) throw new ApiExceptions.BadRequest("套卷暂无可练习题目");
 
