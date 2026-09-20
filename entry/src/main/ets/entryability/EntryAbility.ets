@@ -1,6 +1,7 @@
-import { UIAbility } from '@kit.AbilityKit';
+import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { HomeworkImportService } from '../application/import/HomeworkImportService';
+import { HomeworkShareImportService } from '../application/import/HomeworkShareImportService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { RemoteAssignmentResourceApi } from '../application/remote/RemoteAssignmentResourceApi';
 import { RemoteSubmissionApi } from '../application/remote/RemoteSubmissionApi';
@@ -15,6 +16,27 @@ import { PreferencesHomeworkPersistence } from '../infrastructure/persistence/Pr
 import { PreferencesHomeworkImportInboxPersistence } from '../infrastructure/persistence/PreferencesHomeworkImportInboxPersistence';
 
 export default class EntryAbility extends UIAbility {
+  onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    void launchParam;
+    AppStorage.setOrCreate<string>('shareImportToken', '');
+    AppStorage.setOrCreate<boolean>('shareImportForceParent', false);
+    this.captureShareImportWant(want);
+  }
+
+  onNewWant(want: Want, launchParam: AbilityConstant.LaunchParam): void {
+    void launchParam;
+    this.captureShareImportWant(want);
+  }
+
+  private captureShareImportWant(want: Want): void {
+    let value = want.parameters?.['shareImportToken'];
+    if (typeof value !== 'string' || value.length === 0) return;
+    AppStorage.setOrCreate<string>('shareImportToken', value);
+    AppStorage.setOrCreate<boolean>('shareImportForceParent', true);
+    AppStorage.set<string>('shareImportToken', value);
+    AppStorage.set<boolean>('shareImportForceParent', true);
+  }
+
   private loadMainPage(windowStage: window.WindowStage): void {
     try {
       windowStage.loadContent('pages/Index', (error) => {
@@ -27,6 +49,7 @@ export default class EntryAbility extends UIAbility {
 
   private async bootstrap(windowStage: window.WindowStage): Promise<void> {
     HomeworkImportService.instance.configure(new CoreVisionHomeworkTextExtractor(), new LocalHomeworkAssignmentParser());
+    HomeworkShareImportService.instance.configure(this.context);
     HomeworkSubmissionService.instance.configure(this.context);
     VoiceAssignmentMediaService.instance.configure(this.context);
     RemoteSubmissionApi.instance.configure(this.context);
