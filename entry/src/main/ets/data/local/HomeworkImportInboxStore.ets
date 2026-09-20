@@ -222,6 +222,7 @@ export class HomeworkImportInboxStore {
     let index = this.batchIndex(batchId);
     if (index < 0) return false;
     this.batches[index].status = ImportBatchStatus.PUBLISHED;
+    if (this.activeBatchId === batchId) this.activeBatchId = '';
     this.requestPersist();
     return true;
   }
