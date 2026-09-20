@@ -1,0 +1,962 @@
+{
+  "schemaVersion": 2,
+  "grade": "G2",
+  "subject": "MATH",
+  "track": "EXTRACURRICULAR",
+  "papers": [
+    {
+      "id": "MATH-G2-S1-EXTRA-LIFE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "生活数学·深圳日常（一）",
+      "description": "用地铁、社区、市集、图书馆、运动会等儿童熟悉场景解决简单数学问题。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "课外拓展",
+        "生活数学",
+        "深圳日常"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q01",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "周末去社区市集，小宇有50元，买书用了18元，买文具用了12元，还剩多少元？",
+          "options": [],
+          "answerSpec": "20",
+          "explanation": "计算结果是20。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "加减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q02",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "一家四口坐地铁，每人准备2瓶水，一共要准备多少瓶？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "计算结果是8。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q03",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "小区活动准备了36张椅子，每6张摆一排，可以摆几排？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "计算结果是6。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q04",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "图书馆儿童区有45本故事书，又补充了27本，现在有多少本？",
+          "options": [],
+          "answerSpec": "72",
+          "explanation": "计算结果是72。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q05",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "便利店有80瓶牛奶，上午卖出26瓶，下午卖出19瓶，还剩多少瓶？",
+          "options": [],
+          "answerSpec": "35",
+          "explanation": "计算结果是35。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "连减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q06",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "运动会有7个小组，每组5人，一共有多少名同学？",
+          "options": [],
+          "answerSpec": "35",
+          "explanation": "计算结果是35。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q07",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "48个贴纸平均分给6个孩子，每人几张？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "计算结果是8。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q08",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "小宇从家到公园要走900米，他已经走了300米，还剩多少米？",
+          "options": [],
+          "answerSpec": "600",
+          "explanation": "计算结果是600。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "长度"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q09",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "社区花坛有6排花，每排8盆，共有多少盆？",
+          "options": [],
+          "answerSpec": "48",
+          "explanation": "计算结果是48。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q10",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "妈妈买了3袋苹果，每袋6个，又买了4个梨，一共多少个水果？",
+          "options": [],
+          "answerSpec": "22",
+          "explanation": "计算结果是22。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "综合"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q11",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "书架上层有28本书，下层有35本书，一共有多少本？",
+          "options": [],
+          "answerSpec": "63",
+          "explanation": "计算结果是63。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LIFE-001-Q12",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "32名同学每4人一队参加游戏，可以分成几队？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "计算结果是8。",
+          "hints": [
+            "先想清楚用加、减、乘还是除，再计算。"
+          ],
+          "tags": [
+            "生活数学",
+            "除法"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-EXTRA-PATTERN-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "数学思维·规律与等量代换（一）",
+      "description": "用简单数列、周期和生活物品代换训练二年级数学思维。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "课外拓展",
+        "找规律",
+        "等量代换"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "按规律：2，4，6，8，下一個数是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10"
+            },
+            {
+              "key": "B",
+              "label": "9"
+            },
+            {
+              "key": "C",
+              "label": "12"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "找规律",
+            "数字规律"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "按规律：5，10，15，20，下一個数是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "25"
+            },
+            {
+              "key": "B",
+              "label": "21"
+            },
+            {
+              "key": "C",
+              "label": "30"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "找规律",
+            "数字规律"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "按规律：30，27，24，21，下一個数是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "18"
+            },
+            {
+              "key": "B",
+              "label": "20"
+            },
+            {
+              "key": "C",
+              "label": "17"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "找规律",
+            "数字规律"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "如果1个苹果和2个橘子一样重，2个苹果和几个橘子一样重？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4个"
+            },
+            {
+              "key": "B",
+              "label": "2个"
+            },
+            {
+              "key": "C",
+              "label": "3个"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "等量代换",
+            "生活"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "如果1盒彩笔=3支铅笔，2盒彩笔相当于几支铅笔？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6支"
+            },
+            {
+              "key": "B",
+              "label": "5支"
+            },
+            {
+              "key": "C",
+              "label": "3支"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "等量代换",
+            "生活"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "红球、蓝球、红球、蓝球、红球，下一個应该是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "蓝球"
+            },
+            {
+              "key": "B",
+              "label": "红球"
+            },
+            {
+              "key": "C",
+              "label": "黄球"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "找规律",
+            "周期"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "1，3，5，7，9，这组数每次增加多少？",
+          "options": [
+            {
+              "key": "A",
+              "label": "2"
+            },
+            {
+              "key": "B",
+              "label": "1"
+            },
+            {
+              "key": "C",
+              "label": "3"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "找规律",
+            "数字规律"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "10，20，30，40，下一個数是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "50"
+            },
+            {
+              "key": "B",
+              "label": "45"
+            },
+            {
+              "key": "C",
+              "label": "60"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "找规律",
+            "数字规律"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "如果2本练习本和1盒彩笔价格一样，4本练习本相当于几盒彩笔？",
+          "options": [
+            {
+              "key": "A",
+              "label": "2盒"
+            },
+            {
+              "key": "B",
+              "label": "4盒"
+            },
+            {
+              "key": "C",
+              "label": "1盒"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "等量代换",
+            "生活"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "一组图案按“圆、三角、方”重复，第7个图案是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "圆"
+            },
+            {
+              "key": "B",
+              "label": "三角"
+            },
+            {
+              "key": "C",
+              "label": "方"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "找规律",
+            "周期"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "3，6，9，12，下一個数是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "15"
+            },
+            {
+              "key": "B",
+              "label": "14"
+            },
+            {
+              "key": "C",
+              "label": "18"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "找规律",
+            "数字规律"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PATTERN-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "如果1个大积木和4个小积木一样重，3个大积木相当于多少个小积木？",
+          "options": [
+            {
+              "key": "A",
+              "label": "12个"
+            },
+            {
+              "key": "B",
+              "label": "7个"
+            },
+            {
+              "key": "C",
+              "label": "9个"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "等量代换",
+            "生活"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-EXTRA-LOGIC-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "数学思维·逻辑与图形（一）",
+      "description": "训练排队、比较、位置、简单图形和方向感，不引入高年级公式。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "课外拓展",
+        "逻辑",
+        "图形"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "小明前面有3人，后面有4人，这一队一共有多少人？",
+          "options": [
+            {
+              "key": "A",
+              "label": "8"
+            },
+            {
+              "key": "B",
+              "label": "7"
+            },
+            {
+              "key": "C",
+              "label": "9"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "逻辑",
+            "排队"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "从左往右，小红排第5；从右往左，她排第4。这一排一共有多少人？",
+          "options": [
+            {
+              "key": "A",
+              "label": "8"
+            },
+            {
+              "key": "B",
+              "label": "9"
+            },
+            {
+              "key": "C",
+              "label": "7"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "逻辑",
+            "排队"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "三个人比赛跑步：小乐比小宇快，小宇比小明快。谁最快？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小乐"
+            },
+            {
+              "key": "B",
+              "label": "小宇"
+            },
+            {
+              "key": "C",
+              "label": "小明"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "逻辑",
+            "比较"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "桌上有红、蓝、黄三个盒子。红盒比蓝盒重，蓝盒比黄盒重，哪个最轻？",
+          "options": [
+            {
+              "key": "A",
+              "label": "黄盒"
+            },
+            {
+              "key": "B",
+              "label": "蓝盒"
+            },
+            {
+              "key": "C",
+              "label": "红盒"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "逻辑",
+            "比较"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个正方形有几条边？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4条"
+            },
+            {
+              "key": "B",
+              "label": "3条"
+            },
+            {
+              "key": "C",
+              "label": "5条"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "图形",
+            "基础"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个长方形有几个直角？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4个"
+            },
+            {
+              "key": "B",
+              "label": "2个"
+            },
+            {
+              "key": "C",
+              "label": "3个"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "图形",
+            "基础"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "把一张正方形纸沿一条直线对折，哪种说法更合理？",
+          "options": [
+            {
+              "key": "A",
+              "label": "两部分可能重合"
+            },
+            {
+              "key": "B",
+              "label": "一定变成圆形"
+            },
+            {
+              "key": "C",
+              "label": "纸会变大"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "图形",
+            "对称"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "小宇家在学校东边，公园在学校西边。小宇家和公园大致在学校的什么方向？",
+          "options": [
+            {
+              "key": "A",
+              "label": "相反方向"
+            },
+            {
+              "key": "B",
+              "label": "同一方向"
+            },
+            {
+              "key": "C",
+              "label": "都在北边"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "位置",
+            "方向"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "有4把不同颜色的伞排成一排，红伞在蓝伞左边，蓝伞在黄伞左边。谁最靠右？",
+          "options": [
+            {
+              "key": "A",
+              "label": "黄伞"
+            },
+            {
+              "key": "B",
+              "label": "红伞"
+            },
+            {
+              "key": "C",
+              "label": "蓝伞"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "逻辑",
+            "位置"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个三角形和一个正方形一共有多少条边？",
+          "options": [
+            {
+              "key": "A",
+              "label": "7条"
+            },
+            {
+              "key": "B",
+              "label": "6条"
+            },
+            {
+              "key": "C",
+              "label": "8条"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "图形",
+            "计数"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "小丽住2楼，小杰住5楼。小杰比小丽高几层？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3层"
+            },
+            {
+              "key": "B",
+              "label": "2层"
+            },
+            {
+              "key": "C",
+              "label": "7层"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "逻辑",
+            "生活"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-LOGIC-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "有12个同学排队，小明排第7，他后面有几个人？",
+          "options": [
+            {
+              "key": "A",
+              "label": "5人"
+            },
+            {
+              "key": "B",
+              "label": "6人"
+            },
+            {
+              "key": "C",
+              "label": "7人"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "先找出题目中的数量关系或关键信息。"
+          ],
+          "tags": [
+            "逻辑",
+            "排队"
+          ]
+        }
+      ]
+    }
+  ]
+}

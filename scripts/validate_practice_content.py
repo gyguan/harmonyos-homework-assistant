@@ -16,17 +16,21 @@ MANIFEST_SCHEMA = ROOT / "backend/src/main/resources/practice/preset-manifest.sc
 SHARD_SCHEMA = ROOT / "backend/src/main/resources/practice/preset-shard.schema.json"
 BOOTSTRAP = ROOT / "backend/src/main/java/com/xiaoban/homework/practice/PracticeContentBootstrap.java"
 VALIDATOR = ROOT / "backend/src/main/java/com/xiaoban/homework/practice/PracticeContentValidator.java"
-ATTEMPT_SERVICE = ROOT / "backend/src/main/java/com/xiaoban/homework/practice/PracticeAttemptService.java"
-AUDIENCE_POLICY = ROOT / "backend/src/main/java/com/xiaoban/homework/practice/PracticeAudiencePolicy.java"
-LEGACY_CATALOG = ROOT / "backend/src/main/resources/practice/preset-catalog.json"
-P0_ASSETS = ROOT / "backend/src/main/resources/practice/visual/G2_S1_P0_assets.json"
+PAPER_ENTITY = ROOT / "backend/src/main/java/com/xiaoban/homework/practice/PracticePaperEntity.java"
+MODELS = ROOT / "entry/src/main/ets/domain/model/practice/PracticeModels.ets"
+PROVIDER = ROOT / "entry/src/main/ets/data/practice/PresetPracticeContentProvider.ets"
+HOME = ROOT / "entry/src/main/ets/features/student/practice/PracticeHomePage.ets"
+FILTER = ROOT / "entry/src/main/ets/components/practice/PracticeFilterDialog.ets"
 
-GRADES = {f"G{i}" for i in range(1, 7)}
 SUBJECTS = {"CHINESE", "MATH", "ENGLISH"}
-SEMESTERS = {"ALL", "S1", "S2"}
-DIFFICULTIES = {"L1", "L2", "L3"}
+TRACKS = {"TEXTBOOK_SYNC", "EXTRACURRICULAR"}
 QUESTION_TYPES = {"SINGLE_CHOICE", "MULTIPLE_CHOICE", "FILL_BLANK", "NUMBER", "SHORT_TEXT"}
-
+EXPECTED_FILES = {
+    "G2/CHINESE_SYNC.json", "G2/CHINESE_EXTRA.json",
+    "G2/MATH_SYNC.json", "G2/MATH_EXTRA.json",
+    "G2/ENGLISH_SYNC.json", "G2/ENGLISH_EXTRA.json",
+}
+IMAGE_DEPENDENT_PHRASES = ("看图", "图中", "图片", "画面")
 errors: list[str] = []
 
 
@@ -37,17 +41,6 @@ def require(condition: bool, message: str) -> None:
 
 def norm(value: str) -> str:
     return re.sub(r"\s+", " ", value.strip().lower())
-
-
-def nonempty_list(value, path: str, minimum: int = 1, maximum: int = 8) -> list:
-    require(isinstance(value, list), f"{path} must be a list")
-    if not isinstance(value, list):
-        return []
-    require(minimum <= len(value) <= maximum, f"{path} size must be {minimum}..{maximum}")
-    require(all(isinstance(item, str) and item.strip() for item in value), f"{path} contains blank value")
-    require(len({norm(item) for item in value if isinstance(item, str)}) == len(value),
-            f"{path} contains duplicates")
-    return value
 
 
 def validate_question(paper: dict, question: dict, index: int, global_ids: set[str]) -> None:
@@ -61,129 +54,41 @@ def validate_question(paper: dict, question: dict, index: int, global_ids: set[s
     require(question.get("orderNo") == index + 1, f"{path}.orderNo must be contiguous")
     qtype = question.get("type")
     require(qtype in QUESTION_TYPES, f"{path}.type invalid: {qtype}")
-    require(isinstance(question.get("stem"), str) and question["stem"].strip(), f"{path}.stem blank")
+    stem = question.get("stem")
+    require(isinstance(stem, str) and stem.strip(), f"{path}.stem blank")
+    if isinstance(stem, str):
+        for phrase in IMAGE_DEPENDENT_PHRASES:
+            require(phrase not in stem, f"{path}.stem still depends on retired visual content: {phrase}")
+    require("visualSpec" not in question, f"{path} must be text-only and contain no visualSpec")
     require(isinstance(question.get("answerSpec"), str) and question["answerSpec"].strip(),
             f"{path}.answerSpec blank")
     require(isinstance(question.get("explanation"), str) and question["explanation"].strip(),
             f"{path}.explanation blank")
-    nonempty_list(question.get("hints"), f"{path}.hints", 1, 3)
-    nonempty_list(question.get("tags"), f"{path}.tags", 1, 8)
-
-    if "-P0-" in str(paper.get("id", "")):
-        visual = question.get("visualSpec")
-        require(isinstance(visual, dict), f"{path}.visualSpec must be an object for P0 visual papers")
-        if isinstance(visual, dict):
-            require(bool(str(visual.get("type", "")).strip()) and visual.get("type") != "NONE",
-                    f"{path}.visualSpec.type must be visual for P0 papers")
-            require(bool(str(visual.get("assetId", "")).strip()), f"{path}.visualSpec.assetId blank")
-            require(bool(str(visual.get("layout", "")).strip()), f"{path}.visualSpec.layout blank")
-            require(bool(str(visual.get("accessibilityText", "")).strip()),
-                    f"{path}.visualSpec.accessibilityText blank")
+    hints = question.get("hints")
+    tags = question.get("tags")
+    require(isinstance(hints, list) and 1 <= len(hints) <= 3 and all(str(x).strip() for x in hints),
+            f"{path}.hints invalid")
+    require(isinstance(tags, list) and 1 <= len(tags) <= 8 and all(str(x).strip() for x in tags),
+            f"{path}.tags invalid")
 
     options = question.get("options")
-    require(isinstance(options, list), f"{path}.options must be a list")
+    require(isinstance(options, list), f"{path}.options must be list")
     options = options if isinstance(options, list) else []
-
     if qtype in {"SINGLE_CHOICE", "MULTIPLE_CHOICE"}:
-        require(2 <= len(options) <= 6, f"{path}.options must have 2..6 entries")
-        keys: list[str] = []
-        for option in options:
-            require(isinstance(option, dict), f"{path}.option must be object")
-            if not isinstance(option, dict):
-                continue
-            key = str(option.get("key", "")).strip().upper()
-            label = str(option.get("label", "")).strip()
-            require(bool(key and label), f"{path}.option key/label blank")
-            keys.append(key)
-        require(len(set(keys)) == len(keys), f"{path}.option keys duplicate")
-        expected = {item.strip().upper() for item in question.get("answerSpec", "").split(",") if item.strip()}
-        require(bool(expected), f"{path}.answerSpec has no option key")
-        require(expected.issubset(set(keys)), f"{path}.answerSpec points to undeclared option")
+        require(2 <= len(options) <= 6, f"{path}.choice options must be 2..6")
+        keys = [str(item.get("key", "")).strip().upper() for item in options if isinstance(item, dict)]
+        require(len(keys) == len(options) and len(set(keys)) == len(keys), f"{path}.option keys invalid")
+        expected = {x.strip().upper() for x in question["answerSpec"].split(",") if x.strip()}
+        require(expected and expected.issubset(set(keys)), f"{path}.answerSpec points to missing option")
         if qtype == "SINGLE_CHOICE":
             require(len(expected) == 1, f"{path}.single choice must have exactly one answer")
     else:
-        require(len(options) == 0, f"{path}.non-choice question must not have options")
+        require(not options, f"{path}.non-choice options must be empty")
         if qtype == "NUMBER":
             try:
-                Decimal(question.get("answerSpec", "").strip())
+                Decimal(question["answerSpec"].strip())
             except (InvalidOperation, AttributeError):
                 errors.append(f"{path}.NUMBER answerSpec must be numeric")
-        elif qtype in {"FILL_BLANK", "SHORT_TEXT"}:
-            accepted = [item.strip() for item in question.get("answerSpec", "").split("|") if item.strip()]
-            require(bool(accepted), f"{path}.text answerSpec must define accepted answer")
-
-
-def validate_g2_s1(papers: list[dict]) -> None:
-    g2_s1 = [p for p in papers if p.get("grade") == "G2" and p.get("semester") == "S1"]
-    by_subject: dict[str, list[dict]] = defaultdict(list)
-    for paper in g2_s1:
-        by_subject[paper.get("subject", "")].append(paper)
-
-    require(len(g2_s1) >= 24, "G2/S1 must contain at least 24 semester-specific papers")
-    require(sum(len(p.get("questions", [])) for p in g2_s1) >= 288,
-            "G2/S1 must contain at least 288 semester-specific questions")
-    require(len(by_subject["CHINESE"]) >= 7, "G2/S1 Chinese must contain at least 7 papers")
-    require(len(by_subject["MATH"]) >= 10, "G2/S1 Math must contain at least 10 papers")
-    require(len(by_subject["ENGLISH"]) >= 7, "G2/S1 English must contain at least 7 papers")
-
-    require({
-        "MATH-G2-S1-ADD-SUB-001", "MATH-G2-S1-SHOPPING-001",
-        "MATH-G2-S1-MULTIPLY-001", "MATH-G2-S1-MULTIPLY-002",
-        "MATH-G2-S1-MEASURE-001", "MATH-G2-S1-DIVIDE-001",
-        "MATH-G2-S1-REVIEW-001"
-    }.issubset({p["id"] for p in by_subject["MATH"]}), "G2/S1 Math required topic papers missing")
-
-    require({
-        "CHINESE-G2-S1-WORDS-001", "CHINESE-G2-S1-SENTENCE-001",
-        "CHINESE-G2-S1-READING-001", "CHINESE-G2-S1-READING-002",
-        "CHINESE-G2-S1-REVIEW-001"
-    }.issubset({p["id"] for p in by_subject["CHINESE"]}), "G2/S1 Chinese required topic papers missing")
-
-    require({
-        "ENGLISH-G2-S1-HELLO-001", "ENGLISH-G2-S1-FAMILY-001",
-        "ENGLISH-G2-S1-ROOM-001", "ENGLISH-G2-S1-NATURE-001",
-        "ENGLISH-G2-S1-REVIEW-001"
-    }.issubset({p["id"] for p in by_subject["ENGLISH"]}), "G2/S1 English required topic papers missing")
-
-    required_p0 = {
-        "MATH-G2-S1-P0-M01-001", "MATH-G2-S1-P0-M03-001", "MATH-G2-S1-P0-M05-001",
-        "CHINESE-G2-S1-P0-C03-001", "CHINESE-G2-S1-P0-C04-001",
-        "ENGLISH-G2-S1-P0-E01-001", "ENGLISH-G2-S1-P0-E02-001"
-    }
-    require(required_p0.issubset({p["id"] for p in g2_s1}),
-            "G2/S1 visual P0 papers missing")
-
-    math_forbidden = [
-        r"\d+\.\d+", "分数", "小数", "方程", "面积", "周长", "体积",
-        "百分数", "负数", "质数", "因数", "倍数", "圆周率"
-    ]
-    english_forbidden = [
-        r"\bwould\b", r"\bhad started\b", r"\bneither\b",
-        r"\bcomparative\b", r"\bpassive voice\b", r"\brelative clause\b"
-    ]
-    for paper in by_subject["MATH"]:
-        corpus = "\n".join(
-            [paper.get("title", ""), paper.get("description", "")]
-            + paper.get("tags", [])
-            + [q.get("stem", "") for q in paper.get("questions", [])]
-        )
-        for pattern in math_forbidden:
-            require(re.search(pattern, corpus, flags=re.IGNORECASE) is None,
-                    f"{paper['id']} contains content above G2/S1 scope: {pattern}")
-
-    for paper in by_subject["ENGLISH"]:
-        corpus = "\n".join(
-            [paper.get("title", ""), paper.get("description", "")]
-            + paper.get("tags", [])
-            + [q.get("stem", "") for q in paper.get("questions", [])]
-        )
-        for pattern in english_forbidden:
-            require(re.search(pattern, corpus, flags=re.IGNORECASE) is None,
-                    f"{paper['id']} contains advanced English grammar: {pattern}")
-
-    for paper in g2_s1:
-        require(paper.get("difficulty") in {"L1", "L2"},
-                f"{paper['id']} G2/S1 preset should not be L3 challenge content")
 
 
 def main() -> int:
@@ -195,149 +100,124 @@ def main() -> int:
         print(f"PRACTICE_CONTENT_GATE_FAIL: invalid JSON: {exc}", file=sys.stderr)
         return 1
 
-    require(not LEGACY_CATALOG.exists(), "monolithic preset-catalog.json must not exist")
-    require(manifest.get("schemaVersion") == 1, "manifest schemaVersion must be 1")
-    require(bool(manifest.get("catalogId")), "manifest catalogId missing")
-    require(manifest_schema.get("$schema") == "https://json-schema.org/draft/2020-12/schema",
-            "manifest JSON Schema draft mismatch")
-    require(shard_schema.get("$schema") == "https://json-schema.org/draft/2020-12/schema",
-            "shard JSON Schema draft mismatch")
-    require("paper" in shard_schema.get("$defs", {}) and "question" in shard_schema.get("$defs", {}),
-            "shard JSON Schema missing paper/question definitions")
-
-    base_files = {
-        f"{grade}/{subject}.json"
-        for grade in sorted(GRADES)
-        for subject in sorted(SUBJECTS)
-    }
-    p0_files = {"G2/CHINESE_P0.json", "G2/MATH_P0.json", "G2/ENGLISH_P0.json"}
-    expected_files = base_files | p0_files
+    require(manifest.get("schemaVersion") == 2, "manifest schemaVersion must be 2")
     files = manifest.get("files")
-    require(isinstance(files, list), "manifest files must be a list")
-    files = files if isinstance(files, list) else []
-    require(set(files) == expected_files,
-            f"manifest must declare 18 base files + 3 G2 P0 files; got={sorted(files)}")
-    require(len(files) == len(set(files)), "manifest files contain duplicates")
+    require(isinstance(files, list) and set(files) == EXPECTED_FILES,
+            f"manifest must contain exactly six G2/S1 typed shards: {sorted(EXPECTED_FILES)}")
+    actual_json_files = {
+        path.relative_to(PRESET_ROOT).as_posix()
+        for path in PRESET_ROOT.rglob("*.json")
+        if path.name != "manifest.json"
+    }
+    require(actual_json_files == EXPECTED_FILES,
+            f"old preset JSON files still exist: {sorted(actual_json_files - EXPECTED_FILES)}")
+    require(manifest_schema.get("properties", {}).get("schemaVersion", {}).get("const") == 2,
+            "manifest schema must require v2")
+    require("track" in shard_schema.get("required", []), "shard schema must require track")
+    require("visualSpec" not in shard_schema.get("$defs", {}).get("question", {}).get("properties", {}),
+            "question schema must not expose visualSpec")
 
     papers: list[dict] = []
-    for relative in files:
-        path = PRESET_ROOT / relative
-        require(path.exists(), f"manifest file missing: {relative}")
-        if not path.exists():
-            continue
-        try:
-            shard = json.loads(path.read_text(encoding="utf-8"))
-        except Exception as exc:
-            errors.append(f"invalid shard JSON {relative}: {exc}")
-            continue
-
-        expected_grade = path.parent.name
-        expected_subject = path.stem.removesuffix("_P0")
-        require(shard.get("schemaVersion") == 1, f"{relative}.schemaVersion must be 1")
-        require(shard.get("grade") == expected_grade, f"{relative}.grade must match path")
-        require(shard.get("subject") == expected_subject, f"{relative}.subject must match path")
-        shard_papers = shard.get("papers")
-        require(isinstance(shard_papers, list) and bool(shard_papers), f"{relative}.papers must not be empty")
-        if not isinstance(shard_papers, list):
-            continue
-        for paper in shard_papers:
-            require(paper.get("grade") == expected_grade, f"{paper.get('id')} grade does not match shard")
-            require(paper.get("subject") == expected_subject, f"{paper.get('id')} subject does not match shard")
-            papers.append(paper)
-
-    require(len(papers) >= 60, "split preset catalog must contain at least 60 papers")
-    paper_keys: set[str] = set()
+    subject_track_counts: dict[tuple[str, str], int] = defaultdict(int)
     global_question_ids: set[str] = set()
-    coverage: dict[tuple[str, str], list[dict]] = defaultdict(list)
-    total_questions = 0
+    paper_keys: set[str] = set()
 
-    for paper in papers:
-        pid = paper.get("id")
-        version = paper.get("version")
-        key = f"{pid}@{version}"
-        require(isinstance(pid, str) and bool(pid.strip()), f"{key}.id invalid")
-        require(isinstance(version, int) and version >= 1, f"{key}.version invalid")
-        require(key not in paper_keys, f"duplicate paper key: {key}")
-        paper_keys.add(key)
-        grade, subject, semester = paper.get("grade"), paper.get("subject"), paper.get("semester")
-        require(grade in GRADES, f"{key}.grade invalid: {grade}")
-        require(subject in SUBJECTS, f"{key}.subject invalid: {subject}")
-        require(semester in SEMESTERS, f"{key}.semester invalid: {semester}")
-        require(paper.get("difficulty") in DIFFICULTIES, f"{key}.difficulty invalid")
-        require(paper.get("sourceType") == "PRESET", f"{key}.sourceType must be PRESET")
-        require(paper.get("status") == "PUBLISHED", f"{key}.status must be PUBLISHED")
-        require(isinstance(paper.get("title"), str) and paper["title"].strip(), f"{key}.title blank")
-        require(isinstance(paper.get("description"), str) and paper["description"].strip(), f"{key}.description blank")
-        require(isinstance(paper.get("estimatedMinutes"), int) and 1 <= paper["estimatedMinutes"] <= 120,
-                f"{key}.estimatedMinutes invalid")
-        nonempty_list(paper.get("tags"), f"{key}.tags", 1, 8)
-
-        questions = paper.get("questions")
-        require(isinstance(questions, list), f"{key}.questions must be list")
-        questions = questions if isinstance(questions, list) else []
-        require(paper.get("questionCount") == len(questions), f"{key}.questionCount mismatch")
-        require(5 <= len(questions) <= 50, f"{key}.question count must be 5..50")
-        total_questions += len(questions)
-
-        stems: set[str] = set()
-        for index, question in enumerate(questions):
-            if isinstance(question, dict):
-                stem = question.get("stem")
-                if isinstance(stem, str):
-                    signature = norm(stem)
-                    require(signature not in stems, f"{key} contains duplicate stem: {stem}")
+    for relative in sorted(EXPECTED_FILES):
+        path = PRESET_ROOT / relative
+        shard = json.loads(path.read_text(encoding="utf-8"))
+        expected_subject = path.stem.split("_")[0]
+        expected_track = "TEXTBOOK_SYNC" if path.stem.endswith("_SYNC") else "EXTRACURRICULAR"
+        require(shard.get("schemaVersion") == 2, f"{relative}.schemaVersion must be 2")
+        require(shard.get("grade") == "G2", f"{relative}.grade must be G2")
+        require(shard.get("subject") == expected_subject, f"{relative}.subject mismatch")
+        require(shard.get("track") == expected_track, f"{relative}.track mismatch")
+        shard_papers = shard.get("papers")
+        require(isinstance(shard_papers, list), f"{relative}.papers must be list")
+        for paper in shard_papers or []:
+            papers.append(paper)
+            subject_track_counts[(expected_subject, expected_track)] += 1
+            key = f"{paper.get('id')}@{paper.get('version')}"
+            require(key not in paper_keys, f"duplicate paper key: {key}")
+            paper_keys.add(key)
+            require(paper.get("grade") == "G2", f"{key}.grade must be G2")
+            require(paper.get("semester") == "S1", f"{key}.semester must be S1")
+            require(paper.get("subject") == expected_subject, f"{key}.subject mismatch")
+            require(paper.get("track") == expected_track, f"{key}.track mismatch")
+            require(paper.get("sourceType") == "PRESET", f"{key}.sourceType must be PRESET")
+            require(paper.get("status") == "PUBLISHED", f"{key}.status must be PUBLISHED")
+            require(paper.get("difficulty") in {"L1", "L2"}, f"{key}.difficulty must be L1/L2")
+            require(paper.get("questionCount") == 12, f"{key}.questionCount must be 12")
+            questions = paper.get("questions")
+            require(isinstance(questions, list) and len(questions) == 12, f"{key} must contain 12 questions")
+            stems: set[str] = set()
+            for index, question in enumerate(questions or []):
+                if isinstance(question, dict):
+                    signature = norm(str(question.get("stem", "")))
+                    require(signature not in stems, f"{key} contains duplicate stem")
                     stems.add(signature)
-                validate_question(paper, question, index, global_question_ids)
-            else:
-                errors.append(f"{key}.questions[{index}] must be object")
-        if grade in GRADES and subject in SUBJECTS:
-            coverage[(grade, subject)].append(paper)
+                    validate_question(paper, question, index, global_question_ids)
+                else:
+                    errors.append(f"{key}.questions[{index}] must be object")
 
-    require(total_questions >= 684, "split preset catalog must contain at least 684 questions")
-    for grade in sorted(GRADES):
-        for subject in sorted(SUBJECTS):
-            ids = {item["id"] for item in coverage[(grade, subject)]}
-            require(f"{subject}-{grade}-STARTER-001" in ids, f"{grade}/{subject} starter paper missing")
-            require(f"{subject}-{grade}-CORE-001" in ids, f"{grade}/{subject} CORE paper missing")
+    require(len(papers) == 27, f"active catalog must contain exactly 27 papers, got {len(papers)}")
+    require(len(global_question_ids) == 324,
+            f"active catalog must contain exactly 324 unique questions, got {len(global_question_ids)}")
+    for subject in sorted(SUBJECTS):
+        require(subject_track_counts[(subject, "TEXTBOOK_SYNC")] == 6,
+                f"{subject} must contain 6 textbook-sync papers")
+        require(subject_track_counts[(subject, "EXTRACURRICULAR")] == 3,
+                f"{subject} must contain 3 extracurricular papers")
 
-    validate_g2_s1(papers)
+    math_papers = [p for p in papers if p.get("subject") == "MATH"]
+    math_forbidden = [
+        r"\d+\.\d+", "分数", "小数", "方程", "面积公式", "体积", "百分数",
+        "负数", "质数", "因数分解", "圆周率"
+    ]
+    for paper in math_papers:
+        corpus = "\n".join([paper.get("title", ""), paper.get("description", "")]
+                            + [q.get("stem", "") for q in paper.get("questions", [])])
+        for pattern in math_forbidden:
+            require(re.search(pattern, corpus, flags=re.IGNORECASE) is None,
+                    f"{paper['id']} contains content above G2/S1 scope: {pattern}")
+
+    for retired in [
+        ROOT / "entry/src/main/ets/components/practice/PracticeQuestionVisual.ets",
+        ROOT / "backend/src/main/resources/practice/visual/G2_S1_P0_assets.json",
+        ROOT / "scripts/validate_practice_visual_p0.py",
+    ]:
+        require(not retired.exists(), f"retired visual artifact still exists: {retired.relative_to(ROOT)}")
+    media_dir = ROOT / "entry/src/main/resources/base/media"
+    require(not any(media_dir.glob("practice_visual_*")), "retired Practice visual media still exist")
 
     bootstrap = BOOTSTRAP.read_text(encoding="utf-8")
     validator = VALIDATOR.read_text(encoding="utf-8")
-    attempt_service = ATTEMPT_SERVICE.read_text(encoding="utf-8")
-    audience_policy = AUDIENCE_POLICY.read_text(encoding="utf-8")
-    require("practice/preset" in bootstrap and "manifest.json" in bootstrap
-            and "PracticeContentCatalog.Shard" in bootstrap,
-            "PracticeContentBootstrap must load manifest + grade/subject shards")
-    require("validator.validateCatalog(catalog)" in bootstrap,
-            "bootstrap must validate merged catalog before import")
-    require("existingQuestionCount != source.questionCount()" in bootstrap,
-            "bootstrap must reject immutable published-version drift")
-    require("public void validatePaper" in validator and '"AI_GENERATED"' in validator,
-            "content validator must stay reusable for future AI-generated papers")
-    require("SEMESTERS" in validator and "paper.semester()" in validator,
-            "content validator must validate semester metadata")
-    require("requireFreshStartAllowed" in audience_policy and "gradeCode" in audience_policy
-            and "semesterCode" in audience_policy,
-            "backend must own grade/semester audience matching")
-    require("audiencePolicy.requireFreshStartAllowed(student, paper)" in attempt_service,
-            "fresh practice attempts must enforce grade/semester matching on the server")
+    paper_entity = PAPER_ENTITY.read_text(encoding="utf-8")
+    models = MODELS.read_text(encoding="utf-8")
+    provider = PROVIDER.read_text(encoding="utf-8")
+    home = HOME.read_text(encoding="utf-8")
+    filter_dialog = FILTER.read_text(encoding="utf-8")
 
-    try:
-        p0_assets = json.loads(P0_ASSETS.read_text(encoding="utf-8"))
-        require(p0_assets.get("paperCount") == 7, "P0 asset manifest must describe 7 papers")
-        require(p0_assets.get("questionCount") == 84, "P0 asset manifest must describe 84 questions")
-        require(int(p0_assets.get("assetCount", 0)) >= 70, "P0 asset manifest must contain reusable visual assets")
-    except Exception as exc:
-        errors.append(f"P0 visual asset manifest invalid: {exc}")
+    require("archiveRetiredPresets" in bootstrap and 'paper.status = "ARCHIVED"' in bootstrap,
+            "bootstrap must archive retired PRESET papers instead of deleting history")
+    require("paper.track = source.track()" in bootstrap, "bootstrap must persist track")
+    require("TRACKS" in validator and "paper.track()" in validator, "validator must validate track")
+    require("public String track;" in paper_entity, "PracticePaperEntity must persist track")
+    require("export enum PracticeTrack" in models and "PracticeTrackFilter" in models,
+            "ArkTS domain must model paper track and filter")
+    require("paper.track !== PracticeTrack.TEXTBOOK_SYNC" in provider and
+            "paper.track !== PracticeTrack.EXTRACURRICULAR" in provider,
+            "preset provider must filter by catalog type")
+    require("label: '题库类型'" in home and "selectedTrack" in home,
+            "Practice home must expose catalog type in filter summary")
+    require("Text('题库类型')" in filter_dialog and "@Link selectedTrack" in filter_dialog,
+            "Practice filter dialog must expose catalog type choices")
 
     generated_check = subprocess.run(
         [sys.executable, str(ROOT / "scripts/generate_practice_catalog.py"), "--check"],
         cwd=ROOT, text=True, capture_output=True,
     )
     if generated_check.returncode != 0:
-        errors.append("client preset catalog is out of sync with split JSON: "
-                      + generated_check.stderr.strip())
+        errors.append("generated app catalog is out of sync: " + generated_check.stderr.strip())
 
     if errors:
         print("PRACTICE_CONTENT_GATE_FAIL")
@@ -345,9 +225,7 @@ def main() -> int:
             print(f"- {error}")
         return 1
 
-    g2_s1 = [p for p in papers if p["grade"] == "G2" and p["semester"] == "S1"]
-    print(f"PRACTICE_CONTENT_GATE_PASS files={len(files)} papers={len(papers)} questions={total_questions} "
-          f"g2s1Papers={len(g2_s1)} g2s1Questions={sum(len(p['questions']) for p in g2_s1)}")
+    print("PRACTICE_CONTENT_GATE_PASS papers=27 questions=324 sync=18 extra=9")
     return 0
 
 

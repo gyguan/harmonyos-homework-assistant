@@ -35,7 +35,7 @@ public class PracticeContentService {
 
   public PracticeDtos.PaperResponse response(PracticePaperEntity paper) {
     return new PracticeDtos.PaperResponse(
-        paper.paperId, paper.version, paper.grade, paper.subject, paper.semester, paper.title, paper.description,
+        paper.paperId, paper.version, paper.grade, paper.subject, paper.semester, paper.track, paper.title, paper.description,
         paper.difficulty, paper.questionCount, paper.estimatedMinutes,
         strings(paper.tagsJson), paper.sourceType);
   }
@@ -43,8 +43,7 @@ public class PracticeContentService {
   public PracticeDtos.QuestionResponse questionResponse(PracticeQuestionEntity question) {
     return new PracticeDtos.QuestionResponse(
         question.id, question.orderNo, question.questionType, question.stem,
-        options(question.optionsJson), strings(question.hintsJson), strings(question.tagsJson),
-        visualSpec(question.visualSpecJson));
+        options(question.optionsJson), strings(question.hintsJson), strings(question.tagsJson));
   }
 
   private List<String> strings(String json) {
@@ -52,23 +51,6 @@ public class PracticeContentService {
       return mapper.readValue(json, new TypeReference<List<String>>() {});
     } catch (Exception e) {
       throw new IllegalStateException("练习内容 JSON 损坏", e);
-    }
-  }
-
-  private PracticeDtos.VisualSpecResponse visualSpec(String json) {
-    if (json == null || json.isBlank() || "{}".equals(json.trim())) {
-      return new PracticeDtos.VisualSpecResponse("NONE", "", "", "");
-    }
-    try {
-      PracticeContentCatalog.VisualSpec source =
-          mapper.readValue(json, PracticeContentCatalog.VisualSpec.class);
-      return new PracticeDtos.VisualSpecResponse(
-          source.type() == null ? "NONE" : source.type(),
-          source.assetId() == null ? "" : source.assetId(),
-          source.layout() == null ? "" : source.layout(),
-          source.accessibilityText() == null ? "" : source.accessibilityText());
-    } catch (Exception e) {
-      throw new IllegalStateException("练习视觉内容 JSON 损坏", e);
     }
   }
 

@@ -2,8 +2,6 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VISUAL = ROOT / "entry/src/main/ets/components/practice/PracticeQuestionVisual.ets"
-ATTEMPT = ROOT / "entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets"
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
 
@@ -16,19 +14,8 @@ def require(condition: bool, message: str) -> None:
 
 
 def main() -> int:
-    visual = VISUAL.read_text(encoding="utf-8")
-    attempt = ATTEMPT.read_text(encoding="utf-8")
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
-
-    require("@Prop accessibilityLabel: string = '';" in visual,
-            "PracticeQuestionVisual must use a non-ArkUI-reserved Prop name")
-    require("@Prop accessibilityText" not in visual,
-            "PracticeQuestionVisual must not shadow CustomComponent.accessibilityText")
-    require(".accessibilityText(this.accessibilityLabel.length > 0 ?" in visual,
-            "Practice visual must still expose ArkUI accessibility text")
-    require("accessibilityLabel: this.currentQuestion()!.visualSpec.accessibilityText" in attempt,
-            "PracticeAttemptPage must pass visual accessibility text through accessibilityLabel")
 
     legacy_unsafe = [
         "let writer = await fileIo.open(multipartPath",

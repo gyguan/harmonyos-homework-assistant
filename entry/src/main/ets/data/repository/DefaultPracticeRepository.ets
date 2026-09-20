@@ -9,7 +9,8 @@ import {
   PracticePaper,
   PracticeResult,
   PracticeSemester,
-  PracticeSubject
+  PracticeSubject,
+  PracticeTrackFilter
 } from '../../domain/model/practice/PracticeModels';
 import { PracticeContentProvider } from '../../domain/port/PracticeContentProvider';
 import { PracticeRepository } from '../../domain/port/PracticeRepository';
@@ -30,9 +31,10 @@ export class DefaultPracticeRepository implements PracticeRepository {
   listPapers(
     grade: PracticeGrade,
     subject: PracticeSubject,
-    semester: PracticeSemester
+    semester: PracticeSemester,
+    track: PracticeTrackFilter
   ): Promise<PracticePaper[]> {
-    return this.contentProvider.listPapers(grade, subject, semester);
+    return this.contentProvider.listPapers(grade, subject, semester, track);
   }
 
   getPaper(paperId: string, version: number): Promise<PracticePaper | null> {

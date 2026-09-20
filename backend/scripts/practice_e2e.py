@@ -17,86 +17,37 @@ def main() -> int:
         ).json()
         token = login["token"]
         student_id = "student-xiaoyu-001"
-        paper_id = "MATH-G2-STARTER-001"
+        paper_id = "MATH-G2-S1-SYNC-ADD-SUB-001"
 
         paper = expect(
             http(base_url, "GET", f"/api/v1/practice/papers/{paper_id}?version=1", token=token),
             (200,),
-            "load practice paper",
+            "load textbook-sync practice paper",
         ).json()
-        core_paper_id = "MATH-G2-S1-ADD-SUB-001"
-        core_paper = expect(
-            http(base_url, "GET", f"/api/v1/practice/papers/{core_paper_id}?version=1", token=token),
-            (200,),
-            "load formal practice paper from JSON catalog",
-        ).json()
-        require(core_paper.get("id") == core_paper_id, "formal practice paper id mismatch")
-        require(int(core_paper.get("questionCount", 0)) == 12,
-                "formal practice paper must expose 12 curated questions")
-        require(core_paper.get("sourceType") == "PRESET",
-                "formal practice paper must retain PRESET source type")
-        require(core_paper.get("semester") == "S1",
-                "G2 first-semester paper must expose semester=S1")
-        core_attempt = expect(
-            http(
-                base_url,
-                "POST",
-                f"/api/v1/students/{student_id}/practice/attempts",
-                token=token,
-                payload={"paperId": core_paper_id, "paperVersion": 1},
-            ),
-            (200,),
-            "start formal practice attempt from JSON catalog",
-        ).json()
-        require(len(core_attempt.get("questions") or []) == 12,
-                "formal practice attempt did not load catalog questions")
+        require(paper.get("id") == paper_id, "practice paper id mismatch")
+        require(int(paper.get("questionCount", 0)) == 12,
+                "rebuilt practice paper must expose 12 questions")
+        require(paper.get("sourceType") == "PRESET", "rebuilt practice paper must be PRESET")
+        require(paper.get("semester") == "S1", "rebuilt practice paper must target first semester")
+        require(paper.get("track") == "TEXTBOOK_SYNC",
+                "textbook-sync paper must expose TEXTBOOK_SYNC")
 
-        visual_paper_id = "MATH-G2-S1-P0-M01-001"
-        visual_paper = expect(
-            http(base_url, "GET", f"/api/v1/practice/papers/{visual_paper_id}?version=1", token=token),
+        extra_paper_id = "MATH-G2-S1-EXTRA-LIFE-001"
+        extra_paper = expect(
+            http(base_url, "GET", f"/api/v1/practice/papers/{extra_paper_id}?version=1", token=token),
             (200,),
-            "load G2 S1 visual P0 paper",
+            "load extracurricular practice paper",
         ).json()
-        require(visual_paper.get("id") == visual_paper_id, "visual P0 paper id mismatch")
-        require(int(visual_paper.get("questionCount", 0)) == 12, "visual P0 paper must expose 12 questions")
-        require(visual_paper.get("semester") == "S1", "visual P0 paper must be scoped to first semester")
-        visual_attempt = expect(
-            http(
-                base_url,
-                "POST",
-                f"/api/v1/students/{student_id}/practice/attempts",
-                token=token,
-                payload={"paperId": visual_paper_id, "paperVersion": 1},
-            ),
-            (200,),
-            "start G2 S1 visual P0 attempt",
-        ).json()
-        visual_questions = visual_attempt.get("questions") or []
-        require(len(visual_questions) == 12, "visual P0 attempt did not load 12 questions")
-        first_visual = (visual_questions[0].get("visualSpec") or {})
-        require(first_visual.get("type") == "SCENE", "visual P0 question type was not persisted")
-        require(first_visual.get("assetId") == "asset_scene_library_books_01",
-                "visual P0 assetId was not persisted")
-        require(bool(first_visual.get("accessibilityText")),
-                "visual P0 accessibility text must reach the app API")
-        require("answerSpec" not in visual_questions[0] and "explanation" not in visual_questions[0],
-                "visual P0 attempt leaked answer or explanation before submission")
+        require(extra_paper.get("track") == "EXTRACURRICULAR",
+                "extracurricular paper must expose EXTRACURRICULAR")
+        require(int(extra_paper.get("questionCount", 0)) == 12,
+                "extracurricular paper must expose 12 questions")
 
         expect(
-            http(
-                base_url,
-                "POST",
-                f"/api/v1/students/{student_id}/practice/attempts",
-                token=token,
-                payload={"paperId": "MATH-G3-STARTER-001", "paperVersion": 1},
-            ),
-            (409,),
-            "reject cross-grade practice attempt",
+            http(base_url, "GET", "/api/v1/practice/papers/MATH-G2-STARTER-001?version=1", token=token),
+            (404,),
+            "retired practice paper must be unavailable",
         )
-
-        require(paper.get("id") == paper_id, "practice paper id mismatch")
-        require(int(paper.get("questionCount", 0)) == 10, "practice paper must expose 10 starter questions")
-        require(paper.get("sourceType") == "PRESET", "starter practice paper must be PRESET")
 
         attempt = expect(
             http(
@@ -111,7 +62,7 @@ def main() -> int:
         ).json()
         attempt_id = attempt["id"]
         questions = attempt.get("questions") or []
-        require(len(questions) == 10, "practice attempt did not freeze all paper questions")
+        require(len(questions) == 12, "practice attempt did not freeze all paper questions")
         require(attempt.get("status") == "IN_PROGRESS", "new practice attempt must be IN_PROGRESS")
         require(attempt.get("mode") == "FULL", "new practice attempt must start in FULL mode")
         require(int(attempt.get("attemptNo", 0)) >= 1, "practice attemptNo missing")
@@ -128,7 +79,7 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{attempt_id}/answers/{first_id}",
                 token=token,
-                payload={"answerValue": "10"},
+                payload={"answerValue": "65"},
             ),
             (200,),
             "save correct practice answer",
@@ -162,12 +113,12 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{attempt_id}/notes/{first_id}",
                 token=token,
-                payload={"content": "7加3等于10，先看清加号"},
+                payload={"content": "37加28等于65，先对齐数位"},
             ),
             (200,),
             "update first practice note",
         ).json()
-        require(updated_note.get("content") == "7加3等于10，先看清加号",
+        require(updated_note.get("content") == "37加28等于65，先对齐数位",
                 "practice note update was not persisted")
 
         expect(
@@ -212,7 +163,7 @@ def main() -> int:
         require(int(reloaded.get("noteCount", 0)) == 2, "practice note count mismatch before submission")
         notes = reloaded.get("notes") or []
         require(any(item.get("questionId") == first_id and
-                    item.get("content") == "7加3等于10，先看清加号" for item in notes),
+                    item.get("content") == "37加28等于65，先对齐数位" for item in notes),
                 "updated first practice note missing")
         require(any(item.get("questionId") == second_id for item in notes),
                 "wrong-question note missing")
@@ -225,17 +176,17 @@ def main() -> int:
             "submit practice attempt",
         ).json()
         require(result.get("mode") == "FULL", "submitted source attempt mode mismatch")
-        require(int(result.get("maxScore", 0)) == 10, "practice result max score mismatch")
+        require(int(result.get("maxScore", 0)) == 12, "practice result max score mismatch")
         require(int(result.get("score", -1)) == 1, "deterministic practice score mismatch")
         require(int(result.get("correctCount", -1)) == 1, "practice correct count mismatch")
-        require(int(result.get("wrongCount", -1)) == 9, "wrong count must include wrong and unanswered questions")
+        require(int(result.get("wrongCount", -1)) == 11, "wrong count must include wrong and unanswered questions")
         require(int(result.get("noteCount", 0)) == 2, "submitted practice note count mismatch")
 
         results = result.get("questions") or []
-        require(len(results) == 10, "practice result missing question review")
-        require(results[0].get("correct") is True and results[0].get("correctAnswer") == "10",
+        require(len(results) == 12, "practice result missing question review")
+        require(results[0].get("correct") is True and results[0].get("correctAnswer") == "65",
                 "correct numeric question was not judged correctly")
-        require(results[0].get("noteContent") == "7加3等于10，先看清加号",
+        require(results[0].get("noteContent") == "37加28等于65，先对齐数位",
                 "result did not preserve first question note")
         require(results[1].get("correct") is False, "wrong numeric question was not judged incorrectly")
         require(results[1].get("noteContent") == "第二题要注意两个加数",
@@ -316,13 +267,13 @@ def main() -> int:
 
         previous = repeated.get("previousAnswers") or []
         previous_first = next((item for item in previous if item.get("questionId") == first_id), None)
-        require(previous_first is not None and previous_first.get("answerValue") == "10",
+        require(previous_first is not None and previous_first.get("answerValue") == "65",
                 "repeat did not expose the student's previous answer")
         require(previous_first.get("correct") is True,
                 "repeat previous answer must preserve previous correctness")
         previous_notes = repeated.get("previousNotes") or []
         require(any(item.get("questionId") == first_id and
-                    item.get("content") == "7加3等于10，先看清加号" for item in previous_notes),
+                    item.get("content") == "37加28等于65，先对齐数位" for item in previous_notes),
                 "repeat did not expose the source note")
         require((repeated.get("answers") or []) == [],
                 "new repeat attempt must start with an empty current answer set")
@@ -359,7 +310,7 @@ def main() -> int:
                 "wrong-only attempt did not preserve source lineage")
         wrong_questions = wrong_only.get("questions") or []
         wrong_ids = [item.get("id") for item in wrong_questions]
-        require(len(wrong_ids) == 9, "wrong-only attempt must contain source wrong and unanswered questions")
+        require(len(wrong_ids) == 11, "wrong-only attempt must contain source wrong and unanswered questions")
         require(first_id not in wrong_ids, "wrong-only attempt must exclude source correct questions")
         require(second_id in wrong_ids, "wrong-only attempt must include source wrong questions")
         require((wrong_only.get("answers") or []) == [],
@@ -379,7 +330,7 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{wrong_only_id}/answers/{second_id}",
                 token=token,
-                payload={"answerValue": "12"},
+                payload={"answerValue": "35"},
             ),
             (200,),
             "save corrected wrong-only answer",
@@ -401,7 +352,7 @@ def main() -> int:
             "submit wrong-only practice attempt",
         ).json()
         require(wrong_result.get("mode") == "WRONG_ONLY", "wrong-only result mode mismatch")
-        require(int(wrong_result.get("maxScore", 0)) == 9, "wrong-only result max score mismatch")
+        require(int(wrong_result.get("maxScore", 0)) == 11, "wrong-only result max score mismatch")
         require(int(wrong_result.get("score", -1)) == 1, "wrong-only corrected answer score mismatch")
         require(int(wrong_result.get("noteCount", 0)) == 1, "wrong-only note count mismatch")
 

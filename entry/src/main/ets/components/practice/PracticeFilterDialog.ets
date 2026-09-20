@@ -2,7 +2,8 @@ import { AppTheme } from '../../common/theme/AppTheme';
 import {
   PracticeGrade,
   PracticeSubject,
-  PracticeTaxonomy
+  PracticeTaxonomy,
+  PracticeTrackFilter
 } from '../../domain/model/practice/PracticeModels';
 
 @CustomDialog
@@ -10,8 +11,9 @@ export struct PracticeFilterDialog {
   controller: CustomDialogController;
   @Link selectedGrade: PracticeGrade;
   @Link selectedSubject: PracticeSubject;
-  onApply: (grade: PracticeGrade, subject: PracticeSubject) => void =
-    (_grade: PracticeGrade, _subject: PracticeSubject) => {};
+  @Link selectedTrack: PracticeTrackFilter;
+  onApply: (grade: PracticeGrade, subject: PracticeSubject, track: PracticeTrackFilter) => void =
+    (_grade: PracticeGrade, _subject: PracticeSubject, _track: PracticeTrackFilter) => {};
 
   @Builder
   private GradeOption(grade: PracticeGrade) {
@@ -39,8 +41,21 @@ export struct PracticeFilterDialog {
       .onClick(() => this.selectedSubject = subject);
   }
 
+  @Builder
+  private TrackOption(track: PracticeTrackFilter) {
+    Button(PracticeTaxonomy.trackFilterLabel(track), { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(13)
+      .fontWeight(this.selectedTrack === track ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.selectedTrack === track ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.selectedTrack === track ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.selectedTrack = track);
+  }
+
   private confirm(): void {
-    this.onApply(this.selectedGrade, this.selectedSubject);
+    this.onApply(this.selectedGrade, this.selectedSubject, this.selectedTrack);
   }
 
   build() {
@@ -100,6 +115,21 @@ export struct PracticeFilterDialog {
             .width('100%');
           }
           .width('100%');
+
+          Column({ space: 10 }) {
+            Text('题库类型')
+              .width('100%')
+              .fontSize(15)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Row({ space: 8 }) {
+              this.TrackOption(PracticeTrackFilter.ALL);
+              this.TrackOption(PracticeTrackFilter.TEXTBOOK_SYNC);
+              this.TrackOption(PracticeTrackFilter.EXTRACURRICULAR);
+            }
+            .width('100%');
+          }
+          .width('100%');
         }
         .width('100%')
         .padding({ left: 20, right: 20, top: 8, bottom: 18 });
@@ -120,7 +150,7 @@ export struct PracticeFilterDialog {
     }
     .width('100%')
     .constraintSize({ maxWidth: AppTheme.FILTER_DIALOG_MAX_WIDTH })
-    .height('48%')
+    .height('58%')
     .backgroundColor(AppTheme.SURFACE)
     .borderRadius({ topLeft: 24, topRight: 24 });
   }
