@@ -135,6 +135,10 @@ export struct ParentDashboardPage {
     .borderRadius(AppTheme.PHONE_CARD_RADIUS);
   }
 
+  private assignmentRenderKey(item: Assignment): string {
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+  }
+
   @Builder
   private AttentionSection() {
     if (this.attentionAssignments().length > 0) {
@@ -186,7 +190,7 @@ export struct ParentDashboardPage {
             .accessibilityRole(AccessibilityRoleType.BUTTON)
             .accessibilityText(`${item.subject}，${item.title}，${AssignmentStateMachine.label(item.status)}`)
             .onClick(() => this.openAttention(item));
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
       }
