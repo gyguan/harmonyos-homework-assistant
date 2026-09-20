@@ -11,13 +11,25 @@ import { PersonEntryPage } from './PersonEntryPage';
 @Component
 struct Index {
   @State private selectedRole: AppRole = AppRole.NONE;
-  @StorageLink('shareImportForceParent') private shareImportForceParent: boolean = false;
+  @StorageLink('shareImportForceParent') @Watch('onShareImportForceParentChanged')
+  private shareImportForceParent: boolean = false;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private cloudRevision: number = 0;
   private shellBackHandler: () => boolean = () => false;
 
   aboutToAppear(): void {
+    this.applyShareImportParentRole();
     if (BackendSession.instance.isConnected()) void this.restoreCloud();
+  }
+
+  private onShareImportForceParentChanged(): void {
+    this.applyShareImportParentRole();
+  }
+
+  private applyShareImportParentRole(): void {
+    if (!this.shareImportForceParent) return;
+    this.selectedRole = AppRole.PARENT;
+    this.shareImportForceParent = false;
   }
 
   onBackPress(): boolean {
@@ -45,7 +57,7 @@ struct Index {
 
   build() {
     Stack() {
-      if (this.selectedRole === AppRole.NONE && !this.shareImportForceParent) {
+      if (this.selectedRole === AppRole.NONE) {
         PersonEntryPage({
           revision: this.cloudRevision,
           onSelectParent: () => this.enterParent(),
@@ -53,7 +65,7 @@ struct Index {
         });
       } else {
         AppShell({
-          role: this.shareImportForceParent ? AppRole.PARENT : this.selectedRole,
+          role: this.selectedRole,
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
         });
       }
