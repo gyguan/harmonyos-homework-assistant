@@ -29,6 +29,7 @@ review_vm = read("entry/src/main/ets/features/parent/review/ParentReviewViewMode
 review_page = read("entry/src/main/ets/features/parent/review/ParentReviewPage.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 backend = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
+e2e = read("backend/scripts/e2e_smoke.py")
 import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 voice = read("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
@@ -46,6 +47,8 @@ require("HomeworkRemoteApi.instance.delete(assignmentId)" in repo and "removeCac
         "assignment deletion must remove authoritative remote work and local cache")
 require('"COMPLETED".equals(assignment.status)' in backend and "已完成作业不能删除" in backend,
         "backend must reject completed assignment deletion")
+require("delete unfinished assignment" in e2e and "completed assignment delete rejection" in e2e,
+        "real backend E2E must cover unfinished deletion and completed-delete rejection")
 for token in [
     "@State private bulkMode",
     "@State private selectedDeleteIds",
