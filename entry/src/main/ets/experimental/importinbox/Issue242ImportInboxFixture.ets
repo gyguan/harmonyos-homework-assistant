@@ -37,7 +37,7 @@ export class Issue242ImportInboxFixture {
         '第8课生字写两遍', '语文：第8课生字写两遍。', ['m-1']),
       Issue242ImportInboxFixture.candidate(
         studentId, batchId, 'fixture-c-2', Subject.CHINESE,
-        '朗读第8课三遍', '补充：朗读第8课三遍。', ['m-3'])
+        '朗读第8课三遍', '补充：朗读第8课三遍。', ['m-1', 'm-3'])
     ];
 
     HomeworkImportInboxService.instance.importBatch(batch, messages, candidates);
