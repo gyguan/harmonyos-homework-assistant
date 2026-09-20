@@ -60,7 +60,6 @@ for token in [
     "AppTheme.HOME_PRIMARY_MIN_WIDTH",
     "AppTheme.HOME_SECONDARY_MIN_WIDTH",
     "this.TodayOverview();",
-    "this.TodayScopeNote();",
     "this.TodaySubjects();",
     "StudentSubjectTaskGroupCard",
     ".onAreaChange",
