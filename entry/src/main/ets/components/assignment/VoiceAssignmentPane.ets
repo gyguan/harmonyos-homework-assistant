@@ -142,7 +142,7 @@ export struct VoiceAssignmentPane {
     } catch {
       this.message = '作业资料加载失败，请检查网络后重试';
     } finally {
-      this.loading = false;
+      if (lifecycleVersion === this.lifecycleVersion) this.loading = false;
     }
   }
 
@@ -540,7 +540,7 @@ export struct VoiceAssignmentPane {
           Text('重新加载')
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-            .onClick(() => { void this.load(); });
+            .onClick(() => { void this.load(this.lifecycleVersion); });
         }
         .width('100%')
         .padding(14)
