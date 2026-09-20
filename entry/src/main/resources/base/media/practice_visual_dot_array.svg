@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="200" viewBox="0 0 560 200">
+<rect width="560" height="200" rx="24" fill="#FFFFFF"/>
+<rect x="1" y="1" width="558" height="198" rx="23" fill="none" stroke="#D9E2EA" stroke-width="2"/>
+<circle cx="120" cy="52" r="9" fill="#35608A"/><circle cx="200" cy="52" r="9" fill="#35608A"/><circle cx="280" cy="52" r="9" fill="#35608A"/><circle cx="360" cy="52" r="9" fill="#35608A"/><circle cx="440" cy="52" r="9" fill="#35608A"/><circle cx="120" cy="82" r="9" fill="#35608A"/><circle cx="200" cy="82" r="9" fill="#35608A"/><circle cx="280" cy="82" r="9" fill="#35608A"/><circle cx="360" cy="82" r="9" fill="#35608A"/><circle cx="440" cy="82" r="9" fill="#35608A"/><circle cx="120" cy="112" r="9" fill="#35608A"/><circle cx="200" cy="112" r="9" fill="#35608A"/><circle cx="280" cy="112" r="9" fill="#35608A"/><circle cx="360" cy="112" r="9" fill="#35608A"/><circle cx="440" cy="112" r="9" fill="#35608A"/><circle cx="120" cy="142" r="9" fill="#35608A"/><circle cx="200" cy="142" r="9" fill="#35608A"/><circle cx="280" cy="142" r="9" fill="#35608A"/><circle cx="360" cy="142" r="9" fill="#35608A"/><circle cx="440" cy="142" r="9" fill="#35608A"/>
+<text x="280" y="180" text-anchor="middle" font-size="16" font-family="sans-serif" fill="#334E68">点子图</text>
+</svg>
