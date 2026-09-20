@@ -51,11 +51,11 @@ require("onMinutesChange" in confirmation_components and "预计用时" in confi
         "parent confirmation must keep quick presets on cards and a bounded custom duration in the editor")
 require("onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "confirmation page must persist duration changes from the reactive editor")
-require(".bindSheet($$this.showEditorSheet" in confirmation and
+require(".bindSheet($this.showEditorSheet" in confirmation and
         ".bindSheet($this.showEditorSheet" not in confirmation and
         "private CandidateEditorSheet()" in confirmation and
-        "onSelect: () => this.openEditor(item.id)" in confirmation,
-        "candidate editing must open in a bottom sheet instead of an inline editor at page bottom")
+        "else this.openEditor(item.id);" in confirmation,
+        "candidate editing must open in a bottom sheet outside batch-management mode")
 require("private CandidateListHeader()" in confirmation and "Text('＋ 新增')" in confirmation and
         "Button('＋ 手工新增一项'" not in confirmation,
         "manual add must live in the candidate-list header instead of below the list")
