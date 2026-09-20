@@ -1,5 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
+import { fileIo } from '@kit.CoreFileKit';
 import { PendingHomeworkShareImport } from '../../domain/model/HomeworkShareModels';
 import { HomeworkShareHandoffPersistence } from '../../domain/port/HomeworkShareHandoffPersistence';
 
@@ -45,8 +46,15 @@ export class PreferencesHomeworkShareHandoffPersistence implements HomeworkShare
       let parsed = JSON.parse(raw) as PendingHomeworkShareImport[];
       let cutoff = Date.now() - MAX_AGE_MS;
       let result: PendingHomeworkShareImport[] = [];
+      let expired: PendingHomeworkShareImport[] = [];
       for (let item of parsed) {
         if (item.createdAtEpochMs >= cutoff) result.push(this.clone(item));
+        else expired.push(this.clone(item));
+      }
+      if (expired.length > 0) {
+        for (let item of expired) this.cleanupFiles(item);
+        await store.put(ITEMS_KEY, JSON.stringify(result));
+        await store.flush();
       }
       return result;
     } catch {
@@ -80,6 +88,17 @@ export class PreferencesHomeworkShareHandoffPersistence implements HomeworkShare
     let store = await this.getStore();
     await store.put(ITEMS_KEY, JSON.stringify(next));
     await store.flush();
+  }
+
+  private cleanupFiles(item: PendingHomeworkShareImport): void {
+    for (let record of item.records) {
+      if (record.sandboxUri.length === 0) continue;
+      try {
+        fileIo.unlinkSync(record.sandboxUri);
+      } catch {
+        // Stale handoff cleanup is best-effort.
+      }
+    }
   }
 
   async remove(token: string): Promise<void> {
