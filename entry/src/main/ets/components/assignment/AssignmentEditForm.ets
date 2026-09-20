@@ -75,56 +75,60 @@ export struct AssignmentEditForm {
   @Builder
   private DurationSection() {
     Column({ space: 7 }) {
-      Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      Row({ space: 6 }) {
-        ChoiceSelectionChip({
-          label: '10',
-          selected: this.expectedMinutes === 10,
-          compact: true,
-          onSelect: () => this.onMinutesChange(10)
-        });
-        ChoiceSelectionChip({
-          label: '15',
-          selected: this.expectedMinutes === 15,
-          compact: true,
-          onSelect: () => this.onMinutesChange(15)
-        });
-        ChoiceSelectionChip({
-          label: '20',
-          selected: this.expectedMinutes === 20,
-          compact: true,
-          onSelect: () => this.onMinutesChange(20)
-        });
-        Text('分钟').fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
-        Blank();
+      Text('预计用时（分钟）')
+        .width('100%')
+        .maxLines(1)
+        .fontSize(12)
+        .fontColor(AppTheme.SUBTEXT);
+      Scroll() {
+        Row({ space: 6 }) {
+          ChoiceSelectionChip({
+            label: '10',
+            selected: this.expectedMinutes === 10,
+            compact: true,
+            onSelect: () => this.onMinutesChange(10)
+          });
+          ChoiceSelectionChip({
+            label: '15',
+            selected: this.expectedMinutes === 15,
+            compact: true,
+            onSelect: () => this.onMinutesChange(15)
+          });
+          ChoiceSelectionChip({
+            label: '20',
+            selected: this.expectedMinutes === 20,
+            compact: true,
+            onSelect: () => this.onMinutesChange(20)
+          });
+          ChoiceSelectionChip({
+            label: '30',
+            selected: this.expectedMinutes === 30,
+            compact: true,
+            onSelect: () => this.onMinutesChange(30)
+          });
+          ChoiceSelectionChip({
+            label: '45',
+            selected: this.expectedMinutes === 45,
+            compact: true,
+            onSelect: () => this.onMinutesChange(45)
+          });
+          TextInput({ text: `${this.expectedMinutes}`, placeholder: '自定义' })
+            .width(96)
+            .height(40)
+            .fontSize(12)
+            .backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .borderRadius(AppTheme.CHIP_RADIUS)
+            .textAlign(TextAlign.Center)
+            .onChange((value: string) => this.applyCustomMinutes(value));
+          Text('分钟')
+            .maxLines(1)
+            .fontSize(11)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+        }
       }
-      .width('100%');
-
-      Row({ space: 6 }) {
-        ChoiceSelectionChip({
-          label: '30',
-          selected: this.expectedMinutes === 30,
-          compact: true,
-          onSelect: () => this.onMinutesChange(30)
-        });
-        ChoiceSelectionChip({
-          label: '45',
-          selected: this.expectedMinutes === 45,
-          compact: true,
-          onSelect: () => this.onMinutesChange(45)
-        });
-        TextInput({ text: `${this.expectedMinutes}`, placeholder: '自定义' })
-          .width(100)
-          .height(40)
-          .fontSize(12)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CHIP_RADIUS)
-          .textAlign(TextAlign.Center)
-          .onChange((value: string) => this.applyCustomMinutes(value));
-        Text('分钟').fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
-        Blank();
-      }
-      .width('100%');
+      .width('100%')
+      .scrollable(ScrollDirection.Horizontal)
+      .scrollBar(BarState.Off);
     }
     .width('100%');
   }
