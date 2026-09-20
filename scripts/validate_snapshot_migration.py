@@ -70,8 +70,13 @@ require("contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE" 
         "V6 -> V7 migration must preserve AUDIO_IMAGE and default missing contentType to NORMAL")
 require("dueAtEpochMs: source.dueAtEpochMs" in store and "dueTimezone:" in store,
         "HomeworkStore clone must preserve Assignment V2 due-time fields")
-require("backing: source.backing === AssignmentBacking.REMOTE" in store,
-        "HomeworkStore clone must preserve explicit Assignment backing after migration")
+require("backing: source.backing," in store and
+        "source.backing === AssignmentBacking.REMOTE ?" not in store,
+        "HomeworkStore clone must preserve explicit Assignment backing without guessing after migration")
+require("snapshot.schemaVersion >= 8" in migrator and
+        "assignment.backing !== AssignmentBacking.LOCAL_SEED" in migrator and
+        "assignment.backing !== AssignmentBacking.REMOTE" in migrator,
+        "V8 snapshot validation must reject missing or invalid Assignment backing")
 
 # An existing but corrupt snapshot must not be converted into a first-launch null result.
 require(persistence.count("return null;") == 1,
