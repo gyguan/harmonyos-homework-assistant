@@ -17,7 +17,7 @@ export class PracticeHistoryViewModel {
   }
 
   list(): Promise<PracticeAttemptSummary[]> {
-    return this.repository.listAttempts(this.familyContext.getActiveStudentId());
+    return this.repository.listAttempts(this.familyContext.getActiveStudentId(), '');
   }
 
   statusLabel(item: PracticeAttemptSummary): string {
