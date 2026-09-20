@@ -19,9 +19,15 @@ export struct HomeworkImportRoutePage {
         onBack: () => this.onBack()
       });
       Row({ space: 10 }) {
-        SymbolGlyph($r('sys.symbol.viewfinder'))
-          .fontSize(18)
-          .fontColor([AppTheme.PRIMARY]);
+        Text('采')
+          .width(28)
+          .height(28)
+          .fontSize(13)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.PRIMARY)
+          .textAlign(TextAlign.Center)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .borderRadius(9);
         Column({ space: 2 }) {
           Text('实验：抓取今日作业')
             .fontSize(14)
