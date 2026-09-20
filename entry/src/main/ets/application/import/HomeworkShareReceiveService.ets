@@ -29,6 +29,18 @@ export class HomeworkShareReceiveService {
         let record = records[i];
         let content = record.content === undefined ? '' : record.content.trim();
         let uri = record.uri === undefined ? '' : record.uri.trim();
+        if (uri.length > 0) {
+          let sandboxUri = this.copyImageToSandbox(uri, token, i + 1, record.utd);
+          accepted.push({
+            id: `${token}-record-${i + 1}`,
+            kind: HomeworkShareRecordKind.IMAGE,
+            utd: record.utd,
+            content: content,
+            sandboxUri: sandboxUri,
+            title: record.title === undefined ? '' : record.title
+          });
+          continue;
+        }
         if (content.length > 0) {
           accepted.push({
             id: `${token}-record-${i + 1}`,
@@ -36,18 +48,6 @@ export class HomeworkShareReceiveService {
             utd: record.utd,
             content: content,
             sandboxUri: '',
-            title: record.title === undefined ? '' : record.title
-          });
-          continue;
-        }
-        if (uri.length > 0) {
-          let sandboxUri = this.copyImageToSandbox(uri, token, i + 1, record.utd);
-          accepted.push({
-            id: `${token}-record-${i + 1}`,
-            kind: HomeworkShareRecordKind.IMAGE,
-            utd: record.utd,
-            content: '',
-            sandboxUri: sandboxUri,
             title: record.title === undefined ? '' : record.title
           });
         }
@@ -77,32 +77,41 @@ export class HomeworkShareReceiveService {
 
     let suffix = this.imageSuffix(utd);
     let destination = `${directory}/${token}-${sequence}${suffix}`;
-    let sourceFile = fileIo.openSync(sourceUri, fileIo.OpenMode.READ_ONLY);
     try {
-      let destinationFile = fileIo.openSync(
-        destination,
-        fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+      let sourceFile = fileIo.openSync(sourceUri, fileIo.OpenMode.READ_ONLY);
       try {
-        let bufferSize = 64 * 1024;
-        let buffer = new ArrayBuffer(bufferSize);
-        let readOffset = 0;
-        while (true) {
-          let readLength = fileIo.readSync(sourceFile.fd, buffer, {
-            offset: readOffset,
-            length: bufferSize
-          });
-          if (readLength <= 0) break;
-          fileIo.writeSync(destinationFile.fd, buffer, { length: readLength });
-          readOffset += readLength;
-          if (readLength < bufferSize) break;
+        let destinationFile = fileIo.openSync(
+          destination,
+          fileIo.OpenMode.WRITE_ONLY | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+        try {
+          let bufferSize = 64 * 1024;
+          let buffer = new ArrayBuffer(bufferSize);
+          let readOffset = 0;
+          while (true) {
+            let readLength = fileIo.readSync(sourceFile.fd, buffer, {
+              offset: readOffset,
+              length: bufferSize
+            });
+            if (readLength <= 0) break;
+            fileIo.writeSync(destinationFile.fd, buffer, { length: readLength });
+            readOffset += readLength;
+            if (readLength < bufferSize) break;
+          }
+        } finally {
+          fileIo.closeSync(destinationFile);
         }
       } finally {
-        fileIo.closeSync(destinationFile);
+        fileIo.closeSync(sourceFile);
       }
-    } finally {
-      fileIo.closeSync(sourceFile);
+      return destination;
+    } catch (error) {
+      try {
+        fileIo.unlinkSync(destination);
+      } catch {
+        // The destination may not have been created yet.
+      }
+      throw error;
     }
-    return destination;
   }
 
   private imageSuffix(utd: string): string {
