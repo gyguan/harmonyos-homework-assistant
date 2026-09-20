@@ -26,6 +26,7 @@ preset_provider = read("entry/src/main/ets/data/practice/PresetPracticeContentPr
 preset_catalog = read("entry/src/main/ets/data/practice/PresetPracticeCatalog.ets")
 repo_impl = read("entry/src/main/ets/data/repository/DefaultPracticeRepository.ets")
 page = read("entry/src/main/ets/features/student/practice/PracticeHomePage.ets")
+filter_dialog = read("entry/src/main/ets/components/practice/PracticeFilterDialog.ets")
 view_model = read("entry/src/main/ets/features/student/practice/PracticeHomeViewModel.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 snapshot = read("entry/src/main/ets/domain/model/PersistenceModels.ets")
@@ -81,6 +82,23 @@ require("gradeFromStudentProfile" in models and "defaultGrade()" in view_model,
 require("PracticeSubject.CHINESE" in models and "PracticeSubject.MATH" in models and
         "PracticeSubject.ENGLISH" in models,
         "Practice taxonomy must keep Chinese, Math and English")
+
+# Practice filters stay compact on the page and are edited in one bottom dialog.
+require("@CustomDialog" in filter_dialog and "筛选练习" in filter_dialog,
+        "practice grade/subject selection must live in the popup filter dialog")
+require("@Link selectedGrade" in filter_dialog and "@Link selectedSubject" in filter_dialog,
+        "practice filter dialog must edit draft grade and subject state")
+require("onApply" in filter_dialog and "this.onApply(this.selectedGrade, this.selectedSubject)" in filter_dialog,
+        "practice filters must only commit through the dialog apply action")
+require("filterDialogController" in page and "DialogAlignment.Bottom" in page,
+        "PracticeHomePage must open the filter as a bottom dialog")
+require("FilterSummaryEntry" in page and "label: '年级'" in page and "label: '科目'" in page,
+        "PracticeHomePage must show only a compact filter summary")
+require("GradeSelector" not in page and "SubjectSelector" not in page,
+        "PracticeHomePage must not reserve permanent page space for inline selectors")
+require("this.draftSelectedGrade = this.selectedGrade" in page and
+        "this.draftSelectedSubject = this.selectedSubject" in page,
+        "closing the Practice filter must not mutate the applied selection")
 
 # Keep Practice persistence independent from the homework snapshot/state machine.
 for token in ["PracticePaper", "PracticeQuestion", "PracticeAttempt", "PracticeAnswer", "PracticeNote"]:
