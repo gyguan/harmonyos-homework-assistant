@@ -24,6 +24,8 @@ export struct ParentReviewPane {
   @State private editSaving: boolean = false;
   @State private editNotice: string = '';
   @State private previewUri: string = '';
+  @State private deleteConfirm: boolean = false;
+  @State private deleteBusy: boolean = false;
 
   private previewController: CustomDialogController = new CustomDialogController({
     builder: PhotoPreviewDialog({ uri: $previewUri }),
@@ -32,6 +34,7 @@ export struct ParentReviewPane {
     customStyle: true
   });
   onReviewed: () => void = () => {};
+  onDeleted: () => void = () => {};
 
   private readonly viewModel: ParentReviewViewModel =
     new ParentReviewViewModel(DefaultAssignmentRepository.instance);
@@ -72,6 +75,63 @@ export struct ParentReviewPane {
   private canEdit(item: Assignment): boolean {
     let persisted = item.remoteVersion > 0 || item.candidateId.length > 0;
     return persisted && item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED;
+  }
+
+  private canDelete(item: Assignment): boolean {
+    return item.status !== AssignmentStatus.COMPLETED;
+  }
+
+  private async deleteAssignment(): Promise<void> {
+    let item = this.assignment();
+    if (item === null || !this.canDelete(item) || this.deleteBusy) return;
+    this.deleteBusy = true;
+    this.operationNotice = '';
+    try {
+      await this.viewModel.deleteAssignment(item.id);
+      this.deleteConfirm = false;
+      this.localRevision++;
+      this.onDeleted();
+    } catch (error) {
+      this.operationNotice = `${error}`;
+    } finally {
+      this.deleteBusy = false;
+    }
+  }
+
+  @Builder
+  private DeleteConfirmation() {
+    if (this.deleteConfirm && this.assignment() !== null && this.canDelete(this.assignment()!)) {
+      Column({ space: 10 }) {
+        Text('删除后无法恢复，确定删除这项未完成作业？')
+          .width('100%')
+          .fontSize(13)
+          .lineHeight(19)
+          .fontColor(AppTheme.DANGER);
+        Row({ space: 10 }) {
+          Button('取消', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(40)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.deleteBusy)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT)
+            .onClick(() => this.deleteConfirm = false);
+          Button(this.deleteBusy ? '正在删除…' : '确认删除', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(40)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.deleteBusy)
+            .backgroundColor(AppTheme.DANGER)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => { void this.deleteAssignment(); });
+        }
+        .width('100%');
+      }
+      .width('100%')
+      .padding(12)
+      .backgroundColor(AppTheme.DANGER_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
   }
 
   private startEditing(item: Assignment): void {
@@ -308,20 +368,35 @@ export struct ParentReviewPane {
               }
               .width('100%');
 
-              if (this.canEdit(this.assignment()!)) {
-                Row() {
-                  Text('编辑任务')
-                    .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                    .fontSize(13)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor(AppTheme.PRIMARY)
-                    .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-                    .backgroundColor(AppTheme.PRIMARY_SOFT)
-                    .borderRadius(AppTheme.CONTROL_RADIUS)
-                    .accessibilityRole(AccessibilityRoleType.BUTTON)
-                    .accessibilityText('编辑这项作业')
-                    .onClick(() => this.startEditing(this.assignment()!));
+              if (this.canEdit(this.assignment()!) || this.canDelete(this.assignment()!)) {
+                Row({ space: 10 }) {
+                  if (this.canEdit(this.assignment()!)) {
+                    Text('编辑任务')
+                      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                      .fontSize(13)
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor(AppTheme.PRIMARY)
+                      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+                      .backgroundColor(AppTheme.PRIMARY_SOFT)
+                      .borderRadius(AppTheme.CONTROL_RADIUS)
+                      .accessibilityRole(AccessibilityRoleType.BUTTON)
+                      .accessibilityText('编辑这项作业')
+                      .onClick(() => this.startEditing(this.assignment()!));
+                  }
                   Blank();
+                  if (this.canDelete(this.assignment()!)) {
+                    Text('删除作业')
+                      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                      .fontSize(13)
+                      .fontWeight(FontWeight.Medium)
+                      .fontColor(AppTheme.DANGER)
+                      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+                      .backgroundColor(AppTheme.DANGER_SOFT)
+                      .borderRadius(AppTheme.CONTROL_RADIUS)
+                      .accessibilityRole(AccessibilityRoleType.BUTTON)
+                      .accessibilityText('删除这项未完成作业')
+                      .onClick(() => this.deleteConfirm = true);
+                  }
                 }
                 .width('100%');
               }
@@ -336,6 +411,8 @@ export struct ParentReviewPane {
             .backgroundColor(AppTheme.SURFACE)
             .border({ width: 1, color: AppTheme.BORDER })
             .borderRadius(AppTheme.CONTROL_RADIUS);
+
+            this.DeleteConfirmation();
 
             if (this.operationNotice.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
               Text(this.operationNotice)
