@@ -178,8 +178,7 @@ require("SegmentedSelectionButton" in student_assignments and "FilterSummaryEntr
 for expression in [
     "selected: !this.calendarMode",
     "selected: this.calendarMode",
-    "active: this.typeFilter !== AssignmentTypeFilter.ALL",
-    "active: this.dateFilter !== AssignmentDateFilter.ALL",
+    "active: !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in student_assignments,
@@ -187,8 +186,7 @@ for expression in [
 
 filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 for state_expr, label in [
-    ("this.typeFilter === value ? AppTheme.PRIMARY_SOFT", "assignment type"),
-    ("this.dateFilter === value ? AppTheme.PRIMARY_SOFT", "assignment due date"),
+    ("DatePicker({", "assignment date"),
     ("this.subjectCode === value ? AppTheme.PRIMARY_SOFT", "assignment subject"),
 ]:
     require(state_expr in filter_dialog,
@@ -199,12 +197,11 @@ require("private FilterChip(" not in parent_progress and "private FilterEntry(" 
         "Parent Progress must not keep runtime selection in ordinary @Builder boolean parameters")
 require("FilterSummaryEntry" in parent_progress,
         "Parent Progress must reuse shared reactive filter summary controls")
-require("StatusSelectionChip" not in parent_progress and "StatusMetricCard" in parent_progress and
-        "this.statusFilter === filter" in parent_progress and ".onClick(() => this.chooseStatus(filter))" in parent_progress,
-        "Parent Progress status selection must live in clickable metric cards without duplicate chips")
+require("StatusSelectionChip" not in parent_progress and "AssignmentMetricSummary" in parent_progress and
+        "interactive: true" in parent_progress and "this.chooseStatus(key)" in parent_progress,
+        "Parent Progress status selection must live in the shared clickable metric summary")
 for expression in [
-    "active: this.typeFilter !== AssignmentTypeFilter.ALL",
-    "active: this.dateFilter !== AssignmentDateFilter.ALL",
+    "active: !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in parent_progress,
