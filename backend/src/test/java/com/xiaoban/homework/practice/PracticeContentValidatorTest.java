@@ -1,6 +1,7 @@
 package com.xiaoban.homework.practice;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.InputStream;
@@ -14,13 +15,30 @@ class PracticeContentValidatorTest {
   private final PracticeContentValidator validator = new PracticeContentValidator();
 
   @Test
-  void canonicalPresetCatalogPassesValidator() throws Exception {
+  void splitPresetCatalogPassesValidator() throws Exception {
+    PracticeContentCatalog.Manifest manifest;
     try (InputStream input = getClass().getClassLoader()
-        .getResourceAsStream("practice/preset-catalog.json")) {
-      PracticeContentCatalog.Catalog catalog =
-          mapper.readValue(input, PracticeContentCatalog.Catalog.class);
-      assertDoesNotThrow(() -> validator.validateCatalog(catalog));
+        .getResourceAsStream("practice/preset/manifest.json")) {
+      manifest = mapper.readValue(input, PracticeContentCatalog.Manifest.class);
     }
+
+    List<PracticeContentCatalog.Paper> papers = new ArrayList<>();
+    for (String file : manifest.files()) {
+      try (InputStream input = getClass().getClassLoader()
+          .getResourceAsStream("practice/preset/" + file)) {
+        PracticeContentCatalog.Shard shard =
+            mapper.readValue(input, PracticeContentCatalog.Shard.class);
+        for (PracticeContentCatalog.Paper paper : shard.papers()) {
+          assertEquals(shard.grade(), paper.grade());
+          assertEquals(shard.subject(), paper.subject());
+          papers.add(paper);
+        }
+      }
+    }
+
+    PracticeContentCatalog.Catalog catalog = new PracticeContentCatalog.Catalog(
+        manifest.schemaVersion(), manifest.catalogId(), manifest.generatedBy(), papers);
+    assertDoesNotThrow(() -> validator.validateCatalog(catalog));
   }
 
   @Test
@@ -41,7 +59,7 @@ class PracticeContentValidatorTest {
     }
 
     PracticeContentCatalog.Paper paper = new PracticeContentCatalog.Paper(
-        "MATH-G3-TEST-001", 1, "G3", "MATH", "测试卷", "验证答案约束",
+        "MATH-G3-TEST-001", 1, "G3", "MATH", "ALL", "测试卷", "验证答案约束",
         "L1", 5, 10, List.of("测试"), "AI_GENERATED", "PUBLISHED", questions);
 
     assertThrows(IllegalStateException.class, () -> validator.validatePaper(paper));
