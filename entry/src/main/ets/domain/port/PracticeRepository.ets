@@ -3,6 +3,7 @@ import {
   PracticeAttempt,
   PracticeAttemptSummary,
   PracticeGrade,
+  PracticeNote,
   PracticePaper,
   PracticeResult,
   PracticeSubject
@@ -15,7 +16,10 @@ export interface PracticeRepository {
   getAttempt(attemptId: string): Promise<PracticeAttempt>;
   listAttempts(studentId: string, paperId: string): Promise<PracticeAttemptSummary[]>;
   repeatAttempt(attemptId: string): Promise<PracticeAttempt>;
+  retryWrongAttempt(attemptId: string): Promise<PracticeAttempt>;
   saveAnswer(attemptId: string, questionId: string, answerValue: string): Promise<PracticeAnswer>;
+  saveNote(attemptId: string, questionId: string, content: string): Promise<PracticeNote>;
+  deleteNote(attemptId: string, questionId: string): Promise<void>;
   submitAttempt(attemptId: string): Promise<PracticeResult>;
   getResult(attemptId: string): Promise<PracticeResult>;
 }
