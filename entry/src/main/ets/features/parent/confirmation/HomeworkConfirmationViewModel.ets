@@ -1,5 +1,6 @@
 import { HomeworkBatchPublishResult, HomeworkBatchPublishService } from '../../../application/import/HomeworkBatchPublishService';
 import { DefaultHomeworkImportDraftRepository } from '../../../data/repository/DefaultHomeworkImportDraftRepository';
+import { DefaultHomeworkImportInboxRepository } from '../../../data/repository/DefaultHomeworkImportInboxRepository';
 import { CandidateAssignment, RawHomeworkImport, Subject } from '../../../domain/model/HomeworkModels';
 import { HomeworkImportDraftRepository } from '../../../domain/port/HomeworkImportDraftRepository';
 
@@ -17,6 +18,7 @@ export class HomeworkConfirmationViewModel {
 
   createManualCandidateDraft(): CandidateAssignment {
     let raw = this.rawImport();
+    let activeBatchId = DefaultHomeworkImportInboxRepository.instance.getActiveBatchId();
     return {
       id: `manual-${Date.now()}`,
       studentId: this.drafts.getActiveStudentId(),
@@ -28,7 +30,13 @@ export class HomeworkConfirmationViewModel {
       expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: raw.sourceLabel.length > 0 ? raw.sourceLabel : '家长手工新增',
-        excerpt: '家长手工新增'
+        excerpt: '家长手工新增',
+        batchId: activeBatchId.length > 0 ? activeBatchId : undefined,
+        sourceType: activeBatchId.length > 0 ? 'MANUAL' : undefined,
+        sourceMessageIds: [],
+        rawText: '家长手工新增',
+        imageRef: '',
+        capturedAtEpochMs: Date.now()
       },
       confidence: 1.0
     };
