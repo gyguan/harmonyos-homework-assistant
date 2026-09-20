@@ -74,22 +74,22 @@ for removed in ["private TypeOption", "private DateOption", "今天", "明天", 
 require(query_dialog.index("Text('关闭')") < query_dialog.index("DatePicker({") <
         query_dialog.index("Button('查询'"),
         "task query dialog must keep close top-right and query action at bottom")
-require(deadline_dialog.index("Text('取消')") < deadline_dialog.index("DatePicker({") <
+require(deadline_dialog.index("Text('关闭')") < deadline_dialog.index("DatePicker({") <
         deadline_dialog.index("Button('确定'"),
-        "deadline dialog must keep cancel top-right and confirm action at bottom")
+        "deadline dialog must keep close top-right and confirm action at bottom")
 require("Text('关闭')" in student_switcher,
         "student switcher must keep a top-right close action")
 require("Text('关闭')" in photo_preview,
         "photo preview must keep a top-right close action")
-require(parent_edit.index("Text('取消')") < parent_edit.index("AssignmentEditForm({") <
+require(parent_edit.index("Text('关闭')") < parent_edit.index("AssignmentEditForm({") <
         parent_edit.index("Button(this.saving ? '保存中…' : '保存修改'"),
-        "parent edit sheet must keep cancel in header and save at bottom")
-require("Text('完成')" in confirmation,
-        "candidate edit sheet may use top-right completion only as a sheet exit action")
-require("Text('删除')" not in confirmation_components and
-        confirmation_components.index("AssignmentEditForm({") <
-        confirmation_components.index("Button('删除这项作业'"),
-        "destructive candidate deletion must be at the bottom, not top-right")
+        "parent edit sheet must keep close in header and save in the fixed bottom action area")
+require("Text('关闭')" in confirmation_components and "confirmDiscard" in confirmation_components,
+        "candidate edit sheet must use close as the only header exit and protect dirty edits")
+require(confirmation_components.index("AssignmentEditForm({") <
+        confirmation_components.index("Button('删除'") <
+        confirmation_components.index("Button('完成'"),
+        "candidate editor business actions must stay in its bottom action area")
 
 if errors:
     print("TASK_UI_CONSISTENCY_GATE_FAIL")
