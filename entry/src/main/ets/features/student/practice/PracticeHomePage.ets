@@ -13,6 +13,7 @@ import { PracticeHomeViewModel } from './PracticeHomeViewModel';
 struct PracticePaperCard {
   @Prop paper: PracticePaper;
   @Prop difficultyLabel: string = '';
+  onOpen: () => void = () => {};
 
   private tagsText(): string {
     return this.paper.tags.join(' · ');
@@ -74,13 +75,17 @@ struct PracticePaperCard {
     .padding(AppTheme.PHONE_CARD_PADDING)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(`${this.paper.title}，${this.paper.questionCount}题，点击查看套卷`)
+    .onClick(() => this.onOpen());
   }
 }
 
 @Component
 export struct PracticeHomePage {
   @Prop revision: number = 0;
+  onOpenPaper: (paperId: string, version: number) => void = (_paperId: string, _version: number) => {};
   @State private selectedGrade: PracticeGrade = PracticeGrade.G3;
   @State private selectedSubject: PracticeSubject = PracticeSubject.MATH;
   @State private draftSelectedGrade: PracticeGrade = PracticeGrade.G3;
@@ -220,7 +225,8 @@ export struct PracticeHomePage {
           ForEach(this.papers, (paper: PracticePaper) => {
             PracticePaperCard({
               paper: paper,
-              difficultyLabel: this.viewModel.difficultyLabel(paper)
+              difficultyLabel: this.viewModel.difficultyLabel(paper),
+              onOpen: () => this.onOpenPaper(paper.id, paper.version)
             });
           }, (paper: PracticePaper) => `${paper.id}@${paper.version}`);
         }
@@ -253,7 +259,7 @@ export struct PracticeHomePage {
 
           this.PaperList();
 
-          Text('当前先提供预置套卷浏览；套卷作答、历史练习与错题重练将在后续 Slice 接入。')
+          Text('点击套卷可查看详情并开始练习；历史练习与错题重练将在后续能力中接入。')
             .width('100%')
             .fontSize(12)
             .lineHeight(18)

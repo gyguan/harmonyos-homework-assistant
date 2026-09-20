@@ -3,7 +3,9 @@ import {
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
   ParentImportConfirmationRouteParam,
-  ParentImportRouteParam
+  ParentImportRouteParam,
+  PracticeAttemptRouteParam,
+  PracticePaperRouteParam
 } from '../app/navigation/AppRoutes';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
@@ -29,6 +31,9 @@ import { StudentAssignmentsPage } from '../features/student/assignments/StudentA
 import { StudentHomePage } from '../features/student/home/StudentHomePage';
 import { StudentProfilePage } from '../features/student/profile/StudentProfilePage';
 import { PracticeHomePage } from '../features/student/practice/PracticeHomePage';
+import { PracticeAttemptPage } from '../features/student/practice/PracticeAttemptPage';
+import { PracticePaperDetailPage } from '../features/student/practice/PracticePaperDetailPage';
+import { PracticeResultPage } from '../features/student/practice/PracticeResultPage';
 import { StudyWorkspaceRoutePage } from '../features/student/study/StudyWorkspaceRoutePage';
 
 export enum AppRole {
@@ -169,6 +174,26 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.STUDENT_STUDY, new AssignmentRouteParam(assignmentId));
   }
 
+  private openPracticePaper(paperId: string, version: number): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.STUDENT_PRACTICE_PAPER, new PracticePaperRouteParam(paperId, version));
+  }
+
+  private openPracticeAttempt(attemptId: string): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.STUDENT_PRACTICE_ATTEMPT, new PracticeAttemptRouteParam(attemptId));
+  }
+
+  private openPracticeResult(attemptId: string): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.STUDENT_PRACTICE_RESULT, new PracticeAttemptRouteParam(attemptId));
+  }
+
+  private finishPracticeResult(): void {
+    this.navPathStack.clear();
+    this.studentRoute = StudentRoute.PRACTICE;
+  }
+
   private openParentReview(assignmentId: string): void {
     this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
   }
@@ -206,7 +231,8 @@ export struct AppShell {
       });
     } else if (this.studentRoute === StudentRoute.PRACTICE) {
       PracticeHomePage({
-        revision: this.storeRevision
+        revision: this.storeRevision,
+        onOpenPaper: (paperId: string, version: number) => this.openPracticePaper(paperId, version)
       });
     } else if (this.studentRoute === StudentRoute.PROFILE) {
       StudentProfilePage({
@@ -241,6 +267,36 @@ export struct AppShell {
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.STUDENT_PRACTICE_PAPER) {
+      NavDestination() {
+        PracticePaperDetailPage({
+          paperId: (param as PracticePaperRouteParam).paperId,
+          version: (param as PracticePaperRouteParam).version,
+          onBack: () => this.navPathStack.pop(),
+          onStarted: (attemptId: string) => this.openPracticeAttempt(attemptId)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.STUDENT_PRACTICE_ATTEMPT) {
+      NavDestination() {
+        PracticeAttemptPage({
+          attemptId: (param as PracticeAttemptRouteParam).attemptId,
+          onBack: () => this.navPathStack.pop(),
+          onSubmitted: (attemptId: string) => this.openPracticeResult(attemptId)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.STUDENT_PRACTICE_RESULT) {
+      NavDestination() {
+        PracticeResultPage({
+          attemptId: (param as PracticeAttemptRouteParam).attemptId,
+          onDone: () => this.finishPracticeResult()
         });
       }
       .hideTitleBar(true)

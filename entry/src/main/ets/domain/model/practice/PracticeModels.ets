@@ -74,6 +74,63 @@ export interface PracticeQuestion {
   tags: string[];
 }
 
+export enum PracticeAttemptMode {
+  FULL = 'FULL',
+  WRONG_ONLY = 'WRONG_ONLY'
+}
+
+export enum PracticeAttemptStatus {
+  IN_PROGRESS = 'IN_PROGRESS',
+  SUBMITTED = 'SUBMITTED'
+}
+
+export interface PracticeAnswer {
+  questionId: string;
+  answerValue: string;
+  answeredAtEpochMs: number;
+}
+
+export interface PracticeAttempt {
+  id: string;
+  studentId: string;
+  paperId: string;
+  paperVersion: number;
+  attemptNo: number;
+  mode: PracticeAttemptMode;
+  status: PracticeAttemptStatus;
+  startedAtEpochMs: number;
+  submittedAtEpochMs: number;
+  elapsedSeconds: number;
+  answeredCount: number;
+  questionCount: number;
+  questions: PracticeQuestion[];
+  answers: PracticeAnswer[];
+}
+
+export interface PracticeQuestionResult {
+  questionId: string;
+  orderNo: number;
+  stem: string;
+  answerValue: string;
+  correctAnswer: string;
+  correct: boolean;
+  score: number;
+  explanation: string;
+}
+
+export interface PracticeResult {
+  attemptId: string;
+  paperId: string;
+  paperVersion: number;
+  attemptNo: number;
+  score: number;
+  maxScore: number;
+  correctCount: number;
+  wrongCount: number;
+  elapsedSeconds: number;
+  questions: PracticeQuestionResult[];
+}
+
 export class PracticeTaxonomy {
   static grades(): PracticeGrade[] {
     return [
