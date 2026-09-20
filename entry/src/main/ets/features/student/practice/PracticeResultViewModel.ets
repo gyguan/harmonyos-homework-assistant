@@ -1,5 +1,5 @@
 import { DefaultPracticeRepository } from '../../../data/repository/DefaultPracticeRepository';
-import { PracticeResult } from '../../../domain/model/practice/PracticeModels';
+import { PracticeAttempt, PracticeResult } from '../../../domain/model/practice/PracticeModels';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
 
 export class PracticeResultViewModel {
@@ -11,6 +11,10 @@ export class PracticeResultViewModel {
 
   load(attemptId: string): Promise<PracticeResult> {
     return this.repository.getResult(attemptId);
+  }
+
+  repeat(attemptId: string): Promise<PracticeAttempt> {
+    return this.repository.repeatAttempt(attemptId);
   }
 
   percent(result: PracticeResult): number {
