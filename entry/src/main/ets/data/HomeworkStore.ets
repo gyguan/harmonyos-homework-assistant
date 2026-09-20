@@ -382,6 +382,7 @@ export class HomeworkStore {
         id: `a-published-${candidate.id}`,
         studentId: studentId,
         candidateId: candidate.id,
+        backing: AssignmentBacking.REMOTE,
         assignmentType: AssignmentType.SCHOOL,
         subjectCode: this.subjectCode(candidate.subject),
         contentType: AssignmentContentType.NORMAL,
