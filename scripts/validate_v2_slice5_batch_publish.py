@@ -109,9 +109,10 @@ require("candidateAnchor(candidate.id)" in client_service,
         "relative due dates must be anchored to Candidate/import creation time when available")
 
 # Delivery P0: editing the title must preserve the independently editable teacher instruction.
-require("this.copy(item, item.subject, title, item.instruction)" in confirmation,
-        "confirmation title edit must preserve teacher instruction")
-require("this.copy(item, item.subject, title, title)" not in confirmation,
+require("title: this.titleDraft" in confirmation_components and
+        "instruction: this.instructionDraft" in confirmation_components,
+        "staged confirmation save must preserve title and teacher instruction independently")
+require("instruction: this.titleDraft" not in confirmation_components,
         "confirmation title edit must never overwrite teacher instruction")
 
 # Parent-edited deadlines must use the same native picker as manually created extracurricular tasks.
