@@ -53,9 +53,9 @@ require("TodayScopeNote" not in student_home,
 require("this.assignmentRenderKey(item)" in student_home,
         "student home task rows must use content-aware assignment keys")
 
-require("shouldShowCandidatesStep" in parent_import and
-        "this.showCandidatesStep && this.candidates().length > 0" in parent_import,
-        "import page must leave candidate step when no candidates remain")
+require("CandidatePane" not in parent_import and "继续确认" not in parent_import and
+        "this.onOpenConfirmation()" in parent_import,
+        "import page must use one direct confirmation step after organization")
 
 for source, token, message in [
     (parent_confirmation, "发布采用整批原子提交", "publish page must not expose atomic-submit implementation details"),
