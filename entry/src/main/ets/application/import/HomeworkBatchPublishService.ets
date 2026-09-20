@@ -63,7 +63,7 @@ export class HomeworkBatchPublishService {
     }
     if (seen.size !== candidates.length) throw new Error('云端批量发布响应不完整');
 
-    for (let assignment of mapped) DefaultAssignmentRepository.instance.applyAuthoritative(assignment);
+    DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped);
     this.drafts.clearCandidates();
     return { publishedCount: mapped.length };
   }
