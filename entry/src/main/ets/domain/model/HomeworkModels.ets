@@ -91,6 +91,12 @@ export interface RawHomeworkImport {
 export interface SourceEvidence {
   sourceLabel: string;
   excerpt: string;
+  batchId?: string;
+  sourceType?: string;
+  sourceMessageIds?: string[];
+  rawText?: string;
+  imageRef?: string;
+  capturedAtEpochMs?: number;
 }
 
 export interface CandidateAssignment {
