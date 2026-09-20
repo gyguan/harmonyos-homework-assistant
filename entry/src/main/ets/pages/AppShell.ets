@@ -87,12 +87,14 @@ export struct AppShell {
   });
 
   aboutToAppear(): void {
+    DefaultAssignmentRepository.instance.setChangeListener(() => this.notifyUiChanged());
     this.syncFamilyContext();
     this.onRegisterBackHandler(() => this.handleSystemBack());
     void this.refreshActiveStudent();
   }
 
   aboutToDisappear(): void {
+    DefaultAssignmentRepository.instance.clearChangeListener();
     this.onRegisterBackHandler(() => false);
   }
 
@@ -245,11 +247,8 @@ export struct AppShell {
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
-          onReviewed: () => this.notifyUiChanged(),
-          onDeleted: () => {
-            this.notifyUiChanged();
-            this.navPathStack.pop();
-          }
+          onReviewed: () => {},
+          onDeleted: () => this.navPathStack.pop()
         });
       }
       .hideTitleBar(true)
@@ -284,18 +283,12 @@ export struct AppShell {
         if ((param as ParentExtraCreateRouteParam).voice) {
           ParentVoiceAssignmentPage({
             onBack: () => this.navPathStack.pop(),
-            onCreated: () => {
-              this.notifyUiChanged();
-              this.navPathStack.pop();
-            }
+            onCreated: () => this.navPathStack.pop()
           });
         } else {
           ParentExtraAssignmentPage({
             onBack: () => this.navPathStack.pop(),
-            onCreated: () => {
-              this.notifyUiChanged();
-              this.navPathStack.pop();
-            }
+            onCreated: () => this.navPathStack.pop()
           });
         }
       }
