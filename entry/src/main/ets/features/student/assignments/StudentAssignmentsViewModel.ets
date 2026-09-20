@@ -1,6 +1,5 @@
 import {
   AssignmentDateFilter,
-  AssignmentFilter,
   AssignmentTypeFilter
 } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
@@ -22,7 +21,7 @@ export class StudentAssignmentsViewModel {
 
   calendarAssignments(typeFilter: AssignmentTypeFilter, subjectCode: string): Assignment[] {
     return this.repository.listCached(
-      this.buildFilter(typeFilter, subjectCode, AssignmentDateFilter.ALL, []));
+      AssignmentFilterFactory.create(typeFilter, subjectCode, AssignmentDateFilter.ALL, []));
   }
 
   assignmentsOnDay(typeFilter: AssignmentTypeFilter, subjectCode: string, dayEpochMs: number): Assignment[] {
@@ -57,6 +56,4 @@ export class StudentAssignmentsViewModel {
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
   }
-
-
 }
