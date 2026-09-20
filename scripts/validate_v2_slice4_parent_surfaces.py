@@ -120,8 +120,8 @@ for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode", "
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
     require(removed not in shared_filter,
             f"Parent/Student task query must not retain preset type/relative-date option: {removed}")
-require("AssignmentTypeFilter" in progress_vm and "assignmentType: typeFilter" in progress_vm,
-        "Parent Progress query must support the same Assignment type dimension as Student Assignments")
+require("AssignmentTypeFilter" in progress_vm and "AssignmentFilterFactory.create(typeFilter" in progress_vm,
+        "Parent Progress query must preserve the Assignment type dimension through the shared filter factory")
 require("ParentReviewPane({" in progress and "selectedAssignmentId" in progress,
         "wide Parent Progress must reuse ParentReviewPane instead of a duplicate detail model")
 require("this.onOpenReview(item.id)" in progress,
