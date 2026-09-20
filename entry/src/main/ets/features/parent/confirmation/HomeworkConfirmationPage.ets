@@ -11,6 +11,7 @@ export struct HomeworkConfirmationPage {
   @State private localRevision: number = 0;
   @State private editingCandidateId: string = '';
   @State private manualCandidateDraft: CandidateAssignment | null = null;
+  @State private pendingDeleteCandidateId: string = '';
   @State private showEditorSheet: boolean = false;
   @State private publishing: boolean = false;
   @State private publishMessage: string = '';
@@ -55,8 +56,11 @@ export struct HomeworkConfirmationPage {
   }
 
   private completeEditorDismiss(): void {
+    let pendingDeleteCandidateId = this.pendingDeleteCandidateId;
     this.editingCandidateId = '';
     this.manualCandidateDraft = null;
+    this.pendingDeleteCandidateId = '';
+    if (pendingDeleteCandidateId.length > 0) this.commitCandidateRemoval(pendingDeleteCandidateId);
   }
 
   private saveCandidate(candidate: CandidateAssignment): boolean {
@@ -100,10 +104,14 @@ export struct HomeworkConfirmationPage {
       this.closeEditor();
       return;
     }
+    this.pendingDeleteCandidateId = candidateId;
+    this.closeEditor();
+  }
+
+  private commitCandidateRemoval(candidateId: string): void {
     if (!this.viewModel.removeCandidate(candidateId)) return;
     this.selectedCandidateIds = SelectionIds.without(this.selectedCandidateIds, candidateId);
     this.localRevision++;
-    if (this.editingCandidateId === candidateId) this.closeEditor();
     if (this.candidates().length === 0) this.exitBulkMode();
     this.onStoreChanged();
   }
