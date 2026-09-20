@@ -20,6 +20,7 @@ export struct ParentReviewPane {
   @State private operationNotice: string = '';
   @State private submitting: boolean = false;
   @State private editingAssignmentId: string = '';
+  @State private showEditSheet: boolean = false;
   @State private editSaving: boolean = false;
   @State private editNotice: string = '';
   @State private previewUri: string = '';
@@ -77,9 +78,11 @@ export struct ParentReviewPane {
     if (!this.canEdit(item)) return;
     this.editingAssignmentId = item.id;
     this.editNotice = '';
+    this.showEditSheet = true;
   }
 
   private cancelEditing(): void {
+    this.showEditSheet = false;
     this.editingAssignmentId = '';
     this.editNotice = '';
   }
@@ -90,6 +93,7 @@ export struct ParentReviewPane {
     this.editNotice = '';
     try {
       await this.viewModel.updateDetails(updated);
+      this.showEditSheet = false;
       this.editingAssignmentId = '';
       this.editNotice = '';
       this.operationNotice = '任务信息已更新';
@@ -139,6 +143,38 @@ export struct ParentReviewPane {
     } finally {
       this.submitting = false;
     }
+  }
+
+  @Builder
+  private AssignmentEditorSheet() {
+    Column() {
+      if (this.assignment() !== null && this.editingAssignmentId === this.assignment()!.id) {
+        Scroll() {
+          Column({ space: 10 }) {
+            ParentAssignmentEditPanel({
+              item: this.assignment()!,
+              saving: this.editSaving,
+              onCancel: () => this.cancelEditing(),
+              onSave: (assignment: Assignment) => { void this.saveAssignmentEdit(assignment); }
+            });
+            if (this.editNotice.length > 0) {
+              Text(this.editNotice)
+                .width('100%')
+                .fontSize(12)
+                .fontColor(AppTheme.DANGER);
+            }
+          }
+          .width('100%')
+          .padding({ left: 16, right: 16, top: 16, bottom: 28 });
+        }
+        .width('100%')
+        .height('100%')
+        .scrollBar(BarState.Auto);
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(AppTheme.SURFACE);
   }
 
   @Builder
@@ -252,98 +288,92 @@ export struct ParentReviewPane {
   }
 
   build() {
-    if (this.assignment() === null) {
-      this.EmptyState();
-    } else {
-      Column({ space: 12 }) {
-        Column({ space: 8 }) {
-          Row() {
-            Text(this.assignment()!.subject).fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-            Blank();
-            Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(12).fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%');
-          Text(this.assignment()!.title).width('100%').fontSize(21).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Row({ space: 8 }) {
-            Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
-              .fontSize(12).fontColor(AppTheme.SUBTEXT);
-            Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
-            Text(this.actualMinutes(this.assignment()!) > 0 ?
-              `实际 ${this.actualMinutes(this.assignment()!)} 分钟` : `预计 ${this.assignment()!.expectedMinutes} 分钟`)
-              .fontSize(12).fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%');
-
-          if (this.canEdit(this.assignment()!) && this.editingAssignmentId !== this.assignment()!.id) {
-            Row() {
-              Text('编辑任务')
-                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .fontSize(13)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.PRIMARY)
-                .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-                .backgroundColor(AppTheme.PRIMARY_SOFT)
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .accessibilityRole(AccessibilityRoleType.BUTTON)
-                .accessibilityText('编辑这项作业')
-                .onClick(() => this.startEditing(this.assignment()!));
-              Blank();
-            }
-            .width('100%');
-          }
-          if (this.assignment()!.reviewNote.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
-            Text(`家长备注：${this.assignment()!.reviewNote}`)
-              .width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
-          }
-        }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-        .padding(15)
-        .backgroundColor(AppTheme.SURFACE)
-        .border({ width: 1, color: AppTheme.BORDER })
-        .borderRadius(AppTheme.CONTROL_RADIUS);
-
-        if (this.editingAssignmentId === this.assignment()!.id) {
-          ParentAssignmentEditPanel({
-            item: this.assignment()!,
-            saving: this.editSaving,
-            onCancel: () => this.cancelEditing(),
-            onSave: (assignment: Assignment) => { void this.saveAssignmentEdit(assignment); }
-          });
-          if (this.editNotice.length > 0) {
-            Text(this.editNotice)
-              .width('100%')
-              .fontSize(12)
-              .fontColor(AppTheme.DANGER);
-          }
-        }
-
-        if (this.operationNotice.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
-          Text(this.operationNotice)
-            .width('100%')
-            .fontSize(12)
-            .fontColor(AppTheme.SUCCESS)
-            .padding({ left: 12, right: 12, top: 9, bottom: 9 })
-            .backgroundColor(AppTheme.SUCCESS_SOFT)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
-        }
-
-        this.EvidenceSection();
-
-        if (this.assignment()!.status === AssignmentStatus.SUBMITTED) {
-          this.ReviewActions(this.assignment()!);
+    Column() {
+        if (this.assignment() === null) {
+          this.EmptyState();
         } else {
-          Text(this.assignment()!.status === AssignmentStatus.COMPLETED ? '这项作业已通过验收。' : '当前状态无需家长验收。')
+          Column({ space: 12 }) {
+            Column({ space: 8 }) {
+              Row() {
+                Text(this.assignment()!.subject).fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+                Blank();
+                Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(12).fontColor(AppTheme.SUBTEXT);
+              }
+              .width('100%');
+              Text(this.assignment()!.title).width('100%').fontSize(21).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Row({ space: 8 }) {
+                Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
+                  .fontSize(12).fontColor(AppTheme.SUBTEXT);
+                Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+                Text(this.actualMinutes(this.assignment()!) > 0 ?
+                  `实际 ${this.actualMinutes(this.assignment()!)} 分钟` : `预计 ${this.assignment()!.expectedMinutes} 分钟`)
+                  .fontSize(12).fontColor(AppTheme.SUBTEXT);
+              }
+              .width('100%');
+
+              if (this.canEdit(this.assignment()!) && this.editingAssignmentId !== this.assignment()!.id) {
+                Row() {
+                  Text('编辑任务')
+                    .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                    .fontSize(13)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.PRIMARY)
+                    .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+                    .backgroundColor(AppTheme.PRIMARY_SOFT)
+                    .borderRadius(AppTheme.CONTROL_RADIUS)
+                    .accessibilityRole(AccessibilityRoleType.BUTTON)
+                    .accessibilityText('编辑这项作业')
+                    .onClick(() => this.startEditing(this.assignment()!));
+                  Blank();
+                }
+                .width('100%');
+              }
+              if (this.assignment()!.reviewNote.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
+                Text(`家长备注：${this.assignment()!.reviewNote}`)
+                  .width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+              }
+            }
             .width('100%')
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT)
-            .padding(14)
-            .backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .alignItems(HorizontalAlign.Start)
+            .padding(15)
+            .backgroundColor(AppTheme.SURFACE)
+            .border({ width: 1, color: AppTheme.BORDER })
             .borderRadius(AppTheme.CONTROL_RADIUS);
+
+            if (this.operationNotice.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
+              Text(this.operationNotice)
+                .width('100%')
+                .fontSize(12)
+                .fontColor(AppTheme.SUCCESS)
+                .padding({ left: 12, right: 12, top: 9, bottom: 9 })
+                .backgroundColor(AppTheme.SUCCESS_SOFT)
+                .borderRadius(AppTheme.CONTROL_RADIUS);
+            }
+
+            this.EvidenceSection();
+
+            if (this.assignment()!.status === AssignmentStatus.SUBMITTED) {
+              this.ReviewActions(this.assignment()!);
+            } else {
+              Text(this.assignment()!.status === AssignmentStatus.COMPLETED ? '这项作业已通过验收。' : '当前状态无需家长验收。')
+                .width('100%')
+                .fontSize(13)
+                .fontColor(AppTheme.SUBTEXT)
+                .padding(14)
+                .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                .borderRadius(AppTheme.CONTROL_RADIUS);
+            }
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Start);
         }
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start);
+
     }
+    .width('100%')
+    .bindSheet($$this.showEditSheet, this.AssignmentEditorSheet(), {
+      height: '82%',
+      showClose: false,
+      preferType: SheetType.BOTTOM
+    });
   }
 }
