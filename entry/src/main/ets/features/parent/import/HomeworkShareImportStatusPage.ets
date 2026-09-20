@@ -105,14 +105,22 @@ export struct HomeworkShareImportStatusPage {
           .onClick(() => this.onOpenInbox());
       }
 
-      if (this.phase !== ShareImportPhase.PROCESSING) {
-        Button('取消', { type: ButtonType.Normal })
+      if (this.phase === ShareImportPhase.FAILED) {
+        Button('取消导入', { type: ButtonType.Normal })
           .width('100%')
           .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .backgroundColor(AppTheme.SURFACE_EMPHASIS)
           .fontColor(AppTheme.TEXT)
           .onClick(() => { void this.cancel(); });
+      } else if (this.phase === ShareImportPhase.EMPTY) {
+        Button('完成', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .onClick(() => this.onCancel());
       }
 
       Text('分享内容只有在全部读取和整理成功后才会写入导入批次；失败重试不会生成半成品作业。')
