@@ -927,7 +927,7 @@
           "id": "CHINESE-G2-S1-WORDS-001-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
-          "stem": "下面哪个量词搭配最合适？",
+          "stem": "给“山”选择合适的量词，下面哪一个正确？",
           "options": [
             {
               "key": "A",
