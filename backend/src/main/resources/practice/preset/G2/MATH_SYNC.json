@@ -6,7 +6,7 @@
   "papers": [
     {
       "id": "MATH-G2-S1-SYNC-ADD-SUB-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "MATH",
       "semester": "S1",
@@ -25,7 +25,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q01",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q01-V2",
           "orderNo": 1,
           "type": "NUMBER",
           "stem": "班级图书角上午有37本书，下午又放进去28本，现在有多少本？",
@@ -41,7 +41,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q02",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q02-V2",
           "orderNo": 2,
           "type": "NUMBER",
           "stem": "公交站原来有62人在等车，一辆车接走了27人，还剩多少人？",
@@ -57,7 +57,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q03",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q03-V2",
           "orderNo": 3,
           "type": "NUMBER",
           "stem": "小宇有46张卡片，朋友送给他19张，现在有多少张？",
@@ -73,7 +73,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q04",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q04-V2",
           "orderNo": 4,
           "type": "NUMBER",
           "stem": "社区活动准备了80瓶水，发出去36瓶，还剩多少瓶？",
@@ -89,7 +89,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q05",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q05-V2",
           "orderNo": 5,
           "type": "NUMBER",
           "stem": "文具店上午卖出18本练习本，下午卖出27本，一共卖出多少本？",
@@ -105,7 +105,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q06",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q06-V2",
           "orderNo": 6,
           "type": "NUMBER",
           "stem": "学校花坛有73盆花，搬走25盆后还有多少盆？",
@@ -121,7 +121,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q07",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q07-V2",
           "orderNo": 7,
           "type": "NUMBER",
           "stem": "运动会一班得了24分，二班得了31分，两班一共多少分？",
@@ -137,7 +137,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q08",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q08-V2",
           "orderNo": 8,
           "type": "NUMBER",
           "stem": "小区停车位有90个，已经停了58辆车，还空多少个位置？",
@@ -153,7 +153,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q09",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q09-V2",
           "orderNo": 9,
           "type": "NUMBER",
           "stem": "早餐店准备了35个包子，又蒸了26个，一共有多少个？",
@@ -169,7 +169,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q10",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q10-V2",
           "orderNo": 10,
           "type": "NUMBER",
           "stem": "图书馆有84个座位，已经坐了49人，还剩多少个空座位？",
@@ -185,7 +185,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q11",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q11-V2",
           "orderNo": 11,
           "type": "NUMBER",
           "stem": "美术课有25张蓝纸和38张黄纸，一共有多少张？",
@@ -201,7 +201,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q12",
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q12-V2",
           "orderNo": 12,
           "type": "NUMBER",
           "stem": "小明有70元零花钱，买文具用了23元，还剩多少元？",
@@ -220,7 +220,7 @@
     },
     {
       "id": "MATH-G2-S1-SYNC-MEASURE-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "MATH",
       "semester": "S1",
@@ -239,7 +239,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q01",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "测量一支铅笔的长度，用哪个单位更合适？",
@@ -268,25 +268,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q02",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "测量教室门的高度，用哪个单位更合适？",
           "options": [
             {
               "key": "A",
-              "label": "米"
+              "label": "厘米"
             },
             {
               "key": "B",
-              "label": "厘米"
+              "label": "米"
             },
             {
               "key": "C",
               "label": "毫米"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -297,25 +297,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q03",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "1米等于多少厘米？",
           "options": [
             {
               "key": "A",
-              "label": "100厘米"
-            },
-            {
-              "key": "B",
               "label": "10厘米"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "50厘米"
+            },
+            {
+              "key": "C",
+              "label": "100厘米"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -326,7 +326,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q04",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "一把尺子长20厘米，两把一样长的尺子首尾相接，共多长？",
@@ -355,25 +355,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q05",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "一条彩带长75厘米，剪去30厘米，还剩多少厘米？",
           "options": [
             {
               "key": "A",
-              "label": "45厘米"
+              "label": "35厘米"
             },
             {
               "key": "B",
-              "label": "35厘米"
+              "label": "45厘米"
             },
             {
               "key": "C",
               "label": "55厘米"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -384,25 +384,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q06",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "小桌子高约60厘米，下面哪个估计最合理？",
           "options": [
             {
               "key": "A",
-              "label": "60厘米"
-            },
-            {
-              "key": "B",
               "label": "60米"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "6千米"
+            },
+            {
+              "key": "C",
+              "label": "60厘米"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -413,7 +413,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q07",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "一根1米长的绳子用去20厘米，还剩多少厘米？",
@@ -442,25 +442,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q08",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "小朋友一步大约50厘米，下面哪个说法更合理？",
           "options": [
             {
               "key": "A",
-              "label": "两步大约1米"
+              "label": "两步大约10米"
             },
             {
               "key": "B",
-              "label": "两步大约10米"
+              "label": "两步大约1米"
             },
             {
               "key": "C",
               "label": "两步大约10厘米"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -471,25 +471,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q09",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "书桌长90厘米，书架长70厘米，书桌比书架长多少厘米？",
           "options": [
             {
               "key": "A",
-              "label": "20厘米"
-            },
-            {
-              "key": "B",
               "label": "160厘米"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "30厘米"
+            },
+            {
+              "key": "C",
+              "label": "20厘米"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -500,7 +500,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q10",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "从0刻度开始量，一块橡皮的末端在5厘米处，这块橡皮长多少？",
@@ -529,25 +529,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q11",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "走廊长约20什么？",
           "options": [
             {
               "key": "A",
-              "label": "米"
+              "label": "厘米"
             },
             {
               "key": "B",
-              "label": "厘米"
+              "label": "米"
             },
             {
               "key": "C",
               "label": "毫米"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -558,25 +558,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q12",
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "一根绳子长35厘米，另一根长45厘米，两根合起来多长？",
           "options": [
             {
               "key": "A",
-              "label": "80厘米"
-            },
-            {
-              "key": "B",
               "label": "10厘米"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "70厘米"
+            },
+            {
+              "key": "C",
+              "label": "80厘米"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -590,7 +590,7 @@
     },
     {
       "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "MATH",
       "semester": "S1",
@@ -609,7 +609,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q01",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "4个小组，每组3人，一共有多少人？",
@@ -638,25 +638,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q02",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "3盒彩笔，每盒5支，“3个5”可以写成？",
           "options": [
             {
               "key": "A",
-              "label": "3×5"
+              "label": "3+5"
             },
             {
               "key": "B",
-              "label": "3+5"
+              "label": "3×5"
             },
             {
               "key": "C",
               "label": "5-3"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -667,25 +667,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q03",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "2+2+2+2+2表示几个2？",
           "options": [
             {
               "key": "A",
-              "label": "5个2"
-            },
-            {
-              "key": "B",
               "label": "2个5"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "7个2"
+            },
+            {
+              "key": "C",
+              "label": "5个2"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -696,7 +696,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q04",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "6张桌子，每张桌子放2把椅子，一共有多少把？",
@@ -725,25 +725,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q05",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "5个盘子，每盘4个橘子，正确算式是？",
           "options": [
             {
               "key": "A",
-              "label": "5×4"
+              "label": "5+4"
             },
             {
               "key": "B",
-              "label": "5+4"
+              "label": "5×4"
             },
             {
               "key": "C",
               "label": "5-4"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -754,25 +754,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q06",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "3排座位，每排6个，表示？",
           "options": [
             {
               "key": "A",
-              "label": "3个6"
-            },
-            {
-              "key": "B",
               "label": "6减3"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "3和6相加一次"
+            },
+            {
+              "key": "C",
+              "label": "3个6"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -783,7 +783,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q07",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "4+4+4可以写成哪道乘法算式？",
@@ -812,25 +812,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q08",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "每个笔筒放3支笔，7个笔筒一共多少支？",
           "options": [
             {
               "key": "A",
-              "label": "21"
+              "label": "10"
             },
             {
               "key": "B",
-              "label": "10"
+              "label": "21"
             },
             {
               "key": "C",
               "label": "14"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -841,25 +841,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q09",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "2辆小车，每辆坐4人，一共多少人？",
           "options": [
             {
               "key": "A",
-              "label": "8"
-            },
-            {
-              "key": "B",
               "label": "6"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "4"
+            },
+            {
+              "key": "C",
+              "label": "8"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -870,7 +870,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q10",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "“6个3”表示下面哪一种情境？",
@@ -899,25 +899,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q11",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "每行5盆花，有4行，一共有多少盆？",
           "options": [
             {
               "key": "A",
-              "label": "20"
+              "label": "9"
             },
             {
               "key": "B",
-              "label": "9"
+              "label": "20"
             },
             {
               "key": "C",
               "label": "15"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -928,25 +928,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q12",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "一周上5天课，2周一共上多少天课？",
           "options": [
             {
               "key": "A",
-              "label": "10"
-            },
-            {
-              "key": "B",
               "label": "7"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "5"
+            },
+            {
+              "key": "C",
+              "label": "10"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -960,7 +960,7 @@
     },
     {
       "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "MATH",
       "semester": "S1",
@@ -979,7 +979,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q01",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q01-V2",
           "orderNo": 1,
           "type": "NUMBER",
           "stem": "每盒彩笔6支，买2盒，一共有多少支？",
@@ -995,7 +995,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q02",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q02-V2",
           "orderNo": 2,
           "type": "NUMBER",
           "stem": "操场摆了3排小旗，每排4面，一共有多少面？",
@@ -1011,7 +1011,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q03",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q03-V2",
           "orderNo": 3,
           "type": "NUMBER",
           "stem": "每组5人，有4组，一共有多少人？",
@@ -1027,7 +1027,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q04",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q04-V2",
           "orderNo": 4,
           "type": "NUMBER",
           "stem": "每盒彩笔6支，买5盒，一共有多少支？",
@@ -1043,7 +1043,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q05",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q05-V2",
           "orderNo": 5,
           "type": "NUMBER",
           "stem": "操场摆了6排小旗，每排7面，一共有多少面？",
@@ -1059,7 +1059,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q06",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q06-V2",
           "orderNo": 6,
           "type": "NUMBER",
           "stem": "每组4人，有7组，一共有多少人？",
@@ -1075,7 +1075,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q07",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q07-V2",
           "orderNo": 7,
           "type": "NUMBER",
           "stem": "每盒彩笔5支，买8盒，一共有多少支？",
@@ -1091,7 +1091,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q08",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q08-V2",
           "orderNo": 8,
           "type": "NUMBER",
           "stem": "操场摆了9排小旗，每排3面，一共有多少面？",
@@ -1107,7 +1107,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q09",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q09-V2",
           "orderNo": 9,
           "type": "NUMBER",
           "stem": "每组8人，有6组，一共有多少人？",
@@ -1123,7 +1123,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q10",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q10-V2",
           "orderNo": 10,
           "type": "NUMBER",
           "stem": "每盒彩笔7支，买7盒，一共有多少支？",
@@ -1139,7 +1139,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q11",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q11-V2",
           "orderNo": 11,
           "type": "NUMBER",
           "stem": "操场摆了8排小旗，每排4面，一共有多少面？",
@@ -1155,7 +1155,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q12",
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q12-V2",
           "orderNo": 12,
           "type": "NUMBER",
           "stem": "每组6人，有9组，一共有多少人？",
@@ -1174,7 +1174,7 @@
     },
     {
       "id": "MATH-G2-S1-SYNC-DIVISION-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "MATH",
       "semester": "S1",
@@ -1193,7 +1193,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q01",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q01-V2",
           "orderNo": 1,
           "type": "NUMBER",
           "stem": "12个橘子平均放进3个盘子，每盘几个？",
@@ -1209,7 +1209,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q02",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q02-V2",
           "orderNo": 2,
           "type": "NUMBER",
           "stem": "20本书平均放到4层书架，每层几本？",
@@ -1225,7 +1225,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q03",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q03-V2",
           "orderNo": 3,
           "type": "NUMBER",
           "stem": "18颗糖平均分给6个小朋友，每人几颗？",
@@ -1241,7 +1241,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q04",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q04-V2",
           "orderNo": 4,
           "type": "NUMBER",
           "stem": "24支铅笔，每4支装一盒，可以装几盒？",
@@ -1257,7 +1257,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q05",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q05-V2",
           "orderNo": 5,
           "type": "NUMBER",
           "stem": "30个气球，每5个扎一束，可以扎几束？",
@@ -1273,7 +1273,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q06",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q06-V2",
           "orderNo": 6,
           "type": "NUMBER",
           "stem": "21名同学，每3人一组，可以分几组？",
@@ -1289,7 +1289,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q07",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q07-V2",
           "orderNo": 7,
           "type": "NUMBER",
           "stem": "32张卡片，每8张一份，可以分几份？",
@@ -1305,7 +1305,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q08",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q08-V2",
           "orderNo": 8,
           "type": "NUMBER",
           "stem": "27朵花平均插进9个花瓶，每瓶几朵？",
@@ -1321,7 +1321,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q09",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q09-V2",
           "orderNo": 9,
           "type": "NUMBER",
           "stem": "16块积木平均分给2个孩子，每人几块？",
@@ -1337,7 +1337,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q10",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q10-V2",
           "orderNo": 10,
           "type": "NUMBER",
           "stem": "36本绘本平均放在6个盒子里，每盒几本？",
@@ -1353,7 +1353,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q11",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q11-V2",
           "orderNo": 11,
           "type": "NUMBER",
           "stem": "40个乒乓球，每5个装一袋，可以装几袋？",
@@ -1369,7 +1369,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q12",
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q12-V2",
           "orderNo": 12,
           "type": "NUMBER",
           "stem": "28人平均分成7组，每组几人？",
@@ -1388,7 +1388,7 @@
     },
     {
       "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "MATH",
       "semester": "S1",
@@ -1407,7 +1407,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q01",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q01-V2",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "推拉抽屉时，抽屉主要做什么运动？",
@@ -1436,25 +1436,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q02",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q02-V2",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "风扇叶片转动主要是什么运动？",
           "options": [
             {
               "key": "A",
-              "label": "旋转"
+              "label": "平移"
             },
             {
               "key": "B",
-              "label": "平移"
+              "label": "旋转"
             },
             {
               "key": "C",
               "label": "直线行走"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -1465,25 +1465,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q03",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q03-V2",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "把一张纸对折后剪一个小三角，再打开，左右两边图案通常有什么特点？",
           "options": [
             {
               "key": "A",
-              "label": "比较对称"
-            },
-            {
-              "key": "B",
               "label": "完全没有关系"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "一边一定比另一边大很多"
+            },
+            {
+              "key": "C",
+              "label": "比较对称"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -1494,7 +1494,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q04",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q04-V2",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "电梯从1楼上到5楼，主要可以看成什么运动？",
@@ -1523,25 +1523,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q05",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q05-V2",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "钟表的分针绕中心转动，属于？",
           "options": [
             {
               "key": "A",
-              "label": "旋转"
+              "label": "平移"
             },
             {
               "key": "B",
-              "label": "平移"
+              "label": "旋转"
             },
             {
               "key": "C",
               "label": "静止"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -1552,25 +1552,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q06",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q06-V2",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "每排6把椅子，4排一共有多少把？",
           "options": [
             {
               "key": "A",
-              "label": "24"
-            },
-            {
-              "key": "B",
               "label": "10"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "20"
+            },
+            {
+              "key": "C",
+              "label": "24"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -1581,7 +1581,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q07",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q07-V2",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "24个同学每4人一组，可以分成几组？",
@@ -1610,25 +1610,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q08",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q08-V2",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "5盒彩泥，每盒7块，一共有多少块？",
           "options": [
             {
               "key": "A",
-              "label": "35"
+              "label": "12"
             },
             {
               "key": "B",
-              "label": "12"
+              "label": "35"
             },
             {
               "key": "C",
               "label": "30"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -1639,25 +1639,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q09",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q09-V2",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "36本书平均分给6个小组，每组几本？",
           "options": [
             {
               "key": "A",
-              "label": "6"
-            },
-            {
-              "key": "B",
               "label": "5"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "7"
+            },
+            {
+              "key": "C",
+              "label": "6"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -1668,7 +1668,7 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q10",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q10-V2",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "一个正方形纸片沿中线对折，两边能重合，说明它具有？",
@@ -1697,25 +1697,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q11",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q11-V2",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "每辆小车坐4人，8辆车最多坐多少人？",
           "options": [
             {
               "key": "A",
-              "label": "32"
+              "label": "12"
             },
             {
               "key": "B",
-              "label": "12"
+              "label": "32"
             },
             {
               "key": "C",
               "label": "24"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
@@ -1726,25 +1726,25 @@
           ]
         },
         {
-          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q12",
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q12-V2",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "42个球，每7个放一筐，需要几筐？",
           "options": [
             {
               "key": "A",
-              "label": "6"
-            },
-            {
-              "key": "B",
               "label": "5"
             },
             {
-              "key": "C",
+              "key": "B",
               "label": "7"
+            },
+            {
+              "key": "C",
+              "label": "6"
             }
           ],
-          "answerSpec": "A",
+          "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
             "先找出题目中的数量关系或关键信息。"
