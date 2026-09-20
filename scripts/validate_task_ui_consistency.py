@@ -90,7 +90,7 @@ require("EditSheetHeader({" in confirmation_components and "Text('关闭')" in s
         "confirmDiscard" in confirmation_components,
         "candidate edit sheet must reuse the shared close-only header and protect dirty edits")
 candidate_actions = confirmation_components.split("private BottomActions()", 1)[1].split("build()", 1)[0]
-require("Button('删除'" in candidate_actions and "Button('完成'" in candidate_actions,
+require("Button('删除'" in candidate_actions and "Button('保存'" in candidate_actions,
         "candidate editor business actions must stay in its bottom action area")
 
 if errors:
