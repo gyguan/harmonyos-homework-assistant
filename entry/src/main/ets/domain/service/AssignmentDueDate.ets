@@ -98,7 +98,7 @@ export class AssignmentDueDate {
     if (text.length === 0) return -1;
 
     let today = AssignmentDueDate.businessDayStart(nowEpochMs);
-    if (text.indexOf('今天') >= 0 || text.indexOf('今日') >= 0 || text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0) {
+    if (text.indexOf('今天') >= 0 || text.indexOf('今日') >= 0 || text.indexOf('今晚') >= 0) {
       return today;
     }
     if (text.indexOf('明天') >= 0 || text.indexOf('明日') >= 0) return AssignmentDueDate.addBusinessDays(today, 1);
@@ -133,6 +133,10 @@ export class AssignmentDueDate {
       let now = AssignmentDueDate.businessDateParts(nowEpochMs);
       return AssignmentDueDate.dateStart(now.year, Number(numericMonthDay[2]), Number(numericMonthDay[3]));
     }
+
+    // A standalone evening time means today, but relative/explicit dates above must win first.
+    // This keeps “明天晚上 8 点” and “后天晚上 8 点” on their intended business day.
+    if (text.indexOf('晚上') >= 0) return today;
     return -1;
   }
 
