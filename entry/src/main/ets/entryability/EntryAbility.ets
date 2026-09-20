@@ -7,10 +7,12 @@ import { RemoteSubmissionApi } from '../application/remote/RemoteSubmissionApi';
 import { VoiceAssignmentMediaService } from '../application/assignment/VoiceAssignmentMediaService';
 import { HomeworkSubmissionService } from '../application/submission/HomeworkSubmissionService';
 import { HomeworkLocalBootstrap } from '../data/local/HomeworkLocalBootstrap';
+import { HomeworkImportInboxBootstrap } from '../data/local/HomeworkImportInboxBootstrap';
 import { CoreVisionHomeworkTextExtractor } from '../infrastructure/ai/CoreVisionHomeworkTextExtractor';
 import { LocalHomeworkAssignmentParser } from '../infrastructure/ai/LocalHomeworkAssignmentParser';
 import { PreferencesBackendSessionStorage } from '../infrastructure/persistence/PreferencesBackendSessionStorage';
 import { PreferencesHomeworkPersistence } from '../infrastructure/persistence/PreferencesHomeworkPersistence';
+import { PreferencesHomeworkImportInboxPersistence } from '../infrastructure/persistence/PreferencesHomeworkImportInboxPersistence';
 
 export default class EntryAbility extends UIAbility {
   private loadMainPage(windowStage: window.WindowStage): void {
@@ -40,6 +42,13 @@ export default class EntryAbility extends UIAbility {
       await HomeworkLocalBootstrap.instance.initialize(new PreferencesHomeworkPersistence(this.context));
     } catch {
       console.error('Homework store initialization failed; continuing with in-memory state');
+    }
+
+    try {
+      await HomeworkImportInboxBootstrap.instance.initialize(
+        new PreferencesHomeworkImportInboxPersistence(this.context));
+    } catch {
+      console.error('Homework import inbox initialization failed; continuing with in-memory inbox');
     }
 
     this.loadMainPage(windowStage);
