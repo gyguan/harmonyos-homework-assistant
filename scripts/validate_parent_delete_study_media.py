@@ -50,7 +50,7 @@ for token in [
     "@State private bulkMode",
     "@State private selectedDeleteIds",
     "private selectAllDeletable()",
-    "private deleteSelectedAssignments()",
+    "private async deleteSelectedAssignments(): Promise<void>",
     "this.viewModel.deleteAssignments(ids)",
     "全选当前",
     "确认删除",
