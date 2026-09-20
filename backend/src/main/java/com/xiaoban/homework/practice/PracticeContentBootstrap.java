@@ -132,6 +132,9 @@ public class PracticeContentBootstrap implements ApplicationRunner {
       question.explanation = item.explanation();
       question.hintsJson = json(item.hints());
       question.tagsJson = json(item.tags());
+      question.visualSpecJson = json(item.visualSpec() == null
+          ? new PracticeContentCatalog.VisualSpec("NONE", "", "", "")
+          : item.visualSpec());
       result.add(question);
     }
     return result;
