@@ -124,6 +124,7 @@ def main() -> int:
     subject_track_counts: dict[tuple[str, str], int] = defaultdict(int)
     global_question_ids: set[str] = set()
     paper_keys: set[str] = set()
+    answer_distribution: dict[str, int] = defaultdict(int)
 
     for relative in sorted(EXPECTED_FILES):
         path = PRESET_ROOT / relative
@@ -159,6 +160,8 @@ def main() -> int:
                     require(signature not in stems, f"{key} contains duplicate stem")
                     stems.add(signature)
                     validate_question(paper, question, index, global_question_ids)
+                    if question.get("type") == "SINGLE_CHOICE":
+                        answer_distribution[str(question.get("answerSpec", "")).strip().upper()] += 1
                 else:
                     errors.append(f"{key}.questions[{index}] must be object")
 
@@ -170,6 +173,15 @@ def main() -> int:
                 f"{subject} must contain 6 textbook-sync papers")
         require(subject_track_counts[(subject, "EXTRACURRICULAR")] == 3,
                 f"{subject} must contain 3 extracurricular papers")
+
+    choice_total = sum(answer_distribution.values())
+    require(choice_total == 276, f"expected 276 single-choice questions, got {choice_total}")
+    require(set(answer_distribution) == {"A", "B", "C"},
+            f"single-choice answers must use A/B/C, got {dict(answer_distribution)}")
+    if answer_distribution:
+        spread = max(answer_distribution.values()) - min(answer_distribution.values())
+        require(spread <= 1,
+                f"single-choice answer positions must be balanced, got {dict(answer_distribution)}")
 
     math_papers = [p for p in papers if p.get("subject") == "MATH"]
     math_forbidden = [
