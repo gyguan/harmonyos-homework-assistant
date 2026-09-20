@@ -58,6 +58,7 @@ export class RemoteAssignmentResourceApi {
   static readonly instance: RemoteAssignmentResourceApi = new RemoteAssignmentResourceApi();
   private context: common.UIAbilityContext | null = null;
   private cache: Map<string, string> = new Map<string, string>();
+  private pendingDownloads: Map<string, Promise<string>> = new Map<string, Promise<string>>();
 
   private constructor() {}
 
@@ -83,7 +84,7 @@ export class RemoteAssignmentResourceApi {
     if (this.context === null) throw new Error('语音作业服务尚未初始化');
     if (!BackendSession.instance.isConnected()) throw new Error('当前离线，联网后才能发布语音作业');
     if (audioUri.length === 0) throw new Error('请选择语音文件');
-    if (imageUris.length === 0 || imageUris.length > 9) throw new Error('请选择 1～9 张情景图片');
+    if (imageUris.length === 0) throw new Error('请至少选择 1 张情景图片');
 
     let payload = await this.buildMultipartPayload(assignment, audioUri, imageUris);
     let client = http.createHttp();
@@ -122,6 +123,20 @@ export class RemoteAssignmentResourceApi {
   async download(resource: AssignmentResource): Promise<string> {
     let cached = this.cache.get(resource.id);
     if (cached !== undefined && cached.length > 0) return cached;
+
+    let pending = this.pendingDownloads.get(resource.id);
+    if (pending !== undefined) return await pending;
+
+    let task = this.downloadUncached(resource);
+    this.pendingDownloads.set(resource.id, task);
+    try {
+      return await task;
+    } finally {
+      this.pendingDownloads.delete(resource.id);
+    }
+  }
+
+  private async downloadUncached(resource: AssignmentResource): Promise<string> {
     if (this.context === null || !BackendSession.instance.isConnected()) return '';
 
     let client = http.createHttp();
