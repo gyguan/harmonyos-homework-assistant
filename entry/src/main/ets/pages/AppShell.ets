@@ -31,6 +31,7 @@ import { StudentAssignmentsPage } from '../features/student/assignments/StudentA
 import { StudentHomePage } from '../features/student/home/StudentHomePage';
 import { StudentProfilePage } from '../features/student/profile/StudentProfilePage';
 import { PracticeHomePage } from '../features/student/practice/PracticeHomePage';
+import { PracticeHistoryPage } from '../features/student/practice/PracticeHistoryPage';
 import { PracticeAttemptPage } from '../features/student/practice/PracticeAttemptPage';
 import { PracticePaperDetailPage } from '../features/student/practice/PracticePaperDetailPage';
 import { PracticeResultPage } from '../features/student/practice/PracticeResultPage';
@@ -174,6 +175,10 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.STUDENT_STUDY, new AssignmentRouteParam(assignmentId));
   }
 
+  private openPracticeHistory(): void {
+    this.navPathStack.pushPathByName(AppRoute.STUDENT_PRACTICE_HISTORY, {});
+  }
+
   private openPracticePaper(paperId: string, version: number): void {
     this.navPathStack.pushPathByName(
       AppRoute.STUDENT_PRACTICE_PAPER, new PracticePaperRouteParam(paperId, version));
@@ -232,7 +237,8 @@ export struct AppShell {
     } else if (this.studentRoute === StudentRoute.PRACTICE) {
       PracticeHomePage({
         revision: this.storeRevision,
-        onOpenPaper: (paperId: string, version: number) => this.openPracticePaper(paperId, version)
+        onOpenPaper: (paperId: string, version: number) => this.openPracticePaper(paperId, version),
+        onOpenHistory: () => this.openPracticeHistory()
       });
     } else if (this.studentRoute === StudentRoute.PROFILE) {
       StudentProfilePage({
@@ -271,6 +277,16 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.STUDENT_PRACTICE_HISTORY) {
+      NavDestination() {
+        PracticeHistoryPage({
+          onBack: () => this.navPathStack.pop(),
+          onOpenAttempt: (attemptId: string) => this.openPracticeAttempt(attemptId),
+          onOpenResult: (attemptId: string) => this.openPracticeResult(attemptId)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.STUDENT_PRACTICE_PAPER) {
       NavDestination() {
         PracticePaperDetailPage({
@@ -296,7 +312,8 @@ export struct AppShell {
       NavDestination() {
         PracticeResultPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
-          onDone: () => this.finishPracticeResult()
+          onDone: () => this.finishPracticeResult(),
+          onRepeatStarted: (attemptId: string) => this.openPracticeAttempt(attemptId)
         });
       }
       .hideTitleBar(true)
