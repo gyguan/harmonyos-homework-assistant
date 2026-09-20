@@ -27,6 +27,7 @@ deadline = read("entry/src/main/ets/components/assignment/DeadlinePickerField.et
 sheet_header = read("entry/src/main/ets/components/navigation/EditSheetHeader.ets")
 shared_editor = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 change_detector = read("entry/src/main/ets/common/state/AssignmentEditChangeDetector.ets")
+confirmation_vm = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationViewModel.ets")
 
 # AI result cards: duration presets remain on one horizontal line and card height stays compact.
 require("CandidateDurationControl" in components and "Scroll() {" in components and
@@ -88,6 +89,27 @@ require("Button('保存'" in candidate_actions and "saveAndClose()" in candidate
 require("private CandidateListHeader()" in page and "Text('＋ 新增')" in page and
         "Button('＋ 手工新增一项'" not in page,
         "manual add must live in the candidate list header")
+
+manual_add = page.split("private addCandidate(): void", 1)[1].split("private removeCandidate", 1)[0]
+save_candidate = page.split("private saveCandidate(candidate: CandidateAssignment): boolean", 1)[1].split(
+    "private setExpectedMinutes", 1)[0]
+require("@State private manualCandidateDraft: CandidateAssignment | null = null;" in page and
+        "createManualCandidateDraft()" in manual_add and
+        "this.manualCandidateDraft = candidate;" in manual_add and
+        "this.viewModel.addCandidate(candidate)" not in manual_add,
+        "manual add must open a transient draft without persisting it")
+require("this.viewModel.addCandidate(candidate)" in save_candidate and
+        "this.viewModel.updateCandidate(candidate)" in save_candidate,
+        "candidate persistence must happen only through the explicit Save action")
+require("this.manualCandidateDraft = null;" in page and
+        "onDisappear: () => this.completeEditorDismiss()" in page,
+        "closing or discarding a manual candidate must clear only the transient draft after sheet dismissal")
+require("createManualCandidateDraft(): CandidateAssignment" in confirmation_vm and
+        "addCandidate(candidate: CandidateAssignment): boolean" in confirmation_vm,
+        "confirmation ViewModel must separate draft creation from candidate persistence")
+require("onSave: (candidate: CandidateAssignment) => boolean" in components and
+        "if (!this.onSave(this.buildCandidate())) return;" in components,
+        "candidate editor must remain open if Save fails")
 
 # AI organized tasks support batch selection, select-all, confirmation, and deletion.
 for token in [
