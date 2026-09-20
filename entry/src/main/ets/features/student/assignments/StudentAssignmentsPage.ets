@@ -37,6 +37,7 @@ export struct StudentAssignmentsPage {
   @State private completedAssignments: Assignment[] = [];
   @State private visibleTotal: number = 0;
   @State private totalCount: number = 0;
+  @State private snapshotRevision: number = -1;
 
   onOpenDetail: (assignmentId: string) => void = (_assignmentId: string) => {};
   onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
@@ -122,11 +123,76 @@ export struct StudentAssignmentsPage {
     }
 
     this.visibleTotal = items.length;
+    this.snapshotRevision = this.revision;
     this.needHandlingAssignments = needHandling;
     this.notStartedAssignments = notStarted;
     this.submittedAssignments = submitted;
     this.completedAssignments = completed;
     this.syncSelectedAssignment(items);
+  }
+
+  private currentVisibleAssignments(): Assignment[] {
+    if (this.snapshotRevision === this.revision) {
+      let items: Assignment[] = [];
+      for (let item of this.needHandlingAssignments) items.push(item);
+      for (let item of this.notStartedAssignments) items.push(item);
+      for (let item of this.submittedAssignments) items.push(item);
+      for (let item of this.completedAssignments) items.push(item);
+      return items;
+    }
+    if (this.calendarMode && this.dateFilter === AssignmentDateFilter.CUSTOM) {
+      return this.viewModel.assignmentsOnDay(
+        this.typeFilter, this.subjectCode, this.selectedCalendarDayEpochMs);
+    }
+    return this.viewModel.assignments(this.typeFilter, this.subjectCode, this.dateFilter);
+  }
+
+  private currentNeedHandlingAssignments(): Assignment[] {
+    if (this.snapshotRevision === this.revision) return this.needHandlingAssignments;
+    let result: Assignment[] = [];
+    for (let item of this.currentVisibleAssignments()) {
+      if (item.status === AssignmentStatus.IN_PROGRESS || item.status === AssignmentStatus.PAUSED ||
+        item.status === AssignmentStatus.NEEDS_REWORK || item.status === AssignmentStatus.OVERDUE ||
+        item.status === AssignmentStatus.READY_TO_SUBMIT) result.push(item);
+    }
+    return result;
+  }
+
+  private currentNotStartedAssignments(): Assignment[] {
+    if (this.snapshotRevision === this.revision) return this.notStartedAssignments;
+    let result: Assignment[] = [];
+    for (let item of this.currentVisibleAssignments()) {
+      if (item.status === AssignmentStatus.NOT_STARTED) result.push(item);
+    }
+    return result;
+  }
+
+  private currentSubmittedAssignments(): Assignment[] {
+    if (this.snapshotRevision === this.revision) return this.submittedAssignments;
+    let result: Assignment[] = [];
+    for (let item of this.currentVisibleAssignments()) {
+      if (item.status === AssignmentStatus.SUBMITTED) result.push(item);
+    }
+    return result;
+  }
+
+  private currentCompletedAssignments(): Assignment[] {
+    if (this.snapshotRevision === this.revision) return this.completedAssignments;
+    let result: Assignment[] = [];
+    for (let item of this.currentVisibleAssignments()) {
+      if (item.status === AssignmentStatus.COMPLETED) result.push(item);
+    }
+    return result;
+  }
+
+  private currentVisibleTotal(): number {
+    if (this.snapshotRevision === this.revision) return this.visibleTotal;
+    return this.currentVisibleAssignments().length;
+  }
+
+  private currentTotalCount(): number {
+    if (this.snapshotRevision === this.revision) return this.totalCount;
+    return this.viewModel.allCount();
   }
 
   private syncSelectedAssignment(items: Assignment[]): void {
@@ -287,7 +353,7 @@ export struct StudentAssignmentsPage {
 
   @Builder
   private NeedHandlingSection() {
-    if (this.needHandlingAssignments.length > 0) {
+    if (this.currentNeedHandlingAssignments().length > 0) {
       Column({ space: 9 }) {
         Row() {
           Column({ space: 2 }) {
@@ -296,13 +362,13 @@ export struct StudentAssignmentsPage {
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
-          Text(`${this.needHandlingAssignments.length}`)
+          Text(`${this.currentNeedHandlingAssignments().length}`)
             .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%');
         Column({ space: 6 }) {
-          ForEach(this.needHandlingAssignments, (item: Assignment) => {
+          ForEach(this.currentNeedHandlingAssignments(), (item: Assignment) => {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
@@ -319,7 +385,7 @@ export struct StudentAssignmentsPage {
 
   @Builder
   private NotStartedSection() {
-    if (this.notStartedAssignments.length > 0) {
+    if (this.currentNotStartedAssignments().length > 0) {
       Column({ space: 9 }) {
         Row() {
           Column({ space: 2 }) {
@@ -328,13 +394,13 @@ export struct StudentAssignmentsPage {
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
-          Text(`${this.notStartedAssignments.length}`)
+          Text(`${this.currentNotStartedAssignments().length}`)
             .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%');
         Column({ space: 6 }) {
-          ForEach(this.notStartedAssignments, (item: Assignment) => {
+          ForEach(this.currentNotStartedAssignments(), (item: Assignment) => {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
@@ -351,7 +417,7 @@ export struct StudentAssignmentsPage {
 
   @Builder
   private SubmittedSection() {
-    if (this.submittedAssignments.length > 0) {
+    if (this.currentSubmittedAssignments().length > 0) {
       Column({ space: 9 }) {
         Row() {
           Column({ space: 2 }) {
@@ -360,13 +426,13 @@ export struct StudentAssignmentsPage {
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
-          Text(`${this.submittedAssignments.length}`)
+          Text(`${this.currentSubmittedAssignments().length}`)
             .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%');
         Column({ space: 6 }) {
-          ForEach(this.submittedAssignments, (item: Assignment) => {
+          ForEach(this.currentSubmittedAssignments(), (item: Assignment) => {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
@@ -383,7 +449,7 @@ export struct StudentAssignmentsPage {
 
   @Builder
   private CompletedSection() {
-    if (this.completedAssignments.length > 0) {
+    if (this.currentCompletedAssignments().length > 0) {
       Column({ space: 9 }) {
         Row() {
           Column({ space: 2 }) {
@@ -392,13 +458,13 @@ export struct StudentAssignmentsPage {
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
-          Text(`${this.completedAssignments.length}`)
+          Text(`${this.currentCompletedAssignments().length}`)
             .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%');
         Column({ space: 6 }) {
-          ForEach(this.completedAssignments, (item: Assignment) => {
+          ForEach(this.currentCompletedAssignments(), (item: Assignment) => {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
@@ -415,10 +481,10 @@ export struct StudentAssignmentsPage {
 
   @Builder
   private EmptyState() {
-    if (this.visibleTotal === 0) {
+    if (this.currentVisibleTotal() === 0) {
       Column({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
-        Text(this.totalCount === 0 ? '暂时没有作业' :
+        Text(this.currentTotalCount() === 0 ? '暂时没有作业' :
           (this.calendarMode ? '这一天没有安排任务' : '当前筛选下没有作业'))
           .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Text(this.calendarMode ? '选择其他日期，或切回列表查看全部任务。' : '打开筛选面板调整条件后重新查询。')
@@ -437,7 +503,7 @@ export struct StudentAssignmentsPage {
           (this.hasActiveFilters() ? '筛选结果' : '全部作业'))
           .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text(`${this.visibleTotal} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text(`${this.currentVisibleTotal()} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
