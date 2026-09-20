@@ -156,7 +156,6 @@ export struct AppShell {
   private async refreshActiveStudent(): Promise<void> {
     await DefaultAssignmentRepository.instance.refresh();
     this.syncFamilyContext();
-    this.storeRevision++;
   }
 
   private openAssignmentDetail(assignmentId: string): void {
@@ -235,8 +234,7 @@ export struct AppShell {
           tutorUnavailable: this.demoScenario === DemoScenario.TUTOR_UNAVAILABLE,
           assignmentId: this.routeAssignmentId(param),
           revision: this.storeRevision,
-          onBack: () => this.navPathStack.pop(),
-          onStoreChanged: () => this.notifyUiChanged()
+          onBack: () => this.navPathStack.pop()
         });
       }
       .hideTitleBar(true)
@@ -302,8 +300,7 @@ export struct AppShell {
     if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
         revision: this.storeRevision,
-        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),
-        onStoreChanged: () => this.notifyUiChanged()
+        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
       BackendConnectionPage({
