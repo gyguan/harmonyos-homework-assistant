@@ -17,6 +17,8 @@ export struct VoiceAssignmentPane {
   @State private message: string = '';
   @State private imageUris: string[] = [];
   @State private imageIndex: number = 0;
+  @State private imageLoading: boolean = false;
+  @State private imageLoadMessage: string = '';
   @State private audioUri: string = '';
   @State private prepared: boolean = false;
   @State private playing: boolean = false;
@@ -47,6 +49,8 @@ export struct VoiceAssignmentPane {
     (_toggleAudio: () => void, _seek: (value: number) => void, _previousImage: () => void,
       _nextImage: () => void, _selectImage: (index: number) => void) => {};
   private readonly player: AssignmentAudioPlayerService = new AssignmentAudioPlayerService();
+  private imageResources: AssignmentResource[] = [];
+  private imageRequestVersion: number = 0;
 
   aboutToAppear(): void {
     this.onPauseReady(() => { void this.pauseAudio(); });
@@ -81,6 +85,10 @@ export struct VoiceAssignmentPane {
   private async load(): Promise<void> {
     this.loading = true;
     this.message = '';
+    this.imageLoadMessage = '';
+    this.imageResources = [];
+    this.imageUris = [];
+    this.imageIndex = 0;
     try {
       let resources = await RemoteAssignmentResourceApi.instance.list(this.assignmentId);
       let audio: AssignmentResource | null = null;
@@ -94,26 +102,32 @@ export struct VoiceAssignmentPane {
         return;
       }
 
-      let audioUri = await RemoteAssignmentResourceApi.instance.download(audio);
+      images.sort((left: AssignmentResource, right: AssignmentResource) =>
+        this.compareImageResources(left, right));
+      this.imageResources = images;
+
+      let slots: string[] = [];
+      for (let i = 0; i < images.length; i++) slots.push('');
+      this.imageUris = slots;
+
+      let audioPromise: Promise<string> = RemoteAssignmentResourceApi.instance.download(audio);
+      let firstImagePromise: Promise<string> = this.loadImage(0);
+      let audioUri = await audioPromise;
+      let firstImageUri = await firstImagePromise;
       if (audioUri.length === 0) {
         this.message = '语音加载失败，请检查网络后重试';
         return;
       }
-
-      let downloadedImages: string[] = [];
-      for (let image of images) {
-        let uri = await RemoteAssignmentResourceApi.instance.download(image);
-        if (uri.length > 0) downloadedImages.push(uri);
-      }
-      if (downloadedImages.length === 0) {
+      if (firstImageUri.length === 0) {
         this.message = '情景图片加载失败，请检查网络后重试';
         return;
       }
 
       this.audioUri = audioUri;
-      this.imageUris = downloadedImages;
       this.imageIndex = 0;
       this.notifyMediaState();
+      this.loading = false;
+      void this.prefetchNextImage(0);
 
       let callbacks: AssignmentAudioPlayerCallbacks = {
         onPrepared: (durationMs: number) => {
@@ -145,6 +159,93 @@ export struct VoiceAssignmentPane {
     }
   }
 
+  private compareImageResources(left: AssignmentResource, right: AssignmentResource): number {
+    let leftName = left.originalName.toLowerCase();
+    let rightName = right.originalName.toLowerCase();
+    let leftIndex = 0;
+    let rightIndex = 0;
+
+    while (leftIndex < leftName.length && rightIndex < rightName.length) {
+      let leftCode = leftName.charCodeAt(leftIndex);
+      let rightCode = rightName.charCodeAt(rightIndex);
+      let leftDigit = leftCode >= 48 && leftCode <= 57;
+      let rightDigit = rightCode >= 48 && rightCode <= 57;
+
+      if (leftDigit && rightDigit) {
+        let leftEnd = leftIndex;
+        let rightEnd = rightIndex;
+        while (leftEnd < leftName.length) {
+          let code = leftName.charCodeAt(leftEnd);
+          if (code < 48 || code > 57) break;
+          leftEnd++;
+        }
+        while (rightEnd < rightName.length) {
+          let code = rightName.charCodeAt(rightEnd);
+          if (code < 48 || code > 57) break;
+          rightEnd++;
+        }
+        let leftNumber = Number(leftName.substring(leftIndex, leftEnd));
+        let rightNumber = Number(rightName.substring(rightIndex, rightEnd));
+        if (leftNumber !== rightNumber) return leftNumber < rightNumber ? -1 : 1;
+        leftIndex = leftEnd;
+        rightIndex = rightEnd;
+        continue;
+      }
+
+      if (leftCode !== rightCode) return leftCode < rightCode ? -1 : 1;
+      leftIndex++;
+      rightIndex++;
+    }
+
+    if (leftName.length !== rightName.length) return leftName.length < rightName.length ? -1 : 1;
+    if (left.sortOrder === right.sortOrder) return 0;
+    return left.sortOrder < right.sortOrder ? -1 : 1;
+  }
+
+  private async loadImage(index: number): Promise<string> {
+    if (index < 0 || index >= this.imageResources.length) return '';
+    if (index < this.imageUris.length && this.imageUris[index].length > 0) return this.imageUris[index];
+
+    let uri = await RemoteAssignmentResourceApi.instance.download(this.imageResources[index]);
+    if (uri.length === 0) return '';
+
+    let next = this.imageUris.slice();
+    next[index] = uri;
+    this.imageUris = next;
+    this.notifyMediaState();
+    return uri;
+  }
+
+  private async prefetchNextImage(index: number): Promise<void> {
+    let next = index + 1;
+    if (next < 0 || next >= this.imageResources.length) return;
+    await this.loadImage(next);
+  }
+
+  private async showImage(index: number): Promise<void> {
+    if (index < 0 || index >= this.imageResources.length) return;
+    if (index === this.imageIndex) {
+      void this.prefetchNextImage(index);
+      return;
+    }
+
+    let requestVersion = ++this.imageRequestVersion;
+    this.imageLoading = true;
+    this.imageLoadMessage = '';
+    let uri = await this.loadImage(index);
+    if (requestVersion !== this.imageRequestVersion) return;
+
+    this.imageLoading = false;
+    if (uri.length === 0) {
+      this.imageLoadMessage = `第 ${index + 1} 张图片加载失败，请重试`;
+      return;
+    }
+
+    this.imageIndex = index;
+    this.notifyMediaState();
+    void this.prefetchNextImage(index);
+  }
+
   private async toggleAudio(): Promise<void> {
     if (!this.playbackEnabled || !this.prepared) return;
     if (this.playing) await this.pauseAudio();
@@ -157,21 +258,20 @@ export struct VoiceAssignmentPane {
   }
 
   private previousImage(): void {
-    if (this.imageUris.length <= 1) return;
-    this.imageIndex = this.imageIndex <= 0 ? this.imageUris.length - 1 : this.imageIndex - 1;
-    this.notifyMediaState();
+    if (this.imageResources.length <= 1) return;
+    let index = this.imageIndex <= 0 ? this.imageResources.length - 1 : this.imageIndex - 1;
+    void this.showImage(index);
   }
 
   private nextImage(): void {
-    if (this.imageUris.length <= 1) return;
-    this.imageIndex = this.imageIndex >= this.imageUris.length - 1 ? 0 : this.imageIndex + 1;
-    this.notifyMediaState();
+    if (this.imageResources.length <= 1) return;
+    let index = this.imageIndex >= this.imageResources.length - 1 ? 0 : this.imageIndex + 1;
+    void this.showImage(index);
   }
 
   private selectImage(index: number): void {
-    if (index < 0 || index >= this.imageUris.length || index === this.imageIndex) return;
-    this.imageIndex = index;
-    this.notifyMediaState();
+    if (index < 0 || index >= this.imageResources.length) return;
+    void this.showImage(index);
   }
 
   private openFullscreen(): void {
@@ -257,25 +357,48 @@ export struct VoiceAssignmentPane {
         Scroll() {
           Row({ space: 8 }) {
             ForEach(this.imageUris, (uri: string, index: number) => {
-              Image(uri)
-                .width(64)
-                .height(54)
-                .objectFit(ImageFit.Cover)
-                .border({
-                  width: index === this.imageIndex ? 2 : 1,
-                  color: index === this.imageIndex ? AppTheme.PRIMARY : AppTheme.BORDER
-                })
-                .borderRadius(10)
-                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-                .accessibilityRole(AccessibilityRoleType.BUTTON)
-                .accessibilityText(`查看第 ${index + 1} 张情景图片`)
-                .onClick(() => this.selectImage(index));
+              Stack({ alignContent: Alignment.Center }) {
+                if (uri.length > 0) {
+                  Image(uri)
+                    .width(64)
+                    .height(54)
+                    .objectFit(ImageFit.Cover);
+                } else {
+                  Text(`${index + 1}`)
+                    .fontSize(12)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.SUBTEXT);
+                }
+              }
+              .width(64)
+              .height(54)
+              .border({
+                width: index === this.imageIndex ? 2 : 1,
+                color: index === this.imageIndex ? AppTheme.PRIMARY : AppTheme.BORDER
+              })
+              .borderRadius(10)
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText(`查看第 ${index + 1} 张情景图片`)
+              .onClick(() => this.selectImage(index));
             }, (uri: string, index: number) => `${index}-${uri}`);
           }
         }
         .width('100%')
         .scrollable(ScrollDirection.Horizontal)
         .scrollBar(BarState.Off);
+      }
+
+      if (this.imageLoading) {
+        Text('正在加载图片…')
+          .width('100%')
+          .fontSize(11)
+          .fontColor(AppTheme.SUBTEXT);
+      } else if (this.imageLoadMessage.length > 0) {
+        Text(this.imageLoadMessage)
+          .width('100%')
+          .fontSize(11)
+          .fontColor(AppTheme.WARNING);
       }
     }
     .width('100%');
