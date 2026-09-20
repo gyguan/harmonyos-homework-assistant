@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="200" viewBox="0 0 560 200">
+<rect width="560" height="200" rx="24" fill="#FFFFFF"/>
+<rect x="1" y="1" width="558" height="198" rx="23" fill="none" stroke="#D9E2EA" stroke-width="2"/>
+<path d="M120 70 L280 25 L440 70 L440 145 L120 145 Z" fill="#F7F9FB" stroke="#35608A" stroke-width="2"/><rect x="180" y="90" width="90" height="38" rx="8" fill="#DCE8F2"/><rect x="330" y="82" width="55" height="63" fill="#F4E8C9"/>
+<text x="280" y="180" text-anchor="middle" font-size="16" font-family="sans-serif" fill="#334E68">房间与位置</text>
+</svg>
