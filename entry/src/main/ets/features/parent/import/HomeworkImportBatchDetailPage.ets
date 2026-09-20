@@ -1,0 +1,271 @@
+import { AppTheme } from '../../../common/theme/AppTheme';
+import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
+import {
+  ImportBatch,
+  ImportBatchStatus,
+  ImportedMessage
+} from '../../../domain/model/ImportModels';
+import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
+import { HomeworkImportInboxViewModel } from './HomeworkImportInboxViewModel';
+
+@Component
+export struct HomeworkImportBatchDetailPage {
+  @Prop batchId: string = '';
+  onBack: () => void = () => {};
+  onOpenConfirmation: () => void = () => {};
+  @State private revision: number = 0;
+  @State private message: string = '';
+  @State private abandonConfirm: boolean = false;
+  private readonly viewModel: HomeworkImportInboxViewModel = new HomeworkImportInboxViewModel();
+
+  private batch(): ImportBatch | null {
+    let currentRevision = this.revision;
+    if (currentRevision < 0) return null;
+    return this.viewModel.batch(this.batchId);
+  }
+
+  private messages(): ImportedMessage[] {
+    let currentRevision = this.revision;
+    if (currentRevision < 0) return [];
+    return this.viewModel.messages(this.batchId);
+  }
+
+  private candidates(): CandidateAssignment[] {
+    let currentRevision = this.revision;
+    if (currentRevision < 0) return [];
+    return this.viewModel.candidates(this.batchId);
+  }
+
+  private statusLabel(status: ImportBatchStatus): string {
+    if (status === ImportBatchStatus.READY) return '待确认';
+    if (status === ImportBatchStatus.PUBLISHED) return '已发布';
+    if (status === ImportBatchStatus.ABANDONED) return '已放弃';
+    if (status === ImportBatchStatus.EMPTY) return '未识别到作业';
+    return '已接收';
+  }
+
+  private continueConfirmation(): void {
+    if (!this.viewModel.activate(this.batchId)) {
+      this.message = '这个批次当前无法继续确认';
+      return;
+    }
+    this.message = '';
+    this.onOpenConfirmation();
+  }
+
+  private abandon(): void {
+    if (!this.viewModel.abandon(this.batchId)) {
+      this.message = '已发布批次不能放弃';
+      this.abandonConfirm = false;
+      return;
+    }
+    this.abandonConfirm = false;
+    this.revision++;
+    this.message = '已放弃这个导入批次；已发布作业不会受影响。';
+  }
+
+  @Builder
+  private SourceMessageCard(item: ImportedMessage) {
+    Column({ space: 6 }) {
+      Row() {
+        Text(item.sender.length > 0 ? item.sender : '原始内容')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Blank();
+        Text(`#${item.orderNo}`).fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
+      }
+      .width('100%');
+
+      Text(item.text.length > 0 ? item.text : '（图片消息）')
+        .width('100%')
+        .fontSize(13)
+        .lineHeight(20)
+        .fontColor(AppTheme.TEXT);
+
+      if (item.attachments.length > 0) {
+        Text(`附件 ${item.attachments.length} 个`)
+          .fontSize(11)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+    }
+    .width('100%')
+    .padding(12)
+    .backgroundColor(AppTheme.SURFACE_SUBTLE)
+    .borderRadius(10);
+  }
+
+  @Builder
+  private CandidateCard(item: CandidateAssignment) {
+    Column({ space: 5 }) {
+      Row() {
+        Text(item.subject)
+          .fontSize(12)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY);
+        Blank();
+        Text(`${item.expectedMinutes} 分钟`).fontSize(11).fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%');
+      Text(item.title)
+        .width('100%')
+        .fontSize(14)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+      Text(item.sourceEvidence.excerpt)
+        .width('100%')
+        .fontSize(11)
+        .lineHeight(17)
+        .fontColor(AppTheme.SUBTEXT);
+      if (item.sourceEvidence.sourceMessageIds !== undefined &&
+        item.sourceEvidence.sourceMessageIds!.length > 0) {
+        Text(`证据消息：${item.sourceEvidence.sourceMessageIds!.join(', ')}`)
+          .width('100%')
+          .fontSize(10)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+      }
+    }
+    .width('100%')
+    .padding(12)
+    .backgroundColor(AppTheme.SURFACE)
+    .borderRadius(10);
+  }
+
+  build() {
+    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+      DeepPageHeader({
+        title: '导入批次详情',
+        subtitle: this.batch() === null ? '批次不存在' :
+          `${this.statusLabel(this.batch()!.status)} · ${this.batch()!.messageCount} 条消息 · ${this.batch()!.candidateCount} 项作业`,
+        backAccessibilityText: '返回作业智能收件箱',
+        onBack: () => this.onBack()
+      });
+
+      Scroll() {
+        Column({ space: 14 }) {
+          if (this.batch() === null) {
+            Text('找不到这个导入批次')
+              .width('100%')
+              .fontSize(14)
+              .fontColor(AppTheme.SUBTEXT)
+              .padding(18)
+              .backgroundColor(AppTheme.SURFACE)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
+          } else {
+            Column({ space: 8 }) {
+              Text('来源')
+                .width('100%')
+                .fontSize(15)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.TEXT);
+              Text(this.batch()!.sourceLabel)
+                .width('100%')
+                .fontSize(13)
+                .fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%')
+            .padding(14)
+            .backgroundColor(AppTheme.SURFACE)
+            .borderRadius(AppTheme.CONTROL_RADIUS);
+
+            Column({ space: 8 }) {
+              Text(`原始消息 ${this.messages().length}`)
+                .width('100%')
+                .fontSize(15)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.TEXT);
+              ForEach(this.messages(), (item: ImportedMessage) => {
+                this.SourceMessageCard(item);
+              }, (item: ImportedMessage) => item.id);
+            }
+            .width('100%');
+
+            Column({ space: 8 }) {
+              Text(`候选作业 ${this.candidates().length}`)
+                .width('100%')
+                .fontSize(15)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.TEXT);
+              ForEach(this.candidates(), (item: CandidateAssignment) => {
+                this.CandidateCard(item);
+              }, (item: CandidateAssignment) => item.id);
+            }
+            .width('100%');
+
+            if (this.message.length > 0) {
+              Text(this.message)
+                .width('100%')
+                .fontSize(12)
+                .lineHeight(18)
+                .fontColor(AppTheme.SUBTEXT)
+                .padding(10)
+                .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                .borderRadius(10);
+            }
+
+            if (this.batch()!.status === ImportBatchStatus.READY) {
+              Button('继续确认并发布', { type: ButtonType.Normal })
+                .width('100%')
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.PRIMARY)
+                .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => this.continueConfirmation());
+
+              if (this.abandonConfirm) {
+                Column({ space: 8 }) {
+                  Text('放弃这个导入批次？候选作业会从待确认区清除；已经发布的作业不会被删除。')
+                    .width('100%')
+                    .fontSize(12)
+                    .lineHeight(18)
+                    .fontColor(AppTheme.DANGER);
+                  Row({ space: 8 }) {
+                    Button('取消', { type: ButtonType.Normal })
+                      .layoutWeight(1)
+                      .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                      .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                      .fontColor(AppTheme.TEXT)
+                      .onClick(() => this.abandonConfirm = false);
+                    Button('确认放弃', { type: ButtonType.Normal })
+                      .layoutWeight(1)
+                      .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                      .backgroundColor(AppTheme.DANGER)
+                      .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                      .onClick(() => this.abandon());
+                  }
+                  .width('100%');
+                }
+                .width('100%')
+                .padding(12)
+                .backgroundColor(AppTheme.DANGER_SOFT)
+                .borderRadius(AppTheme.CONTROL_RADIUS);
+              } else {
+                Button('放弃这个批次', { type: ButtonType.Normal })
+                  .width('100%')
+                  .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                  .borderRadius(AppTheme.CONTROL_RADIUS)
+                  .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                  .fontColor(AppTheme.DANGER)
+                  .onClick(() => this.abandonConfirm = true);
+              }
+            }
+          }
+        }
+        .width('100%')
+        .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+        .padding({ top: 4, bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
+      }
+      .width('100%')
+      .layoutWeight(1)
+      .scrollBar(BarState.Off);
+    }
+    .width('100%')
+    .height('100%')
+    .padding({
+      left: AppTheme.PAGE_PADDING,
+      right: AppTheme.PAGE_PADDING,
+      top: AppTheme.DEEP_PAGE_TOP_PADDING
+    })
+    .backgroundColor(AppTheme.BACKGROUND);
+  }
+}
