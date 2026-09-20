@@ -39,9 +39,12 @@ for due in ["周五", "星期五", "月\\d{1,2}"]:
 require("updateCandidate(candidate" in store, "HomeworkStore must support full candidate updates")
 require("addCandidate(candidate" in store, "HomeworkStore must support manually adding a candidate")
 
-for capability in ["updateSubject", "updateTitle", "updateDueText", "updateTextbookRef", "addCandidate",
-                   "ConfirmationCandidateEditor"]:
+for capability in ["saveCandidate", "addCandidate", "ConfirmationCandidateEditor", "CandidateEditorSheet"]:
     require(capability in confirmation, f"confirmation page missing capability: {capability}")
+for capability in ["subjectDraft", "titleDraft", "dueTextDraft", "textbookRefDraft",
+                   "buildCandidate", "saveAndClose", "confirmDiscard"]:
+    require(capability in confirmation_components,
+            f"confirmation editor missing staged-edit capability: {capability}")
 require("ChoiceSelectionChip" in confirmation_components,
         "confirmation editor must expose reactive subject/duration choices")
 require("手工新增一项" in confirmation, "confirmation page must expose manual candidate creation")
