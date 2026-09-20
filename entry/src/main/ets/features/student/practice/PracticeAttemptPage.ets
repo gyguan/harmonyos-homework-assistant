@@ -3,11 +3,14 @@ import { PracticeSubmitConfirmDialog } from '../../../components/practice/Practi
 import {
   PracticeAnswer,
   PracticeAttempt,
+  PracticeAttemptMode,
   PracticeAttemptStatus,
+  PracticeNote,
+  PracticePreviousAnswer,
+  PracticePreviousNote,
   PracticeQuestion,
   PracticeQuestionOption,
-  PracticeQuestionType,
-  PracticePreviousAnswer
+  PracticeQuestionType
 } from '../../../domain/model/practice/PracticeModels';
 import { PracticeAttemptViewModel } from './PracticeAttemptViewModel';
 
@@ -16,8 +19,10 @@ export struct PracticeAttemptPage {
   @Prop attemptId: string = '';
   @State private attempt: PracticeAttempt | null = null;
   @State private answers: PracticeAnswer[] = [];
+  @State private notes: PracticeNote[] = [];
   @State private currentIndex: number = 0;
   @State private currentAnswer: string = '';
+  @State private currentNote: string = '';
   @State private hintVisible: boolean = false;
   @State private showPreviousAnswer: boolean = false;
   @State private saving: boolean = false;
@@ -48,9 +53,10 @@ export struct PracticeAttemptPage {
       let loaded = await this.viewModel.load(this.attemptId);
       this.attempt = loaded;
       this.answers = loaded.answers.slice();
+      this.notes = loaded.notes.slice();
       this.currentIndex = 0;
       this.showPreviousAnswer = false;
-      this.syncCurrentAnswer();
+      this.syncCurrentDraft();
       if (loaded.status === PracticeAttemptStatus.SUBMITTED) this.onSubmitted(loaded.id);
     } catch {
       this.errorMessage = '练习加载失败，请检查网络后重试。';
@@ -67,14 +73,9 @@ export struct PracticeAttemptPage {
     return '';
   }
 
-  private syncCurrentAnswer(): void {
-    let question = this.currentQuestion();
-    this.currentAnswer = question === null ? '' : this.answerFor(question.id);
-    this.hintVisible = false;
-  }
-
-  private isAnswered(questionId: string): boolean {
-    return this.answerFor(questionId).trim().length > 0;
+  private noteFor(questionId: string): string {
+    for (let note of this.notes) if (note.questionId === questionId) return note.content;
+    return '';
   }
 
   private previousAnswerFor(questionId: string): PracticePreviousAnswer | null {
@@ -85,7 +86,31 @@ export struct PracticeAttemptPage {
     return null;
   }
 
-  private async saveCurrent(): Promise<boolean> {
+  private previousNoteFor(questionId: string): PracticePreviousNote | null {
+    if (this.attempt === null) return null;
+    for (let note of this.attempt.previousNotes) {
+      if (note.questionId === questionId) return note;
+    }
+    return null;
+  }
+
+  private hasPreviousContext(): boolean {
+    if (this.attempt === null) return false;
+    return this.attempt.previousAnswers.length > 0 || this.attempt.previousNotes.length > 0;
+  }
+
+  private syncCurrentDraft(): void {
+    let question = this.currentQuestion();
+    this.currentAnswer = question === null ? '' : this.answerFor(question.id);
+    this.currentNote = question === null ? '' : this.noteFor(question.id);
+    this.hintVisible = false;
+  }
+
+  private isAnswered(questionId: string): boolean {
+    return this.answerFor(questionId).trim().length > 0;
+  }
+
+  private async saveCurrentAnswer(): Promise<boolean> {
     let question = this.currentQuestion();
     if (question === null) return true;
     let normalized = this.currentAnswer.trim();
@@ -106,6 +131,41 @@ export struct PracticeAttemptPage {
     }
   }
 
+  private async saveCurrentNote(): Promise<boolean> {
+    let question = this.currentQuestion();
+    if (question === null) return true;
+    let normalized = this.currentNote.trim();
+    let old = this.noteFor(question.id);
+    if (normalized === old) return true;
+    if (normalized.length > 500) {
+      this.errorMessage = '单题笔记不能超过500字。';
+      return false;
+    }
+
+    this.saving = true;
+    this.errorMessage = '';
+    try {
+      if (normalized.length === 0) {
+        await this.viewModel.deleteNote(this.attemptId, question.id);
+        this.removeNote(question.id);
+      } else {
+        let saved = await this.viewModel.saveNote(this.attemptId, question.id, normalized);
+        this.upsertNote(saved);
+      }
+      return true;
+    } catch {
+      this.errorMessage = '笔记保存失败，请检查网络后重试。';
+      return false;
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  private async saveCurrentDraft(): Promise<boolean> {
+    if (!await this.saveCurrentAnswer()) return false;
+    return await this.saveCurrentNote();
+  }
+
   private upsertAnswer(saved: PracticeAnswer): void {
     let next: PracticeAnswer[] = [];
     let replaced = false;
@@ -121,17 +181,46 @@ export struct PracticeAttemptPage {
     this.answers = next;
   }
 
+  private upsertNote(saved: PracticeNote): void {
+    let next: PracticeNote[] = [];
+    let replaced = false;
+    for (let note of this.notes) {
+      if (note.questionId === saved.questionId) {
+        next.push(saved);
+        replaced = true;
+      } else {
+        next.push(note);
+      }
+    }
+    if (!replaced) next.push(saved);
+    this.notes = next;
+  }
+
+  private removeNote(questionId: string): void {
+    let next: PracticeNote[] = [];
+    for (let note of this.notes) {
+      if (note.questionId !== questionId) next.push(note);
+    }
+    this.notes = next;
+  }
+
   private async moveTo(index: number): Promise<void> {
     if (this.saving || this.submitting || this.attempt === null) return;
     if (index < 0 || index >= this.attempt.questions.length || index === this.currentIndex) return;
-    if (!await this.saveCurrent()) return;
+    if (!await this.saveCurrentDraft()) return;
     this.currentIndex = index;
-    this.syncCurrentAnswer();
+    this.syncCurrentDraft();
+  }
+
+  private async requestBack(): Promise<void> {
+    if (this.saving || this.submitting) return;
+    if (!await this.saveCurrentDraft()) return;
+    this.onBack();
   }
 
   private async requestSubmit(): Promise<void> {
     if (this.submitting || this.saving || this.attempt === null) return;
-    if (!await this.saveCurrent()) return;
+    if (!await this.saveCurrentDraft()) return;
     let answered = 0;
     for (let question of this.attempt.questions) if (this.isAnswered(question.id)) answered++;
     this.unansweredCount = this.attempt.questions.length - answered;
@@ -154,6 +243,10 @@ export struct PracticeAttemptPage {
     } finally {
       this.submitting = false;
     }
+  }
+
+  private updateNote(value: string): void {
+    if (value.length <= 500) this.currentNote = value;
   }
 
   @Builder
@@ -224,23 +317,30 @@ export struct PracticeAttemptPage {
     Column() {
       Row({ space: 10 }) {
         Text('‹')
-          .fontSize(28).fontColor(AppTheme.TEXT)
-          .width(AppTheme.MIN_TOUCH_TARGET).height(AppTheme.MIN_TOUCH_TARGET)
-          .textAlign(TextAlign.Center).onClick(() => this.onBack());
-        Text(this.attempt === null ? '套卷练习' : `第 ${this.currentIndex + 1} / ${this.attempt.questionCount} 题`)
+          .fontSize(28)
+          .fontColor(AppTheme.TEXT)
+          .width(AppTheme.MIN_TOUCH_TARGET)
+          .height(AppTheme.MIN_TOUCH_TARGET)
+          .textAlign(TextAlign.Center)
+          .onClick(() => void this.requestBack());
+        Text(this.attempt === null ? '套卷练习' :
+          `${this.attempt.mode === PracticeAttemptMode.WRONG_ONLY ? '错题专项 · ' : ''}第 ${this.currentIndex + 1} / ${this.attempt.questionCount} 题`)
           .fontSize(AppTheme.DEEP_PAGE_HEADER_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
         Blank();
         if (this.saving) Text('保存中…').fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
-      .width('100%').height(AppTheme.DEEP_PAGE_HEADER_HEIGHT).padding({ left: 8, right: 16 });
+      .width('100%')
+      .height(AppTheme.DEEP_PAGE_HEADER_HEIGHT)
+      .padding({ left: 8, right: 16 });
 
       Divider().color(AppTheme.DIVIDER);
 
       if (this.attempt !== null) {
         Column({ space: 8 }) {
           this.QuestionNavigation();
-          if (this.attempt.previousAnswers.length > 0) {
+          if (this.hasPreviousContext()) {
             Row() {
               Text(`第 ${this.attempt.attemptNo} 次练习`)
                 .fontSize(12)
@@ -268,25 +368,69 @@ export struct PracticeAttemptPage {
         Column({ space: 16 }) {
           if (this.currentQuestion() !== null) {
             Column({ space: 12 }) {
-              Text(`第 ${this.currentQuestion()!.orderNo} 题`).width('100%').fontSize(12).fontColor(AppTheme.PRIMARY);
+              Text(`第 ${this.currentQuestion()!.orderNo} 题`)
+                .width('100%')
+                .fontSize(12)
+                .fontColor(AppTheme.PRIMARY);
               Text(this.currentQuestion()!.stem)
-                .width('100%').fontSize(20).fontWeight(FontWeight.Medium).lineHeight(30).fontColor(AppTheme.TEXT);
+                .width('100%')
+                .fontSize(20)
+                .fontWeight(FontWeight.Medium)
+                .lineHeight(30)
+                .fontColor(AppTheme.TEXT);
+
               this.QuestionAnswer(this.currentQuestion()!);
-              if (this.showPreviousAnswer && this.previousAnswerFor(this.currentQuestion()!.id) !== null) {
-                Column({ space: 5 }) {
-                  Text('上次作答')
+
+              Column({ space: 7 }) {
+                Row() {
+                  Text('我的笔记')
+                    .fontSize(13)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.TEXT);
+                  Blank();
+                  Text(`${this.currentNote.length}/500`)
+                    .fontSize(11)
+                    .fontColor(AppTheme.TERTIARY_TEXT);
+                }
+                .width('100%');
+                TextInput({ placeholder: '记录这道题的思路、易错点…', text: this.currentNote })
+                  .width('100%')
+                  .height(AppTheme.INPUT_HEIGHT)
+                  .fontSize(14)
+                  .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                  .border({ width: 1, color: AppTheme.BORDER })
+                  .borderRadius(AppTheme.CONTROL_RADIUS)
+                  .onChange((value: string) => this.updateNote(value));
+              }
+              .width('100%');
+
+              if (this.showPreviousAnswer &&
+                (this.previousAnswerFor(this.currentQuestion()!.id) !== null ||
+                 this.previousNoteFor(this.currentQuestion()!.id) !== null)) {
+                Column({ space: 6 }) {
+                  Text('上次练习')
                     .width('100%')
                     .fontSize(12)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(AppTheme.SUBTEXT);
-                  Text(this.previousAnswerFor(this.currentQuestion()!.id)!.answerValue)
-                    .width('100%')
-                    .fontSize(15)
-                    .fontColor(AppTheme.TEXT);
-                  Text(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ? '上次答对' : '上次需订正')
-                    .width('100%')
-                    .fontSize(12)
-                    .fontColor(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ? AppTheme.SUCCESS : AppTheme.WARNING);
+                  if (this.previousAnswerFor(this.currentQuestion()!.id) !== null) {
+                    Text(`上次作答：${this.previousAnswerFor(this.currentQuestion()!.id)!.answerValue}`)
+                      .width('100%')
+                      .fontSize(14)
+                      .fontColor(AppTheme.TEXT);
+                    Text(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ? '上次答对' : '上次需订正')
+                      .width('100%')
+                      .fontSize(12)
+                      .fontColor(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ?
+                        AppTheme.SUCCESS : AppTheme.WARNING);
+                  }
+                  if (this.previousNoteFor(this.currentQuestion()!.id) !== null) {
+                    Text(`上次笔记：${this.previousNoteFor(this.currentQuestion()!.id)!.content}`)
+                      .width('100%')
+                      .fontSize(12)
+                      .lineHeight(18)
+                      .fontColor(AppTheme.SUBTEXT);
+                  }
                 }
                 .width('100%')
                 .padding(12)
@@ -294,56 +438,90 @@ export struct PracticeAttemptPage {
                 .borderRadius(AppTheme.CONTROL_RADIUS);
               }
             }
-            .width('100%').padding(AppTheme.CARD_PADDING)
-            .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+            .width('100%')
+            .padding(AppTheme.CARD_PADDING)
+            .backgroundColor(AppTheme.SURFACE)
+            .borderRadius(AppTheme.CARD_RADIUS);
 
             if (this.currentQuestion()!.hints.length > 0) {
               Column({ space: 8 }) {
                 Text(this.hintVisible ? '收起提示' : '需要提示？')
-                  .width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+                  .width('100%')
+                  .fontSize(13)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.PRIMARY)
                   .onClick(() => this.hintVisible = !this.hintVisible);
                 if (this.hintVisible) {
-                  Text(this.currentQuestion()!.hints[0]).width('100%').fontSize(13).lineHeight(20).fontColor(AppTheme.SUBTEXT);
+                  Text(this.currentQuestion()!.hints[0])
+                    .width('100%')
+                    .fontSize(13)
+                    .lineHeight(20)
+                    .fontColor(AppTheme.SUBTEXT);
                 }
               }
-              .width('100%').padding(14).backgroundColor(AppTheme.PRIMARY_FAINT).borderRadius(AppTheme.CONTROL_RADIUS);
+              .width('100%')
+              .padding(14)
+              .backgroundColor(AppTheme.PRIMARY_FAINT)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
             }
           }
+
           if (this.errorMessage.length > 0) {
-            Text(this.errorMessage).width('100%').fontSize(13).fontColor(AppTheme.DANGER)
-              .padding(12).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+            Text(this.errorMessage)
+              .width('100%')
+              .fontSize(13)
+              .fontColor(AppTheme.DANGER)
+              .padding(12)
+              .backgroundColor(AppTheme.DANGER_SOFT)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
           }
         }
-        .width('100%').constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH }).padding(AppTheme.PAGE_PADDING);
+        .width('100%')
+        .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
+        .padding(AppTheme.PAGE_PADDING);
       }
-      .width('100%').layoutWeight(1).scrollBar(BarState.Off);
+      .width('100%')
+      .layoutWeight(1)
+      .scrollBar(BarState.Off);
 
       if (this.attempt !== null) {
         Row({ space: 10 }) {
           Button('上一题', { type: ButtonType.Normal })
-            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).backgroundColor(AppTheme.SURFACE_EMPHASIS)
-            .fontColor(this.currentIndex > 0 ? AppTheme.TEXT : AppTheme.DISABLED).borderRadius(AppTheme.CONTROL_RADIUS)
+            .layoutWeight(1)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(this.currentIndex > 0 ? AppTheme.TEXT : AppTheme.DISABLED)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
             .enabled(this.currentIndex > 0 && !this.saving && !this.submitting)
             .onClick(() => void this.moveTo(this.currentIndex - 1));
           if (this.currentIndex < this.attempt.questions.length - 1) {
             Button('下一题', { type: ButtonType.Normal })
-              .layoutWeight(2).height(AppTheme.BUTTON_HEIGHT).backgroundColor(AppTheme.PRIMARY)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
+              .layoutWeight(2)
+              .height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.PRIMARY)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
               .enabled(!this.saving && !this.submitting)
               .onClick(() => void this.moveTo(this.currentIndex + 1));
           } else {
             Button(this.submitting ? '交卷中…' : '交卷', { type: ButtonType.Normal })
-              .layoutWeight(2).height(AppTheme.BUTTON_HEIGHT)
+              .layoutWeight(2)
+              .height(AppTheme.BUTTON_HEIGHT)
               .backgroundColor(this.submitting ? AppTheme.DISABLED : AppTheme.PRIMARY)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
               .enabled(!this.saving && !this.submitting)
               .onClick(() => void this.requestSubmit());
           }
         }
-        .width('100%').padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 10, bottom: 14 })
-        .backgroundColor(AppTheme.SURFACE).border({ width: { top: 1 }, color: AppTheme.DIVIDER });
+        .width('100%')
+        .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 10, bottom: 14 })
+        .backgroundColor(AppTheme.SURFACE)
+        .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
       }
     }
-    .width('100%').height('100%').backgroundColor(AppTheme.BACKGROUND);
+    .width('100%')
+    .height('100%')
+    .backgroundColor(AppTheme.BACKGROUND);
   }
 }

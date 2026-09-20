@@ -1,6 +1,6 @@
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { DefaultPracticeRepository } from '../../../data/repository/DefaultPracticeRepository';
-import { PracticeAttemptSummary, PracticeAttemptStatus } from '../../../domain/model/practice/PracticeModels';
+import { PracticeAttemptMode, PracticeAttemptSummary, PracticeAttemptStatus } from '../../../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
 
@@ -22,6 +22,10 @@ export class PracticeHistoryViewModel {
 
   statusLabel(item: PracticeAttemptSummary): string {
     return item.status === PracticeAttemptStatus.SUBMITTED ? '已完成' : '进行中';
+  }
+
+  modeLabel(item: PracticeAttemptSummary): string {
+    return item.mode === PracticeAttemptMode.WRONG_ONLY ? '错题专项' : '完整套卷';
   }
 
   scoreText(item: PracticeAttemptSummary): string {

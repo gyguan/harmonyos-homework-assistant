@@ -5,6 +5,7 @@ import {
   PracticeAttempt,
   PracticeAttemptSummary,
   PracticeGrade,
+  PracticeNote,
   PracticePaper,
   PracticeResult,
   PracticeSubject
@@ -53,9 +54,24 @@ export class DefaultPracticeRepository implements PracticeRepository {
     return this.remoteApi.repeatAttempt(attemptId);
   }
 
+  retryWrongAttempt(attemptId: string): Promise<PracticeAttempt> {
+    this.requireConnected();
+    return this.remoteApi.retryWrongAttempt(attemptId);
+  }
+
   saveAnswer(attemptId: string, questionId: string, answerValue: string): Promise<PracticeAnswer> {
     this.requireConnected();
     return this.remoteApi.saveAnswer(attemptId, questionId, answerValue);
+  }
+
+  saveNote(attemptId: string, questionId: string, content: string): Promise<PracticeNote> {
+    this.requireConnected();
+    return this.remoteApi.saveNote(attemptId, questionId, content);
+  }
+
+  deleteNote(attemptId: string, questionId: string): Promise<void> {
+    this.requireConnected();
+    return this.remoteApi.deleteNote(attemptId, questionId);
   }
 
   submitAttempt(attemptId: string): Promise<PracticeResult> {

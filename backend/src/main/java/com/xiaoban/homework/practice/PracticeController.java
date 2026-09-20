@@ -4,6 +4,7 @@ import com.xiaoban.homework.auth.AuthInterceptor;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,6 +54,13 @@ public class PracticeController {
     return attempts.repeat(familyId, attemptId);
   }
 
+  @PostMapping("/practice/attempts/{attemptId}/wrong-only")
+  public PracticeDtos.AttemptResponse wrongOnly(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID attemptId) {
+    return attempts.wrongOnly(familyId, attemptId);
+  }
+
   @GetMapping("/practice/attempts/{attemptId}")
   public PracticeDtos.AttemptResponse attempt(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
@@ -67,6 +75,23 @@ public class PracticeController {
       @PathVariable String questionId,
       @Valid @RequestBody PracticeDtos.AnswerRequest input) {
     return attempts.saveAnswer(familyId, attemptId, questionId, input);
+  }
+
+  @PutMapping("/practice/attempts/{attemptId}/notes/{questionId}")
+  public PracticeDtos.NoteResponse note(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID attemptId,
+      @PathVariable String questionId,
+      @Valid @RequestBody PracticeDtos.NoteRequest input) {
+    return attempts.saveNote(familyId, attemptId, questionId, input);
+  }
+
+  @DeleteMapping("/practice/attempts/{attemptId}/notes/{questionId}")
+  public void deleteNote(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID attemptId,
+      @PathVariable String questionId) {
+    attempts.deleteNote(familyId, attemptId, questionId);
   }
 
   @PostMapping("/practice/attempts/{attemptId}/submit")

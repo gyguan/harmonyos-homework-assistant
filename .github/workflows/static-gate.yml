@@ -156,6 +156,9 @@ jobs:
       - name: Validate Practice Slice 3
         run: python scripts/validate_practice_slice3.py
 
+      - name: Validate Practice Slice 4
+        run: python scripts/validate_practice_slice4.py
+
       - name: Validate parent Tutor settings
         run: python scripts/validate_parent_tutor_settings.py
 
