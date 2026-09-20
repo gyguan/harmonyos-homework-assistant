@@ -6,7 +6,8 @@ import {
   PracticeAttemptStatus,
   PracticeQuestion,
   PracticeQuestionOption,
-  PracticeQuestionType
+  PracticeQuestionType,
+  PracticePreviousAnswer
 } from '../../../domain/model/practice/PracticeModels';
 import { PracticeAttemptViewModel } from './PracticeAttemptViewModel';
 
@@ -18,6 +19,7 @@ export struct PracticeAttemptPage {
   @State private currentIndex: number = 0;
   @State private currentAnswer: string = '';
   @State private hintVisible: boolean = false;
+  @State private showPreviousAnswer: boolean = false;
   @State private saving: boolean = false;
   @State private submitting: boolean = false;
   @State private errorMessage: string = '';
@@ -47,6 +49,7 @@ export struct PracticeAttemptPage {
       this.attempt = loaded;
       this.answers = loaded.answers.slice();
       this.currentIndex = 0;
+      this.showPreviousAnswer = false;
       this.syncCurrentAnswer();
       if (loaded.status === PracticeAttemptStatus.SUBMITTED) this.onSubmitted(loaded.id);
     } catch {
@@ -72,6 +75,14 @@ export struct PracticeAttemptPage {
 
   private isAnswered(questionId: string): boolean {
     return this.answerFor(questionId).trim().length > 0;
+  }
+
+  private previousAnswerFor(questionId: string): PracticePreviousAnswer | null {
+    if (this.attempt === null) return null;
+    for (let answer of this.attempt.previousAnswers) {
+      if (answer.questionId === questionId) return answer;
+    }
+    return null;
   }
 
   private async saveCurrent(): Promise<boolean> {
@@ -227,9 +238,30 @@ export struct PracticeAttemptPage {
       Divider().color(AppTheme.DIVIDER);
 
       if (this.attempt !== null) {
-        Column() { this.QuestionNavigation(); }
-          .width('100%').padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 12, bottom: 8 })
-          .backgroundColor(AppTheme.SURFACE);
+        Column({ space: 8 }) {
+          this.QuestionNavigation();
+          if (this.attempt.previousAnswers.length > 0) {
+            Row() {
+              Text(`第 ${this.attempt.attemptNo} 次练习`)
+                .fontSize(12)
+                .fontColor(AppTheme.SUBTEXT);
+              Blank();
+              Text(this.showPreviousAnswer ? '隐藏上次作答' : '显示上次作答')
+                .fontSize(12)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.PRIMARY)
+                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .padding({ left: 10, right: 2 })
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText(this.showPreviousAnswer ? '隐藏上次作答' : '显示上次作答')
+                .onClick(() => this.showPreviousAnswer = !this.showPreviousAnswer);
+            }
+            .width('100%');
+          }
+        }
+        .width('100%')
+        .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 12, bottom: 8 })
+        .backgroundColor(AppTheme.SURFACE);
       }
 
       Scroll() {
@@ -240,6 +272,27 @@ export struct PracticeAttemptPage {
               Text(this.currentQuestion()!.stem)
                 .width('100%').fontSize(20).fontWeight(FontWeight.Medium).lineHeight(30).fontColor(AppTheme.TEXT);
               this.QuestionAnswer(this.currentQuestion()!);
+              if (this.showPreviousAnswer && this.previousAnswerFor(this.currentQuestion()!.id) !== null) {
+                Column({ space: 5 }) {
+                  Text('上次作答')
+                    .width('100%')
+                    .fontSize(12)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.SUBTEXT);
+                  Text(this.previousAnswerFor(this.currentQuestion()!.id)!.answerValue)
+                    .width('100%')
+                    .fontSize(15)
+                    .fontColor(AppTheme.TEXT);
+                  Text(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ? '上次答对' : '上次需订正')
+                    .width('100%')
+                    .fontSize(12)
+                    .fontColor(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ? AppTheme.SUCCESS : AppTheme.WARNING);
+                }
+                .width('100%')
+                .padding(12)
+                .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                .borderRadius(AppTheme.CONTROL_RADIUS);
+              }
             }
             .width('100%').padding(AppTheme.CARD_PADDING)
             .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CARD_RADIUS);
