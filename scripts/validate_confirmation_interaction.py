@@ -41,9 +41,11 @@ require("TextInput" not in card and "maxLines(1)" in card,
 require("private BottomActionBar()" in page and "this.BottomActionBar();" in page and
         ".layoutWeight(1)" in page,
         "confirmation publish/batch actions must stay in a fixed bottom action bar")
-require("private BottomActions()" in components and "this.BottomActions();" in components and
-        components.index("Scroll() {") < components.index("this.BottomActions();"),
-        "candidate editor must keep Complete/Delete outside the scroll area")
+candidate_editor = components.split("export struct ConfirmationCandidateEditor", 1)[1]
+candidate_actions = candidate_editor.split("private BottomActions()", 1)[1].split("build()", 1)[0]
+require("private BottomActions()" in candidate_editor and "this.BottomActions();" in candidate_editor and
+        "Button('删除'" in candidate_actions and "Button('完成'" in candidate_actions,
+        "candidate editor must keep Complete/Delete in its fixed bottom action area")
 require("private BottomActions()" in parent_editor and "this.BottomActions();" in parent_editor and
         parent_editor.index("Scroll() {") < parent_editor.index("this.BottomActions();"),
         "published-task editor must keep Save outside the scroll area")
@@ -59,7 +61,7 @@ require("confirmDiscard" in components and "放弃修改" in components and "继
         "candidate editor must warn before closing dirty edits")
 require("confirmDiscard" in parent_editor and "放弃修改" in parent_editor and "继续编辑" in parent_editor,
         "published-task editor must warn before closing dirty edits")
-require("Button('完成'" in components and components.index("Button('完成'") > components.index("AssignmentEditForm({"),
+require("Button('完成'" in candidate_actions and "saveAndClose()" in candidate_actions,
         "Complete must be a bottom business action that saves and exits")
 
 # Manual add belongs with list management, not after all cards.
