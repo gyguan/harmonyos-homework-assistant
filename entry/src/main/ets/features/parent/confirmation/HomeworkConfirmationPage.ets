@@ -10,6 +10,7 @@ export struct HomeworkConfirmationPage {
   @Prop revision: number = 0;
   @State private localRevision: number = 0;
   @State private editingCandidateId: string = '';
+  @State private manualCandidateDraft: CandidateAssignment | null = null;
   @State private showEditorSheet: boolean = false;
   @State private publishing: boolean = false;
   @State private publishMessage: string = '';
@@ -32,6 +33,9 @@ export struct HomeworkConfirmationPage {
   }
 
   private editingCandidate(): CandidateAssignment | null {
+    if (this.manualCandidateDraft !== null && this.manualCandidateDraft.id === this.editingCandidateId) {
+      return this.manualCandidateDraft;
+    }
     for (let item of this.candidates()) if (item.id === this.editingCandidateId) return item;
     return null;
   }
@@ -52,12 +56,16 @@ export struct HomeworkConfirmationPage {
 
   private completeEditorDismiss(): void {
     this.editingCandidateId = '';
+    this.manualCandidateDraft = null;
   }
 
-  private saveCandidate(candidate: CandidateAssignment): void {
-    if (!this.viewModel.updateCandidate(candidate)) return;
+  private saveCandidate(candidate: CandidateAssignment): boolean {
+    let saved = this.manualCandidateDraft !== null && this.manualCandidateDraft.id === candidate.id ?
+      this.viewModel.addCandidate(candidate) : this.viewModel.updateCandidate(candidate);
+    if (!saved) return false;
     this.localRevision++;
     this.onStoreChanged();
+    return true;
   }
 
   private setExpectedMinutes(item: CandidateAssignment, minutes: number): void {
@@ -81,14 +89,17 @@ export struct HomeworkConfirmationPage {
 
   private addCandidate(): void {
     if (this.bulkMode) return;
-    let candidate = this.viewModel.addCandidate();
-    if (candidate === null) return;
-    this.localRevision++;
-    this.onStoreChanged();
-    this.openEditor(candidate.id);
+    let candidate = this.viewModel.createManualCandidateDraft();
+    this.manualCandidateDraft = candidate;
+    this.editingCandidateId = candidate.id;
+    this.showEditorSheet = true;
   }
 
   private removeCandidate(candidateId: string): void {
+    if (this.manualCandidateDraft !== null && this.manualCandidateDraft.id === candidateId) {
+      this.closeEditor();
+      return;
+    }
     if (!this.viewModel.removeCandidate(candidateId)) return;
     this.selectedCandidateIds = SelectionIds.without(this.selectedCandidateIds, candidateId);
     this.localRevision++;

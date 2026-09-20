@@ -15,9 +15,9 @@ export class HomeworkConfirmationViewModel {
   updateCandidate(candidate: CandidateAssignment): boolean { return this.drafts.updateCandidate(candidate); }
   removeCandidate(candidateId: string): boolean { return this.drafts.removeCandidate(candidateId); }
 
-  addCandidate(): CandidateAssignment | null {
+  createManualCandidateDraft(): CandidateAssignment {
     let raw = this.rawImport();
-    let candidate: CandidateAssignment = {
+    return {
       id: `manual-${Date.now()}`,
       studentId: this.drafts.getActiveStudentId(),
       subject: Subject.CHINESE,
@@ -32,7 +32,10 @@ export class HomeworkConfirmationViewModel {
       },
       confidence: 1.0
     };
-    return this.drafts.addCandidate(candidate) ? candidate : null;
+  }
+
+  addCandidate(candidate: CandidateAssignment): boolean {
+    return this.drafts.addCandidate(candidate);
   }
 
   publish(): Promise<HomeworkBatchPublishResult> {

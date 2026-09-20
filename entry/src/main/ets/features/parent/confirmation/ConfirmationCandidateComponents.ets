@@ -153,7 +153,7 @@ export struct ConfirmationCandidateEditor {
   @State private confirmDelete: boolean = false;
 
   onClose: () => void = () => {};
-  onSave: (candidate: CandidateAssignment) => void = (_candidate: CandidateAssignment) => {};
+  onSave: (candidate: CandidateAssignment) => boolean = (_candidate: CandidateAssignment) => false;
   onDelete: (candidateId: string) => void = (_candidateId: string) => {};
 
   aboutToAppear(): void {
@@ -226,7 +226,7 @@ export struct ConfirmationCandidateEditor {
   }
 
   private saveAndClose(): void {
-    this.onSave(this.buildCandidate());
+    if (!this.onSave(this.buildCandidate())) return;
     this.onClose();
   }
 
