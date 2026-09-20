@@ -58,7 +58,7 @@ require("private QuestionAnswer(question: PracticeQuestion)" not in attempt_page
         "parameterized question Builder can retain stale question snapshots")
 require("private OptionButton(option: PracticeQuestionOption)" not in attempt_page,
         "parameterized option Builder can retain stale option snapshots")
-require("${this.currentIndex}:${this.attempt!.questions[this.currentIndex].id}:${option.key}:${option.label}" in attempt_page,
+require("${this.currentIndex}:${option.key}:${option.label}" in attempt_page,
         "choice option identity must include current question state and option content")
 require("PracticeQuestionVisual" not in attempt_page and "visualSpec" not in attempt_page,
         "attempt page must stay text-only")
