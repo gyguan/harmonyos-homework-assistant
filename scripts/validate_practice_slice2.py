@@ -50,10 +50,16 @@ require("开始练习" in detail and "viewModel.start" in detail,
         "paper detail must create server attempt")
 require("下一题" in attempt_page and "交卷" in attempt_page and "saveCurrent" in attempt_page,
         "attempt page must save answers and support navigation")
-require("${question.id}:${option.key}" in attempt_page,
-        "choice option nodes must be keyed by question identity; option.key alone causes ArkUI to reuse stale options")
-require("}, (option: PracticeQuestionOption) => option.key);" not in attempt_page,
-        "choice option ForEach must not use A/B/C alone as the node key")
+require("private CurrentQuestionAnswer()" in attempt_page,
+        "choice rendering must derive directly from reactive currentIndex state")
+require("this.attempt.questions[this.currentIndex].options" in attempt_page,
+        "choice rendering must bind option data directly to currentIndex")
+require("private QuestionAnswer(question: PracticeQuestion)" not in attempt_page,
+        "parameterized question Builder can retain stale question snapshots")
+require("private OptionButton(option: PracticeQuestionOption)" not in attempt_page,
+        "parameterized option Builder can retain stale option snapshots")
+require("${this.currentIndex}:${this.attempt!.questions[this.currentIndex].id}:${option.key}:${option.label}" in attempt_page,
+        "choice option identity must include current question state and option content")
 require("PracticeQuestionVisual" not in attempt_page and "visualSpec" not in attempt_page,
         "attempt page must stay text-only")
 require("PracticeSubmitConfirmDialog" in attempt_page and "unansweredCount" in attempt_page,
