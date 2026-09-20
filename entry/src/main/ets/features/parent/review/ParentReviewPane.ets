@@ -142,6 +142,10 @@ export struct ParentReviewPane {
 
   private cancelEditing(): void {
     this.showEditSheet = false;
+    this.editNotice = '';
+  }
+
+  private completeEditingDismiss(): void {
     this.editingAssignmentId = '';
     this.editNotice = '';
   }
@@ -153,7 +157,6 @@ export struct ParentReviewPane {
     try {
       await this.viewModel.updateDetails(updated);
       this.showEditSheet = false;
-      this.editingAssignmentId = '';
       this.editNotice = '';
       this.localRevision++;
       this.onReviewed();
@@ -435,10 +438,11 @@ export struct ParentReviewPane {
 
     }
     .width('100%')
-    .bindSheet($$this.showEditSheet, this.AssignmentEditorSheet(), {
+    .bindSheet($this.showEditSheet, this.AssignmentEditorSheet(), {
       height: '82%',
       showClose: false,
-      preferType: SheetType.BOTTOM
+      preferType: SheetType.BOTTOM,
+      onDisappear: () => this.completeEditingDismiss()
     });
   }
 }
