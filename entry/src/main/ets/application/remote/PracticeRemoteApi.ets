@@ -180,10 +180,10 @@ export class PracticeRemoteApi {
       let options: PracticeQuestionOption[] = [];
       for (let option of source.options) options.push({ key: option.key, label: option.label });
       let visualSpec: PracticeVisualSpec = {
-        type: source.visualSpec === undefined ? 'NONE' : source.visualSpec.type,
-        assetId: source.visualSpec === undefined ? '' : source.visualSpec.assetId,
-        layout: source.visualSpec === undefined ? '' : source.visualSpec.layout,
-        accessibilityText: source.visualSpec === undefined ? '' : source.visualSpec.accessibilityText
+        type: source.visualSpec.type,
+        assetId: source.visualSpec.assetId,
+        layout: source.visualSpec.layout,
+        accessibilityText: source.visualSpec.accessibilityText
       };
       questions.push({
         id: source.id, paperId: remote.paperId, paperVersion: remote.paperVersion, orderNo: source.orderNo,
