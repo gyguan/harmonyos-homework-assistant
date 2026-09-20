@@ -42,8 +42,8 @@ export struct PracticePaperDetailPage {
     try {
       let attempt = await this.viewModel.start(this.paper.id, this.paper.version);
       this.onStarted(attempt.id);
-    } catch (error) {
-      this.errorMessage = error instanceof Error ? error.message : '开始练习失败，请稍后重试。';
+    } catch {
+      this.errorMessage = '开始练习失败，请检查网络和家庭云端连接。';
     } finally {
       this.starting = false;
     }
