@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="200" viewBox="0 0 560 200">
+<rect width="560" height="200" rx="24" fill="#FFFFFF"/>
+<rect x="1" y="1" width="558" height="198" rx="23" fill="none" stroke="#D9E2EA" stroke-width="2"/>
+<rect x="75" y="45" width="170" height="100" rx="18" fill="#EEF3F8" stroke="#35608A" stroke-width="2"/><rect x="315" y="45" width="170" height="100" rx="18" fill="#F8F3E9" stroke="#8A6A35" stroke-width="2"/><text x="280" y="105" text-anchor="middle" font-size="30" fill="#35608A">↔</text>
+<text x="280" y="180" text-anchor="middle" font-size="16" font-family="sans-serif" fill="#334E68">图文配对</text>
+</svg>
