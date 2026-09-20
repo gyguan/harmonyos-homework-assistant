@@ -358,7 +358,6 @@ export struct StudentAssignmentsPage {
         Row() {
           Column({ space: 2 }) {
             Text('需要处理').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('进行中、待订正、逾期或待提交').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
@@ -390,7 +389,6 @@ export struct StudentAssignmentsPage {
         Row() {
           Column({ space: 2 }) {
             Text('待开始').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('还没有开始的作业').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
@@ -422,7 +420,6 @@ export struct StudentAssignmentsPage {
         Row() {
           Column({ space: 2 }) {
             Text('已提交').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('等待家长确认').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
@@ -454,7 +451,6 @@ export struct StudentAssignmentsPage {
         Row() {
           Column({ space: 2 }) {
             Text('已完成').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('已经完成并验收').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
@@ -522,8 +518,6 @@ export struct StudentAssignmentsPage {
       Row({ space: 12 }) {
         Column({ space: 4 }) {
           Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text(this.calendarMode ? '按日期查看课内、课外任务和完成情况。' : '通过筛选快速找到要完成的任务。')
-            .fontSize(13).fontColor(AppTheme.SUBTEXT).maxLines(2);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
@@ -555,9 +549,6 @@ export struct StudentAssignmentsPage {
             .fontSize(AppTheme.SECTION_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('点击左侧作业即可切换，状态与操作保持同一数据源。')
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
       }
@@ -592,10 +583,6 @@ export struct StudentAssignmentsPage {
             .fontSize(AppTheme.SECTION_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('阅读、运动、实践等任务独立汇总，和学校作业仍共用 Assignment。')
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .lineHeight(18)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
