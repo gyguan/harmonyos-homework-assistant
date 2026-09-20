@@ -18,8 +18,8 @@ export class MockData {
     {
       id: 'student-xiaoyu-001',
       name: '小宇',
-      grade: '三年级',
-      className: '三（2）班',
+      grade: '二年级',
+      className: '二（2）班',
       semester: '上学期',
       textbookSummary: '语文部编版 · 数学北师大版 · 英语沪教版'
     },
@@ -51,7 +51,7 @@ export class MockData {
       subject: Subject.MATH,
       title: '练习册 P26 第 1～6 题',
       instruction: '先独立完成，再用红笔订正。完成后拍照上传。',
-      textbookRef: '北师大版三年级上册 · 第三单元 加与减',
+      textbookRef: '北师大版二年级上册 · 第三单元 加与减',
       dueAtEpochMs: Date.now() + 60 * 60 * 1000,
       dueTimezone: 'Asia/Shanghai',
       dueText: '20:30 前',
@@ -74,9 +74,9 @@ export class MockData {
       assignmentType: AssignmentType.SCHOOL,
       subjectCode: 'CHINESE',
       subject: Subject.CHINESE,
-      title: '朗读《秋天的雨》第 2～4 自然段',
+      title: '朗读课文指定自然段',
       instruction: '有感情朗读两遍并提交录音。',
-      textbookRef: '部编版三年级上册 · 第二单元',
+      textbookRef: '部编版二年级上册 · 第二单元',
       dueAtEpochMs: Date.now() - 60 * 60 * 1000,
       dueTimezone: 'Asia/Shanghai',
       dueText: '已完成',
@@ -101,7 +101,7 @@ export class MockData {
       subject: Subject.ENGLISH,
       title: '听读 Unit 3 Look and learn',
       instruction: '跟读两遍，注意单词发音。',
-      textbookRef: '沪教版三年级上册 · Unit 3',
+      textbookRef: '沪教版二年级上册 · Unit 3',
       dueAtEpochMs: Date.now() + 2 * 60 * 60 * 1000,
       dueTimezone: 'Asia/Shanghai',
       dueText: '21:00 前',
@@ -126,7 +126,7 @@ export class MockData {
       subject: Subject.MATH,
       title: '错题订正 3 题',
       instruction: '订正并写出错误原因。',
-      textbookRef: '北师大版三年级上册',
+      textbookRef: '北师大版二年级上册',
       dueAtEpochMs: Date.now() - 24 * 60 * 60 * 1000,
       dueTimezone: 'Asia/Shanghai',
       dueText: '昨天 21:00',
@@ -217,9 +217,9 @@ export class MockData {
       id: 'import-001',
       studentId: 'student-xiaoyu-001',
       sourceKind: HomeworkImportSourceKind.IMAGE,
-      sourceLabel: '三（2）班微信群截图 · 19:01',
+      sourceLabel: '二（2）班微信群截图 · 19:01',
       resourceUri: 'mock://wechat-homework-screenshot-001',
-      rawText: '今天作业：语文背诵第12课古诗两首；数学练习册32页；英语听读U4，明天检查。'
+      rawText: '今天作业：语文朗读课文并复习字词；数学练习册32页；英语听读U4，明天检查。'
     },
     {
       id: 'import-002',
@@ -236,14 +236,14 @@ export class MockData {
       id: 'c-1',
       studentId: 'student-xiaoyu-001',
       subject: Subject.CHINESE,
-      title: '背诵第 12 课《古诗两首》',
-      instruction: '按老师要求完成背诵，明天检查。',
-      textbookRef: '部编版三年级上册 · 第 12 课',
+      title: '朗读课文并复习字词',
+      instruction: '按老师要求完成朗读和字词复习，明天检查。',
+      textbookRef: '部编版二年级上册 · 当周课文',
       dueText: '明天',
       expectedMinutes: 15,
       sourceEvidence: {
-        sourceLabel: '三（2）班微信群截图 · 19:01',
-        excerpt: '语文背诵第12课古诗两首'
+        sourceLabel: '二（2）班微信群截图 · 19:01',
+        excerpt: '语文朗读课文并复习字词'
       },
       confidence: 0.96
     },
@@ -253,11 +253,11 @@ export class MockData {
       subject: Subject.MATH,
       title: '完成练习册 P32',
       instruction: '完成练习册第 32 页，明天检查。',
-      textbookRef: '北师大版三年级上册 · 待家长确认页码',
+      textbookRef: '北师大版二年级上册 · 待家长确认页码',
       dueText: '明天',
       expectedMinutes: 20,
       sourceEvidence: {
-        sourceLabel: '三（2）班微信群截图 · 19:01',
+        sourceLabel: '二（2）班微信群截图 · 19:01',
         excerpt: '数学练习册32页'
       },
       confidence: 0.72
@@ -268,11 +268,11 @@ export class MockData {
       subject: Subject.ENGLISH,
       title: '听读 Unit 4',
       instruction: '完成 Unit 4 听读，明天检查。',
-      textbookRef: '沪教版三年级上册 · Unit 4',
+      textbookRef: '沪教版二年级上册 · Unit 4',
       dueText: '明天',
       expectedMinutes: 15,
       sourceEvidence: {
-        sourceLabel: '三（2）班微信群截图 · 19:01',
+        sourceLabel: '二（2）班微信群截图 · 19:01',
         excerpt: '英语听读U4'
       },
       confidence: 0.95
