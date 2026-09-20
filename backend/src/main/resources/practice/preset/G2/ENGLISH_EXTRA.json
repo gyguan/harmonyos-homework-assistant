@@ -6,7 +6,7 @@
   "papers": [
     {
       "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -25,7 +25,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q01",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "你向同学借到一支铅笔后，应该说什么？",
@@ -54,7 +54,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q02",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "老师说“Please sit down.”，你应该做什么？",
@@ -83,7 +83,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q03",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "你想问朋友叫什么名字，应该说哪一句英语？",
@@ -112,7 +112,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q04",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "同学帮助了你，哪一句英语回答最有礼貌？",
@@ -141,7 +141,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q05",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "早上遇到老师，应该怎么打招呼？",
@@ -170,7 +170,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q06",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "你想问朋友会不会游泳，应该说哪一句英语？",
@@ -199,7 +199,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q07",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "你的水杯在桌子上，下面哪一句英语表达正确？",
@@ -228,7 +228,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q08",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "你想介绍朋友Lily，可以说哪一句英语？",
@@ -257,7 +257,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q09",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "学生通常去哪里读书？",
@@ -286,7 +286,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q10",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "体育课上，下面哪个英语动作词最合适？",
@@ -315,7 +315,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q11",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "你准备离开学校时，哪一句英语最合适？",
@@ -344,7 +344,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q12",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "需要别人帮助时，哪一句英语最有礼貌？",
@@ -376,7 +376,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -395,7 +395,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q01",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "你在公园里，下面哪一句英语符合这个场景？",
@@ -424,7 +424,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q02",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "你和家人一起坐地铁。“family”是什么意思？",
@@ -453,7 +453,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q03",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "在图书馆里，下面哪一句英语可以正确描述一本书？",
@@ -482,7 +482,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q04",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "深圳下雨了，下面哪件物品最有用？",
@@ -511,7 +511,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q05",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "你在公园里看到一只鸟，应该用哪个英语单词？",
@@ -540,7 +540,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q06",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "你想表达“天空是蓝色的”，请选择正确的英语句子。",
@@ -569,7 +569,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q07",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "参加社区运动会时，下面哪个英语动作词最合适？",
@@ -598,7 +598,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q08",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "早上走进图书馆时，可以使用哪一句问候语？",
@@ -627,7 +627,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q09",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "你的地铁卡在书包里，下面哪一句英语表达正确？",
@@ -656,7 +656,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q10",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "在公园里，朋友问“Can you run?”，你可以怎样回答？",
@@ -685,7 +685,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q11",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "“公园”用英语怎么说？",
@@ -714,7 +714,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q12",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "别人给你指路后，哪一句英语最有礼貌？",
@@ -746,7 +746,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -765,7 +765,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q01",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\n这个男孩叫什么名字？",
@@ -794,7 +794,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q02",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nSam几岁？",
@@ -823,7 +823,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q03",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nSam喜欢什么颜色？",
@@ -852,7 +852,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q04",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nBen是谁？",
@@ -881,7 +881,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q05",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n书在哪里？",
@@ -910,7 +910,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q06",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n球在哪里？",
@@ -939,7 +939,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q07",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n什么东西在窗户旁边？",
@@ -968,7 +968,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q08",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n这段短文主要介绍什么？",
@@ -997,7 +997,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q09",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy和妈妈什么时候去公园？",
@@ -1026,7 +1026,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q10",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\n谁和Amy一起去？",
@@ -1055,7 +1055,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q11",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy能看到什么？",
@@ -1084,7 +1084,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q12",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy可以和Lucy一起做什么？",
