@@ -150,6 +150,9 @@ jobs:
       - name: Validate Practice Slice 1
         run: python scripts/validate_practice_slice1.py
 
+      - name: Validate Practice Slice 2
+        run: python scripts/validate_practice_slice2.py
+
       - name: Validate parent Tutor settings
         run: python scripts/validate_parent_tutor_settings.py
 
@@ -239,6 +242,9 @@ jobs:
 
       - name: Run assignment action command E2E
         run: python backend/scripts/assignment_action_e2e.py
+
+      - name: Run Practice attempt E2E
+        run: python backend/scripts/practice_e2e.py
 
       - name: Run parent review command E2E
         run: python backend/scripts/parent_review_e2e.py
