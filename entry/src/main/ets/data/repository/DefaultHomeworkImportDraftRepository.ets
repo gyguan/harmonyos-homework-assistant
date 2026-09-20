@@ -35,11 +35,9 @@ export class DefaultHomeworkImportDraftRepository implements HomeworkImportDraft
     return removed;
   }
 
-  clearCandidates(): void {
-    // Publishing/abandoning owns inbox history state. Clearing the legacy active draft must not
-    // erase the batch candidate snapshot that provides audit/source traceability.
-    this.local.replaceCandidates([]);
-  }
+  // Publishing/abandoning owns inbox history state. Clearing the legacy active draft must not
+  // erase the batch candidate snapshot that provides audit/source traceability.
+  clearCandidates(): void { this.local.replaceCandidates([]); }
 
   private syncInboxCandidates(): void {
     let inbox = DefaultHomeworkImportInboxRepository.instance;
