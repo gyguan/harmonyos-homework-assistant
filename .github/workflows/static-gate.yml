@@ -27,6 +27,9 @@ jobs:
       - name: Validate ArkTS compile safety
         run: python scripts/validate_arkts_compile_safety.py
 
+      - name: Validate issue 241 capture spike
+        run: python scripts/validate_issue241_capture_spike.py
+
       - name: Validate pasted teacher text import
         run: python scripts/validate_text_import_feature.py
 
