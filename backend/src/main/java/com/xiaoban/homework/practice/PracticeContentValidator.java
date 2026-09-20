@@ -14,19 +14,16 @@ public class PracticeContentValidator {
   private static final Set<String> SUBJECTS = Set.of("CHINESE", "MATH", "ENGLISH", "THINKING");
   private static final Set<String> DIFFICULTIES = Set.of("L1", "L2", "L3");
   private static final Set<String> SEMESTERS = Set.of("ALL", "S1", "S2");
+  private static final Set<String> TRACKS = Set.of("TEXTBOOK_SYNC", "EXTRACURRICULAR");
   private static final Set<String> SOURCE_TYPES =
       Set.of("PRESET", "AI_GENERATED", "PARENT_CREATED", "IMPORTED");
   private static final Set<String> STATUSES = Set.of("PUBLISHED", "ARCHIVED");
   private static final Set<String> QUESTION_TYPES =
       Set.of("SINGLE_CHOICE", "MULTIPLE_CHOICE", "FILL_BLANK", "NUMBER", "SHORT_TEXT");
-  private static final Set<String> VISUAL_TYPES =
-      Set.of("NONE", "SCENE", "ARRAY", "DOT_ARRAY", "IMAGE_PAIR", "IMAGE_SEQUENCE",
-          "DIALOGUE", "ROOM_SCENE", "FAMILY_SCENE", "CHARACTER", "ILLUSTRATION");
-
   public void validateCatalog(PracticeContentCatalog.Catalog catalog) {
     List<String> errors = new ArrayList<>();
     if (catalog == null) throw new IllegalStateException("练习内容 catalog 为空");
-    if (catalog.schemaVersion() != 1) errors.add("schemaVersion 必须为 1");
+    if (catalog.schemaVersion() != 2) errors.add("schemaVersion 必须为 2");
     requireText(catalog.catalogId(), "catalogId", errors);
     if (catalog.papers() == null || catalog.papers().isEmpty()) errors.add("papers 不能为空");
 
@@ -59,6 +56,7 @@ public class PracticeContentValidator {
     if (!GRADES.contains(paper.grade())) errors.add(path + ".grade 非法: " + paper.grade());
     if (!SUBJECTS.contains(paper.subject())) errors.add(path + ".subject 非法: " + paper.subject());
     if (!SEMESTERS.contains(paper.semester())) errors.add(path + ".semester 非法: " + paper.semester());
+    if (!TRACKS.contains(paper.track())) errors.add(path + ".track 非法: " + paper.track());
     if (!DIFFICULTIES.contains(paper.difficulty())) errors.add(path + ".difficulty 非法: " + paper.difficulty());
     if (!SOURCE_TYPES.contains(paper.sourceType())) errors.add(path + ".sourceType 非法: " + paper.sourceType());
     if (!STATUSES.contains(paper.status())) errors.add(path + ".status 非法: " + paper.status());
@@ -119,26 +117,7 @@ public class PracticeContentValidator {
     requireText(question.explanation(), path + ".explanation", errors);
     validateStringList(question.hints(), path + ".hints", 1, 3, errors);
     validateStringList(question.tags(), path + ".tags", 1, 8, errors);
-    validateVisualSpec(paper, question, path, errors);
     validateAnswerSpec(question, path, errors);
-  }
-
-  private void validateVisualSpec(PracticeContentCatalog.Paper paper,
-      PracticeContentCatalog.Question question, String path, List<String> errors) {
-    PracticeContentCatalog.VisualSpec visual = question.visualSpec();
-    boolean p0 = paper.id() != null && paper.id().contains("-P0-");
-    if (visual == null) {
-      if (p0) errors.add(path + ".visualSpec P0 图文题不能为空");
-      return;
-    }
-    if (!VISUAL_TYPES.contains(visual.type())) {
-      errors.add(path + ".visualSpec.type 非法: " + visual.type());
-    }
-    if (p0 || !"NONE".equals(visual.type())) {
-      requireText(visual.assetId(), path + ".visualSpec.assetId", errors);
-      requireText(visual.layout(), path + ".visualSpec.layout", errors);
-      requireText(visual.accessibilityText(), path + ".visualSpec.accessibilityText", errors);
-    }
   }
 
   private void validateAnswerSpec(PracticeContentCatalog.Question question, String path, List<String> errors) {

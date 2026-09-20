@@ -165,9 +165,6 @@ jobs:
       - name: Validate Practice content catalog
         run: python scripts/validate_practice_content.py
 
-      - name: Validate Practice visual P0
-        run: python scripts/validate_practice_visual_p0.py
-
       - name: Validate parent Tutor settings
         run: python scripts/validate_parent_tutor_settings.py
 

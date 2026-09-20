@@ -17,7 +17,6 @@ public class PracticeQuestionEntity {
   public String explanation;
   public String hintsJson;
   public String tagsJson;
-  public String visualSpecJson;
 
   protected PracticeQuestionEntity() {}
 }

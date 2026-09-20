@@ -12,7 +12,7 @@
   ],
   "properties": {
     "schemaVersion": {
-      "const": 1
+      "const": 2
     },
     "catalogId": {
       "type": "string",
@@ -24,12 +24,13 @@
     },
     "files": {
       "type": "array",
-      "minItems": 18,
+      "minItems": 6,
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "pattern": "^G[1-6]/(CHINESE|MATH|ENGLISH)(?:_P0)?\\.json$"
-      }
+        "pattern": "^G2/(CHINESE|MATH|ENGLISH)_(SYNC|EXTRA)\\.json$"
+      },
+      "maxItems": 6
     }
   }
 }

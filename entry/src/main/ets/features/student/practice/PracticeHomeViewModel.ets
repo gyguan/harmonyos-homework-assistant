@@ -5,6 +5,8 @@ import {
   PracticePaper,
   PracticeSemester,
   PracticeSubject,
+  PracticeTrack,
+  PracticeTrackFilter,
   PracticeTaxonomy
 } from '../../../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
@@ -50,6 +52,14 @@ export class PracticeHomeViewModel {
     return PracticeTaxonomy.semesterLabel(semester);
   }
 
+  trackLabel(track: PracticeTrack): string {
+    return PracticeTaxonomy.trackLabel(track);
+  }
+
+  trackFilterLabel(track: PracticeTrackFilter): string {
+    return PracticeTaxonomy.trackFilterLabel(track);
+  }
+
   difficultyLabel(paper: PracticePaper): string {
     return PracticeTaxonomy.difficultyLabel(paper.difficulty);
   }
@@ -57,8 +67,9 @@ export class PracticeHomeViewModel {
   listPapers(
     grade: PracticeGrade,
     subject: PracticeSubject,
-    semester: PracticeSemester
+    semester: PracticeSemester,
+    track: PracticeTrackFilter
   ): Promise<PracticePaper[]> {
-    return this.practiceRepository.listPapers(grade, subject, semester);
+    return this.practiceRepository.listPapers(grade, subject, semester, track);
   }
 }

@@ -1,0 +1,1118 @@
+{
+  "schemaVersion": 2,
+  "grade": "G2",
+  "subject": "CHINESE",
+  "track": "EXTRACURRICULAR",
+  "papers": [
+    {
+      "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "深圳生活阅读（一）",
+      "description": "以地铁、社区图书馆和红树林等深圳生活场景为背景的原创阅读。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "课外拓展",
+        "深圳生活",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：周末，小宇和爸爸坐地铁去少年宫。进站前，他们先在闸机外排队，进站后按照指示牌找到正确的站台。车到站后，小宇等车上的乘客先下车，再跟着爸爸上车。\n小宇和爸爸准备去哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "少年宫"
+            },
+            {
+              "key": "B",
+              "label": "医院"
+            },
+            {
+              "key": "C",
+              "label": "机场"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文写坐地铁去少年宫。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "深圳生活"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：周末，小宇和爸爸坐地铁去少年宫。进站前，他们先在闸机外排队，进站后按照指示牌找到正确的站台。车到站后，小宇等车上的乘客先下车，再跟着爸爸上车。\n进站后他们怎样找站台？",
+          "options": [
+            {
+              "key": "A",
+              "label": "看指示牌"
+            },
+            {
+              "key": "B",
+              "label": "随便走"
+            },
+            {
+              "key": "C",
+              "label": "跟着跑最快的人"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "他们按照指示牌找站台。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：周末，小宇和爸爸坐地铁去少年宫。进站前，他们先在闸机外排队，进站后按照指示牌找到正确的站台。车到站后，小宇等车上的乘客先下车，再跟着爸爸上车。\n上车前小宇先做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "等乘客先下车"
+            },
+            {
+              "key": "B",
+              "label": "抢先冲上车"
+            },
+            {
+              "key": "C",
+              "label": "坐在地上等"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文写先下后上。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "文明出行"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：周末，小宇和爸爸坐地铁去少年宫。进站前，他们先在闸机外排队，进站后按照指示牌找到正确的站台。车到站后，小宇等车上的乘客先下车，再跟着爸爸上车。\n小宇的乘车行为怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "文明有序"
+            },
+            {
+              "key": "B",
+              "label": "非常危险"
+            },
+            {
+              "key": "C",
+              "label": "不守规则"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "排队和先下后上体现文明有序。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：社区图书馆举办“交换一本好书”活动。小宁带来一本已经读过的故事书，在登记台写下书名，再换走一本自己感兴趣的科普书。她觉得这样既能读到新书，又能让旧书继续被别人阅读。\n活动是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "交换一本好书"
+            },
+            {
+              "key": "B",
+              "label": "跑步比赛"
+            },
+            {
+              "key": "C",
+              "label": "画画比赛"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "开头说明是交换图书活动。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "深圳生活"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：社区图书馆举办“交换一本好书”活动。小宁带来一本已经读过的故事书，在登记台写下书名，再换走一本自己感兴趣的科普书。她觉得这样既能读到新书，又能让旧书继续被别人阅读。\n小宁带来的是什么书？",
+          "options": [
+            {
+              "key": "A",
+              "label": "故事书"
+            },
+            {
+              "key": "B",
+              "label": "字典"
+            },
+            {
+              "key": "C",
+              "label": "菜谱"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "文中写带来一本故事书。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：社区图书馆举办“交换一本好书”活动。小宁带来一本已经读过的故事书，在登记台写下书名，再换走一本自己感兴趣的科普书。她觉得这样既能读到新书，又能让旧书继续被别人阅读。\n她换走了什么书？",
+          "options": [
+            {
+              "key": "A",
+              "label": "科普书"
+            },
+            {
+              "key": "B",
+              "label": "练习本"
+            },
+            {
+              "key": "C",
+              "label": "地图"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "她换走一本科普书。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：社区图书馆举办“交换一本好书”活动。小宁带来一本已经读过的故事书，在登记台写下书名，再换走一本自己感兴趣的科普书。她觉得这样既能读到新书，又能让旧书继续被别人阅读。\n这个活动的好处之一是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "让旧书继续被阅读"
+            },
+            {
+              "key": "B",
+              "label": "让书越来越少"
+            },
+            {
+              "key": "C",
+              "label": "只允许买新书"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "交换能让图书循环阅读。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：清晨的红树林边，几只白鹭站在浅水里寻找食物。观鸟的人们放慢脚步，不大声喊叫，也不靠得太近。大家用安静的方式观察这些小动物。\n白鹭在哪里寻找食物？",
+          "options": [
+            {
+              "key": "A",
+              "label": "浅水里"
+            },
+            {
+              "key": "B",
+              "label": "教室里"
+            },
+            {
+              "key": "C",
+              "label": "商场里"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文写白鹭站在浅水里。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "自然"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：清晨的红树林边，几只白鹭站在浅水里寻找食物。观鸟的人们放慢脚步，不大声喊叫，也不靠得太近。大家用安静的方式观察这些小动物。\n观鸟的人为什么放慢脚步？",
+          "options": [
+            {
+              "key": "A",
+              "label": "避免打扰动物"
+            },
+            {
+              "key": "B",
+              "label": "因为地面很滑"
+            },
+            {
+              "key": "C",
+              "label": "为了比赛谁最慢"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "他们用安静方式观察，不想打扰白鹭。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：清晨的红树林边，几只白鹭站在浅水里寻找食物。观鸟的人们放慢脚步，不大声喊叫，也不靠得太近。大家用安静的方式观察这些小动物。\n大家没有做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "大声喊叫"
+            },
+            {
+              "key": "B",
+              "label": "安静观察"
+            },
+            {
+              "key": "C",
+              "label": "保持距离"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文写不大声喊叫。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SHENZHEN-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：清晨的红树林边，几只白鹭站在浅水里寻找食物。观鸟的人们放慢脚步，不大声喊叫，也不靠得太近。大家用安静的方式观察这些小动物。\n这段话提醒我们观察动物时要？",
+          "options": [
+            {
+              "key": "A",
+              "label": "尊重并减少打扰"
+            },
+            {
+              "key": "B",
+              "label": "追着动物跑"
+            },
+            {
+              "key": "C",
+              "label": "把动物带回家"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "核心是文明观察、不打扰。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "拓展阅读",
+            "理解"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "趣味科普阅读（一）",
+      "description": "用儿童能理解的科普短文训练观察、因果和信息提取。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "课外拓展",
+        "科普",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：下雨后，路边常能看见小蜗牛。空气湿润时，它们身体里的水分不容易散失，所以更愿意出来活动。太阳很晒的时候，它们常躲在阴凉湿润的地方。\n什么时候更容易看到蜗牛出来？",
+          "options": [
+            {
+              "key": "A",
+              "label": "下雨后"
+            },
+            {
+              "key": "B",
+              "label": "烈日正午"
+            },
+            {
+              "key": "C",
+              "label": "干燥大风时"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "文中写下雨后常能看到蜗牛。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "动物"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：下雨后，路边常能看见小蜗牛。空气湿润时，它们身体里的水分不容易散失，所以更愿意出来活动。太阳很晒的时候，它们常躲在阴凉湿润的地方。\n蜗牛为什么喜欢湿润环境？",
+          "options": [
+            {
+              "key": "A",
+              "label": "水分不容易散失"
+            },
+            {
+              "key": "B",
+              "label": "那里没有空气"
+            },
+            {
+              "key": "C",
+              "label": "因为能飞起来"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文说明湿润环境能减少水分散失。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "原因"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：下雨后，路边常能看见小蜗牛。空气湿润时，它们身体里的水分不容易散失，所以更愿意出来活动。太阳很晒的时候，它们常躲在阴凉湿润的地方。\n太阳很晒时蜗牛常躲到？",
+          "options": [
+            {
+              "key": "A",
+              "label": "阴凉湿润处"
+            },
+            {
+              "key": "B",
+              "label": "热的铁板上"
+            },
+            {
+              "key": "C",
+              "label": "阳光最强处"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "文中明确写阴凉湿润处。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：下雨后，路边常能看见小蜗牛。空气湿润时，它们身体里的水分不容易散失，所以更愿意出来活动。太阳很晒的时候，它们常躲在阴凉湿润的地方。\n这段话主要介绍？",
+          "options": [
+            {
+              "key": "A",
+              "label": "蜗牛与湿润环境"
+            },
+            {
+              "key": "B",
+              "label": "蜗牛会唱歌"
+            },
+            {
+              "key": "C",
+              "label": "蜗牛怎样游泳"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "主要讲蜗牛喜欢湿润环境。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "概括"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：植物的叶子需要阳光。阳台上的花盆如果一直朝一个方向摆放，有些叶子可能晒不到太阳。每隔一段时间转动一下花盆，可以让不同方向的叶子都有机会晒到阳光。\n植物的叶子需要什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "阳光"
+            },
+            {
+              "key": "B",
+              "label": "玩具"
+            },
+            {
+              "key": "C",
+              "label": "糖果"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "第一句说明需要阳光。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "植物"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：植物的叶子需要阳光。阳台上的花盆如果一直朝一个方向摆放，有些叶子可能晒不到太阳。每隔一段时间转动一下花盆，可以让不同方向的叶子都有机会晒到阳光。\n为什么要转动花盆？",
+          "options": [
+            {
+              "key": "A",
+              "label": "让不同方向叶子晒到阳光"
+            },
+            {
+              "key": "B",
+              "label": "让花盆变轻"
+            },
+            {
+              "key": "C",
+              "label": "让花更安静"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "转动花盆能让各方向叶子受光。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "原因"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：植物的叶子需要阳光。阳台上的花盆如果一直朝一个方向摆放，有些叶子可能晒不到太阳。每隔一段时间转动一下花盆，可以让不同方向的叶子都有机会晒到阳光。\n一直不转花盆可能怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "有些叶子晒不到太阳"
+            },
+            {
+              "key": "B",
+              "label": "花盆会跑走"
+            },
+            {
+              "key": "C",
+              "label": "叶子会变成石头"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文说明某些叶子可能晒不到。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：植物的叶子需要阳光。阳台上的花盆如果一直朝一个方向摆放，有些叶子可能晒不到太阳。每隔一段时间转动一下花盆，可以让不同方向的叶子都有机会晒到阳光。\n这段话适合用哪个标题？",
+          "options": [
+            {
+              "key": "A",
+              "label": "让叶子都晒到阳光"
+            },
+            {
+              "key": "B",
+              "label": "怎样做纸飞机"
+            },
+            {
+              "key": "C",
+              "label": "为什么要关窗"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "全文围绕叶片受光。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "标题"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：台风来临前，风可能逐渐变大，还会出现强降雨。学校和社区会发布安全提醒。小朋友应该和家人在安全的室内活动，不到海边、河边或大树下玩耍。\n台风来临时可能出现？",
+          "options": [
+            {
+              "key": "A",
+              "label": "大风和强降雨"
+            },
+            {
+              "key": "B",
+              "label": "连续大雪"
+            },
+            {
+              "key": "C",
+              "label": "没有任何风"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文写风变大并有强降雨。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "天气"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：台风来临前，风可能逐渐变大，还会出现强降雨。学校和社区会发布安全提醒。小朋友应该和家人在安全的室内活动，不到海边、河边或大树下玩耍。\n哪里会发布安全提醒？",
+          "options": [
+            {
+              "key": "A",
+              "label": "学校和社区"
+            },
+            {
+              "key": "B",
+              "label": "玩具盒"
+            },
+            {
+              "key": "C",
+              "label": "铅笔袋"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "文中写学校和社区会提醒。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：台风来临前，风可能逐渐变大，还会出现强降雨。学校和社区会发布安全提醒。小朋友应该和家人在安全的室内活动，不到海边、河边或大树下玩耍。\n小朋友应该在哪里活动？",
+          "options": [
+            {
+              "key": "A",
+              "label": "安全的室内"
+            },
+            {
+              "key": "B",
+              "label": "海边"
+            },
+            {
+              "key": "C",
+              "label": "大树下"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文建议在安全室内。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "安全"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-SCIENCE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：台风来临前，风可能逐渐变大，还会出现强降雨。学校和社区会发布安全提醒。小朋友应该和家人在安全的室内活动，不到海边、河边或大树下玩耍。\n这段话主要提醒？",
+          "options": [
+            {
+              "key": "A",
+              "label": "台风天气注意安全"
+            },
+            {
+              "key": "B",
+              "label": "台风天去海边玩"
+            },
+            {
+              "key": "C",
+              "label": "下雨时爬树"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "主题是台风天气安全。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "科普阅读",
+            "主旨"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-EXTRA-STORY-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "故事与推理（一）",
+      "description": "通过原创小故事练习起因、经过、结果、人物特点和简单预测。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "课外拓展",
+        "故事",
+        "推理"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：小杰做手工时发现胶水用完了。他没有马上向同桌要，而是先检查材料盒，找到一卷双面胶。最后，他用双面胶顺利完成了作品。\n小杰开始遇到什么问题？",
+          "options": [
+            {
+              "key": "A",
+              "label": "胶水用完了"
+            },
+            {
+              "key": "B",
+              "label": "纸不见了"
+            },
+            {
+              "key": "C",
+              "label": "剪刀坏了"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "问题是胶水用完。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "起因"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：小杰做手工时发现胶水用完了。他没有马上向同桌要，而是先检查材料盒，找到一卷双面胶。最后，他用双面胶顺利完成了作品。\n他先做了什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "检查材料盒"
+            },
+            {
+              "key": "B",
+              "label": "马上放弃"
+            },
+            {
+              "key": "C",
+              "label": "跑出教室"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "他先检查材料盒。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "经过"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：小杰做手工时发现胶水用完了。他没有马上向同桌要，而是先检查材料盒，找到一卷双面胶。最后，他用双面胶顺利完成了作品。\n最后用什么完成作品？",
+          "options": [
+            {
+              "key": "A",
+              "label": "双面胶"
+            },
+            {
+              "key": "B",
+              "label": "水彩笔"
+            },
+            {
+              "key": "C",
+              "label": "尺子"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "最后找到双面胶。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "结果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：小杰做手工时发现胶水用完了。他没有马上向同桌要，而是先检查材料盒，找到一卷双面胶。最后，他用双面胶顺利完成了作品。\n小杰解决问题的方式说明他？",
+          "options": [
+            {
+              "key": "A",
+              "label": "会主动想办法"
+            },
+            {
+              "key": "B",
+              "label": "遇事只会生气"
+            },
+            {
+              "key": "C",
+              "label": "不愿完成任务"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "他先寻找替代办法。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：小敏在操场捡到一张饭卡。她想到失主可能很着急，就把饭卡交给了老师。午休前，老师找到了丢卡的同学，那位同学连声向小敏道谢。\n小敏捡到了什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "饭卡"
+            },
+            {
+              "key": "B",
+              "label": "雨伞"
+            },
+            {
+              "key": "C",
+              "label": "跳绳"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "她捡到一张饭卡。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：小敏在操场捡到一张饭卡。她想到失主可能很着急，就把饭卡交给了老师。午休前，老师找到了丢卡的同学，那位同学连声向小敏道谢。\n她把饭卡交给谁？",
+          "options": [
+            {
+              "key": "A",
+              "label": "老师"
+            },
+            {
+              "key": "B",
+              "label": "陌生人"
+            },
+            {
+              "key": "C",
+              "label": "商店"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "小敏把饭卡交给老师。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "经过"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：小敏在操场捡到一张饭卡。她想到失主可能很着急，就把饭卡交给了老师。午休前，老师找到了丢卡的同学，那位同学连声向小敏道谢。\n失主最后找回饭卡了吗？",
+          "options": [
+            {
+              "key": "A",
+              "label": "找回了"
+            },
+            {
+              "key": "B",
+              "label": "没有"
+            },
+            {
+              "key": "C",
+              "label": "短文没说"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "老师找到了丢卡同学。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "结果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：小敏在操场捡到一张饭卡。她想到失主可能很着急，就把饭卡交给了老师。午休前，老师找到了丢卡的同学，那位同学连声向小敏道谢。\n小敏的做法值得学习，因为她？",
+          "options": [
+            {
+              "key": "A",
+              "label": "拾到物品主动归还"
+            },
+            {
+              "key": "B",
+              "label": "把饭卡藏起来"
+            },
+            {
+              "key": "C",
+              "label": "拿饭卡去消费"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "她帮助失主找回物品。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "品德"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：哥哥教妹妹整理书桌：常用的铅笔放进笔筒，课本按大小排好，不常用的手工材料放进抽屉。妹妹照着做，很快就找到了一块空出来的桌面。\n哥哥教妹妹做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "整理书桌"
+            },
+            {
+              "key": "B",
+              "label": "做蛋糕"
+            },
+            {
+              "key": "C",
+              "label": "骑自行车"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "故事围绕整理书桌。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：哥哥教妹妹整理书桌：常用的铅笔放进笔筒，课本按大小排好，不常用的手工材料放进抽屉。妹妹照着做，很快就找到了一块空出来的桌面。\n常用铅笔放在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "笔筒"
+            },
+            {
+              "key": "B",
+              "label": "冰箱"
+            },
+            {
+              "key": "C",
+              "label": "鞋柜"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "文中写放进笔筒。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：哥哥教妹妹整理书桌：常用的铅笔放进笔筒，课本按大小排好，不常用的手工材料放进抽屉。妹妹照着做，很快就找到了一块空出来的桌面。\n整理后发生了什么变化？",
+          "options": [
+            {
+              "key": "A",
+              "label": "桌面空出一块地方"
+            },
+            {
+              "key": "B",
+              "label": "书桌更乱了"
+            },
+            {
+              "key": "C",
+              "label": "东西全丢了"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "整理后桌面腾出了空间。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "结果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读短文：哥哥教妹妹整理书桌：常用的铅笔放进笔筒，课本按大小排好，不常用的手工材料放进抽屉。妹妹照着做，很快就找到了一块空出来的桌面。\n这个故事告诉我们？",
+          "options": [
+            {
+              "key": "A",
+              "label": "分类整理更容易找到东西"
+            },
+            {
+              "key": "B",
+              "label": "东西越乱越方便"
+            },
+            {
+              "key": "C",
+              "label": "课本不用整理"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "分类整理能让空间更整洁。",
+          "hints": [
+            "圈出题目中的关键词，再结合生活经验判断。"
+          ],
+          "tags": [
+            "故事",
+            "理解"
+          ]
+        }
+      ]
+    }
+  ]
+}

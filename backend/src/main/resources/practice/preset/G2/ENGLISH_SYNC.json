@@ -1,0 +1,2229 @@
+{
+  "schemaVersion": 2,
+  "grade": "G2",
+  "subject": "ENGLISH",
+  "track": "TEXTBOOK_SYNC",
+  "papers": [
+    {
+      "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语问候、姓名与数字颜色（一）",
+      "description": "围绕深圳二年级上学期常见问候、自我介绍、数字和颜色词汇进行情境练习。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "greetings",
+        "numbers",
+        "colours"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "It is 8:00 in the morning. You meet your classmate. What do you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning!"
+            },
+            {
+              "key": "B",
+              "label": "Good night!"
+            },
+            {
+              "key": "C",
+              "label": "Goodbye!"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "greetings",
+            "daily life"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "A new classmate asks, “What’s your name?” What can you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "I’m Amy."
+            },
+            {
+              "key": "B",
+              "label": "I’m fine."
+            },
+            {
+              "key": "C",
+              "label": "It’s red."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "self-introduction",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “七”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "seven"
+            },
+            {
+              "key": "B",
+              "label": "green"
+            },
+            {
+              "key": "C",
+              "label": "desk"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "numbers",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “蓝色”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "blue"
+            },
+            {
+              "key": "B",
+              "label": "book"
+            },
+            {
+              "key": "C",
+              "label": "run"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "colours",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "Your friend says, “Nice to meet you.” What can you answer?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Nice to meet you, too."
+            },
+            {
+              "key": "B",
+              "label": "Good night."
+            },
+            {
+              "key": "C",
+              "label": "Open the door."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "greetings",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "A: How are you? B: ______",
+          "options": [
+            {
+              "key": "A",
+              "label": "I’m fine, thank you."
+            },
+            {
+              "key": "B",
+              "label": "I’m a pencil."
+            },
+            {
+              "key": "C",
+              "label": "It’s Monday."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "greetings",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “三”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "three"
+            },
+            {
+              "key": "B",
+              "label": "tree"
+            },
+            {
+              "key": "C",
+              "label": "red"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "numbers",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “黄色”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "yellow"
+            },
+            {
+              "key": "B",
+              "label": "window"
+            },
+            {
+              "key": "C",
+              "label": "family"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "colours",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "School is over. What do you say to your teacher?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Goodbye!"
+            },
+            {
+              "key": "B",
+              "label": "Good morning!"
+            },
+            {
+              "key": "C",
+              "label": "Hello, book!"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "greetings",
+            "daily life"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose the correct sentence to introduce Ben.",
+          "options": [
+            {
+              "key": "A",
+              "label": "This is Ben."
+            },
+            {
+              "key": "B",
+              "label": "Ben are this."
+            },
+            {
+              "key": "C",
+              "label": "I is Ben."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "self-introduction",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “同学”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "classmate"
+            },
+            {
+              "key": "B",
+              "label": "kitchen"
+            },
+            {
+              "key": "C",
+              "label": "forest"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "school",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-GREETINGS-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Your classmate helps you pick up a pencil. What should you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Thank you."
+            },
+            {
+              "key": "B",
+              "label": "Good night."
+            },
+            {
+              "key": "C",
+              "label": "Seven."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "polite language",
+            "daily life"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-SYNC-FAMILY-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语家庭与外貌（一）",
+      "description": "练习家庭成员、he/she 和简单外貌描述，场景均来自家庭日常。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "family",
+        "appearance"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “爸爸”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "father"
+            },
+            {
+              "key": "B",
+              "label": "mother"
+            },
+            {
+              "key": "C",
+              "label": "sister"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “妈妈”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "mother"
+            },
+            {
+              "key": "B",
+              "label": "brother"
+            },
+            {
+              "key": "C",
+              "label": "friend"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “哥哥/弟弟”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "brother"
+            },
+            {
+              "key": "B",
+              "label": "sister"
+            },
+            {
+              "key": "C",
+              "label": "teacher"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “姐姐/妹妹”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "sister"
+            },
+            {
+              "key": "B",
+              "label": "father"
+            },
+            {
+              "key": "C",
+              "label": "classmate"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“她留着长头发。” Choose the right sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "She has long hair."
+            },
+            {
+              "key": "B",
+              "label": "He has long hair."
+            },
+            {
+              "key": "C",
+              "label": "She is a desk."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "appearance",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我的头发很短。” Choose the right sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "My hair is short."
+            },
+            {
+              "key": "B",
+              "label": "My room is short."
+            },
+            {
+              "key": "C",
+              "label": "My chair is family."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "appearance",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose the correct sentence about your family.",
+          "options": [
+            {
+              "key": "A",
+              "label": "That’s my family."
+            },
+            {
+              "key": "B",
+              "label": "That’s my pencil."
+            },
+            {
+              "key": "C",
+              "label": "That’s my tree."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "He is my father. Which word tells us the person is male?",
+          "options": [
+            {
+              "key": "A",
+              "label": "He"
+            },
+            {
+              "key": "B",
+              "label": "my"
+            },
+            {
+              "key": "C",
+              "label": "father is a colour"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "pronoun"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "She is my sister. Which word can start this sentence?",
+          "options": [
+            {
+              "key": "A",
+              "label": "She"
+            },
+            {
+              "key": "B",
+              "label": "He"
+            },
+            {
+              "key": "C",
+              "label": "It is a desk"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "pronoun"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "“这是我的妈妈。” Choose the best sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "This is my mother."
+            },
+            {
+              "key": "B",
+              "label": "This are my mother."
+            },
+            {
+              "key": "C",
+              "label": "I am mother."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word can describe hair?",
+          "options": [
+            {
+              "key": "A",
+              "label": "long"
+            },
+            {
+              "key": "B",
+              "label": "kitchen"
+            },
+            {
+              "key": "C",
+              "label": "swim"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "appearance",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-FAMILY-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "At home, you want to introduce your brother to a friend. What can you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "This is my brother."
+            },
+            {
+              "key": "B",
+              "label": "This is my room."
+            },
+            {
+              "key": "C",
+              "label": "He is a chair."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "family",
+            "daily life"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语能力与动作（一）",
+      "description": "通过体育课、家庭和校园活动练习 can 与常见动作词。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "can",
+        "actions"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我会游泳。” Choose the correct sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "I can swim."
+            },
+            {
+              "key": "B",
+              "label": "I am swim."
+            },
+            {
+              "key": "C",
+              "label": "I swim can."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "can",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "A: Can you run? B: ______",
+          "options": [
+            {
+              "key": "A",
+              "label": "Yes, I can."
+            },
+            {
+              "key": "B",
+              "label": "Yes, I am."
+            },
+            {
+              "key": "C",
+              "label": "It is red."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "can",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “跑”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "room"
+            },
+            {
+              "key": "C",
+              "label": "red"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "actions",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “跳”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "jump"
+            },
+            {
+              "key": "B",
+              "label": "chair"
+            },
+            {
+              "key": "C",
+              "label": "mother"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "actions",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "At PE class, your teacher asks, “Can you hop?” You can answer?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Yes, I can."
+            },
+            {
+              "key": "B",
+              "label": "Good night."
+            },
+            {
+              "key": "C",
+              "label": "My name is Amy."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "can",
+            "PE"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "“他会画画。” Choose the best sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "He can draw."
+            },
+            {
+              "key": "B",
+              "label": "He is draw."
+            },
+            {
+              "key": "C",
+              "label": "He can blue."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "can",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which action can you do with a ball?",
+          "options": [
+            {
+              "key": "A",
+              "label": "throw"
+            },
+            {
+              "key": "B",
+              "label": "yellow"
+            },
+            {
+              "key": "C",
+              "label": "kitchen"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "actions",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "A: Can she sing? B: ______",
+          "options": [
+            {
+              "key": "A",
+              "label": "Yes, she can."
+            },
+            {
+              "key": "B",
+              "label": "Yes, she is sing."
+            },
+            {
+              "key": "C",
+              "label": "She is seven colour."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "can",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which sentence is correct?",
+          "options": [
+            {
+              "key": "A",
+              "label": "I can read."
+            },
+            {
+              "key": "B",
+              "label": "I can a book."
+            },
+            {
+              "key": "C",
+              "label": "I am can read."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "can",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "At home, you help put toys away. Which action word fits?",
+          "options": [
+            {
+              "key": "A",
+              "label": "tidy"
+            },
+            {
+              "key": "B",
+              "label": "blue"
+            },
+            {
+              "key": "C",
+              "label": "seven"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "actions",
+            "daily life"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which sentence asks about ability?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Can you swim?"
+            },
+            {
+              "key": "B",
+              "label": "What colour is it?"
+            },
+            {
+              "key": "C",
+              "label": "Who is he?"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "can",
+            "question"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Your friend says, “I can ride a bike.” What does “can” show?",
+          "options": [
+            {
+              "key": "A",
+              "label": "ability"
+            },
+            {
+              "key": "B",
+              "label": "colour"
+            },
+            {
+              "key": "C",
+              "label": "family member"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "can",
+            "meaning"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-SYNC-ROOM-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语房间与位置（一）",
+      "description": "练习房间物品和 in/on 等基础位置表达，贴近家庭收纳场景。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "room",
+        "positions"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“书在桌子上。” The book is ______ the desk.",
+          "options": [
+            {
+              "key": "A",
+              "label": "on"
+            },
+            {
+              "key": "B",
+              "label": "in"
+            },
+            {
+              "key": "C",
+              "label": "can"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“球在盒子里。” The ball is ______ the box.",
+          "options": [
+            {
+              "key": "A",
+              "label": "in"
+            },
+            {
+              "key": "B",
+              "label": "on"
+            },
+            {
+              "key": "C",
+              "label": "yellow"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “床”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "bed"
+            },
+            {
+              "key": "B",
+              "label": "tree"
+            },
+            {
+              "key": "C",
+              "label": "bird"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “椅子”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "chair"
+            },
+            {
+              "key": "B",
+              "label": "sky"
+            },
+            {
+              "key": "C",
+              "label": "rabbit"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “门”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "door"
+            },
+            {
+              "key": "B",
+              "label": "moon"
+            },
+            {
+              "key": "C",
+              "label": "forest"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “房间”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "room"
+            },
+            {
+              "key": "B",
+              "label": "street"
+            },
+            {
+              "key": "C",
+              "label": "sun"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "The pencil is in the schoolbag. Where is the pencil?",
+          "options": [
+            {
+              "key": "A",
+              "label": "in the schoolbag"
+            },
+            {
+              "key": "B",
+              "label": "on the sky"
+            },
+            {
+              "key": "C",
+              "label": "in the tree"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "positions",
+            "school"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "The cup is on the table. Which word shows the position?",
+          "options": [
+            {
+              "key": "A",
+              "label": "on"
+            },
+            {
+              "key": "B",
+              "label": "cup"
+            },
+            {
+              "key": "C",
+              "label": "table is a colour"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "positions",
+            "meaning"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose the correct sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "The book is on the desk."
+            },
+            {
+              "key": "B",
+              "label": "Book desk on is."
+            },
+            {
+              "key": "C",
+              "label": "The desk is book."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "At home, your shoes are in the box. Which preposition do you use?",
+          "options": [
+            {
+              "key": "A",
+              "label": "in"
+            },
+            {
+              "key": "B",
+              "label": "on"
+            },
+            {
+              "key": "C",
+              "label": "can"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "positions",
+            "daily life"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which room item can you sit on?",
+          "options": [
+            {
+              "key": "A",
+              "label": "chair"
+            },
+            {
+              "key": "B",
+              "label": "door"
+            },
+            {
+              "key": "C",
+              "label": "window"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "daily life"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which room item can you sleep on?",
+          "options": [
+            {
+              "key": "A",
+              "label": "bed"
+            },
+            {
+              "key": "B",
+              "label": "book"
+            },
+            {
+              "key": "C",
+              "label": "pencil"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "room",
+            "daily life"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语地点与自然世界（一）",
+      "description": "围绕学校、公园、图书馆和自然世界的基础词汇与简单句型。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "places",
+        "nature"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “天空”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "sky"
+            },
+            {
+              "key": "B",
+              "label": "room"
+            },
+            {
+              "key": "C",
+              "label": "family"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "nature",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “太阳”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "sun"
+            },
+            {
+              "key": "B",
+              "label": "desk"
+            },
+            {
+              "key": "C",
+              "label": "door"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "nature",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “树”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "tree"
+            },
+            {
+              "key": "B",
+              "label": "chair"
+            },
+            {
+              "key": "C",
+              "label": "schoolbag"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "nature",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “鸟”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "bird"
+            },
+            {
+              "key": "B",
+              "label": "bed"
+            },
+            {
+              "key": "C",
+              "label": "book"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "nature",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “公园”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "park"
+            },
+            {
+              "key": "B",
+              "label": "kitchen"
+            },
+            {
+              "key": "C",
+              "label": "hair"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "places",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “学校”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "school"
+            },
+            {
+              "key": "B",
+              "label": "moon"
+            },
+            {
+              "key": "C",
+              "label": "father"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "places",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "A bird can fly in the ______.",
+          "options": [
+            {
+              "key": "A",
+              "label": "sky"
+            },
+            {
+              "key": "B",
+              "label": "room"
+            },
+            {
+              "key": "C",
+              "label": "book"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "nature",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "We can read books in the ______.",
+          "options": [
+            {
+              "key": "A",
+              "label": "library"
+            },
+            {
+              "key": "B",
+              "label": "tree"
+            },
+            {
+              "key": "C",
+              "label": "sun"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "places",
+            "daily life"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "We can play in the ______ after school.",
+          "options": [
+            {
+              "key": "A",
+              "label": "playground"
+            },
+            {
+              "key": "B",
+              "label": "kitchen sink"
+            },
+            {
+              "key": "C",
+              "label": "moon"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "places",
+            "school"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose the correct sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "The tree is green."
+            },
+            {
+              "key": "B",
+              "label": "The tree is a chair."
+            },
+            {
+              "key": "C",
+              "label": "Green can tree."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "nature",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "At a park, which one may you see?",
+          "options": [
+            {
+              "key": "A",
+              "label": "tree"
+            },
+            {
+              "key": "B",
+              "label": "schoolbag in a desk"
+            },
+            {
+              "key": "C",
+              "label": "kitchen door only"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "nature",
+            "daily life"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLACES-NATURE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which place is for borrowing books?",
+          "options": [
+            {
+              "key": "A",
+              "label": "library"
+            },
+            {
+              "key": "B",
+              "label": "playground"
+            },
+            {
+              "key": "C",
+              "label": "bedroom"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "places",
+            "daily life"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-SYNC-REVIEW-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语阶段综合（一）",
+      "description": "综合复习问候、家庭、动作、房间、位置、数字颜色和地点词汇。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "review",
+        "综合"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "It is morning. What do you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning!"
+            },
+            {
+              "key": "B",
+              "label": "Good night!"
+            },
+            {
+              "key": "C",
+              "label": "Goodbye!"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我是Tom。” Choose the right sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "I’m Tom."
+            },
+            {
+              "key": "B",
+              "label": "You’re Tom."
+            },
+            {
+              "key": "C",
+              "label": "It’s Tom desk."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "self-introduction"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “妈妈”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "mother"
+            },
+            {
+              "key": "B",
+              "label": "father"
+            },
+            {
+              "key": "C",
+              "label": "chair"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "A: Can you jump? B: ______",
+          "options": [
+            {
+              "key": "A",
+              "label": "Yes, I can."
+            },
+            {
+              "key": "B",
+              "label": "Yes, I am a jump."
+            },
+            {
+              "key": "C",
+              "label": "It is yellow."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "can"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "The book is ______ the desk.",
+          "options": [
+            {
+              "key": "A",
+              "label": "on"
+            },
+            {
+              "key": "B",
+              "label": "can"
+            },
+            {
+              "key": "C",
+              "label": "seven"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “蓝色”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "blue"
+            },
+            {
+              "key": "B",
+              "label": "bed"
+            },
+            {
+              "key": "C",
+              "label": "bird"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "colours"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “七”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "seven"
+            },
+            {
+              "key": "B",
+              "label": "sun"
+            },
+            {
+              "key": "C",
+              "label": "school"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "numbers"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “图书馆”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "library"
+            },
+            {
+              "key": "B",
+              "label": "family"
+            },
+            {
+              "key": "C",
+              "label": "room"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "places"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "Choose the correct sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "This is my sister."
+            },
+            {
+              "key": "B",
+              "label": "This are sister."
+            },
+            {
+              "key": "C",
+              "label": "My sister am this."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word is an action?",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "yellow"
+            },
+            {
+              "key": "C",
+              "label": "father"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "School is over. What do you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Goodbye!"
+            },
+            {
+              "key": "B",
+              "label": "Good morning!"
+            },
+            {
+              "key": "C",
+              "label": "Thank you seven."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-REVIEW-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which sentence is correct?",
+          "options": [
+            {
+              "key": "A",
+              "label": "The ball is in the box."
+            },
+            {
+              "key": "B",
+              "label": "The ball box in."
+            },
+            {
+              "key": "C",
+              "label": "In ball is box."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "review",
+            "positions"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,7 @@ import {
   PracticePaper,
   PracticeSemester,
   PracticeSubject,
+  PracticeTrackFilter,
   PracticeTaxonomy
 } from '../../../domain/model/practice/PracticeModels';
 import { PracticeHomeViewModel } from './PracticeHomeViewModel';
@@ -29,7 +30,7 @@ struct PracticePaperCard {
             .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.semesterLabel(this.paper.semester)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${this.difficultyLabel}`)
+          Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.semesterLabel(this.paper.semester)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${PracticeTaxonomy.trackLabel(this.paper.track)} · ${this.difficultyLabel}`)
             .width('100%')
             .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
@@ -65,7 +66,7 @@ struct PracticePaperCard {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(12)
           .fontColor(AppTheme.TERTIARY_TEXT);
-        Text('预置题库')
+        Text(PracticeTaxonomy.trackLabel(this.paper.track))
           .fontSize(11)
           .fontColor(AppTheme.SUCCESS);
       }
@@ -91,8 +92,10 @@ export struct PracticeHomePage {
   @State private selectedGrade: PracticeGrade = PracticeGrade.G3;
   @State private selectedSubject: PracticeSubject = PracticeSubject.MATH;
   @State private selectedSemester: PracticeSemester = PracticeSemester.ALL;
+  @State private selectedTrack: PracticeTrackFilter = PracticeTrackFilter.TEXTBOOK_SYNC;
   @State private draftSelectedGrade: PracticeGrade = PracticeGrade.G3;
   @State private draftSelectedSubject: PracticeSubject = PracticeSubject.MATH;
+  @State private draftSelectedTrack: PracticeTrackFilter = PracticeTrackFilter.TEXTBOOK_SYNC;
   @State private papers: PracticePaper[] = [];
   @State private loading: boolean = false;
   @State private errorMessage: string = '';
@@ -103,8 +106,9 @@ export struct PracticeHomePage {
     builder: PracticeFilterDialog({
       selectedGrade: $draftSelectedGrade,
       selectedSubject: $draftSelectedSubject,
-      onApply: (grade: PracticeGrade, subject: PracticeSubject) => {
-        this.applyFilters(grade, subject);
+      selectedTrack: $draftSelectedTrack,
+      onApply: (grade: PracticeGrade, subject: PracticeSubject, track: PracticeTrackFilter) => {
+        this.applyFilters(grade, subject, track);
       }
     }),
     autoCancel: true,
@@ -117,6 +121,7 @@ export struct PracticeHomePage {
     this.selectedSemester = this.viewModel.defaultSemester();
     this.draftSelectedGrade = this.selectedGrade;
     this.draftSelectedSubject = this.selectedSubject;
+    this.draftSelectedTrack = this.selectedTrack;
     void this.reloadPapers();
   }
 
@@ -126,7 +131,7 @@ export struct PracticeHomePage {
     this.errorMessage = '';
     try {
       let papers = await this.viewModel.listPapers(
-        this.selectedGrade, this.selectedSubject, this.selectedSemester);
+        this.selectedGrade, this.selectedSubject, this.selectedSemester, this.selectedTrack);
       if (sequence !== this.loadSequence) return;
       this.papers = papers;
     } catch {
@@ -142,13 +147,16 @@ export struct PracticeHomePage {
     if (this.loading) return;
     this.draftSelectedGrade = this.selectedGrade;
     this.draftSelectedSubject = this.selectedSubject;
+    this.draftSelectedTrack = this.selectedTrack;
     this.filterDialogController.open();
   }
 
-  private applyFilters(grade: PracticeGrade, subject: PracticeSubject): void {
-    let changed = grade !== this.selectedGrade || subject !== this.selectedSubject;
+  private applyFilters(grade: PracticeGrade, subject: PracticeSubject, track: PracticeTrackFilter): void {
+    let changed = grade !== this.selectedGrade || subject !== this.selectedSubject ||
+      track !== this.selectedTrack;
     this.selectedGrade = grade;
     this.selectedSubject = subject;
+    this.selectedTrack = track;
     this.filterDialogController.close();
     if (changed) void this.reloadPapers();
   }
@@ -170,15 +178,12 @@ export struct PracticeHomePage {
         onOpen: () => this.openFilterDialog()
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      Text('筛选')
-        .fontSize(13)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.PRIMARY)
-        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ left: 18, right: 18 })
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('打开练习筛选')
-        .onClick(() => this.openFilterDialog());
+      FilterSummaryEntry({
+        label: '题库类型',
+        value: this.viewModel.trackFilterLabel(this.selectedTrack),
+        active: true,
+        onOpen: () => this.openFilterDialog()
+      });
     }
     .width('100%')
     .height(58)
@@ -192,7 +197,7 @@ export struct PracticeHomePage {
   private PaperList() {
     Column({ space: 10 }) {
       Row() {
-        Text(`${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.semesterLabel(this.selectedSemester)} · ${this.viewModel.subjectLabel(this.selectedSubject)}`)
+        Text(`${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.semesterLabel(this.selectedSemester)} · ${this.viewModel.subjectLabel(this.selectedSubject)} · ${this.viewModel.trackFilterLabel(this.selectedTrack)}`)
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
@@ -217,7 +222,7 @@ export struct PracticeHomePage {
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('可以切换年级或科目继续浏览。')
+          Text('可以切换科目或题库类型继续浏览；当前内容重点覆盖二年级上学期。')
             .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
         }
@@ -263,7 +268,7 @@ export struct PracticeHomePage {
                 .onClick(() => this.onOpenHistory());
             }
             .width('100%');
-            Text(`默认按当前学生的${this.viewModel.semesterLabel(this.selectedSemester)}内容筛选，也可以切换年级和科目浏览。`)
+            Text(`默认按当前学生的${this.viewModel.semesterLabel(this.selectedSemester)}和教材同步题库筛选，也可以切换科目与题库类型。`)
               .width('100%')
               .fontSize(13)
               .lineHeight(19)
@@ -276,7 +281,7 @@ export struct PracticeHomePage {
 
           this.PaperList();
 
-          Text('套卷会标明适用学期；全年基础卷与当前学期专项卷会一起展示。')
+          Text('教材同步紧跟二年级上学期核心能力；课外拓展强调生活应用、阅读和思维训练。')
             .width('100%')
             .fontSize(12)
             .lineHeight(18)

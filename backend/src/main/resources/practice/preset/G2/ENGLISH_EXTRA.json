@@ -1,0 +1,1118 @@
+{
+  "schemaVersion": 2,
+  "grade": "G2",
+  "subject": "ENGLISH",
+  "track": "EXTRACURRICULAR",
+  "papers": [
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·校园日常（一）",
+      "description": "把基础英语放进真实校园交流场景，强化理解和开口使用。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "daily English",
+        "school"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "You borrow a pencil from a classmate. What should you say after getting it?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Thank you."
+            },
+            {
+              "key": "B",
+              "label": "Good night."
+            },
+            {
+              "key": "C",
+              "label": "Seven."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "school"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "Your teacher says, “Please sit down.” What should you do?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Sit down."
+            },
+            {
+              "key": "B",
+              "label": "Run home."
+            },
+            {
+              "key": "C",
+              "label": "Open the fridge."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "classroom"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "You want to ask a friend’s name. What do you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "What’s your name?"
+            },
+            {
+              "key": "B",
+              "label": "What colour is the desk?"
+            },
+            {
+              "key": "C",
+              "label": "Can a book run?"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "A classmate helps you. Which reply is polite?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Thank you."
+            },
+            {
+              "key": "B",
+              "label": "Go away."
+            },
+            {
+              "key": "C",
+              "label": "No chair."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "polite language"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "You meet your teacher in the morning. What do you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning!"
+            },
+            {
+              "key": "B",
+              "label": "Goodbye!"
+            },
+            {
+              "key": "C",
+              "label": "Good night!"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "school"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "You want to ask if your friend can swim. What do you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Can you swim?"
+            },
+            {
+              "key": "B",
+              "label": "Who is your mother?"
+            },
+            {
+              "key": "C",
+              "label": "What colour is seven?"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "can"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "Your water bottle is on the desk. Which sentence is correct?",
+          "options": [
+            {
+              "key": "A",
+              "label": "My bottle is on the desk."
+            },
+            {
+              "key": "B",
+              "label": "My desk is in bottle."
+            },
+            {
+              "key": "C",
+              "label": "Bottle can desk."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "You want to introduce your friend Lily. What can you say?",
+          "options": [
+            {
+              "key": "A",
+              "label": "This is Lily."
+            },
+            {
+              "key": "B",
+              "label": "I am a door."
+            },
+            {
+              "key": "C",
+              "label": "Lily are blue."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "introduction"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which place do students go to read books?",
+          "options": [
+            {
+              "key": "A",
+              "label": "library"
+            },
+            {
+              "key": "B",
+              "label": "bed"
+            },
+            {
+              "key": "C",
+              "label": "sky"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "school"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which action word fits PE class?",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "yellow"
+            },
+            {
+              "key": "C",
+              "label": "mother"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "You are leaving school. Which phrase fits?",
+          "options": [
+            {
+              "key": "A",
+              "label": "See you!"
+            },
+            {
+              "key": "B",
+              "label": "Good morning at night."
+            },
+            {
+              "key": "C",
+              "label": "This is red seven."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "goodbye"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which sentence is polite when asking for help?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Can you help me, please?"
+            },
+            {
+              "key": "B",
+              "label": "Give me now!"
+            },
+            {
+              "key": "C",
+              "label": "You are a desk."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "daily English",
+            "polite language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·深圳生活（一）",
+      "description": "用公园、地铁、社区图书馆、雨天等深圳儿童熟悉场景练习基础英语。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "Shenzhen life",
+        "daily English"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "You are at a park. Which sentence is useful?",
+          "options": [
+            {
+              "key": "A",
+              "label": "The trees are green."
+            },
+            {
+              "key": "B",
+              "label": "My chair is seven."
+            },
+            {
+              "key": "C",
+              "label": "Father is blue door."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "park"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "You are on the metro with your family. Which word means “family”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "family"
+            },
+            {
+              "key": "B",
+              "label": "forest"
+            },
+            {
+              "key": "C",
+              "label": "pencil"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "At the library, what can you say about a book?",
+          "options": [
+            {
+              "key": "A",
+              "label": "This is a book."
+            },
+            {
+              "key": "B",
+              "label": "This is a sun."
+            },
+            {
+              "key": "C",
+              "label": "Book can yellow."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "library"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "It is raining in Shenzhen. Which item is useful?",
+          "options": [
+            {
+              "key": "A",
+              "label": "umbrella"
+            },
+            {
+              "key": "B",
+              "label": "bed"
+            },
+            {
+              "key": "C",
+              "label": "moon"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "weather"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "You see a bird in a park. Which word is correct?",
+          "options": [
+            {
+              "key": "A",
+              "label": "bird"
+            },
+            {
+              "key": "B",
+              "label": "chair"
+            },
+            {
+              "key": "C",
+              "label": "mother"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "nature"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "You want to say “天空是蓝色的。” Choose the best sentence.",
+          "options": [
+            {
+              "key": "A",
+              "label": "The sky is blue."
+            },
+            {
+              "key": "B",
+              "label": "The sky is a room."
+            },
+            {
+              "key": "C",
+              "label": "Blue can sky."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "nature"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "At a community sports day, which action may you do?",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "kitchen"
+            },
+            {
+              "key": "C",
+              "label": "yellow"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "You enter a library in the morning. Which greeting can you use?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning!"
+            },
+            {
+              "key": "B",
+              "label": "Good night!"
+            },
+            {
+              "key": "C",
+              "label": "Goodbye before entering."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "Your metro card is in your schoolbag. Which sentence is correct?",
+          "options": [
+            {
+              "key": "A",
+              "label": "The card is in the schoolbag."
+            },
+            {
+              "key": "B",
+              "label": "The card is on the sky."
+            },
+            {
+              "key": "C",
+              "label": "The bag is can card."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "At a park, your friend asks, “Can you run?” What can you answer?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Yes, I can."
+            },
+            {
+              "key": "B",
+              "label": "I am a door."
+            },
+            {
+              "key": "C",
+              "label": "It is seven."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "can"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which word means “公园”?",
+          "options": [
+            {
+              "key": "A",
+              "label": "park"
+            },
+            {
+              "key": "B",
+              "label": "room"
+            },
+            {
+              "key": "C",
+              "label": "father"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "places"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Which sentence is polite after someone gives you directions?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Thank you."
+            },
+            {
+              "key": "B",
+              "label": "Good night, seven."
+            },
+            {
+              "key": "C",
+              "label": "Blue chair."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "Shenzhen life",
+            "polite language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·迷你阅读（一）",
+      "description": "三篇2～4句原创超短文，训练二年级学生从英语短文中找直接信息。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "mini reading",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q01",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: Hello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nWhat is the boy’s name?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Sam"
+            },
+            {
+              "key": "B",
+              "label": "Ben"
+            },
+            {
+              "key": "C",
+              "label": "Tom"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "information"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q02",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: Hello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nHow old is Sam?",
+          "options": [
+            {
+              "key": "A",
+              "label": "seven"
+            },
+            {
+              "key": "B",
+              "label": "three"
+            },
+            {
+              "key": "C",
+              "label": "nine"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "numbers"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q03",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: Hello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nWhat colour does Sam like?",
+          "options": [
+            {
+              "key": "A",
+              "label": "blue"
+            },
+            {
+              "key": "B",
+              "label": "red"
+            },
+            {
+              "key": "C",
+              "label": "yellow"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "colours"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q04",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: Hello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nWho is Ben?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Sam’s friend"
+            },
+            {
+              "key": "B",
+              "label": "Sam’s father"
+            },
+            {
+              "key": "C",
+              "label": "Sam’s teacher"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "relationship"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q05",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: This is my room. My bed is near the window. My book is on the desk. My ball is in the box.\nWhere is the book?",
+          "options": [
+            {
+              "key": "A",
+              "label": "on the desk"
+            },
+            {
+              "key": "B",
+              "label": "in the box"
+            },
+            {
+              "key": "C",
+              "label": "near the door"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q06",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: This is my room. My bed is near the window. My book is on the desk. My ball is in the box.\nWhere is the ball?",
+          "options": [
+            {
+              "key": "A",
+              "label": "in the box"
+            },
+            {
+              "key": "B",
+              "label": "on the desk"
+            },
+            {
+              "key": "C",
+              "label": "in the sky"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q07",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: This is my room. My bed is near the window. My book is on the desk. My ball is in the box.\nWhat is near the window?",
+          "options": [
+            {
+              "key": "A",
+              "label": "the bed"
+            },
+            {
+              "key": "B",
+              "label": "the ball"
+            },
+            {
+              "key": "C",
+              "label": "the book"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "room"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q08",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: This is my room. My bed is near the window. My book is on the desk. My ball is in the box.\nWhat is this short text about?",
+          "options": [
+            {
+              "key": "A",
+              "label": "a room"
+            },
+            {
+              "key": "B",
+              "label": "a park"
+            },
+            {
+              "key": "C",
+              "label": "a bus"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "main idea"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q09",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: It is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nWhen do Amy and her mother go to the park?",
+          "options": [
+            {
+              "key": "A",
+              "label": "Sunday morning"
+            },
+            {
+              "key": "B",
+              "label": "Monday night"
+            },
+            {
+              "key": "C",
+              "label": "Friday afternoon"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "time"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q10",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: It is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nWho goes with Amy?",
+          "options": [
+            {
+              "key": "A",
+              "label": "her mother"
+            },
+            {
+              "key": "B",
+              "label": "her teacher"
+            },
+            {
+              "key": "C",
+              "label": "her brother only"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q11",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: It is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nWhat can Amy see?",
+          "options": [
+            {
+              "key": "A",
+              "label": "trees and birds"
+            },
+            {
+              "key": "B",
+              "label": "beds and desks"
+            },
+            {
+              "key": "C",
+              "label": "books and pencils only"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "nature"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q12",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "Read: It is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nWhat can Amy do with Lucy?",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "sleep in class"
+            },
+            {
+              "key": "C",
+              "label": "cook dinner"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "Read the key word or situation first, then compare the choices."
+          ],
+          "tags": [
+            "mini reading",
+            "actions"
+          ]
+        }
+      ]
+    }
+  ]
+}

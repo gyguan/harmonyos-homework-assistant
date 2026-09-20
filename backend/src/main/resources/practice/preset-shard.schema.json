@@ -8,21 +8,15 @@
     "schemaVersion",
     "grade",
     "subject",
+    "track",
     "papers"
   ],
   "properties": {
     "schemaVersion": {
-      "const": 1
+      "const": 2
     },
     "grade": {
-      "enum": [
-        "G1",
-        "G2",
-        "G3",
-        "G4",
-        "G5",
-        "G6"
-      ]
+      "const": "G2"
     },
     "subject": {
       "enum": [
@@ -37,6 +31,12 @@
       "items": {
         "$ref": "#/$defs/paper"
       }
+    },
+    "track": {
+      "enum": [
+        "TEXTBOOK_SYNC",
+        "EXTRACURRICULAR"
+      ]
     }
   },
   "$defs": {
@@ -49,6 +49,7 @@
         "grade",
         "subject",
         "semester",
+        "track",
         "title",
         "description",
         "difficulty",
@@ -149,6 +150,12 @@
           "items": {
             "$ref": "#/$defs/question"
           }
+        },
+        "track": {
+          "enum": [
+            "TEXTBOOK_SYNC",
+            "EXTRACURRICULAR"
+          ]
         }
       }
     },
@@ -222,9 +229,6 @@
             "type": "string",
             "minLength": 1
           }
-        },
-        "visualSpec": {
-          "$ref": "#/$defs/visualSpec"
         }
       }
     },
@@ -243,42 +247,6 @@
         "label": {
           "type": "string",
           "minLength": 1
-        }
-      }
-    },
-    "visualSpec": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "assetId",
-        "layout",
-        "accessibilityText"
-      ],
-      "properties": {
-        "type": {
-          "enum": [
-            "NONE",
-            "SCENE",
-            "ARRAY",
-            "DOT_ARRAY",
-            "IMAGE_PAIR",
-            "IMAGE_SEQUENCE",
-            "DIALOGUE",
-            "ROOM_SCENE",
-            "FAMILY_SCENE",
-            "CHARACTER",
-            "ILLUSTRATION"
-          ]
-        },
-        "assetId": {
-          "type": "string"
-        },
-        "layout": {
-          "type": "string"
-        },
-        "accessibilityText": {
-          "type": "string"
         }
       }
     }

@@ -35,13 +35,14 @@ public class PracticeContentBootstrap implements ApplicationRunner {
     PracticeContentCatalog.Catalog catalog = loadCatalog();
     validator.validateCatalog(catalog);
     for (PracticeContentCatalog.Paper source : catalog.papers()) seed(source);
+    archiveRetiredPresets(catalog);
   }
 
   PracticeContentCatalog.Catalog loadCatalog() {
     PracticeContentCatalog.Manifest manifest = read(
         PRESET_MANIFEST, PracticeContentCatalog.Manifest.class);
-    if (manifest.schemaVersion() != 1) {
-      throw new IllegalStateException("预置题库 manifest schemaVersion 必须为 1");
+    if (manifest.schemaVersion() != 2) {
+      throw new IllegalStateException("预置题库 manifest schemaVersion 必须为 2");
     }
     if (manifest.files() == null || manifest.files().isEmpty()) {
       throw new IllegalStateException("预置题库 manifest 没有声明内容文件");
@@ -51,16 +52,17 @@ public class PracticeContentBootstrap implements ApplicationRunner {
     for (String file : manifest.files()) {
       String path = PRESET_ROOT + "/" + file;
       PracticeContentCatalog.Shard shard = read(path, PracticeContentCatalog.Shard.class);
-      if (shard.schemaVersion() != 1) {
+      if (shard.schemaVersion() != 2) {
         throw new IllegalStateException("题库分片 schemaVersion 非法: " + path);
       }
       if (shard.papers() == null) {
         throw new IllegalStateException("题库分片 papers 为空: " + path);
       }
       for (PracticeContentCatalog.Paper paper : shard.papers()) {
-        if (!shard.grade().equals(paper.grade()) || !shard.subject().equals(paper.subject())) {
+        if (!shard.grade().equals(paper.grade()) || !shard.subject().equals(paper.subject())
+            || !shard.track().equals(paper.track())) {
           throw new IllegalStateException(
-              "题库分片与 Paper 年级/科目不一致: " + path + " -> " + paper.id());
+              "题库分片与 Paper 年级/科目/类型不一致: " + path + " -> " + paper.id());
         }
         merged.add(paper);
       }
@@ -104,6 +106,7 @@ public class PracticeContentBootstrap implements ApplicationRunner {
     paper.grade = source.grade();
     paper.subject = source.subject();
     paper.semester = source.semester();
+    paper.track = source.track();
     paper.title = source.title();
     paper.description = source.description();
     paper.difficulty = source.difficulty();
@@ -132,12 +135,26 @@ public class PracticeContentBootstrap implements ApplicationRunner {
       question.explanation = item.explanation();
       question.hintsJson = json(item.hints());
       question.tagsJson = json(item.tags());
-      question.visualSpecJson = json(item.visualSpec() == null
-          ? new PracticeContentCatalog.VisualSpec("NONE", "", "", "")
-          : item.visualSpec());
       result.add(question);
     }
     return result;
+  }
+
+  private void archiveRetiredPresets(PracticeContentCatalog.Catalog catalog) {
+    java.util.Set<String> activeKeys = new java.util.HashSet<>();
+    for (PracticeContentCatalog.Paper paper : catalog.papers()) {
+      activeKeys.add(paper.id() + "@" + paper.version());
+    }
+    List<PracticePaperEntity> changed = new ArrayList<>();
+    for (PracticePaperEntity paper : papers.findAll()) {
+      if (!"PRESET".equals(paper.sourceType)) continue;
+      if (activeKeys.contains(paper.paperKey)) continue;
+      if ("ARCHIVED".equals(paper.status)) continue;
+      paper.status = "ARCHIVED";
+      paper.updatedAt = Instant.now();
+      changed.add(paper);
+    }
+    if (!changed.isEmpty()) papers.saveAll(changed);
   }
 
   private String json(Object value) {

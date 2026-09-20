@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="560" height="200" viewBox="0 0 560 200">
-<rect width="560" height="200" rx="24" fill="#FFFFFF"/>
-<rect x="1" y="1" width="558" height="198" rx="23" fill="none" stroke="#D9E2EA" stroke-width="2"/>
-<circle cx="280" cy="75" r="36" fill="#F4E8C9" stroke="#35608A" stroke-width="2"/><rect x="235" y="112" width="90" height="45" rx="20" fill="#DCE8F2" stroke="#35608A" stroke-width="2"/>
-<text x="280" y="180" text-anchor="middle" font-size="16" font-family="sans-serif" fill="#334E68">人物</text>
-</svg>

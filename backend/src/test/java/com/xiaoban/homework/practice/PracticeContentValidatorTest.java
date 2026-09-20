@@ -31,6 +31,7 @@ class PracticeContentValidatorTest {
         for (PracticeContentCatalog.Paper paper : shard.papers()) {
           assertEquals(shard.grade(), paper.grade());
           assertEquals(shard.subject(), paper.subject());
+          assertEquals(shard.track(), paper.track());
           papers.add(paper);
         }
       }
@@ -48,19 +49,20 @@ class PracticeContentValidatorTest {
         List.of(
             new PracticeContentCatalog.Option("A", "3"),
             new PracticeContentCatalog.Option("B", "4")),
-        "Z", "选择正确结果。", List.of("计算 2 + 2。"), List.of("计算"), null);
+        "Z", "选择正确结果。", List.of("计算 2 + 2。"), List.of("计算"));
 
     List<PracticeContentCatalog.Question> questions = new ArrayList<>();
     questions.add(invalid);
     for (int i = 2; i <= 5; i++) {
       questions.add(new PracticeContentCatalog.Question(
           "MATH-G3-TEST-001-Q0" + i, i, "NUMBER", i + " + 1 = ?",
-          List.of(), Integer.toString(i + 1), "直接计算。", List.of("先做加法。"), List.of("计算"), null));
+          List.of(), Integer.toString(i + 1), "直接计算。", List.of("先做加法。"), List.of("计算")));
     }
 
     PracticeContentCatalog.Paper paper = new PracticeContentCatalog.Paper(
-        "MATH-G3-TEST-001", 1, "G3", "MATH", "ALL", "测试卷", "验证答案约束",
-        "L1", 5, 10, List.of("测试"), "AI_GENERATED", "PUBLISHED", questions);
+        "MATH-G3-TEST-001", 1, "G3", "MATH", "ALL", "TEXTBOOK_SYNC",
+        "测试卷", "验证答案约束", "L1", 5, 10, List.of("测试"),
+        "AI_GENERATED", "PUBLISHED", questions);
 
     assertThrows(IllegalStateException.class, () -> validator.validatePaper(paper));
   }
