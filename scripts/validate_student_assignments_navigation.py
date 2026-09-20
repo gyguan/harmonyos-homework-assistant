@@ -89,32 +89,31 @@ require("components/assignment/AssignmentFilterDialog" in page,
 require("components/selection/SelectionControls" in page,
         "student assignment page must use shared reactive selection controls")
 
-for token in ["AssignmentTypeFilter.ALL", "AssignmentTypeFilter.SCHOOL", "AssignmentTypeFilter.EXTRA"]:
-    require(token in page or token in filter_dialog, f"missing type filter option: {token}")
-for token in ["AssignmentDateFilter.ALL", "AssignmentDateFilter.TODAY", "AssignmentDateFilter.TOMORROW",
-              "AssignmentDateFilter.THIS_WEEK", "AssignmentDateFilter.UNDATED"]:
-    require(token in page or token in filter_dialog, f"missing date filter option: {token}")
 for token in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
     require(token in page or token in filter_dialog, f"missing subject filter option: {token}")
 
 for token in ["StudentAssignmentsViewModel", "DefaultAssignmentRepository.instance", "@State private visibleTotal",
               "private applyItems(items: Assignment[]): void", "this.visibleTotal = items.length",
               "AssignmentFilterDialog", "CustomDialogController", "alignment: DialogAlignment.Bottom",
-              "this.filterDialogController.open()", "FilterSummaryEntry({", "label: '类型'", "label: '截止'", "label: '科目'"]:
-    require(token in page, f"assignment result page missing required V2 behavior: {token}")
+              "this.filterDialogController.open()", "FilterSummaryEntry({", "label: '日期'", "label: '科目'",
+              "selectedDayEpochMs: $draftSelectedDayEpochMs", "queryOnDay"]:
+    require(token in page or token in view_model, f"assignment result page missing required date+subject behavior: {token}")
 require("@Prop active: boolean = false;" in selection_controls and
         "export struct FilterSummaryEntry" in selection_controls,
         "assignment filter summary must keep active state in a reactive shared component")
 for expression in [
-    "active: this.typeFilter !== AssignmentTypeFilter.ALL",
-    "active: this.dateFilter !== AssignmentDateFilter.ALL",
+    "active: !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
-    require(expression in page, f"assignment filter summary must bind directly to page state: {expression}")
-for token in ["@CustomDialog", "@Link typeFilter", "@Link dateFilter", "@Link subjectCode",
-              "private TypeOption", "private DateOption", "private SubjectOption", "Button('重置'", "Button('查询'",
-              "this.onQuery(this.typeFilter, this.dateFilter, this.subjectCode)"]:
-    require(token in filter_dialog, f"assignment filter dialog missing required behavior: {token}")
+    require(expression in page, f"assignment query summary must bind directly to page state: {expression}")
+for token in ["@CustomDialog", "@Link selectedDayEpochMs", "@Link subjectCode",
+              "DatePicker({", "private SubjectOption", "Button('重置'", "Button('查询'",
+              "this.onQuery(this.selectedDayEpochMs, this.subjectCode)"]:
+    require(token in filter_dialog, f"assignment query dialog missing required behavior: {token}")
+for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
+    require(removed not in filter_dialog,
+            f"shared assignment query must not retain preset type/relative-date option: {removed}")
+
 for legacy in ["showFilterPage", "FilterPage()", "bindSheet", "FilterOverlay", "FilterPanel"]:
     require(legacy not in page, f"legacy filter implementation must not return: {legacy}")
 
@@ -152,8 +151,8 @@ require("async listFiltered(studentId: string, filter: AssignmentFilter)" in rem
         "type=${encodeURIComponent(filter.assignmentType)}" in remote_api and
         "subjectCode=${encodeURIComponent(filter.subjectCode)}" in remote_api and "undated=true" in remote_api,
         "remote API must transmit combined filters")
-require("async query(typeFilter: AssignmentTypeFilter" in view_model and "this.repository.query" in view_model,
-        "ViewModel must delegate confirmed filters to Repository")
+require("queryOnDay(subjectCode: string, dayEpochMs: number" in view_model and "this.repository.query" in view_model,
+        "ViewModel must delegate selected-day queries to Repository")
 for param in ["String type", "String subjectCode", "Long from", "Long to", "String status", "Boolean undated"]:
     require(param in controller, f"backend assignment query missing parameter: {param}")
 require("listSpecification" in service and "statusFilter" in service and "compareForList" in service and
