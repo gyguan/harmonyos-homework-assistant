@@ -6,6 +6,14 @@
     {
       "name": "float_view_permission_reason",
       "value": "仅在家长主动开启作业采集实验时显示采集状态和停止按钮"
+    },
+    {
+      "name": "share_extension_label",
+      "value": "小伴作业"
+    },
+    {
+      "name": "share_extension_desc",
+      "value": "将老师文字或作业截图导入小伴作业"
     }
   ]
 }
