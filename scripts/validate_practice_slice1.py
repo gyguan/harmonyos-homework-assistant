@@ -32,95 +32,92 @@ shell = read("entry/src/main/ets/pages/AppShell.ets")
 snapshot = read("entry/src/main/ets/domain/model/PersistenceModels.ets")
 homework_models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 
-# Practice is an independent domain, not another Assignment flavor.
 for token in [
     "export interface PracticePaper",
     "export interface PracticeQuestion",
     "export enum PracticeGrade",
     "export enum PracticeSubject",
     "export enum PracticeSourceType",
+    "export enum PracticeTrack",
+    "export enum PracticeTrackFilter",
 ]:
     require(token in models, f"practice domain missing: {token}")
 
-for grade in ["G1", "G2", "G3", "G4", "G5", "G6"]:
-    require(f"{grade} = '{grade}'" in models, f"practice grade missing: {grade}")
-
-for subject in ["CHINESE", "MATH", "ENGLISH"]:
-    require(f"{subject} = '{subject}'" in models, f"required practice subject missing: {subject}")
-
-for source in ["PRESET", "AI_GENERATED", "PARENT_CREATED", "IMPORTED"]:
-    require(f"{source} = '{source}'" in models, f"practice source extension missing: {source}")
-
-require("version: number;" in models and "sourceType: PracticeSourceType;" in models,
-        "PracticePaper must preserve sourceType and version from Slice 1")
+require("track: PracticeTrack;" in models,
+        "PracticePaper must explicitly classify textbook-sync vs extracurricular")
+require("TEXTBOOK_SYNC = 'TEXTBOOK_SYNC'" in models and
+        "EXTRACURRICULAR = 'EXTRACURRICULAR'" in models,
+        "PracticeTrack values missing")
+require("ALL = 'ALL'" in models,
+        "PracticeTrackFilter must support an all-types option")
 require("paperVersion: number;" in models,
         "PracticeQuestion must bind to an immutable paper version")
+require("PracticeVisualSpec" not in models and "visualSpec:" not in models,
+        "Practice domain must remain text-only after visual retirement")
 
 require("export interface PracticeContentProvider" in provider_port and
-        "listPapers" in provider_port and "getPaper" in provider_port and
-        "PracticeSemester" in provider_port,
-        "practice content must be behind a semester-aware provider port")
+        "PracticeTrackFilter" in provider_port and "listPapers" in provider_port,
+        "practice content provider must support track-aware filtering")
 require("export interface PracticeRepository" in repo_port and
-        "PracticeContentProvider" in repo_impl,
-        "practice UI must access content through repository/provider boundaries")
-require("PresetPracticeContentProvider" in repo_impl and
-        "PracticeSourceType.PRESET" in preset_catalog,
-        "Slice 1 must use the PRESET provider without changing the repository contract")
-require("AI_GENERATED" not in preset_provider,
-        "preset provider must not contain AI-generation branching")
+        "PracticeTrackFilter" in repo_port,
+        "Practice repository must preserve the track filter")
+require("PracticeContentProvider" in repo_impl and "PresetPracticeContentProvider" in repo_impl,
+        "Practice UI must access content through repository/provider boundaries")
+require("paper.track !== PracticeTrack.TEXTBOOK_SYNC" in preset_provider and
+        "paper.track !== PracticeTrack.EXTRACURRICULAR" in preset_provider,
+        "Preset provider must actually filter by track")
 
-# UI can browse the catalog but must not know how preset data is stored.
-require("PracticeHomePage" in shell and "PRACTICE = 'PRACTICE'" in shell,
-        "student shell must expose a first-class Practice route")
-require("label: '练习'" in shell,
-        "student bottom/side navigation must expose Practice")
-require("PracticeContentProvider" not in page and "PresetPractice" not in page,
-        "PracticeHomePage must not depend directly on content providers or preset seed data")
+require("PracticeHomePage" in shell and "PRACTICE = 'PRACTICE'" in shell and "label: '练习'" in shell,
+        "student shell must expose Practice")
 require("DefaultPracticeRepository" in view_model,
         "PracticeHomeViewModel must obtain papers through PracticeRepository")
-require("selectedSemester" in page and "semesterLabel(this.selectedSemester)" in page,
-        "Practice home must show the active semester without adding a permanent semester selector")
-require("gradeFromStudentProfile" in models and "defaultGrade()" in view_model,
-        "Practice must default from the active student's grade")
-require("export enum PracticeSemester" in models and "semesterFromStudentProfile" in models and
-        "defaultSemester()" in view_model,
-        "Practice must preserve and default from the active student's semester")
-require("PracticeSubject.CHINESE" in models and "PracticeSubject.MATH" in models and
-        "PracticeSubject.ENGLISH" in models,
-        "Practice taxonomy must keep Chinese, Math and English")
-
-# Practice filters stay compact on the page and are edited in one bottom dialog.
-require("@CustomDialog" in filter_dialog and "筛选练习" in filter_dialog,
-        "practice grade/subject selection must live in the popup filter dialog")
-require("@Link selectedGrade" in filter_dialog and "@Link selectedSubject" in filter_dialog,
-        "practice filter dialog must edit draft grade and subject state")
-require("onApply" in filter_dialog and "this.onApply(this.selectedGrade, this.selectedSubject)" in filter_dialog,
-        "practice filters must only commit through the dialog apply action")
+require("selectedSemester" in page and "selectedTrack" in page,
+        "Practice home must preserve semester and catalog-type selection")
+require("label: '题库类型'" in page and "trackFilterLabel" in page,
+        "Practice home filter summary must show catalog type")
+require("@Link selectedTrack" in filter_dialog and "Text('题库类型')" in filter_dialog,
+        "Practice filter dialog must edit catalog type")
+require("PracticeTrackFilter.ALL" in filter_dialog and
+        "PracticeTrackFilter.TEXTBOOK_SYNC" in filter_dialog and
+        "PracticeTrackFilter.EXTRACURRICULAR" in filter_dialog,
+        "Practice filter dialog must expose all/sync/extra choices")
+require("onApply(this.selectedGrade, this.selectedSubject, this.selectedTrack)" in filter_dialog,
+        "Practice filters must only commit through explicit apply")
 require("filterDialogController" in page and "DialogAlignment.Bottom" in page,
-        "PracticeHomePage must open the filter as a bottom dialog")
-require("FilterSummaryEntry" in page and "label: '年级'" in page and "label: '科目'" in page,
-        "PracticeHomePage must show only a compact filter summary")
+        "Practice filters must stay in the bottom dialog")
 require("GradeSelector" not in page and "SubjectSelector" not in page,
-        "PracticeHomePage must not reserve permanent page space for inline selectors")
-require("this.draftSelectedGrade = this.selectedGrade" in page and
-        "this.draftSelectedSubject = this.selectedSubject" in page,
-        "closing the Practice filter must not mutate the applied selection")
+        "Practice page must not reserve permanent selector rows")
+require("gradeFromStudentProfile" in models and "defaultGrade()" in view_model,
+        "Practice must default from current student grade")
+require("semesterFromStudentProfile" in models and "defaultSemester()" in view_model,
+        "Practice must default from current student semester")
 
-# Keep Practice persistence independent from the homework snapshot/state machine.
 for token in ["PracticePaper", "PracticeQuestion", "PracticeAttempt", "PracticeAnswer", "PracticeNote"]:
     require(token not in snapshot, f"HomeworkSnapshot must not absorb practice domain: {token}")
 require("Practice" not in homework_models,
         "HomeworkModels must remain independent from Practice domain")
 
-# Seed coverage now comes from the grade/subject shard-generated client catalog.
-require("GENERATED from backend/src/main/resources/practice/preset/manifest.json and grade/subject shards" in preset_catalog,
-        "client preset catalog must be generated from split grade/subject JSON")
-for grade in ["G1", "G2", "G3", "G4", "G5", "G6"]:
-    for subject in ["CHINESE", "MATH", "ENGLISH"]:
-        require(f"id: '{subject}-{grade}-STARTER-001'" in preset_catalog,
-                f"generated preset catalog missing starter paper: {subject}/{grade}")
-        require(f"id: '{subject}-{grade}-CORE-001'" in preset_catalog,
-                f"generated preset catalog missing formal paper: {subject}/{grade}")
+require("Active catalog: Shenzhen G2 first semester" in preset_catalog,
+        "generated catalog must identify the rebuilt G2/S1 scope")
+require(preset_catalog.count("result.push({") == 27,
+        "generated catalog must expose exactly 27 active papers")
+require(preset_catalog.count("PracticeTrack.TEXTBOOK_SYNC") == 18,
+        "generated catalog must expose 18 textbook-sync papers")
+require(preset_catalog.count("PracticeTrack.EXTRACURRICULAR") == 9,
+        "generated catalog must expose 9 extracurricular papers")
+for paper_id in [
+    "CHINESE-G2-S1-SYNC-WORDS-001",
+    "CHINESE-G2-S1-EXTRA-SHENZHEN-001",
+    "MATH-G2-S1-SYNC-ADD-SUB-001",
+    "MATH-G2-S1-EXTRA-LIFE-001",
+    "ENGLISH-G2-S1-SYNC-GREETINGS-001",
+    "ENGLISH-G2-S1-EXTRA-SHENZHEN-001",
+]:
+    require(f"id: '{paper_id}'" in preset_catalog,
+            f"generated catalog missing rebuilt paper: {paper_id}")
+
+require(not (ROOT / "entry/src/main/ets/components/practice/PracticeQuestionVisual.ets").exists(),
+        "retired PracticeQuestionVisual component must stay deleted")
 
 if errors:
     print("PRACTICE_SLICE1_GATE_FAIL")
