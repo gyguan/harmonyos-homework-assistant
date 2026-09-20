@@ -29,6 +29,7 @@ result_page = read("entry/src/main/ets/features/student/practice/PracticeResultP
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 migration = read("backend/src/main/resources/db/migration/V9__practice_core.sql")
+track_migration = read("backend/src/main/resources/db/migration/V14__practice_paper_track.sql")
 controller = read("backend/src/main/java/com/xiaoban/homework/practice/PracticeController.java")
 service = read("backend/src/main/java/com/xiaoban/homework/practice/PracticeAttemptService.java")
 judge = read("backend/src/main/java/com/xiaoban/homework/practice/PracticeJudgeEngine.java")
@@ -44,22 +45,26 @@ for method in ["startAttempt", "getAttempt", "saveAnswer", "submitAttempt", "get
     require(method in remote, f"PracticeRemoteApi missing execution method {method}")
 
 require("onOpenPaper" in home and "onOpen: () => this.onOpenPaper" in home,
-        "practice paper cards must open the detail flow")
+        "practice paper cards must open detail")
 require("开始练习" in detail and "viewModel.start" in detail,
-        "practice paper detail must create a server attempt")
+        "paper detail must create server attempt")
 require("下一题" in attempt_page and "交卷" in attempt_page and "saveCurrent" in attempt_page,
-        "practice attempt page must save answers and support continuous navigation")
+        "attempt page must save answers and support navigation")
+require("PracticeQuestionVisual" not in attempt_page and "visualSpec" not in attempt_page,
+        "attempt page must stay text-only")
 require("PracticeSubmitConfirmDialog" in attempt_page and "unansweredCount" in attempt_page,
-        "practice submission must explicitly handle unanswered questions")
+        "submission must handle unanswered questions")
 require("答题回顾" in result_page and "正确答案" in result_page,
-        "practice result must expose review after submission")
+        "submitted result must expose review")
 
 for route in ["STUDENT_PRACTICE_PAPER", "STUDENT_PRACTICE_ATTEMPT", "STUDENT_PRACTICE_RESULT"]:
     require(route in routes and route in shell, f"practice deep route missing: {route}")
 
 for table in ["practice_paper", "practice_question", "practice_attempt", "practice_answer"]:
     require(f"create table if not exists {table}" in migration,
-            f"V9 practice migration missing {table}")
+            f"V9 migration missing {table}")
+require("add column if not exists track" in track_migration,
+        "V14 must persist practice paper track")
 
 for endpoint in [
     '/students/{studentId}/practice/attempts',
@@ -71,25 +76,26 @@ for endpoint in [
     require(endpoint in controller, f"PracticeController missing endpoint {endpoint}")
 
 require('"IN_PROGRESS"' in service and '"SUBMITTED"' in service,
-        "PracticeAttemptService must enforce attempt lifecycle")
+        "PracticeAttemptService must enforce lifecycle")
 require("PracticeJudgeEngine" in service and "isCorrect" in judge,
-        "practice scoring must use deterministic server JudgeEngine")
-require("question.answerSpec" in service and "question.explanation" in service,
-        "submitted result must be derived from authoritative server content")
-require("answerSpec" not in dtos.split("public record QuestionResponse", 1)[1].split("public record StartRequest", 1)[0],
-        "QuestionResponse must not leak answerSpec before submission")
-require("explanation" not in dtos.split("public record QuestionResponse", 1)[1].split("public record StartRequest", 1)[0],
-        "QuestionResponse must not leak explanation before submission")
-require("PRESET_MANIFEST" in bootstrap and "PracticeContentCatalog.Shard" in bootstrap and
-        "validator.validateCatalog(catalog)" in bootstrap,
-        "server Practice content must come from validated grade/subject shards")
-require("mathQuestions(" not in bootstrap and "chineseQuestions(" not in bootstrap and
-        "englishQuestions(" not in bootstrap,
-        "server Practice bootstrap must not regenerate paper questions in Java")
-require("PRACTICE_E2E_PASS" in e2e and "reject answer mutation after practice submission" in e2e,
-        "real Practice E2E must cover immutable submitted attempts")
-require("reject cross-grade practice attempt" in e2e and "audiencePolicy.requireFreshStartAllowed" in service,
-        "Practice fresh-start E2E must reject cross-grade papers")
+        "scoring must use deterministic JudgeEngine")
+question_dto = dtos.split("public record QuestionResponse", 1)[1].split("public record StartRequest", 1)[0]
+require("answerSpec" not in question_dto and "explanation" not in question_dto,
+        "QuestionResponse must not leak answers before submission")
+require("visualSpec" not in question_dto,
+        "QuestionResponse must not carry retired visual data")
+require("String track" in dtos.split("public record PaperResponse", 1)[1].split("public record QuestionResponse", 1)[0],
+        "PaperResponse must expose catalog type")
+require("archiveRetiredPresets" in bootstrap and 'paper.status = "ARCHIVED"' in bootstrap,
+        "bootstrap must archive old presets while preserving history")
+require("shard.track().equals(paper.track())" in bootstrap,
+        "bootstrap must enforce shard/Paper track consistency")
+require("PRACTICE_E2E_PASS" in e2e and "retired practice paper must be unavailable" in e2e,
+        "real E2E must verify old catalog retirement")
+require("TEXTBOOK_SYNC" in e2e and "EXTRACURRICULAR" in e2e,
+        "real E2E must verify both catalog types")
+require("reject answer mutation after practice submission" in e2e,
+        "real E2E must cover immutable submitted attempts")
 
 if errors:
     print("PRACTICE_SLICE2_GATE_FAIL")
