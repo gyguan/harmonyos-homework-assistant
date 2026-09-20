@@ -93,8 +93,12 @@ export class HomeworkImportInboxService {
   }
 
   importBatch(batch: ImportBatch, messages: ImportedMessage[], candidates: CandidateAssignment[]): void {
+    for (let message of messages) {
+      if (message.batchId !== batch.id) throw new Error('导入消息不属于当前批次');
+    }
     let normalized: CandidateAssignment[] = [];
     for (let candidate of candidates) {
+      if (candidate.studentId !== batch.studentId) throw new Error('候选作业不属于当前孩子');
       let sourceIds = candidate.sourceEvidence.sourceMessageIds;
       let messageIds: string[] = sourceIds === undefined ? [] : sourceIds.slice();
       if (messageIds.length === 0 && messages.length > 0) messageIds.push(messages[0].id);
@@ -140,7 +144,8 @@ export class HomeworkImportInboxService {
   activateBatch(batchId: string): boolean {
     let batch = this.inbox.getBatch(batchId);
     if (batch === null || batch.status === ImportBatchStatus.ABANDONED ||
-      batch.status === ImportBatchStatus.PUBLISHED) return false;
+      batch.status === ImportBatchStatus.PUBLISHED ||
+      batch.studentId !== this.drafts.getActiveStudentId()) return false;
 
     let messages = this.inbox.getMessages(batchId);
     let candidates = this.inbox.getCandidates(batchId);
