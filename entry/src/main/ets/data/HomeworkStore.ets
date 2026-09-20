@@ -2,6 +2,7 @@ import { MockData } from './MockData';
 import {
   AppSettings,
   Assignment,
+  AssignmentBacking,
   AssignmentContentType,
   AssignmentProgress,
   AssignmentStatus,
@@ -153,6 +154,8 @@ export class HomeworkStore {
       id: source.id,
       studentId: source.studentId,
       candidateId: source.candidateId,
+      backing: source.backing === AssignmentBacking.REMOTE ?
+        AssignmentBacking.REMOTE : AssignmentBacking.LOCAL_SEED,
       assignmentType: source.assignmentType,
       subjectCode: source.subjectCode,
       contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE ?
