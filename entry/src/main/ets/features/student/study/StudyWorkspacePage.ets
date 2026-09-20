@@ -248,7 +248,7 @@ export struct StudyWorkspacePage {
     let resumed = await this.executeAction(AssignmentAction.START);
     if (!resumed) return;
     this.submissionPhotoUris = [];
-    this.submissionMessage = '已返回作业，可继续完成后再提交';
+    this.submissionMessage = '';
   }
 
   private async selectSubmissionPhotos(): Promise<void> {
@@ -276,7 +276,7 @@ export struct StudyWorkspacePage {
         return;
       }
       this.submissionPhotoUris = [];
-      this.submissionMessage = '作业照片已提交';
+      this.submissionMessage = '';
       this.actionRevision++;
       this.onStoreChanged();
     } catch {
@@ -636,9 +636,6 @@ export struct StudyWorkspacePage {
             .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('先帮你理思路，再给下一步提示')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
