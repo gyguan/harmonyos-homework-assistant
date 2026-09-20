@@ -70,6 +70,9 @@ require("export class AssignmentDateRange" in date_range and "forDay" in date_ra
 require("businessDayStart" in due_date and "businessDateParts" in due_date and
         "businessWeekday" in due_date and "AssignmentDueDate.businessDayStart" in date_range,
         "all assignment date ranges must share Asia/Shanghai business-day semantics")
+require("text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0" not in due_date and
+        "if (text.indexOf('晚上') >= 0) return today;" in due_date,
+        "generic evening text must be resolved only after explicit/relative dates so 明天晚上 does not become today")
 require("AssignmentDueDate.businessDayStart" in parent_home and
         "AssignmentDueDate.businessDayStart" in student_home and
         "AssignmentDueDate.businessDayStart" in calendar,
