@@ -64,12 +64,11 @@ export class HomeworkImportService {
       rawText: normalized
     };
     let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
+    HomeworkImportInboxService.instance.commitParsedImport(
+      rawImport, HomeworkImportSourceType.CLIPBOARD, output.extracted.text, output.candidates);
     if (output.candidates.length === 0) {
       return { candidateCount: 0, organizerMode: output.organizerMode };
     }
-
-    HomeworkImportInboxService.instance.commitParsedImport(
-      rawImport, HomeworkImportSourceType.CLIPBOARD, output.extracted.text, output.candidates);
     return { candidateCount: output.candidates.length, organizerMode: output.organizerMode };
   }
 
