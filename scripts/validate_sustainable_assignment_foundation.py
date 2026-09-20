@@ -29,6 +29,10 @@ parent_vm = read("entry/src/main/ets/features/parent/progress/ParentProgressView
 student_vm = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
 filter_factory = read("entry/src/main/ets/domain/service/AssignmentFilterFactory.ets")
 date_range = read("entry/src/main/ets/domain/service/AssignmentDateRange.ets")
+due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
+parent_home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+student_home = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
+calendar = read("entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets")
 selection = read("entry/src/main/ets/common/state/SelectionIds.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
@@ -63,6 +67,13 @@ require("backing: source.backing === AssignmentBacking.REMOTE" in store,
 # Date/query construction lives in domain services rather than diverging in ViewModels.
 require("export class AssignmentDateRange" in date_range and "forDay" in date_range,
         "shared assignment date range service is required")
+require("businessDayStart" in due_date and "businessDateParts" in due_date and
+        "businessWeekday" in due_date and "AssignmentDueDate.businessDayStart" in date_range,
+        "all assignment date ranges must share Asia/Shanghai business-day semantics")
+require("AssignmentDueDate.businessDayStart" in parent_home and
+        "AssignmentDueDate.businessDayStart" in student_home and
+        "AssignmentDueDate.businessDayStart" in calendar,
+        "parent home, student home and calendar must use the same business-day boundary")
 require("export class AssignmentFilterFactory" in filter_factory and
         "static forDay" in filter_factory and "static create" in filter_factory,
         "shared assignment filter factory is required")
