@@ -270,6 +270,7 @@ export struct ParentProgressPage {
     this.typeFilter = typeFilter;
     this.dateFilter = dateFilter;
     this.subjectCode = subjectCode;
+    if (this.bulkMode) this.selectedDeleteIds = [];
     this.filterDialogController.close();
     await this.queryCurrent();
   }
@@ -289,6 +290,7 @@ export struct ParentProgressPage {
   private chooseStatus(value: ParentProgressStatusFilter): void {
     if (this.statusFilter === value || this.querying) return;
     this.statusFilter = value;
+    if (this.bulkMode) this.selectedDeleteIds = [];
     void this.queryCurrent();
   }
 
