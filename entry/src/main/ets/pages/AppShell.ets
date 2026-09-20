@@ -28,6 +28,7 @@ import { StudentAssignmentDetailPage } from '../features/student/assignments/Stu
 import { StudentAssignmentsPage } from '../features/student/assignments/StudentAssignmentsPage';
 import { StudentHomePage } from '../features/student/home/StudentHomePage';
 import { StudentProfilePage } from '../features/student/profile/StudentProfilePage';
+import { PracticeHomePage } from '../features/student/practice/PracticeHomePage';
 import { StudyWorkspaceRoutePage } from '../features/student/study/StudyWorkspaceRoutePage';
 
 export enum AppRole {
@@ -39,6 +40,7 @@ export enum AppRole {
 enum StudentRoute {
   HOME = 'HOME',
   ASSIGNMENTS = 'ASSIGNMENTS',
+  PRACTICE = 'PRACTICE',
   PROFILE = 'PROFILE'
 }
 
@@ -201,6 +203,10 @@ export struct AppShell {
         revision: this.storeRevision,
         onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
+      });
+    } else if (this.studentRoute === StudentRoute.PRACTICE) {
+      PracticeHomePage({
+        revision: this.storeRevision
       });
     } else if (this.studentRoute === StudentRoute.PROFILE) {
       StudentProfilePage({
@@ -378,6 +384,10 @@ export struct AppShell {
           onSelect: () => this.studentRoute = StudentRoute.ASSIGNMENTS
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
+          symbol: $r('sys.symbol.checkmark_circle'), label: '练习', selected: this.studentRoute === StudentRoute.PRACTICE,
+          onSelect: () => this.studentRoute = StudentRoute.PRACTICE
+        }).layoutWeight(1).height('100%');
+        BottomPrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.studentRoute === StudentRoute.PROFILE,
           onSelect: () => this.studentRoute = StudentRoute.PROFILE
         }).layoutWeight(1).height('100%');
@@ -426,6 +436,10 @@ export struct AppShell {
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_square'), label: '作业', selected: this.studentRoute === StudentRoute.ASSIGNMENTS,
           onSelect: () => this.studentRoute = StudentRoute.ASSIGNMENTS
+        });
+        SidePrimaryNavItem({
+          symbol: $r('sys.symbol.checkmark_circle'), label: '练习', selected: this.studentRoute === StudentRoute.PRACTICE,
+          onSelect: () => this.studentRoute = StudentRoute.PRACTICE
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.studentRoute === StudentRoute.PROFILE,

@@ -147,6 +147,9 @@ jobs:
       - name: Validate student profile navigation
         run: python scripts/validate_student_profile_navigation.py
 
+      - name: Validate Practice Slice 1
+        run: python scripts/validate_practice_slice1.py
+
       - name: Validate parent Tutor settings
         run: python scripts/validate_parent_tutor_settings.py
 
