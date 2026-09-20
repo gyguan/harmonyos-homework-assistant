@@ -17,8 +17,21 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   private readonly local: AssignmentLocalDataSource = DefaultAssignmentLocalDataSource.instance;
   private syncRunning: boolean = false;
   private syncRequested: boolean = false;
+  private changeListener: (() => void) | null = null;
 
   private constructor() {}
+
+  setChangeListener(listener: () => void): void {
+    this.changeListener = listener;
+  }
+
+  clearChangeListener(): void {
+    this.changeListener = null;
+  }
+
+  private emitChanged(): void {
+    if (this.changeListener !== null) this.changeListener();
+  }
 
   requestSync(): void {
     if (!BackendSession.instance.isConnected()) return;
@@ -242,6 +255,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     this.queryCache = queryRemaining;
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
+    this.emitChanged();
   }
 
   applyAuthoritative(updated: Assignment): void {
@@ -261,6 +275,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     // local Assignment cache before the asynchronous background sync completes.
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
+    this.emitChanged();
   }
 
   async refresh(): Promise<boolean> {
@@ -405,6 +420,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     this.replaceQueryCacheItem(updated);
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
+    this.emitChanged();
     return updated;
   }
 
