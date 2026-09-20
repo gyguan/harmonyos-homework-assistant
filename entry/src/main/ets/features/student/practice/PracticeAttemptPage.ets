@@ -49,8 +49,8 @@ export struct PracticeAttemptPage {
       this.currentIndex = 0;
       this.syncCurrentAnswer();
       if (loaded.status === PracticeAttemptStatus.SUBMITTED) this.onSubmitted(loaded.id);
-    } catch (error) {
-      this.errorMessage = error instanceof Error ? error.message : '练习加载失败。';
+    } catch {
+      this.errorMessage = '练习加载失败，请检查网络后重试。';
     }
   }
 
@@ -87,8 +87,8 @@ export struct PracticeAttemptPage {
       let saved = await this.viewModel.save(this.attemptId, question.id, normalized);
       this.upsertAnswer(saved);
       return true;
-    } catch (error) {
-      this.errorMessage = error instanceof Error ? error.message : '答案保存失败。';
+    } catch {
+      this.errorMessage = '答案保存失败，请检查网络后重试。';
       return false;
     } finally {
       this.saving = false;
@@ -138,8 +138,8 @@ export struct PracticeAttemptPage {
     try {
       await this.viewModel.submit(this.attemptId);
       this.onSubmitted(this.attemptId);
-    } catch (error) {
-      this.errorMessage = error instanceof Error ? error.message : '交卷失败，请稍后重试。';
+    } catch {
+      this.errorMessage = '交卷失败，请检查网络后重试。';
     } finally {
       this.submitting = false;
     }
