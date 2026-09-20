@@ -205,6 +205,67 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     return mapped;
   }
 
+  async deleteAssignments(assignmentIds: string[]): Promise<number> {
+    let ids: string[] = [];
+    let seen: Set<string> = new Set<string>();
+    for (let assignmentId of assignmentIds) {
+      if (assignmentId.length === 0 || seen.has(assignmentId)) continue;
+      let current = this.getCached(assignmentId);
+      if (current === null) continue;
+      if (current.status === AssignmentStatus.COMPLETED) {
+        throw new Error('已完成作业不能删除');
+      }
+      seen.add(assignmentId);
+      ids.push(assignmentId);
+    }
+    if (ids.length === 0) return 0;
+
+    let remoteIds: string[] = [];
+    for (let assignmentId of ids) {
+      let current = this.getCached(assignmentId);
+      if (current !== null && (current.remoteVersion > 0 || current.candidateId.length > 0)) {
+        remoteIds.push(assignmentId);
+      }
+    }
+    if (remoteIds.length > 0 && !BackendSession.instance.isConnected()) {
+      throw new Error('当前离线，联网后才能删除已发布作业');
+    }
+
+    let deleted: Set<string> = new Set<string>();
+    for (let assignmentId of ids) {
+      let current = this.getCached(assignmentId);
+      let isRemote = current !== null && (current.remoteVersion > 0 || current.candidateId.length > 0);
+      if (isRemote) {
+        let success = await HomeworkRemoteApi.instance.delete(assignmentId);
+        if (!success) {
+          this.removeCachedAssignments(deleted);
+          throw new Error(deleted.size > 0 ? '部分作业已删除，其余删除失败，请刷新后重试' : '删除作业失败，请刷新后重试');
+        }
+      }
+      deleted.add(assignmentId);
+    }
+
+    this.removeCachedAssignments(deleted);
+    return deleted.size;
+  }
+
+  private removeCachedAssignments(ids: Set<string>): void {
+    if (ids.size === 0) return;
+    let remaining: Assignment[] = [];
+    for (let item of this.local.listAssignments()) {
+      if (!ids.has(item.id)) remaining.push(item);
+    }
+    this.local.replaceAssignmentsForActiveStudent(remaining);
+
+    let queryRemaining: Assignment[] = [];
+    for (let item of this.queryCache) {
+      if (!ids.has(item.id)) queryRemaining.push(item);
+    }
+    this.queryCache = queryRemaining;
+    this.remoteSummary = null;
+    this.remoteSummaryStudentId = '';
+  }
+
   applyAuthoritative(updated: Assignment): void {
     let assignments = this.local.listAssignments();
     let replaced = false;
