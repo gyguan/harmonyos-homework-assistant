@@ -54,6 +54,11 @@ require("pendingDownloads" in remote_resource,
         "resource downloads must deduplicate concurrent prefetch and foreground requests")
 require("void this.loadAudio(audio)" in pane and "正在加载语音…" in pane,
         "voice audio must load independently after the first image becomes visible")
+require("void this.load(this.lifecycleVersion)" in pane and
+        "void this.load();" not in pane and
+        "lifecycleVersion" in pane,
+        "voice media reloads must preserve lifecycle guards")
+
 
 require("Slider({" in pane and "this.player.seek(value)" in pane,
         "voice media pane must retain audio progress seeking")
