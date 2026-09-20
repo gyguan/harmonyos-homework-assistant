@@ -1,5 +1,6 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { Assignment, AssignmentStatus, AssignmentType } from '../../../domain/model/HomeworkModels';
+import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
 @Component
 export struct AssignmentCalendarPanel {
@@ -9,33 +10,29 @@ export struct AssignmentCalendarPanel {
   onSelectDay: (dayEpochMs: number) => void = (_dayEpochMs: number) => {};
 
   private monthStart(epochMs: number): number {
-    let value = new Date(epochMs);
-    return new Date(value.getFullYear(), value.getMonth(), 1).getTime();
+    return AssignmentDueDate.businessMonthStart(epochMs);
   }
 
   private startOfDay(epochMs: number): number {
-    let value = new Date(epochMs);
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+    return AssignmentDueDate.businessDayStart(epochMs);
   }
 
   private addDays(dayStart: number, days: number): number {
-    let value = new Date(dayStart);
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate() + days).getTime();
+    return AssignmentDueDate.addBusinessDays(dayStart, days);
   }
 
   private addMonths(monthStart: number, months: number): number {
-    let value = new Date(monthStart);
-    return new Date(value.getFullYear(), value.getMonth() + months, 1).getTime();
+    return AssignmentDueDate.addBusinessMonths(monthStart, months);
   }
 
   private monthLabel(): string {
-    let value = new Date(this.monthStart(this.monthEpochMs));
-    return `${value.getFullYear()}年${value.getMonth() + 1}月`;
+    let value = AssignmentDueDate.businessDateParts(this.monthStart(this.monthEpochMs));
+    return `${value.year}年${value.month}月`;
   }
 
   private monthDays(): number[][] {
     let first = this.monthStart(this.monthEpochMs);
-    let weekday = new Date(first).getDay();
+    let weekday = AssignmentDueDate.businessWeekday(first);
     let mondayBasedOffset = weekday === 0 ? 6 : weekday - 1;
     let gridStart = this.addDays(first, -mondayBasedOffset);
     let weeks: number[][] = [];
@@ -115,7 +112,7 @@ export struct AssignmentCalendarPanel {
   @Builder
   private DayCell(dayEpochMs: number) {
     Column({ space: 1 }) {
-      Text(`${new Date(dayEpochMs).getDate()}`)
+      Text(`${AssignmentDueDate.businessDateParts(dayEpochMs).day}`)
         .fontSize(13)
         .fontWeight(this.isToday(dayEpochMs) || this.isSelected(dayEpochMs) ? FontWeight.Medium : FontWeight.Normal)
         .fontColor(this.isSelected(dayEpochMs) ? AppTheme.TEXT_ON_PRIMARY :
@@ -130,7 +127,7 @@ export struct AssignmentCalendarPanel {
       (this.isToday(dayEpochMs) ? AppTheme.PRIMARY_FAINT : Color.Transparent))
     .borderRadius(AppTheme.CHIP_RADIUS)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`${new Date(dayEpochMs).getMonth() + 1}月${new Date(dayEpochMs).getDate()}日，${this.dayAssignments(dayEpochMs).length}项任务`)
+    .accessibilityText(`${AssignmentDueDate.businessDateParts(dayEpochMs).month}月${AssignmentDueDate.businessDateParts(dayEpochMs).day}日，${this.dayAssignments(dayEpochMs).length}项任务`)
     .onClick(() => this.selectDay(dayEpochMs));
   }
 
