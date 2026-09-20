@@ -32,6 +32,10 @@ export struct HomeworkConfirmationPage {
     return null;
   }
 
+  private candidateRenderKey(item: CandidateAssignment): string {
+    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.dueText}|${item.textbookRef}|${item.expectedMinutes}`;
+  }
+
   private openEditor(candidateId: string): void {
     this.editingCandidateId = candidateId;
     this.showEditorSheet = true;
@@ -236,7 +240,7 @@ export struct HomeworkConfirmationPage {
                     onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
                       this.setExpectedMinutes(candidate, minutes)
                   });
-                }, (item: CandidateAssignment) => item.id);
+                }, (item: CandidateAssignment) => this.candidateRenderKey(item));
               }
               .width('100%');
 
