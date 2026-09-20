@@ -41,6 +41,24 @@ export class AssignmentDueDate {
       hour - AssignmentDueDate.SHANGHAI_OFFSET_HOURS, minute, 0, 0);
   }
 
+  static displayText(item: Assignment): string {
+    let dueAt = item.dueAtEpochMs;
+    if (dueAt <= 0) {
+      let anchor = AssignmentDueDate.assignmentCreatedAt(item.id);
+      dueAt = AssignmentDueDate.resolveDueAtEpochMs(
+        item.dueText, anchor > 0 ? anchor : Date.now());
+    }
+    if (dueAt <= 0) return '未设置截止时间';
+
+    let shifted = new Date(dueAt + AssignmentDueDate.SHANGHAI_OFFSET_HOURS * 60 * 60 * 1000);
+    let year = shifted.getUTCFullYear();
+    let month = AssignmentDueDate.pad(shifted.getUTCMonth() + 1);
+    let day = AssignmentDueDate.pad(shifted.getUTCDate());
+    let hour = AssignmentDueDate.pad(shifted.getUTCHours());
+    let minute = AssignmentDueDate.pad(shifted.getUTCMinutes());
+    return `${year}-${month}-${day} ${hour}:${minute}`;
+  }
+
   static matches(item: Assignment, filter: DueDateFilterKey, nowEpochMs: number = Date.now()): boolean {
     if (filter === DueDateFilterKey.ALL) return true;
     if (filter === DueDateFilterKey.OVERDUE) return AssignmentDueDate.isOverdue(item, nowEpochMs);
@@ -280,6 +298,10 @@ export class AssignmentDueDate {
     let monthText = month < 10 ? `0${month}` : `${month}`;
     let dayText = day < 10 ? `0${day}` : `${day}`;
     return `${value.getFullYear()}-${monthText}-${dayText}`;
+  }
+
+  private static pad(value: number): string {
+    return value < 10 ? `0${value}` : `${value}`;
   }
 
   private static dateStart(year: number, month: number, day: number): number {
