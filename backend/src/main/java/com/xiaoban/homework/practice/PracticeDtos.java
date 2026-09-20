@@ -38,7 +38,17 @@ public final class PracticeDtos {
 
   public record AnswerResponse(String questionId, String answerValue, long answeredAtEpochMs) {}
 
+  public record NoteRequest(@NotNull String content) {}
+
+  public record NoteResponse(
+      String questionId,
+      String content,
+      long createdAtEpochMs,
+      long updatedAtEpochMs) {}
+
   public record PreviousAnswerResponse(String questionId, String answerValue, boolean correct) {}
+
+  public record PreviousNoteResponse(String questionId, String content) {}
 
   public record AttemptResponse(
       String id,
@@ -54,9 +64,12 @@ public final class PracticeDtos {
       long elapsedSeconds,
       int answeredCount,
       int questionCount,
+      int noteCount,
       List<QuestionResponse> questions,
       List<AnswerResponse> answers,
-      List<PreviousAnswerResponse> previousAnswers) {}
+      List<NoteResponse> notes,
+      List<PreviousAnswerResponse> previousAnswers,
+      List<PreviousNoteResponse> previousNotes) {}
 
   public record AttemptSummary(
       String id,
@@ -74,6 +87,7 @@ public final class PracticeDtos {
       long elapsedSeconds,
       int answeredCount,
       int questionCount,
+      int noteCount,
       int score,
       int maxScore,
       int correctCount,
@@ -87,17 +101,20 @@ public final class PracticeDtos {
       String correctAnswer,
       boolean correct,
       int score,
-      String explanation) {}
+      String explanation,
+      String noteContent) {}
 
   public record ResultResponse(
       String attemptId,
       String paperId,
       int paperVersion,
       int attemptNo,
+      String mode,
       int score,
       int maxScore,
       int correctCount,
       int wrongCount,
+      int noteCount,
       long elapsedSeconds,
       List<QuestionResult> questions) {}
 }
