@@ -65,6 +65,7 @@ export struct ParentAssignmentEditPanel {
       id: this.item.id,
       studentId: this.item.studentId,
       candidateId: this.item.candidateId,
+      backing: this.item.backing,
       assignmentType: this.item.assignmentType,
       subjectCode: this.item.subjectCode,
       contentType: this.item.contentType,
