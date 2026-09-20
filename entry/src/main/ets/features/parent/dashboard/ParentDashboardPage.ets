@@ -99,9 +99,6 @@ export struct ParentDashboardPage {
             .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('先看结果，再处理需要家长介入的事项')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
