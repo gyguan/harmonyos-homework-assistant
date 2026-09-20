@@ -68,12 +68,14 @@ require("export class AssignmentFilterFactory" in filter_factory and
         "shared assignment filter factory is required")
 for text, name in [(parent_vm, "parent"), (student_vm, "student")]:
     require("AssignmentFilterFactory" in text, f"{name} assignments must reuse AssignmentFilterFactory")
-    require("private buildFilter(" not in text and "private static endOfDay(" not in text,
-            f"{name} assignments must not keep a private duplicate date/filter implementation")
+    require("private buildFilter(" not in text and "this.buildFilter(" not in text and
+            "private static endOfDay(" not in text,
+            f"{name} assignments must not keep or call a private duplicate date/filter implementation")
 
 # Assignment mutations notify the shell from the repository boundary.
-require("setChangeListener" in repo and "clearChangeListener" in repo and "emitChanged" in repo,
-        "Assignment Repository must expose one centralized UI invalidation signal")
+require("setChangeListener" in repo and "clearChangeListener" in repo and "emitChanged" in repo and
+        "applyAuthoritativeBatch" in repo,
+        "Assignment Repository must expose centralized UI invalidation with batched authoritative apply")
 require("DefaultAssignmentRepository.instance.setChangeListener" in shell and
         "DefaultAssignmentRepository.instance.clearChangeListener" in shell,
         "AppShell must subscribe/unsubscribe to repository assignment changes")
