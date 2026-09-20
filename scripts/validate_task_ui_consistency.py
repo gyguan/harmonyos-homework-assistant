@@ -33,6 +33,7 @@ confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkCon
 confirmation_components = read(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 parent_edit = read("entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets")
+sheet_header = read("entry/src/main/ets/components/navigation/EditSheetHeader.ets")
 
 # 1. Assignment list deadlines use one concrete date/time format.
 require("static displayText(item: Assignment): string" in due and
@@ -82,11 +83,12 @@ require("Text('关闭')" in student_switcher,
 require("Text('关闭')" in photo_preview,
         "photo preview must keep a top-right close action")
 parent_actions = parent_edit.split("private BottomActions()", 1)[1].split("build()", 1)[0]
-require("Text('关闭')" in parent_edit and
+require("EditSheetHeader({" in parent_edit and "Text('关闭')" in sheet_header and
         "Button(this.saving ? '保存中…' : '保存修改'" in parent_actions,
-        "parent edit sheet must keep close in header and save in the fixed bottom action area")
-require("Text('关闭')" in confirmation_components and "confirmDiscard" in confirmation_components,
-        "candidate edit sheet must use close as the only header exit and protect dirty edits")
+        "parent edit sheet must reuse the shared close-only header and fixed bottom save area")
+require("EditSheetHeader({" in confirmation_components and "Text('关闭')" in sheet_header and
+        "confirmDiscard" in confirmation_components,
+        "candidate edit sheet must reuse the shared close-only header and protect dirty edits")
 candidate_actions = confirmation_components.split("private BottomActions()", 1)[1].split("build()", 1)[0]
 require("Button('删除'" in candidate_actions and "Button('完成'" in candidate_actions,
         "candidate editor business actions must stay in its bottom action area")
