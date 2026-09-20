@@ -2,22 +2,13 @@ import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
+import { AssignmentMetricKey, AssignmentMetricSummary } from '../../../components/assignment/AssignmentMetricSummary';
 import { FilterSummaryEntry } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import {
-  AssignmentDateFilter,
-  AssignmentTypeFilter
-} from '../../../domain/model/AssignmentFilter';
+import { AssignmentDateFilter, AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { ParentReviewPane } from '../review/ParentReviewPane';
 import { ParentProgressViewModel } from './ParentProgressViewModel';
-
-enum ParentProgressStatusFilter {
-  ALL = 'ALL',
-  ATTENTION = 'ATTENTION',
-  SUBMITTED = 'SUBMITTED',
-  COMPLETED = 'COMPLETED'
-}
 
 @Component
 export struct ParentProgressPage {
@@ -26,12 +17,10 @@ export struct ParentProgressPage {
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
 
-  @State private typeFilter: AssignmentTypeFilter = AssignmentTypeFilter.ALL;
-  @State private dateFilter: AssignmentDateFilter = AssignmentDateFilter.ALL;
+  @State private selectedDayEpochMs: number = Date.now();
   @State private subjectCode: string = 'ALL';
-  @State private statusFilter: ParentProgressStatusFilter = ParentProgressStatusFilter.ALL;
-  @State private draftTypeFilter: AssignmentTypeFilter = AssignmentTypeFilter.ALL;
-  @State private draftDateFilter: AssignmentDateFilter = AssignmentDateFilter.ALL;
+  @State private statusFilter: AssignmentMetricKey = AssignmentMetricKey.ALL;
+  @State private draftSelectedDayEpochMs: number = Date.now();
   @State private draftSubjectCode: string = 'ALL';
   @State private visibleAssignments: Assignment[] = [];
   @State private snapshotRevision: number = -1;
@@ -50,11 +39,10 @@ export struct ParentProgressPage {
 
   private filterDialogController: CustomDialogController = new CustomDialogController({
     builder: AssignmentFilterDialog({
-      typeFilter: $draftTypeFilter,
-      dateFilter: $draftDateFilter,
+      selectedDayEpochMs: $draftSelectedDayEpochMs,
       subjectCode: $draftSubjectCode,
-      onQuery: (typeFilter: AssignmentTypeFilter, dateFilter: AssignmentDateFilter, subjectCode: string) => {
-        void this.applyFilters(typeFilter, dateFilter, subjectCode);
+      onQuery: (selectedDayEpochMs: number, subjectCode: string) => {
+        void this.applyFilters(selectedDayEpochMs, subjectCode);
       }
     }),
     autoCancel: true,
@@ -71,19 +59,26 @@ export struct ParentProgressPage {
   }
 
   private statuses(): AssignmentStatus[] {
-    if (this.statusFilter === ParentProgressStatusFilter.ATTENTION) {
-      return [AssignmentStatus.OVERDUE, AssignmentStatus.NEEDS_REWORK];
+    if (this.statusFilter === AssignmentMetricKey.PENDING) {
+      return [
+        AssignmentStatus.NOT_STARTED,
+        AssignmentStatus.IN_PROGRESS,
+        AssignmentStatus.PAUSED,
+        AssignmentStatus.READY_TO_SUBMIT,
+        AssignmentStatus.NEEDS_REWORK,
+        AssignmentStatus.OVERDUE
+      ];
     }
-    if (this.statusFilter === ParentProgressStatusFilter.SUBMITTED) return [AssignmentStatus.SUBMITTED];
-    if (this.statusFilter === ParentProgressStatusFilter.COMPLETED) return [AssignmentStatus.COMPLETED];
+    if (this.statusFilter === AssignmentMetricKey.SUBMITTED) return [AssignmentStatus.SUBMITTED];
+    if (this.statusFilter === AssignmentMetricKey.COMPLETED) return [AssignmentStatus.COMPLETED];
     return [];
   }
 
   private rebuildView(): void {
     let currentRevision = this.revision + this.refreshRevision;
     if (currentRevision < 0) return;
-    this.applyItems(this.viewModel.assignments(
-      this.typeFilter, this.subjectCode, this.dateFilter, this.statuses()));
+    this.applyItems(this.viewModel.assignmentsOnDay(
+      this.subjectCode, this.selectedDayEpochMs, this.statuses()));
   }
 
   private applyItems(items: Assignment[]): void {
@@ -97,8 +92,8 @@ export struct ParentProgressPage {
   private currentVisibleAssignments(): Assignment[] {
     let currentRevision = this.revision + this.refreshRevision;
     if (this.snapshotRevision === currentRevision) return this.visibleAssignments;
-    return this.viewModel.assignments(
-      this.typeFilter, this.subjectCode, this.dateFilter, this.statuses());
+    return this.viewModel.assignmentsOnDay(
+      this.subjectCode, this.selectedDayEpochMs, this.statuses());
   }
 
   private assignmentRenderKey(item: Assignment): string {
@@ -255,20 +250,16 @@ export struct ParentProgressPage {
 
   private openFilterDialog(): void {
     if (this.querying) return;
-    this.draftTypeFilter = this.typeFilter;
-    this.draftDateFilter = this.dateFilter;
+    this.draftSelectedDayEpochMs = this.selectedDayEpochMs;
     this.draftSubjectCode = this.subjectCode;
     this.filterDialogController.open();
   }
 
-  private async applyFilters(typeFilter: AssignmentTypeFilter,
-    dateFilter: AssignmentDateFilter, subjectCode: string): Promise<void> {
+  private async applyFilters(selectedDayEpochMs: number, subjectCode: string): Promise<void> {
     if (this.querying) return;
-    this.draftTypeFilter = typeFilter;
-    this.draftDateFilter = dateFilter;
+    this.draftSelectedDayEpochMs = selectedDayEpochMs;
     this.draftSubjectCode = subjectCode;
-    this.typeFilter = typeFilter;
-    this.dateFilter = dateFilter;
+    this.selectedDayEpochMs = selectedDayEpochMs;
     this.subjectCode = subjectCode;
     if (this.bulkMode) this.selectedDeleteIds = [];
     this.filterDialogController.close();
@@ -279,15 +270,15 @@ export struct ParentProgressPage {
     if (this.querying) return;
     this.querying = true;
     try {
-      let items = await this.viewModel.query(
-        this.typeFilter, this.subjectCode, this.dateFilter, this.statuses());
+      let items = await this.viewModel.queryOnDay(
+        this.subjectCode, this.selectedDayEpochMs, this.statuses());
       this.applyItems(items);
     } finally {
       this.querying = false;
     }
   }
 
-  private chooseStatus(value: ParentProgressStatusFilter): void {
+  private chooseStatus(value: AssignmentMetricKey): void {
     if (this.statusFilter === value || this.querying) return;
     this.statusFilter = value;
     if (this.bulkMode) this.selectedDeleteIds = [];
@@ -307,47 +298,54 @@ export struct ParentProgressPage {
     return this.canUseReviewPane() && this.selectedAssignmentId === item.id;
   }
 
-  private attentionCount(): number {
+  private allAssignments(): Assignment[] {
+    return this.viewModel.assignments(
+      AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL);
+  }
+
+  private allCount(): number {
+    return this.allAssignments().length;
+  }
+
+  private pendingCount(): number {
     let count = 0;
-    for (let item of this.viewModel.assignments(
-      AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL)) {
-      if (item.status === AssignmentStatus.OVERDUE || item.status === AssignmentStatus.NEEDS_REWORK) count++;
+    for (let item of this.allAssignments()) {
+      if (item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED) count++;
     }
     return count;
   }
 
-  private allCount(): number {
-    return this.viewModel.assignments(
-      AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL).length;
-  }
-
   private submittedCount(): number {
-    return this.viewModel.assignments(
-      AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL, [AssignmentStatus.SUBMITTED]).length;
+    let count = 0;
+    for (let item of this.allAssignments()) if (item.status === AssignmentStatus.SUBMITTED) count++;
+    return count;
   }
 
   private completedCount(): number {
-    return this.viewModel.assignments(
-      AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL, [AssignmentStatus.COMPLETED]).length;
+    let count = 0;
+    for (let item of this.allAssignments()) if (item.status === AssignmentStatus.COMPLETED) count++;
+    return count;
+  }
+
+  private isSelectedDayToday(): boolean {
+    let now = new Date();
+    let today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    let selected = new Date(this.selectedDayEpochMs);
+    let selectedStart = new Date(selected.getFullYear(), selected.getMonth(), selected.getDate()).getTime();
+    return selectedStart === today;
   }
 
   private hasActiveFilters(): boolean {
-    return this.typeFilter !== AssignmentTypeFilter.ALL || this.dateFilter !== AssignmentDateFilter.ALL ||
-      this.subjectCode !== 'ALL';
+    return !this.isSelectedDayToday() || this.subjectCode !== 'ALL';
   }
 
-  private typeLabel(value: AssignmentTypeFilter): string {
-    if (value === AssignmentTypeFilter.SCHOOL) return '课内';
-    if (value === AssignmentTypeFilter.EXTRA) return '课外';
-    return '全部';
-  }
-
-  private dateLabel(value: AssignmentDateFilter): string {
-    if (value === AssignmentDateFilter.TODAY) return '今天';
-    if (value === AssignmentDateFilter.TOMORROW) return '明天';
-    if (value === AssignmentDateFilter.THIS_WEEK) return '本周';
-    if (value === AssignmentDateFilter.UNDATED) return '未定';
-    return '全部日期';
+  private dateLabel(): string {
+    let value = new Date(this.selectedDayEpochMs);
+    let month = value.getMonth() + 1;
+    let day = value.getDate();
+    let monthText = month < 10 ? `0${month}` : `${month}`;
+    let dayText = day < 10 ? `0${day}` : `${day}`;
+    return `${value.getFullYear()}-${monthText}-${dayText}`;
   }
 
   private subjectLabel(value: string): string {
@@ -358,41 +356,36 @@ export struct ParentProgressPage {
     return '全部科目';
   }
 
-  private statusLabel(value: ParentProgressStatusFilter): string {
-    if (value === ParentProgressStatusFilter.ATTENTION) return '需关注';
-    if (value === ParentProgressStatusFilter.SUBMITTED) return '待验收';
-    if (value === ParentProgressStatusFilter.COMPLETED) return '已完成';
-    return '全部状态';
+  private statusLabel(value: AssignmentMetricKey): string {
+    if (value === AssignmentMetricKey.PENDING) return '待完成';
+    if (value === AssignmentMetricKey.SUBMITTED) return '待验收';
+    if (value === AssignmentMetricKey.COMPLETED) return '已完成';
+    return '全部任务';
   }
 
   @Builder
   private FilterBar() {
     Row() {
       FilterSummaryEntry({
-        label: '类型', value: this.typeLabel(this.typeFilter),
-        active: this.typeFilter !== AssignmentTypeFilter.ALL,
+        label: '日期', value: this.dateLabel(),
+        active: !this.isSelectedDayToday(),
         onOpen: () => this.openFilterDialog()
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
       FilterSummaryEntry({
-        label: '截止', value: this.dateLabel(this.dateFilter),
-        active: this.dateFilter !== AssignmentDateFilter.ALL,
+        label: '科目', value: this.subjectLabel(this.subjectCode),
+        active: this.subjectCode !== 'ALL',
         onOpen: () => this.openFilterDialog()
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      FilterSummaryEntry({
-        label: '科目', value: this.subjectLabel(this.subjectCode), active: this.subjectCode !== 'ALL',
-        onOpen: () => this.openFilterDialog()
-      });
-      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      Text(this.querying ? '查询中…' : (this.hasActiveFilters() ? '筛选中' : '筛选'))
+      Text(this.querying ? '查询中…' : '查询')
         .fontSize(13)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.hasActiveFilters() ? AppTheme.PRIMARY : AppTheme.TEXT)
         .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ left: 14, right: 14 })
+        .padding({ left: 18, right: 18 })
         .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('打开筛选面板')
+        .accessibilityText('打开作业查询')
         .onClick(() => this.openFilterDialog());
     }
     .width('100%')
@@ -404,47 +397,16 @@ export struct ParentProgressPage {
   }
 
   @Builder
-  private StatusMetricCard(label: string, value: number, filter: ParentProgressStatusFilter, tone: string) {
-    Column({ space: 5 }) {
-      Text(`${value}`)
-        .fontSize(24)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(tone === 'attention' ? AppTheme.DANGER :
-          tone === 'review' ? AppTheme.WARNING :
-            tone === 'done' ? AppTheme.SUCCESS : AppTheme.PRIMARY);
-      Text(label)
-        .fontSize(11)
-        .fontColor(AppTheme.SUBTEXT);
-    }
-    .layoutWeight(1)
-    .constraintSize({ minHeight: 76 })
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
-    .backgroundColor(tone === 'attention' ? AppTheme.DANGER_SOFT :
-      tone === 'review' ? AppTheme.WARNING_SOFT :
-        tone === 'done' ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_FAINT)
-    .border({
-      width: this.statusFilter === filter ? 2 : 0,
-      color: this.statusFilter === filter ?
-        (tone === 'attention' ? AppTheme.DANGER :
-          tone === 'review' ? AppTheme.WARNING :
-            tone === 'done' ? AppTheme.SUCCESS : AppTheme.PRIMARY) : AppTheme.BORDER
-    })
-    .borderRadius(AppTheme.CONTROL_RADIUS)
-    .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`${label} ${value} 项，点击筛选`)
-    .onClick(() => this.chooseStatus(filter));
-  }
-
-  @Builder
   private StatusSummary() {
-    Row({ space: 8 }) {
-      this.StatusMetricCard('全部', this.allCount(), ParentProgressStatusFilter.ALL, 'primary');
-      this.StatusMetricCard('需关注', this.attentionCount(), ParentProgressStatusFilter.ATTENTION, 'attention');
-      this.StatusMetricCard('待验收', this.submittedCount(), ParentProgressStatusFilter.SUBMITTED, 'review');
-      this.StatusMetricCard('已完成', this.completedCount(), ParentProgressStatusFilter.COMPLETED, 'done');
-    }
-    .width('100%');
+    AssignmentMetricSummary({
+      allCount: this.allCount(),
+      pendingCount: this.pendingCount(),
+      submittedCount: this.submittedCount(),
+      completedCount: this.completedCount(),
+      selectedKey: this.statusFilter,
+      interactive: true,
+      onSelect: (key: AssignmentMetricKey) => this.chooseStatus(key)
+    });
   }
 
   @Builder
@@ -453,8 +415,6 @@ export struct ParentProgressPage {
       Row({ space: 10 }) {
         Column({ space: 3 }) {
           Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text(`${this.viewModel.student().name} · ${this.viewModel.student().grade} · ${this.viewModel.student().className}`)
-            .fontSize(12).fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
@@ -483,7 +443,7 @@ export struct ParentProgressPage {
 
       Row() {
         Text(this.querying ? '查询中…' :
-          `${this.typeLabel(this.typeFilter)} · ${this.dateLabel(this.dateFilter)} · ${this.subjectLabel(this.subjectCode)} · ${this.statusLabel(this.statusFilter)}`)
+          `${this.dateLabel()} · ${this.subjectLabel(this.subjectCode)} · ${this.statusLabel(this.statusFilter)}`)
           .fontSize(12).fontColor(AppTheme.SUBTEXT);
         Blank();
         Text(`${this.currentVisibleAssignments().length} 项`).fontSize(12).fontColor(AppTheme.SUBTEXT);
@@ -494,7 +454,7 @@ export struct ParentProgressPage {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
           Text('当前筛选下没有作业').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('可以调整类型、截止、科目或状态筛选。').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('可以调整日期、科目或任务状态。').fontSize(12).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding({ top: 30, bottom: 30 });
       } else {
