@@ -20,6 +20,8 @@ export struct VoiceAssignmentPane {
   @State private imageLoading: boolean = false;
   @State private imageLoadMessage: string = '';
   @State private audioUri: string = '';
+  @State private audioLoading: boolean = false;
+  @State private audioLoadMessage: string = '';
   @State private prepared: boolean = false;
   @State private playing: boolean = false;
   @State private currentTimeMs: number = 0;
@@ -50,6 +52,7 @@ export struct VoiceAssignmentPane {
       _nextImage: () => void, _selectImage: (index: number) => void) => {};
   private readonly player: AssignmentAudioPlayerService = new AssignmentAudioPlayerService();
   private imageResources: AssignmentResource[] = [];
+  private audioResource: AssignmentResource | null = null;
   private imageRequestVersion: number = 0;
 
   aboutToAppear(): void {
@@ -86,6 +89,10 @@ export struct VoiceAssignmentPane {
     this.loading = true;
     this.message = '';
     this.imageLoadMessage = '';
+    this.audioLoadMessage = '';
+    this.audioUri = '';
+    this.audioResource = null;
+    this.prepared = false;
     this.imageResources = [];
     this.imageUris = [];
     this.imageIndex = 0;
@@ -105,58 +112,76 @@ export struct VoiceAssignmentPane {
       images.sort((left: AssignmentResource, right: AssignmentResource) =>
         this.compareImageResources(left, right));
       this.imageResources = images;
+      this.audioResource = audio;
 
       let slots: string[] = [];
       for (let i = 0; i < images.length; i++) slots.push('');
       this.imageUris = slots;
 
-      let audioPromise: Promise<string> = RemoteAssignmentResourceApi.instance.download(audio);
-      let firstImagePromise: Promise<string> = this.loadImage(0);
-      let audioUri = await audioPromise;
-      let firstImageUri = await firstImagePromise;
-      if (audioUri.length === 0) {
-        this.message = '语音加载失败，请检查网络后重试';
-        return;
-      }
+      let firstImageUri = await this.loadImage(0);
       if (firstImageUri.length === 0) {
         this.message = '情景图片加载失败，请检查网络后重试';
         return;
       }
 
-      this.audioUri = audioUri;
       this.imageIndex = 0;
       this.notifyMediaState();
       this.loading = false;
       void this.prefetchNextImage(0);
-
-      let callbacks: AssignmentAudioPlayerCallbacks = {
-        onPrepared: (durationMs: number) => {
-          this.prepared = true;
-          this.durationMs = durationMs;
-          this.currentTimeMs = 0;
-          this.notifyMediaState();
-        },
-        onState: (state) => {
-          this.playing = state === 'playing';
-          if (state === 'completed') this.playing = false;
-          this.notifyMediaState();
-        },
-        onTime: (timeMs: number) => {
-          this.currentTimeMs = timeMs;
-          this.notifyMediaState();
-        },
-        onError: (_message: string) => {
-          this.playing = false;
-          this.message = '语音播放暂时不可用，请稍后重试';
-          this.notifyMediaState();
-        }
-      };
-      await this.player.prepare(this.audioUri, callbacks);
+      void this.loadAudio(audio);
     } catch {
       this.message = '作业资料加载失败，请检查网络后重试';
     } finally {
       this.loading = false;
     }
+  }
+
+  private async loadAudio(resource: AssignmentResource): Promise<void> {
+    if (this.audioLoading) return;
+    this.audioLoading = true;
+    this.audioLoadMessage = '';
+    this.prepared = false;
+    this.audioUri = '';
+    this.notifyMediaState();
+
+    let audioUri = await RemoteAssignmentResourceApi.instance.download(resource);
+    if (audioUri.length === 0) {
+      this.audioLoading = false;
+      this.audioLoadMessage = '语音加载失败，请检查网络后重试';
+      return;
+    }
+
+    this.audioUri = audioUri;
+    let callbacks: AssignmentAudioPlayerCallbacks = {
+      onPrepared: (durationMs: number) => {
+        this.audioLoading = false;
+        this.prepared = true;
+        this.durationMs = durationMs;
+        this.currentTimeMs = 0;
+        this.notifyMediaState();
+      },
+      onState: (state) => {
+        this.playing = state === 'playing';
+        if (state === 'completed') this.playing = false;
+        this.notifyMediaState();
+      },
+      onTime: (timeMs: number) => {
+        this.currentTimeMs = timeMs;
+        this.notifyMediaState();
+      },
+      onError: (_message: string) => {
+        this.audioLoading = false;
+        this.playing = false;
+        this.audioLoadMessage = '语音播放暂时不可用，请稍后重试';
+        this.notifyMediaState();
+      }
+    };
+    await this.player.prepare(this.audioUri, callbacks);
+  }
+
+  private retryAudio(): void {
+    if (this.audioResource === null || this.audioLoading) return;
+    void this.loadAudio(this.audioResource);
   }
 
   private compareImageResources(left: AssignmentResource, right: AssignmentResource): number {
@@ -275,7 +300,7 @@ export struct VoiceAssignmentPane {
   }
 
   private openFullscreen(): void {
-    if (this.imageUris.length === 0 || this.audioUri.length === 0) return;
+    if (this.imageUris.length === 0 || this.imageUris[this.imageIndex].length === 0) return;
     this.notifyMediaState();
     this.onFullscreenRequest();
   }
@@ -407,53 +432,75 @@ export struct VoiceAssignmentPane {
   @Builder
   private AudioControls() {
     Column({ space: 5 }) {
-      Row({ space: 10 }) {
-        Button(this.playing ? 'Ⅱ' : '▶', { type: ButtonType.Circle })
-          .width(48)
-          .height(48)
-          .fontSize(this.playing ? 18 : 16)
-          .enabled(this.playbackEnabled && this.prepared)
-          .backgroundColor(this.playbackEnabled && this.prepared ? AppTheme.PRIMARY : AppTheme.DISABLED)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .accessibilityText(this.playing ? '暂停语音' : '播放语音')
-          .onClick(() => { void this.toggleAudio(); });
-
-        Column({ space: 2 }) {
-          Slider({
-            value: this.currentTimeMs,
-            min: 0,
-            max: this.durationMs > 0 ? this.durationMs : 1,
-            step: 1000,
-            style: SliderStyle.InSet
-          })
-            .width('100%')
-            .selectedColor(AppTheme.PRIMARY)
-            .trackColor(AppTheme.PRIMARY_SOFT)
-            .enabled(this.playbackEnabled && this.prepared)
-            .onChange((value: number, mode: SliderChangeMode) => {
-              this.currentTimeMs = value;
-              if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
-                this.player.seek(value);
-              }
-            });
-
-          Row() {
-            Text(this.formatTime(this.currentTimeMs)).fontSize(10).fontColor(AppTheme.SUBTEXT);
-            Blank();
-            Text(this.formatTime(this.durationMs)).fontSize(10).fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%');
+      if (this.audioLoading) {
+        Row({ space: 8 }) {
+          LoadingProgress().width(18).height(18).color(AppTheme.PRIMARY);
+          Text('正在加载语音…').fontSize(11).fontColor(AppTheme.SUBTEXT);
         }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-      }
-      .width('100%');
+        .width('100%');
+      } else if (this.audioLoadMessage.length > 0) {
+        Row({ space: 8 }) {
+          Text(this.audioLoadMessage)
+            .layoutWeight(1)
+            .fontSize(11)
+            .fontColor(AppTheme.WARNING);
+          Text('重试')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .fontSize(11)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .onClick(() => this.retryAudio());
+        }
+        .width('100%');
+      } else {
+        Row({ space: 10 }) {
+          Button(this.playing ? 'Ⅱ' : '▶', { type: ButtonType.Circle })
+            .width(48)
+            .height(48)
+            .fontSize(this.playing ? 18 : 16)
+            .enabled(this.playbackEnabled && this.prepared)
+            .backgroundColor(this.playbackEnabled && this.prepared ? AppTheme.PRIMARY : AppTheme.DISABLED)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .accessibilityText(this.playing ? '暂停语音' : '播放语音')
+            .onClick(() => { void this.toggleAudio(); });
 
-      if (!this.playbackEnabled) {
-        Text('开始或继续作业后可播放语音')
-          .width('100%')
-          .fontSize(11)
-          .fontColor(AppTheme.SUBTEXT);
+          Column({ space: 2 }) {
+            Slider({
+              value: this.currentTimeMs,
+              min: 0,
+              max: this.durationMs > 0 ? this.durationMs : 1,
+              step: 1000,
+              style: SliderStyle.InSet
+            })
+              .width('100%')
+              .selectedColor(AppTheme.PRIMARY)
+              .trackColor(AppTheme.PRIMARY_SOFT)
+              .enabled(this.playbackEnabled && this.prepared)
+              .onChange((value: number, mode: SliderChangeMode) => {
+                this.currentTimeMs = value;
+                if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
+                  this.player.seek(value);
+                }
+              });
+
+            Row() {
+              Text(this.formatTime(this.currentTimeMs)).fontSize(10).fontColor(AppTheme.SUBTEXT);
+              Blank();
+              Text(this.formatTime(this.durationMs)).fontSize(10).fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%');
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+        }
+        .width('100%');
+
+        if (!this.playbackEnabled) {
+          Text('开始或继续作业后可播放语音')
+            .width('100%')
+            .fontSize(11)
+            .fontColor(AppTheme.SUBTEXT);
+        }
       }
     }
     .width('100%')
@@ -467,7 +514,7 @@ export struct VoiceAssignmentPane {
       if (this.loading) {
         Row({ space: 8 }) {
           LoadingProgress().width(20).height(20).color(AppTheme.PRIMARY);
-          Text('正在加载语音和情景图片…').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('正在加载首张情景图片…').fontSize(12).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .padding(14)
@@ -486,7 +533,7 @@ export struct VoiceAssignmentPane {
         .alignItems(HorizontalAlign.Start)
         .backgroundColor(AppTheme.WARNING_SOFT)
         .borderRadius(AppTheme.CONTROL_RADIUS);
-      } else if (this.imageUris.length > 0 && this.audioUri.length > 0) {
+      } else if (this.imageUris.length > 0 && this.imageUris[this.imageIndex].length > 0) {
         Column({ space: 10 }) {
           this.ImageViewer();
           this.AudioControls();
