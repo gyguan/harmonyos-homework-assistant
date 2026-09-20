@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class AssignmentResourceService {
   private static final long MAX_AUDIO_BYTES = 20L * 1024 * 1024;
   private static final long MAX_IMAGE_BYTES = 5L * 1024 * 1024;
-  private static final int MAX_IMAGES = 9;
 
   private final AssignmentService assignments;
   private final AssignmentResourceRepository resources;
@@ -122,9 +121,9 @@ public class AssignmentResourceService {
     if (!supported) throw new ApiExceptions.BadRequest("仅支持 mp3、m4a、wav 语音文件");
   }
 
-  private void validateImages(List<MultipartFile> images) {
-    if (images == null || images.isEmpty() || images.size() > MAX_IMAGES) {
-      throw new ApiExceptions.BadRequest("情景图片需选择 1 到 9 张");
+  void validateImages(List<MultipartFile> images) {
+    if (images == null || images.isEmpty()) {
+      throw new ApiExceptions.BadRequest("请至少选择 1 张情景图片");
     }
     for (MultipartFile image : images) {
       if (image == null || image.isEmpty()) throw new ApiExceptions.BadRequest("图片文件不能为空");

@@ -59,8 +59,18 @@ export struct ParentVoiceAssignmentPage {
     let uris = await VoiceAssignmentMediaService.instance.selectImages();
     this.selectingImages = false;
     if (uris.length === 0) return;
-    this.imageUris = uris;
+
+    let merged = this.imageUris.slice();
+    let existing: Set<string> = new Set<string>();
+    for (let uri of merged) existing.add(uri);
+    for (let uri of uris) {
+      if (existing.has(uri)) continue;
+      existing.add(uri);
+      merged.push(uri);
+    }
+    this.imageUris = merged;
     this.message = '';
+    this.messageError = false;
   }
 
   private removeImage(index: number): void {
@@ -79,7 +89,6 @@ export struct ParentVoiceAssignmentPage {
     if (instruction.length === 0) return this.showError('请填写完成要求');
     if (this.audioUri.length === 0) return this.showError('请选择一个语音文件');
     if (this.imageUris.length === 0) return this.showError('请选择至少 1 张情景图片');
-    if (this.imageUris.length > 9) return this.showError('情景图片最多 9 张');
 
     let expectedMinutes = this.expectedMinutes();
     if (expectedMinutes < 0) return this.showError('预计用时请输入 1～240 分钟的整数');
@@ -204,7 +213,7 @@ export struct ParentVoiceAssignmentPage {
       Row() {
         Text('情景图片').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text(`已选择 ${this.imageUris.length} / 9 张`).fontSize(11).fontColor(AppTheme.SUBTEXT);
+        Text(`已选择 ${this.imageUris.length} 张`).fontSize(11).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -230,14 +239,14 @@ export struct ParentVoiceAssignmentPage {
       }
 
       Button(this.selectingImages ? '正在打开相册…' :
-        (this.imageUris.length === 0 ? '选择情景图片' : '重新选择图片'), { type: ButtonType.Normal })
+        (this.imageUris.length === 0 ? '选择情景图片' : '＋ 继续添加图片'), { type: ButtonType.Normal })
         .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
         .enabled(!this.selectingImages && !this.busy)
         .onClick(() => { void this.selectImages(); });
 
-      Text('图片顺序就是学生查看顺序；发布后切换图片不会中断语音。')
+      Text('单次最多选择 9 张，可分多次继续添加；学生端会按图片文件名排序。')
         .width('100%').fontSize(11).lineHeight(17).fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
