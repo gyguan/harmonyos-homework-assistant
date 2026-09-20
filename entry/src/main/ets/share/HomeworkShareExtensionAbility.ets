@@ -6,6 +6,11 @@ const APP_BUNDLE_NAME: string = 'com.gyguan.homeworkassistant';
 
 export default class HomeworkShareExtensionAbility extends ShareExtensionAbility {
   onSessionCreate(want: Want, session: UIExtensionContentSession): void {
+    try {
+      session.loadContent('pages/HomeworkShareReceivingPage');
+    } catch {
+      console.error('Homework share receiving page failed to load');
+    }
     void this.receiveAndOpen(want, session);
   }
 
