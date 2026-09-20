@@ -222,9 +222,6 @@
             "type": "string",
             "minLength": 1
           }
-        },
-        "visualSpec": {
-          "$ref": "#/$defs/visualSpec"
         }
       }
     },
@@ -243,42 +240,6 @@
         "label": {
           "type": "string",
           "minLength": 1
-        }
-      }
-    },
-    "visualSpec": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "type",
-        "assetId",
-        "layout",
-        "accessibilityText"
-      ],
-      "properties": {
-        "type": {
-          "enum": [
-            "NONE",
-            "SCENE",
-            "ARRAY",
-            "DOT_ARRAY",
-            "IMAGE_PAIR",
-            "IMAGE_SEQUENCE",
-            "DIALOGUE",
-            "ROOM_SCENE",
-            "FAMILY_SCENE",
-            "CHARACTER",
-            "ILLUSTRATION"
-          ]
-        },
-        "assetId": {
-          "type": "string"
-        },
-        "layout": {
-          "type": "string"
-        },
-        "accessibilityText": {
-          "type": "string"
         }
       }
     }
