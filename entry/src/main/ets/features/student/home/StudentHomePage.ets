@@ -269,6 +269,18 @@ export struct StudentHomePage {
     return next === null ? '' : next.id;
   }
 
+  private effectiveExpandedSubjectKey(): string {
+    let currentRevision = this.touchRevision();
+    if (currentRevision < 0 || this.expandedSubjectKey.length === 0) return this.expandedSubjectKey;
+    let groups = this.viewModel.todaySubjectGroups();
+    for (let group of groups) {
+      if (group.key === this.expandedSubjectKey) return this.expandedSubjectKey;
+    }
+    let next = this.viewModel.nextAssignment();
+    if (next !== null) return next.subject;
+    return groups.length > 0 ? groups[0].key : '';
+  }
+
   private canUsePadComposition(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.homeFocusSummaryRequirement());
   }
@@ -445,7 +457,7 @@ export struct StudentHomePage {
           ForEach(this.subjectGroups(), (group: StudentHomeSubjectGroup) => {
             StudentSubjectTaskGroupCard({
               group: group,
-              expanded: this.expandedSubjectKey === group.key,
+              expanded: this.effectiveExpandedSubjectKey() === group.key,
               focusAssignmentId: this.focusAssignmentId(),
               onToggle: () => this.toggleSubject(group.key),
               onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
