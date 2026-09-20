@@ -4,6 +4,7 @@ import { FilterSummaryEntry } from '../../../components/selection/SelectionContr
 import {
   PracticeGrade,
   PracticePaper,
+  PracticeSemester,
   PracticeSubject,
   PracticeTaxonomy
 } from '../../../domain/model/practice/PracticeModels';
@@ -28,7 +29,7 @@ struct PracticePaperCard {
             .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${this.difficultyLabel}`)
+          Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.semesterLabel(this.paper.semester)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${this.difficultyLabel}`)
             .width('100%')
             .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
@@ -89,6 +90,7 @@ export struct PracticeHomePage {
   onOpenHistory: () => void = () => {};
   @State private selectedGrade: PracticeGrade = PracticeGrade.G3;
   @State private selectedSubject: PracticeSubject = PracticeSubject.MATH;
+  @State private selectedSemester: PracticeSemester = PracticeSemester.ALL;
   @State private draftSelectedGrade: PracticeGrade = PracticeGrade.G3;
   @State private draftSelectedSubject: PracticeSubject = PracticeSubject.MATH;
   @State private papers: PracticePaper[] = [];
@@ -112,6 +114,7 @@ export struct PracticeHomePage {
 
   aboutToAppear(): void {
     this.selectedGrade = this.viewModel.defaultGrade();
+    this.selectedSemester = this.viewModel.defaultSemester();
     this.draftSelectedGrade = this.selectedGrade;
     this.draftSelectedSubject = this.selectedSubject;
     void this.reloadPapers();
@@ -122,7 +125,8 @@ export struct PracticeHomePage {
     this.loading = true;
     this.errorMessage = '';
     try {
-      let papers = await this.viewModel.listPapers(this.selectedGrade, this.selectedSubject);
+      let papers = await this.viewModel.listPapers(
+        this.selectedGrade, this.selectedSubject, this.selectedSemester);
       if (sequence !== this.loadSequence) return;
       this.papers = papers;
     } catch {
@@ -188,7 +192,7 @@ export struct PracticeHomePage {
   private PaperList() {
     Column({ space: 10 }) {
       Row() {
-        Text(`${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.subjectLabel(this.selectedSubject)}`)
+        Text(`${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.semesterLabel(this.selectedSemester)} · ${this.viewModel.subjectLabel(this.selectedSubject)}`)
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
@@ -259,7 +263,7 @@ export struct PracticeHomePage {
                 .onClick(() => this.onOpenHistory());
             }
             .width('100%');
-            Text('按年级和科目选择一套卷，反复练习并保留每次学习记录。')
+            Text(`默认按当前学生的${this.viewModel.semesterLabel(this.selectedSemester)}内容筛选，也可以切换年级和科目浏览。`)
               .width('100%')
               .fontSize(13)
               .lineHeight(19)
@@ -272,7 +276,7 @@ export struct PracticeHomePage {
 
           this.PaperList();
 
-          Text('点击套卷可查看详情并开始练习；历史练习与错题重练将在后续能力中接入。')
+          Text('套卷会标明适用学期；全年基础卷与当前学期专项卷会一起展示。')
             .width('100%')
             .fontSize(12)
             .lineHeight(18)
