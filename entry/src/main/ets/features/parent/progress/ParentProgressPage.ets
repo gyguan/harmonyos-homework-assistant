@@ -96,6 +96,10 @@ export struct ParentProgressPage {
       this.typeFilter, this.subjectCode, this.dateFilter, this.statuses());
   }
 
+  private assignmentRenderKey(item: Assignment): string {
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+  }
+
   private openFilterDialog(): void {
     if (this.querying) return;
     this.draftTypeFilter = this.typeFilter;
@@ -322,7 +326,7 @@ export struct ParentProgressPage {
               showChevron: !this.canUseReviewPane(),
               onOpen: () => this.openAssignment(item)
             });
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
       }
