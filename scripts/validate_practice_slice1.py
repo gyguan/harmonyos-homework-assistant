@@ -57,8 +57,9 @@ require("paperVersion: number;" in models,
         "PracticeQuestion must bind to an immutable paper version")
 
 require("export interface PracticeContentProvider" in provider_port and
-        "listPapers" in provider_port and "getPaper" in provider_port,
-        "practice content must be behind a provider port")
+        "listPapers" in provider_port and "getPaper" in provider_port and
+        "PracticeSemester" in provider_port,
+        "practice content must be behind a semester-aware provider port")
 require("export interface PracticeRepository" in repo_port and
         "PracticeContentProvider" in repo_impl,
         "practice UI must access content through repository/provider boundaries")
@@ -77,8 +78,13 @@ require("PracticeContentProvider" not in page and "PresetPractice" not in page,
         "PracticeHomePage must not depend directly on content providers or preset seed data")
 require("DefaultPracticeRepository" in view_model,
         "PracticeHomeViewModel must obtain papers through PracticeRepository")
+require("selectedSemester" in page and "semesterLabel(this.selectedSemester)" in page,
+        "Practice home must show the active semester without adding a permanent semester selector")
 require("gradeFromStudentProfile" in models and "defaultGrade()" in view_model,
         "Practice must default from the active student's grade")
+require("export enum PracticeSemester" in models and "semesterFromStudentProfile" in models and
+        "defaultSemester()" in view_model,
+        "Practice must preserve and default from the active student's semester")
 require("PracticeSubject.CHINESE" in models and "PracticeSubject.MATH" in models and
         "PracticeSubject.ENGLISH" in models,
         "Practice taxonomy must keep Chinese, Math and English")
@@ -106,9 +112,9 @@ for token in ["PracticePaper", "PracticeQuestion", "PracticeAttempt", "PracticeA
 require("Practice" not in homework_models,
         "HomeworkModels must remain independent from Practice domain")
 
-# Seed coverage now comes from the canonical JSON-generated client catalog.
-require("GENERATED from backend/src/main/resources/practice/preset-catalog.json" in preset_catalog,
-        "client preset catalog must be generated from the canonical JSON source")
+# Seed coverage now comes from the grade/subject shard-generated client catalog.
+require("GENERATED from backend/src/main/resources/practice/preset/manifest.json and grade/subject shards" in preset_catalog,
+        "client preset catalog must be generated from split grade/subject JSON")
 for grade in ["G1", "G2", "G3", "G4", "G5", "G6"]:
     for subject in ["CHINESE", "MATH", "ENGLISH"]:
         require(f"id: '{subject}-{grade}-STARTER-001'" in preset_catalog,
