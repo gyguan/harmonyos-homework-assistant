@@ -5,12 +5,12 @@
   "papers": [
     {
       "id": "ENGLISH-G2-S1-P0-E01-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
       "title": "Hello! My friends（一）",
-      "description": "问候、自我介绍、数字和颜色的图文英语练习。",
+      "description": "问候、自我介绍、数字和颜色的文字英语练习。",
       "difficulty": "L1",
       "questionCount": 12,
       "estimatedMinutes": 15,
@@ -21,16 +21,16 @@
         "颜色",
         "教材同步",
         "P0",
-        "图文题"
+        "文字题"
       ],
       "sourceType": "PRESET",
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q01",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
-          "stem": "Look at the morning picture. What do they say?",
+          "stem": "It is morning. Two classmates meet at school. What do they say?",
           "options": [
             {
               "key": "A",
@@ -48,24 +48,18 @@
           "answerSpec": "A",
           "explanation": "早晨见面说 Good morning!",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_eng_morning_greeting",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "早晨两个同学见面打招呼"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q02",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
-          "stem": "Choose the right sentence.",
+          "stem": "Ben wants to introduce himself. Choose the right sentence.",
           "options": [
             {
               "key": "A",
@@ -83,21 +77,15 @@
           "answerSpec": "A",
           "explanation": "介绍自己用 I’m...",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "CHARACTER",
-            "assetId": "asset_eng_boy_self_intro",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "男孩指着自己微笑"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q03",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "A: Nice to meet you.\nB: ______",
@@ -118,24 +106,18 @@
           "answerSpec": "A",
           "explanation": "初次见面常用 Nice to meet you, too.",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_eng_meet_handshake",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "两个孩子握手认识"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q04",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
-          "stem": "What colour is it?",
+          "stem": "Which word means “黄色”?",
           "options": [
             {
               "key": "A",
@@ -153,24 +135,18 @@
           "answerSpec": "A",
           "explanation": "图片是黄色。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ILLUSTRATION",
-            "assetId": "asset_eng_yellow_balloon",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "黄色气球"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q05",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
-          "stem": "How many pencils?",
+          "stem": "Which word means “七”?",
           "options": [
             {
               "key": "A",
@@ -188,21 +164,15 @@
           "answerSpec": "B",
           "explanation": "图中有7支铅笔。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ILLUSTRATION",
-            "assetId": "asset_eng_pencils_7",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "7支铅笔"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q06",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "A: What’s your name?\nB: ______",
@@ -223,21 +193,15 @@
           "answerSpec": "A",
           "explanation": "问名字，回答 I’m...",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "CHARACTER",
-            "assetId": "asset_eng_girl_answer_name",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "女孩微笑回答自己的名字"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q07",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "Which word means “同学”？",
@@ -258,21 +222,15 @@
           "answerSpec": "A",
           "explanation": "classmate 表示同学。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_eng_classmates_classroom",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "教室里的同学"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q08",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "A: How are you?\nB: ______",
@@ -293,24 +251,18 @@
           "answerSpec": "A",
           "explanation": "常用回答是 I’m fine, thank you.",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "DIALOGUE",
-            "assetId": "asset_eng_how_are_you",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "老师问候学生"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q09",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
-          "stem": "Choose the right word.",
+          "stem": "Which word means “红色”?",
           "options": [
             {
               "key": "A",
@@ -328,24 +280,18 @@
           "answerSpec": "A",
           "explanation": "red 是颜色词。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ILLUSTRATION",
-            "assetId": "asset_eng_red_apple",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "红色苹果"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q10",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
-          "stem": "How many balls?",
+          "stem": "Which word means “三”?",
           "options": [
             {
               "key": "A",
@@ -363,24 +309,18 @@
           "answerSpec": "A",
           "explanation": "图中有3个球。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ILLUSTRATION",
-            "assetId": "asset_eng_balls_3",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "3个球"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q11",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
-          "stem": "Look at the after-school picture. What do they say?",
+          "stem": "School is over. Two classmates say goodbye. What do they say?",
           "options": [
             {
               "key": "A",
@@ -398,24 +338,18 @@
           "answerSpec": "A",
           "explanation": "放学离开时说 Goodbye!",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_eng_goodbye_afterschool",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "放学挥手再见"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E01-001-Q12",
+          "id": "ENGLISH-G2-S1-P0-E01-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
-          "stem": "Choose the best sentence.",
+          "stem": "You want to introduce a new classmate. Choose the best sentence.",
           "options": [
             {
               "key": "A",
@@ -433,29 +367,23 @@
           "answerSpec": "A",
           "explanation": "This is my new classmate. 表达正确。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "SCENE",
-            "assetId": "asset_eng_new_classmate",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "新同学入班介绍"
-          }
+          ]
         }
       ]
     },
     {
       "id": "ENGLISH-G2-S1-P0-E02-001",
-      "version": 1,
+      "version": 2,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
       "title": "My family & My room（一）",
-      "description": "家庭成员、外貌、房间和位置关系的图文英语练习。",
+      "description": "家庭成员、外貌、房间和位置关系的文字英语练习。",
       "difficulty": "L1",
       "questionCount": 12,
       "estimatedMinutes": 15,
@@ -465,16 +393,16 @@
         "positions",
         "教材同步",
         "P0",
-        "图文题"
+        "文字题"
       ],
       "sourceType": "PRESET",
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q01",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
-          "stem": "Who is he?",
+          "stem": "Which word means “爸爸”?",
           "options": [
             {
               "key": "A",
@@ -492,24 +420,18 @@
           "answerSpec": "A",
           "explanation": "图中是爸爸。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "FAMILY_SCENE",
-            "assetId": "asset_eng_father_portrait",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "爸爸人物图"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q02",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q02",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
-          "stem": "Who is she?",
+          "stem": "Which word means “妈妈”?",
           "options": [
             {
               "key": "A",
@@ -527,24 +449,18 @@
           "answerSpec": "B",
           "explanation": "图中是妈妈。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "FAMILY_SCENE",
-            "assetId": "asset_eng_mother_portrait",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "妈妈人物图"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q03",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
-          "stem": "Look at the girl. Choose the right sentence.",
+          "stem": "“她留着长头发。” Choose the right sentence.",
           "options": [
             {
               "key": "A",
@@ -562,24 +478,18 @@
           "answerSpec": "A",
           "explanation": "女孩长头发，用 She has long hair.",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "CHARACTER",
-            "assetId": "asset_eng_girl_long_hair",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "女孩长头发"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q04",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
-          "stem": "Look at the boy. Choose the right sentence.",
+          "stem": "“我的头发很短。” Choose the right sentence.",
           "options": [
             {
               "key": "A",
@@ -597,24 +507,18 @@
           "answerSpec": "A",
           "explanation": "描述短头发用 My hair is short.",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "CHARACTER",
-            "assetId": "asset_eng_boy_short_hair",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "男孩短头发"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q05",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q05",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
-          "stem": "The book is ______ the desk.",
+          "stem": "“书在桌子上。” The book is ______ the desk.",
           "options": [
             {
               "key": "A",
@@ -632,24 +536,18 @@
           "answerSpec": "A",
           "explanation": "书在桌子上，用 on。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ROOM_SCENE",
-            "assetId": "asset_eng_book_on_desk",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "一本书在桌子上"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q06",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q06",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
-          "stem": "The ball is ______ the box.",
+          "stem": "“球在盒子里。” The ball is ______ the box.",
           "options": [
             {
               "key": "A",
@@ -667,24 +565,18 @@
           "answerSpec": "A",
           "explanation": "球在盒子里，用 in。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ROOM_SCENE",
-            "assetId": "asset_eng_ball_in_box",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "球在盒子里"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q07",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q07",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
-          "stem": "Which one is in the room?",
+          "stem": "Which word means “床”?",
           "options": [
             {
               "key": "A",
@@ -702,24 +594,18 @@
           "answerSpec": "A",
           "explanation": "bed 是房间里的物品。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ROOM_SCENE",
-            "assetId": "asset_eng_room_with_bed",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "房间里有床、桌子、椅子"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q08",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q08",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
-          "stem": "Choose the correct sentence.",
+          "stem": "“那是我的家人。” Choose the correct sentence.",
           "options": [
             {
               "key": "A",
@@ -737,24 +623,18 @@
           "answerSpec": "A",
           "explanation": "图片是家庭合照。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "FAMILY_SCENE",
-            "assetId": "asset_eng_family_photo",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "家庭合照"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q09",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
-          "stem": "Which word matches the picture?",
+          "stem": "Which word means “椅子”?",
           "options": [
             {
               "key": "A",
@@ -772,24 +652,18 @@
           "answerSpec": "A",
           "explanation": "图中是 chair。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ROOM_SCENE",
-            "assetId": "asset_eng_chair",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "椅子"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q10",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
-          "stem": "What is this room item called?",
+          "stem": "Which word means “门”?",
           "options": [
             {
               "key": "A",
@@ -807,24 +681,18 @@
           "answerSpec": "B",
           "explanation": "图中是 door。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ROOM_SCENE",
-            "assetId": "asset_eng_door",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "门"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q11",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
-          "stem": "The pencil is ______ the schoolbag.",
+          "stem": "“铅笔在书包里。” The pencil is ______ the schoolbag.",
           "options": [
             {
               "key": "A",
@@ -842,24 +710,18 @@
           "answerSpec": "A",
           "explanation": "铅笔在书包里，用 in。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "ROOM_SCENE",
-            "assetId": "asset_eng_pencil_in_bag",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "铅笔在书包里"
-          }
+          ]
         },
         {
-          "id": "ENGLISH-G2-S1-P0-E02-001-Q12",
+          "id": "ENGLISH-G2-S1-P0-E02-001-V2-Q12",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
-          "stem": "Choose the right words.",
+          "stem": "Which words mean “哥哥和妹妹”?",
           "options": [
             {
               "key": "A",
@@ -877,18 +739,12 @@
           "answerSpec": "A",
           "explanation": "图中是哥哥和妹妹。",
           "hints": [
-            "先看图，再结合二年级上学期常用词汇和句型选择答案。"
+            "先读清题意，再比较单词或句子。"
           ],
           "tags": [
             "英语基础",
             "图文英语"
-          ],
-          "visualSpec": {
-            "type": "FAMILY_SCENE",
-            "assetId": "asset_eng_brother_sister",
-            "layout": "TOP_VISUAL_BOTTOM_OPTIONS",
-            "accessibilityText": "哥哥和妹妹站在一起"
-          }
+          ]
         }
       ]
     }
