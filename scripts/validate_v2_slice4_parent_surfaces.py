@@ -153,6 +153,12 @@ require("bindSheet($$this.showEditSheet" in review_pane and "AssignmentEditorShe
 require("AssignmentStatus.SUBMITTED" in review_pane and "AssignmentStatus.COMPLETED" in review_pane and
         "private canEdit(item: Assignment)" in review_pane,
         "submitted/completed assignments must lock task-definition editing")
+require("let persisted = item.remoteVersion > 0 || item.candidateId.length > 0" not in review_pane and
+        "return item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED" in review_pane,
+        "all unfinished assignments, including NOT_STARTED, must expose parent editing")
+require("let remoteBacked = current.remoteVersion > 0 || current.candidateId.length > 0" in repo and
+        "if (!remoteBacked)" in repo and "this.applyAuthoritative(localDraft)" in repo,
+        "parent edit must support local unfinished tasks while hydrating real cloud tasks when possible")
 require("async updateDetails(assignment: Assignment" in remote_api and
         "'parent.assignment.edit'" in remote_api and "/details" in remote_api,
         "HarmonyOS parent edit must use the narrow assignment details API")
