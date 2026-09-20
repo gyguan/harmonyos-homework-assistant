@@ -1,6 +1,11 @@
+import { BackendSession } from '../../application/remote/BackendSession';
+import { PracticeRemoteApi } from '../../application/remote/PracticeRemoteApi';
 import {
+  PracticeAnswer,
+  PracticeAttempt,
   PracticeGrade,
   PracticePaper,
+  PracticeResult,
   PracticeSubject
 } from '../../domain/model/practice/PracticeModels';
 import { PracticeContentProvider } from '../../domain/port/PracticeContentProvider';
@@ -9,13 +14,14 @@ import { PresetPracticeContentProvider } from '../practice/PresetPracticeContent
 
 export class DefaultPracticeRepository implements PracticeRepository {
   static readonly instance: DefaultPracticeRepository = new DefaultPracticeRepository(
-    PresetPracticeContentProvider.instance
-  );
+    PresetPracticeContentProvider.instance, PracticeRemoteApi.instance);
 
   private readonly contentProvider: PracticeContentProvider;
+  private readonly remoteApi: PracticeRemoteApi;
 
-  constructor(contentProvider: PracticeContentProvider) {
+  constructor(contentProvider: PracticeContentProvider, remoteApi: PracticeRemoteApi) {
     this.contentProvider = contentProvider;
+    this.remoteApi = remoteApi;
   }
 
   listPapers(grade: PracticeGrade, subject: PracticeSubject): Promise<PracticePaper[]> {
@@ -24,5 +30,34 @@ export class DefaultPracticeRepository implements PracticeRepository {
 
   getPaper(paperId: string, version: number): Promise<PracticePaper | null> {
     return this.contentProvider.getPaper(paperId, version);
+  }
+
+  startAttempt(studentId: string, paperId: string, version: number): Promise<PracticeAttempt> {
+    this.requireConnected();
+    return this.remoteApi.startAttempt(studentId, paperId, version);
+  }
+
+  getAttempt(attemptId: string): Promise<PracticeAttempt> {
+    this.requireConnected();
+    return this.remoteApi.getAttempt(attemptId);
+  }
+
+  saveAnswer(attemptId: string, questionId: string, answerValue: string): Promise<PracticeAnswer> {
+    this.requireConnected();
+    return this.remoteApi.saveAnswer(attemptId, questionId, answerValue);
+  }
+
+  submitAttempt(attemptId: string): Promise<PracticeResult> {
+    this.requireConnected();
+    return this.remoteApi.submitAttempt(attemptId);
+  }
+
+  getResult(attemptId: string): Promise<PracticeResult> {
+    this.requireConnected();
+    return this.remoteApi.getResult(attemptId);
+  }
+
+  private requireConnected(): void {
+    if (!BackendSession.instance.isConnected()) throw new Error('当前离线，连接家庭云端后才能开始练习');
   }
 }
