@@ -1,5 +1,6 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
+import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { Assignment } from '../../../domain/model/HomeworkModels';
 import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
@@ -65,6 +66,7 @@ export struct ParentAssignmentEditPanel {
       id: this.item.id,
       studentId: this.item.studentId,
       candidateId: this.item.candidateId,
+      backing: this.item.backing,
       assignmentType: this.item.assignmentType,
       subjectCode: this.item.subjectCode,
       contentType: this.item.contentType,
@@ -138,30 +140,12 @@ export struct ParentAssignmentEditPanel {
 
   build() {
     Column() {
-      Row() {
-        Column({ space: 2 }) {
-          Text('编辑任务')
-            .fontSize(AppTheme.CARD_TITLE_SIZE)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text(`${this.item.subject} · 不会修改作业状态和计时`)
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-
-        Text('关闭')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT)
-          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .textAlign(TextAlign.Center)
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('关闭任务编辑')
-          .onClick(() => this.requestClose());
-      }
-      .width('100%')
-      .padding({ left: 16, right: 16, top: 12, bottom: 10 });
+      EditSheetHeader({
+        title: '编辑任务',
+        subtitle: `${this.item.subject} · 不会修改作业状态和计时`,
+        closeAccessibilityText: '关闭任务编辑',
+        onClose: () => this.requestClose()
+      });
 
       Divider().color(AppTheme.DIVIDER);
 

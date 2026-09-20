@@ -96,7 +96,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 2. 旧科目只做确定性映射：`语文 -> CHINESE`、`数学 -> MATH`、`英语 -> ENGLISH`，其他值统一 `OTHER`。
 3. **禁止从历史 `dueText` 猜测 `dueAt`**。历史 `dueText` 原值保留，无法确定的 `dueAt` 保持空值，默认 `dueTimezone=Asia/Shanghai`。
 4. V2 日期筛选只依据结构化 `dueAt`；历史未结构化日期不伪造成某个具体日期。
-5. 当前 HarmonyOS Snapshot schema 为 V5；任何后续版本升级必须增加显式逐版本 migration，不得 schema mismatch 后 seed MockData。
+5. 当前 HarmonyOS Snapshot schema 为 V8；V4→V5→V6→V7→V8 均保留显式逐版本 migration。任何后续版本升级仍必须增加明确迁移步骤，不得 schema mismatch 后 seed MockData。
 6. schema-changing save 前保留一次 `homework_snapshot_pre_migration_backup`；迁移失败不得覆盖原主快照。
 7. PostgreSQL V1–V6 永不修改；V7 采用 add -> deterministic backfill -> verify -> tighten constraints，破坏性删除后置。
 8. API 升级顺序为 **backend first**：迁移期支持 `V1 Client -> V2 Backend`，最迟在 Slice 5 结束；**不支持 `V2 Client -> V1 Backend`**，避免在新客户端引入旧后端 fallback。

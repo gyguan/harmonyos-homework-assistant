@@ -52,16 +52,19 @@ require("AssignmentStatus.COMPLETED" in panel,
         "calendar must expose completed-state markers")
 require("item.dueAtEpochMs <= 0" in panel and "this.startOfDay(item.dueAtEpochMs)" in panel,
         "calendar markers must use structured dueAt only")
-require("AssignmentDueDate" not in panel and "dueText" not in panel and "dueDateKey" not in panel,
-        "calendar UI must not infer a concrete date from legacy dueText or dueDateKey")
+require("AssignmentDueDate" in panel and "businessDayStart" in panel and
+        "dueText" not in panel and "dueDateKey" not in panel,
+        "calendar UI must use the shared business-date service and never infer dates from legacy dueText/dueDateKey")
 
 require("calendarAssignments" in view_model and "assignmentsOnDay" in view_model,
         "StudentAssignmentsViewModel must own calendar/day query semantics")
 require("item.dueAtEpochMs <= 0" in view_model and
-        "StudentAssignmentsViewModel.startOfDay(item.dueAtEpochMs)" in view_model,
-        "calendar day query must use structured dueAt only")
+        "AssignmentDateRange.startOfDay(item.dueAtEpochMs)" in view_model,
+        "calendar day query must use structured dueAt through the shared date-range service")
 require("AssignmentDueDate" not in view_model and "dueText" not in view_model and "dueDateKey" not in view_model,
         "calendar query must not infer a concrete date from legacy dueText or dueDateKey")
+require("AssignmentFilterFactory" in view_model and "AssignmentDateRange" in view_model,
+        "Student Assignment day filtering must reuse shared date/query services")
 require("CalendarRepository" not in view_model and "CalendarService" not in view_model,
         "calendar view must not introduce a parallel Calendar domain/repository")
 

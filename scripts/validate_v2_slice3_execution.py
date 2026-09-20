@@ -43,12 +43,11 @@ require("HomeworkRemoteApi.instance.get(assignmentId)" in repository_impl and
         "latest.version === current.remoteVersion" in repository_impl and
         "HomeworkRemoteApi.instance.performAction(assignmentId, latest.version, action)" in repository_impl,
         "assignment actions must recover a stale optimistic version with one single-assignment read and one retry")
-require("if (current.remoteVersion <= 0)" in repository_impl and
-        "current = RemoteAssignmentMapper.toLocal(latest" in repository_impl and
-        "this.applyAuthoritative(current)" in repository_impl,
-        "real assignments with an unhydrated remoteVersion must fetch the single server assignment before action")
-require("current.remoteVersion <= 0 && current.candidateId.length === 0" in repository_impl,
-        "local action fallback must be explicitly limited to seed/demo assignments")
+require("ensureRemoteCurrent" in repository_impl and "reloadRemote" in repository_impl and
+        "current.remoteVersion > 0" in repository_impl,
+        "real assignments with an unhydrated remoteVersion must use the centralized single-item hydrate path")
+require("current.backing === AssignmentBacking.LOCAL_SEED" in repository_impl,
+        "local action fallback must be explicitly limited by Assignment backing")
 require("当前离线，只能查看已缓存作业" in repository_impl,
         "published assignments must not mutate execution state locally while offline")
 require("/actions`" in remote_api and "http.RequestMethod.POST" in remote_api and

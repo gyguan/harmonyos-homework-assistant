@@ -1,3 +1,4 @@
+import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
@@ -86,9 +87,7 @@ export struct HomeworkConfirmationPage {
 
   private removeCandidate(candidateId: string): void {
     if (!this.viewModel.removeCandidate(candidateId)) return;
-    let remaining: string[] = [];
-    for (let id of this.selectedCandidateIds) if (id !== candidateId) remaining.push(id);
-    this.selectedCandidateIds = remaining;
+    this.selectedCandidateIds = SelectionIds.without(this.selectedCandidateIds, candidateId);
     this.localRevision++;
     if (this.editingCandidateId === candidateId) this.closeEditor();
     if (this.candidates().length === 0) this.exitBulkMode();
@@ -96,20 +95,12 @@ export struct HomeworkConfirmationPage {
   }
 
   private isCandidateSelected(candidateId: string): boolean {
-    for (let id of this.selectedCandidateIds) if (id === candidateId) return true;
-    return false;
+    return SelectionIds.contains(this.selectedCandidateIds, candidateId);
   }
 
   private toggleCandidateSelection(candidateId: string): void {
     if (!this.bulkMode) return;
-    let next: string[] = [];
-    let removed = false;
-    for (let id of this.selectedCandidateIds) {
-      if (id === candidateId) removed = true;
-      else next.push(id);
-    }
-    if (!removed) next.push(candidateId);
-    this.selectedCandidateIds = next;
+    this.selectedCandidateIds = SelectionIds.toggle(this.selectedCandidateIds, candidateId);
     this.batchDeleteConfirm = false;
   }
 
@@ -135,7 +126,7 @@ export struct HomeworkConfirmationPage {
 
   private removeSelectedCandidates(): void {
     if (this.selectedCandidateIds.length === 0) return;
-    let ids = this.selectedCandidateIds.slice();
+    let ids = SelectionIds.copy(this.selectedCandidateIds);
     let removed = 0;
     for (let id of ids) {
       if (this.viewModel.removeCandidate(id)) removed++;

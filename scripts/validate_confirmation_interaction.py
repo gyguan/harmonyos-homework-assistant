@@ -24,6 +24,7 @@ components = read("entry/src/main/ets/features/parent/confirmation/ConfirmationC
 parent_editor = read("entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets")
 parent_review = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 deadline = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
+sheet_header = read("entry/src/main/ets/components/navigation/EditSheetHeader.ets")
 
 # AI result cards: duration presets remain on one horizontal line and card height stays compact.
 require("CandidateDurationControl" in components and "Scroll() {" in components and
@@ -55,8 +56,9 @@ require("ParentAssignmentEditPanel({" in parent_review and
         "parent review sheet must not wrap the fixed-action editor in a second scroll")
 
 # Header exits: right-top exit is consistently Close; dirty edits warn before discard.
-require("Text('关闭')" in components and "Text('关闭')" in parent_editor and "Text('关闭')" in deadline,
-        "editor/picker headers must use the single Close exit label")
+require("EditSheetHeader({" in components and "EditSheetHeader({" in parent_editor and
+        "Text('关闭')" in sheet_header and "Text('关闭')" in deadline,
+        "editor sheets must reuse the shared Close-only header; picker must keep Close")
 require("confirmDiscard" in components and "放弃修改" in components and "继续编辑" in components,
         "candidate editor must warn before closing dirty edits")
 require("confirmDiscard" in parent_editor and "放弃修改" in parent_editor and "继续编辑" in parent_editor,

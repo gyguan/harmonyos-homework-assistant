@@ -1,4 +1,5 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
+import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
@@ -105,20 +106,12 @@ export struct ParentProgressPage {
   }
 
   private isDeleteSelected(assignmentId: string): boolean {
-    for (let id of this.selectedDeleteIds) if (id === assignmentId) return true;
-    return false;
+    return SelectionIds.contains(this.selectedDeleteIds, assignmentId);
   }
 
   private toggleDeleteSelection(item: Assignment): void {
     if (!this.canDelete(item) || this.deleteBusy) return;
-    let next: string[] = [];
-    let removed = false;
-    for (let id of this.selectedDeleteIds) {
-      if (id === item.id) removed = true;
-      else next.push(id);
-    }
-    if (!removed) next.push(item.id);
-    this.selectedDeleteIds = next;
+    this.selectedDeleteIds = SelectionIds.toggle(this.selectedDeleteIds, item.id);
     this.deleteMessage = '';
   }
 
@@ -157,7 +150,7 @@ export struct ParentProgressPage {
 
   private async deleteSelectedAssignments(): Promise<void> {
     if (this.deleteBusy || this.selectedDeleteIds.length === 0) return;
-    let ids = this.selectedDeleteIds.slice();
+    let ids = SelectionIds.copy(this.selectedDeleteIds);
     this.deleteBusy = true;
     this.deleteMessage = '';
     try {

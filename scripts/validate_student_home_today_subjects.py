@@ -30,9 +30,8 @@ for token in [
     "todaySubjectGroups()",
     "private static isToday(item: Assignment)",
     "item.dueAtEpochMs <= 0",
-    "due.getFullYear() === now.getFullYear()",
-    "due.getMonth() === now.getMonth()",
-    "due.getDate() === now.getDate()",
+    "AssignmentDueDate.businessDayStart(item.dueAtEpochMs)",
+    "AssignmentDueDate.businessDayStart(Date.now())",
 ]:
     require(token in view_model, f"Student Home ViewModel missing today-only contract: {token}")
 require("dueText" not in view_model,

@@ -19,6 +19,11 @@ export enum AssignmentContentType {
   AUDIO_IMAGE = 'AUDIO_IMAGE'
 }
 
+export enum AssignmentBacking {
+  LOCAL_SEED = 'LOCAL_SEED',
+  REMOTE = 'REMOTE'
+}
+
 export enum AssignmentResourceType {
   AUDIO = 'AUDIO',
   IMAGE = 'IMAGE'
@@ -105,6 +110,7 @@ export interface Assignment {
   id: string;
   studentId: string;
   candidateId: string;
+  backing: AssignmentBacking;
   assignmentType: AssignmentType;
   subjectCode: string;
   contentType?: AssignmentContentType;

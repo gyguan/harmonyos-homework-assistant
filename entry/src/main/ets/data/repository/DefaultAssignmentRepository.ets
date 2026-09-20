@@ -4,7 +4,7 @@ import { RemoteAssignment, RemoteAssignmentMapper } from '../../application/remo
 import { AssignmentAction } from '../../domain/model/AssignmentAction';
 import { AssignmentFilter } from '../../domain/model/AssignmentFilter';
 import { AssignmentReviewDecision } from '../../domain/model/AssignmentReviewDecision';
-import { Assignment, AssignmentContentType, AssignmentStatus, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
+import { Assignment, AssignmentBacking, AssignmentContentType, AssignmentStatus, StudentProfile, TodaySummary } from '../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../domain/port/AssignmentRepository';
 import { AssignmentQuery } from '../../domain/service/AssignmentQuery';
 import { AssignmentLocalDataSource, DefaultAssignmentLocalDataSource } from '../local/AssignmentLocalDataSource';
@@ -17,8 +17,21 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   private readonly local: AssignmentLocalDataSource = DefaultAssignmentLocalDataSource.instance;
   private syncRunning: boolean = false;
   private syncRequested: boolean = false;
+  private changeListener: (() => void) | null = null;
 
   private constructor() {}
+
+  setChangeListener(listener: () => void): void {
+    this.changeListener = listener;
+  }
+
+  clearChangeListener(): void {
+    this.changeListener = null;
+  }
+
+  private emitChanged(): void {
+    if (this.changeListener !== null) this.changeListener();
+  }
 
   requestSync(): void {
     if (!BackendSession.instance.isConnected()) return;
@@ -93,33 +106,13 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       throw new Error('已提交或已完成的作业不能再修改任务内容');
     }
 
-    let remoteBacked = current.remoteVersion > 0 || current.candidateId.length > 0;
-    if (!remoteBacked && BackendSession.instance.isConnected()) {
-      try {
-        let latestRemote = await HomeworkRemoteApi.instance.get(assignment.id);
-        current = RemoteAssignmentMapper.toLocal(latestRemote, this.local.getAssignment(assignment.id));
-        this.applyAuthoritative(current);
-        remoteBacked = true;
-      } catch (error) {
-        if (`${error}`.indexOf('REMOTE_NOT_FOUND') < 0) throw new Error(`${error}`);
-      }
-    }
-
-    if (!remoteBacked) {
+    if (current.backing === AssignmentBacking.LOCAL_SEED) {
       let localDraft = this.mergeEditableDetails(current, assignment);
       this.applyAuthoritative(localDraft);
       return localDraft;
     }
 
-    if (!BackendSession.instance.isConnected()) {
-      throw new Error('当前离线，联网后才能编辑已发布作业');
-    }
-
-    if (current.remoteVersion <= 0) {
-      let latestRemote = await HomeworkRemoteApi.instance.get(assignment.id);
-      current = RemoteAssignmentMapper.toLocal(latestRemote, this.local.getAssignment(assignment.id));
-      this.applyAuthoritative(current);
-    }
+    current = await this.ensureRemoteCurrent(current, '当前离线，联网后才能编辑已发布作业');
     if (current.status === AssignmentStatus.SUBMITTED || current.status === AssignmentStatus.COMPLETED) {
       throw new Error('作业已进入提交或完成状态，不能再修改任务内容');
     }
@@ -131,9 +124,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       this.applyAuthoritative(mapped);
       return mapped;
     } catch {
-      let latestRemote = await HomeworkRemoteApi.instance.get(assignment.id);
-      let latest = RemoteAssignmentMapper.toLocal(latestRemote, this.local.getAssignment(assignment.id));
-      this.applyAuthoritative(latest);
+      let latest = await this.reloadRemote(assignment.id);
       if (latest.remoteVersion === current.remoteVersion) throw new Error('REMOTE_EDIT_FAILED');
       if (latest.status === AssignmentStatus.SUBMITTED || latest.status === AssignmentStatus.COMPLETED) {
         throw new Error('作业已进入提交或完成状态，不能再修改任务内容');
@@ -152,21 +143,11 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
     // Seed/demo assignments intentionally remain local. Published assignments must use the
     // server command path so status and timing cannot be overwritten by a client clock.
-    if (current.remoteVersion <= 0 && current.candidateId.length === 0) {
+    if (current.backing === AssignmentBacking.LOCAL_SEED) {
       return this.performLocalDemoAction(assignmentId, action);
     }
-    if (!BackendSession.instance.isConnected()) {
-      throw new Error('当前离线，只能查看已缓存作业；联网后才能更新作业状态');
-    }
-
-    // Phone can enter Study Workspace before AppShell's asynchronous initial refresh has
-    // hydrated remoteVersion. Do not fail locally without an HTTP request: hydrate only this
-    // assignment from the server first, then execute the user command.
-    if (current.remoteVersion <= 0) {
-      let latest = await HomeworkRemoteApi.instance.get(assignmentId);
-      current = RemoteAssignmentMapper.toLocal(latest, this.local.getAssignment(assignmentId));
-      this.applyAuthoritative(current);
-    }
+    current = await this.ensureRemoteCurrent(
+      current, '当前离线，只能查看已缓存作业；联网后才能更新作业状态');
 
     try {
       let remote = await HomeworkRemoteApi.instance.performAction(assignmentId, current.remoteVersion, action);
@@ -193,9 +174,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     let current = this.getCached(assignmentId);
     if (current === null) throw new Error('作业不存在');
 
-    // Keep the same narrow seed/demo compatibility boundary as student execution. A real
-    // published Assignment is reviewed only after the server accepts the current version.
-    if (current.remoteVersion <= 0 && current.candidateId.length === 0) {
+    if (current.backing === AssignmentBacking.LOCAL_SEED) {
       let completed = decision === AssignmentReviewDecision.APPROVE;
       if (!this.local.reviewAssignment(assignmentId, completed, note)) {
         throw new Error('当前作业状态不能验收');
@@ -205,14 +184,11 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       this.replaceQueryCacheItem(updated);
       this.remoteSummary = null;
       this.remoteSummaryStudentId = '';
+      this.emitChanged();
       return updated;
     }
-    if (!BackendSession.instance.isConnected()) {
-      throw new Error('当前离线，只能查看已缓存提交；联网后才能验收作业');
-    }
-    if (current.remoteVersion <= 0) {
-      throw new Error('作业尚未完成云端同步，请刷新后重试');
-    }
+    current = await this.ensureRemoteCurrent(
+      current, '当前离线，只能查看已缓存提交；联网后才能验收作业');
 
     let remote = await HomeworkRemoteApi.instance.review(
       assignmentId, current.remoteVersion, decision, note.trim());
@@ -239,7 +215,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     let remoteIds: string[] = [];
     for (let assignmentId of ids) {
       let current = this.getCached(assignmentId);
-      if (current !== null && (current.remoteVersion > 0 || current.candidateId.length > 0)) {
+      if (current !== null && current.backing === AssignmentBacking.REMOTE) {
         remoteIds.push(assignmentId);
       }
     }
@@ -250,7 +226,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     let deleted: Set<string> = new Set<string>();
     for (let assignmentId of ids) {
       let current = this.getCached(assignmentId);
-      let isRemote = current !== null && (current.remoteVersion > 0 || current.candidateId.length > 0);
+      let isRemote = current !== null && current.backing === AssignmentBacking.REMOTE;
       if (isRemote) {
         let success = await HomeworkRemoteApi.instance.delete(assignmentId);
         if (!success) {
@@ -280,25 +256,32 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     this.queryCache = queryRemaining;
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
+    this.emitChanged();
   }
 
   applyAuthoritative(updated: Assignment): void {
+    this.applyAuthoritativeBatch([updated]);
+  }
+
+  applyAuthoritativeBatch(updatedItems: Assignment[]): void {
+    if (updatedItems.length === 0) return;
     let assignments = this.local.listAssignments();
-    let replaced = false;
-    for (let i = 0; i < assignments.length; i++) {
-      if (assignments[i].id !== updated.id) continue;
-      assignments[i] = updated;
-      replaced = true;
-      break;
+    for (let updated of updatedItems) {
+      let replaced = false;
+      for (let i = 0; i < assignments.length; i++) {
+        if (assignments[i].id !== updated.id) continue;
+        assignments[i] = updated;
+        replaced = true;
+        break;
+      }
+      if (!replaced) assignments.push(updated);
+      this.replaceQueryCacheItem(updated);
     }
-    if (!replaced) assignments.push(updated);
     this.local.replaceAssignmentsForActiveStudent(assignments);
-    this.replaceQueryCacheItem(updated);
-    // Any authoritative assignment mutation can change nextAssignmentId/progress counters.
-    // Drop the remote summary immediately so hidden Home surfaces re-render from the updated
-    // local Assignment cache before the asynchronous background sync completes.
+    // Any authoritative mutation can change nextAssignmentId/progress counters.
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
+    this.emitChanged();
   }
 
   async refresh(): Promise<boolean> {
@@ -315,6 +298,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     let activeStudentId = this.local.getActiveStudentId();
     this.remoteSummary = this.local.getTodaySummary();
     this.remoteSummaryStudentId = activeStudentId;
+    this.emitChanged();
     return true;
   }
 
@@ -337,9 +321,9 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       for (let assignment of localAssignments) {
         let existing = remoteById.get(assignment.id);
         if (existing === undefined) {
-          // Only real assignments published from Candidate drafts are uploaded automatically.
-          // Demo/seed assignments remain local fixtures.
-          if (assignment.candidateId.length === 0) continue;
+          // Seed assignments never cross the local/remote boundary. Candidate-backed remote
+          // assignments may be restored from a local snapshot before their first refresh.
+          if (assignment.backing === AssignmentBacking.LOCAL_SEED || assignment.candidateId.length === 0) continue;
           let created = await HomeworkRemoteApi.instance.create(assignment);
           remoteById.set(created.id, created);
           remoteOrder.push(created.id);
@@ -378,11 +362,26 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     }
   }
 
+  private async ensureRemoteCurrent(current: Assignment, offlineMessage: string): Promise<Assignment> {
+    if (current.backing === AssignmentBacking.LOCAL_SEED) return current;
+    if (!BackendSession.instance.isConnected()) throw new Error(offlineMessage);
+    if (current.remoteVersion > 0) return current;
+    return this.reloadRemote(current.id);
+  }
+
+  private async reloadRemote(assignmentId: string): Promise<Assignment> {
+    let latestRemote = await HomeworkRemoteApi.instance.get(assignmentId);
+    let latest = RemoteAssignmentMapper.toLocal(latestRemote, this.local.getAssignment(assignmentId));
+    this.applyAuthoritative(latest);
+    return latest;
+  }
+
   private mergeEditableDetails(base: Assignment, draft: Assignment): Assignment {
     return {
       id: base.id,
       studentId: base.studentId,
       candidateId: base.candidateId,
+      backing: base.backing,
       assignmentType: base.assignmentType,
       subjectCode: base.subjectCode,
       contentType: base.contentType === AssignmentContentType.AUDIO_IMAGE ?
@@ -428,6 +427,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     this.replaceQueryCacheItem(updated);
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
+    this.emitChanged();
     return updated;
   }
 

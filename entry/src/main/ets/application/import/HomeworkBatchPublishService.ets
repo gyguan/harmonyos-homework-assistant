@@ -9,6 +9,7 @@ import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssign
 import { DefaultHomeworkImportDraftRepository } from '../../data/repository/DefaultHomeworkImportDraftRepository';
 import {
   Assignment,
+  AssignmentBacking,
   AssignmentContentType,
   AssignmentStatus,
   AssignmentType,
@@ -62,7 +63,7 @@ export class HomeworkBatchPublishService {
     }
     if (seen.size !== candidates.length) throw new Error('云端批量发布响应不完整');
 
-    for (let assignment of mapped) DefaultAssignmentRepository.instance.applyAuthoritative(assignment);
+    DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped);
     this.drafts.clearCandidates();
     return { publishedCount: mapped.length };
   }
@@ -72,6 +73,7 @@ export class HomeworkBatchPublishService {
       id: `a-published-${candidate.id}`,
       studentId: candidate.studentId,
       candidateId: candidate.id,
+      backing: AssignmentBacking.REMOTE,
       assignmentType: AssignmentType.SCHOOL,
       subjectCode: this.subjectCode(candidate.subject),
       contentType: AssignmentContentType.NORMAL,

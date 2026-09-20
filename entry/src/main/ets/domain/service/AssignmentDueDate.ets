@@ -1,6 +1,6 @@
 import { Assignment, AssignmentStatus } from '../model/HomeworkModels';
 
-interface DueDateParts {
+export interface AssignmentDateParts {
   year: number;
   month: number;
   day: number;
@@ -27,7 +27,7 @@ export class AssignmentDueDate {
     let timeMinutes = AssignmentDueDate.resolveTimeMinutes(text);
     if (date === null) {
       if (timeMinutes < 0) return -1;
-      date = AssignmentDueDate.shanghaiDateParts(anchorEpochMs);
+      date = AssignmentDueDate.businessDateParts(anchorEpochMs);
     }
 
     let hour = AssignmentDueDate.DEFAULT_DUE_HOUR;
@@ -66,9 +66,9 @@ export class AssignmentDueDate {
     let dueDay = AssignmentDueDate.dayStart(item, nowEpochMs);
     if (dueDay < 0) return false;
 
-    let today = AssignmentDueDate.startOfDay(nowEpochMs);
+    let today = AssignmentDueDate.businessDayStart(nowEpochMs);
     if (filter === DueDateFilterKey.TODAY) return dueDay === today;
-    if (filter === DueDateFilterKey.TOMORROW) return dueDay === AssignmentDueDate.addDays(today, 1);
+    if (filter === DueDateFilterKey.TOMORROW) return dueDay === AssignmentDueDate.addBusinessDays(today, 1);
     if (filter === DueDateFilterKey.THIS_WEEK) {
       return dueDay >= today && dueDay <= AssignmentDueDate.endOfWeek(today);
     }
@@ -76,7 +76,7 @@ export class AssignmentDueDate {
   }
 
   static dayStart(item: Assignment, nowEpochMs: number = Date.now()): number {
-    if (item.dueAtEpochMs > 0) return AssignmentDueDate.startOfDay(item.dueAtEpochMs);
+    if (item.dueAtEpochMs > 0) return AssignmentDueDate.businessDayStart(item.dueAtEpochMs);
 
     let key = item.dueDateKey;
     if (key !== undefined && key.length > 0) {
@@ -97,19 +97,19 @@ export class AssignmentDueDate {
     let text = dueText.trim();
     if (text.length === 0) return -1;
 
-    let today = AssignmentDueDate.startOfDay(nowEpochMs);
-    if (text.indexOf('今天') >= 0 || text.indexOf('今日') >= 0 || text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0) {
+    let today = AssignmentDueDate.businessDayStart(nowEpochMs);
+    if (text.indexOf('今天') >= 0 || text.indexOf('今日') >= 0 || text.indexOf('今晚') >= 0) {
       return today;
     }
-    if (text.indexOf('明天') >= 0 || text.indexOf('明日') >= 0) return AssignmentDueDate.addDays(today, 1);
-    if (text.indexOf('后天') >= 0) return AssignmentDueDate.addDays(today, 2);
+    if (text.indexOf('明天') >= 0 || text.indexOf('明日') >= 0) return AssignmentDueDate.addBusinessDays(today, 1);
+    if (text.indexOf('后天') >= 0) return AssignmentDueDate.addBusinessDays(today, 2);
 
     let weekday = AssignmentDueDate.weekdayNumber(text);
     if (weekday > 0) {
-      let current = new Date(today).getDay();
+      let current = AssignmentDueDate.businessWeekday(today);
       let currentMondayBased = current === 0 ? 7 : current;
       let delta = (weekday - currentMondayBased + 7) % 7;
-      return AssignmentDueDate.addDays(today, delta);
+      return AssignmentDueDate.addBusinessDays(today, delta);
     }
 
     let chineseFull = text.match(/(\d{4})年(\d{1,2})月(\d{1,2})[日号]?/);
@@ -124,20 +124,24 @@ export class AssignmentDueDate {
 
     let monthDay = text.match(/(\d{1,2})月(\d{1,2})[日号]?/);
     if (monthDay !== null && monthDay.length >= 3) {
-      let now = new Date(nowEpochMs);
-      return AssignmentDueDate.dateStart(now.getFullYear(), Number(monthDay[1]), Number(monthDay[2]));
+      let now = AssignmentDueDate.businessDateParts(nowEpochMs);
+      return AssignmentDueDate.dateStart(now.year, Number(monthDay[1]), Number(monthDay[2]));
     }
 
     let numericMonthDay = text.match(/(^|[^\d])(\d{1,2})[-\/.](\d{1,2})($|[^\d])/);
     if (numericMonthDay !== null && numericMonthDay.length >= 4) {
-      let now = new Date(nowEpochMs);
-      return AssignmentDueDate.dateStart(now.getFullYear(), Number(numericMonthDay[2]), Number(numericMonthDay[3]));
+      let now = AssignmentDueDate.businessDateParts(nowEpochMs);
+      return AssignmentDueDate.dateStart(now.year, Number(numericMonthDay[2]), Number(numericMonthDay[3]));
     }
+
+    // A standalone evening time means today, but relative/explicit dates above must win first.
+    // This keeps “明天晚上 8 点” and “后天晚上 8 点” on their intended business day.
+    if (text.indexOf('晚上') >= 0) return today;
     return -1;
   }
 
-  private static resolveShanghaiDate(text: string, anchorEpochMs: number): DueDateParts | null {
-    let anchor = AssignmentDueDate.shanghaiDateParts(anchorEpochMs);
+  private static resolveShanghaiDate(text: string, anchorEpochMs: number): AssignmentDateParts | null {
+    let anchor = AssignmentDueDate.businessDateParts(anchorEpochMs);
 
     let chineseFull = text.match(/(\d{4})年(\d{1,2})月(\d{1,2})[日号]?/);
     if (chineseFull !== null && chineseFull.length >= 4) {
@@ -218,7 +222,7 @@ export class AssignmentDueDate {
     return hour <= 23 ? hour : -1;
   }
 
-  private static shanghaiDateParts(epochMs: number): DueDateParts {
+  static businessDateParts(epochMs: number): AssignmentDateParts {
     let shifted = new Date(epochMs + AssignmentDueDate.SHANGHAI_OFFSET_HOURS * 60 * 60 * 1000);
     return {
       year: shifted.getUTCFullYear(),
@@ -227,7 +231,7 @@ export class AssignmentDueDate {
     };
   }
 
-  private static addCalendarDays(value: DueDateParts, days: number): DueDateParts {
+  private static addCalendarDays(value: AssignmentDateParts, days: number): AssignmentDateParts {
     let shifted = new Date(Date.UTC(value.year, value.month - 1, value.day + days));
     return {
       year: shifted.getUTCFullYear(),
@@ -236,7 +240,7 @@ export class AssignmentDueDate {
     };
   }
 
-  private static validDateParts(year: number, month: number, day: number): DueDateParts | null {
+  private static validDateParts(year: number, month: number, day: number): AssignmentDateParts | null {
     if (month < 1 || month > 12 || day < 1 || day > 31) return null;
     let value = new Date(Date.UTC(year, month - 1, day));
     if (value.getUTCFullYear() !== year || value.getUTCMonth() !== month - 1 || value.getUTCDate() !== day) {
@@ -256,7 +260,7 @@ export class AssignmentDueDate {
     if (item.status === AssignmentStatus.COMPLETED || item.status === AssignmentStatus.SUBMITTED) return false;
     if (item.status === AssignmentStatus.OVERDUE) return true;
     let dueDay = AssignmentDueDate.dayStart(item, nowEpochMs);
-    return dueDay >= 0 && dueDay < AssignmentDueDate.startOfDay(nowEpochMs);
+    return dueDay >= 0 && dueDay < AssignmentDueDate.businessDayStart(nowEpochMs);
   }
 
   private static weekdayNumber(text: string): number {
@@ -269,20 +273,41 @@ export class AssignmentDueDate {
     return -1;
   }
 
-  private static startOfDay(epochMs: number): number {
-    let value = new Date(epochMs);
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+  static businessDayStart(epochMs: number): number {
+    let value = AssignmentDueDate.businessDateParts(epochMs);
+    return Date.UTC(value.year, value.month - 1, value.day,
+      -AssignmentDueDate.SHANGHAI_OFFSET_HOURS, 0, 0, 0);
   }
 
-  private static addDays(dayStart: number, days: number): number {
-    let value = new Date(dayStart);
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate() + days).getTime();
+  static addBusinessDays(dayStart: number, days: number): number {
+    let value = AssignmentDueDate.businessDateParts(dayStart);
+    let shifted = AssignmentDueDate.addCalendarDays(value, days);
+    return Date.UTC(shifted.year, shifted.month - 1, shifted.day,
+      -AssignmentDueDate.SHANGHAI_OFFSET_HOURS, 0, 0, 0);
+  }
+
+  static businessWeekday(epochMs: number): number {
+    let value = AssignmentDueDate.businessDateParts(epochMs);
+    return new Date(Date.UTC(value.year, value.month - 1, value.day)).getUTCDay();
+  }
+
+  static businessMonthStart(epochMs: number): number {
+    let value = AssignmentDueDate.businessDateParts(epochMs);
+    return Date.UTC(value.year, value.month - 1, 1,
+      -AssignmentDueDate.SHANGHAI_OFFSET_HOURS, 0, 0, 0);
+  }
+
+  static addBusinessMonths(monthStart: number, months: number): number {
+    let value = AssignmentDueDate.businessDateParts(monthStart);
+    let shifted = new Date(Date.UTC(value.year, value.month - 1 + months, 1));
+    return Date.UTC(shifted.getUTCFullYear(), shifted.getUTCMonth(), 1,
+      -AssignmentDueDate.SHANGHAI_OFFSET_HOURS, 0, 0, 0);
   }
 
   private static endOfWeek(todayStart: number): number {
-    let weekday = new Date(todayStart).getDay();
+    let weekday = AssignmentDueDate.businessWeekday(todayStart);
     let mondayBased = weekday === 0 ? 7 : weekday;
-    return AssignmentDueDate.addDays(todayStart, 7 - mondayBased);
+    return AssignmentDueDate.addBusinessDays(todayStart, 7 - mondayBased);
   }
 
   private static dayStartFromKey(key: string): number {
@@ -292,12 +317,10 @@ export class AssignmentDueDate {
   }
 
   private static formatDateKey(dayStart: number): string {
-    let value = new Date(dayStart);
-    let month = value.getMonth() + 1;
-    let day = value.getDate();
-    let monthText = month < 10 ? `0${month}` : `${month}`;
-    let dayText = day < 10 ? `0${day}` : `${day}`;
-    return `${value.getFullYear()}-${monthText}-${dayText}`;
+    let value = AssignmentDueDate.businessDateParts(dayStart);
+    let monthText = value.month < 10 ? `0${value.month}` : `${value.month}`;
+    let dayText = value.day < 10 ? `0${value.day}` : `${value.day}`;
+    return `${value.year}-${monthText}-${dayText}`;
   }
 
   private static pad(value: number): string {
@@ -305,9 +328,9 @@ export class AssignmentDueDate {
   }
 
   private static dateStart(year: number, month: number, day: number): number {
-    if (month < 1 || month > 12 || day < 1 || day > 31) return -1;
-    let value = new Date(year, month - 1, day);
-    if (value.getFullYear() !== year || value.getMonth() !== month - 1 || value.getDate() !== day) return -1;
-    return value.getTime();
+    let value = AssignmentDueDate.validDateParts(year, month, day);
+    if (value === null) return -1;
+    return Date.UTC(value.year, value.month - 1, value.day,
+      -AssignmentDueDate.SHANGHAI_OFFSET_HOURS, 0, 0, 0);
   }
 }

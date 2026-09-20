@@ -36,8 +36,9 @@ require("review(assignmentId: string, decision: AssignmentReviewDecision, note: 
         "AssignmentRepository must expose parent review command")
 require("HomeworkRemoteApi.instance.review" in repo_impl,
         "real parent review must execute through the remote command API")
-require("current.remoteVersion <= 0 && current.candidateId.length === 0" in repo_impl,
-        "local review fallback must be explicitly limited to seed/demo assignments")
+require("current.backing === AssignmentBacking.LOCAL_SEED" in repo_impl and
+        "ensureRemoteCurrent" in repo_impl,
+        "local review fallback must use explicit Assignment backing and shared remote hydration")
 require("联网后才能验收作业" in repo_impl,
         "published assignments must not mutate review state locally while offline")
 require("/review`" in remote_api and "decision: decision, version: version, note: note" in remote_api,

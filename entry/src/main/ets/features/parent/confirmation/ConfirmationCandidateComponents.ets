@@ -1,5 +1,6 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
+import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
 
@@ -285,31 +286,12 @@ export struct ConfirmationCandidateEditor {
 
   build() {
     Column() {
-      Row() {
-        Column({ space: 2 }) {
-          Text('编辑作业')
-            .fontSize(18)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text(`${this.item.subject} · ${this.item.title}`)
-            .maxLines(1)
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-
-        Text('关闭')
-          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .fontSize(14)
-          .fontColor(AppTheme.SUBTEXT)
-          .textAlign(TextAlign.Center)
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('关闭编辑')
-          .onClick(() => this.requestClose());
-      }
-      .width('100%')
-      .padding({ left: 16, right: 16, top: 12, bottom: 10 });
+      EditSheetHeader({
+        title: '编辑作业',
+        subtitle: `${this.item.subject} · ${this.item.title}`,
+        closeAccessibilityText: '关闭编辑',
+        onClose: () => this.requestClose()
+      });
 
       Divider().color(AppTheme.DIVIDER);
 

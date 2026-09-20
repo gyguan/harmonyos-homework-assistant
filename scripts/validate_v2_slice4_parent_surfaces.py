@@ -120,8 +120,8 @@ for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode", "
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
     require(removed not in shared_filter,
             f"Parent/Student task query must not retain preset type/relative-date option: {removed}")
-require("AssignmentTypeFilter" in progress_vm and "assignmentType: typeFilter" in progress_vm,
-        "Parent Progress query must support the same Assignment type dimension as Student Assignments")
+require("AssignmentTypeFilter" in progress_vm and "AssignmentFilterFactory.create(typeFilter" in progress_vm,
+        "Parent Progress query must preserve the Assignment type dimension through the shared filter factory")
 require("ParentReviewPane({" in progress and "selectedAssignmentId" in progress,
         "wide Parent Progress must reuse ParentReviewPane instead of a duplicate detail model")
 require("this.onOpenReview(item.id)" in progress,
@@ -156,9 +156,11 @@ require("AssignmentStatus.SUBMITTED" in review_pane and "AssignmentStatus.COMPLE
 require("let persisted = item.remoteVersion > 0 || item.candidateId.length > 0" not in review_pane and
         "return item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED" in review_pane,
         "all unfinished assignments, including NOT_STARTED, must expose parent editing")
-require("let remoteBacked = current.remoteVersion > 0 || current.candidateId.length > 0" in repo and
-        "if (!remoteBacked)" in repo and "this.applyAuthoritative(localDraft)" in repo,
-        "parent edit must support local unfinished tasks while hydrating real cloud tasks when possible")
+require("current.backing === AssignmentBacking.LOCAL_SEED" in repo and
+        "ensureRemoteCurrent" in repo and "this.applyAuthoritative(localDraft)" in repo,
+        "parent edit must use explicit Assignment backing and hydrate remote work centrally")
+require("remoteVersion > 0 || current.candidateId.length > 0" not in repo,
+        "parent edit must not infer remote identity from sync metadata")
 require("async updateDetails(assignment: Assignment" in remote_api and
         "'parent.assignment.edit'" in remote_api and "/details" in remote_api,
         "HarmonyOS parent edit must use the narrow assignment details API")

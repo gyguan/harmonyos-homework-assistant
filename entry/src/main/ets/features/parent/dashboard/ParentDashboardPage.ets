@@ -52,8 +52,7 @@ export struct ParentDashboardPage {
 
   private todayAssignments(): Assignment[] {
     let result: Assignment[] = [];
-    let today = new Date();
-    let todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    let todayStart = AssignmentDueDate.businessDayStart(Date.now());
     for (let item of this.assignments()) {
       if (AssignmentDueDate.dayStart(item) === todayStart) result.push(item);
     }
