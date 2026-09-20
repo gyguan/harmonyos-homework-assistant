@@ -195,6 +195,10 @@ export struct StudentAssignmentsPage {
     return this.viewModel.allCount();
   }
 
+  private assignmentRenderKey(item: Assignment): string {
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+  }
+
   private syncSelectedAssignment(items: Assignment[]): void {
     for (let item of items) {
       if (item.id === this.selectedAssignmentId) return;
@@ -374,7 +378,7 @@ export struct StudentAssignmentsPage {
               showChevron: !this.canUseMasterDetail() || this.calendarMode,
               onOpen: () => this.openAssignment(item.id)
             });
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
       }
@@ -405,7 +409,7 @@ export struct StudentAssignmentsPage {
               showChevron: !this.canUseMasterDetail() || this.calendarMode,
               onOpen: () => this.openAssignment(item.id)
             });
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
       }
@@ -436,7 +440,7 @@ export struct StudentAssignmentsPage {
               showChevron: !this.canUseMasterDetail() || this.calendarMode,
               onOpen: () => this.openAssignment(item.id)
             });
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
       }
@@ -467,7 +471,7 @@ export struct StudentAssignmentsPage {
               showChevron: !this.canUseMasterDetail() || this.calendarMode,
               onOpen: () => this.openAssignment(item.id)
             });
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
       }
@@ -607,7 +611,7 @@ export struct StudentAssignmentsPage {
                 showChevron: true,
                 onOpen: () => this.onOpenDetail(item.id)
               });
-            }, (item: Assignment) => item.id);
+            }, (item: Assignment) => this.assignmentRenderKey(item));
           }
           .width('100%')
           .padding({ bottom: 12 });
