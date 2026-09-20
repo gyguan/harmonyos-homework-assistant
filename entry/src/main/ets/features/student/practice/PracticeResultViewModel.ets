@@ -17,6 +17,10 @@ export class PracticeResultViewModel {
     return this.repository.repeatAttempt(attemptId);
   }
 
+  retryWrong(attemptId: string): Promise<PracticeAttempt> {
+    return this.repository.retryWrongAttempt(attemptId);
+  }
+
   percent(result: PracticeResult): number {
     if (result.maxScore <= 0) return 0;
     return Math.round(result.score * 100 / result.maxScore);
