@@ -107,6 +107,8 @@ require("HomeworkImportSourceType.CLIPBOARD" in fixture,
         "#242 fixture must validate the CLIPBOARD source type")
 require("家长甲" in fixture and "sourceMessageIds" in fixture,
         "#242 fixture must prove non-homework source messages can coexist with candidate evidence")
+require("['m-1', 'm-3']" in fixture,
+        "#242 fixture must prove one Candidate can reference multiple source messages")
 
 require("enum AssignmentStatus" not in models,
         "Import V2 must not introduce a second Assignment state machine")
