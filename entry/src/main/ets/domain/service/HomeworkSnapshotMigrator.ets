@@ -1,7 +1,7 @@
-import { Assignment, AssignmentContentType, AssignmentType, Subject } from '../model/HomeworkModels';
+import { Assignment, AssignmentBacking, AssignmentContentType, AssignmentType, Subject } from '../model/HomeworkModels';
 import { HomeworkSnapshot } from '../model/PersistenceModels';
 
-export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 7;
+export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 8;
 
 export class HomeworkSnapshotMigrator {
   static migrate(snapshot: HomeworkSnapshot): HomeworkSnapshot {
@@ -25,6 +25,10 @@ export class HomeworkSnapshotMigrator {
       }
       if (current.schemaVersion === 6) {
         current = HomeworkSnapshotMigrator.migrateV6ToV7(current);
+        continue;
+      }
+      if (current.schemaVersion === 7) {
+        current = HomeworkSnapshotMigrator.migrateV7ToV8(current);
         continue;
       }
       throw new Error(`缺少本地作业数据迁移步骤: ${current.schemaVersion}`);
@@ -53,6 +57,7 @@ export class HomeworkSnapshotMigrator {
         id: source.id,
         studentId: source.studentId,
         candidateId: source.candidateId,
+        backing: HomeworkSnapshotMigrator.legacyBacking(source),
         assignmentType: AssignmentType.SCHOOL,
         subjectCode: HomeworkSnapshotMigrator.subjectCode(source.subject),
         contentType: AssignmentContentType.NORMAL,
@@ -95,6 +100,7 @@ export class HomeworkSnapshotMigrator {
         id: source.id,
         studentId: source.studentId,
         candidateId: source.candidateId,
+        backing: HomeworkSnapshotMigrator.legacyBacking(source),
         assignmentType: source.assignmentType,
         subjectCode: source.subjectCode,
         contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE ?
@@ -129,6 +135,60 @@ export class HomeworkSnapshotMigrator {
       tutorSessions: snapshot.tutorSessions,
       submissionSequence: snapshot.submissionSequence
     };
+  }
+
+  private static migrateV7ToV8(snapshot: HomeworkSnapshot): HomeworkSnapshot {
+    let assignments: Assignment[] = [];
+    for (let source of snapshot.assignments) {
+      assignments.push({
+        id: source.id,
+        studentId: source.studentId,
+        candidateId: source.candidateId,
+        backing: HomeworkSnapshotMigrator.legacyBacking(source),
+        assignmentType: source.assignmentType,
+        subjectCode: source.subjectCode,
+        contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE ?
+          AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
+        subject: source.subject,
+        title: source.title,
+        instruction: source.instruction,
+        textbookRef: source.textbookRef,
+        dueAtEpochMs: source.dueAtEpochMs,
+        dueTimezone: source.dueTimezone,
+        dueText: source.dueText,
+        dueDateKey: source.dueDateKey,
+        status: source.status,
+        expectedMinutes: source.expectedMinutes,
+        startedAtEpochMs: source.startedAtEpochMs,
+        finishedAtEpochMs: source.finishedAtEpochMs,
+        elapsedSeconds: source.elapsedSeconds,
+        reviewNote: source.reviewNote,
+        remoteVersion: source.remoteVersion,
+        syncDirty: source.syncDirty,
+        lastSyncedAtEpochMs: source.lastSyncedAtEpochMs,
+        resourceLabels: source.resourceLabels.slice()
+      });
+    }
+    return {
+      schemaVersion: 8,
+      settings: snapshot.settings,
+      rawImports: snapshot.rawImports,
+      assignments: assignments,
+      candidates: snapshot.candidates,
+      submissions: snapshot.submissions,
+      tutorSessions: snapshot.tutorSessions,
+      submissionSequence: snapshot.submissionSequence
+    };
+  }
+
+  private static legacyBacking(source: Assignment): AssignmentBacking {
+    if (source.backing === AssignmentBacking.REMOTE) return AssignmentBacking.REMOTE;
+    if (source.remoteVersion > 0 || source.candidateId.length > 0) return AssignmentBacking.REMOTE;
+    if (source.id.indexOf('a-extra-') === 0 || source.id.indexOf('a-voice-') === 0 ||
+      source.id.indexOf('a-published-') === 0) {
+      return AssignmentBacking.REMOTE;
+    }
+    return AssignmentBacking.LOCAL_SEED;
   }
 
   private static subjectCode(subject: Subject): string {
