@@ -250,39 +250,46 @@ export struct PracticeAttemptPage {
   }
 
   @Builder
-  private OptionButton(option: PracticeQuestionOption) {
-    Button(`${option.key}. ${option.label}`, { type: ButtonType.Normal })
-      .width('100%')
-      .height(50)
-      .fontSize(14)
-      .fontColor(this.currentAnswer === option.key ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .backgroundColor(this.currentAnswer === option.key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE)
-      .border({ width: 1, color: this.currentAnswer === option.key ? AppTheme.PRIMARY : AppTheme.BORDER })
-      .borderRadius(AppTheme.CONTROL_RADIUS)
-      .onClick(() => this.currentAnswer = option.key);
-  }
-
-  @Builder
-  private QuestionAnswer(question: PracticeQuestion) {
-    if (question.type === PracticeQuestionType.SINGLE_CHOICE) {
-      Column({ space: 10 }) {
-        ForEach(question.options, (option: PracticeQuestionOption) => {
-          this.OptionButton(option);
-        }, (option: PracticeQuestionOption) => `${question.id}:${option.key}`);
+  private CurrentQuestionAnswer() {
+    if (this.attempt !== null && this.currentIndex >= 0 &&
+      this.currentIndex < this.attempt.questions.length) {
+      if (this.attempt.questions[this.currentIndex].type === PracticeQuestionType.SINGLE_CHOICE) {
+        Column({ space: 10 }) {
+          ForEach(
+            this.attempt.questions[this.currentIndex].options,
+            (option: PracticeQuestionOption) => {
+              Button(`${option.key}. ${option.label}`, { type: ButtonType.Normal })
+                .width('100%')
+                .height(50)
+                .fontSize(14)
+                .fontColor(this.currentAnswer === option.key ? AppTheme.PRIMARY : AppTheme.TEXT)
+                .backgroundColor(this.currentAnswer === option.key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE)
+                .border({
+                  width: 1,
+                  color: this.currentAnswer === option.key ? AppTheme.PRIMARY : AppTheme.BORDER
+                })
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .onClick(() => this.currentAnswer = option.key);
+            },
+            (option: PracticeQuestionOption) =>
+              `${this.currentIndex}:${this.attempt!.questions[this.currentIndex].id}:${option.key}:${option.label}`
+          );
+        }
+        .width('100%');
+      } else {
+        TextInput({
+          placeholder: this.attempt.questions[this.currentIndex].type === PracticeQuestionType.NUMBER ?
+            '输入答案' : '输入你的答案',
+          text: this.currentAnswer
+        })
+          .width('100%')
+          .height(AppTheme.INPUT_HEIGHT)
+          .fontSize(16)
+          .backgroundColor(AppTheme.SURFACE)
+          .border({ width: 1, color: AppTheme.BORDER })
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => this.currentAnswer = value);
       }
-      .width('100%');
-    } else {
-      TextInput({
-        placeholder: question.type === PracticeQuestionType.NUMBER ? '输入答案' : '输入你的答案',
-        text: this.currentAnswer
-      })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .fontSize(16)
-        .backgroundColor(AppTheme.SURFACE)
-        .border({ width: 1, color: AppTheme.BORDER })
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.currentAnswer = value);
     }
   }
 
@@ -379,7 +386,7 @@ export struct PracticeAttemptPage {
                 .lineHeight(30)
                 .fontColor(AppTheme.TEXT);
 
-              this.QuestionAnswer(this.currentQuestion()!);
+              this.CurrentQuestionAnswer();
 
               Column({ space: 7 }) {
                 Row() {
