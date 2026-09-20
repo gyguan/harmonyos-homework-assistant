@@ -7,6 +7,7 @@ export enum AppRoute {
   STUDENT_PRACTICE_RESULT = 'student/practice/result',
   PARENT_REVIEW = 'parent/review',
   PARENT_IMPORT = 'parent/import',
+  PARENT_CAPTURE_SPIKE = 'parent/import/capture-spike',
   PARENT_IMPORT_CONFIRMATION = 'parent/import/confirmation',
   PARENT_EXTRA_CREATE = 'parent/extra/create'
 }
@@ -41,6 +42,9 @@ export class PracticeAttemptRouteParam {
 }
 
 export class ParentImportRouteParam {
+}
+
+export class ParentCaptureSpikeRouteParam {
 }
 
 export class ParentImportConfirmationRouteParam {
