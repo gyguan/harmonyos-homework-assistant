@@ -38,6 +38,8 @@ public final class PracticeDtos {
 
   public record AnswerResponse(String questionId, String answerValue, long answeredAtEpochMs) {}
 
+  public record PreviousAnswerResponse(String questionId, String answerValue, boolean correct) {}
+
   public record AttemptResponse(
       String id,
       String studentId,
@@ -46,13 +48,36 @@ public final class PracticeDtos {
       int attemptNo,
       String mode,
       String status,
+      String sourceAttemptId,
       long startedAtEpochMs,
       long submittedAtEpochMs,
       long elapsedSeconds,
       int answeredCount,
       int questionCount,
       List<QuestionResponse> questions,
-      List<AnswerResponse> answers) {}
+      List<AnswerResponse> answers,
+      List<PreviousAnswerResponse> previousAnswers) {}
+
+  public record AttemptSummary(
+      String id,
+      String paperId,
+      int paperVersion,
+      String paperTitle,
+      String grade,
+      String subject,
+      int attemptNo,
+      String mode,
+      String status,
+      String sourceAttemptId,
+      long startedAtEpochMs,
+      long submittedAtEpochMs,
+      long elapsedSeconds,
+      int answeredCount,
+      int questionCount,
+      int score,
+      int maxScore,
+      int correctCount,
+      int wrongCount) {}
 
   public record QuestionResult(
       String questionId,
