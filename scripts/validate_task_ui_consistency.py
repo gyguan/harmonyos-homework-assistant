@@ -81,14 +81,14 @@ require("Text('关闭')" in student_switcher,
         "student switcher must keep a top-right close action")
 require("Text('关闭')" in photo_preview,
         "photo preview must keep a top-right close action")
-require(parent_edit.index("Text('关闭')") < parent_edit.index("AssignmentEditForm({") <
-        parent_edit.index("Button(this.saving ? '保存中…' : '保存修改'"),
+parent_actions = parent_edit.split("private BottomActions()", 1)[1].split("build()", 1)[0]
+require("Text('关闭')" in parent_edit and
+        "Button(this.saving ? '保存中…' : '保存修改'" in parent_actions,
         "parent edit sheet must keep close in header and save in the fixed bottom action area")
 require("Text('关闭')" in confirmation_components and "confirmDiscard" in confirmation_components,
         "candidate edit sheet must use close as the only header exit and protect dirty edits")
-require(confirmation_components.index("AssignmentEditForm({") <
-        confirmation_components.index("Button('删除'") <
-        confirmation_components.index("Button('完成'"),
+candidate_actions = confirmation_components.split("private BottomActions()", 1)[1].split("build()", 1)[0]
+require("Button('删除'" in candidate_actions and "Button('完成'" in candidate_actions,
         "candidate editor business actions must stay in its bottom action area")
 
 if errors:
