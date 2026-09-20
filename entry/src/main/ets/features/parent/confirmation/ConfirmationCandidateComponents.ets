@@ -1,3 +1,4 @@
+import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
@@ -148,7 +149,6 @@ export struct ConfirmationCandidateEditor {
   @State private dueTextDraft: string = '';
   @State private expectedMinutesDraft: number = 20;
   @State private textbookRefDraft: string = '';
-  @State private dirty: boolean = false;
   @State private confirmDiscard: boolean = false;
   @State private confirmDelete: boolean = false;
 
@@ -163,13 +163,37 @@ export struct ConfirmationCandidateEditor {
     this.dueTextDraft = this.item.dueText;
     this.expectedMinutesDraft = this.item.expectedMinutes;
     this.textbookRefDraft = this.item.textbookRef;
-    this.dirty = false;
     this.confirmDiscard = false;
     this.confirmDelete = false;
   }
 
-  private markDirty(): void {
-    this.dirty = true;
+  private originalEditValues(): AssignmentEditValues {
+    return {
+      subject: this.item.subject,
+      title: this.item.title,
+      instruction: this.item.instruction,
+      dueText: this.item.dueText,
+      expectedMinutes: this.item.expectedMinutes,
+      textbookRef: this.item.textbookRef
+    };
+  }
+
+  private currentEditValues(): AssignmentEditValues {
+    return {
+      subject: this.subjectDraft,
+      title: this.titleDraft,
+      instruction: this.instructionDraft,
+      dueText: this.dueTextDraft,
+      expectedMinutes: this.expectedMinutesDraft,
+      textbookRef: this.textbookRefDraft
+    };
+  }
+
+  private hasChanges(): boolean {
+    return AssignmentEditChangeDetector.hasChanges(this.originalEditValues(), this.currentEditValues());
+  }
+
+  private markChanged(): void {
     this.confirmDiscard = false;
     this.confirmDelete = false;
   }
@@ -193,7 +217,7 @@ export struct ConfirmationCandidateEditor {
   }
 
   private requestClose(): void {
-    if (this.dirty) {
+    if (this.hasChanges()) {
       this.confirmDiscard = true;
       this.confirmDelete = false;
       return;
@@ -203,7 +227,6 @@ export struct ConfirmationCandidateEditor {
 
   private saveAndClose(): void {
     this.onSave(this.buildCandidate());
-    this.dirty = false;
     this.onClose();
   }
 
@@ -230,7 +253,6 @@ export struct ConfirmationCandidateEditor {
             .backgroundColor(AppTheme.DANGER_SOFT)
             .fontColor(AppTheme.DANGER)
             .onClick(() => {
-              this.dirty = false;
               this.onClose();
             });
         }
@@ -266,7 +288,7 @@ export struct ConfirmationCandidateEditor {
             .backgroundColor(AppTheme.DANGER_SOFT)
             .fontColor(AppTheme.DANGER)
             .onClick(() => this.confirmDelete = true);
-          Button('完成', { type: ButtonType.Normal })
+          Button('保存', { type: ButtonType.Normal })
             .layoutWeight(2)
             .height(AppTheme.BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -307,27 +329,27 @@ export struct ConfirmationCandidateEditor {
             textbookRef: this.textbookRefDraft,
             onSubjectChange: (subject: Subject) => {
               this.subjectDraft = subject;
-              this.markDirty();
+              this.markChanged();
             },
             onTitleChange: (value: string) => {
               this.titleDraft = value;
-              this.markDirty();
+              this.markChanged();
             },
             onInstructionChange: (value: string) => {
               this.instructionDraft = value;
-              this.markDirty();
+              this.markChanged();
             },
             onDueTextChange: (value: string) => {
               this.dueTextDraft = value;
-              this.markDirty();
+              this.markChanged();
             },
             onMinutesChange: (minutes: number) => {
               this.expectedMinutesDraft = minutes;
-              this.markDirty();
+              this.markChanged();
             },
             onTextbookRefChange: (value: string) => {
               this.textbookRefDraft = value;
-              this.markDirty();
+              this.markChanged();
             }
           });
 
