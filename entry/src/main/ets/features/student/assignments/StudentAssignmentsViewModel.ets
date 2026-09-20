@@ -39,6 +39,20 @@ export class StudentAssignmentsViewModel {
     return this.repository.query(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
   }
 
+  queryOnDay(subjectCode: string, dayEpochMs: number,
+    statuses: AssignmentStatus[] = []): Promise<Assignment[]> {
+    let day = StudentAssignmentsViewModel.startOfDay(dayEpochMs);
+    return this.repository.query({
+      assignmentType: AssignmentTypeFilter.ALL,
+      subjectCode: subjectCode,
+      dateFilter: AssignmentDateFilter.CUSTOM,
+      fromEpochMs: day,
+      toEpochMs: StudentAssignmentsViewModel.endOfDay(day),
+      undatedOnly: false,
+      statuses: statuses
+    });
+  }
+
   allCount(): number {
     return this.assignments(AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL).length;
   }
