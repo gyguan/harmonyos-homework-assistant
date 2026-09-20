@@ -311,7 +311,7 @@ export struct ParentReviewPane {
               }
               .width('100%');
 
-              if (this.canEdit(this.assignment()!) && this.editingAssignmentId !== this.assignment()!.id) {
+              if (this.canEdit(this.assignment()!)) {
                 Row() {
                   Text('编辑任务')
                     .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
