@@ -34,6 +34,10 @@ export struct HomeworkImportPage {
     return this.viewModel.candidates();
   }
 
+  private shouldShowCandidatesStep(): boolean {
+    return this.showCandidatesStep && this.candidates().length > 0;
+  }
+
   private canUseSplit(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.importOrganizeRequirement());
   }
@@ -327,7 +331,7 @@ export struct HomeworkImportPage {
             .width('100%')
             .alignItems(HorizontalAlign.Start);
           }
-          if (this.showCandidatesStep) this.CandidatePane(true);
+          if (this.shouldShowCandidatesStep()) this.CandidatePane(true);
           else this.SourcePane();
         }
         .width('100%')
