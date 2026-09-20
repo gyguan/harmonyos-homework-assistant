@@ -1,6 +1,7 @@
 import { AppTheme } from '../../common/theme/AppTheme';
 import { Assignment, AssignmentStatus } from '../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../domain/service/AssignmentStateMachine';
+import { AssignmentDueDate } from '../../domain/service/AssignmentDueDate';
 
 @Component
 export struct AssignmentListItem {
@@ -41,8 +42,12 @@ export struct AssignmentListItem {
     return `预计 ${this.assignment.expectedMinutes} 分钟`;
   }
 
+  private deadlineText(): string {
+    return AssignmentDueDate.displayText(this.assignment);
+  }
+
   private accessibilityLabel(): string {
-    return `${this.assignment.subject}，${this.assignment.title}，${this.assignment.dueText}，${this.timingText()}，${AssignmentStateMachine.label(this.assignment.status)}`;
+    return `${this.assignment.subject}，${this.assignment.title}，${this.deadlineText()}，${this.timingText()}，${AssignmentStateMachine.label(this.assignment.status)}`;
   }
 
   build() {
@@ -70,7 +75,7 @@ export struct AssignmentListItem {
             .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.SUBTEXT);
           Text('·').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-          Text(this.assignment.dueText)
+          Text(this.deadlineText())
             .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.SUBTEXT);
           Text('·').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
