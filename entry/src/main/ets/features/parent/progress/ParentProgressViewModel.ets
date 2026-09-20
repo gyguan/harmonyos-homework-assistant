@@ -1,6 +1,5 @@
 import {
   AssignmentDateFilter,
-  AssignmentFilter,
   AssignmentTypeFilter
 } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus, StudentProfile } from '../../../domain/model/HomeworkModels';
@@ -49,6 +48,4 @@ export class ParentProgressViewModel {
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
   }
-
-
 }
