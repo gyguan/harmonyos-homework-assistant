@@ -17,14 +17,14 @@ def main() -> int:
         ).json()
         token = login["token"]
         student_id = "student-xiaoyu-001"
-        paper_id = "MATH-G3-STARTER-001"
+        paper_id = "MATH-G2-STARTER-001"
 
         paper = expect(
             http(base_url, "GET", f"/api/v1/practice/papers/{paper_id}?version=1", token=token),
             (200,),
             "load practice paper",
         ).json()
-        core_paper_id = "MATH-G3-CORE-001"
+        core_paper_id = "MATH-G2-S1-ADD-SUB-001"
         core_paper = expect(
             http(base_url, "GET", f"/api/v1/practice/papers/{core_paper_id}?version=1", token=token),
             (200,),
@@ -35,6 +35,8 @@ def main() -> int:
                 "formal practice paper must expose 12 curated questions")
         require(core_paper.get("sourceType") == "PRESET",
                 "formal practice paper must retain PRESET source type")
+        require(core_paper.get("semester") == "S1",
+                "G2 first-semester paper must expose semester=S1")
         core_attempt = expect(
             http(
                 base_url,
@@ -48,6 +50,18 @@ def main() -> int:
         ).json()
         require(len(core_attempt.get("questions") or []) == 12,
                 "formal practice attempt did not load catalog questions")
+
+        expect(
+            http(
+                base_url,
+                "POST",
+                f"/api/v1/students/{student_id}/practice/attempts",
+                token=token,
+                payload={"paperId": "MATH-G3-STARTER-001", "paperVersion": 1},
+            ),
+            (409,),
+            "reject cross-grade practice attempt",
+        )
 
         require(paper.get("id") == paper_id, "practice paper id mismatch")
         require(int(paper.get("questionCount", 0)) == 10, "practice paper must expose 10 starter questions")
@@ -83,7 +97,7 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{attempt_id}/answers/{first_id}",
                 token=token,
-                payload={"answerValue": "30"},
+                payload={"answerValue": "10"},
             ),
             (200,),
             "save correct practice answer",
@@ -106,7 +120,7 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{attempt_id}/notes/{first_id}",
                 token=token,
-                payload={"content": "先看乘法关系"},
+                payload={"content": "先看清十位和个位"},
             ),
             (200,),
             "create first practice note",
@@ -117,12 +131,12 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{attempt_id}/notes/{first_id}",
                 token=token,
-                payload={"content": "三乘十等于三十，注意先确认乘数"},
+                payload={"content": "7加3等于10，先看清加号"},
             ),
             (200,),
             "update first practice note",
         ).json()
-        require(updated_note.get("content") == "三乘十等于三十，注意先确认乘数",
+        require(updated_note.get("content") == "7加3等于10，先看清加号",
                 "practice note update was not persisted")
 
         expect(
@@ -131,7 +145,7 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{attempt_id}/notes/{second_id}",
                 token=token,
-                payload={"content": "这题乘法容易看错"},
+                payload={"content": "第二题要注意两个加数"},
             ),
             (200,),
             "save note on wrong question",
@@ -167,7 +181,7 @@ def main() -> int:
         require(int(reloaded.get("noteCount", 0)) == 2, "practice note count mismatch before submission")
         notes = reloaded.get("notes") or []
         require(any(item.get("questionId") == first_id and
-                    item.get("content") == "三乘十等于三十，注意先确认乘数" for item in notes),
+                    item.get("content") == "7加3等于10，先看清加号" for item in notes),
                 "updated first practice note missing")
         require(any(item.get("questionId") == second_id for item in notes),
                 "wrong-question note missing")
@@ -188,12 +202,12 @@ def main() -> int:
 
         results = result.get("questions") or []
         require(len(results) == 10, "practice result missing question review")
-        require(results[0].get("correct") is True and results[0].get("correctAnswer") == "30",
+        require(results[0].get("correct") is True and results[0].get("correctAnswer") == "10",
                 "correct numeric question was not judged correctly")
-        require(results[0].get("noteContent") == "三乘十等于三十，注意先确认乘数",
+        require(results[0].get("noteContent") == "7加3等于10，先看清加号",
                 "result did not preserve first question note")
         require(results[1].get("correct") is False, "wrong numeric question was not judged incorrectly")
-        require(results[1].get("noteContent") == "这题乘法容易看错",
+        require(results[1].get("noteContent") == "第二题要注意两个加数",
                 "result did not preserve wrong-question note")
 
         loaded_result = expect(
@@ -216,7 +230,7 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{attempt_id}/answers/{first_id}",
                 token=token,
-                payload={"answerValue": "31"},
+                payload={"answerValue": "11"},
             ),
             (409,),
             "reject answer mutation after practice submission",
@@ -271,13 +285,13 @@ def main() -> int:
 
         previous = repeated.get("previousAnswers") or []
         previous_first = next((item for item in previous if item.get("questionId") == first_id), None)
-        require(previous_first is not None and previous_first.get("answerValue") == "30",
+        require(previous_first is not None and previous_first.get("answerValue") == "10",
                 "repeat did not expose the student's previous answer")
         require(previous_first.get("correct") is True,
                 "repeat previous answer must preserve previous correctness")
         previous_notes = repeated.get("previousNotes") or []
         require(any(item.get("questionId") == first_id and
-                    item.get("content") == "三乘十等于三十，注意先确认乘数" for item in previous_notes),
+                    item.get("content") == "7加3等于10，先看清加号" for item in previous_notes),
                 "repeat did not expose the source note")
         require((repeated.get("answers") or []) == [],
                 "new repeat attempt must start with an empty current answer set")
@@ -323,7 +337,7 @@ def main() -> int:
                 "wrong-only attempt must start with empty current notes")
         wrong_previous_notes = wrong_only.get("previousNotes") or []
         require(any(item.get("questionId") == second_id and
-                    item.get("content") == "这题乘法容易看错" for item in wrong_previous_notes),
+                    item.get("content") == "第二题要注意两个加数" for item in wrong_previous_notes),
                 "wrong-only attempt must expose source note for included wrong question")
         require(not any(item.get("questionId") == first_id for item in wrong_previous_notes),
                 "wrong-only attempt must not expose source notes for excluded correct questions")
@@ -334,7 +348,7 @@ def main() -> int:
                 "PUT",
                 f"/api/v1/practice/attempts/{wrong_only_id}/answers/{second_id}",
                 token=token,
-                payload={"answerValue": "44"},
+                payload={"answerValue": "12"},
             ),
             (200,),
             "save corrected wrong-only answer",
