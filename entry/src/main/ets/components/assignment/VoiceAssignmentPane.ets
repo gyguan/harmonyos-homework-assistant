@@ -269,8 +269,10 @@ export struct VoiceAssignmentPane {
     }
 
     let requestVersion = ++this.imageRequestVersion;
+    this.imageIndex = index;
     this.imageLoading = true;
     this.imageLoadMessage = '';
+    this.notifyMediaState();
     let uri = await this.loadImage(index);
     if (requestVersion !== this.imageRequestVersion) return;
 
@@ -280,7 +282,6 @@ export struct VoiceAssignmentPane {
       return;
     }
 
-    this.imageIndex = index;
     this.notifyMediaState();
     void this.prefetchNextImage(index);
   }
