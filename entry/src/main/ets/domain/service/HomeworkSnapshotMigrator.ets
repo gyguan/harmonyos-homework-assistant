@@ -210,5 +210,13 @@ export class HomeworkSnapshotMigrator {
       !Array.isArray(snapshot.tutorSessions)) {
       throw new Error('本地作业数据结构不完整');
     }
+    if (snapshot.schemaVersion >= 8) {
+      for (let assignment of snapshot.assignments) {
+        if (assignment.backing !== AssignmentBacking.LOCAL_SEED &&
+          assignment.backing !== AssignmentBacking.REMOTE) {
+          throw new Error(`本地作业数据缺少有效 backing: ${assignment.id}`);
+        }
+      }
+    }
   }
 }
