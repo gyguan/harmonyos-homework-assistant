@@ -19,6 +19,34 @@
         }
       }
     ],
+    "extensionAbilities": [
+      {
+        "name": "HomeworkShareExtensionAbility",
+        "srcEntry": "./ets/share/HomeworkShareExtensionAbility.ets",
+        "type": "share",
+        "description": "$string:share_extension_desc",
+        "exported": true,
+        "label": "$string:share_extension_label",
+        "icon": "$media:app_icon",
+        "skills": [
+          {
+            "actions": ["ohos.want.action.sendData"],
+            "uris": [
+              {
+                "scheme": "file",
+                "utd": "general.text",
+                "maxFileSupported": 1
+              },
+              {
+                "scheme": "file",
+                "utd": "general.image",
+                "maxFileSupported": 9
+              }
+            ]
+          }
+        ]
+      }
+    ],
     "abilities": [
       {
         "name": "EntryAbility",
