@@ -5,6 +5,8 @@ import {
 } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
+import { AssignmentDateRange } from '../../../domain/service/AssignmentDateRange';
+import { AssignmentFilterFactory } from '../../../domain/service/AssignmentFilterFactory';
 
 export class StudentAssignmentsViewModel {
   private readonly repository: AssignmentRepository;
@@ -15,7 +17,7 @@ export class StudentAssignmentsViewModel {
 
   assignments(typeFilter: AssignmentTypeFilter, subjectCode: string,
     dateFilter: AssignmentDateFilter, statuses: AssignmentStatus[] = []): Assignment[] {
-    return this.repository.listCached(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
+    return this.repository.listCached(AssignmentFilterFactory.create(typeFilter, subjectCode, dateFilter, statuses));
   }
 
   calendarAssignments(typeFilter: AssignmentTypeFilter, subjectCode: string): Assignment[] {
@@ -25,32 +27,23 @@ export class StudentAssignmentsViewModel {
 
   assignmentsOnDay(typeFilter: AssignmentTypeFilter, subjectCode: string, dayEpochMs: number): Assignment[] {
     let source = this.calendarAssignments(typeFilter, subjectCode);
-    let targetDay = StudentAssignmentsViewModel.startOfDay(dayEpochMs);
+    let targetDay = AssignmentDateRange.startOfDay(dayEpochMs);
     let result: Assignment[] = [];
     for (let item of source) {
       if (item.dueAtEpochMs <= 0) continue;
-      if (StudentAssignmentsViewModel.startOfDay(item.dueAtEpochMs) === targetDay) result.push(item);
+      if (AssignmentDateRange.startOfDay(item.dueAtEpochMs) === targetDay) result.push(item);
     }
     return result;
   }
 
   async query(typeFilter: AssignmentTypeFilter, subjectCode: string,
     dateFilter: AssignmentDateFilter, statuses: AssignmentStatus[] = []): Promise<Assignment[]> {
-    return this.repository.query(this.buildFilter(typeFilter, subjectCode, dateFilter, statuses));
+    return this.repository.query(AssignmentFilterFactory.create(typeFilter, subjectCode, dateFilter, statuses));
   }
 
   queryOnDay(subjectCode: string, dayEpochMs: number,
     statuses: AssignmentStatus[] = []): Promise<Assignment[]> {
-    let day = StudentAssignmentsViewModel.startOfDay(dayEpochMs);
-    return this.repository.query({
-      assignmentType: AssignmentTypeFilter.ALL,
-      subjectCode: subjectCode,
-      dateFilter: AssignmentDateFilter.CUSTOM,
-      fromEpochMs: day,
-      toEpochMs: StudentAssignmentsViewModel.endOfDay(day),
-      undatedOnly: false,
-      statuses: statuses
-    });
+    return this.repository.query(AssignmentFilterFactory.forDay(subjectCode, dayEpochMs, statuses));
   }
 
   allCount(): number {
@@ -65,51 +58,5 @@ export class StudentAssignmentsViewModel {
     return this.repository.refresh();
   }
 
-  private buildFilter(typeFilter: AssignmentTypeFilter, subjectCode: string,
-    dateFilter: AssignmentDateFilter, statuses: AssignmentStatus[]): AssignmentFilter {
-    let fromEpochMs = 0;
-    let toEpochMs = 0;
-    let undatedOnly = dateFilter === AssignmentDateFilter.UNDATED;
-    let today = StudentAssignmentsViewModel.startOfDay(Date.now());
-    if (dateFilter === AssignmentDateFilter.TODAY) {
-      fromEpochMs = today;
-      toEpochMs = StudentAssignmentsViewModel.endOfDay(today);
-    } else if (dateFilter === AssignmentDateFilter.TOMORROW) {
-      let tomorrow = StudentAssignmentsViewModel.addDays(today, 1);
-      fromEpochMs = tomorrow;
-      toEpochMs = StudentAssignmentsViewModel.endOfDay(tomorrow);
-    } else if (dateFilter === AssignmentDateFilter.THIS_WEEK) {
-      fromEpochMs = today;
-      toEpochMs = StudentAssignmentsViewModel.endOfWeek(today);
-    }
-    return {
-      assignmentType: typeFilter,
-      subjectCode: subjectCode,
-      dateFilter: dateFilter,
-      fromEpochMs: fromEpochMs,
-      toEpochMs: toEpochMs,
-      undatedOnly: undatedOnly,
-      statuses: statuses
-    };
-  }
 
-  private static startOfDay(epochMs: number): number {
-    let value = new Date(epochMs);
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
-  }
-
-  private static endOfDay(dayStart: number): number {
-    return StudentAssignmentsViewModel.addDays(dayStart, 1) - 1;
-  }
-
-  private static addDays(dayStart: number, days: number): number {
-    let value = new Date(dayStart);
-    return new Date(value.getFullYear(), value.getMonth(), value.getDate() + days).getTime();
-  }
-
-  private static endOfWeek(todayStart: number): number {
-    let weekday = new Date(todayStart).getDay();
-    let mondayBased = weekday === 0 ? 7 : weekday;
-    return StudentAssignmentsViewModel.addDays(todayStart, 8 - mondayBased) - 1;
-  }
 }
