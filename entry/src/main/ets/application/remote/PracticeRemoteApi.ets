@@ -1,14 +1,18 @@
 import { http } from '@kit.NetworkKit';
 import {
   PracticeAnswer,
+  PracticeGrade,
   PracticeAttempt,
   PracticeAttemptMode,
+  PracticeAttemptSummary,
   PracticeAttemptStatus,
   PracticeQuestion,
   PracticeQuestionOption,
   PracticeQuestionResult,
   PracticeQuestionType,
-  PracticeResult
+  PracticePreviousAnswer,
+  PracticeResult,
+  PracticeSubject
 } from '../../domain/model/practice/PracticeModels';
 import { BackendHttpClient } from './BackendHttpClient';
 
@@ -18,11 +22,19 @@ interface RemotePracticeQuestion {
   options: RemotePracticeOption[]; hints: string[]; tags: string[];
 }
 interface RemotePracticeAnswer { questionId: string; answerValue: string; answeredAtEpochMs: number; }
+interface RemotePracticePreviousAnswer { questionId: string; answerValue: string; correct: boolean; }
+interface RemotePracticeAttemptSummary {
+  id: string; paperId: string; paperVersion: number; paperTitle: string; grade: string; subject: string;
+  attemptNo: number; mode: string; status: string; sourceAttemptId: string; startedAtEpochMs: number;
+  submittedAtEpochMs: number; elapsedSeconds: number; answeredCount: number; questionCount: number;
+  score: number; maxScore: number; correctCount: number; wrongCount: number;
+}
 interface RemotePracticeAttempt {
   id: string; studentId: string; paperId: string; paperVersion: number; attemptNo: number;
-  mode: string; status: string; startedAtEpochMs: number; submittedAtEpochMs: number;
+  mode: string; status: string; sourceAttemptId: string; startedAtEpochMs: number; submittedAtEpochMs: number;
   elapsedSeconds: number; answeredCount: number; questionCount: number;
   questions: RemotePracticeQuestion[]; answers: RemotePracticeAnswer[];
+  previousAnswers: RemotePracticePreviousAnswer[];
 }
 interface RemotePracticeQuestionResult {
   questionId: string; orderNo: number; stem: string; answerValue: string;
@@ -46,6 +58,33 @@ export class PracticeRemoteApi {
       'practice.attempt.start', `/api/v1/students/${encodeURIComponent(studentId)}/practice/attempts`,
       http.RequestMethod.POST, body);
     if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`开始练习失败: ${response.statusCode}`);
+    return this.mapAttempt(JSON.parse(response.body) as RemotePracticeAttempt);
+  }
+
+  async listAttempts(studentId: string, paperId: string = ''): Promise<PracticeAttemptSummary[]> {
+    let suffix = paperId.length > 0 ? `?paperId=${encodeURIComponent(paperId)}` : '';
+    let response = await BackendHttpClient.instance.requestFor(
+      'practice.history.list',
+      `/api/v1/students/${encodeURIComponent(studentId)}/practice/attempts${suffix}`,
+      http.RequestMethod.GET);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`读取练习历史失败: ${response.statusCode}`);
+    }
+    let remote = JSON.parse(response.body) as RemotePracticeAttemptSummary[];
+    let result: PracticeAttemptSummary[] = [];
+    for (let item of remote) result.push(this.mapSummary(item));
+    return result;
+  }
+
+  async repeatAttempt(attemptId: string): Promise<PracticeAttempt> {
+    let response = await BackendHttpClient.instance.requestFor(
+      'practice.attempt.repeat',
+      `/api/v1/practice/attempts/${encodeURIComponent(attemptId)}/repeat`,
+      http.RequestMethod.POST);
+    if (response.statusCode === 409) throw new Error('只有已交卷练习才能再练一遍');
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`再次练习失败: ${response.statusCode}`);
+    }
     return this.mapAttempt(JSON.parse(response.body) as RemotePracticeAttempt);
   }
 
@@ -101,12 +140,40 @@ export class PracticeRemoteApi {
     for (let answer of remote.answers) {
       answers.push({ questionId: answer.questionId, answerValue: answer.answerValue, answeredAtEpochMs: answer.answeredAtEpochMs });
     }
+    let previousAnswers: PracticePreviousAnswer[] = [];
+    for (let answer of remote.previousAnswers) {
+      previousAnswers.push({ questionId: answer.questionId, answerValue: answer.answerValue, correct: answer.correct });
+    }
     return {
       id: remote.id, studentId: remote.studentId, paperId: remote.paperId, paperVersion: remote.paperVersion,
       attemptNo: remote.attemptNo, mode: remote.mode as PracticeAttemptMode, status: remote.status as PracticeAttemptStatus,
-      startedAtEpochMs: remote.startedAtEpochMs, submittedAtEpochMs: remote.submittedAtEpochMs,
+      sourceAttemptId: remote.sourceAttemptId, startedAtEpochMs: remote.startedAtEpochMs, submittedAtEpochMs: remote.submittedAtEpochMs,
       elapsedSeconds: remote.elapsedSeconds, answeredCount: remote.answeredCount, questionCount: remote.questionCount,
-      questions: questions, answers: answers
+      questions: questions, answers: answers, previousAnswers: previousAnswers
+    };
+  }
+
+  private mapSummary(remote: RemotePracticeAttemptSummary): PracticeAttemptSummary {
+    return {
+      id: remote.id,
+      paperId: remote.paperId,
+      paperVersion: remote.paperVersion,
+      paperTitle: remote.paperTitle,
+      grade: remote.grade as PracticeGrade,
+      subject: remote.subject as PracticeSubject,
+      attemptNo: remote.attemptNo,
+      mode: remote.mode as PracticeAttemptMode,
+      status: remote.status as PracticeAttemptStatus,
+      sourceAttemptId: remote.sourceAttemptId,
+      startedAtEpochMs: remote.startedAtEpochMs,
+      submittedAtEpochMs: remote.submittedAtEpochMs,
+      elapsedSeconds: remote.elapsedSeconds,
+      answeredCount: remote.answeredCount,
+      questionCount: remote.questionCount,
+      score: remote.score,
+      maxScore: remote.maxScore,
+      correctCount: remote.correctCount,
+      wrongCount: remote.wrongCount
     };
   }
 
