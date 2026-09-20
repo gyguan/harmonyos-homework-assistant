@@ -17,6 +17,11 @@ export class AssignmentAudioPlayerService {
   async prepare(sourceUri: string, callbacks: AssignmentAudioPlayerCallbacks): Promise<void> {
     await this.release();
     this.callbacks = callbacks;
+    if (!canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
+      callbacks.onError('当前设备不支持语音播放');
+      this.callbacks = null;
+      return;
+    }
     try {
       let player = await media.createAVPlayer();
       this.player = player;
@@ -70,6 +75,10 @@ export class AssignmentAudioPlayerService {
   }
 
   seek(timeMs: number): void {
+    if (!canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
+      if (this.callbacks !== null) this.callbacks.onError('当前设备不支持语音播放');
+      return;
+    }
     let player = this.player;
     if (player === null) return;
     if (player.state !== 'prepared' && player.state !== 'playing' &&
