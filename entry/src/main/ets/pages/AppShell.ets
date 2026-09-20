@@ -3,7 +3,9 @@ import {
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
   ParentCaptureSpikeRouteParam,
+  ParentImportBatchRouteParam,
   ParentImportConfirmationRouteParam,
+  ParentImportInboxRouteParam,
   ParentImportRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
@@ -25,6 +27,8 @@ import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboar
 import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
 import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceAssignmentPage';
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
+import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImportInboxPage';
+import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkCaptureSpikePage } from '../experimental/homeworkcapture/HomeworkCaptureSpikePage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
@@ -211,6 +215,16 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.PARENT_IMPORT, new ParentImportRouteParam());
   }
 
+  private openParentImportInbox(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_IMPORT_INBOX, new ParentImportInboxRouteParam());
+  }
+
+  private openParentImportBatch(batchId: string): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_IMPORT_BATCH_DETAIL, new ParentImportBatchRouteParam(batchId));
+  }
+
   private openParentCaptureSpike(): void {
     this.navPathStack.pushPathByName(
       AppRoute.PARENT_CAPTURE_SPIKE, new ParentCaptureSpikeRouteParam());
@@ -345,8 +359,28 @@ export struct AppShell {
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => this.openParentImportConfirmation(),
+          onOpenInbox: () => this.openParentImportInbox(),
           onOpenCaptureSpike: () => this.openParentCaptureSpike(),
           onStoreChanged: () => this.notifyUiChanged()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_IMPORT_INBOX) {
+      NavDestination() {
+        HomeworkImportInboxPage({
+          onBack: () => this.navPathStack.pop(),
+          onOpenBatch: (batchId: string) => this.openParentImportBatch(batchId)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_IMPORT_BATCH_DETAIL) {
+      NavDestination() {
+        HomeworkImportBatchDetailPage({
+          batchId: (param as ParentImportBatchRouteParam).batchId,
+          onBack: () => this.navPathStack.pop(),
+          onOpenConfirmation: () => this.openParentImportConfirmation()
         });
       }
       .hideTitleBar(true)
