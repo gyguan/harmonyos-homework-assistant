@@ -438,7 +438,7 @@ export struct ParentReviewPane {
 
     }
     .width('100%')
-    .bindSheet($this.showEditSheet, this.AssignmentEditorSheet(), {
+    .bindSheet($$this.showEditSheet, this.AssignmentEditorSheet(), {
       height: '82%',
       showClose: false,
       preferType: SheetType.BOTTOM,
