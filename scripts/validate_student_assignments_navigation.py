@@ -118,11 +118,18 @@ for token in ["@CustomDialog", "@Link typeFilter", "@Link dateFilter", "@Link su
 for legacy in ["showFilterPage", "FilterPage()", "bindSheet", "FilterOverlay", "FilterPanel"]:
     require(legacy not in page, f"legacy filter implementation must not return: {legacy}")
 
-for state_array in ["needHandlingAssignments", "notStartedAssignments", "submittedAssignments", "completedAssignments"]:
-    require(f"ForEach(this.{state_array}" in page,
-            f"assignment group must render directly from observable state: {state_array}")
-    require(f"Text(`${{this.{state_array}.length}}`)" in page,
-            f"assignment group count must be reactive: {state_array}")
+for getter in [
+    "currentNeedHandlingAssignments",
+    "currentNotStartedAssignments",
+    "currentSubmittedAssignments",
+    "currentCompletedAssignments",
+]:
+    require(f"ForEach(this.{getter}()" in page,
+            f"assignment group must render from revision-aware data: {getter}")
+    require(f"Text(`${{this.{getter}().length}}`)" in page,
+            f"assignment group count must be revision-aware: {getter}")
+require("snapshotRevision" in page and "currentVisibleAssignments" in page,
+        "assignment list must invalidate cached groups when repository revision changes")
 
 require("SingleColumnWorkspace" in study and "SplitWorkspace" in study and "Button('问小伴'" in study,
         "Study must keep Phone standalone Tutor flow and add Pad Study+Tutor split composition")
