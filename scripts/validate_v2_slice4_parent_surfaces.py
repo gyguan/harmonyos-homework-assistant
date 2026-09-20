@@ -153,7 +153,7 @@ require("AssignmentEditForm" in confirmation_editor,
 require("DeadlinePickerField" in shared_editor and "预计用时（分钟）" in shared_editor and
         "教材 / 页码" in shared_editor and "作业标题" in shared_editor,
         "shared assignment editor must own the common title/deadline/duration/textbook fields")
-require("bindSheet($this.showEditSheet" in review_pane and "AssignmentEditorSheet" in review_pane,
+require("bindSheet($$this.showEditSheet" in review_pane and "AssignmentEditorSheet" in review_pane,
         "published assignment editing must open in a bottom sheet rather than inline")
 require("AssignmentStatus.SUBMITTED" in review_pane and "AssignmentStatus.COMPLETED" in review_pane and
         "private canEdit(item: Assignment)" in review_pane,
