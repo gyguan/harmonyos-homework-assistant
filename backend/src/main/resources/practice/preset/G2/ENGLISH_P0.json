@@ -30,7 +30,7 @@
           "id": "ENGLISH-G2-S1-P0-E01-001-Q01",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
-          "stem": "What do they say?",
+          "stem": "Look at the morning picture. What do they say?",
           "options": [
             {
               "key": "A",
@@ -380,7 +380,7 @@
           "id": "ENGLISH-G2-S1-P0-E01-001-Q11",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
-          "stem": "What do they say?",
+          "stem": "Look at the after-school picture. What do they say?",
           "options": [
             {
               "key": "A",
@@ -544,7 +544,7 @@
           "id": "ENGLISH-G2-S1-P0-E02-001-Q03",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
-          "stem": "Choose the right sentence.",
+          "stem": "Look at the girl. Choose the right sentence.",
           "options": [
             {
               "key": "A",
@@ -579,7 +579,7 @@
           "id": "ENGLISH-G2-S1-P0-E02-001-Q04",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
-          "stem": "Choose the right sentence.",
+          "stem": "Look at the boy. Choose the right sentence.",
           "options": [
             {
               "key": "A",
@@ -754,7 +754,7 @@
           "id": "ENGLISH-G2-S1-P0-E02-001-Q09",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
-          "stem": "What is it?",
+          "stem": "Which word matches the picture?",
           "options": [
             {
               "key": "A",
@@ -789,7 +789,7 @@
           "id": "ENGLISH-G2-S1-P0-E02-001-Q10",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
-          "stem": "What is it?",
+          "stem": "What is this room item called?",
           "options": [
             {
               "key": "A",
