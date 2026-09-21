@@ -37,7 +37,10 @@ struct HomeworkCaptureFloatView {
       this.statusText = '等待系统授权';
       this.detailText = '同意屏幕采集后，再进入班级群手工上滑';
     } else if (session.status === CaptureSessionStatus.CAPTURING) {
-      if (progress.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
+      if (progress.groupValidationStatus === SourceGroupValidationStatus.CONFLICT) {
+        this.statusText = '检测到多个微信群';
+        this.detailText = '请结束本次采集，并从目标班级群重新开始';
+      } else if (progress.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
         this.statusText = '当前群与配置不一致';
         this.detailText = `识别到“${progress.detectedGroupTitle}”，请返回正确班级群`;
       } else if (progress.timeBoundaryReached) {
@@ -73,6 +76,9 @@ struct HomeworkCaptureFloatView {
         if (!result.reconstructionSucceeded) {
           this.statusText = '采集已完成，聊天重建待处理';
           this.detailText = '原始屏幕证据已保留，请返回小伴查看';
+        } else if (result.groupValidationStatus === SourceGroupValidationStatus.CONFLICT) {
+          this.statusText = '检测到多个微信群';
+          this.detailText = '为避免混入其他群消息，本次不会自动整理';
         } else if (result.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
           this.statusText = '群名不一致';
           this.detailText = '本次不会自动整理为作业，请返回小伴查看';
