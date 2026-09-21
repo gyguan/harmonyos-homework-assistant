@@ -34,6 +34,7 @@ export interface HomeworkCaptureWorkflowResult {
   pendingReviewCount: number;
   activated: boolean;
   needsGroupConfirmation: boolean;
+  reconstructionSucceeded: boolean;
 }
 
 export class HomeworkCaptureWorkflowService {
@@ -93,8 +94,25 @@ export class HomeworkCaptureWorkflowService {
 
   private finalize(session: CaptureSession, allowUnrecognized: boolean): HomeworkCaptureWorkflowResult {
     let profile = this.requireProfile(session.sourceProfileId, session.studentId);
-    let reconstruction = HomeworkChatReconstructionService.instance.reconstructCaptureSession(
+    let reconstruction = HomeworkChatReconstructionService.instance.tryReconstructCaptureSession(
       session.id, session.importBatchId, profile.defaultStartMinuteOfDay);
+    if (reconstruction === null) {
+      this.writeProfileAudit(
+        session.importBatchId, profile, '', SourceGroupValidationStatus.UNRECOGNIZED, false);
+      return {
+        session: session,
+        batchId: session.importBatchId,
+        detectedGroupTitle: '',
+        groupValidationStatus: SourceGroupValidationStatus.UNRECOGNIZED,
+        timeBoundaryReached: false,
+        earliestDetectedTime: '',
+        candidateCount: 0,
+        pendingReviewCount: 0,
+        activated: false,
+        needsGroupConfirmation: false,
+        reconstructionSucceeded: false
+      };
+    }
     let validation = this.validateGroupTitle(profile.groupTitle, reconstruction.groupTitle);
 
     this.writeProfileAudit(
@@ -116,7 +134,8 @@ export class HomeworkCaptureWorkflowService {
         candidateCount: 0,
         pendingReviewCount: 0,
         activated: false,
-        needsGroupConfirmation: validation === SourceGroupValidationStatus.UNRECOGNIZED
+        needsGroupConfirmation: validation === SourceGroupValidationStatus.UNRECOGNIZED,
+        reconstructionSucceeded: true
       };
     }
 
@@ -136,7 +155,8 @@ export class HomeworkCaptureWorkflowService {
       candidateCount: activation.result.candidates.length,
       pendingReviewCount: activation.result.pendingReviewMessageIds.length,
       activated: activation.activated,
-      needsGroupConfirmation: false
+      needsGroupConfirmation: false,
+      reconstructionSucceeded: true
     };
   }
 
