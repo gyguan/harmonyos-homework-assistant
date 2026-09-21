@@ -33,7 +33,7 @@ route_page = read("entry/src/main/ets/features/parent/import/HomeworkImportRoute
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
-fixture = read("entry/src/main/ets/experimental/homeworkcapture/Issue244CaptureSessionFixture.ets")
+fixture = read("entry/src/test/fixtures/Issue244CaptureSessionFixture.ets")
 spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
@@ -167,8 +167,6 @@ require("messages.length === 2" in fixture,
         "#244 fixture must generate two OCR evidence messages")
 require("batch.captureSessionId === completed.id" in fixture,
         "#244 fixture must verify Session/Batch traceability")
-require("运行 #244 离线流程自测" in spike,
-        "diagnostic page must expose independent #244 fixture acceptance")
 
 if errors:
     print("ISSUE_244_GUIDED_CAPTURE_GATE_FAIL")
