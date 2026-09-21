@@ -2,7 +2,8 @@ import { image } from '@kit.ImageKit';
 import { textRecognition } from '@kit.CoreVisionKit';
 import {
   CaptureFrame,
-  CaptureFrameRecognition
+  CaptureFrameRecognition,
+  CaptureOcrLineEvidence
 } from '../../domain/model/CaptureModels';
 import { HomeworkCaptureFrameRecognizer } from '../../domain/port/HomeworkCaptureFrameRecognizer';
 
@@ -33,11 +34,38 @@ export class CoreVisionHomeworkCaptureFrameRecognizer implements HomeworkCapture
         isDirectionDetectionSupported: false
       };
       let result = await textRecognition.recognizeText(visionInfo, configuration);
-      let lineCount = 0;
-      for (let block of result.blocks) lineCount += block.lines.length;
+      let lines: CaptureOcrLineEvidence[] = [];
+      for (let block of result.blocks) {
+        for (let line of block.lines) {
+          let left = 0;
+          let top = 0;
+          let right = 0;
+          let bottom = 0;
+          if (line.cornerPoints.length > 0) {
+            left = line.cornerPoints[0].x;
+            right = line.cornerPoints[0].x;
+            top = line.cornerPoints[0].y;
+            bottom = line.cornerPoints[0].y;
+            for (let point of line.cornerPoints) {
+              if (point.x < left) left = point.x;
+              if (point.x > right) right = point.x;
+              if (point.y < top) top = point.y;
+              if (point.y > bottom) bottom = point.y;
+            }
+          }
+          lines.push({
+            value: line.value.trim(),
+            left: left,
+            top: top,
+            right: right,
+            bottom: bottom
+          });
+        }
+      }
       return {
         text: result.value.trim(),
-        lineCount: lineCount
+        lineCount: lines.length,
+        lines: lines
       };
     } finally {
       try {
