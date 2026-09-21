@@ -44,13 +44,7 @@ export class HomeworkCaptureOcrService {
         if (point.y > bottom) bottom = point.y;
       }
     }
-    return {
-      value: line.value,
-      left: left,
-      top: top,
-      right: right,
-      bottom: bottom
-    };
+    return { value: line.value, left, top, right, bottom };
   }
 
   async recognize(frame: CaptureFrame): Promise<HomeworkCaptureOcrResult> {
@@ -58,31 +52,24 @@ export class HomeworkCaptureOcrService {
     let options: image.InitializationOptions = {
       editable: false,
       pixelFormat: image.PixelMapFormat.RGBA_8888,
-      size: {
-        width: frame.width,
-        height: frame.height
-      }
+      size: { width: frame.width, height: frame.height }
     };
     let pixelMap = await image.createPixelMap(frame.data, options);
     try {
-      let visionInfo: textRecognition.VisionInfo = {
-        pixelMap: pixelMap
-      };
+      let visionInfo: textRecognition.VisionInfo = { pixelMap };
       let configuration: textRecognition.TextRecognitionConfiguration = {
         isDirectionDetectionSupported: false
       };
       let result = await textRecognition.recognizeText(visionInfo, configuration);
       let lines: HomeworkCaptureOcrLine[] = [];
       for (let block of result.blocks) {
-        for (let line of block.lines) {
-          lines.push(this.lineEvidence(line));
-        }
+        for (let line of block.lines) lines.push(this.lineEvidence(line));
       }
       return {
         text: result.value.trim(),
         blockCount: result.blocks.length,
         lineCount: lines.length,
-        lines: lines
+        lines
       };
     } catch {
       throw new Error('Core Vision OCR 执行失败');
@@ -90,7 +77,7 @@ export class HomeworkCaptureOcrService {
       try {
         void pixelMap.release();
       } catch {
-        // PixelMap release is best-effort in this isolated feasibility spike.
+        // PixelMap release is best-effort in the isolated capture diagnostic flow.
       }
     }
   }

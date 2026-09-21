@@ -2,7 +2,7 @@ import {
   AppRoute,
   ParentCaptureHomeRouteParam,
   ParentCaptureRouteParam,
-  ParentCaptureSpikeRouteParam,
+  ParentCaptureDiagnosticRouteParam,
   ParentImportBatchRouteParam,
   ParentImportConfirmationRouteParam,
   ParentImportInboxRouteParam,
@@ -37,8 +37,9 @@ export class ParentImportNavigator {
       AppRoute.PARENT_SOURCE_PROFILE, new ParentSourceProfileRouteParam(startCaptureAfterSave));
   }
 
-  static openCaptureSpike(stack: NavPathStack): void {
-    stack.pushPathByName(AppRoute.PARENT_CAPTURE_SPIKE, new ParentCaptureSpikeRouteParam());
+  static openCaptureDiagnostics(stack: NavPathStack): void {
+    stack.pushPathByName(
+      AppRoute.PARENT_CAPTURE_DIAGNOSTIC, new ParentCaptureDiagnosticRouteParam());
   }
 
   static openConfirmation(stack: NavPathStack): void {

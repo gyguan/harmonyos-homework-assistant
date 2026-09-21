@@ -174,14 +174,14 @@ export struct HomeworkCaptureHomePage {
           .fontSize(12)
           .fontColor(AppTheme.TERTIARY_TEXT);
         Blank();
-        Text('屏幕采集技术诊断 ›')
+        Text('屏幕采集诊断 ›')
           .fontSize(12)
           .fontColor(AppTheme.PRIMARY);
       }
       .width('100%')
       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
       .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText('打开屏幕采集技术诊断')
+      .accessibilityText('打开屏幕采集诊断')
       .onClick(() => this.onOpenDiagnostics());
     }
     .width('100%')

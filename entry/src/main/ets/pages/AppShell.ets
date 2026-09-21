@@ -30,7 +30,7 @@ import { HomeworkImportBatchDetailPage } from '../features/parent/import/Homewor
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
 import { HomeworkCapturePage } from '../features/parent/import/HomeworkCapturePage';
 import { HomeworkSourceProfilePage } from '../features/parent/import/HomeworkSourceProfilePage';
-import { HomeworkCaptureSpikePage } from '../experimental/homeworkcapture/HomeworkCaptureSpikePage';
+import { HomeworkCaptureDiagnosticPage } from '../features/parent/import/HomeworkCaptureDiagnosticPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
@@ -381,7 +381,7 @@ export struct AppShell {
           onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
             ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave),
           onOpenHistory: () => ParentImportNavigator.openInbox(this.navPathStack),
-          onOpenDiagnostics: () => ParentImportNavigator.openCaptureSpike(this.navPathStack)
+          onOpenDiagnostics: () => ParentImportNavigator.openCaptureDiagnostics(this.navPathStack)
         });
       }
       .hideTitleBar(true)
@@ -428,9 +428,9 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_CAPTURE_SPIKE) {
+    } else if (name === AppRoute.PARENT_CAPTURE_DIAGNOSTIC) {
       NavDestination() {
-        HomeworkCaptureSpikePage({
+        HomeworkCaptureDiagnosticPage({
           onBack: () => this.navPathStack.pop()
         });
       }
