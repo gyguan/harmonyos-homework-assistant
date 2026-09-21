@@ -2,20 +2,35 @@ import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
 import { floatView, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { HomeworkCaptureSessionService } from '../../../application/capture/HomeworkCaptureSessionService';
+import {
+  HomeworkCaptureWorkflowResult,
+  HomeworkCaptureWorkflowService
+} from '../../../application/capture/HomeworkCaptureWorkflowService';
+import { HomeworkSourceProfileService } from '../../../application/capture/HomeworkSourceProfileService';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { CaptureSession, CaptureSessionStatus } from '../../../domain/model/CaptureModels';
+import { SourceGroupValidationStatus } from '../../../domain/model/HomeworkSourceProfileModels';
 
 @Component
 export struct HomeworkCapturePage {
   onBack: () => void = () => {};
   onOpenInbox: () => void = () => {};
+  onOpenConfirmation: () => void = () => {};
+  onOpenSourceProfile: () => void = () => {};
 
   @State private revision: number = 0;
   @State private message: string = '点击开始后，系统会提示屏幕采集授权。进入班级群后只需手工上滑。';
   @State private errorText: string = '';
   @State private currentSessionId: string = '';
+  @State private detectedGroupTitle: string = '';
+  @State private groupValidationStatus: SourceGroupValidationStatus = SourceGroupValidationStatus.UNRECOGNIZED;
+  @State private timeBoundaryReached: boolean = false;
+  @State private earliestDetectedTime: string = '';
+  @State private pendingGroupConfirmationBatchId: string = '';
+  private finalizedBatchId: string = '';
+  private autoStartAttempted: boolean = false;
   private floatViewController: floatView.FloatViewController | undefined = undefined;
   private refreshTimer: number = -1;
 
@@ -23,7 +38,19 @@ export struct HomeworkCapturePage {
     this.refreshTimer = setInterval(() => {
       void this.refreshSession();
     }, 1200);
-    void this.refreshSession();
+    void this.initializePage();
+  }
+
+  private async initializePage(): Promise<void> {
+    await this.refreshSession();
+    if (this.autoStartAttempted || this.currentSessionId.length > 0) return;
+    this.autoStartAttempted = true;
+    let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
+    if (HomeworkSourceProfileService.instance.getActiveProfile(studentId) === null) {
+      this.errorText = '尚未配置班级采集设置，请先完成一次配置。';
+      return;
+    }
+    await this.startCapture();
   }
 
   aboutToDisappear(): void {
@@ -51,11 +78,34 @@ export struct HomeworkCapturePage {
   }
 
   private async refreshSession(): Promise<void> {
-    let active = await HomeworkCaptureSessionService.instance.sampleLatestFrame();
-    if (active !== null) {
+    let progress = await HomeworkCaptureWorkflowService.instance.progress();
+    if (progress !== null) {
+      let active = progress.session;
       this.currentSessionId = active.id;
+      this.detectedGroupTitle = progress.detectedGroupTitle;
+      this.groupValidationStatus = progress.groupValidationStatus;
+      this.timeBoundaryReached = progress.timeBoundaryReached;
+      this.earliestDetectedTime = progress.earliestDetectedTime;
+
       if (active.status === CaptureSessionStatus.CAPTURING) {
-        this.message = '采集中：请切到目标微信群，手工向上滑动；完成后在悬浮窗点“停止采集”。';
+        if (progress.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
+          this.errorText = `当前识别群“${progress.detectedGroupTitle}”与配置“${progress.profile.groupTitle}”不一致，请确认已进入正确微信群。`;
+        } else if (progress.timeBoundaryReached) {
+          this.errorText = '';
+          this.message = `已到达今日抓取时间范围（${HomeworkSourceProfileService.instance.formatStartTime(progress.profile)}），可以结束并自动整理。`;
+        } else if (progress.groupValidationStatus === SourceGroupValidationStatus.MATCHED) {
+          this.errorText = '';
+          this.message = `已确认“${progress.profile.groupTitle}”，继续手工上滑；小伴正在读取今天的消息。`;
+        } else {
+          this.message = '正在识别群标题和聊天消息，请继续手工上滑。';
+        }
+      }
+
+      if ((active.status === CaptureSessionStatus.COMPLETED || active.status === CaptureSessionStatus.FAILED) &&
+        active.importBatchId.length > 0 && this.finalizedBatchId !== active.importBatchId) {
+        this.finalizedBatchId = active.importBatchId;
+        let result = HomeworkCaptureWorkflowService.instance.finalizeCompletedSession(active.id);
+        if (result !== null) await this.handleWorkflowResult(result);
       }
       this.revision++;
       return;
@@ -163,7 +213,7 @@ export struct HomeworkCapturePage {
 
     try {
       let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
-      let session = HomeworkCaptureSessionService.instance.start(studentId);
+      let session = HomeworkCaptureWorkflowService.instance.start(studentId);
       this.currentSessionId = session.id;
       this.revision++;
       if (session.status === CaptureSessionStatus.CANCELLED) {
@@ -179,19 +229,63 @@ export struct HomeworkCapturePage {
   }
 
   private async stopCapture(): Promise<void> {
-    let result = await HomeworkCaptureSessionService.instance.stopByUser();
+    let result = await HomeworkCaptureWorkflowService.instance.finishByUser();
     this.revision++;
     await this.stopFloatView();
     if (result === null) {
-      this.message = '当前没有正在进行的采集。';
+      this.message = '当前没有正在进行的采集，或本次没有生成导入批次。';
       return;
     }
-    this.currentSessionId = result.id;
-    if (result.importBatchId.length > 0) {
-      this.message = `采集已结束，已生成导入批次。采集到 ${result.acceptedFrameCount} 个变化画面。`;
-    } else {
-      this.message = '采集已结束，没有生成导入批次。';
+    this.currentSessionId = result.session.id;
+    this.finalizedBatchId = result.batchId;
+    await this.handleWorkflowResult(result);
+  }
+
+  private async handleWorkflowResult(result: HomeworkCaptureWorkflowResult): Promise<void> {
+    this.detectedGroupTitle = result.detectedGroupTitle;
+    this.groupValidationStatus = result.groupValidationStatus;
+    this.timeBoundaryReached = result.timeBoundaryReached;
+    this.earliestDetectedTime = result.earliestDetectedTime;
+    await this.stopFloatView();
+
+    if (result.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
+      this.errorText = `识别到群“${result.detectedGroupTitle}”，与班级采集设置不一致。本次不会自动整理为作业，请进入正确群后重新抓取。`;
+      this.message = '采集证据已保留在收件箱，未生成待发布作业。';
+      return;
     }
+
+    if (result.needsGroupConfirmation) {
+      this.pendingGroupConfirmationBatchId = result.batchId;
+      this.errorText = '';
+      this.message = '没有可靠识别到群标题。请确认当前确实是目标班级群后再继续整理。';
+      return;
+    }
+
+    this.pendingGroupConfirmationBatchId = '';
+    this.errorText = '';
+    if (result.activated && result.candidateCount > 0) {
+      this.message = `已整理出 ${result.candidateCount} 项内容，正在进入家长确认。`;
+      this.onOpenConfirmation();
+      return;
+    }
+    if (result.pendingReviewCount > 0) {
+      this.message = `已完成整理，其中 ${result.pendingReviewCount} 条消息需要人工确认，请到收件箱处理。`;
+      return;
+    }
+    this.message = result.candidateCount > 0 ?
+      `已整理出 ${result.candidateCount} 项内容，可进入收件箱继续确认。` :
+      '已完成整理，没有识别到需要发布的作业。';
+  }
+
+  private async confirmUnrecognizedGroup(): Promise<void> {
+    let batchId = this.pendingGroupConfirmationBatchId;
+    if (batchId.length === 0) return;
+    let result = HomeworkCaptureWorkflowService.instance.confirmUnrecognizedAndContinue(batchId);
+    if (result === null) {
+      this.errorText = '无法继续整理本次采集，请到收件箱查看原始消息。';
+      return;
+    }
+    await this.handleWorkflowResult(result);
   }
 
   private async cancelCapture(): Promise<void> {
@@ -224,7 +318,7 @@ export struct HomeworkCapturePage {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       DeepPageHeader({
         title: '抓取今日作业',
-        subtitle: '你手工浏览班级群，小伴只采集当前屏幕',
+        subtitle: '进群手工上滑，小伴自动识别、整理并交给你确认',
         backAccessibilityText: '返回导入老师作业',
         onBack: () => this.back()
       });
@@ -237,7 +331,7 @@ export struct HomeworkCapturePage {
               .fontSize(16)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            Text('1. 点击开始并同意系统屏幕采集授权\n2. 切到目标微信群\n3. 手工向上滑动聊天记录\n4. 到合适位置后在悬浮状态中点“停止采集”')
+            Text('1. 同意系统屏幕采集授权\n2. 切到配置的班级群\n3. 手工向上滑动聊天记录\n4. 到达默认时间范围后点“结束并整理”')
               .width('100%')
               .fontSize(13)
               .lineHeight(21)
@@ -292,8 +386,18 @@ export struct HomeworkCapturePage {
               .borderRadius(AppTheme.CONTROL_RADIUS);
           }
 
+          if (this.pendingGroupConfirmationBatchId.length > 0) {
+            Button('确认是目标班级群，继续整理', { type: ButtonType.Normal })
+              .width('100%')
+              .height(AppTheme.BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .backgroundColor(AppTheme.PRIMARY)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .onClick(() => { void this.confirmUnrecognizedGroup(); });
+          }
+
           if (!this.isRunning(this.session())) {
-            Button('开始抓取今日作业', { type: ButtonType.Normal })
+            Button('重新开始抓取', { type: ButtonType.Normal })
               .width('100%')
               .height(AppTheme.BUTTON_HEIGHT)
               .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -301,7 +405,8 @@ export struct HomeworkCapturePage {
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .onClick(() => { void this.startCapture(); });
           } else {
-            Button('停止采集并生成导入批次', { type: ButtonType.Normal })
+            Button(this.timeBoundaryReached ? '已到达时间范围，结束并整理' : '结束采集并自动整理',
+              { type: ButtonType.Normal })
               .width('100%')
               .height(AppTheme.BUTTON_HEIGHT)
               .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -318,6 +423,15 @@ export struct HomeworkCapturePage {
               .onClick(() => { void this.cancelCapture(); });
           }
 
+          Button('修改班级采集设置', { type: ButtonType.Normal })
+            .width('100%')
+            .enabled(!this.isRunning(this.session()))
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT)
+            .onClick(() => this.onOpenSourceProfile());
+
           Button('查看作业智能收件箱', { type: ButtonType.Normal })
             .width('100%')
             .enabled(!this.isRunning(this.session()))
@@ -327,7 +441,7 @@ export struct HomeworkCapturePage {
             .fontColor(AppTheme.PRIMARY)
             .onClick(() => this.onOpenInbox());
 
-          Text('隐私边界：不会读取微信数据库，不会自动点击或滚动微信，不使用 Accessibility 驱动微信；本阶段只生成屏幕 OCR 证据批次，聊天重建和作业判断由后续能力处理。')
+          Text('隐私边界：不会读取微信数据库，不会自动点击或滚动微信，不使用 Accessibility 驱动微信；只处理你主动打开并浏览的当前屏幕，最终作业仍由家长确认发布。')
             .width('100%')
             .fontSize(11)
             .lineHeight(17)
