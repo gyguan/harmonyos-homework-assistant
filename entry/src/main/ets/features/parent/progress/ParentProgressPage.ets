@@ -431,15 +431,15 @@ export struct ParentProgressPage {
       this.FilterBar();
       this.BulkDeleteToolbar();
       if (this.deleteMessage.length > 0) {
-        Text(this.deleteMessage).width('100%').fontSize(12).fontColor(AppTheme.DANGER);
+        Text(this.deleteMessage).width('100%').fontSize(13).fontColor(AppTheme.DANGER);
       }
 
       Row() {
         Text(this.querying ? '查询中…' :
           `${this.dateLabel()} · ${this.subjectLabel(this.subjectCode)} · ${this.statusLabel(this.statusFilter)}`)
-          .fontSize(12).fontColor(AppTheme.SUBTEXT);
+          .fontSize(13).fontColor(AppTheme.SUBTEXT);
         Blank();
-        Text(`${this.currentVisibleAssignments().length} 项`).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text(`${this.currentVisibleAssignments().length} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -447,7 +447,7 @@ export struct ParentProgressPage {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
           Text('当前筛选下没有作业').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('可以调整日期、科目或任务状态。').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('可以调整日期、科目或任务状态。').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding({ top: 30, bottom: 30 });
       } else {
