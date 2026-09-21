@@ -276,23 +276,16 @@ evidencePassed / evidenceTotal
 
 本阶段 Gate 要求固定 Fixture 全部通过。
 
-## 应用内自测
+## 自动化测试
 
-进入：
+20 组固定 Fixture 已迁出生产包：
 
 ~~~text
-家长
-→ 导入老师作业
-→ 屏幕采集技术诊断
-→ 运行 #246 作业理解自测
+entry/src/test/fixtures/Issue246HomeworkUnderstandingFixture.ets
+entry/src/test/List.test.ets
 ~~~
 
-PASS 会显示：
-- case count
-- classification %
-- grouping
-- revision
-- extraction
+Hypium Local Test 执行 classification / grouping / revision / extraction / evidence 断言。生产技术诊断页不包含固定测试数据。
 
 ## UI
 
