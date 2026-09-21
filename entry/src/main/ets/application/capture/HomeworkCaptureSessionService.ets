@@ -27,6 +27,7 @@ export class HomeworkCaptureSessionService {
   private readonly store: HomeworkCaptureSessionStore = HomeworkCaptureSessionStore.instance;
   private lastSignature: number[] = [];
   private signatureSessionId: string = '';
+  private sampleInFlight: Promise<CaptureSession | null> | null = null;
 
   private constructor() {}
 
@@ -87,6 +88,16 @@ export class HomeworkCaptureSessionService {
   }
 
   async sampleLatestFrame(): Promise<CaptureSession | null> {
+    if (this.sampleInFlight !== null) return await this.sampleInFlight;
+    this.sampleInFlight = this.sampleLatestFrameInternal();
+    try {
+      return await this.sampleInFlight;
+    } finally {
+      this.sampleInFlight = null;
+    }
+  }
+
+  private async sampleLatestFrameInternal(): Promise<CaptureSession | null> {
     let session = this.store.getActiveSession();
     if (session === null) return null;
     if (session.status !== CaptureSessionStatus.WAITING_PERMISSION &&
@@ -132,6 +143,8 @@ export class HomeworkCaptureSessionService {
 
     try {
       let recognized = await this.requireRecognizer().recognize(frame);
+      let latest = this.store.getSession(session.id);
+      if (latest === null || this.isTerminal(latest.status)) return latest;
       if (recognized.text.length > 0) {
         let orderNo = this.store.getEvidence(session.id).length + 1;
         this.store.appendEvidence({
@@ -157,6 +170,7 @@ export class HomeworkCaptureSessionService {
   }
 
   async stopByUser(): Promise<CaptureSession | null> {
+    if (this.sampleInFlight !== null) await this.sampleInFlight;
     let session = this.store.getActiveSession();
     if (session === null) return null;
 
@@ -198,7 +212,8 @@ export class HomeworkCaptureSessionService {
     return session;
   }
 
-  cancel(): CaptureSession | null {
+  async cancel(): Promise<CaptureSession | null> {
+    if (this.sampleInFlight !== null) await this.sampleInFlight;
     let session = this.store.getActiveSession();
     if (session === null) return null;
     try {
@@ -314,6 +329,12 @@ export class HomeworkCaptureSessionService {
       result += signature[i].toString(16);
     }
     return result;
+  }
+
+  private isTerminal(status: CaptureSessionStatus): boolean {
+    return status === CaptureSessionStatus.COMPLETED ||
+      status === CaptureSessionStatus.CANCELLED ||
+      status === CaptureSessionStatus.FAILED;
   }
 
   private requireRuntime(): HomeworkCaptureRuntime {
