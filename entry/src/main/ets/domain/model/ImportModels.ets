@@ -54,6 +54,7 @@ export interface ImportBatch {
   earliestDetectedTime?: string;
   reconstructionWarnings?: string[];
   understood?: boolean;
+  understandingVersion?: string;
   pendingReviewMessageIds?: string[];
   understandingWarnings?: string[];
   classificationSummary?: string;
