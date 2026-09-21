@@ -21,6 +21,9 @@ MODELS = ROOT / "entry/src/main/ets/domain/model/practice/PracticeModels.ets"
 PROVIDER = ROOT / "entry/src/main/ets/data/practice/PresetPracticeContentProvider.ets"
 HOME = ROOT / "entry/src/main/ets/features/student/practice/PracticeHomePage.ets"
 FILTER = ROOT / "entry/src/main/ets/components/practice/PracticeFilterDialog.ets"
+STANDARD = ROOT / "docs/product/practice-question-content-standard.md"
+PRESET_README = PRESET_ROOT / "README.md"
+AGENTS = ROOT / "AGENTS.md"
 
 SUBJECTS = {"CHINESE", "MATH", "ENGLISH"}
 TRACKS = {"TEXTBOOK_SYNC", "EXTRACURRICULAR"}
@@ -97,10 +100,14 @@ def validate_question(paper: dict, question: dict, index: int, global_ids: set[s
     if qtype in {"SINGLE_CHOICE", "MULTIPLE_CHOICE"}:
         require(2 <= len(options) <= 6, f"{path}.choice options must be 2..6")
         keys = [str(item.get("key", "")).strip().upper() for item in options if isinstance(item, dict)]
+        labels = [norm(str(item.get("label", ""))) for item in options if isinstance(item, dict)]
         require(len(keys) == len(options) and len(set(keys)) == len(keys), f"{path}.option keys invalid")
+        require(len(labels) == len(options) and all(labels), f"{path}.option labels must be non-empty")
+        require(len(set(labels)) == len(labels), f"{path}.option labels must be unique within the question")
         expected = {x.strip().upper() for x in question["answerSpec"].split(",") if x.strip()}
         require(expected and expected.issubset(set(keys)), f"{path}.answerSpec points to missing option")
         if qtype == "SINGLE_CHOICE":
+            require(3 <= len(options) <= 6, f"{path}.single choice must have at least 3 valid options")
             require(len(expected) == 1, f"{path}.single choice must have exactly one answer")
             if isinstance(hints, list) and len(hints) == 1 and expected:
                 correct_key = next(iter(expected))
@@ -125,6 +132,26 @@ def validate_question(paper: dict, question: dict, index: int, global_ids: set[s
 
 
 def main() -> int:
+    require(STANDARD.exists(), "missing docs/product/practice-question-content-standard.md")
+    require(PRESET_README.exists(), "missing practice preset README.md")
+    require(AGENTS.exists(), "missing AGENTS.md")
+    standard_text = STANDARD.read_text(encoding="utf-8") if STANDARD.exists() else ""
+    preset_readme = PRESET_README.read_text(encoding="utf-8") if PRESET_README.exists() else ""
+    agents_text = AGENTS.read_text(encoding="utf-8") if AGENTS.exists() else ""
+    standard_ref = "docs/product/practice-question-content-standard.md"
+    require(standard_ref in preset_readme,
+            "practice preset README must require the Practice content standard")
+    require(standard_ref in agents_text,
+            "AGENTS.md must require the Practice content standard before content changes")
+    for token in [
+        "## 3. 内容设计原则",
+        "## 5. 选择题规则",
+        "## 6. 提示语规则",
+        "## 9. 发布与版本规则",
+        "## 12. 新增/修改练习题的 Definition of Done",
+    ]:
+        require(token in standard_text, f"Practice content standard missing required section: {token}")
+
     try:
         manifest = json.loads(MANIFEST.read_text(encoding="utf-8"))
         manifest_schema = json.loads(MANIFEST_SCHEMA.read_text(encoding="utf-8"))
@@ -184,6 +211,7 @@ def main() -> int:
             questions = paper.get("questions")
             require(isinstance(questions, list) and len(questions) == 12, f"{key} must contain 12 questions")
             stems: set[str] = set()
+            paper_answer_distribution: dict[str, int] = defaultdict(int)
             for index, question in enumerate(questions or []):
                 if isinstance(question, dict):
                     signature = norm(str(question.get("stem", "")))
@@ -191,9 +219,18 @@ def main() -> int:
                     stems.add(signature)
                     validate_question(paper, question, index, global_question_ids)
                     if question.get("type") == "SINGLE_CHOICE":
-                        answer_distribution[str(question.get("answerSpec", "")).strip().upper()] += 1
+                        answer_key = str(question.get("answerSpec", "")).strip().upper()
+                        answer_distribution[answer_key] += 1
+                        paper_answer_distribution[answer_key] += 1
                 else:
                     errors.append(f"{key}.questions[{index}] must be object")
+            paper_choice_total = sum(paper_answer_distribution.values())
+            if paper_choice_total >= 6:
+                require(len(paper_answer_distribution) >= 3,
+                        f"{key} single-choice answers must use at least 3 positions")
+                paper_spread = max(paper_answer_distribution.values()) - min(paper_answer_distribution.values())
+                require(paper_spread <= 1,
+                        f"{key} single-choice answer positions must be balanced, got {dict(paper_answer_distribution)}")
 
     require(len(papers) == 27, f"active catalog must contain exactly 27 papers, got {len(papers)}")
     require(len(global_question_ids) == 324,
