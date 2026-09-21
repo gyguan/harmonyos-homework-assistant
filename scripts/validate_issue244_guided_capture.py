@@ -114,8 +114,10 @@ require("抓取今日作业" in route_page and "onOpenCapture" in route_page,
         "parent import page must expose the formal capture entry")
 require("PARENT_CAPTURE" in routes and "HomeworkCapturePage" in shell,
         "formal capture must use its own navigation route")
-require("不自动点击或滚动微信" in page and "Accessibility" in page,
-        "formal capture UI must state its non-automation boundary")
+require(("不自动点击" in page or "不会自动点击" in page) and
+        ("不自动滚动" in page or "不会自动点击或滚动" in page) and
+        "Accessibility" in page,
+        "formal capture UI must state click/scroll/accessibility non-automation boundaries")
 require("手工向上滑" in page,
         "formal UX must require user-driven chat scrolling")
 require("setInterval" in float_page and "sampleLatestFrame" in float_page,
