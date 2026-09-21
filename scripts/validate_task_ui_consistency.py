@@ -63,12 +63,16 @@ for page, name in [(progress, "parent progress"), (student, "student assignments
             f"{name} must expose date and subject query entries")
     require("label: '类型'" not in page and "label: '截止'" not in page,
             f"{name} must not expose old type/due preset query entries")
-    require("active: !this.isSelectedDayToday()" in page and "active: this.subjectCode !== 'ALL'" in page,
+    require("active: !this.allDates && !this.isSelectedDayToday()" in page and
+            "active: this.subjectCode !== 'ALL'" in page,
             f"{name} query state must bind to selected date and subject")
-require("@Link selectedDayEpochMs: number" in query_dialog and "DatePicker({" in query_dialog and
+require("@Link allDates: boolean" in query_dialog and
+        "DateModeOption('全部日期', true)" in query_dialog and
+        "DateModeOption('指定日期', false)" in query_dialog and
+        "@Link selectedDayEpochMs: number" in query_dialog and "DatePicker({" in query_dialog and
         "@Link subjectCode: string" in query_dialog,
-        "shared task query dialog must use selectable date plus subject")
-for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周", "全部日期"]:
+        "shared task query dialog must support all dates or one selected date plus subject")
+for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
     require(removed not in query_dialog, f"shared task query retains removed preset: {removed}")
 
 # 5. Popup/sheet action convention: right-top only exit actions; primary/destructive actions at bottom.
