@@ -92,6 +92,12 @@ export class HomeworkImportInboxStore {
       earliestDetectedTime: source.earliestDetectedTime,
       reconstructionWarnings: source.reconstructionWarnings === undefined ?
         undefined : source.reconstructionWarnings.slice(),
+      understood: source.understood,
+      pendingReviewMessageIds: source.pendingReviewMessageIds === undefined ?
+        undefined : source.pendingReviewMessageIds.slice(),
+      understandingWarnings: source.understandingWarnings === undefined ?
+        undefined : source.understandingWarnings.slice(),
+      classificationSummary: source.classificationSummary,
       createdAtEpochMs: source.createdAtEpochMs,
       status: source.status,
       messageCount: source.messageCount,
