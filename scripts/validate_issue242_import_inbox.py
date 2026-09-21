@@ -36,7 +36,7 @@ inbox_page = read("entry/src/main/ets/features/parent/import/HomeworkImportInbox
 detail_page = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
-fixture = read("entry/src/main/ets/experimental/importinbox/Issue242ImportInboxFixture.ets")
+fixture = read("entry/src/test/fixtures/Issue242ImportInboxFixture.ets")
 state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.ets")
 
 for value in ["CLIPBOARD", "SCREENSHOT", "SHARE", "SCREEN_CAPTURE"]:
