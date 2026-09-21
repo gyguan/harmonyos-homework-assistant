@@ -29,7 +29,7 @@ spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpi
 float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
 native_runtime = read("entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
-import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+capture_home = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets")
 entry_pkg = read("entry/oh-package.json5")
 build = read("entry/build-profile.json5")
 
@@ -87,8 +87,8 @@ require("this.captureRuntime.stopCapture()" in float_page,
         "FloatView must allow the user to stop capture while still in WeChat through the runtime adapter")
 require("PARENT_CAPTURE_SPIKE" in routes and "HomeworkCaptureSpikePage" in spike,
         "issue #241 must remain reachable through an isolated experimental route")
-require("#241" in import_route and "onOpenCaptureSpike" in import_route,
-        "homework import page must expose an explicit experimental entry")
+require("屏幕采集技术诊断" in capture_home and "onOpenDiagnostics" in capture_home,
+        "dedicated capture home must expose the isolated experimental diagnostic entry")
 require("不读取微信数据库" in spike and "不自动点击或滚动微信" in spike,
         "experimental UI must keep the product/privacy boundary explicit")
 require("CandidateAssignment" not in spike and "AssignmentRepository" not in spike,

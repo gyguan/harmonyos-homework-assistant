@@ -29,7 +29,7 @@ recognizer = read("entry/src/main/ets/infrastructure/capture/CoreVisionHomeworkC
 service = read("entry/src/main/ets/application/capture/HomeworkCaptureSessionService.ets")
 page = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
 float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
-route_page = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+capture_home = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
@@ -128,8 +128,8 @@ require("batch.status === ImportBatchStatus.RECEIVED" in inbox_service,
 require("采集会话：" in batch_detail,
         "ImportBatch detail must expose CaptureSession trace")
 
-require("抓取今日作业" in route_page and "onOpenCapture" in route_page,
-        "parent import page must expose the formal capture entry")
+require("抓取老师作业" in capture_home and "onStartCapture" in capture_home,
+        "dedicated capture home must expose the formal capture entry")
 require("PARENT_CAPTURE" in routes and "HomeworkCapturePage" in shell,
         "formal capture must use its own navigation route")
 require(shell.count("HomeworkCaptureSessionService.instance.getActiveSession() !== null") >= 2,
