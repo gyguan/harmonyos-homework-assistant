@@ -1113,6 +1113,376 @@
           ]
         }
       ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·生活对话（一）",
+      "description": "用校园、家庭、用餐和出行情境完成简短对话，训练听懂意图并选择自然回应。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "dialogue",
+        "daily English"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "Amy说“Good morning, Ben!”，Ben最自然的回答是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning, Amy!"
+            },
+            {
+              "key": "B",
+              "label": "Good night, Amy!"
+            },
+            {
+              "key": "C",
+              "label": "Seven, Amy!"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "早晨见面时可以用相同的早安问候回应。",
+          "hints": [
+            "关键词：“Good morning”“回答”。先判断见面时间，再选同一场景下自然的问候回应。"
+          ],
+          "tags": [
+            "dialogue",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "朋友问“Can you swim?”，你会游泳，应该怎样回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is blue."
+            },
+            {
+              "key": "B",
+              "label": "Yes, I can."
+            },
+            {
+              "key": "C",
+              "label": "She is my mum."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "对“Can you ...?”的肯定回答可以用“Yes, I can.”。",
+          "hints": [
+            "关键词：“Can you swim?”“会游泳”。这是询问能力，要选择肯定能力的回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "can"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "你问“Where is my book?”，朋友看到书在桌子上，应该怎么回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is red."
+            },
+            {
+              "key": "B",
+              "label": "I can read."
+            },
+            {
+              "key": "C",
+              "label": "It is on the desk."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "书在桌子上可以用“It is on the desk.”描述位置。",
+          "hints": [
+            "关键词：“Where”“在桌子上”。问题在问位置，要找含有位置表达的回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "朋友指着一个女孩问“Who is she?”，那个女孩是你的姐姐。你应该回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "She is my sister."
+            },
+            {
+              "key": "B",
+              "label": "She is blue."
+            },
+            {
+              "key": "C",
+              "label": "She can desk."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "介绍女性家庭成员可以说“She is my sister.”。",
+          "hints": [
+            "关键词：“Who is she?”“姐姐”。问题在问人物身份，要用家庭成员词回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈问“What do you like?”，你喜欢苹果，应该怎么回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "I see apples."
+            },
+            {
+              "key": "B",
+              "label": "I like apples."
+            },
+            {
+              "key": "C",
+              "label": "Apples are seven."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "表达喜欢苹果可以说“I like apples.”。",
+          "hints": [
+            "关键词：“What do you like?”“喜欢苹果”。找表示个人喜好的完整回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "like"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈说“Dinner is ready.”，你准备去吃饭，哪一句回应比较自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good night, desk."
+            },
+            {
+              "key": "B",
+              "label": "I am a bus."
+            },
+            {
+              "key": "C",
+              "label": "Thank you, Mum."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "家人准备好晚餐后，用“Thank you, Mum.”表示感谢很自然。",
+          "hints": [
+            "关键词：“Dinner is ready”“回应”。这是家人准备好晚餐的情境，选择礼貌回应。"
+          ],
+          "tags": [
+            "dialogue",
+            "dinner"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "路口亮起红灯，爸爸问“What should we do?”，最合适的回答是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Stop."
+            },
+            {
+              "key": "B",
+              "label": "Run."
+            },
+            {
+              "key": "C",
+              "label": "Jump."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "红灯时应停下，所以“Stop.”是合适的安全回答。",
+          "hints": [
+            "关键词：“红灯”“应该做什么”。根据交通安全规则判断动作，再匹配英语。"
+          ],
+          "tags": [
+            "dialogue",
+            "street"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "放学时同学说“See you tomorrow!”。你可以怎样回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning!"
+            },
+            {
+              "key": "B",
+              "label": "See you!"
+            },
+            {
+              "key": "C",
+              "label": "I am a book."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "告别时用“See you!”回应“明天见”自然又礼貌。",
+          "hints": [
+            "关键词：“See you tomorrow”“放学”。这是告别场景，要选择相应的告别表达。"
+          ],
+          "tags": [
+            "dialogue",
+            "goodbye"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "同学拿着一个球问“Is this your ball?”，这正是你的球。你应该回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is green."
+            },
+            {
+              "key": "B",
+              "label": "No, I can’t."
+            },
+            {
+              "key": "C",
+              "label": "Yes, it is."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "确认物品是自己的，可以用“Yes, it is.”作肯定回答。",
+          "hints": [
+            "关键词：“Is this your ball?”“正是你的”。这是确认物品的问题，需要肯定回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "objects"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "老师问“How are you?”，你感觉很好，哪一句回答最自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "I’m fine, thank you."
+            },
+            {
+              "key": "B",
+              "label": "I’m a chair."
+            },
+            {
+              "key": "C",
+              "label": "It is nine."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“I’m fine, thank you.”是回答近况并表示礼貌的常用表达。",
+          "hints": [
+            "关键词：“How are you?”“感觉很好”。问题在问近况，要选择描述自己状态的回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "朋友问“What colour is your bag?”，你的书包是蓝色的。你应该回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is a bag."
+            },
+            {
+              "key": "B",
+              "label": "It is blue."
+            },
+            {
+              "key": "C",
+              "label": "It can swim."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "询问颜色时，用“It is blue.”回答书包的颜色。",
+          "hints": [
+            "关键词：“What colour”“蓝色”。问题只问颜色，回答中应该直接给出颜色词。"
+          ],
+          "tags": [
+            "dialogue",
+            "colours"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "商店阿姨问“Can I help you?”，你正需要帮助，可以怎样回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good night."
+            },
+            {
+              "key": "B",
+              "label": "I am seven."
+            },
+            {
+              "key": "C",
+              "label": "Yes, please."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "需要对方帮助时，用“Yes, please.”礼貌接受帮助。",
+          "hints": [
+            "关键词：“Can I help you?”“需要帮助”。这是提供帮助的提问，要选择礼貌接受的回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "polite language"
+          ]
+        }
+      ]
     }
   ]
 }
