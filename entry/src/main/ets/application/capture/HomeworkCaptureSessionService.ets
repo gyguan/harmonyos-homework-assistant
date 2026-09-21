@@ -289,7 +289,7 @@ export class HomeworkCaptureSessionService {
       id: batchId,
       studentId: session.studentId,
       sourceType: HomeworkImportSourceType.SCREEN_CAPTURE,
-      sourceLabel: '屏幕智能采集',
+      sourceLabel: session.sourceProfileId === 'issue244-fixture' ? '#244 离线 Fixture' : '屏幕智能采集',
       sourceProfileId: session.sourceProfileId,
       captureSessionId: session.id,
       createdAtEpochMs: session.startedAtEpochMs,
