@@ -34,9 +34,18 @@ export interface CaptureRuntimeStats {
   latestSequence: number;
 }
 
+export interface CaptureOcrLineEvidence {
+  value: string;
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 export interface CaptureFrameRecognition {
   text: string;
   lineCount: number;
+  lines: CaptureOcrLineEvidence[];
 }
 
 export interface CaptureFrameEvidence {
@@ -50,6 +59,7 @@ export interface CaptureFrameEvidence {
   fingerprint: string;
   text: string;
   lineCount: number;
+  lines: CaptureOcrLineEvidence[];
   orderNo: number;
 }
 
