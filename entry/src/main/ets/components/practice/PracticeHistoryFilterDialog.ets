@@ -1,9 +1,11 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { PracticePassFilter } from '../../domain/model/practice/PracticeModels';
+import {
+  PracticePassFilter,
+  PracticeTaxonomy
+} from '../../domain/model/practice/PracticeModels';
 import {
   PracticeHistorySubjectFilter,
-  PracticeHistoryTimeFilter,
-  PracticeHistoryViewModel
+  PracticeHistoryTimeFilter
 } from '../../features/student/practice/PracticeHistoryViewModel';
 
 @CustomDialog
@@ -19,11 +21,23 @@ export struct PracticeHistoryFilterDialog {
     pass: PracticePassFilter
   ) => void =
     (_subject: PracticeHistorySubjectFilter, _time: PracticeHistoryTimeFilter, _pass: PracticePassFilter) => {};
-  private readonly viewModel: PracticeHistoryViewModel = new PracticeHistoryViewModel();
+  private subjectLabel(value: PracticeHistorySubjectFilter): string {
+    if (value === PracticeHistorySubjectFilter.CHINESE) return '语文';
+    if (value === PracticeHistorySubjectFilter.MATH) return '数学';
+    if (value === PracticeHistorySubjectFilter.ENGLISH) return '英语';
+    return '全部科目';
+  }
+
+  private timeLabel(value: PracticeHistoryTimeFilter): string {
+    if (value === PracticeHistoryTimeFilter.LAST_7_DAYS) return '近7天';
+    if (value === PracticeHistoryTimeFilter.LAST_30_DAYS) return '近30天';
+    if (value === PracticeHistoryTimeFilter.LAST_90_DAYS) return '近90天';
+    return '全部时间';
+  }
 
   @Builder
   private SubjectOption(value: PracticeHistorySubjectFilter) {
-    Button(this.viewModel.subjectFilterLabel(value), { type: ButtonType.Normal })
+    Button(this.subjectLabel(value), { type: ButtonType.Normal })
       .layoutWeight(1)
       .height(AppTheme.MIN_TOUCH_TARGET)
       .borderRadius(AppTheme.CHIP_RADIUS)
@@ -36,7 +50,7 @@ export struct PracticeHistoryFilterDialog {
 
   @Builder
   private TimeOption(value: PracticeHistoryTimeFilter) {
-    Button(this.viewModel.timeFilterLabel(value), { type: ButtonType.Normal })
+    Button(this.timeLabel(value), { type: ButtonType.Normal })
       .layoutWeight(1)
       .height(AppTheme.MIN_TOUCH_TARGET)
       .borderRadius(AppTheme.CHIP_RADIUS)
@@ -49,7 +63,7 @@ export struct PracticeHistoryFilterDialog {
 
   @Builder
   private PassOption(value: PracticePassFilter) {
-    Button(this.viewModel.passFilterLabel(value), { type: ButtonType.Normal })
+    Button(PracticeTaxonomy.passFilterLabel(value), { type: ButtonType.Normal })
       .layoutWeight(1)
       .height(AppTheme.MIN_TOUCH_TARGET)
       .borderRadius(AppTheme.CHIP_RADIUS)
