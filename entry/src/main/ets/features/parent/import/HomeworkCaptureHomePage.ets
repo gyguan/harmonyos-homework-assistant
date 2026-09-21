@@ -171,6 +171,12 @@ export struct HomeworkCaptureHomePage {
         .lineHeight(19)
         .fontColor(AppTheme.SUBTEXT);
 
+      Text('仅处理当前屏幕内容，不读取微信数据库，不自动点击或滚动微信，不使用 Accessibility 驱动微信。')
+        .width('100%')
+        .fontSize(12)
+        .lineHeight(18)
+        .fontColor(AppTheme.TERTIARY_TEXT);
+
       Divider().color(AppTheme.DIVIDER);
 
       Row() {
@@ -205,34 +211,6 @@ export struct HomeworkCaptureHomePage {
 
       Scroll() {
         Column({ space: 14 }) {
-          Row({ space: 12 }) {
-            Text('抓')
-              .width(42)
-              .height(42)
-              .fontSize(16)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppTheme.PRIMARY)
-              .textAlign(TextAlign.Center)
-              .backgroundColor(AppTheme.PRIMARY_SOFT)
-              .borderRadius(14);
-            Column({ space: 4 }) {
-              Text('从老师群聊中抓取今日作业')
-                .fontSize(16)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.TEXT);
-              Text('仅处理当前屏幕内容，不读取微信数据库，不自动点击或滚动微信；不使用 Accessibility 驱动微信。')
-                .fontSize(12)
-                .lineHeight(18)
-                .fontColor(AppTheme.SUBTEXT);
-            }
-            .layoutWeight(1)
-            .alignItems(HorizontalAlign.Start);
-          }
-          .width('100%')
-          .padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.PRIMARY_FAINT)
-          .borderRadius(AppTheme.CARD_RADIUS);
-
           this.SourceCard();
 
           Button(this.hasSourceProfile() ? '开始抓取' : '先配置并开始抓取', { type: ButtonType.Normal })

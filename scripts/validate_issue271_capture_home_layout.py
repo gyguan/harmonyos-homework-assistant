@@ -23,7 +23,6 @@ view_model = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHome
 theme = read("entry/src/main/ets/common/theme/AppTheme.ets")
 
 for text in [
-    "从老师群聊中抓取今日作业",
     "当前来源",
     "班级",
     "学生",
@@ -39,6 +38,8 @@ for text in [
 
 require(page.count("Button(") == 1,
         "capture home must keep exactly one primary Button")
+require("Text('从老师群聊中抓取今日作业')" not in page,
+        "capture home must not duplicate usage guidance in a top explanation card")
 require("if (this.hasSourceProfile())" in page and "尚未配置来源" in page,
         "capture home must have explicit configured/unconfigured source states")
 require("studentName()" in page and "studentName(): string" in view_model,
