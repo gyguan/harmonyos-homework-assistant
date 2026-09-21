@@ -112,6 +112,18 @@ export class HomeworkCaptureSessionStore {
   }
 
   private cloneEvidence(source: CaptureFrameEvidence): CaptureFrameEvidence {
+    let lines = [];
+    if (source.lines !== undefined) {
+      for (let line of source.lines) {
+        lines.push({
+          value: line.value,
+          left: line.left,
+          top: line.top,
+          right: line.right,
+          bottom: line.bottom
+        });
+      }
+    }
     return {
       id: source.id,
       sessionId: source.sessionId,
@@ -123,13 +135,7 @@ export class HomeworkCaptureSessionStore {
       fingerprint: source.fingerprint,
       text: source.text,
       lineCount: source.lineCount,
-      lines: source.lines.map(line => ({
-        value: line.value,
-        left: line.left,
-        top: line.top,
-        right: line.right,
-        bottom: line.bottom
-      })),
+      lines: lines,
       orderNo: source.orderNo
     };
   }
