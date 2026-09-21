@@ -39,6 +39,15 @@ struct HomeworkCaptureFloatView {
     } else if (session.status === CaptureSessionStatus.STOPPING) {
       this.statusText = '正在结束采集';
       this.detailText = '正在整理本次屏幕证据';
+    } else if (session.status === CaptureSessionStatus.COMPLETED) {
+      this.statusText = '采集已完成';
+      this.detailText = `已收集 ${session.acceptedFrameCount} 个变化画面，请返回小伴查看导入批次`;
+    } else if (session.status === CaptureSessionStatus.CANCELLED) {
+      this.statusText = '采集已取消';
+      this.detailText = '请返回小伴重新开始';
+    } else if (session.status === CaptureSessionStatus.FAILED) {
+      this.statusText = '采集异常结束';
+      this.detailText = '资源已释放，请返回小伴查看状态';
     }
   }
 
