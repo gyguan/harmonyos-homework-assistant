@@ -20,6 +20,10 @@ export class HomeworkCaptureHomeViewModel {
     return profile === null ? '尚未配置班级来源' : profile.name;
   }
 
+  studentName(): string {
+    return this.family.getStudent().name;
+  }
+
   groupTitle(): string {
     let profile = this.activeProfile();
     return profile === null ? '首次使用请先配置目标微信群' : profile.groupTitle;
@@ -32,7 +36,7 @@ export class HomeworkCaptureHomeViewModel {
     for (let teacher of profile.teacherAliases) {
       values.push(`${teacher.subject} · ${teacher.displayName}`);
     }
-    return values.join('  /  ');
+    return values.join(' / ');
   }
 
   timeWindow(): string {

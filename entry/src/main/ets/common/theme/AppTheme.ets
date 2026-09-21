@@ -48,6 +48,7 @@ export class AppTheme {
   static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1400;
   static readonly PARENT_REVIEW_READABLE_MAX_WIDTH: number = 1040;
   static readonly IMPORT_READABLE_MAX_WIDTH: number = 1080;
+  static readonly CAPTURE_HOME_READABLE_MAX_WIDTH: number = 720;
   static readonly IMPORT_SPLIT_MAX_WIDTH: number = 1280;
   static readonly CONFIRMATION_READABLE_MAX_WIDTH: number = 1080;
   static readonly PROFILE_READABLE_MAX_WIDTH: number = 900;

@@ -51,6 +51,9 @@ jobs:
       - name: Validate issue 270 capture entry split
         run: python scripts/validate_issue270_capture_entry_split.py
 
+      - name: Validate issue 271 capture home layout
+        run: python scripts/validate_issue271_capture_home_layout.py
+
       - name: Validate pasted teacher text import
         run: python scripts/validate_text_import_feature.py
 

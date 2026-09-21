@@ -72,7 +72,7 @@ require("startCaptureAfterSave" in routes and "finishSourceProfile" in shell,
 require("HomeworkSourceProfilePage" in shell,
         "SourceProfile setup page must be reachable")
 
-require("抓取老师作业" in capture_home and "当前抓取来源" in capture_home,
+require("抓取老师作业" in capture_home and "当前来源" in capture_home,
         "capture home must expose one-click daily capture and active profile summary")
 require("timeWindow()" in capture_home and "今天 " in capture_home_vm and " 至现在" in capture_home_vm,
         "profile summary must show today's capture window through the capture ViewModel")
