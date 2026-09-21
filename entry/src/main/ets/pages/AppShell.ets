@@ -622,11 +622,11 @@ export struct AppShell {
       if (this.role === AppRole.PARENT) {
         Column({ space: 2 }) {
           Text(this.currentStudent().name)
-            .fontSize(11)
+            .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
           Text(this.currentStudent().className)
-            .fontSize(10)
+            .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width(68)
@@ -641,7 +641,7 @@ export struct AppShell {
       } else {
         Text(this.currentStudent().name)
           .width(68)
-          .fontSize(11)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
           .fontColor(AppTheme.TEXT)
