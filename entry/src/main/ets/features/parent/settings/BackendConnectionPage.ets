@@ -407,7 +407,6 @@ export struct BackendConnectionPage {
           Column({ space: 20 }) {
             Column({ space: 4 }) {
               Text('我的').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-              Text('管理家庭成员、小伴规则和数据同步。').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
             }
             .width('100%').alignItems(HorizontalAlign.Start);
 

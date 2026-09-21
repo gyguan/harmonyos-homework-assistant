@@ -14,7 +14,6 @@ export struct HomeworkImportRoutePage {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       DeepPageHeader({
         title: '手工导入作业',
-        subtitle: '粘贴文字、选择截图或从系统分享导入',
         backAccessibilityText: '返回家长首页',
         onBack: () => this.onBack()
       });

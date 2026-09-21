@@ -102,7 +102,6 @@ export struct HomeworkImportInboxPage {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       DeepPageHeader({
         title: '作业智能收件箱',
-        subtitle: '保留每次导入来源、原始消息和候选作业',
         backAccessibilityText: '返回上一页',
         onBack: () => this.onBack()
       });
@@ -115,11 +114,6 @@ export struct HomeworkImportInboxPage {
                 .fontSize(17)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
-              Text('从文字或截图整理一次老师作业后，这里会自动留下可追溯的导入批次。')
-                .fontSize(13)
-                .lineHeight(19)
-                .fontColor(AppTheme.SUBTEXT)
-                .textAlign(TextAlign.Center);
             }
             .width('100%')
             .padding({ top: 48, bottom: 48 })

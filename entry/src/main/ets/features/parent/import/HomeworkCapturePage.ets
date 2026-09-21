@@ -325,7 +325,6 @@ export struct HomeworkCapturePage {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       DeepPageHeader({
         title: '抓取今日作业',
-        subtitle: '进群手工上滑，小伴自动识别、整理并交给你确认',
         backAccessibilityText: '返回抓取老师作业',
         onBack: () => this.back()
       });

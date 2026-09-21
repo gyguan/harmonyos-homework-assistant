@@ -4,7 +4,6 @@ import {
   PracticeAttemptStatus,
   PracticeAttemptSummary,
   PracticePaper,
-  PracticeSourceType,
   PracticeTaxonomy
 } from '../../../domain/model/practice/PracticeModels';
 import { PracticePaperDetailViewModel } from './PracticePaperDetailViewModel';
@@ -81,14 +80,6 @@ export struct PracticePaperDetailPage {
   private openAttempt(item: PracticeAttemptSummary): void {
     if (item.status === PracticeAttemptStatus.SUBMITTED) this.onOpenResult(item.id);
     else this.onOpenAttempt(item.id);
-  }
-
-  private sourceLabel(): string {
-    if (this.paper === null) return '';
-    if (this.paper.sourceType === PracticeSourceType.PRESET) return '平台预置';
-    if (this.paper.sourceType === PracticeSourceType.AI_GENERATED) return 'AI 生成';
-    if (this.paper.sourceType === PracticeSourceType.PARENT_CREATED) return '家长创建';
-    return '外部导入';
   }
 
   @Builder
@@ -204,7 +195,7 @@ export struct PracticePaperDetailPage {
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS);
       } else if (this.recentAttempts.length === 0) {
-        Text('还没有这套卷的练习记录，完成后会保留在这里。')
+        Text('还没有练习记录')
           .width('100%')
           .fontSize(13)
           .lineHeight(18)
@@ -285,10 +276,6 @@ export struct PracticePaperDetailPage {
                 .width('100%')
                 .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT);
-              Text(`内容来源：${this.sourceLabel()} · 版本 V${this.paper.version}`)
-                .width('100%')
-                .fontSize(13)
-                .fontColor(AppTheme.TERTIARY_TEXT);
             }
             .width('100%')
             .padding(AppTheme.CARD_PADDING)

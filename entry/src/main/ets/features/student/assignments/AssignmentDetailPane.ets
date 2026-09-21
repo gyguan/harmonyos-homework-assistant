@@ -80,10 +80,12 @@ export struct AssignmentDetailPane {
         .fontSize(17)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
-      Text(this.assignmentId.length === 0 ? '详情会在这里显示，不需要离开作业列表。' : '作业可能已经删除或尚未同步完成。')
-        .fontSize(13)
-        .lineHeight(20)
-        .fontColor(AppTheme.SUBTEXT);
+      if (this.assignmentId.length > 0) {
+        Text('作业可能已经删除或尚未同步完成。')
+          .fontSize(13)
+          .lineHeight(20)
+          .fontColor(AppTheme.SUBTEXT);
+      }
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)

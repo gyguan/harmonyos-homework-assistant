@@ -177,7 +177,6 @@ export struct ParentExtraAssignmentPage {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
           title: '布置课外任务',
-          subtitle: `给 ${this.viewModel.student().name} 安排阅读、运动或实践任务`,
           backAccessibilityText: '返回家长首页',
           onBack: () => this.onBack()
         });

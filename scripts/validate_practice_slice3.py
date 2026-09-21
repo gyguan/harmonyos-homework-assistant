@@ -45,8 +45,9 @@ for method in ["listAttempts", "repeatAttempt"]:
 
 require("练习记录" in home and "onOpenHistory" in home,
         "Practice home must expose a compact history entry")
-require("每次开始练习都会创建独立实例" in history and "PracticeAttemptSummary" in history,
-        "Practice history page must present immutable per-attempt records")
+require("PracticeAttemptSummary" in history and "item.attemptNo" in history and
+        "item.id" in history,
+        "Practice history page must present immutable per-attempt records without relying on explanatory copy")
 require("DeepPageHeader" in history and "Text('‹')" not in history,
         "Practice history deep page must use the shared DeepPageHeader")
 require("selectedStatus" in history and "selectedSubject" in history,

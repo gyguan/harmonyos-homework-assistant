@@ -477,8 +477,6 @@ export struct StudentAssignmentsPage {
         SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
         Text(this.currentTotalCount() === 0 ? '暂时没有作业' : '这一天没有安排任务')
           .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text('可选择其他日期或科目后重新查询。')
-          .fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
       .padding({ top: 30, bottom: 30 });
@@ -587,7 +585,6 @@ export struct StudentAssignmentsPage {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
           Text('暂无课外任务').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('家长布置的课外任务会出现在这里。').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .padding({ top: 34, bottom: 34 });

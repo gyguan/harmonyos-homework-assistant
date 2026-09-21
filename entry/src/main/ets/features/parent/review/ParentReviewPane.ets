@@ -234,8 +234,6 @@ export struct ParentReviewPane {
       SymbolGlyph($r('sys.symbol.doc_text')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
       Text(this.assignmentId.length === 0 ? '选择一项作业查看详情' : '这项作业暂时找不到')
         .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text('提交证据、实际用时和家长验收都会在这里显示。')
-        .fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -422,14 +420,6 @@ export struct ParentReviewPane {
 
             if (this.assignment()!.status === AssignmentStatus.SUBMITTED) {
               this.ReviewActions(this.assignment()!);
-            } else {
-              Text(this.assignment()!.status === AssignmentStatus.COMPLETED ? '这项作业已通过验收。' : '当前状态无需家长验收。')
-                .width('100%')
-                .fontSize(13)
-                .fontColor(AppTheme.SUBTEXT)
-                .padding(14)
-                .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                .borderRadius(AppTheme.CONTROL_RADIUS);
             }
           }
           .width('100%')

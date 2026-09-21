@@ -282,12 +282,6 @@ export struct PracticeHistoryPage {
             this.StatisticsCard();
           }
 
-          Text('每次开始练习都会创建独立实例，历史记录不会被后续重练覆盖。')
-            .width('100%')
-            .fontSize(13)
-            .lineHeight(18)
-            .fontColor(AppTheme.TERTIARY_TEXT);
-
           if (this.errorMessage.length > 0) {
             Text(this.errorMessage)
               .width('100%')
@@ -309,9 +303,6 @@ export struct PracticeHistoryPage {
                 .fontSize(16)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
-              Text(this.isPaperScoped() ? '完成这套练习后，每一次结果都会保留在这里。' : '完成第一套练习后，每一次结果都会保留在这里。')
-                .fontSize(13)
-                .fontColor(AppTheme.SUBTEXT);
             }
             .width('100%')
             .padding({ top: 32, bottom: 32 })
@@ -323,9 +314,6 @@ export struct PracticeHistoryPage {
                 .fontSize(15)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
-              Text('可以切换状态或科目继续查看。')
-                .fontSize(13)
-                .fontColor(AppTheme.SUBTEXT);
             }
             .width('100%')
             .padding({ top: 28, bottom: 28 })

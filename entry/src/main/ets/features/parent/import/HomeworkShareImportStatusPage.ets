@@ -123,12 +123,6 @@ export struct HomeworkShareImportStatusPage {
           .onClick(() => this.onCancel());
       }
 
-      Text('分享内容只有在全部读取和整理成功后才会写入导入批次；失败重试不会生成半成品作业。')
-        .width('100%')
-        .fontSize(12)
-        .lineHeight(17)
-        .fontColor(AppTheme.TERTIARY_TEXT)
-        .textAlign(TextAlign.Center);
     }
     .width('100%')
     .constraintSize({ maxWidth: 460 })
