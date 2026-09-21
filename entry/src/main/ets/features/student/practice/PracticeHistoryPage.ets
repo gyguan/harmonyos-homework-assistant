@@ -203,13 +203,28 @@ export struct PracticeHistoryPage {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
-        Text(this.viewModel.statusLabel(item))
-          .fontSize(12)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS : AppTheme.PRIMARY)
-          .padding({ left: 9, right: 9, top: 5, bottom: 5 })
-          .backgroundColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
-          .borderRadius(AppTheme.CHIP_RADIUS);
+        Column({ space: 5 }) {
+          Text(this.viewModel.statusLabel(item))
+            .fontSize(12)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS : AppTheme.PRIMARY)
+            .padding({ left: 9, right: 9, top: 5, bottom: 5 })
+            .backgroundColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
+            .borderRadius(AppTheme.CHIP_RADIUS);
+
+          if (item.status === PracticeAttemptStatus.SUBMITTED) {
+            Text(this.viewModel.passLabel(item))
+              .fontSize(12)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.viewModel.isPassApplicable(item) ?
+                (this.viewModel.isPassed(item) ? AppTheme.SUCCESS : AppTheme.WARNING) : AppTheme.PRIMARY)
+              .padding({ left: 9, right: 9, top: 5, bottom: 5 })
+              .backgroundColor(this.viewModel.isPassApplicable(item) ?
+                (this.viewModel.isPassed(item) ? AppTheme.SUCCESS_SOFT : AppTheme.WARNING_SOFT) : AppTheme.PRIMARY_SOFT)
+              .borderRadius(AppTheme.CHIP_RADIUS);
+          }
+        }
+        .alignItems(HorizontalAlign.End);
       }
       .width('100%')
       .alignItems(VerticalAlign.Top);
@@ -225,7 +240,7 @@ export struct PracticeHistoryPage {
           .fontColor(AppTheme.SUBTEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
           Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
-          Text(`耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
+          Text(`完成耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
             .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
@@ -249,7 +264,7 @@ export struct PracticeHistoryPage {
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`${item.paperTitle}第${item.attemptNo}次练习，${this.viewModel.statusLabel(item)}`)
+    .accessibilityText(`${item.paperTitle}第${item.attemptNo}次练习，${this.viewModel.statusLabel(item)}${item.status === PracticeAttemptStatus.SUBMITTED ? `，${this.viewModel.passLabel(item)}，完成耗时${this.viewModel.elapsedText(item.elapsedSeconds)}` : ''}`)
     .onClick(() => this.open(item));
   }
 
