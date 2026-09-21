@@ -434,7 +434,9 @@ export struct AppShell {
       NavDestination() {
         HomeworkCapturePage({
           onBack: () => this.navPathStack.pop(),
-          onOpenInbox: () => this.openParentImportInbox()
+          onOpenInbox: () => this.openParentImportInbox(),
+          onOpenConfirmation: () => this.openParentImportConfirmation(),
+          onOpenSourceProfile: () => this.openParentSourceProfile()
         });
       }
       .hideTitleBar(true)
