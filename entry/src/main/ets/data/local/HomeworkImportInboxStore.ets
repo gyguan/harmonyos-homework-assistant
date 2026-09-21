@@ -86,6 +86,12 @@ export class HomeworkImportInboxStore {
       sourceLabel: source.sourceLabel,
       sourceProfileId: source.sourceProfileId,
       captureSessionId: source.captureSessionId,
+      reconstructed: source.reconstructed,
+      groupTitle: source.groupTitle,
+      timeBoundaryReached: source.timeBoundaryReached,
+      earliestDetectedTime: source.earliestDetectedTime,
+      reconstructionWarnings: source.reconstructionWarnings === undefined ?
+        undefined : source.reconstructionWarnings.slice(),
       createdAtEpochMs: source.createdAtEpochMs,
       status: source.status,
       messageCount: source.messageCount,
