@@ -215,6 +215,11 @@ if len(today_summary) == 2:
 require("AssignmentDueDate.businessDayStart(Date.now())" in home and
         "AssignmentDueDate.dayStart(item)" in home,
         "Parent Dashboard TodayOverview must share the same business-day semantics as TodaySummary")
+
+require("this.viewModel.summary().completed" not in home and
+        "this.viewModel.summary().total" not in home and
+        "this.todayCompletedCount()" in home and "this.todayAssignments().length" in home,
+        "Parent Dashboard child-performance metrics must reuse the same live today snapshot as TodayOverview")
 require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date,
         "assignment business-day semantics must remain anchored to Asia/Shanghai")
 require("candidateAnchor(candidate.id)" in batch_publish,
