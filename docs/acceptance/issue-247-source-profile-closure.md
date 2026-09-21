@@ -358,27 +358,27 @@ groupConfirmedByUser
 - 批量原子发布
 - 学生端 Assignment
 
-## 独立自测
+## 独立自动化测试
 
-进入：
+完整闭环 Fixture 已迁到：
 
 ~~~text
-家长
-→ 导入老师作业
-→ 屏幕采集技术诊断
-→ 运行 #247 完整闭环自测
+entry/src/test/fixtures/Issue247FullClosureFixture.ets
+entry/src/test/List.test.ets
 ~~~
 
-预期：
+Hypium Local Test 必须验证：
 
 ~~~text
-PASS
 group=matched
 boundary=14:58
 messages=5→4
 32→33
 homework+preparation
+mixed-group=CONFLICT / blocked
 ~~~
+
+生产“屏幕采集技术诊断”只用于真机 AVScreenCapture / OCR / FloatView Gate。
 
 ## 静态 Gate
 
