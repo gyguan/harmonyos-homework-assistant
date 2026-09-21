@@ -18,6 +18,7 @@ export interface Issue247ClosureResult {
   groupMatched: boolean;
   mismatchDetected: boolean;
   unrecognizedRequiresConfirmation: boolean;
+  normalizedGroupVariantMatched: boolean;
   timeBoundaryReached: boolean;
   earliestDetectedTime: string;
   uniqueMessageCount: number;
@@ -49,6 +50,8 @@ export class Issue247FullClosureFixture {
       profile.groupTitle, '其他班家长群') === SourceGroupValidationStatus.MISMATCH;
     let unrecognizedRequiresConfirmation = workflow.validateGroupTitle(
       profile.groupTitle, '') === SourceGroupValidationStatus.UNRECOGNIZED;
+    let normalizedGroupVariantMatched = workflow.validateGroupTitle(
+      profile.groupTitle, '二（3）班家长群(45)') === SourceGroupValidationStatus.MATCHED;
 
     let startEpoch = this.startEpoch(profile.defaultStartMinuteOfDay);
     let inWindow: ImportedMessage[] = [];
@@ -87,6 +90,7 @@ export class Issue247FullClosureFixture {
     let evidenceTrace = this.allCandidatesHaveEvidence(understanding.candidates);
 
     let passed = groupMatched && mismatchDetected && unrecognizedRequiresConfirmation &&
+      normalizedGroupVariantMatched &&
       reconstruction.timeBoundaryReached &&
       reconstruction.earliestDetectedTime === '14:58' &&
       reconstruction.messages.length === 5 &&
@@ -103,6 +107,7 @@ export class Issue247FullClosureFixture {
       groupMatched: groupMatched,
       mismatchDetected: mismatchDetected,
       unrecognizedRequiresConfirmation: unrecognizedRequiresConfirmation,
+      normalizedGroupVariantMatched: normalizedGroupVariantMatched,
       timeBoundaryReached: reconstruction.timeBoundaryReached,
       earliestDetectedTime: reconstruction.earliestDetectedTime,
       uniqueMessageCount: reconstruction.messages.length,
