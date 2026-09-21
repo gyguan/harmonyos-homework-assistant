@@ -104,6 +104,7 @@ export class HomeworkCaptureSessionStore {
       status: source.status,
       frameCount: source.frameCount,
       acceptedFrameCount: source.acceptedFrameCount,
+      ocrFailureCount: source.ocrFailureCount === undefined ? 0 : source.ocrFailureCount,
       sourceProfileId: source.sourceProfileId,
       stopReason: source.stopReason,
       importBatchId: source.importBatchId,
