@@ -28,6 +28,7 @@ models = read("entry/src/main/ets/domain/model/HomeworkShareModels.ets")
 entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
 index = read("entry/src/main/ets/pages/Index.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
+parent_import_navigator = read("entry/src/main/ets/app/navigation/ParentImportNavigator.ets")
 status = read("entry/src/main/ets/features/parent/import/HomeworkShareImportStatusPage.ets")
 receiving_page = read("entry/src/main/ets/pages/HomeworkShareReceivingPage.ets")
 pages = read("entry/src/main/resources/base/profile/main_pages.json")
@@ -109,9 +110,11 @@ require("@StorageLink('shareImportToken')" in shell,
         "AppShell must react to share handoff token changes")
 require("HomeworkShareImportStatusPage" in shell,
         "share handoff must have an explicit processing surface")
-require("openParentImportConfirmation" in shell,
+require("ParentImportNavigator.openConfirmation(this.navPathStack)" in shell and
+        "AppRoute.PARENT_IMPORT_CONFIRMATION" in parent_import_navigator,
         "successful share import must reuse HomeworkConfirmationPage route")
-require("openParentImportInbox" in shell,
+require("ParentImportNavigator.openInbox(this.navPathStack)" in shell and
+        "AppRoute.PARENT_IMPORT_INBOX" in parent_import_navigator,
         "empty share import must remain inspectable in Import Inbox")
 
 require("无法读取或识别分享图片，请重试" in status,
