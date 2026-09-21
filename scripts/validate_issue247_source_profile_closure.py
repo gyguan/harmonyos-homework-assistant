@@ -24,8 +24,10 @@ entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 import_home = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+import_home_vm = read("entry/src/main/ets/features/parent/import/HomeworkImportRouteViewModel.ets")
 profile_page = read("entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets")
 capture_page = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
+capture_vm = read("entry/src/main/ets/features/parent/import/HomeworkCaptureViewModel.ets")
 float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
 workflow = read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets")
 group_title_policy = read("entry/src/main/ets/application/capture/DeterministicGroupTitlePolicy.ets")
@@ -69,9 +71,9 @@ require("HomeworkSourceProfilePage" in shell,
 
 require("抓取今日作业" in import_home and "profileSubtitle" in import_home,
         "import home must expose one-click daily capture and active profile summary")
-require("今天 " in import_home and " 至现在" in import_home,
-        "profile summary must show today's capture window")
-require("getActiveProfile(studentId) === null" in import_home and
+require("profileSubtitle()" in import_home and "今天 " in import_home_vm and " 至现在" in import_home_vm,
+        "profile summary must show today's capture window through the import ViewModel")
+require("!this.viewModel.hasSourceProfile()" in import_home and
         "onOpenSourceProfile(true)" in import_home,
         "first click without a profile must route through first-time setup")
 require("onOpenSourceProfile(false)" in import_home,
@@ -89,8 +91,9 @@ require("parseStartTime" in profile_service and "15:00" in profile_page,
 
 require("initializePage" in capture_page and "await this.startCapture()" in capture_page,
         "configured daily capture must auto-start after one entry click")
-require("HomeworkCaptureWorkflowService.instance.start(studentId)" in capture_page,
-        "capture page must start through the profile-aware workflow")
+require("this.viewModel.start()" in capture_page and
+        "this.workflow.start(this.family.getActiveStudentId())" in capture_vm,
+        "capture page must start through the profile-aware workflow via ViewModel")
 require("不使用 Accessibility 驱动微信" in capture_page and
         "不会自动点击或滚动微信" in capture_page,
         "formal capture must keep the no-automation privacy boundary")
@@ -99,8 +102,9 @@ require("Clipboard" not in capture_page and "Clipboard" not in workflow,
 
 require("targetStartMinuteOfDay: profile.defaultStartMinuteOfDay" in workflow,
         "live reconstruction must use SourceProfile start time")
-require("validateGroupTitle(profile.groupTitle" in workflow,
-        "workflow must validate detected group title against profile")
+require("groupTitlePolicy.validate(expected, detected)" in workflow and
+        "validate(expected: string, detected: string)" in group_title_policy,
+        "workflow must validate detected group title against profile through the shared policy")
 require("SourceGroupValidationStatus.MISMATCH" in workflow and
         "SourceGroupValidationStatus.UNRECOGNIZED" in workflow and
         "SourceGroupValidationStatus.CONFLICT" in workflow,
