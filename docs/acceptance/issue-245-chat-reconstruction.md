@@ -199,22 +199,16 @@ A 在 F3/F4/F5 出现 3 次，输出只保留 1 条，但 evidence 数量为 3�
 - 单 Frame OCR 失败 → 其它 Frame 继续重建
 - 老 Capture Evidence 无 geometry → fallback + warning
 
-## UI 验收
+## 自动化与 UI 验收
 
-进入：
-
-~~~text
-家长
-→ 导入老师作业
-→ 屏幕采集技术诊断
-→ 运行 #245 聊天重建自测
-~~~
-
-PASS 应包含：
+固定聊天重建回归已迁到：
 
 ~~~text
-5 frames → 5 unique → A evidence = 3 → boundary = 14:58
+entry/src/test/fixtures/Issue245ChatReconstructionFixture.ets
+entry/src/test/List.test.ets
 ~~~
+
+由 Hypium Local Test 真正执行 5 Frame overlap、去重、时间边界与 Source Evidence 断言；Python Gate 只检查架构不变量。
 
 真实采集完成后进入：
 
