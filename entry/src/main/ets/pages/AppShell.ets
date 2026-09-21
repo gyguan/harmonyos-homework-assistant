@@ -185,9 +185,9 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.STUDENT_STUDY, new AssignmentRouteParam(assignmentId));
   }
 
-  private openPracticeHistory(): void {
+  private openPracticeHistory(paperId: string = ''): void {
     this.navPathStack.pushPathByName(
-      AppRoute.STUDENT_PRACTICE_HISTORY, new PracticeHistoryRouteParam());
+      AppRoute.STUDENT_PRACTICE_HISTORY, new PracticeHistoryRouteParam(paperId));
   }
 
   private openPracticePaper(paperId: string, version: number): void {
@@ -287,6 +287,7 @@ export struct AppShell {
     } else if (name === AppRoute.STUDENT_PRACTICE_HISTORY) {
       NavDestination() {
         PracticeHistoryPage({
+          paperId: (param as PracticeHistoryRouteParam).paperId,
           onBack: () => this.navPathStack.pop(),
           onOpenAttempt: (attemptId: string) => this.openPracticeAttempt(attemptId),
           onOpenResult: (attemptId: string) => this.openPracticeResult(attemptId)
@@ -300,7 +301,9 @@ export struct AppShell {
           paperId: (param as PracticePaperRouteParam).paperId,
           version: (param as PracticePaperRouteParam).version,
           onBack: () => this.navPathStack.pop(),
-          onStarted: (attemptId: string) => this.openPracticeAttempt(attemptId)
+          onStarted: (attemptId: string) => this.openPracticeAttempt(attemptId),
+          onOpenAttempt: (attemptId: string) => this.openPracticeAttempt(attemptId),
+          onOpenHistory: (paperId: string) => this.openPracticeHistory(paperId)
         });
       }
       .hideTitleBar(true)
