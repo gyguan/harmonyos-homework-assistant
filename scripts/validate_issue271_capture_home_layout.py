@@ -31,7 +31,7 @@ for text in [
     "抓取时间范围",
     "开始抓取",
     "班级采集设置",
-    "抓取记录",
+    "作业收件箱",
     "使用说明",
 ]:
     require(text in page, f"capture home prototype content missing: {text}")
@@ -52,6 +52,8 @@ require("showGuide" in page and "屏幕采集诊断" in page,
         "capture diagnostics must be nested under the usage guide")
 require("onOpenDiagnostics()" in page,
         "technical diagnostics must remain reachable")
+require("onOpenInbox" in page,
+        "capture home inbox shortcut must use shared inbox semantics")
 require("不读取微信数据库" in page and "不自动点击或滚动微信" in page and
         "Accessibility" in page,
         "capture privacy/non-automation boundary must remain explicit")

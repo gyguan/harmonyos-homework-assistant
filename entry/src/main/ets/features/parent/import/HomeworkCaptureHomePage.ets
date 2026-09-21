@@ -9,7 +9,7 @@ export struct HomeworkCaptureHomePage {
   onBack: () => void = () => {};
   onStartCapture: () => void = () => {};
   onOpenSourceProfile: (startCaptureAfterSave: boolean) => void = (_startCaptureAfterSave: boolean) => {};
-  onOpenHistory: () => void = () => {};
+  onOpenInbox: () => void = () => {};
   onOpenDiagnostics: () => void = () => {};
   private readonly viewModel: HomeworkCaptureHomeViewModel = new HomeworkCaptureHomeViewModel();
 
@@ -213,7 +213,7 @@ export struct HomeworkCaptureHomePage {
 
           Row({ space: 8 }) {
             this.SecondaryAction('设', '班级采集设置', () => this.onOpenSourceProfile(false));
-            this.SecondaryAction('记', '抓取记录', () => this.onOpenHistory());
+            this.SecondaryAction('箱', '作业收件箱', () => this.onOpenInbox());
             this.SecondaryAction('?', '使用说明', () => this.showGuide = !this.showGuide);
           }
           .width('100%');

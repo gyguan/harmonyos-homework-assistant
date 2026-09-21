@@ -15,6 +15,7 @@ export struct ParentDashboardPage {
   @State private availableWidthVp: number = 390;
   onOpenImport: () => void = () => {};
   onOpenCapture: () => void = () => {};
+  onOpenInbox: () => void = () => {};
   onOpenExtra: () => void = () => {};
   onOpenVoice: () => void = () => {};
   onOpenProgress: () => void = () => {};
@@ -270,19 +271,25 @@ export struct ParentDashboardPage {
 
   @Builder
   private QuickActions() {
-    Column({ space: 9 }) {
+    Column({ space: 10 }) {
       Text('快捷操作')
         .width('100%')
         .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
 
+      Text('收作业')
+        .width('100%')
+        .fontSize(13)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.SUBTEXT);
+
       Row({ space: 8 }) {
         Row({ space: 8 }) {
           SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.PRIMARY]);
           Column({ space: 2 }) {
             Text('手工导入作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('老师截图、文字或分享').fontSize(13).fontColor(AppTheme.SUBTEXT);
+            Text('截图或文字').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
         }
@@ -304,7 +311,7 @@ export struct ParentDashboardPage {
             .textAlign(TextAlign.Center);
           Column({ space: 2 }) {
             Text('抓取老师作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('进班级群手工上滑').fontSize(13).fontColor(AppTheme.SUBTEXT);
+            Text('班级群抓取').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
         }
@@ -318,6 +325,48 @@ export struct ParentDashboardPage {
         .onClick(() => this.onOpenCapture());
       }
       .width('100%');
+
+      Row({ space: 10 }) {
+        Text('箱')
+          .width(30)
+          .height(30)
+          .fontSize(13)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.PRIMARY)
+          .textAlign(TextAlign.Center)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .borderRadius(9);
+        Column({ space: 2 }) {
+          Text('作业收件箱')
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('导入与抓取记录')
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(15)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: 58 })
+      .padding({ left: 12, right: 10, top: 10, bottom: 10 })
+      .backgroundColor(AppTheme.SURFACE)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText('打开作业收件箱')
+      .onClick(() => this.onOpenInbox());
+
+      Text('布置任务')
+        .width('100%')
+        .fontSize(13)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.SUBTEXT)
+        .margin({ top: 2 });
 
       Row({ space: 8 }) {
         Row({ space: 8 }) {

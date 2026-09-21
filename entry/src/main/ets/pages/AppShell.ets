@@ -366,7 +366,6 @@ export struct AppShell {
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
-          onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
           onStoreChanged: () => this.notifyUiChanged()
         });
       }
@@ -380,7 +379,7 @@ export struct AppShell {
           onStartCapture: () => ParentImportNavigator.openCapture(this.navPathStack),
           onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
             ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave),
-          onOpenHistory: () => ParentImportNavigator.openInbox(this.navPathStack),
+          onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
           onOpenDiagnostics: () => ParentImportNavigator.openCaptureDiagnostics(this.navPathStack)
         });
       }
@@ -486,6 +485,7 @@ export struct AppShell {
         activeStudentId: this.activeStudentId,
         onOpenImport: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenCapture: () => ParentImportNavigator.openCaptureHome(this.navPathStack),
+        onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
         onOpenExtra: () => this.openParentExtraCreate(false),
         onOpenVoice: () => this.openParentExtraCreate(true),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
