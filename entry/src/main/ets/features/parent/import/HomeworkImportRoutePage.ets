@@ -1,5 +1,7 @@
+import { HomeworkSourceProfileService } from '../../../application/capture/HomeworkSourceProfileService';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
+import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { HomeworkImportPage } from './HomeworkImportPage';
 
 @Component
@@ -9,8 +11,27 @@ export struct HomeworkImportRoutePage {
   onOpenConfirmation: () => void = () => {};
   onOpenInbox: () => void = () => {};
   onOpenCapture: () => void = () => {};
+  onOpenSourceProfile: () => void = () => {};
   onOpenCaptureSpike: () => void = () => {};
   onStoreChanged: () => void = () => {};
+
+  private profileSubtitle(): string {
+    let currentRevision = this.revision;
+    if (currentRevision < 0) return '';
+    let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
+    let profile = HomeworkSourceProfileService.instance.getActiveProfile(studentId);
+    if (profile === null) return '首次使用先配置班级群、老师和抓取时间';
+    return `${profile.groupTitle} · 今天 ${HomeworkSourceProfileService.instance.formatStartTime(profile)} 至现在`;
+  }
+
+  private openCapture(): void {
+    let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
+    if (HomeworkSourceProfileService.instance.getActiveProfile(studentId) === null) {
+      this.onOpenSourceProfile();
+      return;
+    }
+    this.onOpenCapture();
+  }
 
   build() {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
@@ -68,7 +89,7 @@ export struct HomeworkImportRoutePage {
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('进入班级群手工上滑，小伴自动采集变化画面')
+          Text(this.profileSubtitle())
             .fontSize(11)
             .fontColor(AppTheme.SUBTEXT);
         }
@@ -84,7 +105,23 @@ export struct HomeworkImportRoutePage {
       .accessibilityGroup(true)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
       .accessibilityText('抓取今日作业')
-      .onClick(() => this.onOpenCapture());
+      .onClick(() => this.openCapture());
+
+      Row() {
+        Text('班级采集设置')
+          .fontSize(12)
+          .fontColor(AppTheme.PRIMARY);
+        Blank();
+        Text('修改 ›')
+          .fontSize(12)
+          .fontColor(AppTheme.PRIMARY);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 10, right: 10 })
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText('修改班级采集设置')
+      .onClick(() => this.onOpenSourceProfile());
 
       Row({ space: 10 }) {
         Text('验')
