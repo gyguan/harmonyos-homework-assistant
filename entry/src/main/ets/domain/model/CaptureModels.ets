@@ -1,0 +1,74 @@
+export enum CaptureSessionStatus {
+  CREATED = 'CREATED',
+  WAITING_PERMISSION = 'WAITING_PERMISSION',
+  CAPTURING = 'CAPTURING',
+  STOPPING = 'STOPPING',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  FAILED = 'FAILED'
+}
+
+export enum CaptureStopReason {
+  USER = 'USER',
+  START_REJECTED = 'START_REJECTED',
+  NATIVE_ERROR = 'NATIVE_ERROR',
+  ABILITY_DESTROYED = 'ABILITY_DESTROYED',
+  PROCESS_RESTARTED = 'PROCESS_RESTARTED',
+  CANCELLED = 'CANCELLED'
+}
+
+export interface CaptureFrame {
+  data: ArrayBuffer;
+  width: number;
+  height: number;
+  timestamp: number;
+  sequence: number;
+}
+
+export interface CaptureRuntimeStats {
+  isCapturing: boolean;
+  lastError: number;
+  callbackCount: number;
+  sampledFrameCount: number;
+  latestSequence: number;
+}
+
+export interface CaptureFrameRecognition {
+  text: string;
+  lineCount: number;
+}
+
+export interface CaptureFrameEvidence {
+  id: string;
+  sessionId: string;
+  sequence: number;
+  capturedAtEpochMs: number;
+  width: number;
+  height: number;
+  fingerprint: string;
+  text: string;
+  lineCount: number;
+  orderNo: number;
+}
+
+export interface CaptureSession {
+  id: string;
+  studentId: string;
+  startedAtEpochMs: number;
+  stoppedAtEpochMs: number;
+  status: CaptureSessionStatus;
+  frameCount: number;
+  acceptedFrameCount: number;
+  sourceProfileId: string;
+  stopReason: string;
+  importBatchId: string;
+  lastFrameSequence: number;
+  runtimeErrorCode: number;
+}
+
+export interface HomeworkCaptureSessionSnapshot {
+  schemaVersion: number;
+  activeSessionId: string;
+  sessions: CaptureSession[];
+  evidence: CaptureFrameEvidence[];
+}
