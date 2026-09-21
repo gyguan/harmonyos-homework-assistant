@@ -2,6 +2,7 @@ import { HomeworkChatReconstructionService } from './HomeworkChatReconstructionS
 import { HomeworkCaptureSessionService } from './HomeworkCaptureSessionService';
 import { HomeworkSourceProfileService } from './HomeworkSourceProfileService';
 import { DeterministicChatReconstructor } from './DeterministicChatReconstructor';
+import { DeterministicGroupTitlePolicy } from './DeterministicGroupTitlePolicy';
 import { HomeworkImportInboxService } from '../import/HomeworkImportInboxService';
 import { HomeworkUnderstandingService } from '../understanding/HomeworkUnderstandingService';
 import { CaptureSession } from '../../domain/model/CaptureModels';
@@ -45,6 +46,7 @@ export class HomeworkCaptureWorkflowService {
   private readonly profiles: HomeworkSourceProfileService = HomeworkSourceProfileService.instance;
   private readonly inbox: HomeworkImportInboxService = HomeworkImportInboxService.instance;
   private readonly previewReconstructor: DeterministicChatReconstructor = new DeterministicChatReconstructor();
+  private readonly groupTitlePolicy: DeterministicGroupTitlePolicy = new DeterministicGroupTitlePolicy();
 
   private constructor() {}
 
@@ -314,23 +316,7 @@ export class HomeworkCaptureWorkflowService {
   }
 
   validateGroupTitle(expected: string, detected: string): SourceGroupValidationStatus {
-    let normalizedDetected = this.normalizeTitle(detected);
-    if (normalizedDetected.length === 0) return SourceGroupValidationStatus.UNRECOGNIZED;
-    return normalizedDetected === this.normalizeTitle(expected) ?
-      SourceGroupValidationStatus.MATCHED : SourceGroupValidationStatus.MISMATCH;
-  }
-
-  private normalizeTitle(value: string): string {
-    let normalized = value.trim()
-      .replace(/\s+/g, '')
-      .replace(/（/g, '(')
-      .replace(/）/g, ')')
-      .toLowerCase();
-    let memberCount = normalized.match(/\(\d{1,4}\)$/);
-    if (memberCount !== null) {
-      normalized = normalized.substring(0, normalized.length - memberCount[0].length);
-    }
-    return normalized;
+    return this.groupTitlePolicy.validate(expected, detected);
   }
 
   private requireBatch(batchId: string): ImportBatch {
