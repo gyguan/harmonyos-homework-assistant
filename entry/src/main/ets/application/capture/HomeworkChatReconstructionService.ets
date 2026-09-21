@@ -81,6 +81,7 @@ export class HomeworkChatReconstructionService {
       earliestDetectedTime: result.earliestDetectedTime,
       reconstructionWarnings: result.warnings.slice(),
       understood: batch.understood,
+      understandingVersion: batch.understandingVersion,
       pendingReviewMessageIds: batch.pendingReviewMessageIds === undefined ?
         undefined : batch.pendingReviewMessageIds.slice(),
       understandingWarnings: batch.understandingWarnings === undefined ?
