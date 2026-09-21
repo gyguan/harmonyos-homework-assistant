@@ -98,19 +98,19 @@ export struct AssignmentDetailPane {
         Column({ space: 14 }) {
           Row({ space: 8 }) {
             Text(this.typeLabel(this.assignment()!))
-              .fontSize(12)
+              .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.PRIMARY)
               .padding({ left: 10, right: 10, top: 6, bottom: 6 })
               .backgroundColor(AppTheme.PRIMARY_SOFT)
               .borderRadius(AppTheme.CHIP_RADIUS);
             Text(this.assignment()!.subject)
-              .fontSize(12)
+              .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.SUBTEXT);
             Blank();
             Text(AssignmentStateMachine.label(this.assignment()!.status))
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%');
@@ -214,7 +214,7 @@ export struct AssignmentDetailPane {
           Column({ space: 5 }) {
             Text('家长提醒')
               .width('100%')
-              .fontSize(12)
+              .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.WARNING);
             Text(this.assignment()!.reviewNote)
