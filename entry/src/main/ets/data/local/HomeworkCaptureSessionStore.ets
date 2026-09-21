@@ -123,6 +123,13 @@ export class HomeworkCaptureSessionStore {
       fingerprint: source.fingerprint,
       text: source.text,
       lineCount: source.lineCount,
+      lines: source.lines.map(line => ({
+        value: line.value,
+        left: line.left,
+        top: line.top,
+        right: line.right,
+        bottom: line.bottom
+      })),
       orderNo: source.orderNo
     };
   }
