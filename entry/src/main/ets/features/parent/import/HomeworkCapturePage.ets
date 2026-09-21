@@ -18,7 +18,7 @@ export struct HomeworkCapturePage {
   onBack: () => void = () => {};
   onOpenInbox: () => void = () => {};
   onOpenConfirmation: () => void = () => {};
-  onOpenSourceProfile: () => void = () => {};
+  onOpenSourceProfile: (startCaptureAfterSave: boolean) => void = (_startCaptureAfterSave: boolean) => {};
 
   @State private revision: number = 0;
   @State private message: string = '点击开始后，系统会提示屏幕采集授权。进入班级群后只需手工上滑。';
@@ -439,7 +439,7 @@ export struct HomeworkCapturePage {
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .backgroundColor(AppTheme.SURFACE_EMPHASIS)
             .fontColor(AppTheme.TEXT)
-            .onClick(() => this.onOpenSourceProfile());
+            .onClick(() => this.onOpenSourceProfile(false));
 
           Button('查看作业智能收件箱', { type: ButtonType.Normal })
             .width('100%')
