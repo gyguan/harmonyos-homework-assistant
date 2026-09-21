@@ -17,7 +17,8 @@ interface DetectedTime {
 export class DeterministicChatRegionParser {
   parse(frame: CaptureFrameEvidence): ParsedChatFrame {
     let lines: CaptureOcrLineEvidence[] = [];
-    let sourceLines = frame.lines === undefined ? [] : frame.lines;
+    let geometryMissing = frame.lines === undefined || frame.lines.length === 0;
+    let sourceLines = geometryMissing ? this.fallbackLines(frame.text, frame.width) : frame.lines!;
     for (let source of sourceLines) {
       let value = this.normalizeText(source.value);
       if (value.length === 0) continue;
@@ -37,6 +38,9 @@ export class DeterministicChatRegionParser {
     let groupTitle = this.detectGroupTitle(lines, frame.width, frame.height);
     let messages: ParsedChatMessage[] = [];
     let warnings: string[] = [];
+    if (geometryMissing && frame.text.trim().length > 0) {
+      warnings.push(`FRAME_${frame.orderNo}_GEOMETRY_MISSING`);
+    }
     let pendingTime: DetectedTime | null = null;
     let pendingSender = '';
 
@@ -101,6 +105,25 @@ export class DeterministicChatRegionParser {
       messages: messages,
       warnings: warnings
     };
+  }
+
+  private fallbackLines(text: string, width: number): CaptureOcrLineEvidence[] {
+    let result: CaptureOcrLineEvidence[] = [];
+    let rawLines = text.split('\n');
+    let safeWidth = width > 0 ? width : 800;
+    for (let i = 0; i < rawLines.length; i++) {
+      let value = this.normalizeText(rawLines[i]);
+      if (value.length === 0) continue;
+      let top = 30 + i * 70;
+      result.push({
+        value: value,
+        left: i === 0 ? Math.round(safeWidth * 0.3) : 80,
+        top: top,
+        right: i === 0 ? Math.round(safeWidth * 0.7) : Math.round(safeWidth * 0.88),
+        bottom: top + 42
+      });
+    }
+    return result;
   }
 
   private detectGroupTitle(lines: CaptureOcrLineEvidence[], width: number, height: number): string {
