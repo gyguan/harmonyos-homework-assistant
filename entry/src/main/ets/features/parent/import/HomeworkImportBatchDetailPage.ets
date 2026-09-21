@@ -199,6 +199,45 @@ export struct HomeworkImportBatchDetailPage {
             .backgroundColor(AppTheme.SURFACE)
             .borderRadius(AppTheme.CONTROL_RADIUS);
 
+            if (this.batch()!.sourceProfileId.length > 0) {
+              Column({ space: 6 }) {
+                Text('班级采集范围')
+                  .width('100%')
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                if (this.batch()!.sourceProfileName !== undefined &&
+                  this.batch()!.sourceProfileName!.length > 0) {
+                  Text(`配置：${this.batch()!.sourceProfileName}`)
+                    .width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+                }
+                if (this.batch()!.expectedGroupTitle !== undefined &&
+                  this.batch()!.expectedGroupTitle!.length > 0) {
+                  Text(`目标群：${this.batch()!.expectedGroupTitle}`)
+                    .width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+                }
+                if (this.batch()!.profileStartTime !== undefined &&
+                  this.batch()!.profileStartTime!.length > 0) {
+                  Text(`时间范围：今天 ${this.batch()!.profileStartTime} 至采集结束`)
+                    .width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+                }
+                if (this.batch()!.groupValidationStatus !== undefined) {
+                  Text(this.batch()!.groupValidationStatus === 'MATCHED' ? '群名校验：匹配' :
+                    (this.batch()!.groupValidationStatus === 'MISMATCH' ? '群名校验：不匹配' :
+                      (this.batch()!.groupConfirmedByUser === true ? '群名校验：未识别，家长已确认继续' :
+                        '群名校验：未识别')))
+                    .width('100%')
+                    .fontSize(12)
+                    .fontColor(this.batch()!.groupValidationStatus === 'MATCHED' ? AppTheme.SUCCESS :
+                      (this.batch()!.groupValidationStatus === 'MISMATCH' ? AppTheme.DANGER : AppTheme.WARNING));
+                }
+              }
+              .width('100%')
+              .padding(14)
+              .backgroundColor(AppTheme.SURFACE)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
+            }
+
             if (this.batch()!.reconstructed === true) {
               Column({ space: 6 }) {
                 Text('聊天重建')
