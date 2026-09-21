@@ -19,6 +19,7 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 
+theme = read("entry/src/main/ets/common/theme/AppTheme.ets")
 models = read("entry/src/main/ets/domain/model/practice/PracticeModels.ets")
 repo = read("entry/src/main/ets/domain/port/PracticeRepository.ets")
 remote = read("entry/src/main/ets/application/remote/PracticeRemoteApi.ets")
@@ -63,6 +64,20 @@ require("attempts.slice(0, 3)" in detail_vm,
         "Practice paper detail must limit the embedded history to the latest three attempts")
 require("下一题" in attempt_page and "交卷" in attempt_page and "saveCurrent" in attempt_page,
         "attempt page must save answers and support navigation")
+require("DeepPageHeader" in attempt_page and "Text('‹')" not in attempt_page,
+        "Practice attempt deep page must use the shared DeepPageHeader")
+require("availableWidthVp" in attempt_page and "ResponsiveContext.areaLengthToVp" in attempt_page,
+        "Practice attempt must derive readability from actual available container width")
+require("contentScale()" in attempt_page and "AppTheme.PRACTICE_ATTEMPT_MAX_SCALE" in attempt_page,
+        "Practice attempt must use bounded continuous scaling for wide-container readability")
+require("AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in attempt_page,
+        "Practice attempt content must use its wider shared readable-width token")
+require(".fontSize(this.scaled(20))" in attempt_page and ".height(this.scaled(50))" in attempt_page,
+        "Practice attempt must scale question text and answer controls together")
+require("PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in theme and
+        "PRACTICE_ATTEMPT_SCALE_REFERENCE_WIDTH" in theme and
+        "PRACTICE_ATTEMPT_MAX_SCALE" in theme,
+        "AppTheme must own Practice attempt readability tokens")
 require("private CurrentQuestionAnswer()" in attempt_page,
         "choice rendering must derive directly from reactive currentIndex state")
 require("this.attempt.questions[this.currentIndex].options" in attempt_page,
