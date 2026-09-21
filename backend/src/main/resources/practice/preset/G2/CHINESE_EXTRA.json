@@ -1483,6 +1483,746 @@
           ]
         }
       ]
+    },
+    {
+      "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "城市观察阅读（一)",
+      "description": "阅读地铁、社区、公园和街道中的原创小短文，训练观察细节、信息提取和简单推断。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "课外拓展",
+        "城市观察",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：早高峰的地铁站里，大家排成两队。车门打开后，车上的人先下车，站台上的人再上车。\n大家为什么不一起挤上车？",
+          "options": [
+            {
+              "key": "A",
+              "label": "这样更安全有序"
+            },
+            {
+              "key": "B",
+              "label": "因为车门很小不能开"
+            },
+            {
+              "key": "C",
+              "label": "因为大家都不想坐车"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先下后上能减少拥挤，让乘车更安全、更有秩序。",
+          "hints": [
+            "关键词：“排成两队”“先下后上”。从这些做法推想它们带来的好处。"
+          ],
+          "tags": [
+            "城市阅读",
+            "简单推断"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "同一短文中，车门打开后谁先行动？",
+          "options": [
+            {
+              "key": "A",
+              "label": "站台上的人先上车"
+            },
+            {
+              "key": "B",
+              "label": "车上的人先下车"
+            },
+            {
+              "key": "C",
+              "label": "所有人同时行动"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "短文明确写“车上的人先下车”。",
+          "hints": [
+            "关键词：“车门打开后”“谁先”。回到短文找到“先”字后面的动作主体。"
+          ],
+          "tags": [
+            "城市阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "这段地铁短文主要告诉我们什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "怎样买地铁票"
+            },
+            {
+              "key": "B",
+              "label": "地铁开得多快"
+            },
+            {
+              "key": "C",
+              "label": "文明乘车要排队、先下后上"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "短文围绕排队和先下后上的乘车秩序展开。",
+          "hints": [
+            "关键词：“主要告诉我们”。找全文反复围绕的行为，而不是没有出现的细节。"
+          ],
+          "tags": [
+            "城市阅读",
+            "主旨"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：傍晚，社区花园的自动喷头开始浇水。小朋友看到湿漉漉的小路，就从旁边的干路绕过去。\n小朋友为什么绕路？",
+          "options": [
+            {
+              "key": "A",
+              "label": "避免踩湿滑的小路"
+            },
+            {
+              "key": "B",
+              "label": "想去买东西"
+            },
+            {
+              "key": "C",
+              "label": "忘记回家的方向"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "小路被水打湿可能较滑，绕干路走更安全。",
+          "hints": [
+            "关键词：“湿漉漉”“绕过去”。把路面变化和小朋友的选择联系起来。"
+          ],
+          "tags": [
+            "城市阅读",
+            "因果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "同一短文中，什么让小路变湿了？",
+          "options": [
+            {
+              "key": "A",
+              "label": "下大雪"
+            },
+            {
+              "key": "B",
+              "label": "自动喷头浇水"
+            },
+            {
+              "key": "C",
+              "label": "有人洒了果汁"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "短文写自动喷头开始浇水，因此附近小路变得湿漉漉。",
+          "hints": [
+            "关键词：“自动喷头”“湿漉漉”。找前后两个信息之间的原因和结果。"
+          ],
+          "tags": [
+            "城市阅读",
+            "因果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "这位小朋友的做法说明他怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "不认识路"
+            },
+            {
+              "key": "B",
+              "label": "喜欢踩水"
+            },
+            {
+              "key": "C",
+              "label": "注意安全"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "发现路湿后选择干路，说明他会观察环境并注意安全。",
+          "hints": [
+            "关键词：“看到湿路”“绕干路”。从人物的选择判断他的做事特点。"
+          ],
+          "tags": [
+            "城市阅读",
+            "人物特点"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：周末公园里，志愿者把可回收物、厨余垃圾和其他垃圾的标志贴在三个桶上，还耐心告诉游客怎么分类。\n志愿者主要在做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "帮助游客学习垃圾分类"
+            },
+            {
+              "key": "B",
+              "label": "卖公园门票"
+            },
+            {
+              "key": "C",
+              "label": "给树木浇水"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "志愿者贴分类标志并讲解，主要是在帮助游客正确分类垃圾。",
+          "hints": [
+            "关键词：“分类标志”“告诉游客怎么分类”。抓住志愿者重复做的核心事情。"
+          ],
+          "tags": [
+            "城市阅读",
+            "主旨"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "同一短文里，志愿者把标志贴在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "长椅上"
+            },
+            {
+              "key": "B",
+              "label": "三个垃圾桶上"
+            },
+            {
+              "key": "C",
+              "label": "公园大门上"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "短文明确写“贴在三个桶上”。",
+          "hints": [
+            "关键词：“标志”“贴在哪里”。找到动作“贴”后面对应的地点。"
+          ],
+          "tags": [
+            "城市阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "游客听完讲解后，最合适的做法是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "把垃圾放在地上"
+            },
+            {
+              "key": "B",
+              "label": "把所有垃圾放一个桶"
+            },
+            {
+              "key": "C",
+              "label": "按类别投入不同垃圾桶"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "既然学习了分类，就应该根据垃圾类别投入对应的桶。",
+          "hints": [
+            "关键词：“怎么分类”“听完讲解”。根据短文目的判断接下来最合理的行动。"
+          ],
+          "tags": [
+            "城市阅读",
+            "应用"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：放学路上，路口的志愿者举起小旗，请准备过马路的同学先停下。等绿灯亮起，他才示意大家通行。\n绿灯亮之前，同学们应该怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "先停下等待"
+            },
+            {
+              "key": "B",
+              "label": "马上跑过去"
+            },
+            {
+              "key": "C",
+              "label": "站到马路中间"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "志愿者先让大家停下，等绿灯亮后才通行。",
+          "hints": [
+            "关键词：“先停下”“等绿灯”。按短文中的先后要求判断绿灯前应该做什么。"
+          ],
+          "tags": [
+            "城市阅读",
+            "安全"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "是谁示意同学们通行？",
+          "options": [
+            {
+              "key": "A",
+              "label": "司机"
+            },
+            {
+              "key": "B",
+              "label": "路口志愿者"
+            },
+            {
+              "key": "C",
+              "label": "商店阿姨"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "短文中路口志愿者举旗并在绿灯亮后示意大家通行。",
+          "hints": [
+            "关键词：“示意大家通行”。找这个动作前面对应的人物。"
+          ],
+          "tags": [
+            "城市阅读",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "这段话最适合作为哪一种安全提醒？",
+          "options": [
+            {
+              "key": "A",
+              "label": "吃饭前要洗手"
+            },
+            {
+              "key": "B",
+              "label": "借书后要归还"
+            },
+            {
+              "key": "C",
+              "label": "过马路要看信号、听指引"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "短文全过程都围绕路口等待绿灯和听从引导。",
+          "hints": [
+            "关键词：“路口”“绿灯”“通行”。把三个关键信息合起来判断是哪类安全规则。"
+          ],
+          "tags": [
+            "城市阅读",
+            "主旨"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-EXTRA-STORY-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "故事人物与因果（二)",
+      "description": "用四个原创微故事训练人物动机、事情因果、细节提取和道理理解。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "课外拓展",
+        "故事",
+        "因果推理"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "故事：小松鼠把松果埋在树下，做了一个小木牌作记号。第二天大风吹倒了木牌，它找了很久才找到松果。\n小松鼠做木牌是为了什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "记住松果埋在哪里"
+            },
+            {
+              "key": "B",
+              "label": "装饰大树"
+            },
+            {
+              "key": "C",
+              "label": "告诉别人不要来"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "木牌是位置记号，帮助小松鼠记住松果埋藏地点。",
+          "hints": [
+            "关键词：“埋松果”“做木牌作记号”。想一想“记号”最直接的作用是什么。"
+          ],
+          "tags": [
+            "故事",
+            "人物动机"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "为什么第二天小松鼠找了很久？",
+          "options": [
+            {
+              "key": "A",
+              "label": "松果自己跑走了"
+            },
+            {
+              "key": "B",
+              "label": "木牌被风吹倒了"
+            },
+            {
+              "key": "C",
+              "label": "它忘记自己是谁"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "原来用来定位的木牌倒了，小松鼠失去明显记号，所以寻找更困难。",
+          "hints": [
+            "关键词：“第二天”“木牌吹倒”“找很久”。把前面的变化和后面的困难连起来。"
+          ],
+          "tags": [
+            "故事",
+            "因果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "这个故事提醒我们做重要记号时最好怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "随便放一下"
+            },
+            {
+              "key": "B",
+              "label": "只告诉自己一次"
+            },
+            {
+              "key": "C",
+              "label": "选择更牢固、清楚的方法"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "木牌容易被风吹倒，更牢固清楚的标记能减少丢失。",
+          "hints": [
+            "关键词：“木牌被吹倒”“提醒”。从问题原因想一想怎样改进更可靠。"
+          ],
+          "tags": [
+            "故事",
+            "道理"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "故事：小雨借了同学的彩笔，用完后把笔按颜色排好，还把盒子轻轻盖上再归还。\n小雨为什么把彩笔排好？",
+          "options": [
+            {
+              "key": "A",
+              "label": "方便同学下次使用"
+            },
+            {
+              "key": "B",
+              "label": "想把彩笔带回家"
+            },
+            {
+              "key": "C",
+              "label": "因为她不会画画"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "把借来的物品整理好再归还，是体贴他人的做法。",
+          "hints": [
+            "关键词：“借了彩笔”“排好”“归还”。想一想整理借来物品会给原主人带来什么方便。"
+          ],
+          "tags": [
+            "故事",
+            "人物品质"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "从故事中可以看出小雨怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "马虎"
+            },
+            {
+              "key": "B",
+              "label": "爱护别人的物品"
+            },
+            {
+              "key": "C",
+              "label": "不愿意分享"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "她用完后整理好并轻轻盖盒，表现出爱护和负责。",
+          "hints": [
+            "关键词：“排好”“轻轻盖上”“归还”。从连续动作判断人物做事态度。"
+          ],
+          "tags": [
+            "故事",
+            "人物特点"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "如果你借用别人的东西，最合适的做法是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "用完随手一放"
+            },
+            {
+              "key": "B",
+              "label": "自己喜欢就留下"
+            },
+            {
+              "key": "C",
+              "label": "爱护使用并及时归还"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "借用物品应爱护并归还，这是尊重他人的基本做法。",
+          "hints": [
+            "关键词：“借用”“最合适”。联系故事中小雨的做法，判断哪种行为最尊重别人。"
+          ],
+          "tags": [
+            "故事",
+            "应用"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "故事：小杰种下三颗豆子，每天只给其中两颗浇水。几天后，那两颗发了芽，另一颗一直没有变化。\n哪两颗豆子更可能发芽？",
+          "options": [
+            {
+              "key": "A",
+              "label": "每天浇水的两颗"
+            },
+            {
+              "key": "B",
+              "label": "没有浇水的一颗"
+            },
+            {
+              "key": "C",
+              "label": "三颗都一定不发芽"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "故事已经写每天浇水的两颗发了芽。",
+          "hints": [
+            "关键词：“每天浇水”“发了芽”。直接找故事中照顾方式和结果的对应关系。"
+          ],
+          "tags": [
+            "故事",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "这个小实验说明植物生长需要注意什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "每天搬来搬去"
+            },
+            {
+              "key": "B",
+              "label": "需要合适的照顾和水分"
+            },
+            {
+              "key": "C",
+              "label": "完全不能碰水"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "有水分并得到照顾的豆子发芽了，说明水分是生长条件之一。",
+          "hints": [
+            "关键词：“浇水”“发芽”。比较两组豆子的不同条件，再看结果差别。"
+          ],
+          "tags": [
+            "故事",
+            "因果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "如果小杰想让比较更公平，最应该怎样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "给一颗豆子换名字"
+            },
+            {
+              "key": "B",
+              "label": "把花盆藏起来"
+            },
+            {
+              "key": "C",
+              "label": "除了浇水外让三颗豆子的其他条件尽量一样"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "做简单比较时，最好只改变一个条件，其他条件尽量相同。",
+          "hints": [
+            "关键词：“比较更公平”“其他条件”。想一想要判断浇水影响，就不要同时改变太多别的条件。"
+          ],
+          "tags": [
+            "故事",
+            "简单探究"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "故事：小鹿看到桥边写着“地面维修，请绕行”，就带着朋友走旁边的小路。虽然多走了一会儿，但大家安全到家。\n小鹿为什么绕行？",
+          "options": [
+            {
+              "key": "A",
+              "label": "看到维修提醒"
+            },
+            {
+              "key": "B",
+              "label": "想比赛跑步"
+            },
+            {
+              "key": "C",
+              "label": "不认识自己的家"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "提示牌明确写“地面维修，请绕行”，小鹿按提醒选择了其他道路。",
+          "hints": [
+            "关键词：“地面维修”“请绕行”。找人物改变路线前看到的直接原因。"
+          ],
+          "tags": [
+            "故事",
+            "因果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "小鹿的选择带来了什么结果？",
+          "options": [
+            {
+              "key": "A",
+              "label": "大家迷路了"
+            },
+            {
+              "key": "B",
+              "label": "大家安全到家"
+            },
+            {
+              "key": "C",
+              "label": "桥立刻修好了"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "故事最后写大家虽然多走一会儿，但安全到家。",
+          "hints": [
+            "关键词：“虽然多走”“但”。关注转折后面真正的结果。"
+          ],
+          "tags": [
+            "故事",
+            "结果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-STORY-002-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "这个故事更想告诉我们什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "越近的路越好"
+            },
+            {
+              "key": "B",
+              "label": "看到提示牌也不用管"
+            },
+            {
+              "key": "C",
+              "label": "遇到安全提醒要认真遵守"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "小鹿遵守维修绕行提示，虽然路更远但保证了安全。",
+          "hints": [
+            "关键词：“维修提醒”“安全到家”。把原因和结果联系起来概括道理。"
+          ],
+          "tags": [
+            "故事",
+            "道理"
+          ]
+        }
+      ]
     }
   ]
 }
