@@ -40,6 +40,13 @@ export interface ClassifiedHomeworkMessage {
   confidence: number;
 }
 
+export interface HomeworkMessageGroup {
+  subject: Subject;
+  teacherId: string;
+  teacherName: string;
+  messages: ClassifiedHomeworkMessage[];
+}
+
 export interface HomeworkTaskDraft {
   subject: Subject;
   title: string;
