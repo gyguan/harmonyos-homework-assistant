@@ -20,7 +20,7 @@ def main() -> int:
         paper_id = "MATH-G2-S1-SYNC-ADD-SUB-001"
 
         paper = expect(
-            http(base_url, "GET", f"/api/v1/practice/papers/{paper_id}?version=2", token=token),
+            http(base_url, "GET", f"/api/v1/practice/papers/{paper_id}?version=3", token=token),
             (200,),
             "load textbook-sync practice paper",
         ).json()
@@ -34,7 +34,7 @@ def main() -> int:
 
         extra_paper_id = "MATH-G2-S1-EXTRA-LIFE-001"
         extra_paper = expect(
-            http(base_url, "GET", f"/api/v1/practice/papers/{extra_paper_id}?version=2", token=token),
+            http(base_url, "GET", f"/api/v1/practice/papers/{extra_paper_id}?version=3", token=token),
             (200,),
             "load extracurricular practice paper",
         ).json()
@@ -55,7 +55,7 @@ def main() -> int:
                 "POST",
                 f"/api/v1/students/{student_id}/practice/attempts",
                 token=token,
-                payload={"paperId": paper_id, "paperVersion": 2},
+                payload={"paperId": paper_id, "paperVersion": 3},
             ),
             (200,),
             "start practice attempt",
