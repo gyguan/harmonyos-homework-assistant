@@ -28,7 +28,6 @@ import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_store = read("entry/src/main/ets/data/local/HomeworkImportInboxStore.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
 fixture = read("entry/src/test/fixtures/Issue245ChatReconstructionFixture.ets")
-spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 
 for field in ["value", "left", "top", "right", "bottom"]:

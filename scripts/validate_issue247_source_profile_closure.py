@@ -39,7 +39,6 @@ import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_store = read("entry/src/main/ets/data/local/HomeworkImportInboxStore.ets")
 publish = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
 fixture = read("entry/src/test/fixtures/Issue247FullClosureFixture.ets")
-spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 task_extractor = read("entry/src/main/ets/application/understanding/DeterministicHomeworkTaskExtractor.ets")
 
 for field in [
@@ -81,7 +80,7 @@ require("!this.hasSourceProfile()" in capture_home and
         "first click without a profile must route through first-time setup")
 require("onOpenSourceProfile(false)" in capture_home,
         "profile settings edit must not automatically stack a new capture page")
-require("抓取今日作业" not in import_home and "屏幕采集技术诊断" not in import_home,
+require("抓取今日作业" not in import_home and "屏幕采集诊断" not in import_home,
         "manual import page must not regain capture-specific entry points")
 
 for text in ["班级与微信群", "老师与科目", "默认抓取开始时间", "保存并开始抓取"]:

@@ -32,7 +32,6 @@ detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDeta
 inbox_vm = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxViewModel.ets")
 confirmation_vm = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationViewModel.ets")
 fixture = read("entry/src/test/fixtures/Issue246HomeworkUnderstandingFixture.ets")
-spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 reconstruction = read("entry/src/main/ets/application/capture/HomeworkChatReconstructionService.ets")
 schema = read("docs/contracts/homework-understanding/v1/schema.json")
 prompt = read("docs/contracts/homework-understanding/v1/prompt.md")
