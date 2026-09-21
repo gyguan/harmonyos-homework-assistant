@@ -217,7 +217,7 @@ export struct ParentReviewPane {
         if (this.editNotice.length > 0) {
           Text(this.editNotice)
             .width('100%')
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.DANGER)
             .padding({ left: 16, right: 16, bottom: 10 });
         }
@@ -235,7 +235,7 @@ export struct ParentReviewPane {
       Text(this.assignmentId.length === 0 ? '选择一项作业查看详情' : '这项作业暂时找不到')
         .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       Text('提交证据、实际用时和家长验收都会在这里显示。')
-        .fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+        .fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -271,7 +271,7 @@ export struct ParentReviewPane {
         Text('提交证据').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
         if (this.evidence() !== null) {
-          Text(this.evidence()!.submittedAtText).fontSize(11).fontColor(AppTheme.SUBTEXT);
+          Text(this.evidence()!.submittedAtText).fontSize(12).fontColor(AppTheme.SUBTEXT);
         }
       }
       .width('100%');
@@ -327,7 +327,7 @@ export struct ParentReviewPane {
       }
       .width('100%');
       if (this.operationNotice.length > 0) {
-        Text(this.operationNotice).width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text(this.operationNotice).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
     }
     .width('100%')
@@ -346,19 +346,19 @@ export struct ParentReviewPane {
           Column({ space: 12 }) {
             Column({ space: 8 }) {
               Row() {
-                Text(this.assignment()!.subject).fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+                Text(this.assignment()!.subject).fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
                 Blank();
-                Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(12).fontColor(AppTheme.SUBTEXT);
+                Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(13).fontColor(AppTheme.SUBTEXT);
               }
               .width('100%');
               Text(this.assignment()!.title).width('100%').fontSize(21).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
               Row({ space: 8 }) {
                 Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
-                  .fontSize(12).fontColor(AppTheme.SUBTEXT);
-                Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+                  .fontSize(13).fontColor(AppTheme.SUBTEXT);
+                Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
                 Text(this.actualMinutes(this.assignment()!) > 0 ?
                   `实际 ${this.actualMinutes(this.assignment()!)} 分钟` : `预计 ${this.assignment()!.expectedMinutes} 分钟`)
-                  .fontSize(12).fontColor(AppTheme.SUBTEXT);
+                  .fontSize(13).fontColor(AppTheme.SUBTEXT);
               }
               .width('100%');
 
@@ -396,7 +396,7 @@ export struct ParentReviewPane {
               }
               if (this.assignment()!.reviewNote.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
                 Text(`家长备注：${this.assignment()!.reviewNote}`)
-                  .width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+                  .width('100%').fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
               }
             }
             .width('100%')
@@ -411,7 +411,7 @@ export struct ParentReviewPane {
             if (this.operationNotice.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
               Text(this.operationNotice)
                 .width('100%')
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(AppTheme.SUCCESS)
                 .padding({ left: 12, right: 12, top: 9, bottom: 9 })
                 .backgroundColor(AppTheme.SUCCESS_SOFT)
