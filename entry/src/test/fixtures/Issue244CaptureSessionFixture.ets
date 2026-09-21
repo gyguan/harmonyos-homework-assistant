@@ -8,8 +8,6 @@ import {
 } from '../../main/ets/domain/model/CaptureModels';
 import { HomeworkCaptureFrameRecognizer } from '../../main/ets/domain/port/HomeworkCaptureFrameRecognizer';
 import { HomeworkCaptureRuntime } from '../../main/ets/domain/port/HomeworkCaptureRuntime';
-import { NativeHomeworkCaptureRuntime } from '../../main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime';
-import { CoreVisionHomeworkCaptureFrameRecognizer } from '../../main/ets/infrastructure/capture/CoreVisionHomeworkCaptureFrameRecognizer';
 
 class FixtureCaptureRuntime implements HomeworkCaptureRuntime {
   private started: boolean = false;
@@ -144,8 +142,6 @@ export class Issue244CaptureSessionFixture {
       if (active !== null && active.sourceProfileId === 'issue244-fixture') {
         await HomeworkCaptureSessionService.instance.cancel();
       }
-      HomeworkCaptureSessionService.instance.configure(
-        new NativeHomeworkCaptureRuntime(), new CoreVisionHomeworkCaptureFrameRecognizer());
     }
   }
 }
