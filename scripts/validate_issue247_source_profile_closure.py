@@ -34,7 +34,7 @@ reconstruction_service = read("entry/src/main/ets/application/capture/HomeworkCh
 import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_store = read("entry/src/main/ets/data/local/HomeworkImportInboxStore.ets")
 publish = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
-fixture = read("entry/src/main/ets/experimental/homeworkcapture/Issue247FullClosureFixture.ets")
+fixture = read("entry/src/test/fixtures/Issue247FullClosureFixture.ets")
 spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 task_extractor = read("entry/src/main/ets/application/understanding/DeterministicHomeworkTaskExtractor.ets")
 
@@ -175,8 +175,6 @@ require("normalizedGroupVariantMatched" in fixture and "二（3）班家长群(4
         "fixture must cover common OCR/group-title bracket and member-count normalization")
 require("replace(/（/g, '(')" in workflow and "memberCount" in workflow,
         "group validation must normalize fullwidth brackets and trailing member counts without fuzzy guessing")
-require("运行 #247 完整闭环自测" in spike,
-        "#247 full-closure fixture must be runnable from diagnostic UI")
 
 require("candidateId: candidate.id" in publish,
         "published Assignment must point back to Candidate by candidateId")
