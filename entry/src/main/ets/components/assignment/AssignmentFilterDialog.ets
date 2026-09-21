@@ -3,10 +3,24 @@ import { AppTheme } from '../../common/theme/AppTheme';
 @CustomDialog
 export struct AssignmentFilterDialog {
   controller: CustomDialogController;
+  @Link allDates: boolean;
   @Link selectedDayEpochMs: number;
   @Link subjectCode: string;
-  onQuery: (selectedDayEpochMs: number, subjectCode: string) => void =
-    (_selectedDayEpochMs: number, _subjectCode: string) => {};
+  onQuery: (allDates: boolean, selectedDayEpochMs: number, subjectCode: string) => void =
+    (_allDates: boolean, _selectedDayEpochMs: number, _subjectCode: string) => {};
+
+  @Builder
+  private DateModeOption(label: string, allDates: boolean) {
+    Button(label, { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(14)
+      .fontWeight(this.allDates === allDates ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.allDates === allDates ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.allDates === allDates ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.allDates = allDates);
+  }
 
   @Builder
   private SubjectOption(label: string, value: string) {
@@ -23,12 +37,13 @@ export struct AssignmentFilterDialog {
 
   private reset(): void {
     let now = new Date();
+    this.allDates = false;
     this.selectedDayEpochMs = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
     this.subjectCode = 'ALL';
   }
 
   private confirmQuery(): void {
-    this.onQuery(this.selectedDayEpochMs, this.subjectCode);
+    this.onQuery(this.allDates, this.selectedDayEpochMs, this.subjectCode);
   }
 
   build() {
@@ -55,14 +70,21 @@ export struct AssignmentFilterDialog {
         Column({ space: 22 }) {
           Column({ space: 10 }) {
             Text('日期').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            DatePicker({ selected: new Date(this.selectedDayEpochMs) })
-              .width('100%')
-              .height(170)
-              .lunar(false)
-              .onDateChange((value: Date) => {
-                this.selectedDayEpochMs =
-                  new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
-              });
+            Row({ space: 8 }) {
+              this.DateModeOption('全部日期', true);
+              this.DateModeOption('指定日期', false);
+            }
+            .width('100%');
+            if (!this.allDates) {
+              DatePicker({ selected: new Date(this.selectedDayEpochMs) })
+                .width('100%')
+                .height(170)
+                .lunar(false)
+                .onDateChange((value: Date) => {
+                  this.selectedDayEpochMs =
+                    new Date(value.getFullYear(), value.getMonth(), value.getDate()).getTime();
+                });
+            }
           }
           .width('100%');
 
