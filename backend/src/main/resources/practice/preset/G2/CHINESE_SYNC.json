@@ -2593,6 +2593,1116 @@
           ]
         }
       ]
+    },
+    {
+      "id": "CHINESE-G2-S1-SYNC-POETRY-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上语文古诗画面与词句（一)",
+      "description": "结合二上常见古诗名句理解景物、动作和简单含义，训练从关键词想象诗句画面。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "教材同步",
+        "古诗",
+        "词句理解"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“白日依山尽”中的“白日”指什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "太阳"
+            },
+            {
+              "key": "B",
+              "label": "白云"
+            },
+            {
+              "key": "C",
+              "label": "月亮"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "这里的“白日”指太阳，诗句写太阳靠着山渐渐落下。",
+          "hints": [
+            "关键词：“白日”“依山尽”。先判断句子写的是天空中的哪一种景物，再结合傍晚场景理解。"
+          ],
+          "tags": [
+            "古诗",
+            "词义"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“黄河入海流”主要写出了什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "黄河停在山脚"
+            },
+            {
+              "key": "B",
+              "label": "黄河向大海流去"
+            },
+            {
+              "key": "C",
+              "label": "海水流进黄河"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "诗句写黄河奔流向大海，方向是从河流向海。",
+          "hints": [
+            "关键词：“黄河”“入海流”。抓住“入海”表示流向哪里，再判断水流方向。"
+          ],
+          "tags": [
+            "古诗",
+            "画面"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“欲穷千里目，更上一层楼”告诉我们怎样能看得更远？",
+          "options": [
+            {
+              "key": "A",
+              "label": "闭上眼睛"
+            },
+            {
+              "key": "B",
+              "label": "走下楼去"
+            },
+            {
+              "key": "C",
+              "label": "登得更高"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "诗句表达登得更高，就能看到更远的地方。",
+          "hints": [
+            "关键词：“千里目”“更上一层楼”。把“想看得远”和“再上一层”联系起来理解。"
+          ],
+          "tags": [
+            "古诗",
+            "理解"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "“日照香炉生紫烟”中最先出现的自然景物是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "阳光"
+            },
+            {
+              "key": "B",
+              "label": "大雪"
+            },
+            {
+              "key": "C",
+              "label": "海浪"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“日照”写阳光照在香炉峰上，是诗句开头的景象。",
+          "hints": [
+            "关键词：“日照”。先找表示光线的词，再判断诗句描写的是哪种自然景象。"
+          ],
+          "tags": [
+            "古诗",
+            "景物"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“遥看瀑布挂前川”中的“遥看”是什么意思？",
+          "options": [
+            {
+              "key": "A",
+              "label": "低头看"
+            },
+            {
+              "key": "B",
+              "label": "从远处看"
+            },
+            {
+              "key": "C",
+              "label": "闭眼想"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“遥”有远的意思，“遥看”就是从远处观看。",
+          "hints": [
+            "关键词：“遥看”“遥”。联系“遥远”这个词，判断看瀑布时人与瀑布的距离。"
+          ],
+          "tags": [
+            "古诗",
+            "词义"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "“飞流直下三千尺”让人感受到瀑布怎样的特点？",
+          "options": [
+            {
+              "key": "A",
+              "label": "很安静"
+            },
+            {
+              "key": "B",
+              "label": "流得很慢"
+            },
+            {
+              "key": "C",
+              "label": "又高又急"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“飞流”“直下”突出瀑布从高处快速落下的气势。",
+          "hints": [
+            "关键词：“飞流”“直下”。抓住表示速度和方向的词，体会瀑布落下的样子。"
+          ],
+          "tags": [
+            "古诗",
+            "画面"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“危楼高百尺”主要在说楼怎么样？",
+          "options": [
+            {
+              "key": "A",
+              "label": "很高"
+            },
+            {
+              "key": "B",
+              "label": "很旧"
+            },
+            {
+              "key": "C",
+              "label": "很宽"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“高百尺”用夸张的方式突出楼很高。",
+          "hints": [
+            "关键词：“高百尺”。题目问楼的特点，直接抓住表示高度的词。"
+          ],
+          "tags": [
+            "古诗",
+            "词句"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "“手可摘星辰”表现诗人站在高楼上有什么感觉？",
+          "options": [
+            {
+              "key": "A",
+              "label": "离河水很近"
+            },
+            {
+              "key": "B",
+              "label": "仿佛离星星很近"
+            },
+            {
+              "key": "C",
+              "label": "好像走进森林"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "诗句用想象表现楼很高，仿佛伸手就能碰到星星。",
+          "hints": [
+            "关键词：“手可摘星辰”。想一想只有站得怎样，才会产生能碰到星星的感觉。"
+          ],
+          "tags": [
+            "古诗",
+            "想象"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“天苍苍，野茫茫”描写的是怎样的景象？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小屋里很拥挤"
+            },
+            {
+              "key": "B",
+              "label": "街道上很热闹"
+            },
+            {
+              "key": "C",
+              "label": "天空和草原开阔辽远"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“苍苍”“茫茫”写出了天空和草原辽阔、望不到边的感觉。",
+          "hints": [
+            "关键词：“天”“野”“茫茫”。从景物范围和“茫茫”的感觉判断空间特点。"
+          ],
+          "tags": [
+            "古诗",
+            "画面"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "“风吹草低见牛羊”中，为什么能看见牛羊？",
+          "options": [
+            {
+              "key": "A",
+              "label": "风吹低了草"
+            },
+            {
+              "key": "B",
+              "label": "牛羊飞到天上"
+            },
+            {
+              "key": "C",
+              "label": "天突然黑了"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "草被风吹得低下去，原来被草遮住的牛羊显露出来。",
+          "hints": [
+            "关键词：“风吹”“草低”“见牛羊”。按动作先后想一想，什么变化让牛羊露出来。"
+          ],
+          "tags": [
+            "古诗",
+            "因果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一个词最适合形容“野茫茫”的感觉？",
+          "options": [
+            {
+              "key": "A",
+              "label": "狭窄"
+            },
+            {
+              "key": "B",
+              "label": "辽阔"
+            },
+            {
+              "key": "C",
+              "label": "拥挤"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“茫茫”常用来写范围很大、望不到边，和“辽阔”意思更接近。",
+          "hints": [
+            "关键词：“野茫茫”“形容感觉”。把“茫茫”放回草原场景，想一想视野是大还是小。"
+          ],
+          "tags": [
+            "古诗",
+            "词义"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "读古诗时，想象诗句画面最有帮助的做法是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "只数有几个字"
+            },
+            {
+              "key": "B",
+              "label": "只看最后一个字"
+            },
+            {
+              "key": "C",
+              "label": "抓住景物和动作词"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "景物词和动作词能帮助我们把诗句中的场景在脑中连起来。",
+          "hints": [
+            "关键词：“想象画面”“有帮助”。想一想哪些词最能告诉你“有什么”和“在做什么”。"
+          ],
+          "tags": [
+            "古诗",
+            "阅读方法"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-SYNC-WORDING-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上语文词语搭配与句式（二)",
+      "description": "通过校园、家庭和自然情境练习词语搭配、把字句、被字句和完整表达。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "教材同步",
+        "词语搭配",
+        "句式"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一个搭配最自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "灿烂的阳光"
+            },
+            {
+              "key": "B",
+              "label": "灿烂的脚步"
+            },
+            {
+              "key": "C",
+              "label": "灿烂的雨伞"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“灿烂”常用来形容明亮耀眼的光彩，“灿烂的阳光”搭配自然。",
+          "hints": [
+            "关键词：“搭配最自然”“灿烂”。想一想这个词通常用来形容光彩、声音还是动作。"
+          ],
+          "tags": [
+            "词语搭配",
+            "形容词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“小鸟在枝头___地叫着。”填哪个词更合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "弯弯"
+            },
+            {
+              "key": "B",
+              "label": "欢快"
+            },
+            {
+              "key": "C",
+              "label": "笔直"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "鸟叫可以给人欢快的感觉，“欢快地叫着”表达自然。",
+          "hints": [
+            "关键词：“小鸟”“叫着”。空格修饰的是声音和状态，要选能形容叫声感觉的词。"
+          ],
+          "tags": [
+            "词语搭配",
+            "语境"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“同学们___走进教室。”哪一个词最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "香甜地"
+            },
+            {
+              "key": "B",
+              "label": "碧绿地"
+            },
+            {
+              "key": "C",
+              "label": "陆续"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“陆续”表示一个接一个地来，适合写同学们先后走进教室。",
+          "hints": [
+            "关键词：“同学们”“走进教室”。想一想多人不是同时到达，而是一个接一个时用什么词。"
+          ],
+          "tags": [
+            "词语搭配",
+            "词义"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "把“小明擦干净了黑板”改成“把”字句，哪一句正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小明把黑板擦干净了。"
+            },
+            {
+              "key": "B",
+              "label": "黑板把小明擦干净了。"
+            },
+            {
+              "key": "C",
+              "label": "小明被黑板擦干净了。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“把”字句要保持原来的动作关系：小明做动作，黑板是被处理的对象。",
+          "hints": [
+            "关键词：“小明”“擦黑板”“把字句”。先找谁做动作，再把被处理的事物放到“把”后面。"
+          ],
+          "tags": [
+            "句式",
+            "把字句"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“雨水淋湿了操场。”改成“被”字句，哪一句正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "雨水被操场淋湿了。"
+            },
+            {
+              "key": "B",
+              "label": "操场被雨水淋湿了。"
+            },
+            {
+              "key": "C",
+              "label": "操场把雨水淋湿了。"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "操场是被淋湿的对象，所以应说“操场被雨水淋湿了”。",
+          "hints": [
+            "关键词：“谁被淋湿”。先找动作结果落在谁身上，再把它放到“被”前面。"
+          ],
+          "tags": [
+            "句式",
+            "被字句"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句把事情说得最完整？",
+          "options": [
+            {
+              "key": "A",
+              "label": "在操场。"
+            },
+            {
+              "key": "B",
+              "label": "高兴地。"
+            },
+            {
+              "key": "C",
+              "label": "同学们在操场开心地跳绳。"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "完整句要有人物、地点和动作，“同学们在操场开心地跳绳”信息完整。",
+          "hints": [
+            "关键词：“事情说完整”。检查句子里有没有“谁、在哪里、做什么”等基本信息。"
+          ],
+          "tags": [
+            "句式",
+            "完整句"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“清清的___”填什么最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "河水"
+            },
+            {
+              "key": "B",
+              "label": "声音"
+            },
+            {
+              "key": "C",
+              "label": "跑步"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“清清的河水”能表现水清澈，搭配自然。",
+          "hints": [
+            "关键词：“清清的”。想一想这个词更常用来形容可以看到清澈状态的事物。"
+          ],
+          "tags": [
+            "词语搭配",
+            "形容词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "“轻轻地___”填哪个动作最自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "蓝色"
+            },
+            {
+              "key": "B",
+              "label": "关门"
+            },
+            {
+              "key": "C",
+              "label": "高山"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“轻轻地”修饰动作，“轻轻地关门”表达动作力度小。",
+          "hints": [
+            "关键词：“轻轻地”“动作”。先排除不是动作的词，再判断哪个动作可以轻轻完成。"
+          ],
+          "tags": [
+            "词语搭配",
+            "动作"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“因为下雨，所以运动会延期了。”这句话说明什么关系？",
+          "options": [
+            {
+              "key": "A",
+              "label": "先后关系"
+            },
+            {
+              "key": "B",
+              "label": "比较关系"
+            },
+            {
+              "key": "C",
+              "label": "原因和结果"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“因为……所以……”连接原因与结果，下雨是原因，延期是结果。",
+          "hints": [
+            "关键词：“因为”“所以”。分别找前后两部分，判断哪一部分说明原因、哪一部分说明结果。"
+          ],
+          "tags": [
+            "句式",
+            "因果"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "“只要认真检查，就能少出错。”下面哪个词表示条件？",
+          "options": [
+            {
+              "key": "A",
+              "label": "只要"
+            },
+            {
+              "key": "B",
+              "label": "认真"
+            },
+            {
+              "key": "C",
+              "label": "出错"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“只要”用来提出条件，后面说明满足条件后的结果。",
+          "hints": [
+            "关键词：“条件”。找出表示“做到什么，就会怎样”的连接词。"
+          ],
+          "tags": [
+            "句式",
+            "条件"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "“妹妹一边唱歌，一边整理玩具。”说明妹妹怎样做两件事？",
+          "options": [
+            {
+              "key": "A",
+              "label": "先唱完再整理"
+            },
+            {
+              "key": "B",
+              "label": "同时进行"
+            },
+            {
+              "key": "C",
+              "label": "完全没有做"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“一边……一边……”表示两个动作同时进行。",
+          "hints": [
+            "关键词：“一边……一边……”。观察两个动作的时间关系，是同时还是先后。"
+          ],
+          "tags": [
+            "句式",
+            "并列动作"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-WORDING-002-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句最适合写在“秋天到了”的后面？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我把铅笔放进文具盒。"
+            },
+            {
+              "key": "B",
+              "label": "弟弟正在刷牙。"
+            },
+            {
+              "key": "C",
+              "label": "树叶慢慢变黄，天气也凉快了。"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "树叶变黄、天气变凉都是秋天常见变化，和前句衔接自然。",
+          "hints": [
+            "关键词：“秋天到了”“后面一句”。选择和季节变化直接相关、前后意思连贯的句子。"
+          ],
+          "tags": [
+            "句式",
+            "连贯"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上语文顺序表达与写话（一)",
+      "description": "练习按时间和事情发展顺序组织句子，学会把日常小事说清楚、写完整。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "教材同步",
+        "写话",
+        "顺序表达"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "早晨起床后，下面哪件事最可能先做？",
+          "options": [
+            {
+              "key": "A",
+              "label": "穿好衣服"
+            },
+            {
+              "key": "B",
+              "label": "放学回家"
+            },
+            {
+              "key": "C",
+              "label": "晚上睡觉"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "起床后通常先穿衣整理，再开始一天的活动。",
+          "hints": [
+            "关键词：“早晨起床后”“先”。按照一天的时间顺序判断哪件事紧接着发生。"
+          ],
+          "tags": [
+            "写话",
+            "顺序"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "写“种豆子”的过程，哪一个顺序更合理？",
+          "options": [
+            {
+              "key": "A",
+              "label": "收豆子→浇水→播种"
+            },
+            {
+              "key": "B",
+              "label": "播种→浇水→等待发芽"
+            },
+            {
+              "key": "C",
+              "label": "发芽→播种→浇水"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "要先播种，再浇水照顾，之后等待发芽。",
+          "hints": [
+            "关键词：“种豆子”“过程”。按事情真实发生的先后，把开始、照顾和结果排好。"
+          ],
+          "tags": [
+            "写话",
+            "过程"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我先洗手，___坐到餐桌前吃饭。”填哪个词最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "可是"
+            },
+            {
+              "key": "B",
+              "label": "因为"
+            },
+            {
+              "key": "C",
+              "label": "然后"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“先……然后……”能清楚表示两个动作的先后。",
+          "hints": [
+            "关键词：“先洗手”“坐到餐桌前”。两个动作有顺序，需要表示接下来的连接词。"
+          ],
+          "tags": [
+            "写话",
+            "连接词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句最适合作为“周末去公园”的开头？",
+          "options": [
+            {
+              "key": "A",
+              "label": "星期六上午，我和爸爸一起去公园。"
+            },
+            {
+              "key": "B",
+              "label": "最后，我们开心地回家了。"
+            },
+            {
+              "key": "C",
+              "label": "我最喜欢那只白色小鸟。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "开头先交代时间、人物和要去做的事情，方便读者了解背景。",
+          "hints": [
+            "关键词：“开头”“周末去公园”。想一想一开始最需要先交代时间、人物和地点。"
+          ],
+          "tags": [
+            "写话",
+            "开头"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "写完“做纸飞机”的过程，哪一句最适合作为结尾？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我先拿出一张纸。"
+            },
+            {
+              "key": "B",
+              "label": "纸飞机终于飞起来了，我特别开心。"
+            },
+            {
+              "key": "C",
+              "label": "然后把纸对折。"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "结尾可以写事情的结果和自己的感受，让过程完整收束。",
+          "hints": [
+            "关键词：“结尾”“做纸飞机”。选择能说明最终结果和心情的句子。"
+          ],
+          "tags": [
+            "写话",
+            "结尾"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "“先把书分类，再一本一本放回书架，最后擦干净桌面。”这段话按什么顺序写？",
+          "options": [
+            {
+              "key": "A",
+              "label": "地点变化"
+            },
+            {
+              "key": "B",
+              "label": "人物多少"
+            },
+            {
+              "key": "C",
+              "label": "做事先后"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“先、再、最后”清楚标明了做事情的先后顺序。",
+          "hints": [
+            "关键词：“先”“再”“最后”。这些词都在告诉读者动作发生的时间次序。"
+          ],
+          "tags": [
+            "写话",
+            "顺序"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "观察一天的天气变化，哪一句顺序最自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "早晨有雾，中午太阳出来，傍晚起了风。"
+            },
+            {
+              "key": "B",
+              "label": "傍晚起风，早晨有雾，中午太阳出来。"
+            },
+            {
+              "key": "C",
+              "label": "中午太阳出来，夜里天亮，早晨有雾。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "按一天时间应从早晨写到中午，再到傍晚。",
+          "hints": [
+            "关键词：“一天”“早晨、中午、傍晚”。先按时间从早到晚排列。"
+          ],
+          "tags": [
+            "写话",
+            "时间顺序"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "“下课铃响了，同学们先收好书本，接着排队走出教室。”哪一个词表示第二步？",
+          "options": [
+            {
+              "key": "A",
+              "label": "先"
+            },
+            {
+              "key": "B",
+              "label": "接着"
+            },
+            {
+              "key": "C",
+              "label": "教室"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“接着”表示前一件事做完后紧接着发生下一件事。",
+          "hints": [
+            "关键词：“第二步”。找表示紧跟在前一个动作之后的连接词。"
+          ],
+          "tags": [
+            "写话",
+            "连接词"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "要写“我学会系鞋带”，最应该重点写什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "鞋子的颜色"
+            },
+            {
+              "key": "B",
+              "label": "窗外有几棵树"
+            },
+            {
+              "key": "C",
+              "label": "怎么练习、最后怎样学会"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "题目重点是“学会”的过程，应写练习方法和最后的结果。",
+          "hints": [
+            "关键词：“学会系鞋带”“重点”。围绕题目核心事情写过程，不加入无关细节。"
+          ],
+          "tags": [
+            "写话",
+            "选材"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪句话和“我帮奶奶做家务”这个主题最有关？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我把洗好的袜子一双双夹到晾衣架上。"
+            },
+            {
+              "key": "B",
+              "label": "公园里有很多花。"
+            },
+            {
+              "key": "C",
+              "label": "我今天穿蓝色鞋子。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "晾袜子是具体家务动作，直接表现“帮奶奶做家务”。",
+          "hints": [
+            "关键词：“帮奶奶做家务”“最有关”。选择能直接表现主题的具体行动。"
+          ],
+          "tags": [
+            "写话",
+            "围绕主题"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "写“丢失的铅笔找到了”，哪一种顺序更清楚？",
+          "options": [
+            {
+              "key": "A",
+              "label": "找到→发现丢了→寻找"
+            },
+            {
+              "key": "B",
+              "label": "发现丢了→寻找→找到"
+            },
+            {
+              "key": "C",
+              "label": "寻找→找到→发现丢了"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "事情先是发现铅笔不见了，然后寻找，最后才找到。",
+          "hints": [
+            "关键词：“丢失”“找到了”。按事情发展过程排出发现问题、解决问题、得到结果。"
+          ],
+          "tags": [
+            "写话",
+            "事情发展"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-SEQUENCE-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句最能让写话更具体？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我去了。"
+            },
+            {
+              "key": "B",
+              "label": "很好玩。"
+            },
+            {
+              "key": "C",
+              "label": "我和同学在操场轮流跳绳，每人跳十下。"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "具体句写清了人物、地点、动作和数量，读者更容易想象场景。",
+          "hints": [
+            "关键词：“更具体”。比较三句话包含的信息多少，找能回答“谁、在哪、怎么做”的句子。"
+          ],
+          "tags": [
+            "写话",
+            "具体表达"
+          ]
+        }
+      ]
     }
   ]
 }
