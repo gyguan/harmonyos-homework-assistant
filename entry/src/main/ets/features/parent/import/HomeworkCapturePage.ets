@@ -257,6 +257,12 @@ export struct HomeworkCapturePage {
     this.earliestDetectedTime = result.earliestDetectedTime;
     await this.stopFloatView();
 
+    if (!result.reconstructionSucceeded) {
+      this.errorText = '聊天重建未完成，原始屏幕证据已经保留在收件箱，可以稍后重试或人工处理。';
+      this.message = '本次屏幕采集已经安全结束。';
+      return;
+    }
+
     if (result.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
       this.errorText = `识别到群“${result.detectedGroupTitle}”，与班级采集设置不一致。本次不会自动整理为作业，请进入正确群后重新抓取。`;
       this.message = '采集证据已保留在收件箱，未生成待发布作业。';
