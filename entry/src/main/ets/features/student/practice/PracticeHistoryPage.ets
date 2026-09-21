@@ -41,7 +41,26 @@ export struct PracticeHistoryPage {
       selectedSubject: $draftSelectedSubject,
       selectedTime: $draftSelectedTime,
       selectedPass: $draftSelectedPass,
-      showSubject: !this.isPaperScoped(),
+      showSubject: true,
+      onApply: (
+        subject: PracticeHistorySubjectFilter,
+        time: PracticeHistoryTimeFilter,
+        pass: PracticePassFilter
+      ) => {
+        this.applyFilters(subject, time, pass);
+      }
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Bottom,
+    customStyle: true
+  });
+
+  private paperFilterDialogController: CustomDialogController = new CustomDialogController({
+    builder: PracticeHistoryFilterDialog({
+      selectedSubject: $draftSelectedSubject,
+      selectedTime: $draftSelectedTime,
+      selectedPass: $draftSelectedPass,
+      showSubject: false,
       onApply: (
         subject: PracticeHistorySubjectFilter,
         time: PracticeHistoryTimeFilter,
@@ -95,7 +114,8 @@ export struct PracticeHistoryPage {
       this.isPaperScoped() ? PracticeHistorySubjectFilter.ALL : this.selectedSubject;
     this.draftSelectedTime = this.selectedTime;
     this.draftSelectedPass = this.selectedPass;
-    this.filterDialogController.open();
+    if (this.isPaperScoped()) this.paperFilterDialogController.open();
+    else this.filterDialogController.open();
   }
 
   private applyFilters(
@@ -106,7 +126,8 @@ export struct PracticeHistoryPage {
     this.selectedSubject = this.isPaperScoped() ? PracticeHistorySubjectFilter.ALL : subject;
     this.selectedTime = time;
     this.selectedPass = pass;
-    this.filterDialogController.close();
+    if (this.isPaperScoped()) this.paperFilterDialogController.close();
+    else this.filterDialogController.close();
     this.refreshPresentation();
   }
 
