@@ -70,6 +70,12 @@ require("PracticePassPolicy.passedPaperKeys(attempts)" in view_model and
         "PracticePassPolicy.isPaperPassed(paper, passedPaperKeys)" in view_model,
         "filter and tag must share PracticePassPolicy")
 
+require(".layoutWeight(1)" in home and
+        ".textOverflow({ overflow: TextOverflow.Ellipsis })" in home and
+        ".constraintSize({ minWidth: 64 })" in home and
+        ".textAlign(TextAlign.End)" in home,
+        "practice paper-list header must preserve count visibility on narrow Phone layouts")
+
 if errors:
     print("PRACTICE_PASS_FILTER_GATE_FAIL")
     for error in errors:
