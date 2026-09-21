@@ -34,6 +34,25 @@
 - 微信/钉钉首版采用用户主动分享、截图识别、文本粘贴；不得依赖后台读取聊天记录。
 - 后端保持 Spring Boot 模块化单体 + PostgreSQL；除非新的 ADR 明确批准，不引入 Redis、MQ、微服务、API Gateway 或工作流引擎。
 
+## Practice content standard
+
+任何 Agent / 开发者只要涉及以下内容之一，**必须先阅读** `docs/product/practice-question-content-standard.md`：
+
+- 新增、删除或修改预置练习题 / 套卷；
+- 修改题干、选项、答案、解析、提示语、tags、难度或题库类型；
+- 修改 Practice 题库生成脚本、schema、validator；
+- 修改可能影响答题、重练、练习记录、结果页或 Phone/Pad 可读性的 Practice UI。
+
+Practice 内容维护必须遵守：
+
+1. `backend/src/main/resources/practice/preset/` 是预置题库唯一源数据，生成的 `PresetPracticeCatalog.ets` 禁止手工编辑；
+2. 已发布题目内容变化必须提升 Paper `version`，不得覆盖历史 Attempt / Result 对应版本；
+3. 英语题干必须有中文引导；提示必须逐题生成并突出题干关键词，不能泄露答案；
+4. 单选题必须至少 3 个有效且互不重复的选项，只能有一个明确正确答案，答案位置不得固定；
+5. 教材同步题必须有明确教材/知识点依据，不能凭印象超纲；课外拓展也必须保持当前年级可理解；
+6. 内容变更必须运行 `python scripts/generate_practice_catalog.py` 和 `python scripts/validate_practice_content.py`；
+7. 不允许通过放宽校验、跳过 CI、测试特判或临时兼容分支绕过练习题规范。
+
 ## V2 refactor invariants
 
 V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发者在修改代码前必须阅读：
