@@ -103,7 +103,7 @@ export struct HomeworkImportInboxPage {
       DeepPageHeader({
         title: '作业智能收件箱',
         subtitle: '保留每次导入来源、原始消息和候选作业',
-        backAccessibilityText: '返回导入老师作业',
+        backAccessibilityText: '返回上一页',
         onBack: () => this.onBack()
       });
 
@@ -138,6 +138,7 @@ export struct HomeworkImportInboxPage {
       }
       .width('100%')
       .layoutWeight(1)
+      .align(Alignment.TopStart)
       .scrollBar(BarState.Off);
     }
     .width('100%')

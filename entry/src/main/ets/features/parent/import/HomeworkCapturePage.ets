@@ -326,7 +326,7 @@ export struct HomeworkCapturePage {
       DeepPageHeader({
         title: '抓取今日作业',
         subtitle: '进群手工上滑，小伴自动识别、整理并交给你确认',
-        backAccessibilityText: '返回导入老师作业',
+        backAccessibilityText: '返回抓取老师作业',
         onBack: () => this.back()
       });
 
@@ -350,20 +350,13 @@ export struct HomeworkCapturePage {
           .borderRadius(AppTheme.CONTROL_RADIUS);
 
           if (this.session() !== null) {
-            Column({ space: 8 }) {
-              Row() {
-                Text(this.statusLabel(this.session()!.status))
-                  .fontSize(15)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.PRIMARY);
-                Blank();
-                Text(`变化帧 ${this.session()!.acceptedFrameCount}`)
-                  .fontSize(13)
-                  .fontColor(AppTheme.SUBTEXT);
-              }
-              .width('100%');
-              Text(`视频回调 ${this.session()!.frameCount} · OCR失败 ${this.session()!.ocrFailureCount} · 最近序号 ${this.session()!.lastFrameSequence}`)
-                .width('100%')
+            Row() {
+              Text(this.statusLabel(this.session()!.status))
+                .fontSize(15)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.PRIMARY);
+              Blank();
+              Text(`已采集 ${this.session()!.acceptedFrameCount} 个有效画面`)
                 .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT);
             }
@@ -461,6 +454,7 @@ export struct HomeworkCapturePage {
       }
       .width('100%')
       .layoutWeight(1)
+      .align(Alignment.TopStart)
       .scrollBar(BarState.Off);
     }
     .width('100%')

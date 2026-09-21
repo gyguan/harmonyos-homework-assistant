@@ -43,7 +43,10 @@ export struct HomeworkImportRoutePage {
         Text('›').fontSize(20).fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%')
-      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .constraintSize({
+        minHeight: AppTheme.MIN_TOUCH_TARGET,
+        maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH
+      })
       .padding({ left: 14, right: 14, top: 10, bottom: 10 })
       .backgroundColor(AppTheme.SURFACE)
       .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -65,6 +68,7 @@ export struct HomeworkImportRoutePage {
     }
     .width('100%')
     .height('100%')
+    .alignItems(HorizontalAlign.Center)
     .padding({
       left: AppTheme.PAGE_PADDING,
       right: AppTheme.PAGE_PADDING,

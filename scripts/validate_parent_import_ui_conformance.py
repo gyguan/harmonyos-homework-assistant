@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+errors: list[str] = []
+
+
+def read(path: str) -> str:
+    file = ROOT / path
+    if not file.exists():
+        errors.append(f"missing required file: {path}")
+        return ""
+    return file.read_text(encoding="utf-8")
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        errors.append(message)
+
+
+capture_home = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets")
+capture = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
+profile = read("entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets")
+inbox = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
+batch = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
+import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+
+# Deep pages must not depend on default vertical alignment.
+for name, source in [
+    ("capture home", capture_home),
+    ("capture", capture),
+    ("source profile", profile),
+    ("import inbox", inbox),
+    ("batch detail", batch),
+]:
+    require(".align(Alignment.TopStart)" in source,
+            f"{name} page-level Scroll must be explicitly top anchored")
+    require(".scrollBar(BarState.Off)" in source,
+            f"{name} page-level Scroll must hide the system scrollbar")
+
+# Accessibility return semantics must match the new independent capture information architecture.
+require("backAccessibilityText: '返回抓取老师作业'" in capture,
+        "formal capture page must return semantically to the capture home")
+require("backAccessibilityText: '返回上一页'" in profile,
+        "SourceProfile is reachable from multiple capture surfaces and must use neutral back semantics")
+require("backAccessibilityText: '返回上一页'" in inbox,
+        "Import Inbox is shared by manual import and capture and must use neutral back semantics")
+require("返回导入老师作业" not in capture and "返回导入老师作业" not in inbox,
+        "legacy coupled import return copy must not reappear")
+
+# Phone/Pad readable-width rules.
+require("AppTheme.PROFILE_READABLE_MAX_WIDTH" in profile,
+        "SourceProfile must use its dedicated Pad readable-width token")
+require("maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH" in import_route and
+        ".alignItems(HorizontalAlign.Center)" in import_route,
+        "manual import top action must align with the readable content column on Pad")
+
+# Formal capture UI is a business surface; engineering counters stay in the diagnostic page.
+for engineering_copy in ["视频回调", "OCR失败", "最近序号"]:
+    require(engineering_copy not in capture,
+            f"formal capture page must not expose engineering diagnostic counter: {engineering_copy}")
+require("已采集 " in capture and "个有效画面" in capture,
+        "formal capture page should expose a user-facing capture progress summary")
+
+# SourceProfile does not edit the student; do not tell users it does.
+require("请先设置班级、学生和微信群信息" not in capture_home and
+        "请先设置班级、微信群和老师信息" in capture_home,
+        "capture home setup copy must match actual SourceProfile capabilities")
+
+if errors:
+    print("PARENT_IMPORT_UI_CONFORMANCE_FAIL")
+    for error in errors:
+        print(f"- {error}")
+    raise SystemExit(1)
+
+print("PARENT_IMPORT_UI_CONFORMANCE_PASS")

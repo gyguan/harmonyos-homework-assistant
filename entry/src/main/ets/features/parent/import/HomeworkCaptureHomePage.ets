@@ -80,7 +80,7 @@ export struct HomeworkCaptureHomePage {
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('请先设置班级、学生和微信群信息，再开始抓取作业。')
+          Text('请先设置班级、微信群和老师信息，再开始抓取作业。')
             .fontSize(13)
             .lineHeight(19)
             .fontColor(AppTheme.SUBTEXT)
@@ -248,6 +248,7 @@ export struct HomeworkCaptureHomePage {
       }
       .width('100%')
       .layoutWeight(1)
+      .align(Alignment.TopStart)
       .scrollBar(BarState.Off);
     }
     .width('100%')

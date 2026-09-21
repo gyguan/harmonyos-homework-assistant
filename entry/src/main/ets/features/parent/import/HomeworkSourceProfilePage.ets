@@ -111,7 +111,7 @@ export struct HomeworkSourceProfilePage {
         DeepPageHeader({
           title: '班级采集设置',
           subtitle: this.startCaptureAfterSave ? '首次配置一次，以后直接抓取今日作业' : '修改当前孩子的班级群、老师和抓取时间',
-          backAccessibilityText: '返回作业导入',
+          backAccessibilityText: '返回上一页',
           onBack: () => this.onBack()
         });
 
@@ -181,10 +181,10 @@ export struct HomeworkSourceProfilePage {
           .width('100%')
           .padding({ bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
         }
-        .width('100%').layoutWeight(1).scrollBar(BarState.Off);
+        .width('100%').layoutWeight(1).align(Alignment.TopStart).scrollBar(BarState.Off);
       }
       .width('100%').height('100%')
-      .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.PROFILE_READABLE_MAX_WIDTH })
       .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING,
         top: AppTheme.DEEP_PAGE_TOP_PADDING });
     }
