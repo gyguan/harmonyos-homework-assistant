@@ -57,6 +57,18 @@ UNKNOWN
 
 UNKNOWN 不生成普通作业，进入 pendingReviewMessageIds。
 
+如果整个 Batch 都是 UNKNOWN：
+
+~~~text
+批次详情
+→ 人工确认未识别消息
+→ 激活原 ImportBatch
+→ 现有确认发布页
+→ 家长“＋新增”
+~~~
+
+手工新增 Candidate 会继承 pending message IDs 和原始 Batch 文本，而不是丢失来源证据。
+
 ## Context Grouper
 
 只有已识别老师的：
@@ -202,6 +214,28 @@ sourceMessageIds:
 - 原始32页消息
 - 更正33页消息
 ~~~
+
+## 版本化契约
+
+~~~text
+rules-v1.0
+schema-v1.0
+prompt-v1.0
+fixture-v1.0
+~~~
+
+对应仓库：
+
+~~~text
+docs/contracts/homework-understanding/v1/rules.md
+docs/contracts/homework-understanding/v1/schema.json
+docs/contracts/homework-understanding/v1/prompt.md
+Issue246HomeworkUnderstandingFixture.VERSION = 1.0
+~~~
+
+当前生产路径只使用 rules-v1.0。Prompt / Schema 是未来可选 enhancer 的受控契约，不会在当前主链偷偷调用模型。
+
+ImportBatch 记录 understandingVersion，重建成功/失败或理解失败重试都必须保留版本。
 
 ## 20 组固定 Fixture V1.0
 
