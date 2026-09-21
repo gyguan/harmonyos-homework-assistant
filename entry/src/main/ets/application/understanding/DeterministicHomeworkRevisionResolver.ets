@@ -38,6 +38,13 @@ export class DeterministicHomeworkRevisionResolver {
       return { tasks: result, warnings: warnings };
     }
 
+    if (text.indexOf('补充一下') >= 0 || text.indexOf('补充：') >= 0 || text.indexOf('补充:') >= 0) {
+      let additions = this.extractor.extractRevisionPayload(text, subject, messageId, confidence);
+      for (let item of additions) result.push(item);
+      if (additions.length === 0) warnings.push('REVISION_SUPPLEMENT_EMPTY');
+      return { tasks: result, warnings: warnings };
+    }
+
     let page = this.extractor.pageCorrection(text);
     if (page.length > 0) {
       let index = this.lastTaskContaining(result, '练习册');
@@ -49,13 +56,6 @@ export class DeterministicHomeworkRevisionResolver {
       } else {
         warnings.push('REVISION_PAGE_TARGET_NOT_FOUND');
       }
-      return { tasks: result, warnings: warnings };
-    }
-
-    if (text.indexOf('补充一下') >= 0 || text.indexOf('补充：') >= 0 || text.indexOf('补充:') >= 0) {
-      let additions = this.extractor.extractRevisionPayload(text, subject, messageId, confidence);
-      for (let item of additions) result.push(item);
-      if (additions.length === 0) warnings.push('REVISION_SUPPLEMENT_EMPTY');
       return { tasks: result, warnings: warnings };
     }
 
