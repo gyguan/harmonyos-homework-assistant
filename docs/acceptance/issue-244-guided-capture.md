@@ -95,17 +95,19 @@ messages = accepted frame OCR evidence
 
 ## 离线 Fixture Gate
 
-进入：
+确定性 Fixture 已移出生产包，位于：
 
 ~~~text
-家长 → 导入老师作业 → 屏幕采集技术诊断
+entry/src/test/fixtures/Issue244CaptureSessionFixture.ets
 ~~~
 
-点击：
+由 Hypium Local Test 注册执行：
 
 ~~~text
-运行 #244 离线流程自测
+entry/src/test/List.test.ets
 ~~~
+
+生产“屏幕采集技术诊断”页只保留 AVScreenCapture / OCR / FloatView 真机诊断，不再承载固定测试数据。
 
 Fixture 固定模拟：
 
