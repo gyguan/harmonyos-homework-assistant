@@ -9,7 +9,10 @@ import {
   HomeworkSourceProfile,
   SourceGroupValidationStatus
 } from '../../domain/model/HomeworkSourceProfileModels';
-import { ImportBatch } from '../../domain/model/ImportModels';
+import {
+  HomeworkImportPipelineStage,
+  ImportBatch
+} from '../../domain/model/ImportModels';
 
 export interface HomeworkCaptureWorkflowProgress {
   session: CaptureSession;
@@ -93,97 +96,131 @@ export class HomeworkCaptureWorkflowService {
 
   private finalize(session: CaptureSession, allowUnrecognized: boolean): HomeworkCaptureWorkflowResult {
     let profile = this.requireProfile(session.sourceProfileId, session.studentId);
-    let reconstruction = HomeworkChatReconstructionService.instance.tryReconstructCaptureSession(
-      session.id, session.importBatchId, profile.defaultStartMinuteOfDay);
-    if (reconstruction === null) {
-      this.writeProfileAudit(
-        session.importBatchId, profile, '', SourceGroupValidationStatus.UNRECOGNIZED, false);
-      return {
-        session: session,
-        batchId: session.importBatchId,
-        detectedGroupTitle: '',
-        groupValidationStatus: SourceGroupValidationStatus.UNRECOGNIZED,
-        timeBoundaryReached: false,
-        earliestDetectedTime: '',
-        candidateCount: 0,
-        pendingReviewCount: 0,
-        activated: false,
-        needsGroupConfirmation: false,
-        reconstructionSucceeded: false,
-        understandingSucceeded: false
-      };
+    let batch = this.requireBatch(session.importBatchId);
+
+    if (batch.pipelineStage === HomeworkImportPipelineStage.ACTIVATED) {
+      return this.resultFromStored(session, batch, true);
     }
+
+    if (batch.reconstructed !== true) {
+      let reconstruction = HomeworkChatReconstructionService.instance.tryReconstructCaptureSession(
+        session.id, session.importBatchId, profile.defaultStartMinuteOfDay);
+      if (reconstruction === null) {
+        this.writeProfileAudit(
+          session.importBatchId,
+          profile,
+          '',
+          SourceGroupValidationStatus.UNRECOGNIZED,
+          false,
+          HomeworkImportPipelineStage.RECONSTRUCTION_FAILED);
+        return this.resultFromStored(
+          session, this.requireBatch(session.importBatchId), false);
+      }
+      batch = this.requireBatch(session.importBatchId);
+    }
+
     let validation = this.validationForReconstruction(
-      profile.groupTitle, reconstruction.groupTitle, reconstruction.warnings);
+      profile.groupTitle,
+      batch.groupTitle === undefined ? '' : batch.groupTitle,
+      batch.reconstructionWarnings === undefined ? [] : batch.reconstructionWarnings);
+
+    let confirmedByUser = allowUnrecognized &&
+      validation === SourceGroupValidationStatus.UNRECOGNIZED;
+    let validationStage = this.validationStage(validation, allowUnrecognized);
 
     this.writeProfileAudit(
       session.importBatchId,
       profile,
-      reconstruction.groupTitle,
+      batch.groupTitle === undefined ? '' : batch.groupTitle,
       validation,
-      allowUnrecognized && validation === SourceGroupValidationStatus.UNRECOGNIZED);
+      confirmedByUser,
+      validationStage);
+    batch = this.requireBatch(session.importBatchId);
 
     if (validation === SourceGroupValidationStatus.MISMATCH ||
       validation === SourceGroupValidationStatus.CONFLICT ||
       (validation === SourceGroupValidationStatus.UNRECOGNIZED && !allowUnrecognized)) {
-      return {
-        session: session,
-        batchId: session.importBatchId,
-        detectedGroupTitle: reconstruction.groupTitle,
-        groupValidationStatus: validation,
-        timeBoundaryReached: reconstruction.timeBoundaryReached,
-        earliestDetectedTime: reconstruction.earliestDetectedTime,
-        candidateCount: 0,
-        pendingReviewCount: 0,
-        activated: false,
-        needsGroupConfirmation: validation === SourceGroupValidationStatus.UNRECOGNIZED,
-        reconstructionSucceeded: true,
-        understandingSucceeded: false
-      };
+      return this.resultFromStored(session, batch, false);
     }
 
-    let understanding = HomeworkUnderstandingService.instance.tryUnderstandBatch(
-      session.importBatchId,
-      this.profiles.understandingConfig(profile),
-      this.profileStartEpoch(session.startedAtEpochMs, profile.defaultStartMinuteOfDay));
-    if (understanding === null) {
-      return {
-        session: session,
-        batchId: session.importBatchId,
-        detectedGroupTitle: reconstruction.groupTitle,
-        groupValidationStatus: validation,
-        timeBoundaryReached: reconstruction.timeBoundaryReached,
-        earliestDetectedTime: reconstruction.earliestDetectedTime,
-        candidateCount: 0,
-        pendingReviewCount: 0,
-        activated: false,
-        needsGroupConfirmation: false,
-        reconstructionSucceeded: true,
-        understandingSucceeded: false
-      };
+    if (batch.understood !== true) {
+      let understanding = HomeworkUnderstandingService.instance.tryUnderstandBatch(
+        session.importBatchId,
+        this.profiles.understandingConfig(profile),
+        this.profileStartEpoch(session.startedAtEpochMs, profile.defaultStartMinuteOfDay));
+      if (understanding === null) {
+        return this.resultFromStored(
+          session, this.requireBatch(session.importBatchId), false);
+      }
+      batch = this.requireBatch(session.importBatchId);
     }
-    let activated = understanding.candidates.length > 0 &&
-      this.inbox.activateBatch(session.importBatchId);
 
+    let candidates = this.inbox.getCandidates(session.importBatchId);
+    let activated = batch.pipelineStage === HomeworkImportPipelineStage.ACTIVATED;
+    if (!activated && candidates.length > 0) {
+      activated = this.inbox.activateBatch(session.importBatchId);
+      if (activated) {
+        this.updatePipelineStage(
+          session.importBatchId, HomeworkImportPipelineStage.ACTIVATED);
+        batch = this.requireBatch(session.importBatchId);
+      }
+    }
+
+    return this.resultFromStored(session, batch, activated);
+  }
+
+  private validationStage(validation: SourceGroupValidationStatus,
+    allowUnrecognized: boolean): HomeworkImportPipelineStage {
+    if (validation === SourceGroupValidationStatus.MISMATCH ||
+      validation === SourceGroupValidationStatus.CONFLICT) {
+      return HomeworkImportPipelineStage.BLOCKED_SOURCE;
+    }
+    if (validation === SourceGroupValidationStatus.UNRECOGNIZED && !allowUnrecognized) {
+      return HomeworkImportPipelineStage.RECONSTRUCTED;
+    }
+    return HomeworkImportPipelineStage.SOURCE_VALIDATED;
+  }
+
+  private resultFromStored(session: CaptureSession, batch: ImportBatch,
+    activated: boolean): HomeworkCaptureWorkflowResult {
+    let validation = this.storedValidation(batch);
+    let candidates = this.inbox.getCandidates(batch.id);
+    let pendingReviewCount = batch.pendingReviewMessageIds === undefined ?
+      0 : batch.pendingReviewMessageIds.length;
     return {
       session: session,
-      batchId: session.importBatchId,
-      detectedGroupTitle: reconstruction.groupTitle,
+      batchId: batch.id,
+      detectedGroupTitle: batch.groupTitle === undefined ? '' : batch.groupTitle,
       groupValidationStatus: validation,
-      timeBoundaryReached: reconstruction.timeBoundaryReached,
-      earliestDetectedTime: reconstruction.earliestDetectedTime,
-      candidateCount: understanding.candidates.length,
-      pendingReviewCount: understanding.pendingReviewMessageIds.length,
-      activated: activated,
-      needsGroupConfirmation: false,
-      reconstructionSucceeded: true,
-      understandingSucceeded: true
+      timeBoundaryReached: batch.timeBoundaryReached === true,
+      earliestDetectedTime: batch.earliestDetectedTime === undefined ? '' : batch.earliestDetectedTime,
+      candidateCount: candidates.length,
+      pendingReviewCount: pendingReviewCount,
+      activated: activated || batch.pipelineStage === HomeworkImportPipelineStage.ACTIVATED,
+      needsGroupConfirmation: validation === SourceGroupValidationStatus.UNRECOGNIZED &&
+        batch.groupConfirmedByUser !== true &&
+        batch.pipelineStage !== HomeworkImportPipelineStage.RECONSTRUCTION_FAILED,
+      reconstructionSucceeded: batch.reconstructed === true,
+      understandingSucceeded: batch.understood === true
     };
+  }
+
+  private storedValidation(batch: ImportBatch): SourceGroupValidationStatus {
+    if (batch.groupValidationStatus === SourceGroupValidationStatus.MATCHED) {
+      return SourceGroupValidationStatus.MATCHED;
+    }
+    if (batch.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
+      return SourceGroupValidationStatus.MISMATCH;
+    }
+    if (batch.groupValidationStatus === SourceGroupValidationStatus.CONFLICT) {
+      return SourceGroupValidationStatus.CONFLICT;
+    }
+    return SourceGroupValidationStatus.UNRECOGNIZED;
   }
 
   private writeProfileAudit(batchId: string, profile: HomeworkSourceProfile,
     detectedGroupTitle: string, validation: SourceGroupValidationStatus,
-    confirmedByUser: boolean): void {
+    confirmedByUser: boolean, pipelineStage: HomeworkImportPipelineStage): void {
     let batch = this.inbox.getBatch(batchId);
     if (batch === null) return;
     let updated: ImportBatch = {
@@ -198,8 +235,48 @@ export class HomeworkCaptureWorkflowService {
       groupValidationStatus: validation,
       groupConfirmedByUser: confirmedByUser,
       captureSessionId: batch.captureSessionId,
+      pipelineStage: pipelineStage,
       reconstructed: batch.reconstructed,
       groupTitle: detectedGroupTitle,
+      timeBoundaryReached: batch.timeBoundaryReached,
+      earliestDetectedTime: batch.earliestDetectedTime,
+      reconstructionWarnings: batch.reconstructionWarnings === undefined ?
+        undefined : batch.reconstructionWarnings.slice(),
+      understood: batch.understood,
+      understandingVersion: batch.understandingVersion,
+      pendingReviewMessageIds: batch.pendingReviewMessageIds === undefined ?
+        undefined : batch.pendingReviewMessageIds.slice(),
+      understandingWarnings: batch.understandingWarnings === undefined ?
+        undefined : batch.understandingWarnings.slice(),
+      classificationSummary: batch.classificationSummary,
+      createdAtEpochMs: batch.createdAtEpochMs,
+      status: batch.status,
+      messageCount: batch.messageCount,
+      candidateCount: batch.candidateCount
+    };
+    this.inbox.importBatch(
+      updated,
+      this.inbox.getMessages(batchId),
+      this.inbox.getCandidates(batchId));
+  }
+
+  private updatePipelineStage(batchId: string, pipelineStage: HomeworkImportPipelineStage): void {
+    let batch = this.requireBatch(batchId);
+    let updated: ImportBatch = {
+      id: batch.id,
+      studentId: batch.studentId,
+      sourceType: batch.sourceType,
+      sourceLabel: batch.sourceLabel,
+      sourceProfileId: batch.sourceProfileId,
+      sourceProfileName: batch.sourceProfileName,
+      expectedGroupTitle: batch.expectedGroupTitle,
+      profileStartTime: batch.profileStartTime,
+      groupValidationStatus: batch.groupValidationStatus,
+      groupConfirmedByUser: batch.groupConfirmedByUser,
+      captureSessionId: batch.captureSessionId,
+      pipelineStage: pipelineStage,
+      reconstructed: batch.reconstructed,
+      groupTitle: batch.groupTitle,
       timeBoundaryReached: batch.timeBoundaryReached,
       earliestDetectedTime: batch.earliestDetectedTime,
       reconstructionWarnings: batch.reconstructionWarnings === undefined ?
@@ -254,6 +331,12 @@ export class HomeworkCaptureWorkflowService {
       normalized = normalized.substring(0, normalized.length - memberCount[0].length);
     }
     return normalized;
+  }
+
+  private requireBatch(batchId: string): ImportBatch {
+    let batch = this.inbox.getBatch(batchId);
+    if (batch === null) throw new Error('找不到采集导入批次');
+    return batch;
   }
 
   private requireActiveProfile(studentId: string): HomeworkSourceProfile {
