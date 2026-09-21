@@ -145,7 +145,32 @@ export class DeterministicHomeworkTaskExtractor {
       }
       parts = next;
     }
-    return parts;
+
+    let result: string[] = [];
+    for (let part of parts) {
+      let start = 0;
+      for (let i = 0; i < part.length; i++) {
+        let char = part.substring(i, i + 1);
+        if (char !== '，' && char !== ',') continue;
+        let right = part.substring(i + 1).trim();
+        if (!this.startsTaskClause(right)) continue;
+        let left = part.substring(start, i).trim();
+        if (left.length > 0) result.push(left);
+        start = i + 1;
+      }
+      let tail = part.substring(start).trim();
+      if (tail.length > 0) result.push(tail);
+    }
+    return result;
+  }
+
+  private startsTaskClause(value: string): boolean {
+    let markers: string[] = [
+      '生字', '练习册', '口算', '朗读', '阅读', '背诵', '抄写', '默写',
+      '听读', '订正', '预习', '复习', '完成', '练习', '做第'
+    ];
+    for (let marker of markers) if (value.startsWith(marker)) return true;
+    return false;
   }
 
   private stripListMarker(value: string): string {
