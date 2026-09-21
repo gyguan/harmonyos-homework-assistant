@@ -28,7 +28,6 @@ export interface Issue247ClosureResult {
   homeworkTasksGenerated: boolean;
   preparationGenerated: boolean;
   candidateEvidenceTracePassed: boolean;
-  assignmentCandidateTraceContractPresent: boolean;
   passed: boolean;
 }
 
@@ -114,7 +113,6 @@ export class Issue247FullClosureFixture {
       homeworkTasksGenerated: homeworkGenerated,
       preparationGenerated: preparationGenerated,
       candidateEvidenceTracePassed: evidenceTrace,
-      assignmentCandidateTraceContractPresent: true,
       passed: passed
     };
   }
