@@ -96,10 +96,14 @@ require("SUBMISSION_NETWORK_ERROR" in remote_submission and
 
 
 # Production/test boundary: deterministic fixtures and issue-specific test IDs must not ship in
-# src/main. Business fixtures belong under entry/src/test and are executed by Hypium Local Test.
+# src/main. Hypium is an opt-in Local Test dependency and must not block ordinary app builds.
 test_suite = read("entry/src/test/List.test.ets")
-require("@ohos/hypium" in entry_oh_package,
-        "entry module must declare Hypium as a devDependency for ArkTS Local Test")
+local_test_runner = read("scripts/run_harmony_local_tests.ps1")
+require("@ohos/hypium" not in entry_oh_package,
+        "Hypium must not be a permanent entry dependency; ordinary app builds must stay network-independent")
+require("@ohos/hypium" in local_test_runner and "1.0.19" in local_test_runner and
+        "hvigorw test" in local_test_runner and "finally" in local_test_runner,
+        "optional Harmony Local Test runner must inject Hypium only for the test session and restore the manifest")
 require("Issue245ChatReconstructionFixture" in test_suite and
         "Issue246HomeworkUnderstandingFixture" in test_suite and
         "Issue247FullClosureFixture" in test_suite,
