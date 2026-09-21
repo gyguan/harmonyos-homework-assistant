@@ -220,12 +220,42 @@ napi_value StartCapture(napi_env env, napi_callback_info info)
         return JsNumber(env, code);
     }
 
-    (void)OH_AVScreenCapture_SetMicrophoneEnabled(g_capture, false);
-    (void)OH_AVScreenCapture_SetErrorCallback(g_capture, OnError, nullptr);
-    (void)OH_AVScreenCapture_SetStateCallback(g_capture, OnStateChange, nullptr);
-    (void)OH_AVScreenCapture_SetDataCallback(g_capture, OnBufferAvailable, nullptr);
+    OH_AVSCREEN_CAPTURE_ErrCode microphoneResult =
+        OH_AVScreenCapture_SetMicrophoneEnabled(g_capture, false);
+    if (microphoneResult != AV_SCREEN_CAPTURE_ERR_OK) {
+        int32_t code = static_cast<int32_t>(microphoneResult);
+        g_lastError.store(code);
+        StopAndReleaseLocked();
+        return JsNumber(env, code);
+    }
 
-    g_isCapturing.store(true);
+    OH_AVSCREEN_CAPTURE_ErrCode errorCallbackResult =
+        OH_AVScreenCapture_SetErrorCallback(g_capture, OnError, nullptr);
+    if (errorCallbackResult != AV_SCREEN_CAPTURE_ERR_OK) {
+        int32_t code = static_cast<int32_t>(errorCallbackResult);
+        g_lastError.store(code);
+        StopAndReleaseLocked();
+        return JsNumber(env, code);
+    }
+
+    OH_AVSCREEN_CAPTURE_ErrCode stateCallbackResult =
+        OH_AVScreenCapture_SetStateCallback(g_capture, OnStateChange, nullptr);
+    if (stateCallbackResult != AV_SCREEN_CAPTURE_ERR_OK) {
+        int32_t code = static_cast<int32_t>(stateCallbackResult);
+        g_lastError.store(code);
+        StopAndReleaseLocked();
+        return JsNumber(env, code);
+    }
+
+    OH_AVSCREEN_CAPTURE_ErrCode dataCallbackResult =
+        OH_AVScreenCapture_SetDataCallback(g_capture, OnBufferAvailable, nullptr);
+    if (dataCallbackResult != AV_SCREEN_CAPTURE_ERR_OK) {
+        int32_t code = static_cast<int32_t>(dataCallbackResult);
+        g_lastError.store(code);
+        StopAndReleaseLocked();
+        return JsNumber(env, code);
+    }
+
     OH_AVSCREEN_CAPTURE_ErrCode startResult = OH_AVScreenCapture_StartScreenCapture(g_capture);
     if (startResult != AV_SCREEN_CAPTURE_ERR_OK) {
         int32_t code = static_cast<int32_t>(startResult);
