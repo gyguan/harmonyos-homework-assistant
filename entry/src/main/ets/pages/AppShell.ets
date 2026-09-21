@@ -2,6 +2,7 @@ import {
   AppRoute,
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
+  ParentCaptureRouteParam,
   ParentCaptureSpikeRouteParam,
   ParentImportBatchRouteParam,
   ParentImportConfirmationRouteParam,
@@ -30,6 +31,7 @@ import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImpor
 import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImportInboxPage';
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
+import { HomeworkCapturePage } from '../features/parent/import/HomeworkCapturePage';
 import { HomeworkCaptureSpikePage } from '../experimental/homeworkcapture/HomeworkCaptureSpikePage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
@@ -245,6 +247,11 @@ export struct AppShell {
       AppRoute.PARENT_IMPORT_BATCH_DETAIL, new ParentImportBatchRouteParam(batchId));
   }
 
+  private openParentCapture(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_CAPTURE, new ParentCaptureRouteParam());
+  }
+
   private openParentCaptureSpike(): void {
     this.navPathStack.pushPathByName(
       AppRoute.PARENT_CAPTURE_SPIKE, new ParentCaptureSpikeRouteParam());
@@ -380,6 +387,7 @@ export struct AppShell {
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => this.openParentImportConfirmation(),
           onOpenInbox: () => this.openParentImportInbox(),
+          onOpenCapture: () => this.openParentCapture(),
           onOpenCaptureSpike: () => this.openParentCaptureSpike(),
           onStoreChanged: () => this.notifyUiChanged()
         });
@@ -401,6 +409,15 @@ export struct AppShell {
           batchId: (param as ParentImportBatchRouteParam).batchId,
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => this.openParentImportConfirmation()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_CAPTURE) {
+      NavDestination() {
+        HomeworkCapturePage({
+          onBack: () => this.navPathStack.pop(),
+          onOpenInbox: () => this.openParentImportInbox()
         });
       }
       .hideTitleBar(true)
