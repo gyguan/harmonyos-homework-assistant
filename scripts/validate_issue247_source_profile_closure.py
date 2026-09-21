@@ -171,6 +171,10 @@ for expected in [
     require(expected in fixture, f"#247 closure assertion missing: {expected}")
 require("mismatchDetected" in fixture and "unrecognizedRequiresConfirmation" in fixture,
         "fixture must cover wrong-group and OCR-unrecognized group behavior")
+require("normalizedGroupVariantMatched" in fixture and "二（3）班家长群(45)" in fixture,
+        "fixture must cover common OCR/group-title bracket and member-count normalization")
+require("replace(/（/g, '(')" in workflow and "memberCount" in workflow,
+        "group validation must normalize fullwidth brackets and trailing member counts without fuzzy guessing")
 require("运行 #247 完整闭环自测" in spike,
         "#247 full-closure fixture must be runnable from diagnostic UI")
 
