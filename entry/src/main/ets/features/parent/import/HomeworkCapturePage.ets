@@ -202,6 +202,14 @@ export struct HomeworkCapturePage {
     this.message = '已取消本次采集，可以重新开始。';
   }
 
+  private back(): void {
+    if (this.isRunning(this.session())) {
+      this.errorText = '采集中，请先停止或取消本次采集。';
+      return;
+    }
+    this.onBack();
+  }
+
   private statusLabel(status: CaptureSessionStatus): string {
     if (status === CaptureSessionStatus.WAITING_PERMISSION) return '等待系统授权';
     if (status === CaptureSessionStatus.CAPTURING) return '正在采集';
@@ -218,7 +226,7 @@ export struct HomeworkCapturePage {
         title: '抓取今日作业',
         subtitle: '你手工浏览班级群，小伴只采集当前屏幕',
         backAccessibilityText: '返回导入老师作业',
-        onBack: () => this.onBack()
+        onBack: () => this.back()
       });
 
       Scroll() {
@@ -312,6 +320,7 @@ export struct HomeworkCapturePage {
 
           Button('查看作业智能收件箱', { type: ButtonType.Normal })
             .width('100%')
+            .enabled(!this.isRunning(this.session()))
             .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .backgroundColor(AppTheme.PRIMARY_SOFT)
