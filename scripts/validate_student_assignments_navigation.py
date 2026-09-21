@@ -96,19 +96,21 @@ for token in ["StudentAssignmentsViewModel", "DefaultAssignmentRepository.instan
               "private applyItems(items: Assignment[]): void", "this.visibleTotal = items.length",
               "AssignmentFilterDialog", "CustomDialogController", "alignment: DialogAlignment.Bottom",
               "this.filterDialogController.open()", "FilterSummaryEntry({", "label: '日期'", "label: '科目'",
-              "selectedDayEpochMs: $draftSelectedDayEpochMs", "queryOnDay"]:
+              "allDates: $draftAllDates", "selectedDayEpochMs: $draftSelectedDayEpochMs",
+              "AssignmentDateFilter.ALL", "queryOnDay"]:
     require(token in page or token in view_model, f"assignment result page missing required date+subject behavior: {token}")
 require("@Prop active: boolean = false;" in selection_controls and
         "export struct FilterSummaryEntry" in selection_controls,
         "assignment filter summary must keep active state in a reactive shared component")
 for expression in [
-    "active: !this.isSelectedDayToday()",
+    "active: !this.allDates && !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in page, f"assignment query summary must bind directly to page state: {expression}")
-for token in ["@CustomDialog", "@Link selectedDayEpochMs", "@Link subjectCode",
+for token in ["@CustomDialog", "@Link allDates", "@Link selectedDayEpochMs", "@Link subjectCode",
+              "DateModeOption('全部日期', true)", "DateModeOption('指定日期', false)",
               "DatePicker({", "private SubjectOption", "Button('重置'", "Button('查询'",
-              "this.onQuery(this.selectedDayEpochMs, this.subjectCode)"]:
+              "this.onQuery(this.allDates, this.selectedDayEpochMs, this.subjectCode)"]:
     require(token in filter_dialog, f"assignment query dialog missing required behavior: {token}")
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
     require(removed not in filter_dialog,
