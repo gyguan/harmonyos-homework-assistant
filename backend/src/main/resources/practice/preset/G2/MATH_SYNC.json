@@ -2832,14 +2832,14 @@
             },
             {
               "key": "B",
-              "label": "7组"
+              "label": "8组"
             },
             {
               "key": "C",
-              "label": "8组"
+              "label": "7组"
             }
           ],
-          "answerSpec": "B",
+          "answerSpec": "C",
           "explanation": "42÷6=7，所以能分成7组。",
           "hints": [
             "关键词：“6个一组”“42个”。求42里面有几个6。"
@@ -2922,14 +2922,14 @@
             },
             {
               "key": "B",
-              "label": "4倍"
+              "label": "5倍"
             },
             {
               "key": "C",
-              "label": "5倍"
+              "label": "4倍"
             }
           ],
-          "answerSpec": "B",
+          "answerSpec": "C",
           "explanation": "28÷7=4，所以姐姐有小明的4倍。",
           "hints": [
             "关键词：“7张”“28张”“几倍”。求28里面有几个7。"
