@@ -27,5 +27,6 @@ export interface HomeworkSourceProfileSnapshot {
 export enum SourceGroupValidationStatus {
   MATCHED = 'MATCHED',
   MISMATCH = 'MISMATCH',
-  UNRECOGNIZED = 'UNRECOGNIZED'
+  UNRECOGNIZED = 'UNRECOGNIZED',
+  CONFLICT = 'CONFLICT'
 }
