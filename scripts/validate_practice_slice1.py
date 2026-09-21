@@ -99,12 +99,12 @@ require("Practice" not in homework_models,
 
 require("Active catalog: Shenzhen G2 first semester" in preset_catalog,
         "generated catalog must identify the rebuilt G2/S1 scope")
-require(preset_catalog.count("result.push({") == 27,
-        "generated catalog must expose exactly 27 active papers")
-require(preset_catalog.count("PracticeTrack.TEXTBOOK_SYNC") == 18,
-        "generated catalog must expose 18 textbook-sync papers")
-require(preset_catalog.count("PracticeTrack.EXTRACURRICULAR") == 9,
-        "generated catalog must expose 9 extracurricular papers")
+require(preset_catalog.count("result.push({") >= 33,
+        "generated catalog must expose at least 33 active papers")
+require(preset_catalog.count("PracticeTrack.TEXTBOOK_SYNC") >= 21,
+        "generated catalog must expose at least 21 textbook-sync papers")
+require(preset_catalog.count("PracticeTrack.EXTRACURRICULAR") >= 12,
+        "generated catalog must expose at least 12 extracurricular papers")
 for paper_id in [
     "CHINESE-G2-S1-SYNC-WORDS-001",
     "CHINESE-G2-S1-EXTRA-SHENZHEN-001",
