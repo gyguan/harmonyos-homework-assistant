@@ -290,7 +290,6 @@ export struct ParentVoiceAssignmentPage {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
           title: '布置语音作业',
-          subtitle: `上传语音和配套图片，${this.viewModel.student().name} 可以边听边看`,
           backAccessibilityText: '返回家长首页',
           onBack: () => this.onBack()
         });
