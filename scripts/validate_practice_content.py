@@ -232,17 +232,19 @@ def main() -> int:
                 require(paper_spread <= 1,
                         f"{key} single-choice answer positions must be balanced, got {dict(paper_answer_distribution)}")
 
-    require(len(papers) == 27, f"active catalog must contain exactly 27 papers, got {len(papers)}")
-    require(len(global_question_ids) == 324,
-            f"active catalog must contain exactly 324 unique questions, got {len(global_question_ids)}")
+    expected_question_total = sum(int(paper.get("questionCount", 0)) for paper in papers)
+    require(len(papers) >= 48, f"active catalog must contain at least 48 papers, got {len(papers)}")
+    require(len(global_question_ids) == expected_question_total,
+            f"active catalog question IDs must match declared questionCount total: "
+            f"ids={len(global_question_ids)} declared={expected_question_total}")
     for subject in sorted(SUBJECTS):
-        require(subject_track_counts[(subject, "TEXTBOOK_SYNC")] == 6,
-                f"{subject} must contain 6 textbook-sync papers")
-        require(subject_track_counts[(subject, "EXTRACURRICULAR")] == 3,
-                f"{subject} must contain 3 extracurricular papers")
+        require(subject_track_counts[(subject, "TEXTBOOK_SYNC")] >= 10,
+                f"{subject} must contain at least 10 textbook-sync papers")
+        require(subject_track_counts[(subject, "EXTRACURRICULAR")] >= 6,
+                f"{subject} must contain at least 6 extracurricular papers")
 
     choice_total = sum(answer_distribution.values())
-    require(choice_total == 276, f"expected 276 single-choice questions, got {choice_total}")
+    require(choice_total > 0, "active catalog must contain single-choice questions")
     require(set(answer_distribution) == {"A", "B", "C"},
             f"single-choice answers must use A/B/C, got {dict(answer_distribution)}")
     if answer_distribution:
@@ -307,7 +309,12 @@ def main() -> int:
             print(f"- {error}")
         return 1
 
-    print("PRACTICE_CONTENT_GATE_PASS papers=27 questions=324 sync=18 extra=9")
+    sync_total = sum(subject_track_counts[(subject, "TEXTBOOK_SYNC")] for subject in SUBJECTS)
+    extra_total = sum(subject_track_counts[(subject, "EXTRACURRICULAR")] for subject in SUBJECTS)
+    print(
+        f"PRACTICE_CONTENT_GATE_PASS papers={len(papers)} "
+        f"questions={len(global_question_ids)} sync={sync_total} extra={extra_total}"
+    )
     return 0
 
 

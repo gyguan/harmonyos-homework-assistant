@@ -957,6 +957,882 @@
           ]
         }
       ]
+    },
+    {
+      "id": "MATH-G2-S1-EXTRA-PLANNER-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "数学思维·生活规划（一）",
+      "description": "在班级活动、整理物品和周末安排中综合使用加减乘除，训练分步理解和简单规划。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "课外拓展",
+        "生活数学",
+        "综合规划"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q01-V1",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "班级手工活动分成4组，每组准备6张彩纸，一共要准备多少张彩纸？",
+          "options": [],
+          "answerSpec": "24",
+          "explanation": "4组每组6张，4×6=24，所以需要24张。",
+          "hints": [
+            "关键词：“4组”“每组6张”“一共”。先找共有几组和每组多少，再用乘法求总数。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "32张贴纸每4张装一袋，可以装几袋？",
+          "options": [
+            {
+              "key": "A",
+              "label": "8袋"
+            },
+            {
+              "key": "B",
+              "label": "6袋"
+            },
+            {
+              "key": "C",
+              "label": "7袋"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "32里面有8个4，32÷4=8，所以可以装8袋。",
+          "hints": [
+            "关键词：“每4张一袋”“32张”。这是按每份4张去分，想一想能分成多少份。"
+          ],
+          "tags": [
+            "生活数学",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q03-V1",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "社区活动有80瓶水，上午用了25瓶，下午又用了18瓶，还剩多少瓶？",
+          "options": [],
+          "answerSpec": "37",
+          "explanation": "先算两次一共用了43瓶，再用80-43=37，所以剩37瓶。",
+          "hints": [
+            "关键词：“上午用了25”“下午又用了18”“还剩”。可以先合并用掉的数量，再从总数中减去。"
+          ],
+          "tags": [
+            "生活数学",
+            "两步计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "运动会座位摆成5排，每排7把椅子，一共摆了多少把？",
+          "options": [
+            {
+              "key": "A",
+              "label": "30把"
+            },
+            {
+              "key": "B",
+              "label": "35把"
+            },
+            {
+              "key": "C",
+              "label": "40把"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "5排每排7把，5×7=35，所以一共35把椅子。",
+          "hints": [
+            "关键词：“5排”“每排7把”。相同数量重复5次，用乘法求总数。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q05-V1",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "48本绘本平均放在6层书架上，每层放多少本？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "48÷6=8，所以平均每层放8本。",
+          "hints": [
+            "关键词：“48本”“平均放6层”“每层”。把总数平均分成6份，求每份数量。"
+          ],
+          "tags": [
+            "生活数学",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书角原有27本故事书，又补充36本，现在一共有多少本？",
+          "options": [
+            {
+              "key": "A",
+              "label": "61本"
+            },
+            {
+              "key": "B",
+              "label": "62本"
+            },
+            {
+              "key": "C",
+              "label": "63本"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "27+36=63，所以现在共有63本。",
+          "hints": [
+            "关键词：“原有27本”“又补充36本”“一共”。两个数量合起来，用加法。"
+          ],
+          "tags": [
+            "生活数学",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q07-V1",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "周末野餐准备3袋面包，每袋8个，又准备5个饭团，一共有多少份主食？",
+          "options": [],
+          "answerSpec": "29",
+          "explanation": "3×8=24，24+5=29，所以一共有29份主食。",
+          "hints": [
+            "关键词：“3袋”“每袋8个”“又有5个”。先算面包总数，再把饭团数量加上。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘加"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "56支彩笔每7支放进一个收纳盒，需要几个盒子？",
+          "options": [
+            {
+              "key": "A",
+              "label": "8个"
+            },
+            {
+              "key": "B",
+              "label": "7个"
+            },
+            {
+              "key": "C",
+              "label": "9个"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "56÷7=8，所以需要8个盒子。",
+          "hints": [
+            "关键词：“56支”“每7支一个盒子”。按固定数量分组，求可以分成几组。"
+          ],
+          "tags": [
+            "生活数学",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q09-V1",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "亲子活动准备了90张号码贴，已经发出34张，还剩多少张？",
+          "options": [],
+          "answerSpec": "56",
+          "explanation": "90-34=56，所以还剩56张号码贴。",
+          "hints": [
+            "关键词：“90张”“发出34张”“还剩”。从原来的总数里减去已经发出的数量。"
+          ],
+          "tags": [
+            "生活数学",
+            "减法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "班级展示墙有6栏，每栏贴9张作品，一共贴多少张？",
+          "options": [
+            {
+              "key": "A",
+              "label": "45张"
+            },
+            {
+              "key": "B",
+              "label": "54张"
+            },
+            {
+              "key": "C",
+              "label": "63张"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "6×9=54，所以一共贴54张作品。",
+          "hints": [
+            "关键词：“6栏”“每栏9张”。每栏数量相同，用乘法求总数。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q11-V1",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "45支铅笔平均放进5个笔筒，每个笔筒放多少支？",
+          "options": [],
+          "answerSpec": "9",
+          "explanation": "45÷5=9，所以每个笔筒放9支。",
+          "hints": [
+            "关键词：“45支”“平均5个笔筒”。把总数平均分成5份，求每份多少。"
+          ],
+          "tags": [
+            "生活数学",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书义卖上午卖出38本，下午卖出24本，两段时间一共卖出多少本？",
+          "options": [
+            {
+              "key": "A",
+              "label": "60本"
+            },
+            {
+              "key": "B",
+              "label": "61本"
+            },
+            {
+              "key": "C",
+              "label": "62本"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "38+24=62，所以一共卖出62本。",
+          "hints": [
+            "关键词：“上午38本”“下午24本”“一共”。把两个时段的数量合起来。"
+          ],
+          "tags": [
+            "生活数学",
+            "加法"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-EXTRA-MARKET-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "生活数学·班级旧物市场（一）",
+      "description": "围绕班级旧物市场的定价、付款、找零和数量统计，综合练习购物与100以内加减。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "课外拓展",
+        "旧物市场",
+        "购物"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q01-V1",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "旧物市场上一本故事书12元，一个笔筒8元，两样都买一共多少元？",
+          "options": [],
+          "answerSpec": "20",
+          "explanation": "12+8=20，所以一共20元。",
+          "hints": [
+            "关键词：“两样都买”“一共”，数量12元、8元。把两个价格相加。"
+          ],
+          "tags": [
+            "购物",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "小乐有30元，买了18元的拼图，剩下多少钱？",
+          "options": [
+            {
+              "key": "A",
+              "label": "12元"
+            },
+            {
+              "key": "B",
+              "label": "10元"
+            },
+            {
+              "key": "C",
+              "label": "8元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "30-18=12，所以剩12元。",
+          "hints": [
+            "关键词：“30元”“18元”“剩下”。用原有的钱减去花掉的钱。"
+          ],
+          "tags": [
+            "购物",
+            "找零"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q03-V1",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "三个同学分别卖出9本、14本和7本旧书，一共卖出多少本？",
+          "options": [],
+          "answerSpec": "30",
+          "explanation": "9+14+7=30，所以一共卖出30本。",
+          "hints": [
+            "关键词：“三个同学”“一共”。把三个人卖出的数量连续相加。"
+          ],
+          "tags": [
+            "统计",
+            "连加"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个玩具车15元，一个布偶20元。哪一个更贵？",
+          "options": [
+            {
+              "key": "A",
+              "label": "玩具车"
+            },
+            {
+              "key": "B",
+              "label": "布偶"
+            },
+            {
+              "key": "C",
+              "label": "一样贵"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "20大于15，所以20元的布偶更贵。",
+          "hints": [
+            "关键词：“15元”“20元”“更贵”。比较两个价格，数值大的更贵。"
+          ],
+          "tags": [
+            "购物",
+            "比较"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q05-V1",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "小雨带50元，买了24元的书和16元的棋盘，还剩多少元？",
+          "options": [],
+          "answerSpec": "10",
+          "explanation": "24+16=40，50-40=10，所以还剩10元。",
+          "hints": [
+            "关键词：“50元”“买24元和16元”“还剩”。先算总花费，再从50元中减去。"
+          ],
+          "tags": [
+            "购物",
+            "两步计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "义卖桌上有36个书签，每6个装一袋，可以装几袋？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4袋"
+            },
+            {
+              "key": "B",
+              "label": "5袋"
+            },
+            {
+              "key": "C",
+              "label": "6袋"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "36÷6=6，所以可以装6袋。",
+          "hints": [
+            "关键词：“36个”“每6个一袋”。按每份6个分组，求能分几份。"
+          ],
+          "tags": [
+            "分组",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q07-V1",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "一支旧钢笔卖7元，卖出6支一共收入多少元？",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "7×6=42，所以收入42元。",
+          "hints": [
+            "关键词：“每支7元”“6支”。单价相同，用乘法求总收入。"
+          ],
+          "tags": [
+            "购物",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "小明想用20元正好买完。下面哪一种组合刚好是20元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "12元的书+8元的笔筒"
+            },
+            {
+              "key": "B",
+              "label": "9元的卡片+8元的尺子"
+            },
+            {
+              "key": "C",
+              "label": "13元的拼图+5元的橡皮"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "12+8=20，其他组合分别是17元和18元。",
+          "hints": [
+            "关键词：“正好20元”。分别算每组价格之和，找等于20的一组。"
+          ],
+          "tags": [
+            "购物",
+            "组合"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q09-V1",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "市场开始时有45件物品，上午卖出17件，下午又卖出12件，还剩多少件？",
+          "options": [],
+          "answerSpec": "16",
+          "explanation": "45-17-12=16，所以还剩16件。",
+          "hints": [
+            "关键词：“卖出17”“又卖12”“还剩”。总数连续减少两次。"
+          ],
+          "tags": [
+            "统计",
+            "连减"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "一盒彩笔9元，小红付了20元，应找回多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "9元"
+            },
+            {
+              "key": "B",
+              "label": "11元"
+            },
+            {
+              "key": "C",
+              "label": "12元"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "20-9=11，所以找回11元。",
+          "hints": [
+            "关键词：“付20元”“9元”“找回”。付款减价格就是找零。"
+          ],
+          "tags": [
+            "购物",
+            "找零"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q11-V1",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "4个小组每组整理8件旧物，一共整理多少件？",
+          "options": [],
+          "answerSpec": "32",
+          "explanation": "4×8=32，所以一共32件。",
+          "hints": [
+            "关键词：“4组”“每组8件”。相同数量重复4次，用乘法。"
+          ],
+          "tags": [
+            "统计",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-MARKET-002-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "市场结束后还有24件物品，平均分给6个收纳箱，每箱放几件？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3件"
+            },
+            {
+              "key": "B",
+              "label": "5件"
+            },
+            {
+              "key": "C",
+              "label": "4件"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "24÷6=4，所以每箱4件。",
+          "hints": [
+            "关键词：“24件”“平均6箱”“每箱”。总数平均分成6份。"
+          ],
+          "tags": [
+            "分配",
+            "除法"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-EXTRA-BODY-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "数学好玩·身体里的数学秘密（一）",
+      "description": "用步长、手掌宽度和身高估测等儿童可操作场景练习厘米、米、估算与简单乘除。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "课外拓展",
+        "数学好玩",
+        "测量"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "量一支铅笔的长度，用哪个单位更合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "厘米"
+            },
+            {
+              "key": "B",
+              "label": "米"
+            },
+            {
+              "key": "C",
+              "label": "千米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "铅笔长度通常是十几厘米，用厘米测量最合适。",
+          "hints": [
+            "关键词：“一支铅笔”“长度单位”。先判断物体大小，再选适合短物体的单位。"
+          ],
+          "tags": [
+            "测量",
+            "单位"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q02-V1",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "小乐一步大约50厘米，连续走4步大约走了多少厘米？",
+          "options": [],
+          "answerSpec": "200",
+          "explanation": "50×4=200，所以大约200厘米。",
+          "hints": [
+            "关键词：“每步50厘米”“4步”。相同步长重复4次，用乘法估算。"
+          ],
+          "tags": [
+            "测量",
+            "估算"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "教室门大约2什么高？",
+          "options": [
+            {
+              "key": "A",
+              "label": "厘米"
+            },
+            {
+              "key": "B",
+              "label": "米"
+            },
+            {
+              "key": "C",
+              "label": "毫米"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "教室门高度通常接近2米，用米作单位合适。",
+          "hints": [
+            "关键词：“教室门”“大约2”。根据门的实际大小判断应该用厘米还是米。"
+          ],
+          "tags": [
+            "测量",
+            "单位"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q04-V1",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "一张课桌长约60厘米，两张同样的课桌首尾连起来大约长多少厘米？",
+          "options": [],
+          "answerSpec": "120",
+          "explanation": "60×2=120，所以约120厘米。",
+          "hints": [
+            "关键词：“每张60厘米”“两张首尾相连”。把两个相同长度相加。"
+          ],
+          "tags": [
+            "测量",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "小朋友的手掌宽大约8什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "米"
+            },
+            {
+              "key": "B",
+              "label": "千米"
+            },
+            {
+              "key": "C",
+              "label": "厘米"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "手掌宽只有几厘米，用厘米作单位合适。",
+          "hints": [
+            "关键词：“手掌宽”“大约8”。根据身体部位大小判断长度单位。"
+          ],
+          "tags": [
+            "测量",
+            "单位"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q06-V1",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "小雨用自己的脚长量地垫，地垫大约有6个脚长，每个脚长20厘米，地垫大约长多少厘米？",
+          "options": [],
+          "answerSpec": "120",
+          "explanation": "20×6=120，所以地垫约120厘米。",
+          "hints": [
+            "关键词：“6个脚长”“每个20厘米”。用每份长度乘份数。"
+          ],
+          "tags": [
+            "测量",
+            "估测"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "想比较两条绳子谁更长，下面哪种方法更公平？",
+          "options": [
+            {
+              "key": "A",
+              "label": "用同一把尺子从同一端量"
+            },
+            {
+              "key": "B",
+              "label": "一条用手掌量、一条用脚步量"
+            },
+            {
+              "key": "C",
+              "label": "只看颜色判断"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "使用同一工具和同一方法，测量结果才更容易比较。",
+          "hints": [
+            "关键词：“比较长度”“更公平”。想一想测量工具和方法是否保持一致。"
+          ],
+          "tags": [
+            "测量",
+            "方法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q08-V1",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "一根跳绳长2米，两根同样的跳绳接起来一共多少米？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "2×2=4，所以一共4米。",
+          "hints": [
+            "关键词：“每根2米”“两根”。两个相同长度相加。"
+          ],
+          "tags": [
+            "测量",
+            "米"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪个物体最适合用“米”作单位测长度？",
+          "options": [
+            {
+              "key": "A",
+              "label": "橡皮"
+            },
+            {
+              "key": "B",
+              "label": "操场跑道一小段"
+            },
+            {
+              "key": "C",
+              "label": "铅笔盒"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "操场上的一段距离比文具长得多，用米更合适。",
+          "hints": [
+            "关键词：“用米测量”。比较三个物体的大小，找明显更长的一个。"
+          ],
+          "tags": [
+            "测量",
+            "单位"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q10-V1",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "一条彩带长90厘米，剪去30厘米，还剩多少厘米？",
+          "options": [],
+          "answerSpec": "60",
+          "explanation": "90-30=60，所以还剩60厘米。",
+          "hints": [
+            "关键词：“90厘米”“剪去30厘米”“还剩”。总长度减去剪掉的部分。"
+          ],
+          "tags": [
+            "测量",
+            "减法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "用步数估计走廊长度时，为什么最好每一步尽量走得一样大？",
+          "options": [
+            {
+              "key": "A",
+              "label": "让鞋子更漂亮"
+            },
+            {
+              "key": "B",
+              "label": "让走廊变短"
+            },
+            {
+              "key": "C",
+              "label": "方便比较和估计"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "步长尽量一致，步数和距离之间的关系更稳定，估计更可靠。",
+          "hints": [
+            "关键词：“每一步一样大”“为什么”。想一想步长忽大忽小会不会影响估计结果。"
+          ],
+          "tags": [
+            "测量",
+            "估测方法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-BODY-001-Q12-V1",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "小宇走3步大约150厘米，平均每步大约多少厘米？",
+          "options": [],
+          "answerSpec": "50",
+          "explanation": "150÷3=50，所以平均每步约50厘米。",
+          "hints": [
+            "关键词：“3步150厘米”“平均每步”。总长度平均分成3份。"
+          ],
+          "tags": [
+            "测量",
+            "平均"
+          ]
+        }
+      ]
     }
   ]
 }
