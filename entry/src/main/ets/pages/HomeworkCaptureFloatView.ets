@@ -1,6 +1,8 @@
 import { HomeworkCaptureSessionService } from '../application/capture/HomeworkCaptureSessionService';
+import { HomeworkCaptureWorkflowService } from '../application/capture/HomeworkCaptureWorkflowService';
 import { AppTheme } from '../common/theme/AppTheme';
 import { CaptureSessionStatus } from '../domain/model/CaptureModels';
+import { SourceGroupValidationStatus } from '../domain/model/HomeworkSourceProfileModels';
 import nativeCapture, { CaptureStats } from 'libhomeworkcapture.so';
 
 @Entry
@@ -27,15 +29,27 @@ struct HomeworkCaptureFloatView {
   private async refreshFormalSession(): Promise<void> {
     let active = HomeworkCaptureSessionService.instance.getActiveSession();
     if (active === null) return;
-    let session = await HomeworkCaptureSessionService.instance.sampleLatestFrame();
-    if (session === null) return;
+    let progress = await HomeworkCaptureWorkflowService.instance.progress();
+    if (progress === null) return;
+    let session = progress.session;
 
     if (session.status === CaptureSessionStatus.WAITING_PERMISSION) {
       this.statusText = '等待系统授权';
       this.detailText = '同意屏幕采集后，再进入班级群手工上滑';
     } else if (session.status === CaptureSessionStatus.CAPTURING) {
-      this.statusText = '作业采集中';
-      this.detailText = `变化帧 ${session.acceptedFrameCount} · 到目标位置后点停止`;
+      if (progress.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
+        this.statusText = '当前群与配置不一致';
+        this.detailText = `识别到“${progress.detectedGroupTitle}”，请返回正确班级群`;
+      } else if (progress.timeBoundaryReached) {
+        this.statusText = '已到达今日时间范围';
+        this.detailText = `已看到 ${progress.earliestDetectedTime}，现在可以结束并自动整理`;
+      } else if (progress.groupValidationStatus === SourceGroupValidationStatus.MATCHED) {
+        this.statusText = '班级群已确认';
+        this.detailText = `变化帧 ${session.acceptedFrameCount} · 继续手工上滑到今日开始时间`;
+      } else {
+        this.statusText = '作业采集中';
+        this.detailText = `变化帧 ${session.acceptedFrameCount} · 正在识别群名和时间范围`;
+      }
     } else if (session.status === CaptureSessionStatus.STOPPING) {
       this.statusText = '正在结束采集';
       this.detailText = '正在整理本次屏幕证据';
@@ -54,10 +68,14 @@ struct HomeworkCaptureFloatView {
   private async stopCapture(): Promise<void> {
     let active = HomeworkCaptureSessionService.instance.getActiveSession();
     if (active !== null) {
-      let result = await HomeworkCaptureSessionService.instance.stopByUser();
-      if (result !== null && result.importBatchId.length > 0) {
-        this.statusText = '采集已完成';
-        this.detailText = `已收集 ${result.acceptedFrameCount} 个变化画面，请返回小伴查看导入批次`;
+      let result = await HomeworkCaptureWorkflowService.instance.finishByUser();
+      if (result !== null && result.batchId.length > 0) {
+        this.statusText = result.activated ? '已整理完成' :
+          (result.needsGroupConfirmation ? '需要确认群名' : '采集已完成');
+        this.detailText = result.activated ?
+          `已整理 ${result.candidateCount} 项，请返回小伴确认发布` :
+          (result.needsGroupConfirmation ? '群名未可靠识别，请返回小伴确认后继续' :
+            '结果已保留，请返回小伴查看');
       } else {
         this.statusText = '采集已停止';
         this.detailText = '没有生成导入批次，可以返回小伴重新开始';
