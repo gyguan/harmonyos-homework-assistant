@@ -94,6 +94,27 @@ require("SUBMISSION_NETWORK_ERROR" in remote_submission and
         "response = await client.request(" in remote_submission,
         "Remote submission upload must explicitly handle exceptions from http client.request")
 
+
+# Production/test boundary: deterministic fixtures and issue-specific test IDs must not ship in
+# src/main. Business fixtures belong under entry/src/test and are executed by Hypium Local Test.
+test_suite = read("entry/src/test/List.test.ets")
+require("@ohos/hypium" in entry_oh_package,
+        "entry module must declare Hypium as a devDependency for ArkTS Local Test")
+require("Issue245ChatReconstructionFixture" in test_suite and
+        "Issue246HomeworkUnderstandingFixture" in test_suite and
+        "Issue247FullClosureFixture" in test_suite,
+        "deterministic homework-import regressions must be registered in the ArkTS test suite")
+
+production_ets_root = ROOT / "entry/src/main/ets"
+for production_file in production_ets_root.rglob("*.ets"):
+    relative = production_file.relative_to(ROOT).as_posix()
+    source = production_file.read_text(encoding="utf-8")
+    require("Fixture" not in production_file.name,
+            f"test fixture must not live in production sources: {relative}")
+    require("issue244-fixture" not in source and "issue245-fixture" not in source and
+            "issue246-fixture" not in source and "issue247-fixture" not in source,
+            f"production behavior must not depend on issue fixture IDs: {relative}")
+
 # Keep the backend intentionally lightweight during the family-product refactor.
 for forbidden_dependency in ["spring-data-redis", "spring-kafka", "spring-cloud-gateway", "camunda", "flowable"]:
     require(forbidden_dependency not in backend_pom,
