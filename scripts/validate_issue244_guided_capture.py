@@ -93,6 +93,13 @@ require("HomeworkOrganizerRemoteApi" not in service and "runSmart" not in servic
         "#244 capture loop must not call AI/LLM per frame")
 require("runtime.stopCapture()" in service,
         "manual/cancel/destroy paths must release capture runtime")
+require("sampleInFlight" in service and
+        "if (this.sampleInFlight !== null) await this.sampleInFlight" in service,
+        "stop/cancel must serialize against in-flight OCR sampling")
+require("isTerminal(latest.status)" in service,
+        "late OCR completion must not revive a terminal CaptureSession")
+require("runtime.clearLatestFrame()" in service,
+        "formal termination must clear the retained raw RGBA frame")
 require("handleAbilityDestroy" in service and "ABILITY_DESTROYED" in service,
         "UIAbility abnormal destruction must safely terminate the session")
 
