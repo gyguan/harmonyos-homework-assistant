@@ -93,6 +93,7 @@ export class HomeworkImportInboxStore {
       reconstructionWarnings: source.reconstructionWarnings === undefined ?
         undefined : source.reconstructionWarnings.slice(),
       understood: source.understood,
+      understandingVersion: source.understandingVersion,
       pendingReviewMessageIds: source.pendingReviewMessageIds === undefined ?
         undefined : source.pendingReviewMessageIds.slice(),
       understandingWarnings: source.understandingWarnings === undefined ?
