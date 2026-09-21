@@ -4,7 +4,7 @@ import {
   HomeworkUnderstandingConfig,
   HomeworkUnderstandingResult
 } from '../../domain/model/HomeworkUnderstandingModels';
-import { ImportBatch } from '../../domain/model/ImportModels';
+import { ImportBatch, ImportBatchStatus } from '../../domain/model/ImportModels';
 import { HomeworkUnderstandingPipeline } from './HomeworkUnderstandingPipeline';
 
 export interface HomeworkUnderstandingActivationResult {
@@ -78,7 +78,8 @@ export class HomeworkUnderstandingService {
       understandingWarnings: result.warnings.slice(),
       classificationSummary: this.classificationSummary(result),
       createdAtEpochMs: batch.createdAtEpochMs,
-      status: batch.status,
+      status: result.candidates.length > 0 ? ImportBatchStatus.READY :
+        (result.pendingReviewMessageIds.length > 0 ? ImportBatchStatus.RECEIVED : ImportBatchStatus.EMPTY),
       messageCount: batch.messageCount,
       candidateCount: result.candidates.length
     };
