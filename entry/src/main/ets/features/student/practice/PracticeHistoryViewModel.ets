@@ -8,6 +8,7 @@ import {
 } from '../../../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
+import { PracticePassPolicy } from '../../../domain/service/PracticePassPolicy';
 
 export enum PracticeHistoryStatusFilter {
   ALL = 'ALL',
@@ -111,6 +112,20 @@ export class PracticeHistoryViewModel {
 
   modeLabel(item: PracticeAttemptSummary): string {
     return item.mode === PracticeAttemptMode.WRONG_ONLY ? '错题专项' : '完整套卷';
+  }
+
+  passLabel(item: PracticeAttemptSummary): string {
+    if (item.status !== PracticeAttemptStatus.SUBMITTED) return '';
+    if (item.mode === PracticeAttemptMode.WRONG_ONLY) return '专项练习';
+    return PracticePassPolicy.isPassedAttempt(item) ? '已通过' : '未通过';
+  }
+
+  isPassed(item: PracticeAttemptSummary): boolean {
+    return PracticePassPolicy.isPassedAttempt(item);
+  }
+
+  isPassApplicable(item: PracticeAttemptSummary): boolean {
+    return item.status === PracticeAttemptStatus.SUBMITTED && item.mode === PracticeAttemptMode.FULL;
   }
 
   scoreText(item: PracticeAttemptSummary): string {
