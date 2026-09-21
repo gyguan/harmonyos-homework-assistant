@@ -257,7 +257,6 @@ export struct HomeworkConfirmationPage {
       Column({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(30).fontColor([AppTheme.SUCCESS]);
         Text('没有待确认作业').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text('可以手工新增一项，或返回导入页重新整理老师原文。').fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
       .padding({ top: 30, bottom: 30 });
