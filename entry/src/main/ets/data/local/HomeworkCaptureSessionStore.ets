@@ -37,8 +37,10 @@ export class HomeworkCaptureSessionStore {
 
   private restore(snapshot: HomeworkCaptureSessionSnapshot): void {
     this.activeSessionId = snapshot.activeSessionId;
-    this.sessions = snapshot.sessions.map(item => this.cloneSession(item));
-    this.evidence = snapshot.evidence.map(item => this.cloneEvidence(item));
+    this.sessions = [];
+    this.evidence = [];
+    for (let item of snapshot.sessions) this.sessions.push(this.cloneSession(item));
+    for (let item of snapshot.evidence) this.evidence.push(this.cloneEvidence(item));
   }
 
   private recoverInterruptedSession(): boolean {
@@ -64,11 +66,15 @@ export class HomeworkCaptureSessionStore {
   }
 
   private snapshot(): HomeworkCaptureSessionSnapshot {
+    let sessions: CaptureSession[] = [];
+    let evidence: CaptureFrameEvidence[] = [];
+    for (let item of this.sessions) sessions.push(this.cloneSession(item));
+    for (let item of this.evidence) evidence.push(this.cloneEvidence(item));
     return {
       schemaVersion: CAPTURE_SCHEMA_VERSION,
       activeSessionId: this.activeSessionId,
-      sessions: this.sessions.map(item => this.cloneSession(item)),
-      evidence: this.evidence.map(item => this.cloneEvidence(item))
+      sessions: sessions,
+      evidence: evidence
     };
   }
 
