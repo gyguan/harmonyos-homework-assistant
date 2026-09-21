@@ -18,7 +18,29 @@ export class HomeworkConfirmationViewModel {
 
   createManualCandidateDraft(): CandidateAssignment {
     let raw = this.rawImport();
-    let activeBatchId = DefaultHomeworkImportInboxRepository.instance.getActiveBatchId();
+    let inbox = DefaultHomeworkImportInboxRepository.instance;
+    let activeBatchId = inbox.getActiveBatchId();
+    let sourceMessageIds: string[] = [];
+    let capturedAt = Date.now();
+    let evidenceText = raw.rawText.trim();
+
+    if (activeBatchId.length > 0) {
+      let batch = inbox.getBatch(activeBatchId);
+      let messages = inbox.getMessages(activeBatchId);
+      if (batch !== null && batch.pendingReviewMessageIds !== undefined &&
+        batch.pendingReviewMessageIds.length > 0) {
+        sourceMessageIds = batch.pendingReviewMessageIds.slice();
+      } else {
+        for (let message of messages) sourceMessageIds.push(message.id);
+      }
+      for (let message of messages) {
+        let value = message.sourceEvidence.capturedAtEpochMs;
+        if (value > 0 && (capturedAt <= 0 || value < capturedAt)) capturedAt = value;
+      }
+    }
+
+    let excerpt = evidenceText.length > 0 ?
+      evidenceText.substring(0, Math.min(120, evidenceText.length)) : '家长手工新增';
     return {
       id: `manual-${Date.now()}`,
       studentId: this.drafts.getActiveStudentId(),
@@ -30,15 +52,15 @@ export class HomeworkConfirmationViewModel {
       expectedMinutes: 20,
       sourceEvidence: {
         sourceLabel: raw.sourceLabel.length > 0 ? raw.sourceLabel : '家长手工新增',
-        excerpt: '家长手工新增',
+        excerpt: excerpt,
         batchId: activeBatchId.length > 0 ? activeBatchId : undefined,
-        sourceType: activeBatchId.length > 0 ? 'MANUAL' : undefined,
-        sourceMessageIds: [],
-        rawText: '家长手工新增',
+        sourceType: activeBatchId.length > 0 ? 'MANUAL_REVIEW' : undefined,
+        sourceMessageIds: sourceMessageIds,
+        rawText: evidenceText.length > 0 ? evidenceText : '家长手工新增',
         imageRef: '',
-        capturedAtEpochMs: Date.now()
+        capturedAtEpochMs: capturedAt
       },
-      confidence: 1.0
+      confidence: activeBatchId.length > 0 ? 0.5 : 1.0
     };
   }
 
