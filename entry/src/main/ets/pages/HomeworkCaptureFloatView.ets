@@ -70,15 +70,25 @@ struct HomeworkCaptureFloatView {
     if (active !== null) {
       let result = await HomeworkCaptureWorkflowService.instance.finishByUser();
       if (result !== null && result.batchId.length > 0) {
-        this.statusText = !result.reconstructionSucceeded ? '采集已完成，整理待处理' :
-          (result.activated ? '已整理完成' :
-            (result.needsGroupConfirmation ? '需要确认群名' : '采集已完成'));
-        this.detailText = !result.reconstructionSucceeded ?
-          '原始屏幕证据已保留，请返回小伴查看' :
-          (result.activated ?
-            `已整理 ${result.candidateCount} 项，请返回小伴确认发布` :
-            (result.needsGroupConfirmation ? '群名未可靠识别，请返回小伴确认后继续' :
-              '结果已保留，请返回小伴查看'));
+        if (!result.reconstructionSucceeded) {
+          this.statusText = '采集已完成，聊天重建待处理';
+          this.detailText = '原始屏幕证据已保留，请返回小伴查看';
+        } else if (result.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
+          this.statusText = '群名不一致';
+          this.detailText = '本次不会自动整理为作业，请返回小伴查看';
+        } else if (result.needsGroupConfirmation) {
+          this.statusText = '需要确认群名';
+          this.detailText = '群名未可靠识别，请返回小伴确认后继续';
+        } else if (!result.understandingSucceeded) {
+          this.statusText = '采集已完成，作业理解待处理';
+          this.detailText = '聊天消息已保留，请返回小伴稍后重试或人工处理';
+        } else if (result.activated) {
+          this.statusText = '已整理完成';
+          this.detailText = `已整理 ${result.candidateCount} 项，请返回小伴确认发布`;
+        } else {
+          this.statusText = '采集已完成';
+          this.detailText = '结果已保留，请返回小伴查看';
+        }
       } else {
         this.statusText = '采集已停止';
         this.detailText = '没有生成导入批次，可以返回小伴重新开始';
