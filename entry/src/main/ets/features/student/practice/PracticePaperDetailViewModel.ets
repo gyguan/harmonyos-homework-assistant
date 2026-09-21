@@ -40,16 +40,12 @@ export class PracticePaperDetailViewModel {
     return this.repository.startAttempt(this.familyContext.getActiveStudentId(), paperId, version);
   }
 
-  statusLabel(item: PracticeAttemptSummary): string {
-    return item.status === PracticeAttemptStatus.SUBMITTED ? '已完成' : '进行中';
-  }
-
   modeLabel(item: PracticeAttemptSummary): string {
     return item.mode === PracticeAttemptMode.WRONG_ONLY ? '错题专项' : '完整套卷';
   }
 
-  passLabel(item: PracticeAttemptSummary): string {
-    if (item.status !== PracticeAttemptStatus.SUBMITTED) return '';
+  recordStatusLabel(item: PracticeAttemptSummary): string {
+    if (item.status !== PracticeAttemptStatus.SUBMITTED) return '进行中';
     if (item.mode === PracticeAttemptMode.WRONG_ONLY) return '专项练习';
     return PracticePassPolicy.isPassedAttempt(item) ? '已通过' : '未通过';
   }
@@ -58,8 +54,8 @@ export class PracticePaperDetailViewModel {
     return PracticePassPolicy.isPassedAttempt(item);
   }
 
-  isPassApplicable(item: PracticeAttemptSummary): boolean {
-    return item.status === PracticeAttemptStatus.SUBMITTED && item.mode === PracticeAttemptMode.FULL;
+  isWrongOnly(item: PracticeAttemptSummary): boolean {
+    return item.mode === PracticeAttemptMode.WRONG_ONLY;
   }
 
   scoreText(item: PracticeAttemptSummary): string {
