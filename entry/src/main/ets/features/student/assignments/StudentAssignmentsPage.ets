@@ -553,7 +553,7 @@ export struct StudentAssignmentsPage {
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        Text(`${this.padExtraAssignments().length} 项`).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text(`${this.padExtraAssignments().length} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -561,7 +561,7 @@ export struct StudentAssignmentsPage {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
           Text('暂无课外任务').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('家长布置的课外任务会出现在这里。').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('家长布置的课外任务会出现在这里。').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .padding({ top: 34, bottom: 34 });
