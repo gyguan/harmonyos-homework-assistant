@@ -75,23 +75,23 @@ export class PracticeHomeViewModel {
     return this.practiceRepository.listAttempts(this.familyContext.getActiveStudentId(), '');
   }
 
-  passedPaperKeys(attempts: PracticeAttemptSummary[]): string[] {
-    return PracticePassPolicy.passedPaperKeys(attempts);
+  passedPaperIds(attempts: PracticeAttemptSummary[]): string[] {
+    return PracticePassPolicy.passedPaperIds(attempts);
   }
 
-  isPaperPassed(paper: PracticePaper, passedPaperKeys: string[]): boolean {
-    return PracticePassPolicy.isPaperPassed(paper, passedPaperKeys);
+  isPaperPassed(paper: PracticePaper, passedPaperIds: string[]): boolean {
+    return PracticePassPolicy.isPaperPassed(paper, passedPaperIds);
   }
 
   filterByPass(
     papers: PracticePaper[],
     filter: PracticePassFilter,
-    passedPaperKeys: string[]
+    passedPaperIds: string[]
   ): PracticePaper[] {
     if (filter === PracticePassFilter.ALL) return papers.slice();
     let result: PracticePaper[] = [];
     for (let paper of papers) {
-      let passed = this.isPaperPassed(paper, passedPaperKeys);
+      let passed = this.isPaperPassed(paper, passedPaperIds);
       if (filter === PracticePassFilter.PASSED && passed) result.push(paper);
       if (filter === PracticePassFilter.NOT_PASSED && !passed) result.push(paper);
     }

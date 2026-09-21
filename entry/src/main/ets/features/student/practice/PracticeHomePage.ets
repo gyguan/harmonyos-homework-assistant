@@ -114,7 +114,7 @@ export struct PracticeHomePage {
   @State private draftSelectedPassFilter: PracticePassFilter = PracticePassFilter.ALL;
   @State private allPapers: PracticePaper[] = [];
   @State private papers: PracticePaper[] = [];
-  @State private passedPaperKeys: string[] = [];
+  @State private passedPaperIds: string[] = [];
   @State private passStatusAvailable: boolean = false;
   @State private loading: boolean = false;
   @State private errorMessage: string = '';
@@ -154,24 +154,24 @@ export struct PracticeHomePage {
     try {
       let papers = await this.viewModel.listPapers(
         this.selectedGrade, this.selectedSubject, this.selectedSemester, this.selectedTrack);
-      let passedKeys: string[] = [];
+      let passedIds: string[] = [];
       let statusAvailable = true;
       try {
         let attempts = await this.viewModel.listAttempts();
-        passedKeys = this.viewModel.passedPaperKeys(attempts);
+        passedIds = this.viewModel.passedPaperIds(attempts);
       } catch {
         statusAvailable = false;
       }
       if (sequence !== this.loadSequence) return;
       this.allPapers = papers;
-      this.passedPaperKeys = passedKeys;
+      this.passedPaperIds = passedIds;
       this.passStatusAvailable = statusAvailable;
       this.refreshPaperPresentation();
     } catch {
       if (sequence !== this.loadSequence) return;
       this.allPapers = [];
       this.papers = [];
-      this.passedPaperKeys = [];
+      this.passedPaperIds = [];
       this.passStatusAvailable = false;
       this.errorMessage = '套卷加载失败，请稍后重试。';
     } finally {
@@ -191,7 +191,7 @@ export struct PracticeHomePage {
     }
     this.errorMessage = '';
     this.papers = this.viewModel.filterByPass(
-      this.allPapers, this.selectedPassFilter, this.passedPaperKeys);
+      this.allPapers, this.selectedPassFilter, this.passedPaperIds);
   }
 
   private openFilterDialog(): void {
@@ -307,7 +307,7 @@ export struct PracticeHomePage {
             PracticePaperCard({
               paper: paper,
               difficultyLabel: this.viewModel.difficultyLabel(paper),
-              passed: this.viewModel.isPaperPassed(paper, this.passedPaperKeys),
+              passed: this.viewModel.isPaperPassed(paper, this.passedPaperIds),
               onOpen: () => this.onOpenPaper(paper.id, paper.version)
             });
           }, (paper: PracticePaper) => `${paper.id}@${paper.version}`);

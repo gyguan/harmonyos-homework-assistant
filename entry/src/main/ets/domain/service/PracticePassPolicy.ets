@@ -15,31 +15,25 @@ export class PracticePassPolicy {
     return item.score * 100 >= item.maxScore * PracticePassPolicy.PASS_PERCENT;
   }
 
-  static paperKey(paperId: string, version: number): string {
-    return `${paperId}@${version}`;
-  }
-
-  static passedPaperKeys(attempts: PracticeAttemptSummary[]): string[] {
+  static passedPaperIds(attempts: PracticeAttemptSummary[]): string[] {
     let result: string[] = [];
     for (let item of attempts) {
       if (!PracticePassPolicy.isPassedAttempt(item)) continue;
-      let key = PracticePassPolicy.paperKey(item.paperId, item.paperVersion);
       let exists = false;
       for (let current of result) {
-        if (current === key) {
+        if (current === item.paperId) {
           exists = true;
           break;
         }
       }
-      if (!exists) result.push(key);
+      if (!exists) result.push(item.paperId);
     }
     return result;
   }
 
-  static isPaperPassed(paper: PracticePaper, passedPaperKeys: string[]): boolean {
-    let key = PracticePassPolicy.paperKey(paper.id, paper.version);
-    for (let current of passedPaperKeys) {
-      if (current === key) return true;
+  static isPaperPassed(paper: PracticePaper, passedPaperIds: string[]): boolean {
+    for (let paperId of passedPaperIds) {
+      if (paperId === paper.id) return true;
     }
     return false;
   }

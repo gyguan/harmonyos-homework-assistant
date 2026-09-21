@@ -40,8 +40,12 @@ require("item.status !== PracticeAttemptStatus.SUBMITTED" in policy and
         "only submitted full-paper attempts may pass the whole paper")
 require("item.score * 100 >= item.maxScore * PracticePassPolicy.PASS_PERCENT" in policy,
         "practice pass policy must compare normalized score against the shared threshold")
-require("paper.id, paper.version" in policy and "item.paperId, item.paperVersion" in policy,
-        "pass state must bind to immutable paper id + version")
+require("static passedPaperIds(attempts: PracticeAttemptSummary[])" in policy and
+        "result.push(item.paperId)" in policy and
+        "paperId === paper.id" in policy,
+        "pass state must aggregate by logical paperId across catalog versions")
+require("paperVersion" not in policy and "paper.version" not in policy,
+        "pass policy must not discard a prior pass when the catalog paper version changes")
 
 for token in [
     "@Link selectedPassFilter: PracticePassFilter",
@@ -59,16 +63,19 @@ for token in [
     "active: this.selectedPassFilter !== PracticePassFilter.ALL",
     "@Prop passed: boolean = false",
     "Text('已通过')",
-    "passed: this.viewModel.isPaperPassed(paper, this.passedPaperKeys)",
+    "passed: this.viewModel.isPaperPassed(paper, this.passedPaperIds)",
     "filterByPass(",
 ]:
     require(token in home or token in view_model, f"practice home missing pass filter/tag behavior: {token}")
 
 require("listAttempts(this.familyContext.getActiveStudentId(), '')" in view_model,
         "pass status must use the active student's own practice history")
-require("PracticePassPolicy.passedPaperKeys(attempts)" in view_model and
-        "PracticePassPolicy.isPaperPassed(paper, passedPaperKeys)" in view_model,
-        "filter and tag must share PracticePassPolicy")
+require("PracticePassPolicy.passedPaperIds(attempts)" in view_model and
+        "PracticePassPolicy.isPaperPassed(paper, passedPaperIds)" in view_model,
+        "filter and tag must share the version-independent PracticePassPolicy")
+require("@State private passedPaperIds: string[] = []" in home and
+        "this.viewModel.passedPaperIds(attempts)" in home,
+        "Practice home must store logical passed paper ids rather than versioned keys")
 
 if errors:
     print("PRACTICE_PASS_FILTER_GATE_FAIL")
