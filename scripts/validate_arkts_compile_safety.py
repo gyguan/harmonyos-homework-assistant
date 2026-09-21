@@ -5,7 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
 NATIVE_RUNTIME = ROOT / "entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime.ets"
-CAPTURE_SPIKE = ROOT / "entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets"
+CAPTURE_DIAGNOSTIC = ROOT / "entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets"
 CAPTURE_FLOAT = ROOT / "entry/src/main/ets/pages/HomeworkCaptureFloatView.ets"
 CAPTURE_PAGE = ROOT / "entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
@@ -24,7 +24,7 @@ def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
     native_runtime = NATIVE_RUNTIME.read_text(encoding="utf-8")
-    capture_spike = CAPTURE_SPIKE.read_text(encoding="utf-8")
+    capture_diagnostic = CAPTURE_DIAGNOSTIC.read_text(encoding="utf-8")
     capture_float = CAPTURE_FLOAT.read_text(encoding="utf-8")
     capture_page = CAPTURE_PAGE.read_text(encoding="utf-8")
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
@@ -57,7 +57,7 @@ def main() -> int:
     require("libhomeworkcapture.so" in native_runtime,
             "native capture library must be isolated behind NativeHomeworkCaptureRuntime")
     for source, name in [
-        (capture_spike, "HomeworkCaptureSpikePage"),
+        (capture_diagnostic, "HomeworkCaptureDiagnosticPage"),
         (capture_float, "HomeworkCaptureFloatView"),
     ]:
         require("libhomeworkcapture.so" not in source,
@@ -68,8 +68,8 @@ def main() -> int:
             "static ParentImportNavigator methods must not dispatch through this")
     require("onStateChange(" not in capture_page and "isFloatViewEnabled(" not in capture_page,
             "formal capture page must stay compatible with API 20 FloatView surface")
-    require("onStateChange(" not in capture_spike and "isFloatViewEnabled(" not in capture_spike,
-            "capture spike must stay compatible with API 20 FloatView surface")
+    require("onStateChange(" not in capture_diagnostic and "isFloatViewEnabled(" not in capture_diagnostic,
+            "capture diagnostics must stay compatible with API 20 FloatView surface")
     for method in ["finishShareImportReady", "finishShareImportEmpty", "cancelShareImport"]:
         require(f"private {method}(): void" in app_shell,
                 f"AppShell missing typed share-import callback: {method}")

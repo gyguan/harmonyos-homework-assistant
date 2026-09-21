@@ -24,6 +24,7 @@ profile = read("entry/src/main/ets/features/parent/import/HomeworkSourceProfileP
 inbox = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
 batch = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+diagnostic = read("entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets")
 
 # Deep pages must not depend on default vertical alignment.
 for name, source in [
@@ -32,6 +33,7 @@ for name, source in [
     ("source profile", profile),
     ("import inbox", inbox),
     ("batch detail", batch),
+    ("capture diagnostic", diagnostic),
 ]:
     require(".align(Alignment.TopStart)" in source,
             f"{name} page-level Scroll must be explicitly top anchored")
@@ -66,6 +68,13 @@ require("已采集 " in capture and "个有效画面" in capture,
 require("请先设置班级、学生和微信群信息" not in capture_home and
         "请先设置班级、微信群和老师信息" in capture_home,
         "capture home setup copy must match actual SourceProfile capabilities")
+
+# Capture diagnostics are a formal support surface, not the old feasibility spike.
+require("title: '屏幕采集诊断'" in diagnostic and "高级诊断信息" in diagnostic,
+        "capture diagnostic must use the formal, user-facing information hierarchy")
+for legacy in ["#241", "真机 Gate", "测试 Fixture", "开始真机采集实验", "读取最近一帧并执行 OCR"]:
+    require(legacy not in diagnostic,
+            f"capture diagnostic must not expose legacy spike content: {legacy}")
 
 if errors:
     print("PARENT_IMPORT_UI_CONFORMANCE_FAIL")

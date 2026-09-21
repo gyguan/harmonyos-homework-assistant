@@ -33,8 +33,8 @@ require("onOpenImport" in dashboard and "onOpenCapture" in dashboard,
 
 require("title: '手工导入作业'" in import_home and "HomeworkImportPage" in import_home,
         "manual import page must remain dedicated to manual input")
-for forbidden in ["抓取今日作业", "班级采集设置", "屏幕采集技术诊断",
-                  "onOpenCapture:", "onOpenSourceProfile:", "onOpenCaptureSpike:"]:
+for forbidden in ["抓取今日作业", "班级采集设置", "屏幕采集诊断",
+                  "onOpenCapture:", "onOpenSourceProfile:", "onOpenDiagnostics:"]:
     require(forbidden not in import_home,
             f"manual import page still contains capture-specific UI/callback: {forbidden}")
 

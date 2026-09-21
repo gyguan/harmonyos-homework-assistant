@@ -24,8 +24,8 @@ cpp = read("entry/src/main/cpp/homework_capture_napi.cpp")
 cmake = read("entry/src/main/cpp/CMakeLists.txt")
 module = read("entry/src/main/module.json5")
 pages = read("entry/src/main/resources/base/profile/main_pages.json")
-ocr = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureOcrService.ets")
-spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
+ocr = read("entry/src/main/ets/infrastructure/capture/HomeworkCaptureOcrService.ets")
+diagnostic = read("entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets")
 float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
 native_runtime = read("entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
@@ -51,7 +51,7 @@ for api in [
     "OH_AVScreenCapture_Release",
     "OH_VIDEO_SOURCE_SURFACE_RGBA",
 ]:
-    require(api in cpp, f"native spike missing AVScreenCapture API: {api}")
+    require(api in cpp, f"native diagnostic missing AVScreenCapture API: {api}")
 
 require("OH_AVBuffer_GetAddr" in cpp and "OH_NativeBuffer_GetConfig" in cpp,
         "native bridge must read the RGBA buffer and its stride metadata")
@@ -85,14 +85,20 @@ require("libhomeworkcapture.so" in native_runtime and
         "native capture library must be isolated behind NativeHomeworkCaptureRuntime")
 require("this.captureRuntime.stopCapture()" in float_page,
         "FloatView must allow the user to stop capture while still in WeChat through the runtime adapter")
-require("PARENT_CAPTURE_SPIKE" in routes and "HomeworkCaptureSpikePage" in spike,
-        "issue #241 must remain reachable through an isolated experimental route")
-require("屏幕采集技术诊断" in capture_home and "onOpenDiagnostics" in capture_home,
-        "dedicated capture home must expose the isolated experimental diagnostic entry")
-require("不读取微信数据库" in spike and "不自动点击或滚动微信" in spike,
-        "experimental UI must keep the product/privacy boundary explicit")
-require("CandidateAssignment" not in spike and "AssignmentRepository" not in spike,
-        "feasibility spike must not create or mutate assignment business data")
+require("PARENT_CAPTURE_DIAGNOSTIC" in routes and "HomeworkCaptureDiagnosticPage" in diagnostic,
+        "capture diagnostics must remain reachable through a dedicated formal route")
+require("屏幕采集诊断" in capture_home and "onOpenDiagnostics" in capture_home,
+        "capture home must expose the formal diagnostic entry under usage guidance")
+require("不读取微信数据库" in diagnostic and "不自动点击或滚动微信" in diagnostic,
+        "diagnostic UI must keep the product/privacy boundary explicit")
+require("CandidateAssignment" not in diagnostic and "AssignmentRepository" not in diagnostic,
+        "diagnostic page must not create or mutate assignment business data")
+require("测试 Fixture" not in diagnostic and "#241" not in diagnostic and "真机 Gate" not in diagnostic,
+        "formal diagnostic UI must not expose feasibility-spike language or fixture content")
+for text in ["屏幕采集", "文字识别", "悬浮状态", "高级诊断信息", "开始诊断"]:
+    require(text in diagnostic, f"diagnostic UI missing user-facing capability: {text}")
+for detail in ["callbacks=", "sequence=", "OCR 全文", "OCR 行坐标"]:
+    require(detail in diagnostic, f"advanced diagnostic evidence must remain available: {detail}")
 
 if errors:
     print("ISSUE_241_CAPTURE_SPIKE_STATIC_FAIL")

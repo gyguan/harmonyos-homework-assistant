@@ -48,8 +48,8 @@ require("if (this.hasSourceProfile())" in page and "尚未配置来源" in page,
         "capture home must have explicit configured/unconfigured source states")
 require("studentName()" in page and "studentName(): string" in view_model,
         "source card must surface the active student")
-require("showGuide" in page and "屏幕采集技术诊断" in page,
-        "technical diagnostics must be nested under the usage guide")
+require("showGuide" in page and "屏幕采集诊断" in page,
+        "capture diagnostics must be nested under the usage guide")
 require("onOpenDiagnostics()" in page,
         "technical diagnostics must remain reachable")
 require("不读取微信数据库" in page and "不自动点击或滚动微信" in page and
