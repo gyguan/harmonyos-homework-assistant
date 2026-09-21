@@ -1,5 +1,6 @@
 import { HomeworkImportInboxService } from '../import/HomeworkImportInboxService';
 import {
+  HOMEWORK_UNDERSTANDING_RULESET_VERSION,
   HomeworkMessageClassification,
   HomeworkUnderstandingConfig,
   HomeworkUnderstandingResult
@@ -74,6 +75,7 @@ export class HomeworkUnderstandingService {
       reconstructionWarnings: batch.reconstructionWarnings === undefined ?
         undefined : batch.reconstructionWarnings.slice(),
       understood: true,
+      understandingVersion: HOMEWORK_UNDERSTANDING_RULESET_VERSION,
       pendingReviewMessageIds: result.pendingReviewMessageIds.slice(),
       understandingWarnings: result.warnings.slice(),
       classificationSummary: this.classificationSummary(result),
@@ -109,6 +111,7 @@ export class HomeworkUnderstandingService {
       reconstructionWarnings: batch.reconstructionWarnings === undefined ?
         undefined : batch.reconstructionWarnings.slice(),
       understood: false,
+      understandingVersion: batch.understandingVersion,
       pendingReviewMessageIds: batch.pendingReviewMessageIds === undefined ?
         undefined : batch.pendingReviewMessageIds.slice(),
       understandingWarnings: warnings,
