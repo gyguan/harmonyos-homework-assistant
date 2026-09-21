@@ -108,7 +108,7 @@ export struct HomeworkCapturePage {
     }
 
     if (this.currentSessionId.length > 0) {
-      let finished = HomeworkCaptureSessionService.instance.getSession(this.currentSessionId);
+      let finished = this.viewModel.activeOrSession(this.currentSessionId);
       if (finished !== null) {
         if (finished.status === CaptureSessionStatus.COMPLETED) {
           if (finished.importBatchId.length > 0 && this.finalizedBatchId !== finished.importBatchId) {
