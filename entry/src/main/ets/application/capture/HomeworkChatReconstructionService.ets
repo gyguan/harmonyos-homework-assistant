@@ -15,6 +15,37 @@ export class HomeworkChatReconstructionService {
 
   private constructor() {}
 
+  tryReconstructCaptureSession(sessionId: string, batchId: string,
+    targetStartMinuteOfDay: number = -1): ChatReconstructionResult | null {
+    try {
+      return this.reconstructCaptureSession(sessionId, batchId, targetStartMinuteOfDay);
+    } catch {
+      let batch = HomeworkImportInboxService.instance.getBatch(batchId);
+      if (batch !== null) {
+        let failed: ImportBatch = {
+          id: batch.id,
+          studentId: batch.studentId,
+          sourceType: batch.sourceType,
+          sourceLabel: batch.sourceLabel,
+          sourceProfileId: batch.sourceProfileId,
+          captureSessionId: batch.captureSessionId,
+          reconstructed: false,
+          groupTitle: batch.groupTitle,
+          timeBoundaryReached: batch.timeBoundaryReached,
+          earliestDetectedTime: batch.earliestDetectedTime,
+          reconstructionWarnings: ['CHAT_RECONSTRUCTION_EXCEPTION'],
+          createdAtEpochMs: batch.createdAtEpochMs,
+          status: batch.status,
+          messageCount: batch.messageCount,
+          candidateCount: 0
+        };
+        HomeworkImportInboxService.instance.importBatch(
+          failed, HomeworkImportInboxService.instance.getMessages(batchId), []);
+      }
+      return null;
+    }
+  }
+
   reconstructCaptureSession(sessionId: string, batchId: string,
     targetStartMinuteOfDay: number = -1): ChatReconstructionResult {
     let session = this.captureStore.getSession(sessionId);
