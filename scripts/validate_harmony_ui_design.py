@@ -202,7 +202,7 @@ require("StatusSelectionChip" not in parent_progress and "AssignmentMetricSummar
         "interactive: true" in parent_progress and "this.chooseStatus(key)" in parent_progress,
         "Parent Progress status selection must live in the shared clickable metric summary")
 for expression in [
-    "active: !this.isSelectedDayToday()",
+    "active: !this.allDates && !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in parent_progress,
