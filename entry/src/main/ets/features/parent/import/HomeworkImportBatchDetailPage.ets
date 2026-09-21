@@ -230,7 +230,7 @@ export struct HomeworkImportBatchDetailPage {
             }
 
             Column({ space: 8 }) {
-              Text(`重建消息 ${this.messages().length}`)
+              Text(`${this.batch()!.reconstructed === true ? '重建消息' : '原始消息'} ${this.messages().length}`)
                 .width('100%')
                 .fontSize(15)
                 .fontWeight(FontWeight.Medium)
