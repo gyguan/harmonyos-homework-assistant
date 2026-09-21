@@ -166,7 +166,7 @@ export struct ParentVoiceAssignmentPage {
       Row() {
         Text('语音文件').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text('1 个').fontSize(11).fontColor(AppTheme.SUBTEXT);
+        Text('1 个').fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -189,7 +189,7 @@ export struct ParentVoiceAssignmentPage {
           }
           .layoutWeight(1).alignItems(HorizontalAlign.Start);
           Text('更换')
-            .fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+            .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .padding({ left: 8, right: 8 })
             .textAlign(TextAlign.Center)
@@ -201,7 +201,7 @@ export struct ParentVoiceAssignmentPage {
         .borderRadius(AppTheme.CONTROL_RADIUS);
       }
       Text('支持 mp3 / m4a / wav，单个文件不超过 20MB。')
-        .width('100%').fontSize(11).fontColor(AppTheme.SUBTEXT);
+        .width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
   }
@@ -212,7 +212,7 @@ export struct ParentVoiceAssignmentPage {
       Row() {
         Text('情景图片').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text(`已选择 ${this.imageUris.length} 张`).fontSize(11).fontColor(AppTheme.SUBTEXT);
+        Text(`已选择 ${this.imageUris.length} 张`).fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -259,7 +259,7 @@ export struct ParentVoiceAssignmentPage {
         onChange: (value: string) => this.dueText = value
       });
       Column({ space: 5 }) {
-        Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('预计用时（分钟）').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '15', text: this.expectedMinutesText })
           .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
           .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
