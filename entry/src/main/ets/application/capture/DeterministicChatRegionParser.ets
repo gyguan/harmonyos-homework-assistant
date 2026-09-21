@@ -17,7 +17,8 @@ interface DetectedTime {
 export class DeterministicChatRegionParser {
   parse(frame: CaptureFrameEvidence): ParsedChatFrame {
     let lines: CaptureOcrLineEvidence[] = [];
-    for (let source of frame.lines) {
+    let sourceLines = frame.lines === undefined ? [] : frame.lines;
+    for (let source of sourceLines) {
       let value = this.normalizeText(source.value);
       if (value.length === 0) continue;
       lines.push({
