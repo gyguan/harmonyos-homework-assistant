@@ -5,7 +5,7 @@ import {
   HomeworkUnderstandingConfig,
   HomeworkUnderstandingResult
 } from '../../domain/model/HomeworkUnderstandingModels';
-import { ImportBatch, ImportBatchStatus } from '../../domain/model/ImportModels';
+import { ImportBatch, ImportBatchStatus, ImportedMessage } from '../../domain/model/ImportModels';
 import { HomeworkUnderstandingPipeline } from './HomeworkUnderstandingPipeline';
 
 export interface HomeworkUnderstandingActivationResult {
@@ -21,11 +21,14 @@ export class HomeworkUnderstandingService {
 
   private constructor() {}
 
-  understandBatch(batchId: string, config: HomeworkUnderstandingConfig): HomeworkUnderstandingResult {
+  understandBatch(batchId: string, config: HomeworkUnderstandingConfig,
+    minTimestampEpochMs: number = 0): HomeworkUnderstandingResult {
     let batch = this.inbox.getBatch(batchId);
     if (batch === null) throw new Error('找不到待理解的导入批次');
 
-    let messages = this.inbox.getMessages(batchId);
+    let allMessages = this.inbox.getMessages(batchId);
+    let messages = this.messagesWithinRange(allMessages, minTimestampEpochMs);
+    let filteredCount = allMessages.length - messages.length;
     let result = this.pipeline.understand(
       batch.id,
       batch.studentId,
@@ -33,6 +36,7 @@ export class HomeworkUnderstandingService {
       `${batch.sourceType}`,
       messages,
       config);
+    if (filteredCount > 0) result.warnings.push(`TIME_RANGE_FILTERED:${filteredCount}`);
 
     let updated = this.withUnderstandingResult(batch, result);
     this.inbox.importBatch(updated, messages, result.candidates);
@@ -40,9 +44,9 @@ export class HomeworkUnderstandingService {
   }
 
   tryUnderstandBatch(batchId: string,
-    config: HomeworkUnderstandingConfig): HomeworkUnderstandingResult | null {
+    config: HomeworkUnderstandingConfig, minTimestampEpochMs: number = 0): HomeworkUnderstandingResult | null {
     try {
-      return this.understandBatch(batchId, config);
+      return this.understandBatch(batchId, config, minTimestampEpochMs);
     } catch {
       this.recordFailure(batchId);
       return null;
@@ -50,8 +54,9 @@ export class HomeworkUnderstandingService {
   }
 
   understandAndActivate(batchId: string,
-    config: HomeworkUnderstandingConfig): HomeworkUnderstandingActivationResult {
-    let result = this.understandBatch(batchId, config);
+    config: HomeworkUnderstandingConfig,
+    minTimestampEpochMs: number = 0): HomeworkUnderstandingActivationResult {
+    let result = this.understandBatch(batchId, config, minTimestampEpochMs);
     let activated = result.candidates.length > 0 && this.inbox.activateBatch(batchId);
     return {
       result: result,
@@ -132,6 +137,16 @@ export class HomeworkUnderstandingService {
       candidateCount: candidates.length
     };
     this.inbox.importBatch(failed, messages, candidates);
+  }
+
+  private messagesWithinRange(messages: ImportedMessage[], minTimestampEpochMs: number): ImportedMessage[] {
+    if (minTimestampEpochMs <= 0) return messages;
+    let result: ImportedMessage[] = [];
+    for (let message of messages) {
+      if (message.timestampEpochMs > 0 && message.timestampEpochMs < minTimestampEpochMs) continue;
+      result.push(message);
+    }
+    return result;
   }
 
   private classificationSummary(result: HomeworkUnderstandingResult): string {
