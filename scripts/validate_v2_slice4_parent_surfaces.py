@@ -90,7 +90,7 @@ require("LayoutPolicy.parentHomeRequirement()" in home and "availableWidthVp" in
         "Parent Home must choose wide composition from actual container width + LayoutPolicy")
 require("AppTheme.PARENT_HOME_READABLE_MAX_WIDTH" in home and "AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH" in home,
         "Parent Home must keep readable fallback and capped Pad composition")
-for phrase in ["需要我处理", "最近提交", "导入老师作业", "作业进度"]:
+for phrase in ["需要我处理", "最近提交", "导入老师作业", "查看全部"]:
     require(phrase in home, f"Parent Home missing required P01 content: {phrase}")
 require("AssignmentStatus.OVERDUE" in home_vm and "AssignmentStatus.NEEDS_REWORK" in home_vm and
         "AssignmentStatus.SUBMITTED" in home_vm,
