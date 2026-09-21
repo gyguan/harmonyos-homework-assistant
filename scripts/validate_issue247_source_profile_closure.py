@@ -120,6 +120,12 @@ require("当前群与配置不一致" in float_page,
         "FloatView must surface group mismatch while user is in WeChat")
 require("结束并自动整理" in capture_page and "handleWorkflowResult" in capture_page,
         "capture stop must continue into automatic reconstruction/understanding")
+require("!result.reconstructionSucceeded" in capture_page and
+        "!result.understandingSucceeded" in capture_page,
+        "capture UI must distinguish reconstruction/understanding failures from empty homework")
+require("!result.understandingSucceeded" in float_page and
+        "作业理解待处理" in float_page,
+        "FloatView must surface understanding failure after capture")
 require("onOpenConfirmation" in capture_page and "result.activated" in capture_page,
         "successful understanding must route into the existing parent confirmation page")
 require("确认是目标班级群，继续整理" in capture_page,
