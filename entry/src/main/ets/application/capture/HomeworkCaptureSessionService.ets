@@ -272,7 +272,7 @@ export class HomeworkCaptureSessionService {
       sourceProfileId: session.sourceProfileId,
       captureSessionId: session.id,
       createdAtEpochMs: session.startedAtEpochMs,
-      status: ImportBatchStatus.EMPTY,
+      status: ImportBatchStatus.RECEIVED,
       messageCount: messages.length,
       candidateCount: 0
     };
