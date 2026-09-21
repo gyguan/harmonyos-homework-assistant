@@ -1755,6 +1755,376 @@
           ]
         }
       ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-SHOPPING-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学人民币与购物（一）",
+      "description": "结合文具店、小商店等生活场景练习元角关系、付钱、找钱和简单购物计算。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "人民币",
+        "购物"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "文具店里一本练习本8元，一盒彩笔6元。两样都买一共要多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "14元"
+            },
+            {
+              "key": "B",
+              "label": "13元"
+            },
+            {
+              "key": "C",
+              "label": "15元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "8元和6元合在一起，8+6=14，所以一共14元。",
+          "hints": [
+            "关键词：“两样都买”“一共”，数量8元、6元。把两件商品的价钱合起来计算。"
+          ],
+          "tags": [
+            "人民币",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "小乐有20元，买一个13元的笔袋，应该找回多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6元"
+            },
+            {
+              "key": "B",
+              "label": "7元"
+            },
+            {
+              "key": "C",
+              "label": "8元"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "20-13=7，所以买完笔袋后找回7元。",
+          "hints": [
+            "关键词：“20元”“13元”“找回”。用付出的钱减去商品价格，求剩下的钱。"
+          ],
+          "tags": [
+            "人民币",
+            "找钱"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "1元等于多少角？",
+          "options": [
+            {
+              "key": "A",
+              "label": "5角"
+            },
+            {
+              "key": "B",
+              "label": "8角"
+            },
+            {
+              "key": "C",
+              "label": "10角"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "人民币单位中1元等于10角。",
+          "hints": [
+            "关键词：“1元”“多少角”。回忆元和角之间的基本换算关系，再选择。"
+          ],
+          "tags": [
+            "人民币",
+            "元角关系"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "小宇有6角，妈妈又给他4角，现在一共有多少钱？",
+          "options": [
+            {
+              "key": "A",
+              "label": "1元"
+            },
+            {
+              "key": "B",
+              "label": "9角"
+            },
+            {
+              "key": "C",
+              "label": "2元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "6角+4角=10角，而10角正好是1元。",
+          "hints": [
+            "关键词：“6角”“4角”“一共”。先把角相加，再检查是否正好可以换成整元。"
+          ],
+          "tags": [
+            "人民币",
+            "元角关系"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "一支铅笔3元，一块橡皮7元，两样一共多少钱？",
+          "options": [
+            {
+              "key": "A",
+              "label": "9元"
+            },
+            {
+              "key": "B",
+              "label": "10元"
+            },
+            {
+              "key": "C",
+              "label": "11元"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "3+7=10，所以两样商品一共10元。",
+          "hints": [
+            "关键词：“两样”“一共”，数量3元、7元。把两件商品的价钱相加。"
+          ],
+          "tags": [
+            "人民币",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "小明拿30元买18元的故事书，应该找回多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10元"
+            },
+            {
+              "key": "B",
+              "label": "11元"
+            },
+            {
+              "key": "C",
+              "label": "12元"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "30-18=12，所以应找回12元。",
+          "hints": [
+            "关键词：“30元”“18元”“找回”。先确定总钱数和花掉的钱，再做减法。"
+          ],
+          "tags": [
+            "人民币",
+            "找钱"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "两张5元合起来是多少钱？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10元"
+            },
+            {
+              "key": "B",
+              "label": "7元"
+            },
+            {
+              "key": "C",
+              "label": "15元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "5+5=10，所以两张5元合起来是10元。",
+          "hints": [
+            "关键词：“两张5元”“合起来”。把两张相同面额的钱相加。"
+          ],
+          "tags": [
+            "人民币",
+            "面额"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个本子9元，一个文件夹12元。哪一个更便宜？",
+          "options": [
+            {
+              "key": "A",
+              "label": "文件夹"
+            },
+            {
+              "key": "B",
+              "label": "本子"
+            },
+            {
+              "key": "C",
+              "label": "一样贵"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "9小于12，所以9元的本子更便宜。",
+          "hints": [
+            "关键词：“9元”“12元”“更便宜”。比较两个价钱，较小的表示花的钱更少。"
+          ],
+          "tags": [
+            "人民币",
+            "比较"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个水杯15元，一条毛巾8元，两样都买需要多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "21元"
+            },
+            {
+              "key": "B",
+              "label": "22元"
+            },
+            {
+              "key": "C",
+              "label": "23元"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "15+8=23，所以一共需要23元。",
+          "hints": [
+            "关键词：“两样都买”“需要多少”，数量15元、8元。把两个价格合并。"
+          ],
+          "tags": [
+            "人民币",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈有50元，买水果用了24元，还剩多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "26元"
+            },
+            {
+              "key": "B",
+              "label": "25元"
+            },
+            {
+              "key": "C",
+              "label": "27元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "50-24=26，所以还剩26元。",
+          "hints": [
+            "关键词：“50元”“用了24元”“还剩”。从原有的钱里减去已经花掉的钱。"
+          ],
+          "tags": [
+            "人民币",
+            "减法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "一盒彩泥16元，小林有20元。买完后还剩多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3元"
+            },
+            {
+              "key": "B",
+              "label": "4元"
+            },
+            {
+              "key": "C",
+              "label": "5元"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "20-16=4，所以买完后还剩4元。",
+          "hints": [
+            "关键词：“20元”“16元”“还剩”。用现有的钱减去商品价格。"
+          ],
+          "tags": [
+            "人民币",
+            "减法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "小红正好有10元。下面哪一种买法刚好把10元用完？",
+          "options": [
+            {
+              "key": "A",
+              "label": "买6元的笔盒"
+            },
+            {
+              "key": "B",
+              "label": "买7元的笔记本"
+            },
+            {
+              "key": "C",
+              "label": "买6元的笔盒和4元的橡皮"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "6+4=10，正好等于小红现有的10元。",
+          "hints": [
+            "关键词：“正好10元”“刚好用完”。分别算每种买法需要多少钱，找与10相等的一种。"
+          ],
+          "tags": [
+            "人民币",
+            "购物组合"
+          ]
+        }
+      ]
     }
   ]
 }
