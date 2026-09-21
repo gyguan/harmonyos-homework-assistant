@@ -133,15 +133,11 @@ export class DeterministicChatReconstructor {
       }
 
       let beforeNodes = this.newDistinctNodes(nodes, before);
-      if (beforeNodes.length > 0) {
-        nodes.splice(overlap.existingStart, 0, ...beforeNodes);
-      }
+      this.insertNodes(nodes, overlap.existingStart, beforeNodes);
 
       let overlapEnd = overlap.existingStart + beforeNodes.length + overlap.length;
       let afterNodes = this.newDistinctNodes(nodes, after);
-      if (afterNodes.length > 0) {
-        nodes.splice(overlapEnd, 0, ...afterNodes);
-      }
+      this.insertNodes(nodes, overlapEnd, afterNodes);
       return;
     }
 
@@ -151,7 +147,7 @@ export class DeterministicChatReconstructor {
     let frameRange = this.knownTimeRange(additions);
     let existingRange = this.knownTimeRange(nodes);
     if (frameRange[1] >= 0 && existingRange[0] >= 0 && frameRange[1] < existingRange[0]) {
-      nodes.splice(0, 0, ...additions);
+      this.insertNodes(nodes, 0, additions);
       return;
     }
     if (frameRange[0] >= 0 && existingRange[1] >= 0 && frameRange[0] > existingRange[1]) {
@@ -161,6 +157,12 @@ export class DeterministicChatReconstructor {
 
     for (let item of additions) nodes.push(item);
     this.addWarning(warnings, `FRAME_${frame.frameEvidenceId}_NO_CONFIDENT_OVERLAP`);
+  }
+
+  private insertNodes(target: ChatNode[], index: number, additions: ChatNode[]): void {
+    for (let i = 0; i < additions.length; i++) {
+      target.splice(index + i, 0, additions[i]);
+    }
   }
 
   private bestOverlap(nodes: ChatNode[], incoming: ParsedChatMessage[]): OverlapMatch {
