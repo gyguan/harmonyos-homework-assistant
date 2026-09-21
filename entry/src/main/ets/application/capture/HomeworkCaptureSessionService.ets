@@ -200,9 +200,11 @@ export class HomeworkCaptureSessionService {
   }
 
   async stopByUser(): Promise<CaptureSession | null> {
+    let requested = this.store.getActiveSession();
+    if (requested === null) return null;
     if (this.sampleInFlight !== null) await this.sampleInFlight;
     let session = this.store.getActiveSession();
-    if (session === null) return null;
+    if (session === null) return this.store.getSession(requested.id);
 
     let runtime = this.requireRuntime();
     if (session.status === CaptureSessionStatus.WAITING_PERMISSION) {
@@ -243,9 +245,11 @@ export class HomeworkCaptureSessionService {
   }
 
   async cancel(): Promise<CaptureSession | null> {
+    let requested = this.store.getActiveSession();
+    if (requested === null) return null;
     if (this.sampleInFlight !== null) await this.sampleInFlight;
     let session = this.store.getActiveSession();
-    if (session === null) return null;
+    if (session === null) return this.store.getSession(requested.id);
     try {
       let runtime = this.requireRuntime();
       runtime.stopCapture();
