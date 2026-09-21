@@ -11,7 +11,7 @@ export struct HomeworkImportRoutePage {
   onOpenConfirmation: () => void = () => {};
   onOpenInbox: () => void = () => {};
   onOpenCapture: () => void = () => {};
-  onOpenSourceProfile: () => void = () => {};
+  onOpenSourceProfile: (startCaptureAfterSave: boolean) => void = (_startCaptureAfterSave: boolean) => {};
   onOpenCaptureSpike: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
@@ -27,7 +27,7 @@ export struct HomeworkImportRoutePage {
   private openCapture(): void {
     let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
     if (HomeworkSourceProfileService.instance.getActiveProfile(studentId) === null) {
-      this.onOpenSourceProfile();
+      this.onOpenSourceProfile(true);
       return;
     }
     this.onOpenCapture();
@@ -121,7 +121,7 @@ export struct HomeworkImportRoutePage {
       .padding({ left: 10, right: 10 })
       .accessibilityRole(AccessibilityRoleType.BUTTON)
       .accessibilityText('修改班级采集设置')
-      .onClick(() => this.onOpenSourceProfile());
+      .onClick(() => this.onOpenSourceProfile(false));
 
       Row({ space: 10 }) {
         Text('验')
