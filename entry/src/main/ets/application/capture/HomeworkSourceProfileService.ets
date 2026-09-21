@@ -1,4 +1,5 @@
-import { HomeworkSourceProfileStore } from '../../data/local/HomeworkSourceProfileStore';
+import { DefaultHomeworkSourceProfileRepository } from '../../data/repository/DefaultHomeworkSourceProfileRepository';
+import { HomeworkSourceProfileRepository } from '../../domain/port/HomeworkSourceProfileRepository';
 import {
   HomeworkSourceProfile,
   HomeworkSourceTeacherAlias
@@ -11,15 +12,16 @@ import { Subject } from '../../domain/model/HomeworkModels';
 
 export class HomeworkSourceProfileService {
   static readonly instance: HomeworkSourceProfileService = new HomeworkSourceProfileService();
-  private readonly store: HomeworkSourceProfileStore = HomeworkSourceProfileStore.instance;
+  private readonly repository: HomeworkSourceProfileRepository =
+    DefaultHomeworkSourceProfileRepository.instance;
   private constructor() {}
 
   getActiveProfile(studentId: string): HomeworkSourceProfile | null {
-    return this.store.getActive(studentId);
+    return this.repository.getActive(studentId);
   }
 
   getProfile(profileId: string): HomeworkSourceProfile | null {
-    return this.store.get(profileId);
+    return this.repository.get(profileId);
   }
 
   save(profile: HomeworkSourceProfile): HomeworkSourceProfile {
@@ -37,12 +39,12 @@ export class HomeworkSourceProfileService {
       updatedAtEpochMs: now,
       lastUsedAtEpochMs: profile.lastUsedAtEpochMs
     };
-    this.store.save(saved);
+    this.repository.save(saved);
     return saved;
   }
 
   markUsed(profileId: string): void {
-    this.store.markUsed(profileId);
+    this.repository.markUsed(profileId);
   }
 
   understandingConfig(profile: HomeworkSourceProfile): HomeworkUnderstandingConfig {
@@ -99,6 +101,28 @@ export class HomeworkSourceProfileService {
       throw new Error('默认抓取开始时间无效');
     }
     if (profile.teacherAliases.length === 0) throw new Error('至少配置一位老师');
+    let identities: string[] = [];
+    for (let teacher of profile.teacherAliases) {
+      if (teacher.displayName.trim().length === 0) throw new Error('老师名称不能为空');
+      let values: string[] = [teacher.displayName];
+      for (let alias of teacher.aliases) values.push(alias);
+      for (let value of values) {
+        let normalized = this.normalizeTeacherIdentity(value);
+        if (normalized.length === 0) continue;
+        if (identities.indexOf(normalized) >= 0) {
+          throw new Error(`老师名称或别名重复：${value.trim()}`);
+        }
+        identities.push(normalized);
+      }
+    }
+  }
+
+  private normalizeTeacherIdentity(value: string): string {
+    return value.trim()
+      .replace(/\s+/g, '')
+      .replace(/（/g, '(')
+      .replace(/）/g, ')')
+      .toLowerCase();
   }
 
   private cloneTeachers(values: HomeworkSourceTeacherAlias[]): HomeworkSourceTeacherAlias[] {
