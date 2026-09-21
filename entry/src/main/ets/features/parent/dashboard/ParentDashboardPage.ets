@@ -98,6 +98,10 @@ export struct ParentDashboardPage {
     }
   }
 
+  private openRecentActivity(item: Assignment): void {
+    this.onOpenReview(item.id);
+  }
+
   @Builder
   private TodayOverview() {
     Column({ space: 12 }) {
@@ -212,7 +216,7 @@ export struct ParentDashboardPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
-        Text('查看作业进度')
+        Text('查看全部')
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
@@ -235,7 +239,7 @@ export struct ParentDashboardPage {
             AssignmentListItem({
               assignment: item,
               showChevron: true,
-              onOpen: () => this.openAttention(item)
+              onOpen: () => this.openRecentActivity(item)
             });
           }, (item: Assignment) => item.id);
         }

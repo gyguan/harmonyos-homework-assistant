@@ -42,6 +42,7 @@ assignment_service = read("backend/src/main/java/com/xiaoban/homework/assignment
 evidence = read("entry/src/main/ets/application/submission/ParentSubmissionEvidenceService.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+batch_publish = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
 issue_spec = read("docs/product/ui-page-spec-v2.md")
 
 for token in [
@@ -89,11 +90,29 @@ require("LayoutPolicy.parentHomeRequirement()" in home and "availableWidthVp" in
         "Parent Home must choose wide composition from actual container width + LayoutPolicy")
 require("AppTheme.PARENT_HOME_READABLE_MAX_WIDTH" in home and "AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH" in home,
         "Parent Home must keep readable fallback and capped Pad composition")
-for phrase in ["需要我处理", "最近提交", "导入老师作业", "作业进度"]:
+for phrase in ["需要我处理", "最近提交", "导入老师作业", "查看全部"]:
     require(phrase in home, f"Parent Home missing required P01 content: {phrase}")
 require("AssignmentStatus.OVERDUE" in home_vm and "AssignmentStatus.NEEDS_REWORK" in home_vm and
         "AssignmentStatus.SUBMITTED" in home_vm,
         "Parent Home attention must cover overdue, rework and submitted assignments")
+
+require("private openRecentActivity(item: Assignment)" in home and
+        "this.onOpenReview(item.id)" in home.split("private openRecentActivity(item: Assignment)", 1)[1].split("@Builder", 1)[0],
+        "Parent Home recent activity must open the selected assignment detail directly")
+recent_activity = home.split("private RecentActivity()", 1)
+require(len(recent_activity) == 2, "Parent Home must keep a RecentActivity section")
+if len(recent_activity) == 2:
+    recent_block = recent_activity[1].split("private QuickActions()", 1)[0]
+    require("Text('查看全部')" in recent_block and "this.onOpenProgress()" in recent_block,
+            "Parent Home Recent Activity must keep an explicit View All action to Progress")
+    require("openRecentActivity(item)" in recent_block and "openAttention(item)" not in recent_block,
+            "Parent Home recent items must not reuse attention routing")
+attention_section = home.split("private AttentionSection()", 1)
+require(len(attention_section) == 2, "Parent Home must keep an AttentionSection")
+if len(attention_section) == 2:
+    attention_block = attention_section[1].split("private RecentActivity()", 1)[0]
+    require("openAttention(item)" in attention_block,
+            "Parent Home attention items must preserve state-aware routing")
 
 require("LayoutPolicy.parentProgressReviewRequirement()" in progress and "availableWidthVp" in progress,
         "Parent Progress must choose review split from actual container width + LayoutPolicy")
@@ -177,6 +196,17 @@ require("PARENT_REVIEW = 'parent/review'" in routes,
         "Parent Review must have a formal Navigation route")
 require("openParentReview" in app_shell and "AppRoute.PARENT_REVIEW" in app_shell and "ParentReviewPage({" in app_shell,
         "AppShell must route Parent Review through NavPathStack/NavDestination")
+
+require("DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped)" in batch_publish,
+        "Batch publish must update the authoritative assignment cache before returning to Parent Home")
+require("private finishParentImportPublished(): void" in app_shell and
+        "this.navPathStack.clear();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentExtraCreate", 1)[0] and
+        "this.notifyUiChanged();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentExtraCreate", 1)[0],
+        "Parent import completion must invalidate the dashboard after clearing the deep navigation stack")
+require("onPublished: () => this.finishParentImportPublished()" in app_shell,
+        "Homework confirmation must use the post-navigation dashboard refresh boundary")
+require("backAccessibilityText: '返回上一页'" in review_page and "backAccessibilityText: '返回进度'" not in review_page,
+        "Parent assignment detail back semantics must remain neutral across Home and Progress callers")
 parent_progress_call = app_shell.split("ParentProgressPage({", 1)
 require(len(parent_progress_call) == 2, "AppShell must render ParentProgressPage")
 if len(parent_progress_call) == 2:
