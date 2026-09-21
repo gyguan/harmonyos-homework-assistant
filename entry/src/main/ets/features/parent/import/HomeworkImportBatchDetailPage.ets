@@ -166,6 +166,13 @@ export struct HomeworkImportBatchDetailPage {
                 .width('100%')
                 .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT);
+              if (this.batch()!.captureSessionId !== undefined &&
+                this.batch()!.captureSessionId!.length > 0) {
+                Text(`采集会话：${this.batch()!.captureSessionId}`)
+                  .width('100%')
+                  .fontSize(10)
+                  .fontColor(AppTheme.TERTIARY_TEXT);
+              }
             }
             .width('100%')
             .padding(14)
