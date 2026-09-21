@@ -43,6 +43,8 @@ evidence = read("entry/src/main/ets/application/submission/ParentSubmissionEvide
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 batch_publish = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
+homework_store = read("entry/src/main/ets/data/HomeworkStore.ets")
+due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 issue_spec = read("docs/product/ui-page-spec-v2.md")
 
 for token in [
@@ -199,6 +201,24 @@ require("openParentReview" in app_shell and "AppRoute.PARENT_REVIEW" in app_shel
 
 require("DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped)" in batch_publish,
         "Batch publish must update the authoritative assignment cache before returning to Parent Home")
+
+today_summary = homework_store.split("getTodaySummary(): TodaySummary", 1)
+require(len(today_summary) == 2, "HomeworkStore must expose TodaySummary")
+if len(today_summary) == 2:
+    today_block = today_summary[1].split("getDashboardSummary()", 1)[0]
+    require("AssignmentDueDate.businessDayStart(Date.now())" in today_block and
+            "AssignmentDueDate.dayStart(assignment)" in today_block,
+            "HomeworkStore TodaySummary must use the shared Asia/Shanghai business-day semantics")
+    require("due.getFullYear() === now.getFullYear()" not in today_block and
+            "new Date(assignment.dueAtEpochMs)" not in today_block,
+            "HomeworkStore TodaySummary must not fall back to the device-local calendar date")
+require("AssignmentDueDate.businessDayStart(Date.now())" in home and
+        "AssignmentDueDate.dayStart(item)" in home,
+        "Parent Dashboard TodayOverview must share the same business-day semantics as TodaySummary")
+require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date,
+        "assignment business-day semantics must remain anchored to Asia/Shanghai")
+require("candidateAnchor(candidate.id)" in batch_publish,
+        "relative teacher deadlines must remain anchored to the Candidate/import creation time")
 require("private finishParentImportPublished(): void" in app_shell and
         "this.navPathStack.clear();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentExtraCreate", 1)[0] and
         "this.notifyUiChanged();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentExtraCreate", 1)[0],
