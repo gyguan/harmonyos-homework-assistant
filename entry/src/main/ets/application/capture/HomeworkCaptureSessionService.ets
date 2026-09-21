@@ -243,7 +243,6 @@ export class HomeworkCaptureSessionService {
     await this.sampleLatestFrame();
     session = this.store.getSession(session.id) as CaptureSession;
     let batchId = this.ensureImportBatch(session);
-    HomeworkChatReconstructionService.instance.tryReconstructCaptureSession(session.id, batchId);
     runtime.clearLatestFrame();
 
     session.importBatchId = batchId;
