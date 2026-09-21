@@ -31,7 +31,7 @@ struct StudentHomeMetricCard {
         .fontWeight(FontWeight.Bold)
         .fontColor(this.toneColor());
       Text(this.label)
-        .fontSize(11)
+        .fontSize(13)
         .fontColor(AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
@@ -107,14 +107,14 @@ struct StudentSubjectTaskGroupCard {
       Column({ space: 4 }) {
         Row({ space: 6 }) {
           Text(item.title)
-            .fontSize(14)
+            .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           if (item.assignmentType === AssignmentType.EXTRA) {
             Text('课外')
-              .fontSize(9)
+              .fontSize(13)
               .fontColor(AppTheme.PRIMARY)
               .padding({ left: 6, right: 6, top: 2, bottom: 2 })
               .backgroundColor(AppTheme.PRIMARY_SOFT)
@@ -124,12 +124,12 @@ struct StudentSubjectTaskGroupCard {
         .width('100%');
         Row({ space: 6 }) {
           Text(`预计 ${item.expectedMinutes} 分钟`)
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
           if (item.textbookRef.length > 0) {
-            Text('·').fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
+            Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
             Text(item.textbookRef)
-              .fontSize(11)
+              .fontSize(13)
               .fontColor(AppTheme.SUBTEXT)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis });
@@ -142,7 +142,7 @@ struct StudentSubjectTaskGroupCard {
 
       if (item.id === this.focusAssignmentId) {
         Text(this.actionLabel(item))
-          .fontSize(12)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT_ON_PRIMARY)
           .padding({ left: 14, right: 14, top: 8, bottom: 8 })
@@ -150,19 +150,19 @@ struct StudentSubjectTaskGroupCard {
           .borderRadius(AppTheme.CHIP_RADIUS);
       } else {
         Text(this.statusLabel(item))
-          .fontSize(11)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.statusColor(item))
           .padding({ left: 9, right: 9, top: 6, bottom: 6 })
           .backgroundColor(this.statusBackground(item))
           .borderRadius(AppTheme.CHIP_RADIUS);
         SymbolGlyph($r('sys.symbol.chevron_right'))
-          .fontSize(14)
+          .fontSize(15)
           .fontColor([AppTheme.TERTIARY_TEXT]);
       }
     }
     .width('100%')
-    .constraintSize({ minHeight: 62 })
+    .constraintSize({ minHeight: 68 })
     .padding({ left: 12, right: 10, top: 10, bottom: 10 })
     .backgroundColor(item.id === this.focusAssignmentId ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
     .border({
@@ -195,7 +195,7 @@ struct StudentSubjectTaskGroupCard {
           .fontColor(AppTheme.TEXT);
         Blank();
         Text(`${this.group.items.length} 项`)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
         Text(this.expanded ? '⌃' : '⌄')
           .fontSize(16)
@@ -312,13 +312,13 @@ export struct StudentHomePage {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Text(`${this.viewModel.student().grade} · ${this.viewModel.student().className}`)
-          .fontSize(11)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
       }
       .alignItems(HorizontalAlign.Start);
       Blank();
       Text(this.viewModel.dateLabel())
-        .fontSize(11)
+        .fontSize(13)
         .fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
@@ -331,7 +331,7 @@ export struct StudentHomePage {
         SymbolGlyph($r('sys.symbol.wifi_slash')).fontSize(17).fontColor([AppTheme.WARNING]);
         Text('当前离线，正在使用已缓存的今日作业。')
           .layoutWeight(1)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
@@ -401,7 +401,7 @@ export struct StudentHomePage {
         Blank();
         if (this.subjectGroups().length > 0) {
           Text(`${this.viewModel.todaySubjectCount()} 科 · ${this.viewModel.todayPendingCount()} 项`)
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
       }
