@@ -377,7 +377,7 @@ export struct HomeworkCapturePage {
                   .fontColor(AppTheme.SUBTEXT);
               }
               .width('100%');
-              Text(`视频回调 ${this.session()!.frameCount} · 最近序号 ${this.session()!.lastFrameSequence}`)
+              Text(`视频回调 ${this.session()!.frameCount} · OCR失败 ${this.session()!.ocrFailureCount} · 最近序号 ${this.session()!.lastFrameSequence}`)
                 .width('100%')
                 .fontSize(12)
                 .fontColor(AppTheme.SUBTEXT);
