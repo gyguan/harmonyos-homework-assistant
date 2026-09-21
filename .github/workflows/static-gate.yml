@@ -45,6 +45,9 @@ jobs:
       - name: Validate issue 246 homework understanding
         run: python scripts/validate_issue246_homework_understanding.py
 
+      - name: Validate issue 247 source profile closure
+        run: python scripts/validate_issue247_source_profile_closure.py
+
       - name: Validate pasted teacher text import
         run: python scripts/validate_text_import_feature.py
 
