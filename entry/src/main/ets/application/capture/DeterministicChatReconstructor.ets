@@ -58,8 +58,8 @@ export class DeterministicChatReconstructor {
 
     if (this.allMessagesTimed(nodes)) {
       nodes.sort((left: ChatNode, right: ChatNode) => {
-        if (left.message.detectedMinuteOfDay !== right.message.detectedMinuteOfDay) {
-          return left.message.detectedMinuteOfDay - right.message.detectedMinuteOfDay;
+        if (left.message.approxTimestampEpochMs !== right.message.approxTimestampEpochMs) {
+          return left.message.approxTimestampEpochMs - right.message.approxTimestampEpochMs;
         }
         if (left.message.frameOrderNo !== right.message.frameOrderNo) {
           return left.message.frameOrderNo - right.message.frameOrderNo;
@@ -71,11 +71,14 @@ export class DeterministicChatReconstructor {
     let messages: ImportedMessage[] = [];
     let earliestMinute = -1;
     let earliestText = '';
+    let earliestEpoch = 0;
     for (let i = 0; i < nodes.length; i++) {
       let node = nodes[i];
       let messageId = `${batchId}-chat-${i + 1}`;
       let minute = node.message.detectedMinuteOfDay;
-      if (minute >= 0 && (earliestMinute < 0 || minute < earliestMinute)) {
+      if (node.message.approxTimestampEpochMs > 0 &&
+        (earliestEpoch === 0 || node.message.approxTimestampEpochMs < earliestEpoch)) {
+        earliestEpoch = node.message.approxTimestampEpochMs;
         earliestMinute = minute;
         earliestText = node.message.timeText;
       }
@@ -100,8 +103,9 @@ export class DeterministicChatReconstructor {
     }
 
     let groupTitle = this.resolveGroupTitle(groupTitles, warnings);
-    let boundary = options.targetStartMinuteOfDay >= 0 &&
-      earliestMinute >= 0 && earliestMinute < options.targetStartMinuteOfDay;
+    let targetEpoch = options.targetStartMinuteOfDay >= 0 ?
+      this.targetEpoch(orderedEvidence, options.targetStartMinuteOfDay) : 0;
+    let boundary = targetEpoch > 0 && earliestEpoch > 0 && earliestEpoch < targetEpoch;
     return {
       groupTitle: groupTitle,
       messages: messages,
@@ -204,7 +208,9 @@ export class DeterministicChatReconstructor {
 
   private findStrongDuplicate(nodes: ChatNode[], message: ParsedChatMessage): ChatNode | null {
     for (let node of nodes) {
-      if (this.strongIdentity(node.message, message)) return node;
+      if (!this.strongIdentity(node.message, message)) continue;
+      if (message.imageHash.length > 0) return node;
+      if (Math.abs(node.message.relativePosition - message.relativePosition) <= 80) return node;
     }
     return null;
   }
@@ -292,6 +298,14 @@ export class DeterministicChatReconstructor {
       }
     }
     return best;
+  }
+
+  private targetEpoch(evidence: CaptureFrameEvidence[], minuteOfDay: number): number {
+    if (evidence.length === 0) return 0;
+    let anchor = evidence[evidence.length - 1].capturedAtEpochMs;
+    let date = new Date(anchor);
+    date.setHours(0, 0, 0, 0);
+    return date.getTime() + minuteOfDay * 60 * 1000;
   }
 
   private sourceCapturedAt(frameIds: string[], evidence: CaptureFrameEvidence[]): number {
