@@ -205,9 +205,14 @@ export struct AppShell {
       AppRoute.STUDENT_PRACTICE_RESULT, new PracticeAttemptRouteParam(attemptId));
   }
 
-  private finishPracticeResult(): void {
-    this.navPathStack.clear();
-    this.studentRoute = StudentRoute.PRACTICE;
+  private replacePracticeAttemptWithResult(attemptId: string): void {
+    this.navPathStack.pop();
+    this.openPracticeResult(attemptId);
+  }
+
+  private replacePracticeResultWithAttempt(attemptId: string): void {
+    this.navPathStack.pop();
+    this.openPracticeAttempt(attemptId);
   }
 
   private openParentReview(assignmentId: string): void {
@@ -313,7 +318,7 @@ export struct AppShell {
         PracticeAttemptPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
           onBack: () => this.navPathStack.pop(),
-          onSubmitted: (attemptId: string) => this.openPracticeResult(attemptId)
+          onSubmitted: (attemptId: string) => this.replacePracticeAttemptWithResult(attemptId)
         });
       }
       .hideTitleBar(true)
@@ -322,8 +327,8 @@ export struct AppShell {
       NavDestination() {
         PracticeResultPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
-          onDone: () => this.finishPracticeResult(),
-          onRepeatStarted: (attemptId: string) => this.openPracticeAttempt(attemptId)
+          onBack: () => this.navPathStack.pop(),
+          onRepeatStarted: (attemptId: string) => this.replacePracticeResultWithAttempt(attemptId)
         });
       }
       .hideTitleBar(true)
