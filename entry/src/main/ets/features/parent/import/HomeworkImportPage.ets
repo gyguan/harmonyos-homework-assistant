@@ -140,7 +140,7 @@ export struct HomeworkImportPage {
       SymbolGlyph(symbol).fontSize(22).fontColor([AppTheme.PRIMARY]);
       Column({ space: 3 }) {
         Text(title).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text(description).width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+        Text(description).width('100%').fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
@@ -163,7 +163,7 @@ export struct HomeworkImportPage {
       Row() {
         Text('老师原文').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text('收起').fontSize(12).fontColor(AppTheme.PRIMARY)
+        Text('收起').fontSize(13).fontColor(AppTheme.PRIMARY)
           .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
           .textAlign(TextAlign.Center)
           .accessibilityRole(AccessibilityRoleType.BUTTON)
@@ -218,7 +218,7 @@ export struct HomeworkImportPage {
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
             Text('继续编辑后可直接发布')
-              .fontSize(11)
+              .fontSize(12)
               .fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1)

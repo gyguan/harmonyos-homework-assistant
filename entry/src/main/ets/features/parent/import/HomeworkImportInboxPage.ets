@@ -69,7 +69,7 @@ export struct HomeworkImportInboxPage {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           Text(this.statusLabel(batch.status))
-            .fontSize(11)
+            .fontSize(12)
             .fontColor(batch.status === ImportBatchStatus.READY ? AppTheme.WARNING :
               (batch.status === ImportBatchStatus.PUBLISHED ? AppTheme.SUCCESS : AppTheme.SUBTEXT));
         }
@@ -77,7 +77,7 @@ export struct HomeworkImportInboxPage {
 
         Text(`${this.timeText(batch.createdAtEpochMs)} · ${batch.messageCount} 条原始消息 · ${batch.candidateCount} 项候选作业`)
           .width('100%')
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis });

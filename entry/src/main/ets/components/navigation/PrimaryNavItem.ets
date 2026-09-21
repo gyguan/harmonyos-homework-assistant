@@ -47,12 +47,12 @@ export struct SidePrimaryNavItem {
         .fontSize(23)
         .fontColor([this.selected ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
       Text(this.label)
-        .fontSize(11)
+        .fontSize(13)
         .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
         .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
     }
-    .width(68)
-    .height(58)
+    .width(72)
+    .height(64)
     .justifyContent(FlexAlign.Center)
     .backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : Color.Transparent)
     .borderRadius(AppTheme.CONTROL_RADIUS)

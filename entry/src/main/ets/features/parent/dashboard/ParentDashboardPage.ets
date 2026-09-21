@@ -109,7 +109,7 @@ export struct ParentDashboardPage {
         .alignItems(HorizontalAlign.Start);
         Blank();
         Text(`${this.todayAssignments().length} 项`)
-          .fontSize(11)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT);
       }
@@ -153,7 +153,7 @@ export struct ParentDashboardPage {
             .fontColor(AppTheme.TEXT);
           Blank();
           Text(`${this.attentionAssignments().length} 项`)
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
@@ -164,11 +164,11 @@ export struct ParentDashboardPage {
               Column({ space: 3 }) {
                 Row({ space: 6 }) {
                   Text(item.subject)
-                    .fontSize(11)
+                    .fontSize(13)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(AppTheme.PRIMARY);
                   Text(item.status === AssignmentStatus.SUBMITTED ? '待验收' : AssignmentStateMachine.label(item.status))
-                    .fontSize(10)
+                    .fontSize(13)
                     .fontColor(item.status === AssignmentStatus.SUBMITTED ? AppTheme.WARNING : AppTheme.DANGER);
                 }
                 Text(item.title)
@@ -211,7 +211,7 @@ export struct ParentDashboardPage {
           .fontColor(AppTheme.TEXT);
         Blank();
         Text('查看作业进度')
-          .fontSize(12)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -246,11 +246,11 @@ export struct ParentDashboardPage {
             .fontSize(18)
             .fontColor([AppTheme.SUCCESS]);
           Text('最近提交')
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
           Text(`${this.viewModel.recentSubmitted()!.subject} · ${this.viewModel.recentSubmitted()!.title}`)
             .layoutWeight(1)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
@@ -281,7 +281,7 @@ export struct ParentDashboardPage {
           SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.PRIMARY]);
           Column({ space: 2 }) {
             Text('导入作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('老师截图或文字').fontSize(10).fontColor(AppTheme.SUBTEXT);
+            Text('老师截图或文字').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
         }
@@ -298,7 +298,7 @@ export struct ParentDashboardPage {
           SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.SUCCESS]);
           Column({ space: 2 }) {
             Text('课外任务').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('阅读、体育、实践').fontSize(10).fontColor(AppTheme.SUBTEXT);
+            Text('阅读、体育、实践').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
         }
@@ -322,7 +322,7 @@ export struct ParentDashboardPage {
           .textAlign(TextAlign.Center);
         Column({ space: 2 }) {
           Text('语音作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('上传语音和情景图片，孩子边听边看').fontSize(10).fontColor(AppTheme.SUBTEXT);
+          Text('上传语音和情景图片，孩子边听边看').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
@@ -349,7 +349,7 @@ export struct ParentDashboardPage {
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Row() {
-        Text('今日完成').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('今日完成').fontSize(13).fontColor(AppTheme.SUBTEXT);
         Blank();
         Text(`${this.viewModel.summary().completed} / ${this.viewModel.summary().total}`)
           .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
@@ -357,7 +357,7 @@ export struct ParentDashboardPage {
       .width('100%');
       Divider().color(AppTheme.DIVIDER);
       Row() {
-        Text('待家长验收').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('待家长验收').fontSize(13).fontColor(AppTheme.SUBTEXT);
         Blank();
         Text(`${this.submittedCount()} 项`)
           .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.WARNING);
@@ -365,7 +365,7 @@ export struct ParentDashboardPage {
       .width('100%');
       Divider().color(AppTheme.DIVIDER);
       Row() {
-        Text('需关注').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('需关注').fontSize(13).fontColor(AppTheme.SUBTEXT);
         Blank();
         Text(`${this.attentionAssignments().length} 项`)
           .fontSize(13).fontWeight(FontWeight.Medium)

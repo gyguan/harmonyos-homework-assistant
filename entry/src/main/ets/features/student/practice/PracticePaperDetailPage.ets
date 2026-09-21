@@ -95,7 +95,7 @@ export struct PracticePaperDetailPage {
   private MetricCard(value: string, label: string) {
     Column({ space: 4 }) {
       Text(value).fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text(label).fontSize(11).fontColor(AppTheme.SUBTEXT);
+      Text(label).fontSize(12).fontColor(AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
     .height(72)
@@ -114,7 +114,7 @@ export struct PracticePaperDetailPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text(this.viewModel.statusLabel(item))
-          .fontSize(11)
+          .fontSize(12)
           .fontWeight(FontWeight.Medium)
           .fontColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS : AppTheme.PRIMARY)
           .padding({ left: 8, right: 8, top: 4, bottom: 4 })
@@ -125,18 +125,18 @@ export struct PracticePaperDetailPage {
 
       Row({ space: 7 }) {
         Text(this.viewModel.scoreText(item))
-          .fontSize(12)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
-          Text('·').fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
           Text(this.viewModel.correctRateText(item))
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
         Blank();
         Text('查看')
-          .fontSize(12)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -144,12 +144,12 @@ export struct PracticePaperDetailPage {
 
       Row({ space: 7 }) {
         Text(this.viewModel.timeText(item.startedAtEpochMs))
-          .fontSize(11)
+          .fontSize(12)
           .fontColor(AppTheme.TERTIARY_TEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
-          Text('·').fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
           Text(`耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
-            .fontSize(11)
+            .fontSize(12)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
       }
@@ -175,7 +175,7 @@ export struct PracticePaperDetailPage {
         Blank();
         if (this.attempts.length > 0) {
           Text('查看全部')
-            .fontSize(12)
+            .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -191,14 +191,14 @@ export struct PracticePaperDetailPage {
       if (this.historyLoading) {
         Text('正在加载练习记录…')
           .width('100%')
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT)
           .padding({ top: 12, bottom: 12 })
           .textAlign(TextAlign.Center);
       } else if (this.historyErrorMessage.length > 0) {
         Text(this.historyErrorMessage)
           .width('100%')
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT)
           .padding(12)
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
@@ -206,7 +206,7 @@ export struct PracticePaperDetailPage {
       } else if (this.recentAttempts.length === 0) {
         Text('还没有这套卷的练习记录，完成后会保留在这里。')
           .width('100%')
-          .fontSize(12)
+          .fontSize(13)
           .lineHeight(18)
           .fontColor(AppTheme.SUBTEXT)
           .padding(12)
@@ -287,7 +287,7 @@ export struct PracticePaperDetailPage {
                 .fontColor(AppTheme.SUBTEXT);
               Text(`内容来源：${this.sourceLabel()} · 版本 V${this.paper.version}`)
                 .width('100%')
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(AppTheme.TERTIARY_TEXT);
             }
             .width('100%')

@@ -146,7 +146,7 @@ export struct ParentExtraAssignmentPage {
         onChange: (value: string) => this.dueText = value
       });
       Column({ space: 5 }) {
-        Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('预计用时（分钟）').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '20', text: this.expectedMinutesText })
           .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
           .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)

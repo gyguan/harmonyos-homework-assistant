@@ -53,7 +53,7 @@ export struct HomeworkImportRoutePage {
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text('查看每次导入的来源、原始消息和候选作业')
-            .fontSize(11)
+            .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
@@ -86,7 +86,7 @@ export struct HomeworkImportRoutePage {
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text(this.profileSubtitle())
-            .fontSize(11)
+            .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
@@ -105,11 +105,11 @@ export struct HomeworkImportRoutePage {
 
       Row() {
         Text('班级采集设置')
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.PRIMARY);
         Blank();
         Text('修改 ›')
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.PRIMARY);
       }
       .width('100%')
@@ -123,7 +123,7 @@ export struct HomeworkImportRoutePage {
         Text('验')
           .width(28)
           .height(28)
-          .fontSize(12)
+          .fontSize(13)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.SUBTEXT)
           .textAlign(TextAlign.Center)
@@ -134,7 +134,7 @@ export struct HomeworkImportRoutePage {
             .fontSize(13)
             .fontColor(AppTheme.TEXT);
           Text('#241 · AVScreenCapture / OCR / FloatView 真机 Gate')
-            .fontSize(10)
+            .fontSize(12)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .layoutWeight(1)

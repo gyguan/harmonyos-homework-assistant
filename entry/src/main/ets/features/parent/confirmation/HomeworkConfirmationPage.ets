@@ -305,7 +305,7 @@ export struct HomeworkConfirmationPage {
   @Builder
   private PublishFeedback() {
     if (this.publishMessage.length > 0) {
-      Text(this.publishMessage).width('100%').fontSize(12).lineHeight(18)
+      Text(this.publishMessage).width('100%').fontSize(13).lineHeight(18)
         .fontColor(this.publishError ? AppTheme.DANGER : AppTheme.SUCCESS)
         .padding(10)
         .backgroundColor(this.publishError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
@@ -323,7 +323,7 @@ export struct HomeworkConfirmationPage {
           if (this.batchDeleteConfirm) {
             Text(`确定删除选中的 ${this.selectedCandidateIds.length} 项待确认作业？`)
               .width('100%')
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(AppTheme.DANGER);
             Row({ space: 10 }) {
               Button('取消', { type: ButtonType.Normal })

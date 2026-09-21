@@ -129,13 +129,13 @@ export struct HomeworkSourceProfilePage {
                 .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
                 .onChange((value: string) => this.groupTitle = value);
               Column({ space: 5 }) {
-                Text('默认抓取开始时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+                Text('默认抓取开始时间').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
                 TextInput({ placeholder: '15:00', text: this.startTime })
                   .width('100%').height(AppTheme.INPUT_HEIGHT)
                   .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
                   .onChange((value: string) => this.startTime = value);
                 Text('每天抓取“这个时间到现在”的消息。')
-                  .width('100%').fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
+                  .width('100%').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
               }
               .width('100%');
             }
@@ -155,14 +155,14 @@ export struct HomeworkSourceProfilePage {
                 (value: string) => this.englishTeacher = value,
                 (value: string) => this.englishAliases = value);
               Text('没有对应老师的科目可以留空；无法匹配的聊天消息会进入人工确认，不会猜测。')
-                .width('100%').fontSize(11).lineHeight(17).fontColor(AppTheme.TERTIARY_TEXT);
+                .width('100%').fontSize(12).lineHeight(17).fontColor(AppTheme.TERTIARY_TEXT);
             }
             .width('100%').padding(14).backgroundColor(AppTheme.SURFACE)
             .borderRadius(AppTheme.PHONE_CARD_RADIUS);
 
             if (this.message.length > 0) {
               Text(this.message)
-                .width('100%').fontSize(12).lineHeight(18)
+                .width('100%').fontSize(13).lineHeight(18)
                 .fontColor(this.messageError ? AppTheme.DANGER : AppTheme.SUCCESS)
                 .padding(12)
                 .backgroundColor(this.messageError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)

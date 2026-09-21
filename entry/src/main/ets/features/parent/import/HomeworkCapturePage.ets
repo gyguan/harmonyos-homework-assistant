@@ -358,13 +358,13 @@ export struct HomeworkCapturePage {
                   .fontColor(AppTheme.PRIMARY);
                 Blank();
                 Text(`变化帧 ${this.session()!.acceptedFrameCount}`)
-                  .fontSize(12)
+                  .fontSize(13)
                   .fontColor(AppTheme.SUBTEXT);
               }
               .width('100%');
               Text(`视频回调 ${this.session()!.frameCount} · OCR失败 ${this.session()!.ocrFailureCount} · 最近序号 ${this.session()!.lastFrameSequence}`)
                 .width('100%')
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT);
             }
             .width('100%')
@@ -385,7 +385,7 @@ export struct HomeworkCapturePage {
           if (this.errorText.length > 0) {
             Text(this.errorText)
               .width('100%')
-              .fontSize(12)
+              .fontSize(13)
               .lineHeight(18)
               .fontColor(AppTheme.DANGER)
               .padding(12)
@@ -450,7 +450,7 @@ export struct HomeworkCapturePage {
 
           Text('隐私边界：不会读取微信数据库，不会自动点击或滚动微信，不使用 Accessibility 驱动微信；只处理你主动打开并浏览的当前屏幕，最终作业仍由家长确认发布。')
             .width('100%')
-            .fontSize(11)
+            .fontSize(12)
             .lineHeight(17)
             .fontColor(AppTheme.TERTIARY_TEXT)
             .padding({ bottom: 16 });
