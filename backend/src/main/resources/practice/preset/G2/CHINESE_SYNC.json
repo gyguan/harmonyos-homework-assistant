@@ -2601,7 +2601,7 @@
       "subject": "CHINESE",
       "semester": "S1",
       "track": "TEXTBOOK_SYNC",
-      "title": "二上语文古诗画面与词句（一)",
+      "title": "二上语文古诗画面与词句（一）",
       "description": "结合二上常见古诗名句理解景物、动作和简单含义，训练从关键词想象诗句画面。",
       "difficulty": "L1",
       "questionCount": 12,
@@ -2937,7 +2937,7 @@
           "id": "CHINESE-G2-S1-SYNC-POETRY-001-Q12-V1",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
-          "stem": "读古诗时，想象诗句画面最有帮助的做法是什么？",
+          "stem": "读古诗时，想象诗句内容最有帮助的做法是什么？",
           "options": [
             {
               "key": "A",
@@ -2953,9 +2953,9 @@
             }
           ],
           "answerSpec": "C",
-          "explanation": "景物词和动作词能帮助我们把诗句中的场景在脑中连起来。",
+          "explanation": "景物词和动作词能帮助我们把诗句中的内容和情境连起来理解。",
           "hints": [
-            "关键词：“想象画面”“有帮助”。想一想哪些词最能告诉你“有什么”和“在做什么”。"
+            "关键词：“理解诗句”“有帮助”。想一想哪些词最能告诉你“有什么”和“在做什么”。"
           ],
           "tags": [
             "古诗",
@@ -2971,7 +2971,7 @@
       "subject": "CHINESE",
       "semester": "S1",
       "track": "TEXTBOOK_SYNC",
-      "title": "二上语文词语搭配与句式（二)",
+      "title": "二上语文词语搭配与句式（二）",
       "description": "通过校园、家庭和自然情境练习词语搭配、把字句、被字句和完整表达。",
       "difficulty": "L1",
       "questionCount": 12,
@@ -3341,7 +3341,7 @@
       "subject": "CHINESE",
       "semester": "S1",
       "track": "TEXTBOOK_SYNC",
-      "title": "二上语文顺序表达与写话（一)",
+      "title": "二上语文顺序表达与写话（一）",
       "description": "练习按时间和事情发展顺序组织句子，学会把日常小事说清楚、写完整。",
       "difficulty": "L1",
       "questionCount": 12,
