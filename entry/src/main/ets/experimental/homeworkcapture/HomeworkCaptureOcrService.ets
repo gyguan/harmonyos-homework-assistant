@@ -1,6 +1,6 @@
 import { image } from '@kit.ImageKit';
 import { textRecognition } from '@kit.CoreVisionKit';
-import { CapturedFrame } from 'libhomeworkcapture.so';
+import { CaptureFrame } from '../../domain/model/CaptureModels';
 
 export interface HomeworkCaptureOcrLine {
   value: string;
@@ -53,7 +53,7 @@ export class HomeworkCaptureOcrService {
     };
   }
 
-  async recognize(frame: CapturedFrame): Promise<HomeworkCaptureOcrResult> {
+  async recognize(frame: CaptureFrame): Promise<HomeworkCaptureOcrResult> {
     await this.ensureInitialized();
     let options: image.InitializationOptions = {
       editable: false,
@@ -84,6 +84,8 @@ export class HomeworkCaptureOcrService {
         lineCount: lines.length,
         lines: lines
       };
+    } catch {
+      throw new Error('Core Vision OCR 执行失败');
     } finally {
       try {
         void pixelMap.release();

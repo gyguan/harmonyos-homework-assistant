@@ -67,6 +67,8 @@ export class CoreVisionHomeworkCaptureFrameRecognizer implements HomeworkCapture
         lineCount: lines.length,
         lines: lines
       };
+    } catch {
+      throw new Error('采集文字识别失败');
     } finally {
       try {
         void pixelMap.release();

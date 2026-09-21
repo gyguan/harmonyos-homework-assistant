@@ -1,7 +1,7 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
 import { fileIo } from '@kit.CoreFileKit';
-import { PendingHomeworkShareImport } from '../../domain/model/HomeworkShareModels';
+import { PendingHomeworkShareImport, PendingHomeworkShareRecord } from '../../domain/model/HomeworkShareModels';
 import { HomeworkShareHandoffPersistence } from '../../domain/port/HomeworkShareHandoffPersistence';
 
 const STORE_NAME: string = 'homework_share_handoff_v1';
@@ -18,31 +18,41 @@ export class PreferencesHomeworkShareHandoffPersistence implements HomeworkShare
 
   private async getStore(): Promise<preferences.Preferences> {
     if (this.store !== null) return this.store;
-    let store = await preferences.getPreferences(this.context, STORE_NAME);
-    this.store = store;
-    return store;
+    try {
+      let store: preferences.Preferences = await preferences.getPreferences(this.context, STORE_NAME);
+      this.store = store;
+      return store;
+    } catch {
+      throw new Error('无法打开系统分享暂存数据');
+    }
+  }
+
+  private cloneRecord(record: PendingHomeworkShareRecord): PendingHomeworkShareRecord {
+    return {
+      id: record.id,
+      kind: record.kind,
+      utd: record.utd,
+      content: record.content,
+      sandboxUri: record.sandboxUri,
+      title: record.title
+    };
   }
 
   private clone(item: PendingHomeworkShareImport): PendingHomeworkShareImport {
+    let records: PendingHomeworkShareRecord[] = [];
+    for (let record of item.records) records.push(this.cloneRecord(record));
     return {
       token: item.token,
       createdAtEpochMs: item.createdAtEpochMs,
-      records: item.records.map(record => ({
-        id: record.id,
-        kind: record.kind,
-        utd: record.utd,
-        content: record.content,
-        sandboxUri: record.sandboxUri,
-        title: record.title
-      }))
+      records: records
     };
   }
 
   private async readItems(): Promise<PendingHomeworkShareImport[]> {
-    let store = await this.getStore();
-    let raw = await store.get(ITEMS_KEY, '');
-    if (typeof raw !== 'string' || raw.length === 0) return [];
+    let store: preferences.Preferences = await this.getStore();
     try {
+      let raw = await store.get(ITEMS_KEY, '');
+      if (typeof raw !== 'string' || raw.length === 0) return [];
       let parsed = JSON.parse(raw) as PendingHomeworkShareImport[];
       let cutoff = Date.now() - MAX_AGE_MS;
       let result: PendingHomeworkShareImport[] = [];
@@ -85,9 +95,13 @@ export class PreferencesHomeworkShareHandoffPersistence implements HomeworkShare
       }
     }
     if (!replaced) next.push(this.clone(item));
-    let store = await this.getStore();
-    await store.put(ITEMS_KEY, JSON.stringify(next));
-    await store.flush();
+    let store: preferences.Preferences = await this.getStore();
+    try {
+      await store.put(ITEMS_KEY, JSON.stringify(next));
+      await store.flush();
+    } catch {
+      throw new Error('无法保存系统分享暂存数据');
+    }
   }
 
   private cleanupFiles(item: PendingHomeworkShareImport): void {
@@ -105,8 +119,12 @@ export class PreferencesHomeworkShareHandoffPersistence implements HomeworkShare
     let items = await this.readItems();
     let next: PendingHomeworkShareImport[] = [];
     for (let item of items) if (item.token !== token) next.push(item);
-    let store = await this.getStore();
-    await store.put(ITEMS_KEY, JSON.stringify(next));
-    await store.flush();
+    let store: preferences.Preferences = await this.getStore();
+    try {
+      await store.put(ITEMS_KEY, JSON.stringify(next));
+      await store.flush();
+    } catch {
+      throw new Error('无法更新系统分享暂存数据');
+    }
   }
 }

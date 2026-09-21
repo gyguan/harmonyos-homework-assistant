@@ -155,22 +155,9 @@ export struct HomeworkCapturePage {
     }
   }
 
-  private registerFloatState(): void {
-    this.floatViewController?.onStateChange((info: floatView.FloatViewStateChangeInfo) => {
-      if (info.state === floatView.FloatViewState.STOPPED) {
-        this.floatViewController?.offStateChange();
-        this.floatViewController = undefined;
-      }
-    });
-  }
-
   private async startFloatView(): Promise<boolean> {
     let granted = await this.requestFloatPermission();
     if (!granted) return false;
-    if (!floatView.isFloatViewEnabled()) {
-      this.errorText = '当前系统不支持悬浮采集状态';
-      return false;
-    }
     try {
       let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       let config: floatView.FloatViewConfiguration = {
@@ -178,7 +165,6 @@ export struct HomeworkCapturePage {
         templateType: floatView.FloatViewTemplateType.ROUNDED_RECTANGLE
       };
       this.floatViewController = await floatView.create(config);
-      this.registerFloatState();
       await this.floatViewController.setUIContext('pages/HomeworkCaptureFloatView');
       let limits = floatView.getFloatViewLimits(floatView.FloatViewTemplateType.ROUNDED_RECTANGLE);
       let size: window.Size = {
@@ -201,7 +187,6 @@ export struct HomeworkCapturePage {
     this.floatViewController = undefined;
     if (!controller) return;
     try {
-      controller.offStateChange();
       await controller.stop();
     } catch {
       // The system/user may already have stopped the FloatView.
@@ -226,8 +211,8 @@ export struct HomeworkCapturePage {
         return;
       }
       this.message = '等待系统屏幕采集授权。授权后进入目标微信群并手工上滑。';
-    } catch (error) {
-      this.errorText = `${error}`;
+    } catch {
+      this.errorText = '屏幕采集启动失败，请稍后重试。';
       await this.stopFloatView();
     }
   }

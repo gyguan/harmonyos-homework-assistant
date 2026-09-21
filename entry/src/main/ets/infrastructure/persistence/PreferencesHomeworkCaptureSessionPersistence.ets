@@ -20,17 +20,20 @@ export class PreferencesHomeworkCaptureSessionPersistence implements HomeworkCap
 
   private async getStore(): Promise<preferences.Preferences> {
     if (this.store !== null) return this.store;
-    let store = await preferences.getPreferences(this.context, STORE_NAME);
-    this.store = store;
-    return store;
+    try {
+      let store: preferences.Preferences = await preferences.getPreferences(this.context, STORE_NAME);
+      this.store = store;
+      return store;
+    } catch {
+      throw new Error('无法打开采集会话本地存储');
+    }
   }
 
   async load(): Promise<HomeworkCaptureSessionSnapshot | null> {
-    let store = await this.getStore();
-    let value = await store.get(SNAPSHOT_KEY, '');
-    if (typeof value !== 'string' || value.length === 0) return null;
-
+    let store: preferences.Preferences = await this.getStore();
     try {
+      let value = await store.get(SNAPSHOT_KEY, '');
+      if (typeof value !== 'string' || value.length === 0) return null;
       let parsed: Record<string, Object> = JSON.parse(value);
       return {
         schemaVersion: parsed.schemaVersion as number,
@@ -44,8 +47,12 @@ export class PreferencesHomeworkCaptureSessionPersistence implements HomeworkCap
   }
 
   async save(snapshot: HomeworkCaptureSessionSnapshot): Promise<void> {
-    let store = await this.getStore();
-    await store.put(SNAPSHOT_KEY, JSON.stringify(snapshot));
-    await store.flush();
+    let store: preferences.Preferences = await this.getStore();
+    try {
+      await store.put(SNAPSHOT_KEY, JSON.stringify(snapshot));
+      await store.flush();
+    } catch {
+      throw new Error('无法保存采集会话本地数据');
+    }
   }
 }

@@ -61,9 +61,9 @@ export class HomeworkShareReceiveService {
       };
       await this.persistence.save(pending);
       return pending;
-    } catch (error) {
+    } catch {
       this.cleanupRecords(accepted);
-      throw error;
+      throw new Error('系统分享接收失败');
     }
   }
 
@@ -104,13 +104,13 @@ export class HomeworkShareReceiveService {
         fileIo.closeSync(sourceFile);
       }
       return destination;
-    } catch (error) {
+    } catch {
       try {
         fileIo.unlinkSync(destination);
       } catch {
         // The destination may not have been created yet.
       }
-      throw error;
+      throw new Error('复制分享图片失败');
     }
   }
 

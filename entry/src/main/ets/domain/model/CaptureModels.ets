@@ -30,9 +30,12 @@ export interface CaptureFrame {
 export interface CaptureRuntimeStats {
   isCapturing: boolean;
   lastError: number;
+  state?: number;
   callbackCount: number;
   sampledFrameCount: number;
   latestSequence: number;
+  latestWidth?: number;
+  latestHeight?: number;
 }
 
 export interface CaptureOcrLineEvidence {

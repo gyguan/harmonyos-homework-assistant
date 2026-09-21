@@ -1,7 +1,8 @@
 import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
 import { floatView, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import nativeCapture, { CapturedFrame, CaptureStats } from 'libhomeworkcapture.so';
+import { CaptureFrame, CaptureRuntimeStats } from '../../domain/model/CaptureModels';
+import { NativeHomeworkCaptureRuntime } from '../../infrastructure/capture/NativeHomeworkCaptureRuntime';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
 import {
@@ -25,9 +26,10 @@ export struct HomeworkCaptureSpikePage {
 
   private floatViewController: floatView.FloatViewController | undefined = undefined;
   private readonly ocrService: HomeworkCaptureOcrService = new HomeworkCaptureOcrService();
+  private readonly captureRuntime: NativeHomeworkCaptureRuntime = NativeHomeworkCaptureRuntime.instance;
 
   aboutToDisappear(): void {
-    nativeCapture.stopCapture();
+    this.captureRuntime.stopCapture();
     void this.stopFloatView();
     void this.ocrService.release();
   }
@@ -53,22 +55,9 @@ export struct HomeworkCaptureSpikePage {
     }
   }
 
-  private registerFloatState(): void {
-    this.floatViewController?.onStateChange((info: floatView.FloatViewStateChangeInfo) => {
-      if (info.state === floatView.FloatViewState.STOPPED) {
-        this.floatViewController?.offStateChange();
-        this.floatViewController = undefined;
-      }
-    });
-  }
-
   private async startFloatView(): Promise<boolean> {
     let granted = await this.requestFloatViewPermission();
     if (!granted) return false;
-    if (!floatView.isFloatViewEnabled()) {
-      this.floatStatus = 'FAIL · 系统悬浮视图不可用';
-      return false;
-    }
     try {
       let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       let config: floatView.FloatViewConfiguration = {
@@ -76,7 +65,6 @@ export struct HomeworkCaptureSpikePage {
         templateType: floatView.FloatViewTemplateType.ROUNDED_RECTANGLE
       };
       this.floatViewController = await floatView.create(config);
-      this.registerFloatState();
       await this.floatViewController.setUIContext('pages/HomeworkCaptureFloatView');
       let limits: floatView.FloatViewLimits =
         floatView.getFloatViewLimits(floatView.FloatViewTemplateType.ROUNDED_RECTANGLE);
@@ -101,15 +89,14 @@ export struct HomeworkCaptureSpikePage {
     this.floatViewController = undefined;
     if (!controller) return;
     try {
-      controller.offStateChange();
       await controller.stop();
     } catch {
       // A user may already have closed the system-managed float view.
     }
   }
 
-  private updateStats(): CaptureStats {
-    let stats: CaptureStats = nativeCapture.getStats();
+  private updateStats(): CaptureRuntimeStats {
+    let stats: CaptureRuntimeStats = this.captureRuntime.getStats();
     this.running = stats.isCapturing;
     this.statsText =
       `callbacks=${stats.callbackCount} · sampled=${stats.sampledFrameCount} · ` +
@@ -128,14 +115,14 @@ export struct HomeworkCaptureSpikePage {
     this.ocrStatus = 'PENDING';
     this.recognizedText = '';
     this.ocrLines = [];
-    nativeCapture.clearLatestFrame();
+    this.captureRuntime.clearLatestFrame();
 
     let floatReady = await this.startFloatView();
     if (!floatReady) {
       this.message = 'FloatView 未启动；仍可继续验证屏幕采集，但需通过系统方式停止后再返回小伴。';
     }
 
-    let result = nativeCapture.startCapture();
+    let result: number = this.captureRuntime.startCapture();
     this.updateStats();
     if (result !== 0) {
       this.captureStatus = `FAIL · startCapture=${result}`;
@@ -152,7 +139,7 @@ export struct HomeworkCaptureSpikePage {
   }
 
   private stopCaptureHere(): void {
-    let result = nativeCapture.stopCapture();
+    let result: number = this.captureRuntime.stopCapture();
     this.updateStats();
     this.running = false;
     this.message = result === 0
@@ -168,7 +155,7 @@ export struct HomeworkCaptureSpikePage {
     }
     await this.stopFloatView();
 
-    let frame: CapturedFrame | undefined = nativeCapture.getLatestFrame();
+    let frame: CaptureFrame | undefined = this.captureRuntime.getLatestFrame();
     if (!frame) {
       this.frameText = '没有取得可识别的视频帧';
       this.ocrStatus = 'FAIL · NO_FRAME';

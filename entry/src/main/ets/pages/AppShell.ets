@@ -224,6 +224,20 @@ export struct AppShell {
     this.notifyUiChanged();
   }
 
+  private finishShareImportReady(): void {
+    this.shareImportToken = '';
+    ParentImportNavigator.openConfirmation(this.navPathStack);
+  }
+
+  private finishShareImportEmpty(): void {
+    this.shareImportToken = '';
+    ParentImportNavigator.openInbox(this.navPathStack);
+  }
+
+  private cancelShareImport(): void {
+    this.shareImportToken = '';
+  }
+
   private openParentExtraCreate(voice: boolean = false): void {
     this.navPathStack.pushPathByName(AppRoute.PARENT_EXTRA_CREATE, new ParentExtraCreateRouteParam(voice));
   }

@@ -9,6 +9,8 @@ import {
 import { HomeworkCaptureRuntime } from '../../domain/port/HomeworkCaptureRuntime';
 
 export class NativeHomeworkCaptureRuntime implements HomeworkCaptureRuntime {
+  static readonly instance: NativeHomeworkCaptureRuntime = new NativeHomeworkCaptureRuntime();
+
   startCapture(): number {
     return nativeCapture.startCapture();
   }
@@ -34,9 +36,12 @@ export class NativeHomeworkCaptureRuntime implements HomeworkCaptureRuntime {
     return {
       isCapturing: stats.isCapturing,
       lastError: stats.lastError,
+      state: stats.state,
       callbackCount: stats.callbackCount,
       sampledFrameCount: stats.sampledFrameCount,
-      latestSequence: stats.latestSequence
+      latestSequence: stats.latestSequence,
+      latestWidth: stats.latestWidth,
+      latestHeight: stats.latestHeight
     };
   }
 

@@ -3,7 +3,8 @@ import { HomeworkCaptureWorkflowService } from '../application/capture/HomeworkC
 import { AppTheme } from '../common/theme/AppTheme';
 import { CaptureSessionStatus } from '../domain/model/CaptureModels';
 import { SourceGroupValidationStatus } from '../domain/model/HomeworkSourceProfileModels';
-import nativeCapture, { CaptureStats } from 'libhomeworkcapture.so';
+import { CaptureRuntimeStats } from '../domain/model/CaptureModels';
+import { NativeHomeworkCaptureRuntime } from '../infrastructure/capture/NativeHomeworkCaptureRuntime';
 
 @Entry
 @Component
@@ -11,6 +12,7 @@ struct HomeworkCaptureFloatView {
   @State private statusText: string = '作业采集中';
   @State private detailText: string = '在班级群中手工上滑；到目标位置后点停止';
   private refreshTimer: number = -1;
+  private readonly captureRuntime: NativeHomeworkCaptureRuntime = NativeHomeworkCaptureRuntime.instance;
 
   aboutToAppear(): void {
     this.refreshTimer = setInterval(() => {
@@ -103,8 +105,8 @@ struct HomeworkCaptureFloatView {
     }
 
     // Compatibility fallback for the isolated #241 feasibility spike.
-    let code = nativeCapture.stopCapture();
-    let stats: CaptureStats = nativeCapture.getStats();
+    let code: number = this.captureRuntime.stopCapture();
+    let stats: CaptureRuntimeStats = this.captureRuntime.getStats();
     if (code === 0) {
       this.statusText = '采集已停止';
       this.detailText = `已收到 ${stats.callbackCount} 个视频回调，请返回小伴读取 OCR 结果`;

@@ -51,6 +51,6 @@ export class ParentImportNavigator {
 
   static finishSourceProfile(stack: NavPathStack, startCaptureAfterSave: boolean): void {
     if (stack.size() > 0) stack.pop();
-    if (startCaptureAfterSave) this.openCapture(stack);
+    if (startCaptureAfterSave) ParentImportNavigator.openCapture(stack);
   }
 }
