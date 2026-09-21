@@ -4,7 +4,7 @@ import {
   ChatReconstructionOptions,
   ChatReconstructionResult
 } from '../../domain/model/ChatReconstructionModels';
-import { ImportBatch } from '../../domain/model/ImportModels';
+import { HomeworkImportPipelineStage, ImportBatch } from '../../domain/model/ImportModels';
 import { DeterministicChatReconstructor } from './DeterministicChatReconstructor';
 
 export class HomeworkChatReconstructionService {
@@ -34,6 +34,7 @@ export class HomeworkChatReconstructionService {
           groupValidationStatus: batch.groupValidationStatus,
           groupConfirmedByUser: batch.groupConfirmedByUser,
           captureSessionId: batch.captureSessionId,
+          pipelineStage: HomeworkImportPipelineStage.RECONSTRUCTION_FAILED,
           reconstructed: false,
           groupTitle: batch.groupTitle,
           timeBoundaryReached: batch.timeBoundaryReached,
@@ -86,6 +87,7 @@ export class HomeworkChatReconstructionService {
       groupValidationStatus: batch.groupValidationStatus,
       groupConfirmedByUser: batch.groupConfirmedByUser,
       captureSessionId: batch.captureSessionId,
+      pipelineStage: HomeworkImportPipelineStage.RECONSTRUCTED,
       reconstructed: true,
       groupTitle: result.groupTitle,
       timeBoundaryReached: targetStartMinuteOfDay >= 0 ? result.timeBoundaryReached : undefined,
