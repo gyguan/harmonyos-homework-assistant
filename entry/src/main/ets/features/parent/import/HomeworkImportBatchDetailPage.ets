@@ -41,6 +41,11 @@ export struct HomeworkImportBatchDetailPage {
       [] : item.sourceEvidence.sourceMessageIds;
   }
 
+  private sourceFrameIds(item: ImportedMessage): string[] {
+    return item.sourceEvidence.sourceFrameEvidenceIds === undefined ?
+      [] : item.sourceEvidence.sourceFrameEvidenceIds;
+  }
+
   private statusLabel(status: ImportBatchStatus): string {
     if (status === ImportBatchStatus.READY) return '待确认';
     if (status === ImportBatchStatus.PUBLISHED) return '已发布';
@@ -87,6 +92,12 @@ export struct HomeworkImportBatchDetailPage {
         .fontSize(13)
         .lineHeight(20)
         .fontColor(AppTheme.TEXT);
+
+      if (this.sourceFrameIds(item).length > 0) {
+        Text(`来源画面：${this.sourceFrameIds(item).length} 个 Frame Evidence`)
+          .fontSize(10)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+      }
 
       if (item.attachments.length > 0) {
         Text(`附件 ${item.attachments.length} 个`)
@@ -179,8 +190,47 @@ export struct HomeworkImportBatchDetailPage {
             .backgroundColor(AppTheme.SURFACE)
             .borderRadius(AppTheme.CONTROL_RADIUS);
 
+            if (this.batch()!.reconstructed === true) {
+              Column({ space: 6 }) {
+                Text('聊天重建')
+                  .width('100%')
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                if (this.batch()!.groupTitle !== undefined && this.batch()!.groupTitle!.length > 0) {
+                  Text(`群标题：${this.batch()!.groupTitle}`)
+                    .width('100%')
+                    .fontSize(12)
+                    .fontColor(AppTheme.SUBTEXT);
+                }
+                if (this.batch()!.earliestDetectedTime !== undefined &&
+                  this.batch()!.earliestDetectedTime!.length > 0) {
+                  Text(`最早识别时间：${this.batch()!.earliestDetectedTime}`)
+                    .width('100%')
+                    .fontSize(12)
+                    .fontColor(AppTheme.SUBTEXT);
+                }
+                Text(this.batch()!.timeBoundaryReached === true ? '已达到目标时间边界' : '尚未达到目标时间边界')
+                  .width('100%')
+                  .fontSize(12)
+                  .fontColor(this.batch()!.timeBoundaryReached === true ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+                if (this.batch()!.reconstructionWarnings !== undefined &&
+                  this.batch()!.reconstructionWarnings!.length > 0) {
+                  Text(`重建提示：${this.batch()!.reconstructionWarnings!.join('、')}`)
+                    .width('100%')
+                    .fontSize(10)
+                    .lineHeight(16)
+                    .fontColor(AppTheme.TERTIARY_TEXT);
+                }
+              }
+              .width('100%')
+              .padding(14)
+              .backgroundColor(AppTheme.PRIMARY_FAINT)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
+            }
+
             Column({ space: 8 }) {
-              Text(`原始消息 ${this.messages().length}`)
+              Text(`重建消息 ${this.messages().length}`)
                 .width('100%')
                 .fontSize(15)
                 .fontWeight(FontWeight.Medium)
