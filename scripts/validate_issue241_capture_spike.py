@@ -27,6 +27,7 @@ pages = read("entry/src/main/resources/base/profile/main_pages.json")
 ocr = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureOcrService.ets")
 spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
+native_runtime = read("entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
 entry_pkg = read("entry/oh-package.json5")
@@ -79,8 +80,11 @@ require("image.PixelMapFormat.RGBA_8888" in ocr,
         "captured RGBA bytes must be reconstructed as RGBA_8888 PixelMap")
 require("result.blocks" in ocr and "cornerPoints" in ocr,
         "OCR evidence must retain line coordinates, not only plain text")
-require("nativeCapture.stopCapture()" in float_page,
-        "FloatView must allow the user to stop capture while still in WeChat")
+require("libhomeworkcapture.so" in native_runtime and
+        "NativeHomeworkCaptureRuntime" in native_runtime,
+        "native capture library must be isolated behind NativeHomeworkCaptureRuntime")
+require("this.captureRuntime.stopCapture()" in float_page,
+        "FloatView must allow the user to stop capture while still in WeChat through the runtime adapter")
 require("PARENT_CAPTURE_SPIKE" in routes and "HomeworkCaptureSpikePage" in spike,
         "issue #241 must remain reachable through an isolated experimental route")
 require("#241" in import_route and "onOpenCaptureSpike" in import_route,
