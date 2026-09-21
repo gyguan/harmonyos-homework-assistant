@@ -6,7 +6,7 @@ import {
 import {
   PracticeHistorySubjectFilter,
   PracticeHistoryTimeFilter
-} from '../../features/student/practice/PracticeHistoryViewModel';
+} from '../../domain/model/PracticeHistoryFilter';
 
 @CustomDialog
 export struct PracticeHistoryFilterDialog {
