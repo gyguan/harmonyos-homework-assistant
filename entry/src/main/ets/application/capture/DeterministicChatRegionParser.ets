@@ -200,9 +200,12 @@ export class DeterministicChatRegionParser {
   private looksLikeSender(lines: CaptureOcrLineEvidence[], index: number): boolean {
     let line = lines[index];
     if (index + 1 >= lines.length) return false;
-    let value = this.senderFromLine(line.value);
+    let raw = this.normalizeText(line.value);
+    let value = this.senderFromLine(raw);
     if (value.length === 0 || value.length > 16) return false;
-    if (/[:：，。！？!?]/.test(value)) return false;
+    let explicit = raw.endsWith(':') || raw.endsWith('：') ||
+      /(老师|家长|妈妈|爸爸|同学|先生|女士)$/.test(value);
+    if (!explicit) return false;
     let next = lines[index + 1];
     if (this.parseTime(next.value) !== null) return false;
     let verticalGap = next.top - line.bottom;
