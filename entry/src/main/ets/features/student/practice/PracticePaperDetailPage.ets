@@ -204,7 +204,7 @@ export struct PracticePaperDetailPage {
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS);
       } else if (this.recentAttempts.length === 0) {
-        Text('还没有这套卷的练习记录，完成后会保留在这里。')
+        Text('还没有练习记录')
           .width('100%')
           .fontSize(13)
           .lineHeight(18)
@@ -285,10 +285,6 @@ export struct PracticePaperDetailPage {
                 .width('100%')
                 .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT);
-              Text(`内容来源：${this.sourceLabel()} · 版本 V${this.paper.version}`)
-                .width('100%')
-                .fontSize(13)
-                .fontColor(AppTheme.TERTIARY_TEXT);
             }
             .width('100%')
             .padding(AppTheme.CARD_PADDING)
