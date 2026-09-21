@@ -1,4 +1,5 @@
 import { HomeworkImportInboxService } from '../import/HomeworkImportInboxService';
+import { HomeworkChatReconstructionService } from './HomeworkChatReconstructionService';
 import { HomeworkCaptureSessionStore } from '../../data/local/HomeworkCaptureSessionStore';
 import {
   CaptureFrame,
@@ -182,6 +183,7 @@ export class HomeworkCaptureSessionService {
       // Runtime may already be stopped by the system; release remains best-effort.
     }
     let batchId = this.ensureImportBatch(session);
+    HomeworkChatReconstructionService.instance.reconstructCaptureSession(session.id, batchId);
     runtime.clearLatestFrame();
 
     session.importBatchId = batchId;
@@ -227,6 +229,7 @@ export class HomeworkCaptureSessionService {
     await this.sampleLatestFrame();
     session = this.store.getSession(session.id) as CaptureSession;
     let batchId = this.ensureImportBatch(session);
+    HomeworkChatReconstructionService.instance.reconstructCaptureSession(session.id, batchId);
     runtime.clearLatestFrame();
 
     session.importBatchId = batchId;
