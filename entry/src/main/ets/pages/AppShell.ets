@@ -446,6 +446,7 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_SOURCE_PROFILE) {
       NavDestination() {
         HomeworkSourceProfilePage({
+          startCaptureAfterSave: (param as ParentSourceProfileRouteParam).startCaptureAfterSave,
           onBack: () => this.navPathStack.pop(),
           onSavedAndCapture: () => this.finishSourceProfile(
             (param as ParentSourceProfileRouteParam).startCaptureAfterSave)
