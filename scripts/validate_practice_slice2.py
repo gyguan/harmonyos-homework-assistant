@@ -27,6 +27,7 @@ detail = read("entry/src/main/ets/features/student/practice/PracticePaperDetailP
 detail_vm = read("entry/src/main/ets/features/student/practice/PracticePaperDetailViewModel.ets")
 attempt_page = read("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
 result_page = read("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
+result_vm = read("entry/src/main/ets/features/student/practice/PracticeResultViewModel.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 migration = read("backend/src/main/resources/db/migration/V9__practice_core.sql")
@@ -78,6 +79,15 @@ require("PracticeSubmitConfirmDialog" in attempt_page and "unansweredCount" in a
         "submission must handle unanswered questions")
 require("答题回顾" in result_page and "正确答案" in result_page,
         "submitted result must expose review")
+require("DeepPageHeader" in result_page and "Text('完成')" not in result_page,
+        "Practice result must use the shared back header instead of a Done action")
+require("subtitle: this.headerSubtitle()" in result_page and "paperTitle" in result_page,
+        "Practice result header must identify the paper and attempt")
+require("paperTitle(result: PracticeResult)" in result_vm and "item.paperTitle" in result_vm,
+        "Practice result must resolve the paper title without changing backend result DTOs")
+require("replacePracticeAttemptWithResult" in shell and
+        "onSubmitted: (attemptId: string) => this.replacePracticeAttemptWithResult(attemptId)" in shell,
+        "Submitting practice must replace the completed attempt route with the result route")
 
 for route in ["STUDENT_PRACTICE_PAPER", "STUDENT_PRACTICE_ATTEMPT", "STUDENT_PRACTICE_RESULT"]:
     require(route in routes and route in shell, f"practice deep route missing: {route}")
