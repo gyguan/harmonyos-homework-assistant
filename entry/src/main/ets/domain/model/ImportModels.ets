@@ -48,6 +48,11 @@ export interface ImportBatch {
   sourceLabel: string;
   sourceProfileId: string;
   captureSessionId?: string;
+  reconstructed?: boolean;
+  groupTitle?: string;
+  timeBoundaryReached?: boolean;
+  earliestDetectedTime?: string;
+  reconstructionWarnings?: string[];
   createdAtEpochMs: number;
   status: ImportBatchStatus;
   messageCount: number;
