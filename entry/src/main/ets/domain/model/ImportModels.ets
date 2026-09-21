@@ -53,6 +53,10 @@ export interface ImportBatch {
   timeBoundaryReached?: boolean;
   earliestDetectedTime?: string;
   reconstructionWarnings?: string[];
+  understood?: boolean;
+  pendingReviewMessageIds?: string[];
+  understandingWarnings?: string[];
+  classificationSummary?: string;
   createdAtEpochMs: number;
   status: ImportBatchStatus;
   messageCount: number;
