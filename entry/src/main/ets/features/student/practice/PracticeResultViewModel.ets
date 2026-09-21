@@ -1,16 +1,50 @@
+import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { DefaultPracticeRepository } from '../../../data/repository/DefaultPracticeRepository';
-import { PracticeAttempt, PracticeResult } from '../../../domain/model/practice/PracticeModels';
+import {
+  PracticeAttempt,
+  PracticeAttemptSummary,
+  PracticePaper,
+  PracticeResult
+} from '../../../domain/model/practice/PracticeModels';
+import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
 
 export class PracticeResultViewModel {
   private readonly repository: PracticeRepository;
+  private readonly familyContext: FamilyContextRepository;
 
-  constructor(repository: PracticeRepository = DefaultPracticeRepository.instance) {
+  constructor(
+    repository: PracticeRepository = DefaultPracticeRepository.instance,
+    familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance
+  ) {
     this.repository = repository;
+    this.familyContext = familyContext;
   }
 
   load(attemptId: string): Promise<PracticeResult> {
     return this.repository.getResult(attemptId);
+  }
+
+  async paperTitle(result: PracticeResult): Promise<string> {
+    let historyTitle = await this.historyPaperTitle(result);
+    if (historyTitle.length > 0) return historyTitle;
+
+    let paper: PracticePaper | null = await this.repository.getPaper(result.paperId, result.paperVersion);
+    if (paper !== null && paper.title.length > 0) return paper.title;
+    return result.paperId;
+  }
+
+  private async historyPaperTitle(result: PracticeResult): Promise<string> {
+    try {
+      let attempts: PracticeAttemptSummary[] =
+        await this.repository.listAttempts(this.familyContext.getActiveStudentId(), result.paperId);
+      for (let item of attempts) {
+        if (item.id === result.attemptId && item.paperTitle.length > 0) return item.paperTitle;
+      }
+      return '';
+    } catch {
+      return '';
+    }
   }
 
   repeat(attemptId: string): Promise<PracticeAttempt> {

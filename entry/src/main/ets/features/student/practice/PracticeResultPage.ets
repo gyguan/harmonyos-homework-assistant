@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import {
   PracticeAttemptMode,
   PracticeQuestionResult,
@@ -10,10 +11,11 @@ import { PracticeResultViewModel } from './PracticeResultViewModel';
 export struct PracticeResultPage {
   @Prop attemptId: string = '';
   @State private result: PracticeResult | null = null;
+  @State private paperTitle: string = '';
   @State private errorMessage: string = '';
   @State private repeating: boolean = false;
   @State private wrongRetrying: boolean = false;
-  onDone: () => void = () => {};
+  onBack: () => void = () => {};
   onRepeatStarted: (attemptId: string) => void = (_attemptId: string) => {};
   private readonly viewModel: PracticeResultViewModel = new PracticeResultViewModel();
 
@@ -23,11 +25,21 @@ export struct PracticeResultPage {
 
   private async load(): Promise<void> {
     this.errorMessage = '';
+    this.paperTitle = '';
     try {
-      this.result = await this.viewModel.load(this.attemptId);
+      let loaded = await this.viewModel.load(this.attemptId);
+      this.result = loaded;
+      this.paperTitle = await this.viewModel.paperTitle(loaded);
     } catch {
+      this.result = null;
       this.errorMessage = '结果加载失败，请检查网络后重试。';
     }
+  }
+
+  private headerSubtitle(): string {
+    if (this.result === null) return this.paperTitle;
+    if (this.paperTitle.length > 0) return `${this.paperTitle} · 第 ${this.result.attemptNo} 次`;
+    return `第 ${this.result.attemptNo} 次`;
   }
 
   private async repeat(): Promise<void> {
@@ -73,23 +85,21 @@ export struct PracticeResultPage {
 
   build() {
     Column() {
-      Row({ space: 10 }) {
-        Text('练习结果')
-          .fontSize(AppTheme.DEEP_PAGE_HEADER_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Blank();
-        Text('完成')
-          .fontSize(13)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.PRIMARY)
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 12, right: 4 })
-          .onClick(() => this.onDone());
+      Column() {
+        DeepPageHeader({
+          title: '练习结果',
+          subtitle: this.headerSubtitle(),
+          backAccessibilityText: '返回上一页',
+          onBack: () => this.onBack()
+        });
       }
       .width('100%')
-      .height(AppTheme.DEEP_PAGE_HEADER_HEIGHT)
-      .padding({ left: 20, right: 16 });
+      .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
+      .padding({
+        left: AppTheme.PAGE_PADDING,
+        right: AppTheme.PAGE_PADDING,
+        top: AppTheme.DEEP_PAGE_TOP_PADDING
+      });
 
       Divider().color(AppTheme.DIVIDER);
 
@@ -211,10 +221,16 @@ export struct PracticeResultPage {
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
-        .padding(AppTheme.PAGE_PADDING);
+        .padding({
+          left: AppTheme.PAGE_PADDING,
+          right: AppTheme.PAGE_PADDING,
+          top: AppTheme.DEEP_PAGE_CONTENT_GAP,
+          bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
+        });
       }
       .width('100%')
       .layoutWeight(1)
+      .align(Alignment.Top)
       .scrollBar(BarState.Off);
 
       if (this.result !== null) {
@@ -242,12 +258,13 @@ export struct PracticeResultPage {
           }
         }
         .width('100%')
-        .padding({ left: 20, right: 20, top: 10, bottom: 14 })
-        .backgroundColor(AppTheme.SURFACE);
+        .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
+        .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 10, bottom: 14 });
       }
     }
     .width('100%')
     .height('100%')
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }
