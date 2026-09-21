@@ -10,11 +10,17 @@ import { CaptureSession } from '../../../domain/model/CaptureModels';
 import { HomeworkSourceProfile } from '../../../domain/model/HomeworkSourceProfileModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 
+export type HomeworkCapturePageResult = HomeworkCaptureWorkflowResult;
+
 export class HomeworkCaptureViewModel {
   private readonly family: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   private readonly sessions: HomeworkCaptureSessionService = HomeworkCaptureSessionService.instance;
   private readonly workflow: HomeworkCaptureWorkflowService = HomeworkCaptureWorkflowService.instance;
   private readonly profiles: HomeworkSourceProfileService = HomeworkSourceProfileService.instance;
+
+  hasActiveSession(): boolean {
+    return this.sessions.getActiveSession() !== null;
+  }
 
   hasActiveProfile(): boolean {
     return this.profiles.getActiveProfile(this.family.getActiveStudentId()) !== null;
