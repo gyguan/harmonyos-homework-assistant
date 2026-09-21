@@ -1,8 +1,10 @@
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { DefaultPracticeRepository } from '../../../data/repository/DefaultPracticeRepository';
 import {
+  PracticeAttemptSummary,
   PracticeGrade,
   PracticePaper,
+  PracticePassFilter,
   PracticeSemester,
   PracticeSubject,
   PracticeTrack,
@@ -11,6 +13,7 @@ import {
 } from '../../../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
+import { PracticePassPolicy } from '../../../domain/service/PracticePassPolicy';
 
 export class PracticeHomeViewModel {
   private readonly practiceRepository: PracticeRepository;
@@ -62,6 +65,37 @@ export class PracticeHomeViewModel {
 
   difficultyLabel(paper: PracticePaper): string {
     return PracticeTaxonomy.difficultyLabel(paper.difficulty);
+  }
+
+  passFilterLabel(filter: PracticePassFilter): string {
+    return PracticeTaxonomy.passFilterLabel(filter);
+  }
+
+  listAttempts(): Promise<PracticeAttemptSummary[]> {
+    return this.practiceRepository.listAttempts(this.familyContext.getActiveStudentId(), '');
+  }
+
+  passedPaperKeys(attempts: PracticeAttemptSummary[]): string[] {
+    return PracticePassPolicy.passedPaperKeys(attempts);
+  }
+
+  isPaperPassed(paper: PracticePaper, passedPaperKeys: string[]): boolean {
+    return PracticePassPolicy.isPaperPassed(paper, passedPaperKeys);
+  }
+
+  filterByPass(
+    papers: PracticePaper[],
+    filter: PracticePassFilter,
+    passedPaperKeys: string[]
+  ): PracticePaper[] {
+    if (filter === PracticePassFilter.ALL) return papers.slice();
+    let result: PracticePaper[] = [];
+    for (let paper of papers) {
+      let passed = this.isPaperPassed(paper, passedPaperKeys);
+      if (filter === PracticePassFilter.PASSED && passed) result.push(paper);
+      if (filter === PracticePassFilter.NOT_PASSED && !passed) result.push(paper);
+    }
+    return result;
   }
 
   listPapers(

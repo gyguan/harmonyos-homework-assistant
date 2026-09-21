@@ -81,8 +81,8 @@ require("PracticeTrackFilter.ALL" in filter_dialog and
         "PracticeTrackFilter.TEXTBOOK_SYNC" in filter_dialog and
         "PracticeTrackFilter.EXTRACURRICULAR" in filter_dialog,
         "Practice filter dialog must expose all/sync/extra choices")
-require("onApply(this.selectedGrade, this.selectedSubject, this.selectedTrack)" in filter_dialog,
-        "Practice filters must only commit through explicit apply")
+require("onApply(this.selectedGrade, this.selectedSubject, this.selectedTrack, this.selectedPassFilter)" in filter_dialog,
+        "Practice filters must only commit all filter dimensions through explicit apply")
 require("filterDialogController" in page and "DialogAlignment.Bottom" in page,
         "Practice filters must stay in the bottom dialog")
 require("GradeSelector" not in page and "SubjectSelector" not in page,
