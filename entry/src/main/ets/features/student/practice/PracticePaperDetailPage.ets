@@ -104,12 +104,14 @@ export struct PracticePaperDetailPage {
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text(this.viewModel.statusLabel(item))
+        Text(this.viewModel.recordStatusLabel(item))
           .fontSize(12)
           .fontWeight(FontWeight.Medium)
-          .fontColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS : AppTheme.PRIMARY)
+          .fontColor(item.status !== PracticeAttemptStatus.SUBMITTED || this.viewModel.isWrongOnly(item) ?
+            AppTheme.PRIMARY : (this.viewModel.isPassed(item) ? AppTheme.SUCCESS : AppTheme.WARNING))
           .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-          .backgroundColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
+          .backgroundColor(item.status !== PracticeAttemptStatus.SUBMITTED || this.viewModel.isWrongOnly(item) ?
+            AppTheme.PRIMARY_SOFT : (this.viewModel.isPassed(item) ? AppTheme.SUCCESS_SOFT : AppTheme.WARNING_SOFT))
           .borderRadius(AppTheme.CHIP_RADIUS);
       }
       .width('100%');
@@ -139,7 +141,7 @@ export struct PracticePaperDetailPage {
           .fontColor(AppTheme.TERTIARY_TEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
           Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
-          Text(`耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
+          Text(`完成耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
             .fontSize(12)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
@@ -151,7 +153,7 @@ export struct PracticePaperDetailPage {
     .backgroundColor(AppTheme.SURFACE_SUBTLE)
     .borderRadius(AppTheme.CONTROL_RADIUS)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`第${item.attemptNo}次练习，${this.viewModel.statusLabel(item)}`)
+    .accessibilityText(`第${item.attemptNo}次练习，${this.viewModel.recordStatusLabel(item)}${item.status === PracticeAttemptStatus.SUBMITTED ? `，完成耗时${this.viewModel.elapsedText(item.elapsedSeconds)}` : ''}`)
     .onClick(() => this.openAttempt(item));
   }
 
