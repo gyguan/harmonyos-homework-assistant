@@ -161,6 +161,7 @@ export class HomeworkCaptureSessionService {
           fingerprint: this.signatureText(signature),
           text: recognized.text,
           lineCount: recognized.lineCount,
+          lines: recognized.lines,
           orderNo: orderNo
         });
       }
