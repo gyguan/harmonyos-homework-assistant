@@ -15,7 +15,7 @@ export struct CandidateDurationControl {
     Column({ space: 5 }) {
       Text('预计用时')
         .width('100%')
-        .fontSize(11)
+        .fontSize(13)
         .fontColor(AppTheme.TERTIARY_TEXT);
 
       Scroll() {
@@ -51,7 +51,7 @@ export struct CandidateDurationControl {
             onSelect: () => this.onMinutesChange(this.item, 45)
           });
           Text('分钟')
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
       }
@@ -76,12 +76,12 @@ export struct ConfirmationCandidateCard {
       Row() {
         Row({ space: 7 }) {
           Text(this.item.subject)
-            .fontSize(12)
+            .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
           if (this.item.confidence < 0.8) {
             Text('重点确认')
-              .fontSize(10)
+              .fontSize(13)
               .fontColor(AppTheme.WARNING)
               .padding({ left: 7, right: 7, top: 3, bottom: 3 })
               .backgroundColor(AppTheme.WARNING_SOFT)
@@ -90,7 +90,7 @@ export struct ConfirmationCandidateCard {
         }
         Blank();
         Text(this.item.dueText)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT)
           .maxLines(1);
       }
@@ -106,7 +106,7 @@ export struct ConfirmationCandidateCard {
       if (this.item.textbookRef.length > 0) {
         Text(this.item.textbookRef)
           .width('100%')
-          .fontSize(11)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis });
@@ -120,7 +120,7 @@ export struct ConfirmationCandidateCard {
 
       Text(`来源 · ${this.item.sourceEvidence.excerpt}`)
         .width('100%')
-        .fontSize(11)
+        .fontSize(13)
         .fontColor(this.item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.TERTIARY_TEXT)
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis });
@@ -243,7 +243,7 @@ export struct ConfirmationCandidateEditor {
       if (this.confirmDiscard) {
         Text('当前修改尚未完成，关闭将放弃这些修改。')
           .width('100%')
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.WARNING);
         Row({ space: 10 }) {
           Button('继续编辑', { type: ButtonType.Normal })
@@ -267,7 +267,7 @@ export struct ConfirmationCandidateEditor {
       } else if (this.confirmDelete) {
         Text('删除后无法恢复，确定删除这项待确认作业？')
           .width('100%')
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.DANGER);
         Row({ space: 10 }) {
           Button('取消', { type: ButtonType.Normal })
@@ -364,7 +364,7 @@ export struct ConfirmationCandidateEditor {
             Text(this.item.sourceEvidence.sourceLabel.length > 0 ?
               this.item.sourceEvidence.sourceLabel : '老师原文')
               .width('100%')
-              .fontSize(12)
+              .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
             Text(this.item.sourceEvidence.excerpt)
