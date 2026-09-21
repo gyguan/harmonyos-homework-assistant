@@ -59,7 +59,7 @@ export interface CaptureFrameEvidence {
   fingerprint: string;
   text: string;
   lineCount: number;
-  lines: CaptureOcrLineEvidence[];
+  lines?: CaptureOcrLineEvidence[];
   orderNo: number;
 }
 
