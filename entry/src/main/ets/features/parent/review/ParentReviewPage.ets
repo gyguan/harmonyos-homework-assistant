@@ -15,7 +15,7 @@ export struct ParentReviewPage {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
           title: '作业详情',
-          backAccessibilityText: '返回进度',
+          backAccessibilityText: '返回上一页',
           onBack: () => this.onBack()
         });
         Scroll() {
