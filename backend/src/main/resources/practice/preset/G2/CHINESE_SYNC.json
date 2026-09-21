@@ -2223,6 +2223,376 @@
           ]
         }
       ]
+    },
+    {
+      "id": "CHINESE-G2-S1-SYNC-MESSAGE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上语文留言条与形声字（一）",
+      "description": "用家庭和校园里的真实交流情境练习留言条关键信息，并结合常见形声字辨析字义。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "教材同步",
+        "留言条",
+        "形声字"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈还没回家，小雨要去小区图书室还书。留言条里最需要写清楚什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "去哪里、做什么"
+            },
+            {
+              "key": "B",
+              "label": "今天穿什么颜色"
+            },
+            {
+              "key": "C",
+              "label": "窗外天气怎样"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "留言条要让妈妈知道小雨去了哪里、去做什么，才能放心。",
+          "hints": [
+            "关键词：“留言条”“最需要写清楚”。想一想收留言的人最关心的是行动信息，还是衣服和天气。"
+          ],
+          "tags": [
+            "留言条",
+            "生活表达"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "小明写留言条给妈妈，开头的称呼应该写哪一个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小明："
+            },
+            {
+              "key": "B",
+              "label": "妈妈："
+            },
+            {
+              "key": "C",
+              "label": "星期日："
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "留言条的称呼要写给谁，这张留言条是写给妈妈的。",
+          "hints": [
+            "关键词：“写给妈妈”“称呼”。先确定这张留言条是留给谁看的，再选对应称呼。"
+          ],
+          "tags": [
+            "留言条",
+            "格式"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "留言条正文写完后，通常还要补充哪一项信息？",
+          "options": [
+            {
+              "key": "A",
+              "label": "最喜欢的动画片"
+            },
+            {
+              "key": "B",
+              "label": "今天的早餐"
+            },
+            {
+              "key": "C",
+              "label": "自己的名字和日期"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "留言条末尾要有署名和日期，方便对方知道是谁、什么时候留下的。",
+          "hints": [
+            "关键词：“正文写完后”“还要补充”。想一想对方还需要知道留言人和时间。"
+          ],
+          "tags": [
+            "留言条",
+            "格式"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "山路旁有一座高高的山___。空格里用哪个字最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "峰"
+            },
+            {
+              "key": "B",
+              "label": "蜂"
+            },
+            {
+              "key": "C",
+              "label": "锋"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“峰”常和山有关，“山峰”表示山突出的高处。",
+          "hints": [
+            "关键词：“山路”“高高的山”。根据事物和山有关这一点，判断应该选哪类偏旁的字。"
+          ],
+          "tags": [
+            "形声字",
+            "字义辨析"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "春天到了，一只蜜___停在花朵上采蜜。空格里用哪个字最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "峰"
+            },
+            {
+              "key": "B",
+              "label": "蜂"
+            },
+            {
+              "key": "C",
+              "label": "锋"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“蜂”指会飞、会采蜜的昆虫，“蜜蜂”符合句子意思。",
+          "hints": [
+            "关键词：“停在花朵上”“采蜜”。先判断空格表示的是动物、山还是刀刃。"
+          ],
+          "tags": [
+            "形声字",
+            "字义辨析"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "爸爸提醒小乐剪纸时要小心，因为剪刀的刀___很利。空格里用哪个字？",
+          "options": [
+            {
+              "key": "A",
+              "label": "峰"
+            },
+            {
+              "key": "B",
+              "label": "蜂"
+            },
+            {
+              "key": "C",
+              "label": "锋"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“锋”可以表示刀剑锐利的部分，“刀锋”与剪刀的锋利部分有关。",
+          "hints": [
+            "关键词：“剪刀”“很利”。想一想这里说的是工具锐利的部分，不是山或昆虫。"
+          ],
+          "tags": [
+            "形声字",
+            "字义辨析"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈正在厨房___菜，香味飘了出来。空格里应填哪个字？",
+          "options": [
+            {
+              "key": "A",
+              "label": "炒"
+            },
+            {
+              "key": "B",
+              "label": "抄"
+            },
+            {
+              "key": "C",
+              "label": "吵"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "做菜时用火翻动食物用“炒”，所以应是“炒菜”。",
+          "hints": [
+            "关键词：“厨房”“菜”“香味”。先判断这是做饭动作，再结合字的偏旁帮助辨认。"
+          ],
+          "tags": [
+            "形声字",
+            "语境用字"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "老师请同学们把黑板上的句子___写到本子上。空格里应填哪个字？",
+          "options": [
+            {
+              "key": "A",
+              "label": "炒"
+            },
+            {
+              "key": "B",
+              "label": "抄"
+            },
+            {
+              "key": "C",
+              "label": "吵"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "把文字照着写下来叫“抄写”，和书写动作有关。",
+          "hints": [
+            "关键词：“句子”“写到本子上”。根据动作内容判断是在做饭、写字还是发出大声音。"
+          ],
+          "tags": [
+            "形声字",
+            "语境用字"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "午休时大家要安静，不能大声___闹。空格里应填哪个字？",
+          "options": [
+            {
+              "key": "A",
+              "label": "炒"
+            },
+            {
+              "key": "B",
+              "label": "抄"
+            },
+            {
+              "key": "C",
+              "label": "吵"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "声音大、影响安静叫“吵闹”，这里说的是声音。",
+          "hints": [
+            "关键词：“午休”“大声”“闹”。抓住声音很大的情境，再判断应该使用哪个字。"
+          ],
+          "tags": [
+            "形声字",
+            "语境用字"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "小宇去同学家借书，想给爸爸留一张留言条。下面哪条信息最完整？",
+          "options": [
+            {
+              "key": "A",
+              "label": "爸爸，我去小杰家借书，五点前回来。小宇，星期六。"
+            },
+            {
+              "key": "B",
+              "label": "爸爸，我出门了。"
+            },
+            {
+              "key": "C",
+              "label": "今天阳光很好，我很开心。"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "完整留言应说明去哪里、做什么、何时回来，并有署名和时间信息。",
+          "hints": [
+            "关键词：“去同学家借书”“信息最完整”。逐项检查地点、事情、返回时间和留言人是否清楚。"
+          ],
+          "tags": [
+            "留言条",
+            "信息完整"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "小兰给老师留言：“老师，我把借的书放在办公室桌上了。小兰，9月18日。”这张留言主要告诉老师什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "小兰今天没上学"
+            },
+            {
+              "key": "B",
+              "label": "书已经放到办公室桌上"
+            },
+            {
+              "key": "C",
+              "label": "老师要去图书馆"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "正文明确说明借的书已经放在办公室桌上，其他信息没有出现。",
+          "hints": [
+            "关键词：“主要告诉老师什么”。只抓正文中真正发生的事情，不补充句子里没有的信息。"
+          ],
+          "tags": [
+            "留言条",
+            "信息提取"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-SYNC-MESSAGE-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "什么时候最适合写留言条？",
+          "options": [
+            {
+              "key": "A",
+              "label": "两个人正面对面聊天时"
+            },
+            {
+              "key": "B",
+              "label": "想记录自己的心情时"
+            },
+            {
+              "key": "C",
+              "label": "有事要告诉暂时不在的人时"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "留言条用于不能当面说明事情时，把重要信息留给对方。",
+          "hints": [
+            "关键词：“什么时候”“最适合”。想一想留言条解决的是“人暂时不在、事情需要说明”的问题。"
+          ],
+          "tags": [
+            "留言条",
+            "用途"
+          ]
+        }
+      ]
     }
   ]
 }
