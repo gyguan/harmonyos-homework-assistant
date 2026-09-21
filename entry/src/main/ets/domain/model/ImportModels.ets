@@ -23,6 +23,7 @@ export enum ImportBatchStatus {
 export interface ImportSourceEvidence {
   sourceType: HomeworkImportSourceType;
   sourceMessageIds: string[];
+  sourceFrameEvidenceIds?: string[];
   rawText: string;
   imageRef: string;
   capturedAtEpochMs: number;
