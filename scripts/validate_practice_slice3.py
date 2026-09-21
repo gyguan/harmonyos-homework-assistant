@@ -24,6 +24,7 @@ repo = read("entry/src/main/ets/domain/port/PracticeRepository.ets")
 remote = read("entry/src/main/ets/application/remote/PracticeRemoteApi.ets")
 home = read("entry/src/main/ets/features/student/practice/PracticeHomePage.ets")
 history = read("entry/src/main/ets/features/student/practice/PracticeHistoryPage.ets")
+history_vm = read("entry/src/main/ets/features/student/practice/PracticeHistoryViewModel.ets")
 attempt_page = read("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
 result_page = read("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
@@ -46,6 +47,23 @@ require("练习记录" in home and "onOpenHistory" in home,
         "Practice home must expose a compact history entry")
 require("每次开始练习都会创建独立实例" in history and "PracticeAttemptSummary" in history,
         "Practice history page must present immutable per-attempt records")
+require("DeepPageHeader" in history and "Text('‹')" not in history,
+        "Practice history deep page must use the shared DeepPageHeader")
+require("selectedStatus" in history and "selectedSubject" in history,
+        "Practice history must expose simple status and subject filters")
+require("耗时 " in history and "elapsedText(item.elapsedSeconds)" in history,
+        "Submitted practice history must label elapsed time explicitly")
+require("PracticeHistoryStatistics" in history_vm and "statistics(" in history_vm,
+        "Practice history ViewModel must own lightweight statistics")
+require("item.status !== PracticeAttemptStatus.SUBMITTED" in history_vm,
+        "Practice history statistics must exclude unsubmitted attempts")
+require("totalQuestions += item.maxScore" in history_vm and
+        "totalCorrect * 100 / totalQuestions" in history_vm,
+        "Practice history correct rate must use weighted completed-question totals")
+require("totalElapsedSeconds / completedCount" in history_vm,
+        "Practice history average elapsed time must only use completed attempts")
+require("showStatistics" in history_vm and "IN_PROGRESS" in history_vm,
+        "Practice history must hide statistics for the in-progress-only filter")
 require("showPreviousAnswer: boolean = false" in attempt_page,
         "repeat practice must hide previous answers by default")
 require("显示上次作答" in attempt_page and "previousAnswerFor" in attempt_page,
