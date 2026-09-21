@@ -31,6 +31,14 @@ EXPECTED_FILES = {
     "G2/ENGLISH_SYNC.json", "G2/ENGLISH_EXTRA.json",
 }
 IMAGE_DEPENDENT_PHRASES = ("看图", "图中", "图片", "画面")
+GENERIC_HINT_FRAGMENTS = (
+    "圈出题目中的关键词，再结合生活经验判断",
+    "先找出题目中的数量关系或关键信息",
+    "Read the key word or situation first",
+    "先读清题意，再比较三个选项",
+    "先弄懂这句中文到底在问什么",
+    "先圈出数量和关系词，再判断",
+)
 errors: list[str] = []
 
 
@@ -69,8 +77,17 @@ def validate_question(paper: dict, question: dict, index: int, global_ids: set[s
             f"{path}.explanation blank")
     hints = question.get("hints")
     tags = question.get("tags")
-    require(isinstance(hints, list) and 1 <= len(hints) <= 3 and all(str(x).strip() for x in hints),
-            f"{path}.hints invalid")
+    require(isinstance(hints, list) and len(hints) == 1 and all(str(x).strip() for x in hints),
+            f"{path}.hints must contain exactly one focused hint")
+    if isinstance(hints, list) and len(hints) == 1:
+        hint = str(hints[0]).strip()
+        require(hint.startswith("关键词："), f"{path}.hint must start with 关键词：")
+        require(16 <= len(hint) <= 120, f"{path}.hint length must be 16..120 characters")
+        for fragment in GENERIC_HINT_FRAGMENTS:
+            require(fragment not in hint, f"{path}.hint is still generic: {fragment}")
+        if paper.get("subject") == "ENGLISH":
+            require(re.search(r"[\u3400-\u9fff]", hint) is not None,
+                    f"{path}.English hint must be Chinese-guided")
     require(isinstance(tags, list) and 1 <= len(tags) <= 8 and all(str(x).strip() for x in tags),
             f"{path}.tags invalid")
 
@@ -85,6 +102,19 @@ def validate_question(paper: dict, question: dict, index: int, global_ids: set[s
         require(expected and expected.issubset(set(keys)), f"{path}.answerSpec points to missing option")
         if qtype == "SINGLE_CHOICE":
             require(len(expected) == 1, f"{path}.single choice must have exactly one answer")
+            if isinstance(hints, list) and len(hints) == 1 and expected:
+                correct_key = next(iter(expected))
+                correct_option = next(
+                    (item for item in options if str(item.get("key", "")).strip().upper() == correct_key),
+                    None,
+                )
+                if isinstance(correct_option, dict):
+                    correct_label = str(correct_option.get("label", "")).strip()
+                    hint_lower = str(hints[0]).lower()
+                    stem_lower = str(stem).lower()
+                    if len(correct_label) >= 2 and correct_label.lower() not in stem_lower:
+                        require(correct_label.lower() not in hint_lower,
+                                f"{path}.hint must not reveal the correct option text")
     else:
         require(not options, f"{path}.non-choice options must be empty")
         if qtype == "NUMBER":
