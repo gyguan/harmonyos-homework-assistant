@@ -20,6 +20,7 @@ import {
 } from '../domain/model/HomeworkModels';
 import { HomeworkSnapshot } from '../domain/model/PersistenceModels';
 import { HomeworkPersistence } from '../domain/port/HomeworkPersistence';
+import { AssignmentDueDate } from '../domain/service/AssignmentDueDate';
 import { AssignmentStateMachine } from '../domain/service/AssignmentStateMachine';
 import {
   HOMEWORK_SNAPSHOT_SCHEMA_VERSION,
@@ -502,20 +503,19 @@ export class HomeworkStore {
   }
 
   getTodaySummary(): TodaySummary {
-    let now = new Date();
+    let todayStart = AssignmentDueDate.businessDayStart(Date.now());
     let completed = 0;
     let total = 0;
     let attention = 0;
     let undated = 0;
     for (let assignment of this.getAssignments()) {
       if (assignment.status === AssignmentStatus.OVERDUE || assignment.status === AssignmentStatus.NEEDS_REWORK) attention++;
-      if (assignment.dueAtEpochMs <= 0) {
+      let dueDay = AssignmentDueDate.dayStart(assignment);
+      if (dueDay < 0) {
         if (assignment.status !== AssignmentStatus.COMPLETED) undated++;
         continue;
       }
-      let due = new Date(assignment.dueAtEpochMs);
-      let isToday = due.getFullYear() === now.getFullYear() && due.getMonth() === now.getMonth() && due.getDate() === now.getDate();
-      if (!isToday) continue;
+      if (dueDay !== todayStart) continue;
       total++;
       if (assignment.status === AssignmentStatus.COMPLETED) completed++;
     }
