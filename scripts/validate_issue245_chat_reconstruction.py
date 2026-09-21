@@ -27,7 +27,7 @@ capture_service = read("entry/src/main/ets/application/capture/HomeworkCaptureSe
 import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_store = read("entry/src/main/ets/data/local/HomeworkImportInboxStore.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
-fixture = read("entry/src/main/ets/experimental/homeworkcapture/Issue245ChatReconstructionFixture.ets")
+fixture = read("entry/src/test/fixtures/Issue245ChatReconstructionFixture.ets")
 spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 
@@ -92,8 +92,10 @@ require("tryReconstructCaptureSession" in service and
         "capture shutdown must survive reconstruction failure")
 require("candidateCount: 0" in service,
         "#245 service must not create candidates")
-require("tryReconstructCaptureSession(session.id, batchId)" in capture_service,
-        "completed capture must invoke deterministic reconstruction")
+require("HomeworkChatReconstructionService" not in capture_service,
+        "CaptureSessionService must stop at evidence/batch creation; reconstruction belongs to workflow")
+require("tryReconstructCaptureSession" in read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets"),
+        "profile-aware workflow must own deterministic reconstruction")
 
 for item in [
     "this.frame(1, ['17:46 家长甲 收到', '17:50 李老师 C'])",
@@ -116,8 +118,6 @@ require("imageMessage" in fixture and "img_001" in fixture,
         "image-message/hash regression case missing")
 require("ocrFailure" in fixture and "OCR_EXCEPTION" in fixture,
         "single-frame OCR failure tolerance case missing")
-require("运行 #245 聊天重建自测" in spike,
-        "#245 fixture must be runnable from diagnostic UI")
 
 require("群标题：" in detail and "最早识别时间：" in detail and "来源画面：" in detail,
         "batch detail must expose reconstruction and provenance evidence")
