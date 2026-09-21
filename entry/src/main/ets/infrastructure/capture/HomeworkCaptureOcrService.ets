@@ -44,7 +44,13 @@ export class HomeworkCaptureOcrService {
         if (point.y > bottom) bottom = point.y;
       }
     }
-    return { value: line.value, left, top, right, bottom };
+    return {
+      value: line.value,
+      left: left,
+      top: top,
+      right: right,
+      bottom: bottom
+    };
   }
 
   async recognize(frame: CaptureFrame): Promise<HomeworkCaptureOcrResult> {
@@ -56,7 +62,9 @@ export class HomeworkCaptureOcrService {
     };
     let pixelMap = await image.createPixelMap(frame.data, options);
     try {
-      let visionInfo: textRecognition.VisionInfo = { pixelMap };
+      let visionInfo: textRecognition.VisionInfo = {
+        pixelMap: pixelMap
+      };
       let configuration: textRecognition.TextRecognitionConfiguration = {
         isDirectionDetectionSupported: false
       };

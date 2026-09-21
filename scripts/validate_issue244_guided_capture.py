@@ -34,7 +34,7 @@ routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
 fixture = read("entry/src/test/fixtures/Issue244CaptureSessionFixture.ets")
-spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
+diagnostic = read("entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets")
 import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
 batch_detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
@@ -130,6 +130,8 @@ require("采集会话：" in batch_detail,
 
 require("抓取老师作业" in capture_home and "onStartCapture" in capture_home,
         "dedicated capture home must expose the formal capture entry")
+require("HomeworkCaptureDiagnosticPage" in diagnostic and "屏幕采集诊断" in diagnostic,
+        "guided capture must retain the formal screen-capture diagnostic surface")
 require("PARENT_CAPTURE" in routes and "HomeworkCapturePage" in shell,
         "formal capture must use its own navigation route")
 require(shell.count("HomeworkCaptureSessionService.instance.getActiveSession() !== null") >= 2,

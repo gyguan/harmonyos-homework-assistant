@@ -107,7 +107,7 @@ export struct HomeworkCaptureDiagnosticPage {
     try {
       let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
       let config: floatView.FloatViewConfiguration = {
-        context,
+        context: context,
         templateType: floatView.FloatViewTemplateType.ROUNDED_RECTANGLE
       };
       this.floatViewController = await floatView.create(config);
@@ -159,7 +159,10 @@ export struct HomeworkCaptureDiagnosticPage {
     let wasRunning = this.running;
     let stats = this.updateStats();
     this.running = stats.isCapturing;
-    if (wasRunning && !stats.isCapturing) await this.analyzeLatestFrame();
+    if (wasRunning && !stats.isCapturing &&
+      (stats.sampledFrameCount > 0 || stats.lastError !== 0)) {
+      await this.analyzeLatestFrame();
+    }
   }
 
   private async startDiagnosis(): Promise<void> {
