@@ -20,13 +20,16 @@ export class DeterministicHomeworkClassifier {
 
     if (this.containsAny(text, [
       '刚才说错了', '说错了', '改成', '不用做', '不需要做',
-      '取消第', '补充一下', '补充：', '补充:', '以这条为准', '以此为准'
+      '取消第', '以这条为准', '以此为准'
     ])) {
       return HomeworkMessageClassification.HOMEWORK_REVISION;
     }
 
     if (this.isPreparation(text)) return HomeworkMessageClassification.PREPARATION;
     if (this.isNotice(text)) return HomeworkMessageClassification.NOTICE;
+    if (this.containsAny(text, ['补充一下', '补充：', '补充:'])) {
+      return HomeworkMessageClassification.HOMEWORK_REVISION;
+    }
     if (this.isHomework(text)) return HomeworkMessageClassification.HOMEWORK;
     return HomeworkMessageClassification.UNKNOWN;
   }
