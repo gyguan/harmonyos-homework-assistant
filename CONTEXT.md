@@ -45,6 +45,9 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Parent Review（家长验收）**：家长查看 Submission 后执行通过或退回订正，并可附加 review note。
 - **Parent Intervention（家长介入）**：AI 判断不适合继续自主辅导、学生主动求助或任务异常时，请求家长处理的状态/动作。
 - **Weekly Review（周报）**：面向家长的周期性总结，关注完成率、用时、困难、辅导使用情况和需要关注事项，不做孩子排名。
+- **Practice Paper（练习套卷）**：围绕明确年级、学期、科目、题库类型和能力点组织的一组练习题，是预置练习内容的发布与版本边界。
+- **Practice Attempt（练习实例）**：学生每次开始某套卷时创建的独立作答实例；答案、笔记、提交时间、耗时与结果均归属于该 Attempt，不覆盖历史练习。
+- **Practice Track（题库类型）**：`TEXTBOOK_SYNC` 表示教材同步，`EXTRACURRICULAR` 表示课外拓展。二者共享 Practice 领域模型，但内容设计目标不同。
 
 ## Product rules
 
@@ -60,6 +63,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 10. AI 辅导上下文优先级：老师明确要求 > 老师资料 > 当前教材 > 通用知识。
 11. 家长看到的是作业进度，不做摄像头监控、键盘记录等过度监控能力。
 12. SCHOOL / EXTRA 共用 Assignment，不建设两套平行业务体系。
+13. Practice 题库新增或更新必须遵守 `docs/product/practice-question-content-standard.md`；预置题库以 `backend/src/main/resources/practice/preset/` 为唯一源数据，已发布内容通过新 version 演进，不覆盖历史 Attempt / Result。
 
 ## Technical direction
 
