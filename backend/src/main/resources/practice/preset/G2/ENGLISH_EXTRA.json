@@ -46,7 +46,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“得到帮助”“礼貌回应”。别人帮助你之后，要找表示感谢的英语表达。"
+            "关键词：“借到铅笔”“应该说什么”。别人帮助你以后，要选择表示感谢的礼貌英语。"
           ],
           "tags": [
             "daily English",
@@ -162,7 +162,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“早上”“见面”。先判断这是早晨问候场景，再找对应的英语问候语。"
+            "关键词：“早上”“老师”“打招呼”。先判断时间是早晨，再选择适合见面时使用的问候语。"
           ],
           "tags": [
             "daily English",
@@ -278,7 +278,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“读书”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
+            "关键词：“读书”“去哪里”。先判断读书和借阅通常在哪类场所进行，再匹配英文地点词。"
           ],
           "tags": [
             "daily English",
@@ -307,7 +307,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“体育课”“动作”。先确定动作意思，再匹配 run、jump、swim、draw 等英语动作词。"
+            "关键词：“体育课”“动作词”。先想体育课常见的身体动作，再比较英文动作词。"
           ],
           "tags": [
             "daily English",
@@ -532,7 +532,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“鸟”。先确定题目说的是哪种自然事物，再匹配 sky、sun、tree、bird 等词。"
+            "关键词：“公园”“一只鸟”。题目要找的是动物名称，先确定中文对象，再匹配英文单词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -590,7 +590,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“动作”“动作”。先确定动作意思，再匹配 run、jump、swim、draw 等英语动作词。"
+            "关键词：“社区运动会”“动作词”。先想运动会中常见的身体动作，再比较英文动作词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -706,7 +706,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“公园”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
+            "关键词：“公园”“地点词”。先确定题目要找的是地点名称，再比较英文选项。"
           ],
           "tags": [
             "Shenzhen life",
@@ -786,7 +786,7 @@
           "answerSpec": "A",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "关键词：“这个男孩叫什么名字”。先弄懂这句中文到底在问什么，再只关注对应的英文单词或句型。"
+            "关键词：“这个男孩”“名字”。回到短文第一句，找 I’m 后面出现的人名。"
           ],
           "tags": [
             "mini reading",
