@@ -1,3 +1,7 @@
+export const HOMEWORK_UNDERSTANDING_RULESET_VERSION: string = 'rules-v1.0';
+export const HOMEWORK_UNDERSTANDING_SCHEMA_VERSION: string = 'schema-v1.0';
+export const HOMEWORK_UNDERSTANDING_PROMPT_VERSION: string = 'prompt-v1.0';
+
 import { CandidateAssignment, Subject } from './HomeworkModels';
 import { ImportedMessage } from './ImportModels';
 
