@@ -5,7 +5,8 @@ import {
   PracticeAttemptMode,
   PracticeAttemptStatus,
   PracticeAttemptSummary,
-  PracticePaper
+  PracticePaper,
+  PracticePassFilter
 } from '../../../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
