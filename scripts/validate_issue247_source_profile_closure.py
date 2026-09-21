@@ -30,6 +30,7 @@ float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
 workflow = read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets")
 understanding = read("entry/src/main/ets/application/understanding/HomeworkUnderstandingService.ets")
 batch_detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
+reconstruction_service = read("entry/src/main/ets/application/capture/HomeworkChatReconstructionService.ets")
 import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_store = read("entry/src/main/ets/data/local/HomeworkImportInboxStore.ets")
 publish = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
@@ -136,6 +137,13 @@ require("班级采集范围" in batch_detail and "目标群：" in batch_detail 
         "batch detail must expose historical profile/group audit")
 require("sourceProfileName" in inbox_store and "groupValidationStatus" in inbox_store,
         "Inbox persistence must preserve profile/group validation metadata")
+for field in ["sourceProfileName: batch.sourceProfileName",
+              "expectedGroupTitle: batch.expectedGroupTitle",
+              "profileStartTime: batch.profileStartTime",
+              "groupValidationStatus: batch.groupValidationStatus",
+              "groupConfirmedByUser: batch.groupConfirmedByUser"]:
+    require(reconstruction_service.count(field) >= 2,
+            f"reconstruction success/failure must both preserve profile audit: {field}")
 
 require("startsTaskClause" in task_extractor and "'练习册'" in task_extractor,
         "comma-separated independent tasks must split conservatively")
