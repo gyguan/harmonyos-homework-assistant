@@ -231,6 +231,47 @@ export struct HomeworkImportBatchDetailPage {
               .borderRadius(AppTheme.CONTROL_RADIUS);
             }
 
+            if (this.batch()!.understood !== undefined) {
+              Column({ space: 6 }) {
+                Text('作业理解')
+                  .width('100%')
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                Text(this.batch()!.understood === true ? '已完成老师识别、分类与任务整理' : '理解未完成，可保留原消息后重试')
+                  .width('100%')
+                  .fontSize(12)
+                  .fontColor(this.batch()!.understood === true ? AppTheme.SUCCESS : AppTheme.WARNING);
+                if (this.batch()!.classificationSummary !== undefined &&
+                  this.batch()!.classificationSummary!.length > 0) {
+                  Text(this.batch()!.classificationSummary!)
+                    .width('100%')
+                    .fontSize(10)
+                    .lineHeight(16)
+                    .fontColor(AppTheme.SUBTEXT);
+                }
+                if (this.batch()!.pendingReviewMessageIds !== undefined &&
+                  this.batch()!.pendingReviewMessageIds!.length > 0) {
+                  Text(`待人工确认消息：${this.batch()!.pendingReviewMessageIds!.length} 条`)
+                    .width('100%')
+                    .fontSize(12)
+                    .fontColor(AppTheme.WARNING);
+                }
+                if (this.batch()!.understandingWarnings !== undefined &&
+                  this.batch()!.understandingWarnings!.length > 0) {
+                  Text(`理解提示：${this.batch()!.understandingWarnings!.join('、')}`)
+                    .width('100%')
+                    .fontSize(10)
+                    .lineHeight(16)
+                    .fontColor(AppTheme.TERTIARY_TEXT);
+                }
+              }
+              .width('100%')
+              .padding(14)
+              .backgroundColor(AppTheme.PRIMARY_FAINT)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
+            }
+
             Column({ space: 8 }) {
               Text(`${this.batch()!.reconstructed === true ? '重建消息' : '原始消息'} ${this.messages().length}`)
                 .width('100%')
