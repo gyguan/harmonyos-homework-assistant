@@ -177,7 +177,8 @@ export struct HomeworkImportBatchDetailPage {
               .fontColor(AppTheme.SUBTEXT)
               .padding(18)
               .backgroundColor(AppTheme.SURFACE)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
+              .border({ width: 1, color: AppTheme.BORDER })
+              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
           } else {
             Column({ space: 8 }) {
               Text('来源')
@@ -247,7 +248,8 @@ export struct HomeworkImportBatchDetailPage {
               .width('100%')
               .padding(14)
               .backgroundColor(AppTheme.SURFACE)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
+              .border({ width: 1, color: AppTheme.BORDER })
+              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
             }
 
             if (this.batch()!.reconstructed === true) {
@@ -373,7 +375,7 @@ export struct HomeworkImportBatchDetailPage {
                 .fontColor(AppTheme.SUBTEXT)
                 .padding(10)
                 .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                .borderRadius(10);
+                .borderRadius(AppTheme.CONTROL_RADIUS);
             }
 
             if (this.batch()!.status === ImportBatchStatus.RECEIVED &&
