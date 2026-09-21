@@ -140,6 +140,12 @@ export class HomeworkImportInboxService {
       earliestDetectedTime: batch.earliestDetectedTime,
       reconstructionWarnings: batch.reconstructionWarnings === undefined ?
         undefined : batch.reconstructionWarnings.slice(),
+      understood: batch.understood,
+      pendingReviewMessageIds: batch.pendingReviewMessageIds === undefined ?
+        undefined : batch.pendingReviewMessageIds.slice(),
+      understandingWarnings: batch.understandingWarnings === undefined ?
+        undefined : batch.understandingWarnings.slice(),
+      classificationSummary: batch.classificationSummary,
       createdAtEpochMs: batch.createdAtEpochMs,
       status: normalized.length > 0 ? ImportBatchStatus.READY :
         (batch.status === ImportBatchStatus.RECEIVED ? ImportBatchStatus.RECEIVED : ImportBatchStatus.EMPTY),
