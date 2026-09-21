@@ -26,20 +26,25 @@ export class PracticeResultViewModel {
   }
 
   async paperTitle(result: PracticeResult): Promise<string> {
+    let historyTitle = await this.historyPaperTitle(result);
+    if (historyTitle.length > 0) return historyTitle;
+
+    let paper: PracticePaper | null = await this.repository.getPaper(result.paperId, result.paperVersion);
+    if (paper !== null && paper.title.length > 0) return paper.title;
+    return result.paperId;
+  }
+
+  private async historyPaperTitle(result: PracticeResult): Promise<string> {
     try {
       let attempts: PracticeAttemptSummary[] =
         await this.repository.listAttempts(this.familyContext.getActiveStudentId(), result.paperId);
       for (let item of attempts) {
         if (item.id === result.attemptId && item.paperTitle.length > 0) return item.paperTitle;
       }
+      return '';
     } catch {
-      // Historical summary is a convenience source for retired paper versions.
-      // If it is temporarily unavailable, fall back to the local published catalog below.
+      return '';
     }
-
-    let paper: PracticePaper | null = await this.repository.getPaper(result.paperId, result.paperVersion);
-    if (paper !== null && paper.title.length > 0) return paper.title;
-    return result.paperId;
   }
 
   repeat(attemptId: string): Promise<PracticeAttempt> {
