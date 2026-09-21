@@ -210,10 +210,12 @@ export struct HomeworkImportBatchDetailPage {
                     .fontSize(12)
                     .fontColor(AppTheme.SUBTEXT);
                 }
-                Text(this.batch()!.timeBoundaryReached === true ? '已达到目标时间边界' : '尚未达到目标时间边界')
-                  .width('100%')
-                  .fontSize(12)
-                  .fontColor(this.batch()!.timeBoundaryReached === true ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+                if (this.batch()!.timeBoundaryReached !== undefined) {
+                  Text(this.batch()!.timeBoundaryReached === true ? '已达到目标时间边界' : '尚未达到目标时间边界')
+                    .width('100%')
+                    .fontSize(12)
+                    .fontColor(this.batch()!.timeBoundaryReached === true ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+                }
                 if (this.batch()!.reconstructionWarnings !== undefined &&
                   this.batch()!.reconstructionWarnings!.length > 0) {
                   Text(`重建提示：${this.batch()!.reconstructionWarnings!.join('、')}`)
