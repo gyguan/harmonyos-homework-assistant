@@ -323,11 +323,11 @@ export struct PracticeHistoryPage {
 
       Scroll() {
         Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
-          this.FilterBar();
-
           if (!this.loading && this.errorMessage.length === 0) {
             this.StatisticsCard();
           }
+
+          this.FilterBar();
 
           if (this.errorMessage.length > 0) {
             Text(this.errorMessage)

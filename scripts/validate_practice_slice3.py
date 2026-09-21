@@ -83,7 +83,10 @@ require("'进行中'" in history_vm and "'已通过'" in history_vm and "'未通
         "Practice history must consolidate record state into in-progress/passed/not-passed/special labels")
 require("matchesTime" in history_vm and "matchesPass" in history_vm and "matchesSubject" in history_vm,
         "Practice history filtering must compose subject, time and pass predicates")
-require("item.mode !== PracticeAttemptMode.FULL" in history_vm,
+require("PracticePassPolicy.matchesAttemptPassFilter(item, pass)" in history_vm,
+        "Practice history must delegate pass filtering to the shared policy")
+require("static matchesAttemptPassFilter(item: PracticeAttemptSummary, filter: PracticePassFilter)" in pass_policy and
+        "item.mode !== PracticeAttemptMode.FULL" in pass_policy,
         "Pass filters must exclude wrong-only attempts from passed/not-passed classifications")
 require("PracticeHistoryStatistics" in history_vm and "statistics(" in history_vm,
         "Practice history ViewModel must own lightweight statistics")
@@ -98,6 +101,8 @@ require("totalElapsedSeconds / completedCount" in history_vm,
         "Practice history average elapsed time must only use completed attempts")
 require("基于当前筛选" in history and "完成次数" in history and "平均耗时" in history,
         "Practice history statistics summary must make filtered scope and metrics explicit")
+require(history.find("this.StatisticsCard();") < history.find("this.FilterBar();"),
+        "Practice history statistics must appear above the filter bar")
 require("@Prop paperId: string = '';" in history and "viewModel.list(this.paperId)" in history,
         "Practice history page must support a paper-scoped query without a second page implementation")
 require("if (!this.isPaperScoped())" in history and "showSubject: false" in history and "当前套卷" in history,

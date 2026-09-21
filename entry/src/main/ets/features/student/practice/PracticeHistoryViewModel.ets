@@ -104,9 +104,10 @@ export class PracticeHistoryViewModel {
   }
 
   recordStatusLabel(item: PracticeAttemptSummary): string {
+    if (PracticePassPolicy.matchesAttemptPassFilter(item, PracticePassFilter.PASSED)) return '已通过';
+    if (PracticePassPolicy.matchesAttemptPassFilter(item, PracticePassFilter.NOT_PASSED)) return '未通过';
     if (item.status !== PracticeAttemptStatus.SUBMITTED) return '进行中';
-    if (item.mode === PracticeAttemptMode.WRONG_ONLY) return '专项练习';
-    return PracticePassPolicy.isPassedAttempt(item) ? '已通过' : '未通过';
+    return '专项练习';
   }
 
   isPassed(item: PracticeAttemptSummary): boolean {
@@ -174,12 +175,7 @@ export class PracticeHistoryViewModel {
   }
 
   private matchesPass(item: PracticeAttemptSummary, pass: PracticePassFilter): boolean {
-    if (pass === PracticePassFilter.ALL) return true;
-    if (item.status !== PracticeAttemptStatus.SUBMITTED) return false;
-    if (item.mode !== PracticeAttemptMode.FULL) return false;
-    let passed = PracticePassPolicy.isPassedAttempt(item);
-    if (pass === PracticePassFilter.PASSED) return passed;
-    return !passed;
+    return PracticePassPolicy.matchesAttemptPassFilter(item, pass);
   }
 
   private two(value: number): string {

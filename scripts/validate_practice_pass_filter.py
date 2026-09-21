@@ -38,8 +38,13 @@ require("static readonly PASS_PERCENT: number = 60;" in policy,
 require("item.status !== PracticeAttemptStatus.SUBMITTED" in policy and
         "item.mode !== PracticeAttemptMode.FULL" in policy,
         "only submitted full-paper attempts may pass the whole paper")
-require("item.score * 100 >= item.maxScore * PracticePassPolicy.PASS_PERCENT" in policy,
+require("item.maxScore > 0 ? item.maxScore : item.questionCount" in policy and
+        "item.maxScore > 0 ? item.score : item.correctCount" in policy,
+        "practice pass policy must fall back to correctCount/questionCount for legacy summaries")
+require("numerator * 100 >= denominator * PracticePassPolicy.PASS_PERCENT" in policy,
         "practice pass policy must compare normalized score against the shared threshold")
+require("static matchesAttemptPassFilter(item: PracticeAttemptSummary, filter: PracticePassFilter)" in policy,
+        "practice pass filtering must be centralized in PracticePassPolicy")
 require("static passedPaperIds(attempts: PracticeAttemptSummary[])" in policy and
         "result.push(item.paperId)" in policy and
         "paperId === paper.id" in policy,

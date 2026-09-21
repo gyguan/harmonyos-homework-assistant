@@ -2,7 +2,8 @@ import {
   PracticeAttemptMode,
   PracticeAttemptStatus,
   PracticeAttemptSummary,
-  PracticePaper
+  PracticePaper,
+  PracticePassFilter
 } from '../model/practice/PracticeModels';
 
 export class PracticePassPolicy {
@@ -11,8 +12,19 @@ export class PracticePassPolicy {
   static isPassedAttempt(item: PracticeAttemptSummary): boolean {
     if (item.status !== PracticeAttemptStatus.SUBMITTED) return false;
     if (item.mode !== PracticeAttemptMode.FULL) return false;
-    if (item.maxScore <= 0) return false;
-    return item.score * 100 >= item.maxScore * PracticePassPolicy.PASS_PERCENT;
+    let denominator = item.maxScore > 0 ? item.maxScore : item.questionCount;
+    if (denominator <= 0) return false;
+    let numerator = item.maxScore > 0 ? item.score : item.correctCount;
+    return numerator * 100 >= denominator * PracticePassPolicy.PASS_PERCENT;
+  }
+
+  static matchesAttemptPassFilter(item: PracticeAttemptSummary, filter: PracticePassFilter): boolean {
+    if (filter === PracticePassFilter.ALL) return true;
+    if (item.status !== PracticeAttemptStatus.SUBMITTED) return false;
+    if (item.mode !== PracticeAttemptMode.FULL) return false;
+    let passed = PracticePassPolicy.isPassedAttempt(item);
+    if (filter === PracticePassFilter.PASSED) return passed;
+    return !passed;
   }
 
   static passedPaperIds(attempts: PracticeAttemptSummary[]): string[] {

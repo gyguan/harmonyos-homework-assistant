@@ -5,7 +5,8 @@ import {
   PracticeAttemptMode,
   PracticeAttemptStatus,
   PracticeAttemptSummary,
-  PracticePaper
+  PracticePaper,
+  PracticePassFilter
 } from '../../../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
@@ -45,9 +46,10 @@ export class PracticePaperDetailViewModel {
   }
 
   recordStatusLabel(item: PracticeAttemptSummary): string {
+    if (PracticePassPolicy.matchesAttemptPassFilter(item, PracticePassFilter.PASSED)) return '已通过';
+    if (PracticePassPolicy.matchesAttemptPassFilter(item, PracticePassFilter.NOT_PASSED)) return '未通过';
     if (item.status !== PracticeAttemptStatus.SUBMITTED) return '进行中';
-    if (item.mode === PracticeAttemptMode.WRONG_ONLY) return '专项练习';
-    return PracticePassPolicy.isPassedAttempt(item) ? '已通过' : '未通过';
+    return '专项练习';
   }
 
   isPassed(item: PracticeAttemptSummary): boolean {
