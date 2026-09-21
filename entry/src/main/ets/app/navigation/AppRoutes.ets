@@ -63,6 +63,11 @@ export class ParentCaptureRouteParam {
 }
 
 export class ParentSourceProfileRouteParam {
+  startCaptureAfterSave: boolean;
+
+  constructor(startCaptureAfterSave: boolean = false) {
+    this.startCaptureAfterSave = startCaptureAfterSave;
+  }
 }
 
 export class ParentCaptureSpikeRouteParam {
