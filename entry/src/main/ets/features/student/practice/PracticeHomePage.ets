@@ -267,13 +267,18 @@ export struct PracticeHomePage {
   @Builder
   private PaperList() {
     Column({ space: 10 }) {
-      Row() {
+      Row({ space: 8 }) {
         Text(`${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.semesterLabel(this.selectedSemester)} · ${this.viewModel.subjectLabel(this.selectedSubject)} · ${this.viewModel.trackFilterLabel(this.selectedTrack)} · ${this.viewModel.passFilterLabel(this.selectedPassFilter)}`)
+          .layoutWeight(1)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Blank();
         Text(this.loading ? '加载中…' : `${this.papers.length} 套`)
+          .constraintSize({ minWidth: 64 })
+          .maxLines(1)
+          .textAlign(TextAlign.End)
           .fontSize(14)
           .fontColor(AppTheme.SUBTEXT);
       }
@@ -293,9 +298,6 @@ export struct PracticeHomePage {
             .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('可以切换科目、题库类型或通过状态继续浏览；当前内容重点覆盖二年级上学期。')
-            .fontSize(14)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .padding({ top: 28, bottom: 28 })
@@ -340,11 +342,6 @@ export struct PracticeHomePage {
                 .onClick(() => this.onOpenHistory());
             }
             .width('100%');
-            Text(`默认按当前学生的${this.viewModel.semesterLabel(this.selectedSemester)}和教材同步题库筛选，也可以切换科目、题库类型与通过状态。`)
-              .width('100%')
-              .fontSize(14)
-              .lineHeight(19)
-              .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%')
           .alignItems(HorizontalAlign.Start);
@@ -353,12 +350,6 @@ export struct PracticeHomePage {
 
           this.PaperList();
 
-          Text('教材同步紧跟二年级上学期核心能力；课外拓展强调生活应用、阅读和思维训练。')
-            .width('100%')
-            .fontSize(14)
-            .lineHeight(18)
-            .fontColor(AppTheme.TERTIARY_TEXT)
-            .padding({ left: 2, right: 2, bottom: 8 });
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
