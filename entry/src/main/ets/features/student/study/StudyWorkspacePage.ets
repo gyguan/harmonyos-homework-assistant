@@ -340,7 +340,7 @@ export struct StudyWorkspacePage {
               Text('移除')
                 .width(64)
                 .height(AppTheme.MIN_TOUCH_TARGET)
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(AppTheme.DANGER)
                 .textAlign(TextAlign.Center)
                 .accessibilityRole(AccessibilityRoleType.BUTTON)
@@ -399,7 +399,7 @@ export struct StudyWorkspacePage {
         if (this.submissionMessage.length > 0) {
           Text(this.submissionMessage)
             .width('100%')
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.PRIMARY);
         }
       }
@@ -433,7 +433,7 @@ export struct StudyWorkspacePage {
       Column({ space: 0 }) {
         Row() {
           Column({ space: 3 }) {
-            Text('教材 / 页码').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+            Text('教材 / 页码').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
             Text(this.assignment()!.textbookRef.length > 0 ? this.assignment()!.textbookRef : '未设置')
               .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           }
@@ -447,7 +447,7 @@ export struct StudyWorkspacePage {
 
         Row() {
           Column({ space: 3 }) {
-            Text('老师附件').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+            Text('老师附件').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
             Text(this.assignment()!.resourceLabels.length === 0 ? '暂无附件' : `${this.assignment()!.resourceLabels.length} 项资料`)
               .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           }
@@ -545,7 +545,7 @@ export struct StudyWorkspacePage {
           if (this.actionMessage.length > 0) {
             Text(this.actionMessage)
               .width('100%')
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(AppTheme.WARNING);
           }
 
@@ -646,7 +646,7 @@ export struct StudyWorkspacePage {
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .backgroundColor(AppTheme.SURFACE)
       .fontColor(AppTheme.PRIMARY)
-      .fontSize(12)
+      .fontSize(13)
       .border({ width: 1, color: AppTheme.BORDER })
       .onClick(() => this.fillTutorPrompt(prompt));
   }
@@ -677,7 +677,7 @@ export struct StudyWorkspacePage {
 
         if (this.tutorLoading) {
           Text('同步中')
-            .fontSize(11)
+            .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
         }
       }
@@ -708,7 +708,7 @@ export struct StudyWorkspacePage {
               Text(this.tutorLoadingOlder ? '正在加载更早记录…' : '查看更早的对话')
                 .width('100%')
                 .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(AppTheme.PRIMARY)
                 .textAlign(TextAlign.Center)
                 .accessibilityRole(AccessibilityRoleType.BUTTON)
@@ -804,19 +804,19 @@ export struct StudyWorkspacePage {
           Text(this.tutorNotice)
             .width('100%')
             .padding({ top: 6, bottom: 6 })
-            .fontSize(11)
+            .fontSize(12)
             .fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
         }
 
         Column({ space: 8 }) {
           Row() {
             Text('你的问题')
-              .fontSize(12)
+              .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
             Blank();
             Text('文字提问或拍题')
-              .fontSize(11)
+              .fontSize(12)
               .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%');
@@ -946,7 +946,7 @@ export struct StudyWorkspacePage {
                   .objectFit(ImageFit.Cover);
               } else {
                 Text(`${index + 1}`)
-                  .fontSize(12)
+                  .fontSize(13)
                   .fontWeight(FontWeight.Medium)
                   .fontColor('#D8D8D8');
               }
@@ -1004,9 +1004,9 @@ export struct StudyWorkspacePage {
           });
 
         Row() {
-          Text(this.formatVoiceTime(this.voiceCurrentTimeMs)).fontSize(11).fontColor('#D8D8D8');
+          Text(this.formatVoiceTime(this.voiceCurrentTimeMs)).fontSize(12).fontColor('#D8D8D8');
           Blank();
-          Text(this.formatVoiceTime(this.voiceDurationMs)).fontSize(11).fontColor('#D8D8D8');
+          Text(this.formatVoiceTime(this.voiceDurationMs)).fontSize(12).fontColor('#D8D8D8');
         }
         .width('100%');
       }
