@@ -44,25 +44,24 @@ export class HomeworkCaptureSessionStore {
   }
 
   private recoverInterruptedSession(): boolean {
-    if (this.activeSessionId.length === 0) return false;
-    let index = this.sessionIndex(this.activeSessionId);
-    if (index < 0) {
-      this.activeSessionId = '';
-      return true;
+    let changed = false;
+    let stoppedAt = Date.now();
+    for (let session of this.sessions) {
+      if (session.status === CaptureSessionStatus.CREATED ||
+        session.status === CaptureSessionStatus.WAITING_PERMISSION ||
+        session.status === CaptureSessionStatus.CAPTURING ||
+        session.status === CaptureSessionStatus.STOPPING) {
+        session.status = CaptureSessionStatus.FAILED;
+        session.stoppedAtEpochMs = stoppedAt;
+        session.stopReason = CaptureStopReason.PROCESS_RESTARTED;
+        changed = true;
+      }
     }
-    let status = this.sessions[index].status;
-    if (status === CaptureSessionStatus.CREATED ||
-      status === CaptureSessionStatus.WAITING_PERMISSION ||
-      status === CaptureSessionStatus.CAPTURING ||
-      status === CaptureSessionStatus.STOPPING) {
-      this.sessions[index].status = CaptureSessionStatus.FAILED;
-      this.sessions[index].stoppedAtEpochMs = Date.now();
-      this.sessions[index].stopReason = CaptureStopReason.PROCESS_RESTARTED;
+    if (this.activeSessionId.length > 0) {
       this.activeSessionId = '';
-      return true;
+      changed = true;
     }
-    this.activeSessionId = '';
-    return true;
+    return changed;
   }
 
   private snapshot(): HomeworkCaptureSessionSnapshot {
