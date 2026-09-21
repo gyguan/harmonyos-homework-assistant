@@ -47,7 +47,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“早上/见面”。先判断时间和交流场景，再选择合适的英语问候语。"
+            "关键词：“早上”“见面”。先判断这是早晨问候场景，再找对应的英语问候语。"
           ],
           "tags": [
             "greetings",
@@ -105,7 +105,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“七”“数字”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“七”“数字”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "numbers",
@@ -134,7 +134,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“蓝色”“颜色”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“蓝色”“颜色”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "colours",
@@ -192,7 +192,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“How are you?”。这是在问“你好吗”，要找回应身体或心情状态的礼貌答语。"
+            "关键词：“How are you?”。这是在问“你好吗”，要找回应状态的礼貌答语。"
           ],
           "tags": [
             "greetings",
@@ -221,7 +221,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“三”“数字”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“三”“数字”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "numbers",
@@ -250,7 +250,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“黄色”“颜色”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“黄色”“颜色”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "colours",
@@ -308,7 +308,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“介绍自己/介绍别人”。先判断是在说 I 还是 This is，再看名字放在句子的什么位置。"
+            "关键词：“介绍别人”。想一想介绍一个人时常用 This is…，再检查人名放置是否正确。"
           ],
           "tags": [
             "self-introduction",
@@ -337,7 +337,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“同学”“校园人物”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“同学”“校园人物”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "school",
@@ -366,7 +366,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“同学帮你捡起铅笔，你应该…”。先弄懂中文要求，再只关注题目需要判断的英文单词或句型。"
+            "关键词：“得到帮助”“礼貌回应”。别人帮助你之后，要找表示感谢的英语表达。"
           ],
           "tags": [
             "polite language",
@@ -417,7 +417,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“爸爸”“家庭成员”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“爸爸”“家庭成员”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "family",
@@ -446,7 +446,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“妈妈”“家庭成员”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“妈妈”“家庭成员”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "family",
@@ -475,7 +475,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“哥哥/弟弟”“家庭成员”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“哥哥/弟弟”“家庭成员”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "family",
@@ -504,7 +504,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“姐姐/妹妹”“家庭成员”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“姐姐/妹妹”“家庭成员”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "family",
@@ -591,7 +591,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“家人”。先判断是谁，再对应 father、mother、brother、sister 或介绍家人的句型。"
+            "关键词：“家人”。先判断是哪位家人，再匹配对应英文称呼或介绍家人的句型。"
           ],
           "tags": [
             "family",
@@ -620,7 +620,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“He”“father”。先看句子说的是男性家庭成员，再判断哪个词承担“他”的作用。"
+            "关键词：“He”“father”。句子说的是男性家庭成员，关注表示“他”的代词。"
           ],
           "tags": [
             "family",
@@ -649,7 +649,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“她是我的姐姐/妹妹”。先判断是谁，再对应 father、mother、brother、sister 或介绍家人的句型。"
+            "关键词：“她是我的姐姐/妹妹”。先判断是哪位家人，再匹配对应英文称呼或介绍家人的句型。"
           ],
           "tags": [
             "family",
@@ -678,7 +678,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“这是我的妈妈。”。先判断是谁，再对应 father、mother、brother、sister 或介绍家人的句型。"
+            "关键词：“这是我的妈妈。”。先判断是哪位家人，再匹配对应英文称呼或介绍家人的句型。"
           ],
           "tags": [
             "family",
@@ -707,7 +707,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“下面哪个英语单词…”“外貌”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“下面哪个英语单词…”“外貌”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "appearance",
@@ -736,7 +736,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“哥哥”。先判断是谁，再对应 father、mother、brother、sister 或介绍家人的句型。"
+            "关键词：“哥哥”。先判断是哪位家人，再匹配对应英文称呼或介绍家人的句型。"
           ],
           "tags": [
             "family",
@@ -787,7 +787,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“can”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
+            "关键词：“会/能力”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
           ],
           "tags": [
             "can",
@@ -816,7 +816,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“Can …?”。这是在问“会不会做某事”，回答时要保持人物和 can 一致。"
+            "关键词：“Can …?”。这是在问“会不会做某事”，回答时人物和 can 要保持一致。"
           ],
           "tags": [
             "can",
@@ -845,7 +845,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“跑”“动作”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“跑”“动作”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "actions",
@@ -874,7 +874,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“跳”“动作”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“跳”“动作”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "actions",
@@ -903,7 +903,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“Can …?”。这是在问“会不会做某事”，回答时要保持人物和 can 一致。"
+            "关键词：“Can …?”。这是在问“会不会做某事”，回答时人物和 can 要保持一致。"
           ],
           "tags": [
             "can",
@@ -932,7 +932,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“can”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
+            "关键词：“会/能力”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
           ],
           "tags": [
             "can",
@@ -961,7 +961,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“下面哪个英语单词…”“动作”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“下面哪个英语单词…”“动作”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "actions",
@@ -990,7 +990,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“Can …?”。这是在问“会不会做某事”，回答时要保持人物和 can 一致。"
+            "关键词：“Can …?”。这是在问“会不会做某事”，回答时人物和 can 要保持一致。"
           ],
           "tags": [
             "can",
@@ -1019,7 +1019,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“can”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
+            "关键词：“会/能力”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
           ],
           "tags": [
             "can",
@@ -1048,7 +1048,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“收拾玩具”。先想清这个动作的中文意思，再找对应的 run、jump、swim、draw 等动作表达。"
+            "关键词：“收拾玩具”“动作”。先确定动作意思，再匹配 run、jump、swim、draw 等英语动作词。"
           ],
           "tags": [
             "actions",
@@ -1077,7 +1077,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“can”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
+            "关键词：“会/能力”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
           ],
           "tags": [
             "can",
@@ -1106,7 +1106,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“can”。看 can 后面跟的是动作，判断它是在表达能力还是其他信息。"
+            "关键词：“can”。看 can 后面跟的是动作，判断它在句子里表达什么能力。"
           ],
           "tags": [
             "can",
@@ -1157,7 +1157,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在桌子上”。先把中文位置关系对应到 on，再检查完整句子是否通顺。"
+            "关键词：“在桌子上”。先判断是“在……上”，再对应 on，最后检查完整句子。"
           ],
           "tags": [
             "room",
@@ -1186,7 +1186,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在盒子里”。先把中文位置关系对应到 in，再检查完整句子。"
+            "关键词：“在盒子里”。先判断是“在……里”，再对应 in，最后检查完整句子。"
           ],
           "tags": [
             "room",
@@ -1215,7 +1215,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“床”“房间物品”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“床”“房间物品”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "room",
@@ -1244,7 +1244,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“椅子”“房间物品”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“椅子”“房间物品”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "room",
@@ -1273,7 +1273,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“门”“房间物品”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“门”“房间物品”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "room",
@@ -1302,7 +1302,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“房间”“房间物品”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“房间”“房间物品”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "room",
@@ -1331,7 +1331,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在书包里”。先找 schoolbag，再看表示“在里面”的位置词。"
+            "关键词：“位置关系”。先分清“在上面、在里面、在旁边”，再对应 on、in、near。"
           ],
           "tags": [
             "positions",
@@ -1360,7 +1360,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“can”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
+            "关键词：“会/能力”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
           ],
           "tags": [
             "positions",
@@ -1418,7 +1418,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在盒子里”。先把中文位置关系对应到 in，再检查完整句子。"
+            "关键词：“在盒子里”。先判断是“在……里”，再对应 in，最后检查完整句子。"
           ],
           "tags": [
             "positions",
@@ -1527,7 +1527,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“天空”“自然事物”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“天空”“自然事物”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "nature",
@@ -1556,7 +1556,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“太阳”“自然事物”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“太阳”“自然事物”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "nature",
@@ -1585,7 +1585,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“树”“自然事物”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“树”“自然事物”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "nature",
@@ -1614,7 +1614,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“鸟”“自然事物”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“鸟”“自然事物”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "nature",
@@ -1643,7 +1643,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“公园”“地点”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“公园”“地点”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "places",
@@ -1672,7 +1672,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“学校”“地点”。先确定中文意思属于哪一类，再比较英文单词。"
+            "关键词：“学校”“地点”。先确定中文意思，再从同一类别的英文单词中匹配。"
           ],
           "tags": [
             "places",
@@ -1730,7 +1730,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“地点”。先判断这个活动发生在哪里，再匹配 park、school、library 等地点词。"
+            "关键词：“地点”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
           ],
           "tags": [
             "places",
@@ -1759,7 +1759,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“地点”。先判断这个活动发生在哪里，再匹配 park、school、library 等地点词。"
+            "关键词：“放学/离开”“告别”。这是结束见面的场景，要找表示“再见”的英语表达。"
           ],
           "tags": [
             "places",
@@ -1846,7 +1846,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“借书”。先判断这个活动发生在哪里，再匹配 park、school、library 等地点词。"
+            "关键词：“借书”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
           ],
           "tags": [
             "places",
@@ -1897,7 +1897,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“早上/见面”。先判断时间和交流场景，再选择合适的英语问候语。"
+            "关键词：“早上”“见面”。先判断这是早晨问候场景，再找对应的英语问候语。"
           ],
           "tags": [
             "review",
@@ -1926,7 +1926,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“介绍自己/介绍别人”。先判断是在说 I 还是 This is，再看名字放在句子的什么位置。"
+            "关键词：“句子是否正确”。先看主语是谁，再检查 be 动词、can、has 或位置词是否搭配自然。"
           ],
           "tags": [
             "review",
@@ -1955,7 +1955,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“妈妈”。先判断是谁，再对应 father、mother、brother、sister 或介绍家人的句型。"
+            "关键词：“妈妈”。先判断是哪位家人，再匹配对应英文称呼或介绍家人的句型。"
           ],
           "tags": [
             "review",
@@ -1984,7 +1984,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“Can …?”。这是在问“会不会做某事”，回答时要保持人物和 can 一致。"
+            "关键词：“Can …?”。这是在问“会不会做某事”，回答时人物和 can 要保持一致。"
           ],
           "tags": [
             "review",
@@ -2013,7 +2013,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在桌子上”。先把中文位置关系对应到 on，再检查完整句子是否通顺。"
+            "关键词：“在桌子上”。先判断是“在……上”，再对应 on，最后检查完整句子。"
           ],
           "tags": [
             "review",
@@ -2071,7 +2071,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“数字”。先找题目中的中文数字，再比较英文数字词。"
+            "关键词：“数字”。先找中文数字，再比较英文数字词的拼写。"
           ],
           "tags": [
             "review",
@@ -2100,7 +2100,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“图书馆”。先判断这个活动发生在哪里，再匹配 park、school、library 等地点词。"
+            "关键词：“图书馆”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
           ],
           "tags": [
             "review",
@@ -2129,7 +2129,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“家庭成员”。先判断是谁，再对应 father、mother、brother、sister 或介绍家人的句型。"
+            "关键词：“家庭成员”。先判断是哪位家人，再匹配对应英文称呼或介绍家人的句型。"
           ],
           "tags": [
             "review",
@@ -2158,7 +2158,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“动作”。先想清这个动作的中文意思，再找对应的 run、jump、swim、draw 等动作表达。"
+            "关键词：“动作”“动作”。先确定动作意思，再匹配 run、jump、swim、draw 等英语动作词。"
           ],
           "tags": [
             "review",
@@ -2216,7 +2216,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“位置关系”。先分清“在……上、在……里、在……旁边”，再对应 on、in、near。"
+            "关键词：“位置关系”。先分清“在上面、在里面、在旁边”，再对应 on、in、near。"
           ],
           "tags": [
             "review",
