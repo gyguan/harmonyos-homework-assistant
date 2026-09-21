@@ -25,6 +25,9 @@ remote = read("entry/src/main/ets/application/remote/PracticeRemoteApi.ets")
 home = read("entry/src/main/ets/features/student/practice/PracticeHomePage.ets")
 history = read("entry/src/main/ets/features/student/practice/PracticeHistoryPage.ets")
 history_vm = read("entry/src/main/ets/features/student/practice/PracticeHistoryViewModel.ets")
+detail_page = read("entry/src/main/ets/features/student/practice/PracticePaperDetailPage.ets")
+detail_vm = read("entry/src/main/ets/features/student/practice/PracticePaperDetailViewModel.ets")
+pass_policy = read("entry/src/main/ets/domain/service/PracticePassPolicy.ets")
 attempt_page = read("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
 result_page = read("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
@@ -51,8 +54,19 @@ require("DeepPageHeader" in history and "Text('‹')" not in history,
         "Practice history deep page must use the shared DeepPageHeader")
 require("selectedStatus" in history and "selectedSubject" in history,
         "Practice history must expose simple status and subject filters")
-require("耗时 " in history and "elapsedText(item.elapsedSeconds)" in history,
-        "Submitted practice history must label elapsed time explicitly")
+require("完成耗时 " in history and "elapsedText(item.elapsedSeconds)" in history,
+        "Submitted practice history must label completion elapsed time explicitly")
+require("passLabel(item)" in history and "isPassed(item)" in history,
+        "Practice history cards must expose per-attempt pass state")
+require("完成耗时 " in detail_page and "passLabel(item)" in detail_page,
+        "Paper detail recent attempts must expose pass state and completion elapsed time")
+require("PracticePassPolicy" in history_vm and "PracticePassPolicy" in detail_vm,
+        "History pass state must reuse the shared PracticePassPolicy")
+require("PASS_PERCENT: number = 60" in pass_policy and
+        "item.mode !== PracticeAttemptMode.FULL" in pass_policy,
+        "Practice history pass display must preserve the shared 60% full-paper policy")
+require("'专项练习'" in history_vm and "'专项练习'" in detail_vm,
+        "Wrong-only attempts must not be mislabeled as failed full-paper attempts")
 require("PracticeHistoryStatistics" in history_vm and "statistics(" in history_vm,
         "Practice history ViewModel must own lightweight statistics")
 require("item.status !== PracticeAttemptStatus.SUBMITTED" in history_vm,
