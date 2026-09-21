@@ -957,6 +957,298 @@
           ]
         }
       ]
+    },
+    {
+      "id": "MATH-G2-S1-EXTRA-PLANNER-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "数学思维·生活规划（一）",
+      "description": "在班级活动、整理物品和周末安排中综合使用加减乘除，训练分步理解和简单规划。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "课外拓展",
+        "生活数学",
+        "综合规划"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q01-V1",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "班级手工活动分成4组，每组准备6张彩纸，一共要准备多少张彩纸？",
+          "options": [],
+          "answerSpec": "24",
+          "explanation": "4组每组6张，4×6=24，所以需要24张。",
+          "hints": [
+            "关键词：“4组”“每组6张”“一共”。先找共有几组和每组多少，再用乘法求总数。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "32张贴纸每4张装一袋，可以装几袋？",
+          "options": [
+            {
+              "key": "A",
+              "label": "8袋"
+            },
+            {
+              "key": "B",
+              "label": "6袋"
+            },
+            {
+              "key": "C",
+              "label": "7袋"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "32里面有8个4，32÷4=8，所以可以装8袋。",
+          "hints": [
+            "关键词：“每4张一袋”“32张”。这是按每份4张去分，想一想能分成多少份。"
+          ],
+          "tags": [
+            "生活数学",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q03-V1",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "社区活动有80瓶水，上午用了25瓶，下午又用了18瓶，还剩多少瓶？",
+          "options": [],
+          "answerSpec": "37",
+          "explanation": "先算两次一共用了43瓶，再用80-43=37，所以剩37瓶。",
+          "hints": [
+            "关键词：“上午用了25”“下午又用了18”“还剩”。可以先合并用掉的数量，再从总数中减去。"
+          ],
+          "tags": [
+            "生活数学",
+            "两步计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "运动会座位摆成5排，每排7把椅子，一共摆了多少把？",
+          "options": [
+            {
+              "key": "A",
+              "label": "30把"
+            },
+            {
+              "key": "B",
+              "label": "35把"
+            },
+            {
+              "key": "C",
+              "label": "40把"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "5排每排7把，5×7=35，所以一共35把椅子。",
+          "hints": [
+            "关键词：“5排”“每排7把”。相同数量重复5次，用乘法求总数。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q05-V1",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "48本绘本平均放在6层书架上，每层放多少本？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "48÷6=8，所以平均每层放8本。",
+          "hints": [
+            "关键词：“48本”“平均放6层”“每层”。把总数平均分成6份，求每份数量。"
+          ],
+          "tags": [
+            "生活数学",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书角原有27本故事书，又补充36本，现在一共有多少本？",
+          "options": [
+            {
+              "key": "A",
+              "label": "61本"
+            },
+            {
+              "key": "B",
+              "label": "62本"
+            },
+            {
+              "key": "C",
+              "label": "63本"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "27+36=63，所以现在共有63本。",
+          "hints": [
+            "关键词：“原有27本”“又补充36本”“一共”。两个数量合起来，用加法。"
+          ],
+          "tags": [
+            "生活数学",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q07-V1",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "周末野餐准备3袋面包，每袋8个，又准备5个饭团，一共有多少份主食？",
+          "options": [],
+          "answerSpec": "29",
+          "explanation": "3×8=24，再加5得到29，所以一共有29份。",
+          "hints": [
+            "关键词：“3袋”“每袋8个”“又有5个”。先算面包总数，再把饭团数量加上。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘加"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "56支彩笔每7支放进一个收纳盒，需要几个盒子？",
+          "options": [
+            {
+              "key": "A",
+              "label": "8个"
+            },
+            {
+              "key": "B",
+              "label": "7个"
+            },
+            {
+              "key": "C",
+              "label": "9个"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "56÷7=8，所以需要8个盒子。",
+          "hints": [
+            "关键词：“56支”“每7支一个盒子”。按固定数量分组，求可以分成几组。"
+          ],
+          "tags": [
+            "生活数学",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q09-V1",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "亲子活动准备了90张号码贴，已经发出34张，还剩多少张？",
+          "options": [],
+          "answerSpec": "56",
+          "explanation": "90-34=56，所以还剩56张号码贴。",
+          "hints": [
+            "关键词：“90张”“发出34张”“还剩”。从原来的总数里减去已经发出的数量。"
+          ],
+          "tags": [
+            "生活数学",
+            "减法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "班级展示墙有6栏，每栏贴9张作品，一共贴多少张？",
+          "options": [
+            {
+              "key": "A",
+              "label": "45张"
+            },
+            {
+              "key": "B",
+              "label": "54张"
+            },
+            {
+              "key": "C",
+              "label": "63张"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "6×9=54，所以一共贴54张作品。",
+          "hints": [
+            "关键词：“6栏”“每栏9张”。每栏数量相同，用乘法求总数。"
+          ],
+          "tags": [
+            "生活数学",
+            "乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q11-V1",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "45支铅笔平均放进5个笔筒，每个笔筒放多少支？",
+          "options": [],
+          "answerSpec": "9",
+          "explanation": "45÷5=9，所以每个笔筒放9支。",
+          "hints": [
+            "关键词：“45支”“平均5个笔筒”。把总数平均分成5份，求每份多少。"
+          ],
+          "tags": [
+            "生活数学",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-EXTRA-PLANNER-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书义卖上午卖出38本，下午卖出24本，两段时间一共卖出多少本？",
+          "options": [
+            {
+              "key": "A",
+              "label": "60本"
+            },
+            {
+              "key": "B",
+              "label": "61本"
+            },
+            {
+              "key": "C",
+              "label": "62本"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "38+24=62，所以一共卖出62本。",
+          "hints": [
+            "关键词：“上午38本”“下午24本”“一共”。把两个时段的数量合起来。"
+          ],
+          "tags": [
+            "生活数学",
+            "加法"
+          ]
+        }
+      ]
     }
   ]
 }
