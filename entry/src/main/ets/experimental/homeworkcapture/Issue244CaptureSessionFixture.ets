@@ -126,6 +126,10 @@ export class Issue244CaptureSessionFixture {
         passed: passed
       };
     } finally {
+      let active = HomeworkCaptureSessionService.instance.getActiveSession();
+      if (active !== null && active.sourceProfileId === 'issue244-fixture') {
+        await HomeworkCaptureSessionService.instance.cancel();
+      }
       HomeworkCaptureSessionService.instance.configure(
         new NativeHomeworkCaptureRuntime(), new CoreVisionHomeworkCaptureFrameRecognizer());
     }
