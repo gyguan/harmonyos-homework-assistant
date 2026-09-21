@@ -64,7 +64,8 @@ export class HomeworkCaptureWorkflowService {
       session: session,
       profile: profile,
       detectedGroupTitle: result.groupTitle,
-      groupValidationStatus: this.validateGroupTitle(profile.groupTitle, result.groupTitle),
+      groupValidationStatus: this.validationForReconstruction(
+        profile.groupTitle, result.groupTitle, result.warnings),
       timeBoundaryReached: result.timeBoundaryReached,
       earliestDetectedTime: result.earliestDetectedTime
     };
@@ -112,7 +113,8 @@ export class HomeworkCaptureWorkflowService {
         understandingSucceeded: false
       };
     }
-    let validation = this.validateGroupTitle(profile.groupTitle, reconstruction.groupTitle);
+    let validation = this.validationForReconstruction(
+      profile.groupTitle, reconstruction.groupTitle, reconstruction.warnings);
 
     this.writeProfileAudit(
       session.importBatchId,
@@ -122,6 +124,7 @@ export class HomeworkCaptureWorkflowService {
       allowUnrecognized && validation === SourceGroupValidationStatus.UNRECOGNIZED);
 
     if (validation === SourceGroupValidationStatus.MISMATCH ||
+      validation === SourceGroupValidationStatus.CONFLICT ||
       (validation === SourceGroupValidationStatus.UNRECOGNIZED && !allowUnrecognized)) {
       return {
         session: session,
@@ -223,6 +226,14 @@ export class HomeworkCaptureWorkflowService {
     let date = new Date(anchorEpochMs);
     date.setHours(0, 0, 0, 0);
     return date.getTime() + minuteOfDay * 60 * 1000;
+  }
+
+  validationForReconstruction(expected: string, detected: string,
+    warnings: string[]): SourceGroupValidationStatus {
+    if (warnings.indexOf('GROUP_TITLE_CONFLICT') >= 0) {
+      return SourceGroupValidationStatus.CONFLICT;
+    }
+    return this.validateGroupTitle(expected, detected);
   }
 
   validateGroupTitle(expected: string, detected: string): SourceGroupValidationStatus {
