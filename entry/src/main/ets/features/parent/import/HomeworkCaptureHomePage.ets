@@ -49,21 +49,11 @@ export struct HomeworkCaptureHomePage {
   @Builder
   private SourceCard() {
     Column({ space: 10 }) {
-      Row() {
-        Text('当前来源')
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Blank();
-        Text(this.hasSourceProfile() ? '编辑' : '去配置')
-          .fontSize(13)
-          .fontColor(AppTheme.PRIMARY);
-      }
-      .width('100%')
-      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(this.hasSourceProfile() ? '编辑班级采集设置' : '配置班级采集设置')
-      .onClick(() => this.onOpenSourceProfile(false));
+      Text('当前来源')
+        .width('100%')
+        .fontSize(16)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
 
       if (this.hasSourceProfile()) {
         this.SourceRow('班级', this.viewModel.profileName());

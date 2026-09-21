@@ -38,6 +38,10 @@ for text in [
 
 require(page.count("Button(") == 1,
         "capture home must keep exactly one primary Button")
+require("'编辑' : '去配置'" not in page and "编辑班级采集设置" not in page,
+        "source card must be display-only; configuration belongs to the lower secondary action")
+require(page.count("this.onOpenSourceProfile(false)") == 1,
+        "capture home must keep only one explicit settings entry")
 require("Text('从老师群聊中抓取今日作业')" not in page,
         "capture home must not duplicate usage guidance in a top explanation card")
 require("if (this.hasSourceProfile())" in page and "尚未配置来源" in page,
