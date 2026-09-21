@@ -74,9 +74,23 @@ class FixtureCaptureRuntime implements HomeworkCaptureRuntime {
 class FixtureCaptureRecognizer implements HomeworkCaptureFrameRecognizer {
   async recognize(frame: CaptureFrame): Promise<CaptureFrameRecognition> {
     if (frame.sequence === 1) {
-      return { text: '17:31 王老师 今晚语文作业：第8课生字写两遍', lineCount: 2 };
+      return {
+        text: '17:31 王老师 今晚语文作业：第8课生字写两遍',
+        lineCount: 1,
+        lines: [{
+          value: '17:31 王老师 今晚语文作业：第8课生字写两遍',
+          left: 80, top: 180, right: 620, bottom: 220
+        }]
+      };
     }
-    return { text: '17:32 王老师 补充：朗读第8课三遍', lineCount: 2 };
+    return {
+      text: '17:32 王老师 补充：朗读第8课三遍',
+      lineCount: 1,
+      lines: [{
+        value: '17:32 王老师 补充：朗读第8课三遍',
+        left: 80, top: 360, right: 620, bottom: 400
+      }]
+    };
   }
 
   async release(): Promise<void> {}
