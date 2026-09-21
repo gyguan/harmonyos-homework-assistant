@@ -22,7 +22,7 @@ export class AppTheme {
   static readonly DISABLED: string = '#7D818A';
 
   static readonly PAGE_PADDING: number = 20;
-  static readonly PAGE_PADDING_WIDE: number = 28;
+  static readonly PAGE_PADDING_WIDE: number = 32;
   static readonly SECTION_GAP: number = 20;
   static readonly ITEM_GAP: number = 12;
   static readonly CARD_PADDING: number = 18;
@@ -31,29 +31,29 @@ export class AppTheme {
   static readonly CHIP_RADIUS: number = 12;
 
   static readonly HOME_READABLE_MAX_WIDTH: number = 760;
-  static readonly HOME_PAD_CONTENT_MAX_WIDTH: number = 1180;
+  static readonly HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
   static readonly HOME_PAD_PRIMARY_ACTION_MAX_WIDTH: number = 320;
   static readonly ASSIGNMENT_LIST_READABLE_MAX_WIDTH: number = 760;
-  static readonly ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH: number = 720;
-  static readonly ASSIGNMENT_MASTER_DETAIL_MAX_WIDTH: number = 1180;
-  static readonly STUDY_READABLE_MAX_WIDTH: number = 820;
-  static readonly STUDY_SPLIT_MAX_WIDTH: number = 1220;
+  static readonly ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH: number = 1040;
+  static readonly ASSIGNMENT_MASTER_DETAIL_MAX_WIDTH: number = 1360;
+  static readonly STUDY_READABLE_MAX_WIDTH: number = 1040;
+  static readonly STUDY_SPLIT_MAX_WIDTH: number = 1400;
   static readonly FILTER_DIALOG_MAX_WIDTH: number = 640;
   static readonly STUDY_TITLE_SIZE: number = 26;
-  static readonly PARENT_HOME_READABLE_MAX_WIDTH: number = 820;
-  static readonly PARENT_HOME_PAD_CONTENT_MAX_WIDTH: number = 1180;
-  static readonly PARENT_PROGRESS_READABLE_MAX_WIDTH: number = 800;
-  static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1220;
-  static readonly PARENT_REVIEW_READABLE_MAX_WIDTH: number = 760;
-  static readonly IMPORT_READABLE_MAX_WIDTH: number = 820;
-  static readonly IMPORT_SPLIT_MAX_WIDTH: number = 1180;
-  static readonly CONFIRMATION_READABLE_MAX_WIDTH: number = 920;
-  static readonly PROFILE_READABLE_MAX_WIDTH: number = 680;
-  static readonly PRACTICE_READABLE_MAX_WIDTH: number = 820;
-  static readonly PRACTICE_ATTEMPT_READABLE_MAX_WIDTH: number = 960;
+  static readonly PARENT_HOME_READABLE_MAX_WIDTH: number = 1040;
+  static readonly PARENT_HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
+  static readonly PARENT_PROGRESS_READABLE_MAX_WIDTH: number = 1040;
+  static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1400;
+  static readonly PARENT_REVIEW_READABLE_MAX_WIDTH: number = 1040;
+  static readonly IMPORT_READABLE_MAX_WIDTH: number = 1080;
+  static readonly IMPORT_SPLIT_MAX_WIDTH: number = 1280;
+  static readonly CONFIRMATION_READABLE_MAX_WIDTH: number = 1080;
+  static readonly PROFILE_READABLE_MAX_WIDTH: number = 900;
+  static readonly PRACTICE_READABLE_MAX_WIDTH: number = 1120;
+  static readonly PRACTICE_ATTEMPT_READABLE_MAX_WIDTH: number = 1120;
   static readonly PRACTICE_ATTEMPT_SCALE_REFERENCE_WIDTH: number = 640;
-  static readonly PRACTICE_ATTEMPT_MAX_SCALE: number = 1.2;
-  static readonly SETTINGS_READABLE_MAX_WIDTH: number = 760;
+  static readonly PRACTICE_ATTEMPT_MAX_SCALE: number = 1.35;
+  static readonly SETTINGS_READABLE_MAX_WIDTH: number = 1000;
 
   static readonly DEEP_PAGE_TOP_PADDING: number = 8;
   static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
@@ -65,14 +65,14 @@ export class AppTheme {
   static readonly DEEP_PAGE_CONTENT_GAP: number = 12;
 
   static readonly HOME_PRIMARY_MIN_WIDTH: number = 520;
-  static readonly HOME_SECONDARY_MIN_WIDTH: number = 300;
-  static readonly SPLIT_PRIMARY_MIN_WIDTH: number = 360;
+  static readonly HOME_SECONDARY_MIN_WIDTH: number = 320;
+  static readonly SPLIT_PRIMARY_MIN_WIDTH: number = 400;
   static readonly SPLIT_SECONDARY_MIN_WIDTH: number = 420;
-  static readonly STUDY_PRIMARY_MIN_WIDTH: number = 480;
-  static readonly STUDY_TUTOR_MIN_WIDTH: number = 340;
+  static readonly STUDY_PRIMARY_MIN_WIDTH: number = 520;
+  static readonly STUDY_TUTOR_MIN_WIDTH: number = 360;
   static readonly PARENT_HOME_PRIMARY_MIN_WIDTH: number = 500;
-  static readonly PARENT_HOME_SECONDARY_MIN_WIDTH: number = 320;
-  static readonly PARENT_PROGRESS_LIST_MIN_WIDTH: number = 360;
+  static readonly PARENT_HOME_SECONDARY_MIN_WIDTH: number = 340;
+  static readonly PARENT_PROGRESS_LIST_MIN_WIDTH: number = 400;
   static readonly PARENT_REVIEW_MIN_WIDTH: number = 440;
   static readonly IMPORT_SOURCE_MIN_WIDTH: number = 400;
   static readonly IMPORT_CANDIDATE_MIN_WIDTH: number = 420;
@@ -85,6 +85,14 @@ export class AppTheme {
   static readonly PHONE_CARD_RADIUS: number = 16;
   static readonly PHONE_PAGE_TITLE_SIZE: number = 23;
   static readonly PHONE_SECTION_TITLE_SIZE: number = 17;
+
+  // PAD-only visual scale. Use these from wide compositions instead of enlarging phone defaults.
+  static readonly PAD_PAGE_TITLE_SIZE: number = 28;
+  static readonly PAD_SECTION_TITLE_SIZE: number = 20;
+  static readonly PAD_CARD_TITLE_SIZE: number = 18;
+  static readonly PAD_BODY_SIZE: number = 16;
+  static readonly PAD_META_SIZE: number = 13;
+  static readonly PAD_MIN_TOUCH_TARGET: number = 48;
 
   static readonly PAGE_TITLE_SIZE: number = 26;
   static readonly SECTION_TITLE_SIZE: number = 20;
