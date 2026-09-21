@@ -48,7 +48,7 @@ for status in [
 
 for field in [
     "startedAtEpochMs", "stoppedAtEpochMs", "status", "frameCount",
-    "acceptedFrameCount", "sourceProfileId", "stopReason", "importBatchId",
+    "acceptedFrameCount", "ocrFailureCount", "sourceProfileId", "stopReason", "importBatchId",
     "lastFrameSequence", "runtimeErrorCode", "runtimeTimestamp"
 ]:
     require(field in models, f"CaptureSession field missing: {field}")
@@ -82,6 +82,10 @@ require(service.index("session.status = CaptureSessionStatus.CAPTURING") >
         "CAPTURING must only be entered after a real frame exists")
 require("START_REJECTED" in service and "CaptureSessionStatus.CANCELLED" in service,
         "rejected start/permission path must return to recoverable terminal state")
+require("FIRST_FRAME_TIMEOUT_MS" in service and "FIRST_FRAME_TIMEOUT" in models,
+        "capture waiting for authorization/first frame must have an explicit timeout")
+require("session.ocrFailureCount++" in service,
+        "single-frame OCR failures must be observable without aborting the session")
 require("SYSTEM_STOPPED" in models and "finishRuntimeEnded" in service,
         "system-driven capture stop must converge to a terminal session")
 require("!stats.isCapturing" in service,
