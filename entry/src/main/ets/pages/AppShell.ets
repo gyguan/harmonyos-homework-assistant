@@ -257,15 +257,15 @@ export struct AppShell {
       AppRoute.PARENT_CAPTURE, new ParentCaptureRouteParam());
   }
 
-  private openParentSourceProfile(): void {
+  private openParentSourceProfile(startCaptureAfterSave: boolean = false): void {
     this.navPathStack.pushPathByName(
-      AppRoute.PARENT_SOURCE_PROFILE, new ParentSourceProfileRouteParam());
+      AppRoute.PARENT_SOURCE_PROFILE, new ParentSourceProfileRouteParam(startCaptureAfterSave));
   }
 
-  private finishSourceProfileAndCapture(): void {
+  private finishSourceProfile(startCaptureAfterSave: boolean): void {
     if (this.navPathStack.size() > 0) this.navPathStack.pop();
     this.notifyUiChanged();
-    this.openParentCapture();
+    if (startCaptureAfterSave) this.openParentCapture();
   }
 
   private openParentCaptureSpike(): void {
@@ -404,7 +404,8 @@ export struct AppShell {
           onOpenConfirmation: () => this.openParentImportConfirmation(),
           onOpenInbox: () => this.openParentImportInbox(),
           onOpenCapture: () => this.openParentCapture(),
-          onOpenSourceProfile: () => this.openParentSourceProfile(),
+          onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
+            this.openParentSourceProfile(startCaptureAfterSave),
           onOpenCaptureSpike: () => this.openParentCaptureSpike(),
           onStoreChanged: () => this.notifyUiChanged()
         });
@@ -436,7 +437,8 @@ export struct AppShell {
           onBack: () => this.navPathStack.pop(),
           onOpenInbox: () => this.openParentImportInbox(),
           onOpenConfirmation: () => this.openParentImportConfirmation(),
-          onOpenSourceProfile: () => this.openParentSourceProfile()
+          onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
+            this.openParentSourceProfile(startCaptureAfterSave)
         });
       }
       .hideTitleBar(true)
@@ -445,7 +447,8 @@ export struct AppShell {
       NavDestination() {
         HomeworkSourceProfilePage({
           onBack: () => this.navPathStack.pop(),
-          onSavedAndCapture: () => this.finishSourceProfileAndCapture()
+          onSavedAndCapture: () => this.finishSourceProfile(
+            (param as ParentSourceProfileRouteParam).startCaptureAfterSave)
         });
       }
       .hideTitleBar(true)
