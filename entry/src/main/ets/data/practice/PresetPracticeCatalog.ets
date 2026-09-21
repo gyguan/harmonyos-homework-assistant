@@ -49,6 +49,22 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'CHINESE-G2-S1-SYNC-POETRY-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上语文古诗画面与词句（一)',
+      description: '结合二上常见古诗名句理解景物、动作和简单含义，训练从关键词想象诗句画面。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['教材同步', '古诗', '词句理解'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'CHINESE-G2-S1-SYNC-READING-LIFE-001',
       version: 3,
       grade: PracticeGrade.G2,
@@ -113,6 +129,38 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'CHINESE-G2-S1-SYNC-SEQUENCE-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上语文顺序表达与写话（一)',
+      description: '练习按时间和事情发展顺序组织句子，学会把日常小事说清楚、写完整。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['教材同步', '写话', '顺序表达'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'CHINESE-G2-S1-SYNC-WORDING-002',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上语文词语搭配与句式（二)',
+      description: '通过校园、家庭和自然情境练习词语搭配、把字句、被字句和完整表达。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['教材同步', '词语搭配', '句式'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'CHINESE-G2-S1-SYNC-WORDS-001',
       version: 3,
       grade: PracticeGrade.G2,
@@ -125,6 +173,22 @@ export class PresetPracticeCatalog {
       questionCount: 12,
       estimatedMinutes: 20,
       tags: ['教材同步', '字词', '积累'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'CHINESE-G2-S1-EXTRA-CITY-OBSERVE-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '城市观察阅读（一)',
+      description: '阅读地铁、社区、公园和街道中的原创小短文，训练观察细节、信息提取和简单推断。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['课外拓展', '城市观察', '阅读'],
       sourceType: PracticeSourceType.PRESET,
       status: PracticePaperStatus.PUBLISHED
     });
@@ -193,6 +257,22 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'CHINESE-G2-S1-EXTRA-STORY-002',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '故事人物与因果（二)',
+      description: '用四个原创微故事训练人物动机、事情因果、细节提取和道理理解。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['课外拓展', '故事', '因果推理'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'MATH-G2-S1-SYNC-ADD-SUB-001',
       version: 3,
       grade: PracticeGrade.G2,
@@ -257,6 +337,38 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'MATH-G2-S1-SYNC-MIXED-CALC-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上数学连加连减与加减混合（一）',
+      description: '在比赛得分、人数变化和物品整理等情境中练习100以内连加、连减和加减混合。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['教材同步', '加与减', '两步计算'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'MATH-G2-S1-SYNC-MULTIPLY-69-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上数学6～9的乘法口诀（一）',
+      description: '用贴画、座位、运动和整理物品等情境巩固6～9的乘法口诀及简单应用。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['教材同步', '6-9乘法口诀', '生活应用'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'MATH-G2-S1-SYNC-MULTIPLY-FACTS-001',
       version: 3,
       grade: PracticeGrade.G2,
@@ -305,6 +417,38 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'MATH-G2-S1-SYNC-TIMES-DIV-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上数学倍数关系与除法应用（一）',
+      description: '用动物数量、文具分组和生活场景理解“几倍”关系，并用除法解决每份与份数问题。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['教材同步', '倍数关系', '除法应用'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'MATH-G2-S1-EXTRA-BODY-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '数学好玩·身体里的数学秘密（一）',
+      description: '用步长、手掌宽度和身高估测等儿童可操作场景练习厘米、米、估算与简单乘除。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['课外拓展', '数学好玩', '测量'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'MATH-G2-S1-EXTRA-LIFE-001',
       version: 3,
       grade: PracticeGrade.G2,
@@ -333,6 +477,22 @@ export class PresetPracticeCatalog {
       questionCount: 12,
       estimatedMinutes: 18,
       tags: ['课外拓展', '逻辑', '图形'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'MATH-G2-S1-EXTRA-MARKET-002',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '生活数学·班级旧物市场（一）',
+      description: '围绕班级旧物市场的定价、付款、找零和数量统计，综合练习购物与100以内加减。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['课外拓展', '旧物市场', '购物'],
       sourceType: PracticeSourceType.PRESET,
       status: PracticePaperStatus.PUBLISHED
     });
@@ -433,6 +593,22 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'ENGLISH-G2-S1-SYNC-NATURE-STREET-002',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上英语天空、森林与街道（二）',
+      description: '整合In the sky、In the forest和In the street场景，强化自然词汇、动物、交通与安全表达。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 16,
+      tags: ['教材同步', 'nature', 'street'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'ENGLISH-G2-S1-SYNC-PLACES-NATURE-001',
       version: 4,
       grade: PracticeGrade.G2,
@@ -445,6 +621,22 @@ export class PresetPracticeCatalog {
       questionCount: 12,
       estimatedMinutes: 16,
       tags: ['教材同步', 'places', 'nature'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'ENGLISH-G2-S1-SYNC-PLAYGROUND-002',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上英语操场与动作（二）',
+      description: '围绕操场活动、动作词和Can you...?句型进行二次强化，全部使用儿童熟悉的校园情境。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 16,
+      tags: ['教材同步', 'playground', 'actions'],
       sourceType: PracticeSourceType.PRESET,
       status: PracticePaperStatus.PUBLISHED
     });
@@ -481,6 +673,22 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'ENGLISH-G2-S1-SYNC-ROOM-DINNER-002',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上英语房间与晚餐（二）',
+      description: '把In my room与Dinner is ready场景结合起来，强化位置表达、房间物品、食物与餐桌礼貌用语。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 16,
+      tags: ['教材同步', 'room', 'dinner'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'ENGLISH-G2-S1-EXTRA-DIALOGUE-001',
       version: 1,
       grade: PracticeGrade.G2,
@@ -505,6 +713,22 @@ export class PresetPracticeCatalog {
       track: PracticeTrack.EXTRACURRICULAR,
       title: '英语拓展·迷你阅读（一）',
       description: '三篇2～4句原创超短文，训练二年级学生从英语短文中找直接信息。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 16,
+      tags: ['课外拓展', 'mini reading', '阅读'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'ENGLISH-G2-S1-EXTRA-MINI-READING-002',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '英语拓展·迷你阅读（二）',
+      description: '用四段超短原创英语材料配中文问题，训练低年级从熟悉词句中提取人物、地点、颜色和动作。',
       difficulty: PracticeDifficulty.L2,
       questionCount: 12,
       estimatedMinutes: 16,
@@ -541,6 +765,22 @@ export class PresetPracticeCatalog {
       questionCount: 12,
       estimatedMinutes: 16,
       tags: ['课外拓展', 'Shenzhen life', 'daily English'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'ENGLISH-G2-S1-EXTRA-TASK-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '英语拓展·校园任务挑战（一）',
+      description: '把问候、找物品、课堂指令、能力表达和礼貌用语组合成可完成的小任务，强化英语理解与实际回应。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 16,
+      tags: ['课外拓展', 'task English', 'school'],
       sourceType: PracticeSourceType.PRESET,
       status: PracticePaperStatus.PUBLISHED
     });
