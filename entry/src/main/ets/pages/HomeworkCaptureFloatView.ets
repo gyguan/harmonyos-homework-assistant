@@ -70,12 +70,15 @@ struct HomeworkCaptureFloatView {
     if (active !== null) {
       let result = await HomeworkCaptureWorkflowService.instance.finishByUser();
       if (result !== null && result.batchId.length > 0) {
-        this.statusText = result.activated ? '已整理完成' :
-          (result.needsGroupConfirmation ? '需要确认群名' : '采集已完成');
-        this.detailText = result.activated ?
-          `已整理 ${result.candidateCount} 项，请返回小伴确认发布` :
-          (result.needsGroupConfirmation ? '群名未可靠识别，请返回小伴确认后继续' :
-            '结果已保留，请返回小伴查看');
+        this.statusText = !result.reconstructionSucceeded ? '采集已完成，整理待处理' :
+          (result.activated ? '已整理完成' :
+            (result.needsGroupConfirmation ? '需要确认群名' : '采集已完成'));
+        this.detailText = !result.reconstructionSucceeded ?
+          '原始屏幕证据已保留，请返回小伴查看' :
+          (result.activated ?
+            `已整理 ${result.candidateCount} 项，请返回小伴确认发布` :
+            (result.needsGroupConfirmation ? '群名未可靠识别，请返回小伴确认后继续' :
+              '结果已保留，请返回小伴查看'));
       } else {
         this.statusText = '采集已停止';
         this.detailText = '没有生成导入批次，可以返回小伴重新开始';
