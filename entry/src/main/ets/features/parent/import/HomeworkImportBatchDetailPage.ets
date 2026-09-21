@@ -54,6 +54,15 @@ export struct HomeworkImportBatchDetailPage {
     return '已接收';
   }
 
+  private manualReview(): void {
+    if (!this.viewModel.activateForManualReview(this.batchId)) {
+      this.message = '这个批次当前无法进入人工确认';
+      return;
+    }
+    this.message = '';
+    this.onOpenConfirmation();
+  }
+
   private continueConfirmation(): void {
     if (!this.viewModel.activate(this.batchId)) {
       this.message = '这个批次当前无法继续确认';
@@ -312,6 +321,18 @@ export struct HomeworkImportBatchDetailPage {
                 .padding(10)
                 .backgroundColor(AppTheme.SURFACE_SUBTLE)
                 .borderRadius(10);
+            }
+
+            if (this.batch()!.status === ImportBatchStatus.RECEIVED &&
+              this.batch()!.pendingReviewMessageIds !== undefined &&
+              this.batch()!.pendingReviewMessageIds!.length > 0) {
+              Button('人工确认未识别消息', { type: ButtonType.Normal })
+                .width('100%')
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.PRIMARY)
+                .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => this.manualReview());
             }
 
             if (this.batch()!.status === ImportBatchStatus.READY) {
