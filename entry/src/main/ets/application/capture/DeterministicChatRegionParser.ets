@@ -187,7 +187,7 @@ export class DeterministicChatRegionParser {
     let hour = Number(match[2]);
     let minute = Number(match[3]);
     return {
-      text: `${hour < 10 ? '0' : ''}${hour}:${minute < 10 ? '0' : ''}${minute}`,
+      text: `${match[1] === undefined ? '' : '昨天 '}${hour < 10 ? '0' : ''}${hour}:${minute < 10 ? '0' : ''}${minute}`,
       minuteOfDay: hour * 60 + minute,
       dayOffset: match[1] === undefined ? 0 : -1
     };
