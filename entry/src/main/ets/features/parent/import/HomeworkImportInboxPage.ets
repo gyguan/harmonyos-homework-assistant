@@ -300,33 +300,38 @@ export struct HomeworkImportInboxPage {
   }
 
   build() {
-    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
-      DeepPageHeader({
-        title: '作业收件箱',
-        backAccessibilityText: '返回上一页',
-        onBack: () => this.onBack()
-      });
+    Column() {
+      Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+        DeepPageHeader({
+          title: '作业收件箱',
+          backAccessibilityText: '返回上一页',
+          onBack: () => this.onBack()
+        });
 
-      Scroll() {
-        Column() {
-          this.InboxContent();
+        Scroll() {
+          Column() {
+            this.InboxContent();
+          }
+          .width('100%')
+          .padding({ top: 4, bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
-        .padding({ top: 4, bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
+        .layoutWeight(1)
+        .align(Alignment.TopStart)
+        .scrollBar(BarState.Off);
       }
       .width('100%')
-      .layoutWeight(1)
-      .align(Alignment.TopStart)
-      .scrollBar(BarState.Off);
+      .height('100%')
+      .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+      .padding({
+        left: AppTheme.PAGE_PADDING,
+        right: AppTheme.PAGE_PADDING,
+        top: AppTheme.DEEP_PAGE_TOP_PADDING
+      });
     }
     .width('100%')
     .height('100%')
-    .padding({
-      left: AppTheme.PAGE_PADDING,
-      right: AppTheme.PAGE_PADDING,
-      top: AppTheme.DEEP_PAGE_TOP_PADDING
-    })
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }
