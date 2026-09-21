@@ -310,6 +310,7 @@ export class HomeworkCaptureSessionService {
         sourceEvidence: {
           sourceType: HomeworkImportSourceType.SCREEN_CAPTURE,
           sourceMessageIds: [messageId],
+          sourceFrameEvidenceIds: [item.id],
           rawText: item.text,
           imageRef: '',
           capturedAtEpochMs: item.capturedAtEpochMs
