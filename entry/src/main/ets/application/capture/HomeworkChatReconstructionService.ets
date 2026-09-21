@@ -71,7 +71,7 @@ export class HomeworkChatReconstructionService {
       captureSessionId: batch.captureSessionId,
       reconstructed: true,
       groupTitle: result.groupTitle,
-      timeBoundaryReached: result.timeBoundaryReached,
+      timeBoundaryReached: targetStartMinuteOfDay >= 0 ? result.timeBoundaryReached : undefined,
       earliestDetectedTime: result.earliestDetectedTime,
       reconstructionWarnings: result.warnings.slice(),
       createdAtEpochMs: batch.createdAtEpochMs,
