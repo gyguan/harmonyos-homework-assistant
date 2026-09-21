@@ -428,7 +428,7 @@ export struct ParentDashboardPage {
       Row() {
         Text('今日完成').fontSize(13).fontColor(AppTheme.SUBTEXT);
         Blank();
-        Text(`${this.viewModel.summary().completed} / ${this.viewModel.summary().total}`)
+        Text(`${this.todayCompletedCount()} / ${this.todayAssignments().length}`)
           .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
       }
       .width('100%');
