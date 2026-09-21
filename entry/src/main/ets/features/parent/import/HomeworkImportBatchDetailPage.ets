@@ -224,12 +224,20 @@ export struct HomeworkImportBatchDetailPage {
                 if (this.batch()!.groupValidationStatus !== undefined) {
                   Text(this.batch()!.groupValidationStatus === 'MATCHED' ? '群名校验：匹配' :
                     (this.batch()!.groupValidationStatus === 'MISMATCH' ? '群名校验：不匹配' :
-                      (this.batch()!.groupConfirmedByUser === true ? '群名校验：未识别，家长已确认继续' :
-                        '群名校验：未识别')))
+                      (this.batch()!.groupValidationStatus === 'CONFLICT' ? '群名校验：检测到多个微信群，已阻断自动整理' :
+                        (this.batch()!.groupConfirmedByUser === true ? '群名校验：未识别，家长已确认继续' :
+                          '群名校验：未识别'))))
                     .width('100%')
                     .fontSize(12)
                     .fontColor(this.batch()!.groupValidationStatus === 'MATCHED' ? AppTheme.SUCCESS :
-                      (this.batch()!.groupValidationStatus === 'MISMATCH' ? AppTheme.DANGER : AppTheme.WARNING));
+                      ((this.batch()!.groupValidationStatus === 'MISMATCH' ||
+                        this.batch()!.groupValidationStatus === 'CONFLICT') ? AppTheme.DANGER : AppTheme.WARNING));
+                }
+                if (this.batch()!.pipelineStage !== undefined) {
+                  Text(`处理阶段：${this.batch()!.pipelineStage}`)
+                    .width('100%')
+                    .fontSize(10)
+                    .fontColor(AppTheme.TERTIARY_TEXT);
                 }
               }
               .width('100%')
