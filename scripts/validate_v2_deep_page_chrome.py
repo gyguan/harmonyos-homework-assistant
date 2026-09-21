@@ -23,6 +23,7 @@ header = read("entry/src/main/ets/components/navigation/DeepPageHeader.ets")
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 parent_import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+practice_attempt = read("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
 spec = read("docs/product/v2-deep-page-chrome-standard.md")
 agents = read("AGENTS.md")
 
@@ -52,6 +53,7 @@ for path, text in [
     ("StudentAssignmentDetailPage.ets", detail),
     ("StudyWorkspacePage.ets", study),
     ("HomeworkImportRoutePage.ets", parent_import_route),
+    ("PracticeAttemptPage.ets", practice_attempt),
 ]:
     require("DeepPageHeader" in text, f"migrated deep page must reuse DeepPageHeader: {path}")
     require("AppTheme.DEEP_PAGE_TOP_PADDING" in text,
