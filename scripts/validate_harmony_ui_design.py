@@ -178,7 +178,7 @@ require("SegmentedSelectionButton" in student_assignments and "FilterSummaryEntr
 for expression in [
     "selected: !this.calendarMode",
     "selected: this.calendarMode",
-    "active: !this.isSelectedDayToday()",
+    "active: !this.allDates && !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in student_assignments,
@@ -186,6 +186,7 @@ for expression in [
 
 filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 for state_expr, label in [
+    ("this.allDates === allDates ? AppTheme.PRIMARY_SOFT", "assignment date mode"),
     ("DatePicker({", "assignment date"),
     ("this.subjectCode === value ? AppTheme.PRIMARY_SOFT", "assignment subject"),
 ]:
