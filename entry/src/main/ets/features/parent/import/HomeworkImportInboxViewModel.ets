@@ -28,6 +28,10 @@ export class HomeworkImportInboxViewModel {
     return HomeworkImportInboxService.instance.activateBatch(batchId);
   }
 
+  activateForManualReview(batchId: string): boolean {
+    return HomeworkImportInboxService.instance.activateBatchForManualReview(batchId);
+  }
+
   abandon(batchId: string): boolean {
     return HomeworkImportInboxService.instance.abandonBatch(batchId);
   }
