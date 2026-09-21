@@ -53,7 +53,9 @@ export class HomeworkChatReconstructionService {
           candidateCount: 0
         };
         HomeworkImportInboxService.instance.importBatch(
-          failed, HomeworkImportInboxService.instance.getMessages(batchId), []);
+          failed,
+          HomeworkImportInboxService.instance.getMessages(batchId),
+          HomeworkImportInboxService.instance.getCandidates(batchId));
       }
       return null;
     }
@@ -67,6 +69,9 @@ export class HomeworkChatReconstructionService {
     let batch = HomeworkImportInboxService.instance.getBatch(batchId);
     if (batch === null || batch.captureSessionId !== sessionId) {
       throw new Error('采集会话与导入批次不匹配');
+    }
+    if (batch.reconstructed === true) {
+      return this.storedResult(batch);
     }
 
     let options: ChatReconstructionOptions = {
@@ -107,5 +112,21 @@ export class HomeworkChatReconstructionService {
     };
     HomeworkImportInboxService.instance.importBatch(updated, result.messages, []);
     return result;
+  }
+
+  private storedResult(batch: ImportBatch): ChatReconstructionResult {
+    let earliestMinute = -1;
+    if (batch.earliestDetectedTime !== undefined) {
+      let match = batch.earliestDetectedTime.match(/^(?:昨天\s*)?(\d{2}):(\d{2})$/);
+      if (match !== null) earliestMinute = Number(match[1]) * 60 + Number(match[2]);
+    }
+    return {
+      groupTitle: batch.groupTitle === undefined ? '' : batch.groupTitle,
+      messages: HomeworkImportInboxService.instance.getMessages(batch.id),
+      timeBoundaryReached: batch.timeBoundaryReached === true,
+      earliestDetectedMinuteOfDay: earliestMinute,
+      earliestDetectedTime: batch.earliestDetectedTime === undefined ? '' : batch.earliestDetectedTime,
+      warnings: batch.reconstructionWarnings === undefined ? [] : batch.reconstructionWarnings.slice()
+    };
   }
 }
