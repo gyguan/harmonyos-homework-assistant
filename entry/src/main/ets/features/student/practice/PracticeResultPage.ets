@@ -74,7 +74,7 @@ export struct PracticeResultPage {
   private Metric(value: string, label: string) {
     Column({ space: 4 }) {
       Text(value).fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text(label).fontSize(11).fontColor(AppTheme.SUBTEXT);
+      Text(label).fontSize(12).fontColor(AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
     .height(72)
@@ -109,7 +109,7 @@ export struct PracticeResultPage {
             Column({ space: 6 }) {
               if (this.result.mode === PracticeAttemptMode.WRONG_ONLY) {
                 Text('错题专项')
-                  .fontSize(12)
+                  .fontSize(13)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.PRIMARY)
                   .padding({ left: 9, right: 9, top: 4, bottom: 4 })
@@ -125,7 +125,7 @@ export struct PracticeResultPage {
                 .fontColor(AppTheme.SUBTEXT);
               if (this.result.noteCount > 0) {
                 Text(`本次记录 ${this.result.noteCount} 条笔记`)
-                  .fontSize(12)
+                  .fontSize(13)
                   .fontColor(AppTheme.TERTIARY_TEXT);
               }
             }
@@ -156,7 +156,7 @@ export struct PracticeResultPage {
                       .fontColor(AppTheme.TEXT);
                     Blank();
                     Text(item.correct ? '正确' : '需订正')
-                      .fontSize(12)
+                      .fontSize(13)
                       .fontWeight(FontWeight.Medium)
                       .fontColor(item.correct ? AppTheme.SUCCESS : AppTheme.DANGER);
                   }
@@ -168,29 +168,29 @@ export struct PracticeResultPage {
                     .fontColor(AppTheme.TEXT);
                   Text(`我的答案：${item.answerValue.length > 0 ? item.answerValue : '未作答'}`)
                     .width('100%')
-                    .fontSize(12)
+                    .fontSize(13)
                     .fontColor(AppTheme.SUBTEXT);
                   if (!item.correct) {
                     Text(`正确答案：${item.correctAnswer}`)
                       .width('100%')
-                      .fontSize(12)
+                      .fontSize(13)
                       .fontColor(AppTheme.SUCCESS);
                   }
                   Text(item.explanation)
                     .width('100%')
-                    .fontSize(12)
+                    .fontSize(13)
                     .lineHeight(18)
                     .fontColor(AppTheme.TERTIARY_TEXT);
                   if (item.noteContent.length > 0) {
                     Column({ space: 4 }) {
                       Text('我的笔记')
                         .width('100%')
-                        .fontSize(11)
+                        .fontSize(12)
                         .fontWeight(FontWeight.Medium)
                         .fontColor(AppTheme.SUBTEXT);
                       Text(item.noteContent)
                         .width('100%')
-                        .fontSize(12)
+                        .fontSize(13)
                         .lineHeight(18)
                         .fontColor(AppTheme.TEXT);
                     }
