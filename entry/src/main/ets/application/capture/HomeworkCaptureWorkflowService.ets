@@ -233,7 +233,16 @@ export class HomeworkCaptureWorkflowService {
   }
 
   private normalizeTitle(value: string): string {
-    return value.trim().replace(/\s+/g, '').toLowerCase();
+    let normalized = value.trim()
+      .replace(/\s+/g, '')
+      .replace(/（/g, '(')
+      .replace(/）/g, ')')
+      .toLowerCase();
+    let memberCount = normalized.match(/\(\d{1,4}\)$/);
+    if (memberCount !== null) {
+      normalized = normalized.substring(0, normalized.length - memberCount[0].length);
+    }
+    return normalized;
   }
 
   private requireActiveProfile(studentId: string): HomeworkSourceProfile {
