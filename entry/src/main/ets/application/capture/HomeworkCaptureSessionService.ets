@@ -183,7 +183,7 @@ export class HomeworkCaptureSessionService {
       // Runtime may already be stopped by the system; release remains best-effort.
     }
     let batchId = this.ensureImportBatch(session);
-    HomeworkChatReconstructionService.instance.reconstructCaptureSession(session.id, batchId);
+    HomeworkChatReconstructionService.instance.tryReconstructCaptureSession(session.id, batchId);
     runtime.clearLatestFrame();
 
     session.importBatchId = batchId;
@@ -229,7 +229,7 @@ export class HomeworkCaptureSessionService {
     await this.sampleLatestFrame();
     session = this.store.getSession(session.id) as CaptureSession;
     let batchId = this.ensureImportBatch(session);
-    HomeworkChatReconstructionService.instance.reconstructCaptureSession(session.id, batchId);
+    HomeworkChatReconstructionService.instance.tryReconstructCaptureSession(session.id, batchId);
     runtime.clearLatestFrame();
 
     session.importBatchId = batchId;
