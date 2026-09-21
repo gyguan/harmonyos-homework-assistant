@@ -195,7 +195,7 @@ export struct HomeworkCapturePage {
   }
 
   private async cancelCapture(): Promise<void> {
-    let cancelled = HomeworkCaptureSessionService.instance.cancel();
+    let cancelled = await HomeworkCaptureSessionService.instance.cancel();
     if (cancelled !== null) this.currentSessionId = cancelled.id;
     this.revision++;
     await this.stopFloatView();
