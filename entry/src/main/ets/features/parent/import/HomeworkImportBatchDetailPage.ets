@@ -116,8 +116,9 @@ export struct HomeworkImportBatchDetailPage {
     }
     .width('100%')
     .padding(12)
-    .backgroundColor(AppTheme.SURFACE_SUBTLE)
-    .borderRadius(10);
+    .backgroundColor(AppTheme.SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
   }
 
   @Builder
@@ -152,16 +153,18 @@ export struct HomeworkImportBatchDetailPage {
     .width('100%')
     .padding(12)
     .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(10);
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
   }
 
   build() {
-    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+    Column() {
+      Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       DeepPageHeader({
         title: '导入批次详情',
         subtitle: this.batch() === null ? '批次不存在' :
           `${this.statusLabel(this.batch()!.status)} · ${this.batch()!.messageCount} 条消息 · ${this.batch()!.candidateCount} 项作业`,
-        backAccessibilityText: '返回作业智能收件箱',
+        backAccessibilityText: '返回作业收件箱',
         onBack: () => this.onBack()
       });
 
@@ -174,7 +177,8 @@ export struct HomeworkImportBatchDetailPage {
               .fontColor(AppTheme.SUBTEXT)
               .padding(18)
               .backgroundColor(AppTheme.SURFACE)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
+              .border({ width: 1, color: AppTheme.BORDER })
+              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
           } else {
             Column({ space: 8 }) {
               Text('来源')
@@ -197,7 +201,8 @@ export struct HomeworkImportBatchDetailPage {
             .width('100%')
             .padding(14)
             .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
+            .border({ width: 1, color: AppTheme.BORDER })
+            .borderRadius(AppTheme.PHONE_CARD_RADIUS);
 
             if (this.batch()!.sourceProfileId.length > 0) {
               Column({ space: 6 }) {
@@ -243,7 +248,8 @@ export struct HomeworkImportBatchDetailPage {
               .width('100%')
               .padding(14)
               .backgroundColor(AppTheme.SURFACE)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
+              .border({ width: 1, color: AppTheme.BORDER })
+              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
             }
 
             if (this.batch()!.reconstructed === true) {
@@ -284,7 +290,8 @@ export struct HomeworkImportBatchDetailPage {
               .width('100%')
               .padding(14)
               .backgroundColor(AppTheme.PRIMARY_FAINT)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
+              .border({ width: 1, color: AppTheme.BORDER })
+              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
             }
 
             if (this.batch()!.understood !== undefined) {
@@ -332,7 +339,8 @@ export struct HomeworkImportBatchDetailPage {
               .width('100%')
               .padding(14)
               .backgroundColor(AppTheme.PRIMARY_FAINT)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
+              .border({ width: 1, color: AppTheme.BORDER })
+              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
             }
 
             Column({ space: 8 }) {
@@ -367,7 +375,7 @@ export struct HomeworkImportBatchDetailPage {
                 .fontColor(AppTheme.SUBTEXT)
                 .padding(10)
                 .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                .borderRadius(10);
+                .borderRadius(AppTheme.CONTROL_RADIUS);
             }
 
             if (this.batch()!.status === ImportBatchStatus.RECEIVED &&
@@ -431,7 +439,6 @@ export struct HomeworkImportBatchDetailPage {
           }
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
         .padding({ top: 4, bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
       }
       .width('100%')
@@ -441,11 +448,16 @@ export struct HomeworkImportBatchDetailPage {
     }
     .width('100%')
     .height('100%')
+    .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
     .padding({
       left: AppTheme.PAGE_PADDING,
       right: AppTheme.PAGE_PADDING,
       top: AppTheme.DEEP_PAGE_TOP_PADDING
-    })
+    });
+    }
+    .width('100%')
+    .height('100%')
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }

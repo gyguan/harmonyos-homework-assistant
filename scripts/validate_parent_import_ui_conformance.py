@@ -65,6 +65,18 @@ require("AppTheme.IMPORT_READABLE_MAX_WIDTH" in inbox and
         "AppTheme.PHONE_CARD_RADIUS" in inbox and "AppTheme.BORDER" in inbox,
         "Import Inbox cards must stay aligned with current Phone/Pad visual tokens")
 
+require(inbox.count(".alignItems(HorizontalAlign.Center)") >= 1 and
+        ".constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })" in inbox,
+        "Import Inbox page shell must center the readable column on wide layouts")
+require(batch.count(".alignItems(HorizontalAlign.Center)") >= 1 and
+        ".constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })" in batch,
+        "Import batch detail page shell must center the readable column on wide layouts")
+require("backAccessibilityText: '返回作业收件箱'" in batch,
+        "Import batch detail return semantics must match the current inbox title")
+require(batch.count("AppTheme.PHONE_CARD_RADIUS") >= 4 and
+        batch.count(".border({ width: 1, color: AppTheme.BORDER })") >= 4,
+        "Import batch detail cards must reuse current parent card radius and border tokens")
+
 # Formal capture UI is a business surface; engineering counters stay in the diagnostic page.
 for engineering_copy in ["视频回调", "OCR失败", "最近序号"]:
     require(engineering_copy not in capture,
