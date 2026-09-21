@@ -217,9 +217,6 @@ export struct HomeworkImportPage {
               .fontSize(14)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            Text('继续编辑后可直接发布')
-              .fontSize(12)
-              .fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start);
