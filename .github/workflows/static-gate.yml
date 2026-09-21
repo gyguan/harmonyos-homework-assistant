@@ -192,6 +192,9 @@ jobs:
       - name: Validate Practice content catalog
         run: python scripts/validate_practice_content.py
 
+      - name: Validate Practice pass filter
+        run: python scripts/validate_practice_pass_filter.py
+
       - name: Validate parent Tutor settings
         run: python scripts/validate_parent_tutor_settings.py
 
