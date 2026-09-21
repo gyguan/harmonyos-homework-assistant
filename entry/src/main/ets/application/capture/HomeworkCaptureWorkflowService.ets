@@ -3,10 +3,7 @@ import { HomeworkCaptureSessionService } from './HomeworkCaptureSessionService';
 import { HomeworkSourceProfileService } from './HomeworkSourceProfileService';
 import { DeterministicChatReconstructor } from './DeterministicChatReconstructor';
 import { HomeworkImportInboxService } from '../import/HomeworkImportInboxService';
-import {
-  HomeworkUnderstandingActivationResult,
-  HomeworkUnderstandingService
-} from '../understanding/HomeworkUnderstandingService';
+import { HomeworkUnderstandingService } from '../understanding/HomeworkUnderstandingService';
 import { CaptureSession } from '../../domain/model/CaptureModels';
 import {
   HomeworkSourceProfile,
@@ -35,6 +32,7 @@ export interface HomeworkCaptureWorkflowResult {
   activated: boolean;
   needsGroupConfirmation: boolean;
   reconstructionSucceeded: boolean;
+  understandingSucceeded: boolean;
 }
 
 export class HomeworkCaptureWorkflowService {
@@ -110,7 +108,8 @@ export class HomeworkCaptureWorkflowService {
         pendingReviewCount: 0,
         activated: false,
         needsGroupConfirmation: false,
-        reconstructionSucceeded: false
+        reconstructionSucceeded: false,
+        understandingSucceeded: false
       };
     }
     let validation = this.validateGroupTitle(profile.groupTitle, reconstruction.groupTitle);
@@ -135,15 +134,33 @@ export class HomeworkCaptureWorkflowService {
         pendingReviewCount: 0,
         activated: false,
         needsGroupConfirmation: validation === SourceGroupValidationStatus.UNRECOGNIZED,
-        reconstructionSucceeded: true
+        reconstructionSucceeded: true,
+        understandingSucceeded: false
       };
     }
 
-    let activation: HomeworkUnderstandingActivationResult =
-      HomeworkUnderstandingService.instance.understandAndActivate(
-        session.importBatchId,
-        this.profiles.understandingConfig(profile),
-        this.profileStartEpoch(session.startedAtEpochMs, profile.defaultStartMinuteOfDay));
+    let understanding = HomeworkUnderstandingService.instance.tryUnderstandBatch(
+      session.importBatchId,
+      this.profiles.understandingConfig(profile),
+      this.profileStartEpoch(session.startedAtEpochMs, profile.defaultStartMinuteOfDay));
+    if (understanding === null) {
+      return {
+        session: session,
+        batchId: session.importBatchId,
+        detectedGroupTitle: reconstruction.groupTitle,
+        groupValidationStatus: validation,
+        timeBoundaryReached: reconstruction.timeBoundaryReached,
+        earliestDetectedTime: reconstruction.earliestDetectedTime,
+        candidateCount: 0,
+        pendingReviewCount: 0,
+        activated: false,
+        needsGroupConfirmation: false,
+        reconstructionSucceeded: true,
+        understandingSucceeded: false
+      };
+    }
+    let activated = understanding.candidates.length > 0 &&
+      this.inbox.activateBatch(session.importBatchId);
 
     return {
       session: session,
@@ -152,11 +169,12 @@ export class HomeworkCaptureWorkflowService {
       groupValidationStatus: validation,
       timeBoundaryReached: reconstruction.timeBoundaryReached,
       earliestDetectedTime: reconstruction.earliestDetectedTime,
-      candidateCount: activation.result.candidates.length,
-      pendingReviewCount: activation.result.pendingReviewMessageIds.length,
-      activated: activation.activated,
+      candidateCount: understanding.candidates.length,
+      pendingReviewCount: understanding.pendingReviewMessageIds.length,
+      activated: activated,
       needsGroupConfirmation: false,
-      reconstructionSucceeded: true
+      reconstructionSucceeded: true,
+      understandingSucceeded: true
     };
   }
 
