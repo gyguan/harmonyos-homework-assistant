@@ -46,8 +46,8 @@ export class PracticeHistoryViewModel {
     this.familyContext = familyContext;
   }
 
-  list(): Promise<PracticeAttemptSummary[]> {
-    return this.repository.listAttempts(this.familyContext.getActiveStudentId(), '');
+  list(paperId: string = ''): Promise<PracticeAttemptSummary[]> {
+    return this.repository.listAttempts(this.familyContext.getActiveStudentId(), paperId);
   }
 
   filter(

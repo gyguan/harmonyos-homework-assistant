@@ -14,6 +14,7 @@ import {
 
 @Component
 export struct PracticeHistoryPage {
+  @Prop paperId: string = '';
   @State private allAttempts: PracticeAttemptSummary[] = [];
   @State private attempts: PracticeAttemptSummary[] = [];
   @State private statistics: PracticeHistoryStatistics = new PracticeHistoryStatistics();
@@ -34,7 +35,7 @@ export struct PracticeHistoryPage {
     this.loading = true;
     this.errorMessage = '';
     try {
-      this.allAttempts = await this.viewModel.list();
+      this.allAttempts = await this.viewModel.list(this.paperId);
       this.refreshPresentation();
     } catch {
       this.allAttempts = [];
@@ -49,6 +50,10 @@ export struct PracticeHistoryPage {
   private refreshPresentation(): void {
     this.attempts = this.viewModel.filter(this.allAttempts, this.selectedStatus, this.selectedSubject);
     this.statistics = this.viewModel.statistics(this.allAttempts, this.selectedSubject);
+  }
+
+  private isPaperScoped(): boolean {
+    return this.paperId.length > 0;
   }
 
   private selectStatus(status: PracticeHistoryStatusFilter): void {
@@ -109,18 +114,20 @@ export struct PracticeHistoryPage {
       .width('100%')
       .alignItems(VerticalAlign.Center);
 
-      Row({ space: 6 }) {
-        Text('科目')
-          .width(34)
-          .fontSize(12)
-          .fontColor(AppTheme.SUBTEXT);
-        this.SubjectOption(PracticeHistorySubjectFilter.ALL);
-        this.SubjectOption(PracticeHistorySubjectFilter.CHINESE);
-        this.SubjectOption(PracticeHistorySubjectFilter.MATH);
-        this.SubjectOption(PracticeHistorySubjectFilter.ENGLISH);
+      if (!this.isPaperScoped()) {
+        Row({ space: 6 }) {
+          Text('科目')
+            .width(34)
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+          this.SubjectOption(PracticeHistorySubjectFilter.ALL);
+          this.SubjectOption(PracticeHistorySubjectFilter.CHINESE);
+          this.SubjectOption(PracticeHistorySubjectFilter.MATH);
+          this.SubjectOption(PracticeHistorySubjectFilter.ENGLISH);
+        }
+        .width('100%')
+        .alignItems(VerticalAlign.Center);
       }
-      .width('100%')
-      .alignItems(VerticalAlign.Center);
     }
     .width('100%')
     .padding(10)
@@ -251,6 +258,7 @@ export struct PracticeHistoryPage {
       Column() {
         DeepPageHeader({
           title: '练习记录',
+          subtitle: this.isPaperScoped() ? '当前套卷' : '',
           backAccessibilityText: '返回练习',
           onBack: () => this.onBack()
         });
@@ -297,11 +305,11 @@ export struct PracticeHistoryPage {
               .textAlign(TextAlign.Center);
           } else if (this.allAttempts.length === 0) {
             Column({ space: 7 }) {
-              Text('还没有练习记录')
+              Text(this.isPaperScoped() ? '这套卷还没有练习记录' : '还没有练习记录')
                 .fontSize(16)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
-              Text('完成第一套练习后，每一次结果都会保留在这里。')
+              Text(this.isPaperScoped() ? '完成这套练习后，每一次结果都会保留在这里。' : '完成第一套练习后，每一次结果都会保留在这里。')
                 .fontSize(12)
                 .fontColor(AppTheme.SUBTEXT);
             }

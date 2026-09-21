@@ -20,6 +20,11 @@ export class AssignmentRouteParam {
 }
 
 export class PracticeHistoryRouteParam {
+  paperId: string;
+
+  constructor(paperId: string = '') {
+    this.paperId = paperId;
+  }
 }
 
 export class PracticePaperRouteParam {
