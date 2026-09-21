@@ -18,9 +18,11 @@ export struct ParentProgressPage {
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
 
+  @State private allDates: boolean = false;
   @State private selectedDayEpochMs: number = Date.now();
   @State private subjectCode: string = 'ALL';
   @State private statusFilter: AssignmentMetricKey = AssignmentMetricKey.ALL;
+  @State private draftAllDates: boolean = false;
   @State private draftSelectedDayEpochMs: number = Date.now();
   @State private draftSubjectCode: string = 'ALL';
   @State private visibleAssignments: Assignment[] = [];
@@ -40,10 +42,11 @@ export struct ParentProgressPage {
 
   private filterDialogController: CustomDialogController = new CustomDialogController({
     builder: AssignmentFilterDialog({
+      allDates: $draftAllDates,
       selectedDayEpochMs: $draftSelectedDayEpochMs,
       subjectCode: $draftSubjectCode,
-      onQuery: (selectedDayEpochMs: number, subjectCode: string) => {
-        void this.applyFilters(selectedDayEpochMs, subjectCode);
+      onQuery: (allDates: boolean, selectedDayEpochMs: number, subjectCode: string) => {
+        void this.applyFilters(allDates, selectedDayEpochMs, subjectCode);
       }
     }),
     autoCancel: true,
@@ -78,6 +81,11 @@ export struct ParentProgressPage {
   private rebuildView(): void {
     let currentRevision = this.revision + this.refreshRevision;
     if (currentRevision < 0) return;
+    if (this.allDates) {
+      this.applyItems(this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses()));
+      return;
+    }
     this.applyItems(this.viewModel.assignmentsOnDay(
       this.subjectCode, this.selectedDayEpochMs, this.statuses()));
   }
@@ -93,6 +101,10 @@ export struct ParentProgressPage {
   private currentVisibleAssignments(): Assignment[] {
     let currentRevision = this.revision + this.refreshRevision;
     if (this.snapshotRevision === currentRevision) return this.visibleAssignments;
+    if (this.allDates) {
+      return this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses());
+    }
     return this.viewModel.assignmentsOnDay(
       this.subjectCode, this.selectedDayEpochMs, this.statuses());
   }
@@ -243,15 +255,18 @@ export struct ParentProgressPage {
 
   private openFilterDialog(): void {
     if (this.querying) return;
+    this.draftAllDates = this.allDates;
     this.draftSelectedDayEpochMs = this.selectedDayEpochMs;
     this.draftSubjectCode = this.subjectCode;
     this.filterDialogController.open();
   }
 
-  private async applyFilters(selectedDayEpochMs: number, subjectCode: string): Promise<void> {
+  private async applyFilters(allDates: boolean, selectedDayEpochMs: number, subjectCode: string): Promise<void> {
     if (this.querying) return;
+    this.draftAllDates = allDates;
     this.draftSelectedDayEpochMs = selectedDayEpochMs;
     this.draftSubjectCode = subjectCode;
+    this.allDates = allDates;
     this.selectedDayEpochMs = selectedDayEpochMs;
     this.subjectCode = subjectCode;
     if (this.bulkMode) this.selectedDeleteIds = [];
@@ -263,8 +278,11 @@ export struct ParentProgressPage {
     if (this.querying) return;
     this.querying = true;
     try {
-      let items = await this.viewModel.queryOnDay(
-        this.subjectCode, this.selectedDayEpochMs, this.statuses());
+      let items = this.allDates ?
+        await this.viewModel.query(
+          AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses()) :
+        await this.viewModel.queryOnDay(
+          this.subjectCode, this.selectedDayEpochMs, this.statuses());
       this.applyItems(items);
     } finally {
       this.querying = false;
@@ -329,10 +347,11 @@ export struct ParentProgressPage {
   }
 
   private hasActiveFilters(): boolean {
-    return !this.isSelectedDayToday() || this.subjectCode !== 'ALL';
+    return (!this.allDates && !this.isSelectedDayToday()) || this.subjectCode !== 'ALL';
   }
 
   private dateLabel(): string {
+    if (this.allDates) return '全部日期';
     let value = new Date(this.selectedDayEpochMs);
     let month = value.getMonth() + 1;
     let day = value.getDate();
@@ -361,7 +380,7 @@ export struct ParentProgressPage {
     Row() {
       FilterSummaryEntry({
         label: '日期', value: this.dateLabel(),
-        active: !this.isSelectedDayToday(),
+        active: !this.allDates && !this.isSelectedDayToday(),
         onOpen: () => this.openFilterDialog()
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
