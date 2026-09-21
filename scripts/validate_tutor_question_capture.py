@@ -58,9 +58,10 @@ for suggestion in ["怎么开始？", "检查思路", "提示下一步"]:
     require(suggestion in study, f"Tutor empty state missing quick prompt: {suggestion}")
 require("CenteredTextBadge" in study and "badgeText: '伴'" in study,
         "Tutor assistant messages must keep a visible assistant identity")
-require("Text('你的问题')" in study and "文字提问或拍题" in study and
+require("Text('你的问题')" in study and "TutorQuestionCapturePanel" in study and
+        "Button(this.tutorSending ? '发送中…' : '发送'" in study and
         "backgroundColor(AppTheme.SURFACE_SUBTLE)" in study,
-        "Tutor composer must group text, camera and send actions into one input surface")
+        "Tutor composer must group text, camera and send actions into one input surface without redundant helper copy")
 require("请确认或补充后再发送" in study,
         "captured question must require student review before sending instead of auto-submit")
 require("TutorRemoteApi.instance.ask(this.assignmentId, text)" in study,
