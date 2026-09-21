@@ -1157,7 +1157,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在桌子上”。先判断是“在……上”，再对应 on，最后检查完整句子。"
+            "关键词：“书”“桌子上”。先分清中文位置关系是“在上面”，再从位置词中选择对应表达。"
           ],
           "tags": [
             "room",
@@ -1186,7 +1186,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在盒子里”。先判断是“在……里”，再对应 in，最后检查完整句子。"
+            "关键词：“球”“盒子里”。先分清中文位置关系是“在里面”，再从位置词中选择对应表达。"
           ],
           "tags": [
             "room",
@@ -1418,7 +1418,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在盒子里”。先判断是“在……里”，再对应 in，最后检查完整句子。"
+            "关键词：“鞋子”“盒子里面”。先判断是“在里面”的位置关系，再比较英语位置词。"
           ],
           "tags": [
             "positions",
@@ -1447,7 +1447,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“房间”。先确定题目说的是哪件房间物品，再匹配 bed、chair、door、room 等词。"
+            "关键词：“房间物品”“可以坐”。先想一想房间里哪类家具是用来坐的，再匹配英文单词。"
           ],
           "tags": [
             "room",
@@ -1476,7 +1476,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“房间”。先确定题目说的是哪件房间物品，再匹配 bed、chair、door、room 等词。"
+            "关键词：“房间物品”“可以睡觉”。先想一想房间里哪类家具是用来睡觉的，再匹配英文单词。"
           ],
           "tags": [
             "room",
@@ -1701,7 +1701,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“自然事物”。先确定题目说的是哪种自然事物，再匹配 sky、sun、tree、bird 等词。"
+            "关键词：“bird”“fly”“在哪里”。根据鸟飞行的场景，判断空格需要填哪一类自然地点词。"
           ],
           "tags": [
             "nature",
@@ -1730,7 +1730,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“地点”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
+            "关键词：“read books”“在哪里”。先想读书通常发生在哪类公共场所，再匹配英文地点词。"
           ],
           "tags": [
             "places",
@@ -1817,7 +1817,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“公园”。先确定题目说的是哪种自然事物，再匹配 sky、sun、tree、bird 等词。"
+            "关键词：“公园”“最可能看到”。先想公园里常见的自然事物，再与英文选项对应。"
           ],
           "tags": [
             "nature",
@@ -1846,7 +1846,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“借书”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
+            "关键词：“借书”“地方”。先想借书通常去什么场所，再匹配英文地点词。"
           ],
           "tags": [
             "places",
@@ -2013,7 +2013,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“在桌子上”。先判断是“在……上”，再对应 on，最后检查完整句子。"
+            "关键词：“书”“桌子上”。先判断“在……上”的位置关系，再比较英语位置词。"
           ],
           "tags": [
             "review",
@@ -2100,7 +2100,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“图书馆”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
+            "关键词：“图书馆”“地点词”。先确定题目要找的是一个地点名称，再比较三个英文单词。"
           ],
           "tags": [
             "review",
@@ -2158,7 +2158,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "关键词：“动作”“动作”。先确定动作意思，再匹配 run、jump、swim、draw 等英语动作词。"
+            "关键词：“表示动作”。逐个想一想这些英文词是在表示“做什么”，还是人物、颜色或物品。"
           ],
           "tags": [
             "review",
