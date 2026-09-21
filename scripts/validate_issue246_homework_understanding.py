@@ -126,6 +126,8 @@ require("understandingWarnings" in inbox_service and "classificationSummary" in 
         "Inbox service must preserve understanding metadata")
 require("understood: batch.understood" in reconstruction,
         "reconstruction retry must preserve understanding metadata")
+require(reconstruction.count("understandingVersion: batch.understandingVersion") >= 2,
+        "reconstruction success/failure must both preserve understanding version")
 
 case_ids = re.findall(r"id: 'C\d{2}[^']*'", fixture)
 require(len(case_ids) >= 20, f"expected at least 20 fixed fixtures, found {len(case_ids)}")
