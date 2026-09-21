@@ -91,6 +91,7 @@ export class HomeworkImportInboxStore {
       groupValidationStatus: source.groupValidationStatus,
       groupConfirmedByUser: source.groupConfirmedByUser,
       captureSessionId: source.captureSessionId,
+      pipelineStage: source.pipelineStage,
       reconstructed: source.reconstructed,
       groupTitle: source.groupTitle,
       timeBoundaryReached: source.timeBoundaryReached,
