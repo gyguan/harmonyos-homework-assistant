@@ -2594,6 +2594,1116 @@
           ]
         }
       ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语操场与动作（二）",
+      "description": "围绕操场活动、动作词和Can you...?句型进行二次强化，全部使用儿童熟悉的校园情境。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "playground",
+        "actions"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "操场上你看到同学在跑步，“跑”对应哪个英语单词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "sit"
+            },
+            {
+              "key": "C",
+              "label": "read"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“run”表示跑步，适合操场活动情境。",
+          "hints": [
+            "关键词：“跑步”“动作词”。先确定中文动作，再从三个英语动作中匹配。"
+          ],
+          "tags": [
+            "playground",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "老师问“Can you jump?”，你会跳，应该怎么回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "No, I can’t."
+            },
+            {
+              "key": "B",
+              "label": "Yes, I can."
+            },
+            {
+              "key": "C",
+              "label": "It is blue."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "对能力提问作肯定回答可以说“Yes, I can.”。",
+          "hints": [
+            "关键词：“Can you jump?”“会跳”。这是询问能力，要选择肯定回答。"
+          ],
+          "tags": [
+            "can",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“滑滑梯”最接近下面哪个活动词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "read a book"
+            },
+            {
+              "key": "B",
+              "label": "eat dinner"
+            },
+            {
+              "key": "C",
+              "label": "play on the slide"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“play on the slide”表示玩滑梯，符合操场活动。",
+          "hints": [
+            "关键词：“滑滑梯”“操场活动”。比较三个短语，找和游乐设施有关的一个。"
+          ],
+          "tags": [
+            "playground",
+            "activities"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "你想邀请朋友一起跑步，可以说哪一句？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Let’s run."
+            },
+            {
+              "key": "B",
+              "label": "This is my mum."
+            },
+            {
+              "key": "C",
+              "label": "Good night."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“Let’s run.”表示“我们一起跑吧”，适合邀请同伴活动。",
+          "hints": [
+            "关键词：“邀请朋友”“一起跑步”。找表示共同做动作的句型。"
+          ],
+          "tags": [
+            "playground",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "朋友问“Can you skip?”，你不会跳绳，应该怎么回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Yes, I am."
+            },
+            {
+              "key": "B",
+              "label": "No, I can’t."
+            },
+            {
+              "key": "C",
+              "label": "It is green."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "不会做某动作时，可以用“No, I can’t.”回答。",
+          "hints": [
+            "关键词：“Can you skip?”“不会”。这是能力否定回答。"
+          ],
+          "tags": [
+            "can",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "操场上有一个“球”，对应哪个英语单词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "desk"
+            },
+            {
+              "key": "B",
+              "label": "door"
+            },
+            {
+              "key": "C",
+              "label": "ball"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“ball”表示球，是操场常见物品。",
+          "hints": [
+            "关键词：“球”“操场物品”。从教室物品和运动物品中找对应词。"
+          ],
+          "tags": [
+            "playground",
+            "objects"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“walk”表示什么动作？",
+          "options": [
+            {
+              "key": "A",
+              "label": "走路"
+            },
+            {
+              "key": "B",
+              "label": "唱歌"
+            },
+            {
+              "key": "C",
+              "label": "画画"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“walk”表示走路。",
+          "hints": [
+            "关键词：“walk”“动作”。回忆这个英语动作词在校园里通常表示什么。"
+          ],
+          "tags": [
+            "actions",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "老师说“Please line up.”，同学们应该做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "坐到桌下"
+            },
+            {
+              "key": "B",
+              "label": "排好队"
+            },
+            {
+              "key": "C",
+              "label": "马上睡觉"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“line up”表示排队。",
+          "hints": [
+            "关键词：“line up”“老师指令”。根据课堂和操场常见指令判断动作。"
+          ],
+          "tags": [
+            "playground",
+            "instructions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“I can run and jump.”这句话在说什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "我有一盒彩笔"
+            },
+            {
+              "key": "B",
+              "label": "我喜欢蓝色"
+            },
+            {
+              "key": "C",
+              "label": "我会跑也会跳"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“can”表示会做某事，run和jump分别是跑和跳。",
+          "hints": [
+            "关键词：“can”“run and jump”。先找表示能力的词，再理解两个动作。"
+          ],
+          "tags": [
+            "can",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "你想问朋友会不会踢球，哪一句最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Can you play ball?"
+            },
+            {
+              "key": "B",
+              "label": "What colour is it?"
+            },
+            {
+              "key": "C",
+              "label": "Who is she?"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "询问对方会不会做某项活动，可以用“Can you...?”。",
+          "hints": [
+            "关键词：“会不会”“踢球”。找询问能力的句型。"
+          ],
+          "tags": [
+            "can",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "“Don’t run in the classroom.”是在提醒什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "在教室里唱歌"
+            },
+            {
+              "key": "B",
+              "label": "不要在教室里跑"
+            },
+            {
+              "key": "C",
+              "label": "请把书打开"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "句子中的“Don’t run”表示不要跑。",
+          "hints": [
+            "关键词：“Don’t run”“classroom”。抓住否定指令和地点。"
+          ],
+          "tags": [
+            "instructions",
+            "safety"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-PLAYGROUND-002-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "运动后你想说“我累了”，哪一句英语更合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "I am a desk."
+            },
+            {
+              "key": "B",
+              "label": "I am seven."
+            },
+            {
+              "key": "C",
+              "label": "I am tired."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“I am tired.”表示“我累了”。",
+          "hints": [
+            "关键词：“运动后”“累了”。找描述自己状态的英语句子。"
+          ],
+          "tags": [
+            "playground",
+            "feelings"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语房间与晚餐（二）",
+      "description": "把In my room与Dinner is ready场景结合起来，强化位置表达、房间物品、食物与餐桌礼貌用语。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "room",
+        "dinner"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "你的书在桌子上，哪一句英语正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "The book is on the desk."
+            },
+            {
+              "key": "B",
+              "label": "The desk is in the book."
+            },
+            {
+              "key": "C",
+              "label": "The book can swim."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“on the desk”表示“在桌子上”。",
+          "hints": [
+            "关键词：“书”“在桌子上”。先找物品，再找表示“在……上”的位置词。"
+          ],
+          "tags": [
+            "room",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "“床”对应哪个英语单词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "bowl"
+            },
+            {
+              "key": "B",
+              "label": "bed"
+            },
+            {
+              "key": "C",
+              "label": "bus"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“bed”表示床。",
+          "hints": [
+            "关键词：“床”“房间物品”。从餐具、家具和交通工具中匹配。"
+          ],
+          "tags": [
+            "room",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“碗”对应哪个英语单词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "chair"
+            },
+            {
+              "key": "B",
+              "label": "door"
+            },
+            {
+              "key": "C",
+              "label": "bowl"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“bowl”表示碗，是常见餐具。",
+          "hints": [
+            "关键词：“碗”“餐具”。先判断类别，再从三个词中选择。"
+          ],
+          "tags": [
+            "dinner",
+            "tableware"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈问“Where is your bag?”，书包在椅子下面。哪一句回答正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is under the chair."
+            },
+            {
+              "key": "B",
+              "label": "It is seven."
+            },
+            {
+              "key": "C",
+              "label": "It can jump."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“under the chair”表示“在椅子下面”。",
+          "hints": [
+            "关键词：“Where”“椅子下面”。问题在问位置，要用位置短语回答。"
+          ],
+          "tags": [
+            "room",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "晚餐时你想说“我喜欢米饭”，应该怎么说？",
+          "options": [
+            {
+              "key": "A",
+              "label": "I see rice."
+            },
+            {
+              "key": "B",
+              "label": "I like rice."
+            },
+            {
+              "key": "C",
+              "label": "Rice is a door."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "表达喜欢某种食物可以用“I like...”。",
+          "hints": [
+            "关键词：“喜欢”“米饭”。找表示喜好的句型。"
+          ],
+          "tags": [
+            "dinner",
+            "food"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈说“Dinner is ready.”，这句话是什么意思？",
+          "options": [
+            {
+              "key": "A",
+              "label": "房间很大"
+            },
+            {
+              "key": "B",
+              "label": "公交车来了"
+            },
+            {
+              "key": "C",
+              "label": "晚餐准备好了"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“Dinner is ready.”表示晚餐已经准备好。",
+          "hints": [
+            "关键词：“Dinner”“ready”。结合家庭用餐情境理解整句。"
+          ],
+          "tags": [
+            "dinner",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“plate”表示哪一种餐具？",
+          "options": [
+            {
+              "key": "A",
+              "label": "盘子"
+            },
+            {
+              "key": "B",
+              "label": "勺子"
+            },
+            {
+              "key": "C",
+              "label": "杯子"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“plate”表示盘子。",
+          "hints": [
+            "关键词：“plate”“餐具”。回忆餐桌上不同物品的英文名称。"
+          ],
+          "tags": [
+            "dinner",
+            "tableware"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "你的玩具熊在床上，应该说哪一句？",
+          "options": [
+            {
+              "key": "A",
+              "label": "The bed is a bear."
+            },
+            {
+              "key": "B",
+              "label": "The bear is on the bed."
+            },
+            {
+              "key": "C",
+              "label": "The bear is under the street."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“The bear is on the bed.”正确表达玩具熊在床上。",
+          "hints": [
+            "关键词：“玩具熊”“床上”。先找主语，再选择正确位置短语。"
+          ],
+          "tags": [
+            "room",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "吃饭前你想请别人坐下，可以说什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Run, please."
+            },
+            {
+              "key": "B",
+              "label": "Good night."
+            },
+            {
+              "key": "C",
+              "label": "Sit down, please."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“Sit down, please.”是礼貌请别人坐下。",
+          "hints": [
+            "关键词：“请别人坐下”“礼貌”。找包含坐下动作和please的句子。"
+          ],
+          "tags": [
+            "dinner",
+            "polite language"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "房间里有一张桌子，哪一句正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "There is a desk in the room."
+            },
+            {
+              "key": "B",
+              "label": "The room is a soup."
+            },
+            {
+              "key": "C",
+              "label": "A desk can fly."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“There is a desk in the room.”表达房间里有一张桌子。",
+          "hints": [
+            "关键词：“房间里”“有一张桌子”。找能表达地点和物品存在的完整句。"
+          ],
+          "tags": [
+            "room",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "你想要一勺汤，哪一个英语词表示“汤”？",
+          "options": [
+            {
+              "key": "A",
+              "label": "bread"
+            },
+            {
+              "key": "B",
+              "label": "soup"
+            },
+            {
+              "key": "C",
+              "label": "street"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“soup”表示汤。",
+          "hints": [
+            "关键词：“汤”“食物”。从食物和地点词中找到对应单词。"
+          ],
+          "tags": [
+            "dinner",
+            "food"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-ROOM-DINNER-002-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "晚餐结束后，向帮你盛饭的家人说什么最礼貌？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Go away."
+            },
+            {
+              "key": "B",
+              "label": "Blue desk."
+            },
+            {
+              "key": "C",
+              "label": "Thank you."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "得到帮助后说“Thank you.”表示感谢。",
+          "hints": [
+            "关键词：“帮你盛饭”“最礼貌”。这是接受帮助后的感谢场景。"
+          ],
+          "tags": [
+            "dinner",
+            "polite language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上英语天空、森林与街道（二）",
+      "description": "整合In the sky、In the forest和In the street场景，强化自然词汇、动物、交通与安全表达。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "教材同步",
+        "nature",
+        "street"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "“太阳”对应哪个英语单词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "sun"
+            },
+            {
+              "key": "B",
+              "label": "moon"
+            },
+            {
+              "key": "C",
+              "label": "star"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“sun”表示太阳。",
+          "hints": [
+            "关键词：“太阳”“天空”。比较三个常见天空词汇。"
+          ],
+          "tags": [
+            "sky",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "夜晚天空里最常看到“月亮”，对应哪个词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "cloud"
+            },
+            {
+              "key": "B",
+              "label": "moon"
+            },
+            {
+              "key": "C",
+              "label": "tree"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“moon”表示月亮。",
+          "hints": [
+            "关键词：“夜晚”“月亮”。先判断是天空中的哪种自然物。"
+          ],
+          "tags": [
+            "sky",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "“森林”对应哪个英语单词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "street"
+            },
+            {
+              "key": "B",
+              "label": "room"
+            },
+            {
+              "key": "C",
+              "label": "forest"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“forest”表示森林。",
+          "hints": [
+            "关键词：“森林”“地点词”。从街道、房间和自然地点中选择。"
+          ],
+          "tags": [
+            "forest",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "你看到一只鸟在天空飞，可以说哪一句？",
+          "options": [
+            {
+              "key": "A",
+              "label": "The bird can fly."
+            },
+            {
+              "key": "B",
+              "label": "The bird is a desk."
+            },
+            {
+              "key": "C",
+              "label": "The bird is soup."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "鸟会飞可以用“The bird can fly.”表达。",
+          "hints": [
+            "关键词：“鸟”“天空飞”。找同时表达动物和飞行动作的句子。"
+          ],
+          "tags": [
+            "sky",
+            "animals"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "“fox”是哪一种动物？",
+          "options": [
+            {
+              "key": "A",
+              "label": "熊"
+            },
+            {
+              "key": "B",
+              "label": "狐狸"
+            },
+            {
+              "key": "C",
+              "label": "鸟"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“fox”表示狐狸。",
+          "hints": [
+            "关键词：“fox”“动物”。回忆森林动物词汇。"
+          ],
+          "tags": [
+            "forest",
+            "animals"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "在街道上看到红灯，应该怎么做？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Go."
+            },
+            {
+              "key": "B",
+              "label": "Run."
+            },
+            {
+              "key": "C",
+              "label": "Stop."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "红灯时应停下，“Stop.”符合交通安全规则。",
+          "hints": [
+            "关键词：“街道”“红灯”。先想安全动作，再匹配英语。"
+          ],
+          "tags": [
+            "street",
+            "safety"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "“cloud”表示什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "云"
+            },
+            {
+              "key": "B",
+              "label": "树"
+            },
+            {
+              "key": "C",
+              "label": "汽车"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“cloud”表示云。",
+          "hints": [
+            "关键词：“cloud”“天空”。判断这是天空景物还是地面物品。"
+          ],
+          "tags": [
+            "sky",
+            "vocabulary"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "你看到一辆公交车，哪个英语单词正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "bike"
+            },
+            {
+              "key": "B",
+              "label": "bus"
+            },
+            {
+              "key": "C",
+              "label": "bird"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“bus”表示公交车。",
+          "hints": [
+            "关键词：“公交车”“交通工具”。在交通词和动物词中匹配。"
+          ],
+          "tags": [
+            "street",
+            "transport"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“The bear is in the forest.”是什么意思？",
+          "options": [
+            {
+              "key": "A",
+              "label": "熊在街道上"
+            },
+            {
+              "key": "B",
+              "label": "熊在房间里"
+            },
+            {
+              "key": "C",
+              "label": "熊在森林里"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“in the forest”表示在森林里。",
+          "hints": [
+            "关键词：“bear”“in the forest”。分别理解动物和地点。"
+          ],
+          "tags": [
+            "forest",
+            "sentence"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "绿灯亮了，可以用哪个动作词表示前进？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Go."
+            },
+            {
+              "key": "B",
+              "label": "Sleep."
+            },
+            {
+              "key": "C",
+              "label": "Read."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "绿灯时可以通行，“Go.”表示前进。",
+          "hints": [
+            "关键词：“绿灯”“前进”。根据交通信号选择动作词。"
+          ],
+          "tags": [
+            "street",
+            "safety"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一个是森林里的动物？",
+          "options": [
+            {
+              "key": "A",
+              "label": "plate"
+            },
+            {
+              "key": "B",
+              "label": "bear"
+            },
+            {
+              "key": "C",
+              "label": "desk"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“bear”是熊，属于动物；另外两个是餐具和家具。",
+          "hints": [
+            "关键词：“森林里的动物”。先分清物品和动物类别。"
+          ],
+          "tags": [
+            "forest",
+            "animals"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-SYNC-NATURE-STREET-002-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "“Look at the light.”在过马路时最接近什么意思？",
+          "options": [
+            {
+              "key": "A",
+              "label": "看看晚餐"
+            },
+            {
+              "key": "B",
+              "label": "看看房间"
+            },
+            {
+              "key": "C",
+              "label": "看看交通灯"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "街道情境中的“light”指交通灯，过马路前要观察信号。",
+          "hints": [
+            "关键词：“过马路”“light”。结合街道场景判断light不是普通灯光，而是交通信号。"
+          ],
+          "tags": [
+            "street",
+            "safety"
+          ]
+        }
+      ]
     }
   ]
 }
