@@ -63,6 +63,8 @@ for page, name in [(progress, "parent progress"), (student, "student assignments
             f"{name} must expose date and subject query entries")
     require("label: '类型'" not in page and "label: '截止'" not in page,
             f"{name} must not expose old type/due preset query entries")
+    require("allDates: $draftAllDates" in page and "AssignmentDateFilter.ALL" in page,
+            f"{name} must support a real all-date query instead of UI-only selection")
     require("active: !this.allDates && !this.isSelectedDayToday()" in page and
             "active: this.subjectCode !== 'ALL'" in page,
             f"{name} query state must bind to selected date and subject")
