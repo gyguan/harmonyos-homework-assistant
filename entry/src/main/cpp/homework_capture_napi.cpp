@@ -70,11 +70,11 @@ void CopyLatestFrame(OH_AVBuffer *buffer, int64_t timestamp)
     }
 
     OH_NativeBuffer_Config config {};
-    int32_t configResult = OH_NativeBuffer_GetConfig(nativeBuffer, &config);
+    OH_NativeBuffer_GetConfig(nativeBuffer, &config);
     uint8_t *source = OH_AVBuffer_GetAddr(buffer);
     int32_t capacity = OH_AVBuffer_GetCapacity(buffer);
 
-    if (configResult != 0 || source == nullptr || capacity <= 0 ||
+    if (source == nullptr || capacity <= 0 ||
         config.width <= 0 || config.height <= 0 || config.stride <= 0) {
         OH_NativeBuffer_Unreference(nativeBuffer);
         return;
