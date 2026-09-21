@@ -12,6 +12,7 @@ import {
   PracticeHistoryRouteParam,
   PracticePaperRouteParam
 } from '../app/navigation/AppRoutes';
+import { HomeworkCaptureSessionService } from '../application/capture/HomeworkCaptureSessionService';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
@@ -154,12 +155,14 @@ export struct AppShell {
 
   private openStudentSwitcher(): void {
     if (this.role !== AppRole.PARENT || this.familyStudents.length <= 1) return;
+    if (HomeworkCaptureSessionService.instance.getActiveSession() !== null) return;
     if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideStudentSwitcherController.open();
     else this.phoneStudentSwitcherController.open();
   }
 
   private selectStudent(studentId: string): void {
     if (this.role !== AppRole.PARENT || studentId.length === 0 || studentId === this.activeStudentId) return;
+    if (HomeworkCaptureSessionService.instance.getActiveSession() !== null) return;
     if (!this.familyContext.setActiveStudent(studentId)) return;
 
     // A child switch is a family-context boundary. Drop any detail route that may still point to
