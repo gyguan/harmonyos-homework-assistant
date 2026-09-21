@@ -9,9 +9,11 @@ import {
   PracticeTaxonomy
 } from '../../../domain/model/practice/PracticeModels';
 import {
-  PracticeHistoryStatistics,
   PracticeHistorySubjectFilter,
-  PracticeHistoryTimeFilter,
+  PracticeHistoryTimeFilter
+} from '../../../domain/model/PracticeHistoryFilter';
+import {
+  PracticeHistoryStatistics,
   PracticeHistoryViewModel
 } from './PracticeHistoryViewModel';
 
