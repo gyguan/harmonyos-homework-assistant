@@ -210,7 +210,14 @@ export struct ConfirmationCandidateEditor {
       expectedMinutes: this.expectedMinutesDraft,
       sourceEvidence: {
         sourceLabel: this.item.sourceEvidence.sourceLabel,
-        excerpt: this.item.sourceEvidence.excerpt
+        excerpt: this.item.sourceEvidence.excerpt,
+        batchId: this.item.sourceEvidence.batchId,
+        sourceType: this.item.sourceEvidence.sourceType,
+        sourceMessageIds: this.item.sourceEvidence.sourceMessageIds === undefined ?
+          undefined : this.item.sourceEvidence.sourceMessageIds.slice(),
+        rawText: this.item.sourceEvidence.rawText,
+        imageRef: this.item.sourceEvidence.imageRef,
+        capturedAtEpochMs: this.item.sourceEvidence.capturedAtEpochMs
       },
       confidence: this.item.confidence
     };

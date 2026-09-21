@@ -1,4 +1,5 @@
 import { BackendSession } from '../remote/BackendSession';
+import { HomeworkImportInboxService } from './HomeworkImportInboxService';
 import {
   BatchPublishEntry,
   HomeworkRemoteApi,
@@ -64,6 +65,7 @@ export class HomeworkBatchPublishService {
     if (seen.size !== candidates.length) throw new Error('云端批量发布响应不完整');
 
     DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped);
+    HomeworkImportInboxService.instance.markActiveBatchPublished();
     this.drafts.clearCandidates();
     return { publishedCount: mapped.length };
   }

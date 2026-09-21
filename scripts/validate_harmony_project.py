@@ -94,6 +94,75 @@ require("SUBMISSION_NETWORK_ERROR" in remote_submission and
         "response = await client.request(" in remote_submission,
         "Remote submission upload must explicitly handle exceptions from http client.request")
 
+
+# Production/test boundary: deterministic fixtures and issue-specific test IDs must not ship in
+# src/main. Business fixtures belong under entry/src/test and are executed by Hypium Local Test.
+test_suite = read("entry/src/test/List.test.ets")
+require("@ohos/hypium" in entry_oh_package,
+        "entry module must declare Hypium as a devDependency for ArkTS Local Test")
+require("Issue245ChatReconstructionFixture" in test_suite and
+        "Issue246HomeworkUnderstandingFixture" in test_suite and
+        "Issue247FullClosureFixture" in test_suite,
+        "deterministic homework-import regressions must be registered in the ArkTS test suite")
+
+production_ets_root = ROOT / "entry/src/main/ets"
+for production_file in production_ets_root.rglob("*.ets"):
+    relative = production_file.relative_to(ROOT).as_posix()
+    source = production_file.read_text(encoding="utf-8")
+    require("Fixture" not in production_file.name,
+            f"test fixture must not live in production sources: {relative}")
+    require("issue244-fixture" not in source and "issue245-fixture" not in source and
+            "issue246-fixture" not in source and "issue247-fixture" not in source,
+            f"production behavior must not depend on issue fixture IDs: {relative}")
+
+
+# V2 parent-import architecture: Feature pages are UI composition only; business access goes
+# through ViewModels. Parent-import route actions live outside AppShell.
+for page_path in [
+    "entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets",
+]:
+    page_source = read(page_path)
+    require("Service.instance" not in page_source,
+            f"V2 Feature page must not call application service singleton directly: {page_path}")
+    require("DefaultFamilyContextRepository.instance" not in page_source,
+            f"V2 Feature page must not call repository singleton directly: {page_path}")
+
+source_profile_service = read("entry/src/main/ets/application/capture/HomeworkSourceProfileService.ets")
+require("HomeworkSourceProfileStore" not in source_profile_service and
+        "HomeworkSourceProfileRepository" in source_profile_service,
+        "SourceProfile application service must use repository boundary, not local Store")
+
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+parent_import_navigator = read("entry/src/main/ets/app/navigation/ParentImportNavigator.ets")
+for legacy_shell_method in [
+    "private openParentImport(",
+    "private openParentImportInbox(",
+    "private openParentImportBatch(",
+    "private openParentCapture(",
+    "private openParentSourceProfile(",
+    "private openParentCaptureSpike(",
+    "private openParentImportConfirmation(",
+]:
+    require(legacy_shell_method not in app_shell,
+            f"AppShell must not regain parent-import route operation: {legacy_shell_method}")
+require("class ParentImportNavigator" in parent_import_navigator,
+        "parent-import navigation operations must stay in dedicated navigator")
+
+capture_service = read("entry/src/main/ets/application/capture/HomeworkCaptureSessionService.ets")
+capture_workflow = read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets")
+require("HomeworkChatReconstructionService" not in capture_service,
+        "CaptureSessionService must stop at capture evidence/batch creation")
+require("HomeworkImportPipelineStage" in capture_workflow and
+        "pipelineStage" in capture_workflow and
+        "tryReconstructCaptureSession" in capture_workflow and
+        "tryUnderstandBatch" in capture_workflow,
+        "capture downstream pipeline must have one stage-aware workflow orchestrator")
+require("SourceGroupValidationStatus.CONFLICT" in capture_workflow and
+        "GROUP_TITLE_CONFLICT" in capture_workflow,
+        "mixed-group capture must fail closed before homework understanding")
+
 # Keep the backend intentionally lightweight during the family-product refactor.
 for forbidden_dependency in ["spring-data-redis", "spring-kafka", "spring-cloud-gateway", "camunda", "flowable"]:
     require(forbidden_dependency not in backend_pom,

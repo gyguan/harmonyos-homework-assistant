@@ -5,5 +5,10 @@
   "main": "",
   "author": "gyguan",
   "license": "MIT",
-  "dependencies": {}
+  "dependencies": {
+    "libhomeworkcapture.so": "file:./src/main/cpp/types/libhomeworkcapture"
+  },
+  "devDependencies": {
+    "@ohos/hypium": "1.0.19"
+  }
 }

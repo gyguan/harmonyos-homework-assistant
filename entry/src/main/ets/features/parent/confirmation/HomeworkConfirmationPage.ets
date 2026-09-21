@@ -85,7 +85,14 @@ export struct HomeworkConfirmationPage {
       expectedMinutes: minutes,
       sourceEvidence: {
         sourceLabel: item.sourceEvidence.sourceLabel,
-        excerpt: item.sourceEvidence.excerpt
+        excerpt: item.sourceEvidence.excerpt,
+        batchId: item.sourceEvidence.batchId,
+        sourceType: item.sourceEvidence.sourceType,
+        sourceMessageIds: item.sourceEvidence.sourceMessageIds === undefined ?
+          undefined : item.sourceEvidence.sourceMessageIds.slice(),
+        rawText: item.sourceEvidence.rawText,
+        imageRef: item.sourceEvidence.imageRef,
+        capturedAtEpochMs: item.sourceEvidence.capturedAtEpochMs
       },
       confidence: item.confidence
     });

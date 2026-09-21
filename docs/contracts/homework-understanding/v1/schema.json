@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "homework-understanding/schema-v1.0",
+  "title": "Homework Understanding Enhancement Result",
+  "type": "object",
+  "required": ["version", "messages", "tasks", "warnings"],
+  "properties": {
+    "version": { "const": "schema-v1.0" },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["messageId", "classification", "teacherStatus"],
+        "properties": {
+          "messageId": { "type": "string" },
+          "classification": {
+            "enum": ["HOMEWORK", "HOMEWORK_REVISION", "PREPARATION", "NOTICE", "CHAT", "UNKNOWN"]
+          },
+          "teacherStatus": { "enum": ["RESOLVED", "UNKNOWN"] },
+          "teacherId": { "type": "string" },
+          "subject": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["subject", "title", "classification", "sourceMessageIds", "confidence"],
+        "properties": {
+          "subject": { "type": "string" },
+          "title": { "type": "string" },
+          "classification": { "enum": ["HOMEWORK", "PREPARATION"] },
+          "sourceMessageIds": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}
