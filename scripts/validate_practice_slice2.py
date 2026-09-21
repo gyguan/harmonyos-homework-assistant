@@ -24,6 +24,7 @@ repo = read("entry/src/main/ets/domain/port/PracticeRepository.ets")
 remote = read("entry/src/main/ets/application/remote/PracticeRemoteApi.ets")
 home = read("entry/src/main/ets/features/student/practice/PracticeHomePage.ets")
 detail = read("entry/src/main/ets/features/student/practice/PracticePaperDetailPage.ets")
+detail_vm = read("entry/src/main/ets/features/student/practice/PracticePaperDetailViewModel.ets")
 attempt_page = read("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
 result_page = read("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
@@ -48,6 +49,17 @@ require("onOpenPaper" in home and "onOpen: () => this.onOpenPaper" in home,
         "practice paper cards must open detail")
 require("开始练习" in detail and "viewModel.start" in detail,
         "paper detail must create server attempt")
+require("DeepPageHeader" in detail and "Text('‹')" not in detail,
+        "Practice paper detail must use the shared DeepPageHeader")
+require("我的练习记录" in detail and "recentAttempts" in detail and "查看全部" in detail,
+        "Practice paper detail must expose recent per-paper history")
+require("onOpenAttempt" in detail and "onOpenResult" in detail and "onOpenHistory" in detail,
+        "Practice paper detail history cards must reuse existing attempt/result/history navigation")
+require("listAttempts(paperId: string)" in detail_vm and
+        "repository.listAttempts(this.familyContext.getActiveStudentId(), paperId)" in detail_vm,
+        "Practice paper detail must query history through the existing paperId repository contract")
+require("attempts.slice(0, 3)" in detail_vm,
+        "Practice paper detail must limit the embedded history to the latest three attempts")
 require("下一题" in attempt_page and "交卷" in attempt_page and "saveCurrent" in attempt_page,
         "attempt page must save answers and support navigation")
 require("private CurrentQuestionAnswer()" in attempt_page,
