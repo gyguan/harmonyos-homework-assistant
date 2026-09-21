@@ -1,6 +1,7 @@
 import { AppTheme } from '../../common/theme/AppTheme';
 import {
   PracticeGrade,
+  PracticePassFilter,
   PracticeSubject,
   PracticeTaxonomy,
   PracticeTrackFilter
@@ -12,8 +13,11 @@ export struct PracticeFilterDialog {
   @Link selectedGrade: PracticeGrade;
   @Link selectedSubject: PracticeSubject;
   @Link selectedTrack: PracticeTrackFilter;
-  onApply: (grade: PracticeGrade, subject: PracticeSubject, track: PracticeTrackFilter) => void =
-    (_grade: PracticeGrade, _subject: PracticeSubject, _track: PracticeTrackFilter) => {};
+  @Link selectedPassFilter: PracticePassFilter;
+  onApply: (grade: PracticeGrade, subject: PracticeSubject, track: PracticeTrackFilter,
+    passFilter: PracticePassFilter) => void =
+    (_grade: PracticeGrade, _subject: PracticeSubject, _track: PracticeTrackFilter,
+      _passFilter: PracticePassFilter) => {};
 
   @Builder
   private GradeOption(grade: PracticeGrade) {
@@ -54,8 +58,21 @@ export struct PracticeFilterDialog {
       .onClick(() => this.selectedTrack = track);
   }
 
+  @Builder
+  private PassOption(filter: PracticePassFilter) {
+    Button(PracticeTaxonomy.passFilterLabel(filter), { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(13)
+      .fontWeight(this.selectedPassFilter === filter ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.selectedPassFilter === filter ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.selectedPassFilter === filter ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.selectedPassFilter = filter);
+  }
+
   private confirm(): void {
-    this.onApply(this.selectedGrade, this.selectedSubject, this.selectedTrack);
+    this.onApply(this.selectedGrade, this.selectedSubject, this.selectedTrack, this.selectedPassFilter);
   }
 
   build() {
@@ -130,6 +147,21 @@ export struct PracticeFilterDialog {
             .width('100%');
           }
           .width('100%');
+
+          Column({ space: 10 }) {
+            Text('通过状态')
+              .width('100%')
+              .fontSize(15)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Row({ space: 8 }) {
+              this.PassOption(PracticePassFilter.ALL);
+              this.PassOption(PracticePassFilter.PASSED);
+              this.PassOption(PracticePassFilter.NOT_PASSED);
+            }
+            .width('100%');
+          }
+          .width('100%');
         }
         .width('100%')
         .padding({ left: 20, right: 20, top: 8, bottom: 18 });
@@ -150,7 +182,7 @@ export struct PracticeFilterDialog {
     }
     .width('100%')
     .constraintSize({ maxWidth: AppTheme.FILTER_DIALOG_MAX_WIDTH })
-    .height('58%')
+    .height('66%')
     .backgroundColor(AppTheme.SURFACE)
     .borderRadius({ topLeft: 24, topRight: 24 });
   }
