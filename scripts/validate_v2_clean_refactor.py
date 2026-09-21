@@ -64,6 +64,7 @@ for shell_path in [
 app_shell_path = ROOT / "entry/src/main/ets/pages/AppShell.ets"
 if app_shell_path.exists():
     app_shell = app_shell_path.read_text(encoding="utf-8")
+    parent_import_navigator = (ROOT / "entry/src/main/ets/app/navigation/ParentImportNavigator.ets").read_text(encoding="utf-8")
     state_names = set(re.findall(r"@State\s+private\s+(\w+)\s*:", app_shell))
     suspicious = {
         name for name in state_names
