@@ -1113,6 +1113,376 @@
           ]
         }
       ]
+    },
+    {
+      "id": "CHINESE-G2-S1-EXTRA-INFO-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "CHINESE",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "生活信息阅读·校园与社区（一）",
+      "description": "阅读原创通知、活动提醒和失物招领，训练时间、地点、要求与关键信息提取。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 20,
+      "tags": [
+        "课外拓展",
+        "生活阅读",
+        "信息提取"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书馆通知：本周六上午9点，二楼儿童区举行亲子阅读活动，请带借书证。\n活动在什么时候开始？",
+          "options": [
+            {
+              "key": "A",
+              "label": "周六上午9点"
+            },
+            {
+              "key": "B",
+              "label": "周六下午3点"
+            },
+            {
+              "key": "C",
+              "label": "周日上午10点"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "通知第一句明确写明活动时间是本周六上午9点。",
+          "hints": [
+            "关键词：“什么时候开始”。回到通知中找表示星期和具体时间的词，不要被其他信息干扰。"
+          ],
+          "tags": [
+            "生活阅读",
+            "时间"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书馆通知：本周六上午9点，二楼儿童区举行亲子阅读活动，请带借书证。\n活动地点在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "一楼大厅"
+            },
+            {
+              "key": "B",
+              "label": "二楼儿童区"
+            },
+            {
+              "key": "C",
+              "label": "学校操场"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "通知写明亲子阅读活动在二楼儿童区举行。",
+          "hints": [
+            "关键词：“活动地点”。在通知中定位“在……举行”前后的地点信息。"
+          ],
+          "tags": [
+            "生活阅读",
+            "地点"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书馆通知：本周六上午9点，二楼儿童区举行亲子阅读活动，请带借书证。\n参加活动需要带什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "运动鞋"
+            },
+            {
+              "key": "B",
+              "label": "旧报纸"
+            },
+            {
+              "key": "C",
+              "label": "借书证"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "通知最后明确提醒参加者带借书证。",
+          "hints": [
+            "关键词：“需要带什么”。重点找“请带”后面的物品，不要把地点当成物品。"
+          ],
+          "tags": [
+            "生活阅读",
+            "要求"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "校园活动提醒：周三下午3点在操场举行跳绳活动，请穿运动鞋、自带水杯；下雨则改到体育馆。\n跳绳活动原计划在哪里举行？",
+          "options": [
+            {
+              "key": "A",
+              "label": "操场"
+            },
+            {
+              "key": "B",
+              "label": "体育馆"
+            },
+            {
+              "key": "C",
+              "label": "中心花园"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "提醒先写活动在操场举行，只有下雨时才改到体育馆。",
+          "hints": [
+            "关键词：“原计划”“在哪里”。注意区分正常安排和下雨后的备用地点。"
+          ],
+          "tags": [
+            "生活阅读",
+            "条件"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "校园活动提醒：周三下午3点在操场举行跳绳活动，请穿运动鞋、自带水杯；下雨则改到体育馆。\n同学参加活动时需要自己准备什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "借书证"
+            },
+            {
+              "key": "B",
+              "label": "水杯"
+            },
+            {
+              "key": "C",
+              "label": "雨伞"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "提醒中写着“自带水杯”，这是参加者要自己准备的物品。",
+          "hints": [
+            "关键词：“自己准备”。找“自带”这个动作词，它后面就是需要准备的物品。"
+          ],
+          "tags": [
+            "生活阅读",
+            "要求"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "校园活动提醒：周三下午3点在操场举行跳绳活动，请穿运动鞋、自带水杯；下雨则改到体育馆。\n如果下雨，活动改到哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "教室"
+            },
+            {
+              "key": "B",
+              "label": "图书馆"
+            },
+            {
+              "key": "C",
+              "label": "体育馆"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "提醒明确说明下雨时活动改到体育馆。",
+          "hints": [
+            "关键词：“如果下雨”“改到哪里”。先找到条件“下雨”，再读它后面的变化安排。"
+          ],
+          "tags": [
+            "生活阅读",
+            "条件"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "社区环保站通知：周日上午10点，在中心花园开展旧纸回收活动，请把废纸整理好后带来。\n环保活动主要回收什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "旧纸"
+            },
+            {
+              "key": "B",
+              "label": "玻璃杯"
+            },
+            {
+              "key": "C",
+              "label": "旧玩具"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "通知写的是旧纸回收活动，并要求把废纸整理好带来。",
+          "hints": [
+            "关键词：“主要回收什么”。找活动名称和“废纸”这个重复出现的信息。"
+          ],
+          "tags": [
+            "生活阅读",
+            "主题"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "社区环保站通知：周日上午10点，在中心花园开展旧纸回收活动，请把废纸整理好后带来。\n活动地点在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "学校门口"
+            },
+            {
+              "key": "B",
+              "label": "中心花园"
+            },
+            {
+              "key": "C",
+              "label": "公园服务台"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "通知中“在中心花园开展”直接说明了地点。",
+          "hints": [
+            "关键词：“地点”。找到“在”字后面的场所名称，再和选项比较。"
+          ],
+          "tags": [
+            "生活阅读",
+            "地点"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "社区环保站通知：周日上午10点，在中心花园开展旧纸回收活动，请把废纸整理好后带来。\n带废纸去之前应该先做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "把纸涂上颜色"
+            },
+            {
+              "key": "B",
+              "label": "把纸撕得很碎"
+            },
+            {
+              "key": "C",
+              "label": "把废纸整理好"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "通知要求先把废纸整理好，再带到活动现场。",
+          "hints": [
+            "关键词：“带来之前”“先做什么”。关注“整理好后带来”中的先后顺序。"
+          ],
+          "tags": [
+            "生活阅读",
+            "顺序"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "失物招领：在公园长椅旁捡到一个蓝色水杯。请失主到服务台说明水杯上的贴纸图案后领取。\n捡到的是什么物品？",
+          "options": [
+            {
+              "key": "A",
+              "label": "蓝色水杯"
+            },
+            {
+              "key": "B",
+              "label": "蓝色书包"
+            },
+            {
+              "key": "C",
+              "label": "一把雨伞"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "失物招领第一句说明捡到的是一个蓝色水杯。",
+          "hints": [
+            "关键词：“捡到”“什么物品”。直接找失物名称和颜色，不要把领取地点混进来。"
+          ],
+          "tags": [
+            "生活阅读",
+            "直接信息"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "失物招领：在公园长椅旁捡到一个蓝色水杯。请失主到服务台说明水杯上的贴纸图案后领取。\n失主应该去哪里领取？",
+          "options": [
+            {
+              "key": "A",
+              "label": "公园长椅旁"
+            },
+            {
+              "key": "B",
+              "label": "服务台"
+            },
+            {
+              "key": "C",
+              "label": "中心花园"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "招领信息写明失主需要到服务台领取。",
+          "hints": [
+            "关键词：“去哪里领取”。找“到……领取”这一结构中的地点。"
+          ],
+          "tags": [
+            "生活阅读",
+            "地点"
+          ]
+        },
+        {
+          "id": "CHINESE-G2-S1-EXTRA-INFO-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "失物招领：在公园长椅旁捡到一个蓝色水杯。请失主到服务台说明水杯上的贴纸图案后领取。\n领取前为什么要说明水杯上的贴纸图案？",
+          "options": [
+            {
+              "key": "A",
+              "label": "为了给水杯换颜色"
+            },
+            {
+              "key": "B",
+              "label": "为了参加阅读活动"
+            },
+            {
+              "key": "C",
+              "label": "为了确认是真正的失主"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "说明只有真正知道水杯特征的人更可能是失主，可以帮助核对物品。",
+          "hints": [
+            "关键词：“说明贴纸图案”“为什么”。想一想服务台需要怎样判断来领取的人和失物是否匹配。"
+          ],
+          "tags": [
+            "生活阅读",
+            "简单推断"
+          ]
+        }
+      ]
     }
   ]
 }
