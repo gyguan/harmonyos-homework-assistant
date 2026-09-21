@@ -57,11 +57,11 @@ export class AppTheme {
 
   static readonly DEEP_PAGE_TOP_PADDING: number = 8;
   static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
-  static readonly DEEP_PAGE_HEADER_HEIGHT: number = 44;
+  static readonly DEEP_PAGE_HEADER_HEIGHT: number = 48;
   static readonly DEEP_PAGE_HEADER_GAP: number = 10;
-  static readonly DEEP_PAGE_HEADER_TITLE_SIZE: number = 18;
-  static readonly DEEP_PAGE_HEADER_META_SIZE: number = 12;
-  static readonly DEEP_PAGE_BACK_GLYPH_SIZE: number = 20;
+  static readonly DEEP_PAGE_HEADER_TITLE_SIZE: number = 20;
+  static readonly DEEP_PAGE_HEADER_META_SIZE: number = 13;
+  static readonly DEEP_PAGE_BACK_GLYPH_SIZE: number = 22;
   static readonly DEEP_PAGE_CONTENT_GAP: number = 12;
 
   static readonly HOME_PRIMARY_MIN_WIDTH: number = 520;
