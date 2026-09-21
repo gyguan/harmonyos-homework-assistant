@@ -127,6 +127,8 @@ require("抓取今日作业" in route_page and "onOpenCapture" in route_page,
         "parent import page must expose the formal capture entry")
 require("PARENT_CAPTURE" in routes and "HomeworkCapturePage" in shell,
         "formal capture must use its own navigation route")
+require(shell.count("HomeworkCaptureSessionService.instance.getActiveSession() !== null") >= 2,
+        "active capture must block parent child-context switching")
 require(("不自动点击" in page or "不会自动点击" in page) and
         ("不自动滚动" in page or "不会自动点击或滚动" in page) and
         "Accessibility" in page,
@@ -137,6 +139,9 @@ require("setInterval" in float_page and "sampleLatestFrame" in float_page,
         "FloatView must continuously sample the formal session")
 require("HomeworkCaptureSessionService.instance.stopByUser" in float_page,
         "FloatView must allow user-controlled stop")
+require("CaptureSessionStatus.COMPLETED" in float_page and
+        "CaptureSessionStatus.FAILED" in float_page,
+        "FloatView must reflect runtime-driven terminal states")
 require("nativeCapture.stopCapture()" in float_page,
         "#241 diagnostic fallback must remain available")
 
