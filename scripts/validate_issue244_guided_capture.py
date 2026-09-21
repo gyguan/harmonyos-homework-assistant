@@ -48,7 +48,7 @@ for status in [
 for field in [
     "startedAtEpochMs", "stoppedAtEpochMs", "status", "frameCount",
     "acceptedFrameCount", "sourceProfileId", "stopReason", "importBatchId",
-    "lastFrameSequence", "runtimeErrorCode"
+    "lastFrameSequence", "runtimeErrorCode", "runtimeTimestamp"
 ]:
     require(field in models, f"CaptureSession field missing: {field}")
 
@@ -100,6 +100,8 @@ require("isTerminal(latest.status)" in service,
         "late OCR completion must not revive a terminal CaptureSession")
 require("runtime.clearLatestFrame()" in service,
         "formal termination must clear the retained raw RGBA frame")
+require("capturedAtEpochMs: Date.now()" in service and "runtimeTimestamp: frame.timestamp" in service,
+        "native media timestamp must not be misused as wall-clock epoch")
 require("handleAbilityDestroy" in service and "ABILITY_DESTROYED" in service,
         "UIAbility abnormal destruction must safely terminate the session")
 
