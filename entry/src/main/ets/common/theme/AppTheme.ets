@@ -68,8 +68,8 @@ export class AppTheme {
   static readonly HOME_SECONDARY_MIN_WIDTH: number = 320;
   static readonly SPLIT_PRIMARY_MIN_WIDTH: number = 400;
   static readonly SPLIT_SECONDARY_MIN_WIDTH: number = 420;
-  static readonly STUDY_PRIMARY_MIN_WIDTH: number = 520;
-  static readonly STUDY_TUTOR_MIN_WIDTH: number = 360;
+  static readonly STUDY_PRIMARY_MIN_WIDTH: number = 480;
+  static readonly STUDY_TUTOR_MIN_WIDTH: number = 340;
   static readonly PARENT_HOME_PRIMARY_MIN_WIDTH: number = 500;
   static readonly PARENT_HOME_SECONDARY_MIN_WIDTH: number = 340;
   static readonly PARENT_PROGRESS_LIST_MIN_WIDTH: number = 400;
