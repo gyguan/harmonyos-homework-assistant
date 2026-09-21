@@ -118,6 +118,7 @@ export class HomeworkCaptureSessionStore {
       sessionId: source.sessionId,
       sequence: source.sequence,
       capturedAtEpochMs: source.capturedAtEpochMs,
+      runtimeTimestamp: source.runtimeTimestamp,
       width: source.width,
       height: source.height,
       fingerprint: source.fingerprint,
