@@ -4,23 +4,17 @@ import {
   PracticeAttemptMode,
   PracticeAttemptStatus,
   PracticeAttemptSummary,
-  PracticeSubject
+  PracticePassFilter,
+  PracticeSubject,
+  PracticeTaxonomy
 } from '../../../domain/model/practice/PracticeModels';
+import {
+  PracticeHistorySubjectFilter,
+  PracticeHistoryTimeFilter
+} from '../../../domain/model/PracticeHistoryFilter';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
-
-export enum PracticeHistoryStatusFilter {
-  ALL = 'ALL',
-  SUBMITTED = 'SUBMITTED',
-  IN_PROGRESS = 'IN_PROGRESS'
-}
-
-export enum PracticeHistorySubjectFilter {
-  ALL = 'ALL',
-  CHINESE = 'CHINESE',
-  MATH = 'MATH',
-  ENGLISH = 'ENGLISH'
-}
+import { PracticePassPolicy } from '../../../domain/service/PracticePassPolicy';
 
 export class PracticeHistoryStatistics {
   completedCount: number;
@@ -52,22 +46,22 @@ export class PracticeHistoryViewModel {
 
   filter(
     attempts: PracticeAttemptSummary[],
-    status: PracticeHistoryStatusFilter,
-    subject: PracticeHistorySubjectFilter
+    subject: PracticeHistorySubjectFilter,
+    time: PracticeHistoryTimeFilter,
+    pass: PracticePassFilter,
+    nowEpochMs: number
   ): PracticeAttemptSummary[] {
     let result: PracticeAttemptSummary[] = [];
     for (let item of attempts) {
-      if (!this.matchesStatus(item, status)) continue;
       if (!this.matchesSubject(item, subject)) continue;
+      if (!this.matchesTime(item, time, nowEpochMs)) continue;
+      if (!this.matchesPass(item, pass)) continue;
       result.push(item);
     }
     return result;
   }
 
-  statistics(
-    attempts: PracticeAttemptSummary[],
-    subject: PracticeHistorySubjectFilter
-  ): PracticeHistoryStatistics {
+  statistics(attempts: PracticeAttemptSummary[]): PracticeHistoryStatistics {
     let completedCount = 0;
     let totalCorrect = 0;
     let totalQuestions = 0;
@@ -75,7 +69,6 @@ export class PracticeHistoryViewModel {
 
     for (let item of attempts) {
       if (item.status !== PracticeAttemptStatus.SUBMITTED) continue;
-      if (!this.matchesSubject(item, subject)) continue;
       completedCount++;
       totalCorrect += item.correctCount;
       totalQuestions += item.maxScore;
@@ -88,29 +81,40 @@ export class PracticeHistoryViewModel {
     return new PracticeHistoryStatistics(completedCount, correctRate, averageElapsedSeconds);
   }
 
-  showStatistics(status: PracticeHistoryStatusFilter): boolean {
-    return status !== PracticeHistoryStatusFilter.IN_PROGRESS;
-  }
-
-  statusLabel(item: PracticeAttemptSummary): string {
-    return item.status === PracticeAttemptStatus.SUBMITTED ? '已完成' : '进行中';
-  }
-
-  statusFilterLabel(status: PracticeHistoryStatusFilter): string {
-    if (status === PracticeHistoryStatusFilter.SUBMITTED) return '已完成';
-    if (status === PracticeHistoryStatusFilter.IN_PROGRESS) return '进行中';
-    return '全部';
-  }
-
   subjectFilterLabel(subject: PracticeHistorySubjectFilter): string {
     if (subject === PracticeHistorySubjectFilter.CHINESE) return '语文';
     if (subject === PracticeHistorySubjectFilter.MATH) return '数学';
     if (subject === PracticeHistorySubjectFilter.ENGLISH) return '英语';
-    return '全部';
+    return '全部科目';
+  }
+
+  timeFilterLabel(time: PracticeHistoryTimeFilter): string {
+    if (time === PracticeHistoryTimeFilter.LAST_7_DAYS) return '近7天';
+    if (time === PracticeHistoryTimeFilter.LAST_30_DAYS) return '近30天';
+    if (time === PracticeHistoryTimeFilter.LAST_90_DAYS) return '近90天';
+    return '全部时间';
+  }
+
+  passFilterLabel(filter: PracticePassFilter): string {
+    return PracticeTaxonomy.passFilterLabel(filter);
   }
 
   modeLabel(item: PracticeAttemptSummary): string {
     return item.mode === PracticeAttemptMode.WRONG_ONLY ? '错题专项' : '完整套卷';
+  }
+
+  recordStatusLabel(item: PracticeAttemptSummary): string {
+    if (item.status !== PracticeAttemptStatus.SUBMITTED) return '进行中';
+    if (item.mode === PracticeAttemptMode.WRONG_ONLY) return '专项练习';
+    return PracticePassPolicy.isPassedAttempt(item) ? '已通过' : '未通过';
+  }
+
+  isPassed(item: PracticeAttemptSummary): boolean {
+    return PracticePassPolicy.isPassedAttempt(item);
+  }
+
+  isWrongOnly(item: PracticeAttemptSummary): boolean {
+    return item.mode === PracticeAttemptMode.WRONG_ONLY;
   }
 
   scoreText(item: PracticeAttemptSummary): string {
@@ -149,21 +153,33 @@ export class PracticeHistoryViewModel {
     return `${minutes}分${rest}秒`;
   }
 
-  private matchesStatus(item: PracticeAttemptSummary, status: PracticeHistoryStatusFilter): boolean {
-    if (status === PracticeHistoryStatusFilter.SUBMITTED) {
-      return item.status === PracticeAttemptStatus.SUBMITTED;
-    }
-    if (status === PracticeHistoryStatusFilter.IN_PROGRESS) {
-      return item.status === PracticeAttemptStatus.IN_PROGRESS;
-    }
-    return true;
-  }
-
   private matchesSubject(item: PracticeAttemptSummary, subject: PracticeHistorySubjectFilter): boolean {
     if (subject === PracticeHistorySubjectFilter.CHINESE) return item.subject === PracticeSubject.CHINESE;
     if (subject === PracticeHistorySubjectFilter.MATH) return item.subject === PracticeSubject.MATH;
     if (subject === PracticeHistorySubjectFilter.ENGLISH) return item.subject === PracticeSubject.ENGLISH;
     return true;
+  }
+
+  private matchesTime(
+    item: PracticeAttemptSummary,
+    time: PracticeHistoryTimeFilter,
+    nowEpochMs: number
+  ): boolean {
+    if (time === PracticeHistoryTimeFilter.ALL) return true;
+    let days = 7;
+    if (time === PracticeHistoryTimeFilter.LAST_30_DAYS) days = 30;
+    if (time === PracticeHistoryTimeFilter.LAST_90_DAYS) days = 90;
+    let startEpochMs = nowEpochMs - days * 24 * 60 * 60 * 1000;
+    return item.startedAtEpochMs >= startEpochMs && item.startedAtEpochMs <= nowEpochMs;
+  }
+
+  private matchesPass(item: PracticeAttemptSummary, pass: PracticePassFilter): boolean {
+    if (pass === PracticePassFilter.ALL) return true;
+    if (item.status !== PracticeAttemptStatus.SUBMITTED) return false;
+    if (item.mode !== PracticeAttemptMode.FULL) return false;
+    let passed = PracticePassPolicy.isPassedAttempt(item);
+    if (pass === PracticePassFilter.PASSED) return passed;
+    return !passed;
   }
 
   private two(value: number): string {
