@@ -39,7 +39,7 @@ for forbidden in ["抓取今日作业", "班级采集设置", "屏幕采集诊�
             f"manual import page still contains capture-specific UI/callback: {forbidden}")
 
 for text in ["抓取老师作业", "当前来源", "开始抓取", "抓取记录",
-             "班级采集设置", "使用说明", "屏幕采集技术诊断", "不读取微信数据库",
+             "班级采集设置", "使用说明", "屏幕采集诊断", "不读取微信数据库",
              "不自动点击或滚动微信", "Accessibility"]:
     require(text in capture_home, f"capture home missing required UX/privacy content: {text}")
 require("AppTheme.CAPTURE_HOME_READABLE_MAX_WIDTH" in capture_home,
