@@ -123,7 +123,8 @@ export class HomeworkCaptureWorkflowService {
     let activation: HomeworkUnderstandingActivationResult =
       HomeworkUnderstandingService.instance.understandAndActivate(
         session.importBatchId,
-        this.profiles.understandingConfig(profile));
+        this.profiles.understandingConfig(profile),
+        this.profileStartEpoch(session.startedAtEpochMs, profile.defaultStartMinuteOfDay));
 
     return {
       session: session,
@@ -178,6 +179,12 @@ export class HomeworkCaptureWorkflowService {
       updated,
       this.inbox.getMessages(batchId),
       this.inbox.getCandidates(batchId));
+  }
+
+  private profileStartEpoch(anchorEpochMs: number, minuteOfDay: number): number {
+    let date = new Date(anchorEpochMs);
+    date.setHours(0, 0, 0, 0);
+    return date.getTime() + minuteOfDay * 60 * 1000;
   }
 
   private validateGroup(expected: string, detected: string): SourceGroupValidationStatus {
