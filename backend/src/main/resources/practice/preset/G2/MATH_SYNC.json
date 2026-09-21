@@ -2125,6 +2125,882 @@
           ]
         }
       ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-MIXED-CALC-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学连加连减与加减混合（一）",
+      "description": "在比赛得分、人数变化和物品整理等情境中练习100以内连加、连减和加减混合。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "加与减",
+        "两步计算"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q01-V1",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "运动会一班第一轮得了24分，第二轮得18分，第三轮得16分，一共得多少分？",
+          "options": [],
+          "answerSpec": "58",
+          "explanation": "24+18+16=58，所以三轮一共58分。",
+          "hints": [
+            "关键词：“三轮”“一共”，数量24、18、16。把三次得分连续相加。"
+          ],
+          "tags": [
+            "连加",
+            "得分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书角有80本书，借走23本，又借走17本，还剩多少本？",
+          "options": [
+            {
+              "key": "A",
+              "label": "40本"
+            },
+            {
+              "key": "B",
+              "label": "50本"
+            },
+            {
+              "key": "C",
+              "label": "60本"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "80-23-17=40，所以还剩40本。",
+          "hints": [
+            "关键词：“借走23”“又借走17”“还剩”。总数连续减少两次，要做连减。"
+          ],
+          "tags": [
+            "连减",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q03-V1",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "公交车上原有36人，到站下去12人，又上来18人，现在有多少人？",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "36-12+18=42，所以现在有42人。",
+          "hints": [
+            "关键词：“下去12”“上来18”。先减少，再增加，按事情发生顺序计算。"
+          ],
+          "tags": [
+            "加减混合",
+            "人数变化"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "小店上午卖出15盒彩笔，下午卖出22盒，晚上又卖出13盒，一共卖出多少盒？",
+          "options": [
+            {
+              "key": "A",
+              "label": "45盒"
+            },
+            {
+              "key": "B",
+              "label": "50盒"
+            },
+            {
+              "key": "C",
+              "label": "55盒"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "15+22+13=50，所以一共卖出50盒。",
+          "hints": [
+            "关键词：“上午、下午、晚上”“一共”。三个时段都在增加卖出的总量，连续相加。"
+          ],
+          "tags": [
+            "连加",
+            "购物"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q05-V1",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "班级准备了75张彩纸，手工课用了28张，课后又用了19张，还剩多少张？",
+          "options": [],
+          "answerSpec": "28",
+          "explanation": "75-28-19=28，所以还剩28张。",
+          "hints": [
+            "关键词：“用了28”“又用了19”“还剩”。从总数中连续减去两次使用量。"
+          ],
+          "tags": [
+            "连减",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "小宇有42张贴纸，送给同学15张，后来又得到20张，现在有多少张？",
+          "options": [
+            {
+              "key": "A",
+              "label": "37张"
+            },
+            {
+              "key": "B",
+              "label": "42张"
+            },
+            {
+              "key": "C",
+              "label": "47张"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "42-15+20=47，所以现在有47张。",
+          "hints": [
+            "关键词：“送出15”“又得到20”。先减去送出的，再加上新得到的。"
+          ],
+          "tags": [
+            "加减混合",
+            "数量变化"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q07-V1",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "合唱队原来有31人，又加入9人，后来有6人请假，现在参加排练的有多少人？",
+          "options": [],
+          "answerSpec": "34",
+          "explanation": "31+9-6=34，所以参加排练的有34人。",
+          "hints": [
+            "关键词：“加入9”“6人请假”。人数先增加，再减少。"
+          ],
+          "tags": [
+            "加减混合",
+            "人数"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "果篮里有60个橘子，第一组拿走18个，第二组拿走22个，还剩多少个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "20个"
+            },
+            {
+              "key": "B",
+              "label": "30个"
+            },
+            {
+              "key": "C",
+              "label": "40个"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "60-18-22=20，所以还剩20个。",
+          "hints": [
+            "关键词：“拿走18”“拿走22”“还剩”。两个小组都让总数减少。"
+          ],
+          "tags": [
+            "连减",
+            "分物"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q09-V1",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "图书义卖第一小时卖出26本，第二小时卖出17本，第三小时卖出15本，一共卖出多少本？",
+          "options": [],
+          "answerSpec": "58",
+          "explanation": "26+17+15=58，所以一共卖出58本。",
+          "hints": [
+            "关键词：“三个小时”“一共”。把三个时段卖出的数量连续相加。"
+          ],
+          "tags": [
+            "连加",
+            "统计"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "停车场原来有48辆车，开走16辆，又开进25辆，现在有多少辆？",
+          "options": [
+            {
+              "key": "A",
+              "label": "52辆"
+            },
+            {
+              "key": "B",
+              "label": "57辆"
+            },
+            {
+              "key": "C",
+              "label": "63辆"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "48-16+25=57，所以现在有57辆。",
+          "hints": [
+            "关键词：“开走16”“开进25”。先减后加，按实际变化顺序计算。"
+          ],
+          "tags": [
+            "加减混合",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q11-V1",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "小乐攒了65元，买书花了24元，买文具又花了18元，还剩多少元？",
+          "options": [],
+          "answerSpec": "23",
+          "explanation": "65-24-18=23，所以还剩23元。",
+          "hints": [
+            "关键词：“花了24”“又花18”“还剩”。钱连续减少两次。"
+          ],
+          "tags": [
+            "连减",
+            "购物"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "班级原来有29盒彩泥，新买了18盒，手工课用了12盒，现在还剩多少盒？",
+          "options": [
+            {
+              "key": "A",
+              "label": "31盒"
+            },
+            {
+              "key": "B",
+              "label": "33盒"
+            },
+            {
+              "key": "C",
+              "label": "35盒"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "29+18-12=35，所以还剩35盒。",
+          "hints": [
+            "关键词：“新买18”“用了12”。数量先增加再减少。"
+          ],
+          "tags": [
+            "加减混合",
+            "生活应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学6～9的乘法口诀（一）",
+      "description": "用贴画、座位、运动和整理物品等情境巩固6～9的乘法口诀及简单应用。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "6-9乘法口诀",
+        "生活应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q01-V1",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "有6排座位，每排7个，一共有多少个座位？",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "6×7=42，所以一共有42个座位。",
+          "hints": [
+            "关键词：“6排”“每排7个”。相同数量重复6次，用乘法求总数。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和7"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "8盒彩笔，每盒6支，一共有多少支？",
+          "options": [
+            {
+              "key": "A",
+              "label": "48支"
+            },
+            {
+              "key": "B",
+              "label": "42支"
+            },
+            {
+              "key": "C",
+              "label": "56支"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "8×6=48，所以共有48支。",
+          "hints": [
+            "关键词：“8盒”“每盒6支”。找出份数和每份数量，再用乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和8"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q03-V1",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "9个小组，每组5人，一共有多少人？",
+          "options": [],
+          "answerSpec": "45",
+          "explanation": "9×5=45，所以共有45人。",
+          "hints": [
+            "关键词：“9组”“每组5人”。每组人数相同，用乘法求总人数。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "5和9"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "7辆小车，每辆有4个轮子，一共有多少个轮子？",
+          "options": [
+            {
+              "key": "A",
+              "label": "24个"
+            },
+            {
+              "key": "B",
+              "label": "28个"
+            },
+            {
+              "key": "C",
+              "label": "32个"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "7×4=28，所以一共有28个轮子。",
+          "hints": [
+            "关键词：“7辆”“每辆4个轮子”。相同的4重复7次。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "4和7"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q05-V1",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "一页贴8张星星贴纸，贴了9页，一共贴了多少张？",
+          "options": [],
+          "answerSpec": "72",
+          "explanation": "8×9=72，所以一共72张。",
+          "hints": [
+            "关键词：“每页8张”“9页”。每页一样多，用8乘9。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "8和9"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "6个篮子，每个篮子放9个橘子，一共有多少个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "48个"
+            },
+            {
+              "key": "B",
+              "label": "52个"
+            },
+            {
+              "key": "C",
+              "label": "54个"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "6×9=54，所以一共有54个橘子。",
+          "hints": [
+            "关键词：“6个篮子”“每个9个”。用乘法求相同份数的总量。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和9"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q07-V1",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "操场上有7队同学，每队8人，一共有多少人？",
+          "options": [],
+          "answerSpec": "56",
+          "explanation": "7×8=56，所以共有56人。",
+          "hints": [
+            "关键词：“7队”“每队8人”。7个8相加可以直接用乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "7和8"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一个算式的结果是63？",
+          "options": [
+            {
+              "key": "A",
+              "label": "7×9"
+            },
+            {
+              "key": "B",
+              "label": "8×7"
+            },
+            {
+              "key": "C",
+              "label": "6×9"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "7×9=63，另外两个分别是56和54。",
+          "hints": [
+            "关键词：“结果63”。回忆7、8、9相关口诀，逐个比较算式结果。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "算式辨析"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q09-V1",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "8张桌子，每张桌子坐7人，一共可以坐多少人？",
+          "options": [],
+          "answerSpec": "56",
+          "explanation": "8×7=56，所以可以坐56人。",
+          "hints": [
+            "关键词：“8张桌子”“每桌7人”。每桌人数相同，用乘法。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "7和8"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "9袋糖，每袋6颗，一共有多少颗？",
+          "options": [
+            {
+              "key": "A",
+              "label": "45颗"
+            },
+            {
+              "key": "B",
+              "label": "54颗"
+            },
+            {
+              "key": "C",
+              "label": "63颗"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "9×6=54，所以共有54颗糖。",
+          "hints": [
+            "关键词：“9袋”“每袋6颗”。用9乘6求总数。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和9"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q11-V1",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "6行花盆，每行8盆，一共有多少盆？",
+          "options": [],
+          "answerSpec": "48",
+          "explanation": "6×8=48，所以一共有48盆。",
+          "hints": [
+            "关键词：“6行”“每行8盆”。相同数量重复6次，用乘法求总数。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和8"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句乘法口诀可以帮助计算8×9？",
+          "options": [
+            {
+              "key": "A",
+              "label": "七八五十六"
+            },
+            {
+              "key": "B",
+              "label": "六九五十四"
+            },
+            {
+              "key": "C",
+              "label": "八九七十二"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“八九七十二”直接对应8×9=72。",
+          "hints": [
+            "关键词：“8×9”“口诀”。找同时包含8和9的一句口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "口诀"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-TIMES-DIV-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学倍数关系与除法应用（一）",
+      "description": "用动物数量、文具分组和生活场景理解“几倍”关系，并用除法解决每份与份数问题。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "倍数关系",
+        "除法应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "小兔有3只，小鸟有12只。小鸟的数量是小兔的几倍？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4倍"
+            },
+            {
+              "key": "B",
+              "label": "3倍"
+            },
+            {
+              "key": "C",
+              "label": "6倍"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "12里面有4个3，12÷3=4，所以小鸟是小兔的4倍。",
+          "hints": [
+            "关键词：“3只”“12只”“几倍”。看大数量里有几个小数量，用除法。"
+          ],
+          "tags": [
+            "倍数关系",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q02-V1",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "红花有5朵，黄花有20朵。黄花是红花的几倍？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "20÷5=4，所以黄花是红花的4倍。",
+          "hints": [
+            "关键词：“5朵”“20朵”“几倍”。求20里面有几个5。"
+          ],
+          "tags": [
+            "倍数关系",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "24个苹果平均放进6个盘子，每盘放几个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3个"
+            },
+            {
+              "key": "B",
+              "label": "4个"
+            },
+            {
+              "key": "C",
+              "label": "6个"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "24÷6=4，所以每盘4个。",
+          "hints": [
+            "关键词：“平均放6盘”“每盘几个”。总数平均分成6份，求每份数量。"
+          ],
+          "tags": [
+            "除法",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q04-V1",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "35张卡片，每5张装一袋，可以装几袋？",
+          "options": [],
+          "answerSpec": "7",
+          "explanation": "35÷5=7，所以可以装7袋。",
+          "hints": [
+            "关键词：“每5张一袋”“35张”。按每份5张分组，求能分几份。"
+          ],
+          "tags": [
+            "除法",
+            "份数"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "6个气球是一组，42个气球能分成几组？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6组"
+            },
+            {
+              "key": "B",
+              "label": "7组"
+            },
+            {
+              "key": "C",
+              "label": "8组"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "42÷6=7，所以能分成7组。",
+          "hints": [
+            "关键词：“6个一组”“42个”。求42里面有几个6。"
+          ],
+          "tags": [
+            "除法",
+            "分组"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q06-V1",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "小猫有4条鱼，小狗有16根骨头。16是4的几倍？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "16÷4=4，所以16是4的4倍。",
+          "hints": [
+            "关键词：“4”“16”“几倍”。用较大数除以较小数。"
+          ],
+          "tags": [
+            "倍数关系",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一个问题适合用18÷3解决？",
+          "options": [
+            {
+              "key": "A",
+              "label": "18个球每3个一组，可以分几组？"
+            },
+            {
+              "key": "B",
+              "label": "18个球又买3个，一共有几个？"
+            },
+            {
+              "key": "C",
+              "label": "18个球送走3个，还剩几个？"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "18÷3表示把18按每3个分组，求能分成多少组。",
+          "hints": [
+            "关键词：“18÷3”“适合的问题”。除法常用于平均分或按固定数量分组。"
+          ],
+          "tags": [
+            "除法",
+            "算式意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q08-V1",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "48支铅笔平均分给8个同学，每人分到多少支？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "48÷8=6，所以每人6支。",
+          "hints": [
+            "关键词：“48支”“平均8人”“每人”。总数平均分成8份。"
+          ],
+          "tags": [
+            "除法",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "小明有7张邮票，姐姐有28张。姐姐的邮票数是小明的几倍？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3倍"
+            },
+            {
+              "key": "B",
+              "label": "4倍"
+            },
+            {
+              "key": "C",
+              "label": "5倍"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "28÷7=4，所以姐姐有小明的4倍。",
+          "hints": [
+            "关键词：“7张”“28张”“几倍”。求28里面有几个7。"
+          ],
+          "tags": [
+            "倍数关系",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q10-V1",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "54本书每9本放一层，需要几层书架？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "54÷9=6，所以需要6层。",
+          "hints": [
+            "关键词：“每9本一层”“54本”。按9本一份分组，求份数。"
+          ],
+          "tags": [
+            "除法",
+            "分组"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "8只小鸭，鸭妈妈准备了40条小鱼，平均每只小鸭分几条？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4条"
+            },
+            {
+              "key": "B",
+              "label": "5条"
+            },
+            {
+              "key": "C",
+              "label": "6条"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "40÷8=5，所以每只小鸭分5条。",
+          "hints": [
+            "关键词：“40条”“8只”“平均”。总数平均分给8只小鸭。"
+          ],
+          "tags": [
+            "除法",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q12-V1",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "6盒彩泥一共36块，平均每盒有多少块？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "36÷6=6，所以平均每盒6块。",
+          "hints": [
+            "关键词：“36块”“6盒”“平均每盒”。总数除以盒数，求每盒数量。"
+          ],
+          "tags": [
+            "除法",
+            "平均分"
+          ]
+        }
+      ]
     }
   ]
 }
