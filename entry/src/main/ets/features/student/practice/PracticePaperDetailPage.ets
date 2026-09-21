@@ -113,15 +113,31 @@ export struct PracticePaperDetailPage {
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text(this.viewModel.statusLabel(item))
-          .fontSize(12)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS : AppTheme.PRIMARY)
-          .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-          .backgroundColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
-          .borderRadius(AppTheme.CHIP_RADIUS);
+        Column({ space: 4 }) {
+          Text(this.viewModel.statusLabel(item))
+            .fontSize(12)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS : AppTheme.PRIMARY)
+            .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+            .backgroundColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
+            .borderRadius(AppTheme.CHIP_RADIUS);
+
+          if (item.status === PracticeAttemptStatus.SUBMITTED) {
+            Text(this.viewModel.passLabel(item))
+              .fontSize(12)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.viewModel.isPassApplicable(item) ?
+                (this.viewModel.isPassed(item) ? AppTheme.SUCCESS : AppTheme.WARNING) : AppTheme.PRIMARY)
+              .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+              .backgroundColor(this.viewModel.isPassApplicable(item) ?
+                (this.viewModel.isPassed(item) ? AppTheme.SUCCESS_SOFT : AppTheme.WARNING_SOFT) : AppTheme.PRIMARY_SOFT)
+              .borderRadius(AppTheme.CHIP_RADIUS);
+          }
+        }
+        .alignItems(HorizontalAlign.End);
       }
-      .width('100%');
+      .width('100%')
+      .alignItems(VerticalAlign.Top);
 
       Row({ space: 7 }) {
         Text(this.viewModel.scoreText(item))
@@ -148,7 +164,7 @@ export struct PracticePaperDetailPage {
           .fontColor(AppTheme.TERTIARY_TEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
           Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
-          Text(`耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
+          Text(`完成耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
             .fontSize(12)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
@@ -160,7 +176,7 @@ export struct PracticePaperDetailPage {
     .backgroundColor(AppTheme.SURFACE_SUBTLE)
     .borderRadius(AppTheme.CONTROL_RADIUS)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText(`第${item.attemptNo}次练习，${this.viewModel.statusLabel(item)}`)
+    .accessibilityText(`第${item.attemptNo}次练习，${this.viewModel.statusLabel(item)}${item.status === PracticeAttemptStatus.SUBMITTED ? `，${this.viewModel.passLabel(item)}，完成耗时${this.viewModel.elapsedText(item.elapsedSeconds)}` : ''}`)
     .onClick(() => this.openAttempt(item));
   }
 
