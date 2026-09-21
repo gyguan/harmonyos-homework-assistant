@@ -26,19 +26,19 @@ routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 navigator = read("entry/src/main/ets/app/navigation/ParentImportNavigator.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 
-require("手工导入作业" in dashboard and "抓取老师作业" in dashboard,
-        "parent dashboard must expose manual import and capture as independent entries")
-require("onOpenImport" in dashboard and "onOpenCapture" in dashboard,
-        "dashboard entries must have independent callbacks")
+require("手工导入作业" in dashboard and "抓取老师作业" in dashboard and "作业收件箱" in dashboard,
+        "parent dashboard must expose manual import, capture and inbox as independent entries")
+require("onOpenImport" in dashboard and "onOpenCapture" in dashboard and "onOpenInbox" in dashboard,
+        "dashboard import/capture/inbox entries must have independent callbacks")
 
 require("title: '手工导入作业'" in import_home and "HomeworkImportPage" in import_home,
         "manual import page must remain dedicated to manual input")
-for forbidden in ["抓取今日作业", "班级采集设置", "屏幕采集诊断",
-                  "onOpenCapture:", "onOpenSourceProfile:", "onOpenDiagnostics:"]:
+for forbidden in ["抓取今日作业", "班级采集设置", "屏幕采集诊断", "作业收件箱",
+                  "onOpenCapture:", "onOpenSourceProfile:", "onOpenDiagnostics:", "onOpenInbox:"]:
     require(forbidden not in import_home,
             f"manual import page still contains capture-specific UI/callback: {forbidden}")
 
-for text in ["抓取老师作业", "当前来源", "开始抓取", "抓取记录",
+for text in ["抓取老师作业", "当前来源", "开始抓取", "作业收件箱",
              "班级采集设置", "使用说明", "屏幕采集诊断", "不读取微信数据库",
              "不自动点击或滚动微信", "Accessibility"]:
     require(text in capture_home, f"capture home missing required UX/privacy content: {text}")
@@ -61,6 +61,8 @@ require("HomeworkCaptureHomePage" in shell and "name === AppRoute.PARENT_CAPTURE
         "AppShell must compose the dedicated capture home destination")
 require("onOpenCapture: () => ParentImportNavigator.openCaptureHome" in shell,
         "parent dashboard capture entry must open the dedicated capture home")
+require("onOpenInbox: () => ParentImportNavigator.openInbox" in shell,
+        "parent dashboard inbox entry must open the shared Import Inbox")
 require("onStartCapture: () => ParentImportNavigator.openCapture" in shell,
         "capture home must reuse the existing capture session route")
 

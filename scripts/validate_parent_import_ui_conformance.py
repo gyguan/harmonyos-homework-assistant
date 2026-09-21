@@ -24,6 +24,7 @@ profile = read("entry/src/main/ets/features/parent/import/HomeworkSourceProfileP
 inbox = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
 batch = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 diagnostic = read("entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets")
 
 # Deep pages must not depend on default vertical alignment.
@@ -53,9 +54,16 @@ require("返回导入老师作业" not in capture and "返回导入老师作业"
 # Phone/Pad readable-width rules.
 require("AppTheme.PROFILE_READABLE_MAX_WIDTH" in profile,
         "SourceProfile must use its dedicated Pad readable-width token")
-require("maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH" in import_route and
-        ".alignItems(HorizontalAlign.Center)" in import_route,
-        "manual import top action must align with the readable content column on Pad")
+require(".alignItems(HorizontalAlign.Center)" in import_route and
+        "AppTheme.IMPORT_READABLE_MAX_WIDTH" in import_page,
+        "manual import route must center the embedded readable content column on Pad")
+
+require("FilterSummaryEntry" in inbox and "label: '来源'" in inbox and
+        "label: '状态'" in inbox and "label: '时间'" in inbox,
+        "Import Inbox must reuse the standard filter summary interaction")
+require("AppTheme.IMPORT_READABLE_MAX_WIDTH" in inbox and
+        "AppTheme.PHONE_CARD_RADIUS" in inbox and "AppTheme.BORDER" in inbox,
+        "Import Inbox cards must stay aligned with current Phone/Pad visual tokens")
 
 # Formal capture UI is a business surface; engineering counters stay in the diagnostic page.
 for engineering_copy in ["视频回调", "OCR失败", "最近序号"]:

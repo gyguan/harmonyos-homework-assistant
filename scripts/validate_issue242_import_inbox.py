@@ -33,7 +33,12 @@ import_service = read("entry/src/main/ets/application/import/HomeworkImportServi
 publish = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
 entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
 inbox_page = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
+inbox_vm = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxViewModel.ets")
+inbox_filters = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxFilters.ets")
+inbox_filter_dialog = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxFilterDialog.ets")
 detail_page = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
+dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+import_home = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 fixture = read("entry/src/test/fixtures/Issue242ImportInboxFixture.ets")
@@ -93,8 +98,28 @@ require("markActiveBatchPublished" in publish and
 require("PreferencesHomeworkImportInboxPersistence" in entry and "HomeworkImportInboxBootstrap" in entry,
         "EntryAbility must initialize Import Inbox persistence")
 
-require("作业智能收件箱" in inbox_page and "messageCount" in inbox_page and "candidateCount" in inbox_page,
-        "parent UI must expose batch history and counts")
+require("title: '作业收件箱'" in inbox_page and "messageCount" in inbox_page and "candidateCount" in inbox_page,
+        "parent UI must expose the shared homework inbox and batch counts")
+for token in [
+    "HomeworkImportInboxSourceFilter",
+    "HomeworkImportInboxStatusFilter",
+    "HomeworkImportInboxTimeFilter",
+]:
+    require(token in inbox_filters, f"Import Inbox filter model missing: {token}")
+require("filterBatches(" in inbox_vm and "matchesSource(" in inbox_vm and
+        "matchesStatus(" in inbox_vm and "earliestEpochMs(" in inbox_vm,
+        "Import Inbox ViewModel must own source/status/time filtering")
+require("FilterSummaryEntry" in inbox_page and "label: '来源'" in inbox_page and
+        "label: '状态'" in inbox_page and "label: '时间'" in inbox_page,
+        "Import Inbox page must expose the standard filter summary bar")
+for token in ["Text('来源')", "Text('状态')", "Text('时间')", "Button('重置'", "Button('确定'"]:
+    require(token in inbox_filter_dialog, f"Import Inbox filter dialog missing: {token}")
+require("作业收件箱" in dashboard and "onOpenInbox" in dashboard,
+        "parent dashboard must expose Import Inbox as an independent entry")
+require("onOpenInbox: () => ParentImportNavigator.openInbox" in shell,
+        "parent dashboard inbox entry must use ParentImportNavigator")
+require("作业收件箱" not in import_home and "onOpenInbox" not in import_home,
+        "manual import page must not own the shared Import Inbox entry")
 require("原始消息" in detail_page and "候选作业" in detail_page and "sourceMessageIds" in detail_page,
         "batch detail must show source messages, candidates and provenance")
 require("继续确认并发布" in detail_page and "activate(this.batchId)" in detail_page,
