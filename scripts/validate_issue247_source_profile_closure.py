@@ -46,7 +46,7 @@ for field in [
     require(field in profile_models, f"SourceProfile field missing: {field}")
 for field in ["displayName: string", "aliases: string[]", "subject: Subject"]:
     require(field in profile_models, f"TeacherAlias field missing: {field}")
-for state in ["MATCHED", "MISMATCH", "UNRECOGNIZED"]:
+for state in ["MATCHED", "MISMATCH", "UNRECOGNIZED", "CONFLICT"]:
     require(state in profile_models, f"group validation state missing: {state}")
 
 require("homework_source_profiles_v1" in profile_persistence,
@@ -101,8 +101,9 @@ require("targetStartMinuteOfDay: profile.defaultStartMinuteOfDay" in workflow,
 require("validateGroupTitle(profile.groupTitle" in workflow,
         "workflow must validate detected group title against profile")
 require("SourceGroupValidationStatus.MISMATCH" in workflow and
-        "SourceGroupValidationStatus.UNRECOGNIZED" in workflow,
-        "mismatch and unrecognized group states must not be conflated")
+        "SourceGroupValidationStatus.UNRECOGNIZED" in workflow and
+        "SourceGroupValidationStatus.CONFLICT" in workflow,
+        "mismatch, unrecognized and mixed-group states must not be conflated")
 require("needsGroupConfirmation" in workflow and
         "confirmUnrecognizedAndContinue" in workflow,
         "unrecognized group must require explicit parent continuation")
@@ -111,6 +112,10 @@ require("validation === SourceGroupValidationStatus.MISMATCH" in workflow,
 require("profileStartEpoch" in workflow and "tryUnderstandBatch" in workflow and
         "this.inbox.activateBatch(session.importBatchId)" in workflow,
         "profile time window must flow through retry-safe understanding before confirmation activation")
+require("HomeworkImportPipelineStage" in import_models and
+        "pipelineStage?: HomeworkImportPipelineStage" in import_models and
+        "HomeworkImportPipelineStage.ACTIVATED" in workflow,
+        "capture-to-confirmation pipeline stage must be persisted for idempotent resume")
 require("TIME_RANGE_FILTERED" in understanding and
         "this.inbox.importBatch(updated, allMessages, result.candidates)" in understanding,
         "out-of-window messages must be excluded from semantics but retained for audit")
@@ -171,6 +176,8 @@ for expected in [
     require(expected in fixture, f"#247 closure assertion missing: {expected}")
 require("mismatchDetected" in fixture and "unrecognizedRequiresConfirmation" in fixture,
         "fixture must cover wrong-group and OCR-unrecognized group behavior")
+require("mixedGroupConflictBlocked" in fixture and "conflictingGroupFrames" in fixture,
+        "fixture must prove mixed-group capture is fail-closed")
 require("normalizedGroupVariantMatched" in fixture and "二（3）班家长群(45)" in fixture,
         "fixture must cover common OCR/group-title bracket and member-count normalization")
 require("replace(/（/g, '(')" in workflow and "memberCount" in workflow,
