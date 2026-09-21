@@ -79,7 +79,7 @@ export struct PracticeHistoryPage {
       .layoutWeight(1)
       .height(AppTheme.MIN_TOUCH_TARGET)
       .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(12)
+      .fontSize(13)
       .fontWeight(this.selectedStatus === status ? FontWeight.Medium : FontWeight.Normal)
       .backgroundColor(this.selectedStatus === status ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
       .fontColor(this.selectedStatus === status ? AppTheme.PRIMARY : AppTheme.TEXT)
@@ -92,7 +92,7 @@ export struct PracticeHistoryPage {
       .layoutWeight(1)
       .height(AppTheme.MIN_TOUCH_TARGET)
       .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(12)
+      .fontSize(13)
       .fontWeight(this.selectedSubject === subject ? FontWeight.Medium : FontWeight.Normal)
       .backgroundColor(this.selectedSubject === subject ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
       .fontColor(this.selectedSubject === subject ? AppTheme.PRIMARY : AppTheme.TEXT)
@@ -105,7 +105,7 @@ export struct PracticeHistoryPage {
       Row({ space: 6 }) {
         Text('状态')
           .width(34)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
         this.StatusOption(PracticeHistoryStatusFilter.ALL);
         this.StatusOption(PracticeHistoryStatusFilter.SUBMITTED);
@@ -118,7 +118,7 @@ export struct PracticeHistoryPage {
         Row({ space: 6 }) {
           Text('科目')
             .width(34)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
           this.SubjectOption(PracticeHistorySubjectFilter.ALL);
           this.SubjectOption(PracticeHistorySubjectFilter.CHINESE);
@@ -146,7 +146,7 @@ export struct PracticeHistoryPage {
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis });
       Text(label)
-        .fontSize(11)
+        .fontSize(12)
         .fontColor(AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
@@ -166,7 +166,7 @@ export struct PracticeHistoryPage {
           .fontColor(AppTheme.TEXT);
         Blank();
         Text('仅统计已完成')
-          .fontSize(11)
+          .fontSize(12)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
@@ -197,14 +197,14 @@ export struct PracticeHistoryPage {
             .fontColor(AppTheme.TEXT);
           Text(`${PracticeTaxonomy.gradeLabel(item.grade)} · ${PracticeTaxonomy.subjectLabel(item.subject)} · ${this.viewModel.modeLabel(item)} · 第 ${item.attemptNo} 次`)
             .width('100%')
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
         Text(this.viewModel.statusLabel(item))
-          .fontSize(11)
+          .fontSize(12)
           .fontWeight(FontWeight.Medium)
           .fontColor(item.status === PracticeAttemptStatus.SUBMITTED ? AppTheme.SUCCESS : AppTheme.PRIMARY)
           .padding({ left: 9, right: 9, top: 5, bottom: 5 })
@@ -219,25 +219,25 @@ export struct PracticeHistoryPage {
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+        Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
         Text(this.viewModel.timeText(item.startedAtEpochMs))
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
-          Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
           Text(`耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
         if (item.noteCount > 0) {
-          Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
           Text(`${item.noteCount} 条笔记`)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
         Blank();
         Text('查看')
-          .fontSize(12)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -284,7 +284,7 @@ export struct PracticeHistoryPage {
 
           Text('每次开始练习都会创建独立实例，历史记录不会被后续重练覆盖。')
             .width('100%')
-            .fontSize(12)
+            .fontSize(13)
             .lineHeight(18)
             .fontColor(AppTheme.TERTIARY_TEXT);
 
@@ -310,7 +310,7 @@ export struct PracticeHistoryPage {
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
               Text(this.isPaperScoped() ? '完成这套练习后，每一次结果都会保留在这里。' : '完成第一套练习后，每一次结果都会保留在这里。')
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT);
             }
             .width('100%')
@@ -324,7 +324,7 @@ export struct PracticeHistoryPage {
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
               Text('可以切换状态或科目继续查看。')
-                .fontSize(12)
+                .fontSize(13)
                 .fontColor(AppTheme.SUBTEXT);
             }
             .width('100%')
