@@ -88,7 +88,9 @@ export struct HomeworkCapturePage {
       this.earliestDetectedTime = progress.earliestDetectedTime;
 
       if (active.status === CaptureSessionStatus.CAPTURING) {
-        if (progress.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
+        if (progress.groupValidationStatus === SourceGroupValidationStatus.CONFLICT) {
+          this.errorText = '本次采集检测到多个不同微信群，已停止自动整理。请结束本次采集，并从目标班级群重新开始。';
+        } else if (progress.groupValidationStatus === SourceGroupValidationStatus.MISMATCH) {
           this.errorText = `当前识别群“${progress.detectedGroupTitle}”与配置“${progress.profile.groupTitle}”不一致，请确认已进入正确微信群。`;
         } else if (progress.timeBoundaryReached) {
           this.errorText = '';
@@ -260,6 +262,12 @@ export struct HomeworkCapturePage {
     if (!result.reconstructionSucceeded) {
       this.errorText = '聊天重建未完成，原始屏幕证据已经保留在收件箱，可以稍后重试或人工处理。';
       this.message = '本次屏幕采集已经安全结束。';
+      return;
+    }
+
+    if (result.groupValidationStatus === SourceGroupValidationStatus.CONFLICT) {
+      this.errorText = '本次采集混入了多个微信群的内容。原始证据已保留，但不会自动生成作业，请从目标班级群重新抓取。';
+      this.message = '为避免把其他群消息混入作业，本次自动整理已阻断。';
       return;
     }
 
