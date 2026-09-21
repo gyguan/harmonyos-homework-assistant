@@ -92,7 +92,7 @@ export class DeterministicChatReconstructor {
           sourceFrameEvidenceIds: node.sourceFrameEvidenceIds.slice(),
           rawText: node.message.text,
           imageRef: '',
-          capturedAtEpochMs: node.message.approxTimestampEpochMs
+          capturedAtEpochMs: this.sourceCapturedAt(node.sourceFrameEvidenceIds, orderedEvidence)
         },
         fingerprint: this.persistedFingerprint(node.message),
         orderNo: i + 1
@@ -292,6 +292,17 @@ export class DeterministicChatReconstructor {
       }
     }
     return best;
+  }
+
+  private sourceCapturedAt(frameIds: string[], evidence: CaptureFrameEvidence[]): number {
+    let earliest = 0;
+    for (let frameId of frameIds) {
+      for (let item of evidence) {
+        if (item.id !== frameId) continue;
+        if (earliest === 0 || item.capturedAtEpochMs < earliest) earliest = item.capturedAtEpochMs;
+      }
+    }
+    return earliest;
   }
 
   private persistedFingerprint(message: ParsedChatMessage): string {
