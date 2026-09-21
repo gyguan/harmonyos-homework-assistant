@@ -24,6 +24,7 @@ import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboar
 import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
 import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceAssignmentPage';
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
+import { HomeworkCaptureHomePage } from '../features/parent/import/HomeworkCaptureHomePage';
 import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImportInboxPage';
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
@@ -366,11 +367,21 @@ export struct AppShell {
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
           onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-          onOpenCapture: () => ParentImportNavigator.openCapture(this.navPathStack),
+          onStoreChanged: () => this.notifyUiChanged()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_CAPTURE_HOME) {
+      NavDestination() {
+        HomeworkCaptureHomePage({
+          revision: this.storeRevision,
+          onBack: () => this.navPathStack.pop(),
+          onStartCapture: () => ParentImportNavigator.openCapture(this.navPathStack),
           onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
             ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave),
-          onOpenCaptureSpike: () => ParentImportNavigator.openCaptureSpike(this.navPathStack),
-          onStoreChanged: () => this.notifyUiChanged()
+          onOpenHistory: () => ParentImportNavigator.openInbox(this.navPathStack),
+          onOpenDiagnostics: () => ParentImportNavigator.openCaptureSpike(this.navPathStack)
         });
       }
       .hideTitleBar(true)
@@ -474,6 +485,7 @@ export struct AppShell {
         revision: this.storeRevision,
         activeStudentId: this.activeStudentId,
         onOpenImport: () => ParentImportNavigator.openImport(this.navPathStack),
+        onOpenCapture: () => ParentImportNavigator.openCaptureHome(this.navPathStack),
         onOpenExtra: () => this.openParentExtraCreate(false),
         onOpenVoice: () => this.openParentExtraCreate(true),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,

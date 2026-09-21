@@ -14,6 +14,7 @@ export struct ParentDashboardPage {
   @Prop activeStudentId: string = '';
   @State private availableWidthVp: number = 390;
   onOpenImport: () => void = () => {};
+  onOpenCapture: () => void = () => {};
   onOpenExtra: () => void = () => {};
   onOpenVoice: () => void = () => {};
   onOpenProgress: () => void = () => {};
@@ -280,8 +281,8 @@ export struct ParentDashboardPage {
         Row({ space: 8 }) {
           SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.PRIMARY]);
           Column({ space: 2 }) {
-            Text('导入作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('老师截图或文字').fontSize(13).fontColor(AppTheme.SUBTEXT);
+            Text('手工导入作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('老师截图、文字或分享').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
         }
@@ -291,9 +292,34 @@ export struct ParentDashboardPage {
         .backgroundColor(AppTheme.PRIMARY_FAINT)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`给 ${this.student().name} 导入老师作业`)
+        .accessibilityText(`给 ${this.student().name} 手工导入老师作业`)
         .onClick(() => this.onOpenImport());
 
+        Row({ space: 8 }) {
+          Text('抓')
+            .width(22)
+            .fontSize(17)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center);
+          Column({ space: 2 }) {
+            Text('抓取老师作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('进班级群手工上滑').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+        }
+        .layoutWeight(1)
+        .constraintSize({ minHeight: 64 })
+        .padding(11)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(`给 ${this.student().name} 抓取老师作业`)
+        .onClick(() => this.onOpenCapture());
+      }
+      .width('100%');
+
+      Row({ space: 8 }) {
         Row({ space: 8 }) {
           SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.SUCCESS]);
           Column({ space: 2 }) {
@@ -310,32 +336,30 @@ export struct ParentDashboardPage {
         .accessibilityRole(AccessibilityRoleType.BUTTON)
         .accessibilityText(`给 ${this.student().name} 布置课外任务`)
         .onClick(() => this.onOpenExtra());
-      }
-      .width('100%');
 
-      Row({ space: 8 }) {
-        Text('♪')
-          .width(24)
-          .fontSize(22)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.PRIMARY)
-          .textAlign(TextAlign.Center);
-        Column({ space: 2 }) {
-          Text('语音作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('上传语音和情景图片，孩子边听边看').fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Row({ space: 8 }) {
+          Text('♪')
+            .width(22)
+            .fontSize(19)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center);
+          Column({ space: 2 }) {
+            Text('语音作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('语音和情景图片').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
         }
         .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-        SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).fontColor([AppTheme.TERTIARY_TEXT]);
+        .constraintSize({ minHeight: 64 })
+        .padding(11)
+        .backgroundColor(AppTheme.PRIMARY_FAINT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(`给 ${this.student().name} 布置语音作业`)
+        .onClick(() => this.onOpenVoice());
       }
-      .width('100%')
-      .constraintSize({ minHeight: 58 })
-      .padding(11)
-      .backgroundColor(AppTheme.PRIMARY_FAINT)
-      .borderRadius(AppTheme.CONTROL_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(`给 ${this.student().name} 布置语音作业`)
-      .onClick(() => this.onOpenVoice());
+      .width('100%');
     }
     .width('100%');
   }

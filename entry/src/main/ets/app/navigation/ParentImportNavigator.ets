@@ -1,5 +1,6 @@
 import {
   AppRoute,
+  ParentCaptureHomeRouteParam,
   ParentCaptureRouteParam,
   ParentCaptureSpikeRouteParam,
   ParentImportBatchRouteParam,
@@ -12,6 +13,10 @@ import {
 export class ParentImportNavigator {
   static openImport(stack: NavPathStack): void {
     stack.pushPathByName(AppRoute.PARENT_IMPORT, new ParentImportRouteParam());
+  }
+
+  static openCaptureHome(stack: NavPathStack): void {
+    stack.pushPathByName(AppRoute.PARENT_CAPTURE_HOME, new ParentCaptureHomeRouteParam());
   }
 
   static openInbox(stack: NavPathStack): void {

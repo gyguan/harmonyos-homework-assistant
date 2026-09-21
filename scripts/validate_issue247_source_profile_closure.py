@@ -24,7 +24,8 @@ entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 import_home = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
-import_home_vm = read("entry/src/main/ets/features/parent/import/HomeworkImportRouteViewModel.ets")
+capture_home = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets")
+capture_home_vm = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHomeViewModel.ets")
 profile_page = read("entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets")
 capture_page = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
 capture_vm = read("entry/src/main/ets/features/parent/import/HomeworkCaptureViewModel.ets")
@@ -64,20 +65,24 @@ require("HomeworkSourceProfileBootstrap" in entry and
 
 require("PARENT_SOURCE_PROFILE" in routes and "ParentSourceProfileRouteParam" in routes,
         "SourceProfile must have a dedicated navigation route")
+require("PARENT_CAPTURE_HOME" in routes and "HomeworkCaptureHomePage" in shell,
+        "daily capture must have a dedicated home route separate from manual import")
 require("startCaptureAfterSave" in routes and "finishSourceProfile" in shell,
         "first-use setup and later settings edit must have different navigation semantics")
 require("HomeworkSourceProfilePage" in shell,
         "SourceProfile setup page must be reachable")
 
-require("抓取今日作业" in import_home and "profileSubtitle" in import_home,
-        "import home must expose one-click daily capture and active profile summary")
-require("profileSubtitle()" in import_home and "今天 " in import_home_vm and " 至现在" in import_home_vm,
-        "profile summary must show today's capture window through the import ViewModel")
-require("!this.viewModel.hasSourceProfile()" in import_home and
-        "onOpenSourceProfile(true)" in import_home,
+require("抓取老师作业" in capture_home and "当前抓取来源" in capture_home,
+        "capture home must expose one-click daily capture and active profile summary")
+require("timeWindow()" in capture_home and "今天 " in capture_home_vm and " 至现在" in capture_home_vm,
+        "profile summary must show today's capture window through the capture ViewModel")
+require("!this.hasSourceProfile()" in capture_home and
+        "onOpenSourceProfile(true)" in capture_home,
         "first click without a profile must route through first-time setup")
-require("onOpenSourceProfile(false)" in import_home,
+require("onOpenSourceProfile(false)" in capture_home,
         "profile settings edit must not automatically stack a new capture page")
+require("抓取今日作业" not in import_home and "屏幕采集技术诊断" not in import_home,
+        "manual import page must not regain capture-specific entry points")
 
 for text in ["班级与微信群", "老师与科目", "默认抓取开始时间", "保存并开始抓取"]:
     require(text in profile_page, f"SourceProfile setup UI missing: {text}")

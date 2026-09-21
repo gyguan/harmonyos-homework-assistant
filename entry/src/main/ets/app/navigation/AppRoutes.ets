@@ -7,6 +7,7 @@ export enum AppRoute {
   STUDENT_PRACTICE_RESULT = 'student/practice/result',
   PARENT_REVIEW = 'parent/review',
   PARENT_IMPORT = 'parent/import',
+  PARENT_CAPTURE_HOME = 'parent/capture/home',
   PARENT_IMPORT_INBOX = 'parent/import/inbox',
   PARENT_IMPORT_BATCH_DETAIL = 'parent/import/inbox/detail',
   PARENT_CAPTURE = 'parent/import/capture',
@@ -51,6 +52,9 @@ export class PracticeAttemptRouteParam {
 }
 
 export class ParentImportRouteParam {
+}
+
+export class ParentCaptureHomeRouteParam {
 }
 
 export class ParentImportInboxRouteParam {
