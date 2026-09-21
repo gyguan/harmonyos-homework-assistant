@@ -19,6 +19,7 @@ export interface Issue247ClosureResult {
   mismatchDetected: boolean;
   unrecognizedRequiresConfirmation: boolean;
   normalizedGroupVariantMatched: boolean;
+  mixedGroupConflictBlocked: boolean;
   timeBoundaryReached: boolean;
   earliestDetectedTime: string;
   uniqueMessageCount: number;
@@ -52,6 +53,14 @@ export class Issue247FullClosureFixture {
       profile.groupTitle, '') === SourceGroupValidationStatus.UNRECOGNIZED;
     let normalizedGroupVariantMatched = workflow.validateGroupTitle(
       profile.groupTitle, '二（3）班家长群(45)') === SourceGroupValidationStatus.MATCHED;
+    let conflictReconstruction = reconstructor.reconstruct(
+      'issue247-conflict-batch',
+      this.conflictingGroupFrames(),
+      { targetStartMinuteOfDay: profile.defaultStartMinuteOfDay });
+    let mixedGroupConflictBlocked = workflow.validationForReconstruction(
+      profile.groupTitle,
+      conflictReconstruction.groupTitle,
+      conflictReconstruction.warnings) === SourceGroupValidationStatus.CONFLICT;
 
     let startEpoch = this.startEpoch(profile.defaultStartMinuteOfDay);
     let inWindow: ImportedMessage[] = [];
@@ -90,7 +99,7 @@ export class Issue247FullClosureFixture {
     let evidenceTrace = this.allCandidatesHaveEvidence(understanding.candidates);
 
     let passed = groupMatched && mismatchDetected && unrecognizedRequiresConfirmation &&
-      normalizedGroupVariantMatched &&
+      normalizedGroupVariantMatched && mixedGroupConflictBlocked &&
       reconstruction.timeBoundaryReached &&
       reconstruction.earliestDetectedTime === '14:58' &&
       reconstruction.messages.length === 5 &&
@@ -108,6 +117,7 @@ export class Issue247FullClosureFixture {
       mismatchDetected: mismatchDetected,
       unrecognizedRequiresConfirmation: unrecognizedRequiresConfirmation,
       normalizedGroupVariantMatched: normalizedGroupVariantMatched,
+      mixedGroupConflictBlocked: mixedGroupConflictBlocked,
       timeBoundaryReached: reconstruction.timeBoundaryReached,
       earliestDetectedTime: reconstruction.earliestDetectedTime,
       uniqueMessageCount: reconstruction.messages.length,
@@ -161,6 +171,40 @@ export class Issue247FullClosureFixture {
         '17:31 王老师 今晚语文：生字写两遍，练习册32页'
       ])
     ];
+  }
+
+  private static conflictingGroupFrames(): CaptureFrameEvidence[] {
+    return [
+      this.frameForGroup(11, '二(3)班家长群', ['17:31 王老师 今晚语文：生字写两遍']),
+      this.frameForGroup(12, '兴趣班家长群', ['17:35 张老师 明天带画笔']),
+      this.frameForGroup(13, '二(3)班家长群', ['17:42 王老师 练习册33页'])
+    ];
+  }
+
+  private static frameForGroup(orderNo: number, groupTitle: string,
+    messages: string[]): CaptureFrameEvidence {
+    let lines: CaptureOcrLineEvidence[] = [
+      this.line(groupTitle, 260, 30, 540, 70)
+    ];
+    for (let i = 0; i < messages.length; i++) {
+      lines.push(this.line(messages[i], 80, 220 + i * 190, 720, 270 + i * 190));
+    }
+    let values: string[] = [];
+    for (let line of lines) values.push(line.value);
+    return {
+      id: `issue247-conflict-frame-${orderNo}`,
+      sessionId: 'issue247-conflict-session',
+      sequence: orderNo,
+      capturedAtEpochMs: this.BASE_EPOCH + orderNo * 1000,
+      runtimeTimestamp: orderNo * 1000,
+      width: 800,
+      height: 1200,
+      fingerprint: `issue247-conflict-fingerprint-${orderNo}`,
+      text: values.join('\n'),
+      lineCount: lines.length,
+      lines: lines,
+      orderNo: orderNo
+    };
   }
 
   private static frame(orderNo: number, messages: string[]): CaptureFrameEvidence {
