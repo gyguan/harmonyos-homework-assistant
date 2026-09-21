@@ -47,6 +47,11 @@ export interface ImportBatch {
   sourceType: HomeworkImportSourceType;
   sourceLabel: string;
   sourceProfileId: string;
+  sourceProfileName?: string;
+  expectedGroupTitle?: string;
+  profileStartTime?: string;
+  groupValidationStatus?: string;
+  groupConfirmedByUser?: boolean;
   captureSessionId?: string;
   reconstructed?: boolean;
   groupTitle?: string;
