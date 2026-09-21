@@ -15,6 +15,7 @@ export struct HomeworkCapturePage {
   @State private revision: number = 0;
   @State private message: string = '点击开始后，系统会提示屏幕采集授权。进入班级群后只需手工上滑。';
   @State private errorText: string = '';
+  @State private currentSessionId: string = '';
   private floatViewController: floatView.FloatViewController | undefined = undefined;
   private refreshTimer: number = -1;
 
@@ -35,17 +36,45 @@ export struct HomeworkCapturePage {
   private session(): CaptureSession | null {
     let currentRevision = this.revision;
     if (currentRevision < 0) return null;
-    return HomeworkCaptureSessionService.instance.getActiveSession();
+    let active = HomeworkCaptureSessionService.instance.getActiveSession();
+    if (active !== null) return active;
+    if (this.currentSessionId.length === 0) return null;
+    return HomeworkCaptureSessionService.instance.getSession(this.currentSessionId);
+  }
+
+  private isRunning(session: CaptureSession | null): boolean {
+    if (session === null) return false;
+    return session.status === CaptureSessionStatus.CREATED ||
+      session.status === CaptureSessionStatus.WAITING_PERMISSION ||
+      session.status === CaptureSessionStatus.CAPTURING ||
+      session.status === CaptureSessionStatus.STOPPING;
   }
 
   private async refreshSession(): Promise<void> {
-    let session = await HomeworkCaptureSessionService.instance.sampleLatestFrame();
-    if (session !== null) {
-      this.revision++;
-      if (session.status === CaptureSessionStatus.CAPTURING) {
+    let active = await HomeworkCaptureSessionService.instance.sampleLatestFrame();
+    if (active !== null) {
+      this.currentSessionId = active.id;
+      if (active.status === CaptureSessionStatus.CAPTURING) {
         this.message = '采集中：请切到目标微信群，手工向上滑动；完成后在悬浮窗点“停止采集”。';
       }
+      this.revision++;
       return;
+    }
+
+    if (this.currentSessionId.length > 0) {
+      let finished = HomeworkCaptureSessionService.instance.getSession(this.currentSessionId);
+      if (finished !== null) {
+        if (finished.status === CaptureSessionStatus.COMPLETED) {
+          this.message = `采集已完成，已生成导入批次；共接受 ${finished.acceptedFrameCount} 个变化画面。`;
+          await this.stopFloatView();
+        } else if (finished.status === CaptureSessionStatus.CANCELLED) {
+          this.message = '本次采集已取消，可以重新开始。';
+          await this.stopFloatView();
+        } else if (finished.status === CaptureSessionStatus.FAILED) {
+          this.message = '本次采集异常结束，资源已释放，可以重新开始。';
+          await this.stopFloatView();
+        }
+      }
     }
     this.revision++;
   }
@@ -135,6 +164,7 @@ export struct HomeworkCapturePage {
     try {
       let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
       let session = HomeworkCaptureSessionService.instance.start(studentId);
+      this.currentSessionId = session.id;
       this.revision++;
       if (session.status === CaptureSessionStatus.CANCELLED) {
         this.message = '系统未开始屏幕采集，可以重新点击开始。';
@@ -156,6 +186,7 @@ export struct HomeworkCapturePage {
       this.message = '当前没有正在进行的采集。';
       return;
     }
+    this.currentSessionId = result.id;
     if (result.importBatchId.length > 0) {
       this.message = `采集已结束，已生成导入批次。采集到 ${result.acceptedFrameCount} 个变化画面。`;
     } else {
@@ -164,7 +195,8 @@ export struct HomeworkCapturePage {
   }
 
   private async cancelCapture(): Promise<void> {
-    HomeworkCaptureSessionService.instance.cancel();
+    let cancelled = HomeworkCaptureSessionService.instance.cancel();
+    if (cancelled !== null) this.currentSessionId = cancelled.id;
     this.revision++;
     await this.stopFloatView();
     this.message = '已取消本次采集，可以重新开始。';
@@ -252,7 +284,7 @@ export struct HomeworkCapturePage {
               .borderRadius(AppTheme.CONTROL_RADIUS);
           }
 
-          if (this.session() === null) {
+          if (!this.isRunning(this.session())) {
             Button('开始抓取今日作业', { type: ButtonType.Normal })
               .width('100%')
               .height(AppTheme.BUTTON_HEIGHT)
