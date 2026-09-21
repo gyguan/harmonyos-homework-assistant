@@ -115,6 +115,15 @@ export struct HomeworkCapturePage {
       let finished = HomeworkCaptureSessionService.instance.getSession(this.currentSessionId);
       if (finished !== null) {
         if (finished.status === CaptureSessionStatus.COMPLETED) {
+          if (finished.importBatchId.length > 0 && this.finalizedBatchId !== finished.importBatchId) {
+            this.finalizedBatchId = finished.importBatchId;
+            let result = HomeworkCaptureWorkflowService.instance.finalizeCompletedSession(finished.id);
+            if (result !== null) {
+              await this.handleWorkflowResult(result);
+              this.revision++;
+              return;
+            }
+          }
           this.message = `采集已完成，已生成导入批次；共接受 ${finished.acceptedFrameCount} 个变化画面。`;
           await this.stopFloatView();
         } else if (finished.status === CaptureSessionStatus.CANCELLED) {
