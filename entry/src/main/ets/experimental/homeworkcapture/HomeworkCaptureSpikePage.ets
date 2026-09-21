@@ -4,11 +4,6 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import nativeCapture, { CapturedFrame, CaptureStats } from 'libhomeworkcapture.so';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { DefaultFamilyContextRepository } from '../../data/repository/DefaultFamilyContextRepository';
-import { Issue244CaptureSessionFixture } from './Issue244CaptureSessionFixture';
-import { Issue245ChatReconstructionFixture } from './Issue245ChatReconstructionFixture';
-import { Issue246HomeworkUnderstandingFixture } from './Issue246HomeworkUnderstandingFixture';
-import { Issue247FullClosureFixture } from './Issue247FullClosureFixture';
 import {
   HomeworkCaptureOcrLine,
   HomeworkCaptureOcrResult,
@@ -27,10 +22,6 @@ export struct HomeworkCaptureSpikePage {
   @State private recognizedText: string = '';
   @State private ocrLines: HomeworkCaptureOcrLine[] = [];
   @State private running: boolean = false;
-  @State private issue244FixtureStatus: string = 'PENDING';
-  @State private issue245FixtureStatus: string = 'PENDING';
-  @State private issue246FixtureStatus: string = 'PENDING';
-  @State private issue247FixtureStatus: string = 'PENDING';
 
   private floatViewController: floatView.FloatViewController | undefined = undefined;
   private readonly ocrService: HomeworkCaptureOcrService = new HomeworkCaptureOcrService();
@@ -169,72 +160,6 @@ export struct HomeworkCaptureSpikePage {
       : `停止采集返回错误码 ${result}`;
   }
 
-  private async runIssue244Fixture(): Promise<void> {
-    if (this.running) {
-      this.issue244FixtureStatus = 'FAIL · 请先停止 #241 真机采集';
-      return;
-    }
-    this.issue244FixtureStatus = 'RUNNING';
-    try {
-      let result = await Issue244CaptureSessionFixture.run(
-        DefaultFamilyContextRepository.instance.getActiveStudentId());
-      this.issue244FixtureStatus = result.passed ?
-        `PASS · 3 sampled → ${result.acceptedFrameCount} accepted → ${result.messageCount} messages → 1 batch` :
-        'FAIL · Fixture 结果不满足 #244 Gate';
-    } catch (error) {
-      this.issue244FixtureStatus = `FAIL · ${error}`;
-    }
-  }
-
-  private runIssue245Fixture(): void {
-    if (this.running) {
-      this.issue245FixtureStatus = 'FAIL · 请先停止 #241 真机采集';
-      return;
-    }
-    this.issue245FixtureStatus = 'RUNNING';
-    try {
-      let result = Issue245ChatReconstructionFixture.run();
-      this.issue245FixtureStatus = result.passed ?
-        `PASS · 5 frames → ${result.messageCount} unique · A证据=${result.repeatedMessageEvidenceCount} · boundary=${result.earliestDetectedTime}` :
-        'FAIL · #245 Fixture 结果不满足重建 Gate';
-    } catch (error) {
-      this.issue245FixtureStatus = `FAIL · ${error}`;
-    }
-  }
-
-  private runIssue246Fixture(): void {
-    if (this.running) {
-      this.issue246FixtureStatus = 'FAIL · 请先停止 #241 真机采集';
-      return;
-    }
-    this.issue246FixtureStatus = 'RUNNING';
-    try {
-      let result = Issue246HomeworkUnderstandingFixture.run();
-      let accuracy = Math.round(result.classificationAccuracy * 100);
-      this.issue246FixtureStatus = result.passed ?
-        `PASS · ${result.caseCount} cases · classification=${accuracy}% · grouping=${result.groupingPassed}/${result.groupingTotal} · revision=${result.revisionPassed}/${result.revisionTotal} · extraction=${result.taskExtractionPassed}/${result.taskExtractionTotal}` :
-        `FAIL · classification=${accuracy}% · grouping=${result.groupingPassed}/${result.groupingTotal} · revision=${result.revisionPassed}/${result.revisionTotal} · extraction=${result.taskExtractionPassed}/${result.taskExtractionTotal}`;
-    } catch (error) {
-      this.issue246FixtureStatus = `FAIL · ${error}`;
-    }
-  }
-
-  private runIssue247Fixture(): void {
-    if (this.running) {
-      this.issue247FixtureStatus = 'FAIL · 请先停止 #241 真机采集';
-      return;
-    }
-    this.issue247FixtureStatus = 'RUNNING';
-    try {
-      let result = Issue247FullClosureFixture.run();
-      this.issue247FixtureStatus = result.passed ?
-        `PASS · group=matched · boundary=${result.earliestDetectedTime} · messages=${result.uniqueMessageCount}→${result.inWindowMessageCount} · 32→33 · homework+preparation` :
-        'FAIL · #247 全闭环 Fixture 未满足目标';
-    } catch (error) {
-      this.issue247FixtureStatus = `FAIL · ${error}`;
-    }
-  }
-
   private async readAndRecognize(): Promise<void> {
     let stats = this.updateStats();
     if (stats.isCapturing) {
@@ -338,128 +263,6 @@ export struct HomeworkCaptureSpikePage {
               .padding(12)
               .backgroundColor(AppTheme.SURFACE_SUBTLE)
               .borderRadius(10);
-          }
-          .width('100%')
-          .padding(14)
-          .backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
-
-          Column({ space: 8 }) {
-            Text('#244 业务流程 Fixture')
-              .width('100%')
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
-            Text('不调用真实录屏：验证 Session 状态机、Frame Diff、OCR Stub 与“一 Session 一 ImportBatch”。')
-              .width('100%')
-              .fontSize(11)
-              .lineHeight(17)
-              .fontColor(AppTheme.SUBTEXT);
-            Text(this.issue244FixtureStatus)
-              .width('100%')
-              .fontSize(12)
-              .fontColor(this.issue244FixtureStatus.startsWith('FAIL') ? AppTheme.DANGER :
-                (this.issue244FixtureStatus.startsWith('PASS') ? AppTheme.SUCCESS : AppTheme.SUBTEXT));
-            Button('运行 #244 离线流程自测', { type: ButtonType.Normal })
-              .width('100%')
-              .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .backgroundColor(AppTheme.PRIMARY_SOFT)
-              .fontColor(AppTheme.PRIMARY)
-              .enabled(!this.running)
-              .onClick(() => { void this.runIssue244Fixture(); });
-          }
-          .width('100%')
-          .padding(14)
-          .backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
-
-          Column({ space: 8 }) {
-            Text('#245 聊天重建 Fixture')
-              .width('100%')
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
-            Text('5 个 50% 重叠 Frame：验证顺序重建、重复消息合并、时间边界、缺时间、图片与 OCR 失败容错。')
-              .width('100%')
-              .fontSize(11)
-              .lineHeight(17)
-              .fontColor(AppTheme.SUBTEXT);
-            Text(this.issue245FixtureStatus)
-              .width('100%')
-              .fontSize(12)
-              .fontColor(this.issue245FixtureStatus.startsWith('FAIL') ? AppTheme.DANGER :
-                (this.issue245FixtureStatus.startsWith('PASS') ? AppTheme.SUCCESS : AppTheme.SUBTEXT));
-            Button('运行 #245 聊天重建自测', { type: ButtonType.Normal })
-              .width('100%')
-              .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .backgroundColor(AppTheme.PRIMARY_SOFT)
-              .fontColor(AppTheme.PRIMARY)
-              .enabled(!this.running)
-              .onClick(() => this.runIssue245Fixture());
-          }
-          .width('100%')
-          .padding(14)
-          .backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
-
-          Column({ space: 8 }) {
-            Text('#246 作业理解 Fixture')
-              .width('100%')
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
-            Text('20 组固定用例：老师/别名、六类分类、多消息合并、更正覆盖、删除、准备、通知与 UNKNOWN。')
-              .width('100%')
-              .fontSize(11)
-              .lineHeight(17)
-              .fontColor(AppTheme.SUBTEXT);
-            Text(this.issue246FixtureStatus)
-              .width('100%')
-              .fontSize(12)
-              .lineHeight(18)
-              .fontColor(this.issue246FixtureStatus.startsWith('FAIL') ? AppTheme.DANGER :
-                (this.issue246FixtureStatus.startsWith('PASS') ? AppTheme.SUCCESS : AppTheme.SUBTEXT));
-            Button('运行 #246 作业理解自测', { type: ButtonType.Normal })
-              .width('100%')
-              .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .backgroundColor(AppTheme.PRIMARY_SOFT)
-              .fontColor(AppTheme.PRIMARY)
-              .enabled(!this.running)
-              .onClick(() => this.runIssue246Fixture());
-          }
-          .width('100%')
-          .padding(14)
-          .backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
-
-          Column({ space: 8 }) {
-            Text('#247 一键抓取完整闭环 Fixture')
-              .width('100%')
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT);
-            Text('模拟二(3)班群：验证 15:00 边界、群名、家长聊天过滤、32→33、更正、两项作业与明日准备。')
-              .width('100%')
-              .fontSize(11)
-              .lineHeight(17)
-              .fontColor(AppTheme.SUBTEXT);
-            Text(this.issue247FixtureStatus)
-              .width('100%')
-              .fontSize(12)
-              .lineHeight(18)
-              .fontColor(this.issue247FixtureStatus.startsWith('FAIL') ? AppTheme.DANGER :
-                (this.issue247FixtureStatus.startsWith('PASS') ? AppTheme.SUCCESS : AppTheme.SUBTEXT));
-            Button('运行 #247 完整闭环自测', { type: ButtonType.Normal })
-              .width('100%')
-              .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .backgroundColor(AppTheme.PRIMARY_SOFT)
-              .fontColor(AppTheme.PRIMARY)
-              .enabled(!this.running)
-              .onClick(() => this.runIssue247Fixture());
           }
           .width('100%')
           .padding(14)
