@@ -242,6 +242,13 @@ export struct HomeworkImportBatchDetailPage {
                   .width('100%')
                   .fontSize(12)
                   .fontColor(this.batch()!.understood === true ? AppTheme.SUCCESS : AppTheme.WARNING);
+                if (this.batch()!.understandingVersion !== undefined &&
+                  this.batch()!.understandingVersion!.length > 0) {
+                  Text(`规则版本：${this.batch()!.understandingVersion}`)
+                    .width('100%')
+                    .fontSize(10)
+                    .fontColor(AppTheme.TERTIARY_TEXT);
+                }
                 if (this.batch()!.classificationSummary !== undefined &&
                   this.batch()!.classificationSummary!.length > 0) {
                   Text(this.batch()!.classificationSummary!)
