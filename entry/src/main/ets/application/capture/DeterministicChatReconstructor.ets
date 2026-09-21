@@ -10,6 +10,7 @@ import {
   ImportedMessage
 } from '../../domain/model/ImportModels';
 import { DeterministicChatRegionParser } from './DeterministicChatRegionParser';
+import { DeterministicGroupTitlePolicy } from './DeterministicGroupTitlePolicy';
 
 interface ChatNode {
   message: ParsedChatMessage;
@@ -24,6 +25,7 @@ interface OverlapMatch {
 
 export class DeterministicChatReconstructor {
   private readonly parser: DeterministicChatRegionParser = new DeterministicChatRegionParser();
+  private readonly groupTitlePolicy: DeterministicGroupTitlePolicy = new DeterministicGroupTitlePolicy();
 
   reconstruct(batchId: string, evidence: CaptureFrameEvidence[],
     options: ChatReconstructionOptions): ChatReconstructionResult {
@@ -282,24 +284,9 @@ export class DeterministicChatReconstructor {
   }
 
   private resolveGroupTitle(values: string[], warnings: string[]): string {
-    if (values.length === 0) return '';
-    let best = '';
-    let bestCount = 0;
-    for (let value of values) {
-      let count = 0;
-      for (let candidate of values) if (candidate === value) count++;
-      if (count > bestCount) {
-        best = value;
-        bestCount = count;
-      }
-    }
-    for (let value of values) {
-      if (value !== best) {
-        this.addWarning(warnings, 'GROUP_TITLE_CONFLICT');
-        break;
-      }
-    }
-    return best;
+    let resolved = this.groupTitlePolicy.resolve(values);
+    if (resolved.conflict) this.addWarning(warnings, 'GROUP_TITLE_CONFLICT');
+    return resolved.title;
   }
 
   private targetEpoch(evidence: CaptureFrameEvidence[], minuteOfDay: number): number {
