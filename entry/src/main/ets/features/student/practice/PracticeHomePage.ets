@@ -267,13 +267,18 @@ export struct PracticeHomePage {
   @Builder
   private PaperList() {
     Column({ space: 10 }) {
-      Row() {
+      Row({ space: 8 }) {
         Text(`${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.semesterLabel(this.selectedSemester)} · ${this.viewModel.subjectLabel(this.selectedSubject)} · ${this.viewModel.trackFilterLabel(this.selectedTrack)} · ${this.viewModel.passFilterLabel(this.selectedPassFilter)}`)
+          .layoutWeight(1)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Blank();
         Text(this.loading ? '加载中…' : `${this.papers.length} 套`)
+          .constraintSize({ minWidth: 64 })
+          .maxLines(1)
+          .textAlign(TextAlign.End)
           .fontSize(14)
           .fontColor(AppTheme.SUBTEXT);
       }
