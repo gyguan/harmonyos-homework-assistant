@@ -32,6 +32,9 @@ detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDeta
 fixture = read("entry/src/main/ets/experimental/homeworkcapture/Issue246HomeworkUnderstandingFixture.ets")
 spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 reconstruction = read("entry/src/main/ets/application/capture/HomeworkChatReconstructionService.ets")
+schema = read("docs/contracts/homework-understanding/v1/schema.json")
+prompt = read("docs/contracts/homework-understanding/v1/prompt.md")
+rules = read("docs/contracts/homework-understanding/v1/rules.md")
 
 for value in [
     "HOMEWORK", "HOMEWORK_REVISION", "PREPARATION", "NOTICE", "CHAT", "UNKNOWN"
@@ -43,6 +46,14 @@ require("aliases: string[]" in models and "subject: Subject" in models,
         "teacher directory alias/subject mapping missing")
 require("pendingReviewMessageIds" in models,
         "understanding result must expose pending review messages")
+for version in ["rules-v1.0", "schema-v1.0", "prompt-v1.0"]:
+    require(version in models, f"version constant missing: {version}")
+require('"const": "schema-v1.0"' in schema and "sourceMessageIds" in schema,
+        "versioned enhancement schema missing evidence contract")
+require("prompt-v1.0" in prompt and "do not guess" in prompt.lower(),
+        "versioned optional enhancer prompt missing")
+require("rules-v1.0" in rules and "teacherId + subject" in rules,
+        "versioned deterministic rules contract missing")
 
 require("matchesEntry" in teacher and "entry.aliases" in teacher,
         "teacher resolver must support exact aliases")
@@ -104,12 +115,13 @@ require("ImportBatchStatus.EMPTY" in service and "ImportBatchStatus.RECEIVED" in
         "understood-empty and pending-review states must be distinguished")
 
 for field in [
-    "understood?: boolean", "pendingReviewMessageIds?: string[]",
+    "understood?: boolean", "understandingVersion?: string", "pendingReviewMessageIds?: string[]",
     "understandingWarnings?: string[]", "classificationSummary?: string"
 ]:
     require(field in import_models, f"ImportBatch understanding metadata missing: {field}")
-require("understandingWarnings" in inbox_store and "classificationSummary" in inbox_store,
-        "Inbox store must persist understanding metadata")
+require("understandingWarnings" in inbox_store and "classificationSummary" in inbox_store and
+        "understandingVersion" in inbox_store,
+        "Inbox store must persist understanding metadata/version")
 require("understandingWarnings" in inbox_service and "classificationSummary" in inbox_service,
         "Inbox service must preserve understanding metadata")
 require("understood: batch.understood" in reconstruction,
