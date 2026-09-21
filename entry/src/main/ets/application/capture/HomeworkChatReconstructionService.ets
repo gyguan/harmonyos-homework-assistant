@@ -34,6 +34,12 @@ export class HomeworkChatReconstructionService {
           timeBoundaryReached: batch.timeBoundaryReached,
           earliestDetectedTime: batch.earliestDetectedTime,
           reconstructionWarnings: ['CHAT_RECONSTRUCTION_EXCEPTION'],
+          understood: batch.understood,
+          pendingReviewMessageIds: batch.pendingReviewMessageIds === undefined ?
+            undefined : batch.pendingReviewMessageIds.slice(),
+          understandingWarnings: batch.understandingWarnings === undefined ?
+            undefined : batch.understandingWarnings.slice(),
+          classificationSummary: batch.classificationSummary,
           createdAtEpochMs: batch.createdAtEpochMs,
           status: batch.status,
           messageCount: batch.messageCount,
@@ -74,6 +80,12 @@ export class HomeworkChatReconstructionService {
       timeBoundaryReached: targetStartMinuteOfDay >= 0 ? result.timeBoundaryReached : undefined,
       earliestDetectedTime: result.earliestDetectedTime,
       reconstructionWarnings: result.warnings.slice(),
+      understood: batch.understood,
+      pendingReviewMessageIds: batch.pendingReviewMessageIds === undefined ?
+        undefined : batch.pendingReviewMessageIds.slice(),
+      understandingWarnings: batch.understandingWarnings === undefined ?
+        undefined : batch.understandingWarnings.slice(),
+      classificationSummary: batch.classificationSummary,
       createdAtEpochMs: batch.createdAtEpochMs,
       status: batch.status,
       messageCount: result.messages.length,
