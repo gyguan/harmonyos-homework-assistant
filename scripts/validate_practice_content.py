@@ -233,15 +233,15 @@ def main() -> int:
                         f"{key} single-choice answer positions must be balanced, got {dict(paper_answer_distribution)}")
 
     expected_question_total = sum(int(paper.get("questionCount", 0)) for paper in papers)
-    require(len(papers) >= 33, f"active catalog must contain at least 33 papers, got {len(papers)}")
+    require(len(papers) >= 48, f"active catalog must contain at least 48 papers, got {len(papers)}")
     require(len(global_question_ids) == expected_question_total,
             f"active catalog question IDs must match declared questionCount total: "
             f"ids={len(global_question_ids)} declared={expected_question_total}")
     for subject in sorted(SUBJECTS):
-        require(subject_track_counts[(subject, "TEXTBOOK_SYNC")] >= 7,
-                f"{subject} must contain at least 7 textbook-sync papers")
-        require(subject_track_counts[(subject, "EXTRACURRICULAR")] >= 4,
-                f"{subject} must contain at least 4 extracurricular papers")
+        require(subject_track_counts[(subject, "TEXTBOOK_SYNC")] >= 10,
+                f"{subject} must contain at least 10 textbook-sync papers")
+        require(subject_track_counts[(subject, "EXTRACURRICULAR")] >= 6,
+                f"{subject} must contain at least 6 extracurricular papers")
 
     choice_total = sum(answer_distribution.values())
     require(choice_total > 0, "active catalog must contain single-choice questions")
