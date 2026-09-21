@@ -39,7 +39,9 @@ export class HomeworkUnderstandingService {
     if (filteredCount > 0) result.warnings.push(`TIME_RANGE_FILTERED:${filteredCount}`);
 
     let updated = this.withUnderstandingResult(batch, result);
-    this.inbox.importBatch(updated, messages, result.candidates);
+    // The time window filters semantic understanding only. Keep the full reconstructed
+    // message set in the inbox so boundary/out-of-range evidence remains auditable.
+    this.inbox.importBatch(updated, allMessages, result.candidates);
     return result;
   }
 
