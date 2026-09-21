@@ -19,6 +19,7 @@ import { HomeworkCaptureRuntime } from '../../domain/port/HomeworkCaptureRuntime
 
 const FRAME_DIFF_THRESHOLD: number = 10;
 const SIGNATURE_SAMPLES: number = 96;
+const FIRST_FRAME_TIMEOUT_MS: number = 30 * 1000;
 
 export class HomeworkCaptureSessionService {
   static readonly instance: HomeworkCaptureSessionService = new HomeworkCaptureSessionService();
@@ -63,6 +64,7 @@ export class HomeworkCaptureSessionService {
       status: CaptureSessionStatus.CREATED,
       frameCount: 0,
       acceptedFrameCount: 0,
+      ocrFailureCount: 0,
       sourceProfileId: sourceProfileId,
       stopReason: '',
       importBatchId: '',
@@ -121,6 +123,18 @@ export class HomeworkCaptureSessionService {
       return session;
     }
 
+    if (session.status === CaptureSessionStatus.WAITING_PERMISSION &&
+      stats.latestSequence <= session.lastFrameSequence &&
+      Date.now() - session.startedAtEpochMs >= FIRST_FRAME_TIMEOUT_MS) {
+      runtime.stopCapture();
+      runtime.clearLatestFrame();
+      session.status = CaptureSessionStatus.CANCELLED;
+      session.stoppedAtEpochMs = Date.now();
+      session.stopReason = CaptureStopReason.FIRST_FRAME_TIMEOUT;
+      this.store.updateSession(session);
+      return session;
+    }
+
     let runtimeEnded = session.status === CaptureSessionStatus.CAPTURING && !stats.isCapturing;
     let frame = runtime.getLatestFrame();
     if (!frame || frame.sequence <= session.lastFrameSequence) {
@@ -167,8 +181,9 @@ export class HomeworkCaptureSessionService {
         });
       }
     } catch {
-      // A single OCR failure must not abort a 60-second capture session.
-      // Later changed frames remain eligible for recognition.
+      // A single OCR failure must not abort the capture session.
+      // Keep an explicit count so "OCR failed" is never confused with "no homework found".
+      session.ocrFailureCount++;
     }
 
     this.store.updateSession(session);
