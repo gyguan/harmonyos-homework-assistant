@@ -46,6 +46,7 @@ export interface ImportBatch {
   sourceType: HomeworkImportSourceType;
   sourceLabel: string;
   sourceProfileId: string;
+  captureSessionId?: string;
   createdAtEpochMs: number;
   status: ImportBatchStatus;
   messageCount: number;
