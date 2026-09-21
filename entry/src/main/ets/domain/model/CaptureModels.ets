@@ -43,6 +43,7 @@ export interface CaptureFrameEvidence {
   sessionId: string;
   sequence: number;
   capturedAtEpochMs: number;
+  runtimeTimestamp: number;
   width: number;
   height: number;
   fingerprint: string;
