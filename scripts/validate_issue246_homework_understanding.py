@@ -29,6 +29,8 @@ import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_store = read("entry/src/main/ets/data/local/HomeworkImportInboxStore.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
 detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
+inbox_vm = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxViewModel.ets")
+confirmation_vm = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationViewModel.ets")
 fixture = read("entry/src/main/ets/experimental/homeworkcapture/Issue246HomeworkUnderstandingFixture.ets")
 spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpikePage.ets")
 reconstruction = read("entry/src/main/ets/application/capture/HomeworkChatReconstructionService.ets")
@@ -105,6 +107,8 @@ require("HomeworkOrganizerRemoteApi" not in pipeline and "HomeworkOrganizerRemot
 
 require("understandBatch" in service and "understandAndActivate" in service,
         "understanding service must write to batch and reuse existing confirmation activation")
+require("activateBatchForManualReview" in inbox_service,
+        "UNKNOWN-only batch must be activatable for human review")
 require("tryUnderstandBatch" in service and "recordFailure" in service and
         "HOMEWORK_UNDERSTANDING_EXCEPTION" in service,
         "understanding failure must preserve retryable batch")
@@ -155,6 +159,11 @@ require("运行 #246 作业理解自测" in spike,
         "#246 benchmark must be runnable from diagnostic UI")
 require("作业理解" in detail and "待人工确认消息：" in detail and "理解提示：" in detail,
         "batch detail must expose understanding status/pending review/warnings")
+require("人工确认未识别消息" in detail and "activateForManualReview" in inbox_vm,
+        "pending UNKNOWN messages must have a manual confirmation entry")
+require("pendingReviewMessageIds" in confirmation_vm and "MANUAL_REVIEW" in confirmation_vm and
+        "sourceMessageIds: sourceMessageIds" in confirmation_vm,
+        "manual review candidate must inherit pending message evidence")
 
 if errors:
     print("ISSUE_246_HOMEWORK_UNDERSTANDING_GATE_FAIL")
