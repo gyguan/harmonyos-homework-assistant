@@ -139,6 +139,7 @@ export class HomeworkImportInboxService {
       groupValidationStatus: batch.groupValidationStatus,
       groupConfirmedByUser: batch.groupConfirmedByUser,
       captureSessionId: batch.captureSessionId,
+      pipelineStage: batch.pipelineStage,
       reconstructed: batch.reconstructed,
       groupTitle: batch.groupTitle,
       timeBoundaryReached: batch.timeBoundaryReached,
