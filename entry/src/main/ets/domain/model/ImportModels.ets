@@ -20,6 +20,17 @@ export enum ImportBatchStatus {
   ABANDONED = 'ABANDONED'
 }
 
+export enum HomeworkImportPipelineStage {
+  CAPTURED = 'CAPTURED',
+  RECONSTRUCTED = 'RECONSTRUCTED',
+  SOURCE_VALIDATED = 'SOURCE_VALIDATED',
+  UNDERSTOOD = 'UNDERSTOOD',
+  ACTIVATED = 'ACTIVATED',
+  BLOCKED_SOURCE = 'BLOCKED_SOURCE',
+  RECONSTRUCTION_FAILED = 'RECONSTRUCTION_FAILED',
+  UNDERSTANDING_FAILED = 'UNDERSTANDING_FAILED'
+}
+
 export interface ImportSourceEvidence {
   sourceType: HomeworkImportSourceType;
   sourceMessageIds: string[];
@@ -53,6 +64,7 @@ export interface ImportBatch {
   groupValidationStatus?: string;
   groupConfirmedByUser?: boolean;
   captureSessionId?: string;
+  pipelineStage?: HomeworkImportPipelineStage;
   reconstructed?: boolean;
   groupTitle?: string;
   timeBoundaryReached?: boolean;
