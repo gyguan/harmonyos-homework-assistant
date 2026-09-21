@@ -200,7 +200,7 @@ export class DeterministicHomeworkTaskExtractor {
 
   private cleanPreparation(value: string): string {
     let result = value.trim();
-    let prefixes: string[] = ['另外', '提醒', '请', '明天', '明日', '明早'];
+    let prefixes: string[] = ['另外', '提醒', '请', '明天', '明日', '明早', '记得'];
     let changed = true;
     while (changed) {
       changed = false;
