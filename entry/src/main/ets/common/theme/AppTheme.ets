@@ -50,6 +50,9 @@ export class AppTheme {
   static readonly CONFIRMATION_READABLE_MAX_WIDTH: number = 920;
   static readonly PROFILE_READABLE_MAX_WIDTH: number = 680;
   static readonly PRACTICE_READABLE_MAX_WIDTH: number = 820;
+  static readonly PRACTICE_ATTEMPT_READABLE_MAX_WIDTH: number = 960;
+  static readonly PRACTICE_ATTEMPT_SCALE_REFERENCE_WIDTH: number = 640;
+  static readonly PRACTICE_ATTEMPT_MAX_SCALE: number = 1.2;
   static readonly SETTINGS_READABLE_MAX_WIDTH: number = 760;
 
   static readonly DEEP_PAGE_TOP_PADDING: number = 8;
