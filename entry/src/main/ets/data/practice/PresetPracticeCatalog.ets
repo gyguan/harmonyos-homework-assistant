@@ -33,6 +33,22 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'CHINESE-G2-S1-SYNC-MESSAGE-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上语文留言条与形声字（一）',
+      description: '用家庭和校园里的真实交流情境练习留言条关键信息，并结合常见形声字辨析字义。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['教材同步', '留言条', '形声字'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'CHINESE-G2-S1-SYNC-READING-LIFE-001',
       version: 3,
       grade: PracticeGrade.G2,
@@ -109,6 +125,22 @@ export class PresetPracticeCatalog {
       questionCount: 12,
       estimatedMinutes: 20,
       tags: ['教材同步', '字词', '积累'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'CHINESE-G2-S1-EXTRA-INFO-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.CHINESE,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '生活信息阅读·校园与社区（一）',
+      description: '阅读原创通知、活动提醒和失物招领，训练时间、地点、要求与关键信息提取。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['课外拓展', '生活阅读', '信息提取'],
       sourceType: PracticeSourceType.PRESET,
       status: PracticePaperStatus.PUBLISHED
     });
@@ -257,6 +289,22 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'MATH-G2-S1-SYNC-SHOPPING-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上数学人民币与购物（一）',
+      description: '结合文具店、小商店等生活场景练习元角关系、付钱、找钱和简单购物计算。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 18,
+      tags: ['教材同步', '人民币', '购物'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'MATH-G2-S1-EXTRA-LIFE-001',
       version: 3,
       grade: PracticeGrade.G2,
@@ -305,6 +353,22 @@ export class PresetPracticeCatalog {
       status: PracticePaperStatus.PUBLISHED
     });
     result.push({
+      id: 'MATH-G2-S1-EXTRA-PLANNER-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.MATH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '数学思维·生活规划（一）',
+      description: '在班级活动、整理物品和周末安排中综合使用加减乘除，训练分步理解和简单规划。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 20,
+      tags: ['课外拓展', '生活数学', '综合规划'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
       id: 'ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001',
       version: 4,
       grade: PracticeGrade.G2,
@@ -317,6 +381,22 @@ export class PresetPracticeCatalog {
       questionCount: 12,
       estimatedMinutes: 16,
       tags: ['教材同步', 'can', 'actions'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'ENGLISH-G2-S1-SYNC-DINNER-STREET-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.TEXTBOOK_SYNC,
+      title: '二上英语用餐与街道（一）',
+      description: '用家庭晚餐和街道出行情境练习常见食物、用餐表达、交通词汇和简单安全用语。',
+      difficulty: PracticeDifficulty.L1,
+      questionCount: 12,
+      estimatedMinutes: 16,
+      tags: ['教材同步', 'dinner', 'street'],
       sourceType: PracticeSourceType.PRESET,
       status: PracticePaperStatus.PUBLISHED
     });
@@ -397,6 +477,22 @@ export class PresetPracticeCatalog {
       questionCount: 12,
       estimatedMinutes: 16,
       tags: ['教材同步', 'room', 'positions'],
+      sourceType: PracticeSourceType.PRESET,
+      status: PracticePaperStatus.PUBLISHED
+    });
+    result.push({
+      id: 'ENGLISH-G2-S1-EXTRA-DIALOGUE-001',
+      version: 1,
+      grade: PracticeGrade.G2,
+      subject: PracticeSubject.ENGLISH,
+      semester: PracticeSemester.S1,
+      track: PracticeTrack.EXTRACURRICULAR,
+      title: '英语拓展·生活对话（一）',
+      description: '用校园、家庭、用餐和出行情境完成简短对话，训练听懂意图并选择自然回应。',
+      difficulty: PracticeDifficulty.L2,
+      questionCount: 12,
+      estimatedMinutes: 16,
+      tags: ['课外拓展', 'dialogue', 'daily English'],
       sourceType: PracticeSourceType.PRESET,
       status: PracticePaperStatus.PUBLISHED
     });
