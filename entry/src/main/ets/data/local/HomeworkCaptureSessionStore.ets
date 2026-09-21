@@ -1,5 +1,6 @@
 import {
   CaptureFrameEvidence,
+  CaptureOcrLineEvidence,
   CaptureSession,
   CaptureSessionStatus,
   CaptureStopReason,
@@ -112,7 +113,7 @@ export class HomeworkCaptureSessionStore {
   }
 
   private cloneEvidence(source: CaptureFrameEvidence): CaptureFrameEvidence {
-    let lines = [];
+    let lines: CaptureOcrLineEvidence[] = [];
     if (source.lines !== undefined) {
       for (let line of source.lines) {
         lines.push({
