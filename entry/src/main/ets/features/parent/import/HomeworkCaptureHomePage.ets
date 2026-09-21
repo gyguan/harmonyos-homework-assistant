@@ -194,7 +194,6 @@ export struct HomeworkCaptureHomePage {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       DeepPageHeader({
         title: '抓取老师作业',
-        subtitle: '从老师群聊中提取今日作业',
         backAccessibilityText: '返回家长首页',
         onBack: () => this.onBack()
       });
@@ -223,24 +222,6 @@ export struct HomeworkCaptureHomePage {
             this.UsageGuide();
           }
 
-          Row({ space: 6 }) {
-            Text('i')
-              .width(18)
-              .height(18)
-              .fontSize(11)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppTheme.PRIMARY)
-              .textAlign(TextAlign.Center)
-              .backgroundColor(AppTheme.PRIMARY_SOFT)
-              .borderRadius(9);
-            Text('抓取结束后，仍需家长确认后才能导入作业。')
-              .layoutWeight(1)
-              .fontSize(12)
-              .lineHeight(18)
-              .fontColor(AppTheme.TERTIARY_TEXT);
-          }
-          .width('100%')
-          .padding({ left: 10, right: 10, top: 4, bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.CAPTURE_HOME_READABLE_MAX_WIDTH })
