@@ -5,7 +5,7 @@ import { AssignmentFilterDialog } from '../../../components/assignment/Assignmen
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { FilterSummaryEntry, SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import { AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
+import { AssignmentDateFilter, AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentCalendarPanel } from './AssignmentCalendarPanel';
 import { AssignmentDetailPane } from './AssignmentDetailPane';
@@ -19,6 +19,8 @@ export struct StudentAssignmentsPage {
 
   @State private subjectCode: string = 'ALL';
   @State private draftSubjectCode: string = 'ALL';
+  @State private allDates: boolean = false;
+  @State private draftAllDates: boolean = false;
   @State private selectedCalendarDayEpochMs: number = Date.now();
   @State private draftSelectedDayEpochMs: number = Date.now();
   @State private querying: boolean = false;
@@ -41,10 +43,11 @@ export struct StudentAssignmentsPage {
 
   private filterDialogController: CustomDialogController = new CustomDialogController({
     builder: AssignmentFilterDialog({
+      allDates: $draftAllDates,
       selectedDayEpochMs: $draftSelectedDayEpochMs,
       subjectCode: $draftSubjectCode,
-      onQuery: (selectedDayEpochMs: number, subjectCode: string) => {
-        void this.applyFilters(selectedDayEpochMs, subjectCode);
+      onQuery: (allDates: boolean, selectedDayEpochMs: number, subjectCode: string) => {
+        void this.applyFilters(allDates, selectedDayEpochMs, subjectCode);
       }
     }),
     autoCancel: true,
@@ -68,6 +71,11 @@ export struct StudentAssignmentsPage {
   }
 
   private rebuildResults(): void {
+    if (this.allDates) {
+      this.applyItems(this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL));
+      return;
+    }
     this.applyItems(this.viewModel.assignmentsOnDay(
       AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs));
   }
@@ -128,6 +136,10 @@ export struct StudentAssignmentsPage {
       for (let item of this.submittedAssignments) items.push(item);
       for (let item of this.completedAssignments) items.push(item);
       return items;
+    }
+    if (this.allDates) {
+      return this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL);
     }
     return this.viewModel.assignmentsOnDay(
       AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs);
@@ -206,22 +218,27 @@ export struct StudentAssignmentsPage {
 
   private openFilterDialog(): void {
     if (this.querying) return;
+    this.draftAllDates = this.allDates;
     this.draftSelectedDayEpochMs = this.selectedCalendarDayEpochMs;
     this.draftSubjectCode = this.subjectCode;
     this.filterDialogController.open();
   }
 
-  private async applyFilters(selectedDayEpochMs: number, subjectCode: string): Promise<void> {
+  private async applyFilters(allDates: boolean, selectedDayEpochMs: number, subjectCode: string): Promise<void> {
     if (this.querying) return;
     this.querying = true;
+    this.draftAllDates = allDates;
     this.draftSelectedDayEpochMs = selectedDayEpochMs;
     this.draftSubjectCode = subjectCode;
+    this.allDates = allDates;
     this.selectedCalendarDayEpochMs = selectedDayEpochMs;
-    this.calendarMonthEpochMs = selectedDayEpochMs;
+    if (!allDates) this.calendarMonthEpochMs = selectedDayEpochMs;
     this.subjectCode = subjectCode;
     this.filterDialogController.close();
     try {
-      let items = await this.viewModel.queryOnDay(subjectCode, selectedDayEpochMs);
+      let items = allDates ?
+        await this.viewModel.query(AssignmentTypeFilter.ALL, subjectCode, AssignmentDateFilter.ALL) :
+        await this.viewModel.queryOnDay(subjectCode, selectedDayEpochMs);
       this.applyItems(items);
     } finally {
       this.querying = false;
@@ -231,6 +248,12 @@ export struct StudentAssignmentsPage {
   private showCalendar(): void {
     if (this.calendarMode) return;
     this.calendarMode = true;
+    if (this.allDates) {
+      this.allDates = false;
+      this.draftAllDates = false;
+      this.applyItems(this.viewModel.assignmentsOnDay(
+        AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs));
+    }
     this.calendarMonthEpochMs = this.selectedCalendarDayEpochMs;
   }
 
@@ -240,6 +263,8 @@ export struct StudentAssignmentsPage {
   }
 
   private selectCalendarDay(dayEpochMs: number): void {
+    this.allDates = false;
+    this.draftAllDates = false;
     this.selectedCalendarDayEpochMs = dayEpochMs;
     this.draftSelectedDayEpochMs = dayEpochMs;
     this.applyItems(this.viewModel.assignmentsOnDay(
@@ -255,10 +280,11 @@ export struct StudentAssignmentsPage {
   }
 
   private hasActiveFilters(): boolean {
-    return !this.isSelectedDayToday() || this.subjectCode !== 'ALL';
+    return (!this.allDates && !this.isSelectedDayToday()) || this.subjectCode !== 'ALL';
   }
 
   private dateLabel(): string {
+    if (this.allDates) return '全部日期';
     let selected = new Date(this.selectedCalendarDayEpochMs);
     let month = selected.getMonth() + 1;
     let day = selected.getDate();
@@ -292,7 +318,7 @@ export struct StudentAssignmentsPage {
     Row() {
       FilterSummaryEntry({
         label: '日期', value: this.dateLabel(),
-        active: !this.isSelectedDayToday(),
+        active: !this.allDates && !this.isSelectedDayToday(),
         onOpen: () => this.openFilterDialog()
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
@@ -463,7 +489,7 @@ export struct StudentAssignmentsPage {
   private AssignmentSections() {
     Column({ space: 22 }) {
       Row() {
-        Text(`${this.dateLabel()} 任务`)
+        Text(this.allDates ? '全部作业' : `${this.dateLabel()} 任务`)
           .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
         Text(`${this.currentVisibleTotal()} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
