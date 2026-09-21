@@ -6,7 +6,7 @@
   "papers": [
     {
       "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001",
-      "version": 3,
+      "version": 4,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -25,7 +25,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q01-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q01-V4",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "你向同学借到一支铅笔后，应该说什么？",
@@ -46,7 +46,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“借到铅笔”“应该说什么”。别人帮助你以后，要选择表示感谢的礼貌英语。"
           ],
           "tags": [
             "daily English",
@@ -54,7 +54,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q02-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q02-V4",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "老师说“Please sit down.”，你应该做什么？",
@@ -75,7 +75,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“Please sit down.”。先理解老师的课堂指令，再判断应该做什么动作。"
           ],
           "tags": [
             "daily English",
@@ -83,7 +83,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q03-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q03-V4",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "你想问朋友叫什么名字，应该说哪一句英语？",
@@ -104,7 +104,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“问名字”。先找询问 name 的句型，再判断哪一句是在提问。"
           ],
           "tags": [
             "daily English",
@@ -112,7 +112,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q04-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q04-V4",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "同学帮助了你，哪一句英语回答最有礼貌？",
@@ -133,7 +133,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“得到帮助”“礼貌回应”。别人帮助你之后，要找表示感谢的英语表达。"
           ],
           "tags": [
             "daily English",
@@ -141,7 +141,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q05-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q05-V4",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "早上遇到老师，应该怎么打招呼？",
@@ -162,7 +162,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“早上”“老师”“打招呼”。先判断时间是早晨，再选择适合见面时使用的问候语。"
           ],
           "tags": [
             "daily English",
@@ -170,7 +170,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q06-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q06-V4",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "你想问朋友会不会游泳，应该说哪一句英语？",
@@ -191,7 +191,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“会/能力”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
           ],
           "tags": [
             "daily English",
@@ -199,7 +199,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q07-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q07-V4",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "你的水杯在桌子上，下面哪一句英语表达正确？",
@@ -220,7 +220,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“在桌子上”。先判断是“在……上”，再对应 on，最后检查完整句子。"
           ],
           "tags": [
             "daily English",
@@ -228,7 +228,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q08-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q08-V4",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "你想介绍朋友Lily，可以说哪一句英语？",
@@ -249,7 +249,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“介绍别人”。想一想介绍一个人时常用 This is…，再检查人名放置是否正确。"
           ],
           "tags": [
             "daily English",
@@ -257,7 +257,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q09-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q09-V4",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "学生通常去哪里读书？",
@@ -278,7 +278,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“读书”“去哪里”。先判断读书和借阅通常在哪类场所进行，再匹配英文地点词。"
           ],
           "tags": [
             "daily English",
@@ -286,7 +286,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q10-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q10-V4",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "体育课上，下面哪个英语动作词最合适？",
@@ -307,7 +307,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“体育课”“动作词”。先想体育课常见的身体动作，再比较英文动作词。"
           ],
           "tags": [
             "daily English",
@@ -315,7 +315,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q11-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q11-V4",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "你准备离开学校时，哪一句英语最合适？",
@@ -336,7 +336,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“放学/离开”“告别”。这是结束见面的场景，要找表示“再见”的英语表达。"
           ],
           "tags": [
             "daily English",
@@ -344,7 +344,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q12-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q12-V4",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "需要别人帮助时，哪一句英语最有礼貌？",
@@ -365,7 +365,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“得到帮助”“礼貌回应”。别人帮助你之后，要找表示感谢的英语表达。"
           ],
           "tags": [
             "daily English",
@@ -376,7 +376,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001",
-      "version": 3,
+      "version": 4,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -395,7 +395,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q01-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q01-V4",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "你在公园里，下面哪一句英语符合这个场景？",
@@ -416,7 +416,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“公园”。想一想公园里常见什么，再判断哪句英语符合场景。"
           ],
           "tags": [
             "Shenzhen life",
@@ -424,7 +424,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q02-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q02-V4",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "你和家人一起坐地铁。“family”是什么意思？",
@@ -445,7 +445,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“家人”。先判断是哪位家人，再匹配对应英文称呼或介绍家人的句型。"
           ],
           "tags": [
             "Shenzhen life",
@@ -453,7 +453,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q03-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q03-V4",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "在图书馆里，下面哪一句英语可以正确描述一本书？",
@@ -474,7 +474,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“图书馆”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -482,7 +482,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q04-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q04-V4",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "深圳下雨了，下面哪件物品最有用？",
@@ -503,7 +503,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“深圳下雨”。先想雨天最需要的物品，再匹配对应英文词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -511,7 +511,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q05-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q05-V4",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "你在公园里看到一只鸟，应该用哪个英语单词？",
@@ -532,7 +532,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“公园”“一只鸟”。题目要找的是动物名称，先确定中文对象，再匹配英文单词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -540,7 +540,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q06-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q06-V4",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "你想表达“天空是蓝色的”，请选择正确的英语句子。",
@@ -561,7 +561,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“天空”。先确定题目说的是哪种自然事物，再匹配 sky、sun、tree、bird 等词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -569,7 +569,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q07-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q07-V4",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "参加社区运动会时，下面哪个英语动作词最合适？",
@@ -590,7 +590,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“社区运动会”“动作词”。先想运动会中常见的身体动作，再比较英文动作词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -598,7 +598,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q08-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q08-V4",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "早上走进图书馆时，可以使用哪一句问候语？",
@@ -619,7 +619,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“图书馆”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -627,7 +627,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q09-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q09-V4",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "你的地铁卡在书包里，下面哪一句英语表达正确？",
@@ -648,7 +648,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“在书包里”。先找 schoolbag，再找表示“在里面”的位置词。"
           ],
           "tags": [
             "Shenzhen life",
@@ -656,7 +656,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q10-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q10-V4",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "在公园里，朋友问“Can you run?”，你可以怎样回答？",
@@ -677,7 +677,7 @@
           "answerSpec": "A",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“Can …?”。这是在问“会不会做某事”，回答时人物和 can 要保持一致。"
           ],
           "tags": [
             "Shenzhen life",
@@ -685,7 +685,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q11-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q11-V4",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "“公园”用英语怎么说？",
@@ -706,7 +706,7 @@
           "answerSpec": "B",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“公园”“地点词”。先确定题目要找的是地点名称，再比较英文选项。"
           ],
           "tags": [
             "Shenzhen life",
@@ -714,7 +714,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q12-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q12-V4",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "别人给你指路后，哪一句英语最有礼貌？",
@@ -735,7 +735,7 @@
           "answerSpec": "C",
           "explanation": "Read the sentence carefully and choose the best answer.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“句子是否正确”。先看主语是谁，再检查 be 动词、can、has 或位置词是否搭配自然。"
           ],
           "tags": [
             "Shenzhen life",
@@ -746,7 +746,7 @@
     },
     {
       "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001",
-      "version": 3,
+      "version": 4,
       "grade": "G2",
       "subject": "ENGLISH",
       "semester": "S1",
@@ -765,7 +765,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q01-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q01-V4",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\n这个男孩叫什么名字？",
@@ -786,7 +786,7 @@
           "answerSpec": "A",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“这个男孩”“名字”。回到短文第一句，找 I’m 后面出现的人名。"
           ],
           "tags": [
             "mini reading",
@@ -794,7 +794,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q02-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q02-V4",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nSam几岁？",
@@ -815,7 +815,7 @@
           "answerSpec": "B",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“Sam”“几岁”。回到英文短文中找 Sam 附近表示年龄的数字词。"
           ],
           "tags": [
             "mini reading",
@@ -823,7 +823,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q03-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q03-V4",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nSam喜欢什么颜色？",
@@ -844,7 +844,7 @@
           "answerSpec": "C",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“Sam”“喜欢”“颜色”。回原文找 like 后面紧跟的颜色词。"
           ],
           "tags": [
             "mini reading",
@@ -852,7 +852,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q04-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q04-V4",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nBen是谁？",
@@ -873,7 +873,7 @@
           "answerSpec": "A",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“Ben”“谁”。回原文找介绍 Ben 的句子，注意人物关系词。"
           ],
           "tags": [
             "mini reading",
@@ -881,7 +881,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q05-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q05-V4",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n书在哪里？",
@@ -902,7 +902,7 @@
           "answerSpec": "B",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“book”“哪里”。回原文找 book，再看后面的 on / in 位置短语。"
           ],
           "tags": [
             "mini reading",
@@ -910,7 +910,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q06-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q06-V4",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n球在哪里？",
@@ -931,7 +931,7 @@
           "answerSpec": "C",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“ball”“哪里”。回原文找 ball，再看后面的 on / in 位置短语。"
           ],
           "tags": [
             "mini reading",
@@ -939,7 +939,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q07-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q07-V4",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n什么东西在窗户旁边？",
@@ -960,7 +960,7 @@
           "answerSpec": "A",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“窗户旁边”。回原文找 near the window 前面的物品是谁。"
           ],
           "tags": [
             "mini reading",
@@ -968,7 +968,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q08-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q08-V4",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n这段短文主要介绍什么？",
@@ -989,7 +989,7 @@
           "answerSpec": "B",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“主要介绍什么”。看每句话是不是都在描述同一个 room 里的物品和位置。"
           ],
           "tags": [
             "mini reading",
@@ -997,7 +997,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q09-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q09-V4",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy和妈妈什么时候去公园？",
@@ -1018,7 +1018,7 @@
           "answerSpec": "C",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“什么时候”。回原文找 Sunday、morning 这类时间词。"
           ],
           "tags": [
             "mini reading",
@@ -1026,7 +1026,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q10-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q10-V4",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\n谁和Amy一起去？",
@@ -1047,7 +1047,7 @@
           "answerSpec": "A",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“谁和Amy一起”。回原文找 Amy 身边出现的家庭成员。"
           ],
           "tags": [
             "mini reading",
@@ -1055,7 +1055,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q11-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q11-V4",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy能看到什么？",
@@ -1076,7 +1076,7 @@
           "answerSpec": "B",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“Amy能看到什么”。回原文找 see 后面列出的自然事物。"
           ],
           "tags": [
             "mini reading",
@@ -1084,7 +1084,7 @@
           ]
         },
         {
-          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q12-V3",
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q12-V4",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy可以和Lucy一起做什么？",
@@ -1105,7 +1105,7 @@
           "answerSpec": "C",
           "explanation": "Find the answer in the short text.",
           "hints": [
-            "Read the key word or situation first, then compare the choices."
+            "关键词：“Amy和Lucy做什么”。回原文找 can 后面的动作词。"
           ],
           "tags": [
             "mini reading",

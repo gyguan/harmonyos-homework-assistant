@@ -118,6 +118,26 @@ EXTRACURRICULAR:
 - Shenzhen-life situations
 - very short reading passages
 
+## Hint writing standard
+
+Every active question has exactly one student-facing `hints[]` item.
+
+The hint must:
+
+- start with `关键词：`
+- quote or paraphrase the concrete keyword, quantity relation, person, action, time, location or sentence pattern from the stem
+- explain what the student should pay attention to next
+- stay short and age-appropriate for G2
+- never expose the correct option text when that text is not already present in the stem
+
+Avoid generic templates such as “先读清题意”“圈出关键词”“先找数量关系” without naming the actual keyword or relation from the question.
+
+Examples:
+
+- Chinese: `关键词：“晴朗”“意思相反”。先结合句子理解“晴朗”的意思，再按题目要求找相反或相近的词。`
+- Math: `关键词：“还剩”，数量 62、27。先找原来的总数，再找减少或已经占用的数量，最后求剩下的部分。`
+- English: `关键词：“What’s your name?”。题目是在问名字，回答时要介绍“我是谁”。`
+
 ## Immutable history and retiring old catalogs
 
 Source JSON is the active catalog, but PostgreSQL also contains historical Practice data.

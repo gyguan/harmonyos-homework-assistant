@@ -18,7 +18,7 @@ export class PresetPracticeCatalog {
     let result: PracticePaper[] = [];
     result.push({
       id: 'CHINESE-G2-S1-SYNC-EXPRESSION-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -34,7 +34,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'CHINESE-G2-S1-SYNC-READING-LIFE-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -50,7 +50,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'CHINESE-G2-S1-SYNC-READING-NATURE-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -66,7 +66,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'CHINESE-G2-S1-SYNC-REVIEW-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -82,7 +82,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'CHINESE-G2-S1-SYNC-SENTENCE-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -98,7 +98,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'CHINESE-G2-S1-SYNC-WORDS-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -114,7 +114,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'CHINESE-G2-S1-EXTRA-SCIENCE-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -130,7 +130,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'CHINESE-G2-S1-EXTRA-SHENZHEN-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -146,7 +146,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'CHINESE-G2-S1-EXTRA-STORY-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.CHINESE,
       semester: PracticeSemester.S1,
@@ -162,7 +162,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-SYNC-ADD-SUB-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -178,7 +178,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-SYNC-DIVISION-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -194,7 +194,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-SYNC-GEOMETRY-APP-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -210,7 +210,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-SYNC-MEASURE-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -226,7 +226,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-SYNC-MULTIPLY-FACTS-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -242,7 +242,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-SYNC-MULTIPLY-MEANING-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -258,7 +258,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-EXTRA-LIFE-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -274,7 +274,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-EXTRA-LOGIC-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -290,7 +290,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'MATH-G2-S1-EXTRA-PATTERN-001',
-      version: 2,
+      version: 3,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.MATH,
       semester: PracticeSemester.S1,
@@ -306,7 +306,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-SYNC-CAN-ACTIONS-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
@@ -322,7 +322,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-SYNC-FAMILY-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
@@ -338,7 +338,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-SYNC-GREETINGS-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
@@ -354,7 +354,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-SYNC-PLACES-NATURE-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
@@ -370,7 +370,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-SYNC-REVIEW-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
@@ -386,7 +386,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-SYNC-ROOM-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
@@ -402,7 +402,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-EXTRA-MINI-READING-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
@@ -418,7 +418,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
@@ -434,7 +434,7 @@ export class PresetPracticeCatalog {
     });
     result.push({
       id: 'ENGLISH-G2-S1-EXTRA-SHENZHEN-001',
-      version: 3,
+      version: 4,
       grade: PracticeGrade.G2,
       subject: PracticeSubject.ENGLISH,
       semester: PracticeSemester.S1,
