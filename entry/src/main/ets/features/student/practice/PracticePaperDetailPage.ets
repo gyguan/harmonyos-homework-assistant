@@ -4,7 +4,6 @@ import {
   PracticeAttemptStatus,
   PracticeAttemptSummary,
   PracticePaper,
-  PracticeSourceType,
   PracticeTaxonomy
 } from '../../../domain/model/practice/PracticeModels';
 import { PracticePaperDetailViewModel } from './PracticePaperDetailViewModel';
@@ -81,14 +80,6 @@ export struct PracticePaperDetailPage {
   private openAttempt(item: PracticeAttemptSummary): void {
     if (item.status === PracticeAttemptStatus.SUBMITTED) this.onOpenResult(item.id);
     else this.onOpenAttempt(item.id);
-  }
-
-  private sourceLabel(): string {
-    if (this.paper === null) return '';
-    if (this.paper.sourceType === PracticeSourceType.PRESET) return '平台预置';
-    if (this.paper.sourceType === PracticeSourceType.AI_GENERATED) return 'AI 生成';
-    if (this.paper.sourceType === PracticeSourceType.PARENT_CREATED) return '家长创建';
-    return '外部导入';
   }
 
   @Builder
