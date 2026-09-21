@@ -39,6 +39,9 @@ jobs:
       - name: Validate issue 244 guided capture
         run: python scripts/validate_issue244_guided_capture.py
 
+      - name: Validate issue 245 chat reconstruction
+        run: python scripts/validate_issue245_chat_reconstruction.py
+
       - name: Validate pasted teacher text import
         run: python scripts/validate_text_import_feature.py
 
