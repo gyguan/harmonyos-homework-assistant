@@ -104,6 +104,8 @@ export class HomeworkImportInboxStore {
       sourceEvidence: {
         sourceType: source.sourceEvidence.sourceType,
         sourceMessageIds: source.sourceEvidence.sourceMessageIds.slice(),
+        sourceFrameEvidenceIds: source.sourceEvidence.sourceFrameEvidenceIds === undefined ?
+          undefined : source.sourceEvidence.sourceFrameEvidenceIds.slice(),
         rawText: source.sourceEvidence.rawText,
         imageRef: source.sourceEvidence.imageRef,
         capturedAtEpochMs: source.sourceEvidence.capturedAtEpochMs
