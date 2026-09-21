@@ -13,7 +13,7 @@ struct HomeworkShareReceivingPage {
         .fontSize(14)
         .fontColor(AppTheme.SUBTEXT);
       Text('图片会先安全复制到小伴本地，再进入作业整理。')
-        .fontSize(11)
+        .fontSize(12)
         .lineHeight(17)
         .fontColor(AppTheme.TERTIARY_TEXT)
         .textAlign(TextAlign.Center);
