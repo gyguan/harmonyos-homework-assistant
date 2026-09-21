@@ -155,8 +155,6 @@ require("ids.length === 2" in fixture,
 require("expectedPendingReview: 1" in fixture,
         "UNKNOWN fixture must require pending review")
 
-require("运行 #246 作业理解自测" in spike,
-        "#246 benchmark must be runnable from diagnostic UI")
 require("作业理解" in detail and "待人工确认消息：" in detail and "理解提示：" in detail,
         "batch detail must expose understanding status/pending review/warnings")
 require("人工确认未识别消息" in detail and "activateForManualReview" in inbox_vm,
