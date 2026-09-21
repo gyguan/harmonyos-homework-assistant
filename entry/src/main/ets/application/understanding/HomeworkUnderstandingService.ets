@@ -5,7 +5,12 @@ import {
   HomeworkUnderstandingConfig,
   HomeworkUnderstandingResult
 } from '../../domain/model/HomeworkUnderstandingModels';
-import { ImportBatch, ImportBatchStatus, ImportedMessage } from '../../domain/model/ImportModels';
+import {
+  HomeworkImportPipelineStage,
+  ImportBatch,
+  ImportBatchStatus,
+  ImportedMessage
+} from '../../domain/model/ImportModels';
 import { HomeworkUnderstandingPipeline } from './HomeworkUnderstandingPipeline';
 
 export interface HomeworkUnderstandingActivationResult {
@@ -80,6 +85,7 @@ export class HomeworkUnderstandingService {
       groupValidationStatus: batch.groupValidationStatus,
       groupConfirmedByUser: batch.groupConfirmedByUser,
       captureSessionId: batch.captureSessionId,
+      pipelineStage: HomeworkImportPipelineStage.UNDERSTOOD,
       reconstructed: batch.reconstructed,
       groupTitle: batch.groupTitle,
       timeBoundaryReached: batch.timeBoundaryReached,
@@ -121,6 +127,7 @@ export class HomeworkUnderstandingService {
       groupValidationStatus: batch.groupValidationStatus,
       groupConfirmedByUser: batch.groupConfirmedByUser,
       captureSessionId: batch.captureSessionId,
+      pipelineStage: HomeworkImportPipelineStage.UNDERSTANDING_FAILED,
       reconstructed: batch.reconstructed,
       groupTitle: batch.groupTitle,
       timeBoundaryReached: batch.timeBoundaryReached,
