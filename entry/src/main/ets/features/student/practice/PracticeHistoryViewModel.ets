@@ -174,12 +174,7 @@ export class PracticeHistoryViewModel {
   }
 
   private matchesPass(item: PracticeAttemptSummary, pass: PracticePassFilter): boolean {
-    if (pass === PracticePassFilter.ALL) return true;
-    if (item.status !== PracticeAttemptStatus.SUBMITTED) return false;
-    if (item.mode !== PracticeAttemptMode.FULL) return false;
-    let passed = PracticePassPolicy.isPassedAttempt(item);
-    if (pass === PracticePassFilter.PASSED) return passed;
-    return !passed;
+    return PracticePassPolicy.matchesAttemptPassFilter(item, pass);
   }
 
   private two(value: number): string {
