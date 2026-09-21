@@ -64,6 +64,18 @@ require("totalElapsedSeconds / completedCount" in history_vm,
         "Practice history average elapsed time must only use completed attempts")
 require("showStatistics" in history_vm and "IN_PROGRESS" in history_vm,
         "Practice history must hide statistics for the in-progress-only filter")
+require("@Prop paperId: string = '';" in history and "viewModel.list(this.paperId)" in history,
+        "Practice history page must support a paper-scoped query without a second page implementation")
+require("if (!this.isPaperScoped())" in history and "当前套卷" in history,
+        "Paper-scoped practice history must hide the redundant subject filter and identify its scope")
+history_route = routes.split("export class PracticeHistoryRouteParam", 1)[1].split("export class PracticePaperRouteParam", 1)[0]
+require("paperId: string;" in history_route and "constructor(paperId: string = '')" in history_route,
+        "PracticeHistoryRouteParam must carry an optional paperId scope")
+require("new PracticeHistoryRouteParam(paperId)" in shell and
+        "paperId: (param as PracticeHistoryRouteParam).paperId" in shell,
+        "Practice history navigation must preserve the optional paperId scope")
+require("onOpenHistory: (paperId: string) => this.openPracticeHistory(paperId)" in shell,
+        "Practice paper detail must route View All to the scoped history page")
 require("showPreviousAnswer: boolean = false" in attempt_page,
         "repeat practice must hide previous answers by default")
 require("显示上次作答" in attempt_page and "previousAnswerFor" in attempt_page,
@@ -78,7 +90,7 @@ require("onRepeatStarted" in result_page and "onRepeatStarted" in shell,
 # ArkTS declarations/routes must stay explicitly typed.
 require("listAttempts(studentId: string, paperId: string = '')" not in repo,
         "PracticeRepository interface methods must not use parameter initializers")
-require("PracticeHistoryRouteParam" in routes and "new PracticeHistoryRouteParam()" in shell,
+require("PracticeHistoryRouteParam" in routes and "new PracticeHistoryRouteParam(paperId)" in shell,
         "Practice history route must use an explicitly declared parameter class")
 require("STUDENT_PRACTICE_HISTORY, {})" not in shell,
         "Practice navigation must not pass untyped object literals")
