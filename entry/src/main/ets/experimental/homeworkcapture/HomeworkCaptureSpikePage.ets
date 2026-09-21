@@ -7,6 +7,7 @@ import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
 import { DefaultFamilyContextRepository } from '../../data/repository/DefaultFamilyContextRepository';
 import { Issue244CaptureSessionFixture } from './Issue244CaptureSessionFixture';
 import { Issue245ChatReconstructionFixture } from './Issue245ChatReconstructionFixture';
+import { Issue246HomeworkUnderstandingFixture } from './Issue246HomeworkUnderstandingFixture';
 import {
   HomeworkCaptureOcrLine,
   HomeworkCaptureOcrResult,
@@ -27,6 +28,7 @@ export struct HomeworkCaptureSpikePage {
   @State private running: boolean = false;
   @State private issue244FixtureStatus: string = 'PENDING';
   @State private issue245FixtureStatus: string = 'PENDING';
+  @State private issue246FixtureStatus: string = 'PENDING';
 
   private floatViewController: floatView.FloatViewController | undefined = undefined;
   private readonly ocrService: HomeworkCaptureOcrService = new HomeworkCaptureOcrService();
@@ -198,6 +200,23 @@ export struct HomeworkCaptureSpikePage {
     }
   }
 
+  private runIssue246Fixture(): void {
+    if (this.running) {
+      this.issue246FixtureStatus = 'FAIL · 请先停止 #241 真机采集';
+      return;
+    }
+    this.issue246FixtureStatus = 'RUNNING';
+    try {
+      let result = Issue246HomeworkUnderstandingFixture.run();
+      let accuracy = Math.round(result.classificationAccuracy * 100);
+      this.issue246FixtureStatus = result.passed ?
+        `PASS · ${result.caseCount} cases · classification=${accuracy}% · grouping=${result.groupingPassed}/${result.groupingTotal} · revision=${result.revisionPassed}/${result.revisionTotal} · extraction=${result.taskExtractionPassed}/${result.taskExtractionTotal}` :
+        `FAIL · classification=${accuracy}% · grouping=${result.groupingPassed}/${result.groupingTotal} · revision=${result.revisionPassed}/${result.revisionTotal} · extraction=${result.taskExtractionPassed}/${result.taskExtractionTotal}`;
+    } catch (error) {
+      this.issue246FixtureStatus = `FAIL · ${error}`;
+    }
+  }
+
   private async readAndRecognize(): Promise<void> {
     let stats = this.updateStats();
     if (stats.isCapturing) {
@@ -361,6 +380,37 @@ export struct HomeworkCaptureSpikePage {
               .fontColor(AppTheme.PRIMARY)
               .enabled(!this.running)
               .onClick(() => this.runIssue245Fixture());
+          }
+          .width('100%')
+          .padding(14)
+          .backgroundColor(AppTheme.SURFACE)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+
+          Column({ space: 8 }) {
+            Text('#246 作业理解 Fixture')
+              .width('100%')
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text('20 组固定用例：老师/别名、六类分类、多消息合并、更正覆盖、删除、准备、通知与 UNKNOWN。')
+              .width('100%')
+              .fontSize(11)
+              .lineHeight(17)
+              .fontColor(AppTheme.SUBTEXT);
+            Text(this.issue246FixtureStatus)
+              .width('100%')
+              .fontSize(12)
+              .lineHeight(18)
+              .fontColor(this.issue246FixtureStatus.startsWith('FAIL') ? AppTheme.DANGER :
+                (this.issue246FixtureStatus.startsWith('PASS') ? AppTheme.SUCCESS : AppTheme.SUBTEXT));
+            Button('运行 #246 作业理解自测', { type: ButtonType.Normal })
+              .width('100%')
+              .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .backgroundColor(AppTheme.PRIMARY_SOFT)
+              .fontColor(AppTheme.PRIMARY)
+              .enabled(!this.running)
+              .onClick(() => this.runIssue246Fixture());
           }
           .width('100%')
           .padding(14)
