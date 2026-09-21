@@ -15,6 +15,7 @@ export enum CaptureStopReason {
   NATIVE_ERROR = 'NATIVE_ERROR',
   ABILITY_DESTROYED = 'ABILITY_DESTROYED',
   PROCESS_RESTARTED = 'PROCESS_RESTARTED',
+  FIRST_FRAME_TIMEOUT = 'FIRST_FRAME_TIMEOUT',
   CANCELLED = 'CANCELLED'
 }
 
@@ -71,6 +72,7 @@ export interface CaptureSession {
   status: CaptureSessionStatus;
   frameCount: number;
   acceptedFrameCount: number;
+  ocrFailureCount: number;
   sourceProfileId: string;
   stopReason: string;
   importBatchId: string;
