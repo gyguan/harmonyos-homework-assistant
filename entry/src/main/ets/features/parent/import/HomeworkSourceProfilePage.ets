@@ -1,15 +1,14 @@
-import { HomeworkSourceProfileService } from '../../../application/capture/HomeworkSourceProfileService';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
-import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
-import {
-  HomeworkSourceProfile,
-  HomeworkSourceTeacherAlias
-} from '../../../domain/model/HomeworkSourceProfileModels';
 import { Subject } from '../../../domain/model/HomeworkModels';
+import {
+  HomeworkSourceProfileFormState,
+  HomeworkSourceProfileViewModel
+} from './HomeworkSourceProfileViewModel';
 
 @Component
 export struct HomeworkSourceProfilePage {
+  @Prop startCaptureAfterSave: boolean = false;
   onBack: () => void = () => {};
   onSavedAndCapture: () => void = () => {};
 
@@ -25,42 +24,27 @@ export struct HomeworkSourceProfilePage {
   @State private message: string = '';
   @State private messageError: boolean = false;
   @State private saving: boolean = false;
+  private studentId: string = '';
   private profileId: string = '';
   private createdAtEpochMs: number = 0;
   private lastUsedAtEpochMs: number = 0;
+  private readonly viewModel: HomeworkSourceProfileViewModel = new HomeworkSourceProfileViewModel();
 
   aboutToAppear(): void {
-    let student = DefaultFamilyContextRepository.instance.getStudent();
-    let existing = HomeworkSourceProfileService.instance.getActiveProfile(student.id);
-    if (existing === null) {
-      this.profileId = `source-profile-${student.id}`;
-      this.profileName = student.className.length > 0 ? student.className : '班级作业群';
-      this.groupTitle = '';
-      this.startTime = '15:00';
-      return;
-    }
-
-    this.profileId = existing.id;
-    this.createdAtEpochMs = existing.createdAtEpochMs;
-    this.lastUsedAtEpochMs = existing.lastUsedAtEpochMs;
-    this.profileName = existing.name;
-    this.groupTitle = existing.groupTitle;
-    this.startTime = HomeworkSourceProfileService.instance.formatStartTime(existing);
-    for (let teacher of existing.teacherAliases) this.loadTeacher(teacher);
-  }
-
-  private loadTeacher(teacher: HomeworkSourceTeacherAlias): void {
-    let aliases = teacher.aliases.join(',');
-    if (teacher.subject === Subject.CHINESE) {
-      this.chineseTeacher = teacher.displayName;
-      this.chineseAliases = aliases;
-    } else if (teacher.subject === Subject.MATH) {
-      this.mathTeacher = teacher.displayName;
-      this.mathAliases = aliases;
-    } else if (teacher.subject === Subject.ENGLISH) {
-      this.englishTeacher = teacher.displayName;
-      this.englishAliases = aliases;
-    }
+    let form = this.viewModel.load();
+    this.studentId = form.studentId;
+    this.profileId = form.profileId;
+    this.createdAtEpochMs = form.createdAtEpochMs;
+    this.lastUsedAtEpochMs = form.lastUsedAtEpochMs;
+    this.profileName = form.profileName;
+    this.groupTitle = form.groupTitle;
+    this.startTime = form.startTime;
+    this.chineseTeacher = form.chineseTeacher;
+    this.chineseAliases = form.chineseAliases;
+    this.mathTeacher = form.mathTeacher;
+    this.mathAliases = form.mathAliases;
+    this.englishTeacher = form.englishTeacher;
+    this.englishAliases = form.englishAliases;
   }
 
   private async saveAndCapture(): Promise<void> {
@@ -69,34 +53,22 @@ export struct HomeworkSourceProfilePage {
     this.message = '';
     this.messageError = false;
     try {
-      let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
-      let startMinute = HomeworkSourceProfileService.instance.parseStartTime(this.startTime);
-      if (startMinute < 0) throw new Error('开始时间请按 HH:mm 填写，例如 15:00');
-
-      let teachers: HomeworkSourceTeacherAlias[] = [];
-      let chinese = HomeworkSourceProfileService.instance.createTeacher(
-        this.chineseTeacher, this.chineseAliases, Subject.CHINESE);
-      let math = HomeworkSourceProfileService.instance.createTeacher(
-        this.mathTeacher, this.mathAliases, Subject.MATH);
-      let english = HomeworkSourceProfileService.instance.createTeacher(
-        this.englishTeacher, this.englishAliases, Subject.ENGLISH);
-      if (chinese !== null) teachers.push(chinese);
-      if (math !== null) teachers.push(math);
-      if (english !== null) teachers.push(english);
-
-      let profile: HomeworkSourceProfile = {
-        id: this.profileId.length > 0 ? this.profileId : `source-profile-${studentId}`,
-        name: this.profileName,
-        groupTitle: this.groupTitle,
-        studentId: studentId,
-        teacherAliases: teachers,
-        defaultStartMinuteOfDay: startMinute,
-        enabled: true,
+      let form: HomeworkSourceProfileFormState = {
+        studentId: this.studentId,
+        profileId: this.profileId,
         createdAtEpochMs: this.createdAtEpochMs,
-        updatedAtEpochMs: Date.now(),
-        lastUsedAtEpochMs: this.lastUsedAtEpochMs
+        lastUsedAtEpochMs: this.lastUsedAtEpochMs,
+        profileName: this.profileName,
+        groupTitle: this.groupTitle,
+        startTime: this.startTime,
+        chineseTeacher: this.chineseTeacher,
+        chineseAliases: this.chineseAliases,
+        mathTeacher: this.mathTeacher,
+        mathAliases: this.mathAliases,
+        englishTeacher: this.englishTeacher,
+        englishAliases: this.englishAliases
       };
-      HomeworkSourceProfileService.instance.save(profile);
+      this.viewModel.save(form);
       this.message = '班级采集设置已保存';
       this.onSavedAndCapture();
     } catch (error) {
@@ -138,7 +110,7 @@ export struct HomeworkSourceProfilePage {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
           title: '班级采集设置',
-          subtitle: '首次配置一次，以后直接抓取今日作业',
+          subtitle: this.startCaptureAfterSave ? '首次配置一次，以后直接抓取今日作业' : '修改当前孩子的班级群、老师和抓取时间',
           backAccessibilityText: '返回作业导入',
           onBack: () => this.onBack()
         });
@@ -197,7 +169,8 @@ export struct HomeworkSourceProfilePage {
                 .borderRadius(AppTheme.CONTROL_RADIUS);
             }
 
-            Button(this.saving ? '正在保存…' : '保存并开始抓取', { type: ButtonType.Normal })
+            Button(this.saving ? '正在保存…' :
+              (this.startCaptureAfterSave ? '保存并开始抓取' : '保存设置'), { type: ButtonType.Normal })
               .width('100%').height(AppTheme.BUTTON_HEIGHT)
               .enabled(!this.saving)
               .borderRadius(AppTheme.CONTROL_RADIUS)
