@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -53,6 +54,8 @@ for api in [
 
 require("OH_AVBuffer_GetAddr" in cpp and "OH_NativeBuffer_GetConfig" in cpp,
         "native bridge must read the RGBA buffer and its stride metadata")
+require(re.search(r"=\s*OH_NativeBuffer_GetConfig\s*\(", cpp) is None,
+        "OH_NativeBuffer_GetConfig returns void and must not be treated as a status code")
 require("SAMPLE_EVERY_CALLBACKS" in cpp,
         "native bridge must sample video callbacks instead of retaining every frame")
 require("fwrite(" not in cpp and "std::ofstream" not in cpp,
