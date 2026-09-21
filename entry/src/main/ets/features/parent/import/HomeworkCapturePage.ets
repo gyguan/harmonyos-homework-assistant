@@ -277,6 +277,12 @@ export struct HomeworkCapturePage {
     }
 
     this.pendingGroupConfirmationBatchId = '';
+    if (!result.understandingSucceeded) {
+      this.errorText = '聊天消息已重建并保留，但作业理解未完成。请到收件箱稍后重试或人工处理。';
+      this.message = '本次屏幕采集已经安全结束。';
+      return;
+    }
+
     this.errorText = '';
     if (result.activated && result.candidateCount > 0) {
       this.message = `已整理出 ${result.candidateCount} 项内容，正在进入家长确认。`;
