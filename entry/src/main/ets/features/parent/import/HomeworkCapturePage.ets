@@ -405,7 +405,7 @@ export struct HomeworkCapturePage {
               .onClick(() => { void this.confirmUnrecognizedGroup(); });
           }
 
-          if (!this.isRunning(this.session())) {
+          if (!this.isRunning(this.session()) && this.pendingGroupConfirmationBatchId.length === 0) {
             Button('重新开始抓取', { type: ButtonType.Normal })
               .width('100%')
               .height(AppTheme.BUTTON_HEIGHT)
