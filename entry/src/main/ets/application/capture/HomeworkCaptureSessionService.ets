@@ -1,5 +1,4 @@
 import { HomeworkImportInboxService } from '../import/HomeworkImportInboxService';
-import { HomeworkChatReconstructionService } from './HomeworkChatReconstructionService';
 import { HomeworkCaptureSessionStore } from '../../data/local/HomeworkCaptureSessionStore';
 import {
   CaptureFrame,
@@ -9,6 +8,7 @@ import {
   CaptureStopReason
 } from '../../domain/model/CaptureModels';
 import {
+  HomeworkImportPipelineStage,
   HomeworkImportSourceType,
   ImportBatch,
   ImportBatchStatus,
@@ -183,7 +183,6 @@ export class HomeworkCaptureSessionService {
       // Runtime may already be stopped by the system; release remains best-effort.
     }
     let batchId = this.ensureImportBatch(session);
-    HomeworkChatReconstructionService.instance.tryReconstructCaptureSession(session.id, batchId);
     runtime.clearLatestFrame();
 
     session.importBatchId = batchId;
@@ -327,9 +326,10 @@ export class HomeworkCaptureSessionService {
       id: batchId,
       studentId: session.studentId,
       sourceType: HomeworkImportSourceType.SCREEN_CAPTURE,
-      sourceLabel: session.sourceProfileId === 'issue244-fixture' ? '#244 离线 Fixture' : '屏幕智能采集',
+      sourceLabel: '屏幕智能采集',
       sourceProfileId: session.sourceProfileId,
       captureSessionId: session.id,
+      pipelineStage: HomeworkImportPipelineStage.CAPTURED,
       createdAtEpochMs: session.startedAtEpochMs,
       status: ImportBatchStatus.RECEIVED,
       messageCount: messages.length,
