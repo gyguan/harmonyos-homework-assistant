@@ -32,14 +32,14 @@ struct PracticePaperCard {
             .fontColor(AppTheme.TEXT);
           Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.semesterLabel(this.paper.semester)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${PracticeTaxonomy.trackLabel(this.paper.track)} · ${this.difficultyLabel}`)
             .width('100%')
-            .fontSize(12)
+            .fontSize(14)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
         Text(`${this.paper.questionCount} 题`)
-          .fontSize(12)
+          .fontSize(14)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .padding({ left: 10, right: 10, top: 6, bottom: 6 })
@@ -51,23 +51,23 @@ struct PracticePaperCard {
 
       Text(this.paper.description)
         .width('100%')
-        .fontSize(13)
+        .fontSize(14)
         .lineHeight(19)
         .fontColor(AppTheme.SUBTEXT);
 
       Row({ space: 8 }) {
         Text(`约 ${this.paper.estimatedMinutes} 分钟`)
-          .fontSize(12)
+          .fontSize(14)
           .fontColor(AppTheme.SUBTEXT);
-        Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+        Text('·').fontSize(14).fontColor(AppTheme.TERTIARY_TEXT);
         Text(this.tagsText())
           .layoutWeight(1)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(12)
+          .fontSize(14)
           .fontColor(AppTheme.TERTIARY_TEXT);
         Text(PracticeTaxonomy.trackLabel(this.paper.track))
-          .fontSize(11)
+          .fontSize(14)
           .fontColor(AppTheme.SUCCESS);
       }
       .width('100%')
@@ -203,7 +203,7 @@ export struct PracticeHomePage {
           .fontColor(AppTheme.TEXT);
         Blank();
         Text(this.loading ? '加载中…' : `${this.papers.length} 套`)
-          .fontSize(12)
+          .fontSize(14)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
@@ -211,7 +211,7 @@ export struct PracticeHomePage {
       if (this.errorMessage.length > 0) {
         Text(this.errorMessage)
           .width('100%')
-          .fontSize(13)
+          .fontSize(14)
           .fontColor(AppTheme.DANGER)
           .padding(14)
           .backgroundColor(AppTheme.DANGER_SOFT)
@@ -223,7 +223,7 @@ export struct PracticeHomePage {
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text('可以切换科目或题库类型继续浏览；当前内容重点覆盖二年级上学期。')
-            .fontSize(12)
+            .fontSize(14)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
@@ -258,7 +258,7 @@ export struct PracticeHomePage {
                 .fontColor(AppTheme.TEXT);
               Blank();
               Text('练习记录')
-                .fontSize(13)
+                .fontSize(14)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.PRIMARY)
                 .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -270,7 +270,7 @@ export struct PracticeHomePage {
             .width('100%');
             Text(`默认按当前学生的${this.viewModel.semesterLabel(this.selectedSemester)}和教材同步题库筛选，也可以切换科目与题库类型。`)
               .width('100%')
-              .fontSize(13)
+              .fontSize(14)
               .lineHeight(19)
               .fontColor(AppTheme.SUBTEXT);
           }
@@ -283,7 +283,7 @@ export struct PracticeHomePage {
 
           Text('教材同步紧跟二年级上学期核心能力；课外拓展强调生活应用、阅读和思维训练。')
             .width('100%')
-            .fontSize(12)
+            .fontSize(14)
             .lineHeight(18)
             .fontColor(AppTheme.TERTIARY_TEXT)
             .padding({ left: 2, right: 2, bottom: 8 });
