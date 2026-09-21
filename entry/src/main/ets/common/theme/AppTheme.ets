@@ -30,6 +30,8 @@ export class AppTheme {
   static readonly CONTROL_RADIUS: number = 14;
   static readonly CHIP_RADIUS: number = 12;
 
+  // Readable-width tokens are upper bounds: compact layouts still size to the actual container.
+  // Issue #266 widens only large-container ceilings so Phone composition remains unchanged.
   static readonly HOME_READABLE_MAX_WIDTH: number = 760;
   static readonly HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
   static readonly HOME_PAD_PRIMARY_ACTION_MAX_WIDTH: number = 320;
