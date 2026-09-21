@@ -1,8 +1,7 @@
-import { HomeworkSourceProfileService } from '../../../application/capture/HomeworkSourceProfileService';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
-import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { HomeworkImportPage } from './HomeworkImportPage';
+import { HomeworkImportRouteViewModel } from './HomeworkImportRouteViewModel';
 
 @Component
 export struct HomeworkImportRoutePage {
@@ -14,19 +13,16 @@ export struct HomeworkImportRoutePage {
   onOpenSourceProfile: (startCaptureAfterSave: boolean) => void = (_startCaptureAfterSave: boolean) => {};
   onOpenCaptureSpike: () => void = () => {};
   onStoreChanged: () => void = () => {};
+  private readonly viewModel: HomeworkImportRouteViewModel = new HomeworkImportRouteViewModel();
 
   private profileSubtitle(): string {
     let currentRevision = this.revision;
     if (currentRevision < 0) return '';
-    let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
-    let profile = HomeworkSourceProfileService.instance.getActiveProfile(studentId);
-    if (profile === null) return '首次使用先配置班级群、老师和抓取时间';
-    return `${profile.groupTitle} · 今天 ${HomeworkSourceProfileService.instance.formatStartTime(profile)} 至现在`;
+    return this.viewModel.profileSubtitle();
   }
 
   private openCapture(): void {
-    let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
-    if (HomeworkSourceProfileService.instance.getActiveProfile(studentId) === null) {
+    if (!this.viewModel.hasSourceProfile()) {
       this.onOpenSourceProfile(true);
       return;
     }
