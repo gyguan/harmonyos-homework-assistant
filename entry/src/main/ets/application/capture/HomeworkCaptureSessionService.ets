@@ -180,6 +180,7 @@ export class HomeworkCaptureSessionService {
     await this.sampleLatestFrame();
     session = this.store.getSession(session.id) as CaptureSession;
     let batchId = this.ensureImportBatch(session);
+    runtime.clearLatestFrame();
 
     session.importBatchId = batchId;
     session.stoppedAtEpochMs = Date.now();
@@ -201,7 +202,9 @@ export class HomeworkCaptureSessionService {
     let session = this.store.getActiveSession();
     if (session === null) return null;
     try {
-      this.requireRuntime().stopCapture();
+      let runtime = this.requireRuntime();
+      runtime.stopCapture();
+      runtime.clearLatestFrame();
     } catch {
       // Cancellation is still terminal even if the native runtime already stopped.
     }
@@ -218,7 +221,9 @@ export class HomeworkCaptureSessionService {
     let session = this.store.getActiveSession();
     if (session === null) return;
     try {
-      this.requireRuntime().stopCapture();
+      let runtime = this.requireRuntime();
+      runtime.stopCapture();
+      runtime.clearLatestFrame();
     } catch {
       // Destruction recovery must not throw from UIAbility lifecycle.
     }
