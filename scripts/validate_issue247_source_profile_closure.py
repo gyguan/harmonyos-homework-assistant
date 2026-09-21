@@ -28,6 +28,7 @@ profile_page = read("entry/src/main/ets/features/parent/import/HomeworkSourcePro
 capture_page = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
 float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
 workflow = read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets")
+group_title_policy = read("entry/src/main/ets/application/capture/DeterministicGroupTitlePolicy.ets")
 understanding = read("entry/src/main/ets/application/understanding/HomeworkUnderstandingService.ets")
 batch_detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 reconstruction_service = read("entry/src/main/ets/application/capture/HomeworkChatReconstructionService.ets")
@@ -180,8 +181,9 @@ require("mixedGroupConflictBlocked" in fixture and "conflictingGroupFrames" in f
         "fixture must prove mixed-group capture is fail-closed")
 require("normalizedGroupVariantMatched" in fixture and "二（3）班家长群(45)" in fixture,
         "fixture must cover common OCR/group-title bracket and member-count normalization")
-require("replace(/（/g, '(')" in workflow and "memberCount" in workflow,
-        "group validation must normalize fullwidth brackets and trailing member counts without fuzzy guessing")
+require("replace(/（/g, '(')" in group_title_policy and "memberCount" in group_title_policy and
+        "normalizedValues.length > 1" in group_title_policy,
+        "group-title policy must normalize OCR variants before mixed-group conflict detection")
 
 require("candidateId: candidate.id" in publish,
         "published Assignment must point back to Candidate by candidateId")
