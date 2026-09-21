@@ -157,14 +157,22 @@ export class HomeworkImportInboxService {
   }
 
   activateBatch(batchId: string): boolean {
+    let candidates = this.inbox.getCandidates(batchId);
+    if (candidates.length === 0) return false;
+    return this.activateBatchDraft(batchId, candidates);
+  }
+
+  activateBatchForManualReview(batchId: string): boolean {
+    return this.activateBatchDraft(batchId, this.inbox.getCandidates(batchId));
+  }
+
+  private activateBatchDraft(batchId: string, candidates: CandidateAssignment[]): boolean {
     let batch = this.inbox.getBatch(batchId);
     if (batch === null || batch.status === ImportBatchStatus.ABANDONED ||
       batch.status === ImportBatchStatus.PUBLISHED ||
       batch.studentId !== this.drafts.getActiveStudentId()) return false;
 
     let messages = this.inbox.getMessages(batchId);
-    let candidates = this.inbox.getCandidates(batchId);
-    if (candidates.length === 0) return false;
     if (!this.inbox.setActiveBatch(batchId)) return false;
 
     let text = '';
