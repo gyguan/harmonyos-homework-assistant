@@ -109,8 +109,10 @@ export class HomeworkCaptureSessionService {
     session.frameCount = stats.callbackCount;
     session.runtimeErrorCode = stats.lastError;
 
-    if (session.status === CaptureSessionStatus.WAITING_PERMISSION && stats.lastError !== 0) {
+    if (session.status === CaptureSessionStatus.WAITING_PERMISSION &&
+      (stats.lastError !== 0 || !stats.isCapturing)) {
       runtime.stopCapture();
+      runtime.clearLatestFrame();
       session.status = CaptureSessionStatus.CANCELLED;
       session.stoppedAtEpochMs = Date.now();
       session.stopReason = CaptureStopReason.START_REJECTED;
@@ -118,10 +120,11 @@ export class HomeworkCaptureSessionService {
       return session;
     }
 
+    let runtimeEnded = session.status === CaptureSessionStatus.CAPTURING && !stats.isCapturing;
     let frame = runtime.getLatestFrame();
     if (!frame || frame.sequence <= session.lastFrameSequence) {
       this.store.updateSession(session);
-      return session;
+      return runtimeEnded ? this.finishRuntimeEnded(session, stats.lastError) : session;
     }
 
     if (session.status === CaptureSessionStatus.WAITING_PERMISSION) {
@@ -134,7 +137,7 @@ export class HomeworkCaptureSessionService {
     let signature = this.frameSignature(frame);
     if (!this.isMeaningfulChange(session.id, signature)) {
       this.store.updateSession(session);
-      return session;
+      return runtimeEnded ? this.finishRuntimeEnded(session, stats.lastError) : session;
     }
 
     session.acceptedFrameCount++;
@@ -167,6 +170,32 @@ export class HomeworkCaptureSessionService {
     }
 
     this.store.updateSession(session);
+    return runtimeEnded ? this.finishRuntimeEnded(session, stats.lastError) : session;
+  }
+
+  private finishRuntimeEnded(session: CaptureSession, runtimeErrorCode: number): CaptureSession {
+    let runtime = this.requireRuntime();
+    try {
+      runtime.stopCapture();
+    } catch {
+      // Runtime may already be stopped by the system; release remains best-effort.
+    }
+    let batchId = this.ensureImportBatch(session);
+    runtime.clearLatestFrame();
+
+    session.importBatchId = batchId;
+    session.stoppedAtEpochMs = Date.now();
+    session.runtimeErrorCode = runtimeErrorCode;
+    if (runtimeErrorCode === 0) {
+      session.status = CaptureSessionStatus.COMPLETED;
+      session.stopReason = CaptureStopReason.SYSTEM_STOPPED;
+    } else {
+      session.status = CaptureSessionStatus.FAILED;
+      session.stopReason = CaptureStopReason.NATIVE_ERROR;
+    }
+    this.store.updateSession(session);
+    this.lastSignature = [];
+    this.signatureSessionId = '';
     return session;
   }
 
