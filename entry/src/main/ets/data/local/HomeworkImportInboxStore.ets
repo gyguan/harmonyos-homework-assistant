@@ -85,6 +85,7 @@ export class HomeworkImportInboxStore {
       sourceType: source.sourceType,
       sourceLabel: source.sourceLabel,
       sourceProfileId: source.sourceProfileId,
+      captureSessionId: source.captureSessionId,
       createdAtEpochMs: source.createdAtEpochMs,
       status: source.status,
       messageCount: source.messageCount,
