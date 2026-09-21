@@ -13,6 +13,8 @@ export interface AssignmentRepository {
   updateDetails(assignment: Assignment): Promise<Assignment>;
   performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment>;
   review(assignmentId: string, decision: AssignmentReviewDecision, note: string): Promise<Assignment>;
+  deleteAssignments(assignmentIds: string[]): Promise<number>;
   applyAuthoritative(assignment: Assignment): void;
+  applyAuthoritativeBatch(assignments: Assignment[]): void;
   refresh(): Promise<boolean>;
 }

@@ -1,0 +1,3006 @@
+{
+  "schemaVersion": 2,
+  "grade": "G2",
+  "subject": "MATH",
+  "track": "TEXTBOOK_SYNC",
+  "papers": [
+    {
+      "id": "MATH-G2-S1-SYNC-ADD-SUB-001",
+      "version": 3,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学100以内加减（一）",
+      "description": "用校园、家庭、社区生活情境练习100以内两位数加减。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "100以内加减",
+        "生活应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q01-V3",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "班级图书角上午有37本书，下午又放进去28本，现在有多少本？",
+          "options": [],
+          "answerSpec": "65",
+          "explanation": "计算结果是65。",
+          "hints": [
+            "关键词：“又”，数量 37、28。先确认这些数量是在合并，再求合起来的总数。"
+          ],
+          "tags": [
+            "100以内加法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q02-V3",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "公交站原来有62人在等车，一辆车接走了27人，还剩多少人？",
+          "options": [],
+          "answerSpec": "35",
+          "explanation": "计算结果是35。",
+          "hints": [
+            "关键词：“还剩”，数量 62、27。先找原来的总数，再找减少或已经占用的数量，最后求剩下的部分。"
+          ],
+          "tags": [
+            "100以内减法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q03-V3",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "小宇有46张卡片，朋友送给他19张，现在有多少张？",
+          "options": [],
+          "answerSpec": "65",
+          "explanation": "计算结果是65。",
+          "hints": [
+            "关键词：“现在”，数量 46、19。先确认这些数量是在合并，再求合起来的总数。"
+          ],
+          "tags": [
+            "100以内加法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q04-V3",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "社区活动准备了80瓶水，发出去36瓶，还剩多少瓶？",
+          "options": [],
+          "answerSpec": "44",
+          "explanation": "计算结果是44。",
+          "hints": [
+            "关键词：“还剩”，数量 80、36。先找原来的总数，再找减少或已经占用的数量，最后求剩下的部分。"
+          ],
+          "tags": [
+            "100以内减法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q05-V3",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "文具店上午卖出18本练习本，下午卖出27本，一共卖出多少本？",
+          "options": [],
+          "answerSpec": "45",
+          "explanation": "计算结果是45。",
+          "hints": [
+            "关键词：“一共”，数量 18、27。先确认这些数量是在合并，再求合起来的总数。"
+          ],
+          "tags": [
+            "100以内加法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q06-V3",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "学校花坛有73盆花，搬走25盆后还有多少盆？",
+          "options": [],
+          "answerSpec": "48",
+          "explanation": "计算结果是48。",
+          "hints": [
+            "关键词：“搬走”，数量 73、25。先找原来的总数，再找减少或已经占用的数量，最后求剩下的部分。"
+          ],
+          "tags": [
+            "100以内减法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q07-V3",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "运动会一班得了24分，二班得了31分，两班一共多少分？",
+          "options": [],
+          "answerSpec": "55",
+          "explanation": "计算结果是55。",
+          "hints": [
+            "关键词：“一共”，数量 24、31。先确认这些数量是在合并，再求合起来的总数。"
+          ],
+          "tags": [
+            "100以内加法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q08-V3",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "小区停车位有90个，已经停了58辆车，还空多少个位置？",
+          "options": [],
+          "answerSpec": "32",
+          "explanation": "计算结果是32。",
+          "hints": [
+            "关键词：“空”，数量 90、58。先找原来的总数，再找减少或已经占用的数量，最后求剩下的部分。"
+          ],
+          "tags": [
+            "100以内减法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q09-V3",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "早餐店准备了35个包子，又蒸了26个，一共有多少个？",
+          "options": [],
+          "answerSpec": "61",
+          "explanation": "计算结果是61。",
+          "hints": [
+            "关键词：“又”，数量 35、26。先确认这些数量是在合并，再求合起来的总数。"
+          ],
+          "tags": [
+            "100以内加法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q10-V3",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "图书馆有84个座位，已经坐了49人，还剩多少个空座位？",
+          "options": [],
+          "answerSpec": "35",
+          "explanation": "计算结果是35。",
+          "hints": [
+            "关键词：“还剩”，数量 84、49。先找原来的总数，再找减少或已经占用的数量，最后求剩下的部分。"
+          ],
+          "tags": [
+            "100以内减法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q11-V3",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "美术课有25张蓝纸和38张黄纸，一共有多少张？",
+          "options": [],
+          "answerSpec": "63",
+          "explanation": "计算结果是63。",
+          "hints": [
+            "关键词：“一共”，数量 25、38。先确认这些数量是在合并，再求合起来的总数。"
+          ],
+          "tags": [
+            "100以内加法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-ADD-SUB-001-Q12-V3",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "小明有70元零花钱，买文具用了23元，还剩多少元？",
+          "options": [],
+          "answerSpec": "47",
+          "explanation": "计算结果是47。",
+          "hints": [
+            "关键词：“还剩”，数量 70、23。先找原来的总数，再找减少或已经占用的数量，最后求剩下的部分。"
+          ],
+          "tags": [
+            "100以内减法",
+            "生活应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-MEASURE-001",
+      "version": 3,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学长度与测量（一）",
+      "description": "练习厘米、米、实际测量、估测和简单长度计算。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "测量",
+        "厘米和米"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q01-V3",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "测量一支铅笔的长度，用哪个单位更合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "厘米"
+            },
+            {
+              "key": "B",
+              "label": "米"
+            },
+            {
+              "key": "C",
+              "label": "千米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“铅笔”“长度单位”。铅笔是较短的小物体，应优先考虑适合测量小物体的长度单位。"
+          ],
+          "tags": [
+            "测量",
+            "单位"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q02-V3",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "测量教室门的高度，用哪个单位更合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "厘米"
+            },
+            {
+              "key": "B",
+              "label": "米"
+            },
+            {
+              "key": "C",
+              "label": "毫米"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“教室门”“单位”。先估一估真实长度，再判断用厘米还是米更合适。"
+          ],
+          "tags": [
+            "测量",
+            "单位"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q03-V3",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "1米等于多少厘米？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10厘米"
+            },
+            {
+              "key": "B",
+              "label": "50厘米"
+            },
+            {
+              "key": "C",
+              "label": "100厘米"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“1米”“厘米”。先回忆米和厘米之间的基本关系，再换成同一种单位。"
+          ],
+          "tags": [
+            "测量",
+            "单位换算"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q04-V3",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "一把尺子长20厘米，两把一样长的尺子首尾相接，共多长？",
+          "options": [
+            {
+              "key": "A",
+              "label": "40厘米"
+            },
+            {
+              "key": "B",
+              "label": "22厘米"
+            },
+            {
+              "key": "C",
+              "label": "10厘米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“首尾相接”，数量 20。先判断长度是在合并还是减少，并保持单位一致。"
+          ],
+          "tags": [
+            "测量",
+            "长度计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q05-V3",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "一条彩带长75厘米，剪去30厘米，还剩多少厘米？",
+          "options": [
+            {
+              "key": "A",
+              "label": "35厘米"
+            },
+            {
+              "key": "B",
+              "label": "45厘米"
+            },
+            {
+              "key": "C",
+              "label": "55厘米"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“剪去”，数量 75、30。先判断长度是在合并还是减少，并保持单位一致。"
+          ],
+          "tags": [
+            "测量",
+            "长度计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q06-V3",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "小桌子高约60厘米，下面哪个估计最合理？",
+          "options": [
+            {
+              "key": "A",
+              "label": "60米"
+            },
+            {
+              "key": "B",
+              "label": "6千米"
+            },
+            {
+              "key": "C",
+              "label": "60厘米"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“小桌子”“大约”。联系生活中真实大小估一估，不要把厘米和米混在一起。"
+          ],
+          "tags": [
+            "测量",
+            "估测"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q07-V3",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "一根1米长的绳子用去20厘米，还剩多少厘米？",
+          "options": [
+            {
+              "key": "A",
+              "label": "80厘米"
+            },
+            {
+              "key": "B",
+              "label": "20厘米"
+            },
+            {
+              "key": "C",
+              "label": "120厘米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“用去”，数量 1、20。先判断长度是在合并还是减少，并保持单位一致。"
+          ],
+          "tags": [
+            "测量",
+            "长度计算"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q08-V3",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "小朋友一步大约50厘米，下面哪个说法更合理？",
+          "options": [
+            {
+              "key": "A",
+              "label": "两步大约10米"
+            },
+            {
+              "key": "B",
+              "label": "两步大约1米"
+            },
+            {
+              "key": "C",
+              "label": "两步大约10厘米"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“一步”“大约”。联系生活中真实大小估一估，不要把厘米和米混在一起。"
+          ],
+          "tags": [
+            "测量",
+            "估测"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q09-V3",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "书桌长90厘米，书架长70厘米，书桌比书架长多少厘米？",
+          "options": [
+            {
+              "key": "A",
+              "label": "160厘米"
+            },
+            {
+              "key": "B",
+              "label": "30厘米"
+            },
+            {
+              "key": "C",
+              "label": "20厘米"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“比……长多少”，数量 90、70。把两条长度放在一起比较，关注它们相差多少。"
+          ],
+          "tags": [
+            "测量",
+            "比较"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q10-V3",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "从0刻度开始量，一块橡皮的末端在5厘米处，这块橡皮长多少？",
+          "options": [
+            {
+              "key": "A",
+              "label": "5厘米"
+            },
+            {
+              "key": "B",
+              "label": "0厘米"
+            },
+            {
+              "key": "C",
+              "label": "10厘米"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“0刻度”“末端”。从0开始量时，末端停在哪个刻度，长度就对应到哪里。"
+          ],
+          "tags": [
+            "测量",
+            "读数"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q11-V3",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "走廊长约20什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "厘米"
+            },
+            {
+              "key": "B",
+              "label": "米"
+            },
+            {
+              "key": "C",
+              "label": "毫米"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“走廊”“单位”。先估一估真实长度，再判断用厘米还是米更合适。"
+          ],
+          "tags": [
+            "测量",
+            "单位选择"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MEASURE-001-Q12-V3",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "一根绳子长35厘米，另一根长45厘米，两根合起来多长？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10厘米"
+            },
+            {
+              "key": "B",
+              "label": "70厘米"
+            },
+            {
+              "key": "C",
+              "label": "80厘米"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“合起来”，数量 35、45。先判断长度是在合并还是减少，并保持单位一致。"
+          ],
+          "tags": [
+            "测量",
+            "长度计算"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001",
+      "version": 3,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学乘法的认识（一）",
+      "description": "从“几个几”和相同加数出发理解乘法意义，并联系班级和家庭生活。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "乘法认识",
+        "几个几"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q01-V3",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "4个小组，每组3人，一共有多少人？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4×3"
+            },
+            {
+              "key": "B",
+              "label": "4+3"
+            },
+            {
+              "key": "C",
+              "label": "4-3"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每组”，数量 4、3。先找每份几个、共有几份，再理解成几个相同加数。"
+          ],
+          "tags": [
+            "乘法",
+            "乘法意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q02-V3",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "3盒彩笔，每盒5支，“3个5”可以写成？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3+5"
+            },
+            {
+              "key": "B",
+              "label": "3×5"
+            },
+            {
+              "key": "C",
+              "label": "5-3"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每盒”，数量 3、5、3、5。先找每份几个、共有几份，再理解成几个相同加数。"
+          ],
+          "tags": [
+            "乘法",
+            "乘法意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q03-V3",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "2+2+2+2+2表示几个2？",
+          "options": [
+            {
+              "key": "A",
+              "label": "2个5"
+            },
+            {
+              "key": "B",
+              "label": "7个2"
+            },
+            {
+              "key": "C",
+              "label": "5个2"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“个2”，数量 2、2、2、2。先找每份几个、共有几份，再理解成几个相同加数。"
+          ],
+          "tags": [
+            "乘法",
+            "几个几"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q04-V3",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "6张桌子，每张桌子放2把椅子，一共有多少把？",
+          "options": [
+            {
+              "key": "A",
+              "label": "12"
+            },
+            {
+              "key": "B",
+              "label": "8"
+            },
+            {
+              "key": "C",
+              "label": "6"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每张”，数量 6、2。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q05-V3",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "5个盘子，每盘4个橘子，正确算式是？",
+          "options": [
+            {
+              "key": "A",
+              "label": "5+4"
+            },
+            {
+              "key": "B",
+              "label": "5×4"
+            },
+            {
+              "key": "C",
+              "label": "5-4"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每盘”，数量 5、4。先找每份几个、共有几份，再理解成几个相同加数。"
+          ],
+          "tags": [
+            "乘法",
+            "乘法意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q06-V3",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "3排座位，每排6个，表示？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6减3"
+            },
+            {
+              "key": "B",
+              "label": "3和6相加一次"
+            },
+            {
+              "key": "C",
+              "label": "3个6"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每排”，数量 3、6。先找每份几个、共有几份，再理解成几个相同加数。"
+          ],
+          "tags": [
+            "乘法",
+            "几个几"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q07-V3",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "4+4+4可以写成哪道乘法算式？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3×4"
+            },
+            {
+              "key": "B",
+              "label": "4×4"
+            },
+            {
+              "key": "C",
+              "label": "3+4"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“相同加数”。数一数有几个相同的数，再用“几个几”表示成乘法。"
+          ],
+          "tags": [
+            "乘法",
+            "加法转乘法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q08-V3",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "每个笔筒放3支笔，7个笔筒一共多少支？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10"
+            },
+            {
+              "key": "B",
+              "label": "21"
+            },
+            {
+              "key": "C",
+              "label": "14"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每份”，数量 3、7。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q09-V3",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "2辆小车，每辆坐4人，一共多少人？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6"
+            },
+            {
+              "key": "B",
+              "label": "4"
+            },
+            {
+              "key": "C",
+              "label": "8"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每辆”，数量 2、4。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q10-V3",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "“6个3”表示下面哪一种情境？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6组，每组3个"
+            },
+            {
+              "key": "B",
+              "label": "3组，每组2个"
+            },
+            {
+              "key": "C",
+              "label": "6和3相差多少"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“个3”，数量 6、3。先找每份几个、共有几份，再理解成几个相同加数。"
+          ],
+          "tags": [
+            "乘法",
+            "乘法意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q11-V3",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "每行5盆花，有4行，一共有多少盆？",
+          "options": [
+            {
+              "key": "A",
+              "label": "9"
+            },
+            {
+              "key": "B",
+              "label": "20"
+            },
+            {
+              "key": "C",
+              "label": "15"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每份”，数量 5、4。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-MEANING-001-Q12-V3",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "一周上5天课，2周一共上多少天课？",
+          "options": [
+            {
+              "key": "A",
+              "label": "7"
+            },
+            {
+              "key": "B",
+              "label": "5"
+            },
+            {
+              "key": "C",
+              "label": "10"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“一周”，数量 5、2。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法",
+            "生活应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001",
+      "version": 3,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学乘法口诀（一）",
+      "description": "在生活数量关系中熟练2～9乘法口诀，不做机械抄写式刷题。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "乘法口诀",
+        "生活应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q01-V3",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "每盒彩笔6支，买2盒，一共有多少支？",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "2×6=12。",
+          "hints": [
+            "关键词：“每盒”，数量 6、2。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q02-V3",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "操场摆了3排小旗，每排4面，一共有多少面？",
+          "options": [],
+          "answerSpec": "12",
+          "explanation": "3×4=12。",
+          "hints": [
+            "关键词：“每排”，数量 3、4。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q03-V3",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "每组5人，有4组，一共有多少人？",
+          "options": [],
+          "answerSpec": "20",
+          "explanation": "4×5=20。",
+          "hints": [
+            "关键词：“每组”，数量 5、4。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q04-V3",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "每盒彩笔6支，买5盒，一共有多少支？",
+          "options": [],
+          "answerSpec": "30",
+          "explanation": "5×6=30。",
+          "hints": [
+            "关键词：“每盒”，数量 6、5。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q05-V3",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "操场摆了6排小旗，每排7面，一共有多少面？",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "6×7=42。",
+          "hints": [
+            "关键词：“每排”，数量 6、7。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q06-V3",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "每组4人，有7组，一共有多少人？",
+          "options": [],
+          "answerSpec": "28",
+          "explanation": "7×4=28。",
+          "hints": [
+            "关键词：“每组”，数量 4、7。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q07-V3",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "每盒彩笔5支，买8盒，一共有多少支？",
+          "options": [],
+          "answerSpec": "40",
+          "explanation": "8×5=40。",
+          "hints": [
+            "关键词：“每盒”，数量 5、8。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q08-V3",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "操场摆了9排小旗，每排3面，一共有多少面？",
+          "options": [],
+          "answerSpec": "27",
+          "explanation": "9×3=27。",
+          "hints": [
+            "关键词：“每排”，数量 9、3。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q09-V3",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "每组8人，有6组，一共有多少人？",
+          "options": [],
+          "answerSpec": "48",
+          "explanation": "6×8=48。",
+          "hints": [
+            "关键词：“每组”，数量 8、6。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q10-V3",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "每盒彩笔7支，买7盒，一共有多少支？",
+          "options": [],
+          "answerSpec": "49",
+          "explanation": "7×7=49。",
+          "hints": [
+            "关键词：“每盒”，数量 7、7。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q11-V3",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "操场摆了8排小旗，每排4面，一共有多少面？",
+          "options": [],
+          "answerSpec": "32",
+          "explanation": "8×4=32。",
+          "hints": [
+            "关键词：“每排”，数量 8、4。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-FACTS-001-Q12-V3",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "每组6人，有9组，一共有多少人？",
+          "options": [],
+          "answerSpec": "54",
+          "explanation": "9×6=54。",
+          "hints": [
+            "关键词：“每组”，数量 6、9。先找每份几个和共有几份，再用对应乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "生活应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-DIVISION-001",
+      "version": 3,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学平均分与除法（一）",
+      "description": "通过分糖果、分组、装盒等生活情境理解平均分和除法。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "平均分",
+        "除法"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q01-V3",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "12个橘子平均放进3个盘子，每盘几个？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "12÷3=4。",
+          "hints": [
+            "关键词：“平均”，数量 12、3。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q02-V3",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "20本书平均放到4层书架，每层几本？",
+          "options": [],
+          "answerSpec": "5",
+          "explanation": "20÷4=5。",
+          "hints": [
+            "关键词：“平均”，数量 20、4。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q03-V3",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "18颗糖平均分给6个小朋友，每人几颗？",
+          "options": [],
+          "answerSpec": "3",
+          "explanation": "18÷6=3。",
+          "hints": [
+            "关键词：“平均”，数量 18、6。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q04-V3",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "24支铅笔，每4支装一盒，可以装几盒？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "24÷4=6。",
+          "hints": [
+            "关键词：“每4”，数量 24、4。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q05-V3",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "30个气球，每5个扎一束，可以扎几束？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "30÷5=6。",
+          "hints": [
+            "关键词：“每5”，数量 30、5。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q06-V3",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "21名同学，每3人一组，可以分几组？",
+          "options": [],
+          "answerSpec": "7",
+          "explanation": "21÷3=7。",
+          "hints": [
+            "关键词：“每3”，数量 21、3。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q07-V3",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "32张卡片，每8张一份，可以分几份？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "32÷8=4。",
+          "hints": [
+            "关键词：“每8”，数量 32、8。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q08-V3",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "27朵花平均插进9个花瓶，每瓶几朵？",
+          "options": [],
+          "answerSpec": "3",
+          "explanation": "27÷9=3。",
+          "hints": [
+            "关键词：“平均”，数量 27、9。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q09-V3",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "16块积木平均分给2个孩子，每人几块？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "16÷2=8。",
+          "hints": [
+            "关键词：“平均”，数量 16、2。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q10-V3",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "36本绘本平均放在6个盒子里，每盒几本？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "36÷6=6。",
+          "hints": [
+            "关键词：“平均”，数量 36、6。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q11-V3",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "40个乒乓球，每5个装一袋，可以装几袋？",
+          "options": [],
+          "answerSpec": "8",
+          "explanation": "40÷5=8。",
+          "hints": [
+            "关键词：“每5”，数量 40、5。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-DIVISION-001-Q12-V3",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "28人平均分成7组，每组几人？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "28÷7=4。",
+          "hints": [
+            "关键词：“平均”，数量 28、7。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "平均分",
+            "除法"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001",
+      "version": 3,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学图形运动与乘除应用（一）",
+      "description": "结合抽屉、电梯、风扇、钟表等生活现象认识平移旋转，并综合练习乘除应用。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "图形运动",
+        "乘除应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q01-V3",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "推拉抽屉时，抽屉主要做什么运动？",
+          "options": [
+            {
+              "key": "A",
+              "label": "平移"
+            },
+            {
+              "key": "B",
+              "label": "旋转"
+            },
+            {
+              "key": "C",
+              "label": "跳跃"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“抽屉”。判断它是整体沿一个方向移动、绕中心转动，还是两边能够重合。"
+          ],
+          "tags": [
+            "图形运动",
+            "平移"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q02-V3",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "风扇叶片转动主要是什么运动？",
+          "options": [
+            {
+              "key": "A",
+              "label": "平移"
+            },
+            {
+              "key": "B",
+              "label": "旋转"
+            },
+            {
+              "key": "C",
+              "label": "直线行走"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“风扇”。判断它是整体沿一个方向移动、绕中心转动，还是两边能够重合。"
+          ],
+          "tags": [
+            "图形运动",
+            "旋转"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q03-V3",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "把一张纸对折后剪一个小三角，再打开，左右两边图案通常有什么特点？",
+          "options": [
+            {
+              "key": "A",
+              "label": "完全没有关系"
+            },
+            {
+              "key": "B",
+              "label": "一边一定比另一边大很多"
+            },
+            {
+              "key": "C",
+              "label": "比较对称"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“对折”。判断它是整体沿一个方向移动、绕中心转动，还是两边能够重合。"
+          ],
+          "tags": [
+            "图形运动",
+            "对称"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q04-V3",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "电梯从1楼上到5楼，主要可以看成什么运动？",
+          "options": [
+            {
+              "key": "A",
+              "label": "平移"
+            },
+            {
+              "key": "B",
+              "label": "旋转"
+            },
+            {
+              "key": "C",
+              "label": "翻滚"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“电梯”。判断它是整体沿一个方向移动、绕中心转动，还是两边能够重合。"
+          ],
+          "tags": [
+            "图形运动",
+            "平移"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q05-V3",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "钟表的分针绕中心转动，属于？",
+          "options": [
+            {
+              "key": "A",
+              "label": "平移"
+            },
+            {
+              "key": "B",
+              "label": "旋转"
+            },
+            {
+              "key": "C",
+              "label": "静止"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“分针”。判断它是整体沿一个方向移动、绕中心转动，还是两边能够重合。"
+          ],
+          "tags": [
+            "图形运动",
+            "旋转"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q06-V3",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "每排6把椅子，4排一共有多少把？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10"
+            },
+            {
+              "key": "B",
+              "label": "20"
+            },
+            {
+              "key": "C",
+              "label": "24"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每排6把”“4排”“一共”。先找每排有几把、共有几排，再表示几个相同的6。"
+          ],
+          "tags": [
+            "乘法应用",
+            "综合"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q07-V3",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "24个同学每4人一组，可以分成几组？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6"
+            },
+            {
+              "key": "B",
+              "label": "8"
+            },
+            {
+              "key": "C",
+              "label": "4"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每4”，数量 24、4。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "除法应用",
+            "综合"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q08-V3",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "5盒彩泥，每盒7块，一共有多少块？",
+          "options": [
+            {
+              "key": "A",
+              "label": "12"
+            },
+            {
+              "key": "B",
+              "label": "35"
+            },
+            {
+              "key": "C",
+              "label": "30"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“5盒”“每盒7块”“一共”。先找盒数和每盒块数，再表示5个相同的7。"
+          ],
+          "tags": [
+            "乘法应用",
+            "综合"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q09-V3",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "36本书平均分给6个小组，每组几本？",
+          "options": [
+            {
+              "key": "A",
+              "label": "5"
+            },
+            {
+              "key": "B",
+              "label": "7"
+            },
+            {
+              "key": "C",
+              "label": "6"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“平均”，数量 36、6。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "除法应用",
+            "综合"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q10-V3",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个正方形纸片沿中线对折，两边能重合，说明它具有？",
+          "options": [
+            {
+              "key": "A",
+              "label": "对称特点"
+            },
+            {
+              "key": "B",
+              "label": "会旋转"
+            },
+            {
+              "key": "C",
+              "label": "会变长"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“对折”。判断它是整体沿一个方向移动、绕中心转动，还是两边能够重合。"
+          ],
+          "tags": [
+            "图形运动",
+            "对称"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q11-V3",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "每辆小车坐4人，8辆车最多坐多少人？",
+          "options": [
+            {
+              "key": "A",
+              "label": "12"
+            },
+            {
+              "key": "B",
+              "label": "32"
+            },
+            {
+              "key": "C",
+              "label": "24"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每辆4人”“8辆”“最多”。先找每辆能坐几人、共有几辆，再求全部车辆能坐的人数。"
+          ],
+          "tags": [
+            "乘法应用",
+            "综合"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-GEOMETRY-APP-001-Q12-V3",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "42个球，每7个放一筐，需要几筐？",
+          "options": [
+            {
+              "key": "A",
+              "label": "5"
+            },
+            {
+              "key": "B",
+              "label": "7"
+            },
+            {
+              "key": "C",
+              "label": "6"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "先读清题意，再比较三个选项。",
+          "hints": [
+            "关键词：“每7”，数量 42、7。先判断是在求“每份几个”还是“能分几份”，再考虑除法。"
+          ],
+          "tags": [
+            "除法应用",
+            "综合"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-SHOPPING-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学人民币与购物（一）",
+      "description": "结合文具店、小商店等生活场景练习元角关系、付钱、找钱和简单购物计算。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "人民币",
+        "购物"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "文具店里一本练习本8元，一盒彩笔6元。两样都买一共要多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "14元"
+            },
+            {
+              "key": "B",
+              "label": "13元"
+            },
+            {
+              "key": "C",
+              "label": "15元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "8元和6元合在一起，8+6=14，所以一共14元。",
+          "hints": [
+            "关键词：“两样都买”“一共”，数量8元、6元。把两件商品的价钱合起来计算。"
+          ],
+          "tags": [
+            "人民币",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "小乐有20元，买一个13元的笔袋，应该找回多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6元"
+            },
+            {
+              "key": "B",
+              "label": "7元"
+            },
+            {
+              "key": "C",
+              "label": "8元"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "20-13=7，所以买完笔袋后找回7元。",
+          "hints": [
+            "关键词：“20元”“13元”“找回”。用付出的钱减去商品价格，求剩下的钱。"
+          ],
+          "tags": [
+            "人民币",
+            "找钱"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "1元等于多少角？",
+          "options": [
+            {
+              "key": "A",
+              "label": "5角"
+            },
+            {
+              "key": "B",
+              "label": "8角"
+            },
+            {
+              "key": "C",
+              "label": "10角"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "人民币单位中1元等于10角。",
+          "hints": [
+            "关键词：“1元”“多少角”。回忆元和角之间的基本换算关系，再选择。"
+          ],
+          "tags": [
+            "人民币",
+            "元角关系"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "小宇有6角，妈妈又给他4角，现在一共有多少钱？",
+          "options": [
+            {
+              "key": "A",
+              "label": "1元"
+            },
+            {
+              "key": "B",
+              "label": "9角"
+            },
+            {
+              "key": "C",
+              "label": "2元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "6角+4角=10角，而10角正好是1元。",
+          "hints": [
+            "关键词：“6角”“4角”“一共”。先把角相加，再检查是否正好可以换成整元。"
+          ],
+          "tags": [
+            "人民币",
+            "元角关系"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "一支铅笔3元，一块橡皮7元，两样一共多少钱？",
+          "options": [
+            {
+              "key": "A",
+              "label": "9元"
+            },
+            {
+              "key": "B",
+              "label": "10元"
+            },
+            {
+              "key": "C",
+              "label": "11元"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "3+7=10，所以两样商品一共10元。",
+          "hints": [
+            "关键词：“两样”“一共”，数量3元、7元。把两件商品的价钱相加。"
+          ],
+          "tags": [
+            "人民币",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "小明拿30元买18元的故事书，应该找回多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10元"
+            },
+            {
+              "key": "B",
+              "label": "11元"
+            },
+            {
+              "key": "C",
+              "label": "12元"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "30-18=12，所以应找回12元。",
+          "hints": [
+            "关键词：“30元”“18元”“找回”。先确定总钱数和花掉的钱，再做减法。"
+          ],
+          "tags": [
+            "人民币",
+            "找钱"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "两张5元合起来是多少钱？",
+          "options": [
+            {
+              "key": "A",
+              "label": "10元"
+            },
+            {
+              "key": "B",
+              "label": "7元"
+            },
+            {
+              "key": "C",
+              "label": "15元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "5+5=10，所以两张5元合起来是10元。",
+          "hints": [
+            "关键词：“两张5元”“合起来”。把两张相同面额的钱相加。"
+          ],
+          "tags": [
+            "人民币",
+            "面额"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个本子9元，一个文件夹12元。哪一个更便宜？",
+          "options": [
+            {
+              "key": "A",
+              "label": "文件夹"
+            },
+            {
+              "key": "B",
+              "label": "本子"
+            },
+            {
+              "key": "C",
+              "label": "一样贵"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "9小于12，所以9元的本子更便宜。",
+          "hints": [
+            "关键词：“9元”“12元”“更便宜”。比较两个价钱，较小的表示花的钱更少。"
+          ],
+          "tags": [
+            "人民币",
+            "比较"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "一个水杯15元，一条毛巾8元，两样都买需要多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "21元"
+            },
+            {
+              "key": "B",
+              "label": "22元"
+            },
+            {
+              "key": "C",
+              "label": "23元"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "15+8=23，所以一共需要23元。",
+          "hints": [
+            "关键词：“两样都买”“需要多少”，数量15元、8元。把两个价格合并。"
+          ],
+          "tags": [
+            "人民币",
+            "加法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈有50元，买水果用了24元，还剩多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "26元"
+            },
+            {
+              "key": "B",
+              "label": "25元"
+            },
+            {
+              "key": "C",
+              "label": "27元"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "50-24=26，所以还剩26元。",
+          "hints": [
+            "关键词：“50元”“用了24元”“还剩”。从原有的钱里减去已经花掉的钱。"
+          ],
+          "tags": [
+            "人民币",
+            "减法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "一盒彩泥16元，小林有20元。买完后还剩多少元？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3元"
+            },
+            {
+              "key": "B",
+              "label": "4元"
+            },
+            {
+              "key": "C",
+              "label": "5元"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "20-16=4，所以买完后还剩4元。",
+          "hints": [
+            "关键词：“20元”“16元”“还剩”。用现有的钱减去商品价格。"
+          ],
+          "tags": [
+            "人民币",
+            "减法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-SHOPPING-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "小红正好有10元。下面哪一种买法刚好把10元用完？",
+          "options": [
+            {
+              "key": "A",
+              "label": "买6元的笔盒"
+            },
+            {
+              "key": "B",
+              "label": "买7元的笔记本"
+            },
+            {
+              "key": "C",
+              "label": "买6元的笔盒和4元的橡皮"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "6+4=10，正好等于小红现有的10元。",
+          "hints": [
+            "关键词：“正好10元”“刚好用完”。分别算每种买法需要多少钱，找与10相等的一种。"
+          ],
+          "tags": [
+            "人民币",
+            "购物组合"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-MIXED-CALC-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学连加连减与加减混合（一）",
+      "description": "在比赛得分、人数变化和物品整理等情境中练习100以内连加、连减和加减混合。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "加与减",
+        "两步计算"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q01-V1",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "运动会一班第一轮得了24分，第二轮得18分，第三轮得16分，一共得多少分？",
+          "options": [],
+          "answerSpec": "58",
+          "explanation": "24+18+16=58，所以三轮一共58分。",
+          "hints": [
+            "关键词：“三轮”“一共”，数量24、18、16。把三次得分连续相加。"
+          ],
+          "tags": [
+            "连加",
+            "得分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "图书角有80本书，借走23本，又借走17本，还剩多少本？",
+          "options": [
+            {
+              "key": "A",
+              "label": "40本"
+            },
+            {
+              "key": "B",
+              "label": "50本"
+            },
+            {
+              "key": "C",
+              "label": "60本"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "80-23-17=40，所以还剩40本。",
+          "hints": [
+            "关键词：“借走23”“又借走17”“还剩”。总数连续减少两次，要做连减。"
+          ],
+          "tags": [
+            "连减",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q03-V1",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "公交车上原有36人，到站下去12人，又上来18人，现在有多少人？",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "36-12+18=42，所以现在有42人。",
+          "hints": [
+            "关键词：“下去12”“上来18”。先减少，再增加，按事情发生顺序计算。"
+          ],
+          "tags": [
+            "加减混合",
+            "人数变化"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "小店上午卖出15盒彩笔，下午卖出22盒，晚上又卖出13盒，一共卖出多少盒？",
+          "options": [
+            {
+              "key": "A",
+              "label": "45盒"
+            },
+            {
+              "key": "B",
+              "label": "50盒"
+            },
+            {
+              "key": "C",
+              "label": "55盒"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "15+22+13=50，所以一共卖出50盒。",
+          "hints": [
+            "关键词：“上午、下午、晚上”“一共”。三个时段都在增加卖出的总量，连续相加。"
+          ],
+          "tags": [
+            "连加",
+            "购物"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q05-V1",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "班级准备了75张彩纸，手工课用了28张，课后又用了19张，还剩多少张？",
+          "options": [],
+          "answerSpec": "28",
+          "explanation": "75-28-19=28，所以还剩28张。",
+          "hints": [
+            "关键词：“用了28”“又用了19”“还剩”。从总数中连续减去两次使用量。"
+          ],
+          "tags": [
+            "连减",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "小宇有42张贴纸，送给同学15张，后来又得到20张，现在有多少张？",
+          "options": [
+            {
+              "key": "A",
+              "label": "37张"
+            },
+            {
+              "key": "B",
+              "label": "42张"
+            },
+            {
+              "key": "C",
+              "label": "47张"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "42-15+20=47，所以现在有47张。",
+          "hints": [
+            "关键词：“送出15”“又得到20”。先减去送出的，再加上新得到的。"
+          ],
+          "tags": [
+            "加减混合",
+            "数量变化"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q07-V1",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "合唱队原来有31人，又加入9人，后来有6人请假，现在参加排练的有多少人？",
+          "options": [],
+          "answerSpec": "34",
+          "explanation": "31+9-6=34，所以参加排练的有34人。",
+          "hints": [
+            "关键词：“加入9”“6人请假”。人数先增加，再减少。"
+          ],
+          "tags": [
+            "加减混合",
+            "人数"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "果篮里有60个橘子，第一组拿走18个，第二组拿走22个，还剩多少个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "20个"
+            },
+            {
+              "key": "B",
+              "label": "30个"
+            },
+            {
+              "key": "C",
+              "label": "40个"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "60-18-22=20，所以还剩20个。",
+          "hints": [
+            "关键词：“拿走18”“拿走22”“还剩”。两个小组都让总数减少。"
+          ],
+          "tags": [
+            "连减",
+            "分物"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q09-V1",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "图书义卖第一小时卖出26本，第二小时卖出17本，第三小时卖出15本，一共卖出多少本？",
+          "options": [],
+          "answerSpec": "58",
+          "explanation": "26+17+15=58，所以一共卖出58本。",
+          "hints": [
+            "关键词：“三个小时”“一共”。把三个时段卖出的数量连续相加。"
+          ],
+          "tags": [
+            "连加",
+            "统计"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "停车场原来有48辆车，开走16辆，又开进25辆，现在有多少辆？",
+          "options": [
+            {
+              "key": "A",
+              "label": "52辆"
+            },
+            {
+              "key": "B",
+              "label": "57辆"
+            },
+            {
+              "key": "C",
+              "label": "63辆"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "48-16+25=57，所以现在有57辆。",
+          "hints": [
+            "关键词：“开走16”“开进25”。先减后加，按实际变化顺序计算。"
+          ],
+          "tags": [
+            "加减混合",
+            "生活应用"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q11-V1",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "小乐攒了65元，买书花了24元，买文具又花了18元，还剩多少元？",
+          "options": [],
+          "answerSpec": "23",
+          "explanation": "65-24-18=23，所以还剩23元。",
+          "hints": [
+            "关键词：“花了24”“又花18”“还剩”。钱连续减少两次。"
+          ],
+          "tags": [
+            "连减",
+            "购物"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MIXED-CALC-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "班级原来有29盒彩泥，新买了18盒，手工课用了12盒，现在还剩多少盒？",
+          "options": [
+            {
+              "key": "A",
+              "label": "31盒"
+            },
+            {
+              "key": "B",
+              "label": "33盒"
+            },
+            {
+              "key": "C",
+              "label": "35盒"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "29+18-12=35，所以还剩35盒。",
+          "hints": [
+            "关键词：“新买18”“用了12”。数量先增加再减少。"
+          ],
+          "tags": [
+            "加减混合",
+            "生活应用"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学6～9的乘法口诀（一）",
+      "description": "用贴画、座位、运动和整理物品等情境巩固6～9的乘法口诀及简单应用。",
+      "difficulty": "L1",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "6-9乘法口诀",
+        "生活应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q01-V1",
+          "orderNo": 1,
+          "type": "NUMBER",
+          "stem": "有6排座位，每排7个，一共有多少个座位？",
+          "options": [],
+          "answerSpec": "42",
+          "explanation": "6×7=42，所以一共有42个座位。",
+          "hints": [
+            "关键词：“6排”“每排7个”。相同数量重复6次，用乘法求总数。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和7"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "8盒彩笔，每盒6支，一共有多少支？",
+          "options": [
+            {
+              "key": "A",
+              "label": "48支"
+            },
+            {
+              "key": "B",
+              "label": "42支"
+            },
+            {
+              "key": "C",
+              "label": "56支"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "8×6=48，所以共有48支。",
+          "hints": [
+            "关键词：“8盒”“每盒6支”。找出份数和每份数量，再用乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和8"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q03-V1",
+          "orderNo": 3,
+          "type": "NUMBER",
+          "stem": "9个小组，每组5人，一共有多少人？",
+          "options": [],
+          "answerSpec": "45",
+          "explanation": "9×5=45，所以共有45人。",
+          "hints": [
+            "关键词：“9组”“每组5人”。每组人数相同，用乘法求总人数。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "5和9"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "7辆小车，每辆有4个轮子，一共有多少个轮子？",
+          "options": [
+            {
+              "key": "A",
+              "label": "24个"
+            },
+            {
+              "key": "B",
+              "label": "28个"
+            },
+            {
+              "key": "C",
+              "label": "32个"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "7×4=28，所以一共有28个轮子。",
+          "hints": [
+            "关键词：“7辆”“每辆4个轮子”。相同的4重复7次。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "4和7"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q05-V1",
+          "orderNo": 5,
+          "type": "NUMBER",
+          "stem": "一页贴8张星星贴纸，贴了9页，一共贴了多少张？",
+          "options": [],
+          "answerSpec": "72",
+          "explanation": "8×9=72，所以一共72张。",
+          "hints": [
+            "关键词：“每页8张”“9页”。每页一样多，用8乘9。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "8和9"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "6个篮子，每个篮子放9个橘子，一共有多少个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "48个"
+            },
+            {
+              "key": "B",
+              "label": "52个"
+            },
+            {
+              "key": "C",
+              "label": "54个"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "6×9=54，所以一共有54个橘子。",
+          "hints": [
+            "关键词：“6个篮子”“每个9个”。用乘法求相同份数的总量。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和9"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q07-V1",
+          "orderNo": 7,
+          "type": "NUMBER",
+          "stem": "操场上有7队同学，每队8人，一共有多少人？",
+          "options": [],
+          "answerSpec": "56",
+          "explanation": "7×8=56，所以共有56人。",
+          "hints": [
+            "关键词：“7队”“每队8人”。7个8相加可以直接用乘法口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "7和8"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一个算式的结果是63？",
+          "options": [
+            {
+              "key": "A",
+              "label": "7×9"
+            },
+            {
+              "key": "B",
+              "label": "8×7"
+            },
+            {
+              "key": "C",
+              "label": "6×9"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "7×9=63，另外两个分别是56和54。",
+          "hints": [
+            "关键词：“结果63”。回忆7、8、9相关口诀，逐个比较算式结果。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "算式辨析"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q09-V1",
+          "orderNo": 9,
+          "type": "NUMBER",
+          "stem": "8张桌子，每张桌子坐7人，一共可以坐多少人？",
+          "options": [],
+          "answerSpec": "56",
+          "explanation": "8×7=56，所以可以坐56人。",
+          "hints": [
+            "关键词：“8张桌子”“每桌7人”。每桌人数相同，用乘法。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "7和8"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "9袋糖，每袋6颗，一共有多少颗？",
+          "options": [
+            {
+              "key": "A",
+              "label": "45颗"
+            },
+            {
+              "key": "B",
+              "label": "54颗"
+            },
+            {
+              "key": "C",
+              "label": "63颗"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "9×6=54，所以共有54颗糖。",
+          "hints": [
+            "关键词：“9袋”“每袋6颗”。用9乘6求总数。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和9"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q11-V1",
+          "orderNo": 11,
+          "type": "NUMBER",
+          "stem": "6行花盆，每行8盆，一共有多少盆？",
+          "options": [],
+          "answerSpec": "48",
+          "explanation": "6×8=48，所以一共有48盆。",
+          "hints": [
+            "关键词：“6行”“每行8盆”。相同数量重复6次，用乘法求总数。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "6和8"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-MULTIPLY-69-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一句乘法口诀可以帮助计算8×9？",
+          "options": [
+            {
+              "key": "A",
+              "label": "七八五十六"
+            },
+            {
+              "key": "B",
+              "label": "六九五十四"
+            },
+            {
+              "key": "C",
+              "label": "八九七十二"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“八九七十二”直接对应8×9=72。",
+          "hints": [
+            "关键词：“8×9”“口诀”。找同时包含8和9的一句口诀。"
+          ],
+          "tags": [
+            "乘法口诀",
+            "口诀"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MATH-G2-S1-SYNC-TIMES-DIV-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "MATH",
+      "semester": "S1",
+      "track": "TEXTBOOK_SYNC",
+      "title": "二上数学倍数关系与除法应用（一）",
+      "description": "用动物数量、文具分组和生活场景理解“几倍”关系，并用除法解决每份与份数问题。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 18,
+      "tags": [
+        "教材同步",
+        "倍数关系",
+        "除法应用"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "小兔有3只，小鸟有12只。小鸟的数量是小兔的几倍？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4倍"
+            },
+            {
+              "key": "B",
+              "label": "3倍"
+            },
+            {
+              "key": "C",
+              "label": "6倍"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "12里面有4个3，12÷3=4，所以小鸟是小兔的4倍。",
+          "hints": [
+            "关键词：“3只”“12只”“几倍”。看大数量里有几个小数量，用除法。"
+          ],
+          "tags": [
+            "倍数关系",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q02-V1",
+          "orderNo": 2,
+          "type": "NUMBER",
+          "stem": "红花有5朵，黄花有20朵。黄花是红花的几倍？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "20÷5=4，所以黄花是红花的4倍。",
+          "hints": [
+            "关键词：“5朵”“20朵”“几倍”。求20里面有几个5。"
+          ],
+          "tags": [
+            "倍数关系",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "24个苹果平均放进6个盘子，每盘放几个？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3个"
+            },
+            {
+              "key": "B",
+              "label": "4个"
+            },
+            {
+              "key": "C",
+              "label": "6个"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "24÷6=4，所以每盘4个。",
+          "hints": [
+            "关键词：“平均放6盘”“每盘几个”。总数平均分成6份，求每份数量。"
+          ],
+          "tags": [
+            "除法",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q04-V1",
+          "orderNo": 4,
+          "type": "NUMBER",
+          "stem": "35张卡片，每5张装一袋，可以装几袋？",
+          "options": [],
+          "answerSpec": "7",
+          "explanation": "35÷5=7，所以可以装7袋。",
+          "hints": [
+            "关键词：“每5张一袋”“35张”。按每份5张分组，求能分几份。"
+          ],
+          "tags": [
+            "除法",
+            "份数"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "6个气球是一组，42个气球能分成几组？",
+          "options": [
+            {
+              "key": "A",
+              "label": "6组"
+            },
+            {
+              "key": "B",
+              "label": "8组"
+            },
+            {
+              "key": "C",
+              "label": "7组"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "42÷6=7，所以能分成7组。",
+          "hints": [
+            "关键词：“6个一组”“42个”。求42里面有几个6。"
+          ],
+          "tags": [
+            "除法",
+            "分组"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q06-V1",
+          "orderNo": 6,
+          "type": "NUMBER",
+          "stem": "小猫有4条鱼，小狗有16根骨头。16是4的几倍？",
+          "options": [],
+          "answerSpec": "4",
+          "explanation": "16÷4=4，所以16是4的4倍。",
+          "hints": [
+            "关键词：“4”“16”“几倍”。用较大数除以较小数。"
+          ],
+          "tags": [
+            "倍数关系",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "下面哪一个问题适合用18÷3解决？",
+          "options": [
+            {
+              "key": "A",
+              "label": "18个球每3个一组，可以分几组？"
+            },
+            {
+              "key": "B",
+              "label": "18个球又买3个，一共有几个？"
+            },
+            {
+              "key": "C",
+              "label": "18个球送走3个，还剩几个？"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "18÷3表示把18按每3个分组，求能分成多少组。",
+          "hints": [
+            "关键词：“18÷3”“适合的问题”。除法常用于平均分或按固定数量分组。"
+          ],
+          "tags": [
+            "除法",
+            "算式意义"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q08-V1",
+          "orderNo": 8,
+          "type": "NUMBER",
+          "stem": "48支铅笔平均分给8个同学，每人分到多少支？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "48÷8=6，所以每人6支。",
+          "hints": [
+            "关键词：“48支”“平均8人”“每人”。总数平均分成8份。"
+          ],
+          "tags": [
+            "除法",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "小明有7张邮票，姐姐有28张。姐姐的邮票数是小明的几倍？",
+          "options": [
+            {
+              "key": "A",
+              "label": "3倍"
+            },
+            {
+              "key": "B",
+              "label": "5倍"
+            },
+            {
+              "key": "C",
+              "label": "4倍"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "28÷7=4，所以姐姐有小明的4倍。",
+          "hints": [
+            "关键词：“7张”“28张”“几倍”。求28里面有几个7。"
+          ],
+          "tags": [
+            "倍数关系",
+            "除法"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q10-V1",
+          "orderNo": 10,
+          "type": "NUMBER",
+          "stem": "54本书每9本放一层，需要几层书架？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "54÷9=6，所以需要6层。",
+          "hints": [
+            "关键词：“每9本一层”“54本”。按9本一份分组，求份数。"
+          ],
+          "tags": [
+            "除法",
+            "分组"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "8只小鸭，鸭妈妈准备了40条小鱼，平均每只小鸭分几条？",
+          "options": [
+            {
+              "key": "A",
+              "label": "4条"
+            },
+            {
+              "key": "B",
+              "label": "5条"
+            },
+            {
+              "key": "C",
+              "label": "6条"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "40÷8=5，所以每只小鸭分5条。",
+          "hints": [
+            "关键词：“40条”“8只”“平均”。总数平均分给8只小鸭。"
+          ],
+          "tags": [
+            "除法",
+            "平均分"
+          ]
+        },
+        {
+          "id": "MATH-G2-S1-SYNC-TIMES-DIV-001-Q12-V1",
+          "orderNo": 12,
+          "type": "NUMBER",
+          "stem": "6盒彩泥一共36块，平均每盒有多少块？",
+          "options": [],
+          "answerSpec": "6",
+          "explanation": "36÷6=6，所以平均每盒6块。",
+          "hints": [
+            "关键词：“36块”“6盒”“平均每盒”。总数除以盒数，求每盒数量。"
+          ],
+          "tags": [
+            "除法",
+            "平均分"
+          ]
+        }
+      ]
+    }
+  ]
+}

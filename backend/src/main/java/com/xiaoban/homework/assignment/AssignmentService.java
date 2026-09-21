@@ -272,6 +272,9 @@ public class AssignmentService {
   @Transactional
   public void delete(UUID familyId, String id) {
     AssignmentEntity assignment = requireOwned(familyId, id);
+    if ("COMPLETED".equals(assignment.status)) {
+      throw new ApiExceptions.BadRequest("已完成作业不能删除");
+    }
     for (SubmissionEntity submission : submissions.findByFamilyIdAndAssignmentIdOrderBySubmittedAtDesc(familyId, id)) {
       for (SubmissionPhotoEntity photo : photos.findBySubmissionIdOrderById(submission.id)) {
         storage.delete(photo.storagePath);

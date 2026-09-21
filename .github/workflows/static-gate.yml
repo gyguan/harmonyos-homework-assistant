@@ -24,11 +24,62 @@ jobs:
       - name: Validate HarmonyOS project invariants
         run: python scripts/validate_harmony_project.py
 
+      - name: Validate ArkTS compile safety
+        run: python scripts/validate_arkts_compile_safety.py
+
+      - name: Validate issue 241 capture spike
+        run: python scripts/validate_issue241_capture_spike.py
+
+      - name: Validate issue 242 import inbox
+        run: python scripts/validate_issue242_import_inbox.py
+
+      - name: Validate issue 243 share import
+        run: python scripts/validate_issue243_share_import.py
+
+      - name: Validate issue 244 guided capture
+        run: python scripts/validate_issue244_guided_capture.py
+
+      - name: Validate issue 245 chat reconstruction
+        run: python scripts/validate_issue245_chat_reconstruction.py
+
+      - name: Validate issue 246 homework understanding
+        run: python scripts/validate_issue246_homework_understanding.py
+
+      - name: Validate issue 247 source profile closure
+        run: python scripts/validate_issue247_source_profile_closure.py
+
+      - name: Validate issue 270 capture entry split
+        run: python scripts/validate_issue270_capture_entry_split.py
+
+      - name: Validate issue 271 capture home layout
+        run: python scripts/validate_issue271_capture_home_layout.py
+
+      - name: Validate parent import UI conformance
+        run: python scripts/validate_parent_import_ui_conformance.py
+
       - name: Validate pasted teacher text import
         run: python scripts/validate_text_import_feature.py
 
       - name: Validate V0.2 parser and confirmation
         run: python scripts/validate_v02_parser_confirmation.py
+
+      - name: Validate assignment editor consistency
+        run: python scripts/validate_assignment_editor_consistency.py
+
+      - name: Validate UI refresh and copy consistency
+        run: python scripts/validate_ui_refresh_copy.py
+
+      - name: Validate unified task UI consistency
+        run: python scripts/validate_task_ui_consistency.py
+
+      - name: Validate sustainable assignment foundation
+        run: python scripts/validate_sustainable_assignment_foundation.py
+
+      - name: Validate confirmation interaction
+        run: python scripts/validate_confirmation_interaction.py
+
+      - name: Validate parent delete and study media enhancements
+        run: python scripts/validate_parent_delete_study_media.py
 
       - name: Validate real homework submission
         run: python scripts/validate_real_submission_feature.py
@@ -129,6 +180,24 @@ jobs:
       - name: Validate student profile navigation
         run: python scripts/validate_student_profile_navigation.py
 
+      - name: Validate Practice Slice 1
+        run: python scripts/validate_practice_slice1.py
+
+      - name: Validate Practice Slice 2
+        run: python scripts/validate_practice_slice2.py
+
+      - name: Validate Practice Slice 3
+        run: python scripts/validate_practice_slice3.py
+
+      - name: Validate Practice Slice 4
+        run: python scripts/validate_practice_slice4.py
+
+      - name: Validate Practice content catalog
+        run: python scripts/validate_practice_content.py
+
+      - name: Validate Practice pass filter
+        run: python scripts/validate_practice_pass_filter.py
+
       - name: Validate parent Tutor settings
         run: python scripts/validate_parent_tutor_settings.py
 
@@ -218,6 +287,9 @@ jobs:
 
       - name: Run assignment action command E2E
         run: python backend/scripts/assignment_action_e2e.py
+
+      - name: Run Practice attempt E2E
+        run: python backend/scripts/practice_e2e.py
 
       - name: Run parent review command E2E
         run: python backend/scripts/parent_review_e2e.py

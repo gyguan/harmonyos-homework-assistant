@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+from pathlib import Path
+import sys
+
+ROOT = Path(__file__).resolve().parents[1]
+errors: list[str] = []
+
+
+def read(path: str) -> str:
+    file = ROOT / path
+    if not file.exists():
+        errors.append(f"missing required file: {path}")
+        return ""
+    return file.read_text(encoding="utf-8")
+
+
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        errors.append(message)
+
+
+models = read("entry/src/main/ets/domain/model/practice/PracticeModels.ets")
+policy = read("entry/src/main/ets/domain/service/PracticePassPolicy.ets")
+dialog = read("entry/src/main/ets/components/practice/PracticeFilterDialog.ets")
+home = read("entry/src/main/ets/features/student/practice/PracticeHomePage.ets")
+view_model = read("entry/src/main/ets/features/student/practice/PracticeHomeViewModel.ets")
+
+for token in [
+    "export enum PracticePassFilter",
+    "PASSED = 'PASSED'",
+    "NOT_PASSED = 'NOT_PASSED'",
+    "static passFilterLabel(filter: PracticePassFilter)",
+]:
+    require(token in models, f"practice pass filter model missing: {token}")
+
+require("static readonly PASS_PERCENT: number = 60;" in policy,
+        "practice pass threshold must remain centralized at 60 percent")
+require("item.status !== PracticeAttemptStatus.SUBMITTED" in policy and
+        "item.mode !== PracticeAttemptMode.FULL" in policy,
+        "only submitted full-paper attempts may pass the whole paper")
+require("item.maxScore > 0 ? item.maxScore : item.questionCount" in policy and
+        "item.maxScore > 0 ? item.score : item.correctCount" in policy,
+        "practice pass policy must fall back to correctCount/questionCount for legacy summaries")
+require("numerator * 100 >= denominator * PracticePassPolicy.PASS_PERCENT" in policy,
+        "practice pass policy must compare normalized score against the shared threshold")
+require("static matchesAttemptPassFilter(item: PracticeAttemptSummary, filter: PracticePassFilter)" in policy,
+        "practice pass filtering must be centralized in PracticePassPolicy")
+require("static passedPaperIds(attempts: PracticeAttemptSummary[])" in policy and
+        "result.push(item.paperId)" in policy and
+        "paperId === paper.id" in policy,
+        "pass state must aggregate by logical paperId across catalog versions")
+require("paperVersion" not in policy and "paper.version" not in policy,
+        "pass policy must not discard a prior pass when the catalog paper version changes")
+
+for token in [
+    "@Link selectedPassFilter: PracticePassFilter",
+    "Text('通过状态')",
+    "PassOption(PracticePassFilter.ALL)",
+    "PassOption(PracticePassFilter.PASSED)",
+    "PassOption(PracticePassFilter.NOT_PASSED)",
+    "PracticeTaxonomy.passFilterLabel(filter)",
+]:
+    require(token in dialog, f"practice filter dialog missing pass-status behavior: {token}")
+
+for token in [
+    "@State private selectedPassFilter: PracticePassFilter = PracticePassFilter.ALL",
+    "label: '通过状态'",
+    "active: this.selectedPassFilter !== PracticePassFilter.ALL",
+    "@Prop passed: boolean = false",
+    "Text('已通过')",
+    "passed: this.viewModel.isPaperPassed(paper, this.passedPaperIds)",
+    "filterByPass(",
+]:
+    require(token in home or token in view_model, f"practice home missing pass filter/tag behavior: {token}")
+
+require("listAttempts(this.familyContext.getActiveStudentId(), '')" in view_model,
+        "pass status must use the active student's own practice history")
+require("PracticePassPolicy.passedPaperIds(attempts)" in view_model and
+        "PracticePassPolicy.isPaperPassed(paper, passedPaperIds)" in view_model,
+        "filter and tag must share the version-independent PracticePassPolicy")
+require("@State private passedPaperIds: string[] = []" in home and
+        "this.viewModel.passedPaperIds(attempts)" in home,
+        "Practice home must store logical passed paper ids rather than versioned keys")
+
+require(".layoutWeight(1)" in home and
+        ".textOverflow({ overflow: TextOverflow.Ellipsis })" in home and
+        ".constraintSize({ minWidth: 64 })" in home and
+        ".textAlign(TextAlign.End)" in home,
+        "practice paper-list header must preserve count visibility on narrow Phone layouts")
+
+if errors:
+    print("PRACTICE_PASS_FILTER_GATE_FAIL")
+    for error in errors:
+        print(f"- {error}")
+    sys.exit(1)
+
+print("PRACTICE_PASS_FILTER_GATE_PASS")

@@ -3,6 +3,7 @@ import { RemoteAssignmentMapper } from '../../../application/remote/RemoteModels
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import {
   Assignment,
+  AssignmentBacking,
   AssignmentContentType,
   AssignmentStatus,
   AssignmentType,
@@ -36,6 +37,7 @@ export class ParentVoiceAssignmentViewModel {
       id: `a-voice-${student.id}-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
       studentId: student.id,
       candidateId: '',
+      backing: AssignmentBacking.REMOTE,
       assignmentType: AssignmentType.EXTRA,
       subjectCode: this.subjectCode(draft.subject),
       contentType: AssignmentContentType.AUDIO_IMAGE,

@@ -8,14 +8,14 @@ export struct ParentReviewPage {
   @Prop revision: number = 0;
   onBack: () => void = () => {};
   onReviewed: () => void = () => {};
+  onDeleted: () => void = () => {};
 
   build() {
     Column() {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
           title: '作业详情',
-          subtitle: '查看任务、调整计划，提交后可在这里验收',
-          backAccessibilityText: '返回进度',
+          backAccessibilityText: '返回上一页',
           onBack: () => this.onBack()
         });
         Scroll() {
@@ -23,7 +23,8 @@ export struct ParentReviewPage {
             ParentReviewPane({
               assignmentId: this.assignmentId,
               revision: this.revision,
-              onReviewed: () => this.onReviewed()
+              onReviewed: () => this.onReviewed(),
+              onDeleted: () => this.onDeleted()
             });
           }
           .width('100%')

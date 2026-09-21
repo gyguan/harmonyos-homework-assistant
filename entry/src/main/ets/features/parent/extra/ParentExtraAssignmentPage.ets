@@ -11,7 +11,7 @@ export struct ParentExtraAssignmentPage {
   @State private category: Subject = Subject.READING;
   @State private title: string = '';
   @State private instruction: string = '';
-  @State private dueText: string = '';
+  @State private dueText: string = '今天';
   @State private expectedMinutesText: string = '20';
   @State private busy: boolean = false;
   @State private message: string = '';
@@ -140,15 +140,13 @@ export struct ParentExtraAssignmentPage {
   private TimingSection() {
     Column({ space: 10 }) {
       Text('时间安排').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text('截止时间可不设置；需要时直接选择日期和时间，统一按北京时间保存。').width('100%')
-        .fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
       DeadlinePickerField({
         value: this.dueText,
         allowClear: true,
         onChange: (value: string) => this.dueText = value
       });
       Column({ space: 5 }) {
-        Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('预计用时（分钟）').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '20', text: this.expectedMinutesText })
           .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
           .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -179,7 +177,6 @@ export struct ParentExtraAssignmentPage {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
           title: '布置课外任务',
-          subtitle: `给 ${this.viewModel.student().name} 安排阅读、运动或实践任务`,
           backAccessibilityText: '返回家长首页',
           onBack: () => this.onBack()
         });

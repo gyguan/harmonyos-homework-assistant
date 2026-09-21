@@ -44,6 +44,8 @@ require("this.voiceToggleAudio()" in study and "this.voiceSeek(value)" in study,
 require("this.voicePreviousImage()" in study and "this.voiceNextImage()" in study and
         "this.voiceSelectImage(index)" in study,
         "fullscreen image controls must delegate to the still-mounted pane")
+require("Swiper()" in study and ".onChange((index: number)" in study,
+        "fullscreen assignment images must support touch swipe paging")
 
 if errors:
     print("VOICE_WORKSPACE_FULLSCREEN_GATE_FAIL")

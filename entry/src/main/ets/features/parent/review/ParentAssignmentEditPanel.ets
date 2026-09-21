@@ -1,6 +1,7 @@
+import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
-import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
+import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
+import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { Assignment } from '../../../domain/model/HomeworkModels';
 import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
@@ -13,6 +14,7 @@ export struct ParentAssignmentEditPanel {
   @State private textbookRefDraft: string = '';
   @State private dueTextDraft: string = '';
   @State private minutesDraft: string = '20';
+  @State private confirmDiscard: boolean = false;
 
   onCancel: () => void = () => {};
   onSave: (assignment: Assignment) => void = (_assignment: Assignment) => {};
@@ -23,6 +25,7 @@ export struct ParentAssignmentEditPanel {
     this.textbookRefDraft = this.item.textbookRef;
     this.dueTextDraft = this.item.dueText;
     this.minutesDraft = `${this.item.expectedMinutes}`;
+    this.confirmDiscard = false;
   }
 
   private parsedMinutes(): number {
@@ -36,8 +39,47 @@ export struct ParentAssignmentEditPanel {
     return !this.saving && this.titleDraft.trim().length > 0 && minutes >= 1 && minutes <= 240;
   }
 
+  private originalEditValues(): AssignmentEditValues {
+    return {
+      subject: this.item.subject,
+      title: this.item.title,
+      instruction: this.item.instruction,
+      dueText: this.item.dueText,
+      expectedMinutes: this.item.expectedMinutes,
+      textbookRef: this.item.textbookRef
+    };
+  }
+
+  private currentEditValues(): AssignmentEditValues {
+    return {
+      subject: this.item.subject,
+      title: this.titleDraft,
+      instruction: this.instructionDraft,
+      dueText: this.dueTextDraft,
+      expectedMinutes: this.parsedMinutes(),
+      textbookRef: this.textbookRefDraft
+    };
+  }
+
+  private hasChanges(): boolean {
+    return AssignmentEditChangeDetector.hasChanges(this.originalEditValues(), this.currentEditValues());
+  }
+
+  private markChanged(): void {
+    this.confirmDiscard = false;
+  }
+
   private setMinutes(minutes: number): void {
     this.minutesDraft = `${minutes}`;
+    this.markChanged();
+  }
+
+  private requestClose(): void {
+    if (this.hasChanges()) {
+      this.confirmDiscard = true;
+      return;
+    }
+    this.onCancel();
   }
 
   private buildAssignment(): Assignment {
@@ -48,8 +90,10 @@ export struct ParentAssignmentEditPanel {
       id: this.item.id,
       studentId: this.item.studentId,
       candidateId: this.item.candidateId,
+      backing: this.item.backing,
       assignmentType: this.item.assignmentType,
       subjectCode: this.item.subjectCode,
+      contentType: this.item.contentType,
       subject: this.item.subject,
       title: this.titleDraft.trim(),
       instruction: this.instructionDraft.trim(),
@@ -71,99 +115,100 @@ export struct ParentAssignmentEditPanel {
     };
   }
 
-  build() {
-    Column({ space: 12 }) {
-      Row() {
-        Column({ space: 2 }) {
-          Text('编辑任务')
-            .fontSize(AppTheme.CARD_TITLE_SIZE)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text(`${this.item.subject} · 不会修改作业状态和计时`)
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
+  @Builder
+  private BottomActions() {
+    Column({ space: 8 }) {
+      if (this.confirmDiscard) {
+        Text('当前修改尚未保存，关闭将放弃这些修改。')
+          .width('100%')
+          .fontSize(12)
+          .fontColor(AppTheme.WARNING);
+        Row({ space: 10 }) {
+          Button('继续编辑', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT)
+            .onClick(() => this.confirmDiscard = false);
+          Button('放弃修改', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.DANGER_SOFT)
+            .fontColor(AppTheme.DANGER)
+            .onClick(() => {
+              this.onCancel();
+            });
         }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-
-        Text('取消')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT)
-          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .textAlign(TextAlign.Center)
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .onClick(() => this.onCancel());
+        .width('100%');
+      } else {
+        Button(this.saving ? '保存中…' : '保存修改', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(this.canSave())
+          .backgroundColor(this.canSave() ? AppTheme.PRIMARY : AppTheme.DISABLED)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .onClick(() => this.onSave(this.buildAssignment()));
       }
-      .width('100%');
-
-      Text('作业标题').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: this.titleDraft })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.titleDraft = value);
-
-      Text('老师要求').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextArea({ text: this.instructionDraft })
-        .width('100%')
-        .height(88)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.instructionDraft = value);
-
-      Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      DeadlinePickerField({
-        value: this.dueTextDraft,
-        allowClear: true,
-        onChange: (value: string) => this.dueTextDraft = value
-      });
-
-      Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      Row({ space: 6 }) {
-        ChoiceSelectionChip({ label: '10', selected: this.parsedMinutes() === 10, compact: true,
-          onSelect: () => this.setMinutes(10) });
-        ChoiceSelectionChip({ label: '15', selected: this.parsedMinutes() === 15, compact: true,
-          onSelect: () => this.setMinutes(15) });
-        ChoiceSelectionChip({ label: '20', selected: this.parsedMinutes() === 20, compact: true,
-          onSelect: () => this.setMinutes(20) });
-        ChoiceSelectionChip({ label: '30', selected: this.parsedMinutes() === 30, compact: true,
-          onSelect: () => this.setMinutes(30) });
-        ChoiceSelectionChip({ label: '45', selected: this.parsedMinutes() === 45, compact: true,
-          onSelect: () => this.setMinutes(45) });
-      }
-      .width('100%');
-
-      TextInput({ text: this.minutesDraft })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.minutesDraft = value);
-
-      Text('教材 / 页码').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-      TextInput({ text: this.textbookRefDraft })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.textbookRefDraft = value);
-
-      Button(this.saving ? '保存中…' : '保存修改', { type: ButtonType.Normal })
-        .width('100%')
-        .height(AppTheme.BUTTON_HEIGHT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .enabled(this.canSave())
-        .backgroundColor(this.canSave() ? AppTheme.PRIMARY : AppTheme.DISABLED)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .fontSize(14)
-        .fontWeight(FontWeight.Medium)
-        .onClick(() => this.onSave(this.buildAssignment()));
     }
     .width('100%')
-    .padding(15)
+    .padding({ left: 16, right: 16, top: 10, bottom: 18 })
     .backgroundColor(AppTheme.SURFACE)
-    .border({ width: 1, color: AppTheme.PRIMARY })
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+    .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
+  }
+
+  build() {
+    Column() {
+      EditSheetHeader({
+        title: '编辑任务',
+        subtitle: `${this.item.subject} · 不会修改作业状态和计时`,
+        closeAccessibilityText: '关闭任务编辑',
+        onClose: () => this.requestClose()
+      });
+
+      Divider().color(AppTheme.DIVIDER);
+
+      Scroll() {
+        AssignmentEditForm({
+          subject: this.item.subject,
+          subjectEditable: false,
+          title: this.titleDraft,
+          instruction: this.instructionDraft,
+          dueText: this.dueTextDraft,
+          expectedMinutes: this.parsedMinutes() > 0 ? this.parsedMinutes() : 20,
+          textbookRef: this.textbookRefDraft,
+          onTitleChange: (value: string) => {
+            this.titleDraft = value;
+            this.markChanged();
+          },
+          onInstructionChange: (value: string) => {
+            this.instructionDraft = value;
+            this.markChanged();
+          },
+          onDueTextChange: (value: string) => {
+            this.dueTextDraft = value;
+            this.markChanged();
+          },
+          onMinutesChange: (minutes: number) => this.setMinutes(minutes),
+          onTextbookRefChange: (value: string) => {
+            this.textbookRefDraft = value;
+            this.markChanged();
+          }
+        })
+        .padding({ left: 16, right: 16, top: 12, bottom: 16 });
+      }
+      .width('100%')
+      .layoutWeight(1)
+      .scrollBar(BarState.Auto);
+
+      this.BottomActions();
+    }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(AppTheme.SURFACE);
   }
 }

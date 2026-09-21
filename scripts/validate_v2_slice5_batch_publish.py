@@ -29,6 +29,7 @@ draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraft
 draft_local = read("entry/src/main/ets/data/local/HomeworkImportLocalDataSource.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+assignment_edit_form = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 deadline_picker = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 mock_parser = read("entry/src/main/ets/infrastructure/ai/MockHomeworkAssignmentParser.ets")
 due_date_service = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
@@ -108,16 +109,19 @@ require("candidateAnchor(candidate.id)" in client_service,
         "relative due dates must be anchored to Candidate/import creation time when available")
 
 # Delivery P0: editing the title must preserve the independently editable teacher instruction.
-require("this.copy(item, item.subject, title, item.instruction)" in confirmation,
-        "confirmation title edit must preserve teacher instruction")
-require("this.copy(item, item.subject, title, title)" not in confirmation,
+require("title: this.titleDraft" in confirmation_components and
+        "instruction: this.instructionDraft" in confirmation_components,
+        "staged confirmation save must preserve title and teacher instruction independently")
+require("instruction: this.titleDraft" not in confirmation_components,
         "confirmation title edit must never overwrite teacher instruction")
 
 # Parent-edited deadlines must use the same native picker as manually created extracurricular tasks.
-require("DeadlinePickerField" in confirmation_components and
-        "onChange: (value: string) => this.onDueTextChange(this.item, value)" in confirmation_components,
-        "confirmation deadline edit must reuse the shared date/time picker")
-require("TextInput({ text: this.item.dueText })" not in confirmation_components,
+require("AssignmentEditForm" in confirmation_components and
+        "DeadlinePickerField" in assignment_edit_form and
+        "onChange: (value: string) => this.onDueTextChange(value)" in assignment_edit_form,
+        "confirmation deadline edit must reuse the shared assignment form and date/time picker")
+require("TextInput({ text: this.item.dueText })" not in confirmation_components and
+        "TextInput({ text: this.dueText })" not in assignment_edit_form,
         "confirmation deadline must not regress to free-text date/time input")
 require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker,
         "shared confirmation deadline picker must expose native date and time controls")

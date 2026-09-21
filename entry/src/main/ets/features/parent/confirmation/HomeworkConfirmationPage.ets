@@ -1,6 +1,7 @@
+import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
-import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
+import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
 import { HomeworkConfirmationViewModel } from './HomeworkConfirmationViewModel';
 import { ConfirmationCandidateCard, ConfirmationCandidateEditor } from './ConfirmationCandidateComponents';
 
@@ -9,10 +10,15 @@ export struct HomeworkConfirmationPage {
   @Prop revision: number = 0;
   @State private localRevision: number = 0;
   @State private editingCandidateId: string = '';
+  @State private manualCandidateDraft: CandidateAssignment | null = null;
+  @State private pendingDeleteCandidateId: string = '';
   @State private showEditorSheet: boolean = false;
   @State private publishing: boolean = false;
   @State private publishMessage: string = '';
   @State private publishError: boolean = false;
+  @State private bulkMode: boolean = false;
+  @State private selectedCandidateIds: string[] = [];
+  @State private batchDeleteConfirm: boolean = false;
   onBack: () => void = () => {};
   onPublished: () => void = () => {};
   onStoreChanged: () => void = () => {};
@@ -28,11 +34,19 @@ export struct HomeworkConfirmationPage {
   }
 
   private editingCandidate(): CandidateAssignment | null {
+    if (this.manualCandidateDraft !== null && this.manualCandidateDraft.id === this.editingCandidateId) {
+      return this.manualCandidateDraft;
+    }
     for (let item of this.candidates()) if (item.id === this.editingCandidateId) return item;
     return null;
   }
 
+  private candidateRenderKey(item: CandidateAssignment): string {
+    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.dueText}|${item.textbookRef}|${item.expectedMinutes}`;
+  }
+
   private openEditor(candidateId: string): void {
+    if (this.bulkMode) return;
     this.editingCandidateId = candidateId;
     this.showEditorSheet = true;
   }
@@ -41,68 +55,120 @@ export struct HomeworkConfirmationPage {
     this.showEditorSheet = false;
   }
 
-  private saveCandidate(candidate: CandidateAssignment): void {
-    if (!this.viewModel.updateCandidate(candidate)) return;
+  private completeEditorDismiss(): void {
+    let pendingDeleteCandidateId = this.pendingDeleteCandidateId;
+    this.editingCandidateId = '';
+    this.manualCandidateDraft = null;
+    this.pendingDeleteCandidateId = '';
+    if (pendingDeleteCandidateId.length > 0) this.commitCandidateRemoval(pendingDeleteCandidateId);
+  }
+
+  private saveCandidate(candidate: CandidateAssignment): boolean {
+    let saved = this.manualCandidateDraft !== null && this.manualCandidateDraft.id === candidate.id ?
+      this.viewModel.addCandidate(candidate) : this.viewModel.updateCandidate(candidate);
+    if (!saved) return false;
     this.localRevision++;
     this.onStoreChanged();
-  }
-
-  private copy(item: CandidateAssignment, subject: Subject = item.subject, title: string = item.title,
-    instruction: string = item.instruction, dueText: string = item.dueText,
-    textbookRef: string = item.textbookRef, expectedMinutes: number = item.expectedMinutes): CandidateAssignment {
-    return {
-      id: item.id, studentId: item.studentId, subject: subject, title: title, instruction: instruction,
-      textbookRef: textbookRef, dueText: dueText, expectedMinutes: expectedMinutes,
-      sourceEvidence: { sourceLabel: item.sourceEvidence.sourceLabel, excerpt: item.sourceEvidence.excerpt },
-      confidence: item.confidence
-    };
-  }
-
-  private updateSubject(item: CandidateAssignment, subject: Subject): void {
-    this.saveCandidate(this.copy(item, subject));
-  }
-
-  private updateTitle(item: CandidateAssignment, title: string): void {
-    this.saveCandidate(this.copy(item, item.subject, title, item.instruction));
-  }
-
-  private updateInstruction(item: CandidateAssignment, instruction: string): void {
-    this.saveCandidate(this.copy(item, item.subject, item.title, instruction));
-  }
-
-  private updateDueText(item: CandidateAssignment, dueText: string): void {
-    this.saveCandidate(this.copy(item, item.subject, item.title, item.instruction, dueText));
-  }
-
-  private updateTextbookRef(item: CandidateAssignment, textbookRef: string): void {
-    this.saveCandidate(this.copy(item, item.subject, item.title, item.instruction, item.dueText, textbookRef));
+    return true;
   }
 
   private setExpectedMinutes(item: CandidateAssignment, minutes: number): void {
-    this.saveCandidate(this.copy(item, item.subject, item.title, item.instruction,
-      item.dueText, item.textbookRef, minutes));
+    if (this.bulkMode) return;
+    this.saveCandidate({
+      id: item.id,
+      studentId: item.studentId,
+      subject: item.subject,
+      title: item.title,
+      instruction: item.instruction,
+      textbookRef: item.textbookRef,
+      dueText: item.dueText,
+      expectedMinutes: minutes,
+      sourceEvidence: {
+        sourceLabel: item.sourceEvidence.sourceLabel,
+        excerpt: item.sourceEvidence.excerpt,
+        batchId: item.sourceEvidence.batchId,
+        sourceType: item.sourceEvidence.sourceType,
+        sourceMessageIds: item.sourceEvidence.sourceMessageIds === undefined ?
+          undefined : item.sourceEvidence.sourceMessageIds.slice(),
+        rawText: item.sourceEvidence.rawText,
+        imageRef: item.sourceEvidence.imageRef,
+        capturedAtEpochMs: item.sourceEvidence.capturedAtEpochMs
+      },
+      confidence: item.confidence
+    });
   }
 
   private addCandidate(): void {
-    let candidate = this.viewModel.addCandidate();
-    if (candidate === null) return;
-    this.localRevision++;
-    this.onStoreChanged();
-    this.openEditor(candidate.id);
+    if (this.bulkMode) return;
+    let candidate = this.viewModel.createManualCandidateDraft();
+    this.manualCandidateDraft = candidate;
+    this.editingCandidateId = candidate.id;
+    this.showEditorSheet = true;
   }
 
   private removeCandidate(candidateId: string): void {
-    if (!this.viewModel.removeCandidate(candidateId)) return;
-    this.localRevision++;
-    if (this.editingCandidateId === candidateId) {
-      this.editingCandidateId = '';
-      this.showEditorSheet = false;
+    if (this.manualCandidateDraft !== null && this.manualCandidateDraft.id === candidateId) {
+      this.closeEditor();
+      return;
     }
+    this.pendingDeleteCandidateId = candidateId;
+    this.closeEditor();
+  }
+
+  private commitCandidateRemoval(candidateId: string): void {
+    if (!this.viewModel.removeCandidate(candidateId)) return;
+    this.selectedCandidateIds = SelectionIds.without(this.selectedCandidateIds, candidateId);
+    this.localRevision++;
+    if (this.candidates().length === 0) this.exitBulkMode();
     this.onStoreChanged();
   }
 
+  private isCandidateSelected(candidateId: string): boolean {
+    return SelectionIds.contains(this.selectedCandidateIds, candidateId);
+  }
+
+  private toggleCandidateSelection(candidateId: string): void {
+    if (!this.bulkMode) return;
+    this.selectedCandidateIds = SelectionIds.toggle(this.selectedCandidateIds, candidateId);
+    this.batchDeleteConfirm = false;
+  }
+
+  private enterBulkMode(): void {
+    if (this.candidates().length === 0) return;
+    this.bulkMode = true;
+    this.selectedCandidateIds = [];
+    this.batchDeleteConfirm = false;
+  }
+
+  private exitBulkMode(): void {
+    this.bulkMode = false;
+    this.selectedCandidateIds = [];
+    this.batchDeleteConfirm = false;
+  }
+
+  private selectAllCandidates(): void {
+    let ids: string[] = [];
+    for (let item of this.candidates()) ids.push(item.id);
+    this.selectedCandidateIds = ids;
+    this.batchDeleteConfirm = false;
+  }
+
+  private removeSelectedCandidates(): void {
+    if (this.selectedCandidateIds.length === 0) return;
+    let ids = SelectionIds.copy(this.selectedCandidateIds);
+    let removed = 0;
+    for (let id of ids) {
+      if (this.viewModel.removeCandidate(id)) removed++;
+    }
+    if (removed > 0) {
+      this.localRevision++;
+      this.onStoreChanged();
+    }
+    this.exitBulkMode();
+  }
+
   private async publish(): Promise<void> {
-    if (this.publishing || this.candidates().length === 0) return;
+    if (this.publishing || this.candidates().length === 0 || this.bulkMode) return;
     this.publishing = true;
     this.publishMessage = '';
     this.publishError = false;
@@ -124,77 +190,191 @@ export struct HomeworkConfirmationPage {
 
   @Builder
   private CandidateEditorSheet() {
-    Column({ space: 10 }) {
-      Row() {
-        Column({ space: 2 }) {
-          Text('编辑作业')
-            .fontSize(18)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          if (this.editingCandidate() !== null) {
-            Text(`${this.editingCandidate()!.subject} · ${this.editingCandidate()!.title}`)
-              .maxLines(1)
-              .fontSize(12)
-              .fontColor(AppTheme.SUBTEXT);
-          }
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
+    if (this.editingCandidate() !== null) {
+      ConfirmationCandidateEditor({
+        item: this.editingCandidate()!,
+        onClose: () => this.closeEditor(),
+        onSave: (candidate: CandidateAssignment) => this.saveCandidate(candidate),
+        onDelete: (candidateId: string) => this.removeCandidate(candidateId)
+      });
+    }
+  }
 
-        Text('完成')
-          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .fontSize(14)
+  @Builder
+  private CandidateListHeader() {
+    Row({ space: 10 }) {
+      Text(this.bulkMode ? `已选 ${this.selectedCandidateIds.length} 项` : '发布前最后核对')
+        .layoutWeight(1)
+        .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+
+      if (this.bulkMode) {
+        Text('全选')
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
-          .textAlign(TextAlign.Center)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 8 })
+          .onClick(() => this.selectAllCandidates());
+        Text('完成')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 4 })
+          .onClick(() => this.exitBulkMode());
+      } else {
+        Text('＋ 新增')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 8 })
           .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('完成编辑')
-          .onClick(() => this.closeEditor());
-      }
-      .width('100%')
-      .padding({ left: 16, right: 16, top: 4, bottom: 8 });
-
-      Divider().color(AppTheme.DIVIDER);
-
-      if (this.editingCandidate() !== null) {
-        Scroll() {
-          ConfirmationCandidateEditor({
-            item: this.editingCandidate()!,
-            onDelete: (candidateId: string) => this.removeCandidate(candidateId),
-            onSubjectChange: (candidate: CandidateAssignment, subject: Subject) =>
-              this.updateSubject(candidate, subject),
-            onTitleChange: (candidate: CandidateAssignment, value: string) =>
-              this.updateTitle(candidate, value),
-            onInstructionChange: (candidate: CandidateAssignment, value: string) =>
-              this.updateInstruction(candidate, value),
-            onDueTextChange: (candidate: CandidateAssignment, value: string) =>
-              this.updateDueText(candidate, value),
-            onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
-              this.setExpectedMinutes(candidate, minutes),
-            onTextbookRefChange: (candidate: CandidateAssignment, value: string) =>
-              this.updateTextbookRef(candidate, value)
-          })
-          .padding({ left: 16, right: 16, top: 12, bottom: 28 });
+          .accessibilityText('手工新增一项作业')
+          .onClick(() => this.addCandidate());
+        if (this.candidates().length > 0) {
+          Text('管理')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 8, right: 4 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('批量管理待确认作业')
+            .onClick(() => this.enterBulkMode());
         }
-        .width('100%')
-        .layoutWeight(1)
-        .scrollBar(BarState.Auto);
       }
     }
     .width('100%')
-    .height('100%')
-    .backgroundColor(AppTheme.SURFACE);
+    .alignItems(VerticalAlign.Center);
+  }
+
+  @Builder
+  private CandidateList() {
+    if (this.candidates().length === 0) {
+      Column({ space: 8 }) {
+        SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(30).fontColor([AppTheme.SUCCESS]);
+        Text('没有待确认作业').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+      }
+      .width('100%')
+      .padding({ top: 30, bottom: 30 });
+    } else {
+      Column({ space: 7 }) {
+        ForEach(this.candidates(), (item: CandidateAssignment) => {
+          Row({ space: 8 }) {
+            if (this.bulkMode) {
+              Text(this.isCandidateSelected(item.id) ? '✓' : '')
+                .width(28)
+                .height(28)
+                .fontSize(15)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(this.isCandidateSelected(item.id) ? AppTheme.TEXT_ON_PRIMARY : AppTheme.SUBTEXT)
+                .textAlign(TextAlign.Center)
+                .backgroundColor(this.isCandidateSelected(item.id) ? AppTheme.PRIMARY : AppTheme.SURFACE_EMPHASIS)
+                .border({ width: 1, color: this.isCandidateSelected(item.id) ? AppTheme.PRIMARY : AppTheme.BORDER })
+                .borderRadius(14)
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText(this.isCandidateSelected(item.id) ? '取消选择这项作业' : '选择这项作业')
+                .onClick(() => this.toggleCandidateSelection(item.id));
+            }
+
+            ConfirmationCandidateCard({
+              item: item,
+              selected: this.bulkMode ? this.isCandidateSelected(item.id) :
+                (this.showEditorSheet && this.editingCandidateId === item.id),
+              onSelect: () => {
+                if (this.bulkMode) this.toggleCandidateSelection(item.id);
+                else this.openEditor(item.id);
+              },
+              onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
+                this.setExpectedMinutes(candidate, minutes)
+            })
+            .layoutWeight(1);
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Center);
+        }, (item: CandidateAssignment) => this.candidateRenderKey(item));
+      }
+      .width('100%');
+    }
   }
 
   @Builder
   private PublishFeedback() {
     if (this.publishMessage.length > 0) {
-      Text(this.publishMessage).width('100%').fontSize(12).lineHeight(18)
+      Text(this.publishMessage).width('100%').fontSize(13).lineHeight(18)
         .fontColor(this.publishError ? AppTheme.DANGER : AppTheme.SUCCESS)
         .padding(10)
         .backgroundColor(this.publishError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
         .borderRadius(AppTheme.CONTROL_RADIUS);
     }
+  }
+
+  @Builder
+  private BottomActionBar() {
+    Column() {
+      Column({ space: 8 }) {
+        this.PublishFeedback();
+
+        if (this.bulkMode) {
+          if (this.batchDeleteConfirm) {
+            Text(`确定删除选中的 ${this.selectedCandidateIds.length} 项待确认作业？`)
+              .width('100%')
+              .fontSize(13)
+              .fontColor(AppTheme.DANGER);
+            Row({ space: 10 }) {
+              Button('取消', { type: ButtonType.Normal })
+                .layoutWeight(1)
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                .fontColor(AppTheme.TEXT)
+                .onClick(() => this.batchDeleteConfirm = false);
+              Button('确认删除', { type: ButtonType.Normal })
+                .layoutWeight(1)
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.DANGER)
+                .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => this.removeSelectedCandidates());
+            }
+            .width('100%');
+          } else {
+            Button(this.selectedCandidateIds.length > 0 ?
+              `删除选中的 ${this.selectedCandidateIds.length} 项` : '请选择要删除的作业',
+              { type: ButtonType.Normal })
+              .width('100%')
+              .height(AppTheme.BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(this.selectedCandidateIds.length > 0)
+              .backgroundColor(this.selectedCandidateIds.length > 0 ? AppTheme.DANGER : AppTheme.DISABLED)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .onClick(() => this.batchDeleteConfirm = true);
+          }
+        } else {
+          Button(this.publishing ? '正在发布…' : `确认并发布 ${this.candidates().length} 项`,
+            { type: ButtonType.Normal })
+            .width('100%')
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.publishing && this.candidates().length > 0)
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .backgroundColor(this.candidates().length > 0 ? AppTheme.PRIMARY : AppTheme.DISABLED)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => { void this.publish(); });
+        }
+      }
+      .width('100%')
+      .constraintSize({ maxWidth: AppTheme.CONFIRMATION_READABLE_MAX_WIDTH })
+      .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 10, bottom: 14 });
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Center)
+    .backgroundColor(AppTheme.SURFACE)
+    .border({ width: { top: 1 }, color: AppTheme.DIVIDER });
   }
 
   build() {
@@ -209,67 +389,23 @@ export struct HomeworkConfirmationPage {
               onBack: () => this.onBack()
             });
 
-            Column({ space: 4 }) {
-              Text('发布前最后核对').width('100%')
-                .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-              Text('低置信字段和来源证据优先确认；发布采用整批原子提交，不会出现只发布一半。')
-                .width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.SUBTEXT);
-            }
-            .width('100%')
-            .alignItems(HorizontalAlign.Start);
-
-            if (this.candidates().length === 0) {
-              Column({ space: 8 }) {
-                SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(30).fontColor([AppTheme.SUCCESS]);
-                Text('没有待确认作业').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-                Text('返回导入页重新整理老师原文。').fontSize(13).fontColor(AppTheme.SUBTEXT);
-              }
-              .width('100%')
-              .padding({ top: 30, bottom: 30 });
-            } else {
-              Column({ space: 7 }) {
-                ForEach(this.candidates(), (item: CandidateAssignment) => {
-                  ConfirmationCandidateCard({
-                    item: item,
-                    selected: this.showEditorSheet && this.editingCandidateId === item.id,
-                    onSelect: () => this.openEditor(item.id),
-                    onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
-                      this.setExpectedMinutes(candidate, minutes)
-                  });
-                }, (item: CandidateAssignment) => item.id);
-              }
-              .width('100%');
-
-              Button('＋ 手工新增一项', { type: ButtonType.Normal })
-                .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
-                .onClick(() => this.addCandidate());
-
-              this.PublishFeedback();
-
-              Button(this.publishing ? '正在发布…' : `确认并发布 ${this.candidates().length} 项`,
-                { type: ButtonType.Normal })
-                .width('100%').height(AppTheme.BUTTON_HEIGHT)
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .enabled(!this.publishing && this.candidates().length > 0)
-                .fontSize(15).fontWeight(FontWeight.Medium)
-                .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
-                .onClick(() => { void this.publish(); });
-            }
+            this.CandidateListHeader();
+            this.CandidateList();
           }
           .width('100%')
           .constraintSize({ maxWidth: AppTheme.CONFIRMATION_READABLE_MAX_WIDTH })
           .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING,
-            top: AppTheme.DEEP_PAGE_TOP_PADDING, bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
+            top: AppTheme.DEEP_PAGE_TOP_PADDING, bottom: 16 });
         }
         .width('100%')
         .alignItems(HorizontalAlign.Center);
       }
       .width('100%')
-      .height('100%')
+      .layoutWeight(1)
       .align(Alignment.TopStart)
       .scrollBar(BarState.Off);
+
+      this.BottomActionBar();
     }
     .width('100%')
     .height('100%')
@@ -277,7 +413,8 @@ export struct HomeworkConfirmationPage {
     .bindSheet($$this.showEditorSheet, this.CandidateEditorSheet(), {
       height: '82%',
       showClose: false,
-      preferType: SheetType.BOTTOM
+      preferType: SheetType.BOTTOM,
+      onDisappear: () => this.completeEditorDismiss()
     });
   }
 }

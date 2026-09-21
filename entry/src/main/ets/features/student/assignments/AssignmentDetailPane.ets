@@ -80,10 +80,12 @@ export struct AssignmentDetailPane {
         .fontSize(17)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
-      Text(this.assignmentId.length === 0 ? '详情会在这里显示，不需要离开作业列表。' : '作业可能已经删除或尚未同步完成。')
-        .fontSize(13)
-        .lineHeight(20)
-        .fontColor(AppTheme.SUBTEXT);
+      if (this.assignmentId.length > 0) {
+        Text('作业可能已经删除或尚未同步完成。')
+          .fontSize(13)
+          .lineHeight(20)
+          .fontColor(AppTheme.SUBTEXT);
+      }
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -98,19 +100,19 @@ export struct AssignmentDetailPane {
         Column({ space: 14 }) {
           Row({ space: 8 }) {
             Text(this.typeLabel(this.assignment()!))
-              .fontSize(12)
+              .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.PRIMARY)
               .padding({ left: 10, right: 10, top: 6, bottom: 6 })
               .backgroundColor(AppTheme.PRIMARY_SOFT)
               .borderRadius(AppTheme.CHIP_RADIUS);
             Text(this.assignment()!.subject)
-              .fontSize(12)
+              .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.SUBTEXT);
             Blank();
             Text(AssignmentStateMachine.label(this.assignment()!.status))
-              .fontSize(12)
+              .fontSize(13)
               .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%');
@@ -214,7 +216,7 @@ export struct AssignmentDetailPane {
           Column({ space: 5 }) {
             Text('家长提醒')
               .width('100%')
-              .fontSize(12)
+              .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.WARNING);
             Text(this.assignment()!.reviewNote)

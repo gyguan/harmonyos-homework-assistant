@@ -1,9 +1,11 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
+import { AssignmentMetricSummary } from '../../../components/assignment/AssignmentMetricSummary';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, StudentProfile } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
+import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 import { ParentHomeViewModel } from './ParentHomeViewModel';
 
 @Component
@@ -12,6 +14,8 @@ export struct ParentDashboardPage {
   @Prop activeStudentId: string = '';
   @State private availableWidthVp: number = 390;
   onOpenImport: () => void = () => {};
+  onOpenCapture: () => void = () => {};
+  onOpenInbox: () => void = () => {};
   onOpenExtra: () => void = () => {};
   onOpenVoice: () => void = () => {};
   onOpenProgress: () => void = () => {};
@@ -48,9 +52,33 @@ export struct ParentDashboardPage {
     return this.viewModel.assignments();
   }
 
-  private pendingTodayCount(): number {
-    let pending = this.viewModel.summary().total - this.viewModel.summary().completed;
-    return pending > 0 ? pending : 0;
+  private todayAssignments(): Assignment[] {
+    let result: Assignment[] = [];
+    let todayStart = AssignmentDueDate.businessDayStart(Date.now());
+    for (let item of this.assignments()) {
+      if (AssignmentDueDate.dayStart(item) === todayStart) result.push(item);
+    }
+    return result;
+  }
+
+  private todayPendingCount(): number {
+    let count = 0;
+    for (let item of this.todayAssignments()) {
+      if (item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED) count++;
+    }
+    return count;
+  }
+
+  private todaySubmittedCount(): number {
+    let count = 0;
+    for (let item of this.todayAssignments()) if (item.status === AssignmentStatus.SUBMITTED) count++;
+    return count;
+  }
+
+  private todayCompletedCount(): number {
+    let count = 0;
+    for (let item of this.todayAssignments()) if (item.status === AssignmentStatus.COMPLETED) count++;
+    return count;
   }
 
   private submittedCount(): number {
@@ -70,24 +98,8 @@ export struct ParentDashboardPage {
     }
   }
 
-  @Builder
-  private MetricCard(label: string, value: number, tone: string) {
-    Column({ space: 5 }) {
-      Text(`${value}`)
-        .fontSize(24)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(tone === 'attention' ? AppTheme.WARNING : tone === 'done' ? AppTheme.SUCCESS : AppTheme.PRIMARY);
-      Text(label)
-        .fontSize(11)
-        .fontColor(AppTheme.SUBTEXT);
-    }
-    .layoutWeight(1)
-    .constraintSize({ minHeight: 76 })
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
-    .backgroundColor(tone === 'attention' ? AppTheme.WARNING_SOFT :
-      tone === 'done' ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_FAINT)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+  private openRecentActivity(item: Assignment): void {
+    this.onOpenReview(item.id);
   }
 
   @Builder
@@ -99,32 +111,26 @@ export struct ParentDashboardPage {
             .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('先看结果，再处理需要家长介入的事项')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        Text(this.attentionAssignments().length > 0 ? '有待处理' : '进展正常')
-          .fontSize(11)
+        Text(`${this.todayAssignments().length} 项`)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
-          .fontColor(this.attentionAssignments().length > 0 ? AppTheme.WARNING : AppTheme.SUCCESS)
-          .padding({ left: 9, right: 9, top: 6, bottom: 6 })
-          .backgroundColor(this.attentionAssignments().length > 0 ? AppTheme.WARNING_SOFT : AppTheme.SUCCESS_SOFT)
-          .borderRadius(AppTheme.CHIP_RADIUS);
+          .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
-      Row({ space: 8 }) {
-        this.MetricCard('待完成', this.pendingTodayCount(), 'primary');
-        this.MetricCard('需关注', this.attentionAssignments().length, 'attention');
-        this.MetricCard('已完成', this.viewModel.summary().completed, 'done');
-      }
-      .width('100%');
+      AssignmentMetricSummary({
+        allCount: this.todayAssignments().length,
+        pendingCount: this.todayPendingCount(),
+        submittedCount: this.todaySubmittedCount(),
+        completedCount: this.todayCompletedCount()
+      });
 
       Progress({
-        value: this.viewModel.summary().completed,
-        total: this.viewModel.summary().total > 0 ? this.viewModel.summary().total : 1,
+        value: this.todayCompletedCount(),
+        total: this.todayAssignments().length > 0 ? this.todayAssignments().length : 1,
         type: ProgressType.Linear
       })
         .width('100%')
@@ -138,6 +144,10 @@ export struct ParentDashboardPage {
     .borderRadius(AppTheme.PHONE_CARD_RADIUS);
   }
 
+  private assignmentRenderKey(item: Assignment): string {
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+  }
+
   @Builder
   private AttentionSection() {
     if (this.attentionAssignments().length > 0) {
@@ -149,7 +159,7 @@ export struct ParentDashboardPage {
             .fontColor(AppTheme.TEXT);
           Blank();
           Text(`${this.attentionAssignments().length} 项`)
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
@@ -160,11 +170,11 @@ export struct ParentDashboardPage {
               Column({ space: 3 }) {
                 Row({ space: 6 }) {
                   Text(item.subject)
-                    .fontSize(11)
+                    .fontSize(13)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(AppTheme.PRIMARY);
                   Text(item.status === AssignmentStatus.SUBMITTED ? '待验收' : AssignmentStateMachine.label(item.status))
-                    .fontSize(10)
+                    .fontSize(13)
                     .fontColor(item.status === AssignmentStatus.SUBMITTED ? AppTheme.WARNING : AppTheme.DANGER);
                 }
                 Text(item.title)
@@ -189,7 +199,7 @@ export struct ParentDashboardPage {
             .accessibilityRole(AccessibilityRoleType.BUTTON)
             .accessibilityText(`${item.subject}，${item.title}，${AssignmentStateMachine.label(item.status)}`)
             .onClick(() => this.openAttention(item));
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
       }
@@ -206,8 +216,8 @@ export struct ParentDashboardPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
-        Text('查看作业进度')
-          .fontSize(12)
+        Text('查看全部')
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -229,7 +239,7 @@ export struct ParentDashboardPage {
             AssignmentListItem({
               assignment: item,
               showChevron: true,
-              onOpen: () => this.openAttention(item)
+              onOpen: () => this.openRecentActivity(item)
             });
           }, (item: Assignment) => item.id);
         }
@@ -242,11 +252,11 @@ export struct ParentDashboardPage {
             .fontSize(18)
             .fontColor([AppTheme.SUCCESS]);
           Text('最近提交')
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
           Text(`${this.viewModel.recentSubmitted()!.subject} · ${this.viewModel.recentSubmitted()!.title}`)
             .layoutWeight(1)
-            .fontSize(12)
+            .fontSize(13)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
@@ -265,19 +275,25 @@ export struct ParentDashboardPage {
 
   @Builder
   private QuickActions() {
-    Column({ space: 9 }) {
+    Column({ space: 10 }) {
       Text('快捷操作')
         .width('100%')
         .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
 
+      Text('收作业')
+        .width('100%')
+        .fontSize(13)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.SUBTEXT);
+
       Row({ space: 8 }) {
         Row({ space: 8 }) {
           SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.PRIMARY]);
           Column({ space: 2 }) {
-            Text('导入作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('老师截图或文字').fontSize(10).fontColor(AppTheme.SUBTEXT);
+            Text('手工导入作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('截图或文字').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
         }
@@ -287,14 +303,81 @@ export struct ParentDashboardPage {
         .backgroundColor(AppTheme.PRIMARY_FAINT)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`给 ${this.student().name} 导入老师作业`)
+        .accessibilityText(`给 ${this.student().name} 手工导入老师作业`)
         .onClick(() => this.onOpenImport());
 
+        Row({ space: 8 }) {
+          Text('抓')
+            .width(22)
+            .fontSize(17)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center);
+          Column({ space: 2 }) {
+            Text('抓取老师作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('班级群抓取').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
+        }
+        .layoutWeight(1)
+        .constraintSize({ minHeight: 64 })
+        .padding(11)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(`给 ${this.student().name} 抓取老师作业`)
+        .onClick(() => this.onOpenCapture());
+      }
+      .width('100%');
+
+      Row({ space: 10 }) {
+        Text('箱')
+          .width(30)
+          .height(30)
+          .fontSize(13)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.PRIMARY)
+          .textAlign(TextAlign.Center)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .borderRadius(9);
+        Column({ space: 2 }) {
+          Text('作业收件箱')
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('导入与抓取记录')
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(15)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: 58 })
+      .padding({ left: 12, right: 10, top: 10, bottom: 10 })
+      .backgroundColor(AppTheme.SURFACE)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText('打开作业收件箱')
+      .onClick(() => this.onOpenInbox());
+
+      Text('布置任务')
+        .width('100%')
+        .fontSize(13)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.SUBTEXT)
+        .margin({ top: 2 });
+
+      Row({ space: 8 }) {
         Row({ space: 8 }) {
           SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.SUCCESS]);
           Column({ space: 2 }) {
             Text('课外任务').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('阅读、体育、实践').fontSize(10).fontColor(AppTheme.SUBTEXT);
+            Text('阅读、体育、实践').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .alignItems(HorizontalAlign.Start);
         }
@@ -306,32 +389,30 @@ export struct ParentDashboardPage {
         .accessibilityRole(AccessibilityRoleType.BUTTON)
         .accessibilityText(`给 ${this.student().name} 布置课外任务`)
         .onClick(() => this.onOpenExtra());
-      }
-      .width('100%');
 
-      Row({ space: 8 }) {
-        Text('♪')
-          .width(24)
-          .fontSize(22)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.PRIMARY)
-          .textAlign(TextAlign.Center);
-        Column({ space: 2 }) {
-          Text('语音作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('上传语音和情景图片，孩子边听边看').fontSize(10).fontColor(AppTheme.SUBTEXT);
+        Row({ space: 8 }) {
+          Text('♪')
+            .width(22)
+            .fontSize(19)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center);
+          Column({ space: 2 }) {
+            Text('语音作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('语音和情景图片').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          }
+          .alignItems(HorizontalAlign.Start);
         }
         .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-        SymbolGlyph($r('sys.symbol.chevron_right')).fontSize(15).fontColor([AppTheme.TERTIARY_TEXT]);
+        .constraintSize({ minHeight: 64 })
+        .padding(11)
+        .backgroundColor(AppTheme.PRIMARY_FAINT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(`给 ${this.student().name} 布置语音作业`)
+        .onClick(() => this.onOpenVoice());
       }
-      .width('100%')
-      .constraintSize({ minHeight: 58 })
-      .padding(11)
-      .backgroundColor(AppTheme.PRIMARY_FAINT)
-      .borderRadius(AppTheme.CONTROL_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(`给 ${this.student().name} 布置语音作业`)
-      .onClick(() => this.onOpenVoice());
+      .width('100%');
     }
     .width('100%');
   }
@@ -345,15 +426,15 @@ export struct ParentDashboardPage {
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Row() {
-        Text('今日完成').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('今日完成').fontSize(13).fontColor(AppTheme.SUBTEXT);
         Blank();
-        Text(`${this.viewModel.summary().completed} / ${this.viewModel.summary().total}`)
+        Text(`${this.todayCompletedCount()} / ${this.todayAssignments().length}`)
           .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
       }
       .width('100%');
       Divider().color(AppTheme.DIVIDER);
       Row() {
-        Text('待家长验收').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('待家长验收').fontSize(13).fontColor(AppTheme.SUBTEXT);
         Blank();
         Text(`${this.submittedCount()} 项`)
           .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.WARNING);
@@ -361,7 +442,7 @@ export struct ParentDashboardPage {
       .width('100%');
       Divider().color(AppTheme.DIVIDER);
       Row() {
-        Text('需关注').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('需关注').fontSize(13).fontColor(AppTheme.SUBTEXT);
         Blank();
         Text(`${this.attentionAssignments().length} 项`)
           .fontSize(13).fontWeight(FontWeight.Medium)

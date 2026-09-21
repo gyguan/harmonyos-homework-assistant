@@ -37,11 +37,6 @@ export struct PersonEntryPage {
         .fontSize(18)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
-      Text('进入后身份固定，孩子只看到自己的作业。')
-        .fontSize(13)
-        .lineHeight(20)
-        .fontColor(AppTheme.SUBTEXT)
-        .textAlign(TextAlign.Center);
     }
     .width('100%')
     .alignItems(HorizontalAlign.Center)
@@ -160,12 +155,6 @@ export struct PersonEntryPage {
         .backgroundColor(AppTheme.SURFACE)
         .borderRadius(AppTheme.CONTROL_RADIUS);
 
-        Text('选择后进入对应空间。家长可以管理多个孩子，学生空间不会切换到其他家庭成员。')
-          .width('100%')
-          .padding({ top: 8, left: 4, right: 4 })
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
       .constraintSize({ maxWidth: 560 })

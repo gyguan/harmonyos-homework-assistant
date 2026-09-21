@@ -6,6 +6,7 @@ import {
   TodaySummary
 } from '../../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
+import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 
 export class StudentHomeSubjectGroup {
   key: string;
@@ -111,9 +112,9 @@ export class StudentHomeViewModel {
   }
 
   dateLabel(): string {
-    let now = new Date();
+    let now = AssignmentDueDate.businessDateParts(Date.now());
     let weekday: string[] = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    return `今天 · ${now.getMonth() + 1}月${now.getDate()}日 ${weekday[now.getDay()]}`;
+    return `今天 · ${now.month}月${now.day}日 ${weekday[AssignmentDueDate.businessWeekday(Date.now())]}`;
   }
 
   async refresh(): Promise<boolean> {
@@ -122,11 +123,8 @@ export class StudentHomeViewModel {
 
   private static isToday(item: Assignment): boolean {
     if (item.dueAtEpochMs <= 0) return false;
-    let due = new Date(item.dueAtEpochMs);
-    let now = new Date();
-    return due.getFullYear() === now.getFullYear() &&
-      due.getMonth() === now.getMonth() &&
-      due.getDate() === now.getDate();
+    return AssignmentDueDate.businessDayStart(item.dueAtEpochMs) ===
+      AssignmentDueDate.businessDayStart(Date.now());
   }
 
   private static isActionable(status: AssignmentStatus): boolean {

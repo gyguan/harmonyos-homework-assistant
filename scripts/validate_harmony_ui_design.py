@@ -178,8 +178,7 @@ require("SegmentedSelectionButton" in student_assignments and "FilterSummaryEntr
 for expression in [
     "selected: !this.calendarMode",
     "selected: this.calendarMode",
-    "active: this.typeFilter !== AssignmentTypeFilter.ALL",
-    "active: this.dateFilter !== AssignmentDateFilter.ALL",
+    "active: !this.allDates && !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in student_assignments,
@@ -187,8 +186,8 @@ for expression in [
 
 filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 for state_expr, label in [
-    ("this.typeFilter === value ? AppTheme.PRIMARY_SOFT", "assignment type"),
-    ("this.dateFilter === value ? AppTheme.PRIMARY_SOFT", "assignment due date"),
+    ("this.allDates === allDates ? AppTheme.PRIMARY_SOFT", "assignment date mode"),
+    ("DatePicker({", "assignment date"),
     ("this.subjectCode === value ? AppTheme.PRIMARY_SOFT", "assignment subject"),
 ]:
     require(state_expr in filter_dialog,
@@ -199,12 +198,11 @@ require("private FilterChip(" not in parent_progress and "private FilterEntry(" 
         "Parent Progress must not keep runtime selection in ordinary @Builder boolean parameters")
 require("FilterSummaryEntry" in parent_progress,
         "Parent Progress must reuse shared reactive filter summary controls")
-require("StatusSelectionChip" not in parent_progress and "StatusMetricCard" in parent_progress and
-        "this.statusFilter === filter" in parent_progress and ".onClick(() => this.chooseStatus(filter))" in parent_progress,
-        "Parent Progress status selection must live in clickable metric cards without duplicate chips")
+require("StatusSelectionChip" not in parent_progress and "AssignmentMetricSummary" in parent_progress and
+        "interactive: true" in parent_progress and "this.chooseStatus(key)" in parent_progress,
+        "Parent Progress status selection must live in the shared clickable metric summary")
 for expression in [
-    "active: this.typeFilter !== AssignmentTypeFilter.ALL",
-    "active: this.dateFilter !== AssignmentDateFilter.ALL",
+    "active: !this.allDates && !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in parent_progress,
@@ -226,15 +224,18 @@ require("DeadlinePickerField" in extra_assignment and "placeholder: 'YYYY-MM-DD'
 confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read_optional(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+assignment_edit_form = read_optional(
+    "entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 require("private SubjectChip(" not in confirmation and "private TimeChip(" not in confirmation and
         "private CandidateCard(" not in confirmation and "private CandidateEditor(" not in confirmation,
         "Confirmation persistent selection must not depend on ordinary @Builder object snapshots")
 require("ConfirmationCandidateCard" in confirmation and "ConfirmationCandidateEditor" in confirmation,
         "Confirmation page must render reactive Candidate child components")
-require("DeadlinePickerField" in confirmation_components and
+require("AssignmentEditForm" in confirmation_components and
+        "DeadlinePickerField" in assignment_edit_form and
         "TextInput({ text: this.item.dueText })" not in confirmation_components,
-        "Confirmation deadline edit must reuse the shared native deadline picker")
-require("selected: this.showEditorSheet && this.editingCandidateId === item.id" in confirmation,
+        "Confirmation deadline edit must reuse the shared assignment form and native deadline picker")
+require("this.showEditorSheet && this.editingCandidateId === item.id" in confirmation,
         "Confirmation selected Candidate must reflect both the active editor id and bottom-sheet visibility")
 require(".bindSheet($$this.showEditorSheet" in confirmation and
         ".bindSheet($this.showEditorSheet" not in confirmation and
@@ -247,9 +248,13 @@ require("backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFA
         "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in confirmation_components,
         "Confirmation selected Candidate must combine active surface and border")
 for expression in [
-    "selected: this.item.subject === Subject.CHINESE",
-    "selected: this.item.subject === Subject.MATH",
-    "selected: this.item.subject === Subject.ENGLISH",
+    "selected: this.subject === Subject.CHINESE",
+    "selected: this.subject === Subject.MATH",
+    "selected: this.subject === Subject.ENGLISH",
+]:
+    require(expression in assignment_edit_form,
+            f"Shared assignment editor subject state must bind directly to current prop: {expression}")
+for expression in [
     "selected: this.item.expectedMinutes === 10",
     "selected: this.item.expectedMinutes === 15",
     "selected: this.item.expectedMinutes === 20",
@@ -257,7 +262,7 @@ for expression in [
     "selected: this.item.expectedMinutes === 45",
 ]:
     require(expression in confirmation_components,
-            f"Confirmation choice state must bind directly to current Candidate prop: {expression}")
+            f"Confirmation duration state must bind directly to current Candidate prop: {expression}")
 require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_controls and
         "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in selection_controls,
         "shared choice selection must combine active surface and border")

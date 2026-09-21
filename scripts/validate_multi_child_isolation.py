@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,7 +43,8 @@ require("familyId" not in models and "tenantId" not in models,
 
 require("student-xiaoyu-001" in mock_data and "student-xiaomi-002" in mock_data,
         "two children must exist in the regression baseline")
-require("三（2）班" in mock_data and "一（5）班" in mock_data,
+class_names = re.findall(r"className:\s*'([^']+)'", mock_data)
+require(len(class_names) >= 2 and len(set(class_names[:2])) == 2,
         "regression children must belong to different classes")
 
 # Legacy Store remains a migration source until Repository/Session replaces it. These checks

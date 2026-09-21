@@ -11,12 +11,25 @@ import { PersonEntryPage } from './PersonEntryPage';
 @Component
 struct Index {
   @State private selectedRole: AppRole = AppRole.NONE;
+  @StorageLink('shareImportForceParent') @Watch('onShareImportForceParentChanged')
+  private shareImportForceParent: boolean = false;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private cloudRevision: number = 0;
   private shellBackHandler: () => boolean = () => false;
 
   aboutToAppear(): void {
+    this.applyShareImportParentRole();
     if (BackendSession.instance.isConnected()) void this.restoreCloud();
+  }
+
+  private onShareImportForceParentChanged(): void {
+    this.applyShareImportParentRole();
+  }
+
+  private applyShareImportParentRole(): void {
+    if (!this.shareImportForceParent) return;
+    this.selectedRole = AppRole.PARENT;
+    this.shareImportForceParent = false;
   }
 
   onBackPress(): boolean {

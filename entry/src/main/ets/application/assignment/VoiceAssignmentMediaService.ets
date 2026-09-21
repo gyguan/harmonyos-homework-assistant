@@ -2,7 +2,7 @@ import { common } from '@kit.AbilityKit';
 import { picker } from '@kit.CoreFileKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 
-const MAX_VOICE_IMAGES: number = 9;
+const MAX_VOICE_IMAGES_PER_PICK: number = 9;
 
 export class VoiceAssignmentMediaService {
   static readonly instance: VoiceAssignmentMediaService = new VoiceAssignmentMediaService();
@@ -32,9 +32,9 @@ export class VoiceAssignmentMediaService {
       let imagePicker = new photoAccessHelper.PhotoViewPicker();
       let result = await imagePicker.select({
         MIMEType: photoAccessHelper.PhotoViewMIMETypes.IMAGE_TYPE,
-        maxSelectNumber: MAX_VOICE_IMAGES
+        maxSelectNumber: MAX_VOICE_IMAGES_PER_PICK
       });
-      return result.photoUris.slice(0, MAX_VOICE_IMAGES);
+      return result.photoUris.slice(0, MAX_VOICE_IMAGES_PER_PICK);
     } catch {
       return [];
     }

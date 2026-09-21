@@ -33,8 +33,8 @@ require("SegmentedSelectionButton({ label: '列表', selected: !this.calendarMod
 require("export struct SegmentedSelectionButton" in selection_controls and
         "@Prop selected: boolean = false;" in selection_controls,
         "list/calendar switch must keep selected state in a reactive child-component prop")
-require("AssignmentDateFilter.CUSTOM" in page and "assignmentsOnDay" in page,
-        "calendar day selection must reuse Assignment filtering semantics")
+require("assignmentsOnDay" in page and "queryOnDay" in view_model,
+        "calendar day selection must reuse selected-day Assignment query semantics")
 require("$selectedCalendarDayEpochMs" in page and "$calendarMonthEpochMs" in page,
         "calendar selection/month state must stay page-local and flow through component links")
 require("LayoutPolicy.canSplit" in page and "assignmentMasterDetailRequirement" in page,
@@ -52,16 +52,19 @@ require("AssignmentStatus.COMPLETED" in panel,
         "calendar must expose completed-state markers")
 require("item.dueAtEpochMs <= 0" in panel and "this.startOfDay(item.dueAtEpochMs)" in panel,
         "calendar markers must use structured dueAt only")
-require("AssignmentDueDate" not in panel and "dueText" not in panel and "dueDateKey" not in panel,
-        "calendar UI must not infer a concrete date from legacy dueText or dueDateKey")
+require("AssignmentDueDate" in panel and "businessDayStart" in panel and
+        "dueText" not in panel and "dueDateKey" not in panel,
+        "calendar UI must use the shared business-date service and never infer dates from legacy dueText/dueDateKey")
 
 require("calendarAssignments" in view_model and "assignmentsOnDay" in view_model,
         "StudentAssignmentsViewModel must own calendar/day query semantics")
 require("item.dueAtEpochMs <= 0" in view_model and
-        "StudentAssignmentsViewModel.startOfDay(item.dueAtEpochMs)" in view_model,
-        "calendar day query must use structured dueAt only")
+        "AssignmentDateRange.startOfDay(item.dueAtEpochMs)" in view_model,
+        "calendar day query must use structured dueAt through the shared date-range service")
 require("AssignmentDueDate" not in view_model and "dueText" not in view_model and "dueDateKey" not in view_model,
         "calendar query must not infer a concrete date from legacy dueText or dueDateKey")
+require("AssignmentFilterFactory" in view_model and "AssignmentDateRange" in view_model,
+        "Student Assignment day filtering must reuse shared date/query services")
 require("CalendarRepository" not in view_model and "CalendarService" not in view_model,
         "calendar view must not introduce a parallel Calendar domain/repository")
 

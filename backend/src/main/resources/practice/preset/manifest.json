@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 2,
+  "catalogId": "xiaoban-g2-s1-practice-v2",
+  "generatedBy": "curated-shenzhen-g2-s1-v2",
+  "files": [
+    "G2/CHINESE_SYNC.json",
+    "G2/CHINESE_EXTRA.json",
+    "G2/MATH_SYNC.json",
+    "G2/MATH_EXTRA.json",
+    "G2/ENGLISH_SYNC.json",
+    "G2/ENGLISH_EXTRA.json"
+  ]
+}

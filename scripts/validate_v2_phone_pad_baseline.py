@@ -28,6 +28,7 @@ filter_dialog = read("entry/src/main/ets/components/assignment/AssignmentFilterD
 detail = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 study_route = read("entry/src/main/ets/features/student/study/StudyWorkspaceRoutePage.ets")
+practice_attempt = read("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 spec = read("docs/product/v2-phone-pad-baseline-standard.md")
 
@@ -39,6 +40,9 @@ for token in [
     "FILTER_DIALOG_MAX_WIDTH",
     "STUDY_PRIMARY_MIN_WIDTH",
     "STUDY_TUTOR_MIN_WIDTH",
+    "PRACTICE_ATTEMPT_READABLE_MAX_WIDTH",
+    "PRACTICE_ATTEMPT_SCALE_REFERENCE_WIDTH",
+    "PRACTICE_ATTEMPT_MAX_SCALE",
 ]:
     require(token in theme, f"AppTheme missing Phone/Pad baseline token: {token}")
 
@@ -72,6 +76,12 @@ require("AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH" in detail,
         "Assignment Detail must use the shared readable-width token")
 require("AppTheme.STUDY_READABLE_MAX_WIDTH" in study and "AppTheme.STUDY_TITLE_SIZE" in study,
         "Study Workspace must keep shared readable-width and title tokens")
+require("AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in practice_attempt,
+        "Practice Attempt must keep a dedicated readable width on wide containers")
+require("ResponsiveContext.areaLengthToVp" in practice_attempt and "contentScale()" in practice_attempt,
+        "Practice Attempt must scale from actual container width rather than device identity")
+require("WindowSizeClass." not in practice_attempt and "@Prop sizeClass" not in practice_attempt,
+        "Practice Attempt must not branch on shell size classes")
 
 for text, path in [
     (study, "StudyWorkspacePage.ets"),
@@ -90,7 +100,7 @@ if len(study_destination) == 2:
     require("sizeClass:" not in study_call,
             "AppShell must not pass a shell size class into the migrated Study feature")
 
-feature_texts = [home, assignments, filter_dialog, detail, study, study_route]
+feature_texts = [home, assignments, filter_dialog, detail, study, study_route, practice_attempt]
 magic_breakpoint = re.compile(r"(?:<=|>=|<|>)\s*(?:600|840|1080)\b")
 for text in feature_texts:
     require(magic_breakpoint.search(text) is None,

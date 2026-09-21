@@ -55,8 +55,9 @@ require("assignments/summary" in controller and "TodaySummary" in dtos and "toda
 require("undated" in dtos and "assignment.dueAt == null" in service,
         "historical undated tasks must stay explicit instead of receiving guessed dates")
 
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 7" in migrator and "migrateV5ToV6" in migrator,
-        "Assignment V2 client fields must retain the explicit V5 -> V6 migration when later schemas advance")
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 8" in migrator and "migrateV5ToV6" in migrator and
+        "migrateV7ToV8" in migrator,
+        "Assignment V2 client fields must retain V5 -> V6 while later schemas advance through V8")
 require("assignmentType: AssignmentType.SCHOOL" in migrator and "dueAtEpochMs: 0" in migrator,
         "V5 -> V6 must use deterministic historical defaults without guessing due time")
 

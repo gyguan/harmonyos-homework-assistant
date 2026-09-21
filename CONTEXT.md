@@ -29,7 +29,10 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Requirement（完成要求）**：某项 Assignment 的结构化完成要求，如完成题目、朗读、拍照、文字说明等。
 - **Submission（提交）**：学生对某个 Assignment 提交的照片、录音、视频或文本，以及提交时间与状态。
 - **Textbook（教材）**：按城市、学段、年级、学期、学科、出版社、册、单元、课组织的教材目录元数据。
-- **Homework Import（作业导入）**：把用户主动提供的微信/钉钉分享内容、聊天截图、粘贴文本、文件或音视频转成候选作业。
+- **Homework Import（作业导入）**：把用户主动提供的微信/钉钉分享内容、聊天截图、粘贴文本、文件、音视频或明确授权的引导式屏幕采集转成候选作业。
+- **Import Batch（导入批次）**：一次作业导入的审计与处理边界，保存来源类型、原始消息、候选作业、处理阶段与来源校验结果；发布后仍保留用于 Source Evidence 追溯。
+- **Source Profile（来源配置）**：某个学生针对“班级作业来源”的家庭私有配置，包含目标群标题、默认抓取时间、老师名称/别名与学科映射。一个学生同一时刻只启用一个当前 Profile。
+- **Capture Session（采集会话）**：家长主动发起、经系统授权的短时屏幕采集过程，只负责收集变化画面及 OCR 证据；聊天重建、来源校验和作业理解属于后续独立 Pipeline。
 - **Candidate Assignment（候选作业）**：AI 从非结构化内容解析出的、尚待家长确认的 Assignment。
 - **Homework Confirmation（作业确认）**：家长对候选作业进行修改、拆分、合并并最终发布给学生的动作。
 - **Source Evidence（来源证据）**：Candidate Assignment 与老师原始文字、截图区域、文件页码或音视频时间段之间的可追溯关系。
@@ -42,13 +45,16 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Parent Review（家长验收）**：家长查看 Submission 后执行通过或退回订正，并可附加 review note。
 - **Parent Intervention（家长介入）**：AI 判断不适合继续自主辅导、学生主动求助或任务异常时，请求家长处理的状态/动作。
 - **Weekly Review（周报）**：面向家长的周期性总结，关注完成率、用时、困难、辅导使用情况和需要关注事项，不做孩子排名。
+- **Practice Paper（练习套卷）**：围绕明确年级、学期、科目、题库类型和能力点组织的一组练习题，是预置练习内容的发布与版本边界。
+- **Practice Attempt（练习实例）**：学生每次开始某套卷时创建的独立作答实例；答案、笔记、提交时间、耗时与结果均归属于该 Attempt，不覆盖历史练习。
+- **Practice Track（题库类型）**：`TEXTBOOK_SYNC` 表示教材同步，`EXTRACURRICULAR` 表示课外拓展。二者共享 Practice 领域模型，但内容设计目标不同。
 
 ## Product rules
 
 1. AI 负责理解和结构化老师内容，不单方面判定学生是否真正完成作业。
 2. AI 解析形成的候选作业默认经过家长确认后再发布给学生。
 3. 每个 Candidate Assignment 应尽可能保留 Source Evidence，避免“AI 说了算”。
-4. 微信/钉钉首版只处理用户主动提供给 App 的内容，不后台读取聊天记录。
+4. 微信/钉钉只处理用户主动提供给 App 的内容；允许家长明确授权的引导式屏幕采集，但不得后台读取聊天数据库、Hook、自动点击/滚动或使用 Accessibility 驱动第三方应用。
 5. 教材目录与正版教材内容分离：目录元数据可维护，受版权保护的教材全文/音视频需合法授权。
 6. 学生提交与家庭数据默认属于 Family 私有空间。
 7. 学生端原则：孩子少管理、多行动；首页突出下一项作业；Phone 核心流程保持单列。
@@ -57,6 +63,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 10. AI 辅导上下文优先级：老师明确要求 > 老师资料 > 当前教材 > 通用知识。
 11. 家长看到的是作业进度，不做摄像头监控、键盘记录等过度监控能力。
 12. SCHOOL / EXTRA 共用 Assignment，不建设两套平行业务体系。
+13. Practice 题库新增或更新必须遵守 `docs/product/practice-question-content-standard.md`；预置题库以 `backend/src/main/resources/practice/preset/` 为唯一源数据，已发布内容通过新 version 演进，不覆盖历史 Attempt / Result。
 
 ## Technical direction
 
@@ -82,6 +89,14 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - Assignment 状态流转和权威计时逐步从通用 PATCH 收敛到后端 Action Command。
 - `OVERDUE` 优先作为派生属性，不为此引入定时任务。
 
+### Homework Import / Capture
+
+- 导入入口可以包括文字、截图/OCR、系统分享和家长明确授权的引导式屏幕采集。
+- 屏幕采集只保存结构化 OCR/来源证据，不持久化原始 RGBA 帧；麦克风默认关闭。
+- CaptureSession 只负责采集与证据，后续统一由可幂等恢复的 Import Pipeline 执行：重建 → 来源校验 → 作业理解 → 家长确认。
+- 一次采集中检测到多个明确群标题时必须 fail-closed，不允许以“多数群名”继续自动理解。
+- SourceProfile 与 ImportBatch 都按 studentId 隔离；历史 ImportBatch 保存当时使用的群名/时间等审计快照。
+
 ### AI
 
 - 导入：OCR / 任务拆分 / 学科识别 / due-time extraction / textbook matching / source evidence。
@@ -96,7 +111,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 2. 旧科目只做确定性映射：`语文 -> CHINESE`、`数学 -> MATH`、`英语 -> ENGLISH`，其他值统一 `OTHER`。
 3. **禁止从历史 `dueText` 猜测 `dueAt`**。历史 `dueText` 原值保留，无法确定的 `dueAt` 保持空值，默认 `dueTimezone=Asia/Shanghai`。
 4. V2 日期筛选只依据结构化 `dueAt`；历史未结构化日期不伪造成某个具体日期。
-5. 当前 HarmonyOS Snapshot schema 为 V5；任何后续版本升级必须增加显式逐版本 migration，不得 schema mismatch 后 seed MockData。
+5. 当前 HarmonyOS Snapshot schema 为 V8；V4→V5→V6→V7→V8 均保留显式逐版本 migration。任何后续版本升级仍必须增加明确迁移步骤，不得 schema mismatch 后 seed MockData。
 6. schema-changing save 前保留一次 `homework_snapshot_pre_migration_backup`；迁移失败不得覆盖原主快照。
 7. PostgreSQL V1–V6 永不修改；V7 采用 add -> deterministic backfill -> verify -> tighten constraints，破坏性删除后置。
 8. API 升级顺序为 **backend first**：迁移期支持 `V1 Client -> V2 Backend`，最迟在 Slice 5 结束；**不支持 `V2 Client -> V1 Backend`**，避免在新客户端引入旧后端 fallback。

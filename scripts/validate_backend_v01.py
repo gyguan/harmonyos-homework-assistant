@@ -63,8 +63,8 @@ require("requestSync(): void" in sync and "syncRequested" in sync and "syncRunni
         "Assignment Repository must preserve coalesced background sync semantics")
 require(not (ROOT / "entry/src/main/ets/application/remote/HomeworkSyncService.ets").exists(),
         "legacy HomeworkSyncService must remain deleted after Repository migration")
-require("assignment.candidateId.length === 0" in sync,
-        "demo/seed assignments must remain local instead of polluting the backend")
+require("assignment.backing === AssignmentBacking.LOCAL_SEED" in sync,
+        "demo/seed assignments must remain local through explicit Assignment backing")
 require("云端连接" in settings and "BackendAuthService" in settings,
         "parent settings must provide an explicit backend connection surface")
 require("request.uploadFile" not in remote_submission and "@kit.BasicServicesKit" not in remote_submission,

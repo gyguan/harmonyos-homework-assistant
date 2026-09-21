@@ -5,6 +5,90 @@ export enum HomeworkOrganizerMode {
   LOCAL = 'LOCAL'
 }
 
+export enum HomeworkImportSourceType {
+  CLIPBOARD = 'CLIPBOARD',
+  SCREENSHOT = 'SCREENSHOT',
+  SHARE = 'SHARE',
+  SCREEN_CAPTURE = 'SCREEN_CAPTURE'
+}
+
+export enum ImportBatchStatus {
+  RECEIVED = 'RECEIVED',
+  READY = 'READY',
+  EMPTY = 'EMPTY',
+  PUBLISHED = 'PUBLISHED',
+  ABANDONED = 'ABANDONED'
+}
+
+export enum HomeworkImportPipelineStage {
+  CAPTURED = 'CAPTURED',
+  RECONSTRUCTED = 'RECONSTRUCTED',
+  SOURCE_VALIDATED = 'SOURCE_VALIDATED',
+  UNDERSTOOD = 'UNDERSTOOD',
+  ACTIVATED = 'ACTIVATED',
+  BLOCKED_SOURCE = 'BLOCKED_SOURCE',
+  RECONSTRUCTION_FAILED = 'RECONSTRUCTION_FAILED',
+  UNDERSTANDING_FAILED = 'UNDERSTANDING_FAILED'
+}
+
+export interface ImportSourceEvidence {
+  sourceType: HomeworkImportSourceType;
+  sourceMessageIds: string[];
+  sourceFrameEvidenceIds?: string[];
+  rawText: string;
+  imageRef: string;
+  capturedAtEpochMs: number;
+}
+
+export interface ImportedMessage {
+  id: string;
+  batchId: string;
+  sender: string;
+  timestampEpochMs: number;
+  text: string;
+  attachments: string[];
+  sourceEvidence: ImportSourceEvidence;
+  fingerprint: string;
+  orderNo: number;
+}
+
+export interface ImportBatch {
+  id: string;
+  studentId: string;
+  sourceType: HomeworkImportSourceType;
+  sourceLabel: string;
+  sourceProfileId: string;
+  sourceProfileName?: string;
+  expectedGroupTitle?: string;
+  profileStartTime?: string;
+  groupValidationStatus?: string;
+  groupConfirmedByUser?: boolean;
+  captureSessionId?: string;
+  pipelineStage?: HomeworkImportPipelineStage;
+  reconstructed?: boolean;
+  groupTitle?: string;
+  timeBoundaryReached?: boolean;
+  earliestDetectedTime?: string;
+  reconstructionWarnings?: string[];
+  understood?: boolean;
+  understandingVersion?: string;
+  pendingReviewMessageIds?: string[];
+  understandingWarnings?: string[];
+  classificationSummary?: string;
+  createdAtEpochMs: number;
+  status: ImportBatchStatus;
+  messageCount: number;
+  candidateCount: number;
+}
+
+export interface HomeworkImportInboxSnapshot {
+  schemaVersion: number;
+  activeBatchId: string;
+  batches: ImportBatch[];
+  messages: ImportedMessage[];
+  candidates: CandidateAssignment[];
+}
+
 export interface ExtractedHomeworkText {
   importId: string;
   studentId: string;

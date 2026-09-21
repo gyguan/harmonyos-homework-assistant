@@ -63,7 +63,7 @@ export struct BackendConnectionPage {
   private updateTutorSettings(guidanceFirst: boolean, directAnswerAllowed: boolean): void {
     this.familyContext.updateTutorSettings(guidanceFirst, directAnswerAllowed);
     this.pageRevision++;
-    this.message = 'AI 辅导规则已保存';
+    this.message = '';
     this.onStoreChanged();
   }
 
@@ -75,12 +75,12 @@ export struct BackendConnectionPage {
     this.connecting = true;
     this.message = '正在连接…';
     try {
-      let displayName = await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
+      await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
       let familySynced = await FamilyCloudService.instance.syncStudents();
       let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
       this.syncLocalStudents();
       this.pageRevision++;
-      this.message = familySynced && homeworkSynced ? `已连接：${displayName}，家庭数据已同步` : `已登录：${displayName}，部分数据稍后再同步`;
+      this.message = familySynced && homeworkSynced ? '' : '已登录，部分数据稍后再同步';
       this.onStoreChanged();
     } catch {
       this.message = '连接失败，请检查电脑局域网地址、后端服务和账号密码';
@@ -102,7 +102,7 @@ export struct BackendConnectionPage {
     let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
     this.syncLocalStudents();
     this.pageRevision++;
-    this.message = familySynced && homeworkSynced ? '家庭数据已同步' : '部分数据同步失败，请稍后重试';
+    this.message = familySynced && homeworkSynced ? '' : '部分数据同步失败，请稍后重试';
     this.onStoreChanged();
   }
 
@@ -154,7 +154,7 @@ export struct BackendConnectionPage {
       this.deleteStudentConfirmId = '';
       this.syncLocalStudents();
       this.pageRevision++;
-      this.message = '孩子资料已保存并同步';
+      this.message = '';
       this.onStoreChanged();
     } else {
       this.message = '保存失败，请确认云端连接';
@@ -167,7 +167,7 @@ export struct BackendConnectionPage {
       this.deleteStudentConfirmId = '';
       this.syncLocalStudents();
       this.pageRevision++;
-      this.message = '孩子资料已删除';
+      this.message = '';
       this.onStoreChanged();
     } else {
       this.deleteStudentConfirmId = '';
@@ -177,7 +177,7 @@ export struct BackendConnectionPage {
 
   private async disconnect(): Promise<void> {
     await BackendAuthService.instance.logout();
-    this.message = '已断开云端连接，本地作业仍可继续使用';
+    this.message = '';
     this.pageRevision++;
   }
 
@@ -185,7 +185,7 @@ export struct BackendConnectionPage {
   private SectionTitle(title: string, description: string) {
     Column({ space: 3 }) {
       Text(title).width('100%').fontSize(18).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text(description).width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+      Text(description).width('100%').fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start);
@@ -248,7 +248,7 @@ export struct BackendConnectionPage {
           Column({ space: 8 }) {
             Text('确认删除这个孩子？').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
             Text('删除家庭成员属于高风险操作。已有作业的孩子或家庭最后一个孩子仍会被服务端拒绝删除。')
-              .width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+              .width('100%').fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
             Row({ space: 8 }) {
               Button('取消删除', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
                 .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
@@ -295,7 +295,7 @@ export struct BackendConnectionPage {
           });
           Column({ space: 3 }) {
             Text(student.name).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text(`${student.grade} · ${student.className} · ${student.semester}`).width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+            Text(`${student.grade} · ${student.className} · ${student.semester}`).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1).alignItems(HorizontalAlign.Start);
           Text('›').fontSize(22).fontColor(AppTheme.TERTIARY_TEXT);
@@ -318,7 +318,7 @@ export struct BackendConnectionPage {
         .onClick(() => this.beginAdd());
       } else {
         Text('连接家庭云端后可新增或修改家庭成员。').width('100%').padding({ top: 12, bottom: 12 })
-          .fontSize(12).fontColor(AppTheme.SUBTEXT);
+          .fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
 
       this.StudentEditor();
@@ -355,7 +355,7 @@ export struct BackendConnectionPage {
           Text(BackendSession.instance.isConnected()
             ? `已连接${BackendSession.instance.getDisplayName().length > 0 ? ' · ' + BackendSession.instance.getDisplayName() : ''}`
             : '未连接 · 本地作业仍可使用')
-            .fontSize(12).fontColor(BackendSession.instance.isConnected() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+            .fontSize(13).fontColor(BackendSession.instance.isConnected() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
         }
         .layoutWeight(1).alignItems(HorizontalAlign.Start);
         Text(this.cloudPanelOpen ? '⌃' : '⌄').fontSize(16).fontColor(AppTheme.TERTIARY_TEXT);
@@ -367,7 +367,7 @@ export struct BackendConnectionPage {
 
       if (this.cloudPanelOpen) {
         Divider().color(AppTheme.DIVIDER);
-        Text('高级连接设置').width('100%').fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+        Text('高级连接设置').width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '例如 http://192.168.1.10:8080', text: this.baseUrl })
           .width('100%').height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.baseUrl = value);
@@ -407,7 +407,6 @@ export struct BackendConnectionPage {
           Column({ space: 20 }) {
             Column({ space: 4 }) {
               Text('我的').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-              Text('管理家庭成员、小伴规则和数据同步。').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
             }
             .width('100%').alignItems(HorizontalAlign.Start);
 

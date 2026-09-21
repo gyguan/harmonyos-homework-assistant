@@ -17,6 +17,10 @@ export class ParentReviewViewModel {
     return this.repository.updateDetails(assignment);
   }
 
+  deleteAssignment(assignmentId: string): Promise<number> {
+    return this.repository.deleteAssignments([assignmentId]);
+  }
+
   approve(assignmentId: string, note: string): Promise<Assignment> {
     return this.repository.review(assignmentId, AssignmentReviewDecision.APPROVE, note.trim());
   }

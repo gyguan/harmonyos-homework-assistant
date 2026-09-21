@@ -31,7 +31,7 @@ struct StudentHomeMetricCard {
         .fontWeight(FontWeight.Bold)
         .fontColor(this.toneColor());
       Text(this.label)
-        .fontSize(11)
+        .fontSize(13)
         .fontColor(AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
@@ -97,20 +97,24 @@ struct StudentSubjectTaskGroupCard {
     return AppTheme.WARNING_SOFT;
   }
 
+  private assignmentRenderKey(item: Assignment): string {
+    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+  }
+
   @Builder
   private TaskRow(item: Assignment) {
     Row({ space: 10 }) {
       Column({ space: 4 }) {
         Row({ space: 6 }) {
           Text(item.title)
-            .fontSize(14)
+            .fontSize(15)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           if (item.assignmentType === AssignmentType.EXTRA) {
             Text('课外')
-              .fontSize(9)
+              .fontSize(13)
               .fontColor(AppTheme.PRIMARY)
               .padding({ left: 6, right: 6, top: 2, bottom: 2 })
               .backgroundColor(AppTheme.PRIMARY_SOFT)
@@ -120,12 +124,12 @@ struct StudentSubjectTaskGroupCard {
         .width('100%');
         Row({ space: 6 }) {
           Text(`预计 ${item.expectedMinutes} 分钟`)
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
           if (item.textbookRef.length > 0) {
-            Text('·').fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
+            Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
             Text(item.textbookRef)
-              .fontSize(11)
+              .fontSize(13)
               .fontColor(AppTheme.SUBTEXT)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis });
@@ -138,7 +142,7 @@ struct StudentSubjectTaskGroupCard {
 
       if (item.id === this.focusAssignmentId) {
         Text(this.actionLabel(item))
-          .fontSize(12)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT_ON_PRIMARY)
           .padding({ left: 14, right: 14, top: 8, bottom: 8 })
@@ -146,19 +150,19 @@ struct StudentSubjectTaskGroupCard {
           .borderRadius(AppTheme.CHIP_RADIUS);
       } else {
         Text(this.statusLabel(item))
-          .fontSize(11)
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.statusColor(item))
           .padding({ left: 9, right: 9, top: 6, bottom: 6 })
           .backgroundColor(this.statusBackground(item))
           .borderRadius(AppTheme.CHIP_RADIUS);
         SymbolGlyph($r('sys.symbol.chevron_right'))
-          .fontSize(14)
+          .fontSize(15)
           .fontColor([AppTheme.TERTIARY_TEXT]);
       }
     }
     .width('100%')
-    .constraintSize({ minHeight: 62 })
+    .constraintSize({ minHeight: 68 })
     .padding({ left: 12, right: 10, top: 10, bottom: 10 })
     .backgroundColor(item.id === this.focusAssignmentId ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
     .border({
@@ -191,7 +195,7 @@ struct StudentSubjectTaskGroupCard {
           .fontColor(AppTheme.TEXT);
         Blank();
         Text(`${this.group.items.length} 项`)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
         Text(this.expanded ? '⌃' : '⌄')
           .fontSize(16)
@@ -211,7 +215,7 @@ struct StudentSubjectTaskGroupCard {
         Column({ space: 7 }) {
           ForEach(this.group.items, (item: Assignment) => {
             this.TaskRow(item);
-          }, (item: Assignment) => item.id);
+          }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%')
         .padding({ left: 8, right: 8, top: 8, bottom: 8 });
@@ -269,6 +273,18 @@ export struct StudentHomePage {
     return next === null ? '' : next.id;
   }
 
+  private effectiveExpandedSubjectKey(): string {
+    let currentRevision = this.touchRevision();
+    if (currentRevision < 0 || this.expandedSubjectKey.length === 0) return this.expandedSubjectKey;
+    let groups = this.viewModel.todaySubjectGroups();
+    for (let group of groups) {
+      if (group.key === this.expandedSubjectKey) return this.expandedSubjectKey;
+    }
+    let next = this.viewModel.nextAssignment();
+    if (next !== null) return next.subject;
+    return groups.length > 0 ? groups[0].key : '';
+  }
+
   private canUsePadComposition(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.homeFocusSummaryRequirement());
   }
@@ -296,13 +312,13 @@ export struct StudentHomePage {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Text(`${this.viewModel.student().grade} · ${this.viewModel.student().className}`)
-          .fontSize(11)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
       }
       .alignItems(HorizontalAlign.Start);
       Blank();
       Text(this.viewModel.dateLabel())
-        .fontSize(11)
+        .fontSize(13)
         .fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
@@ -315,7 +331,7 @@ export struct StudentHomePage {
         SymbolGlyph($r('sys.symbol.wifi_slash')).fontSize(17).fontColor([AppTheme.WARNING]);
         Text('当前离线，正在使用已缓存的今日作业。')
           .layoutWeight(1)
-          .fontSize(12)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
@@ -372,31 +388,6 @@ export struct StudentHomePage {
   }
 
   @Builder
-  private TodayScopeNote() {
-    Row({ space: 8 }) {
-      Text('i')
-        .width(20)
-        .height(20)
-        .fontSize(12)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.PRIMARY)
-        .textAlign(TextAlign.Center)
-        .padding({ top: 2 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(10);
-      Text('首页只显示今天要做的任务，其他日期和未定时间作业请到「作业」页筛选。')
-        .layoutWeight(1)
-        .fontSize(11)
-        .lineHeight(17)
-        .fontColor(AppTheme.SUBTEXT);
-    }
-    .width('100%')
-    .padding({ left: 11, right: 11, top: 9, bottom: 9 })
-    .backgroundColor(AppTheme.PRIMARY_FAINT)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
-  }
-
-  @Builder
   private TodaySubjects() {
     Column({ space: 10 }) {
       Row() {
@@ -405,15 +396,12 @@ export struct StudentHomePage {
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
-          Text('按学科完成，一次专注一个学科')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
         if (this.subjectGroups().length > 0) {
           Text(`${this.viewModel.todaySubjectCount()} 科 · ${this.viewModel.todayPendingCount()} 项`)
-            .fontSize(11)
+            .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
       }
@@ -429,9 +417,6 @@ export struct StudentHomePage {
               .fontSize(15)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            Text('其他日期的作业可以在「作业」页查看。')
-              .fontSize(11)
-              .fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1)
           .alignItems(HorizontalAlign.Start);
@@ -445,7 +430,7 @@ export struct StudentHomePage {
           ForEach(this.subjectGroups(), (group: StudentHomeSubjectGroup) => {
             StudentSubjectTaskGroupCard({
               group: group,
-              expanded: this.expandedSubjectKey === group.key,
+              expanded: this.effectiveExpandedSubjectKey() === group.key,
               focusAssignmentId: this.focusAssignmentId(),
               onToggle: () => this.toggleSubject(group.key),
               onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
@@ -464,7 +449,6 @@ export struct StudentHomePage {
       this.Header();
       this.OfflineBanner();
       this.TodayOverview();
-      this.TodayScopeNote();
       this.TodaySubjects();
     }
     .width('100%')
@@ -479,7 +463,6 @@ export struct StudentHomePage {
         this.Header();
         this.OfflineBanner();
         this.TodayOverview();
-        this.TodayScopeNote();
       }
       .width(AppTheme.HOME_SECONDARY_MIN_WIDTH)
       .alignItems(HorizontalAlign.Start);

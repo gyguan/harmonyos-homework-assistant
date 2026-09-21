@@ -12,7 +12,7 @@ export struct ParentVoiceAssignmentPage {
   @State private subject: Subject = Subject.ENGLISH;
   @State private title: string = '';
   @State private instruction: string = '';
-  @State private dueText: string = '';
+  @State private dueText: string = '今天';
   @State private expectedMinutesText: string = '15';
   @State private audioUri: string = '';
   @State private audioName: string = '';
@@ -59,8 +59,18 @@ export struct ParentVoiceAssignmentPage {
     let uris = await VoiceAssignmentMediaService.instance.selectImages();
     this.selectingImages = false;
     if (uris.length === 0) return;
-    this.imageUris = uris;
+
+    let merged = this.imageUris.slice();
+    let existing: Set<string> = new Set<string>();
+    for (let uri of merged) existing.add(uri);
+    for (let uri of uris) {
+      if (existing.has(uri)) continue;
+      existing.add(uri);
+      merged.push(uri);
+    }
+    this.imageUris = merged;
     this.message = '';
+    this.messageError = false;
   }
 
   private removeImage(index: number): void {
@@ -79,7 +89,6 @@ export struct ParentVoiceAssignmentPage {
     if (instruction.length === 0) return this.showError('请填写完成要求');
     if (this.audioUri.length === 0) return this.showError('请选择一个语音文件');
     if (this.imageUris.length === 0) return this.showError('请选择至少 1 张情景图片');
-    if (this.imageUris.length > 9) return this.showError('情景图片最多 9 张');
 
     let expectedMinutes = this.expectedMinutes();
     if (expectedMinutes < 0) return this.showError('预计用时请输入 1～240 分钟的整数');
@@ -157,7 +166,7 @@ export struct ParentVoiceAssignmentPage {
       Row() {
         Text('语音文件').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text('1 个').fontSize(11).fontColor(AppTheme.SUBTEXT);
+        Text('1 个').fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -177,11 +186,10 @@ export struct ParentVoiceAssignmentPage {
           Column({ space: 2 }) {
             Text(this.audioName).fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT)
               .maxLines(1).textOverflow({ overflow: TextOverflow.Ellipsis });
-            Text('发布后孩子可播放、暂停和拖动进度').fontSize(10).fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1).alignItems(HorizontalAlign.Start);
           Text('更换')
-            .fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+            .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .padding({ left: 8, right: 8 })
             .textAlign(TextAlign.Center)
@@ -193,7 +201,7 @@ export struct ParentVoiceAssignmentPage {
         .borderRadius(AppTheme.CONTROL_RADIUS);
       }
       Text('支持 mp3 / m4a / wav，单个文件不超过 20MB。')
-        .width('100%').fontSize(11).fontColor(AppTheme.SUBTEXT);
+        .width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
   }
@@ -204,7 +212,7 @@ export struct ParentVoiceAssignmentPage {
       Row() {
         Text('情景图片').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text(`已选择 ${this.imageUris.length} / 9 张`).fontSize(11).fontColor(AppTheme.SUBTEXT);
+        Text(`已选择 ${this.imageUris.length} 张`).fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -230,15 +238,13 @@ export struct ParentVoiceAssignmentPage {
       }
 
       Button(this.selectingImages ? '正在打开相册…' :
-        (this.imageUris.length === 0 ? '选择情景图片' : '重新选择图片'), { type: ButtonType.Normal })
+        (this.imageUris.length === 0 ? '选择情景图片' : '＋ 继续添加图片'), { type: ButtonType.Normal })
         .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
         .enabled(!this.selectingImages && !this.busy)
         .onClick(() => { void this.selectImages(); });
 
-      Text('图片顺序就是学生查看顺序；发布后切换图片不会中断语音。')
-        .width('100%').fontSize(11).lineHeight(17).fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
   }
@@ -253,7 +259,7 @@ export struct ParentVoiceAssignmentPage {
         onChange: (value: string) => this.dueText = value
       });
       Column({ space: 5 }) {
-        Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('预计用时（分钟）').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '15', text: this.expectedMinutesText })
           .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
           .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -284,7 +290,6 @@ export struct ParentVoiceAssignmentPage {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
           title: '布置语音作业',
-          subtitle: `上传语音和配套图片，${this.viewModel.student().name} 可以边听边看`,
           backAccessibilityText: '返回家长首页',
           onBack: () => this.onBack()
         });

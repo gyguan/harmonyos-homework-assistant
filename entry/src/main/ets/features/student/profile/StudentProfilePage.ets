@@ -46,7 +46,7 @@ export struct StudentProfilePage {
         .fontColor(AppTheme.TEXT);
       Text(description)
         .width('100%')
-        .fontSize(12)
+        .fontSize(13)
         .lineHeight(18)
         .fontColor(AppTheme.SUBTEXT);
     }
@@ -63,9 +63,6 @@ export struct StudentProfilePage {
               .fontSize(AppTheme.PAGE_TITLE_SIZE)
               .fontWeight(FontWeight.Bold)
               .fontColor(AppTheme.TEXT);
-            Text('这里展示你的学习资料和家长设置。')
-              .fontSize(AppTheme.BODY_SIZE)
-              .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%')
           .alignItems(HorizontalAlign.Start);
@@ -136,7 +133,7 @@ export struct StudentProfilePage {
 
           Text('需要修改姓名、年级、班级、学期或教材时，请由家长在家长空间中调整。')
             .width('100%')
-            .fontSize(12)
+            .fontSize(13)
             .lineHeight(19)
             .fontColor(AppTheme.SUBTEXT)
             .padding({ left: 4, right: 4 });

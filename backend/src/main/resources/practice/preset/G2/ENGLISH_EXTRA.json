@@ -1,0 +1,2228 @@
+{
+  "schemaVersion": 2,
+  "grade": "G2",
+  "subject": "ENGLISH",
+  "track": "EXTRACURRICULAR",
+  "papers": [
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001",
+      "version": 4,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·校园日常（一）",
+      "description": "把基础英语放进真实校园交流场景，强化理解和开口使用。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "daily English",
+        "school"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q01-V4",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "你向同学借到一支铅笔后，应该说什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Thank you."
+            },
+            {
+              "key": "B",
+              "label": "Good night."
+            },
+            {
+              "key": "C",
+              "label": "Seven."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“借到铅笔”“应该说什么”。别人帮助你以后，要选择表示感谢的礼貌英语。"
+          ],
+          "tags": [
+            "daily English",
+            "school"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q02-V4",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "老师说“Please sit down.”，你应该做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Run home."
+            },
+            {
+              "key": "B",
+              "label": "Sit down."
+            },
+            {
+              "key": "C",
+              "label": "Open the fridge."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“Please sit down.”。先理解老师的课堂指令，再判断应该做什么动作。"
+          ],
+          "tags": [
+            "daily English",
+            "classroom"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q03-V4",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "你想问朋友叫什么名字，应该说哪一句英语？",
+          "options": [
+            {
+              "key": "A",
+              "label": "What colour is the desk?"
+            },
+            {
+              "key": "B",
+              "label": "Can a book run?"
+            },
+            {
+              "key": "C",
+              "label": "What’s your name?"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“问名字”。先找询问 name 的句型，再判断哪一句是在提问。"
+          ],
+          "tags": [
+            "daily English",
+            "dialogue"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q04-V4",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "同学帮助了你，哪一句英语回答最有礼貌？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Thank you."
+            },
+            {
+              "key": "B",
+              "label": "Go away."
+            },
+            {
+              "key": "C",
+              "label": "No chair."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“得到帮助”“礼貌回应”。别人帮助你之后，要找表示感谢的英语表达。"
+          ],
+          "tags": [
+            "daily English",
+            "polite language"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q05-V4",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "早上遇到老师，应该怎么打招呼？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Goodbye!"
+            },
+            {
+              "key": "B",
+              "label": "Good morning!"
+            },
+            {
+              "key": "C",
+              "label": "Good night!"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“早上”“老师”“打招呼”。先判断时间是早晨，再选择适合见面时使用的问候语。"
+          ],
+          "tags": [
+            "daily English",
+            "school"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q06-V4",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "你想问朋友会不会游泳，应该说哪一句英语？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Who is your mother?"
+            },
+            {
+              "key": "B",
+              "label": "What colour is seven?"
+            },
+            {
+              "key": "C",
+              "label": "Can you swim?"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“会/能力”“动作”。先确定谁会做什么，再检查 can 后面是否直接接动作词。"
+          ],
+          "tags": [
+            "daily English",
+            "can"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q07-V4",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "你的水杯在桌子上，下面哪一句英语表达正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "My bottle is on the desk."
+            },
+            {
+              "key": "B",
+              "label": "My desk is in bottle."
+            },
+            {
+              "key": "C",
+              "label": "Bottle can desk."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“在桌子上”。先判断是“在……上”，再对应 on，最后检查完整句子。"
+          ],
+          "tags": [
+            "daily English",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q08-V4",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "你想介绍朋友Lily，可以说哪一句英语？",
+          "options": [
+            {
+              "key": "A",
+              "label": "I am a door."
+            },
+            {
+              "key": "B",
+              "label": "This is Lily."
+            },
+            {
+              "key": "C",
+              "label": "Lily are blue."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“介绍别人”。想一想介绍一个人时常用 This is…，再检查人名放置是否正确。"
+          ],
+          "tags": [
+            "daily English",
+            "introduction"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q09-V4",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "学生通常去哪里读书？",
+          "options": [
+            {
+              "key": "A",
+              "label": "bed"
+            },
+            {
+              "key": "B",
+              "label": "sky"
+            },
+            {
+              "key": "C",
+              "label": "library"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“读书”“去哪里”。先判断读书和借阅通常在哪类场所进行，再匹配英文地点词。"
+          ],
+          "tags": [
+            "daily English",
+            "school"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q10-V4",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "体育课上，下面哪个英语动作词最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "yellow"
+            },
+            {
+              "key": "C",
+              "label": "mother"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“体育课”“动作词”。先想体育课常见的身体动作，再比较英文动作词。"
+          ],
+          "tags": [
+            "daily English",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q11-V4",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "你准备离开学校时，哪一句英语最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning at night."
+            },
+            {
+              "key": "B",
+              "label": "See you!"
+            },
+            {
+              "key": "C",
+              "label": "This is red seven."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“放学/离开”“告别”。这是结束见面的场景，要找表示“再见”的英语表达。"
+          ],
+          "tags": [
+            "daily English",
+            "goodbye"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SCHOOL-LIFE-001-Q12-V4",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "需要别人帮助时，哪一句英语最有礼貌？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Give me now!"
+            },
+            {
+              "key": "B",
+              "label": "You are a desk."
+            },
+            {
+              "key": "C",
+              "label": "Can you help me, please?"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“得到帮助”“礼貌回应”。别人帮助你之后，要找表示感谢的英语表达。"
+          ],
+          "tags": [
+            "daily English",
+            "polite language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001",
+      "version": 4,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·深圳生活（一）",
+      "description": "用公园、地铁、社区图书馆、雨天等深圳儿童熟悉场景练习基础英语。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "Shenzhen life",
+        "daily English"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q01-V4",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "你在公园里，下面哪一句英语符合这个场景？",
+          "options": [
+            {
+              "key": "A",
+              "label": "The trees are green."
+            },
+            {
+              "key": "B",
+              "label": "My chair is seven."
+            },
+            {
+              "key": "C",
+              "label": "Father is blue door."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“公园”。想一想公园里常见什么，再判断哪句英语符合场景。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "park"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q02-V4",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "你和家人一起坐地铁。“family”是什么意思？",
+          "options": [
+            {
+              "key": "A",
+              "label": "forest"
+            },
+            {
+              "key": "B",
+              "label": "family"
+            },
+            {
+              "key": "C",
+              "label": "pencil"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“家人”。先判断是哪位家人，再匹配对应英文称呼或介绍家人的句型。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q03-V4",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "在图书馆里，下面哪一句英语可以正确描述一本书？",
+          "options": [
+            {
+              "key": "A",
+              "label": "This is a sun."
+            },
+            {
+              "key": "B",
+              "label": "Book can yellow."
+            },
+            {
+              "key": "C",
+              "label": "This is a book."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“图书馆”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "library"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q04-V4",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "深圳下雨了，下面哪件物品最有用？",
+          "options": [
+            {
+              "key": "A",
+              "label": "umbrella"
+            },
+            {
+              "key": "B",
+              "label": "bed"
+            },
+            {
+              "key": "C",
+              "label": "moon"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“深圳下雨”。先想雨天最需要的物品，再匹配对应英文词。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "weather"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q05-V4",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "你在公园里看到一只鸟，应该用哪个英语单词？",
+          "options": [
+            {
+              "key": "A",
+              "label": "chair"
+            },
+            {
+              "key": "B",
+              "label": "bird"
+            },
+            {
+              "key": "C",
+              "label": "mother"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“公园”“一只鸟”。题目要找的是动物名称，先确定中文对象，再匹配英文单词。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "nature"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q06-V4",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "你想表达“天空是蓝色的”，请选择正确的英语句子。",
+          "options": [
+            {
+              "key": "A",
+              "label": "The sky is a room."
+            },
+            {
+              "key": "B",
+              "label": "Blue can sky."
+            },
+            {
+              "key": "C",
+              "label": "The sky is blue."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“天空”。先确定题目说的是哪种自然事物，再匹配 sky、sun、tree、bird 等词。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "nature"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q07-V4",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "参加社区运动会时，下面哪个英语动作词最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "run"
+            },
+            {
+              "key": "B",
+              "label": "kitchen"
+            },
+            {
+              "key": "C",
+              "label": "yellow"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“社区运动会”“动作词”。先想运动会中常见的身体动作，再比较英文动作词。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q08-V4",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "早上走进图书馆时，可以使用哪一句问候语？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good night!"
+            },
+            {
+              "key": "B",
+              "label": "Good morning!"
+            },
+            {
+              "key": "C",
+              "label": "Goodbye before entering."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“图书馆”“地点”。先判断这个活动通常发生在哪里，再匹配 park、school、library 等词。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q09-V4",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "你的地铁卡在书包里，下面哪一句英语表达正确？",
+          "options": [
+            {
+              "key": "A",
+              "label": "The card is on the sky."
+            },
+            {
+              "key": "B",
+              "label": "The bag is can card."
+            },
+            {
+              "key": "C",
+              "label": "The card is in the schoolbag."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“在书包里”。先找 schoolbag，再找表示“在里面”的位置词。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q10-V4",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "在公园里，朋友问“Can you run?”，你可以怎样回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Yes, I can."
+            },
+            {
+              "key": "B",
+              "label": "I am a door."
+            },
+            {
+              "key": "C",
+              "label": "It is seven."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“Can …?”。这是在问“会不会做某事”，回答时人物和 can 要保持一致。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "can"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q11-V4",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "“公园”用英语怎么说？",
+          "options": [
+            {
+              "key": "A",
+              "label": "room"
+            },
+            {
+              "key": "B",
+              "label": "park"
+            },
+            {
+              "key": "C",
+              "label": "father"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“公园”“地点词”。先确定题目要找的是地点名称，再比较英文选项。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "places"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-SHENZHEN-001-Q12-V4",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "别人给你指路后，哪一句英语最有礼貌？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good night, seven."
+            },
+            {
+              "key": "B",
+              "label": "Blue chair."
+            },
+            {
+              "key": "C",
+              "label": "Thank you."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Read the sentence carefully and choose the best answer.",
+          "hints": [
+            "关键词：“句子是否正确”。先看主语是谁，再检查 be 动词、can、has 或位置词是否搭配自然。"
+          ],
+          "tags": [
+            "Shenzhen life",
+            "polite language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001",
+      "version": 4,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·迷你阅读（一）",
+      "description": "三篇2～4句原创超短文，训练二年级学生从英语短文中找直接信息。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "mini reading",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q01-V4",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\n这个男孩叫什么名字？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Sam"
+            },
+            {
+              "key": "B",
+              "label": "Ben"
+            },
+            {
+              "key": "C",
+              "label": "Tom"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“这个男孩”“名字”。回到短文第一句，找 I’m 后面出现的人名。"
+          ],
+          "tags": [
+            "mini reading",
+            "information"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q02-V4",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nSam几岁？",
+          "options": [
+            {
+              "key": "A",
+              "label": "three"
+            },
+            {
+              "key": "B",
+              "label": "seven"
+            },
+            {
+              "key": "C",
+              "label": "nine"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“Sam”“几岁”。回到英文短文中找 Sam 附近表示年龄的数字词。"
+          ],
+          "tags": [
+            "mini reading",
+            "numbers"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q03-V4",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nSam喜欢什么颜色？",
+          "options": [
+            {
+              "key": "A",
+              "label": "red"
+            },
+            {
+              "key": "B",
+              "label": "yellow"
+            },
+            {
+              "key": "C",
+              "label": "blue"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“Sam”“喜欢”“颜色”。回原文找 like 后面紧跟的颜色词。"
+          ],
+          "tags": [
+            "mini reading",
+            "colours"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q04-V4",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nHello! I’m Sam. I’m seven. I like blue. I can run and jump. This is my friend Ben.\nBen是谁？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Sam’s friend"
+            },
+            {
+              "key": "B",
+              "label": "Sam’s father"
+            },
+            {
+              "key": "C",
+              "label": "Sam’s teacher"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“Ben”“谁”。回原文找介绍 Ben 的句子，注意人物关系词。"
+          ],
+          "tags": [
+            "mini reading",
+            "relationship"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q05-V4",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n书在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "in the box"
+            },
+            {
+              "key": "B",
+              "label": "on the desk"
+            },
+            {
+              "key": "C",
+              "label": "near the door"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“book”“哪里”。回原文找 book，再看后面的 on / in 位置短语。"
+          ],
+          "tags": [
+            "mini reading",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q06-V4",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n球在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "on the desk"
+            },
+            {
+              "key": "B",
+              "label": "in the sky"
+            },
+            {
+              "key": "C",
+              "label": "in the box"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“ball”“哪里”。回原文找 ball，再看后面的 on / in 位置短语。"
+          ],
+          "tags": [
+            "mini reading",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q07-V4",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n什么东西在窗户旁边？",
+          "options": [
+            {
+              "key": "A",
+              "label": "the bed"
+            },
+            {
+              "key": "B",
+              "label": "the ball"
+            },
+            {
+              "key": "C",
+              "label": "the book"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“窗户旁边”。回原文找 near the window 前面的物品是谁。"
+          ],
+          "tags": [
+            "mini reading",
+            "room"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q08-V4",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nThis is my room. My bed is near the window. My book is on the desk. My ball is in the box.\n这段短文主要介绍什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "a park"
+            },
+            {
+              "key": "B",
+              "label": "a room"
+            },
+            {
+              "key": "C",
+              "label": "a bus"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“主要介绍什么”。看每句话是不是都在描述同一个 room 里的物品和位置。"
+          ],
+          "tags": [
+            "mini reading",
+            "main idea"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q09-V4",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy和妈妈什么时候去公园？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Monday night"
+            },
+            {
+              "key": "B",
+              "label": "Friday afternoon"
+            },
+            {
+              "key": "C",
+              "label": "Sunday morning"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“什么时候”。回原文找 Sunday、morning 这类时间词。"
+          ],
+          "tags": [
+            "mini reading",
+            "time"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q10-V4",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\n谁和Amy一起去？",
+          "options": [
+            {
+              "key": "A",
+              "label": "her mother"
+            },
+            {
+              "key": "B",
+              "label": "her teacher"
+            },
+            {
+              "key": "C",
+              "label": "her brother only"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“谁和Amy一起”。回原文找 Amy 身边出现的家庭成员。"
+          ],
+          "tags": [
+            "mini reading",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q11-V4",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy能看到什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "beds and desks"
+            },
+            {
+              "key": "B",
+              "label": "trees and birds"
+            },
+            {
+              "key": "C",
+              "label": "books and pencils only"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“Amy能看到什么”。回原文找 see 后面列出的自然事物。"
+          ],
+          "tags": [
+            "mini reading",
+            "nature"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-001-Q12-V4",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "阅读下面的英文短文：\nIt is Sunday morning. Amy and her mother go to the park. Amy can see trees and birds. She can run with her friend Lucy.\nAmy可以和Lucy一起做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "sleep in class"
+            },
+            {
+              "key": "B",
+              "label": "cook dinner"
+            },
+            {
+              "key": "C",
+              "label": "run"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "Find the answer in the short text.",
+          "hints": [
+            "关键词：“Amy和Lucy做什么”。回原文找 can 后面的动作词。"
+          ],
+          "tags": [
+            "mini reading",
+            "actions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·生活对话（一）",
+      "description": "用校园、家庭、用餐和出行情境完成简短对话，训练听懂意图并选择自然回应。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "dialogue",
+        "daily English"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "Amy说“Good morning, Ben!”，Ben最自然的回答是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning, Amy!"
+            },
+            {
+              "key": "B",
+              "label": "Good night, Amy!"
+            },
+            {
+              "key": "C",
+              "label": "Seven, Amy!"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "早晨见面时可以用相同的早安问候回应。",
+          "hints": [
+            "关键词：“Good morning”“回答”。先判断见面时间，再选同一场景下自然的问候回应。"
+          ],
+          "tags": [
+            "dialogue",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "朋友问“Can you swim?”，你会游泳，应该怎样回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is blue."
+            },
+            {
+              "key": "B",
+              "label": "Yes, I can."
+            },
+            {
+              "key": "C",
+              "label": "She is my mum."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "对“Can you ...?”的肯定回答可以用“Yes, I can.”。",
+          "hints": [
+            "关键词：“Can you swim?”“会游泳”。这是询问能力，要选择肯定能力的回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "can"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "你问“Where is my book?”，朋友看到书在桌子上，应该怎么回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is red."
+            },
+            {
+              "key": "B",
+              "label": "I can read."
+            },
+            {
+              "key": "C",
+              "label": "It is on the desk."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "书在桌子上可以用“It is on the desk.”描述位置。",
+          "hints": [
+            "关键词：“Where”“在桌子上”。问题在问位置，要找含有位置表达的回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "朋友指着一个女孩问“Who is she?”，那个女孩是你的姐姐。你应该回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "She is my sister."
+            },
+            {
+              "key": "B",
+              "label": "She is blue."
+            },
+            {
+              "key": "C",
+              "label": "She can desk."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "介绍女性家庭成员可以说“She is my sister.”。",
+          "hints": [
+            "关键词：“Who is she?”“姐姐”。问题在问人物身份，要用家庭成员词回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈问“What do you like?”，你喜欢苹果，应该怎么回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "I see apples."
+            },
+            {
+              "key": "B",
+              "label": "I like apples."
+            },
+            {
+              "key": "C",
+              "label": "Apples are seven."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "表达喜欢苹果可以说“I like apples.”。",
+          "hints": [
+            "关键词：“What do you like?”“喜欢苹果”。找表示个人喜好的完整回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "like"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "妈妈说“Dinner is ready.”，你准备去吃饭，哪一句回应比较自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good night, desk."
+            },
+            {
+              "key": "B",
+              "label": "I am a bus."
+            },
+            {
+              "key": "C",
+              "label": "Thank you, Mum."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "家人准备好晚餐后，用“Thank you, Mum.”表示感谢很自然。",
+          "hints": [
+            "关键词：“Dinner is ready”“回应”。这是家人准备好晚餐的情境，选择礼貌回应。"
+          ],
+          "tags": [
+            "dialogue",
+            "dinner"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "路口亮起红灯，爸爸问“What should we do?”，最合适的回答是什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Stop."
+            },
+            {
+              "key": "B",
+              "label": "Run."
+            },
+            {
+              "key": "C",
+              "label": "Jump."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "红灯时应停下，所以“Stop.”是合适的安全回答。",
+          "hints": [
+            "关键词：“红灯”“应该做什么”。根据交通安全规则判断动作，再匹配英语。"
+          ],
+          "tags": [
+            "dialogue",
+            "street"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "放学时同学说“See you tomorrow!”。你可以怎样回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning!"
+            },
+            {
+              "key": "B",
+              "label": "See you!"
+            },
+            {
+              "key": "C",
+              "label": "I am a book."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "告别时用“See you!”回应“明天见”自然又礼貌。",
+          "hints": [
+            "关键词：“See you tomorrow”“放学”。这是告别场景，要选择相应的告别表达。"
+          ],
+          "tags": [
+            "dialogue",
+            "goodbye"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "同学拿着一个球问“Is this your ball?”，这正是你的球。你应该回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is green."
+            },
+            {
+              "key": "B",
+              "label": "No, I can’t."
+            },
+            {
+              "key": "C",
+              "label": "Yes, it is."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "确认物品是自己的，可以用“Yes, it is.”作肯定回答。",
+          "hints": [
+            "关键词：“Is this your ball?”“正是你的”。这是确认物品的问题，需要肯定回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "objects"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "老师问“How are you?”，你感觉很好，哪一句回答最自然？",
+          "options": [
+            {
+              "key": "A",
+              "label": "I’m fine, thank you."
+            },
+            {
+              "key": "B",
+              "label": "I’m a chair."
+            },
+            {
+              "key": "C",
+              "label": "It is nine."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "“I’m fine, thank you.”是回答近况并表示礼貌的常用表达。",
+          "hints": [
+            "关键词：“How are you?”“感觉很好”。问题在问近况，要选择描述自己状态的回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "朋友问“What colour is your bag?”，你的书包是蓝色的。你应该回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is a bag."
+            },
+            {
+              "key": "B",
+              "label": "It is blue."
+            },
+            {
+              "key": "C",
+              "label": "It can swim."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "询问颜色时，用“It is blue.”回答书包的颜色。",
+          "hints": [
+            "关键词：“What colour”“蓝色”。问题只问颜色，回答中应该直接给出颜色词。"
+          ],
+          "tags": [
+            "dialogue",
+            "colours"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-DIALOGUE-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "商店阿姨问“Can I help you?”，你正需要帮助，可以怎样回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good night."
+            },
+            {
+              "key": "B",
+              "label": "I am seven."
+            },
+            {
+              "key": "C",
+              "label": "Yes, please."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "需要对方帮助时，用“Yes, please.”礼貌接受帮助。",
+          "hints": [
+            "关键词：“Can I help you?”“需要帮助”。这是提供帮助的提问，要选择礼貌接受的回答。"
+          ],
+          "tags": [
+            "dialogue",
+            "polite language"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·迷你阅读（二）",
+      "description": "用四段超短原创英语材料配中文问题，训练低年级从熟悉词句中提取人物、地点、颜色和动作。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "mini reading",
+        "阅读"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：Amy has a red bag. She goes to school with Ben.\nAmy的书包是什么颜色？",
+          "options": [
+            {
+              "key": "A",
+              "label": "red"
+            },
+            {
+              "key": "B",
+              "label": "blue"
+            },
+            {
+              "key": "C",
+              "label": "green"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "短文直接写“Amy has a red bag.”。",
+          "hints": [
+            "关键词：“Amy”“bag”“颜色”。在短文第一句找bag前面的颜色词。"
+          ],
+          "tags": [
+            "mini reading",
+            "colours"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "同一短文中，谁和Amy一起去学校？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Mum"
+            },
+            {
+              "key": "B",
+              "label": "Ben"
+            },
+            {
+              "key": "C",
+              "label": "Tom"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "第二句写“She goes to school with Ben.”。",
+          "hints": [
+            "关键词：“with”“一起去学校”。找with后面的人名。"
+          ],
+          "tags": [
+            "mini reading",
+            "people"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "Amy和Ben去哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "forest"
+            },
+            {
+              "key": "B",
+              "label": "dinner"
+            },
+            {
+              "key": "C",
+              "label": "school"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "短文中明确出现“goes to school”。",
+          "hints": [
+            "关键词：“goes to”“哪里”。找表示目的地的词。"
+          ],
+          "tags": [
+            "mini reading",
+            "places"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：Tom is in the playground. He can run and jump. His ball is blue.\nTom在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "playground"
+            },
+            {
+              "key": "B",
+              "label": "room"
+            },
+            {
+              "key": "C",
+              "label": "street"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "第一句写“Tom is in the playground.”。",
+          "hints": [
+            "关键词：“Tom”“在哪里”。直接定位第一句地点词。"
+          ],
+          "tags": [
+            "mini reading",
+            "places"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "Tom会做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "read and sleep"
+            },
+            {
+              "key": "B",
+              "label": "run and jump"
+            },
+            {
+              "key": "C",
+              "label": "cook and sing"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "短文第二句写“He can run and jump.”。",
+          "hints": [
+            "关键词：“can”“会做什么”。找到can后面的两个动作词。"
+          ],
+          "tags": [
+            "mini reading",
+            "actions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "Tom的球是什么颜色？",
+          "options": [
+            {
+              "key": "A",
+              "label": "red"
+            },
+            {
+              "key": "B",
+              "label": "yellow"
+            },
+            {
+              "key": "C",
+              "label": "blue"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "最后一句写“His ball is blue.”。",
+          "hints": [
+            "关键词：“ball”“颜色”。找ball所在句的颜色词。"
+          ],
+          "tags": [
+            "mini reading",
+            "colours"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：Mum is in the kitchen. Dinner is ready. I like rice and soup.\n谁在厨房？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Mum"
+            },
+            {
+              "key": "B",
+              "label": "Ben"
+            },
+            {
+              "key": "C",
+              "label": "Teacher"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "第一句写“Mum is in the kitchen.”。",
+          "hints": [
+            "关键词：“in the kitchen”“谁”。找到地点前面的主语。"
+          ],
+          "tags": [
+            "mini reading",
+            "family"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文中，晚餐是什么状态？",
+          "options": [
+            {
+              "key": "A",
+              "label": "not ready"
+            },
+            {
+              "key": "B",
+              "label": "ready"
+            },
+            {
+              "key": "C",
+              "label": "in the street"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "第二句“Dinner is ready.”表示晚餐已经准备好了。",
+          "hints": [
+            "关键词：“Dinner”“状态”。找描述晚餐是否准备好的词。"
+          ],
+          "tags": [
+            "mini reading",
+            "dinner"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "“我”喜欢什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "desk and chair"
+            },
+            {
+              "key": "B",
+              "label": "bus and bike"
+            },
+            {
+              "key": "C",
+              "label": "rice and soup"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "最后一句写“I like rice and soup.”。",
+          "hints": [
+            "关键词：“I like”。找like后面的两个食物词。"
+          ],
+          "tags": [
+            "mini reading",
+            "food"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "短文：It is evening. A bird is in the tree. A bus stops in the street.\n现在是什么时候？",
+          "options": [
+            {
+              "key": "A",
+              "label": "evening"
+            },
+            {
+              "key": "B",
+              "label": "morning"
+            },
+            {
+              "key": "C",
+              "label": "noon"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "第一句直接写“It is evening.”。",
+          "hints": [
+            "关键词：“什么时候”。找第一句表示时间的词。"
+          ],
+          "tags": [
+            "mini reading",
+            "time"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "鸟在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "on the bus"
+            },
+            {
+              "key": "B",
+              "label": "in the tree"
+            },
+            {
+              "key": "C",
+              "label": "under the desk"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "第二句写“A bird is in the tree.”。",
+          "hints": [
+            "关键词：“bird”“在哪里”。找bird所在句的位置短语。"
+          ],
+          "tags": [
+            "mini reading",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-MINI-READING-002-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "街道上停着什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "a bear"
+            },
+            {
+              "key": "B",
+              "label": "a bed"
+            },
+            {
+              "key": "C",
+              "label": "a bus"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "最后一句写“A bus stops in the street.”。",
+          "hints": [
+            "关键词：“in the street”“什么停着”。找到street前一句的交通工具。"
+          ],
+          "tags": [
+            "mini reading",
+            "transport"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ENGLISH-G2-S1-EXTRA-TASK-001",
+      "version": 1,
+      "grade": "G2",
+      "subject": "ENGLISH",
+      "semester": "S1",
+      "track": "EXTRACURRICULAR",
+      "title": "英语拓展·校园任务挑战（一）",
+      "description": "把问候、找物品、课堂指令、能力表达和礼貌用语组合成可完成的小任务，强化英语理解与实际回应。",
+      "difficulty": "L2",
+      "questionCount": 12,
+      "estimatedMinutes": 16,
+      "tags": [
+        "课外拓展",
+        "task English",
+        "school"
+      ],
+      "sourceType": "PRESET",
+      "status": "PUBLISHED",
+      "questions": [
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q01-V1",
+          "orderNo": 1,
+          "type": "SINGLE_CHOICE",
+          "stem": "早上你负责在教室门口迎接同学，最合适说什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Good morning!"
+            },
+            {
+              "key": "B",
+              "label": "Good night!"
+            },
+            {
+              "key": "C",
+              "label": "Stop!"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "早上见面用“Good morning!”最自然。",
+          "hints": [
+            "关键词：“早上”“迎接同学”。先判断时间和交际目的。"
+          ],
+          "tags": [
+            "task English",
+            "greetings"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q02-V1",
+          "orderNo": 2,
+          "type": "SINGLE_CHOICE",
+          "stem": "同学问“What’s your name?”，你叫Leo，应该怎样回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is red."
+            },
+            {
+              "key": "B",
+              "label": "I’m Leo."
+            },
+            {
+              "key": "C",
+              "label": "I can run."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "介绍自己的名字可以说“I’m Leo.”。",
+          "hints": [
+            "关键词：“What’s your name?”“Leo”。问题在问名字，要用自我介绍回答。"
+          ],
+          "tags": [
+            "task English",
+            "introduction"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q03-V1",
+          "orderNo": 3,
+          "type": "SINGLE_CHOICE",
+          "stem": "老师说“Open your book, please.”，你应该做什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "关上门"
+            },
+            {
+              "key": "B",
+              "label": "站到操场上"
+            },
+            {
+              "key": "C",
+              "label": "打开书"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“Open your book”表示打开书。",
+          "hints": [
+            "关键词：“Open”“book”。抓住动作词和物品词。"
+          ],
+          "tags": [
+            "task English",
+            "instructions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q04-V1",
+          "orderNo": 4,
+          "type": "SINGLE_CHOICE",
+          "stem": "你找不到铅笔，想问“我的铅笔在哪里？”，哪一句最合适？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Where is my pencil?"
+            },
+            {
+              "key": "B",
+              "label": "Who is my pencil?"
+            },
+            {
+              "key": "C",
+              "label": "Can my pencil swim?"
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "询问物品位置用“Where is...?”。",
+          "hints": [
+            "关键词：“在哪里”“铅笔”。找询问位置的句型。"
+          ],
+          "tags": [
+            "task English",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q05-V1",
+          "orderNo": 5,
+          "type": "SINGLE_CHOICE",
+          "stem": "朋友说“Your pencil is under the desk.”，铅笔在哪里？",
+          "options": [
+            {
+              "key": "A",
+              "label": "桌子上面"
+            },
+            {
+              "key": "B",
+              "label": "桌子下面"
+            },
+            {
+              "key": "C",
+              "label": "书包里面"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "“under the desk”表示在桌子下面。",
+          "hints": [
+            "关键词：“under the desk”。回忆under表示“在……下面”。"
+          ],
+          "tags": [
+            "task English",
+            "positions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q06-V1",
+          "orderNo": 6,
+          "type": "SINGLE_CHOICE",
+          "stem": "体育课老师问“Can you run?”，你会跑步，应该回答？",
+          "options": [
+            {
+              "key": "A",
+              "label": "It is blue."
+            },
+            {
+              "key": "B",
+              "label": "No, I can’t."
+            },
+            {
+              "key": "C",
+              "label": "Yes, I can."
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "会做某动作时，用“Yes, I can.”作肯定回答。",
+          "hints": [
+            "关键词：“Can you run?”“会”。这是能力的肯定回答。"
+          ],
+          "tags": [
+            "task English",
+            "can"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q07-V1",
+          "orderNo": 7,
+          "type": "SINGLE_CHOICE",
+          "stem": "同学借给你一块橡皮，用完后最礼貌说什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Thank you."
+            },
+            {
+              "key": "B",
+              "label": "Go away."
+            },
+            {
+              "key": "C",
+              "label": "Good night."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "得到同学帮助后说“Thank you.”表示感谢。",
+          "hints": [
+            "关键词：“借给你”“最礼貌”。这是接受帮助后的感谢场景。"
+          ],
+          "tags": [
+            "task English",
+            "polite language"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q08-V1",
+          "orderNo": 8,
+          "type": "SINGLE_CHOICE",
+          "stem": "你看到朋友手里拿着蓝色水杯，想问颜色，应该说哪一句？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Can it run?"
+            },
+            {
+              "key": "B",
+              "label": "What colour is it?"
+            },
+            {
+              "key": "C",
+              "label": "Who is your mum?"
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "询问颜色用“What colour is it?”。",
+          "hints": [
+            "关键词：“问颜色”。找含有colour的提问句。"
+          ],
+          "tags": [
+            "task English",
+            "colours"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q09-V1",
+          "orderNo": 9,
+          "type": "SINGLE_CHOICE",
+          "stem": "老师说“Please sit down.”，你应该怎样做？",
+          "options": [
+            {
+              "key": "A",
+              "label": "跑出去"
+            },
+            {
+              "key": "B",
+              "label": "举起水杯"
+            },
+            {
+              "key": "C",
+              "label": "坐下"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "“sit down”表示坐下。",
+          "hints": [
+            "关键词：“sit down”“指令”。理解动作词后选择对应行为。"
+          ],
+          "tags": [
+            "task English",
+            "instructions"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q10-V1",
+          "orderNo": 10,
+          "type": "SINGLE_CHOICE",
+          "stem": "放学准备离开教室时，可以对同学说什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "See you!"
+            },
+            {
+              "key": "B",
+              "label": "Dinner is ready."
+            },
+            {
+              "key": "C",
+              "label": "It is a forest."
+            }
+          ],
+          "answerSpec": "A",
+          "explanation": "离开时用“See you!”告别自然。",
+          "hints": [
+            "关键词：“放学”“离开”。这是结束见面的告别场景。"
+          ],
+          "tags": [
+            "task English",
+            "goodbye"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q11-V1",
+          "orderNo": 11,
+          "type": "SINGLE_CHOICE",
+          "stem": "午餐时你想表达“我喜欢面包”，应该说什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "Bread can jump."
+            },
+            {
+              "key": "B",
+              "label": "I like bread."
+            },
+            {
+              "key": "C",
+              "label": "I am bread."
+            }
+          ],
+          "answerSpec": "B",
+          "explanation": "表达喜好用“I like bread.”。",
+          "hints": [
+            "关键词：“喜欢”“面包”。找表示个人喜好的句型。"
+          ],
+          "tags": [
+            "task English",
+            "food"
+          ]
+        },
+        {
+          "id": "ENGLISH-G2-S1-EXTRA-TASK-001-Q12-V1",
+          "orderNo": 12,
+          "type": "SINGLE_CHOICE",
+          "stem": "过马路前爸爸提醒“Look at the light.”，你应该注意什么？",
+          "options": [
+            {
+              "key": "A",
+              "label": "书包"
+            },
+            {
+              "key": "B",
+              "label": "晚餐"
+            },
+            {
+              "key": "C",
+              "label": "交通灯"
+            }
+          ],
+          "answerSpec": "C",
+          "explanation": "街道情境中light指交通灯，过马路前应观察信号。",
+          "hints": [
+            "关键词：“过马路”“light”。结合地点判断这里的light指哪一种信号。"
+          ],
+          "tags": [
+            "task English",
+            "street"
+          ]
+        }
+      ]
+    }
+  ]
+}

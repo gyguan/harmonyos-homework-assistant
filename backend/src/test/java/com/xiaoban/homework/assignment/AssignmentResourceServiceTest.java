@@ -1,5 +1,6 @@
 package com.xiaoban.homework.assignment;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
@@ -30,17 +31,14 @@ class AssignmentResourceServiceTest {
   }
 
   @Test
-  void voiceAssignmentAllowsAtMostNineImages() {
+  void voiceAssignmentAllowsMoreThanNineImages() {
     AssignmentResourceService service = service();
-    MultipartFile audio =
-        new MockMultipartFile("audio", "lesson.mp3", "audio/mpeg", new byte[] {1});
     List<MultipartFile> images = new ArrayList<>();
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 12; i++) {
       images.add(new MockMultipartFile(
           "images", "scene-" + i + ".jpg", "image/jpeg", new byte[] {1}));
     }
 
-    assertThrows(ApiExceptions.BadRequest.class,
-        () -> service.createVoiceAssignment(null, "student-1", null, audio, images));
+    assertDoesNotThrow(() -> service.validateImages(images));
   }
 }

@@ -30,6 +30,7 @@ remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+shared_editor = read("entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
@@ -57,11 +58,11 @@ for duration in ["10", "15", "20", "30", "45"]:
             f"this.onMinutesChange(this.item, {duration})" in confirmation_components,
             f"parent confirmation must expose reactive quick duration option: {duration} minutes")
 require("预计用时" in confirmation_components and
-        "placeholder: '自定义'" in confirmation_components and
-        "if (minutes < 1) minutes = 1;" in confirmation_components and
-        "if (minutes > 240) minutes = 240;" in confirmation_components and
+        "placeholder: '自定义'" in shared_editor and
+        "if (minutes < 1) minutes = 1;" in shared_editor and
+        "if (minutes > 240) minutes = 240;" in shared_editor and
         "onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
-        "parent must be able to use preset or custom expected completion time before publishing")
+        "parent must be able to use quick presets or a custom expected completion time before publishing")
 # Student Home now presents the time budget inside each expanded subject task row instead of a
 # single hero assignment. Preserve the capability rather than the old component structure.
 require("`预计 ${item.expectedMinutes} 分钟`" in student_home and "StudentSubjectTaskGroupCard" in student_home,

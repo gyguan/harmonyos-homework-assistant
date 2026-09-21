@@ -12,11 +12,11 @@ export struct HomeworkImportRoutePage {
   build() {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       DeepPageHeader({
-        title: '导入老师作业',
-        subtitle: '老师原文 → 小伴整理 → 家长确认发布',
+        title: '手工导入作业',
         backAccessibilityText: '返回家长首页',
         onBack: () => this.onBack()
       });
+
       Column() {
         HomeworkImportPage({
           revision: this.revision,
@@ -30,7 +30,12 @@ export struct HomeworkImportRoutePage {
     }
     .width('100%')
     .height('100%')
-    .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: AppTheme.DEEP_PAGE_TOP_PADDING })
+    .alignItems(HorizontalAlign.Center)
+    .padding({
+      left: AppTheme.PAGE_PADDING,
+      right: AppTheme.PAGE_PADDING,
+      top: AppTheme.DEEP_PAGE_TOP_PADDING
+    })
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }

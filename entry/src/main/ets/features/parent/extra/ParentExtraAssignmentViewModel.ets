@@ -1,5 +1,6 @@
 import {
   Assignment,
+  AssignmentBacking,
   AssignmentContentType,
   AssignmentStatus,
   AssignmentType,
@@ -34,6 +35,7 @@ export class ParentExtraAssignmentViewModel {
       id: `a-extra-${student.id}-${Date.now()}-${Math.floor(Math.random() * 100000)}`,
       studentId: student.id,
       candidateId: '',
+      backing: AssignmentBacking.REMOTE,
       assignmentType: AssignmentType.EXTRA,
       subjectCode: this.subjectCode(draft.category),
       contentType: AssignmentContentType.NORMAL,

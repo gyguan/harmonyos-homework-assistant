@@ -16,19 +16,16 @@ export struct DeadlinePickerDialog {
             .fontSize(20)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
-          Text('日期和时间均使用北京时间')
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        Text('取消')
+        Text('关闭')
           .fontSize(13)
           .fontColor(AppTheme.SUBTEXT)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 12, right: 4 })
           .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('取消选择截止时间')
+          .accessibilityText('关闭截止时间选择')
           .onClick(() => this.controller.close());
       }
       .width('100%');
@@ -120,10 +117,9 @@ export struct DeadlinePickerField {
       return;
     }
 
-    let tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    tomorrow.setHours(0, 0, 0, 0);
-    this.selectedDate = tomorrow;
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    this.selectedDate = today;
     this.selectedTime = new Date(2000, 0, 1, 20, 0, 0, 0);
   }
 
@@ -150,10 +146,6 @@ export struct DeadlinePickerField {
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.value.length > 0 ? AppTheme.TEXT : AppTheme.SUBTEXT);
-          Text(this.value.length > 0 ? '点击修改日期和时间' : '点击选择日期和时间')
-            .width('100%')
-            .fontSize(11)
-            .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
