@@ -732,13 +732,6 @@ export struct StudyWorkspacePage {
                   .fontSize(17)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.TEXT);
-                Text('先说说你已经做到哪一步，小伴会给提示，不会直接替你完成。')
-                  .width('100%')
-                  .fontSize(13)
-                  .lineHeight(20)
-                  .textAlign(TextAlign.Center)
-                  .fontColor(AppTheme.SUBTEXT);
-
                 Row({ space: 8 }) {
                   this.TutorSuggestion('怎么开始？', '这题我不知道怎么开始，请先给我一个提示。');
                   this.TutorSuggestion('检查思路', '我已经有一个思路了，请帮我检查哪里需要调整。');
@@ -814,10 +807,6 @@ export struct StudyWorkspacePage {
               .fontSize(13)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            Blank();
-            Text('文字提问或拍题')
-              .fontSize(12)
-              .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%');
 
