@@ -2,17 +2,11 @@ import {
   AppRoute,
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
-  ParentCaptureRouteParam,
-  ParentSourceProfileRouteParam,
-  ParentCaptureSpikeRouteParam,
-  ParentImportBatchRouteParam,
-  ParentImportConfirmationRouteParam,
-  ParentImportInboxRouteParam,
-  ParentImportRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
   PracticePaperRouteParam
 } from '../app/navigation/AppRoutes';
+import { ParentImportNavigator } from '../app/navigation/ParentImportNavigator';
 import { HomeworkCaptureSessionService } from '../application/capture/HomeworkCaptureSessionService';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
@@ -220,62 +214,9 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
   }
 
-  private openParentImport(): void {
-    this.navPathStack.pushPathByName(AppRoute.PARENT_IMPORT, new ParentImportRouteParam());
-  }
-
-  private finishShareImportReady(): void {
-    this.parentRoute = ParentRoute.DASHBOARD;
-    this.navPathStack.clear();
-    this.openParentImportConfirmation();
-    this.shareImportToken = '';
-  }
-
-  private finishShareImportEmpty(): void {
-    this.parentRoute = ParentRoute.DASHBOARD;
-    this.navPathStack.clear();
-    this.openParentImportInbox();
-    this.shareImportToken = '';
-  }
-
-  private cancelShareImport(): void {
-    this.shareImportToken = '';
-  }
-
-  private openParentImportInbox(): void {
-    this.navPathStack.pushPathByName(
-      AppRoute.PARENT_IMPORT_INBOX, new ParentImportInboxRouteParam());
-  }
-
-  private openParentImportBatch(batchId: string): void {
-    this.navPathStack.pushPathByName(
-      AppRoute.PARENT_IMPORT_BATCH_DETAIL, new ParentImportBatchRouteParam(batchId));
-  }
-
-  private openParentCapture(): void {
-    this.navPathStack.pushPathByName(
-      AppRoute.PARENT_CAPTURE, new ParentCaptureRouteParam());
-  }
-
-  private openParentSourceProfile(startCaptureAfterSave: boolean = false): void {
-    this.navPathStack.pushPathByName(
-      AppRoute.PARENT_SOURCE_PROFILE, new ParentSourceProfileRouteParam(startCaptureAfterSave));
-  }
-
   private finishSourceProfile(startCaptureAfterSave: boolean): void {
-    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    ParentImportNavigator.finishSourceProfile(this.navPathStack, startCaptureAfterSave);
     this.notifyUiChanged();
-    if (startCaptureAfterSave) this.openParentCapture();
-  }
-
-  private openParentCaptureSpike(): void {
-    this.navPathStack.pushPathByName(
-      AppRoute.PARENT_CAPTURE_SPIKE, new ParentCaptureSpikeRouteParam());
-  }
-
-  private openParentImportConfirmation(): void {
-    this.navPathStack.pushPathByName(
-      AppRoute.PARENT_IMPORT_CONFIRMATION, new ParentImportConfirmationRouteParam());
   }
 
   private openParentExtraCreate(voice: boolean = false): void {
@@ -401,12 +342,12 @@ export struct AppShell {
         HomeworkImportRoutePage({
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
-          onOpenConfirmation: () => this.openParentImportConfirmation(),
-          onOpenInbox: () => this.openParentImportInbox(),
-          onOpenCapture: () => this.openParentCapture(),
+          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
+          onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
+          onOpenCapture: () => ParentImportNavigator.openCapture(this.navPathStack),
           onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
-            this.openParentSourceProfile(startCaptureAfterSave),
-          onOpenCaptureSpike: () => this.openParentCaptureSpike(),
+            ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave),
+          onOpenCaptureSpike: () => ParentImportNavigator.openCaptureSpike(this.navPathStack),
           onStoreChanged: () => this.notifyUiChanged()
         });
       }
@@ -416,7 +357,7 @@ export struct AppShell {
       NavDestination() {
         HomeworkImportInboxPage({
           onBack: () => this.navPathStack.pop(),
-          onOpenBatch: (batchId: string) => this.openParentImportBatch(batchId)
+          onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(this.navPathStack, batchId)
         });
       }
       .hideTitleBar(true)
@@ -424,9 +365,9 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_IMPORT_BATCH_DETAIL) {
       NavDestination() {
         HomeworkImportBatchDetailPage({
-          batchId: (param as ParentImportBatchRouteParam).batchId,
+          batchId: ParentImportNavigator.batchId(param),
           onBack: () => this.navPathStack.pop(),
-          onOpenConfirmation: () => this.openParentImportConfirmation()
+          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack)
         });
       }
       .hideTitleBar(true)
@@ -435,10 +376,10 @@ export struct AppShell {
       NavDestination() {
         HomeworkCapturePage({
           onBack: () => this.navPathStack.pop(),
-          onOpenInbox: () => this.openParentImportInbox(),
-          onOpenConfirmation: () => this.openParentImportConfirmation(),
+          onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
+          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
           onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
-            this.openParentSourceProfile(startCaptureAfterSave)
+            ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave)
         });
       }
       .hideTitleBar(true)
@@ -446,10 +387,10 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_SOURCE_PROFILE) {
       NavDestination() {
         HomeworkSourceProfilePage({
-          startCaptureAfterSave: (param as ParentSourceProfileRouteParam).startCaptureAfterSave,
+          startCaptureAfterSave: ParentImportNavigator.sourceProfileStartCapture(param),
           onBack: () => this.navPathStack.pop(),
           onSavedAndCapture: () => this.finishSourceProfile(
-            (param as ParentSourceProfileRouteParam).startCaptureAfterSave)
+            ParentImportNavigator.sourceProfileStartCapture(param))
         });
       }
       .hideTitleBar(true)
@@ -510,7 +451,7 @@ export struct AppShell {
       ParentDashboardPage({
         revision: this.storeRevision,
         activeStudentId: this.activeStudentId,
-        onOpenImport: () => this.openParentImport(),
+        onOpenImport: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenExtra: () => this.openParentExtraCreate(false),
         onOpenVoice: () => this.openParentExtraCreate(true),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
