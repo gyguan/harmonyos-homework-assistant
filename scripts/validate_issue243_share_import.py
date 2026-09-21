@@ -123,8 +123,8 @@ require("Button('重试'" in status and "this.retry()" in status,
         "failed share import must be retryable")
 require("HomeworkShareImportService.instance.cancel" in status,
         "share handoff cancellation must clean pending data")
-require("半成品作业" in status,
-        "UI must make the all-or-nothing behavior explicit")
+require("半成品作业" not in status,
+        "share status UI should not expose transactional implementation details")
 
 for source in [extension, receiver, processor]:
     require("AssignmentStateMachine" not in source and "AssignmentRepository" not in source,
