@@ -6,6 +6,7 @@ import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
 import { DefaultFamilyContextRepository } from '../../data/repository/DefaultFamilyContextRepository';
 import { Issue244CaptureSessionFixture } from './Issue244CaptureSessionFixture';
+import { Issue245ChatReconstructionFixture } from './Issue245ChatReconstructionFixture';
 import {
   HomeworkCaptureOcrLine,
   HomeworkCaptureOcrResult,
@@ -25,6 +26,7 @@ export struct HomeworkCaptureSpikePage {
   @State private ocrLines: HomeworkCaptureOcrLine[] = [];
   @State private running: boolean = false;
   @State private issue244FixtureStatus: string = 'PENDING';
+  @State private issue245FixtureStatus: string = 'PENDING';
 
   private floatViewController: floatView.FloatViewController | undefined = undefined;
   private readonly ocrService: HomeworkCaptureOcrService = new HomeworkCaptureOcrService();
@@ -180,6 +182,22 @@ export struct HomeworkCaptureSpikePage {
     }
   }
 
+  private runIssue245Fixture(): void {
+    if (this.running) {
+      this.issue245FixtureStatus = 'FAIL · 请先停止 #241 真机采集';
+      return;
+    }
+    this.issue245FixtureStatus = 'RUNNING';
+    try {
+      let result = Issue245ChatReconstructionFixture.run();
+      this.issue245FixtureStatus = result.passed ?
+        `PASS · 5 frames → ${result.messageCount} unique · A证据=${result.repeatedMessageEvidenceCount} · boundary=${result.earliestDetectedTime}` :
+        'FAIL · #245 Fixture 结果不满足重建 Gate';
+    } catch (error) {
+      this.issue245FixtureStatus = `FAIL · ${error}`;
+    }
+  }
+
   private async readAndRecognize(): Promise<void> {
     let stats = this.updateStats();
     if (stats.isCapturing) {
@@ -313,6 +331,36 @@ export struct HomeworkCaptureSpikePage {
               .fontColor(AppTheme.PRIMARY)
               .enabled(!this.running)
               .onClick(() => { void this.runIssue244Fixture(); });
+          }
+          .width('100%')
+          .padding(14)
+          .backgroundColor(AppTheme.SURFACE)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+
+          Column({ space: 8 }) {
+            Text('#245 聊天重建 Fixture')
+              .width('100%')
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text('5 个 50% 重叠 Frame：验证顺序重建、重复消息合并、时间边界、缺时间、图片与 OCR 失败容错。')
+              .width('100%')
+              .fontSize(11)
+              .lineHeight(17)
+              .fontColor(AppTheme.SUBTEXT);
+            Text(this.issue245FixtureStatus)
+              .width('100%')
+              .fontSize(12)
+              .fontColor(this.issue245FixtureStatus.startsWith('FAIL') ? AppTheme.DANGER :
+                (this.issue245FixtureStatus.startsWith('PASS') ? AppTheme.SUCCESS : AppTheme.SUBTEXT));
+            Button('运行 #245 聊天重建自测', { type: ButtonType.Normal })
+              .width('100%')
+              .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .backgroundColor(AppTheme.PRIMARY_SOFT)
+              .fontColor(AppTheme.PRIMARY)
+              .enabled(!this.running)
+              .onClick(() => this.runIssue245Fixture());
           }
           .width('100%')
           .padding(14)
