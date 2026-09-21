@@ -10,6 +10,7 @@ export enum AppRoute {
   PARENT_IMPORT_INBOX = 'parent/import/inbox',
   PARENT_IMPORT_BATCH_DETAIL = 'parent/import/inbox/detail',
   PARENT_CAPTURE = 'parent/import/capture',
+  PARENT_SOURCE_PROFILE = 'parent/import/source-profile',
   PARENT_CAPTURE_SPIKE = 'parent/import/capture-spike',
   PARENT_IMPORT_CONFIRMATION = 'parent/import/confirmation',
   PARENT_EXTRA_CREATE = 'parent/extra/create'
@@ -59,6 +60,9 @@ export class ParentImportBatchRouteParam {
 }
 
 export class ParentCaptureRouteParam {
+}
+
+export class ParentSourceProfileRouteParam {
 }
 
 export class ParentCaptureSpikeRouteParam {
