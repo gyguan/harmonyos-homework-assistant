@@ -134,6 +134,12 @@ export class HomeworkImportInboxService {
       sourceLabel: batch.sourceLabel,
       sourceProfileId: batch.sourceProfileId,
       captureSessionId: batch.captureSessionId,
+      reconstructed: batch.reconstructed,
+      groupTitle: batch.groupTitle,
+      timeBoundaryReached: batch.timeBoundaryReached,
+      earliestDetectedTime: batch.earliestDetectedTime,
+      reconstructionWarnings: batch.reconstructionWarnings === undefined ?
+        undefined : batch.reconstructionWarnings.slice(),
       createdAtEpochMs: batch.createdAtEpochMs,
       status: normalized.length > 0 ? ImportBatchStatus.READY :
         (batch.status === ImportBatchStatus.RECEIVED ? ImportBatchStatus.RECEIVED : ImportBatchStatus.EMPTY),
