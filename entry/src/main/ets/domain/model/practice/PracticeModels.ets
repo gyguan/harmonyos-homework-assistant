@@ -31,6 +31,12 @@ export enum PracticeTrackFilter {
   EXTRACURRICULAR = 'EXTRACURRICULAR'
 }
 
+export enum PracticePassFilter {
+  ALL = 'ALL',
+  PASSED = 'PASSED',
+  NOT_PASSED = 'NOT_PASSED'
+}
+
 export enum PracticeDifficulty {
   L1 = 'L1',
   L2 = 'L2',
@@ -253,6 +259,12 @@ export class PracticeTaxonomy {
   static trackFilterLabel(track: PracticeTrackFilter): string {
     if (track === PracticeTrackFilter.TEXTBOOK_SYNC) return '教材同步';
     if (track === PracticeTrackFilter.EXTRACURRICULAR) return '课外拓展';
+    return '全部';
+  }
+
+  static passFilterLabel(filter: PracticePassFilter): string {
+    if (filter === PracticePassFilter.PASSED) return '已通过';
+    if (filter === PracticePassFilter.NOT_PASSED) return '未通过';
     return '全部';
   }
 
