@@ -135,7 +135,8 @@ export class HomeworkImportInboxService {
       sourceProfileId: batch.sourceProfileId,
       captureSessionId: batch.captureSessionId,
       createdAtEpochMs: batch.createdAtEpochMs,
-      status: normalized.length > 0 ? ImportBatchStatus.READY : ImportBatchStatus.EMPTY,
+      status: normalized.length > 0 ? ImportBatchStatus.READY :
+        (batch.status === ImportBatchStatus.RECEIVED ? ImportBatchStatus.RECEIVED : ImportBatchStatus.EMPTY),
       messageCount: messages.length,
       candidateCount: normalized.length
     };
