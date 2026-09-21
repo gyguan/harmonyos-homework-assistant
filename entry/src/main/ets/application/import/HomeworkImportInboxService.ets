@@ -141,6 +141,7 @@ export class HomeworkImportInboxService {
       reconstructionWarnings: batch.reconstructionWarnings === undefined ?
         undefined : batch.reconstructionWarnings.slice(),
       understood: batch.understood,
+      understandingVersion: batch.understandingVersion,
       pendingReviewMessageIds: batch.pendingReviewMessageIds === undefined ?
         undefined : batch.pendingReviewMessageIds.slice(),
       understandingWarnings: batch.understandingWarnings === undefined ?
