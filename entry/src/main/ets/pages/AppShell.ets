@@ -3,6 +3,7 @@ import {
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
   ParentCaptureRouteParam,
+  ParentSourceProfileRouteParam,
   ParentCaptureSpikeRouteParam,
   ParentImportBatchRouteParam,
   ParentImportConfirmationRouteParam,
@@ -33,6 +34,7 @@ import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImpor
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
 import { HomeworkCapturePage } from '../features/parent/import/HomeworkCapturePage';
+import { HomeworkSourceProfilePage } from '../features/parent/import/HomeworkSourceProfilePage';
 import { HomeworkCaptureSpikePage } from '../experimental/homeworkcapture/HomeworkCaptureSpikePage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
@@ -255,6 +257,17 @@ export struct AppShell {
       AppRoute.PARENT_CAPTURE, new ParentCaptureRouteParam());
   }
 
+  private openParentSourceProfile(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_SOURCE_PROFILE, new ParentSourceProfileRouteParam());
+  }
+
+  private finishSourceProfileAndCapture(): void {
+    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    this.notifyUiChanged();
+    this.openParentCapture();
+  }
+
   private openParentCaptureSpike(): void {
     this.navPathStack.pushPathByName(
       AppRoute.PARENT_CAPTURE_SPIKE, new ParentCaptureSpikeRouteParam());
@@ -391,6 +404,7 @@ export struct AppShell {
           onOpenConfirmation: () => this.openParentImportConfirmation(),
           onOpenInbox: () => this.openParentImportInbox(),
           onOpenCapture: () => this.openParentCapture(),
+          onOpenSourceProfile: () => this.openParentSourceProfile(),
           onOpenCaptureSpike: () => this.openParentCaptureSpike(),
           onStoreChanged: () => this.notifyUiChanged()
         });
@@ -421,6 +435,15 @@ export struct AppShell {
         HomeworkCapturePage({
           onBack: () => this.navPathStack.pop(),
           onOpenInbox: () => this.openParentImportInbox()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_SOURCE_PROFILE) {
+      NavDestination() {
+        HomeworkSourceProfilePage({
+          onBack: () => this.navPathStack.pop(),
+          onSavedAndCapture: () => this.finishSourceProfileAndCapture()
         });
       }
       .hideTitleBar(true)
