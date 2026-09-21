@@ -65,7 +65,7 @@ export class HomeworkCaptureWorkflowService {
       session: session,
       profile: profile,
       detectedGroupTitle: result.groupTitle,
-      groupValidationStatus: this.validateGroup(profile.groupTitle, result.groupTitle),
+      groupValidationStatus: this.validateGroupTitle(profile.groupTitle, result.groupTitle),
       timeBoundaryReached: result.timeBoundaryReached,
       earliestDetectedTime: result.earliestDetectedTime
     };
@@ -95,7 +95,7 @@ export class HomeworkCaptureWorkflowService {
     let profile = this.requireProfile(session.sourceProfileId, session.studentId);
     let reconstruction = HomeworkChatReconstructionService.instance.reconstructCaptureSession(
       session.id, session.importBatchId, profile.defaultStartMinuteOfDay);
-    let validation = this.validateGroup(profile.groupTitle, reconstruction.groupTitle);
+    let validation = this.validateGroupTitle(profile.groupTitle, reconstruction.groupTitle);
 
     this.writeProfileAudit(
       session.importBatchId,
@@ -187,7 +187,7 @@ export class HomeworkCaptureWorkflowService {
     return date.getTime() + minuteOfDay * 60 * 1000;
   }
 
-  private validateGroup(expected: string, detected: string): SourceGroupValidationStatus {
+  validateGroupTitle(expected: string, detected: string): SourceGroupValidationStatus {
     let normalizedDetected = this.normalizeTitle(detected);
     if (normalizedDetected.length === 0) return SourceGroupValidationStatus.UNRECOGNIZED;
     return normalizedDetected === this.normalizeTitle(expected) ?
