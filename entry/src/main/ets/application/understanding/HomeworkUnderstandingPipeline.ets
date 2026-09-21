@@ -23,7 +23,7 @@ export class HomeworkUnderstandingPipeline {
   private readonly revisionResolver: DeterministicHomeworkRevisionResolver =
     new DeterministicHomeworkRevisionResolver(this.extractor);
 
-  understand(batchId: string, studentId: string, sourceLabel: string,
+  understand(batchId: string, studentId: string, sourceLabel: string, sourceType: string,
     messages: ImportedMessage[], config: HomeworkUnderstandingConfig): HomeworkUnderstandingResult {
     let classified: ClassifiedHomeworkMessage[] = [];
     let pendingReviewMessageIds: string[] = [];
@@ -61,7 +61,7 @@ export class HomeworkUnderstandingPipeline {
     let candidates: CandidateAssignment[] = [];
     for (let i = 0; i < tasks.length; i++) {
       candidates.push(this.toCandidate(
-        batchId, studentId, sourceLabel, tasks[i], ordered, i + 1));
+        batchId, studentId, sourceLabel, sourceType, tasks[i], ordered, i + 1));
     }
 
     return {
@@ -102,7 +102,7 @@ export class HomeworkUnderstandingPipeline {
     return result;
   }
 
-  private toCandidate(batchId: string, studentId: string, sourceLabel: string,
+  private toCandidate(batchId: string, studentId: string, sourceLabel: string, sourceType: string,
     task: HomeworkTaskDraft, messages: ImportedMessage[], sequence: number): CandidateAssignment {
     let rawTextParts: string[] = [];
     let capturedAt = 0;
@@ -127,7 +127,7 @@ export class HomeworkUnderstandingPipeline {
         sourceLabel: sourceLabel,
         excerpt: rawText.length > 0 ? rawText : task.title,
         batchId: batchId,
-        sourceType: 'SCREEN_CAPTURE',
+        sourceType: sourceType,
         sourceMessageIds: task.sourceMessageIds.slice(),
         rawText: rawText,
         imageRef: '',
