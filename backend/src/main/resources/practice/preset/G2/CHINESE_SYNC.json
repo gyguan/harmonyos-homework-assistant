@@ -6,7 +6,7 @@
   "papers": [
     {
       "id": "CHINESE-G2-S1-SYNC-WORDS-001",
-      "version": 2,
+      "version": 3,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -25,7 +25,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q01-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q01-V3",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "放学时，天空下起雨。和“晴朗”意思相反的词更接近哪一个？",
@@ -46,7 +46,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“晴朗”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "字词",
@@ -54,7 +54,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q02-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q02-V3",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "社区花园里有一___小路，应该填哪个量词？",
@@ -75,7 +75,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“小路”“量词”。想一想平时这个名词前面最自然地说“一什么/几什么”。"
           ],
           "tags": [
             "字词",
@@ -83,7 +83,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q03-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q03-V3",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "妈妈提醒小乐“仔细检查书包”。“仔细”的反义词更接近？",
@@ -104,7 +104,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“仔细”“意思相反”。先想清“仔细”在句子里的意思，再找意义方向相反的词。"
           ],
           "tags": [
             "字词",
@@ -112,7 +112,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q04-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q04-V3",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "图书馆里大家轻轻翻书。“安静”的近义词更接近？",
@@ -133,7 +133,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“安静”“意思相近”。把“安静”放回原句读一读，再找意思接近的词。"
           ],
           "tags": [
             "字词",
@@ -141,7 +141,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q05-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q05-V3",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "早晨，阳光照进教室。“明亮”主要是在说什么？",
@@ -162,7 +162,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“明亮”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "字词",
@@ -170,7 +170,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q06-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q06-V3",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "小区门口停着一___公交车，应该填？",
@@ -191,7 +191,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“公交车”“量词”。想一想平时这个名词前面最自然地说“一什么/几什么”。"
           ],
           "tags": [
             "字词",
@@ -199,7 +199,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q07-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q07-V3",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "爷爷在阳台上种了几___花，应该填？",
@@ -220,7 +220,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“花”“量词”。想一想平时这个名词前面最自然地说“一什么/几什么”。"
           ],
           "tags": [
             "字词",
@@ -228,7 +228,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q08-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q08-V3",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "“同学们陆续走进教室”中的“陆续”更接近？",
@@ -249,7 +249,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“陆续”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "字词",
@@ -257,7 +257,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q09-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q09-V3",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "“温暖的阳光”中“温暖”最适合形容什么感受？",
@@ -278,7 +278,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“温暖”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "字词",
@@ -286,7 +286,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q10-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q10-V3",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪组词都是表示动作的？",
@@ -307,7 +307,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“动作”。想一想哪些词表示“人或事物正在做什么”，不要把颜色、地点当成动作。"
           ],
           "tags": [
             "字词",
@@ -315,7 +315,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q11-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q11-V3",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "“弯弯的小路”中的“弯弯”主要写出了小路的什么？",
@@ -336,7 +336,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“弯弯”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "字词",
@@ -344,7 +344,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q12-V2",
+          "id": "CHINESE-G2-S1-SYNC-WORDS-001-Q12-V3",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "周末公园里很“热闹”。下面哪个场景最符合“热闹”？",
@@ -365,7 +365,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“热闹”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "字词",
@@ -376,7 +376,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-SENTENCE-001",
-      "version": 2,
+      "version": 3,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -395,7 +395,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q01-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q01-V3",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "老师问：“你今天带水杯了吗___”应填什么标点？",
@@ -416,7 +416,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“”应填什么标点”“量词”。想一想平时这个名词前面最自然地说“一什么/几什么”。"
           ],
           "tags": [
             "句子",
@@ -424,7 +424,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q02-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q02-V3",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "运动会上，小华跑得很快。下面哪一句最完整？",
@@ -445,7 +445,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“句子完整”。检查有没有说清“谁、在哪里、做什么”，避免只有一个词或短语。"
           ],
           "tags": [
             "句子",
@@ -453,7 +453,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q03-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q03-V3",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "“因为今天下雨，___我们带了雨伞。”横线上填什么最合适？",
@@ -474,7 +474,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“我们带了雨伞”“量词”。想一想平时这个名词前面最自然地说“一什么/几什么”。"
           ],
           "tags": [
             "句子",
@@ -482,7 +482,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q04-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q04-V3",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "妈妈说：“先洗手，再吃饭。”这句话表示什么？",
@@ -503,7 +503,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“先、再”。先确定两件事发生的先后，再判断句子表达的关系。"
           ],
           "tags": [
             "句子",
@@ -511,7 +511,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q05-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q05-V3",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句语序最自然？",
@@ -532,7 +532,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“语序自然”。按“谁—在哪里—做什么”的顺序读一读，哪一句最通顺就重点考虑。"
           ],
           "tags": [
             "句子",
@@ -540,7 +540,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q06-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q06-V3",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "“我把书放回书架。”谁做了动作？",
@@ -561,7 +561,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“把”。先找“谁”发出动作，再看“把”后面的事物发生了什么变化。"
           ],
           "tags": [
             "句子",
@@ -569,7 +569,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q07-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q07-V3",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "“足球被小明踢进球门。”什么东西被踢进了球门？",
@@ -590,7 +590,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“被”。先找“什么东西被怎么样”，不要把做动作的人当成被作用的事物。"
           ],
           "tags": [
             "句子",
@@ -598,7 +598,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q08-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q08-V3",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "看到同学获得奖状，最合适的一句话是？",
@@ -619,7 +619,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“看到同学获得奖状最合适的一句”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "句子",
@@ -627,7 +627,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q09-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q09-V3",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "“教室里很安静，同学们都在认真阅读。”可以知道？",
@@ -648,7 +648,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“教室里很安静，同学们都在认真阅读。”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "句子",
@@ -656,7 +656,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q10-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q10-V3",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "“小树长高了。”如果补充时间，哪一句更自然？",
@@ -677,7 +677,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“补充信息”。保留原句的人物和动作，再增加时间、地点或怎样做，让句子更具体。"
           ],
           "tags": [
             "句子",
@@ -685,7 +685,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q11-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q11-V3",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "放学前老师提醒：“请把桌面整理好___”最合适的标点是？",
@@ -706,7 +706,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“”最合适的标点是”“量词”。想一想平时这个名词前面最自然地说“一什么/几什么”。"
           ],
           "tags": [
             "句子",
@@ -714,7 +714,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q12-V2",
+          "id": "CHINESE-G2-S1-SYNC-SENTENCE-001-Q12-V3",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪一句用了合适的词语搭配？",
@@ -735,7 +735,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“下面哪一句用了合适的词语搭配”。先找题目真正要判断的对象和要求，再逐项排除不符合题意的选项。"
           ],
           "tags": [
             "句子",
@@ -746,7 +746,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001",
-      "version": 2,
+      "version": 3,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -765,7 +765,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q01-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q01-V3",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周五放学后，乐乐先把课桌里的纸屑收好，再和值日同学一起扫地。离开教室前，他还检查了窗户有没有关好。\n乐乐放学后先做了什么？",
@@ -786,7 +786,7 @@
           "answerSpec": "A",
           "explanation": "短文先写了他收拾课桌。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“先、后来、最后”。按短文中事情发生的先后顺序梳理，不要跳过中间动作。"
           ],
           "tags": [
             "阅读",
@@ -794,7 +794,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q02-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q02-V3",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周五放学后，乐乐先把课桌里的纸屑收好，再和值日同学一起扫地。离开教室前，他还检查了窗户有没有关好。\n乐乐后来和谁一起扫地？",
@@ -815,7 +815,7 @@
           "answerSpec": "B",
           "explanation": "文中写和值日同学一起扫地。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“先、后来、最后”。按短文中事情发生的先后顺序梳理，不要跳过中间动作。"
           ],
           "tags": [
             "阅读",
@@ -823,7 +823,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q03-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q03-V3",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周五放学后，乐乐先把课桌里的纸屑收好，再和值日同学一起扫地。离开教室前，他还检查了窗户有没有关好。\n离开教室前，他还检查了什么？",
@@ -844,7 +844,7 @@
           "answerSpec": "C",
           "explanation": "最后写他检查窗户。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“离开教室前他还检查了什么”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -852,7 +852,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q04-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q04-V3",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周五放学后，乐乐先把课桌里的纸屑收好，再和值日同学一起扫地。离开教室前，他还检查了窗户有没有关好。\n乐乐做事给人的感觉更接近？",
@@ -873,7 +873,7 @@
           "answerSpec": "A",
           "explanation": "能主动收拾并检查窗户，说明认真负责。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“人物的做法/表现”。先找文中人物具体做了什么，再根据这些行为判断特点或含义。"
           ],
           "tags": [
             "阅读",
@@ -881,7 +881,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q05-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q05-V3",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周末，妈妈带小雨去社区图书馆。小雨挑了一本童话书，找到靠窗的位置安静阅读。看完后，她把书放回原处，又向管理员阿姨说了谢谢。\n小雨去了哪里？",
@@ -902,7 +902,7 @@
           "answerSpec": "B",
           "explanation": "短文开头说明去了社区图书馆。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“哪里/地点”。回到短文里找表示地点的词，注意不要和人物或时间混淆。"
           ],
           "tags": [
             "阅读",
@@ -910,7 +910,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q06-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q06-V3",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周末，妈妈带小雨去社区图书馆。小雨挑了一本童话书，找到靠窗的位置安静阅读。看完后，她把书放回原处，又向管理员阿姨说了谢谢。\n她挑了什么书？",
@@ -931,7 +931,7 @@
           "answerSpec": "C",
           "explanation": "文中写挑了一本童话书。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“她挑了什么书”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -939,7 +939,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q07-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q07-V3",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周末，妈妈带小雨去社区图书馆。小雨挑了一本童话书，找到靠窗的位置安静阅读。看完后，她把书放回原处，又向管理员阿姨说了谢谢。\n看完书后她怎么做？",
@@ -960,7 +960,7 @@
           "answerSpec": "A",
           "explanation": "短文明确写放回原处。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“看完书后她怎么做”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -968,7 +968,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q08-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q08-V3",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：周末，妈妈带小雨去社区图书馆。小雨挑了一本童话书，找到靠窗的位置安静阅读。看完后，她把书放回原处，又向管理员阿姨说了谢谢。\n从她的做法可以看出？",
@@ -989,7 +989,7 @@
           "answerSpec": "B",
           "explanation": "爱护图书并主动道谢。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“人物的做法/表现”。先找文中人物具体做了什么，再根据这些行为判断特点或含义。"
           ],
           "tags": [
             "阅读",
@@ -997,7 +997,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q09-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q09-V3",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：早晨下起小雨，爸爸提醒安安带伞。到了学校，安安发现同桌没有伞，就和同桌一起撑伞走到教学楼。\n谁提醒安安带伞？",
@@ -1018,7 +1018,7 @@
           "answerSpec": "C",
           "explanation": "爸爸提醒安安带伞。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“人物的做法/表现”。先找文中人物具体做了什么，再根据这些行为判断特点或含义。"
           ],
           "tags": [
             "阅读",
@@ -1026,7 +1026,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q10-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q10-V3",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：早晨下起小雨，爸爸提醒安安带伞。到了学校，安安发现同桌没有伞，就和同桌一起撑伞走到教学楼。\n同桌遇到了什么问题？",
@@ -1047,7 +1047,7 @@
           "answerSpec": "A",
           "explanation": "文中写同桌没有伞。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“同桌遇到了什么问题”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -1055,7 +1055,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q11-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q11-V3",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：早晨下起小雨，爸爸提醒安安带伞。到了学校，安安发现同桌没有伞，就和同桌一起撑伞走到教学楼。\n安安怎么帮助同桌？",
@@ -1076,7 +1076,7 @@
           "answerSpec": "B",
           "explanation": "安安和同桌一起撑伞。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“安安怎么帮助同桌”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -1084,7 +1084,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q12-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-LIFE-001-Q12-V3",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：早晨下起小雨，爸爸提醒安安带伞。到了学校，安安发现同桌没有伞，就和同桌一起撑伞走到教学楼。\n安安是个怎样的孩子？",
@@ -1105,7 +1105,7 @@
           "answerSpec": "C",
           "explanation": "他主动和同桌共用雨伞。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“人物的做法/表现”。先找文中人物具体做了什么，再根据这些行为判断特点或含义。"
           ],
           "tags": [
             "阅读",
@@ -1116,7 +1116,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001",
-      "version": 2,
+      "version": 3,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -1135,7 +1135,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q01-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q01-V3",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，校园里的木棉树叶有的变黄了。风一吹，几片叶子轻轻落到草地上。小朋友捡起完整的叶子，夹进旧杂志里做标本。\n短文写的是哪个季节？",
@@ -1156,7 +1156,7 @@
           "answerSpec": "A",
           "explanation": "开头写秋天到了。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“短文写的是哪个季节”。回到短文中找表示时间或季节的词，再和题目对应。"
           ],
           "tags": [
             "阅读",
@@ -1164,7 +1164,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q02-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q02-V3",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，校园里的木棉树叶有的变黄了。风一吹，几片叶子轻轻落到草地上。小朋友捡起完整的叶子，夹进旧杂志里做标本。\n风吹来后发生了什么？",
@@ -1185,7 +1185,7 @@
           "answerSpec": "B",
           "explanation": "文中写叶子轻轻落下。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“风吹来后发生了什么”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -1193,7 +1193,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q03-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q03-V3",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，校园里的木棉树叶有的变黄了。风一吹，几片叶子轻轻落到草地上。小朋友捡起完整的叶子，夹进旧杂志里做标本。\n小朋友捡叶子做什么？",
@@ -1214,7 +1214,7 @@
           "answerSpec": "C",
           "explanation": "他们把叶子夹进杂志做标本。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“小朋友捡叶子做什么”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -1222,7 +1222,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q04-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q04-V3",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：秋天到了，校园里的木棉树叶有的变黄了。风一吹，几片叶子轻轻落到草地上。小朋友捡起完整的叶子，夹进旧杂志里做标本。\n“轻轻落到草地”中的“轻轻”让人感觉叶子？",
@@ -1243,7 +1243,7 @@
           "answerSpec": "A",
           "explanation": "“轻轻”写出了叶子下落的轻柔。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“轻轻”。把这个词放回原句中读一遍，结合前后内容理解它的意思。"
           ],
           "tags": [
             "阅读",
@@ -1251,7 +1251,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q05-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q05-V3",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：清晨，草叶上挂着小水珠。太阳出来后，水珠越来越小，过了一会儿就看不见了。小杰觉得很有趣，蹲下来观察了很久。\n草叶上开始有什么？",
@@ -1272,7 +1272,7 @@
           "answerSpec": "B",
           "explanation": "第一句写草叶上挂着小水珠。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“草叶上开始有什么”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -1280,7 +1280,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q06-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q06-V3",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：清晨，草叶上挂着小水珠。太阳出来后，水珠越来越小，过了一会儿就看不见了。小杰觉得很有趣，蹲下来观察了很久。\n太阳出来后水珠怎样变化？",
@@ -1301,7 +1301,7 @@
           "answerSpec": "C",
           "explanation": "文中写水珠越来越小。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“人物的做法/表现”。先找文中人物具体做了什么，再根据这些行为判断特点或含义。"
           ],
           "tags": [
             "阅读",
@@ -1309,7 +1309,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q07-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q07-V3",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：清晨，草叶上挂着小水珠。太阳出来后，水珠越来越小，过了一会儿就看不见了。小杰觉得很有趣，蹲下来观察了很久。\n小杰为什么蹲下来很久？",
@@ -1330,7 +1330,7 @@
           "answerSpec": "A",
           "explanation": "他觉得小水珠的变化很有趣。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“为什么/原因”。先找结果发生了什么，再回前文找导致它发生的线索。"
           ],
           "tags": [
             "阅读",
@@ -1338,7 +1338,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q08-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q08-V3",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：清晨，草叶上挂着小水珠。太阳出来后，水珠越来越小，过了一会儿就看不见了。小杰觉得很有趣，蹲下来观察了很久。\n这段话主要写？",
@@ -1359,7 +1359,7 @@
           "answerSpec": "B",
           "explanation": "整段围绕水珠变化和观察。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“这段话主要写”。看整段反复围绕哪件事写，不要只抓一个小细节。"
           ],
           "tags": [
             "阅读",
@@ -1367,7 +1367,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q09-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q09-V3",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：傍晚，天空中出现大片乌云，风也比刚才大了。妈妈把阳台上的衣服收进屋。没过多久，雨点就落了下来。\n妈妈先看到什么天气变化？",
@@ -1388,7 +1388,7 @@
           "answerSpec": "C",
           "explanation": "短文先写乌云和风变大。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“妈妈先看到什么天气变化”。回到短文中找和问题用词最接近的那一句，再提取直接信息。"
           ],
           "tags": [
             "阅读",
@@ -1396,7 +1396,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q10-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q10-V3",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：傍晚，天空中出现大片乌云，风也比刚才大了。妈妈把阳台上的衣服收进屋。没过多久，雨点就落了下来。\n妈妈为什么收衣服？",
@@ -1417,7 +1417,7 @@
           "answerSpec": "A",
           "explanation": "乌云和大风提示可能下雨。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“为什么/原因”。先找结果发生了什么，再回前文找导致它发生的线索。"
           ],
           "tags": [
             "阅读",
@@ -1425,7 +1425,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q11-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q11-V3",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：傍晚，天空中出现大片乌云，风也比刚才大了。妈妈把阳台上的衣服收进屋。没过多久，雨点就落了下来。\n后来真的发生了什么？",
@@ -1446,7 +1446,7 @@
           "answerSpec": "B",
           "explanation": "最后写雨点落下。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“先、后来、最后”。按短文中事情发生的先后顺序梳理，不要跳过中间动作。"
           ],
           "tags": [
             "阅读",
@@ -1454,7 +1454,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q12-V2",
+          "id": "CHINESE-G2-S1-SYNC-READING-NATURE-001-Q12-V3",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "阅读短文：傍晚，天空中出现大片乌云，风也比刚才大了。妈妈把阳台上的衣服收进屋。没过多久，雨点就落了下来。\n事情顺序正确的是？",
@@ -1475,7 +1475,7 @@
           "answerSpec": "C",
           "explanation": "按短文发生顺序排列。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“先、后来、最后”。按短文中事情发生的先后顺序梳理，不要跳过中间动作。"
           ],
           "tags": [
             "阅读",
@@ -1486,7 +1486,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001",
-      "version": 2,
+      "version": 3,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -1505,7 +1505,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q01-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q01-V3",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "情境：体育课后，小明把篮球放回器材架。哪句话表达最完整？",
@@ -1526,7 +1526,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“句子完整”。检查有没有说清“谁、在哪里、做什么”，避免只有一个词或短语。"
           ],
           "tags": [
             "表达",
@@ -1534,7 +1534,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q02-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q02-V3",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "情境：奶奶提着两袋菜回家，小乐走过去帮忙。最合适的话是？",
@@ -1555,7 +1555,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“情境奶奶提着两袋菜回家小乐走”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "表达",
@@ -1563,7 +1563,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q03-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q03-V3",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "情境：同学不小心碰掉了你的橡皮，并马上道歉。你可以说？",
@@ -1584,7 +1584,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“情境同学不小心碰掉了你的橡皮”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "表达",
@@ -1592,7 +1592,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q04-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q04-V3",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "早晨的顺序最合理的是？",
@@ -1613,7 +1613,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“先、再”。先确定两件事发生的先后，再判断句子表达的关系。"
           ],
           "tags": [
             "表达",
@@ -1621,7 +1621,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q05-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q05-V3",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "情境：社区志愿者正在给花草浇水。哪一句更生动？",
@@ -1642,7 +1642,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“情境社区志愿者正在给花草浇水”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "表达",
@@ -1650,7 +1650,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q06-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q06-V3",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "情境：小猫听到门口有声音，轻轻走过去。哪一句最合理？",
@@ -1671,7 +1671,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“情境小猫听到门口有声音轻轻走”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "表达",
@@ -1679,7 +1679,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q07-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q07-V3",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "请给“深圳的秋天”补一句较完整的话。",
@@ -1700,7 +1700,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“补充信息”。保留原句的人物和动作，再增加时间、地点或怎样做，让句子更具体。"
           ],
           "tags": [
             "表达",
@@ -1708,7 +1708,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q08-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q08-V3",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "情境：图书角的书有些乱，三位同学一起整理。可以怎样概括？",
@@ -1729,7 +1729,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“情境图书角的书有些乱三位同学”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "表达",
@@ -1737,7 +1737,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q09-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q09-V3",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "放学时你想向老师告别，最合适的是？",
@@ -1758,7 +1758,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“放学时你想向老师告别最合适的”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "表达",
@@ -1766,7 +1766,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q10-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q10-V3",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "情境：小树苗刚种下，需要每天照顾。哪句话最合适？",
@@ -1787,7 +1787,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“情境小树苗刚种下需要每天照顾”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "表达",
@@ -1795,7 +1795,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q11-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q11-V3",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "“公园里开着花。”怎样扩充更具体？",
@@ -1816,7 +1816,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“补充信息”。保留原句的人物和动作，再增加时间、地点或怎样做，让句子更具体。"
           ],
           "tags": [
             "表达",
@@ -1824,7 +1824,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q12-V2",
+          "id": "CHINESE-G2-S1-SYNC-EXPRESSION-001-Q12-V3",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "情境：运动会上同学跑完比赛很累。你最适合说？",
@@ -1845,7 +1845,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“情境运动会上同学跑完比赛很累”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "表达",
@@ -1856,7 +1856,7 @@
     },
     {
       "id": "CHINESE-G2-S1-SYNC-REVIEW-001",
-      "version": 2,
+      "version": 3,
       "grade": "G2",
       "subject": "CHINESE",
       "semester": "S1",
@@ -1875,7 +1875,7 @@
       "status": "PUBLISHED",
       "questions": [
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q01-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q01-V3",
           "orderNo": 1,
           "type": "SINGLE_CHOICE",
           "stem": "“一___红领巾”最合适的量词是？",
@@ -1896,7 +1896,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“红领巾”最合适的”“量词”。想一想平时这个名词前面最自然地说“一什么/几什么”。"
           ],
           "tags": [
             "综合",
@@ -1904,7 +1904,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q02-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q02-V3",
           "orderNo": 2,
           "type": "SINGLE_CHOICE",
           "stem": "“高兴”的近义词更接近？",
@@ -1925,7 +1925,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“高兴”“意思相近”。把“高兴”放回原句读一读，再找意思接近的词。"
           ],
           "tags": [
             "综合",
@@ -1933,7 +1933,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q03-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q03-V3",
           "orderNo": 3,
           "type": "SINGLE_CHOICE",
           "stem": "下面标点正确的是？",
@@ -1954,7 +1954,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“陈述或提醒语气”。先判断整句话是在提问、陈述还是感叹，再选择对应标点。"
           ],
           "tags": [
             "综合",
@@ -1962,7 +1962,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q04-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q04-V3",
           "orderNo": 4,
           "type": "SINGLE_CHOICE",
           "stem": "“先整理书包，再出门”主要表示？",
@@ -1983,7 +1983,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“先、再”。先确定两件事发生的先后，再判断句子表达的关系。"
           ],
           "tags": [
             "综合",
@@ -1991,7 +1991,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q05-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q05-V3",
           "orderNo": 5,
           "type": "SINGLE_CHOICE",
           "stem": "“操场上，同学们正在做早操。”这句话说清了？",
@@ -2012,7 +2012,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“操场上，同学们正在做早操。”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "综合",
@@ -2020,7 +2020,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q06-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q06-V3",
           "orderNo": 6,
           "type": "SINGLE_CHOICE",
           "stem": "短句“风来了，树叶轻轻摇动。”中“轻轻”写出了？",
@@ -2041,7 +2041,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“轻轻”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "综合",
@@ -2049,7 +2049,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q07-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q07-V3",
           "orderNo": 7,
           "type": "SINGLE_CHOICE",
           "stem": "同学借给你橡皮，你应该说？",
@@ -2070,7 +2070,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“同学借给你橡皮你应该说”。先判断人物处在什么情境、需要表达什么态度，再选最得体的话。"
           ],
           "tags": [
             "综合",
@@ -2078,7 +2078,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q08-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q08-V3",
           "orderNo": 8,
           "type": "SINGLE_CHOICE",
           "stem": "“教室被同学们打扫干净了。”什么变干净了？",
@@ -2099,7 +2099,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“被”。先找“什么东西被怎么样”，不要把做动作的人当成被作用的事物。"
           ],
           "tags": [
             "综合",
@@ -2107,7 +2107,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q09-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q09-V3",
           "orderNo": 9,
           "type": "SINGLE_CHOICE",
           "stem": "周末图书馆里大家都轻声说话，说明大家？",
@@ -2128,7 +2128,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“周末图书馆里大家都轻声说话说明大”。先找题目真正要判断的对象和要求，再逐项排除不符合题意的选项。"
           ],
           "tags": [
             "综合",
@@ -2136,7 +2136,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q10-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q10-V3",
           "orderNo": 10,
           "type": "SINGLE_CHOICE",
           "stem": "看到乌云越来越多，最可能发生什么？",
@@ -2157,7 +2157,7 @@
           "answerSpec": "A",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“看到乌云越来越多最可能发生什么”。先找题目真正要判断的对象和要求，再逐项排除不符合题意的选项。"
           ],
           "tags": [
             "综合",
@@ -2165,7 +2165,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q11-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q11-V3",
           "orderNo": 11,
           "type": "SINGLE_CHOICE",
           "stem": "下面哪句最完整？",
@@ -2186,7 +2186,7 @@
           "answerSpec": "B",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“句子完整”。检查有没有说清“谁、在哪里、做什么”，避免只有一个词或短语。"
           ],
           "tags": [
             "综合",
@@ -2194,7 +2194,7 @@
           ]
         },
         {
-          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q12-V2",
+          "id": "CHINESE-G2-S1-SYNC-REVIEW-001-Q12-V3",
           "orderNo": 12,
           "type": "SINGLE_CHOICE",
           "stem": "“大家分工合作，很快完成值日。”这句话告诉我们？",
@@ -2215,7 +2215,7 @@
           "answerSpec": "C",
           "explanation": "先读清题意，再比较三个选项。",
           "hints": [
-            "圈出题目中的关键词，再结合生活经验判断。"
+            "关键词：“大家分工合作，很快完成值日。”。把这个词放回原句中读一遍，结合前后场景判断它写的是意思、感觉还是特点。"
           ],
           "tags": [
             "综合",
