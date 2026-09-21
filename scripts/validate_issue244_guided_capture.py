@@ -38,6 +38,7 @@ spike = read("entry/src/main/ets/experimental/homeworkcapture/HomeworkCaptureSpi
 import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
 batch_detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
+workflow = read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets")
 
 for status in [
     "CREATED", "WAITING_PERMISSION", "CAPTURING", "STOPPING",
@@ -135,10 +136,15 @@ require(("不自动点击" in page or "不会自动点击" in page) and
         "formal capture UI must state click/scroll/accessibility non-automation boundaries")
 require("手工向上滑" in page,
         "formal UX must require user-driven chat scrolling")
-require("setInterval" in float_page and "sampleLatestFrame" in float_page,
-        "FloatView must continuously sample the formal session")
-require("HomeworkCaptureSessionService.instance.stopByUser" in float_page,
-        "FloatView must allow user-controlled stop")
+require("setInterval" in float_page and
+        (("sampleLatestFrame" in float_page) or
+         ("HomeworkCaptureWorkflowService.instance.progress" in float_page and
+          "this.capture.sampleLatestFrame()" in workflow)),
+        "FloatView must continuously sample the formal session, directly or through workflow orchestration")
+require(("HomeworkCaptureSessionService.instance.stopByUser" in float_page) or
+        ("HomeworkCaptureWorkflowService.instance.finishByUser" in float_page and
+         "this.capture.stopByUser()" in workflow),
+        "FloatView must allow user-controlled stop and reach CaptureSessionService.stopByUser")
 require("CaptureSessionStatus.COMPLETED" in float_page and
         "CaptureSessionStatus.FAILED" in float_page,
         "FloatView must reflect runtime-driven terminal states")
