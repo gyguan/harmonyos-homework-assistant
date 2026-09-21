@@ -108,8 +108,9 @@ require("needsGroupConfirmation" in workflow and
         "unrecognized group must require explicit parent continuation")
 require("validation === SourceGroupValidationStatus.MISMATCH" in workflow,
         "mismatched group must block automatic homework understanding")
-require("profileStartEpoch" in workflow and "understandAndActivate" in workflow,
-        "profile time window must flow into homework understanding")
+require("profileStartEpoch" in workflow and "tryUnderstandBatch" in workflow and
+        "this.inbox.activateBatch(session.importBatchId)" in workflow,
+        "profile time window must flow through retry-safe understanding before confirmation activation")
 require("TIME_RANGE_FILTERED" in understanding and
         "this.inbox.importBatch(updated, allMessages, result.candidates)" in understanding,
         "out-of-window messages must be excluded from semantics but retained for audit")
