@@ -133,6 +133,7 @@ export class HomeworkImportInboxService {
       sourceType: batch.sourceType,
       sourceLabel: batch.sourceLabel,
       sourceProfileId: batch.sourceProfileId,
+      captureSessionId: batch.captureSessionId,
       createdAtEpochMs: batch.createdAtEpochMs,
       status: normalized.length > 0 ? ImportBatchStatus.READY : ImportBatchStatus.EMPTY,
       messageCount: messages.length,
