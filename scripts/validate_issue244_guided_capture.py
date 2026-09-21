@@ -81,6 +81,10 @@ require(service.index("session.status = CaptureSessionStatus.CAPTURING") >
         "CAPTURING must only be entered after a real frame exists")
 require("START_REJECTED" in service and "CaptureSessionStatus.CANCELLED" in service,
         "rejected start/permission path must return to recoverable terminal state")
+require("SYSTEM_STOPPED" in models and "finishRuntimeEnded" in service,
+        "system-driven capture stop must converge to a terminal session")
+require("!stats.isCapturing" in service,
+        "capture state must observe runtime-driven stop/cancel signals")
 require("已有作业采集正在进行" in service,
         "duplicate start must be rejected")
 require("FRAME_DIFF_THRESHOLD" in service and "SIGNATURE_SAMPLES" in service,
