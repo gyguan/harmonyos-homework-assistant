@@ -1,17 +1,14 @@
 import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
 import { floatView, window } from '@kit.ArkUI';
 import { BusinessError } from '@kit.BasicServicesKit';
-import { HomeworkCaptureSessionService } from '../../../application/capture/HomeworkCaptureSessionService';
-import {
-  HomeworkCaptureWorkflowResult,
-  HomeworkCaptureWorkflowService
-} from '../../../application/capture/HomeworkCaptureWorkflowService';
-import { HomeworkSourceProfileService } from '../../../application/capture/HomeworkSourceProfileService';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
-import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { CaptureSession, CaptureSessionStatus } from '../../../domain/model/CaptureModels';
 import { SourceGroupValidationStatus } from '../../../domain/model/HomeworkSourceProfileModels';
+import {
+  HomeworkCapturePageResult,
+  HomeworkCaptureViewModel
+} from './HomeworkCaptureViewModel';
 
 @Component
 export struct HomeworkCapturePage {
@@ -33,6 +30,7 @@ export struct HomeworkCapturePage {
   private autoStartAttempted: boolean = false;
   private floatViewController: floatView.FloatViewController | undefined = undefined;
   private refreshTimer: number = -1;
+  private readonly viewModel: HomeworkCaptureViewModel = new HomeworkCaptureViewModel();
 
   aboutToAppear(): void {
     this.refreshTimer = setInterval(() => {
@@ -45,8 +43,7 @@ export struct HomeworkCapturePage {
     await this.refreshSession();
     if (this.autoStartAttempted || this.currentSessionId.length > 0) return;
     this.autoStartAttempted = true;
-    let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
-    if (HomeworkSourceProfileService.instance.getActiveProfile(studentId) === null) {
+    if (!this.viewModel.hasActiveProfile()) {
       this.errorText = '尚未配置班级采集设置，请先完成一次配置。';
       return;
     }
@@ -63,10 +60,7 @@ export struct HomeworkCapturePage {
   private session(): CaptureSession | null {
     let currentRevision = this.revision;
     if (currentRevision < 0) return null;
-    let active = HomeworkCaptureSessionService.instance.getActiveSession();
-    if (active !== null) return active;
-    if (this.currentSessionId.length === 0) return null;
-    return HomeworkCaptureSessionService.instance.getSession(this.currentSessionId);
+    return this.viewModel.activeOrSession(this.currentSessionId);
   }
 
   private isRunning(session: CaptureSession | null): boolean {
@@ -78,7 +72,7 @@ export struct HomeworkCapturePage {
   }
 
   private async refreshSession(): Promise<void> {
-    let progress = await HomeworkCaptureWorkflowService.instance.progress();
+    let progress = await this.viewModel.progress();
     if (progress !== null) {
       let active = progress.session;
       this.currentSessionId = active.id;
@@ -94,7 +88,7 @@ export struct HomeworkCapturePage {
           this.errorText = `当前识别群“${progress.detectedGroupTitle}”与配置“${progress.profile.groupTitle}”不一致，请确认已进入正确微信群。`;
         } else if (progress.timeBoundaryReached) {
           this.errorText = '';
-          this.message = `已到达今日抓取时间范围（${HomeworkSourceProfileService.instance.formatStartTime(progress.profile)}），可以结束并自动整理。`;
+          this.message = `已到达今日抓取时间范围（${this.viewModel.formatStartTime(progress.profile)}），可以结束并自动整理。`;
         } else if (progress.groupValidationStatus === SourceGroupValidationStatus.MATCHED) {
           this.errorText = '';
           this.message = `已确认“${progress.profile.groupTitle}”，继续手工上滑；小伴正在读取今天的消息。`;
@@ -106,7 +100,7 @@ export struct HomeworkCapturePage {
       if ((active.status === CaptureSessionStatus.COMPLETED || active.status === CaptureSessionStatus.FAILED) &&
         active.importBatchId.length > 0 && this.finalizedBatchId !== active.importBatchId) {
         this.finalizedBatchId = active.importBatchId;
-        let result = HomeworkCaptureWorkflowService.instance.finalizeCompletedSession(active.id);
+        let result = this.viewModel.finalizeCompletedSession(active.id);
         if (result !== null) await this.handleWorkflowResult(result);
       }
       this.revision++;
@@ -119,7 +113,7 @@ export struct HomeworkCapturePage {
         if (finished.status === CaptureSessionStatus.COMPLETED) {
           if (finished.importBatchId.length > 0 && this.finalizedBatchId !== finished.importBatchId) {
             this.finalizedBatchId = finished.importBatchId;
-            let result = HomeworkCaptureWorkflowService.instance.finalizeCompletedSession(finished.id);
+            let result = this.viewModel.finalizeCompletedSession(finished.id);
             if (result !== null) {
               await this.handleWorkflowResult(result);
               this.revision++;
@@ -216,15 +210,14 @@ export struct HomeworkCapturePage {
 
   private async startCapture(): Promise<void> {
     this.errorText = '';
-    if (HomeworkCaptureSessionService.instance.getActiveSession() !== null) {
+    if (this.viewModel.hasActiveSession()) {
       this.errorText = '已有采集任务正在进行，请先结束当前采集。';
       return;
     }
     if (!await this.startFloatView()) return;
 
     try {
-      let studentId = DefaultFamilyContextRepository.instance.getActiveStudentId();
-      let session = HomeworkCaptureWorkflowService.instance.start(studentId);
+      let session = this.viewModel.start();
       this.currentSessionId = session.id;
       this.revision++;
       if (session.status === CaptureSessionStatus.CANCELLED) {
@@ -240,7 +233,7 @@ export struct HomeworkCapturePage {
   }
 
   private async stopCapture(): Promise<void> {
-    let result = await HomeworkCaptureWorkflowService.instance.finishByUser();
+    let result = await this.viewModel.finishByUser();
     this.revision++;
     await this.stopFloatView();
     if (result === null) {
@@ -252,7 +245,7 @@ export struct HomeworkCapturePage {
     await this.handleWorkflowResult(result);
   }
 
-  private async handleWorkflowResult(result: HomeworkCaptureWorkflowResult): Promise<void> {
+  private async handleWorkflowResult(result: HomeworkCapturePageResult): Promise<void> {
     this.detectedGroupTitle = result.detectedGroupTitle;
     this.groupValidationStatus = result.groupValidationStatus;
     this.timeBoundaryReached = result.timeBoundaryReached;
@@ -309,7 +302,7 @@ export struct HomeworkCapturePage {
   private async confirmUnrecognizedGroup(): Promise<void> {
     let batchId = this.pendingGroupConfirmationBatchId;
     if (batchId.length === 0) return;
-    let result = HomeworkCaptureWorkflowService.instance.confirmUnrecognizedAndContinue(batchId);
+    let result = this.viewModel.confirmUnrecognizedAndContinue(batchId);
     if (result === null) {
       this.errorText = '无法继续整理本次采集，请到收件箱查看原始消息。';
       return;
@@ -318,7 +311,7 @@ export struct HomeworkCapturePage {
   }
 
   private async cancelCapture(): Promise<void> {
-    let cancelled = await HomeworkCaptureSessionService.instance.cancel();
+    let cancelled = await this.viewModel.cancel();
     if (cancelled !== null) this.currentSessionId = cancelled.id;
     this.revision++;
     await this.stopFloatView();
