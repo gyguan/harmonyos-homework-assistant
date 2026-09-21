@@ -239,6 +239,14 @@ export struct AppShell {
     this.shareImportToken = '';
   }
 
+  private finishParentImportPublished(): void {
+    this.parentRoute = ParentRoute.DASHBOARD;
+    this.navPathStack.clear();
+    // Batch publish already updated DefaultAssignmentRepository. Invalidate the now-visible
+    // dashboard after navigation so cached metrics/recent activity are rendered immediately.
+    this.notifyUiChanged();
+  }
+
   private openParentExtraCreate(voice: boolean = false): void {
     this.navPathStack.pushPathByName(AppRoute.PARENT_EXTRA_CREATE, new ParentExtraCreateRouteParam(voice));
   }
@@ -441,10 +449,7 @@ export struct AppShell {
         HomeworkConfirmationPage({
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
-          onPublished: () => {
-            this.parentRoute = ParentRoute.DASHBOARD;
-            this.navPathStack.clear();
-          },
+          onPublished: () => this.finishParentImportPublished(),
           onStoreChanged: () => this.notifyUiChanged()
         });
       }
