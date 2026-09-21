@@ -152,8 +152,9 @@ require(("HomeworkCaptureSessionService.instance.stopByUser" in float_page) or
 require("CaptureSessionStatus.COMPLETED" in float_page and
         "CaptureSessionStatus.FAILED" in float_page,
         "FloatView must reflect runtime-driven terminal states")
-require("nativeCapture.stopCapture()" in float_page,
-        "#241 diagnostic fallback must remain available")
+require("this.captureRuntime.stopCapture()" in float_page and
+        "NativeHomeworkCaptureRuntime" in float_page,
+        "#241 diagnostic fallback must remain available through the runtime adapter")
 
 require("HomeworkCaptureSessionBootstrap" in entry and
         "PreferencesHomeworkCaptureSessionPersistence" in entry,
