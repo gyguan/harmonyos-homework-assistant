@@ -8,4 +8,5 @@ public interface AssignmentResourceRepository extends JpaRepository<AssignmentRe
   List<AssignmentResourceEntity> findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(
       UUID familyId, String assignmentId);
   void deleteByFamilyIdAndAssignmentId(UUID familyId, String assignmentId);
+  boolean existsByAssetId(UUID assetId);
 }

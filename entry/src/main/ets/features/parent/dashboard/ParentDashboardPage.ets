@@ -18,6 +18,7 @@ export struct ParentDashboardPage {
   onOpenInbox: () => void = () => {};
   onOpenExtra: () => void = () => {};
   onOpenVoice: () => void = () => {};
+  onOpenVoiceMaterial: () => void = () => {};
   onOpenProgress: () => void = () => {};
   onOpenReview: (assignmentId: string) => void = (_assignmentId: string) => {};
 
@@ -413,6 +414,43 @@ export struct ParentDashboardPage {
         .onClick(() => this.onOpenVoice());
       }
       .width('100%');
+
+      Row({ space: 10 }) {
+        Text('库')
+          .width(30)
+          .height(30)
+          .fontSize(13)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.PRIMARY)
+          .textAlign(TextAlign.Center)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .borderRadius(9);
+        Column({ space: 2 }) {
+          Text('语音素材库')
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('批量导入 · 每天自动创建 1 个')
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(15)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: 58 })
+      .padding({ left: 12, right: 10, top: 10, bottom: 10 })
+      .backgroundColor(AppTheme.SURFACE)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(`管理 ${this.student().name} 的语音素材库`)
+      .onClick(() => this.onOpenVoiceMaterial());
+
+
     }
     .width('100%');
   }

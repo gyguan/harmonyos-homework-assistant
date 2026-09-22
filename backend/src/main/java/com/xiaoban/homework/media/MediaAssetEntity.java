@@ -1,4 +1,4 @@
-package com.xiaoban.homework.assignment;
+package com.xiaoban.homework.media;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -7,20 +7,16 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "assignment_resource")
-public class AssignmentResourceEntity {
+@Table(name = "media_asset")
+public class MediaAssetEntity {
   @Id public UUID id;
   public UUID familyId;
-  public String assignmentId;
-  public String resourceType;
   public String storagePath;
-  public UUID assetId;
   public String originalName;
   public String contentType;
   public long sizeBytes;
-  public int sortOrder;
-  public long durationMs;
+  public String sha256;
   public Instant createdAt;
 
-  protected AssignmentResourceEntity() {}
+  protected MediaAssetEntity() {}
 }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import com.xiaoban.homework.media.MediaAssetService;
 import com.xiaoban.homework.storage.FileStorage;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,9 @@ class AssignmentResourceServiceTest {
     return new AssignmentResourceService(
         mock(AssignmentService.class),
         mock(AssignmentResourceRepository.class),
-        mock(FileStorage.class));
+        mock(FileStorage.class),
+        mock(MediaAssetService.class),
+        new VoiceMediaPolicy());
   }
 
   @Test

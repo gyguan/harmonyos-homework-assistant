@@ -26,6 +26,9 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Assignment（作业/任务）**：学生需要完成的一项独立任务。`assignmentType=SCHOOL` 表示课内作业，`assignmentType=EXTRA` 表示课外任务；二者共享同一领域模型、状态机、学习空间、提交与验收链路。
 - **Assignment Filter（作业筛选）**：围绕类型、科目、日期、状态的统一查询条件，Phone 与 Pad 使用同一查询语义。
 - **Resource（资料）**：老师或家长提供的图片、文档、音频、视频、文本等学习材料，可与 Assignment 关联。
+- **Media Asset（媒体资产）**：家庭私有的物理媒体文件所有权实体。Assignment Resource 与语音素材目录只引用 Asset，不因创建任务而复制文件。
+- **Voice Material Package（语音素材目录）**：家长预先导入的一组“1 个语音 + 至少 1 张图片”的待发布素材，携带 studentId、subjectCode、标题和预计用时等结构化属性；目录名用于展示与队列排序，不作为科目识别来源。
+- **Daily Voice Auto Create（每日语音自动创建）**：按 studentId + Asia/Shanghai 业务日最多自动消费一个 READY Voice Material Package；家长手工创建不占每日自动额度。
 - **Requirement（完成要求）**：某项 Assignment 的结构化完成要求，如完成题目、朗读、拍照、文字说明等。
 - **Submission（提交）**：学生对某个 Assignment 提交的照片、录音、视频或文本，以及提交时间与状态。
 - **Textbook（教材）**：按城市、学段、年级、学期、学科、出版社、册、单元、课组织的教材目录元数据。
@@ -83,6 +86,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - Java 21 + Spring Boot 4.1.x 模块化单体。
 - PostgreSQL + JPA + Flyway。
 - 文件通过 `FileStorage` 抽象管理；当前可使用本地文件，未来可替换对象存储。
+- 可复用媒体文件由 MediaAsset 持有物理 storagePath；AssignmentResource 对新媒体只保存 assetId 引用，历史独占 storagePath 在迁移期继续兼容。
 - 不引入 Redis、MQ、微服务、API Gateway 或工作流引擎，除非未来通过新的 ADR 明确批准。
 - Assignment 是唯一作业主模型，统一支持 SCHOOL / EXTRA、subjectCode、结构化 `dueAt`、resources、requirements。
 - 历史 Flyway migration 不修改，通过 V7+ 增量演进。
