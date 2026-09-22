@@ -1,8 +1,10 @@
 import {
   completeVoiceMaterialBatch,
   createVoiceMaterialBatch,
+  fetchVoiceMaterialAsset,
   getToken,
   listStudents,
+  listVoiceMaterialPackages,
   login,
   logout,
   registerVoiceMaterialPackage,
@@ -21,7 +23,8 @@ const state = {
   defaultSubjectCode: 'CHINESE',
   packages: [],
   ignoredCount: 0,
-  uploading: false
+  uploading: false,
+  importedPackages: []
 };
 
 const el = id => document.getElementById(id);
@@ -114,6 +117,12 @@ const defaultMinutes = el('default-minutes');
 const subjectChips = el('subject-chips');
 const folderInput = el('folder-input');
 const folderPicker = el('folder-picker');
+const folderFilesInput = el('folder-files-input');
+const importedCard = el('imported-card');
+const importedSummary = el('imported-summary');
+const importedList = el('imported-list');
+const assetViewer = el('asset-viewer');
+const assetViewerContent = el('asset-viewer-content');
 const previewCard = el('preview-card');
 const previewSummary = el('preview-summary');
 const packageList = el('package-list');
@@ -143,6 +152,96 @@ async function loadStudents() {
     studentSelect.append(option);
   }
   updateUploadState();
+}
+
+function mergeSelectedFiles(fileList) {
+  const incoming = Array.from(fileList || []);
+  if (incoming.length === 0) return;
+  const parsed = parseVoiceMaterialPackages(incoming, state.defaultSubjectCode, readDefaultMinutes());
+  const existing = new Map(state.packages.map(item => [item.key, item]));
+  for (const item of parsed.packages) {
+    const current = existing.get(item.key);
+    if (!current) existing.set(item.key, item);
+    else {
+      const known = new Set(current.files.map(file => `${file.resourceType}|${file.relativeName}`));
+      for (const file of item.files) {
+        const key = `${file.resourceType}|${file.relativeName}`;
+        if (!known.has(key)) current.files.push(file);
+      }
+    }
+  }
+  state.packages = Array.from(existing.values()).sort((a, b) => a.directoryName.localeCompare(b.directoryName, 'zh-CN'));
+  state.ignoredCount += parsed.ignoredCount;
+  progressCard.hidden = true;
+  resultMessage.hidden = true;
+  renderPackages();
+}
+
+async function loadImportedPackages() {
+  if (!studentSelect.value) {
+    state.importedPackages = [];
+    renderImportedPackages();
+    return;
+  }
+  try {
+    state.importedPackages = await listVoiceMaterialPackages(studentSelect.value);
+    renderImportedPackages();
+  } catch (error) {
+    importedSummary.textContent = '已导入文件加载失败：' + (error?.message || '请稍后刷新。');
+  }
+}
+
+function renderImportedPackages() {
+  importedCard.hidden = state.importedPackages.length === 0;
+  if (state.importedPackages.length === 0) {
+    importedSummary.textContent = '当前学生还没有已导入的语音素材。';
+    importedList.innerHTML = '';
+    return;
+  }
+  importedSummary.textContent = `共 ${state.importedPackages.length} 个已导入目录，可展开查看文件。`;
+  importedList.innerHTML = state.importedPackages.map((item, index) => {
+    const status = item.status === 'READY' || item.status === 'CONSUMED' ? '可用' : item.status;
+    const files = (item.files || []).map(file => `
+      <div class="imported-file">
+        <span class="imported-file-name" title="${escapeHtml(file.relativeName)}">${escapeHtml(file.relativeName)}<span class="imported-file-type">${fileKindLabel(file.resourceType)}</span></span>
+        <button class="preview-button" type="button" data-preview-asset="${escapeHtml(file.assetId)}" data-preview-name="${escapeHtml(file.relativeName)}" data-preview-type="${escapeHtml(file.resourceType)}">查看</button>
+      </div>`).join('');
+    return `<details class="imported-package" ${index === 0 ? 'open' : ''}>
+      <summary><div class="imported-package-main"><strong>${escapeHtml(item.directoryName)}</strong><span>${escapeHtml(subjectLabel(item.subjectCode))} · ${escapeHtml(status)}</span></div><span class="imported-package-meta">${(item.files || []).length} 个文件</span></summary>
+      <div class="imported-file-list">${files}</div>
+    </details>`;
+  }).join('');
+}
+
+function fileKindLabel(type) {
+  return type === 'AUDIO' ? '语音' : '图片';
+}
+
+async function openAssetViewer(assetId, name, resourceType) {
+  assetViewer.hidden = false;
+  assetViewerContent.innerHTML = '<p class="muted">正在加载素材…</p>';
+  try {
+    const blob = await fetchVoiceMaterialAsset(assetId);
+    const url = URL.createObjectURL(blob);
+    assetViewerContent.innerHTML = `<h3 class="asset-viewer-title">${escapeHtml(name)}</h3>`;
+    const node = resourceType === 'AUDIO' ? document.createElement('audio') : document.createElement('img');
+    node.controls = resourceType === 'AUDIO';
+    node.autoplay = resourceType === 'AUDIO';
+    node.src = url;
+    if (resourceType === 'IMAGE') node.alt = name;
+    assetViewerContent.append(node);
+    assetViewerContent.dataset.objectUrl = url;
+  } catch (error) {
+    assetViewerContent.innerHTML = `<p class="error-text">${escapeHtml(error?.message || '素材加载失败')}</p>`;
+  }
+}
+
+function closeAssetViewer() {
+  const url = assetViewerContent.dataset.objectUrl;
+  if (url) URL.revokeObjectURL(url);
+  assetViewerContent.dataset.objectUrl = '';
+  assetViewerContent.innerHTML = '';
+  assetViewer.hidden = true;
 }
 
 function readDefaultMinutes() {
@@ -232,6 +331,25 @@ function showResult(message, success) {
   resultMessage.textContent = message;
 }
 
+async function collectDroppedDirectory(entry, files, parentPath = '') {
+  const reader = entry.createReader();
+  const entries = [];
+  while (true) {
+    const chunk = await new Promise(resolve => reader.readEntries(resolve, () => resolve([])));
+    if (chunk.length === 0) break;
+    entries.push(...chunk);
+  }
+  for (const child of entries) {
+    const path = parentPath ? `${parentPath}/${child.name}` : child.name;
+    if (child.isDirectory) await collectDroppedDirectory(child, files, path);
+    else await new Promise(resolve => child.file(file => {
+      try { Object.defineProperty(file, 'relativePath', { value: path }); } catch {}
+      files.push(file);
+      resolve();
+    }, resolve));
+  }
+}
+
 async function uploadSelected() {
   const selected = state.packages.filter(item => item.selected && validatePackage(item).valid);
   if (!studentSelect.value || selected.length === 0 || state.uploading) return;
@@ -280,6 +398,7 @@ async function uploadSelected() {
     );
 
     if (failures === 0 && completed.readyCount > 0) {
+      await loadImportedPackages();
       state.packages = state.packages.filter(item => !item.selected || !validatePackage(item).valid);
       renderPackages();
       folderInput.value = '';
@@ -310,6 +429,24 @@ subjectChips.addEventListener('click', event => {
 });
 
 folderPicker.addEventListener('click', () => folderInput.click());
+folderPicker.addEventListener('dragover', event => { event.preventDefault(); folderPicker.classList.add('drag-over'); });
+folderPicker.addEventListener('dragleave', () => folderPicker.classList.remove('drag-over'));
+folderPicker.addEventListener('drop', async event => {
+  event.preventDefault();
+  folderPicker.classList.remove('drag-over');
+  const files = [];
+  for (const item of Array.from(event.dataTransfer?.items || [])) {
+    if (item.kind !== 'file') continue;
+    const entry = item.webkitGetAsEntry?.() || item.getAsEntry?.();
+    if (entry?.isDirectory) await collectDroppedDirectory(entry, files);
+    else {
+      const file = item.getAsFile();
+      if (file) files.push(file);
+    }
+  }
+  mergeSelectedFiles(files);
+});
+
 
 folderInput.addEventListener('change', () => {
   const minutes = readDefaultMinutes();
@@ -325,6 +462,13 @@ folderInput.addEventListener('change', () => {
   progressCard.hidden = true;
   resultMessage.hidden = true;
   renderPackages();
+});
+
+folderFilesInput.addEventListener('change', () => {
+  const minutes = readDefaultMinutes();
+  if (minutes < 0) { progressCard.hidden = false; showResult('预计用时请输入 1～240 分钟的整数。', false); folderFilesInput.value = ''; return; }
+  mergeSelectedFiles(folderFilesInput.files);
+  folderFilesInput.value = '';
 });
 
 applyDefaultsButton.addEventListener('click', () => {
@@ -367,7 +511,14 @@ el('clear-packages').addEventListener('click', () => {
   renderPackages();
 });
 
-studentSelect.addEventListener('change', updateUploadState);
+studentSelect.addEventListener('change', () => { updateUploadState(); void loadImportedPackages(); });
+el('refresh-imported').addEventListener('click', () => void loadImportedPackages());
+importedList.addEventListener('click', event => {
+  const button = event.target.closest('[data-preview-asset]');
+  if (button) void openAssetViewer(button.dataset.previewAsset, button.dataset.previewName, button.dataset.previewType);
+});
+el('close-asset-viewer').addEventListener('click', closeAssetViewer);
+assetViewer.addEventListener('click', event => { if (event.target.hasAttribute('data-close-viewer')) closeAssetViewer(); });
 uploadButton.addEventListener('click', () => void uploadSelected());
 
 async function bootstrap() {
