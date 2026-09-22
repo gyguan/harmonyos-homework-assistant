@@ -47,7 +47,7 @@ public class VoiceMaterialService {
 
   @Transactional
   public VoiceMaterialDtos.BatchResponse createBatch(UUID familyId, String studentId) {
-    students.requireOwned(familyId, studentId);
+    students.requireOwnedForUpdate(familyId, studentId);
     Instant now = Instant.now();
     VoiceMaterialBatchEntity batch = new VoiceMaterialBatchEntity();
     batch.id = UUID.randomUUID();
