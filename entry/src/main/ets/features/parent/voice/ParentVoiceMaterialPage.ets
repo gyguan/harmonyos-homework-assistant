@@ -175,13 +175,14 @@ export struct ParentVoiceMaterialPage {
     this.uploading = true;
     this.clearMessage();
     try {
-      let batch = await this.viewModel.upload(this.pendingPackages);
+      let result = await this.viewModel.upload(this.pendingPackages);
       this.pendingPackages = [];
       await this.reload();
-      if (batch.invalidCount > 0) {
-        this.showSuccess(`已导入 ${batch.readyCount} 个，${batch.invalidCount} 个目录素材异常`);
+      let failedCount = result.batch.invalidCount + result.registrationFailureCount;
+      if (failedCount > 0) {
+        this.showSuccess(`已导入 ${result.batch.readyCount} 个，${failedCount} 个目录未成功`);
       } else {
-        this.showSuccess(`已导入 ${batch.readyCount} 个语音素材目录`);
+        this.showSuccess(`已导入 ${result.batch.readyCount} 个语音素材目录`);
       }
     } catch (error) {
       this.showError(error instanceof Error ? error.message : '批量导入语音素材失败');
