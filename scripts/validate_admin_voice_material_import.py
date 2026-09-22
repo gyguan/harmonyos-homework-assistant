@@ -26,8 +26,8 @@ api = read("backend/src/main/resources/static/admin/js/api.js")
 app = read("backend/src/main/resources/static/admin/js/app.js")
 voice = read("backend/src/main/resources/static/admin/js/voice-material.js")
 
-require('@GetMapping("/admin")' in controller and 'redirect:/admin/' in controller,
-        "admin root must redirect to the static admin shell")
+require('@GetMapping({"/admin", "/admin/"})' in controller and 'forward:/admin/index.html' in controller,
+        "admin root must deterministically forward to the static admin shell")
 require('webkitdirectory' in index and 'id="folder-input"' in index,
         "admin import must support browser folder selection")
 require('id="student-select"' in index and 'id="subject-chips"' in index and
