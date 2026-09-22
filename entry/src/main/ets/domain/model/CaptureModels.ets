@@ -36,6 +36,7 @@ export interface CaptureRuntimeStats {
   latestSequence: number;
   latestWidth?: number;
   latestHeight?: number;
+  pendingFrameCount?: number;
 }
 
 export interface CaptureOcrLineEvidence {
