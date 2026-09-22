@@ -35,7 +35,7 @@ export class VoiceMaterialDirectoryPicker {
     Promise<VoiceMaterialLocalPackage[]> {
     if (this.context === null) throw new Error('语音素材目录选择服务尚未初始化');
 
-    if (!this.supportsMultiFolderPicker()) {
+    if (!this.supportsFolderPicker()) {
       return await this.selectFilesFallback(defaultSubjectCode, expectedMinutes);
     }
 
@@ -51,23 +51,21 @@ export class VoiceMaterialDirectoryPicker {
     }
   }
 
-  private supportsMultiFolderPicker(): boolean {
-    return deviceInfo.apiAvailable('26.0.0') &&
+  private supportsFolderPicker(): boolean {
+    return deviceInfo.apiAvailable('26.0.0') ||
       canIUse('SystemCapability.FileManagement.UserFileService.FolderSelection');
   }
 
   private async selectDirectories(): Promise<string[]> {
-    if (this.context === null) return [];
-    if (deviceInfo.apiAvailable('26.0.0') &&
-      canIUse('SystemCapability.FileManagement.UserFileService.FolderSelection')) {
-      let options = new picker.DocumentSelectOptions();
-      options.maxSelectNumber = 200;
-      options.selectMode = picker.DocumentSelectMode.FOLDER;
-      options.allowsMulFolderSelection = true;
-      let documentPicker = new picker.DocumentViewPicker(this.context);
-      return await documentPicker.select(options);
-    }
-    return [];
+    if (this.context === null || !this.supportsFolderPicker()) return [];
+    let options = new picker.DocumentSelectOptions();
+    // Phone supports FOLDER selection from API 26, but does not support selecting multiple
+    // folders in one picker session. Use one folder per invocation on every device so the
+    // same code path remains compatible; users can press "添加目录" repeatedly for batching.
+    options.maxSelectNumber = 1;
+    options.selectMode = picker.DocumentSelectMode.FOLDER;
+    let documentPicker = new picker.DocumentViewPicker(this.context);
+    return await documentPicker.select(options);
   }
 
   private async selectFilesFallback(defaultSubjectCode: string,
