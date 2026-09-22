@@ -153,6 +153,14 @@ def main() -> int:
         student_id = f"voice-material-{run_id}"
         create_student(base_url, token, student_id)
 
+        pending_student_id = f"voice-material-pending-{run_id}"
+        create_student(base_url, token, pending_student_id)
+        create_batch(base_url, token, pending_student_id)
+        expect(
+            http(base_url, "DELETE", f"/api/v1/students/{pending_student_id}", token=token),
+            (409,), "reject student deletion while voice-material batch exists",
+        )
+
         batch_id = create_batch(base_url, token, student_id)
 
         # Register in reverse lexical order to prove consumption uses directoryName ordering.
