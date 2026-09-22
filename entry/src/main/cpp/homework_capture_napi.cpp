@@ -25,6 +25,7 @@
 namespace {
 constexpr uint64_t SAMPLE_EVERY_CALLBACKS = 30;
 constexpr size_t MAX_PENDING_FRAMES = 6;
+constexpr size_t MAX_PENDING_BYTES = 64 * 1024 * 1024;
 constexpr size_t FRAME_SIGNATURE_SAMPLES = 96;
 constexpr double FRAME_DIFF_THRESHOLD = 10.0;
 
@@ -47,6 +48,7 @@ struct BufferedFrame {
 };
 
 std::deque<BufferedFrame> g_pendingFrames;
+size_t g_pendingBytes = 0;
 std::vector<uint8_t> g_lastQueuedSignature;
 
 std::vector<uint8_t> FrameSignature(const std::vector<uint8_t> &rgba)
@@ -157,9 +159,12 @@ void CopyLatestFrame(OH_AVBuffer *buffer, int64_t timestamp)
             frame.height = config.height;
             frame.timestamp = timestamp;
             frame.sequence = g_sequence.fetch_add(1) + 1;
+            g_pendingBytes += frame.rgba.size();
             g_pendingFrames.push_back(std::move(frame));
             g_lastQueuedSignature = std::move(signature);
-            while (g_pendingFrames.size() > MAX_PENDING_FRAMES) {
+            while (g_pendingFrames.size() > MAX_PENDING_FRAMES ||
+                   (g_pendingBytes > MAX_PENDING_BYTES && g_pendingFrames.size() > 1)) {
+                g_pendingBytes -= g_pendingFrames.front().rgba.size();
                 g_pendingFrames.pop_front();
             }
         }
@@ -341,6 +346,7 @@ napi_value ClearLatestFrame(napi_env env, napi_callback_info info)
     (void)info;
     std::lock_guard<std::mutex> frameLock(g_frameMutex);
     g_pendingFrames.clear();
+    g_pendingBytes = 0;
     g_lastQueuedSignature.clear();
     g_sequence.store(0);
 
@@ -395,6 +401,7 @@ napi_value GetPendingFrame(napi_env env, napi_callback_info info)
             napi_get_undefined(env, &undefinedValue);
             return undefinedValue;
         }
+        g_pendingBytes -= g_pendingFrames.front().rgba.size();
         frame = std::move(g_pendingFrames.front());
         g_pendingFrames.pop_front();
     }
