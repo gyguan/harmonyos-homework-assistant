@@ -138,7 +138,8 @@ public class VoiceMaterialAssignmentService {
     List<AssignmentResourceService.AssetLink> links = new ArrayList<>();
     for (VoiceMaterialFileEntity file : packageFiles) {
       links.add(new AssignmentResourceService.AssetLink(
-          file.resourceType, file.assetId, file.sortOrder, 0L));
+          file.resourceType, file.assetId, file.sortOrder, 0L,
+          file.relativeName, contentType(file.resourceType, file.relativeName)));
     }
     assignmentResources.linkAssets(familyId, assignment.id(), links);
 
@@ -158,6 +159,19 @@ public class VoiceMaterialAssignmentService {
     } catch (ApiExceptions.NotFound missing) {
       return null;
     }
+  }
+
+  private String contentType(String resourceType, String fileName) {
+    String lower = fileName == null ? "" : fileName.toLowerCase();
+    if ("AUDIO".equals(resourceType)) {
+      if (lower.endsWith(".m4a")) return "audio/mp4";
+      if (lower.endsWith(".wav")) return "audio/wav";
+      return "audio/mpeg";
+    }
+    if (lower.endsWith(".png")) return "image/png";
+    if (lower.endsWith(".webp")) return "image/webp";
+    if (lower.endsWith(".heic")) return "image/heic";
+    return "image/jpeg";
   }
 
   private String subjectDisplay(String subjectCode) {
