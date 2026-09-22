@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 import sys
 import time
 import uuid
@@ -12,6 +13,30 @@ from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, require
 
 AUDIO_BYTES = b"xiaoban-voice-material-e2e-audio"
 IMAGE_BYTES = b"\x89PNG\r\n\x1a\nvoice-material-e2e-image"
+
+
+def multipart_voice_assignment(metadata: dict, audio_name: str, image_name: str) -> tuple[bytes, str]:
+    boundary = "----xiaoban-legacy-voice-e2e-" + uuid.uuid4().hex
+    parts = [
+        f"--{boundary}".encode(),
+        b'Content-Disposition: form-data; name="metadata"',
+        b"Content-Type: application/json",
+        b"",
+        json.dumps(metadata, ensure_ascii=False).encode("utf-8"),
+        f"--{boundary}".encode(),
+        f'Content-Disposition: form-data; name="audio"; filename="{audio_name}"'.encode(),
+        b"Content-Type: audio/mpeg",
+        b"",
+        AUDIO_BYTES,
+        f"--{boundary}".encode(),
+        f'Content-Disposition: form-data; name="images"; filename="{image_name}"'.encode(),
+        b"Content-Type: image/png",
+        b"",
+        IMAGE_BYTES,
+        f"--{boundary}--".encode(),
+        b"",
+    ]
+    return b"\r\n".join(parts), f"multipart/form-data; boundary={boundary}"
 
 
 def multipart_file(field: str, filename: str, content_type: str, content: bytes) -> tuple[bytes, str]:
@@ -160,6 +185,56 @@ def main() -> int:
             http(base_url, "DELETE", f"/api/v1/students/{pending_student_id}", token=token),
             (409,), "reject student deletion while voice-material batch exists",
         )
+
+        legacy_assignment_id = f"legacy-voice-{run_id}"
+        legacy_metadata = {
+            "id": legacy_assignment_id,
+            "assignmentType": "EXTRA",
+            "subject": "语文",
+            "subjectCode": "CHINESE",
+            "contentType": "NORMAL",
+            "title": "旧版手工语音兼容验证",
+            "instruction": "验证原有语音作业接口在共享媒体迁移后仍可使用",
+            "textbookRef": "",
+            "dueText": "",
+            "dueAtEpochMs": 0,
+            "dueTimezone": "Asia/Shanghai",
+            "status": "NOT_STARTED",
+            "sourceLabel": "legacy voice compatibility",
+            "sourceExcerpt": "",
+            "expectedMinutes": 10,
+            "startedAtEpochMs": 0,
+            "finishedAtEpochMs": 0,
+            "elapsedSeconds": 0,
+            "reviewNote": "",
+        }
+        legacy_body, legacy_type = multipart_voice_assignment(
+            legacy_metadata, "legacy-voice.mp3", "legacy-scene.png")
+        legacy_created = expect(
+            http(
+                base_url, "POST",
+                f"/api/v1/students/{student_id}/assignments/voice",
+                token=token, raw=legacy_body, content_type=legacy_type,
+            ),
+            (200,), "create legacy manual voice assignment",
+        ).json()
+        require((legacy_created.get("assignment") or {}).get("contentType") == "AUDIO_IMAGE",
+                "legacy manual voice API must continue forcing AUDIO_IMAGE")
+        legacy_resources = legacy_created.get("resources") or []
+        require(len(legacy_resources) == 2,
+                "legacy manual voice assignment must persist audio + image resources")
+        require([item.get("originalName") for item in legacy_resources] ==
+                ["legacy-voice.mp3", "legacy-scene.png"],
+                "legacy manual voice resource metadata changed after MediaAsset migration")
+        assert_downloads(base_url, token, legacy_resources, "legacy manual voice assignment")
+        legacy_download_paths = [item.get("downloadPath") for item in legacy_resources]
+        expect(
+            http(base_url, "DELETE", f"/api/v1/assignments/{legacy_assignment_id}", token=token),
+            (200, 204), "delete legacy manual voice assignment",
+        )
+        for path in legacy_download_paths:
+            expect(http(base_url, "GET", path, token=token), (404,),
+                   "legacy manual voice resource removed with assignment")
 
         batch_id = create_batch(base_url, token, student_id)
 
