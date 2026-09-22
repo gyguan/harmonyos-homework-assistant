@@ -1,6 +1,7 @@
 package com.xiaoban.homework.assignment;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import com.xiaoban.homework.media.MediaAssetService;
 import com.xiaoban.homework.storage.FileStorage;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -20,12 +21,15 @@ public class AssignmentResourceService {
   private final AssignmentService assignments;
   private final AssignmentResourceRepository resources;
   private final FileStorage storage;
+  private final MediaAssetService mediaAssets;
 
   public AssignmentResourceService(AssignmentService assignments,
-      AssignmentResourceRepository resources, FileStorage storage) {
+      AssignmentResourceRepository resources, FileStorage storage,
+      MediaAssetService mediaAssets) {
     this.assignments = assignments;
     this.resources = resources;
     this.storage = storage;
+    this.mediaAssets = mediaAssets;
   }
 
   @Transactional
@@ -85,8 +89,13 @@ public class AssignmentResourceService {
         .orElseThrow(() -> new ApiExceptions.NotFound("作业资料不存在"));
     if (!familyId.equals(resource.familyId)) throw new ApiExceptions.NotFound("作业资料不存在");
     assignments.requireOwned(familyId, resource.assignmentId);
-    return new ResourceDownload(storage.resolve(resource.storagePath),
-        resource.originalName, resource.contentType);
+    Path path;
+    if (resource.assetId != null) {
+      path = mediaAssets.resolveOwned(familyId, resource.assetId).path();
+    } else {
+      path = storage.resolve(resource.storagePath);
+    }
+    return new ResourceDownload(path, resource.originalName, resource.contentType);
   }
 
   private AssignmentResourceEntity saveResource(UUID familyId, String assignmentId,
