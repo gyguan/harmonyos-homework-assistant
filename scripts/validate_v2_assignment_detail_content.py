@@ -26,19 +26,27 @@ models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 for token in ["老师要求", "教材 / 页码", "老师资料", "需要先订正"]:
     require(token in detail, f"Assignment Detail missing focused V2 content: {token}")
 
-require("Text(item.instruction.length > 0 ? item.instruction" in detail,
+require("Text(this.assignment()!.instruction.length > 0 ? this.assignment()!.instruction" in detail,
         "teacher requirement must render the authoritative Assignment instruction")
-require("if (item.textbookRef.length > 0)" in detail and "Text(item.textbookRef)" in detail,
+require("if (this.assignment()!.textbookRef.length > 0)" in detail and "Text(this.assignment()!.textbookRef)" in detail,
         "textbook/page section must render only when Assignment.textbookRef exists")
-require("if (item.resourceLabels.length > 0)" in detail and
-        "ForEach(item.resourceLabels" in detail,
+require("if (this.assignment()!.resourceLabels.length > 0)" in detail and
+        "ForEach(this.assignment()!.resourceLabels" in detail,
         "teacher resources must render existing Assignment.resourceLabels individually")
-require("暂无老师资料" not in detail and "Text(item.textbookRef)" in detail,
+require("暂无老师资料" not in detail and "Text(this.assignment()!.textbookRef)" in detail,
         "Assignment Detail must not show empty optional-value cards to the student")
 require("完成要求" not in detail and "提交方式" not in detail,
         "Assignment Detail must not repeat generic completion or submission instructions")
 require(detail.find("需要先订正") < detail.find("老师要求"),
         "rework feedback must appear before the teacher instruction")
+
+require("private DetailContent()" in detail and
+        "private DetailContent(item: Assignment)" not in detail and
+        "this.DetailContent();" in detail,
+        "Assignment Detail content must stay bound to reactive assignmentId/revision instead of capturing an Assignment builder parameter")
+detail_content = detail.split("private DetailContent()", 1)[-1].split("\n  build() {", 1)[0]
+require("item." not in detail_content and "this.assignment()!" in detail_content,
+        "Assignment Detail content must resolve the current assignment from reactive props during render")
 require("Scroll()" in detail and ".layoutWeight(1)" in detail and
         "Button(this.actionLabel(this.assignment()!)" in detail,
         "Assignment Detail must keep content scrollable with a fixed primary action")
