@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface VoiceMaterialBatchRepository extends JpaRepository<VoiceMaterialBatchEntity, UUID> {
   boolean existsByFamilyIdAndStudentId(UUID familyId, String studentId);
+  void deleteByFamilyIdAndStudentId(UUID familyId, String studentId);
 
   @Query("""
       select b.studentId from VoiceMaterialBatchEntity b
