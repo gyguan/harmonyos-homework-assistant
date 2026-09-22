@@ -44,7 +44,7 @@ public class StudentService {
 
   @Transactional
   public void delete(UUID familyId, String id) {
-    StudentEntity student = requireOwned(familyId, id);
+    StudentEntity student = requireOwnedForUpdate(familyId, id);
     if (repository.countByFamilyId(familyId) <= 1) throw new ApiExceptions.Conflict("家庭至少保留一个孩子");
     if (assignments.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有作业记录，不能直接删除；可先保留资料或清理作业后再删除");
