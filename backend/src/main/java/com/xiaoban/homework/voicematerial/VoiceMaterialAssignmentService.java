@@ -59,7 +59,7 @@ public class VoiceMaterialAssignmentService {
       throw new ApiExceptions.BadRequest("只有可创建的语音素材目录才能生成任务");
     }
 
-    AssignmentDtos.Response assignment = consumeLocked(familyId, item, null, "");
+    AssignmentDtos.Response assignment = consumeLocked(familyId, item, null, "", LocalDate.now(BUSINESS_ZONE));
     return new VoiceMaterialDtos.CreateAssignmentResponse(
         true, assignment.id(), assignment);
   }
@@ -90,7 +90,7 @@ public class VoiceMaterialAssignmentService {
         ? businessDate.atTime(LocalTime.of(23, 59)).atZone(BUSINESS_ZONE).toInstant()
         : null;
     AssignmentDtos.Response assignment = consumeLocked(
-        familyId, item, dailyDueAt, item.dueAt == null ? "今天" : "");
+        familyId, item, dailyDueAt, item.dueAt == null ? "今天" : "", businessDate);
 
     VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
     record.id = UUID.randomUUID();
@@ -108,7 +108,7 @@ public class VoiceMaterialAssignmentService {
   }
 
   private AssignmentDtos.Response consumeLocked(UUID familyId,
-      VoiceMaterialPackageEntity item, Instant dueAtOverride, String dueTextOverride) {
+      VoiceMaterialPackageEntity item, Instant dueAtOverride, String dueTextOverride, LocalDate businessDate) {
     String assignmentId = "a-voicepkg-" + item.id;
     Long dueAtEpochMs = null;
     if (dueAtOverride != null) dueAtEpochMs = Long.valueOf(dueAtOverride.toEpochMilli());
@@ -117,7 +117,7 @@ public class VoiceMaterialAssignmentService {
     AssignmentDtos.Create create = new AssignmentDtos.Create(
         assignmentId,
         subjectDisplay(item.subjectCode),
-        item.title,
+        assignments.nextVoiceMaterialTaskTitle(familyId, item.studentId, item.subjectCode, businessDate),
         "请听语音并结合图片完成任务。",
         "",
         dueTextOverride,
