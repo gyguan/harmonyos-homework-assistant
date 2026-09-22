@@ -38,6 +38,7 @@ import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
 batch_detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 workflow = read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets")
+cpp = read("entry/src/main/cpp/homework_capture_napi.cpp")
 module = read("entry/src/main/module.json5")
 pages = read("entry/src/main/resources/base/profile/main_pages.json")
 
@@ -69,8 +70,11 @@ require("已有采集会话正在运行" in store and "activeSessionId" in store
 
 require("nativeCapture.startCapture()" in runtime and "nativeCapture.stopCapture()" in runtime,
         "formal runtime must adapt the #241 native bridge")
-require("nativeCapture.getLatestFrame()" in runtime,
-        "formal runtime must expose latest sampled frame")
+require("nativeCapture.getLatestFrame()" in runtime and "nativeCapture.getPendingFrame()" in runtime,
+        "formal runtime must expose latest and pending sampled frames")
+require("MAX_PENDING_FRAMES" in cpp and "MAX_PENDING_BYTES" in cpp and
+        "GetPendingFrame" in cpp,
+        "cross-app capture must retain a bounded in-memory changed-frame queue")
 require("textRecognition.recognizeText" in recognizer,
         "formal frame recognizer must use Core Vision OCR")
 
@@ -78,9 +82,10 @@ require("CaptureSessionStatus.WAITING_PERMISSION" in service,
         "session must enter WAITING_PERMISSION before capture")
 require("if (!frame || frame.sequence <= session.lastFrameSequence)" in service,
         "capture must require a real new frame before processing")
-require(service.index("session.status = CaptureSessionStatus.CAPTURING") >
-        service.index("let frame = runtime.getLatestFrame()"),
-        "CAPTURING must only be entered after a real frame exists")
+require("let frame = runtime.getPendingFrame()" in service and
+        service.index("session.status = CaptureSessionStatus.CAPTURING") >
+        service.index("let frame = runtime.getPendingFrame()"),
+        "CAPTURING must only be entered after a real pending frame exists")
 require("START_REJECTED" in service and "CaptureSessionStatus.CANCELLED" in service,
         "rejected start/permission path must return to recoverable terminal state")
 require("FIRST_FRAME_TIMEOUT_MS" in service and "FIRST_FRAME_TIMEOUT" in models,
@@ -150,9 +155,11 @@ require('"pages/HomeworkCaptureFloatView"' not in pages,
         "guided capture must not register a cross-app floating UI")
 require("floatView" not in page and "FLOAT_VIEW" not in page,
         "formal capture page must not invoke FloatView APIs")
-require("返回小伴" in page and "this.viewModel.finishByUser()" in page and
-        "this.capture.stopByUser()" in workflow,
-        "user-controlled stop must happen after returning to the app and reach CaptureSessionService.stopByUser")
+require("系统录屏通知" in page and "备用：" in page and
+        "this.viewModel.finishByUser()" in page and "this.capture.stopByUser()" in workflow,
+        "system notification must be the primary stop path with an in-app fallback")
+require("pendingFrameCount" in service and "runtime.getPendingFrame()" in service,
+        "system-driven stop must drain bounded pending frames before finalization")
 require("floatView" not in diagnostic and "FLOAT_VIEW" not in diagnostic and
         "this.captureRuntime.stopCapture()" in diagnostic,
         "diagnostic capture must also avoid floating-window permissions and stop in-app")
