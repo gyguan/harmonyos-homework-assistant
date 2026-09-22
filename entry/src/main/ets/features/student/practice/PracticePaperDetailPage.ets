@@ -83,19 +83,6 @@ export struct PracticePaperDetailPage {
   }
 
   @Builder
-  private MetricCard(value: string, label: string) {
-    Column({ space: 4 }) {
-      Text(value).fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text(label).fontSize(12).fontColor(AppTheme.SUBTEXT);
-    }
-    .layoutWeight(1)
-    .height(72)
-    .justifyContent(FlexAlign.Center)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
-  }
-
-  @Builder
   private RecentAttemptCard(item: PracticeAttemptSummary) {
     Column({ space: 7 }) {
       Row({ space: 8 }) {
@@ -206,10 +193,12 @@ export struct PracticePaperDetailPage {
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS);
       } else {
-        Column({ space: 8 }) {
-          ForEach(this.recentAttempts, (item: PracticeAttemptSummary) => {
-            this.RecentAttemptCard(item);
-          }, (item: PracticeAttemptSummary) => item.id);
+        Column({ space: 6 }) {
+          Text('最近一次')
+            .width('100%')
+            .fontSize(12)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+          this.RecentAttemptCard(this.recentAttempts[0]);
         }
         .width('100%');
       }
@@ -261,28 +250,21 @@ export struct PracticePaperDetailPage {
             .width('100%')
             .alignItems(HorizontalAlign.Start);
 
-            Row({ space: 10 }) {
-              this.MetricCard(`${this.paper.questionCount}`, '题目');
-              this.MetricCard(`${this.paper.estimatedMinutes} 分钟`, '预计');
-              this.MetricCard(PracticeTaxonomy.difficultyLabel(this.paper.difficulty), '难度');
-            }
-            .width('100%');
+            Text(`${this.paper.questionCount} 题 · 约 ${this.paper.estimatedMinutes} 分钟 · ${PracticeTaxonomy.difficultyLabel(this.paper.difficulty)}`)
+              .width('100%')
+              .fontSize(14)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
 
-            Column({ space: 8 }) {
-              Text('训练内容')
-                .width('100%')
-                .fontSize(16)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.TEXT);
+            if (this.paper.tags.length > 0) {
               Text(this.paper.tags.join(' · '))
                 .width('100%')
+                .maxLines(2)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
                 .fontSize(13)
-                .fontColor(AppTheme.SUBTEXT);
+                .lineHeight(18)
+                .fontColor(AppTheme.TERTIARY_TEXT);
             }
-            .width('100%')
-            .padding(AppTheme.CARD_PADDING)
-            .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CARD_RADIUS);
 
             this.HistorySection();
           }
