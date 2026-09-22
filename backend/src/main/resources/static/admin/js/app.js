@@ -184,14 +184,21 @@ async function uploadSelected() {
     batch = await createVoiceMaterialBatch(studentSelect.value);
     for (const item of selected) {
       updateProgress(finishedDirectories, selected.length, `正在导入：${item.directoryName}`);
+      let remotePackage = null;
       try {
-        const remotePackage = await registerVoiceMaterialPackage(batch.id, item);
-        for (const file of uploadOrder(item.files)) {
-          await uploadVoiceMaterialFile(remotePackage.id, file, file.sortOrder);
-        }
+        remotePackage = await registerVoiceMaterialPackage(batch.id, item);
       } catch (error) {
         registrationFailures++;
-        console.error('voice material package upload failed', item.directoryName, error);
+        console.error('voice material package registration failed', item.directoryName, error);
+      }
+      if (remotePackage !== null) {
+        try {
+          for (const file of uploadOrder(item.files)) {
+            await uploadVoiceMaterialFile(remotePackage.id, file, file.sortOrder);
+          }
+        } catch (error) {
+          console.error('voice material file upload failed', item.directoryName, error);
+        }
       }
       finishedDirectories++;
       updateProgress(finishedDirectories, selected.length, `已处理 ${finishedDirectories} / ${selected.length} 个目录`);
@@ -207,7 +214,7 @@ async function uploadSelected() {
       failures === 0
     );
 
-    if (completed.readyCount > 0) {
+    if (failures === 0 && completed.readyCount > 0) {
       state.packages = state.packages.filter(item => !item.selected || !validatePackage(item).valid);
       renderPackages();
       folderInput.value = '';
