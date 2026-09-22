@@ -434,7 +434,7 @@ export struct ParentVoiceMaterialPage {
         .enabled(!this.selecting && !this.uploading)
         .onClick(() => { void this.addPackages(); });
 
-      Text('支持目录选择的设备可直接多选文件夹；其他设备可选择目录内的语音和图片，系统会按父目录自动归组。')
+      Text('支持目录选择的设备可直接选择文件夹；如需批量导入，可重复点击“添加目录”。不支持目录选择的设备可选择目录内的语音和图片，系统会按父目录自动归组。')
         .width('100%')
         .fontSize(11)
         .lineHeight(17)
