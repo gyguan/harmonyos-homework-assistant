@@ -26,10 +26,10 @@ module = read("entry/src/main/module.json5")
 pages = read("entry/src/main/resources/base/profile/main_pages.json")
 ocr = read("entry/src/main/ets/infrastructure/capture/HomeworkCaptureOcrService.ets")
 diagnostic = read("entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets")
-float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
 native_runtime = read("entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 capture_home = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets")
+capture_page = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
 entry_pkg = read("entry/oh-package.json5")
 build = read("entry/build-profile.json5")
 
@@ -64,13 +64,11 @@ require("fwrite(" not in cpp and "std::ofstream" not in cpp,
 require("OH_MIC" not in cpp and "ohos.permission.MICROPHONE" not in module,
         "issue #241 must not capture microphone audio")
 
-require('"ohos.permission.FLOAT_VIEW"' in module,
-        "FloatView user-grant permission must be declared")
-require('"reason": "$string:float_view_permission_reason"' in module and
-        '"usedScene"' in module and '"when": "inuse"' in module,
-        "FloatView permission must include reason and in-use scene")
-require('"pages/HomeworkCaptureFloatView"' in pages,
-        "FloatView content page must be registered")
+require('"ohos.permission.FLOAT_VIEW"' not in module and
+        '"ohos.permission.SYSTEM_FLOAT_WINDOW"' not in module,
+        "capture must not depend on restricted floating-window permissions")
+require('"pages/HomeworkCaptureFloatView"' not in pages,
+        "obsolete cross-app floating capture page must stay unregistered")
 require("libhomeworkcapture.so" in entry_pkg and "externalNativeOptions" in build,
         "native bridge must be wired into the entry module")
 
@@ -83,8 +81,10 @@ require("result.blocks" in ocr and "cornerPoints" in ocr,
 require("libhomeworkcapture.so" in native_runtime and
         "NativeHomeworkCaptureRuntime" in native_runtime,
         "native capture library must be isolated behind NativeHomeworkCaptureRuntime")
-require("this.captureRuntime.stopCapture()" in float_page,
-        "FloatView must allow the user to stop capture while still in WeChat through the runtime adapter")
+require("this.captureRuntime.stopCapture()" in diagnostic,
+        "diagnostic page must allow capture to stop after the user returns to the app")
+require("this.viewModel.finishByUser()" in capture_page and "返回小伴" in capture_page,
+        "formal capture must finish from the app after the user returns from the target chat")
 require("PARENT_CAPTURE_DIAGNOSTIC" in routes and "HomeworkCaptureDiagnosticPage" in diagnostic,
         "capture diagnostics must remain reachable through a dedicated formal route")
 require("屏幕采集诊断" in capture_home and "onOpenDiagnostics" in capture_home,
@@ -95,7 +95,7 @@ require("CandidateAssignment" not in diagnostic and "AssignmentRepository" not i
         "diagnostic page must not create or mutate assignment business data")
 require("测试 Fixture" not in diagnostic and "#241" not in diagnostic and "真机 Gate" not in diagnostic,
         "formal diagnostic UI must not expose feasibility-spike language or fixture content")
-for text in ["屏幕采集", "文字识别", "悬浮状态", "高级诊断信息", "开始诊断"]:
+for text in ["屏幕采集", "文字识别", "高级诊断信息", "开始诊断"]:
     require(text in diagnostic, f"diagnostic UI missing user-facing capability: {text}")
 for detail in ["callbacks=", "sequence=", "OCR 全文", "OCR 行坐标"]:
     require(detail in diagnostic, f"advanced diagnostic evidence must remain available: {detail}")
