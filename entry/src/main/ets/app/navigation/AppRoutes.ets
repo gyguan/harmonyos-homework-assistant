@@ -14,7 +14,8 @@ export enum AppRoute {
   PARENT_SOURCE_PROFILE = 'parent/import/source-profile',
   PARENT_CAPTURE_DIAGNOSTIC = 'parent/capture/diagnostic',
   PARENT_IMPORT_CONFIRMATION = 'parent/import/confirmation',
-  PARENT_EXTRA_CREATE = 'parent/extra/create'
+  PARENT_EXTRA_CREATE = 'parent/extra/create',
+  PARENT_VOICE_MATERIAL = 'parent/voice/material'
 }
 
 export class AssignmentRouteParam {
