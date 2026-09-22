@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
@@ -134,10 +135,8 @@ public class VoiceMaterialService {
   public VoiceMaterialDtos.BatchResponse completeBatch(UUID familyId, UUID batchId) {
     VoiceMaterialBatchEntity batch = requireBatch(familyId, batchId);
     List<VoiceMaterialPackageEntity> items =
-        packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
-            familyId, batch.studentId).stream()
-            .filter(item -> batch.id.equals(item.batchId))
-            .toList();
+        packages.findByFamilyIdAndBatchIdOrderByDirectoryNameAscCreatedAtAsc(
+            familyId, batch.id);
 
     int ready = 0;
     int invalid = 0;
@@ -159,6 +158,10 @@ public class VoiceMaterialService {
         invalid++;
         continue;
       }
+
+      normalizeSortOrder(packageFiles);
+      files.saveAll(packageFiles);
+      packageFiles.sort(Comparator.comparingInt(file -> file.sortOrder));
 
       String fingerprint = fingerprint(item, packageFiles);
       VoiceMaterialPackageEntity duplicate = packages
@@ -222,6 +225,20 @@ public class VoiceMaterialService {
   private VoiceMaterialDtos.FileResponse fileResponse(VoiceMaterialFileEntity file) {
     return new VoiceMaterialDtos.FileResponse(file.id.toString(), file.assetId.toString(),
         file.resourceType, file.relativeName, file.sortOrder);
+  }
+
+  private void normalizeSortOrder(List<VoiceMaterialFileEntity> packageFiles) {
+    List<VoiceMaterialFileEntity> audio = packageFiles.stream()
+        .filter(file -> "AUDIO".equals(file.resourceType))
+        .toList();
+    if (!audio.isEmpty()) audio.get(0).sortOrder = 0;
+
+    List<VoiceMaterialFileEntity> images = packageFiles.stream()
+        .filter(file -> "IMAGE".equals(file.resourceType))
+        .sorted(Comparator.comparing(
+            file -> file.relativeName.toLowerCase(Locale.ROOT)))
+        .toList();
+    for (int i = 0; i < images.size(); i++) images.get(i).sortOrder = i + 1;
   }
 
   private String fingerprint(VoiceMaterialPackageEntity item,
