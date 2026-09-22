@@ -41,12 +41,12 @@
 微信聊天页面
 → 上滑 3~5 屏
 → 保持约 30 秒
+→ 从系统录屏通知停止采集
 → 返回小伴
-→ 点击“结束并整理”
-→ 读取最后一张有效微信画面并执行 OCR
+→ 消费有限变化帧队列并执行 OCR
 ~~~
 
-采集层应以最后一张有效变化帧作为证据，不应因为用户返回小伴而用应用自身页面覆盖最后一张已接受的微信证据。
+Native 层只保留有限数量的“变化帧”，同时按数量和内存上限淘汰旧帧；不落盘。这样不需要跨应用悬浮窗，也避免用户返回小伴后应用自身页面覆盖最后的微信证据。
 
 构建 ABI：arm64-v8a（真机）+ x86_64（模拟器）；#241 最终 Gate 仍以真机为准。
 
@@ -73,8 +73,8 @@
 5. 系统出现屏幕采集隐私提示后同意。
 6. 切到微信测试群。
 7. 连续上滑 3~5 屏并保持采集至少 30 秒。
-8. 返回小伴。
-9. 点击“结束并整理”。
+8. 从系统录屏通知停止采集。
+9. 返回小伴，等待剩余变化帧处理完成。
 
 验收：
 
@@ -82,7 +82,7 @@
 - [ ] 同意后 callbackCount > 0。
 - [ ] sampledFrameCount > 0。
 - [ ] 连续 30 秒没有崩溃。
-- [ ] 返回小伴并结束后 isCapturing=false。
+- [ ] 从系统录屏通知停止后 isCapturing=false。
 - [ ] 停止后回调计数不再增长。
 - [ ] 退出实验页后再次进入可以重新启动，未出现资源占用/实例上限错误。
 
@@ -106,8 +106,9 @@
 - [ ] 不申请 FLOAT_VIEW / SYSTEM_FLOAT_WINDOW。
 - [ ] 切换微信后采集仍继续。
 - [ ] 微信界面没有小伴悬浮层遮挡。
-- [ ] 返回小伴后采集页仍能恢复当前会话状态。
-- [ ] 点击“结束并整理”后采集停止并释放资源。
+- [ ] 从系统录屏通知停止后 Native 状态变为非采集中。
+- [ ] 返回小伴后采集页仍能恢复当前会话状态并处理残留变化帧。
+- [ ] 页面备用结束按钮仍可停止并释放资源。
 
 ## 7. 结果记录
 
@@ -116,7 +117,7 @@
 ~~~text
 AVScreenCapture: PASS / FAIL
 OCR: PASS / FAIL
-Return-to-app stop: PASS / FAIL
+System-notification stop: PASS / FAIL
 
 Target HarmonyOS version:
 Target device:
@@ -137,10 +138,10 @@ OCR:
 - timestamp recognized: YES / NO
 - homework body recognized: YES / NO
 
-Return-to-app stop:
+System-notification stop:
 - capture continues after switching to WeChat: YES / NO
-- capture page resumes after returning: YES / NO
-- stop button works: YES / NO
+- system notification stop works: YES / NO
+- capture page resumes and finalizes after returning: YES / NO
 
 Known limitations:
 
@@ -157,7 +158,7 @@ AVScreenCapture = PASS
 Core Vision OCR = PASS
 ~~~
 
-停止交互以“返回小伴后结束并整理”为正式方案，不依赖跨应用悬浮能力。
+停止交互以“系统录屏通知停止 + 返回小伴自动整理”为正式方案，应用内结束仅作为兜底，不依赖跨应用悬浮能力。
 
 ## 9. 当前状态
 
@@ -166,7 +167,7 @@ Static implementation: IMPLEMENTED
 Static repository gate: IMPLEMENTED
 AVScreenCapture real-device gate: PENDING
 Core Vision OCR real-device gate: PENDING
-Return-to-app stop real-device gate: PENDING
+System-notification stop real-device gate: PENDING
 ~~~
 
 本文件不以代码可编译或 API 文档存在来替代真机 Gate。
