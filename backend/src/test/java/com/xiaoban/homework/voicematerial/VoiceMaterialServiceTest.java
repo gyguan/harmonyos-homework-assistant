@@ -44,7 +44,8 @@ class VoiceMaterialServiceTest {
     existing.relativeName = "voice.mp3";
     existing.sortOrder = 0;
 
-    when(packages.findById(packageId)).thenReturn(Optional.of(item));
+    when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
     when(files.findByFamilyIdAndPackageIdAndResourceTypeAndRelativeName(
         familyId, packageId, "AUDIO", "voice.mp3"))
         .thenReturn(Optional.of(existing));
@@ -57,6 +58,7 @@ class VoiceMaterialServiceTest {
         new MockMultipartFile("file", "voice.mp3", "audio/mpeg", new byte[] {1, 2, 3}));
 
     assertEquals(existing.id.toString(), result.id());
+    verify(students).requireOwnedForUpdate(familyId, "student-1");
     verify(mediaAssets, never()).store(any(), any());
   }
 }
