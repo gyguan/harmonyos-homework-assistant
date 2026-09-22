@@ -69,6 +69,8 @@ require("item.status = \"CONSUMED\"" in assignment_service and
 require("input.subjectCode().trim().toUpperCase" in material_service and
         "directoryName" in material_service,
         "#298 subjectCode must be explicit package metadata while directoryName stays a separate field")
+require("batch.readyCount + batch.invalidCount >= batch.directoryCount" in material_service,
+        "#298 completed material batches must reject late package registration")
 require('item.consumedAssignmentId == null ? "" : item.consumedAssignmentId' in material_service,
         "#298 PackageResponse must keep consumedAssignmentId non-null for the ArkTS string contract")
 require("students.requireOwnedForUpdate(familyId, studentId)" in material_service,
@@ -119,8 +121,10 @@ require("voiceMaterials.existsByFamilyIdAndStudentId" in student_service,
 require("StudentEntity student = requireOwnedForUpdate(familyId, id)" in student_service,
         "#298 student deletion must lock the student row before checking voice-material ownership")
 require("legacy manual voice assignment" in voice_e2e and
-        "concurrent retry created duplicate package file" in voice_e2e,
-        "#298 E2E must preserve legacy storage-path voice compatibility and concurrent retry idempotency")
+        "concurrent retry created duplicate package file" in voice_e2e and
+        "student delete/material batch race escaped business boundary" in voice_e2e and
+        "reject package registration after batch completion" in voice_e2e,
+        "#298 E2E must preserve legacy compatibility and concurrency/lifecycle boundaries")
 require("Media Asset（媒体资产）" in context and
         "Daily Voice Auto Create（每日语音自动创建）" in context,
         "#298 domain language must be documented in CONTEXT.md")
