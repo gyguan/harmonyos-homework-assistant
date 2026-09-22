@@ -64,8 +64,10 @@ public class VoiceMaterialService {
   @Transactional
   public VoiceMaterialDtos.PackageResponse registerPackage(UUID familyId, UUID batchId,
       VoiceMaterialDtos.RegisterPackageRequest input) {
+    String studentId = batches.findOwnedStudentId(familyId, batchId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材批次不存在"));
+    students.requireOwnedForUpdate(familyId, studentId);
     VoiceMaterialBatchEntity batch = requireBatch(familyId, batchId);
-    students.requireOwnedForUpdate(familyId, batch.studentId);
     String subjectCode = input.subjectCode().trim().toUpperCase(Locale.ROOT);
     if (subjectCode.isBlank()) throw new ApiExceptions.BadRequest("请选择科目");
     String directoryName = input.directoryName().trim();
@@ -107,8 +109,9 @@ public class VoiceMaterialService {
   @Transactional
   public VoiceMaterialDtos.FileResponse uploadFile(UUID familyId, UUID packageId,
       String resourceType, String relativeName, int sortOrder, MultipartFile file) {
-    VoiceMaterialPackageEntity snapshot = requirePackage(familyId, packageId);
-    students.requireOwnedForUpdate(familyId, snapshot.studentId);
+    String studentId = packages.findOwnedStudentId(familyId, packageId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
+    students.requireOwnedForUpdate(familyId, studentId);
     VoiceMaterialPackageEntity item = packages.lockOwned(familyId, packageId)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
     if (!"UPLOADING".equals(item.status)) {
@@ -149,8 +152,10 @@ public class VoiceMaterialService {
 
   @Transactional
   public VoiceMaterialDtos.BatchResponse completeBatch(UUID familyId, UUID batchId) {
+    String studentId = batches.findOwnedStudentId(familyId, batchId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材批次不存在"));
+    students.requireOwnedForUpdate(familyId, studentId);
     VoiceMaterialBatchEntity batch = requireBatch(familyId, batchId);
-    students.requireOwnedForUpdate(familyId, batch.studentId);
     List<VoiceMaterialPackageEntity> items =
         packages.findByFamilyIdAndBatchIdOrderByDirectoryNameAscCreatedAtAsc(
             familyId, batch.id);
