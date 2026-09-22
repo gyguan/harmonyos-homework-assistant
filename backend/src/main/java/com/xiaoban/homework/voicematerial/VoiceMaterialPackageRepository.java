@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 public interface VoiceMaterialPackageRepository extends JpaRepository<VoiceMaterialPackageEntity, UUID> {
   List<VoiceMaterialPackageEntity> findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
       UUID familyId, String studentId);
+  boolean existsByFamilyIdAndStudentId(UUID familyId, String studentId);
 
   Optional<VoiceMaterialPackageEntity> findByFamilyIdAndStudentIdAndPackageFingerprint(
       UUID familyId, String studentId, String packageFingerprint);
