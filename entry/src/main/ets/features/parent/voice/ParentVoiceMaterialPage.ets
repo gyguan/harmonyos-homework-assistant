@@ -6,10 +6,7 @@ import { RemoteVoiceMaterialPackage } from '../../../application/remote/RemoteVo
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import {
-  ParentVoiceMaterialViewModel,
-  VoiceMaterialLocalValidation
-} from './ParentVoiceMaterialViewModel';
+import { ParentVoiceMaterialViewModel } from './ParentVoiceMaterialViewModel';
 
 const VOICE_SUBJECT_CODES: string[] = ['CHINESE', 'MATH', 'ENGLISH', 'OTHER'];
 
@@ -219,14 +216,14 @@ export struct ParentVoiceMaterialPage {
     return '上传中';
   }
 
-  private statusColor(status: string): ResourceColor {
+  private statusColor(status: string): string {
     if (status === 'READY') return AppTheme.PRIMARY;
     if (status === 'CONSUMED') return AppTheme.SUCCESS;
     if (status === 'INVALID') return AppTheme.DANGER;
     return AppTheme.SUBTEXT;
   }
 
-  private statusBackground(status: string): ResourceColor {
+  private statusBackground(status: string): string {
     if (status === 'READY') return AppTheme.PRIMARY_SOFT;
     if (status === 'CONSUMED') return AppTheme.SUCCESS_SOFT;
     if (status === 'INVALID') return AppTheme.DANGER_SOFT;
@@ -246,6 +243,15 @@ export struct ParentVoiceMaterialPage {
   private showSuccess(message: string): void {
     this.message = message;
     this.messageError = false;
+  }
+
+  private validationSummary(item: VoiceMaterialLocalPackage): string {
+    let validation = this.viewModel.validate(item);
+    return `${validation.audioCount} 个语音 · ${validation.imageCount} 张图片 · ${validation.message}`;
+  }
+
+  private validationColor(item: VoiceMaterialLocalPackage): string {
+    return this.viewModel.validate(item).valid ? AppTheme.SUBTEXT : AppTheme.DANGER;
   }
 
   @Builder
@@ -323,10 +329,9 @@ export struct ParentVoiceMaterialPage {
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
-          let validation: VoiceMaterialLocalValidation = this.viewModel.validate(item);
-          Text(`${validation.audioCount} 个语音 · ${validation.imageCount} 张图片 · ${validation.message}`)
+          Text(this.validationSummary(item))
             .fontSize(12)
-            .fontColor(validation.valid ? AppTheme.SUBTEXT : AppTheme.DANGER);
+            .fontColor(this.validationColor(item));
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
