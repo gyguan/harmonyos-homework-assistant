@@ -27,6 +27,8 @@ export struct PracticeAttemptPage {
   @State private currentNote: string = '';
   @State private hintVisible: boolean = false;
   @State private showPreviousAnswer: boolean = false;
+  @State private showQuestionNavigation: boolean = false;
+  @State private showNoteEditor: boolean = false;
   @State private saving: boolean = false;
   @State private submitting: boolean = false;
   @State private errorMessage: string = '';
@@ -349,24 +351,32 @@ export struct PracticeAttemptPage {
     if (this.attempt !== null) {
       Column() {
         Column({ space: this.scaled(8) }) {
-          this.QuestionNavigation();
-          if (this.hasPreviousContext()) {
-            Row() {
-              Text(`第 ${this.attempt.attemptNo} 次练习`)
-                .fontSize(this.scaled(12))
-                .fontColor(AppTheme.SUBTEXT);
-              Blank();
+          Row({ space: this.scaled(12) }) {
+            Text(this.showQuestionNavigation ? '收起题号' : '选择题目')
+              .fontSize(this.scaled(12))
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY)
+              .constraintSize({ minHeight: this.scaled(AppTheme.MIN_TOUCH_TARGET) })
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText(this.showQuestionNavigation ? '收起题号导航' : '打开题号导航')
+              .onClick(() => this.showQuestionNavigation = !this.showQuestionNavigation);
+            if (this.hasPreviousContext()) {
               Text(this.showPreviousAnswer ? '隐藏上次作答' : '显示上次作答')
                 .fontSize(this.scaled(12))
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.PRIMARY)
                 .constraintSize({ minHeight: this.scaled(AppTheme.MIN_TOUCH_TARGET) })
-                .padding({ left: this.scaled(10), right: this.scaled(2) })
                 .accessibilityRole(AccessibilityRoleType.BUTTON)
                 .accessibilityText(this.showPreviousAnswer ? '隐藏上次作答' : '显示上次作答')
                 .onClick(() => this.showPreviousAnswer = !this.showPreviousAnswer);
             }
-            .width('100%');
+            Blank();
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Center);
+
+          if (this.showQuestionNavigation) {
+            this.QuestionNavigation();
           }
         }
         .width('100%')
@@ -374,8 +384,8 @@ export struct PracticeAttemptPage {
         .padding({
           left: this.scaled(AppTheme.PAGE_PADDING),
           right: this.scaled(AppTheme.PAGE_PADDING),
-          top: this.scaled(12),
-          bottom: this.scaled(8)
+          top: this.scaled(6),
+          bottom: this.scaled(6)
         });
       }
       .width('100%')
@@ -405,24 +415,33 @@ export struct PracticeAttemptPage {
 
           Column({ space: this.scaled(7) }) {
             Row() {
-              Text('我的笔记')
+              Text(this.showNoteEditor ? '收起笔记' : (this.currentNote.length > 0 ? '编辑笔记' : '记笔记'))
                 .fontSize(this.scaled(13))
                 .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.TEXT);
+                .fontColor(AppTheme.PRIMARY)
+                .constraintSize({ minHeight: this.scaled(AppTheme.MIN_TOUCH_TARGET) })
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText(this.showNoteEditor ? '收起我的笔记' : '打开我的笔记')
+                .onClick(() => this.showNoteEditor = !this.showNoteEditor);
               Blank();
-              Text(`${this.currentNote.length}/500`)
-                .fontSize(this.scaled(11))
-                .fontColor(AppTheme.TERTIARY_TEXT);
+              if (this.currentNote.length > 0 && !this.showNoteEditor) {
+                Text('已记录')
+                  .fontSize(this.scaled(11))
+                  .fontColor(AppTheme.SUCCESS);
+              }
             }
             .width('100%');
-            TextInput({ placeholder: '记录这道题的思路、易错点…', text: this.currentNote })
-              .width('100%')
-              .height(this.scaled(AppTheme.INPUT_HEIGHT))
-              .fontSize(this.scaled(14))
-              .backgroundColor(AppTheme.SURFACE_SUBTLE)
-              .border({ width: 1, color: AppTheme.BORDER })
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .onChange((value: string) => this.updateNote(value));
+
+            if (this.showNoteEditor) {
+              TextInput({ placeholder: '记录这道题的思路、易错点…', text: this.currentNote })
+                .width('100%')
+                .height(this.scaled(AppTheme.INPUT_HEIGHT))
+                .fontSize(this.scaled(14))
+                .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                .border({ width: 1, color: AppTheme.BORDER })
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .onChange((value: string) => this.updateNote(value));
+            }
           }
           .width('100%');
 
