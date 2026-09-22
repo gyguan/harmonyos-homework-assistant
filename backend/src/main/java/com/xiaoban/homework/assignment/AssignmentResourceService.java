@@ -1,6 +1,7 @@
 package com.xiaoban.homework.assignment;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import com.xiaoban.homework.media.MediaAssetEntity;
 import com.xiaoban.homework.media.MediaAssetService;
 import com.xiaoban.homework.storage.FileStorage;
 import java.nio.file.Path;
@@ -74,6 +75,39 @@ public class AssignmentResourceService {
       }
       throw error;
     }
+  }
+
+  @Transactional
+  public List<AssignmentResourceDtos.Response> linkAssets(UUID familyId, String assignmentId,
+      List<AssetLink> links) {
+    assignments.requireOwned(familyId, assignmentId);
+    List<AssignmentResourceEntity> existing =
+        resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, assignmentId);
+    if (!existing.isEmpty()) {
+      return existing.stream().map(AssignmentResourceDtos.Response::from).toList();
+    }
+
+    List<AssignmentResourceEntity> created = new ArrayList<>();
+    for (AssetLink link : links) {
+      MediaAssetEntity asset = mediaAssets.requireOwned(familyId, link.assetId());
+      AssignmentResourceEntity entity = new AssignmentResourceEntity();
+      entity.id = UUID.randomUUID();
+      entity.familyId = familyId;
+      entity.assignmentId = assignmentId;
+      entity.resourceType = link.resourceType();
+      entity.storagePath = null;
+      entity.assetId = asset.id;
+      entity.originalName = asset.originalName;
+      entity.contentType = asset.contentType;
+      entity.sizeBytes = asset.sizeBytes;
+      entity.sortOrder = link.sortOrder();
+      entity.durationMs = link.durationMs();
+      entity.createdAt = Instant.now();
+      created.add(entity);
+    }
+    resources.saveAll(created);
+    resources.flush();
+    return created.stream().map(AssignmentResourceDtos.Response::from).toList();
   }
 
   @Transactional(readOnly = true)
@@ -157,5 +191,6 @@ public class AssignmentResourceService {
     return value == null ? "" : value.trim().toLowerCase(Locale.ROOT);
   }
 
+  public record AssetLink(String resourceType, UUID assetId, int sortOrder, long durationMs) {}
   public record ResourceDownload(Path path, String originalName, String contentType) {}
 }
