@@ -56,7 +56,7 @@ export class VoiceMaterialDirectoryPicker {
   }
 
   private async selectDirectories(): Promise<string[]> {
-    if (this.context === null) return [];
+    if (this.context === null || !this.supportsMultiFolderPicker()) return [];
     let options = new picker.DocumentSelectOptions();
     options.maxSelectNumber = 200;
     options.selectMode = picker.DocumentSelectMode.FOLDER;
