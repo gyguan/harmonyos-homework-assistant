@@ -79,6 +79,7 @@ require("if (resource.assetId == null && resource.storagePath != null" in delete
 require("allowsMulFolderSelection = true" in picker and
         "deviceInfo.sdkApiVersion >= 26" in picker and
         "if (!this.supportsMultiFolderPicker())" in picker and
+        "this.context === null || !this.supportsMultiFolderPicker()" in picker and
         "getFullDirectoryUri()" in picker and
         "selectFilesFallback" in picker and
         "DocumentSelectMode.FILE" in picker,
@@ -94,6 +95,8 @@ require("VoiceMaterialAutoCreateService.instance.checkToday(studentId)" in index
         "#298 student entry must trigger the server-authoritative daily check")
 require("Text('语音素材库')" in dashboard and "onOpenVoiceMaterial" in dashboard,
         "#298 parent dashboard must expose the voice material library")
+require("sys.symbol.exclamationmark_circle_fill" not in page,
+        "#298 parent material page must not depend on a version-sensitive feedback system symbol")
 require("private PendingSection()" in page and "private LibrarySection()" in page and
         "setPackageSubject" in page and
         "setPackageExpectedMinutes" in page and
