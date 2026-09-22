@@ -194,16 +194,25 @@ def main() -> int:
             race_delete = delete_future.result()
         race_statuses = (race_create.status, race_delete.status)
         require(
-            race_statuses in ((200, 409), (404, 200), (404, 204)),
+            race_statuses in ((200, 200), (200, 204), (404, 200), (404, 204)),
             f"student delete/material batch race escaped business boundary: {race_statuses!r}",
+        )
+
+        empty_student_id = f"voice-material-empty-{run_id}"
+        create_student(base_url, token, empty_student_id)
+        create_batch(base_url, token, empty_student_id)
+        expect(
+            http(base_url, "DELETE", f"/api/v1/students/{empty_student_id}", token=token),
+            (200, 204), "delete student after cleaning empty voice-material batch",
         )
 
         pending_student_id = f"voice-material-pending-{run_id}"
         create_student(base_url, token, pending_student_id)
-        create_batch(base_url, token, pending_student_id)
+        pending_batch_id = create_batch(base_url, token, pending_student_id)
+        register_package(base_url, token, pending_batch_id, "001-待上传素材", "CHINESE")
         expect(
             http(base_url, "DELETE", f"/api/v1/students/{pending_student_id}", token=token),
-            (409,), "reject student deletion while voice-material batch exists",
+            (409,), "reject student deletion while voice-material package exists",
         )
 
         legacy_assignment_id = f"legacy-voice-{run_id}"
