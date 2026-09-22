@@ -61,7 +61,7 @@ export struct HomeworkCaptureDiagnosticPage {
 
   private overallDetail(): string {
     if (this.analyzing) return '正在读取最后一个采集画面并检查文字识别。';
-    if (this.running) return '请打开一个有文字的页面短暂浏览，然后返回此页结束诊断。';
+    if (this.running) return '请打开一个有文字的页面短暂浏览，可从系统录屏通知停止后再返回此页。';
     if (!this.diagnosisStarted) return '诊断不会创建作业，只检查屏幕采集和文字识别。';
     if (this.captureStatus === '异常' || this.ocrStatus === '异常') {
       return '请查看下方异常项；需要进一步排查时可展开高级诊断信息。';
@@ -124,7 +124,7 @@ export struct HomeworkCaptureDiagnosticPage {
     this.running = stats.isCapturing || result === 0;
     this.captureStatus = '检测中';
     this.captureDetail = '等待系统授权并获取屏幕画面';
-    this.message = '授权后请打开一个有文字的页面短暂浏览，完成后返回此页点击结束诊断。';
+    this.message = '授权后请打开一个有文字的页面短暂浏览。建议从系统录屏通知停止后再返回；也可返回此页结束诊断。';
   }
 
   private async finishDiagnosis(): Promise<void> {
