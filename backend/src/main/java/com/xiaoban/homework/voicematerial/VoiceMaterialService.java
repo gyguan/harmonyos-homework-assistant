@@ -106,7 +106,10 @@ public class VoiceMaterialService {
   @Transactional
   public VoiceMaterialDtos.FileResponse uploadFile(UUID familyId, UUID packageId,
       String resourceType, String relativeName, int sortOrder, MultipartFile file) {
-    VoiceMaterialPackageEntity item = requirePackage(familyId, packageId);
+    VoiceMaterialPackageEntity snapshot = requirePackage(familyId, packageId);
+    students.requireOwnedForUpdate(familyId, snapshot.studentId);
+    VoiceMaterialPackageEntity item = packages.lockOwned(familyId, packageId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
     if (!"UPLOADING".equals(item.status)) {
       throw new ApiExceptions.BadRequest("当前目录已结束上传，不能再添加文件");
     }
