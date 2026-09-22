@@ -45,8 +45,11 @@ const LoginState = Object.freeze({
 let loginState = LoginState.LOGGED_OUT;
 
 function setView(view) {
-  loginView.hidden = view !== 'login';
-  adminView.hidden = view !== 'admin';
+  const showLoginView = view === 'login';
+  loginView.hidden = !showLoginView;
+  adminView.hidden = showLoginView;
+  loginView.style.display = showLoginView ? '' : 'none';
+  adminView.style.display = showLoginView ? 'none' : 'grid';
 }
 
 function setLoginState(nextState, message = '', error = '') {
@@ -77,6 +80,7 @@ function showAdminShell(displayName) {
   el('account-name').textContent = state.displayName;
   setView('admin');
   setLoginState(LoginState.READY);
+  console.debug('admin shell ready');
 }
 
 async function initializeAdmin() {
