@@ -65,6 +65,7 @@ public class VoiceMaterialService {
   public VoiceMaterialDtos.PackageResponse registerPackage(UUID familyId, UUID batchId,
       VoiceMaterialDtos.RegisterPackageRequest input) {
     VoiceMaterialBatchEntity batch = requireBatch(familyId, batchId);
+    students.requireOwnedForUpdate(familyId, batch.studentId);
     String subjectCode = input.subjectCode().trim().toUpperCase(Locale.ROOT);
     if (subjectCode.isBlank()) throw new ApiExceptions.BadRequest("请选择科目");
     String directoryName = input.directoryName().trim();
