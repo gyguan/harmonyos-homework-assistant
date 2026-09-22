@@ -46,14 +46,17 @@ require('private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai")'
 require("students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
         "packages.lockNextReady" in assignment_service,
         "#298 daily auto-create must serialize per student before consuming a READY package")
-require("students.requireOwnedForUpdate(familyId, batch.studentId)" in material_service,
-        "#298 batch completion must serialize per student before applying fingerprints and READY state")
-require("students.requireOwnedForUpdate(familyId, snapshot.studentId)" in material_service and
+require("batches.findOwnedStudentId(familyId, batchId)" in material_service and
+        "students.requireOwnedForUpdate(familyId, studentId)" in material_service,
+        "#298 package registration/completion must resolve student as a scalar before taking the Student lock")
+require("packages.findOwnedStudentId(familyId, packageId)" in material_service and
+        "students.requireOwnedForUpdate(familyId, studentId)" in material_service and
         "packages.lockOwned(familyId, packageId)" in material_service,
-        "#298 file upload retries must serialize with batch completion using Student -> Package lock order")
-require("students.requireOwnedForUpdate(familyId, snapshot.studentId)" in assignment_service and
+        "#298 file upload retries must resolve student without preloading Package and then use Student -> Package lock order")
+require("packages.findOwnedStudentId(familyId, packageId)" in assignment_service and
+        "students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
         "packages.lockOwned(familyId, packageId)" in assignment_service,
-        "#298 manual package consumption must use the same Student -> Package lock order")
+        "#298 manual package consumption must resolve student without a stale Package snapshot and use Student -> Package lock order")
 require("LocalTime.of(23, 59)" in assignment_service and
         'item.dueAt == null ? "今天" : ""' in assignment_service,
         "#298 an undated package auto-created for the day must appear in the student Today view")
