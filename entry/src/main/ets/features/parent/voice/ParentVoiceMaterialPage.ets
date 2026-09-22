@@ -102,6 +102,22 @@ export struct ParentVoiceMaterialPage {
     return false;
   }
 
+  private setPackageExpectedMinutes(index: number, value: string): void {
+    if (index < 0 || index >= this.pendingPackages.length) return;
+    let minutes = Number(value.trim());
+    if (!Number.isFinite(minutes) || Math.floor(minutes) !== minutes || minutes < 1 || minutes > 240) return;
+    let next = this.pendingPackages.slice();
+    let item = next[index];
+    next[index] = {
+      directoryUri: item.directoryUri,
+      directoryName: item.directoryName,
+      files: item.files.slice(),
+      subjectCode: item.subjectCode,
+      expectedMinutes: minutes
+    };
+    this.pendingPackages = next;
+  }
+
   private setPackageSubject(index: number, subjectCode: string): void {
     if (index < 0 || index >= this.pendingPackages.length) return;
     let next = this.pendingPackages.slice();
@@ -162,7 +178,11 @@ export struct ParentVoiceMaterialPage {
       let batch = await this.viewModel.upload(this.pendingPackages);
       this.pendingPackages = [];
       await this.reload();
-      this.showSuccess(`已导入 ${batch.readyCount} 个语音素材目录`);
+      if (batch.invalidCount > 0) {
+        this.showSuccess(`已导入 ${batch.readyCount} 个，${batch.invalidCount} 个目录素材异常`);
+      } else {
+        this.showSuccess(`已导入 ${batch.readyCount} 个语音素材目录`);
+      }
     } catch (error) {
       this.showError(error instanceof Error ? error.message : '批量导入语音素材失败');
     } finally {
@@ -352,6 +372,19 @@ export struct ParentVoiceMaterialPage {
             this.setPackageSubject(index, code);
           });
         }, (code: string) => `${item.directoryUri}-${code}`);
+      }
+      .width('100%');
+
+      Row({ space: 8 }) {
+        Text('预计用时').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        TextInput({ text: `${item.expectedMinutes}` })
+          .width(92)
+          .height(38)
+          .fontSize(13)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CHIP_RADIUS)
+          .onChange((value: string) => this.setPackageExpectedMinutes(index, value));
+        Text('分钟').fontSize(12).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
     }
