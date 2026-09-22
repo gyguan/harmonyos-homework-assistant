@@ -107,6 +107,10 @@ public class VoiceMaterialAssignmentService {
   private AssignmentDtos.Response consumeLocked(UUID familyId,
       VoiceMaterialPackageEntity item, Instant dueAtOverride, String dueTextOverride) {
     String assignmentId = "a-voicepkg-" + item.id;
+    Long dueAtEpochMs = null;
+    if (dueAtOverride != null) dueAtEpochMs = Long.valueOf(dueAtOverride.toEpochMilli());
+    else if (item.dueAt != null) dueAtEpochMs = Long.valueOf(item.dueAt.toEpochMilli());
+
     AssignmentDtos.Create create = new AssignmentDtos.Create(
         assignmentId,
         subjectDisplay(item.subjectCode),
@@ -117,8 +121,7 @@ public class VoiceMaterialAssignmentService {
         item.assignmentType,
         item.subjectCode,
         "AUDIO_IMAGE",
-        dueAtOverride != null ? dueAtOverride.toEpochMilli()
-            : (item.dueAt == null ? null : item.dueAt.toEpochMilli()),
+        dueAtEpochMs,
         BUSINESS_ZONE.getId(),
         "NOT_STARTED",
         "语音素材库",
