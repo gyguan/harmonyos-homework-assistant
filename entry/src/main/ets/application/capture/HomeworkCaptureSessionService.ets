@@ -158,7 +158,9 @@ export class HomeworkCaptureSessionService {
     let signature = this.frameSignature(frame);
     if (!this.isMeaningfulChange(session.id, signature)) {
       this.store.updateSession(session);
-      return runtimeEnded ? this.finishRuntimeEnded(session, stats.lastError) : session;
+      let remaining = runtime.getStats().pendingFrameCount;
+      return runtimeEnded && (remaining === undefined || remaining === 0) ?
+        this.finishRuntimeEnded(session, stats.lastError) : session;
     }
 
     session.acceptedFrameCount++;
@@ -233,12 +235,17 @@ export class HomeworkCaptureSessionService {
 
     let runtime = this.requireRuntime();
     if (session.status === CaptureSessionStatus.WAITING_PERMISSION) {
-      runtime.stopCapture();
-      session.status = CaptureSessionStatus.CANCELLED;
-      session.stoppedAtEpochMs = Date.now();
-      session.stopReason = CaptureStopReason.CANCELLED;
+      let pending = runtime.getStats().pendingFrameCount;
+      if (pending === undefined || pending === 0) {
+        runtime.stopCapture();
+        session.status = CaptureSessionStatus.CANCELLED;
+        session.stoppedAtEpochMs = Date.now();
+        session.stopReason = CaptureStopReason.CANCELLED;
+        this.store.updateSession(session);
+        return session;
+      }
+      session.status = CaptureSessionStatus.CAPTURING;
       this.store.updateSession(session);
-      return session;
     }
 
     if (session.status !== CaptureSessionStatus.CAPTURING &&
@@ -249,9 +256,11 @@ export class HomeworkCaptureSessionService {
 
     let stopCode = runtime.stopCapture();
     let drainCount = 0;
-    while ((runtime.getStats().pendingFrameCount ?? 0) > 0 && drainCount < 12) {
+    let pending = runtime.getStats().pendingFrameCount;
+    while (pending !== undefined && pending > 0 && drainCount < 12) {
       await this.sampleLatestFrame();
       drainCount++;
+      pending = runtime.getStats().pendingFrameCount;
     }
     session = this.store.getSession(session.id) as CaptureSession;
     let batchId = this.ensureImportBatch(session);
