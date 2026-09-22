@@ -276,6 +276,21 @@ export struct ParentVoiceMaterialPage {
   }
 
   @Builder
+  private DefaultSubjectChip(label: string, code: string) {
+    Button(label, { type: ButtonType.Normal })
+      .height(36)
+      .padding({ left: 10, right: 10 })
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(12)
+      .fontWeight(this.defaultSubjectCode === code ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.defaultSubjectCode === code ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.defaultSubjectCode === code ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => {
+        this.defaultSubjectCode = code;
+      });
+  }
+
+  @Builder
   private SubjectChip(label: string, code: string, selectedCode: string,
     onSelect: () => void) {
     Button(label, { type: ButtonType.Normal })
@@ -301,11 +316,10 @@ export struct ParentVoiceMaterialPage {
       Column({ space: 7 }) {
         Text('科目').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
         Row({ space: 6 }) {
-          ForEach(VOICE_SUBJECT_CODES, (code: string) => {
-            this.SubjectChip(this.subjectLabel(code), code, this.defaultSubjectCode, () => {
-              this.defaultSubjectCode = code;
-            });
-          }, (code: string) => code);
+          this.DefaultSubjectChip('语文', 'CHINESE');
+          this.DefaultSubjectChip('数学', 'MATH');
+          this.DefaultSubjectChip('英语', 'ENGLISH');
+          this.DefaultSubjectChip('其他', 'OTHER');
         }
         .width('100%');
       }
