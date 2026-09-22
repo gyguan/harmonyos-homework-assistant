@@ -110,6 +110,12 @@ require("Text('语音素材库')" in dashboard and "onOpenVoiceMaterial" in dash
         "#298 parent dashboard must expose the voice material library")
 require("sys.symbol.exclamationmark_circle_fill" not in page,
         "#298 parent material page must not depend on a version-sensitive feedback system symbol")
+require("private DefaultSubjectChip(label: string, code: string)" in page and
+        "this.defaultSubjectCode === code" in page and
+        "this.defaultSubjectCode = code" in page and
+        "this.DefaultSubjectChip('数学', 'MATH')" in page and
+        "this.DefaultSubjectChip('英语', 'ENGLISH')" in page,
+        "#298 batch default subject selector must bind directly to reactive state instead of passing a stale selectedCode through fixed ForEach items")
 require("private PendingSection()" in page and "private LibrarySection()" in page and
         "setPackageSubject" in page and
         "setPackageExpectedMinutes" in page and
