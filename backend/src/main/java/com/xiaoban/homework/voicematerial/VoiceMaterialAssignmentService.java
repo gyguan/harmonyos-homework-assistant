@@ -7,6 +7,7 @@ import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +56,7 @@ public class VoiceMaterialAssignmentService {
       throw new ApiExceptions.BadRequest("只有可创建的语音素材目录才能生成任务");
     }
 
-    AssignmentDtos.Response assignment = consumeLocked(familyId, item);
+    AssignmentDtos.Response assignment = consumeLocked(familyId, item, null, "");
     return new VoiceMaterialDtos.CreateAssignmentResponse(
         true, assignment.id(), assignment);
   }
@@ -82,7 +83,11 @@ public class VoiceMaterialAssignmentService {
     }
 
     VoiceMaterialPackageEntity item = ready.get(0);
-    AssignmentDtos.Response assignment = consumeLocked(familyId, item);
+    Instant dailyDueAt = item.dueAt == null
+        ? businessDate.atTime(LocalTime.of(23, 59)).atZone(BUSINESS_ZONE).toInstant()
+        : null;
+    AssignmentDtos.Response assignment = consumeLocked(
+        familyId, item, dailyDueAt, item.dueAt == null ? "今天" : "");
 
     VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
     record.id = UUID.randomUUID();
@@ -100,7 +105,7 @@ public class VoiceMaterialAssignmentService {
   }
 
   private AssignmentDtos.Response consumeLocked(UUID familyId,
-      VoiceMaterialPackageEntity item) {
+      VoiceMaterialPackageEntity item, Instant dueAtOverride, String dueTextOverride) {
     String assignmentId = "a-voicepkg-" + item.id;
     AssignmentDtos.Create create = new AssignmentDtos.Create(
         assignmentId,
@@ -108,11 +113,12 @@ public class VoiceMaterialAssignmentService {
         item.title,
         "请听语音并结合图片完成任务。",
         "",
-        "",
+        dueTextOverride,
         item.assignmentType,
         item.subjectCode,
         "AUDIO_IMAGE",
-        item.dueAt == null ? null : item.dueAt.toEpochMilli(),
+        dueAtOverride != null ? dueAtOverride.toEpochMilli()
+            : (item.dueAt == null ? null : item.dueAt.toEpochMilli()),
         BUSINESS_ZONE.getId(),
         "NOT_STARTED",
         "语音素材库",
