@@ -116,6 +116,16 @@ public class VoiceMaterialService {
     else if ("IMAGE".equals(type)) mediaPolicy.validateImage(file);
     else throw new ApiExceptions.BadRequest("资源类型只支持 AUDIO 或 IMAGE");
 
+    String normalizedName = relativeName == null || relativeName.isBlank()
+        ? file.getOriginalFilename() : relativeName.trim();
+    if (normalizedName == null || normalizedName.isBlank()) normalizedName = "material";
+
+    VoiceMaterialFileEntity existing = files
+        .findByFamilyIdAndPackageIdAndResourceTypeAndRelativeName(
+            familyId, packageId, type, normalizedName)
+        .orElse(null);
+    if (existing != null) return fileResponse(existing);
+
     MediaAssetEntity asset = mediaAssets.store(familyId, file);
     VoiceMaterialFileEntity entity = new VoiceMaterialFileEntity();
     entity.id = UUID.randomUUID();
@@ -123,8 +133,7 @@ public class VoiceMaterialService {
     entity.familyId = familyId;
     entity.assetId = asset.id;
     entity.resourceType = type;
-    entity.relativeName = relativeName == null || relativeName.isBlank()
-        ? asset.originalName : relativeName.trim();
+    entity.relativeName = normalizedName;
     entity.sortOrder = Math.max(0, sortOrder);
     entity.createdAt = Instant.now();
     files.save(entity);
