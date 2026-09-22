@@ -51,10 +51,15 @@ public class MediaAssetService {
     }
   }
 
-  public ResolvedAsset resolveOwned(UUID familyId, UUID assetId) {
+  public MediaAssetEntity requireOwned(UUID familyId, UUID assetId) {
     MediaAssetEntity asset = assets.findById(assetId)
         .orElseThrow(() -> new ApiExceptions.NotFound("媒体资源不存在"));
     if (!familyId.equals(asset.familyId)) throw new ApiExceptions.NotFound("媒体资源不存在");
+    return asset;
+  }
+
+  public ResolvedAsset resolveOwned(UUID familyId, UUID assetId) {
+    MediaAssetEntity asset = requireOwned(familyId, assetId);
     return new ResolvedAsset(storage.resolve(asset.storagePath),
         asset.originalName, asset.contentType, asset.sizeBytes);
   }
