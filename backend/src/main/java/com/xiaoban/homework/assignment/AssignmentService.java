@@ -281,7 +281,9 @@ public class AssignmentService {
       }
     }
     for (AssignmentResourceEntity resource : resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, id)) {
-      storage.delete(resource.storagePath);
+      if (resource.assetId == null && resource.storagePath != null && !resource.storagePath.isBlank()) {
+        storage.delete(resource.storagePath);
+      }
     }
     resources.deleteByFamilyIdAndAssignmentId(familyId, id);
     repository.delete(assignment);
