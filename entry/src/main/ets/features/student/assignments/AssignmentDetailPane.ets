@@ -66,7 +66,7 @@ export struct AssignmentDetailPane {
     Column({ space: 14 }) {
       Column({ space: 14 }) {
         Row({ space: 8 }) {
-          Text(this.typeLabel(item))
+          Text(this.typeLabel(this.assignment()!))
             .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY)
