@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import java.time.Instant;
 
 import com.xiaoban.homework.assignment.AssignmentDtos;
 import com.xiaoban.homework.assignment.AssignmentResourceService;
@@ -80,6 +81,9 @@ class VoiceMaterialAssignmentServiceTest {
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
         familyId, packageId)).thenReturn(java.util.List.of());
+    when(assignments.nextVoiceMaterialTaskTitle(
+        any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
+        .thenReturn("语文 · 语音作业");
 
     AssignmentDtos.Response authoritative = new AssignmentDtos.Response(
         "a-voicepkg-" + packageId, "student-1", "EXTRA", "CHINESE",
@@ -97,6 +101,7 @@ class VoiceMaterialAssignmentServiceTest {
         ArgumentCaptor.forClass(AssignmentDtos.Create.class);
     verify(assignments).create(any(UUID.class), anyString(), input.capture());
     assertNull(input.getValue().dueAtEpochMs());
+    assertEquals("语文 · 语音作业", input.getValue().title());
     assertTrue(result.created());
     assertEquals("CONSUMED", item.status);
     verify(students).requireOwnedForUpdate(familyId, "student-1");
