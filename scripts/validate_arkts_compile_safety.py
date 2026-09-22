@@ -72,6 +72,11 @@ def main() -> int:
             "voice material folder selection must use apiAvailable for API 26 compatibility")
     require("SystemCapability.FileManagement.UserFileService.FolderSelection" in voice_material_picker,
             "voice material folder selection must guard the FolderSelection SysCap")
+    require("allowsMulFolderSelection" not in voice_material_picker,
+            "voice material picker must not use multi-folder selection because Phone does not support it")
+    require("options.maxSelectNumber = 1" in voice_material_picker and
+            "DocumentSelectMode.FOLDER" in voice_material_picker,
+            "voice material picker must use phone-compatible single-folder selection")
     require("deviceInfo.sdkApiVersion >= 26" not in voice_material_picker,
             "raw sdkApiVersion comparison must not replace ArkTS apiAvailable compatibility protection")
 

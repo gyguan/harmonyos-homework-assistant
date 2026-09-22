@@ -276,6 +276,21 @@ export struct ParentVoiceMaterialPage {
   }
 
   @Builder
+  private DefaultSubjectChip(label: string, code: string) {
+    Button(label, { type: ButtonType.Normal })
+      .height(36)
+      .padding({ left: 10, right: 10 })
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(12)
+      .fontWeight(this.defaultSubjectCode === code ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.defaultSubjectCode === code ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.defaultSubjectCode === code ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => {
+        this.defaultSubjectCode = code;
+      });
+  }
+
+  @Builder
   private SubjectChip(label: string, code: string, selectedCode: string,
     onSelect: () => void) {
     Button(label, { type: ButtonType.Normal })
@@ -301,11 +316,10 @@ export struct ParentVoiceMaterialPage {
       Column({ space: 7 }) {
         Text('科目').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
         Row({ space: 6 }) {
-          ForEach(VOICE_SUBJECT_CODES, (code: string) => {
-            this.SubjectChip(this.subjectLabel(code), code, this.defaultSubjectCode, () => {
-              this.defaultSubjectCode = code;
-            });
-          }, (code: string) => code);
+          this.DefaultSubjectChip('语文', 'CHINESE');
+          this.DefaultSubjectChip('数学', 'MATH');
+          this.DefaultSubjectChip('英语', 'ENGLISH');
+          this.DefaultSubjectChip('其他', 'OTHER');
         }
         .width('100%');
       }
@@ -420,7 +434,7 @@ export struct ParentVoiceMaterialPage {
         .enabled(!this.selecting && !this.uploading)
         .onClick(() => { void this.addPackages(); });
 
-      Text('支持目录选择的设备可直接多选文件夹；其他设备可选择目录内的语音和图片，系统会按父目录自动归组。')
+      Text('支持目录选择的设备可直接选择文件夹；如需批量导入，可重复点击“添加目录”。不支持目录选择的设备可选择目录内的语音和图片，系统会按父目录自动归组。')
         .width('100%')
         .fontSize(11)
         .lineHeight(17)
