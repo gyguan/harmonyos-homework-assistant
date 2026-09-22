@@ -69,8 +69,8 @@ require("requestResumeFromSubmission" in study and "SubmissionResumeConfirmDialo
         "#291 Continue-work must confirm before clearing selected photos")
 require("关闭" in resume_dialog and "清空并继续" in resume_dialog and "@Link photoCount" in resume_dialog,
         "#291 Continue-work dialog must provide a top-right cancel and explicit destructive action")
-require("fontSize(17)" in countdown and "height(5)" in countdown and "private hint()" not in countdown,
-        "#291 Assignment timing must use a compact presentation")
+require("fontSize(36)" in countdown and "height(6)" in countdown and "private hint()" not in countdown,
+        "#291 Assignment timing may emphasize the clock while staying free of extra instructional copy")
 
 if errors:
     print("ISSUE_291_STUDENT_UI_SIMPLIFICATION_GATE_FAIL")

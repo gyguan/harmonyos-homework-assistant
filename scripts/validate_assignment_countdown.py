@@ -71,8 +71,11 @@ require("AssignmentCountdownCard" in study,
 
 for phrase in ["还剩", "超出", "用了", "预计"]:
     require(phrase in countdown, f"countdown UI missing required state: {phrase}")
-require("fontSize(17)" in countdown and "height(5)" in countdown and "private hint()" not in countdown,
-        "countdown must remain compact and avoid instructional copy competing with the task")
+require("fontSize(36)" in countdown and "height(6)" in countdown and "private hint()" not in countdown,
+        "countdown must emphasize the remaining time without adding instructional copy")
+require("private isNearDeadline()" in countdown and "remaining <= 5 * 60" in countdown and
+        "AppTheme.WARNING" in countdown and "AppTheme.DANGER" in countdown,
+        "countdown must distinguish normal, near-deadline, and overtime visual states")
 require("this.nowEpochMs - this.assignment.startedAtEpochMs" in countdown,
         "countdown must derive remaining time from timestamps so it survives page/background gaps")
 require("setInterval" in countdown and "clearInterval" in countdown,
