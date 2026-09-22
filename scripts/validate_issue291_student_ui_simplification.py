@@ -82,6 +82,11 @@ require("fontSize(36)" in countdown and "height(6)" in countdown and "private hi
 require("Text('练习套卷')" in practice_home and "tags.join" not in practice_home and
         "PracticeTaxonomy.gradeLabel(this.paper.grade)" not in practice_home,
         "#291 Practice home must avoid repeating filter taxonomy and tag metadata on every paper card")
+require("private QuickFilterBar()" in practice_home and
+        "selectSubject(PracticeSubject.CHINESE)" in practice_home and
+        "selectPassFilter(PracticePassFilter.NOT_PASSED)" in practice_home and
+        "更多筛选：" in practice_home,
+        "#291 Practice home must keep common subject/pass filters direct and low-frequency filters under More")
 require("private MetricCard" not in practice_detail and
         "this.RecentAttemptCard(this.recentAttempts[0]);" in practice_detail and "查看全部" in practice_detail,
         "#291 Practice detail must replace duplicate metrics with a focused latest-attempt summary")
