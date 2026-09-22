@@ -6,7 +6,6 @@ RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentRes
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
 NATIVE_RUNTIME = ROOT / "entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime.ets"
 CAPTURE_DIAGNOSTIC = ROOT / "entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets"
-CAPTURE_FLOAT = ROOT / "entry/src/main/ets/pages/HomeworkCaptureFloatView.ets"
 CAPTURE_PAGE = ROOT / "entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
 PARENT_IMPORT_NAV = ROOT / "entry/src/main/ets/app/navigation/ParentImportNavigator.ets"
@@ -25,7 +24,6 @@ def main() -> int:
     audio = AUDIO.read_text(encoding="utf-8")
     native_runtime = NATIVE_RUNTIME.read_text(encoding="utf-8")
     capture_diagnostic = CAPTURE_DIAGNOSTIC.read_text(encoding="utf-8")
-    capture_float = CAPTURE_FLOAT.read_text(encoding="utf-8")
     capture_page = CAPTURE_PAGE.read_text(encoding="utf-8")
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
     parent_import_nav = PARENT_IMPORT_NAV.read_text(encoding="utf-8")
@@ -56,20 +54,18 @@ def main() -> int:
 
     require("libhomeworkcapture.so" in native_runtime,
             "native capture library must be isolated behind NativeHomeworkCaptureRuntime")
-    for source, name in [
-        (capture_diagnostic, "HomeworkCaptureDiagnosticPage"),
-        (capture_float, "HomeworkCaptureFloatView"),
-    ]:
-        require("libhomeworkcapture.so" not in source,
-                f"{name} must not import the native library directly")
+    require("libhomeworkcapture.so" not in capture_diagnostic,
+            "HomeworkCaptureDiagnosticPage must not import the native library directly")
     require("throw error;" not in share_receive,
             "share receive flow must only throw explicit Error values")
     require("this.openCapture(stack)" not in parent_import_nav,
             "static ParentImportNavigator methods must not dispatch through this")
-    require("onStateChange(" not in capture_page and "isFloatViewEnabled(" not in capture_page,
-            "formal capture page must stay compatible with API 20 FloatView surface")
-    require("onStateChange(" not in capture_diagnostic and "isFloatViewEnabled(" not in capture_diagnostic,
-            "capture diagnostics must stay compatible with API 20 FloatView surface")
+    for source, name in [
+        (capture_page, "HomeworkCapturePage"),
+        (capture_diagnostic, "HomeworkCaptureDiagnosticPage"),
+    ]:
+        require("floatView" not in source and "FLOAT_VIEW" not in source,
+                f"{name} must not depend on restricted floating-window APIs")
     for method in ["finishShareImportReady", "finishShareImportEmpty", "cancelShareImport"]:
         require(f"private {method}(): void" in app_shell,
                 f"AppShell missing typed share-import callback: {method}")
