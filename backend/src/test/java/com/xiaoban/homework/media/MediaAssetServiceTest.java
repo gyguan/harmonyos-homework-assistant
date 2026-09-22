@@ -9,6 +9,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.xiaoban.homework.family.FamilyEntity;
+import com.xiaoban.homework.family.FamilyRepository;
 import com.xiaoban.homework.storage.FileStorage;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,7 +22,10 @@ class MediaAssetServiceTest {
   void identicalFamilyFileReusesExistingAssetWithoutCopyingAgain() {
     MediaAssetRepository repository = mock(MediaAssetRepository.class);
     FileStorage storage = mock(FileStorage.class);
+    FamilyRepository families = mock(FamilyRepository.class);
     UUID familyId = UUID.randomUUID();
+    when(families.lockById(familyId)).thenReturn(Optional.of(
+        new FamilyEntity(familyId, "E2E家庭", java.time.Instant.now())));
 
     MediaAssetEntity existing = new MediaAssetEntity();
     existing.id = UUID.randomUUID();
@@ -32,7 +37,7 @@ class MediaAssetServiceTest {
         any(UUID.class), anyString(), anyLong()))
         .thenReturn(Optional.of(existing));
 
-    MediaAssetEntity result = new MediaAssetService(repository, storage).store(
+    MediaAssetEntity result = new MediaAssetService(repository, storage, families).store(
         familyId,
         new MockMultipartFile("file", "voice.mp3", "audio/mpeg", new byte[] {1, 2, 3}));
 
