@@ -58,7 +58,7 @@ require("registrationFailures" in app and "failures === 0" in app,
         "partial failures must be surfaced and failed selections retained for retry")
 require("imported-card" in index and "loadImportedPackages" in app and "data-preview-asset" in app,
         "admin import must provide an imported material library with file preview")
-require("/api/v1/media-assets/" in api and "/api/v1/media-assets/{assetId}" in read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java"),
+require("/api/v1/media-assets/" in api and '@GetMapping("/media-assets/{assetId}")' in read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java"),
         "imported files must use an authenticated media asset endpoint")
 require("registrationFailures" in app and "failures === 0" in app,
         "partial failures must be surfaced and failed selections retained for retry")
