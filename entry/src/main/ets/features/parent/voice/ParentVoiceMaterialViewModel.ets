@@ -13,6 +13,11 @@ import { RemoteAssignmentMapper } from '../../../application/remote/RemoteModels
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, StudentProfile } from '../../../domain/model/HomeworkModels';
 
+export interface VoiceMaterialUploadResult {
+  batch: RemoteVoiceMaterialBatch;
+  registrationFailureCount: number;
+}
+
 export interface VoiceMaterialLocalValidation {
   valid: boolean;
   audioCount: number;
@@ -58,7 +63,7 @@ export class ParentVoiceMaterialViewModel {
     };
   }
 
-  async upload(packages: VoiceMaterialLocalPackage[]): Promise<RemoteVoiceMaterialBatch> {
+  async upload(packages: VoiceMaterialLocalPackage[]): Promise<VoiceMaterialUploadResult> {
     if (packages.length === 0) throw new Error('请先添加语音素材目录');
     for (let item of packages) {
       if (!this.validate(item).valid) {
@@ -68,6 +73,7 @@ export class ParentVoiceMaterialViewModel {
 
     let batch = await RemoteVoiceMaterialApi.instance.createBatch(this.student().id);
     let registeredCount = 0;
+    let registrationFailureCount = 0;
     for (let item of packages) {
       try {
         let remotePackage = await RemoteVoiceMaterialApi.instance.registerPackage(batch.id, {
@@ -86,12 +92,16 @@ export class ParentVoiceMaterialViewModel {
           // mark this incomplete package INVALID without blocking successfully uploaded siblings.
         }
       } catch {
-        // A single directory registration failure must not prevent the remaining directories
-        // from being imported. If every registration fails, surface a batch-level error below.
+        registrationFailureCount++;
+        // A single directory registration failure must not prevent the remaining directories.
       }
     }
     if (registeredCount === 0) throw new Error('所有语音素材目录都导入失败，请检查网络后重试');
-    return await RemoteVoiceMaterialApi.instance.completeBatch(batch.id);
+    let completed = await RemoteVoiceMaterialApi.instance.completeBatch(batch.id);
+    return {
+      batch: completed,
+      registrationFailureCount: registrationFailureCount
+    };
   }
 
   async list(): Promise<RemoteVoiceMaterialPackage[]> {
