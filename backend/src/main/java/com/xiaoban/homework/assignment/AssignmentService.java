@@ -135,6 +135,16 @@ public class AssignmentService {
     };
   }
 
+  @Transactional(readOnly = true)
+  public AssignmentDtos.Response findFirstVoiceMaterialTask(UUID familyId, String studentId) {
+    students.requireOwned(familyId, studentId);
+    AssignmentEntity current = repository
+        .findFirstByFamilyIdAndStudentIdAndContentTypeOrderByUpdatedAtDesc(
+            familyId, studentId, "AUDIO_IMAGE")
+        .orElse(null);
+    return current == null ? null : AssignmentDtos.Response.from(current);
+  }
+
   @Transactional
   public AssignmentDtos.Response create(UUID familyId, String studentId, AssignmentDtos.Create input) {
     students.requireOwned(familyId, studentId);
