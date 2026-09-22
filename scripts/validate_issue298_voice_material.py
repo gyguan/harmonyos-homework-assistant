@@ -69,14 +69,22 @@ require("item.status = \"CONSUMED\"" in assignment_service and
 require("input.subjectCode().trim().toUpperCase" in material_service and
         "directoryName" in material_service,
         "#298 subjectCode must be explicit package metadata while directoryName stays a separate field")
+require('item.consumedAssignmentId == null ? "" : item.consumedAssignmentId' in material_service,
+        "#298 PackageResponse must keep consumedAssignmentId non-null for the ArkTS string contract")
+require("students.requireOwnedForUpdate(familyId, studentId)" in material_service,
+        "#298 material batch creation must serialize with student deletion")
 require("normalizeSortOrder" in material_service and
         "relativeName.toLowerCase" in material_service,
         "#298 image ordering must be normalized by file name")
 require("entity.assetId = asset.id" in resource_service and
         "entity.storagePath = null" in resource_service,
         "#298 new Assignment resources must reference MediaAsset without copying files")
-require("families.lockById(familyId)" in read("backend/src/main/java/com/xiaoban/homework/media/MediaAssetService.java"),
+media_asset_service = read("backend/src/main/java/com/xiaoban/homework/media/MediaAssetService.java")
+require("families.lockById(familyId)" in media_asset_service,
         "#298 MediaAsset dedup must serialize same-family inserts instead of recovering from a rollback-only unique-key exception")
+require("registerRollbackCleanup(stored.storagePath())" in media_asset_service and
+        "TransactionSynchronization.STATUS_ROLLED_BACK" in media_asset_service,
+        "#298 newly stored physical media must be removed when the surrounding database transaction rolls back")
 require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
         "#298 deleting Assignment must not delete shared MediaAsset files")
 require("allowsMulFolderSelection = true" in picker and
@@ -105,8 +113,11 @@ require("private PendingSection()" in page and "private LibrarySection()" in pag
         "setPackageExpectedMinutes" in page and
         "registrationFailureCount" in read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialViewModel.ets"),
         "#298 parent material page must support staging, per-directory subject/duration override, partial-failure feedback and library status")
-require("voiceMaterials.existsByFamilyIdAndStudentId" in read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java"),
+student_service = read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java")
+require("voiceMaterials.existsByFamilyIdAndStudentId" in student_service,
         "#298 student deletion must be rejected while voice-material batches still reference the student")
+require("StudentEntity student = requireOwnedForUpdate(familyId, id)" in student_service,
+        "#298 student deletion must lock the student row before checking voice-material ownership")
 require("legacy manual voice assignment" in voice_e2e and
         "concurrent retry created duplicate package file" in voice_e2e,
         "#298 E2E must preserve legacy storage-path voice compatibility and concurrent retry idempotency")
