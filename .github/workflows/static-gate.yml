@@ -126,6 +126,11 @@ jobs:
       - name: Validate issue 298 voice material automation
         run: python scripts/validate_issue298_voice_material.py
 
+      - name: Validate admin login refactor
+        run: |
+          python scripts/validate_admin_login.py
+          node --check backend/src/main/resources/static/admin/js/app.js
+
       - name: Validate admin voice material import
         run: |
           python scripts/validate_admin_voice_material_import.py

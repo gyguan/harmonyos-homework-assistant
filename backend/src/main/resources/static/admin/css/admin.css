@@ -31,6 +31,7 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px var
 .secondary-button { background: var(--blue-soft); color: var(--blue); }
 .text-button { border: 0; background: transparent; color: var(--blue); padding: 6px; }
 .text-button.danger { color: var(--danger); }
+.login-status { color: var(--muted); margin: 0; font-size: 13px; line-height: 1.5; }
 .error-text { color: var(--danger); margin: 0; font-size: 13px; }
 
 .admin-shell { min-height: 100vh; display: grid; grid-template-columns: 220px 1fr; }
