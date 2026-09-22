@@ -7,8 +7,7 @@ import {
   PracticePassFilter,
   PracticeSemester,
   PracticeSubject,
-  PracticeTrackFilter,
-  PracticeTaxonomy
+  PracticeTrackFilter
 } from '../../../domain/model/practice/PracticeModels';
 import { PracticeHomeViewModel } from './PracticeHomeViewModel';
 
