@@ -291,8 +291,8 @@ def main() -> int:
     require("paper.track !== PracticeTrack.TEXTBOOK_SYNC" in provider and
             "paper.track !== PracticeTrack.EXTRACURRICULAR" in provider,
             "preset provider must filter by catalog type")
-    require("label: '题库类型'" in home and "selectedTrack" in home,
-            "Practice home must expose catalog type in filter summary")
+    require("更多筛选：" in home and "selectedTrack" in home and "trackFilterLabel" in home,
+            "Practice home must expose catalog type in the More-filter summary")
     require("Text('题库类型')" in filter_dialog and "@Link selectedTrack" in filter_dialog,
             "Practice filter dialog must expose catalog type choices")
 
