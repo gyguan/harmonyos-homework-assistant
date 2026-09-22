@@ -15,7 +15,7 @@ export struct HomeworkCapturePage {
   onOpenSourceProfile: (startCaptureAfterSave: boolean) => void = (_startCaptureAfterSave: boolean) => {};
 
   @State private revision: number = 0;
-  @State private message: string = '点击开始后，系统会提示屏幕采集授权。浏览完成后返回小伴结束并整理。';
+  @State private message: string = '点击开始后，系统会提示屏幕采集授权。浏览完成后请先从系统录屏通知停止，再返回小伴。';
   @State private errorText: string = '';
   @State private currentSessionId: string = '';
   @State private detectedGroupTitle: string = '';
@@ -84,7 +84,7 @@ export struct HomeworkCapturePage {
           this.errorText = `当前识别群“${progress.detectedGroupTitle}”与配置“${progress.profile.groupTitle}”不一致，请确认已进入正确微信群。`;
         } else if (progress.timeBoundaryReached) {
           this.errorText = '';
-          this.message = `已到达今日抓取时间范围（${this.viewModel.formatStartTime(progress.profile)}），可以结束并自动整理。`;
+          this.message = `已到达今日抓取时间范围（${this.viewModel.formatStartTime(progress.profile)}）。请在微信中从系统录屏通知停止采集，再返回小伴自动整理。`;
         } else if (progress.groupValidationStatus === SourceGroupValidationStatus.MATCHED) {
           this.errorText = '';
           this.message = `已确认“${progress.profile.groupTitle}”，继续手工上滑；小伴正在读取今天的消息。`;
@@ -141,7 +141,7 @@ export struct HomeworkCapturePage {
         this.message = '系统未开始屏幕采集，可以重新点击开始。';
         return;
       }
-      this.message = '等待系统屏幕采集授权。授权后进入目标微信群并手工上滑；浏览完成后返回小伴结束并整理。';
+      this.message = '等待系统屏幕采集授权。授权后进入目标微信群并手工上滑；浏览完成后先从系统录屏通知停止，再返回小伴。';
     } catch {
       this.errorText = '屏幕采集启动失败，请稍后重试。';
     }
@@ -264,7 +264,7 @@ export struct HomeworkCapturePage {
               .fontSize(16)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            Text('1. 同意系统屏幕采集授权\n2. 切到配置的班级群\n3. 手工向上滑动聊天记录\n4. 浏览完成后返回小伴，点“结束并整理”')
+            Text('1. 同意系统屏幕采集授权\n2. 切到配置的班级群\n3. 手工向上滑动聊天记录\n4. 浏览完成后从系统录屏通知停止\n5. 返回小伴，自动整理；如仍在采集可手工结束')
               .width('100%')
               .fontSize(13)
               .lineHeight(21)
@@ -331,7 +331,7 @@ export struct HomeworkCapturePage {
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .onClick(() => { void this.startCapture(); });
           } else {
-            Button(this.timeBoundaryReached ? '已到达时间范围，结束并整理' : '结束采集并自动整理',
+            Button(this.timeBoundaryReached ? '备用：立即结束并整理' : '备用：结束采集并自动整理',
               { type: ButtonType.Normal })
               .width('100%')
               .height(AppTheme.BUTTON_HEIGHT)
