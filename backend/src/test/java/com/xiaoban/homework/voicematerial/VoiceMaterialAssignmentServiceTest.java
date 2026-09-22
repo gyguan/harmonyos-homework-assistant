@@ -2,6 +2,8 @@ package com.xiaoban.homework.voicematerial;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -9,6 +11,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.xiaoban.homework.assignment.AssignmentDtos;
 import com.xiaoban.homework.assignment.AssignmentResourceService;
 import com.xiaoban.homework.assignment.AssignmentService;
 import com.xiaoban.homework.student.StudentService;
@@ -16,6 +19,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 class VoiceMaterialAssignmentServiceTest {
   private final VoiceMaterialPackageRepository packages = mock(VoiceMaterialPackageRepository.class);
@@ -53,6 +57,47 @@ class VoiceMaterialAssignmentServiceTest {
     assertFalse(result.created());
     assertEquals(existing.assignmentId, result.assignmentId());
     verify(packages, never()).lockNextReady(any(UUID.class), anyString(), any());
+  }
+
+
+  @Test
+  void readyManualPackageWithoutDueAtKeepsAssignmentDueAtNullable() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    VoiceMaterialPackageEntity item = new VoiceMaterialPackageEntity();
+    item.id = packageId;
+    item.familyId = familyId;
+    item.studentId = "student-1";
+    item.status = "READY";
+    item.subjectCode = "CHINESE";
+    item.title = "课文朗读";
+    item.assignmentType = "EXTRA";
+    item.expectedMinutes = 15;
+    item.directoryName = "001-课文朗读";
+    item.dueAt = null;
+
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, packageId)).thenReturn(java.util.List.of());
+
+    AssignmentDtos.Response authoritative = new AssignmentDtos.Response(
+        "a-voicepkg-" + packageId, "student-1", "EXTRA", "CHINESE",
+        "AUDIO_IMAGE", "语文", "课文朗读", "请听语音并结合图片完成任务。",
+        "", 0L, "Asia/Shanghai", "", "NOT_STARTED",
+        "语音素材库", "001-课文朗读", 15,
+        0L, 0L, 0L, "", 0L);
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenReturn(authoritative);
+
+    VoiceMaterialDtos.CreateAssignmentResponse result =
+        service().createManually(familyId, packageId);
+
+    ArgumentCaptor<AssignmentDtos.Create> input =
+        ArgumentCaptor.forClass(AssignmentDtos.Create.class);
+    verify(assignments).create(any(UUID.class), anyString(), input.capture());
+    assertNull(input.getValue().dueAtEpochMs());
+    assertTrue(result.created());
+    assertEquals("CONSUMED", item.status);
   }
 
   @Test
