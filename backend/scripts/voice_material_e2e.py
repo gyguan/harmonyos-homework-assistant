@@ -5,6 +5,7 @@ import json
 import sys
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from urllib.parse import quote
@@ -251,8 +252,22 @@ def main() -> int:
         for package in (second, first):
             package_id = package["id"]
             audio_name, image_name = package_file_names[package_id]
-            audio = upload(base_url, token, package_id, "AUDIO", audio_name, 0,
-                           AUDIO_BYTES, "audio/mpeg")
+            if package_id == first["id"]:
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    futures = [
+                        executor.submit(
+                            upload, base_url, token, package_id, "AUDIO", audio_name, 0,
+                            AUDIO_BYTES, "audio/mpeg"
+                        )
+                        for _ in range(2)
+                    ]
+                    concurrent_audio = [future.result() for future in futures]
+                require(concurrent_audio[0].get("id") == concurrent_audio[1].get("id"),
+                        "concurrent retry created duplicate package file")
+                audio = concurrent_audio[0]
+            else:
+                audio = upload(base_url, token, package_id, "AUDIO", audio_name, 0,
+                               AUDIO_BYTES, "audio/mpeg")
             image = upload(base_url, token, package_id, "IMAGE", image_name, 1,
                            IMAGE_BYTES, "image/png")
             require(bool(audio.get("assetId")) and bool(image.get("assetId")),
