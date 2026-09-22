@@ -44,6 +44,12 @@ public class VoiceMaterialAssignmentService {
   @Transactional
   public VoiceMaterialDtos.CreateAssignmentResponse createManually(
       UUID familyId, UUID packageId) {
+    VoiceMaterialPackageEntity snapshot = packages.findById(packageId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
+    if (!familyId.equals(snapshot.familyId)) {
+      throw new ApiExceptions.NotFound("语音素材目录不存在");
+    }
+    students.requireOwnedForUpdate(familyId, snapshot.studentId);
     VoiceMaterialPackageEntity item = packages.lockOwned(familyId, packageId)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
     if ("CONSUMED".equals(item.status)) {
