@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>小伴管理台</title>
-  <link rel="stylesheet" href="/admin/css/admin.css?v=20260922">
+  <link rel="stylesheet" href="/admin/css/admin.css?v=20260922-2">
 </head>
 <body>
   <div id="login-view" class="login-shell">
@@ -73,11 +73,12 @@
 
       <section class="card picker-card">
         <input id="folder-input" type="file" webkitdirectory multiple hidden>
+        <input id="folder-files-input" type="file" webkitdirectory multiple hidden>
         <button id="folder-picker" class="drop-zone" type="button">
           <span class="folder-icon">＋</span>
           <strong>选择文件夹</strong>
-          <span>可一次选择包含多个子目录的根目录</span>
-          <small>支持 mp3 / m4a / wav / jpg / jpeg / png / webp / heic</small>
+          <span>支持选择根目录，也支持将多个文件夹一次拖入这里</span>
+          <small>支持 mp3 / m4a / wav / jpg / jpeg / png / webp / heic · 可继续添加多个文件夹</small>
         </button>
       </section>
 
@@ -96,6 +97,11 @@
         </div>
       </section>
 
+      <section id="imported-card" class="card" hidden>
+        <div class="section-title-row"><div><h2>已导入文件</h2><p id="imported-summary">查看已经保存到素材库的目录和文件。</p></div><button id="refresh-imported" class="secondary-button" type="button">刷新</button></div>
+        <div id="imported-list" class="imported-list"></div>
+      </section>
+
       <section id="progress-card" class="card" hidden>
         <div class="section-title-row">
           <div><h2>导入进度</h2><p id="progress-text">准备上传…</p></div>
@@ -107,6 +113,7 @@
     </main>
   </div>
 
-  <script type="module" src="/admin/js/app.js?v=20260922"></script>
+  <script type="module" src="/admin/js/app.js?v=20260922-2"></script>
+  <div id="asset-viewer" class="asset-viewer" hidden><div class="asset-viewer-backdrop" data-close-viewer></div><section class="asset-viewer-dialog" role="dialog" aria-modal="true" aria-label="素材预览"><button id="close-asset-viewer" class="asset-viewer-close" type="button" aria-label="关闭">×</button><div id="asset-viewer-content"></div></section></div>
 </body>
 </html>

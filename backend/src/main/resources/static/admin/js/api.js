@@ -90,6 +90,14 @@ export async function uploadVoiceMaterialFile(packageId, item, sortOrder) {
   });
 }
 
+export async function listVoiceMaterialPackages(studentId) { return await request(`/api/v1/students/${encodeURIComponent(studentId)}/voice-material-packages`); }
+
+export async function fetchVoiceMaterialAsset(assetId) {
+  const headers = new Headers(); const token = getToken(); if (token) headers.set('Authorization', `Bearer ${token}`);
+  const response = await fetch(`/api/v1/media-assets/${encodeURIComponent(assetId)}`, { headers });
+  if (!response.ok) throw new Error(`素材读取失败（${response.status}）`); return await response.blob();
+}
+
 export async function completeVoiceMaterialBatch(batchId) {
   return await request(`/api/v1/voice-material-batches/${encodeURIComponent(batchId)}/complete`, {
     method: 'POST'

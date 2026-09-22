@@ -1,10 +1,17 @@
 package com.xiaoban.homework.voicematerial;
 
 import com.xiaoban.homework.auth.AuthInterceptor;
+import com.xiaoban.homework.media.MediaAssetService;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import java.net.MalformedURLException;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,11 +28,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class VoiceMaterialController {
   private final VoiceMaterialService materials;
   private final VoiceMaterialAssignmentService assignments;
+  private final MediaAssetService mediaAssets;
 
   public VoiceMaterialController(VoiceMaterialService materials,
-      VoiceMaterialAssignmentService assignments) {
+      VoiceMaterialAssignmentService assignments, MediaAssetService mediaAssets) {
     this.materials = materials;
     this.assignments = assignments;
+    this.mediaAssets = mediaAssets;
   }
 
   @PostMapping("/students/{studentId}/voice-material-batches")
@@ -68,6 +77,19 @@ public class VoiceMaterialController {
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String studentId) {
     return materials.list(familyId, studentId);
+  }
+
+  @GetMapping("/media-assets/{assetId}")
+  public ResponseEntity<Resource> downloadAsset(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID assetId) throws MalformedURLException {
+    MediaAssetService.ResolvedAsset file = mediaAssets.resolveOwned(familyId, assetId);
+    Resource resource = new UrlResource(file.path().toUri());
+    MediaType type;
+    try { type = MediaType.parseMediaType(file.contentType()); }
+    catch (IllegalArgumentException error) { type = MediaType.APPLICATION_OCTET_STREAM; }
+    return ResponseEntity.ok().contentType(type)
+        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(file.originalName()).build().toString())
+        .body(resource);
   }
 
   @PostMapping("/voice-material-packages/{packageId}/create-assignment")

@@ -21,7 +21,7 @@ function resourceType(file) {
 }
 
 function normalizePath(file) {
-  return (file.webkitRelativePath || file.name).replaceAll('\\', '/');
+  return (file.relativePath || file.webkitRelativePath || file.name).replaceAll('\\', '/');
 }
 
 function packageLocation(file) {

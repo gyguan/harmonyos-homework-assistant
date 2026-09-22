@@ -28,8 +28,10 @@ voice = read("backend/src/main/resources/static/admin/js/voice-material.js")
 
 require('@GetMapping({"/admin", "/admin/"})' in controller and 'forward:/admin/index.html' in controller,
         "admin root must deterministically forward to the static admin shell")
-require('webkitdirectory' in index and 'id="folder-input"' in index,
-        "admin import must support browser folder selection")
+require('webkitdirectory' in index and 'multiple' in index and 'id="folder-input"' in index,
+        "admin import must support selecting multiple directories")
+require("dragover" in app and "webkitGetAsEntry" in app and "collectDroppedDirectory" in app,
+        "admin import must support dropping multiple folders into the picker")
 require('id="student-select"' in index and 'id="subject-chips"' in index and
         'id="default-minutes"' in index,
         "admin import must expose student, subject and expected-minute defaults")
@@ -49,8 +51,15 @@ require("webkitRelativePath" in voice and "parseVoiceMaterialPackages" in voice,
 require("audioCount === 0" in voice and "audioCount > 1" in voice and "imageCount === 0" in voice,
         "admin preview must enforce 1 audio + at least 1 image before upload")
 require("completeVoiceMaterialBatch" in app and "registerVoiceMaterialPackage" in app and
-        "uploadVoiceMaterialFile" in app,
+        "uploadVoiceMaterialFile" in app and "listVoiceMaterialPackages" in api and
+        "fetchVoiceMaterialAsset" in api,
         "admin upload must execute the existing batch/package/file/complete workflow")
+require("registrationFailures" in app and "failures === 0" in app,
+        "partial failures must be surfaced and failed selections retained for retry")
+require("imported-card" in index and "loadImportedPackages" in app and "data-preview-asset" in app,
+        "admin import must provide an imported material library with file preview")
+require("/api/v1/media-assets/" in api and '@GetMapping("/media-assets/{assetId}")' in read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java"),
+        "imported files must use an authenticated media asset endpoint")
 require("registrationFailures" in app and "failures === 0" in app,
         "partial failures must be surfaced and failed selections retained for retry")
 require("AdminVoiceMaterialService" not in controller + app + api,

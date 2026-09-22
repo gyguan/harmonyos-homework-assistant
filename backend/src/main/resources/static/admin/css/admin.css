@@ -101,3 +101,27 @@ nav { display: grid; gap: 6px; }
   body { min-width: 900px; }
   .package-row { grid-template-columns: 30px minmax(190px,1fr) 110px 100px 180px 70px; }
 }
+
+.drop-zone.drag-over { border-color: var(--blue); background: var(--blue-soft); }
+.imported-list { display:grid; gap:10px; margin-top:18px; }
+.imported-package { border:1px solid var(--border); border-radius:12px; background:#fff; overflow:hidden; }
+.imported-package summary { cursor:pointer; list-style:none; padding:14px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.imported-package summary::-webkit-details-marker { display:none; }
+.imported-package summary:hover { background:#fbfcfe; }
+.imported-package-main strong,.imported-package-main span { display:block; }
+.imported-package-main strong { font-size:14px; }
+.imported-package-main span { margin-top:4px; color:var(--muted); font-size:11px; }
+.imported-package-meta { color:var(--muted); font-size:12px; white-space:nowrap; }
+.imported-file-list { display:grid; gap:6px; padding:0 14px 14px; }
+.imported-file { min-height:38px; padding:8px 10px; border-radius:8px; background:#f8fafc; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.imported-file-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
+.imported-file-type { color:var(--muted); font-size:11px; margin-left:8px; }
+.preview-button { border:0; background:transparent; color:var(--blue); padding:4px 6px; white-space:nowrap; }
+.asset-viewer { position:fixed; inset:0; z-index:20; display:grid; place-items:center; }
+.asset-viewer[hidden] { display:none; }
+.asset-viewer-backdrop { position:absolute; inset:0; background:rgba(20,30,45,.45); }
+.asset-viewer-dialog { position:relative; z-index:1; width:min(820px,calc(100vw - 80px)); max-height:calc(100vh - 80px); padding:28px; border-radius:16px; background:#fff; box-shadow:0 20px 60px rgba(27,54,93,.22); display:grid; place-items:center; overflow:auto; }
+.asset-viewer-close { position:absolute; top:8px; right:10px; width:32px; height:32px; border:0; background:transparent; font-size:24px; color:var(--muted); }
+.asset-viewer-dialog img { max-width:100%; max-height:calc(100vh - 150px); object-fit:contain; border-radius:8px; }
+.asset-viewer-dialog audio { width:min(640px,100%); }
+.asset-viewer-title { margin:0 0 16px; font-size:15px; }
