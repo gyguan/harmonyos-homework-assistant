@@ -35,6 +35,10 @@ export struct AssignmentCountdownCard {
     return accumulated + Math.max(0, Math.floor((this.nowEpochMs - this.assignment.startedAtEpochMs) / 1000));
   }
 
+  private remainingSeconds(): number {
+    return this.budgetSeconds() - this.elapsedSeconds();
+  }
+
   private clock(seconds: number): string {
     let safe = Math.max(0, Math.floor(seconds));
     let minutes = Math.floor(safe / 60);
@@ -51,21 +55,39 @@ export struct AssignmentCountdownCard {
   }
 
   private isOvertime(): boolean {
-    return this.isRunning() && this.elapsedSeconds() > this.budgetSeconds();
+    return this.isRunning() && this.remainingSeconds() < 0;
   }
 
-  private headline(): string {
-    let remaining = this.budgetSeconds() - this.elapsedSeconds();
-    if (this.isRunning()) {
-      if (remaining >= 0) return `还剩 ${this.clock(remaining)}`;
-      return `超出 ${this.clock(-remaining)}`;
-    }
-    if (this.isPaused()) {
-      if (remaining >= 0) return `已暂停 · 还剩 ${this.clock(remaining)}`;
-      return `已暂停 · 超出 ${this.clock(-remaining)}`;
-    }
-    if (this.assignment.elapsedSeconds > 0) return `用了 ${this.clock(this.assignment.elapsedSeconds)}`;
-    return `预计 ${this.assignment.expectedMinutes} 分钟`;
+  private isNearDeadline(): boolean {
+    let remaining = this.remainingSeconds();
+    return this.isRunning() && remaining > 0 && remaining <= 5 * 60;
+  }
+
+  private statusLabel(): string {
+    let remaining = this.remainingSeconds();
+    if (this.isRunning()) return remaining >= 0 ? '还剩' : '超出';
+    if (this.isPaused()) return remaining >= 0 ? '已暂停 · 还剩' : '已暂停 · 超出';
+    if (this.assignment.elapsedSeconds > 0) return '用了';
+    return '预计';
+  }
+
+  private timeValue(): string {
+    let remaining = this.remainingSeconds();
+    if (this.isRunning() || this.isPaused()) return this.clock(Math.abs(remaining));
+    if (this.assignment.elapsedSeconds > 0) return this.clock(this.assignment.elapsedSeconds);
+    return `${this.assignment.expectedMinutes} 分钟`;
+  }
+
+  private emphasisColor(): string {
+    if (this.isOvertime()) return AppTheme.DANGER;
+    if (this.isNearDeadline()) return AppTheme.WARNING;
+    return AppTheme.PRIMARY;
+  }
+
+  private emphasisBackground(): string {
+    if (this.isOvertime()) return AppTheme.DANGER_SOFT;
+    if (this.isNearDeadline()) return AppTheme.WARNING_SOFT;
+    return AppTheme.PRIMARY_FAINT;
   }
 
   private progressValue(): number {
@@ -73,32 +95,36 @@ export struct AssignmentCountdownCard {
   }
 
   build() {
-    Column({ space: 8 }) {
+    Column({ space: 10 }) {
       Row({ space: 8 }) {
-        Text('计时')
-          .fontSize(12)
+        Text(this.statusLabel())
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
-          .fontColor(this.isOvertime() ? AppTheme.WARNING : AppTheme.PRIMARY);
-        Text(this.headline())
-          .layoutWeight(1)
-          .fontSize(17)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(this.isOvertime() ? AppTheme.WARNING : AppTheme.TEXT);
+          .fontColor(this.emphasisColor());
+        Blank();
         Text(`目标 ${this.assignment.expectedMinutes} 分钟`)
           .fontSize(12)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
-      .width('100%');
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
+
+      Text(this.timeValue())
+        .width('100%')
+        .fontSize(36)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(this.emphasisColor());
 
       Progress({ value: this.progressValue(), total: this.budgetSeconds(), type: ProgressType.Linear })
         .width('100%')
-        .height(5)
-        .color(this.isOvertime() ? AppTheme.WARNING : AppTheme.PRIMARY)
-        .backgroundColor(this.isOvertime() ? AppTheme.WARNING_SOFT : AppTheme.PRIMARY_SOFT);
+        .height(6)
+        .color(this.emphasisColor())
+        .backgroundColor(this.isOvertime() ? AppTheme.DANGER_SOFT :
+          (this.isNearDeadline() ? AppTheme.WARNING_SOFT : AppTheme.PRIMARY_SOFT));
     }
     .width('100%')
-    .padding({ left: 14, right: 14, top: 12, bottom: 12 })
-    .backgroundColor(this.isOvertime() ? AppTheme.WARNING_SOFT : AppTheme.PRIMARY_FAINT)
+    .padding({ left: 16, right: 16, top: 14, bottom: 14 })
+    .backgroundColor(this.emphasisBackground())
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 }
