@@ -86,6 +86,7 @@ async function initializeAdmin() {
     setLoginState(LoginState.READY);
   } catch (error) {
     console.error('admin initialization failed', error);
+    progressCard.hidden = false;
     showResult('学生信息加载失败：' + (error?.message || '请刷新重试。'), false);
     setLoginState(LoginState.READY, '已登录，但学生信息加载失败，请刷新重试。');
   }
