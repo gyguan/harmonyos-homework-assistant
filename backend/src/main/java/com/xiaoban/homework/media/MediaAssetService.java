@@ -13,6 +13,8 @@ import java.util.HexFormat;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -50,7 +52,9 @@ public class MediaAssetService {
     entity.sha256 = sha256;
     entity.createdAt = Instant.now();
     try {
-      return assets.saveAndFlush(entity);
+      MediaAssetEntity saved = assets.saveAndFlush(entity);
+      registerRollbackCleanup(stored.storagePath());
+      return saved;
     } catch (RuntimeException error) {
       try {
         storage.delete(stored.storagePath());
@@ -59,6 +63,21 @@ public class MediaAssetService {
       }
       throw error;
     }
+  }
+
+  private void registerRollbackCleanup(String storagePath) {
+    if (!TransactionSynchronizationManager.isSynchronizationActive()) return;
+    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+      @Override
+      public void afterCompletion(int status) {
+        if (status != TransactionSynchronization.STATUS_ROLLED_BACK) return;
+        try {
+          storage.delete(storagePath);
+        } catch (RuntimeException ignored) {
+          // Database rollback remains authoritative. Orphan cleanup can be retried operationally.
+        }
+      }
+    });
   }
 
   public MediaAssetEntity requireOwned(UUID familyId, UUID assetId) {

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 import sys
 import time
 import uuid
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from urllib.parse import quote
@@ -12,6 +14,30 @@ from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, require
 
 AUDIO_BYTES = b"xiaoban-voice-material-e2e-audio"
 IMAGE_BYTES = b"\x89PNG\r\n\x1a\nvoice-material-e2e-image"
+
+
+def multipart_voice_assignment(metadata: dict, audio_name: str, image_name: str) -> tuple[bytes, str]:
+    boundary = "----xiaoban-legacy-voice-e2e-" + uuid.uuid4().hex
+    parts = [
+        f"--{boundary}".encode(),
+        b'Content-Disposition: form-data; name="metadata"',
+        b"Content-Type: application/json",
+        b"",
+        json.dumps(metadata, ensure_ascii=False).encode("utf-8"),
+        f"--{boundary}".encode(),
+        f'Content-Disposition: form-data; name="audio"; filename="{audio_name}"'.encode(),
+        b"Content-Type: audio/mpeg",
+        b"",
+        AUDIO_BYTES,
+        f"--{boundary}".encode(),
+        f'Content-Disposition: form-data; name="images"; filename="{image_name}"'.encode(),
+        b"Content-Type: image/png",
+        b"",
+        IMAGE_BYTES,
+        f"--{boundary}--".encode(),
+        b"",
+    ]
+    return b"\r\n".join(parts), f"multipart/form-data; boundary={boundary}"
 
 
 def multipart_file(field: str, filename: str, content_type: str, content: bytes) -> tuple[bytes, str]:
@@ -153,13 +179,91 @@ def main() -> int:
         student_id = f"voice-material-{run_id}"
         create_student(base_url, token, student_id)
 
+        race_student_id = f"voice-material-race-{run_id}"
+        create_student(base_url, token, race_student_id)
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            create_future = executor.submit(
+                http, base_url, "POST",
+                f"/api/v1/students/{race_student_id}/voice-material-batches",
+                token=token,
+            )
+            delete_future = executor.submit(
+                http, base_url, "DELETE", f"/api/v1/students/{race_student_id}", token=token
+            )
+            race_create = create_future.result()
+            race_delete = delete_future.result()
+        race_statuses = (race_create.status, race_delete.status)
+        require(
+            race_statuses in ((200, 200), (200, 204), (404, 200), (404, 204)),
+            f"student delete/material batch race escaped business boundary: {race_statuses!r}",
+        )
+
+        empty_student_id = f"voice-material-empty-{run_id}"
+        create_student(base_url, token, empty_student_id)
+        create_batch(base_url, token, empty_student_id)
+        expect(
+            http(base_url, "DELETE", f"/api/v1/students/{empty_student_id}", token=token),
+            (200, 204), "delete student after cleaning empty voice-material batch",
+        )
+
         pending_student_id = f"voice-material-pending-{run_id}"
         create_student(base_url, token, pending_student_id)
-        create_batch(base_url, token, pending_student_id)
+        pending_batch_id = create_batch(base_url, token, pending_student_id)
+        register_package(base_url, token, pending_batch_id, "001-待上传素材", "CHINESE")
         expect(
             http(base_url, "DELETE", f"/api/v1/students/{pending_student_id}", token=token),
-            (409,), "reject student deletion while voice-material batch exists",
+            (409,), "reject student deletion while voice-material package exists",
         )
+
+        legacy_assignment_id = f"legacy-voice-{run_id}"
+        legacy_metadata = {
+            "id": legacy_assignment_id,
+            "assignmentType": "EXTRA",
+            "subject": "语文",
+            "subjectCode": "CHINESE",
+            "contentType": "NORMAL",
+            "title": "旧版手工语音兼容验证",
+            "instruction": "验证原有语音作业接口在共享媒体迁移后仍可使用",
+            "textbookRef": "",
+            "dueText": "",
+            "dueAtEpochMs": 0,
+            "dueTimezone": "Asia/Shanghai",
+            "status": "NOT_STARTED",
+            "sourceLabel": "legacy voice compatibility",
+            "sourceExcerpt": "",
+            "expectedMinutes": 10,
+            "startedAtEpochMs": 0,
+            "finishedAtEpochMs": 0,
+            "elapsedSeconds": 0,
+            "reviewNote": "",
+        }
+        legacy_body, legacy_type = multipart_voice_assignment(
+            legacy_metadata, "legacy-voice.mp3", "legacy-scene.png")
+        legacy_created = expect(
+            http(
+                base_url, "POST",
+                f"/api/v1/students/{student_id}/assignments/voice",
+                token=token, raw=legacy_body, content_type=legacy_type,
+            ),
+            (200,), "create legacy manual voice assignment",
+        ).json()
+        require((legacy_created.get("assignment") or {}).get("contentType") == "AUDIO_IMAGE",
+                "legacy manual voice API must continue forcing AUDIO_IMAGE")
+        legacy_resources = legacy_created.get("resources") or []
+        require(len(legacy_resources) == 2,
+                "legacy manual voice assignment must persist audio + image resources")
+        require([item.get("originalName") for item in legacy_resources] ==
+                ["legacy-voice.mp3", "legacy-scene.png"],
+                "legacy manual voice resource metadata changed after MediaAsset migration")
+        assert_downloads(base_url, token, legacy_resources, "legacy manual voice assignment")
+        legacy_download_paths = [item.get("downloadPath") for item in legacy_resources]
+        expect(
+            http(base_url, "DELETE", f"/api/v1/assignments/{legacy_assignment_id}", token=token),
+            (200, 204), "delete legacy manual voice assignment",
+        )
+        for path in legacy_download_paths:
+            expect(http(base_url, "GET", path, token=token), (404,),
+                   "legacy manual voice resource removed with assignment")
 
         batch_id = create_batch(base_url, token, student_id)
 
@@ -176,8 +280,22 @@ def main() -> int:
         for package in (second, first):
             package_id = package["id"]
             audio_name, image_name = package_file_names[package_id]
-            audio = upload(base_url, token, package_id, "AUDIO", audio_name, 0,
-                           AUDIO_BYTES, "audio/mpeg")
+            if package_id == first["id"]:
+                with ThreadPoolExecutor(max_workers=2) as executor:
+                    futures = [
+                        executor.submit(
+                            upload, base_url, token, package_id, "AUDIO", audio_name, 0,
+                            AUDIO_BYTES, "audio/mpeg"
+                        )
+                        for _ in range(2)
+                    ]
+                    concurrent_audio = [future.result() for future in futures]
+                require(concurrent_audio[0].get("id") == concurrent_audio[1].get("id"),
+                        "concurrent retry created duplicate package file")
+                audio = concurrent_audio[0]
+            else:
+                audio = upload(base_url, token, package_id, "AUDIO", audio_name, 0,
+                               AUDIO_BYTES, "audio/mpeg")
             image = upload(base_url, token, package_id, "IMAGE", image_name, 1,
                            IMAGE_BYTES, "image/png")
             require(bool(audio.get("assetId")) and bool(image.get("assetId")),
@@ -208,6 +326,23 @@ def main() -> int:
                 "voice-material batch must have two READY packages")
         require(int(completed.get("invalidCount", -1)) == 0,
                 "valid voice-material batch unexpectedly contains INVALID package")
+
+        expect(
+            http(
+                base_url, "POST",
+                f"/api/v1/voice-material-batches/{batch_id}/packages",
+                token=token,
+                payload={
+                    "directoryName": "003-迟到目录",
+                    "subjectCode": "CHINESE",
+                    "title": "",
+                    "expectedMinutes": 15,
+                    "dueAtEpochMs": 0,
+                    "assignmentType": "EXTRA",
+                },
+            ),
+            (400,), "reject package registration after batch completion",
+        )
 
         listed = expect(
             http(base_url, "GET",

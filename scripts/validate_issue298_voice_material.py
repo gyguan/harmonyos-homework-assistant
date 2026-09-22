@@ -31,6 +31,7 @@ index = read("entry/src/main/ets/pages/Index.ets")
 page = read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets")
 dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 context = read("CONTEXT.md")
+voice_e2e = read("backend/scripts/voice_material_e2e.py")
 
 require("create table media_asset" in migration and
         "asset_id uuid references media_asset(id)" in migration,
@@ -45,8 +46,17 @@ require('private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai")'
 require("students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
         "packages.lockNextReady" in assignment_service,
         "#298 daily auto-create must serialize per student before consuming a READY package")
-require("students.requireOwnedForUpdate(familyId, batch.studentId)" in material_service,
-        "#298 batch completion must serialize per student before applying fingerprints and READY state")
+require("batches.findOwnedStudentId(familyId, batchId)" in material_service and
+        "students.requireOwnedForUpdate(familyId, studentId)" in material_service,
+        "#298 package registration/completion must resolve student as a scalar before taking the Student lock")
+require("packages.findOwnedStudentId(familyId, packageId)" in material_service and
+        "students.requireOwnedForUpdate(familyId, studentId)" in material_service and
+        "packages.lockOwned(familyId, packageId)" in material_service,
+        "#298 file upload retries must resolve student without preloading Package and then use Student -> Package lock order")
+require("packages.findOwnedStudentId(familyId, packageId)" in assignment_service and
+        "students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
+        "packages.lockOwned(familyId, packageId)" in assignment_service,
+        "#298 manual package consumption must resolve student without a stale Package snapshot and use Student -> Package lock order")
 require("LocalTime.of(23, 59)" in assignment_service and
         'item.dueAt == null ? "今天" : ""' in assignment_service,
         "#298 an undated package auto-created for the day must appear in the student Today view")
@@ -59,21 +69,34 @@ require("item.status = \"CONSUMED\"" in assignment_service and
 require("input.subjectCode().trim().toUpperCase" in material_service and
         "directoryName" in material_service,
         "#298 subjectCode must be explicit package metadata while directoryName stays a separate field")
+require("batch.readyCount + batch.invalidCount >= batch.directoryCount" in material_service,
+        "#298 completed material batches must reject late package registration")
+require('item.consumedAssignmentId == null ? "" : item.consumedAssignmentId' in material_service,
+        "#298 PackageResponse must keep consumedAssignmentId non-null for the ArkTS string contract")
+require("students.requireOwnedForUpdate(familyId, studentId)" in material_service,
+        "#298 material batch creation must serialize with student deletion")
 require("normalizeSortOrder" in material_service and
         "relativeName.toLowerCase" in material_service,
         "#298 image ordering must be normalized by file name")
 require("entity.assetId = asset.id" in resource_service and
         "entity.storagePath = null" in resource_service,
         "#298 new Assignment resources must reference MediaAsset without copying files")
-require("families.lockById(familyId)" in read("backend/src/main/java/com/xiaoban/homework/media/MediaAssetService.java"),
+media_asset_service = read("backend/src/main/java/com/xiaoban/homework/media/MediaAssetService.java")
+require("families.lockById(familyId)" in media_asset_service,
         "#298 MediaAsset dedup must serialize same-family inserts instead of recovering from a rollback-only unique-key exception")
+require("registerRollbackCleanup(stored.storagePath())" in media_asset_service and
+        "TransactionSynchronization.STATUS_ROLLED_BACK" in media_asset_service,
+        "#298 newly stored physical media must be removed when the surrounding database transaction rolls back")
 require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
         "#298 deleting Assignment must not delete shared MediaAsset files")
 require("allowsMulFolderSelection = true" in picker and
+        "deviceInfo.sdkApiVersion >= 26" in picker and
+        "if (!this.supportsMultiFolderPicker())" in picker and
+        "this.context === null || !this.supportsMultiFolderPicker()" in picker and
         "getFullDirectoryUri()" in picker and
         "selectFilesFallback" in picker and
         "DocumentSelectMode.FILE" in picker,
-        "#298 picker must support folder selection and automatically fall back to file grouping by parent directory")
+        "#298 picker must guard API 26 multi-folder selection and fall back to file grouping on API 20-25")
 require("createBatch(studentId" in remote and
         "uploadFile(packageId" in remote and
         "completeBatch(batchId" in remote,
@@ -85,13 +108,27 @@ require("VoiceMaterialAutoCreateService.instance.checkToday(studentId)" in index
         "#298 student entry must trigger the server-authoritative daily check")
 require("Text('语音素材库')" in dashboard and "onOpenVoiceMaterial" in dashboard,
         "#298 parent dashboard must expose the voice material library")
+require("sys.symbol.exclamationmark_circle_fill" not in page,
+        "#298 parent material page must not depend on a version-sensitive feedback system symbol")
 require("private PendingSection()" in page and "private LibrarySection()" in page and
         "setPackageSubject" in page and
         "setPackageExpectedMinutes" in page and
         "registrationFailureCount" in read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialViewModel.ets"),
         "#298 parent material page must support staging, per-directory subject/duration override, partial-failure feedback and library status")
-require("voiceMaterials.existsByFamilyIdAndStudentId" in read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java"),
-        "#298 student deletion must be rejected while voice-material batches still reference the student")
+student_service = read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java")
+require("voiceMaterialPackages.existsByFamilyIdAndStudentId" in student_service,
+        "#298 student deletion must be rejected while actual voice-material packages still reference the student")
+require("voiceMaterials.deleteByFamilyIdAndStudentId" in student_service,
+        "#298 empty material batches must be cleaned instead of permanently blocking student deletion")
+require("StudentEntity student = requireOwnedForUpdate(familyId, id)" in student_service,
+        "#298 student deletion must lock the student row before checking voice-material ownership")
+require("legacy manual voice assignment" in voice_e2e and
+        "concurrent retry created duplicate package file" in voice_e2e and
+        "student delete/material batch race escaped business boundary" in voice_e2e and
+        "delete student after cleaning empty voice-material batch" in voice_e2e and
+        "reject student deletion while voice-material package exists" in voice_e2e and
+        "reject package registration after batch completion" in voice_e2e,
+        "#298 E2E must preserve legacy compatibility and concurrency/lifecycle boundaries")
 require("Media Asset（媒体资产）" in context and
         "Daily Voice Auto Create（每日语音自动创建）" in context,
         "#298 domain language must be documented in CONTEXT.md")

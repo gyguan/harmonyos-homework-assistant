@@ -47,7 +47,7 @@ public class VoiceMaterialService {
 
   @Transactional
   public VoiceMaterialDtos.BatchResponse createBatch(UUID familyId, String studentId) {
-    students.requireOwned(familyId, studentId);
+    students.requireOwnedForUpdate(familyId, studentId);
     Instant now = Instant.now();
     VoiceMaterialBatchEntity batch = new VoiceMaterialBatchEntity();
     batch.id = UUID.randomUUID();
@@ -64,7 +64,14 @@ public class VoiceMaterialService {
   @Transactional
   public VoiceMaterialDtos.PackageResponse registerPackage(UUID familyId, UUID batchId,
       VoiceMaterialDtos.RegisterPackageRequest input) {
+    String studentId = batches.findOwnedStudentId(familyId, batchId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材批次不存在"));
+    students.requireOwnedForUpdate(familyId, studentId);
     VoiceMaterialBatchEntity batch = requireBatch(familyId, batchId);
+    if (batch.directoryCount > 0 &&
+        batch.readyCount + batch.invalidCount >= batch.directoryCount) {
+      throw new ApiExceptions.BadRequest("当前语音素材批次已完成，不能继续添加目录");
+    }
     String subjectCode = input.subjectCode().trim().toUpperCase(Locale.ROOT);
     if (subjectCode.isBlank()) throw new ApiExceptions.BadRequest("请选择科目");
     String directoryName = input.directoryName().trim();
@@ -106,7 +113,11 @@ public class VoiceMaterialService {
   @Transactional
   public VoiceMaterialDtos.FileResponse uploadFile(UUID familyId, UUID packageId,
       String resourceType, String relativeName, int sortOrder, MultipartFile file) {
-    VoiceMaterialPackageEntity item = requirePackage(familyId, packageId);
+    String studentId = packages.findOwnedStudentId(familyId, packageId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
+    students.requireOwnedForUpdate(familyId, studentId);
+    VoiceMaterialPackageEntity item = packages.lockOwned(familyId, packageId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
     if (!"UPLOADING".equals(item.status)) {
       throw new ApiExceptions.BadRequest("当前目录已结束上传，不能再添加文件");
     }
@@ -145,8 +156,10 @@ public class VoiceMaterialService {
 
   @Transactional
   public VoiceMaterialDtos.BatchResponse completeBatch(UUID familyId, UUID batchId) {
+    String studentId = batches.findOwnedStudentId(familyId, batchId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材批次不存在"));
+    students.requireOwnedForUpdate(familyId, studentId);
     VoiceMaterialBatchEntity batch = requireBatch(familyId, batchId);
-    students.requireOwnedForUpdate(familyId, batch.studentId);
     List<VoiceMaterialPackageEntity> items =
         packages.findByFamilyIdAndBatchIdOrderByDirectoryNameAscCreatedAtAsc(
             familyId, batch.id);
@@ -232,7 +245,9 @@ public class VoiceMaterialService {
         item.id.toString(), item.batchId.toString(), item.studentId,
         item.directoryName, item.subjectCode, item.title, item.expectedMinutes,
         item.dueAt == null ? 0L : item.dueAt.toEpochMilli(), item.assignmentType,
-        item.status, item.errorMessage, item.consumedAssignmentId, fileResponses);
+        item.status, item.errorMessage,
+        item.consumedAssignmentId == null ? "" : item.consumedAssignmentId,
+        fileResponses);
   }
 
   private VoiceMaterialDtos.FileResponse fileResponse(VoiceMaterialFileEntity file) {
