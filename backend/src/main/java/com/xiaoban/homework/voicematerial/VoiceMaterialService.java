@@ -68,6 +68,10 @@ public class VoiceMaterialService {
         .orElseThrow(() -> new ApiExceptions.NotFound("语音素材批次不存在"));
     students.requireOwnedForUpdate(familyId, studentId);
     VoiceMaterialBatchEntity batch = requireBatch(familyId, batchId);
+    if (batch.directoryCount > 0 &&
+        batch.readyCount + batch.invalidCount >= batch.directoryCount) {
+      throw new ApiExceptions.BadRequest("当前语音素材批次已完成，不能继续添加目录");
+    }
     String subjectCode = input.subjectCode().trim().toUpperCase(Locale.ROOT);
     if (subjectCode.isBlank()) throw new ApiExceptions.BadRequest("请选择科目");
     String directoryName = input.directoryName().trim();
