@@ -89,14 +89,16 @@ require("registerRollbackCleanup(stored.storagePath())" in media_asset_service a
         "#298 newly stored physical media must be removed when the surrounding database transaction rolls back")
 require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
         "#298 deleting Assignment must not delete shared MediaAsset files")
-require("allowsMulFolderSelection = true" in picker and
+require("allowsMulFolderSelection" not in picker and
         "deviceInfo.apiAvailable('26.0.0')" in picker and
         "SystemCapability.FileManagement.UserFileService.FolderSelection" in picker and
-        "if (!this.supportsMultiFolderPicker())" in picker and
+        "if (!this.supportsFolderPicker())" in picker and
+        "options.maxSelectNumber = 1" in picker and
+        "DocumentSelectMode.FOLDER" in picker and
         "getFullDirectoryUri()" in picker and
         "selectFilesFallback" in picker and
         "DocumentSelectMode.FILE" in picker,
-        "#298 picker must use apiAvailable + FolderSelection SysCap and fall back to file grouping on unsupported devices")
+        "#298 picker must support phone-compatible single-folder selection and fall back to file grouping only when folder selection is unavailable")
 require("createBatch(studentId" in remote and
         "uploadFile(packageId" in remote and
         "completeBatch(batchId" in remote,
