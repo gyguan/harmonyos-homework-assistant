@@ -51,8 +51,8 @@ for removed in ["private NeedHandlingSection()", "private NotStartedSection()",
 # Detail: show authoritative content only; omit generic and empty cards; pin the main action.
 require("Scroll()" in detail and "Button(this.actionLabel(this.assignment()!)" in detail,
         "#291 Detail must scroll content independently from its primary action")
-require("if (item.textbookRef.length > 0)" in detail and
-        "if (item.resourceLabels.length > 0)" in detail,
+require("if (this.assignment()!.textbookRef.length > 0)" in detail and
+        "if (this.assignment()!.resourceLabels.length > 0)" in detail,
         "#291 Detail must render optional information only when present")
 require("完成要求" not in detail and "提交方式" not in detail and "暂无老师资料" not in detail,
         "#291 Detail must omit generic and empty-value cards")
