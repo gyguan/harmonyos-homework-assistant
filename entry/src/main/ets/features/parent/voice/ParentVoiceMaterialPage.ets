@@ -534,10 +534,13 @@ export struct ParentVoiceMaterialPage {
   private Feedback() {
     if (this.message.length > 0) {
       Row({ space: 8 }) {
-        SymbolGlyph(this.messageError ?
-          $r('sys.symbol.exclamationmark_circle_fill') : $r('sys.symbol.checkmark_circle_fill'))
-          .fontSize(17)
-          .fontColor([this.messageError ? AppTheme.DANGER : AppTheme.SUCCESS]);
+        Text(this.messageError ? '!' : '✓')
+          .width(20)
+          .height(20)
+          .fontSize(13)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.messageError ? AppTheme.DANGER : AppTheme.SUCCESS)
+          .textAlign(TextAlign.Center);
         Text(this.message)
           .layoutWeight(1)
           .fontSize(13)
