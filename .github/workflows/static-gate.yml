@@ -126,6 +126,13 @@ jobs:
       - name: Validate issue 298 voice material automation
         run: python scripts/validate_issue298_voice_material.py
 
+      - name: Validate admin voice material import
+        run: |
+          python scripts/validate_admin_voice_material_import.py
+          node --check backend/src/main/resources/static/admin/js/api.js
+          node --check backend/src/main/resources/static/admin/js/voice-material.js
+          node --check backend/src/main/resources/static/admin/js/app.js
+
       - name: Validate voice workspace media focus
         run: python scripts/validate_voice_workspace_media_focus.py
 
@@ -287,6 +294,11 @@ jobs:
           done
           cat backend-e2e-first.log
           exit 1
+
+      - name: Verify admin import page is served
+        run: |
+          curl -fsSL http://localhost:8080/admin | grep -q "语音素材导入"
+          curl -fsS http://localhost:8080/admin/js/app.js | grep -q "uploadSelected"
 
       - name: Run real backend E2E smoke with Tutor fallback
         run: python backend/scripts/e2e_smoke.py --expect-tutor-unavailable
