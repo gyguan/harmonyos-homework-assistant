@@ -12,7 +12,7 @@ V2 Homework Import 已支持用户主动提供的文字、截图/OCR 与系统�
 
 - HarmonyOS AVScreenCapture 原始视频流；
 - Core Vision OCR；
-- FloatView 跨应用采集状态；
+- 屏幕采集期间的跨应用生命周期与用户可控停止；
 - SourceProfile 家庭私有配置；
 - CaptureSession / FrameEvidence 持久化；
 - ImportBatch 的重建、来源校验、理解与家长确认；
@@ -35,7 +35,7 @@ V2 Homework Import 已支持用户主动提供的文字、截图/OCR 与系统�
 - 家长自己进入目标微信群；
 - 家长自己手工滚动聊天记录；
 - App 在授权期间读取当前屏幕像素并执行 OCR；
-- FloatView 展示采集状态、群校验、时间边界和“结束采集”。
+- 家长浏览完成后返回小伴，在采集页查看状态、群校验、时间边界并执行“结束采集”。
 
 禁止：
 
@@ -169,7 +169,7 @@ SourceProfile 的默认时间，例如 15:00，只决定本次“今天 HH:mm �
 ### Positive
 
 - 不依赖微信内部实现；
-- 家长明确授权且能随时停止；
+- 家长明确授权，并可返回小伴主动停止；
 - 错误群和混合群不会静默生成作业；
 - Capture 停止不被 OCR/语义后处理失败拖死；
 - 进程恢复或重复回调可以按 Pipeline Stage 续跑；
@@ -178,7 +178,7 @@ SourceProfile 的默认时间，例如 15:00，只决定本次“今天 HH:mm �
 
 ### Cost
 
-- 真机仍需验证不同 HarmonyOS / 微信版本的 AVScreenCapture、OCR 与 FloatView 行为；
+- 真机仍需验证不同 HarmonyOS / 微信版本的 AVScreenCapture、OCR 与后台切换/返回应用行为；
 - 需要维护 SourceProfile；
 - 导入 Pipeline 比单次 OCR 多一个持久化阶段模型；
 - GitHub hosted runner 没有 HarmonyOS SDK 时，ArkTS Local Test 只能在 DevEco/配置了 SDK 的 CI 环境执行。
@@ -192,6 +192,10 @@ SourceProfile 的默认时间，例如 15:00，只决定本次“今天 HH:mm �
 ### Accessibility 自动进入群并滚动
 
 拒绝。自动控制第三方应用不是本产品需要的能力，也扩大权限与审核风险。
+
+### 使用 FloatView / 系统悬浮窗跨应用显示停止按钮
+
+拒绝。FLOAT_VIEW / SYSTEM_FLOAT_WINDOW 属于受限或高敏感悬浮能力，会扩大应用权限面并增加应用市场审核风险。当前场景并不要求在微信界面上覆盖操作控件，家长浏览完成后返回小伴停止即可满足业务闭环。
 
 ### 一次录屏后直接调用大模型生成 Assignment
 
