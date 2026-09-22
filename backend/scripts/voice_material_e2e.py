@@ -179,6 +179,25 @@ def main() -> int:
         student_id = f"voice-material-{run_id}"
         create_student(base_url, token, student_id)
 
+        race_student_id = f"voice-material-race-{run_id}"
+        create_student(base_url, token, race_student_id)
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            create_future = executor.submit(
+                http, base_url, "POST",
+                f"/api/v1/students/{race_student_id}/voice-material-batches",
+                token=token,
+            )
+            delete_future = executor.submit(
+                http, base_url, "DELETE", f"/api/v1/students/{race_student_id}", token=token
+            )
+            race_create = create_future.result()
+            race_delete = delete_future.result()
+        race_statuses = (race_create.status, race_delete.status)
+        require(
+            race_statuses in ((200, 409), (404, 200), (404, 204)),
+            f"student delete/material batch race escaped business boundary: {race_statuses!r}",
+        )
+
         pending_student_id = f"voice-material-pending-{run_id}"
         create_student(base_url, token, pending_student_id)
         create_batch(base_url, token, pending_student_id)
@@ -298,6 +317,23 @@ def main() -> int:
                 "voice-material batch must have two READY packages")
         require(int(completed.get("invalidCount", -1)) == 0,
                 "valid voice-material batch unexpectedly contains INVALID package")
+
+        expect(
+            http(
+                base_url, "POST",
+                f"/api/v1/voice-material-batches/{batch_id}/packages",
+                token=token,
+                payload={
+                    "directoryName": "003-迟到目录",
+                    "subjectCode": "CHINESE",
+                    "title": "",
+                    "expectedMinutes": 15,
+                    "dueAtEpochMs": 0,
+                    "assignmentType": "EXTRA",
+                },
+            ),
+            (400,), "reject package registration after batch completion",
+        )
 
         listed = expect(
             http(base_url, "GET",
