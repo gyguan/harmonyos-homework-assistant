@@ -23,17 +23,30 @@ detail = read("entry/src/main/ets/features/student/assignments/AssignmentDetailP
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 
+# A by-value Assignment argument freezes the reused Pad detail builder at its
+# initial selection. Bind UI reads to the pane's reactive ID + cache revision.
+require("private DetailContent()" in detail and "this.DetailContent();" in detail,
+        "reused detail content must not receive a by-value Assignment snapshot")
+require("let currentRevision = this.revision;" in detail and
+        "getCached(this.assignmentId)" in detail,
+        "detail reads must track both selected ID and authoritative cache revision")
+content = detail.split("private DetailContent", 1)[-1].split("  build()", 1)[0]
+for field in ["subject", "status", "title", "dueText", "expectedMinutes", "reviewNote",
+              "instruction", "textbookRef", "resourceLabels"]:
+    require(f"this.assignment()!.{field}" in content,
+            f"detail field must react to selection/revision changes: {field}")
+
 for token in ["老师要求", "教材 / 页码", "老师资料", "需要先订正"]:
     require(token in detail, f"Assignment Detail missing focused V2 content: {token}")
 
-require("Text(item.instruction.length > 0 ? item.instruction" in detail,
+require("Text(this.assignment()!.instruction.length > 0 ? this.assignment()!.instruction" in detail,
         "teacher requirement must render the authoritative Assignment instruction")
-require("if (item.textbookRef.length > 0)" in detail and "Text(item.textbookRef)" in detail,
+require("if (this.assignment()!.textbookRef.length > 0)" in detail and "Text(this.assignment()!.textbookRef)" in detail,
         "textbook/page section must render only when Assignment.textbookRef exists")
-require("if (item.resourceLabels.length > 0)" in detail and
-        "ForEach(item.resourceLabels" in detail,
+require("if (this.assignment()!.resourceLabels.length > 0)" in detail and
+        "ForEach(this.assignment()!.resourceLabels" in detail,
         "teacher resources must render existing Assignment.resourceLabels individually")
-require("暂无老师资料" not in detail and "Text(item.textbookRef)" in detail,
+require("暂无老师资料" not in detail and "Text(this.assignment()!.textbookRef)" in detail,
         "Assignment Detail must not show empty optional-value cards to the student")
 require("完成要求" not in detail and "提交方式" not in detail,
         "Assignment Detail must not repeat generic completion or submission instructions")
