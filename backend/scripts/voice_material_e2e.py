@@ -108,7 +108,9 @@ def package_by_name(items: list[dict], directory_name: str) -> dict:
     return found
 
 
-def list_resources(base_url: str, token: str, assignment_id: str) -> list[dict]:
+def list_resources(
+    base_url: str, token: str, assignment_id: str, expected_names: list[str] | None = None
+) -> list[dict]:
     resources = expect(
         http(base_url, "GET", f"/api/v1/assignments/{assignment_id}/resources", token=token),
         (200,), f"list resources {assignment_id}",
@@ -119,6 +121,10 @@ def list_resources(base_url: str, token: str, assignment_id: str) -> list[dict]:
             "first voice resource must be AUDIO")
     require(resources[1].get("resourceType") == "IMAGE",
             "second voice resource must be IMAGE")
+    if expected_names is not None:
+        names = [item.get("originalName") for item in resources]
+        require(names == expected_names,
+                f"assignment resource names crossed shared-asset references: {names!r}")
     return resources
 
 
@@ -153,17 +159,33 @@ def main() -> int:
         second = register_package(base_url, token, batch_id, "002-数学口算", "MATH")
         first = register_package(base_url, token, batch_id, "001-语文朗读", "CHINESE")
 
+        shared_audio_asset_id = ""
+        shared_image_asset_id = ""
+        package_file_names = {
+            second["id"]: ("math-voice.mp3", "math-scene.png"),
+            first["id"]: ("chinese-voice.mp3", "chinese-scene.png"),
+        }
         for package in (second, first):
             package_id = package["id"]
-            audio = upload(base_url, token, package_id, "AUDIO", "voice.mp3", 0,
+            audio_name, image_name = package_file_names[package_id]
+            audio = upload(base_url, token, package_id, "AUDIO", audio_name, 0,
                            AUDIO_BYTES, "audio/mpeg")
-            image = upload(base_url, token, package_id, "IMAGE", "01.png", 1,
+            image = upload(base_url, token, package_id, "IMAGE", image_name, 1,
                            IMAGE_BYTES, "image/png")
             require(bool(audio.get("assetId")) and bool(image.get("assetId")),
                     "uploaded material file missing assetId")
 
+            if not shared_audio_asset_id:
+                shared_audio_asset_id = audio["assetId"]
+                shared_image_asset_id = image["assetId"]
+            else:
+                require(audio.get("assetId") == shared_audio_asset_id,
+                        "identical audio bytes were not deduplicated to one MediaAsset")
+                require(image.get("assetId") == shared_image_asset_id,
+                        "identical image bytes were not deduplicated to one MediaAsset")
+
             # Retrying the exact same file upload must resolve to the same package-file row.
-            retry = upload(base_url, token, package_id, "AUDIO", "voice.mp3", 0,
+            retry = upload(base_url, token, package_id, "AUDIO", audio_name, 0,
                            AUDIO_BYTES, "audio/mpeg")
             require(retry.get("id") == audio.get("id"),
                     "material file response-loss retry created a duplicate package file")
@@ -242,7 +264,9 @@ def main() -> int:
         require(second_state.get("status") == "READY",
                 "same-day second automatic check consumed a second package")
 
-        first_resources = list_resources(base_url, token, first_assignment_id)
+        first_resources = list_resources(
+            base_url, token, first_assignment_id,
+            ["chinese-voice.mp3", "chinese-scene.png"])
         assert_downloads(base_url, token, first_resources, "first assignment")
 
         # Manual creation is independent of daily AUTO quota and can consume another READY package.
@@ -270,7 +294,9 @@ def main() -> int:
         require(manual_retry.get("assignmentId") == second_assignment_id,
                 "manual retry did not return original Assignment id")
 
-        second_resources = list_resources(base_url, token, second_assignment_id)
+        second_resources = list_resources(
+            base_url, token, second_assignment_id,
+            ["math-voice.mp3", "math-scene.png"])
         assert_downloads(base_url, token, second_resources, "second assignment before shared delete")
 
         # Both packages uploaded identical media bytes, so MediaAsset dedup should share the
