@@ -76,6 +76,7 @@ class VoiceMaterialAssignmentServiceTest {
     item.directoryName = "001-课文朗读";
     item.dueAt = null;
 
+    when(packages.findById(packageId)).thenReturn(Optional.of(item));
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
         familyId, packageId)).thenReturn(java.util.List.of());
@@ -98,6 +99,7 @@ class VoiceMaterialAssignmentServiceTest {
     assertNull(input.getValue().dueAtEpochMs());
     assertTrue(result.created());
     assertEquals("CONSUMED", item.status);
+    verify(students).requireOwnedForUpdate(familyId, "student-1");
   }
 
   @Test
@@ -111,6 +113,7 @@ class VoiceMaterialAssignmentServiceTest {
     item.status = "CONSUMED";
     item.consumedAssignmentId = "a-voicepkg-" + packageId;
 
+    when(packages.findById(packageId)).thenReturn(Optional.of(item));
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
 
     VoiceMaterialDtos.CreateAssignmentResponse result =
@@ -118,6 +121,7 @@ class VoiceMaterialAssignmentServiceTest {
 
     assertFalse(result.created());
     assertEquals(item.consumedAssignmentId, result.assignmentId());
+    verify(students).requireOwnedForUpdate(familyId, "student-1");
     verify(assignments, never()).create(any(), anyString(), any());
   }
 }
