@@ -52,6 +52,12 @@ public class StudentService {
     repository.delete(student);
   }
 
+  @Transactional
+  public StudentEntity requireOwnedForUpdate(UUID familyId, String id) {
+    return repository.lockOwned(familyId, id)
+        .orElseThrow(() -> new ApiExceptions.NotFound("孩子不存在"));
+  }
+
   @Transactional(readOnly = true)
   public StudentEntity requireOwned(UUID familyId, String id) {
     StudentEntity student = repository.findById(id).orElseThrow(() -> new ApiExceptions.NotFound("孩子不存在"));
