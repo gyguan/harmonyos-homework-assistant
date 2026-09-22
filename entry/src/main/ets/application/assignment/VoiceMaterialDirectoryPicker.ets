@@ -1,4 +1,5 @@
 import { common } from '@kit.AbilityKit';
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { fileIo, fileUri, picker } from '@kit.CoreFileKit';
 
 export enum VoiceMaterialLocalResourceType {
@@ -34,6 +35,10 @@ export class VoiceMaterialDirectoryPicker {
     Promise<VoiceMaterialLocalPackage[]> {
     if (this.context === null) throw new Error('语音素材目录选择服务尚未初始化');
 
+    if (!this.supportsMultiFolderPicker()) {
+      return await this.selectFilesFallback(defaultSubjectCode, expectedMinutes);
+    }
+
     try {
       let directoryUris = await this.selectDirectories();
       if (directoryUris.length === 0) return [];
@@ -44,6 +49,10 @@ export class VoiceMaterialDirectoryPicker {
     } catch {
       return await this.selectFilesFallback(defaultSubjectCode, expectedMinutes);
     }
+  }
+
+  private supportsMultiFolderPicker(): boolean {
+    return deviceInfo.sdkApiVersion >= 26;
   }
 
   private async selectDirectories(): Promise<string[]> {
