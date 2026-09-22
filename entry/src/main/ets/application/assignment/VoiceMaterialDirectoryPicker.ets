@@ -34,15 +34,38 @@ export class VoiceMaterialDirectoryPicker {
     Promise<VoiceMaterialLocalPackage[]> {
     if (this.context === null) throw new Error('语音素材目录选择服务尚未初始化');
 
+    try {
+      let directoryUris = await this.selectDirectories();
+      if (directoryUris.length === 0) return [];
+      let resolved = this.resolvePackages(
+        directoryUris, defaultSubjectCode, expectedMinutes);
+      if (resolved.length > 0) return resolved;
+      return await this.selectFilesFallback(defaultSubjectCode, expectedMinutes);
+    } catch {
+      return await this.selectFilesFallback(defaultSubjectCode, expectedMinutes);
+    }
+  }
+
+  private async selectDirectories(): Promise<string[]> {
+    if (this.context === null) return [];
     let options = new picker.DocumentSelectOptions();
     options.maxSelectNumber = 200;
-    options.fileSuffixFilters = [
-      '语音与图片|.mp3,.m4a,.wav,.jpg,.jpeg,.png,.webp,.heic'
-    ];
     options.selectMode = picker.DocumentSelectMode.FOLDER;
     options.allowsMulFolderSelection = true;
+    let documentPicker = new picker.DocumentViewPicker(this.context);
+    return await documentPicker.select(options);
+  }
 
+  private async selectFilesFallback(defaultSubjectCode: string,
+    expectedMinutes: number): Promise<VoiceMaterialLocalPackage[]> {
+    if (this.context === null) return [];
     try {
+      let options = new picker.DocumentSelectOptions();
+      options.maxSelectNumber = 200;
+      options.fileSuffixFilters = [
+        '语音与图片|.mp3,.m4a,.wav,.jpg,.jpeg,.png,.webp,.heic'
+      ];
+      options.selectMode = picker.DocumentSelectMode.FILE;
       let documentPicker = new picker.DocumentViewPicker(this.context);
       let uris = await documentPicker.select(options);
       return this.resolvePackages(uris, defaultSubjectCode, expectedMinutes);
