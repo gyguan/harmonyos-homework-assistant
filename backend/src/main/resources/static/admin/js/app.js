@@ -28,6 +28,8 @@ const el = id => document.getElementById(id);
 const loginView = el('login-view');
 const adminView = el('admin-view');
 const loginForm = el('login-form');
+const loginSubmit = el('login-submit');
+const loginStatus = el('login-status');
 const loginError = el('login-error');
 const studentSelect = el('student-select');
 const defaultMinutes = el('default-minutes');
