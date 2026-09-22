@@ -23,6 +23,9 @@ require("AUTHENTICATING" in app and "INITIALIZING" in app and "READY" in app, "l
 require("showAdminShell(result.displayName)" in app, "admin shell must become visible immediately after authentication")
 require("await initializeAdmin()" in app, "student loading must be a separate initialization step")
 require("setView('admin')" in app, "authenticated state must switch to admin view")
+require("loginView.style.display = showLoginView ? '' : 'none'" in app, "login view must be explicitly hidden after authentication")
+require("adminView.style.display = showLoginView ? 'none' : 'grid'" in app, "admin view must be explicitly shown after authentication")
+require("?v=20260922" in index, "admin static assets must be cache-busted")
 require("学生信息加载失败" in app, "initialization failure must remain visible in admin shell")
 require('id="login-form"' in index, "login form must remain present")
 
