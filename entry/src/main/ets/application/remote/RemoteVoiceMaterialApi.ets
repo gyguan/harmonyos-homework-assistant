@@ -35,6 +35,8 @@ export interface RemoteVoiceMaterialPackage {
   status: string;
   errorMessage: string;
   consumedAssignmentId: string;
+  hasCreatedBefore: boolean;
+  hasActiveAssignment: boolean;
   files: RemoteVoiceMaterialFile[];
 }
 

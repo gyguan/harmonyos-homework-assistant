@@ -18,13 +18,15 @@ public interface VoiceMaterialPackageRepository extends JpaRepository<VoiceMater
   Optional<VoiceMaterialPackageEntity> findByFamilyIdAndStudentIdAndPackageFingerprint(
       UUID familyId, String studentId, String packageFingerprint);
 
+  Optional<VoiceMaterialPackageEntity> findByFamilyIdAndStudentIdAndConsumedAssignmentId(
+      UUID familyId, String studentId, String consumedAssignmentId);
+
   @Query("""
       select p.studentId from VoiceMaterialPackageEntity p
       where p.familyId = :familyId and p.id = :packageId
       """)
   Optional<String> findOwnedStudentId(
       @Param("familyId") UUID familyId, @Param("packageId") UUID packageId);
-
 
   List<VoiceMaterialPackageEntity> findByFamilyIdAndBatchIdOrderByDirectoryNameAscCreatedAtAsc(
       UUID familyId, UUID batchId);
@@ -42,10 +44,22 @@ public interface VoiceMaterialPackageRepository extends JpaRepository<VoiceMater
       select p from VoiceMaterialPackageEntity p
       where p.familyId = :familyId
         and p.studentId = :studentId
-        and p.status = 'READY'
+        and (
+          p.status = 'READY'
+          or (
+            p.status = 'CONSUMED'
+            and not exists (
+              select a.id from assignment a
+              where a.id = p.consumedAssignmentId
+                and a.familyId = :familyId
+                and a.studentId = :studentId
+                and a.contentType = 'AUDIO_IMAGE'
+            )
+          )
+        )
       order by p.directoryName asc, p.createdAt asc, p.id asc
       """)
-  List<VoiceMaterialPackageEntity> lockNextReady(
+  List<VoiceMaterialPackageEntity> lockNextAvailableForAutoCreate(
       @Param("familyId") UUID familyId,
       @Param("studentId") String studentId,
       Pageable pageable);

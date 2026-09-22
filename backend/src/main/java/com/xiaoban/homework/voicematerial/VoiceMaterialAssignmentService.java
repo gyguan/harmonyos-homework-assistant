@@ -49,17 +49,19 @@ public class VoiceMaterialAssignmentService {
     students.requireOwnedForUpdate(familyId, studentId);
     VoiceMaterialPackageEntity item = packages.lockOwned(familyId, packageId)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
-    if ("CONSUMED".equals(item.status)) {
-      AssignmentDtos.Response existing = loadAssignmentIfPresent(
-          familyId, item.consumedAssignmentId);
+
+    AssignmentDtos.Response existing = loadAssignmentIfPresent(
+        familyId, item.consumedAssignmentId);
+    if (existing != null) {
       return new VoiceMaterialDtos.CreateAssignmentResponse(
-          false, item.consumedAssignmentId, existing);
+          false, existing.id(), existing);
     }
-    if (!"READY".equals(item.status)) {
-      throw new ApiExceptions.BadRequest("只有可创建的语音素材目录才能生成任务");
+    if (!"READY".equals(item.status) && !"CONSUMED".equals(item.status)) {
+      throw new ApiExceptions.BadRequest("当前目录还没有准备好，不能生成任务");
     }
 
-    AssignmentDtos.Response assignment = consumeLocked(familyId, item, null, "", LocalDate.now(BUSINESS_ZONE));
+    AssignmentDtos.Response assignment = consumeLocked(
+        familyId, item, null, "", LocalDate.now(BUSINESS_ZONE));
     return new VoiceMaterialDtos.CreateAssignmentResponse(
         true, assignment.id(), assignment);
   }
@@ -69,31 +71,34 @@ public class VoiceMaterialAssignmentService {
     students.requireOwnedForUpdate(familyId, studentId);
     LocalDate businessDate = LocalDate.now(BUSINESS_ZONE);
 
-    VoiceMaterialAutoCreateRecordEntity existing =
-        autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
-            familyId, studentId, businessDate).orElse(null);
-    if (existing != null) {
+    AssignmentDtos.Response current = assignments.findFirstVoiceMaterialTask(familyId, studentId);
+    if (current != null) {
+      String packageId = packages
+          .findByFamilyIdAndStudentIdAndConsumedAssignmentId(familyId, studentId, current.id())
+          .map(item -> item.id.toString())
+          .orElse("");
       return new VoiceMaterialDtos.AutoCreateResponse(
-          false, businessDate.toString(), existing.packageId.toString(),
-          existing.assignmentId, loadAssignmentIfPresent(familyId, existing.assignmentId));
+          false, businessDate.toString(), packageId, current.id(), current);
     }
 
-    List<VoiceMaterialPackageEntity> ready =
-        packages.lockNextReady(familyId, studentId, PageRequest.of(0, 1));
-    if (ready.isEmpty()) {
+    List<VoiceMaterialPackageEntity> available =
+        packages.lockNextAvailableForAutoCreate(familyId, studentId, PageRequest.of(0, 1));
+    if (available.isEmpty()) {
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), "", "", null);
     }
 
-    VoiceMaterialPackageEntity item = ready.get(0);
+    VoiceMaterialPackageEntity item = available.get(0);
     Instant dailyDueAt = item.dueAt == null
         ? businessDate.atTime(LocalTime.of(23, 59)).atZone(BUSINESS_ZONE).toInstant()
         : null;
     AssignmentDtos.Response assignment = consumeLocked(
         familyId, item, dailyDueAt, item.dueAt == null ? "今天" : "", businessDate);
 
-    VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
-    record.id = UUID.randomUUID();
+    VoiceMaterialAutoCreateRecordEntity record =
+        autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+            familyId, studentId, businessDate).orElseGet(VoiceMaterialAutoCreateRecordEntity::new);
+    if (record.id == null) record.id = UUID.randomUUID();
     record.familyId = familyId;
     record.studentId = studentId;
     record.businessDate = businessDate;

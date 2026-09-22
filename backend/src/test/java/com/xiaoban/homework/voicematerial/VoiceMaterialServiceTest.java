@@ -8,6 +8,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.assignment.VoiceMediaPolicy;
 import com.xiaoban.homework.media.MediaAssetRepository;
 import com.xiaoban.homework.media.MediaAssetService;
@@ -23,6 +24,7 @@ class VoiceMaterialServiceTest {
     VoiceMaterialBatchRepository batches = mock(VoiceMaterialBatchRepository.class);
     VoiceMaterialPackageRepository packages = mock(VoiceMaterialPackageRepository.class);
     VoiceMaterialFileRepository files = mock(VoiceMaterialFileRepository.class);
+    AssignmentRepository assignments = mock(AssignmentRepository.class);
     MediaAssetRepository assets = mock(MediaAssetRepository.class);
     MediaAssetService mediaAssets = mock(MediaAssetService.class);
     StudentService students = mock(StudentService.class);
@@ -51,7 +53,7 @@ class VoiceMaterialServiceTest {
         .thenReturn(Optional.of(existing));
 
     VoiceMaterialService service = new VoiceMaterialService(
-        batches, packages, files, assets, mediaAssets, students, new VoiceMediaPolicy());
+        batches, packages, files, assignments, assets, mediaAssets, students, new VoiceMediaPolicy());
 
     VoiceMaterialDtos.FileResponse result = service.uploadFile(
         familyId, packageId, "AUDIO", "voice.mp3", 0,

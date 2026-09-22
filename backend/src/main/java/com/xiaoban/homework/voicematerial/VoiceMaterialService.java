@@ -1,5 +1,6 @@
 package com.xiaoban.homework.voicematerial;
 
+import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.assignment.VoiceMediaPolicy;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.media.MediaAssetEntity;
@@ -24,6 +25,7 @@ public class VoiceMaterialService {
   private final VoiceMaterialBatchRepository batches;
   private final VoiceMaterialPackageRepository packages;
   private final VoiceMaterialFileRepository files;
+  private final AssignmentRepository assignments;
   private final MediaAssetRepository assets;
   private final MediaAssetService mediaAssets;
   private final StudentService students;
@@ -32,6 +34,7 @@ public class VoiceMaterialService {
   public VoiceMaterialService(VoiceMaterialBatchRepository batches,
       VoiceMaterialPackageRepository packages,
       VoiceMaterialFileRepository files,
+      AssignmentRepository assignments,
       MediaAssetRepository assets,
       MediaAssetService mediaAssets,
       StudentService students,
@@ -39,6 +42,7 @@ public class VoiceMaterialService {
     this.batches = batches;
     this.packages = packages;
     this.files = files;
+    this.assignments = assignments;
     this.assets = assets;
     this.mediaAssets = mediaAssets;
     this.students = students;
@@ -241,13 +245,15 @@ public class VoiceMaterialService {
     List<VoiceMaterialDtos.FileResponse> fileResponses =
         files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(item.familyId, item.id)
             .stream().map(this::fileResponse).toList();
+    boolean hasCreatedBefore = item.consumedAssignmentId != null && !item.consumedAssignmentId.isBlank();
+    boolean hasActiveAssignment = hasCreatedBefore && assignments.existsById(item.consumedAssignmentId);
     return new VoiceMaterialDtos.PackageResponse(
         item.id.toString(), item.batchId.toString(), item.studentId,
         item.directoryName, item.subjectCode, item.title, item.expectedMinutes,
         item.dueAt == null ? 0L : item.dueAt.toEpochMilli(), item.assignmentType,
         item.status, item.errorMessage,
         item.consumedAssignmentId == null ? "" : item.consumedAssignmentId,
-        fileResponses);
+        hasCreatedBefore, hasActiveAssignment, fileResponses);
   }
 
   private VoiceMaterialDtos.FileResponse fileResponse(VoiceMaterialFileEntity file) {

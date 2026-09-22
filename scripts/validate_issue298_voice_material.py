@@ -44,8 +44,9 @@ require('private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai")'
         "findByFamilyIdAndStudentIdAndBusinessDate" in assignment_service,
         "#298 automatic creation must use a server-authoritative Asia/Shanghai business day")
 require("students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
-        "packages.lockNextReady" in assignment_service,
-        "#298 daily auto-create must serialize per student before consuming a READY package")
+        "findFirstVoiceMaterialTask(familyId, studentId)" in assignment_service and
+        "packages.lockNextAvailableForAutoCreate" in assignment_service,
+        "#298 automatic creation must serialize per student and recheck current valid voice task before consuming the next eligible package")
 require("batches.findOwnedStudentId(familyId, batchId)" in material_service and
         "students.requireOwnedForUpdate(familyId, studentId)" in material_service,
         "#298 package registration/completion must resolve student as a scalar before taking the Student lock")
@@ -71,8 +72,10 @@ require("input.subjectCode().trim().toUpperCase" in material_service and
         "#298 subjectCode must be explicit package metadata while directoryName stays a separate field")
 require("batch.readyCount + batch.invalidCount >= batch.directoryCount" in material_service,
         "#298 completed material batches must reject late package registration")
-require('item.consumedAssignmentId == null ? "" : item.consumedAssignmentId' in material_service,
-        "#298 PackageResponse must keep consumedAssignmentId non-null for the ArkTS string contract")
+require('item.consumedAssignmentId == null ? "" : item.consumedAssignmentId' in material_service and
+        "hasCreatedBefore" in material_service and
+        "hasActiveAssignment" in material_service,
+        "#298 PackageResponse must expose historical usage and current active-assignment state")
 require("students.requireOwnedForUpdate(familyId, studentId)" in material_service,
         "#298 material batch creation must serialize with student deletion")
 require("normalizeSortOrder" in material_service and
@@ -121,8 +124,12 @@ require("private DefaultSubjectChip(label: string, code: string)" in page and
 require("private PendingSection()" in page and "private LibrarySection()" in page and
         "setPackageSubject" in page and
         "setPackageExpectedMinutes" in page and
-        "registrationFailureCount" in read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialViewModel.ets"),
-        "#298 parent material page must support staging, per-directory subject/duration override, partial-failure feedback and library status")
+        "registrationFailureCount" in read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialViewModel.ets") and
+        "hasCreatedBefore" in remote and
+        "hasActiveAssignment" in remote and
+        "item.hasCreatedBefore" in page and
+        "item.hasActiveAssignment" in page,
+        "#298 parent material page must support staging, per-directory subject/duration override, partial-failure feedback and historical/current usage markers")
 student_service = read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java")
 require("voiceMaterialPackages.existsByFamilyIdAndStudentId" in student_service,
         "#298 student deletion must be rejected while actual voice-material packages still reference the student")

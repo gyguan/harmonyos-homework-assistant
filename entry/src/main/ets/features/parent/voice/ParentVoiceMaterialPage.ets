@@ -204,7 +204,8 @@ export struct ParentVoiceMaterialPage {
   }
 
   private async createAssignment(item: RemoteVoiceMaterialPackage): Promise<void> {
-    if (this.creatingPackageId.length > 0 || item.status !== 'READY') return;
+    if (this.creatingPackageId.length > 0 || item.hasActiveAssignment ||
+      (item.status !== 'READY' && item.status !== 'CONSUMED')) return;
     this.creatingPackageId = item.id;
     this.clearMessage();
     try {
@@ -230,24 +231,27 @@ export struct ParentVoiceMaterialPage {
     return '其他';
   }
 
-  private statusLabel(status: string): string {
-    if (status === 'READY') return '待创建';
-    if (status === 'CONSUMED') return '已创建';
-    if (status === 'INVALID') return '素材异常';
+  private statusLabel(item: RemoteVoiceMaterialPackage): string {
+    if (item.hasActiveAssignment) return '已有任务';
+    if (item.hasCreatedBefore) return '已创建过';
+    if (item.status === 'READY') return '待创建';
+    if (item.status === 'INVALID') return '素材异常';
     return '上传中';
   }
 
-  private statusColor(status: string): string {
-    if (status === 'READY') return AppTheme.PRIMARY;
-    if (status === 'CONSUMED') return AppTheme.SUCCESS;
-    if (status === 'INVALID') return AppTheme.DANGER;
+  private statusColor(item: RemoteVoiceMaterialPackage): string {
+    if (item.hasActiveAssignment) return AppTheme.SUCCESS;
+    if (item.hasCreatedBefore) return AppTheme.PRIMARY;
+    if (item.status === 'READY') return AppTheme.PRIMARY;
+    if (item.status === 'INVALID') return AppTheme.DANGER;
     return AppTheme.SUBTEXT;
   }
 
-  private statusBackground(status: string): string {
-    if (status === 'READY') return AppTheme.PRIMARY_SOFT;
-    if (status === 'CONSUMED') return AppTheme.SUCCESS_SOFT;
-    if (status === 'INVALID') return AppTheme.DANGER_SOFT;
+  private statusBackground(item: RemoteVoiceMaterialPackage): string {
+    if (item.hasActiveAssignment) return AppTheme.SUCCESS_SOFT;
+    if (item.hasCreatedBefore) return AppTheme.PRIMARY_SOFT;
+    if (item.status === 'READY') return AppTheme.PRIMARY_SOFT;
+    if (item.status === 'INVALID') return AppTheme.DANGER_SOFT;
     return AppTheme.SURFACE_SUBTLE;
   }
 
@@ -477,12 +481,12 @@ export struct ParentVoiceMaterialPage {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
-        Text(this.statusLabel(item.status))
+        Text(this.statusLabel(item))
           .fontSize(12)
           .fontWeight(FontWeight.Medium)
-          .fontColor(this.statusColor(item.status))
+          .fontColor(this.statusColor(item))
           .padding({ left: 9, right: 9, top: 5, bottom: 5 })
-          .backgroundColor(this.statusBackground(item.status))
+          .backgroundColor(this.statusBackground(item))
           .borderRadius(AppTheme.CHIP_RADIUS);
       }
       .width('100%');
@@ -494,15 +498,22 @@ export struct ParentVoiceMaterialPage {
           .fontColor(AppTheme.DANGER);
       }
 
-      if (item.status === 'READY') {
-        Button(this.creatingPackageId === item.id ? '正在创建…' : '创建语音任务',
+      if (item.status === 'READY' || item.status === 'CONSUMED') {
+        Button(
+          this.creatingPackageId === item.id
+            ? '正在创建…'
+            : item.hasActiveAssignment
+              ? '已有任务'
+              : item.hasCreatedBefore
+                ? '再次创建任务'
+                : '创建语音任务',
           { type: ButtonType.Normal })
           .width('100%')
           .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .backgroundColor(AppTheme.PRIMARY_SOFT)
           .fontColor(AppTheme.PRIMARY)
-          .enabled(this.creatingPackageId.length === 0)
+          .enabled(this.creatingPackageId.length === 0 && !item.hasActiveAssignment)
           .onClick(() => { void this.createAssignment(item); });
       }
     }
