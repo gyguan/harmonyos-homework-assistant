@@ -20,28 +20,29 @@ V2 页面先满足 Phone 单列流程；当**当前 Feature 内容容器**能够
 
 ```text
 Header
-TodayProgress
-Attention?
-NextAssignmentHero
-RemainingAssignments
+今天要做
+TaskCard [开始 / 继续 / 去提交]
+TaskCard ...
 ```
 
 ### Pad / 宽容器
 
 ```text
 ┌──────────────────────────────┬──────────────────┐
-│ Header                       │ Attention?       │
-│ TodayProgress                │                  │
-│                              │ 今天还要做       │
-│ NextAssignmentHero           │ Remaining...     │
+│ 先做这项                     │ 接下来           │
+│ Focus Task                   │ Task...          │
+│ 老师要求（简要）             │ Task...          │
+│ [开始 / 继续 / 去提交]       │ [对应动作]       │
 │                              │                  │
 └──────────────────────────────┴──────────────────┘
 ```
 
 要求：
 
-- 左侧 Hero 仍是第一视觉焦点，不被压缩成窄卡片；
-- 右侧承载剩余任务/提醒摘要；
+- 不展示统计卡，不要求先展开学科，再选择作业；
+- 每项任务直接提供与状态一致的主动作；
+- 左侧第一项是第一视觉焦点，不被压缩成窄卡片；
+- 右侧承载剩余任务；
 - 任一 pane 不满足最小宽度时立即回退单列；
 - Pad 组合由 `LayoutPolicy.homeFocusSummaryRequirement()` 决定。
 
@@ -56,6 +57,8 @@ NavDestination Assignment Detail
 ```
 
 ### Pad / 宽容器
+
+默认仍聚焦当前作业，并限制正文最大可读宽度。学生主动点击“问小伴”后才切换为：
 
 ```text
 ┌─────────────────────┬────────────────────────────────┐
@@ -103,7 +106,8 @@ Study content
 
 要求：
 
-- Tutor 在宽屏中常驻右侧，不再通过“问小伴”按钮替换整张学习页；
+- Tutor 不在进入页面时自动加载或常驻；
+- 学生点击“问小伴”后，宽屏在右侧展开 Tutor，并提供“收起”；
 - Study 主动作仍固定在学习 pane 底部；
 - Tutor unavailable 不遮挡学习内容和提交；
 - 窄窗自动退回 Phone 的 Tutor 子表面；
@@ -128,5 +132,5 @@ Study content
 - Pad 竖屏/横屏：当内容宽度满足 requirement 时出现对应双区/双栏；
 - Pad 分屏或窄窗：自动退回 Phone 组合；
 - Assignment：左侧选择不同作业，右侧详情同步切换，主动作可进入 Study；
-- Study：宽屏同时可见学习内容与 Tutor，窄屏 Tutor 仍是独立子表面；
+- Study：宽屏默认聚焦学习内容，主动问小伴后同时显示 Tutor；窄屏 Tutor 仍是独立子表面；
 - 不出现横向溢出、双滚动条或被压缩到不可读的 pane。

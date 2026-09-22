@@ -23,21 +23,25 @@ detail = read("entry/src/main/ets/features/student/assignments/AssignmentDetailP
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentDetailPage.ets")
 models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 
-for token in ["老师要求", "完成要求", "教材 / 页码", "老师资料", "提交方式"]:
-    require(token in detail, f"Assignment Detail missing V2 section: {token}")
+for token in ["老师要求", "教材 / 页码", "老师资料", "需要先订正"]:
+    require(token in detail, f"Assignment Detail missing focused V2 content: {token}")
 
-require("this.assignment()!.instruction" in detail,
+require("Text(item.instruction.length > 0 ? item.instruction" in detail,
         "teacher requirement must render the authoritative Assignment instruction")
-require("this.assignment()!.textbookRef" in detail,
-        "textbook/page section must render Assignment.textbookRef")
-require("ForEach(this.assignment()!.resourceLabels" in detail,
+require("if (item.textbookRef.length > 0)" in detail and "Text(item.textbookRef)" in detail,
+        "textbook/page section must render only when Assignment.textbookRef exists")
+require("if (item.resourceLabels.length > 0)" in detail and
+        "ForEach(item.resourceLabels" in detail,
         "teacher resources must render existing Assignment.resourceLabels individually")
-require("暂无老师资料" in detail,
-        "Assignment Detail must expose an explicit empty resource state")
-require("作业照片 1–6 张" in detail,
-        "Assignment Detail must expose the current P0 submission method")
-require("按老师要求完成本项作业" in detail and "完成后检查遗漏和订正" in detail,
-        "Assignment Detail must expose a concise completion checklist")
+require("暂无老师资料" not in detail and "Text(item.textbookRef)" in detail,
+        "Assignment Detail must not show empty optional-value cards to the student")
+require("完成要求" not in detail and "提交方式" not in detail,
+        "Assignment Detail must not repeat generic completion or submission instructions")
+require(detail.find("需要先订正") < detail.find("老师要求"),
+        "rework feedback must appear before the teacher instruction")
+require("Scroll()" in detail and ".layoutWeight(1)" in detail and
+        "Button(this.actionLabel(this.assignment()!)" in detail,
+        "Assignment Detail must keep content scrollable with a fixed primary action")
 require("HomeworkStore.instance" not in detail,
         "V2 Assignment Detail must stay behind AssignmentRepository cache instead of direct Store access")
 require("AssignmentDetailPane" in page and "DeepPageHeader" in page,
@@ -45,9 +49,9 @@ require("AssignmentDetailPane" in page and "DeepPageHeader" in page,
 require("resourceLabels: string[]" in models,
         "Assignment domain must retain resource metadata used by Detail/Study")
 
-# Resource labels currently have no URI in the V2 domain. Do not create fake clickable resources
-# until the resource model is upgraded in a later vertical slice.
-require("onClick" not in detail.split("this.SectionTitle('老师资料');", 1)[-1].split("if (this.assignment()!.reviewNote", 1)[0],
+# Resource labels have no URI in the current domain; they must remain non-clickable labels.
+resource_section = detail.split("this.SectionTitle('老师资料');", 1)[-1].split(".backgroundColor(AppTheme.SURFACE_SUBTLE)", 1)[0]
+require("onClick" not in resource_section,
         "label-only teacher resources must not pretend to be clickable without a real URI")
 
 if errors:

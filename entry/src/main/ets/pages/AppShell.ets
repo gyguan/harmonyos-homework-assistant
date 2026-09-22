@@ -283,7 +283,8 @@ export struct AppShell {
       StudentHomePage({
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
+        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onStoreChanged: () => this.notifyUiChanged()
       });
     }
   }

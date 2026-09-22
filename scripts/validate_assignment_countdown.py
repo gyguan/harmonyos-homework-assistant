@@ -63,15 +63,16 @@ require("预计用时" in confirmation_components and
         "if (minutes > 240) minutes = 240;" in shared_editor and
         "onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "parent must be able to use quick presets or a custom expected completion time before publishing")
-# Student Home now presents the time budget inside each expanded subject task row instead of a
-# single hero assignment. Preserve the capability rather than the old component structure.
-require("`预计 ${item.expectedMinutes} 分钟`" in student_home and "StudentSubjectTaskGroupCard" in student_home,
+# Student Home presents the time budget on each directly actionable task card.
+require("`预计 ${this.assignment.expectedMinutes} 分钟`" in student_home and "StudentTodayTaskCard" in student_home,
         "V2 student home must show each task's time budget before starting")
 require("AssignmentCountdownCard" in study,
         "student study workspace must render the homework countdown")
 
-for phrase in ["还剩", "已超出", "实际用时", "点击“开始作业”后开始倒计时"]:
+for phrase in ["还剩", "超出", "用了", "预计"]:
     require(phrase in countdown, f"countdown UI missing required state: {phrase}")
+require("fontSize(17)" in countdown and "height(5)" in countdown and "private hint()" not in countdown,
+        "countdown must remain compact and avoid instructional copy competing with the task")
 require("this.nowEpochMs - this.assignment.startedAtEpochMs" in countdown,
         "countdown must derive remaining time from timestamps so it survives page/background gaps")
 require("setInterval" in countdown and "clearInterval" in countdown,

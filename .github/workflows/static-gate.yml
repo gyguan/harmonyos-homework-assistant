@@ -96,8 +96,11 @@ jobs:
       - name: Validate V2 Phone/Pad baseline
         run: python scripts/validate_v2_phone_pad_baseline.py
 
-      - name: Validate student home Today subject groups
+      - name: Validate student home Today task list
         run: python scripts/validate_student_home_today_subjects.py
+
+      - name: Validate issue 291 student UI simplification
+        run: python scripts/validate_issue291_student_ui_simplification.py
 
       - name: Validate V2 Pad prototype alignment
         run: python scripts/validate_v2_pad_prototype_alignment.py

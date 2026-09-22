@@ -58,31 +58,14 @@ export struct AssignmentCountdownCard {
     let remaining = this.budgetSeconds() - this.elapsedSeconds();
     if (this.isRunning()) {
       if (remaining >= 0) return `还剩 ${this.clock(remaining)}`;
-      return `已超出 ${this.clock(-remaining)}`;
+      return `超出 ${this.clock(-remaining)}`;
     }
     if (this.isPaused()) {
       if (remaining >= 0) return `已暂停 · 还剩 ${this.clock(remaining)}`;
-      return `已暂停 · 已超出 ${this.clock(-remaining)}`;
+      return `已暂停 · 超出 ${this.clock(-remaining)}`;
     }
-    if (this.assignment.elapsedSeconds > 0) {
-      return `实际用时 ${this.clock(this.assignment.elapsedSeconds)}`;
-    }
+    if (this.assignment.elapsedSeconds > 0) return `用了 ${this.clock(this.assignment.elapsedSeconds)}`;
     return `预计 ${this.assignment.expectedMinutes} 分钟`;
-  }
-
-  private hint(): string {
-    if (this.isRunning()) {
-      return this.isOvertime() ? '不用着急，先把这项作业认真完成。' : '专心完成这一项，小伴帮你看着时间。';
-    }
-    if (this.isPaused()) {
-      return `已经专注 ${this.clock(this.assignment.elapsedSeconds)}，继续后从这里接着计时。`;
-    }
-    if (this.assignment.elapsedSeconds > 0) {
-      let actualMinutes = Math.max(1, Math.round(this.assignment.elapsedSeconds / 60));
-      if (actualMinutes <= this.assignment.expectedMinutes) return `比预计时间快 ${this.assignment.expectedMinutes - actualMinutes} 分钟。`;
-      return `比预计时间多用了 ${actualMinutes - this.assignment.expectedMinutes} 分钟。`;
-    }
-    return '点击“开始作业”后开始倒计时。';
   }
 
   private progressValue(): number {
@@ -90,46 +73,31 @@ export struct AssignmentCountdownCard {
   }
 
   build() {
-    Column({ space: 9 }) {
-      if (this.assignment.status === AssignmentStatus.NEEDS_REWORK && this.assignment.reviewNote.length > 0) {
-        Column({ space: 4 }) {
-          Text('家长请你订正').width('100%').fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
-          Text(this.assignment.reviewNote).width('100%').fontSize(14).lineHeight(20).fontColor(AppTheme.TEXT);
-        }.width('100%').padding(11).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
-      }
-
-      Row() {
-        Text('作业计时')
-          .fontSize(AppTheme.CAPTION_SIZE)
+    Column({ space: 8 }) {
+      Row({ space: 8 }) {
+        Text('计时')
+          .fontSize(12)
           .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.SUBTEXT);
-        Blank();
+          .fontColor(this.isOvertime() ? AppTheme.WARNING : AppTheme.PRIMARY);
+        Text(this.headline())
+          .layoutWeight(1)
+          .fontSize(17)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.isOvertime() ? AppTheme.WARNING : AppTheme.TEXT);
         Text(`目标 ${this.assignment.expectedMinutes} 分钟`)
-          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontSize(12)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%');
 
-      Text(this.headline())
-        .width('100%')
-        .fontSize(28)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(this.isOvertime() ? AppTheme.WARNING : AppTheme.TEXT);
-
       Progress({ value: this.progressValue(), total: this.budgetSeconds(), type: ProgressType.Linear })
         .width('100%')
-        .height(7)
+        .height(5)
         .color(this.isOvertime() ? AppTheme.WARNING : AppTheme.PRIMARY)
         .backgroundColor(this.isOvertime() ? AppTheme.WARNING_SOFT : AppTheme.PRIMARY_SOFT);
-
-      Text(this.hint())
-        .width('100%')
-        .fontSize(13)
-        .lineHeight(19)
-        .fontColor(this.isOvertime() ? AppTheme.WARNING : AppTheme.SUBTEXT);
     }
     .width('100%')
-    .padding(14)
+    .padding({ left: 14, right: 14, top: 12, bottom: 12 })
     .backgroundColor(this.isOvertime() ? AppTheme.WARNING_SOFT : AppTheme.PRIMARY_FAINT)
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
