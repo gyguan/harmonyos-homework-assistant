@@ -7,8 +7,7 @@ import {
   PracticePassFilter,
   PracticeSemester,
   PracticeSubject,
-  PracticeTrackFilter,
-  PracticeTaxonomy
+  PracticeTrackFilter
 } from '../../../domain/model/practice/PracticeModels';
 import { PracticeHomeViewModel } from './PracticeHomeViewModel';
 
@@ -19,73 +18,41 @@ struct PracticePaperCard {
   @Prop passed: boolean = false;
   onOpen: () => void = () => {};
 
-  private tagsText(): string {
-    return this.paper.tags.join(' · ');
-  }
-
   build() {
-    Column({ space: 10 }) {
+    Column({ space: 8 }) {
       Row({ space: 10 }) {
-        Column({ space: 4 }) {
-          Text(this.paper.title)
-            .width('100%')
-            .fontSize(AppTheme.CARD_TITLE_SIZE)
+        Text(this.paper.title)
+          .layoutWeight(1)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        if (this.passed) {
+          Text('已通过')
+            .fontSize(12)
             .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.semesterLabel(this.paper.semester)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${PracticeTaxonomy.trackLabel(this.paper.track)} · ${this.difficultyLabel}`)
-            .width('100%')
-            .fontSize(14)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-
-        Column({ space: 6 }) {
-          if (this.passed) {
-            Text('已通过')
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.SUCCESS)
-              .padding({ left: 10, right: 10, top: 5, bottom: 5 })
-              .backgroundColor(AppTheme.SUCCESS_SOFT)
-              .borderRadius(AppTheme.CHIP_RADIUS);
-          }
-          Text(`${this.paper.questionCount} 题`)
-            .fontSize(14)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.PRIMARY)
-            .padding({ left: 10, right: 10, top: 6, bottom: 6 })
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.SUCCESS)
+            .padding({ left: 9, right: 9, top: 4, bottom: 4 })
+            .backgroundColor(AppTheme.SUCCESS_SOFT)
             .borderRadius(AppTheme.CHIP_RADIUS);
         }
-        .alignItems(HorizontalAlign.End);
-      }
-      .width('100%')
-      .alignItems(VerticalAlign.Top);
-
-      Text(this.paper.description)
-        .width('100%')
-        .fontSize(14)
-        .lineHeight(19)
-        .fontColor(AppTheme.SUBTEXT);
-
-      Row({ space: 8 }) {
-        Text(`约 ${this.paper.estimatedMinutes} 分钟`)
-          .fontSize(14)
-          .fontColor(AppTheme.SUBTEXT);
-        Text('·').fontSize(14).fontColor(AppTheme.TERTIARY_TEXT);
-        Text(this.tagsText())
-          .layoutWeight(1)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(14)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-        Text(PracticeTaxonomy.trackLabel(this.paper.track))
-          .fontSize(14)
-          .fontColor(AppTheme.SUCCESS);
       }
       .width('100%')
       .alignItems(VerticalAlign.Center);
+
+      Text(`${this.paper.questionCount} 题 · 约 ${this.paper.estimatedMinutes} 分钟 · ${this.difficultyLabel}`)
+        .width('100%')
+        .fontSize(13)
+        .fontColor(AppTheme.SUBTEXT);
+
+      if (this.paper.description.length > 0) {
+        Text(this.paper.description)
+          .width('100%')
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .fontSize(13)
+          .lineHeight(18)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+      }
     }
     .width('100%')
     .padding(AppTheme.PHONE_CARD_PADDING)
@@ -268,10 +235,8 @@ export struct PracticeHomePage {
   private PaperList() {
     Column({ space: 10 }) {
       Row({ space: 8 }) {
-        Text(`${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.semesterLabel(this.selectedSemester)} · ${this.viewModel.subjectLabel(this.selectedSubject)} · ${this.viewModel.trackFilterLabel(this.selectedTrack)} · ${this.viewModel.passFilterLabel(this.selectedPassFilter)}`)
+        Text('练习套卷')
           .layoutWeight(1)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);

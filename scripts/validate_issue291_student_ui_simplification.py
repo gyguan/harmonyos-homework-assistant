@@ -25,6 +25,12 @@ detail = read("entry/src/main/ets/features/student/assignments/AssignmentDetailP
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
 resume_dialog = read("entry/src/main/ets/components/submission/SubmissionResumeConfirmDialog.ets")
+practice_home = read("entry/src/main/ets/features/student/practice/PracticeHomePage.ets")
+practice_detail = read("entry/src/main/ets/features/student/practice/PracticePaperDetailPage.ets")
+practice_attempt = read("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
+practice_result = read("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
+practice_history = read("entry/src/main/ets/features/student/practice/PracticeHistoryPage.ets")
+profile = read("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 
 # Home: show today's work directly and keep command execution behind the existing repository.
@@ -71,6 +77,40 @@ require("关闭" in resume_dialog and "清空并继续" in resume_dialog and "@L
         "#291 Continue-work dialog must provide a top-right cancel and explicit destructive action")
 require("fontSize(36)" in countdown and "height(6)" in countdown and "private hint()" not in countdown,
         "#291 Assignment timing may emphasize the clock while staying free of extra instructional copy")
+
+# Practice list/detail: keep the current choice visible without repeating taxonomy and metric cards.
+require("Text('练习套卷')" in practice_home and "tags.join" not in practice_home and
+        "PracticeTaxonomy.gradeLabel(this.paper.grade)" not in practice_home,
+        "#291 Practice home must avoid repeating filter taxonomy and tag metadata on every paper card")
+require("private MetricCard" not in practice_detail and
+        "this.RecentAttemptCard(this.recentAttempts[0]);" in practice_detail and "查看全部" in practice_detail,
+        "#291 Practice detail must replace duplicate metrics with a focused latest-attempt summary")
+
+# Attempt: secondary navigation/context must stay opt-in so the question and answer dominate.
+require("@State private showQuestionNavigation: boolean = false;" in practice_attempt and
+        "if (this.showQuestionNavigation)" in practice_attempt and "选择题目" in practice_attempt,
+        "#291 Practice attempt question-number navigation must be collapsed by default")
+require("@State private showNoteEditor: boolean = false;" in practice_attempt and
+        "if (this.showNoteEditor)" in practice_attempt and "记笔记" in practice_attempt,
+        "#291 Practice notes must open only when the student asks for them")
+require("@State private showPreviousAnswer: boolean = false;" in practice_attempt and
+        "if (this.showPreviousAnswer &&" in practice_attempt and "显示上次作答" in practice_attempt,
+        "#291 Previous-answer context must remain hidden by default")
+
+# Result/history: wrong answers first; extra statistics are optional and history summary stays lightweight.
+require("@State private showDetailedStats: boolean = false;" in practice_result and
+        "@State private showAllQuestions: boolean = false;" in practice_result and
+        "错题优先 · 答题回顾" in practice_result and "查看详细统计" in practice_result,
+        "#291 Practice result must prioritize wrong questions and collapse detailed statistics")
+require("private Metric(" not in practice_history and "基于当前筛选" in practice_history and
+        "完成次数 " in practice_history and "平均耗时 " in practice_history,
+        "#291 Practice history must use one compact filtered statistics line")
+
+# Profile: identity stays visible; parent-managed read-only details become two optional entries.
+require("@State private learningInfoExpanded: boolean = false;" in profile and
+        "@State private tutorRulesExpanded: boolean = false;" in profile and
+        "Text('学习资料')" in profile and "Text('小伴规则')" in profile,
+        "#291 Student profile must collapse read-only details behind simple entries")
 
 if errors:
     print("ISSUE_291_STUDENT_UI_SIMPLIFICATION_GATE_FAIL")

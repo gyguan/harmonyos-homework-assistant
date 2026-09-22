@@ -184,50 +184,28 @@ export struct PracticeHistoryPage {
   }
 
   @Builder
-  private Metric(value: string, label: string, tone: string) {
-    Column({ space: 5 }) {
-      Text(value)
-        .fontSize(22)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(tone === 'success' ? AppTheme.SUCCESS : AppTheme.PRIMARY)
-        .maxLines(1)
-        .textOverflow({ overflow: TextOverflow.Ellipsis });
-      Text(label)
-        .fontSize(11)
+  private StatisticsCard() {
+    Row({ space: 6 }) {
+      Text('基于当前筛选')
+        .fontSize(12)
+        .fontColor(AppTheme.TERTIARY_TEXT);
+      Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+      Text(`完成次数 ${this.statistics.completedCount}`)
+        .fontSize(13)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+      Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+      Text(`正确率 ${this.viewModel.correctRateText(this.statistics)}`)
+        .fontSize(13)
+        .fontColor(AppTheme.SUCCESS);
+      Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+      Text(`平均耗时 ${this.viewModel.averageElapsedText(this.statistics)}`)
+        .fontSize(13)
         .fontColor(AppTheme.SUBTEXT);
     }
-    .layoutWeight(1)
-    .constraintSize({ minHeight: 76 })
-    .justifyContent(FlexAlign.Center)
-    .alignItems(HorizontalAlign.Center)
-    .backgroundColor(tone === 'success' ? AppTheme.SUCCESS_SOFT :
-      tone === 'neutral' ? AppTheme.SURFACE_EMPHASIS : AppTheme.PRIMARY_FAINT)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
-  }
-
-  @Builder
-  private StatisticsCard() {
-    Column({ space: 8 }) {
-      Row() {
-        Text('练习统计')
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Blank();
-        Text('基于当前筛选 · 仅统计已完成')
-          .fontSize(12)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%');
-
-      Row({ space: 8 }) {
-        this.Metric(`${this.statistics.completedCount}`, '完成次数', 'primary');
-        this.Metric(this.viewModel.correctRateText(this.statistics), '正确率', 'success');
-        this.Metric(this.viewModel.averageElapsedText(this.statistics), '平均耗时', 'neutral');
-      }
-      .width('100%');
-    }
-    .width('100%');
+    .width('100%')
+    .padding({ left: 4, right: 4, top: 2, bottom: 2 })
+    .alignItems(VerticalAlign.Center);
   }
 
   @Builder
