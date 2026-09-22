@@ -67,17 +67,30 @@ export class ParentVoiceMaterialViewModel {
     }
 
     let batch = await RemoteVoiceMaterialApi.instance.createBatch(this.student().id);
+    let registeredCount = 0;
     for (let item of packages) {
-      let remotePackage = await RemoteVoiceMaterialApi.instance.registerPackage(batch.id, {
-        directoryName: item.directoryName,
-        subjectCode: item.subjectCode,
-        title: '',
-        expectedMinutes: item.expectedMinutes,
-        dueAtEpochMs: 0,
-        assignmentType: 'EXTRA'
-      });
-      await this.uploadPackageFiles(remotePackage.id, item.files);
+      try {
+        let remotePackage = await RemoteVoiceMaterialApi.instance.registerPackage(batch.id, {
+          directoryName: item.directoryName,
+          subjectCode: item.subjectCode,
+          title: '',
+          expectedMinutes: item.expectedMinutes,
+          dueAtEpochMs: 0,
+          assignmentType: 'EXTRA'
+        });
+        registeredCount++;
+        try {
+          await this.uploadPackageFiles(remotePackage.id, item.files);
+        } catch {
+          // Complete the batch after all directories have been attempted. The backend will
+          // mark this incomplete package INVALID without blocking successfully uploaded siblings.
+        }
+      } catch {
+        // A single directory registration failure must not prevent the remaining directories
+        // from being imported. If every registration fails, surface a batch-level error below.
+      }
     }
+    if (registeredCount === 0) throw new Error('所有语音素材目录都导入失败，请检查网络后重试');
     return await RemoteVoiceMaterialApi.instance.completeBatch(batch.id);
   }
 
