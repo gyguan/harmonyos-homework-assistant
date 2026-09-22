@@ -113,15 +113,7 @@ export class RemoteVoiceMaterialApi {
 
     let client = http.createHttp();
     try {
-      let response = await client.request(
-        BackendSession.instance.getBaseUrl() + path,
-        {
-          method: http.RequestMethod.POST,
-          header: headers,
-          extraData: payload.body,
-          connectTimeout: 15000,
-          readTimeout: 90000
-        });
+      let response = await this.requestUpload(client, path, headers, payload.body);
       if (response.responseCode === 401) {
         BackendSession.instance.disconnect();
         throw new Error('登录已失效，请重新连接家庭云端');
@@ -190,23 +182,27 @@ export class RemoteVoiceMaterialApi {
     let boundary = `----xiaoban-voice-material-${Date.now()}`;
     let multipartPath = `${this.context.cacheDir}/voice-material-${Date.now()}.bin`;
     try {
-      let writer = await fileIo.open(
+      let writer = await this.openFile(
         multipartPath,
-        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC,
+        '无法创建语音素材上传缓存');
       let totalBytes = 0;
       try {
         let header =
           `--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${this.safeFileName(fileName)}"\r\n` +
           `Content-Type: ${this.contentType(fileName)}\r\n\r\n`;
-        totalBytes += await fileIo.write(writer.fd, header);
+        totalBytes += await this.writeText(
+          writer.fd, header, '无法写入语音素材上传请求头');
 
-        let source = await fileIo.open(uri, fileIo.OpenMode.READ_ONLY);
+        let source = await this.openFile(uri, fileIo.OpenMode.READ_ONLY, '无法读取语音素材文件');
         try {
           let chunk = new ArrayBuffer(64 * 1024);
           while (true) {
-            let readLength = await fileIo.read(source.fd, chunk);
+            let readLength = await this.readBuffer(
+              source.fd, chunk, '读取语音素材文件失败');
             if (readLength <= 0) break;
-            let written = await fileIo.write(writer.fd, chunk, { length: readLength });
+            let written = await this.writeBuffer(
+              writer.fd, chunk, readLength, '写入语音素材上传缓存失败');
             if (written !== readLength) throw new Error('语音素材文件写入上传缓存失败');
             totalBytes += written;
           }
@@ -214,20 +210,24 @@ export class RemoteVoiceMaterialApi {
           try { await fileIo.close(source); } catch {}
         }
 
-        totalBytes += await fileIo.write(writer.fd, '\r\n');
-        totalBytes += await fileIo.write(writer.fd, `--${boundary}--\r\n`);
+        totalBytes += await this.writeText(
+          writer.fd, '\r\n', '无法结束语音素材文件内容');
+        totalBytes += await this.writeText(
+          writer.fd, `--${boundary}--\r\n`, '无法结束语音素材上传请求');
       } finally {
         try { await fileIo.close(writer); } catch {}
       }
 
       let body = new ArrayBuffer(totalBytes);
       let target = new Uint8Array(body);
-      let reader = await fileIo.open(multipartPath, fileIo.OpenMode.READ_ONLY);
+      let reader = await this.openFile(
+        multipartPath, fileIo.OpenMode.READ_ONLY, '无法读取语音素材上传缓存');
       let offset = 0;
       try {
         let chunk = new ArrayBuffer(64 * 1024);
         while (offset < totalBytes) {
-          let readLength = await fileIo.read(reader.fd, chunk);
+          let readLength = await this.readBuffer(
+            reader.fd, chunk, '读取语音素材上传缓存失败');
           if (readLength <= 0) break;
           target.set(new Uint8Array(chunk, 0, readLength), offset);
           offset += readLength;
@@ -239,6 +239,55 @@ export class RemoteVoiceMaterialApi {
       return { boundary: boundary, body: body };
     } finally {
       try { await fileIo.unlink(multipartPath); } catch {}
+    }
+  }
+
+  private async requestUpload(client: http.HttpRequest, path: string,
+    headers: Record<string, string>, body: ArrayBuffer): Promise<http.HttpResponse> {
+    try {
+      let options: http.HttpRequestOptions = {
+        method: http.RequestMethod.POST,
+        header: headers,
+        extraData: body,
+        connectTimeout: 15000,
+        readTimeout: 90000
+      };
+      return await client.request(BackendSession.instance.getBaseUrl() + path, options);
+    } catch {
+      throw new Error('上传语音素材时网络请求失败');
+    }
+  }
+
+  private async openFile(path: string, mode: number, errorMessage: string): Promise<fileIo.File> {
+    try {
+      return await fileIo.open(path, mode);
+    } catch {
+      throw new Error(errorMessage);
+    }
+  }
+
+  private async writeText(fd: number, value: string, errorMessage: string): Promise<number> {
+    try {
+      return await fileIo.write(fd, value);
+    } catch {
+      throw new Error(errorMessage);
+    }
+  }
+
+  private async readBuffer(fd: number, buffer: ArrayBuffer, errorMessage: string): Promise<number> {
+    try {
+      return await fileIo.read(fd, buffer);
+    } catch {
+      throw new Error(errorMessage);
+    }
+  }
+
+  private async writeBuffer(fd: number, buffer: ArrayBuffer, length: number,
+    errorMessage: string): Promise<number> {
+    try {
+      return await fileIo.write(fd, buffer, { length: length });
+    } catch {
+      throw new Error(errorMessage);
     }
   }
 

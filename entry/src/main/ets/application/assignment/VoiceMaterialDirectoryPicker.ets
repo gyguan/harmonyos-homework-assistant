@@ -52,17 +52,22 @@ export class VoiceMaterialDirectoryPicker {
   }
 
   private supportsMultiFolderPicker(): boolean {
-    return deviceInfo.sdkApiVersion >= 26;
+    return deviceInfo.apiAvailable('26.0.0') &&
+      canIUse('SystemCapability.FileManagement.UserFileService.FolderSelection');
   }
 
   private async selectDirectories(): Promise<string[]> {
-    if (this.context === null || !this.supportsMultiFolderPicker()) return [];
-    let options = new picker.DocumentSelectOptions();
-    options.maxSelectNumber = 200;
-    options.selectMode = picker.DocumentSelectMode.FOLDER;
-    options.allowsMulFolderSelection = true;
-    let documentPicker = new picker.DocumentViewPicker(this.context);
-    return await documentPicker.select(options);
+    if (this.context === null) return [];
+    if (deviceInfo.apiAvailable('26.0.0') &&
+      canIUse('SystemCapability.FileManagement.UserFileService.FolderSelection')) {
+      let options = new picker.DocumentSelectOptions();
+      options.maxSelectNumber = 200;
+      options.selectMode = picker.DocumentSelectMode.FOLDER;
+      options.allowsMulFolderSelection = true;
+      let documentPicker = new picker.DocumentViewPicker(this.context);
+      return await documentPicker.select(options);
+    }
+    return [];
   }
 
   private async selectFilesFallback(defaultSubjectCode: string,

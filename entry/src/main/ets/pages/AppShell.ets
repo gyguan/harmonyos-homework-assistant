@@ -2,6 +2,7 @@ import {
   AppRoute,
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
+  ParentVoiceMaterialRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
   PracticePaperRouteParam
@@ -253,7 +254,8 @@ export struct AppShell {
   }
 
   private openParentVoiceMaterial(): void {
-    this.navPathStack.pushPathByName(AppRoute.PARENT_VOICE_MATERIAL, {});
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_VOICE_MATERIAL, new ParentVoiceMaterialRouteParam());
   }
 
   private routeAssignmentId(param: Object): string {

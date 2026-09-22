@@ -90,13 +90,13 @@ require("registerRollbackCleanup(stored.storagePath())" in media_asset_service a
 require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
         "#298 deleting Assignment must not delete shared MediaAsset files")
 require("allowsMulFolderSelection = true" in picker and
-        "deviceInfo.sdkApiVersion >= 26" in picker and
+        "deviceInfo.apiAvailable('26.0.0')" in picker and
+        "SystemCapability.FileManagement.UserFileService.FolderSelection" in picker and
         "if (!this.supportsMultiFolderPicker())" in picker and
-        "this.context === null || !this.supportsMultiFolderPicker()" in picker and
         "getFullDirectoryUri()" in picker and
         "selectFilesFallback" in picker and
         "DocumentSelectMode.FILE" in picker,
-        "#298 picker must guard API 26 multi-folder selection and fall back to file grouping on API 20-25")
+        "#298 picker must use apiAvailable + FolderSelection SysCap and fall back to file grouping on unsupported devices")
 require("createBatch(studentId" in remote and
         "uploadFile(packageId" in remote and
         "completeBatch(batchId" in remote,
