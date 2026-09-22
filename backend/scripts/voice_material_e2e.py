@@ -4,6 +4,8 @@ from __future__ import annotations
 import sys
 import time
 import uuid
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from urllib.parse import quote
 
 from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, require
@@ -206,6 +208,14 @@ def main() -> int:
                 "auto-created Assignment lost package subjectCode")
         require(first_assignment.get("contentType") == "AUDIO_IMAGE",
                 "auto-created Assignment must keep AUDIO_IMAGE contentType")
+        due_at_ms = int(first_assignment.get("dueAtEpochMs", 0))
+        require(due_at_ms > 0, "daily auto-created Assignment must receive today's dueAt")
+        due_date = datetime.fromtimestamp(
+            due_at_ms / 1000, ZoneInfo("Asia/Shanghai")).date().isoformat()
+        require(due_date == auto_first.get("businessDate"),
+                "daily auto-created Assignment dueAt must fall on the business date")
+        require(first_assignment.get("dueText") == "今天",
+                "daily auto-created Assignment must expose 今天 as dueText")
 
         # Same student, same business day: no second automatic task may be consumed.
         auto_second = expect(
