@@ -2,23 +2,11 @@ import {
   Assignment,
   AssignmentStatus,
   StudentProfile,
-  Subject,
   TodaySummary
 } from '../../../domain/model/HomeworkModels';
+import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
 import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
-
-export class StudentHomeSubjectGroup {
-  key: string;
-  subject: Subject;
-  items: Assignment[];
-
-  constructor(key: string, subject: Subject, items: Assignment[]) {
-    this.key = key;
-    this.subject = subject;
-    this.items = items;
-  }
-}
 
 export class StudentHomeViewModel {
   private readonly repository: AssignmentRepository;
@@ -39,6 +27,14 @@ export class StudentHomeViewModel {
     return this.repository.listCached();
   }
 
+  assignment(assignmentId: string): Assignment | null {
+    return this.repository.getCached(assignmentId);
+  }
+
+  async performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment> {
+    return this.repository.performAction(assignmentId, action);
+  }
+
   todayActionableAssignments(): Assignment[] {
     let result: Assignment[] = [];
     for (let item of this.assignments()) {
@@ -47,68 +43,6 @@ export class StudentHomeViewModel {
       StudentHomeViewModel.insertByPriority(result, item);
     }
     return result;
-  }
-
-  todaySubjectGroups(): StudentHomeSubjectGroup[] {
-    let assignments = this.todayActionableAssignments();
-    let groups: StudentHomeSubjectGroup[] = [];
-    let subjects: Subject[] = [
-      Subject.CHINESE,
-      Subject.MATH,
-      Subject.ENGLISH,
-      Subject.READING,
-      Subject.READ_ALOUD,
-      Subject.SPORTS,
-      Subject.PRACTICE,
-      Subject.INTEREST,
-      Subject.OTHER
-    ];
-
-    for (let subject of subjects) {
-      let items: Assignment[] = [];
-      for (let assignment of assignments) {
-        if (assignment.subject === subject) items.push(assignment);
-      }
-      if (items.length > 0) groups.push(new StudentHomeSubjectGroup(subject, subject, items));
-    }
-    return groups;
-  }
-
-  todaySubjectCount(): number {
-    return this.todaySubjectGroups().length;
-  }
-
-  todayPendingCount(): number {
-    return this.todayActionableAssignments().length;
-  }
-
-  todayExpectedMinutes(): number {
-    let total = 0;
-    for (let item of this.todayActionableAssignments()) {
-      if (item.expectedMinutes > 0) total += item.expectedMinutes;
-    }
-    return total;
-  }
-
-  nextAssignment(): Assignment | null {
-    let items = this.todayActionableAssignments();
-    if (items.length === 0) return null;
-
-    let summary = this.summary();
-    if (summary.nextAssignmentId.length > 0) {
-      for (let item of items) {
-        if (item.id === summary.nextAssignmentId) return item;
-      }
-    }
-    return items[0];
-  }
-
-  attentionCount(): number {
-    let count = 0;
-    for (let item of this.todayActionableAssignments()) {
-      if (item.status === AssignmentStatus.OVERDUE || item.status === AssignmentStatus.NEEDS_REWORK) count++;
-    }
-    return count;
   }
 
   dateLabel(): string {

@@ -43,10 +43,10 @@ require("已暂停 · 还剩" in countdown and "assignment.elapsedSeconds" in co
         "countdown must render paused cumulative timing")
 require("暂停一下" in study and "AssignmentStatus.PAUSED" in study,
         "study workspace must expose pause/resume controls")
-# Student Home action labels now live with the subject task-row presentation, while PAUSED remains
+# Student Home action labels live with the direct task-card presentation, while PAUSED remains
 # part of the ViewModel's actionable ordering.
 require("AssignmentStatus.PAUSED" in home_vm and "return 1;" in home_vm and
-        "item.status === AssignmentStatus.IN_PROGRESS || item.status === AssignmentStatus.PAUSED" in home and
+        "this.assignment.status === AssignmentStatus.PAUSED" in home and
         "return '继续'" in home,
         "V2 Student Home must expose paused tasks as resumable")
 require('"PAUSED"' in backend_policy,

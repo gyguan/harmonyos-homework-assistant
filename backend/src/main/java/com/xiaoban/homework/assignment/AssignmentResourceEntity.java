@@ -14,6 +14,7 @@ public class AssignmentResourceEntity {
   public String assignmentId;
   public String resourceType;
   public String storagePath;
+  public UUID assetId;
   public String originalName;
   public String contentType;
   public long sizeBytes;

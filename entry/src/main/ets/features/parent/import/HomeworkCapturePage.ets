@@ -1,6 +1,3 @@
-import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
-import { floatView, window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { CaptureSession, CaptureSessionStatus } from '../../../domain/model/CaptureModels';
@@ -18,7 +15,7 @@ export struct HomeworkCapturePage {
   onOpenSourceProfile: (startCaptureAfterSave: boolean) => void = (_startCaptureAfterSave: boolean) => {};
 
   @State private revision: number = 0;
-  @State private message: string = '点击开始后，系统会提示屏幕采集授权。进入班级群后只需手工上滑。';
+  @State private message: string = '点击开始后，系统会提示屏幕采集授权。浏览完成后请先从系统录屏通知停止，再返回小伴。';
   @State private errorText: string = '';
   @State private currentSessionId: string = '';
   @State private detectedGroupTitle: string = '';
@@ -28,7 +25,6 @@ export struct HomeworkCapturePage {
   @State private pendingGroupConfirmationBatchId: string = '';
   private finalizedBatchId: string = '';
   private autoStartAttempted: boolean = false;
-  private floatViewController: floatView.FloatViewController | undefined = undefined;
   private refreshTimer: number = -1;
   private readonly viewModel: HomeworkCaptureViewModel = new HomeworkCaptureViewModel();
 
@@ -88,7 +84,7 @@ export struct HomeworkCapturePage {
           this.errorText = `当前识别群“${progress.detectedGroupTitle}”与配置“${progress.profile.groupTitle}”不一致，请确认已进入正确微信群。`;
         } else if (progress.timeBoundaryReached) {
           this.errorText = '';
-          this.message = `已到达今日抓取时间范围（${this.viewModel.formatStartTime(progress.profile)}），可以结束并自动整理。`;
+          this.message = `已到达今日抓取时间范围（${this.viewModel.formatStartTime(progress.profile)}）。请在微信中从系统录屏通知停止采集，再返回小伴自动整理。`;
         } else if (progress.groupValidationStatus === SourceGroupValidationStatus.MATCHED) {
           this.errorText = '';
           this.message = `已确认“${progress.profile.groupTitle}”，继续手工上滑；小伴正在读取今天的消息。`;
@@ -121,76 +117,14 @@ export struct HomeworkCapturePage {
             }
           }
           this.message = `采集已完成，已生成导入批次；共接受 ${finished.acceptedFrameCount} 个变化画面。`;
-          await this.stopFloatView();
         } else if (finished.status === CaptureSessionStatus.CANCELLED) {
           this.message = '本次采集已取消，可以重新开始。';
-          await this.stopFloatView();
         } else if (finished.status === CaptureSessionStatus.FAILED) {
           this.message = '本次采集异常结束，资源已释放，可以重新开始。';
-          await this.stopFloatView();
         }
       }
     }
     this.revision++;
-  }
-
-  private async requestFloatPermission(): Promise<boolean> {
-    let hostContext = this.getUIContext().getHostContext();
-    if (!hostContext) {
-      this.errorText = '无法获取应用上下文';
-      return false;
-    }
-    try {
-      let manager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-      let result = await manager.requestPermissionsFromUser(
-        hostContext, ['ohos.permission.FLOAT_VIEW'] as Permissions[]);
-      if (result.authResults.length === 0 || result.authResults[0] !== 0) {
-        this.errorText = '未开启悬浮采集状态。请授权后重试。';
-        return false;
-      }
-      return true;
-    } catch {
-      this.errorText = '悬浮状态授权失败，请稍后重试。';
-      return false;
-    }
-  }
-
-  private async startFloatView(): Promise<boolean> {
-    let granted = await this.requestFloatPermission();
-    if (!granted) return false;
-    try {
-      let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
-      let config: floatView.FloatViewConfiguration = {
-        context: context,
-        templateType: floatView.FloatViewTemplateType.ROUNDED_RECTANGLE
-      };
-      this.floatViewController = await floatView.create(config);
-      await this.floatViewController.setUIContext('pages/HomeworkCaptureFloatView');
-      let limits = floatView.getFloatViewLimits(floatView.FloatViewTemplateType.ROUNDED_RECTANGLE);
-      let size: window.Size = {
-        width: limits.minSize.width,
-        height: limits.minSize.height
-      };
-      await this.floatViewController.setWindowSize(size);
-      await this.floatViewController.start();
-      return true;
-    } catch (error) {
-      let businessError = error as BusinessError;
-      this.errorText = `悬浮状态启动失败（${businessError.code}）`;
-      this.floatViewController = undefined;
-      return false;
-    }
-  }
-
-  private async stopFloatView(): Promise<void> {
-    let controller = this.floatViewController;
-    this.floatViewController = undefined;
-    if (!controller) return;
-    try {
-      await controller.stop();
-    } catch {
-      // The system/user may already have stopped the FloatView.
-    }
   }
 
   private async startCapture(): Promise<void> {
@@ -199,28 +133,23 @@ export struct HomeworkCapturePage {
       this.errorText = '已有采集任务正在进行，请先结束当前采集。';
       return;
     }
-    if (!await this.startFloatView()) return;
-
     try {
       let session = this.viewModel.start();
       this.currentSessionId = session.id;
       this.revision++;
       if (session.status === CaptureSessionStatus.CANCELLED) {
         this.message = '系统未开始屏幕采集，可以重新点击开始。';
-        await this.stopFloatView();
         return;
       }
-      this.message = '等待系统屏幕采集授权。授权后进入目标微信群并手工上滑。';
+      this.message = '等待系统屏幕采集授权。授权后进入目标微信群并手工上滑；浏览完成后先从系统录屏通知停止，再返回小伴。';
     } catch {
       this.errorText = '屏幕采集启动失败，请稍后重试。';
-      await this.stopFloatView();
     }
   }
 
   private async stopCapture(): Promise<void> {
     let result = await this.viewModel.finishByUser();
     this.revision++;
-    await this.stopFloatView();
     if (result === null) {
       this.message = '当前没有正在进行的采集，或本次没有生成导入批次。';
       return;
@@ -235,7 +164,6 @@ export struct HomeworkCapturePage {
     this.groupValidationStatus = result.groupValidationStatus;
     this.timeBoundaryReached = result.timeBoundaryReached;
     this.earliestDetectedTime = result.earliestDetectedTime;
-    await this.stopFloatView();
 
     if (!result.reconstructionSucceeded) {
       this.errorText = '聊天重建未完成，原始屏幕证据已经保留在收件箱，可以稍后重试或人工处理。';
@@ -299,7 +227,6 @@ export struct HomeworkCapturePage {
     let cancelled = await this.viewModel.cancel();
     if (cancelled !== null) this.currentSessionId = cancelled.id;
     this.revision++;
-    await this.stopFloatView();
     this.message = '已取消本次采集，可以重新开始。';
   }
 
@@ -337,7 +264,7 @@ export struct HomeworkCapturePage {
               .fontSize(16)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
-            Text('1. 同意系统屏幕采集授权\n2. 切到配置的班级群\n3. 手工向上滑动聊天记录\n4. 到达默认时间范围后点“结束并整理”')
+            Text('1. 同意系统屏幕采集授权\n2. 切到配置的班级群\n3. 手工向上滑动聊天记录\n4. 浏览完成后从系统录屏通知停止\n5. 返回小伴，自动整理；如仍在采集可手工结束')
               .width('100%')
               .fontSize(13)
               .lineHeight(21)
@@ -404,7 +331,7 @@ export struct HomeworkCapturePage {
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .onClick(() => { void this.startCapture(); });
           } else {
-            Button(this.timeBoundaryReached ? '已到达时间范围，结束并整理' : '结束采集并自动整理',
+            Button(this.timeBoundaryReached ? '备用：立即结束并整理' : '备用：结束采集并自动整理',
               { type: ButtonType.Normal })
               .width('100%')
               .height(AppTheme.BUTTON_HEIGHT)

@@ -483,6 +483,10 @@ Pad：
 
 ```text
 StudyWorkspace
+  └─ Task + Resource
+
+点击问小伴且容器满足 capability 后：
+StudyWorkspace
   ├─ Task + Resource
   └─ TutorPane
 ```

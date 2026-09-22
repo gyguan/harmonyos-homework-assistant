@@ -29,7 +29,6 @@ capture_home_vm = read("entry/src/main/ets/features/parent/import/HomeworkCaptur
 profile_page = read("entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets")
 capture_page = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
 capture_vm = read("entry/src/main/ets/features/parent/import/HomeworkCaptureViewModel.ets")
-float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
 workflow = read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets")
 group_title_policy = read("entry/src/main/ets/application/capture/DeterministicGroupTitlePolicy.ets")
 understanding = read("entry/src/main/ets/application/understanding/HomeworkUnderstandingService.ets")
@@ -129,18 +128,20 @@ require("TIME_RANGE_FILTERED" in understanding and
         "this.inbox.importBatch(updated, allMessages, result.candidates)" in understanding,
         "out-of-window messages must be excluded from semantics but retained for audit")
 
-require("timeBoundaryReached" in float_page and "已到达今日时间范围" in float_page,
-        "FloatView must tell the user when the profile time boundary is reached")
-require("当前群与配置不一致" in float_page,
-        "FloatView must surface group mismatch while user is in WeChat")
-require("结束并自动整理" in capture_page and "handleWorkflowResult" in capture_page,
-        "capture stop must continue into automatic reconstruction/understanding")
+require("timeBoundaryReached" in capture_page and "已到达今日抓取时间范围" in capture_page and
+        "系统录屏通知" in capture_page,
+        "capture UI must tell the user when the profile time boundary is reached and how to stop")
+require("SourceGroupValidationStatus.MISMATCH" in capture_page and
+        "与配置" in capture_page,
+        "capture UI must surface group mismatch when the user returns to the app")
+require("this.viewModel.finishByUser()" in capture_page and "handleWorkflowResult" in capture_page,
+        "capture stop fallback must continue into automatic reconstruction/understanding")
 require("!result.reconstructionSucceeded" in capture_page and
         "!result.understandingSucceeded" in capture_page,
         "capture UI must distinguish reconstruction/understanding failures from empty homework")
-require("!result.understandingSucceeded" in float_page and
-        "作业理解待处理" in float_page,
-        "FloatView must surface understanding failure after capture")
+require("!result.understandingSucceeded" in capture_page and
+        "作业理解未完成" in capture_page,
+        "capture UI must surface understanding failure after capture")
 require("onOpenConfirmation" in capture_page and "result.activated" in capture_page,
         "successful understanding must route into the existing parent confirmation page")
 require("确认是目标班级群，继续整理" in capture_page,

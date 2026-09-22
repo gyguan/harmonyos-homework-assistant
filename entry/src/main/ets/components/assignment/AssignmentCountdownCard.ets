@@ -35,6 +35,10 @@ export struct AssignmentCountdownCard {
     return accumulated + Math.max(0, Math.floor((this.nowEpochMs - this.assignment.startedAtEpochMs) / 1000));
   }
 
+  private remainingSeconds(): number {
+    return this.budgetSeconds() - this.elapsedSeconds();
+  }
+
   private clock(seconds: number): string {
     let safe = Math.max(0, Math.floor(seconds));
     let minutes = Math.floor(safe / 60);
@@ -51,38 +55,39 @@ export struct AssignmentCountdownCard {
   }
 
   private isOvertime(): boolean {
-    return this.isRunning() && this.elapsedSeconds() > this.budgetSeconds();
+    return this.isRunning() && this.remainingSeconds() < 0;
   }
 
-  private headline(): string {
-    let remaining = this.budgetSeconds() - this.elapsedSeconds();
-    if (this.isRunning()) {
-      if (remaining >= 0) return `还剩 ${this.clock(remaining)}`;
-      return `已超出 ${this.clock(-remaining)}`;
-    }
-    if (this.isPaused()) {
-      if (remaining >= 0) return `已暂停 · 还剩 ${this.clock(remaining)}`;
-      return `已暂停 · 已超出 ${this.clock(-remaining)}`;
-    }
-    if (this.assignment.elapsedSeconds > 0) {
-      return `实际用时 ${this.clock(this.assignment.elapsedSeconds)}`;
-    }
-    return `预计 ${this.assignment.expectedMinutes} 分钟`;
+  private isNearDeadline(): boolean {
+    let remaining = this.remainingSeconds();
+    return this.isRunning() && remaining > 0 && remaining <= 5 * 60;
   }
 
-  private hint(): string {
-    if (this.isRunning()) {
-      return this.isOvertime() ? '不用着急，先把这项作业认真完成。' : '专心完成这一项，小伴帮你看着时间。';
-    }
-    if (this.isPaused()) {
-      return `已经专注 ${this.clock(this.assignment.elapsedSeconds)}，继续后从这里接着计时。`;
-    }
-    if (this.assignment.elapsedSeconds > 0) {
-      let actualMinutes = Math.max(1, Math.round(this.assignment.elapsedSeconds / 60));
-      if (actualMinutes <= this.assignment.expectedMinutes) return `比预计时间快 ${this.assignment.expectedMinutes - actualMinutes} 分钟。`;
-      return `比预计时间多用了 ${actualMinutes - this.assignment.expectedMinutes} 分钟。`;
-    }
-    return '点击“开始作业”后开始倒计时。';
+  private statusLabel(): string {
+    let remaining = this.remainingSeconds();
+    if (this.isRunning()) return remaining >= 0 ? '还剩' : '超出';
+    if (this.isPaused()) return remaining >= 0 ? '已暂停 · 还剩' : '已暂停 · 超出';
+    if (this.assignment.elapsedSeconds > 0) return '用了';
+    return '预计';
+  }
+
+  private timeValue(): string {
+    let remaining = this.remainingSeconds();
+    if (this.isRunning() || this.isPaused()) return this.clock(Math.abs(remaining));
+    if (this.assignment.elapsedSeconds > 0) return this.clock(this.assignment.elapsedSeconds);
+    return `${this.assignment.expectedMinutes} 分钟`;
+  }
+
+  private emphasisColor(): string {
+    if (this.isOvertime()) return AppTheme.DANGER;
+    if (this.isNearDeadline()) return AppTheme.WARNING;
+    return AppTheme.PRIMARY;
+  }
+
+  private emphasisBackground(): string {
+    if (this.isOvertime()) return AppTheme.DANGER_SOFT;
+    if (this.isNearDeadline()) return AppTheme.WARNING_SOFT;
+    return AppTheme.PRIMARY_FAINT;
   }
 
   private progressValue(): number {
@@ -90,47 +95,36 @@ export struct AssignmentCountdownCard {
   }
 
   build() {
-    Column({ space: 9 }) {
-      if (this.assignment.status === AssignmentStatus.NEEDS_REWORK && this.assignment.reviewNote.length > 0) {
-        Column({ space: 4 }) {
-          Text('家长请你订正').width('100%').fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
-          Text(this.assignment.reviewNote).width('100%').fontSize(14).lineHeight(20).fontColor(AppTheme.TEXT);
-        }.width('100%').padding(11).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
-      }
-
-      Row() {
-        Text('作业计时')
-          .fontSize(AppTheme.CAPTION_SIZE)
+    Column({ space: 10 }) {
+      Row({ space: 8 }) {
+        Text(this.statusLabel())
+          .fontSize(13)
           .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontColor(this.emphasisColor());
         Blank();
         Text(`目标 ${this.assignment.expectedMinutes} 分钟`)
-          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontSize(12)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
-      .width('100%');
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
 
-      Text(this.headline())
+      Text(this.timeValue())
         .width('100%')
-        .fontSize(28)
+        .fontSize(36)
         .fontWeight(FontWeight.Bold)
-        .fontColor(this.isOvertime() ? AppTheme.WARNING : AppTheme.TEXT);
+        .fontColor(this.emphasisColor());
 
       Progress({ value: this.progressValue(), total: this.budgetSeconds(), type: ProgressType.Linear })
         .width('100%')
-        .height(7)
-        .color(this.isOvertime() ? AppTheme.WARNING : AppTheme.PRIMARY)
-        .backgroundColor(this.isOvertime() ? AppTheme.WARNING_SOFT : AppTheme.PRIMARY_SOFT);
-
-      Text(this.hint())
-        .width('100%')
-        .fontSize(13)
-        .lineHeight(19)
-        .fontColor(this.isOvertime() ? AppTheme.WARNING : AppTheme.SUBTEXT);
+        .height(6)
+        .color(this.emphasisColor())
+        .backgroundColor(this.isOvertime() ? AppTheme.DANGER_SOFT :
+          (this.isNearDeadline() ? AppTheme.WARNING_SOFT : AppTheme.PRIMARY_SOFT));
     }
     .width('100%')
-    .padding(14)
-    .backgroundColor(this.isOvertime() ? AppTheme.WARNING_SOFT : AppTheme.PRIMARY_FAINT)
+    .padding({ left: 16, right: 16, top: 14, bottom: 14 })
+    .backgroundColor(this.emphasisBackground())
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 }

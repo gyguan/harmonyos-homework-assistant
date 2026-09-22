@@ -2,6 +2,7 @@ import {
   AppRoute,
   AssignmentRouteParam,
   ParentExtraCreateRouteParam,
+  ParentVoiceMaterialRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
   PracticePaperRouteParam
@@ -23,6 +24,7 @@ import { HomeworkConfirmationPage } from '../features/parent/confirmation/Homewo
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
 import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
 import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceAssignmentPage';
+import { ParentVoiceMaterialPage } from '../features/parent/voice/ParentVoiceMaterialPage';
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
 import { HomeworkCaptureHomePage } from '../features/parent/import/HomeworkCaptureHomePage';
 import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImportInboxPage';
@@ -251,6 +253,11 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.PARENT_EXTRA_CREATE, new ParentExtraCreateRouteParam(voice));
   }
 
+  private openParentVoiceMaterial(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_VOICE_MATERIAL, new ParentVoiceMaterialRouteParam());
+  }
+
   private routeAssignmentId(param: Object): string {
     return (param as AssignmentRouteParam).assignmentId;
   }
@@ -283,7 +290,8 @@ export struct AppShell {
       StudentHomePage({
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
+        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onStoreChanged: () => this.notifyUiChanged()
       });
     }
   }
@@ -470,6 +478,15 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_VOICE_MATERIAL) {
+      NavDestination() {
+        ParentVoiceMaterialPage({
+          onBack: () => this.navPathStack.pop(),
+          onAssignmentCreated: () => this.notifyUiChanged()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     }
   }
 
@@ -493,6 +510,7 @@ export struct AppShell {
         onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
         onOpenExtra: () => this.openParentExtraCreate(false),
         onOpenVoice: () => this.openParentExtraCreate(true),
+        onOpenVoiceMaterial: () => this.openParentVoiceMaterial(),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
       });

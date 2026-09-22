@@ -113,7 +113,8 @@ export class HomeworkCaptureSessionService {
     session.runtimeErrorCode = stats.lastError;
 
     if (session.status === CaptureSessionStatus.WAITING_PERMISSION &&
-      (stats.lastError !== 0 || !stats.isCapturing)) {
+      (stats.lastError !== 0 ||
+        (!stats.isCapturing && (stats.pendingFrameCount === undefined || stats.pendingFrameCount === 0)))) {
       runtime.stopCapture();
       runtime.clearLatestFrame();
       session.status = CaptureSessionStatus.CANCELLED;
@@ -135,11 +136,16 @@ export class HomeworkCaptureSessionService {
       return session;
     }
 
-    let runtimeEnded = session.status === CaptureSessionStatus.CAPTURING && !stats.isCapturing;
-    let frame = runtime.getLatestFrame();
+    let runtimeEnded =
+      (session.status === CaptureSessionStatus.WAITING_PERMISSION ||
+        session.status === CaptureSessionStatus.CAPTURING) &&
+      !stats.isCapturing;
+    let frame = runtime.getPendingFrame();
     if (!frame || frame.sequence <= session.lastFrameSequence) {
       this.store.updateSession(session);
-      return runtimeEnded ? this.finishRuntimeEnded(session, stats.lastError) : session;
+      let remaining = runtime.getStats().pendingFrameCount;
+      return runtimeEnded && (remaining === undefined || remaining === 0) ?
+        this.finishRuntimeEnded(session, stats.lastError) : session;
     }
 
     if (session.status === CaptureSessionStatus.WAITING_PERMISSION) {
@@ -152,7 +158,9 @@ export class HomeworkCaptureSessionService {
     let signature = this.frameSignature(frame);
     if (!this.isMeaningfulChange(session.id, signature)) {
       this.store.updateSession(session);
-      return runtimeEnded ? this.finishRuntimeEnded(session, stats.lastError) : session;
+      let remaining = runtime.getStats().pendingFrameCount;
+      return runtimeEnded && (remaining === undefined || remaining === 0) ?
+        this.finishRuntimeEnded(session, stats.lastError) : session;
     }
 
     session.acceptedFrameCount++;
@@ -187,7 +195,9 @@ export class HomeworkCaptureSessionService {
     }
 
     this.store.updateSession(session);
-    return runtimeEnded ? this.finishRuntimeEnded(session, stats.lastError) : session;
+    let remaining = runtime.getStats().pendingFrameCount;
+    return runtimeEnded && (remaining === undefined || remaining === 0) ?
+      this.finishRuntimeEnded(session, stats.lastError) : session;
   }
 
   private finishRuntimeEnded(session: CaptureSession, runtimeErrorCode: number): CaptureSession {
@@ -225,12 +235,17 @@ export class HomeworkCaptureSessionService {
 
     let runtime = this.requireRuntime();
     if (session.status === CaptureSessionStatus.WAITING_PERMISSION) {
-      runtime.stopCapture();
-      session.status = CaptureSessionStatus.CANCELLED;
-      session.stoppedAtEpochMs = Date.now();
-      session.stopReason = CaptureStopReason.CANCELLED;
+      let pending = runtime.getStats().pendingFrameCount;
+      if (pending === undefined || pending === 0) {
+        runtime.stopCapture();
+        session.status = CaptureSessionStatus.CANCELLED;
+        session.stoppedAtEpochMs = Date.now();
+        session.stopReason = CaptureStopReason.CANCELLED;
+        this.store.updateSession(session);
+        return session;
+      }
+      session.status = CaptureSessionStatus.CAPTURING;
       this.store.updateSession(session);
-      return session;
     }
 
     if (session.status !== CaptureSessionStatus.CAPTURING &&
@@ -240,7 +255,13 @@ export class HomeworkCaptureSessionService {
     this.store.updateSession(session);
 
     let stopCode = runtime.stopCapture();
-    await this.sampleLatestFrame();
+    let drainCount = 0;
+    let pending = runtime.getStats().pendingFrameCount;
+    while (pending !== undefined && pending > 0 && drainCount < 12) {
+      await this.sampleLatestFrame();
+      drainCount++;
+      pending = runtime.getStats().pendingFrameCount;
+    }
     session = this.store.getSession(session.id) as CaptureSession;
     let batchId = this.ensureImportBatch(session);
     runtime.clearLatestFrame();

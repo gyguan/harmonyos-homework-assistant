@@ -48,9 +48,9 @@ export class AssignmentStateMachine {
       case AssignmentStatus.COMPLETED:
         return '已完成';
       case AssignmentStatus.NEEDS_REWORK:
-        return '需要重做';
+        return '要订正';
       case AssignmentStatus.OVERDUE:
-        return '已超时';
+        return '已逾期';
       default:
         return '未知';
     }

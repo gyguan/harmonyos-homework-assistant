@@ -52,26 +52,23 @@ require("static passedPaperIds(attempts: PracticeAttemptSummary[])" in policy an
 require("paperVersion" not in policy and "paper.version" not in policy,
         "pass policy must not discard a prior pass when the catalog paper version changes")
 
-for token in [
-    "@Link selectedPassFilter: PracticePassFilter",
-    "Text('通过状态')",
-    "PassOption(PracticePassFilter.ALL)",
-    "PassOption(PracticePassFilter.PASSED)",
-    "PassOption(PracticePassFilter.NOT_PASSED)",
-    "PracticeTaxonomy.passFilterLabel(filter)",
-]:
-    require(token in dialog, f"practice filter dialog missing pass-status behavior: {token}")
+require("@Link selectedPassFilter: PracticePassFilter" in dialog,
+        "Practice More-filter dialog must preserve the selected pass value while editing low-frequency filters")
+require("Text('通过状态')" not in dialog and "private PassOption" not in dialog,
+        "Practice pass status must not be duplicated inside the More-filter dialog")
 
 for token in [
     "@State private selectedPassFilter: PracticePassFilter = PracticePassFilter.ALL",
-    "label: '通过状态'",
-    "active: this.selectedPassFilter !== PracticePassFilter.ALL",
+    "private selectPassFilter(passFilter: PracticePassFilter)",
+    "label: '全部'",
+    "label: '未通过'",
+    "label: '已通过'",
     "@Prop passed: boolean = false",
     "Text('已通过')",
     "passed: this.viewModel.isPaperPassed(paper, this.passedPaperIds)",
     "filterByPass(",
 ]:
-    require(token in home or token in view_model, f"practice home missing pass filter/tag behavior: {token}")
+    require(token in home or token in view_model, f"practice home missing quick pass filter/tag behavior: {token}")
 
 require("listAttempts(this.familyContext.getActiveStudentId(), '')" in view_model,
         "pass status must use the active student's own practice history")

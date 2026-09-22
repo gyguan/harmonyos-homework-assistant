@@ -8,6 +8,8 @@ import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepos
 @Component
 export struct StudentProfilePage {
   @Prop revision: number = 0;
+  @State private learningInfoExpanded: boolean = false;
+  @State private tutorRulesExpanded: boolean = false;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
 
   private student(): StudentProfile {
@@ -33,39 +35,18 @@ export struct StudentProfilePage {
         .fontColor(AppTheme.TEXT);
     }
     .width('100%')
-    .padding({ top: 12, bottom: 12 });
-  }
-
-  @Builder
-  private SectionTitle(title: string, description: string) {
-    Column({ space: 3 }) {
-      Text(title)
-        .width('100%')
-        .fontSize(18)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.TEXT);
-      Text(description)
-        .width('100%')
-        .fontSize(13)
-        .lineHeight(18)
-        .fontColor(AppTheme.SUBTEXT);
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start);
+    .padding({ top: 11, bottom: 11 });
   }
 
   build() {
     Scroll() {
       Column() {
-        Column({ space: 20 }) {
-          Column({ space: 5 }) {
-            Text('我的')
-              .fontSize(AppTheme.PAGE_TITLE_SIZE)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppTheme.TEXT);
-          }
-          .width('100%')
-          .alignItems(HorizontalAlign.Start);
+        Column({ space: 18 }) {
+          Text('我的')
+            .width('100%')
+            .fontSize(AppTheme.PAGE_TITLE_SIZE)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
 
           Row({ space: 14 }) {
             CenteredTextBadge({
@@ -93,50 +74,95 @@ export struct StudentProfilePage {
           .width('100%')
           .padding({ top: 4, bottom: 4 });
 
-          Column({ space: 10 }) {
-            this.SectionTitle('学习资料', '学期和教材由家长维护。');
-            Column() {
-              this.InfoRow('学期', this.student().semester);
-              Divider().color(AppTheme.DIVIDER);
-              this.InfoRow('教材', this.student().textbookSummary);
+          Column() {
+            Column({ space: 2 }) {
+              Row() {
+                Column({ space: 3 }) {
+                  Text('学习资料')
+                    .fontSize(16)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.TEXT);
+                  Text('学期和教材')
+                    .fontSize(12)
+                    .fontColor(AppTheme.SUBTEXT);
+                }
+                .layoutWeight(1)
+                .alignItems(HorizontalAlign.Start);
+                Text(this.learningInfoExpanded ? '收起' : '查看')
+                  .fontSize(13)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.PRIMARY);
+              }
+              .width('100%')
+              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+              .alignItems(VerticalAlign.Center)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText(this.learningInfoExpanded ? '收起学习资料' : '查看学习资料')
+              .onClick(() => this.learningInfoExpanded = !this.learningInfoExpanded);
+
+              if (this.learningInfoExpanded) {
+                this.InfoRow('学期', this.student().semester);
+                Divider().color(AppTheme.DIVIDER);
+                this.InfoRow('教材', this.student().textbookSummary);
+              }
             }
             .width('100%')
-            .padding({ left: 16, right: 16 })
-            .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
-          }
-          .width('100%');
+            .padding(16);
 
-          Column({ space: 10 }) {
-            this.SectionTitle('AI 辅导规则', '这些规则由家长设置，小伴会按规则陪你思考。');
-            Column() {
-              ReadonlySettingStateRow({
-                title: '引导优先',
-                description: this.settings().tutorGuidanceFirst ?
-                  '先提示思路，再一步一步讲解。' : '可以更直接地解释解题方法。',
-                isEnabled: this.settings().tutorGuidanceFirst
-              });
-              Divider().color(AppTheme.DIVIDER);
-              ReadonlySettingStateRow({
-                title: '直接答案',
-                description: this.settings().directAnswerAllowed ?
-                  '家长已允许在需要时展示直接答案。' : '默认不直接给答案，先帮助你自己想出来。',
-                isEnabled: this.settings().directAnswerAllowed
-              });
+            Divider().color(AppTheme.DIVIDER);
+
+            Column({ space: 2 }) {
+              Row() {
+                Column({ space: 3 }) {
+                  Text('小伴规则')
+                    .fontSize(16)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.TEXT);
+                  Text('AI 辅导规则由家长设置')
+                    .fontSize(12)
+                    .fontColor(AppTheme.SUBTEXT);
+                }
+                .layoutWeight(1)
+                .alignItems(HorizontalAlign.Start);
+                Text(this.tutorRulesExpanded ? '收起' : '查看')
+                  .fontSize(13)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.PRIMARY);
+              }
+              .width('100%')
+              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+              .alignItems(VerticalAlign.Center)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText(this.tutorRulesExpanded ? '收起小伴规则' : '查看小伴规则')
+              .onClick(() => this.tutorRulesExpanded = !this.tutorRulesExpanded);
+
+              if (this.tutorRulesExpanded) {
+                ReadonlySettingStateRow({
+                  title: '引导优先',
+                  description: this.settings().tutorGuidanceFirst ?
+                    '先提示思路，再一步一步讲解。' : '可以更直接地解释解题方法。',
+                  isEnabled: this.settings().tutorGuidanceFirst
+                });
+                Divider().color(AppTheme.DIVIDER);
+                ReadonlySettingStateRow({
+                  title: '直接答案',
+                  description: this.settings().directAnswerAllowed ?
+                    '家长已允许在需要时展示直接答案。' : '默认不直接给答案，先帮助你自己想出来。',
+                  isEnabled: this.settings().directAnswerAllowed
+                });
+              }
             }
             .width('100%')
-            .padding({ left: 16, right: 16 })
-            .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
+            .padding(16);
           }
-          .width('100%');
+          .width('100%')
+          .backgroundColor(AppTheme.SURFACE)
+          .borderRadius(AppTheme.CARD_RADIUS);
 
-          Text('需要修改姓名、年级、班级、学期或教材时，请由家长在家长空间中调整。')
+          Text('学习资料和小伴规则都由家长维护。')
             .width('100%')
-            .fontSize(13)
-            .lineHeight(19)
-            .fontColor(AppTheme.SUBTEXT)
-            .padding({ left: 4, right: 4 });
+            .fontSize(12)
+            .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.PROFILE_READABLE_MAX_WIDTH })
@@ -148,6 +174,7 @@ export struct StudentProfilePage {
     .width('100%')
     .height('100%')
     .align(Alignment.Top)
+    .scrollBar(BarState.Off)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }

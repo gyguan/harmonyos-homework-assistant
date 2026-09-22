@@ -35,6 +35,6 @@ Thumbs.db
 # Logs
 *.log
 
-# 客户端安装包本体不入库（构建产物，由 scripts/publish_hap_release.sh 上传到服务器）
-releases/*.hap
-releases/*.app
+# Python validation cache
+__pycache__/
+*.pyc

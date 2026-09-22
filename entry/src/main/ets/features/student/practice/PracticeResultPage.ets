@@ -15,6 +15,8 @@ export struct PracticeResultPage {
   @State private errorMessage: string = '';
   @State private repeating: boolean = false;
   @State private wrongRetrying: boolean = false;
+  @State private showDetailedStats: boolean = false;
+  @State private showAllQuestions: boolean = false;
   onBack: () => void = () => {};
   onRepeatStarted: (attemptId: string) => void = (_attemptId: string) => {};
   private readonly viewModel: PracticeResultViewModel = new PracticeResultViewModel();
@@ -134,21 +136,51 @@ export struct PracticeResultPage {
             .backgroundColor(AppTheme.SURFACE)
             .borderRadius(AppTheme.CARD_RADIUS);
 
-            Row({ space: 10 }) {
-              this.Metric(`${this.result.correctCount}`, '答对');
-              this.Metric(`${this.result.wrongCount}`, '答错/未答');
-              this.Metric(this.viewModel.elapsedText(this.result.elapsedSeconds), '用时');
+            Column({ space: 8 }) {
+              Text(this.showDetailedStats ? '收起详细统计' : '查看详细统计')
+                .width('100%')
+                .fontSize(13)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.PRIMARY)
+                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText(this.showDetailedStats ? '收起详细统计' : '查看详细统计')
+                .onClick(() => this.showDetailedStats = !this.showDetailedStats);
+              if (this.showDetailedStats) {
+                Row({ space: 10 }) {
+                  this.Metric(`${this.result.correctCount}`, '答对');
+                  this.Metric(`${this.result.wrongCount}`, '答错/未答');
+                  this.Metric(this.viewModel.elapsedText(this.result.elapsedSeconds), '用时');
+                }
+                .width('100%');
+              }
             }
             .width('100%');
 
             Column({ space: 10 }) {
-              Text('答题回顾')
-                .width('100%')
-                .fontSize(18)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.TEXT);
+              Row() {
+                Text(this.result.wrongCount > 0 && !this.showAllQuestions ? '错题优先 · 答题回顾' : '答题回顾')
+                  .layoutWeight(1)
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                if (this.result.wrongCount > 0) {
+                  Text(this.showAllQuestions ? '只看错题' : '查看全部题目')
+                    .fontSize(13)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.PRIMARY)
+                    .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                    .accessibilityRole(AccessibilityRoleType.BUTTON)
+                    .accessibilityText(this.showAllQuestions ? '只查看错题' : '查看全部题目')
+                    .onClick(() => this.showAllQuestions = !this.showAllQuestions);
+                }
+              }
+              .width('100%')
+              .alignItems(VerticalAlign.Center);
+
               ForEach(this.result.questions, (item: PracticeQuestionResult) => {
-                Column({ space: 6 }) {
+                if (this.showAllQuestions || this.result!.wrongCount === 0 || !item.correct) {
+                  Column({ space: 6 }) {
                   Row() {
                     Text(`第 ${item.orderNo} 题`)
                       .fontSize(13)
@@ -202,8 +234,9 @@ export struct PracticeResultPage {
                 }
                 .width('100%')
                 .padding(14)
-                .backgroundColor(AppTheme.SURFACE)
-                .borderRadius(AppTheme.CONTROL_RADIUS);
+                  .backgroundColor(AppTheme.SURFACE)
+                  .borderRadius(AppTheme.CONTROL_RADIUS);
+                }
               }, (item: PracticeQuestionResult) => item.questionId);
             }
             .width('100%');

@@ -54,13 +54,18 @@ class FixtureCaptureRuntime implements HomeworkCaptureRuntime {
     return this.frames[this.index];
   }
 
+  getPendingFrame(): CaptureFrame | undefined {
+    return this.getLatestFrame();
+  }
+
   getStats(): CaptureRuntimeStats {
     return {
       isCapturing: this.started,
       lastError: 0,
       callbackCount: this.started ? this.index + 1 : this.index + 1,
       sampledFrameCount: this.index + 1,
-      latestSequence: this.frames[this.index].sequence
+      latestSequence: this.frames[this.index].sequence,
+      pendingFrameCount: 0
     };
   }
 

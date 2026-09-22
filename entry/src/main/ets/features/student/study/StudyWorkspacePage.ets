@@ -8,6 +8,7 @@ import { VoiceAssignmentPane } from '../../../components/assignment/VoiceAssignm
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
+import { SubmissionResumeConfirmDialog } from '../../../components/submission/SubmissionResumeConfirmDialog';
 import { TutorQuestionCapturePanel } from '../../../components/tutor/TutorQuestionCapturePanel';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
@@ -31,6 +32,7 @@ export struct StudyWorkspacePage {
   @State private submittingPhotos: boolean = false;
   @State private submissionMessage: string = '';
   @State private previewUri: string = '';
+  @State private resumePhotoCount: number = 0;
   @State private tutorDraft: string = '';
   @State private tutorMessages: TutorChatMessage[] = [];
   @State private tutorNotice: string = '';
@@ -58,6 +60,16 @@ export struct StudyWorkspacePage {
     customStyle: true
   });
 
+  private resumeConfirmController: CustomDialogController = new CustomDialogController({
+    builder: SubmissionResumeConfirmDialog({
+      photoCount: $resumePhotoCount,
+      onConfirm: () => { void this.resumeFromSubmission(); }
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
+
   private readonly viewModel: StudyWorkspaceViewModel =
     new StudyWorkspaceViewModel(DefaultAssignmentRepository.instance);
   private pauseEmbeddedMedia: () => void = () => {};
@@ -66,8 +78,6 @@ export struct StudyWorkspacePage {
   private voicePreviousImage: () => void = () => {};
   private voiceNextImage: () => void = () => {};
   private voiceSelectImage: (index: number) => void = (_index: number) => {};
-
-  aboutToAppear(): void { void this.loadTutor(); }
 
   private applyVoiceMediaState(
     imageUris: string[],
@@ -252,6 +262,15 @@ export struct StudyWorkspacePage {
     this.submissionMessage = '';
   }
 
+  private requestResumeFromSubmission(): void {
+    if (this.submissionPhotoUris.length === 0) {
+      void this.resumeFromSubmission();
+      return;
+    }
+    this.resumePhotoCount = this.submissionPhotoUris.length;
+    this.resumeConfirmController.open();
+  }
+
   private appendSubmissionPhotos(uris: string[]): void {
     let next = this.submissionPhotoUris.slice();
     for (let uri of uris) {
@@ -429,33 +448,40 @@ export struct StudyWorkspacePage {
 
   @Builder
   private ResourcePane() {
-    if (this.assignment() !== null && this.assignment()!.contentType !== AssignmentContentType.AUDIO_IMAGE) {
+    if (this.assignment() !== null && this.assignment()!.contentType !== AssignmentContentType.AUDIO_IMAGE &&
+      (this.assignment()!.textbookRef.length > 0 || this.assignment()!.resourceLabels.length > 0)) {
       Column({ space: 0 }) {
-        Row() {
-          Column({ space: 3 }) {
-            Text('教材 / 页码').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
-            Text(this.assignment()!.textbookRef.length > 0 ? this.assignment()!.textbookRef : '未设置')
-              .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        if (this.assignment()!.textbookRef.length > 0) {
+          Row() {
+            Column({ space: 3 }) {
+              Text('教材 / 页码').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+              Text(this.assignment()!.textbookRef)
+                .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            }
+            .layoutWeight(1)
+            .alignItems(HorizontalAlign.Start);
           }
-          .layoutWeight(1)
-          .alignItems(HorizontalAlign.Start);
+          .width('100%')
+          .padding({ top: 12, bottom: 12 });
         }
-        .width('100%')
-        .padding({ top: 12, bottom: 12 });
 
-        Divider().color(AppTheme.DIVIDER);
+        if (this.assignment()!.textbookRef.length > 0 && this.assignment()!.resourceLabels.length > 0) {
+          Divider().color(AppTheme.DIVIDER);
+        }
 
-        Row() {
-          Column({ space: 3 }) {
-            Text('老师附件').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
-            Text(this.assignment()!.resourceLabels.length === 0 ? '暂无附件' : `${this.assignment()!.resourceLabels.length} 项资料`)
-              .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        if (this.assignment()!.resourceLabels.length > 0) {
+          Row() {
+            Column({ space: 3 }) {
+              Text('老师附件').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+              Text(`${this.assignment()!.resourceLabels.length} 项资料`)
+                .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            }
+            .layoutWeight(1)
+            .alignItems(HorizontalAlign.Start);
           }
-          .layoutWeight(1)
-          .alignItems(HorizontalAlign.Start);
+          .width('100%')
+          .padding({ top: 12, bottom: 12 });
         }
-        .width('100%')
-        .padding({ top: 12, bottom: 12 });
       }
       .width('100%')
       .padding({ left: 14, right: 14 })
@@ -501,46 +527,91 @@ export struct StudyWorkspacePage {
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
 
-          Text(this.assignment()!.instruction)
+          if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT ||
+            this.assignment()!.status === AssignmentStatus.SUBMITTED ||
+            this.assignment()!.status === AssignmentStatus.COMPLETED) {
+            Row({ space: 10 }) {
+              SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
+                .fontSize(24)
+                .fontColor([AppTheme.SUCCESS]);
+              Text(this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT ?
+                '最后一步：添加清晰、完整的作业照片。' :
+                (this.assignment()!.status === AssignmentStatus.SUBMITTED ?
+                  '照片已提交，等待家长确认。' : '这项作业已经完成。'))
+                .layoutWeight(1)
+                .fontSize(15)
+                .lineHeight(22)
+                .fontColor(AppTheme.TEXT);
+            }
             .width('100%')
-            .fontSize(15)
-            .lineHeight(23)
-            .fontColor(AppTheme.SUBTEXT);
+            .padding(14)
+            .backgroundColor(AppTheme.SUCCESS_SOFT)
+            .borderRadius(AppTheme.CONTROL_RADIUS);
 
-          if (this.assignment()!.contentType === AssignmentContentType.AUDIO_IMAGE) {
-            VoiceAssignmentPane({
-              assignmentId: this.assignment()!.id,
-              playbackEnabled: this.assignment()!.status === AssignmentStatus.IN_PROGRESS,
-              onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause,
-              onFullscreenRequest: () => this.voiceFullscreenOpen = true,
-              onFullscreenDismissed: () => this.voiceFullscreenOpen = false,
-              onMediaStateChanged: (
-                imageUris: string[],
-                imageIndex: number,
-                playing: boolean,
-                currentTimeMs: number,
-                durationMs: number,
-                playbackEnabled: boolean,
-                prepared: boolean
-              ) => this.applyVoiceMediaState(
-                imageUris, imageIndex, playing, currentTimeMs, durationMs, playbackEnabled, prepared),
-              onFullscreenControlsReady: (
-                toggleAudio: () => void,
-                seek: (value: number) => void,
-                previousImage: () => void,
-                nextImage: () => void,
-                selectImage: (index: number) => void
-              ) => {
-                this.voiceToggleAudio = toggleAudio;
-                this.voiceSeek = seek;
-                this.voicePreviousImage = previousImage;
-                this.voiceNextImage = nextImage;
-                this.voiceSelectImage = selectImage;
+            this.SubmissionPane();
+          } else {
+            if (this.assignment()!.reviewNote.length > 0) {
+              Column({ space: 5 }) {
+                Text('需要先订正')
+                  .width('100%')
+                  .fontSize(13)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.DANGER);
+                Text(this.assignment()!.reviewNote)
+                  .width('100%')
+                  .fontSize(15)
+                  .lineHeight(22)
+                  .fontColor(AppTheme.TEXT);
               }
-            });
-          }
+              .width('100%')
+              .padding(14)
+              .backgroundColor(AppTheme.DANGER_SOFT)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
+            }
 
-          AssignmentCountdownCard({ assignment: this.assignment()! });
+            Text(this.assignment()!.instruction.length > 0 ?
+              this.assignment()!.instruction : '按课堂要求完成这项作业。')
+              .width('100%')
+              .fontSize(16)
+              .lineHeight(24)
+              .fontColor(AppTheme.TEXT);
+
+            if (this.assignment()!.contentType === AssignmentContentType.AUDIO_IMAGE) {
+              VoiceAssignmentPane({
+                assignmentId: this.assignment()!.id,
+                playbackEnabled: this.assignment()!.status === AssignmentStatus.IN_PROGRESS,
+                onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause,
+                onFullscreenRequest: () => this.voiceFullscreenOpen = true,
+                onFullscreenDismissed: () => this.voiceFullscreenOpen = false,
+                onMediaStateChanged: (
+                  imageUris: string[],
+                  imageIndex: number,
+                  playing: boolean,
+                  currentTimeMs: number,
+                  durationMs: number,
+                  playbackEnabled: boolean,
+                  prepared: boolean
+                ) => this.applyVoiceMediaState(
+                  imageUris, imageIndex, playing, currentTimeMs, durationMs, playbackEnabled, prepared),
+                onFullscreenControlsReady: (
+                  toggleAudio: () => void,
+                  seek: (value: number) => void,
+                  previousImage: () => void,
+                  nextImage: () => void,
+                  selectImage: (index: number) => void
+                ) => {
+                  this.voiceToggleAudio = toggleAudio;
+                  this.voiceSeek = seek;
+                  this.voicePreviousImage = previousImage;
+                  this.voiceNextImage = nextImage;
+                  this.voiceSelectImage = selectImage;
+                }
+              });
+            }
+
+            AssignmentCountdownCard({ assignment: this.assignment()! });
+            this.ResourcePane();
+          }
 
           if (this.actionMessage.length > 0) {
             Text(this.actionMessage)
@@ -548,9 +619,6 @@ export struct StudyWorkspacePage {
               .fontSize(13)
               .fontColor(AppTheme.WARNING);
           }
-
-          this.ResourcePane();
-          this.SubmissionPane();
 
           if (showPrimaryAction) {
             Button(this.primaryActionLabel(), { type: ButtonType.Normal })
@@ -580,62 +648,64 @@ export struct StudyWorkspacePage {
 
   @Builder
   private WorkspaceActionBar(showTutorEntry: boolean) {
-    Row({ space: 10 }) {
-      if (showTutorEntry) {
-        Button('问小伴', { type: ButtonType.Normal })
-          .width(this.assignment() !== null &&
-            (this.assignment()!.status === AssignmentStatus.IN_PROGRESS ||
-              this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) ? 88 : 112)
+    if (this.assignment() !== null &&
+      this.assignment()!.status !== AssignmentStatus.SUBMITTED &&
+      this.assignment()!.status !== AssignmentStatus.COMPLETED) {
+      Row({ space: 10 }) {
+        if (showTutorEntry && this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
+          Button('问小伴', { type: ButtonType.Normal })
+            .width(88)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .fontSize(13)
+            .onClick(() => {
+              this.tutorPanelOpen = true;
+              void this.loadTutor();
+            });
+        }
+
+        if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
+          Button('暂停一下', { type: ButtonType.Normal })
+            .width(showTutorEntry ? 88 : 112)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.actionRunning)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .fontSize(13)
+            .accessibilityText('暂停作业计时')
+            .onClick(() => { void this.pauseCurrentAssignment(); });
+        }
+
+        if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
+          Button('继续作业', { type: ButtonType.Normal })
+            .width(112)
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .fontSize(13)
+            .accessibilityText('返回作业继续完成')
+            .onClick(() => this.requestResumeFromSubmission());
+        }
+
+        Button(this.primaryActionLabel(), { type: ButtonType.Normal })
+          .layoutWeight(1)
           .height(AppTheme.BUTTON_HEIGHT)
           .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .fontColor(AppTheme.PRIMARY)
-          .fontSize(13)
-          .onClick(() => {
-            this.tutorPanelOpen = true;
-            void this.loadTutor();
-          });
+          .enabled(this.primaryActionEnabled())
+          .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .onClick(() => { void this.runPrimaryAction(); });
       }
-
-      if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
-        Button('暂停一下', { type: ButtonType.Normal })
-          .width(showTutorEntry ? 88 : 112)
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(!this.actionRunning)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .fontColor(AppTheme.PRIMARY)
-          .fontSize(13)
-          .accessibilityText('暂停作业计时')
-          .onClick(() => { void this.pauseCurrentAssignment(); });
-      }
-
-      if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
-        Button('继续作业', { type: ButtonType.Normal })
-          .width(showTutorEntry ? 88 : 112)
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(!this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .fontColor(AppTheme.PRIMARY)
-          .fontSize(13)
-          .accessibilityText('返回作业继续完成')
-          .onClick(() => { void this.resumeFromSubmission(); });
-      }
-
-      Button(this.primaryActionLabel(), { type: ButtonType.Normal })
-        .layoutWeight(1)
-        .height(AppTheme.BUTTON_HEIGHT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .enabled(this.primaryActionEnabled())
-        .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .fontSize(14)
-        .fontWeight(FontWeight.Medium)
-        .onClick(() => { void this.runPrimaryAction(); });
+      .width('100%')
+      .padding({ top: 2, bottom: 4 });
     }
-    .width('100%')
-    .padding({ top: 2, bottom: 4 });
   }
 
   @Builder
@@ -679,6 +749,16 @@ export struct StudyWorkspacePage {
           Text('同步中')
             .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
+        }
+        if (this.canUseTutorSplit() && this.tutorPanelOpen) {
+          Text('收起')
+            .fontSize(13)
+            .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 10, right: 2 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('收起小伴学习助手')
+            .onClick(() => this.tutorPanelOpen = false);
         }
       }
       .width('100%')
@@ -1136,7 +1216,21 @@ export struct StudyWorkspacePage {
   private PadWorkspacePage() {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       this.PageHeader();
-      this.SplitWorkspace();
+      if (this.tutorPanelOpen) this.SplitWorkspace();
+      else {
+        Row() {
+          Column() {
+            this.SingleColumnWorkspace();
+          }
+          .width('100%')
+          .height('100%')
+          .constraintSize({ maxWidth: AppTheme.STUDY_READABLE_MAX_WIDTH });
+        }
+        .width('100%')
+        .layoutWeight(1)
+        .justifyContent(FlexAlign.Center)
+        .alignItems(VerticalAlign.Top);
+      }
     }
     .width('100%')
     .height('100%')

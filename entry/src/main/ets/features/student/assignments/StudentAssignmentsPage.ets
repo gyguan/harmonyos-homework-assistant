@@ -26,6 +26,7 @@ export struct StudentAssignmentsPage {
   @State private querying: boolean = false;
   @State private calendarMode: boolean = false;
   @State private calendarMonthEpochMs: number = Date.now();
+  @State private historyExpanded: boolean = false;
 
   @State private needHandlingAssignments: Assignment[] = [];
   @State private notStartedAssignments: Assignment[] = [];
@@ -180,6 +181,20 @@ export struct StudentAssignmentsPage {
     for (let item of this.currentVisibleAssignments()) {
       if (item.status === AssignmentStatus.COMPLETED) result.push(item);
     }
+    return result;
+  }
+
+  private currentTodoAssignments(): Assignment[] {
+    let result: Assignment[] = [];
+    for (let item of this.currentNeedHandlingAssignments()) result.push(item);
+    for (let item of this.currentNotStartedAssignments()) result.push(item);
+    return result;
+  }
+
+  private currentHistoryAssignments(): Assignment[] {
+    let result: Assignment[] = [];
+    for (let item of this.currentSubmittedAssignments()) result.push(item);
+    for (let item of this.currentCompletedAssignments()) result.push(item);
     return result;
   }
 
@@ -347,22 +362,22 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
-  private NeedHandlingSection() {
-    if (this.currentNeedHandlingAssignments().length > 0) {
+  private TodoSection() {
+    if (this.currentTodoAssignments().length > 0) {
       Column({ space: 9 }) {
         Row() {
           Column({ space: 2 }) {
-            Text('需要处理').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('要做的').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           }
           .alignItems(HorizontalAlign.Start);
           Blank();
-          Text(`${this.currentNeedHandlingAssignments().length}`)
+          Text(`${this.currentTodoAssignments().length}`)
             .fontSize(AppTheme.CAPTION_SIZE)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%');
         Column({ space: 6 }) {
-          ForEach(this.currentNeedHandlingAssignments(), (item: Assignment) => {
+          ForEach(this.currentTodoAssignments(), (item: Assignment) => {
             AssignmentListItem({
               assignment: item,
               selected: this.isSelected(item.id),
@@ -378,93 +393,44 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
-  private NotStartedSection() {
-    if (this.currentNotStartedAssignments().length > 0) {
+  private HistorySection() {
+    if (this.currentHistoryAssignments().length > 0) {
       Column({ space: 9 }) {
-        Row() {
-          Column({ space: 2 }) {
-            Text('待开始').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-          Blank();
-          Text(`${this.currentNotStartedAssignments().length}`)
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.TERTIARY_TEXT);
+        Row({ space: 8 }) {
+          Text(`已提交 / 已完成 · ${this.currentHistoryAssignments().length}`)
+            .layoutWeight(1)
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.SUBTEXT);
+          Text(this.historyExpanded ? '收起' : '查看')
+            .fontSize(13)
+            .fontColor(AppTheme.PRIMARY);
+          Text(this.historyExpanded ? '⌃' : '⌄')
+            .fontSize(16)
+            .fontColor(AppTheme.PRIMARY);
         }
-        .width('100%');
-        Column({ space: 6 }) {
-          ForEach(this.currentNotStartedAssignments(), (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail() || this.calendarMode,
-              onOpen: () => this.openAssignment(item.id)
-            });
-          }, (item: Assignment) => this.assignmentRenderKey(item));
-        }
-        .width('100%');
-      }
-      .width('100%');
-    }
-  }
+        .width('100%')
+        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+        .padding({ left: 12, right: 12 })
+        .backgroundColor(AppTheme.SURFACE)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(this.historyExpanded ? '收起已提交和已完成作业' : '查看已提交和已完成作业')
+        .onClick(() => this.historyExpanded = !this.historyExpanded);
 
-  @Builder
-  private SubmittedSection() {
-    if (this.currentSubmittedAssignments().length > 0) {
-      Column({ space: 9 }) {
-        Row() {
-          Column({ space: 2 }) {
-            Text('已提交').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        if (this.historyExpanded) {
+          Column({ space: 6 }) {
+            ForEach(this.currentHistoryAssignments(), (item: Assignment) => {
+              AssignmentListItem({
+                assignment: item,
+                selected: this.isSelected(item.id),
+                showChevron: !this.canUseMasterDetail() || this.calendarMode,
+                onOpen: () => this.openAssignment(item.id)
+              });
+            }, (item: Assignment) => this.assignmentRenderKey(item));
           }
-          .alignItems(HorizontalAlign.Start);
-          Blank();
-          Text(`${this.currentSubmittedAssignments().length}`)
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.TERTIARY_TEXT);
+          .width('100%');
         }
-        .width('100%');
-        Column({ space: 6 }) {
-          ForEach(this.currentSubmittedAssignments(), (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail() || this.calendarMode,
-              onOpen: () => this.openAssignment(item.id)
-            });
-          }, (item: Assignment) => this.assignmentRenderKey(item));
-        }
-        .width('100%');
-      }
-      .width('100%');
-    }
-  }
-
-  @Builder
-  private CompletedSection() {
-    if (this.currentCompletedAssignments().length > 0) {
-      Column({ space: 9 }) {
-        Row() {
-          Column({ space: 2 }) {
-            Text('已完成').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-          Blank();
-          Text(`${this.currentCompletedAssignments().length}`)
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.TERTIARY_TEXT);
-        }
-        .width('100%');
-        Column({ space: 6 }) {
-          ForEach(this.currentCompletedAssignments(), (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail() || this.calendarMode,
-              onOpen: () => this.openAssignment(item.id)
-            });
-          }, (item: Assignment) => this.assignmentRenderKey(item));
-        }
-        .width('100%');
       }
       .width('100%');
     }
@@ -494,10 +460,8 @@ export struct StudentAssignmentsPage {
       }
       .width('100%');
 
-      this.NeedHandlingSection();
-      this.NotStartedSection();
-      this.SubmittedSection();
-      this.CompletedSection();
+      this.TodoSection();
+      this.HistorySection();
       this.EmptyState();
     }
     .width('100%');
@@ -545,21 +509,16 @@ export struct StudentAssignmentsPage {
       }
       .width('100%');
 
-      Scroll() {
-        Column() {
-          AssignmentDetailPane({
-            assignmentId: this.selectedAssignmentId,
-            revision: this.revision,
-            onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
-          });
-        }
-        .width('100%')
-        .padding({ bottom: 12 });
+      Column() {
+        AssignmentDetailPane({
+          assignmentId: this.selectedAssignmentId,
+          revision: this.revision,
+          onOpenStudy: (assignmentId: string) => this.onOpenStudy(assignmentId)
+        });
       }
       .width('100%')
       .layoutWeight(1)
-      .align(Alignment.TopStart)
-      .scrollBar(BarState.Off);
+      .alignItems(HorizontalAlign.Start);
     }
     .width('100%')
     .height('100%');

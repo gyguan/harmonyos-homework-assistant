@@ -1,3 +1,4 @@
+import { VoiceMaterialAutoCreateService } from '../application/assignment/VoiceMaterialAutoCreateService';
 import { BackendAuthService } from '../application/remote/BackendAuthService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { FamilyCloudService } from '../application/remote/FamilyCloudService';
@@ -51,8 +52,13 @@ struct Index {
   private enterStudent(studentId: string): void {
     if (this.familyContext.setActiveStudent(studentId)) {
       this.selectedRole = AppRole.STUDENT;
-      DefaultAssignmentRepository.instance.requestSync();
+      void this.prepareStudentAssignments(studentId);
     }
+  }
+
+  private async prepareStudentAssignments(studentId: string): Promise<void> {
+    await VoiceMaterialAutoCreateService.instance.checkToday(studentId);
+    DefaultAssignmentRepository.instance.requestSync();
   }
 
   build() {

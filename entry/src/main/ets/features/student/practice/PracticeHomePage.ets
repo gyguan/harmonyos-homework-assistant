@@ -1,14 +1,13 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { PracticeFilterDialog } from '../../../components/practice/PracticeFilterDialog';
-import { FilterSummaryEntry } from '../../../components/selection/SelectionControls';
+import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import {
   PracticeGrade,
   PracticePaper,
   PracticePassFilter,
   PracticeSemester,
   PracticeSubject,
-  PracticeTrackFilter,
-  PracticeTaxonomy
+  PracticeTrackFilter
 } from '../../../domain/model/practice/PracticeModels';
 import { PracticeHomeViewModel } from './PracticeHomeViewModel';
 
@@ -19,73 +18,41 @@ struct PracticePaperCard {
   @Prop passed: boolean = false;
   onOpen: () => void = () => {};
 
-  private tagsText(): string {
-    return this.paper.tags.join(' · ');
-  }
-
   build() {
-    Column({ space: 10 }) {
+    Column({ space: 8 }) {
       Row({ space: 10 }) {
-        Column({ space: 4 }) {
-          Text(this.paper.title)
-            .width('100%')
-            .fontSize(AppTheme.CARD_TITLE_SIZE)
+        Text(this.paper.title)
+          .layoutWeight(1)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        if (this.passed) {
+          Text('已通过')
+            .fontSize(12)
             .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text(`${PracticeTaxonomy.gradeLabel(this.paper.grade)} · ${PracticeTaxonomy.semesterLabel(this.paper.semester)} · ${PracticeTaxonomy.subjectLabel(this.paper.subject)} · ${PracticeTaxonomy.trackLabel(this.paper.track)} · ${this.difficultyLabel}`)
-            .width('100%')
-            .fontSize(14)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-
-        Column({ space: 6 }) {
-          if (this.passed) {
-            Text('已通过')
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.SUCCESS)
-              .padding({ left: 10, right: 10, top: 5, bottom: 5 })
-              .backgroundColor(AppTheme.SUCCESS_SOFT)
-              .borderRadius(AppTheme.CHIP_RADIUS);
-          }
-          Text(`${this.paper.questionCount} 题`)
-            .fontSize(14)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.PRIMARY)
-            .padding({ left: 10, right: 10, top: 6, bottom: 6 })
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.SUCCESS)
+            .padding({ left: 9, right: 9, top: 4, bottom: 4 })
+            .backgroundColor(AppTheme.SUCCESS_SOFT)
             .borderRadius(AppTheme.CHIP_RADIUS);
         }
-        .alignItems(HorizontalAlign.End);
-      }
-      .width('100%')
-      .alignItems(VerticalAlign.Top);
-
-      Text(this.paper.description)
-        .width('100%')
-        .fontSize(14)
-        .lineHeight(19)
-        .fontColor(AppTheme.SUBTEXT);
-
-      Row({ space: 8 }) {
-        Text(`约 ${this.paper.estimatedMinutes} 分钟`)
-          .fontSize(14)
-          .fontColor(AppTheme.SUBTEXT);
-        Text('·').fontSize(14).fontColor(AppTheme.TERTIARY_TEXT);
-        Text(this.tagsText())
-          .layoutWeight(1)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(14)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-        Text(PracticeTaxonomy.trackLabel(this.paper.track))
-          .fontSize(14)
-          .fontColor(AppTheme.SUCCESS);
       }
       .width('100%')
       .alignItems(VerticalAlign.Center);
+
+      Text(`${this.paper.questionCount} 题 · 约 ${this.paper.estimatedMinutes} 分钟 · ${this.difficultyLabel}`)
+        .width('100%')
+        .fontSize(13)
+        .fontColor(AppTheme.SUBTEXT);
+
+      if (this.paper.description.length > 0) {
+        Text(this.paper.description)
+          .width('100%')
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .fontSize(13)
+          .lineHeight(18)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+      }
     }
     .width('100%')
     .padding(AppTheme.PHONE_CARD_PADDING)
@@ -181,6 +148,7 @@ export struct PracticeHomePage {
 
   private refreshPaperPresentation(): void {
     if (this.selectedPassFilter === PracticePassFilter.ALL) {
+      this.errorMessage = '';
       this.papers = this.allPapers.slice();
       return;
     }
@@ -201,6 +169,24 @@ export struct PracticeHomePage {
     this.draftSelectedTrack = this.selectedTrack;
     this.draftSelectedPassFilter = this.selectedPassFilter;
     this.filterDialogController.open();
+  }
+
+  private selectSubject(subject: PracticeSubject): void {
+    if (this.loading || subject === this.selectedSubject) return;
+    this.selectedSubject = subject;
+    this.draftSelectedSubject = subject;
+    void this.reloadPapers();
+  }
+
+  private selectPassFilter(passFilter: PracticePassFilter): void {
+    if (this.loading || passFilter === this.selectedPassFilter) return;
+    this.selectedPassFilter = passFilter;
+    this.draftSelectedPassFilter = passFilter;
+    if (passFilter !== PracticePassFilter.ALL && !this.passStatusAvailable) {
+      void this.reloadPapers();
+      return;
+    }
+    this.refreshPaperPresentation();
   }
 
   private applyFilters(
@@ -226,52 +212,98 @@ export struct PracticeHomePage {
   }
 
   @Builder
-  private FilterBar() {
-    Row() {
-      FilterSummaryEntry({
-        label: '年级',
-        value: this.viewModel.gradeLabel(this.selectedGrade),
-        active: true,
-        onOpen: () => this.openFilterDialog()
-      });
-      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      FilterSummaryEntry({
-        label: '科目',
-        value: this.viewModel.subjectLabel(this.selectedSubject),
-        active: true,
-        onOpen: () => this.openFilterDialog()
-      });
-      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      FilterSummaryEntry({
-        label: '题库类型',
-        value: this.viewModel.trackFilterLabel(this.selectedTrack),
-        active: true,
-        onOpen: () => this.openFilterDialog()
-      });
-      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      FilterSummaryEntry({
-        label: '通过状态',
-        value: this.viewModel.passFilterLabel(this.selectedPassFilter),
-        active: this.selectedPassFilter !== PracticePassFilter.ALL,
-        onOpen: () => this.openFilterDialog()
-      });
+  private QuickFilterBar() {
+    Column({ space: 10 }) {
+      Row({ space: 8 }) {
+        Text('科目')
+          .width(42)
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.SUBTEXT);
+        SegmentedSelectionButton({
+          label: '语文',
+          selected: this.selectedSubject === PracticeSubject.CHINESE,
+          onSelect: () => this.selectSubject(PracticeSubject.CHINESE)
+        })
+          .layoutWeight(1);
+        SegmentedSelectionButton({
+          label: '数学',
+          selected: this.selectedSubject === PracticeSubject.MATH,
+          onSelect: () => this.selectSubject(PracticeSubject.MATH)
+        })
+          .layoutWeight(1);
+        SegmentedSelectionButton({
+          label: '英语',
+          selected: this.selectedSubject === PracticeSubject.ENGLISH,
+          onSelect: () => this.selectSubject(PracticeSubject.ENGLISH)
+        })
+          .layoutWeight(1);
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
+
+      Row({ space: 8 }) {
+        Text('状态')
+          .width(42)
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.SUBTEXT);
+        SegmentedSelectionButton({
+          label: '全部',
+          selected: this.selectedPassFilter === PracticePassFilter.ALL,
+          onSelect: () => this.selectPassFilter(PracticePassFilter.ALL)
+        })
+          .layoutWeight(1);
+        SegmentedSelectionButton({
+          label: '未通过',
+          selected: this.selectedPassFilter === PracticePassFilter.NOT_PASSED,
+          onSelect: () => this.selectPassFilter(PracticePassFilter.NOT_PASSED)
+        })
+          .layoutWeight(1);
+        SegmentedSelectionButton({
+          label: '已通过',
+          selected: this.selectedPassFilter === PracticePassFilter.PASSED,
+          onSelect: () => this.selectPassFilter(PracticePassFilter.PASSED)
+        })
+          .layoutWeight(1);
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
+
+      Row({ space: 8 }) {
+        Text(`更多筛选：${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.trackFilterLabel(this.selectedTrack)}`)
+          .layoutWeight(1)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .fontSize(12)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+        Text('调整')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 10, right: 2 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('调整年级和题库类型筛选')
+          .onClick(() => this.openFilterDialog());
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
     }
     .width('100%')
-    .height(58)
-    .padding({ left: 8, right: 8 })
+    .padding({ left: 12, right: 12, top: 12, bottom: 10 })
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
+
   @Builder
   private PaperList() {
     Column({ space: 10 }) {
       Row({ space: 8 }) {
-        Text(`${this.viewModel.gradeLabel(this.selectedGrade)} · ${this.viewModel.semesterLabel(this.selectedSemester)} · ${this.viewModel.subjectLabel(this.selectedSubject)} · ${this.viewModel.trackFilterLabel(this.selectedTrack)} · ${this.viewModel.passFilterLabel(this.selectedPassFilter)}`)
+        Text('练习套卷')
           .layoutWeight(1)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
@@ -346,7 +378,7 @@ export struct PracticeHomePage {
           .width('100%')
           .alignItems(HorizontalAlign.Start);
 
-          this.FilterBar();
+          this.QuickFilterBar();
 
           this.PaperList();
 

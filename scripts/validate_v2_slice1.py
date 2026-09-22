@@ -90,11 +90,13 @@ require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "th
 require("private PhoneHome()" in home and "private PadHome()" in home and
         "LayoutPolicy.homeFocusSummaryRequirement()" in home,
         "V2 Student Home must keep the Phone single-column fallback and the approved Pad focus/summary composition")
-# The approved Student Home hierarchy is now a strict Today surface organized by subject. The
-# earlier hero + remaining-list structure is intentionally superseded rather than preserved.
-require("TodayOverview" in home and "TodaySubjects" in home and "StudentSubjectTaskGroupCard" in home and
-        "todayActionableAssignments()" in view_model and "todaySubjectGroups()" in view_model,
-        "V2 Student Home must preserve the approved Today + subject-group information hierarchy")
+# Student Home is a strict Today surface with direct task actions. Summary cards and the
+# subject accordion were removed because they delayed the grade-two student's primary action.
+require("private TodayTasks()" in home and "StudentTodayTaskCard" in home and
+        "todayActionableAssignments()" in view_model and "AssignmentAction.START" in home,
+        "V2 Student Home must preserve the simplified Today task hierarchy and command path")
+require("StudentHomeMetricCard" not in home and "StudentSubjectTaskGroupCard" not in home,
+        "V2 Student Home must not restore summary-card or subject-accordion friction")
 require("dueAtEpochMs <= 0" in view_model and "dueText" not in view_model,
         "V2 Student Home must use structured dueAt for Today and leave undated work to Assignments")
 require("StudentHomePage" in shell and "StudentTodayPage" not in shell,

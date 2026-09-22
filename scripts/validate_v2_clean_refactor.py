@@ -122,8 +122,10 @@ if student_home_path.exists():
         fail("Student Home wide composition must remain capability-based")
     if "AppTheme.HOME_SECONDARY_MIN_WIDTH" not in student_home or "AppTheme.HOME_PRIMARY_MIN_WIDTH" not in student_home:
         fail("Pad Student Home must preserve distinct summary and primary task widths")
-    if "this.TodayOverview();" not in student_home or "this.TodaySubjects();" not in student_home:
-        fail("Pad Student Home must preserve Today summary + subject-task composition")
+    if "this.TodayTasks();" not in student_home or "StudentTodayTaskCard" not in student_home:
+        fail("Student Home must preserve the simplified Today task-list composition")
+    if "this.TaskList(this.remainingAssignments());" not in student_home or "先做这项" not in student_home:
+        fail("Pad Student Home must preserve focus + remaining-task composition")
 
 repository_root = ROOT / "entry/src/main/ets/data/repository"
 if repository_root.exists():

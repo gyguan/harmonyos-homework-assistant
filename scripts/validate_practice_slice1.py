@@ -73,8 +73,8 @@ require("DefaultPracticeRepository" in view_model,
         "PracticeHomeViewModel must obtain papers through PracticeRepository")
 require("selectedSemester" in page and "selectedTrack" in page,
         "Practice home must preserve semester and catalog-type selection")
-require("label: '题库类型'" in page and "trackFilterLabel" in page,
-        "Practice home filter summary must show catalog type")
+require("更多筛选" in page and "trackFilterLabel" in page and "selectSubject" in page,
+        "Practice home must expose subject as a quick filter and keep catalog type in More filters")
 require("@Link selectedTrack" in filter_dialog and "Text('题库类型')" in filter_dialog,
         "Practice filter dialog must edit catalog type")
 require("PracticeTrackFilter.ALL" in filter_dialog and

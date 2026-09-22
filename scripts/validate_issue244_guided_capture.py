@@ -28,7 +28,6 @@ runtime = read("entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureR
 recognizer = read("entry/src/main/ets/infrastructure/capture/CoreVisionHomeworkCaptureFrameRecognizer.ets")
 service = read("entry/src/main/ets/application/capture/HomeworkCaptureSessionService.ets")
 page = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
-float_page = read("entry/src/main/ets/pages/HomeworkCaptureFloatView.ets")
 capture_home = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
@@ -39,6 +38,9 @@ import_models = read("entry/src/main/ets/domain/model/ImportModels.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
 batch_detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 workflow = read("entry/src/main/ets/application/capture/HomeworkCaptureWorkflowService.ets")
+cpp = read("entry/src/main/cpp/homework_capture_napi.cpp")
+module = read("entry/src/main/module.json5")
+pages = read("entry/src/main/resources/base/profile/main_pages.json")
 
 for status in [
     "CREATED", "WAITING_PERMISSION", "CAPTURING", "STOPPING",
@@ -68,8 +70,11 @@ require("已有采集会话正在运行" in store and "activeSessionId" in store
 
 require("nativeCapture.startCapture()" in runtime and "nativeCapture.stopCapture()" in runtime,
         "formal runtime must adapt the #241 native bridge")
-require("nativeCapture.getLatestFrame()" in runtime,
-        "formal runtime must expose latest sampled frame")
+require("nativeCapture.getLatestFrame()" in runtime and "nativeCapture.getPendingFrame()" in runtime,
+        "formal runtime must expose latest and pending sampled frames")
+require("MAX_PENDING_FRAMES" in cpp and "MAX_PENDING_BYTES" in cpp and
+        "GetPendingFrame" in cpp,
+        "cross-app capture must retain a bounded in-memory changed-frame queue")
 require("textRecognition.recognizeText" in recognizer,
         "formal frame recognizer must use Core Vision OCR")
 
@@ -77,9 +82,10 @@ require("CaptureSessionStatus.WAITING_PERMISSION" in service,
         "session must enter WAITING_PERMISSION before capture")
 require("if (!frame || frame.sequence <= session.lastFrameSequence)" in service,
         "capture must require a real new frame before processing")
-require(service.index("session.status = CaptureSessionStatus.CAPTURING") >
-        service.index("let frame = runtime.getLatestFrame()"),
-        "CAPTURING must only be entered after a real frame exists")
+require("let frame = runtime.getPendingFrame()" in service and
+        service.index("session.status = CaptureSessionStatus.CAPTURING") >
+        service.index("let frame = runtime.getPendingFrame()"),
+        "CAPTURING must only be entered after a real pending frame exists")
 require("START_REJECTED" in service and "CaptureSessionStatus.CANCELLED" in service,
         "rejected start/permission path must return to recoverable terminal state")
 require("FIRST_FRAME_TIMEOUT_MS" in service and "FIRST_FRAME_TIMEOUT" in models,
@@ -142,21 +148,21 @@ require(("不自动点击" in page or "不会自动点击" in page) and
         "formal capture UI must state click/scroll/accessibility non-automation boundaries")
 require("手工向上滑" in page,
         "formal UX must require user-driven chat scrolling")
-require("setInterval" in float_page and
-        (("sampleLatestFrame" in float_page) or
-         ("HomeworkCaptureWorkflowService.instance.progress" in float_page and
-          "this.capture.sampleLatestFrame()" in workflow)),
-        "FloatView must continuously sample the formal session, directly or through workflow orchestration")
-require(("HomeworkCaptureSessionService.instance.stopByUser" in float_page) or
-        ("HomeworkCaptureWorkflowService.instance.finishByUser" in float_page and
-         "this.capture.stopByUser()" in workflow),
-        "FloatView must allow user-controlled stop and reach CaptureSessionService.stopByUser")
-require("CaptureSessionStatus.COMPLETED" in float_page and
-        "CaptureSessionStatus.FAILED" in float_page,
-        "FloatView must reflect runtime-driven terminal states")
-require("this.captureRuntime.stopCapture()" in float_page and
-        "NativeHomeworkCaptureRuntime" in float_page,
-        "#241 diagnostic fallback must remain available through the runtime adapter")
+require('"ohos.permission.FLOAT_VIEW"' not in module and
+        '"ohos.permission.SYSTEM_FLOAT_WINDOW"' not in module,
+        "guided capture must not request restricted floating-window permissions")
+require('"pages/HomeworkCaptureFloatView"' not in pages,
+        "guided capture must not register a cross-app floating UI")
+require("floatView" not in page and "FLOAT_VIEW" not in page,
+        "formal capture page must not invoke FloatView APIs")
+require("系统录屏通知" in page and "备用：" in page and
+        "this.viewModel.finishByUser()" in page and "this.capture.stopByUser()" in workflow,
+        "system notification must be the primary stop path with an in-app fallback")
+require("pendingFrameCount" in service and "runtime.getPendingFrame()" in service,
+        "system-driven stop must drain bounded pending frames before finalization")
+require("floatView" not in diagnostic and "FLOAT_VIEW" not in diagnostic and
+        "this.captureRuntime.stopCapture()" in diagnostic,
+        "diagnostic capture must also avoid floating-window permissions and stop in-app")
 
 require("HomeworkCaptureSessionBootstrap" in entry and
         "PreferencesHomeworkCaptureSessionPersistence" in entry,

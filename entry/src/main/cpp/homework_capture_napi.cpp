@@ -1,7 +1,10 @@
 #include <atomic>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
+#include <deque>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 #include <hilog/log.h>
@@ -21,6 +24,10 @@
 
 namespace {
 constexpr uint64_t SAMPLE_EVERY_CALLBACKS = 30;
+constexpr size_t MAX_PENDING_FRAMES = 6;
+constexpr size_t MAX_PENDING_BYTES = 64 * 1024 * 1024;
+constexpr size_t FRAME_SIGNATURE_SAMPLES = 96;
+constexpr double FRAME_DIFF_THRESHOLD = 10.0;
 
 std::mutex g_captureMutex;
 std::mutex g_frameMutex;
@@ -32,10 +39,50 @@ std::atomic<uint64_t> g_callbackCount(0);
 std::atomic<uint64_t> g_sampledFrameCount(0);
 std::atomic<uint64_t> g_sequence(0);
 
-std::vector<uint8_t> g_latestRgba;
-int32_t g_latestWidth = 0;
-int32_t g_latestHeight = 0;
-int64_t g_latestTimestamp = 0;
+struct BufferedFrame {
+    std::vector<uint8_t> rgba;
+    int32_t width = 0;
+    int32_t height = 0;
+    int64_t timestamp = 0;
+    uint64_t sequence = 0;
+};
+
+std::deque<BufferedFrame> g_pendingFrames;
+size_t g_pendingBytes = 0;
+std::vector<uint8_t> g_lastQueuedSignature;
+
+std::vector<uint8_t> FrameSignature(const std::vector<uint8_t> &rgba)
+{
+    std::vector<uint8_t> signature;
+    if (rgba.empty()) {
+        return signature;
+    }
+    signature.reserve(FRAME_SIGNATURE_SAMPLES);
+    size_t stride = rgba.size() / FRAME_SIGNATURE_SAMPLES;
+    if (stride < 1) {
+        stride = 1;
+    }
+    for (size_t i = 0; i < rgba.size() && signature.size() < FRAME_SIGNATURE_SAMPLES; i += stride) {
+        signature.push_back(rgba[i]);
+    }
+    return signature;
+}
+
+bool IsMeaningfulFrame(const std::vector<uint8_t> &signature)
+{
+    if (signature.empty()) {
+        return false;
+    }
+    if (g_lastQueuedSignature.size() != signature.size()) {
+        return true;
+    }
+    double total = 0.0;
+    for (size_t i = 0; i < signature.size(); ++i) {
+        total += static_cast<double>(
+            std::abs(static_cast<int>(signature[i]) - static_cast<int>(g_lastQueuedSignature[i])));
+    }
+    return total / static_cast<double>(signature.size()) >= FRAME_DIFF_THRESHOLD;
+}
 
 void OnError(OH_AVScreenCapture *capture, int32_t errorCode, void *userData)
 {
@@ -100,16 +147,29 @@ void CopyLatestFrame(OH_AVBuffer *buffer, int64_t timestamp)
             compactRowBytes);
     }
 
+    g_sampledFrameCount.fetch_add(1);
+    std::vector<uint8_t> signature = FrameSignature(compact);
+
     {
         std::lock_guard<std::mutex> frameLock(g_frameMutex);
-        g_latestRgba.swap(compact);
-        g_latestWidth = config.width;
-        g_latestHeight = config.height;
-        g_latestTimestamp = timestamp;
-        g_sequence.fetch_add(1);
+        if (IsMeaningfulFrame(signature)) {
+            BufferedFrame frame;
+            frame.rgba = std::move(compact);
+            frame.width = config.width;
+            frame.height = config.height;
+            frame.timestamp = timestamp;
+            frame.sequence = g_sequence.fetch_add(1) + 1;
+            g_pendingBytes += frame.rgba.size();
+            g_pendingFrames.push_back(std::move(frame));
+            g_lastQueuedSignature = std::move(signature);
+            while (g_pendingFrames.size() > MAX_PENDING_FRAMES ||
+                   (g_pendingBytes > MAX_PENDING_BYTES && g_pendingFrames.size() > 1)) {
+                g_pendingBytes -= g_pendingFrames.front().rgba.size();
+                g_pendingFrames.pop_front();
+            }
+        }
     }
 
-    g_sampledFrameCount.fetch_add(1);
     OH_NativeBuffer_Unreference(nativeBuffer);
 }
 
@@ -285,11 +345,9 @@ napi_value ClearLatestFrame(napi_env env, napi_callback_info info)
 {
     (void)info;
     std::lock_guard<std::mutex> frameLock(g_frameMutex);
-    g_latestRgba.clear();
-    g_latestRgba.shrink_to_fit();
-    g_latestWidth = 0;
-    g_latestHeight = 0;
-    g_latestTimestamp = 0;
+    g_pendingFrames.clear();
+    g_pendingBytes = 0;
+    g_lastQueuedSignature.clear();
     g_sequence.store(0);
 
     napi_value undefinedValue = nullptr;
@@ -297,35 +355,57 @@ napi_value ClearLatestFrame(napi_env env, napi_callback_info info)
     return undefinedValue;
 }
 
-napi_value GetLatestFrame(napi_env env, napi_callback_info info)
+napi_value ToJsFrame(napi_env env, const BufferedFrame &frame)
 {
-    (void)info;
-    std::lock_guard<std::mutex> frameLock(g_frameMutex);
-    if (g_latestRgba.empty() || g_latestWidth <= 0 || g_latestHeight <= 0) {
-        napi_value undefinedValue = nullptr;
-        napi_get_undefined(env, &undefinedValue);
-        return undefinedValue;
-    }
-
     void *arrayBufferData = nullptr;
     napi_value arrayBuffer = nullptr;
-    napi_create_arraybuffer(env, g_latestRgba.size(), &arrayBufferData, &arrayBuffer);
+    napi_create_arraybuffer(env, frame.rgba.size(), &arrayBufferData, &arrayBuffer);
     if (arrayBufferData == nullptr) {
         napi_value undefinedValue = nullptr;
         napi_get_undefined(env, &undefinedValue);
         return undefinedValue;
     }
-    std::memcpy(arrayBufferData, g_latestRgba.data(), g_latestRgba.size());
+    std::memcpy(arrayBufferData, frame.rgba.data(), frame.rgba.size());
 
     napi_value result = nullptr;
     napi_create_object(env, &result);
     napi_set_named_property(env, result, "data", arrayBuffer);
-    napi_set_named_property(env, result, "width", JsNumber(env, g_latestWidth));
-    napi_set_named_property(env, result, "height", JsNumber(env, g_latestHeight));
-    napi_set_named_property(env, result, "timestamp", JsInt64(env, g_latestTimestamp));
+    napi_set_named_property(env, result, "width", JsNumber(env, frame.width));
+    napi_set_named_property(env, result, "height", JsNumber(env, frame.height));
+    napi_set_named_property(env, result, "timestamp", JsInt64(env, frame.timestamp));
     napi_set_named_property(env, result, "sequence",
-        JsInt64(env, static_cast<int64_t>(g_sequence.load())));
+        JsInt64(env, static_cast<int64_t>(frame.sequence)));
     return result;
+}
+
+napi_value GetLatestFrame(napi_env env, napi_callback_info info)
+{
+    (void)info;
+    std::lock_guard<std::mutex> frameLock(g_frameMutex);
+    if (g_pendingFrames.empty()) {
+        napi_value undefinedValue = nullptr;
+        napi_get_undefined(env, &undefinedValue);
+        return undefinedValue;
+    }
+    return ToJsFrame(env, g_pendingFrames.back());
+}
+
+napi_value GetPendingFrame(napi_env env, napi_callback_info info)
+{
+    (void)info;
+    BufferedFrame frame;
+    {
+        std::lock_guard<std::mutex> frameLock(g_frameMutex);
+        if (g_pendingFrames.empty()) {
+            napi_value undefinedValue = nullptr;
+            napi_get_undefined(env, &undefinedValue);
+            return undefinedValue;
+        }
+        g_pendingBytes -= g_pendingFrames.front().rgba.size();
+        frame = std::move(g_pendingFrames.front());
+        g_pendingFrames.pop_front();
+    }
+    return ToJsFrame(env, frame);
 }
 
 napi_value GetStats(napi_env env, napi_callback_info info)
@@ -345,8 +425,12 @@ napi_value GetStats(napi_env env, napi_callback_info info)
 
     {
         std::lock_guard<std::mutex> frameLock(g_frameMutex);
-        napi_set_named_property(env, result, "latestWidth", JsNumber(env, g_latestWidth));
-        napi_set_named_property(env, result, "latestHeight", JsNumber(env, g_latestHeight));
+        int32_t latestWidth = g_pendingFrames.empty() ? 0 : g_pendingFrames.back().width;
+        int32_t latestHeight = g_pendingFrames.empty() ? 0 : g_pendingFrames.back().height;
+        napi_set_named_property(env, result, "latestWidth", JsNumber(env, latestWidth));
+        napi_set_named_property(env, result, "latestHeight", JsNumber(env, latestHeight));
+        napi_set_named_property(env, result, "pendingFrameCount",
+            JsInt64(env, static_cast<int64_t>(g_pendingFrames.size())));
     }
     return result;
 }
@@ -357,6 +441,7 @@ napi_value Init(napi_env env, napi_value exports)
         {"startCapture", nullptr, StartCapture, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"stopCapture", nullptr, StopCapture, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getLatestFrame", nullptr, GetLatestFrame, nullptr, nullptr, nullptr, napi_default, nullptr},
+        {"getPendingFrame", nullptr, GetPendingFrame, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"getStats", nullptr, GetStats, nullptr, nullptr, nullptr, napi_default, nullptr},
         {"clearLatestFrame", nullptr, ClearLatestFrame, nullptr, nullptr, nullptr, napi_default, nullptr},
     };
