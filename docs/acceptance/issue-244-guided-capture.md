@@ -144,8 +144,8 @@ OCR Stub：
 5. 同意系统屏幕采集授权。
 6. 切换微信目标群。
 7. 手工上滑聊天。
-8. 浏览到目标时间范围后返回小伴。
-9. 在采集页点击“结束并整理”。
+8. 浏览到目标时间范围后，从系统录屏通知停止屏幕采集。
+9. 返回小伴，等待剩余变化帧处理并自动整理；如系统采集仍在运行，可使用页面上的备用结束按钮。
 10. 打开作业智能收件箱。
 11. 查看状态为“已接收”的屏幕智能采集批次。
 
@@ -162,8 +162,9 @@ OCR Stub：
 
 - [ ] 切到微信后屏幕采集继续运行。
 - [ ] 不向微信界面叠加任何应用悬浮窗。
-- [ ] 用户返回小伴后可看到 accepted changed frame 数量。
-- [ ] 用户可在小伴采集页手工结束并整理。
+- [ ] 用户可从系统录屏通知停止采集。
+- [ ] 返回小伴后会继续消费 Native 层保留的有限变化帧，并自动进入整理流程。
+- [ ] 页面保留“备用结束”作为系统通知停止失败时的兜底。
 
 ### Frame Diff / 性能
 
@@ -219,7 +220,7 @@ ISSUE_244_GUIDED_CAPTURE_GATE_PASS
 #241 AVScreenCapture real device = PASS
 #241 Core Vision OCR real device = PASS
 #244 60s real device capture = PASS
-#244 return-to-app manual stop = PASS
+#244 system-notification stop + return-to-app finalize = PASS
 #244 one Session → one ImportBatch = PASS
 ~~~
 
