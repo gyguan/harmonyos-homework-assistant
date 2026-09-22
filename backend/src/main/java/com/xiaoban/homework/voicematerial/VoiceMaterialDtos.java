@@ -4,6 +4,7 @@ import com.xiaoban.homework.assignment.AssignmentDtos;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 
 public final class VoiceMaterialDtos {
@@ -18,12 +19,12 @@ public final class VoiceMaterialDtos {
   }
 
   public record RegisterPackageRequest(
-      @NotBlank String directoryName,
-      @NotBlank String subjectCode,
-      String title,
+      @NotBlank @Size(max = 300) String directoryName,
+      @NotBlank @Size(max = 64) String subjectCode,
+      @Size(max = 300) String title,
       @Min(1) @Max(240) Integer expectedMinutes,
       Long dueAtEpochMs,
-      String assignmentType) {}
+      @Size(max = 32) String assignmentType) {}
 
   public record PackageResponse(String id, String batchId, String studentId,
       String directoryName, String subjectCode, String title, int expectedMinutes,
