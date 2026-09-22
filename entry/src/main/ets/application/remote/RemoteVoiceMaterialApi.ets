@@ -243,17 +243,16 @@ export class RemoteVoiceMaterialApi {
   }
 
   private async requestUpload(client: http.HttpRequest, path: string,
-    headers: Object, body: ArrayBuffer): Promise<http.HttpResponse> {
+    headers: Record<string, string>, body: ArrayBuffer): Promise<http.HttpResponse> {
     try {
-      return await client.request(
-        BackendSession.instance.getBaseUrl() + path,
-        {
-          method: http.RequestMethod.POST,
-          header: headers,
-          extraData: body,
-          connectTimeout: 15000,
-          readTimeout: 90000
-        });
+      let options: http.HttpRequestOptions = {
+        method: http.RequestMethod.POST,
+        header: headers,
+        extraData: body,
+        connectTimeout: 15000,
+        readTimeout: 90000
+      };
+      return await client.request(BackendSession.instance.getBaseUrl() + path, options);
     } catch {
       throw new Error('上传语音素材时网络请求失败');
     }
