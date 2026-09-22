@@ -70,10 +70,12 @@ require("families.lockById(familyId)" in read("backend/src/main/java/com/xiaoban
 require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
         "#298 deleting Assignment must not delete shared MediaAsset files")
 require("allowsMulFolderSelection = true" in picker and
+        "deviceInfo.sdkApiVersion >= 26" in picker and
+        "if (!this.supportsMultiFolderPicker())" in picker and
         "getFullDirectoryUri()" in picker and
         "selectFilesFallback" in picker and
         "DocumentSelectMode.FILE" in picker,
-        "#298 picker must support folder selection and automatically fall back to file grouping by parent directory")
+        "#298 picker must guard API 26 multi-folder selection and fall back to file grouping on API 20-25")
 require("createBatch(studentId" in remote and
         "uploadFile(packageId" in remote and
         "completeBatch(batchId" in remote,
