@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>小伴管理台</title>
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div id="login-view" class="login-shell">
+    <section class="login-card">
+      <div class="brand-mark">小伴</div>
+      <h1>小伴管理台</h1>
+      <p class="muted">家庭作业助手 · 管理入口</p>
+      <form id="login-form" class="stack">
+        <label>账号<input id="login-name" autocomplete="username" value="parent" required></label>
+        <label>密码<input id="login-password" type="password" autocomplete="current-password" required></label>
+        <button class="primary-button" type="submit">登录</button>
+        <p id="login-error" class="error-text" hidden></p>
+      </form>
+    </section>
+  </div>
+
+  <div id="admin-view" class="admin-shell" hidden>
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-mark small">小伴</div>
+        <div><strong>小伴管理台</strong><span>家庭管理</span></div>
+      </div>
+      <nav>
+        <button class="nav-item placeholder" disabled><span>首页</span><em>待扩展</em></button>
+        <button class="nav-item active"><span>语音素材</span><em>导入</em></button>
+        <button class="nav-item placeholder" disabled><span>作业管理</span><em>待扩展</em></button>
+        <button class="nav-item placeholder" disabled><span>系统</span><em>待扩展</em></button>
+      </nav>
+      <div class="sidebar-footer">
+        <span id="account-name">家长</span>
+        <button id="logout-button" class="text-button">退出</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="page-header">
+        <div>
+          <h1>语音素材导入</h1>
+          <p>批量选择目录，将语音和图片直接上传到服务端素材库。</p>
+        </div>
+      </header>
+
+      <section class="card config-card">
+        <div class="section-title-row">
+          <div><h2>导入设置</h2><p>这些设置会作为新识别目录的默认值。</p></div>
+        </div>
+        <div class="form-grid">
+          <label>学生
+            <select id="student-select"></select>
+          </label>
+          <label>预计用时
+            <div class="inline-input"><input id="default-minutes" type="number" min="1" max="240" value="15"><span>分钟</span></div>
+          </label>
+        </div>
+        <div class="subject-field">
+          <span>科目</span>
+          <div id="subject-chips" class="chips">
+            <button type="button" class="chip active" data-subject="CHINESE">语文</button>
+            <button type="button" class="chip" data-subject="MATH">数学</button>
+            <button type="button" class="chip" data-subject="ENGLISH">英语</button>
+            <button type="button" class="chip" data-subject="OTHER">其他</button>
+          </div>
+        </div>
+        <button id="apply-defaults" class="secondary-button" type="button" disabled>应用默认设置到已识别目录</button>
+      </section>
+
+      <section class="card picker-card">
+        <input id="folder-input" type="file" webkitdirectory multiple hidden>
+        <button id="folder-picker" class="drop-zone" type="button">
+          <span class="folder-icon">＋</span>
+          <strong>选择文件夹</strong>
+          <span>可一次选择包含多个子目录的根目录</span>
+          <small>支持 mp3 / m4a / wav / jpg / jpeg / png / webp / heic</small>
+        </button>
+      </section>
+
+      <section id="preview-card" class="card" hidden>
+        <div class="section-title-row">
+          <div><h2>待导入目录</h2><p id="preview-summary"></p></div>
+          <button id="clear-packages" class="text-button danger" type="button">清空</button>
+        </div>
+        <div id="package-list" class="package-list"></div>
+        <div class="action-bar">
+          <div>
+            <strong id="selected-summary">0 个可导入</strong>
+            <span id="ignored-summary" class="muted"></span>
+          </div>
+          <button id="upload-button" class="primary-button" type="button" disabled>开始导入</button>
+        </div>
+      </section>
+
+      <section id="progress-card" class="card" hidden>
+        <div class="section-title-row">
+          <div><h2>导入进度</h2><p id="progress-text">准备上传…</p></div>
+          <strong id="progress-percent">0%</strong>
+        </div>
+        <div class="progress-track"><div id="progress-bar" class="progress-bar"></div></div>
+        <div id="result-message" class="result-message" hidden></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="/admin/js/app.js"></script>
+</body>
+</html>
