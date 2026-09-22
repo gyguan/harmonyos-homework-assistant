@@ -15,12 +15,14 @@ export interface CaptureStats {
   latestSequence: number;
   latestWidth: number;
   latestHeight: number;
+  pendingFrameCount: number;
 }
 
 export interface HomeworkCaptureNative {
   startCapture(): number;
   stopCapture(): number;
   getLatestFrame(): CapturedFrame | undefined;
+  getPendingFrame(): CapturedFrame | undefined;
   getStats(): CaptureStats;
   clearLatestFrame(): void;
 }

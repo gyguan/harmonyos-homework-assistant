@@ -1,6 +1,3 @@
-import { abilityAccessCtrl, common, Permissions } from '@kit.AbilityKit';
-import { floatView, window } from '@kit.ArkUI';
-import { BusinessError } from '@kit.BasicServicesKit';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { CaptureFrame, CaptureRuntimeStats } from '../../../domain/model/CaptureModels';
@@ -20,8 +17,6 @@ export struct HomeworkCaptureDiagnosticPage {
   @State private captureDetail: string = '尚未检查屏幕采集能力';
   @State private ocrStatus: string = '待检测';
   @State private ocrDetail: string = '尚未检查文字识别能力';
-  @State private floatStatus: string = '待检测';
-  @State private floatDetail: string = '尚未检查悬浮状态能力';
   @State private statsText: string = '暂无采集统计';
   @State private frameText: string = '暂无画面信息';
   @State private recognizedText: string = '';
@@ -33,7 +28,6 @@ export struct HomeworkCaptureDiagnosticPage {
   @State private showAdvanced: boolean = false;
 
   private refreshTimer: number = -1;
-  private floatViewController: floatView.FloatViewController | undefined = undefined;
   private readonly ocrService: HomeworkCaptureOcrService = new HomeworkCaptureOcrService();
   private readonly captureRuntime: NativeHomeworkCaptureRuntime = NativeHomeworkCaptureRuntime.instance;
 
@@ -49,7 +43,6 @@ export struct HomeworkCaptureDiagnosticPage {
       this.refreshTimer = -1;
     }
     this.captureRuntime.stopCapture();
-    void this.stopFloatView();
     void this.ocrService.release();
   }
 
@@ -57,10 +50,10 @@ export struct HomeworkCaptureDiagnosticPage {
     if (this.analyzing) return '正在生成诊断结果';
     if (this.running) return '正在诊断';
     if (!this.diagnosisStarted) return '尚未诊断';
-    if (this.captureStatus === '异常' || this.ocrStatus === '异常' || this.floatStatus === '异常') {
+    if (this.captureStatus === '异常' || this.ocrStatus === '异常') {
       return '检测到问题';
     }
-    if (this.captureStatus === '正常' && this.ocrStatus === '正常' && this.floatStatus === '正常') {
+    if (this.captureStatus === '正常' && this.ocrStatus === '正常') {
       return '当前环境可正常使用';
     }
     return '诊断未完成';
@@ -68,75 +61,13 @@ export struct HomeworkCaptureDiagnosticPage {
 
   private overallDetail(): string {
     if (this.analyzing) return '正在读取最后一个采集画面并检查文字识别。';
-    if (this.running) return '请打开一个有文字的页面短暂浏览，然后通过悬浮窗停止，或返回此页结束诊断。';
-    if (!this.diagnosisStarted) return '诊断不会创建作业，只检查屏幕采集、文字识别和悬浮状态。';
-    if (this.captureStatus === '异常' || this.ocrStatus === '异常' || this.floatStatus === '异常') {
+    if (this.running) return '请打开一个有文字的页面短暂浏览，可从系统录屏通知停止后再返回此页。';
+    if (!this.diagnosisStarted) return '诊断不会创建作业，只检查屏幕采集和文字识别。';
+    if (this.captureStatus === '异常' || this.ocrStatus === '异常') {
       return '请查看下方异常项；需要进一步排查时可展开高级诊断信息。';
     }
-    if (this.diagnosisComplete) return '屏幕采集、文字识别和悬浮状态均已通过检查。';
+    if (this.diagnosisComplete) return '屏幕采集和文字识别均已通过检查。';
     return this.message;
-  }
-
-  private async requestFloatViewPermission(): Promise<boolean> {
-    let hostContext = this.getUIContext().getHostContext();
-    if (!hostContext) {
-      this.floatStatus = '异常';
-      this.floatDetail = '无法获取应用上下文';
-      return false;
-    }
-    try {
-      let manager: abilityAccessCtrl.AtManager = abilityAccessCtrl.createAtManager();
-      let result = await manager.requestPermissionsFromUser(
-        hostContext, ['ohos.permission.FLOAT_VIEW'] as Permissions[]);
-      if (result.authResults.length === 0 || result.authResults[0] !== 0) {
-        this.floatStatus = '异常';
-        this.floatDetail = '未获得悬浮窗权限';
-        return false;
-      }
-      return true;
-    } catch {
-      this.floatStatus = '异常';
-      this.floatDetail = '悬浮窗权限申请失败';
-      return false;
-    }
-  }
-
-  private async startFloatView(): Promise<boolean> {
-    let granted = await this.requestFloatViewPermission();
-    if (!granted) return false;
-    try {
-      let context = this.getUIContext().getHostContext() as common.UIAbilityContext;
-      let config: floatView.FloatViewConfiguration = {
-        context: context,
-        templateType: floatView.FloatViewTemplateType.ROUNDED_RECTANGLE
-      };
-      this.floatViewController = await floatView.create(config);
-      await this.floatViewController.setUIContext('pages/HomeworkCaptureFloatView');
-      let limits = floatView.getFloatViewLimits(floatView.FloatViewTemplateType.ROUNDED_RECTANGLE);
-      let size: window.Size = { width: limits.minSize.width, height: limits.minSize.height };
-      await this.floatViewController.setWindowSize(size);
-      await this.floatViewController.start();
-      this.floatStatus = '正常';
-      this.floatDetail = '可以显示抓取状态并从悬浮窗停止采集';
-      return true;
-    } catch (error) {
-      let businessError = error as BusinessError;
-      this.floatStatus = '异常';
-      this.floatDetail = `悬浮状态启动失败（${businessError.code}）`;
-      this.floatViewController = undefined;
-      return false;
-    }
-  }
-
-  private async stopFloatView(): Promise<void> {
-    let controller = this.floatViewController;
-    this.floatViewController = undefined;
-    if (!controller) return;
-    try {
-      await controller.stop();
-    } catch {
-      // The system/user may already have stopped the FloatView.
-    }
   }
 
   private updateStats(): CaptureRuntimeStats {
@@ -174,18 +105,11 @@ export struct HomeworkCaptureDiagnosticPage {
     this.captureDetail = '等待系统屏幕采集授权和画面';
     this.ocrStatus = '待检测';
     this.ocrDetail = '取得画面后自动检查文字识别';
-    this.floatStatus = '检测中';
-    this.floatDetail = '正在申请悬浮状态权限';
     this.statsText = '暂无采集统计';
     this.frameText = '暂无画面信息';
     this.recognizedText = '';
     this.ocrLines = [];
     this.captureRuntime.clearLatestFrame();
-
-    let floatReady = await this.startFloatView();
-    if (!floatReady) {
-      this.message = '悬浮状态不可用，仍可继续检查屏幕采集；返回此页后点击“结束并生成诊断结果”。';
-    }
 
     let result = this.captureRuntime.startCapture();
     let stats = this.updateStats();
@@ -194,14 +118,13 @@ export struct HomeworkCaptureDiagnosticPage {
       this.captureDetail = `屏幕采集无法启动（错误码 ${result}）`;
       this.running = false;
       this.diagnosisComplete = true;
-      await this.stopFloatView();
       return;
     }
 
     this.running = stats.isCapturing || result === 0;
     this.captureStatus = '检测中';
     this.captureDetail = '等待系统授权并获取屏幕画面';
-    this.message = '授权后请打开一个有文字的页面短暂浏览。可在悬浮窗停止，或返回此页点击结束诊断。';
+    this.message = '授权后请打开一个有文字的页面短暂浏览。建议从系统录屏通知停止后再返回；也可返回此页结束诊断。';
   }
 
   private async finishDiagnosis(): Promise<void> {
@@ -214,7 +137,6 @@ export struct HomeworkCaptureDiagnosticPage {
   private async analyzeLatestFrame(): Promise<void> {
     if (this.analyzing || this.diagnosisComplete) return;
     this.analyzing = true;
-    await this.stopFloatView();
 
     let stats = this.updateStats();
     if (stats.sampledFrameCount === 0 && stats.lastError === 0) {
@@ -339,8 +261,6 @@ export struct HomeworkCaptureDiagnosticPage {
             this.DiagnosticRow('屏幕采集', this.captureStatus, this.captureDetail);
             Divider().color(AppTheme.DIVIDER);
             this.DiagnosticRow('文字识别', this.ocrStatus, this.ocrDetail);
-            Divider().color(AppTheme.DIVIDER);
-            this.DiagnosticRow('悬浮状态', this.floatStatus, this.floatDetail);
           }
           .width('100%')
           .padding({ left: 14, right: 14 })

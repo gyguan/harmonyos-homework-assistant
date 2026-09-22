@@ -20,7 +20,14 @@ export class NativeHomeworkCaptureRuntime implements HomeworkCaptureRuntime {
   }
 
   getLatestFrame(): CaptureFrame | undefined {
-    let frame: CapturedFrame | undefined = nativeCapture.getLatestFrame();
+    return this.toCaptureFrame(nativeCapture.getLatestFrame());
+  }
+
+  getPendingFrame(): CaptureFrame | undefined {
+    return this.toCaptureFrame(nativeCapture.getPendingFrame());
+  }
+
+  private toCaptureFrame(frame: CapturedFrame | undefined): CaptureFrame | undefined {
     if (!frame) return undefined;
     return {
       data: frame.data,
@@ -41,7 +48,8 @@ export class NativeHomeworkCaptureRuntime implements HomeworkCaptureRuntime {
       sampledFrameCount: stats.sampledFrameCount,
       latestSequence: stats.latestSequence,
       latestWidth: stats.latestWidth,
-      latestHeight: stats.latestHeight
+      latestHeight: stats.latestHeight,
+      pendingFrameCount: stats.pendingFrameCount
     };
   }
 

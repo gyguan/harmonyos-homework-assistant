@@ -4,10 +4,6 @@
     { "name": "EntryAbility_desc", "value": "小伴作业入口" },
     { "name": "EntryAbility_label", "value": "小伴作业" },
     {
-      "name": "float_view_permission_reason",
-      "value": "仅在家长主动开启作业采集实验时显示采集状态和停止按钮"
-    },
-    {
       "name": "share_extension_label",
       "value": "小伴作业"
     },
