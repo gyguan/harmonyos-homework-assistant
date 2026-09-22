@@ -1,8 +1,10 @@
 #include <atomic>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <deque>
 #include <mutex>
+#include <utility>
 #include <vector>
 
 #include <hilog/log.h>
