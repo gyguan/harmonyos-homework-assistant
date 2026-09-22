@@ -119,6 +119,9 @@ public class VoiceMaterialService {
     String normalizedName = relativeName == null || relativeName.isBlank()
         ? file.getOriginalFilename() : relativeName.trim();
     if (normalizedName == null || normalizedName.isBlank()) normalizedName = "material";
+    if (normalizedName.length() > 300) {
+      throw new ApiExceptions.BadRequest("素材文件名不能超过 300 个字符");
+    }
 
     VoiceMaterialFileEntity existing = files
         .findByFamilyIdAndPackageIdAndResourceTypeAndRelativeName(
