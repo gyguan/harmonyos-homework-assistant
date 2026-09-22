@@ -28,6 +28,8 @@ const el = id => document.getElementById(id);
 const loginView = el('login-view');
 const adminView = el('admin-view');
 const loginForm = el('login-form');
+const loginSubmit = el('login-submit');
+const loginStatus = el('login-status');
 const loginError = el('login-error');
 const studentSelect = el('student-select');
 const defaultMinutes = el('default-minutes');
@@ -47,19 +49,35 @@ const progressPercent = el('progress-percent');
 const progressBar = el('progress-bar');
 const resultMessage = el('result-message');
 
-function showLogin(message = '') {
+function setLoginBusy(busy, status = '') {
+  loginSubmit.disabled = busy;
+  loginSubmit.textContent = busy ? '登录中…' : '登录';
+  loginStatus.hidden = !status;
+  loginStatus.textContent = status;
+}
+
+function loginFailureMessage(error) {
+  if (error && error.status === 401) {
+    return '账号或密码错误。默认密码只在首次初始化数据库时创建；已有账号不会在重启时被自动覆盖。';
+  }
+  return error && error.message ? error.message : '登录失败，请检查后端服务是否可访问';
+}
+
+function showLogin(message = '', status = '') {
   loginView.hidden = false;
   adminView.hidden = true;
+  setLoginBusy(false, status);
   loginError.hidden = !message;
   loginError.textContent = message;
 }
 
 async function showAdmin(displayName) {
+  await loadStudents();
   state.displayName = displayName;
   el('account-name').textContent = displayName || '家长';
   loginView.hidden = true;
   adminView.hidden = false;
-  await loadStudents();
+  setLoginBusy(false);
 }
 
 async function loadStudents() {
@@ -230,11 +248,23 @@ async function uploadSelected() {
 loginForm.addEventListener('submit', async event => {
   event.preventDefault();
   loginError.hidden = true;
+  setLoginBusy(true, '正在验证账号…');
+
+  let result = null;
   try {
-    const result = await login(el('login-name').value.trim(), el('login-password').value);
+    result = await login(el('login-name').value.trim(), el('login-password').value);
+  } catch (error) {
+    showLogin(loginFailureMessage(error));
+    return;
+  }
+
+  setLoginBusy(true, '登录成功，正在加载学生信息…');
+  try {
     await showAdmin(result.displayName);
   } catch (error) {
-    showLogin(error.message || '登录失败');
+    try { await logout(); } catch {}
+    const detail = error && error.message ? error.message : '未知错误';
+    showLogin('账号验证成功，但加载学生信息失败：' + detail);
   }
 });
 

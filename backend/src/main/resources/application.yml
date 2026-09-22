@@ -26,6 +26,7 @@ spring:
 app:
   bootstrap:
     enabled: ${BOOTSTRAP_ENABLED:true}
+    reset-password: ${BOOTSTRAP_RESET_PASSWORD:false}
     login-name: ${BOOTSTRAP_LOGIN:parent}
     password: ${BOOTSTRAP_PASSWORD:parent123}
     family-name: ${BOOTSTRAP_FAMILY_NAME:我的家庭}

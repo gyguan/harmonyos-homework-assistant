@@ -17,18 +17,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class LocalBootstrap implements ApplicationRunner {
   private final FamilyRepository families; private final AccountRepository accounts; private final StudentService students;
-  private final PasswordEncoder encoder; private final boolean enabled; private final String login; private final String password; private final String familyName;
+  private final PasswordEncoder encoder; private final boolean enabled; private final boolean resetPassword;
+  private final String login; private final String password; private final String familyName;
 
   public LocalBootstrap(FamilyRepository families, AccountRepository accounts, StudentService students, PasswordEncoder encoder,
-      @Value("${app.bootstrap.enabled:true}") boolean enabled, @Value("${app.bootstrap.login-name:parent}") String login,
-      @Value("${app.bootstrap.password:parent123}") String password, @Value("${app.bootstrap.family-name:我的家庭}") String familyName) {
+      @Value("${app.bootstrap.enabled:true}") boolean enabled,
+      @Value("${app.bootstrap.reset-password:false}") boolean resetPassword,
+      @Value("${app.bootstrap.login-name:parent}") String login,
+      @Value("${app.bootstrap.password:parent123}") String password,
+      @Value("${app.bootstrap.family-name:我的家庭}") String familyName) {
     this.families = families; this.accounts = accounts; this.students = students; this.encoder = encoder;
-    this.enabled = enabled; this.login = login; this.password = password; this.familyName = familyName;
+    this.enabled = enabled; this.resetPassword = resetPassword;
+    this.login = login; this.password = password; this.familyName = familyName;
   }
 
   @Override public void run(ApplicationArguments args) {
-    if (!enabled || accounts.findByLoginName(login).isPresent()) return;
-    Instant now = Instant.now(); UUID familyId = UUID.randomUUID();
+    if (!enabled) return;
+    Instant now = Instant.now();
+    AccountEntity existing = accounts.findByLoginName(login).orElse(null);
+    if (existing != null) {
+      if (resetPassword) {
+        existing.passwordHash = encoder.encode(password);
+        existing.updatedAt = now;
+        accounts.save(existing);
+      }
+      return;
+    }
+    UUID familyId = UUID.randomUUID();
     families.save(new FamilyEntity(familyId, familyName, now));
     accounts.save(new AccountEntity(UUID.randomUUID(), familyId, login, encoder.encode(password), "家长", now));
     students.upsert(familyId, new StudentDtos.Upsert("student-xiaoyu-001", "小宇", "二年级", "二（2）班", "2026秋",
