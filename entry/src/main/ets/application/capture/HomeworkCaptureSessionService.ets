@@ -143,7 +143,9 @@ export class HomeworkCaptureSessionService {
     let frame = runtime.getPendingFrame();
     if (!frame || frame.sequence <= session.lastFrameSequence) {
       this.store.updateSession(session);
-      return runtimeEnded ? this.finishRuntimeEnded(session, stats.lastError) : session;
+      let remaining = runtime.getStats().pendingFrameCount;
+      return runtimeEnded && (remaining === undefined || remaining === 0) ?
+        this.finishRuntimeEnded(session, stats.lastError) : session;
     }
 
     if (session.status === CaptureSessionStatus.WAITING_PERMISSION) {
