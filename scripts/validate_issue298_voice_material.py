@@ -31,6 +31,7 @@ index = read("entry/src/main/ets/pages/Index.ets")
 page = read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets")
 dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 context = read("CONTEXT.md")
+voice_e2e = read("backend/scripts/voice_material_e2e.py")
 
 require("create table media_asset" in migration and
         "asset_id uuid references media_asset(id)" in migration,
