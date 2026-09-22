@@ -248,11 +248,23 @@ async function uploadSelected() {
 loginForm.addEventListener('submit', async event => {
   event.preventDefault();
   loginError.hidden = true;
+  setLoginBusy(true, '正在验证账号…');
+
+  let result = null;
   try {
-    const result = await login(el('login-name').value.trim(), el('login-password').value);
+    result = await login(el('login-name').value.trim(), el('login-password').value);
+  } catch (error) {
+    showLogin(loginFailureMessage(error));
+    return;
+  }
+
+  setLoginBusy(true, '登录成功，正在加载学生信息…');
+  try {
     await showAdmin(result.displayName);
   } catch (error) {
-    showLogin(error.message || '登录失败');
+    try { await logout(); } catch {}
+    const detail = error && error.message ? error.message : '未知错误';
+    showLogin('账号验证成功，但加载学生信息失败：' + detail);
   }
 });
 
