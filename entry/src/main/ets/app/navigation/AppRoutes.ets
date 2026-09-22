@@ -93,3 +93,6 @@ export class ParentExtraCreateRouteParam {
     this.voice = voice;
   }
 }
+
+export class ParentVoiceMaterialRouteParam {
+}
