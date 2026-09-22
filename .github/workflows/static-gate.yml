@@ -123,6 +123,9 @@ jobs:
       - name: Validate voice assignment content type retention
         run: python scripts/validate_voice_assignment_content_type.py
 
+      - name: Validate issue 298 voice material automation
+        run: python scripts/validate_issue298_voice_material.py
+
       - name: Validate voice workspace media focus
         run: python scripts/validate_voice_workspace_media_focus.py
 
