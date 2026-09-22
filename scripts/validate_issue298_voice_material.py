@@ -116,13 +116,17 @@ require("private PendingSection()" in page and "private LibrarySection()" in pag
         "registrationFailureCount" in read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialViewModel.ets"),
         "#298 parent material page must support staging, per-directory subject/duration override, partial-failure feedback and library status")
 student_service = read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java")
-require("voiceMaterials.existsByFamilyIdAndStudentId" in student_service,
-        "#298 student deletion must be rejected while voice-material batches still reference the student")
+require("voiceMaterialPackages.existsByFamilyIdAndStudentId" in student_service,
+        "#298 student deletion must be rejected while actual voice-material packages still reference the student")
+require("voiceMaterials.deleteByFamilyIdAndStudentId" in student_service,
+        "#298 empty material batches must be cleaned instead of permanently blocking student deletion")
 require("StudentEntity student = requireOwnedForUpdate(familyId, id)" in student_service,
         "#298 student deletion must lock the student row before checking voice-material ownership")
 require("legacy manual voice assignment" in voice_e2e and
         "concurrent retry created duplicate package file" in voice_e2e and
         "student delete/material batch race escaped business boundary" in voice_e2e and
+        "delete student after cleaning empty voice-material batch" in voice_e2e and
+        "reject student deletion while voice-material package exists" in voice_e2e and
         "reject package registration after batch completion" in voice_e2e,
         "#298 E2E must preserve legacy compatibility and concurrency/lifecycle boundaries")
 require("Media Asset（媒体资产）" in context and
