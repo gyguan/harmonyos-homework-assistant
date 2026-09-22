@@ -113,7 +113,7 @@ class VoiceMaterialAssignmentServiceTest {
     item.status = "CONSUMED";
     item.consumedAssignmentId = "a-voicepkg-" + packageId;
 
-    when(packages.findById(packageId)).thenReturn(Optional.of(item));
+    when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
 
     VoiceMaterialDtos.CreateAssignmentResponse result =
