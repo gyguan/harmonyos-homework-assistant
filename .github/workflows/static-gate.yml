@@ -133,6 +133,9 @@ jobs:
           node --check backend/src/main/resources/static/admin/js/voice-material.js
           node --check backend/src/main/resources/static/admin/js/app.js
 
+      - name: Validate admin login diagnostics
+        run: python scripts/validate_admin_login.py
+
       - name: Validate voice workspace media focus
         run: python scripts/validate_voice_workspace_media_focus.py
 
