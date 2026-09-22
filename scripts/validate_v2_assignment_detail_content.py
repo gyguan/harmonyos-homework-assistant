@@ -45,7 +45,7 @@ require("private DetailContent()" in detail and
         "this.DetailContent();" in detail,
         "Assignment Detail content must stay bound to reactive assignmentId/revision instead of capturing an Assignment builder parameter")
 detail_content = detail.split("private DetailContent()", 1)[-1].split("\n  build() {", 1)[0]
-require("item." not in detail_content and "this.assignment()!" in detail_content,
+require("item" not in detail_content and "this.assignment()!" in detail_content,
         "Assignment Detail content must resolve the current assignment from reactive props during render")
 require("Scroll()" in detail and ".layoutWeight(1)" in detail and
         "Button(this.actionLabel(this.assignment()!)" in detail,
