@@ -3,6 +3,7 @@ package com.xiaoban.homework.student;
 import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.practice.PracticeAttemptRepository;
+import com.xiaoban.homework.voicematerial.VoiceMaterialBatchRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -14,12 +15,14 @@ public class StudentService {
   private final StudentRepository repository;
   private final AssignmentRepository assignments;
   private final PracticeAttemptRepository practiceAttempts;
+  private final VoiceMaterialBatchRepository voiceMaterials;
 
   public StudentService(StudentRepository repository, AssignmentRepository assignments,
-      PracticeAttemptRepository practiceAttempts) {
+      PracticeAttemptRepository practiceAttempts, VoiceMaterialBatchRepository voiceMaterials) {
     this.repository = repository;
     this.assignments = assignments;
     this.practiceAttempts = practiceAttempts;
+    this.voiceMaterials = voiceMaterials;
   }
 
   @Transactional(readOnly = true)
@@ -48,6 +51,9 @@ public class StudentService {
     }
     if (practiceAttempts.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有练习记录，不能直接删除；练习历史需要保留");
+    }
+    if (voiceMaterials.existsByFamilyIdAndStudentId(familyId, id)) {
+      throw new ApiExceptions.Conflict("该孩子已有语音素材，不能直接删除；请先保留或处理素材库");
     }
     repository.delete(student);
   }
