@@ -109,6 +109,32 @@ public class AssignmentService {
     return new AssignmentDtos.TodaySummary(total, completed, attention, undated, next == null ? "" : next.id);
   }
 
+  @Transactional(readOnly = true)
+  public String nextVoiceMaterialTaskTitle(UUID familyId, String studentId, String subjectCode, LocalDate businessDate) {
+    students.requireOwned(familyId, studentId);
+    ZoneId zone = ZoneId.of(DEFAULT_DUE_TIMEZONE);
+    Instant from = businessDate.atStartOfDay(zone).toInstant();
+    Instant to = businessDate.plusDays(1).atStartOfDay(zone).toInstant();
+    long count = repository.countByFamilyIdAndStudentIdAndSubjectCodeAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
+        familyId, studentId, subjectCode, from, to);
+    String base = subjectDisplay(subjectCode) + " · 语音作业";
+    return count == 0 ? base : base + " " + toCircledNumber(count + 1);
+  }
+
+  private String toCircledNumber(long number) {
+    if (number >= 2 && number <= 20) return String.valueOf((char) (0x2460 + number - 1));
+    return "(" + number + ")";
+  }
+
+  private String subjectDisplay(String subjectCode) {
+    return switch (subjectCode) {
+      case "CHINESE" -> "语文";
+      case "MATH" -> "数学";
+      case "ENGLISH" -> "英语";
+      default -> "其他";
+    };
+  }
+
   @Transactional
   public AssignmentDtos.Response create(UUID familyId, String studentId, AssignmentDtos.Create input) {
     students.requireOwned(familyId, studentId);
