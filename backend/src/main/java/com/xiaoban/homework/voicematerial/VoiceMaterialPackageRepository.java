@@ -17,6 +17,17 @@ public interface VoiceMaterialPackageRepository extends JpaRepository<VoiceMater
   Optional<VoiceMaterialPackageEntity> findByFamilyIdAndStudentIdAndPackageFingerprint(
       UUID familyId, String studentId, String packageFingerprint);
 
+  List<VoiceMaterialPackageEntity> findByFamilyIdAndBatchIdOrderByDirectoryNameAscCreatedAtAsc(
+      UUID familyId, UUID batchId);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query("""
+      select p from VoiceMaterialPackageEntity p
+      where p.familyId = :familyId and p.id = :packageId
+      """)
+  Optional<VoiceMaterialPackageEntity> lockOwned(
+      @Param("familyId") UUID familyId, @Param("packageId") UUID packageId);
+
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("""
       select p from VoiceMaterialPackageEntity p
