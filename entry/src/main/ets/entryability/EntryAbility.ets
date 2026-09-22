@@ -5,8 +5,10 @@ import { HomeworkShareImportService } from '../application/import/HomeworkShareI
 import { HomeworkCaptureSessionService } from '../application/capture/HomeworkCaptureSessionService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { RemoteAssignmentResourceApi } from '../application/remote/RemoteAssignmentResourceApi';
+import { RemoteVoiceMaterialApi } from '../application/remote/RemoteVoiceMaterialApi';
 import { RemoteSubmissionApi } from '../application/remote/RemoteSubmissionApi';
 import { VoiceAssignmentMediaService } from '../application/assignment/VoiceAssignmentMediaService';
+import { VoiceMaterialDirectoryPicker } from '../application/assignment/VoiceMaterialDirectoryPicker';
 import { HomeworkSubmissionService } from '../application/submission/HomeworkSubmissionService';
 import { HomeworkLocalBootstrap } from '../data/local/HomeworkLocalBootstrap';
 import { HomeworkImportInboxBootstrap } from '../data/local/HomeworkImportInboxBootstrap';
@@ -61,8 +63,10 @@ export default class EntryAbility extends UIAbility {
       new NativeHomeworkCaptureRuntime(), new CoreVisionHomeworkCaptureFrameRecognizer());
     HomeworkSubmissionService.instance.configure(this.context);
     VoiceAssignmentMediaService.instance.configure(this.context);
+    VoiceMaterialDirectoryPicker.instance.configure(this.context);
     RemoteSubmissionApi.instance.configure(this.context);
     RemoteAssignmentResourceApi.instance.configure(this.context);
+    RemoteVoiceMaterialApi.instance.configure(this.context);
 
     try {
       await BackendSession.instance.initialize(new PreferencesBackendSessionStorage(this.context));
