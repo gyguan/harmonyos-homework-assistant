@@ -95,8 +95,10 @@ public class AssignmentResourceService {
       entity.resourceType = link.resourceType();
       entity.storagePath = null;
       entity.assetId = asset.id;
-      entity.originalName = asset.originalName;
-      entity.contentType = asset.contentType;
+      entity.originalName = link.originalName() == null || link.originalName().isBlank()
+          ? asset.originalName : link.originalName();
+      entity.contentType = link.contentType() == null || link.contentType().isBlank()
+          ? asset.contentType : link.contentType();
       entity.sizeBytes = asset.sizeBytes;
       entity.sortOrder = link.sortOrder();
       entity.durationMs = link.durationMs();
@@ -160,6 +162,7 @@ public class AssignmentResourceService {
     }
   }
 
-  public record AssetLink(String resourceType, UUID assetId, int sortOrder, long durationMs) {}
+  public record AssetLink(String resourceType, UUID assetId, int sortOrder, long durationMs,
+      String originalName, String contentType) {}
   public record ResourceDownload(Path path, String originalName, String contentType) {}
 }
