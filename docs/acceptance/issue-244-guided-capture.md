@@ -107,7 +107,7 @@ entry/src/test/fixtures/Issue244CaptureSessionFixture.ets
 entry/src/test/List.test.ets
 ~~~
 
-生产“屏幕采集技术诊断”页只保留 AVScreenCapture / OCR / FloatView 真机诊断，不再承载固定测试数据。
+生产“屏幕采集技术诊断”页只保留 AVScreenCapture / OCR 真机诊断，不再承载固定测试数据。
 
 Fixture 固定模拟：
 
@@ -141,15 +141,13 @@ OCR Stub：
 2. 点击“抓取今日作业”。
 3. 页面说明屏幕采集范围。
 4. 点击“开始抓取今日作业”。
-5. 同意 FloatView 权限。
-6. 同意系统屏幕采集授权。
-7. 切换微信目标群。
-8. 手工上滑聊天。
-9. 观察悬浮状态持续显示。
-10. 在悬浮状态点“停止采集”。
-11. 返回小伴。
-12. 打开作业智能收件箱。
-13. 查看状态为“已接收”的屏幕智能采集批次。
+5. 同意系统屏幕采集授权。
+6. 切换微信目标群。
+7. 手工上滑聊天。
+8. 浏览到目标时间范围后返回小伴。
+9. 在采集页点击“结束并整理”。
+10. 打开作业智能收件箱。
+11. 查看状态为“已接收”的屏幕智能采集批次。
 
 ## 独立验收
 
@@ -158,15 +156,14 @@ OCR Stub：
 - [ ] 未取得真实视频帧前 Session 保持 WAITING_PERMISSION。
 - [ ] 拒绝/启动失败后 Session 进入 CANCELLED，可重新开始。
 - [ ] 连续点击开始不会创建两个 active Session。
-- [ ] FloatView 权限失败时不启动正式 CaptureSession。
+- [ ] 不申请 FLOAT_VIEW / SYSTEM_FLOAT_WINDOW 等受限悬浮窗权限。
 
 ### 采集状态
 
-- [ ] 微信上方持续显示轻量采集状态。
-- [ ] 不严重遮挡主要聊天区域。
-- [ ] 状态显示 accepted changed frame 数量。
-- [ ] 用户可从 FloatView 手工停止。
-- [ ] 用户也可返回小伴手工停止。
+- [ ] 切到微信后屏幕采集继续运行。
+- [ ] 不向微信界面叠加任何应用悬浮窗。
+- [ ] 用户返回小伴后可看到 accepted changed frame 数量。
+- [ ] 用户可在小伴采集页手工结束并整理。
 
 ### Frame Diff / 性能
 
@@ -222,7 +219,7 @@ ISSUE_244_GUIDED_CAPTURE_GATE_PASS
 #241 AVScreenCapture real device = PASS
 #241 Core Vision OCR real device = PASS
 #244 60s real device capture = PASS
-#244 FloatView manual stop = PASS
+#244 return-to-app manual stop = PASS
 #244 one Session → one ImportBatch = PASS
 ~~~
 
