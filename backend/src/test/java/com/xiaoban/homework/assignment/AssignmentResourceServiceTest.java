@@ -19,7 +19,8 @@ class AssignmentResourceServiceTest {
         mock(AssignmentService.class),
         mock(AssignmentResourceRepository.class),
         mock(FileStorage.class),
-        mock(MediaAssetService.class));
+        mock(MediaAssetService.class),
+        new VoiceMediaPolicy());
   }
 
   @Test
