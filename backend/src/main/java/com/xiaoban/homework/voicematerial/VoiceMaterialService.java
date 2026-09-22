@@ -241,7 +241,9 @@ public class VoiceMaterialService {
         item.id.toString(), item.batchId.toString(), item.studentId,
         item.directoryName, item.subjectCode, item.title, item.expectedMinutes,
         item.dueAt == null ? 0L : item.dueAt.toEpochMilli(), item.assignmentType,
-        item.status, item.errorMessage, item.consumedAssignmentId, fileResponses);
+        item.status, item.errorMessage,
+        item.consumedAssignmentId == null ? "" : item.consumedAssignmentId,
+        fileResponses);
   }
 
   private VoiceMaterialDtos.FileResponse fileResponse(VoiceMaterialFileEntity file) {
