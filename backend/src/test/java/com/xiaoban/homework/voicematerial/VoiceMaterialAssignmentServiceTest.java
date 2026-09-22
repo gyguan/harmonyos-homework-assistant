@@ -76,7 +76,7 @@ class VoiceMaterialAssignmentServiceTest {
     item.directoryName = "001-课文朗读";
     item.dueAt = null;
 
-    when(packages.findById(packageId)).thenReturn(Optional.of(item));
+    when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
         familyId, packageId)).thenReturn(java.util.List.of());
