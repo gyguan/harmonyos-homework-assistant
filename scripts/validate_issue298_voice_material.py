@@ -45,6 +45,8 @@ require('private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai")'
 require("students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
         "packages.lockNextReady" in assignment_service,
         "#298 daily auto-create must serialize per student before consuming a READY package")
+require("students.requireOwnedForUpdate(familyId, batch.studentId)" in material_service,
+        "#298 batch completion must serialize per student before applying fingerprints and READY state")
 require("LocalTime.of(23, 59)" in assignment_service and
         'item.dueAt == null ? "今天" : ""' in assignment_service,
         "#298 an undated package auto-created for the day must appear in the student Today view")
@@ -88,6 +90,8 @@ require("private PendingSection()" in page and "private LibrarySection()" in pag
         "setPackageExpectedMinutes" in page and
         "registrationFailureCount" in read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialViewModel.ets"),
         "#298 parent material page must support staging, per-directory subject/duration override, partial-failure feedback and library status")
+require("voiceMaterials.existsByFamilyIdAndStudentId" in read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java"),
+        "#298 student deletion must be rejected while voice-material batches still reference the student")
 require("Media Asset（媒体资产）" in context and
         "Daily Voice Auto Create（每日语音自动创建）" in context,
         "#298 domain language must be documented in CONTEXT.md")
