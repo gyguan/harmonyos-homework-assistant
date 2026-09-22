@@ -45,6 +45,9 @@ require('private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai")'
 require("students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
         "packages.lockNextReady" in assignment_service,
         "#298 daily auto-create must serialize per student before consuming a READY package")
+require("LocalTime.of(23, 59)" in assignment_service and
+        'item.dueAt == null ? "今天" : ""' in assignment_service,
+        "#298 an undated package auto-created for the day must appear in the student Today view")
 require('"a-voicepkg-" + item.id' in assignment_service and
         "assignmentResources.linkAssets" in assignment_service,
         "#298 package consumption must use deterministic Assignment id and shared media links")
@@ -60,11 +63,15 @@ require("normalizeSortOrder" in material_service and
 require("entity.assetId = asset.id" in resource_service and
         "entity.storagePath = null" in resource_service,
         "#298 new Assignment resources must reference MediaAsset without copying files")
+require("families.lockById(familyId)" in read("backend/src/main/java/com/xiaoban/homework/media/MediaAssetService.java"),
+        "#298 MediaAsset dedup must serialize same-family inserts instead of recovering from a rollback-only unique-key exception")
 require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
         "#298 deleting Assignment must not delete shared MediaAsset files")
 require("allowsMulFolderSelection = true" in picker and
-        "getFullDirectoryUri()" in picker,
-        "#298 picker must support multi-folder-capable devices and group file fallback by parent directory")
+        "getFullDirectoryUri()" in picker and
+        "selectFilesFallback" in picker and
+        "DocumentSelectMode.FILE" in picker,
+        "#298 picker must support folder selection and automatically fall back to file grouping by parent directory")
 require("createBatch(studentId" in remote and
         "uploadFile(packageId" in remote and
         "completeBatch(batchId" in remote,
@@ -77,8 +84,10 @@ require("VoiceMaterialAutoCreateService.instance.checkToday(studentId)" in index
 require("Text('语音素材库')" in dashboard and "onOpenVoiceMaterial" in dashboard,
         "#298 parent dashboard must expose the voice material library")
 require("private PendingSection()" in page and "private LibrarySection()" in page and
-        "setPackageSubject" in page,
-        "#298 parent material page must support staging, per-directory subject override and library status")
+        "setPackageSubject" in page and
+        "setPackageExpectedMinutes" in page and
+        "registrationFailureCount" in read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialViewModel.ets"),
+        "#298 parent material page must support staging, per-directory subject/duration override, partial-failure feedback and library status")
 require("Media Asset（媒体资产）" in context and
         "Daily Voice Auto Create（每日语音自动创建）" in context,
         "#298 domain language must be documented in CONTEXT.md")
