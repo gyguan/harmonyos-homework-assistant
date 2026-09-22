@@ -59,6 +59,11 @@ require(re.search(r"=\s*OH_NativeBuffer_GetConfig\s*\(", cpp) is None,
         "OH_NativeBuffer_GetConfig returns void and must not be treated as a status code")
 require("SAMPLE_EVERY_CALLBACKS" in cpp,
         "native bridge must sample video callbacks instead of retaining every frame")
+require("MAX_PENDING_FRAMES" in cpp and "MAX_PENDING_BYTES" in cpp and
+        "g_pendingFrames" in cpp and "GetPendingFrame" in cpp,
+        "native bridge must retain only a bounded in-memory queue of changed frames")
+require("FRAME_SIGNATURE_SAMPLES" in cpp and "IsMeaningfulFrame" in cpp,
+        "native queue must suppress static duplicate frames before buffering")
 require("fwrite(" not in cpp and "std::ofstream" not in cpp,
         "issue #241 must not persist captured chat frames to disk")
 require("OH_MIC" not in cpp and "ohos.permission.MICROPHONE" not in module,
@@ -83,8 +88,8 @@ require("libhomeworkcapture.so" in native_runtime and
         "native capture library must be isolated behind NativeHomeworkCaptureRuntime")
 require("this.captureRuntime.stopCapture()" in diagnostic,
         "diagnostic page must allow capture to stop after the user returns to the app")
-require("this.viewModel.finishByUser()" in capture_page and "返回小伴" in capture_page,
-        "formal capture must finish from the app after the user returns from the target chat")
+require("系统录屏通知" in capture_page and "this.viewModel.finishByUser()" in capture_page,
+        "formal capture must prefer the system capture notification and retain an in-app stop fallback")
 require("PARENT_CAPTURE_DIAGNOSTIC" in routes and "HomeworkCaptureDiagnosticPage" in diagnostic,
         "capture diagnostics must remain reachable through a dedicated formal route")
 require("屏幕采集诊断" in capture_home and "onOpenDiagnostics" in capture_home,
