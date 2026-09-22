@@ -146,6 +146,7 @@ public class VoiceMaterialService {
   @Transactional
   public VoiceMaterialDtos.BatchResponse completeBatch(UUID familyId, UUID batchId) {
     VoiceMaterialBatchEntity batch = requireBatch(familyId, batchId);
+    students.requireOwnedForUpdate(familyId, batch.studentId);
     List<VoiceMaterialPackageEntity> items =
         packages.findByFamilyIdAndBatchIdOrderByDirectoryNameAscCreatedAtAsc(
             familyId, batch.id);
