@@ -106,9 +106,8 @@ primaryMinWidth
 
 ### Student Home
 
-Phone：保持单列 Focus Journey。  
-Pad 基线：同一信息结构居中显示，限制最大可读宽度，不让卡片无限横向拉伸。  
-完整 Pad Home 信息组合：后续增强。
+Phone：单列展示按优先级排序的今日任务，每项直接开始、继续或提交，不显示统计卡和学科折叠层。
+Pad：空间足够时使用“先做这项 + 接下来”双区，否则回退 Phone 单列；所有内容保持可读宽度。
 
 ### Assignment List
 
@@ -125,8 +124,7 @@ Pad 基线：独立详情页保持较窄阅读宽度并居中。
 ### Study Workspace
 
 Phone：单任务沉浸式单列，Tutor 作为独立子表面。  
-Pad 基线：同一单列工作区限制最大可读宽度，不依据 `WindowSizeClass` 改业务布局。  
-完整 Pad 增强：满足 `studyTutorRequirement()` 后组合 Study + Tutor 双栏。
+Pad：默认将当前学习内容限制在可读宽度内；学生主动打开 Tutor 且满足 `studyTutorRequirement()` 后组合 Study + Tutor 双栏。
 
 ## 6. 新页面验收标准
 

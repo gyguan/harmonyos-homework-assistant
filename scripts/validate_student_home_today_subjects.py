@@ -23,54 +23,54 @@ page = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 view_model = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 workflow = read(".github/workflows/static-gate.yml")
 
-# The Student Home is a Today surface. Its data boundary must be structured dueAt,
-# never dueText inference, and undated/future/history work belongs to Assignments filters.
+# Student Home remains a strict Today surface backed by structured dueAt data.
 for token in [
     "todayActionableAssignments()",
-    "todaySubjectGroups()",
     "private static isToday(item: Assignment)",
     "item.dueAtEpochMs <= 0",
     "AssignmentDueDate.businessDayStart(item.dueAtEpochMs)",
     "AssignmentDueDate.businessDayStart(Date.now())",
+    "private static insertByPriority",
 ]:
     require(token in view_model, f"Student Home ViewModel missing today-only contract: {token}")
 require("dueText" not in view_model,
         "Student Home must not infer Today from legacy dueText")
-require("nextAssignment(): Assignment | null" in view_model and
-        "let items = this.todayActionableAssignments();" in view_model,
-        "Student Home focus assignment must come only from today's actionable tasks")
 
-# Subject-first information architecture and accordion behavior.
+# Grade-two Today UX is a direct, priority-ordered task list with one action per card.
 for token in [
-    "StudentHomeSubjectGroup",
-    "StudentSubjectTaskGroupCard",
-    "@State private expandedSubjectKey: string = '';",
-    "toggleSubject(key: string)",
-    "effectiveExpandedSubjectKey()",
-    "expanded: this.effectiveExpandedSubjectKey() === group.key",
+    "StudentTodayTaskCard",
+    "private TaskList(items: Assignment[])",
+    "private TodayTasks()",
     "今天要做",
-    "todaySubjectCount()",
-    "todayPendingCount()",
+    "this.viewModel.todayActionableAssignments()",
+    "AssignmentAction.START",
+    "this.viewModel.performAction(assignmentId, AssignmentAction.START)",
+    "@State private actionAssignmentId",
+    "onStoreChanged: () => void",
 ]:
-    require(token in page, f"Student Home missing subject-first Today UX: {token}")
-require("@Prop expanded: boolean = false;" in page,
-        "Subject group expanded state must be a reactive component prop")
-require("this.expandedSubjectKey = this.expandedSubjectKey === key ? '' : key;" in page,
-        "Subject groups must support collapse and single-subject focus")
+    require(token in page, f"Student Home missing simplified Today UX: {token}")
 
-# The old all-assignment hero/remaining-list structure must not return.
-for legacy in ["NextAssignmentHero", "RemainingAssignments", "今天还要做"]:
-    require(legacy not in page,
-            f"Student Home must not reintroduce the old all-assignment structure: {legacy}")
+for removed in [
+    "StudentHomeMetricCard",
+    "StudentSubjectTaskGroupCard",
+    "expandedSubjectKey",
+    "TodayOverview",
+    "todaySubjectGroups",
+]:
+    require(removed not in page,
+            f"Student Home must not restore summary or subject-accordion friction: {removed}")
 
-require("Validate student home Today subject groups" in workflow and
+require("先做这项" in page and "接下来" in page and
+        "LayoutPolicy.homeFocusSummaryRequirement()" in page,
+        "Pad Student Home must keep a distinct focus + next-tasks composition")
+require("Validate student home Today task list" in workflow and
         "python scripts/validate_student_home_today_subjects.py" in workflow,
-        "CI must run the Student Home Today subject-group gate")
+        "CI must run the simplified Student Home Today gate")
 
 if errors:
-    print("STUDENT_HOME_TODAY_SUBJECTS_GATE_FAIL")
+    print("STUDENT_HOME_TODAY_TASKS_GATE_FAIL")
     for error in errors:
         print(f"- {error}")
     sys.exit(1)
 
-print("STUDENT_HOME_TODAY_SUBJECTS_GATE_PASS")
+print("STUDENT_HOME_TODAY_TASKS_GATE_PASS")

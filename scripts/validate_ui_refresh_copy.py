@@ -63,8 +63,8 @@ for method in [
 require("this.assignmentRenderKey(item)" in student_assignments,
         "student assignment rows must use content-aware assignment keys")
 
-require("effectiveExpandedSubjectKey" in student_home,
-        "student home must recover when the expanded subject disappears after an action")
+require("onStoreChanged: () => void" in student_home and "this.onStoreChanged();" in student_home,
+        "student home must invalidate shared UI state after a direct action")
 require("TodayScopeNote" not in student_home,
         "student home must not reference the removed TodayScopeNote builder")
 require("this.assignmentRenderKey(item)" in student_home,

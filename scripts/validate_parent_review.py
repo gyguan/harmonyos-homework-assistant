@@ -33,6 +33,7 @@ remote_api = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 remote_submission_cache = read("entry/src/main/ets/application/remote/RemoteSubmissionCache.ets")
 assignment_card = read("entry/src/main/ets/components/assignment/AssignmentCard.ets")
 countdown = read("entry/src/main/ets/components/assignment/AssignmentCountdownCard.ets")
+study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 
 # This gate intentionally keeps only the durable model/backend compatibility checks from the
 # pre-V2 Parent Progress implementation. Slice 4 UI structure is validated separately by
@@ -49,7 +50,7 @@ require("reviewAssignment" in store and "AssignmentStatus.COMPLETED" in store an
         "seed/demo compatibility store must still support parent review transitions")
 require("家长订正说明" in assignment_card and "reviewNote" in assignment_card,
         "student assignment card must show parent correction note")
-require("家长请你订正" in countdown and "reviewNote" in countdown,
+require("需要先订正" in study and "this.assignment()!.reviewNote" in study,
         "student study view must show parent correction note")
 
 # Assignment management remains a backend capability even though the V2 Progress surface no

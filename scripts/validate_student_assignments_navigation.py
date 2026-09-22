@@ -82,7 +82,7 @@ require("AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH" in page and
         "AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH" in detail,
         "list/detail must keep shared readable-width fallback constraints")
 require("private AssignmentListPage()" in page and ".align(Alignment.TopStart)" in page and
-        ".align(Alignment.TopStart)" in detail,
+        ".justifyContent(FlexAlign.Start)" in detail and ".height('100%')" in detail,
         "Phone list/detail fallback must stay top-anchored")
 require("components/assignment/AssignmentFilterDialog" in page,
         "student assignment page must use the shared assignment filter dialog")
@@ -119,16 +119,22 @@ for removed in ["private TypeOption", "private DateOption", "今天", "明天", 
 for legacy in ["showFilterPage", "FilterPage()", "bindSheet", "FilterOverlay", "FilterPanel"]:
     require(legacy not in page, f"legacy filter implementation must not return: {legacy}")
 
-for getter in [
+for getter in ["currentTodoAssignments", "currentHistoryAssignments"]:
+    require(f"ForEach(this.{getter}()" in page,
+            f"simplified assignment group must render from revision-aware data: {getter}")
+    require(f"this.{getter}().length" in page,
+            f"simplified assignment group count must be revision-aware: {getter}")
+for source_getter in [
     "currentNeedHandlingAssignments",
     "currentNotStartedAssignments",
     "currentSubmittedAssignments",
     "currentCompletedAssignments",
 ]:
-    require(f"ForEach(this.{getter}()" in page,
-            f"assignment group must render from revision-aware data: {getter}")
-    require(f"Text(`${{this.{getter}().length}}`)" in page,
-            f"assignment group count must be revision-aware: {getter}")
+    require(f"this.{source_getter}()" in page,
+            f"combined assignment groups must retain revision-aware source: {source_getter}")
+require("@State private historyExpanded: boolean = false;" in page and
+        "Text(`已提交 / 已完成 · ${this.currentHistoryAssignments().length}`)" in page,
+        "submitted and completed assignments must remain collapsed behind one history row")
 require("snapshotRevision" in page and "currentVisibleAssignments" in page,
         "assignment list must invalidate cached groups when repository revision changes")
 

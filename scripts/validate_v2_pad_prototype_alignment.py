@@ -51,7 +51,7 @@ for token in [
     require(token in policy, f"LayoutPolicy missing Pad prototype capability: {token}")
 
 # Home: wide composition must be materially different from Phone single column. The current
-# Student Home uses a summary rail plus the subject-first Today task surface on wide containers.
+# Student Home uses a first-task focus pane plus the remaining priority-ordered tasks.
 for token in [
     "@State private availableWidthVp",
     "LayoutPolicy.homeFocusSummaryRequirement()",
@@ -59,9 +59,11 @@ for token in [
     "private PadHome()",
     "AppTheme.HOME_PRIMARY_MIN_WIDTH",
     "AppTheme.HOME_SECONDARY_MIN_WIDTH",
-    "this.TodayOverview();",
-    "this.TodaySubjects();",
-    "StudentSubjectTaskGroupCard",
+    "this.TodayTasks();",
+    "StudentTodayTaskCard",
+    "this.TaskList(this.remainingAssignments());",
+    "先做这项",
+    "接下来",
     ".onAreaChange",
 ]:
     require(token in home, f"Student Home missing Pad prototype behavior: {token}")
@@ -89,7 +91,7 @@ require("DefaultAssignmentRepository.instance" in detail_pane,
 require("onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)" in shell,
         "AppShell must wire the embedded Pad detail primary action to the existing Study destination")
 
-# Study: Phone stays single-column; Pad shows Study + Tutor simultaneously.
+# Study: Phone stays single-column; Pad opens Study + Tutor only after the student asks for help.
 for token in [
     "@State private availableWidthVp",
     "LayoutPolicy.studyTutorRequirement()",
@@ -99,6 +101,7 @@ for token in [
     "private PadWorkspacePage()",
     "this.StudyContent(false);",
     "this.TutorPane();",
+    "if (this.tutorPanelOpen) this.SplitWorkspace();",
     "AppTheme.STUDY_PRIMARY_MIN_WIDTH",
     "AppTheme.STUDY_TUTOR_MIN_WIDTH",
     ".onAreaChange",

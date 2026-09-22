@@ -18,9 +18,8 @@ export struct AssignmentDetailPane {
   private actionLabel(item: Assignment): string {
     if (item.status === AssignmentStatus.IN_PROGRESS || item.status === AssignmentStatus.PAUSED) return '继续完成';
     if (item.status === AssignmentStatus.READY_TO_SUBMIT) return '去提交';
-    if (item.status === AssignmentStatus.NEEDS_REWORK) return '继续订正';
+    if (item.status === AssignmentStatus.NEEDS_REWORK) return '去订正';
     if (item.status === AssignmentStatus.SUBMITTED) return '查看提交状态';
-    if (item.status === AssignmentStatus.COMPLETED) return '查看完成记录';
     return '开始作业';
   }
 
@@ -33,43 +32,12 @@ export struct AssignmentDetailPane {
   }
 
   @Builder
-  private DetailRow(label: string, value: string) {
-    Row({ space: 12 }) {
-      Text(label).width(76).fontSize(13).fontColor(AppTheme.SUBTEXT);
-      Text(value.length > 0 ? value : '未设置')
-        .layoutWeight(1)
-        .fontSize(14)
-        .lineHeight(21)
-        .fontColor(AppTheme.TEXT);
-    }
-    .width('100%')
-    .padding({ top: 10, bottom: 10 });
-  }
-
-  @Builder
   private SectionTitle(title: string) {
     Text(title)
       .width('100%')
       .fontSize(13)
       .fontWeight(FontWeight.Medium)
       .fontColor(AppTheme.SUBTEXT);
-  }
-
-  @Builder
-  private RequirementLine(text: string) {
-    Row({ space: 9 }) {
-      Text('•')
-        .width(12)
-        .fontSize(16)
-        .fontColor(AppTheme.PRIMARY);
-      Text(text)
-        .layoutWeight(1)
-        .fontSize(14)
-        .lineHeight(21)
-        .fontColor(AppTheme.TEXT);
-    }
-    .width('100%')
-    .alignItems(VerticalAlign.Top);
   }
 
   @Builder
@@ -88,164 +56,165 @@ export struct AssignmentDetailPane {
       }
     }
     .width('100%')
-    .alignItems(HorizontalAlign.Start)
-    .padding({ top: 12, bottom: 24 });
+    .height('100%')
+    .justifyContent(FlexAlign.Center)
+    .alignItems(HorizontalAlign.Center);
   }
 
-  build() {
-    if (this.assignment() === null) {
-      this.EmptyState();
-    } else {
+  @Builder
+  private DetailContent(item: Assignment) {
+    Column({ space: 14 }) {
       Column({ space: 14 }) {
-        Column({ space: 14 }) {
-          Row({ space: 8 }) {
-            Text(this.typeLabel(this.assignment()!))
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.PRIMARY)
-              .padding({ left: 10, right: 10, top: 6, bottom: 6 })
-              .backgroundColor(AppTheme.PRIMARY_SOFT)
-              .borderRadius(AppTheme.CHIP_RADIUS);
-            Text(this.assignment()!.subject)
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.SUBTEXT);
-            Blank();
-            Text(AssignmentStateMachine.label(this.assignment()!.status))
-              .fontSize(13)
-              .fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%');
-
-          Text(this.assignment()!.title)
-            .width('100%')
-            .fontSize(AppTheme.PAGE_TITLE_SIZE)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT);
-
-          Row({ space: 8 }) {
-            Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
-              .fontSize(13)
-              .fontColor(AppTheme.SUBTEXT);
-            Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
-            Text(`预计 ${this.assignment()!.expectedMinutes} 分钟`)
-              .fontSize(13)
-              .fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%');
+        Row({ space: 8 }) {
+          Text(this.typeLabel(item))
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .padding({ left: 10, right: 10, top: 6, bottom: 6 })
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .borderRadius(AppTheme.CHIP_RADIUS);
+          Text(item.subject)
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.SUBTEXT);
+          Blank();
+          Text(AssignmentStateMachine.label(item.status))
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
         }
-        .width('100%')
-        .alignItems(HorizontalAlign.Start)
-        .padding(16)
-        .backgroundColor(AppTheme.SURFACE)
-        .border({ width: 1, color: AppTheme.BORDER })
-        .borderRadius(AppTheme.CARD_RADIUS);
+        .width('100%');
 
-        Column({ space: 8 }) {
-          this.SectionTitle('老师要求');
-          Text(this.assignment()!.instruction.length > 0 ? this.assignment()!.instruction : '老师暂未补充具体要求')
+        Text(item.title)
+          .width('100%')
+          .fontSize(AppTheme.PAGE_TITLE_SIZE)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT);
+
+        Row({ space: 8 }) {
+          Text(item.dueText.length > 0 ? item.dueText : '未设置截止时间')
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
+          Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+          Text(`预计 ${item.expectedMinutes} 分钟`)
+            .fontSize(13)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%');
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+      .padding(16)
+      .backgroundColor(AppTheme.SURFACE)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CARD_RADIUS);
+
+      if (item.reviewNote.length > 0) {
+        Column({ space: 5 }) {
+          Text('需要先订正')
+            .width('100%')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.DANGER);
+          Text(item.reviewNote)
             .width('100%')
             .fontSize(15)
-            .lineHeight(23)
+            .lineHeight(22)
             .fontColor(AppTheme.TEXT);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start)
         .padding(15)
-        .backgroundColor(AppTheme.SURFACE)
-        .border({ width: 1, color: AppTheme.BORDER })
+        .backgroundColor(AppTheme.DANGER_SOFT)
         .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
 
-        Column({ space: 10 }) {
-          this.SectionTitle('完成要求');
-          this.RequirementLine('按老师要求完成本项作业');
-          if (this.assignment()!.textbookRef.length > 0) {
-            this.RequirementLine('核对教材与页码，避免做错范围');
-          }
-          this.RequirementLine('完成后检查遗漏和订正，再按页面提示提交结果');
+      Column({ space: 8 }) {
+        this.SectionTitle('老师要求');
+        Text(item.instruction.length > 0 ? item.instruction : '按课堂要求完成这项作业。')
+          .width('100%')
+          .fontSize(16)
+          .lineHeight(24)
+          .fontColor(AppTheme.TEXT);
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start)
+      .padding(16)
+      .backgroundColor(AppTheme.SURFACE)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CONTROL_RADIUS);
+
+      if (item.textbookRef.length > 0) {
+        Row({ space: 12 }) {
+          Text('教材 / 页码').width(76).fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text(item.textbookRef)
+            .layoutWeight(1)
+            .fontSize(14)
+            .lineHeight(21)
+            .fontColor(AppTheme.TEXT);
         }
         .width('100%')
-        .alignItems(HorizontalAlign.Start)
         .padding(15)
         .backgroundColor(AppTheme.SURFACE)
-        .border({ width: 1, color: AppTheme.BORDER })
         .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
 
-        Column({ space: 0 }) {
-          this.DetailRow('教材 / 页码', this.assignment()!.textbookRef);
-          Divider().color(AppTheme.DIVIDER);
-          this.DetailRow('提交方式', '作业照片 1–6 张');
-        }
-        .width('100%')
-        .padding({ left: 14, right: 14 })
-        .backgroundColor(AppTheme.SURFACE)
-        .border({ width: 1, color: AppTheme.BORDER })
-        .borderRadius(AppTheme.CONTROL_RADIUS);
-
+      if (item.resourceLabels.length > 0) {
         Column({ space: 10 }) {
           this.SectionTitle('老师资料');
-          if (this.assignment()!.resourceLabels.length === 0) {
-            Text('暂无老师资料')
-              .width('100%')
-              .fontSize(14)
-              .fontColor(AppTheme.TERTIARY_TEXT);
-          } else {
-            ForEach(this.assignment()!.resourceLabels, (label: string) => {
-              Row({ space: 10 }) {
-                SymbolGlyph($r('sys.symbol.doc_text'))
-                  .fontSize(18)
-                  .fontColor([AppTheme.PRIMARY]);
-                Text(label)
-                  .layoutWeight(1)
-                  .fontSize(14)
-                  .lineHeight(21)
-                  .fontColor(AppTheme.TEXT);
-              }
-              .width('100%')
-              .padding({ top: 4, bottom: 4 });
-            }, (label: string) => label);
-          }
+          ForEach(item.resourceLabels, (label: string) => {
+            Row({ space: 10 }) {
+              SymbolGlyph($r('sys.symbol.doc_text'))
+                .fontSize(18)
+                .fontColor([AppTheme.PRIMARY]);
+              Text(label)
+                .layoutWeight(1)
+                .fontSize(14)
+                .lineHeight(21)
+                .fontColor(AppTheme.TEXT);
+            }
+            .width('100%')
+            .padding({ top: 4, bottom: 4 });
+          }, (label: string) => label);
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start)
         .padding(15)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+    }
+    .width('100%')
+    .alignItems(HorizontalAlign.Start)
+    .padding({ bottom: 14 });
+  }
 
-        if (this.assignment()!.reviewNote.length > 0) {
-          Column({ space: 5 }) {
-            Text('家长提醒')
-              .width('100%')
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.WARNING);
-            Text(this.assignment()!.reviewNote)
-              .width('100%')
-              .fontSize(14)
-              .lineHeight(21)
-              .fontColor(AppTheme.TEXT);
-          }
-          .width('100%')
-          .alignItems(HorizontalAlign.Start)
-          .padding(14)
-          .backgroundColor(AppTheme.WARNING_SOFT)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
+  build() {
+    if (this.assignment() === null) {
+      this.EmptyState();
+    } else {
+      Column({ space: 10 }) {
+        Scroll() {
+          this.DetailContent(this.assignment()!);
         }
+        .width('100%')
+        .layoutWeight(1)
+        .align(Alignment.TopStart)
+        .scrollBar(BarState.Off);
 
-        Button(this.actionLabel(this.assignment()!), { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .enabled(this.canOpenStudy(this.assignment()!))
-          .backgroundColor(this.canOpenStudy(this.assignment()!) ? AppTheme.PRIMARY : AppTheme.DISABLED)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .onClick(() => {
-            if (this.canOpenStudy(this.assignment()!)) this.onOpenStudy(this.assignment()!.id);
-          });
+        if (this.canOpenStudy(this.assignment()!)) {
+          Button(this.actionLabel(this.assignment()!), { type: ButtonType.Normal })
+            .width('100%')
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .backgroundColor(AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => this.onOpenStudy(this.assignment()!.id));
+        }
       }
       .width('100%')
+      .height('100%')
       .alignItems(HorizontalAlign.Start);
     }
   }
