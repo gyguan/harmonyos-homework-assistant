@@ -25,6 +25,7 @@ oh_package = read("oh-package.json5")
 entry_oh_package = read("entry/oh-package.json5")
 module_config = read("entry/src/main/module.json5")
 backend_pom = read("backend/pom.xml")
+native_cmake = read("entry/src/main/cpp/CMakeLists.txt")
 
 require('"compileSdkVersion": "26.0.0"' in build_profile,
         "compileSdkVersion must match the DevEco Studio 26.0.0 toolchain")
@@ -93,6 +94,9 @@ require("sys.symbol.plus_square" in parent_dashboard,
 require("SUBMISSION_NETWORK_ERROR" in remote_submission and
         "response = await client.request(" in remote_submission,
         "Remote submission upload must explicitly handle exceptions from http client.request")
+require("target_compile_options(homeworkcapture PRIVATE" in native_cmake and
+        "-Wno-unused-command-line-argument" in native_cmake,
+        "homeworkcapture must suppress only the SDK-injected unused --gcc-toolchain driver warning")
 
 
 # Production/test boundary: deterministic fixtures and issue-specific test IDs must not ship in
