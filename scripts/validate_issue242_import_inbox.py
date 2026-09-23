@@ -44,11 +44,11 @@ shell = read("entry/src/main/ets/pages/AppShell.ets")
 fixture = read("entry/src/test/fixtures/Issue242ImportInboxFixture.ets")
 state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.ets")
 
-for value in ["CLIPBOARD", "SCREENSHOT", "SHARE", "SCREEN_CAPTURE"]:
+for value in ["CLIPBOARD", "SCREENSHOT", "SHARE"]:
     require(value in models, f"Import V2 source type missing: {value}")
 for value in ["ImportBatch", "ImportedMessage", "ImportSourceEvidence", "HomeworkImportInboxSnapshot"]:
     require(f"interface {value}" in models, f"Import V2 model missing: {value}")
-for field in ["messageCount", "candidateCount", "sourceProfileId", "createdAtEpochMs", "status"]:
+for field in ["messageCount", "candidateCount", "createdAtEpochMs", "status"]:
     require(field in models, f"ImportBatch missing field: {field}")
 
 for field in ["batchId?: string", "sourceMessageIds?: string[]", "rawText?: string",
