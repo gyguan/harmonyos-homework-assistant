@@ -66,7 +66,7 @@ public class VoiceMaterialController {
   }
 
   @PostMapping("/voice-material-batches/{batchId}/complete")
-  public VoiceMaterialDtos.BatchResponse completeBatch(
+  public VoiceMaterialDtos.CompleteResponse completeBatch(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable UUID batchId) {
     return materials.completeBatch(familyId, batchId);
