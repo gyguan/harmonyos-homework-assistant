@@ -10,6 +10,23 @@ on:
       - 'refactor/**'
 
 jobs:
+  validate-parent-home-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate parent home and progress interaction
+        run: |
+          python scripts/validate_task_ui_consistency.py
+          python scripts/validate_v2_slice4_parent_surfaces.py
+          python scripts/validate_ui_refresh_copy.py
+
   validate-app-identity:
     runs-on: ubuntu-latest
     steps:
