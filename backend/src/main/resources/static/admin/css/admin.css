@@ -150,3 +150,44 @@ nav { display: grid; gap: 6px; }
 @media (max-width: 1100px) {
   .voice-task-row { grid-template-columns:minmax(180px,1fr) minmax(160px,1fr) 80px 110px; gap:10px; }
 }
+
+
+/* 语音任务页：任务为主、素材上传为辅 */
+.voice-task-toolbar { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; }
+.voice-task-heading h2 { margin:0; font-size:18px; }
+.voice-task-heading p { margin:6px 0 0; color:var(--muted); font-size:12px; }
+.voice-task-controls { display:flex; align-items:flex-end; gap:12px; }
+.voice-task-student { width:240px; }
+.voice-task-student select { min-height:42px; }
+.voice-task-stats { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:20px; }
+.voice-task-stat { min-height:82px; padding:14px 16px; border:1px solid var(--border); border-radius:12px; background:#fbfcfe; display:flex; flex-direction:column; justify-content:center; }
+.voice-task-stat strong { font-size:24px; line-height:1; color:var(--blue); }
+.voice-task-stat span { margin-top:8px; color:var(--muted); font-size:12px; }
+.upload-default-grid { grid-template-columns:minmax(220px,360px); }
+.voice-task-list { display:grid; gap:12px; margin-top:18px; }
+.voice-task-row { display:block; padding:16px; border:1px solid var(--border); border-radius:14px; background:#fff; }
+.voice-task-head { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; }
+.voice-task-title strong,.voice-task-title span { display:block; }
+.voice-task-title strong { font-size:15px; }
+.voice-task-title span { margin-top:5px; color:var(--muted); font-size:12px; }
+.voice-task-source { margin-top:14px; padding:13px 14px; border-radius:10px; background:#f8fafc; }
+.voice-task-label { display:block; margin-bottom:5px; color:#8a929d; font-size:10px; }
+.voice-task-folder-line { display:flex; align-items:center; gap:10px; min-width:0; }
+.voice-task-folder-line strong { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13px; }
+.voice-task-folder-line > span { color:var(--muted); font-size:11px; white-space:nowrap; }
+.voice-task-materials { display:flex; flex-wrap:wrap; gap:7px; margin-top:10px; }
+.voice-material-file { max-width:300px; min-height:30px; padding:4px 8px; border:1px solid var(--border); border-radius:8px; background:#fff; color:#2e3237; display:flex; align-items:center; gap:6px; }
+.voice-material-file:hover { border-color:#b9d1f5; background:var(--blue-soft); }
+.voice-material-kind { flex:0 0 auto; color:var(--blue); font-size:10px; font-weight:650; }
+.voice-material-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:11px; }
+.voice-material-missing { color:var(--danger); font-size:11px; }
+.voice-task-footer { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-top:13px; }
+.voice-task-meta { color:var(--muted); font-size:11px; }
+.voice-task-status.pending { background:#f1f3f6; color:var(--muted); }
+.imported-material-card { display:none !important; }
+@media (max-width: 1100px) {
+  .voice-task-toolbar { align-items:stretch; }
+  .voice-task-controls { align-items:flex-end; }
+  .voice-task-student { width:210px; }
+  .voice-task-stats { gap:8px; }
+}

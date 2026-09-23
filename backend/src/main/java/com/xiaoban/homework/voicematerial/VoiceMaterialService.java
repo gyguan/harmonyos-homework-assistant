@@ -262,7 +262,8 @@ public class VoiceMaterialService {
         item.dueAt == null ? 0L : item.dueAt.toEpochMilli(), item.assignmentType,
         item.status, item.errorMessage,
         item.consumedAssignmentId == null ? "" : item.consumedAssignmentId,
-        hasCreatedBefore, hasActiveAssignment, fileResponses);
+        hasCreatedBefore, hasActiveAssignment,
+        item.consumedAt == null ? 0L : item.consumedAt.toEpochMilli(), fileResponses);
   }
 
   private VoiceMaterialDtos.FileResponse fileResponse(VoiceMaterialFileEntity file) {

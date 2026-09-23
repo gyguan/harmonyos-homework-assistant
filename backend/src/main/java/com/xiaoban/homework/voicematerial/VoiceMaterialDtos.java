@@ -41,7 +41,7 @@ public final class VoiceMaterialDtos {
       String directoryName, String subjectCode, String title, int expectedMinutes,
       long dueAtEpochMs, String assignmentType, String status, String errorMessage,
       String consumedAssignmentId, boolean hasCreatedBefore, boolean hasActiveAssignment,
-      List<FileResponse> files) {}
+      long consumedAtEpochMs, List<FileResponse> files) {}
 
   public record FileResponse(String id, String assetId, String resourceType,
       String relativeName, int sortOrder) {}

@@ -133,6 +133,9 @@ const uploadButton = el('upload-button');
 const applyDefaultsButton = el('apply-defaults');
 const voiceTaskSummary = el('voice-task-summary');
 const voiceTaskList = el('voice-task-list');
+const voiceStatCreated = el('voice-stat-created');
+const voiceStatReady = el('voice-stat-ready');
+const voiceStatFolders = el('voice-stat-folders');
 const uploadMaterialEntry = el('upload-material-entry');
 const uploadSection = el('upload-section');
 const progressCard = el('progress-card');
@@ -195,37 +198,18 @@ async function loadImportedPackages() {
     renderImportedPackages();
     renderVoiceTasks();
   } catch (error) {
-    importedSummary.textContent = '已导入文件加载失败：' + (error?.message || '请稍后刷新。');
+    state.importedPackages = [];
+    renderImportedPackages();
+    renderVoiceTasks();
+    voiceTaskSummary.textContent = '语音任务加载失败：' + (error?.message || '请稍后刷新。');
   }
 }
 
 function renderImportedPackages() {
-  importedCard.hidden = state.importedPackages.length === 0;
-  if (state.importedPackages.length === 0) {
-    importedSummary.textContent = '当前学生还没有已导入的语音素材。';
-    importedList.innerHTML = '';
-    return;
-  }
-  importedSummary.textContent = `共 ${state.importedPackages.length} 个已导入目录，可展开查看文件。`;
-  importedList.innerHTML = state.importedPackages.map((item, index) => {
-    const status = item.status === 'READY' || item.status === 'CONSUMED' ? '可用' : item.status === 'INVALID' ? '导入失败' : item.status;
-    const error = item.status === 'INVALID' && item.errorMessage
-      ? `<p class="imported-package-error">${escapeHtml(item.errorMessage)}</p>`
-      : '';
-    const files = (item.files || []).map(file => `
-      <div class="imported-file">
-        <span class="imported-file-name" title="${escapeHtml(file.relativeName)}">${escapeHtml(file.relativeName)}<span class="imported-file-type">${fileKindLabel(file.resourceType)}</span></span>
-        <button class="preview-button" type="button" data-preview-asset="${escapeHtml(file.assetId)}" data-preview-name="${escapeHtml(file.relativeName)}" data-preview-type="${escapeHtml(file.resourceType)}">查看</button>
-      </div>`).join('');
-    return `<details class="imported-package" ${index === 0 ? 'open' : ''}>
-      <summary><div class="imported-package-main"><strong>${escapeHtml(item.directoryName)}</strong><span>${escapeHtml(subjectLabel(item.subjectCode))} · ${escapeHtml(status)}</span></div><span class="imported-package-meta">${(item.files || []).length} 个文件</span></summary>
-      ${error}
-      <div class="imported-file-list">${files}</div>
-    </details>`;
-  }).join('');
+  // 语音素材已经合并到“语音任务”卡片中展示，避免再维护第二套素材列表。
+  importedCard.hidden = true;
+  importedList.innerHTML = '';
 }
-
-
 
 function voiceTaskStatus(item) {
   if (item.status === 'CONSUMED') return { label: '已创建', className: 'created' };
@@ -234,52 +218,120 @@ function voiceTaskStatus(item) {
   return { label: item.status || '处理中', className: 'pending' };
 }
 
+function formatTaskTime(epochMs) {
+  const value = Number(epochMs || 0);
+  if (!value) return '';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '';
+  const pad = part => String(part).padStart(2, '0');
+  return pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + ' ' +
+    pad(date.getHours()) + ':' + pad(date.getMinutes());
+}
+
+function renderTaskFiles(item) {
+  const files = item.files || [];
+  const audio = files.filter(file => file.resourceType === 'AUDIO');
+  const images = files.filter(file => file.resourceType === 'IMAGE');
+  const renderFile = (file, kind) =>
+    '<button class="voice-material-file" type="button" data-preview-asset="' +
+    escapeHtml(file.assetId) + '" data-preview-name="' + escapeHtml(file.relativeName) +
+    '" data-preview-type="' + escapeHtml(file.resourceType) + '">' +
+    '<span class="voice-material-kind">' + kind + '</span>' +
+    '<span class="voice-material-name">' + escapeHtml(file.relativeName) + '</span></button>';
+
+  const audioHtml = audio.length > 0
+    ? audio.map(file => renderFile(file, '语音')).join('')
+    : '<span class="voice-material-missing">无语音文件</span>';
+  const imageHtml = images.length > 0
+    ? images.map(file => renderFile(file, '图片')).join('')
+    : '<span class="voice-material-missing">无图片</span>';
+
+  return '<div class="voice-task-materials">' + audioHtml + imageHtml + '</div>';
+}
+
 function renderVoiceTasks() {
   if (!studentSelect.value) {
     voiceTaskSummary.textContent = '请选择学生后查看语音任务。';
+    voiceStatCreated.textContent = '0';
+    voiceStatReady.textContent = '0';
+    voiceStatFolders.textContent = '0';
     voiceTaskList.innerHTML = '';
     return;
   }
+
   const packages = state.importedPackages || [];
   const created = packages.filter(item => item.status === 'CONSUMED' && item.consumedAssignmentId).length;
   const ready = packages.filter(item => item.status === 'READY').length;
   const invalid = packages.filter(item => item.status === 'INVALID').length;
-  voiceTaskSummary.textContent = \`已创建 \${created} 个 · 待创建 \${ready} 个\${invalid ? \` · 导入失败 \${invalid} 个\` : ''}\`;
+  voiceStatCreated.textContent = String(created);
+  voiceStatReady.textContent = String(ready);
+  voiceStatFolders.textContent = String(packages.length);
+  voiceTaskSummary.textContent = invalid > 0
+    ? '共 ' + packages.length + ' 个素材文件夹，其中 ' + invalid + ' 个需要处理。'
+    : '任务与来源文件夹一一对应，可直接查看素材或创建任务。';
 
   if (packages.length === 0) {
-    voiceTaskList.innerHTML = \`
-      <div class="voice-task-empty">
-        <strong>还没有语音任务</strong>
-        <span>先上传一个包含 1 个语音文件和至少 1 张图片的文件夹。</span>
-        <button class="secondary-button" type="button" data-upload-material>上传语音文件夹</button>
-      </div>\`;
+    voiceTaskList.innerHTML =
+      '<div class="voice-task-empty">' +
+      '<strong>还没有语音任务</strong>' +
+      '<span>先上传一个包含 1 个语音文件和至少 1 张图片的文件夹。</span>' +
+      '<button class="secondary-button" type="button" data-upload-material>上传语音文件夹</button>' +
+      '</div>';
     return;
   }
 
-  voiceTaskList.innerHTML = packages.map(item => {
+  const priority = { CONSUMED: 0, READY: 1, INVALID: 2 };
+  const sorted = [...packages].sort((a, b) => {
+    const statusCompare = (priority[a.status] ?? 9) - (priority[b.status] ?? 9);
+    return statusCompare !== 0
+      ? statusCompare
+      : String(a.directoryName || '').localeCompare(String(b.directoryName || ''), 'zh-CN');
+  });
+
+  voiceTaskList.innerHTML = sorted.map(item => {
     const status = voiceTaskStatus(item);
-    const fileCount = (item.files || []).length;
+    const createdAt = formatTaskTime(item.consumedAtEpochMs);
+    const footerMeta = item.status === 'CONSUMED'
+      ? (createdAt ? '创建时间 ' + createdAt : '任务已创建')
+      : item.status === 'READY'
+        ? '素材已就绪，可以创建任务'
+        : item.status === 'INVALID'
+          ? '未创建任务'
+          : '素材处理中';
+
     const action = item.status === 'READY'
-      ? \`<button class="secondary-button voice-task-create" type="button" data-create-package="\${escapeHtml(item.id)}">创建任务</button>\`
+      ? '<button class="secondary-button voice-task-create" type="button" data-create-package="' +
+        escapeHtml(item.id) + '">创建语音任务</button>'
       : item.status === 'CONSUMED'
         ? '<span class="voice-task-done">任务已关联</span>'
         : item.status === 'INVALID'
-          ? \`<span class="voice-task-error">\${escapeHtml(item.errorMessage || '素材校验未通过')}</span>\`
+          ? '<span class="voice-task-error">' +
+            escapeHtml(item.errorMessage || '素材校验未通过') + '</span>'
           : '<span class="muted">处理中</span>';
-    return \`
-      <div class="voice-task-row">
-        <div class="voice-task-title">
-          <strong>\${escapeHtml(item.title || item.directoryName)}</strong>
-          <span>\${escapeHtml(subjectLabel(item.subjectCode))} · \${item.expectedMinutes} 分钟</span>
-        </div>
-        <div class="voice-task-folder">
-          <span class="voice-task-label">关联文件夹</span>
-          <strong title="\${escapeHtml(item.directoryName)}">\${escapeHtml(item.directoryName)}</strong>
-          <span>\${fileCount} 个素材文件</span>
-        </div>
-        <span class="voice-task-status \${status.className}">\${status.label}</span>
-        <div class="voice-task-action">\${action}</div>
-      </div>\`;
+
+    return '<article class="voice-task-row">' +
+      '<div class="voice-task-head">' +
+        '<div class="voice-task-title">' +
+          '<strong>' + escapeHtml(item.title || item.directoryName) + '</strong>' +
+          '<span>' + escapeHtml(subjectLabel(item.subjectCode)) + ' · 预计 ' +
+            escapeHtml(item.expectedMinutes) + ' 分钟</span>' +
+        '</div>' +
+        '<span class="voice-task-status ' + status.className + '">' + status.label + '</span>' +
+      '</div>' +
+      '<div class="voice-task-source">' +
+        '<span class="voice-task-label">来源文件夹</span>' +
+        '<div class="voice-task-folder-line">' +
+          '<strong title="' + escapeHtml(item.directoryName) + '">' +
+            escapeHtml(item.directoryName) + '</strong>' +
+          '<span>' + (item.files || []).length + ' 个素材文件</span>' +
+        '</div>' +
+        renderTaskFiles(item) +
+      '</div>' +
+      '<div class="voice-task-footer">' +
+        '<span class="voice-task-meta">' + escapeHtml(footerMeta) + '</span>' +
+        '<div class="voice-task-action">' + action + '</div>' +
+      '</div>' +
+    '</article>';
   }).join('');
 }
 
@@ -621,6 +673,15 @@ el('clear-packages').addEventListener('click', () => {
 studentSelect.addEventListener('change', () => { updateUploadState(); void loadImportedPackages(); });
 uploadMaterialEntry.addEventListener('click', () => uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' }));
 voiceTaskList.addEventListener('click', event => {
+  const previewButton = event.target.closest('[data-preview-asset]');
+  if (previewButton) {
+    void openAssetViewer(
+      previewButton.dataset.previewAsset,
+      previewButton.dataset.previewName,
+      previewButton.dataset.previewType
+    );
+    return;
+  }
   if (event.target.closest('[data-upload-material]')) {
     uploadSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
     return;

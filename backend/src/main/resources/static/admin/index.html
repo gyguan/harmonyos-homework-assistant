@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>小伴管理台</title>
-  <link rel="stylesheet" href="/admin/css/admin.css?v=20260922-2">
+  <link rel="stylesheet" href="/admin/css/admin.css?v=20260923-1">
 </head>
 <body>
   <div id="login-view" class="login-shell">
@@ -42,16 +42,31 @@
     <main class="main">
       <header class="page-header">
         <div>
-          <h1>语音素材导入</h1>
-          <p>批量选择目录，将语音和图片直接上传到服务端素材库。</p>
+          <h1>语音任务</h1>
+          <p>查看语音任务与来源文件夹，并从已上传素材直接创建任务。</p>
         </div>
       </header>
 
       <section class="card voice-task-card">
-        <div class="section-title-row">
-          <div><h2>语音任务</h2><p id="voice-task-summary">正在加载任务…</p></div>
-          <button id="upload-material-entry" class="primary-button" type="button">上传新文件夹</button>
+        <div class="voice-task-toolbar">
+          <div class="voice-task-heading">
+            <h2>语音任务</h2>
+            <p id="voice-task-summary">正在加载任务…</p>
+          </div>
+          <div class="voice-task-controls">
+            <label class="voice-task-student">学生
+              <select id="student-select"></select>
+            </label>
+            <button id="upload-material-entry" class="primary-button" type="button">上传新文件夹</button>
+          </div>
         </div>
+
+        <div class="voice-task-stats" aria-label="语音任务统计">
+          <div class="voice-task-stat"><strong id="voice-stat-created">0</strong><span>已创建任务</span></div>
+          <div class="voice-task-stat"><strong id="voice-stat-ready">0</strong><span>待创建</span></div>
+          <div class="voice-task-stat"><strong id="voice-stat-folders">0</strong><span>素材文件夹</span></div>
+        </div>
+
         <div id="voice-task-list" class="voice-task-list"></div>
       </section>
 
@@ -59,10 +74,7 @@
         <div class="section-title-row">
           <div><h2>导入设置</h2><p>这些设置会作为新识别目录的默认值。</p></div>
         </div>
-        <div class="form-grid">
-          <label>学生
-            <select id="student-select"></select>
-          </label>
+        <div class="form-grid upload-default-grid">
           <label>预计用时
             <div class="inline-input"><input id="default-minutes" type="number" min="1" max="240" value="15"><span>分钟</span></div>
           </label>
@@ -121,7 +133,7 @@
     </main>
   </div>
 
-  <script type="module" src="/admin/js/app.js?v=20260922-2"></script>
+  <script type="module" src="/admin/js/app.js?v=20260923-1"></script>
   <div id="asset-viewer" class="asset-viewer" hidden><div class="asset-viewer-backdrop" data-close-viewer></div><section class="asset-viewer-dialog" role="dialog" aria-modal="true" aria-label="素材预览"><button id="close-asset-viewer" class="asset-viewer-close" type="button" aria-label="关闭">×</button><div id="asset-viewer-content"></div></section></div>
 </body>
 </html>
