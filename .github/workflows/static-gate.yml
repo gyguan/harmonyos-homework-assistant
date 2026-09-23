@@ -10,6 +10,22 @@ on:
       - 'refactor/**'
 
 jobs:
+  validate-app-identity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate in-app identity switching
+        run: |
+          python scripts/validate_person_entry_role_lock.py
+          python scripts/validate_harmony_ui_design.py
+
   validate-admin-voice:
     runs-on: ubuntu-latest
     steps:
