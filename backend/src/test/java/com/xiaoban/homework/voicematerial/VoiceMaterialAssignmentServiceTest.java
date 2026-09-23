@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 import com.xiaoban.homework.assignment.AssignmentDtos;
 import com.xiaoban.homework.assignment.AssignmentResourceService;
 import com.xiaoban.homework.assignment.AssignmentService;
+import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -21,11 +22,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.ArgumentCaptor;
 
 class VoiceMaterialAssignmentServiceTest {
   private final VoiceMaterialPackageRepository packages = mock(VoiceMaterialPackageRepository.class);
   private final VoiceMaterialFileRepository files = mock(VoiceMaterialFileRepository.class);
+  private final VoiceMaterialTaskLinkRepository links = mock(VoiceMaterialTaskLinkRepository.class);
   private final VoiceMaterialAutoCreateRecordRepository autoRecords =
       mock(VoiceMaterialAutoCreateRecordRepository.class);
   private final AssignmentService assignments = mock(AssignmentService.class);
@@ -35,75 +38,74 @@ class VoiceMaterialAssignmentServiceTest {
 
   private VoiceMaterialAssignmentService service() {
     return new VoiceMaterialAssignmentService(
-        packages, files, autoRecords, assignments, assignmentResources, students);
+        packages, files, links, autoRecords, assignments, assignmentResources, students);
   }
 
   @Test
-  void existingAutoCreateRecordDoesNotBlockRecreationAfterAssignmentDeletion() {
+  void sameDayAutoRecordRemainsIdempotentAfterAssignmentDeletion() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
-    VoiceMaterialAutoCreateRecordEntity existingRecord = new VoiceMaterialAutoCreateRecordEntity();
-    existingRecord.id = UUID.randomUUID();
-    existingRecord.familyId = familyId;
-    existingRecord.studentId = "student-1";
-    existingRecord.businessDate = LocalDate.now();
-    existingRecord.packageId = packageId;
-    existingRecord.assignmentId = "a-voicepkg-" + packageId;
+    VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
+    record.id = UUID.randomUUID();
+    record.familyId = familyId;
+    record.studentId = "student-1";
+    record.businessDate = LocalDate.now();
+    record.packageId = packageId;
+    record.assignmentId = "a-voice-deleted";
 
-    VoiceMaterialPackageEntity item = packageEntity(packageId, "001-语文", "CONSUMED");
-    item.consumedAssignmentId = existingRecord.assignmentId;
-
-    AssignmentDtos.Response created = response(existingRecord.assignmentId, "语文 · 语音作业");
-    when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(null);
-    when(packages.lockNextAvailableForAutoCreate(
-        any(UUID.class), anyString(), any())).thenReturn(List.of(item));
     when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
         any(UUID.class), anyString(), any(LocalDate.class)))
-        .thenReturn(Optional.of(existingRecord));
-    when(assignments.nextVoiceMaterialTaskTitle(
-        any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
-        .thenReturn("语文 · 语音作业");
-    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
-        .thenReturn(created);
-    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
-        familyId, packageId)).thenReturn(List.of());
+        .thenReturn(Optional.of(record));
+    when(assignments.get(familyId, record.assignmentId))
+        .thenThrow(new ApiExceptions.NotFound("作业不存在"));
 
     VoiceMaterialDtos.AutoCreateResponse result =
         service().autoCreateNext(familyId, "student-1");
 
-    assertTrue(result.created());
+    assertFalse(result.created());
     assertEquals(packageId.toString(), result.packageId());
-    assertEquals(existingRecord.assignmentId, result.assignmentId());
-    verify(packages).lockNextAvailableForAutoCreate(
-        familyId, "student-1", org.mockito.ArgumentMatchers.any());
+    assertEquals(record.assignmentId, result.assignmentId());
+    assertNull(result.assignment());
+    verify(packages, never()).findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        any(), anyString());
   }
 
   @Test
-  void currentManualVoiceTaskBlocksAutomaticCreation() {
+  void currentVoiceTaskBlocksAutomaticCreation() {
     UUID familyId = UUID.randomUUID();
-    AssignmentDtos.Response current = response("a-voicepkg-existing", "数学 · 语音作业");
+    AssignmentDtos.Response current = response("a-voice-existing", "数学 · 语音作业");
+    when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.empty());
     when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(current);
+    VoiceMaterialTaskLinkEntity link = link(UUID.randomUUID(), current.id(), "student-1");
+    when(links.findByFamilyIdAndAssignmentId(familyId, current.id()))
+        .thenReturn(Optional.of(link));
 
     VoiceMaterialDtos.AutoCreateResponse result =
         service().autoCreateNext(familyId, "student-1");
 
     assertFalse(result.created());
     assertEquals(current.id(), result.assignmentId());
-    assertEquals(current.id(), result.assignment().id());
-    verify(packages, never()).lockNextAvailableForAutoCreate(
-        any(UUID.class), anyString(), any());
+    assertEquals(link.packageId.toString(), result.packageId());
+    verify(packages, never()).findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        any(), anyString());
   }
 
   @Test
-  void automaticCreationUsesFirstPackageWithoutCurrentAssignmentAssociation() {
+  void automaticCreationUsesUnusedFolderAndKeepsItReady() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
-    VoiceMaterialPackageEntity item = packageEntity(packageId, "001-语文", "READY");
-    AssignmentDtos.Response created = response("a-voicepkg-" + packageId, "语文 · 语音作业");
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
+    AssignmentDtos.Response created = response("a-voice-new", "语文 · 语音作业");
 
+    when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.empty());
     when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(null);
-    when(packages.lockNextAvailableForAutoCreate(
-        any(UUID.class), anyString(), any())).thenReturn(List.of(item));
+    when(packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        familyId, "student-1")).thenReturn(List.of(item));
+    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(
+        familyId, "student-1")).thenReturn(List.of());
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
     when(assignments.nextVoiceMaterialTaskTitle(
         any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
         .thenReturn("语文 · 语音作业");
@@ -111,8 +113,6 @@ class VoiceMaterialAssignmentServiceTest {
         .thenReturn(created);
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
         familyId, packageId)).thenReturn(List.of());
-    when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
-        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.empty());
 
     VoiceMaterialDtos.AutoCreateResponse result =
         service().autoCreateNext(familyId, "student-1");
@@ -120,51 +120,59 @@ class VoiceMaterialAssignmentServiceTest {
     assertTrue(result.created());
     assertEquals(packageId.toString(), result.packageId());
     assertEquals(created.id(), result.assignmentId());
-    assertEquals("CONSUMED", item.status);
+    assertEquals("READY", item.status);
+    verify(links).saveAndFlush(any(VoiceMaterialTaskLinkEntity.class));
   }
 
   @Test
-  void manuallyReusesConsumedPackageWhenPreviousAssignmentWasDeleted() {
+  void manualCreationCanReusePreviouslyUsedReadyFolder() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
-    VoiceMaterialPackageEntity item = packageEntity(packageId, "001-语文", "CONSUMED");
-    item.consumedAssignmentId = "a-voicepkg-" + packageId;
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
+    AssignmentDtos.Response created = response("a-voice-second", "语文 · 第二次语音作业");
 
     when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
-    when(assignments.get(familyId, item.consumedAssignmentId))
-        .thenThrow(new com.xiaoban.homework.common.ApiExceptions.NotFound("作业不存在"));
-    when(assignments.nextVoiceMaterialTaskTitle(
-        any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
-        .thenReturn("语文 · 语音作业");
-    AssignmentDtos.Response created = response(item.consumedAssignmentId, "语文 · 语音作业");
+    when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(null);
     when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
         .thenReturn(created);
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
         familyId, packageId)).thenReturn(List.of());
 
-    VoiceMaterialDtos.CreateAssignmentResponse result =
-        service().createManually(familyId, packageId);
+    VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
+        familyId, packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest(
+            "student-1", 18, 0L, "", "语文 · 第二次语音作业", "req-2"));
 
     assertTrue(result.created());
     assertEquals(created.id(), result.assignmentId());
-    assertEquals("CONSUMED", item.status);
+    assertEquals("READY", item.status);
+    ArgumentCaptor<VoiceMaterialTaskLinkEntity> link =
+        ArgumentCaptor.forClass(VoiceMaterialTaskLinkEntity.class);
+    verify(links).saveAndFlush(link.capture());
+    assertEquals(packageId, link.getValue().packageId);
+    assertEquals(created.id(), link.getValue().assignmentId);
+    assertEquals("req-2", link.getValue().requestId);
   }
 
   @Test
-  void manuallyCreatingOnActivePackageReturnsExistingAssignment() {
+  void sameManualRequestIdReturnsExistingAssignment() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
-    VoiceMaterialPackageEntity item = packageEntity(packageId, "001-语文", "CONSUMED");
-    item.consumedAssignmentId = "a-voicepkg-" + packageId;
-    AssignmentDtos.Response existing = response(item.consumedAssignmentId, "语文 · 语音作业");
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
+    VoiceMaterialTaskLinkEntity link = link(packageId, "a-voice-existing", "student-1");
+    link.requestId = "req-1";
+    AssignmentDtos.Response existing = response(link.assignmentId, "语文 · 语音作业");
 
     when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
-    when(assignments.get(familyId, item.consumedAssignmentId)).thenReturn(existing);
+    when(links.findByFamilyIdAndRequestId(familyId, "req-1")).thenReturn(Optional.of(link));
+    when(assignments.get(familyId, link.assignmentId)).thenReturn(existing);
 
-    VoiceMaterialDtos.CreateAssignmentResponse result =
-        service().createManually(familyId, packageId);
+    VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
+        familyId, packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest(
+            "student-1", 15, 0L, "", "", "req-1"));
 
     assertFalse(result.created());
     assertEquals(existing.id(), result.assignmentId());
@@ -173,75 +181,54 @@ class VoiceMaterialAssignmentServiceTest {
   }
 
   @Test
-  void manualCreationUsesSelectedStudentDueDateAndExpectedMinutes() {
+  void manualCreationUsesTitleDueDateAndExpectedMinutes() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
-    VoiceMaterialPackageEntity item = packageEntity(packageId, "001-课文朗读", "READY");
-    item.expectedMinutes = 15;
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-课文朗读", "READY");
     when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
+    when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(null);
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
         familyId, packageId)).thenReturn(List.of());
-    when(assignments.nextVoiceMaterialTaskTitle(
-        any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
-        .thenReturn("语文 · 语音作业");
-    AssignmentDtos.Response authoritative = response("a-voicepkg-" + packageId, "语文 · 语音作业");
+    AssignmentDtos.Response authoritative = response("a-voice-new", "自定义语音作业");
     when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
         .thenReturn(authoritative);
 
     long dueAt = Instant.parse("2026-09-25T15:59:59Z").toEpochMilli();
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
-        new VoiceMaterialDtos.CreateAssignmentRequest("student-2", 30, dueAt, "自定义"));
+        new VoiceMaterialDtos.CreateAssignmentRequest(
+            "student-1", 30, dueAt, "自定义", "自定义语音作业", "req-custom"));
 
     ArgumentCaptor<AssignmentDtos.Create> input =
         ArgumentCaptor.forClass(AssignmentDtos.Create.class);
-    verify(assignments).create(any(UUID.class), org.mockito.ArgumentMatchers.eq("student-2"), input.capture());
+    verify(assignments).create(any(UUID.class), org.mockito.ArgumentMatchers.eq("student-1"), input.capture());
     assertEquals(30, input.getValue().expectedMinutes());
     assertEquals(dueAt, input.getValue().dueAtEpochMs());
+    assertEquals("自定义语音作业", input.getValue().title());
     assertTrue(result.created());
   }
 
   @Test
-  void readyManualPackageWithoutDueAtKeepsAssignmentDueAtNullable() {
+  void folderCannotBeUsedForDifferentStudent() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
-    VoiceMaterialPackageEntity item = packageEntity(packageId, "001-课文朗读", "READY");
-    item.subjectCode = "CHINESE";
-    item.title = "课文朗读";
-    item.assignmentType = "EXTRA";
-    item.expectedMinutes = 15;
-    item.dueAt = null;
-
     when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
-    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
-    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
-        familyId, packageId)).thenReturn(List.of());
-    when(assignments.nextVoiceMaterialTaskTitle(
-        any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
-        .thenReturn("语文 · 语音作业");
 
-    AssignmentDtos.Response authoritative = response("a-voicepkg-" + packageId, "语文 · 语音作业");
-    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
-        .thenReturn(authoritative);
+    Executable action = () -> service().createManually(
+        familyId, packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest(
+            "student-2", 15, 0L, "", "", "req-cross"));
 
-    VoiceMaterialDtos.CreateAssignmentResponse result =
-        service().createManually(familyId, packageId);
-
-    ArgumentCaptor<AssignmentDtos.Create> input =
-        ArgumentCaptor.forClass(AssignmentDtos.Create.class);
-    verify(assignments).create(any(UUID.class), anyString(), input.capture());
-    assertNull(input.getValue().dueAtEpochMs());
-    assertEquals("语文 · 语音作业", input.getValue().title());
-    assertTrue(result.created());
-    assertEquals("CONSUMED", item.status);
-    verify(students).requireOwnedForUpdate(familyId, "student-1");
+    org.junit.jupiter.api.Assertions.assertThrows(ApiExceptions.BadRequest.class, action);
+    verify(packages, never()).lockOwned(any(), any());
   }
 
-  private VoiceMaterialPackageEntity packageEntity(UUID id, String directoryName, String status) {
+  private VoiceMaterialPackageEntity packageEntity(
+      UUID familyId, UUID id, String directoryName, String status) {
     VoiceMaterialPackageEntity item = new VoiceMaterialPackageEntity();
     item.id = id;
-    item.familyId = UUID.randomUUID();
+    item.familyId = familyId;
     item.studentId = "student-1";
     item.directoryName = directoryName;
     item.subjectCode = "CHINESE";
@@ -250,7 +237,18 @@ class VoiceMaterialAssignmentServiceTest {
     item.expectedMinutes = 15;
     item.status = status;
     item.dueAt = null;
+    item.createdAt = Instant.now();
     return item;
+  }
+
+  private VoiceMaterialTaskLinkEntity link(UUID packageId, String assignmentId, String studentId) {
+    VoiceMaterialTaskLinkEntity link = new VoiceMaterialTaskLinkEntity();
+    link.id = UUID.randomUUID().toString();
+    link.packageId = packageId;
+    link.assignmentId = assignmentId;
+    link.studentId = studentId;
+    link.createdAt = Instant.now();
+    return link;
   }
 
   private AssignmentDtos.Response response(String id, String title) {
