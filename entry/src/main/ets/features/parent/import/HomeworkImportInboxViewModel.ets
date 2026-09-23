@@ -51,7 +51,7 @@ export class HomeworkImportInboxViewModel {
     if (filter === HomeworkImportInboxSourceFilter.SHARE) {
       return sourceType === HomeworkImportSourceType.SHARE;
     }
-    return sourceType === HomeworkImportSourceType.SCREEN_CAPTURE;
+    return false;
   }
 
   private matchesStatus(status: ImportBatchStatus, filter: HomeworkImportInboxStatusFilter): boolean {
