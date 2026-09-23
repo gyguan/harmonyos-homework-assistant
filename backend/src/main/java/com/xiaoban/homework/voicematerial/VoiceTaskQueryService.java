@@ -151,7 +151,8 @@ public class VoiceTaskQueryService {
           p.error_message,
           p.created_at as imported_at,
           coalesce(a.created_at, p.consumed_at) as task_created_at,
-          """ + STATUS_SQL + """ as display_status,
+        """ + STATUS_SQL + """
+          as display_status,
           (select count(*) from voice_material_file af
             where af.family_id = p.family_id and af.package_id = p.id
               and af.resource_type = 'AUDIO') as audio_count,
