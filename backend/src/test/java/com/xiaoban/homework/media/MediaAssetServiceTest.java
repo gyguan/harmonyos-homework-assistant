@@ -57,6 +57,33 @@ class MediaAssetServiceTest {
   }
 
   @Test
+  void differentFamilyFilesWithSameSizeCreateDifferentAssets() {
+    MediaAssetRepository repository = mock(MediaAssetRepository.class);
+    FileStorage storage = mock(FileStorage.class);
+    FamilyRepository families = mock(FamilyRepository.class);
+    UUID familyId = UUID.randomUUID();
+    when(families.lockById(familyId)).thenReturn(Optional.of(
+        new FamilyEntity(familyId, "差异文件测试家庭", java.time.Instant.now())));
+    when(repository.findByFamilyIdAndSha256AndSizeBytes(
+        any(UUID.class), anyString(), anyLong())).thenReturn(Optional.empty());
+    when(storage.save(any(), any())).thenAnswer(invocation -> {
+      UUID id = invocation.getArgument(0);
+      return new FileStorage.StoredFile("media/" + id + ".png", "image.png", "image/png", 3L);
+    });
+    when(repository.saveAndFlush(any(MediaAssetEntity.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+
+    MediaAssetService service = new MediaAssetService(repository, storage, families);
+    MediaAssetEntity first = service.store(familyId,
+        new MockMultipartFile("file", "5.png", "image/png", new byte[] {1, 2, 3}));
+    MediaAssetEntity second = service.store(familyId,
+        new MockMultipartFile("file", "6.png", "image/png", new byte[] {1, 2, 4}));
+
+    assertFalse(first.id.equals(second.id));
+    verify(storage, org.mockito.Mockito.times(2)).save(any(), any());
+  }
+
+  @Test
   void identicalFamilyFileReusesExistingAssetWithoutCopyingAgain() {
     MediaAssetRepository repository = mock(MediaAssetRepository.class);
     FileStorage storage = mock(FileStorage.class);
