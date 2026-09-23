@@ -10,6 +10,22 @@ on:
       - 'refactor/**'
 
 jobs:
+  validate-parent-import-inbox:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate homework inbox navigation
+        run: |
+          python scripts/validate_issue242_import_inbox.py
+          python scripts/validate_parent_import_ui_conformance.py
+
   validate-parent-home-progress:
     runs-on: ubuntu-latest
     steps:
