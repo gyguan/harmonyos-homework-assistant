@@ -3,9 +3,9 @@ package com.xiaoban.homework.voicematerial;
 import com.xiaoban.homework.auth.AuthInterceptor;
 import com.xiaoban.homework.media.MediaAssetService;
 import jakarta.validation.Valid;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.UUID;
-import java.net.MalformedURLException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ContentDisposition;
@@ -28,12 +28,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class VoiceMaterialController {
   private final VoiceMaterialService materials;
   private final VoiceMaterialAssignmentService assignments;
+  private final VoiceTaskQueryService voiceTasks;
   private final MediaAssetService mediaAssets;
 
   public VoiceMaterialController(VoiceMaterialService materials,
-      VoiceMaterialAssignmentService assignments, MediaAssetService mediaAssets) {
+      VoiceMaterialAssignmentService assignments,
+      VoiceTaskQueryService voiceTasks,
+      MediaAssetService mediaAssets) {
     this.materials = materials;
     this.assignments = assignments;
+    this.voiceTasks = voiceTasks;
     this.mediaAssets = mediaAssets;
   }
 
@@ -79,8 +83,32 @@ public class VoiceMaterialController {
     return materials.list(familyId, studentId);
   }
 
+  @GetMapping("/voice-task-items")
+  public VoiceMaterialDtos.VoiceTaskPageResponse queryVoiceTasks(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @RequestParam(required = false, defaultValue = "") String studentId,
+      @RequestParam(required = false, defaultValue = "") String status,
+      @RequestParam(required = false, defaultValue = "") String subjectCode,
+      @RequestParam(required = false, defaultValue = "") String keyword,
+      @RequestParam(required = false, defaultValue = "") String createdFrom,
+      @RequestParam(required = false, defaultValue = "") String createdTo,
+      @RequestParam(required = false, defaultValue = "0") int page,
+      @RequestParam(required = false, defaultValue = "20") int size,
+      @RequestParam(required = false, defaultValue = "createdAt,desc") String sort) {
+    return voiceTasks.query(familyId, studentId, status, subjectCode, keyword,
+        createdFrom, createdTo, page, size, sort);
+  }
+
+  @GetMapping("/voice-task-items/{packageId}")
+  public VoiceMaterialDtos.VoiceTaskDetailResponse getVoiceTaskDetail(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID packageId) {
+    return voiceTasks.detail(familyId, packageId);
+  }
+
   @GetMapping("/media-assets/{assetId}")
-  public ResponseEntity<Resource> downloadAsset(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+  public ResponseEntity<Resource> downloadAsset(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable UUID assetId) throws MalformedURLException {
     MediaAssetService.ResolvedAsset file = mediaAssets.resolveOwned(familyId, assetId);
     Resource resource = new UrlResource(file.path().toUri());
@@ -88,7 +116,8 @@ public class VoiceMaterialController {
     try { type = MediaType.parseMediaType(file.contentType()); }
     catch (IllegalArgumentException error) { type = MediaType.APPLICATION_OCTET_STREAM; }
     return ResponseEntity.ok().contentType(type)
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(file.originalName()).build().toString())
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.inline().filename(file.originalName()).build().toString())
         .body(resource);
   }
 

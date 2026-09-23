@@ -219,12 +219,24 @@ public class VoiceMaterialService {
     batches.save(batch);
 
     List<VoiceMaterialDtos.PackageResult> results = items.stream()
-        .map(item -> new VoiceMaterialDtos.PackageResult(
-            item.id.toString(),
-            item.batchId.toString(),
-            item.directoryName,
-            item.status,
-            item.errorMessage == null ? "" : item.errorMessage))
+        .map(item -> {
+          List<VoiceMaterialFileEntity> packageFiles =
+              files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(familyId, item.id);
+          int audioCount = (int) packageFiles.stream()
+              .filter(file -> "AUDIO".equals(file.resourceType)).count();
+          int imageCount = (int) packageFiles.stream()
+              .filter(file -> "IMAGE".equals(file.resourceType)).count();
+          return new VoiceMaterialDtos.PackageResult(
+              item.id.toString(),
+              item.batchId.toString(),
+              item.directoryName,
+              item.subjectCode,
+              item.expectedMinutes,
+              audioCount,
+              imageCount,
+              item.status,
+              item.errorMessage == null ? "" : item.errorMessage);
+        })
         .toList();
     return VoiceMaterialDtos.CompleteResponse.from(batch, results);
   }

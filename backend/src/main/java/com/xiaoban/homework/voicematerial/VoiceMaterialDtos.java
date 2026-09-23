@@ -27,6 +27,7 @@ public final class VoiceMaterialDtos {
   }
 
   public record PackageResult(String id, String batchId, String directoryName,
+      String subjectCode, int expectedMinutes, int audioCount, int imageCount,
       String status, String errorMessage) {}
 
   public record RegisterPackageRequest(
@@ -45,6 +46,31 @@ public final class VoiceMaterialDtos {
 
   public record FileResponse(String id, String assetId, String resourceType,
       String relativeName, int sortOrder) {}
+
+  public record VoiceTaskPageResponse(List<VoiceTaskItemResponse> items,
+      int page, int size, long totalElements, int totalPages) {}
+
+  public record VoiceTaskItemResponse(
+      String packageId,
+      String studentId,
+      String studentName,
+      String assignmentId,
+      String taskName,
+      String assignmentStatus,
+      String subjectCode,
+      String directoryName,
+      String displayStatus,
+      int audioCount,
+      int imageCount,
+      int expectedMinutes,
+      long taskCreatedAtEpochMs,
+      long importedAtEpochMs,
+      String errorMessage) {}
+
+  public record VoiceTaskHistoryItem(long atEpochMs, String type, String label) {}
+
+  public record VoiceTaskDetailResponse(VoiceTaskItemResponse item,
+      List<FileResponse> files, List<VoiceTaskHistoryItem> history) {}
 
   public record CreateAssignmentRequest(
       @NotBlank @Size(max = 80) String studentId,
