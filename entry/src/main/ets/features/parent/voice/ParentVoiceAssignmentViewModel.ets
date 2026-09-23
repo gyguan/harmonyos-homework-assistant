@@ -11,6 +11,7 @@ import {
   Assignment,
   AssignmentBacking,
   AssignmentContentType,
+  AssignmentStatus,
   AssignmentType,
   StudentProfile,
   Subject
