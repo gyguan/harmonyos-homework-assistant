@@ -83,11 +83,6 @@ public class VoiceMaterialAssignmentService {
       }
     }
 
-    AssignmentDtos.Response activeTarget =
-        assignments.findFirstVoiceMaterialTask(familyId, targetStudentId);
-    if (activeTarget != null) {
-      throw new ApiExceptions.Conflict("该学生当前已有语音任务，请完成或处理现有任务后再创建");
-    }
     if (!"READY".equals(item.status) && !"CONSUMED".equals(item.status)) {
       throw new ApiExceptions.BadRequest("当前文件夹不可用于创建任务");
     }
@@ -121,6 +116,15 @@ public class VoiceMaterialAssignmentService {
           false, businessDate.toString(), packageId, current.id(), current);
     }
 
+    VoiceMaterialAutoCreateRecordEntity todayRecord =
+        autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+            familyId, studentId, businessDate).orElse(null);
+    if (todayRecord != null) {
+      return new VoiceMaterialDtos.AutoCreateResponse(
+          false, businessDate.toString(), todayRecord.packageId.toString(),
+          todayRecord.assignmentId, null);
+    }
+
     VoiceMaterialPackageEntity item = chooseAutoFolder(familyId, studentId);
     if (item == null) {
       return new VoiceMaterialDtos.AutoCreateResponse(
@@ -137,10 +141,8 @@ public class VoiceMaterialAssignmentService {
         item.dueAt == null ? "今天" : "", businessDate,
         "", "", "AUTO");
 
-    VoiceMaterialAutoCreateRecordEntity record =
-        autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
-            familyId, studentId, businessDate).orElseGet(VoiceMaterialAutoCreateRecordEntity::new);
-    if (record.id == null) record.id = UUID.randomUUID();
+    VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
+    record.id = UUID.randomUUID();
     record.familyId = familyId;
     record.studentId = studentId;
     record.businessDate = businessDate;

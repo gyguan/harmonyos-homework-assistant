@@ -52,14 +52,35 @@ require("uq_voice_material_task_link_request" in link_migration,
         "manual folder assignment creation must support request idempotency")
 require("update voice_material_package" in link_migration and "status = 'READY'" in link_migration,
         "legacy consumed folders must migrate back to reusable READY state")
+require("uq_voice_material_auto_daily" in asset_migration and
+        "unique (family_id, student_id, business_date)" in asset_migration,
+        "database must enforce at most one automatic voice creation record per student per business day")
 
-# One student has at most one active voice task, while a folder can be reused over time.
+# Manual creation and automatic creation have different concurrency rules.
 require("VoiceMaterialTaskLinkRepository links" in assignment_service and
         "links.findByFamilyIdAndRequestId" in assignment_service,
         "manual folder creation must resolve idempotent retries through task links")
-require("findFirstVoiceMaterialTask(familyId, targetStudentId)" in assignment_service and
-        "当前已有语音任务" in assignment_service,
-        "manual creation must reject a second active voice task for the same student")
+manual_block = assignment_service.split(
+    "public VoiceMaterialDtos.CreateAssignmentResponse createManually(\n      UUID familyId, UUID packageId, VoiceMaterialDtos.CreateAssignmentRequest input)", 1)
+require(len(manual_block) == 2, "manual voice creation method must exist")
+if len(manual_block) == 2:
+    manual_body = manual_block[1].split(
+        "public VoiceMaterialDtos.AutoCreateResponse autoCreateNext", 1)[0]
+    require("findFirstVoiceMaterialTask" not in manual_body and "当前已有语音任务" not in manual_body,
+            "manual creation must allow multiple active voice tasks")
+auto_block = assignment_service.split("public VoiceMaterialDtos.AutoCreateResponse autoCreateNext", 1)
+require(len(auto_block) == 2 and
+        "assignments.findFirstVoiceMaterialTask(familyId, studentId)" in auto_block[1],
+        "automatic creation must stop when an effective voice task already exists")
+if len(auto_block) == 2:
+    auto_body = auto_block[1].split("private VoiceMaterialPackageEntity chooseAutoFolder", 1)[0]
+    require("todayRecord" in auto_body and
+            "autoRecords.findByFamilyIdAndStudentIdAndBusinessDate" in auto_body and
+            "if (todayRecord != null)" in auto_body,
+            "automatic creation must stop after the first automatic creation of the business day")
+    require("new VoiceMaterialAutoCreateRecordEntity()" in auto_body and
+            "orElseGet(VoiceMaterialAutoCreateRecordEntity::new)" not in auto_body,
+            "daily automatic creation record must be one-shot and must not be overwritten")
 require('String assignmentId = "a-voice-" + UUID.randomUUID()' in assignment_service,
         "folder reuse must create a distinct Assignment instance")
 require("link.packageId = item.id" in assignment_service and
@@ -97,8 +118,9 @@ require("VOICE_SOURCE_LOCAL" in voice_page and "VOICE_SOURCE_SERVER" in voice_pa
         "voice assignment page must unify local and server material sources")
 require("folderUsageText" in voice_page and "已使用" in voice_page and "未使用" in voice_page,
         "server folder picker must expose historical usage without treating used folders as unavailable")
-require("activeVoiceAssignment()" in voice_vm and "activeVoiceAssignment()" in voice_page,
-        "voice create UI must prevent a second active voice task before submit")
+require("activeVoiceAssignment()" not in voice_vm and "activeVoiceAssignment()" not in voice_page and
+        "当前已有语音作业，请先完成或处理现有任务" not in voice_page,
+        "parent manual voice creation UI must not block multiple active tasks")
 require("createRequestId" in voice_page and "createFromFolder" in voice_vm,
         "server-folder creation must use an idempotent request id")
 require("queryFolders(" in voice_vm,
@@ -121,13 +143,14 @@ require("VoiceMaterialAutoCreateService.instance.checkToday(studentId)" in index
 require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
         "deleting Assignment must not delete shared MediaAsset files")
 
-# Real E2E protects reuse, active-task exclusivity, deletion continuation and idempotent retry.
+# Real E2E protects manual multi-create, automatic guard, reuse and idempotent retry.
 for token in [
     "valid batch must have two reusable READY folders",
-    "reject second active voice task",
-    "deleted task must remain in folder usage history",
-    "auto recreate after first task deletion",
-    "reuse same folder manually",
+    "manual create while auto task active",
+    "auto skip while active voice tasks exist",
+    "auto skip while manual task remains active",
+    "enforce daily auto-create limit after all tasks cleared",
+    "create parallel manual task from same folder",
     "manual create idempotent retry",
 ]:
     require(token in voice_e2e, f"voice material E2E missing lifecycle assertion: {token}")

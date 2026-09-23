@@ -4,7 +4,7 @@ import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import { Assignment, Subject } from '../../../domain/model/HomeworkModels';
+import { Subject } from '../../../domain/model/HomeworkModels';
 import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 import { ParentVoiceAssignmentViewModel, VoiceAssignmentDraft } from './ParentVoiceAssignmentViewModel';
 
@@ -42,10 +42,6 @@ export struct ParentVoiceAssignmentPage {
 
   private readonly viewModel: ParentVoiceAssignmentViewModel =
     new ParentVoiceAssignmentViewModel(DefaultAssignmentRepository.instance);
-
-  private activeVoiceAssignment(): Assignment | null {
-    return this.viewModel.activeVoiceAssignment();
-  }
 
   private expectedMinutes(): number {
     let value = Number(this.expectedMinutesText.trim());
@@ -162,11 +158,6 @@ export struct ParentVoiceAssignmentPage {
 
   private async createTask(): Promise<void> {
     if (this.busy) return;
-    if (this.activeVoiceAssignment() !== null) {
-      this.showError('当前已有语音作业，请先完成或处理现有任务');
-      return;
-    }
-
     let expectedMinutes = this.expectedMinutes();
     if (expectedMinutes < 0) return this.showError('预计用时请输入 1～240 分钟的整数');
     let dueAt = this.dueAtEpochMs();
@@ -267,37 +258,6 @@ export struct ParentVoiceAssignmentPage {
       .width('100%');
     }
     .width('100%');
-  }
-
-  @Builder
-  private ActiveTaskNotice() {
-    if (this.activeVoiceAssignment() !== null) {
-      Row({ space: 10 }) {
-        SymbolGlyph($r('sys.symbol.exclamationmark_circle_fill'))
-          .fontSize(18)
-          .fontColor([AppTheme.WARNING]);
-        Column({ space: 3 }) {
-          Text('当前已有语音作业')
-            .fontSize(14)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text(this.activeVoiceAssignment()!.title)
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis });
-          Text('完成或处理现有任务后，可以创建新的语音作业')
-            .fontSize(12)
-            .fontColor(AppTheme.WARNING);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-      }
-      .width('100%')
-      .padding(12)
-      .backgroundColor(AppTheme.WARNING_SOFT)
-      .borderRadius(AppTheme.CONTROL_RADIUS);
-    }
   }
 
   @Builder
@@ -633,8 +593,6 @@ export struct ParentVoiceAssignmentPage {
 
         Scroll() {
           Column({ space: 14 }) {
-            this.ActiveTaskNotice();
-
             Column({ space: 18 }) {
               this.SourceSelector();
               Divider().color(AppTheme.DIVIDER);
@@ -663,10 +621,10 @@ export struct ParentVoiceAssignmentPage {
               .width('100%')
               .height(AppTheme.BUTTON_HEIGHT)
               .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(!this.busy && this.activeVoiceAssignment() === null)
+              .enabled(!this.busy)
               .fontSize(15)
               .fontWeight(FontWeight.Medium)
-              .backgroundColor(this.activeVoiceAssignment() === null ? AppTheme.PRIMARY : AppTheme.DISABLED)
+              .backgroundColor(AppTheme.PRIMARY)
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .onClick(() => { void this.createTask(); });
           }
