@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>小伴管理台</title>
-  <link rel="stylesheet" href="/admin/css/admin.css?v=20260923-3">
+  <link rel="stylesheet" href="/admin/css/admin.css?v=20260923-4">
 </head>
 <body>
   <div id="login-view" class="login-shell">
@@ -45,238 +45,253 @@
       <header class="page-header page-header-with-action">
         <div>
           <h1>语音任务</h1>
-          <p>查询语音任务及其来源文件夹，并通过文件夹导入补充新的语音素材。</p>
+          <p>管理已创建的语音任务，以及可重复使用的语音素材文件夹。</p>
         </div>
-        <button id="open-import" class="primary-button" type="button">导入语音文件夹</button>
+        <div class="header-actions">
+          <button id="open-create-task" class="secondary-button" type="button">创建语音任务</button>
+          <button id="open-import" class="primary-button" type="button">导入语音文件夹</button>
+        </div>
       </header>
 
-      <section class="card search-card" aria-label="语音任务查询条件">
-        <div class="section-title-row">
-          <div><h2>查询条件</h2></div>
-        </div>
-        <form id="task-search-form" class="search-form">
-          <label>学生
-            <select id="student-select"></select>
-          </label>
-          <label>任务状态
-            <select id="status-filter">
-              <option value="">全部</option>
-              <option value="ACTIVE">已创建</option>
-              <option value="READY">待创建</option>
-              <option value="USED_BEFORE">已创建过</option>
-              <option value="INVALID">导入失败</option>
-              <option value="PROCESSING">处理中</option>
-            </select>
-          </label>
-          <label>科目
-            <select id="subject-filter">
-              <option value="">全部</option>
-              <option value="CHINESE">语文</option>
-              <option value="MATH">数学</option>
-              <option value="ENGLISH">英语</option>
-              <option value="OTHER">其他</option>
-            </select>
-          </label>
-          <label class="search-keyword">关键词
-            <input id="keyword-filter" type="search" maxlength="100" placeholder="任务名称 / 文件夹名称 / 文件名">
-          </label>
-          <label>任务创建开始时间
-            <input id="created-from" type="date">
-          </label>
-          <label>任务创建结束时间
-            <input id="created-to" type="date">
-          </label>
-          <div class="search-actions">
-            <button id="reset-search" class="secondary-button" type="button">重置</button>
-            <button class="primary-button" type="submit">查询</button>
-          </div>
-        </form>
-      </section>
+      <div class="page-tabs" role="tablist">
+        <button id="tab-tasks" class="page-tab active" type="button" role="tab" aria-selected="true">任务列表</button>
+        <button id="tab-folders" class="page-tab" type="button" role="tab" aria-selected="false">语音文件夹</button>
+      </div>
 
-      <section class="card result-card">
-        <div class="result-toolbar">
-          <div>
-            <h2>查询结果</h2>
-            <p id="result-summary">正在加载…</p>
-          </div>
-          <button id="refresh-tasks" class="text-button" type="button">刷新</button>
-        </div>
-
-        <div class="table-shell">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>任务名称</th>
-                <th>状态</th>
-                <th>学生</th>
-                <th>科目</th>
-                <th>来源文件夹</th>
-                <th>素材</th>
-                <th>预计用时</th>
-                <th>任务创建时间</th>
-                <th class="operation-column">操作</th>
-              </tr>
-            </thead>
-            <tbody id="task-table-body"></tbody>
-          </table>
-          <div id="task-empty" class="table-empty" hidden>
-            <strong>没有符合条件的语音任务</strong>
-            <span>可以调整查询条件，或导入新的语音文件夹。</span>
-          </div>
-        </div>
-
-        <div class="pagination-bar">
-          <label class="page-size">每页
-            <select id="page-size">
-              <option value="20">20</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
-            </select>
-            条
-          </label>
-          <div id="pagination" class="pagination"></div>
-        </div>
-      </section>
-    </main>
-  </div>
-
-  <div id="detail-drawer" class="drawer" hidden>
-    <div class="drawer-backdrop" data-close-detail></div>
-    <section class="drawer-panel detail-panel" role="dialog" aria-modal="true" aria-label="语音任务详情">
-      <header class="drawer-header">
-        <div><h2>语音任务详情</h2><p id="detail-subtitle"></p></div>
-        <button id="close-detail" class="icon-button" type="button" aria-label="关闭">×</button>
-      </header>
-      <div id="detail-content" class="drawer-body"></div>
-      <footer id="detail-footer" class="drawer-footer"></footer>
-    </section>
-  </div>
-
-  <div id="import-drawer" class="drawer" hidden>
-    <div class="drawer-backdrop" data-close-import></div>
-    <section class="drawer-panel import-panel" role="dialog" aria-modal="true" aria-label="导入语音文件夹">
-      <header class="drawer-header">
-        <div>
-          <h2>导入语音文件夹</h2>
-          <p>每个目录需要包含 1 个语音文件和至少 1 张图片。</p>
-        </div>
-        <button id="close-import" class="icon-button" type="button" aria-label="关闭">×</button>
-      </header>
-
-      <div class="drawer-body import-body">
-        <section id="import-select-stage">
-          <div class="import-defaults">
-            <label>学生<select id="import-student-select"></select></label>
-            <label>默认科目
-              <select id="import-default-subject">
+      <section id="task-view">
+        <section class="card search-card">
+          <div class="section-title-row"><h2>查询条件</h2></div>
+          <form id="task-search-form" class="search-form">
+            <label>学生<select id="task-student"></select></label>
+            <label>任务状态
+              <select id="task-status">
+                <option value="">全部</option>
+                <option value="NOT_STARTED">待开始</option>
+                <option value="IN_PROGRESS">进行中</option>
+                <option value="PAUSED">已暂停</option>
+                <option value="READY_TO_SUBMIT">待提交</option>
+                <option value="SUBMITTED">待验收</option>
+                <option value="NEEDS_REWORK">需重做</option>
+                <option value="OVERDUE">已逾期</option>
+                <option value="COMPLETED">已完成</option>
+              </select>
+            </label>
+            <label>科目
+              <select id="task-subject">
+                <option value="">全部</option>
                 <option value="CHINESE">语文</option>
                 <option value="MATH">数学</option>
                 <option value="ENGLISH">英语</option>
                 <option value="OTHER">其他</option>
               </select>
             </label>
-            <label>默认预计用时
-              <div class="inline-input"><input id="import-default-minutes" type="number" min="1" max="240" value="15"><span>分钟</span></div>
+            <label class="search-keyword">关键词
+              <input id="task-keyword" type="search" maxlength="100" placeholder="任务名称 / 来源文件夹">
             </label>
-            <button id="apply-import-defaults" class="secondary-button align-end" type="button">应用到已识别目录</button>
-          </div>
-
-          <input id="folder-input" type="file" webkitdirectory multiple hidden>
-          <button id="folder-picker" class="drop-zone compact" type="button">
-            <span class="folder-icon">＋</span>
-            <strong>选择语音文件夹</strong>
-            <span>也可以将多个文件夹拖到这里</span>
-            <small>支持 mp3 / m4a / wav / jpg / jpeg / png / webp / heic</small>
-          </button>
-
-          <div class="import-list-toolbar">
-            <div>
-              <h3>待导入目录</h3>
-              <p id="import-preview-summary">尚未选择文件夹</p>
+            <label>任务创建开始时间<input id="task-created-from" type="date"></label>
+            <label>任务创建结束时间<input id="task-created-to" type="date"></label>
+            <div class="search-actions">
+              <button id="task-reset" class="secondary-button" type="button">重置</button>
+              <button class="primary-button" type="submit">查询</button>
             </div>
-            <input id="import-folder-search" type="search" placeholder="搜索文件夹名称">
-          </div>
-
-          <div class="table-shell import-table-shell">
-            <table class="data-table import-table">
-              <thead>
-                <tr>
-                  <th class="checkbox-column"><input id="select-all-import" type="checkbox" aria-label="全选"></th>
-                  <th>文件夹名称</th>
-                  <th>科目</th>
-                  <th>预计用时</th>
-                  <th>素材</th>
-                  <th>校验结果</th>
-                  <th class="operation-column">操作</th>
-                </tr>
-              </thead>
-              <tbody id="import-table-body"></tbody>
-            </table>
-            <div id="import-empty" class="table-empty">
-              <strong>请选择需要导入的语音文件夹</strong>
-              <span>可以选择一个包含多个子目录的根目录，也可以拖入多个文件夹。</span>
-            </div>
-          </div>
+          </form>
         </section>
 
-        <section id="import-progress-stage" class="import-progress-stage" hidden>
-          <div class="progress-heading">
-            <div><h3>正在导入</h3><p id="import-progress-text">准备上传…</p></div>
-            <strong id="import-progress-percent">0%</strong>
-          </div>
-          <div class="progress-track"><div id="import-progress-bar" class="progress-bar"></div></div>
-        </section>
-
-        <section id="import-result-stage" hidden>
-          <div class="import-result-heading">
-            <div>
-              <h3>导入结果</h3>
-              <p id="import-result-summary"></p>
-            </div>
-            <div class="segmented" id="import-result-filter">
-              <button class="active" type="button" data-result-filter="ALL">全部</button>
-              <button type="button" data-result-filter="SUCCESS">成功</button>
-              <button type="button" data-result-filter="FAILED">失败</button>
-            </div>
+        <section class="card result-card">
+          <div class="result-toolbar">
+            <div><h2>查询结果</h2><p id="task-result-summary">正在加载…</p></div>
+            <button id="task-refresh" class="text-button" type="button">刷新</button>
           </div>
           <div class="table-shell">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>文件夹名称</th>
-                  <th>科目</th>
-                  <th>素材</th>
-                  <th>导入结果</th>
-                  <th>结果说明</th>
-                </tr>
-              </thead>
-              <tbody id="import-result-body"></tbody>
+            <table class="data-table task-table">
+              <thead><tr>
+                <th>任务名称</th><th>状态</th><th>学生</th><th>科目</th>
+                <th>来源文件夹</th><th>预计用时</th><th>创建时间</th><th class="operation-column">操作</th>
+              </tr></thead>
+              <tbody id="task-table-body"></tbody>
             </table>
+            <div id="task-empty" class="table-empty" hidden>
+              <strong>没有符合条件的语音任务</strong><span>可以调整查询条件，或创建新的语音任务。</span>
+            </div>
+          </div>
+          <div class="pagination-bar">
+            <label class="page-size">每页<select id="task-page-size"><option>20</option><option>50</option><option>100</option></select>条</label>
+            <div id="task-pagination" class="pagination"></div>
           </div>
         </section>
-      </div>
+      </section>
 
-      <footer class="drawer-footer import-footer">
-        <div id="import-selected-summary" class="footer-summary">已选择 0 个目录</div>
+      <section id="folder-view" hidden>
+        <section class="card search-card">
+          <div class="section-title-row"><h2>查询条件</h2></div>
+          <form id="folder-search-form" class="search-form">
+            <label>学生<select id="folder-student"></select></label>
+            <label>文件夹状态
+              <select id="folder-status">
+                <option value="">全部</option>
+                <option value="READY">可用</option>
+                <option value="INVALID">导入失败</option>
+                <option value="PROCESSING">处理中</option>
+                <option value="ARCHIVED">已归档</option>
+              </select>
+            </label>
+            <label>科目
+              <select id="folder-subject">
+                <option value="">全部</option>
+                <option value="CHINESE">语文</option>
+                <option value="MATH">数学</option>
+                <option value="ENGLISH">英语</option>
+                <option value="OTHER">其他</option>
+              </select>
+            </label>
+            <label>使用情况
+              <select id="folder-usage">
+                <option value="ALL">全部</option>
+                <option value="UNUSED">从未使用</option>
+                <option value="USED">已使用</option>
+              </select>
+            </label>
+            <label class="search-keyword">关键词
+              <input id="folder-keyword" type="search" maxlength="100" placeholder="文件夹名称 / 文件名">
+            </label>
+            <label>导入开始时间<input id="folder-imported-from" type="date"></label>
+            <label>导入结束时间<input id="folder-imported-to" type="date"></label>
+            <div class="search-actions folder-search-actions">
+              <button id="folder-reset" class="secondary-button" type="button">重置</button>
+              <button class="primary-button" type="submit">查询</button>
+            </div>
+          </form>
+        </section>
+
+        <section class="card result-card">
+          <div class="result-toolbar">
+            <div><h2>查询结果</h2><p id="folder-result-summary">正在加载…</p></div>
+            <button id="folder-refresh" class="text-button" type="button">刷新</button>
+          </div>
+          <div class="table-shell">
+            <table class="data-table folder-table">
+              <thead><tr>
+                <th>文件夹名称</th><th>状态</th><th>学生</th><th>科目</th><th>素材</th>
+                <th>使用次数</th><th>最近使用</th><th>导入时间</th><th class="operation-column">操作</th>
+              </tr></thead>
+              <tbody id="folder-table-body"></tbody>
+            </table>
+            <div id="folder-empty" class="table-empty" hidden>
+              <strong>没有符合条件的语音文件夹</strong><span>可以调整查询条件，或导入新的语音文件夹。</span>
+            </div>
+          </div>
+          <div class="pagination-bar">
+            <label class="page-size">每页<select id="folder-page-size"><option>20</option><option>50</option><option>100</option></select>条</label>
+            <div id="folder-pagination" class="pagination"></div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <div id="task-detail-drawer" class="drawer" hidden>
+    <div class="drawer-backdrop" data-close-task-detail></div>
+    <section class="drawer-panel detail-panel" role="dialog" aria-modal="true" aria-label="语音任务详情">
+      <header class="drawer-header"><div><h2>语音任务详情</h2><p id="task-detail-subtitle"></p></div><button id="close-task-detail" class="icon-button" type="button">×</button></header>
+      <div id="task-detail-content" class="drawer-body"></div>
+      <footer id="task-detail-footer" class="drawer-footer"></footer>
+    </section>
+  </div>
+
+  <div id="folder-detail-drawer" class="drawer" hidden>
+    <div class="drawer-backdrop" data-close-folder-detail></div>
+    <section class="drawer-panel detail-panel" role="dialog" aria-modal="true" aria-label="语音文件夹详情">
+      <header class="drawer-header"><div><h2>语音文件夹详情</h2><p id="folder-detail-subtitle"></p></div><button id="close-folder-detail" class="icon-button" type="button">×</button></header>
+      <div id="folder-detail-content" class="drawer-body"></div>
+      <footer id="folder-detail-footer" class="drawer-footer"></footer>
+    </section>
+  </div>
+
+  <div id="create-drawer" class="drawer" hidden>
+    <div class="drawer-backdrop" data-close-create></div>
+    <section class="drawer-panel create-panel" role="dialog" aria-modal="true" aria-label="创建语音任务">
+      <header class="drawer-header"><div><h2>创建语音任务</h2><p id="create-step-caption">1 选择语音文件夹</p></div><button id="close-create" class="icon-button" type="button">×</button></header>
+      <div class="drawer-body">
+        <section id="create-folder-stage">
+          <form id="create-folder-search-form" class="create-search-form">
+            <label>学生<select id="create-student"></select></label>
+            <label>科目
+              <select id="create-subject"><option value="">全部</option><option value="CHINESE">语文</option><option value="MATH">数学</option><option value="ENGLISH">英语</option><option value="OTHER">其他</option></select>
+            </label>
+            <label>使用情况
+              <select id="create-usage"><option value="ALL">全部</option><option value="UNUSED">从未使用</option><option value="USED">已使用</option></select>
+            </label>
+            <label class="search-keyword">关键词<input id="create-keyword" type="search" placeholder="文件夹名称 / 文件名"></label>
+            <div class="search-actions"><button id="create-folder-reset" class="secondary-button" type="button">重置</button><button class="primary-button" type="submit">查询</button></div>
+          </form>
+          <div class="table-shell create-folder-table-shell">
+            <table class="data-table">
+              <thead><tr><th class="radio-column">选择</th><th>文件夹名称</th><th>科目</th><th>素材</th><th>使用情况</th><th>最近使用</th></tr></thead>
+              <tbody id="create-folder-body"></tbody>
+            </table>
+            <div id="create-folder-empty" class="table-empty" hidden><strong>没有可用文件夹</strong><span>可以先导入语音文件夹。</span></div>
+          </div>
+          <div class="pagination-bar">
+            <span id="create-folder-summary" class="muted"></span>
+            <div id="create-folder-pagination" class="pagination"></div>
+          </div>
+        </section>
+
+        <section id="create-settings-stage" hidden>
+          <div id="create-selected-folder" class="selected-folder-card"></div>
+          <div class="settings-form">
+            <label>任务名称<input id="create-title" maxlength="300"></label>
+            <label>预计用时<div class="inline-input"><input id="create-minutes" type="number" min="1" max="240"><span>分钟</span></div></label>
+            <label>截止时间<input id="create-due-at" type="datetime-local"></label>
+          </div>
+          <p id="create-message" class="form-message" hidden></p>
+        </section>
+      </div>
+      <footer class="drawer-footer">
+        <div id="create-footer-summary" class="footer-summary"></div>
         <div class="footer-actions">
-          <button id="import-cancel" class="secondary-button" type="button">取消</button>
-          <button id="import-another" class="secondary-button" type="button" hidden>继续导入</button>
-          <button id="import-finish" class="primary-button" type="button" hidden>完成并返回任务列表</button>
-          <button id="start-import" class="primary-button" type="button" disabled>开始导入</button>
+          <button id="create-cancel" class="secondary-button" type="button">取消</button>
+          <button id="create-back" class="secondary-button" type="button" hidden>上一步</button>
+          <button id="create-next" class="primary-button" type="button" disabled>下一步</button>
+          <button id="create-submit" class="primary-button" type="button" hidden>创建任务</button>
         </div>
       </footer>
     </section>
   </div>
 
-  <div id="asset-viewer" class="asset-viewer" hidden>
-    <div class="asset-viewer-backdrop" data-close-viewer></div>
-    <section class="asset-viewer-dialog" role="dialog" aria-modal="true" aria-label="素材预览">
-      <button id="close-asset-viewer" class="asset-viewer-close" type="button" aria-label="关闭">×</button>
-      <div id="asset-viewer-content"></div>
+  <div id="import-drawer" class="drawer" hidden>
+    <div class="drawer-backdrop" data-close-import></div>
+    <section class="drawer-panel import-panel" role="dialog" aria-modal="true" aria-label="导入语音文件夹">
+      <header class="drawer-header"><div><h2>导入语音文件夹</h2><p>每个目录需要包含 1 个语音文件和至少 1 张图片。</p></div><button id="close-import" class="icon-button" type="button">×</button></header>
+      <div class="drawer-body">
+        <section id="import-select-stage">
+          <div class="import-defaults">
+            <label>学生<select id="import-student"></select></label>
+            <label>默认科目<select id="import-subject"><option value="CHINESE">语文</option><option value="MATH">数学</option><option value="ENGLISH">英语</option><option value="OTHER">其他</option></select></label>
+            <label>默认预计用时<div class="inline-input"><input id="import-minutes" type="number" min="1" max="240" value="15"><span>分钟</span></div></label>
+            <button id="apply-import-defaults" class="secondary-button align-end" type="button">应用到已识别目录</button>
+          </div>
+          <input id="folder-input" type="file" webkitdirectory multiple hidden>
+          <button id="folder-picker" class="drop-zone" type="button"><span class="folder-icon">＋</span><strong>选择语音文件夹</strong><span>也可以将多个文件夹拖到这里</span><small>支持 mp3 / m4a / wav / jpg / jpeg / png / webp / heic</small></button>
+          <div class="import-list-toolbar"><div><h3>待导入目录</h3><p id="import-preview-summary">尚未选择文件夹</p></div><input id="import-folder-search" type="search" placeholder="搜索文件夹名称"></div>
+          <div class="table-shell import-table-shell">
+            <table class="data-table"><thead><tr><th class="checkbox-column"><input id="select-all-import" type="checkbox"></th><th>文件夹名称</th><th>科目</th><th>预计用时</th><th>素材</th><th>校验结果</th><th class="operation-column">操作</th></tr></thead><tbody id="import-table-body"></tbody></table>
+            <div id="import-empty" class="table-empty"><strong>请选择需要导入的语音文件夹</strong><span>可以选择一个根目录，也可以拖入多个文件夹。</span></div>
+          </div>
+        </section>
+        <section id="import-progress-stage" hidden><div class="progress-heading"><div><h3>正在导入</h3><p id="import-progress-text">准备上传…</p></div><strong id="import-progress-percent">0%</strong></div><div class="progress-track"><div id="import-progress-bar" class="progress-bar"></div></div></section>
+        <section id="import-result-stage" hidden>
+          <div class="import-result-heading"><div><h3>导入结果</h3><p id="import-result-summary"></p></div><div class="segmented" id="import-result-filter"><button class="active" type="button" data-result-filter="ALL">全部</button><button type="button" data-result-filter="SUCCESS">成功</button><button type="button" data-result-filter="FAILED">失败</button></div></div>
+          <div class="table-shell"><table class="data-table"><thead><tr><th>文件夹名称</th><th>科目</th><th>素材</th><th>导入结果</th><th>结果说明</th></tr></thead><tbody id="import-result-body"></tbody></table></div>
+        </section>
+      </div>
+      <footer class="drawer-footer"><div id="import-selected-summary" class="footer-summary">已选择 0 个目录</div><div class="footer-actions"><button id="import-cancel" class="secondary-button" type="button">取消</button><button id="import-another" class="secondary-button" type="button" hidden>继续导入</button><button id="import-finish" class="primary-button" type="button" hidden>查看语音文件夹</button><button id="start-import" class="primary-button" type="button" disabled>开始导入</button></div></footer>
     </section>
   </div>
 
-  <script type="module" src="/admin/js/login-shell.js?v=20260923-3"></script>
-  <script type="module" src="/admin/js/app.js?v=20260923-3"></script>
+  <div id="asset-viewer" class="asset-viewer" hidden><div class="asset-viewer-backdrop" data-close-viewer></div><section class="asset-viewer-dialog" role="dialog" aria-modal="true"><button id="close-asset-viewer" class="asset-viewer-close" type="button">×</button><div id="asset-viewer-content"></div></section></div>
+
+  <script type="module" src="/admin/js/login-shell.js?v=20260923-4"></script>
+  <script type="module" src="/admin/js/app.js?v=20260923-4"></script>
 </body>
 </html>

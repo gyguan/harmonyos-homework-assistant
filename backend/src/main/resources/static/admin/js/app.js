@@ -1,823 +1,212 @@
 import {
-  completeVoiceMaterialBatch,
-  createVoiceMaterialAssignment,
-  createVoiceMaterialBatch,
-  fetchVoiceMaterialAsset,
-  getVoiceTaskDetail,
-  listStudents,
-  logout,
-  registerVoiceMaterialPackage,
-  searchVoiceTasks,
+  completeVoiceMaterialBatch, createVoiceMaterialAssignment, createVoiceMaterialBatch,
+  fetchVoiceMaterialAsset, getVoiceFolderDetail, getVoiceTaskDetail, listStudents,
+  logout, registerVoiceMaterialPackage, searchVoiceFolders, searchVoiceTasks,
   uploadVoiceMaterialFile
-} from './api.js?v=20260923-3';
-import {
-  SUBJECTS,
-  parseVoiceMaterialPackages,
-  uploadOrder,
-  validatePackage
-} from './voice-material.js?v=20260923-3';
+} from './api.js?v=20260923-4';
+import { SUBJECTS, parseVoiceMaterialPackages, uploadOrder, validatePackage } from './voice-material.js?v=20260923-4';
 
 const el = id => document.getElementById(id);
 const state = {
-  initialized: false,
-  students: [],
-  items: [],
-  page: 0,
-  size: 20,
-  totalPages: 0,
-  totalElements: 0,
-  loading: false,
-  detail: null,
-  importPackages: [],
-  importIgnoredCount: 0,
-  importing: false,
-  importResults: [],
-  importResultFilter: 'ALL'
+  initialized: false, students: [], activeTab: 'tasks',
+  tasks: { items: [], page: 0, size: 20, totalPages: 0, totalElements: 0 },
+  folders: { items: [], page: 0, size: 20, totalPages: 0, totalElements: 0 },
+  create: { items: [], page: 0, size: 10, totalPages: 0, totalElements: 0, selected: null, requestId: '' },
+  taskDetail: null, folderDetail: null,
+  importPackages: [], importIgnoredCount: 0, importing: false, importResults: [], importResultFilter: 'ALL'
 };
 
-const studentSelect = el('student-select');
-const statusFilter = el('status-filter');
-const subjectFilter = el('subject-filter');
-const keywordFilter = el('keyword-filter');
-const createdFrom = el('created-from');
-const createdTo = el('created-to');
-const taskTableBody = el('task-table-body');
-const taskEmpty = el('task-empty');
-const resultSummary = el('result-summary');
-const pageSize = el('page-size');
-const pagination = el('pagination');
-
-const detailDrawer = el('detail-drawer');
-const detailSubtitle = el('detail-subtitle');
-const detailContent = el('detail-content');
-const detailFooter = el('detail-footer');
-
-const importDrawer = el('import-drawer');
-const importStudentSelect = el('import-student-select');
-const importDefaultSubject = el('import-default-subject');
-const importDefaultMinutes = el('import-default-minutes');
-const folderInput = el('folder-input');
-const folderPicker = el('folder-picker');
-const importFolderSearch = el('import-folder-search');
-const importTableBody = el('import-table-body');
-const importEmpty = el('import-empty');
-const importPreviewSummary = el('import-preview-summary');
-const selectAllImport = el('select-all-import');
-const importSelectStage = el('import-select-stage');
-const importProgressStage = el('import-progress-stage');
-const importProgressText = el('import-progress-text');
-const importProgressPercent = el('import-progress-percent');
-const importProgressBar = el('import-progress-bar');
-const importResultStage = el('import-result-stage');
-const importResultSummary = el('import-result-summary');
-const importResultBody = el('import-result-body');
-const importSelectedSummary = el('import-selected-summary');
-const startImportButton = el('start-import');
-const importCancelButton = el('import-cancel');
-const importAnotherButton = el('import-another');
-const importFinishButton = el('import-finish');
-
-const assetViewer = el('asset-viewer');
-const assetViewerContent = el('asset-viewer-content');
-
-function escapeHtml(value) {
-  return String(value ?? '').replace(/[&<>"']/g, char => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-  })[char]);
+const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const subjectLabel = code => SUBJECTS.find(x => x.code === code)?.label || '其他';
+const pad = n => String(n).padStart(2, '0');
+function formatDateTime(ms) {
+  const n = Number(ms || 0); if (!n) return '—'; const d = new Date(n); if (Number.isNaN(d.getTime())) return '—';
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-
-function subjectLabel(code) {
-  return SUBJECTS.find(item => item.code === code)?.label || '其他';
+function taskStatusLabel(status) {
+  return ({NOT_STARTED:'待开始',IN_PROGRESS:'进行中',PAUSED:'已暂停',READY_TO_SUBMIT:'待提交',SUBMITTED:'待验收',NEEDS_REWORK:'需重做',OVERDUE:'已逾期',COMPLETED:'已完成'})[status] || status || '—';
 }
-
-function statusInfo(status) {
-  const map = {
-    ACTIVE: { label: '已创建', className: 'success' },
-    READY: { label: '待创建', className: 'ready' },
-    USED_BEFORE: { label: '已创建过', className: 'used' },
-    INVALID: { label: '导入失败', className: 'danger' },
-    PROCESSING: { label: '处理中', className: 'muted' }
-  };
-  return map[status] || { label: status || '未知', className: 'muted' };
+function taskStatusClass(status) {
+  if (status === 'COMPLETED') return 'success'; if (status === 'OVERDUE' || status === 'NEEDS_REWORK') return 'danger';
+  if (status === 'IN_PROGRESS' || status === 'READY_TO_SUBMIT' || status === 'SUBMITTED') return 'ready'; return 'muted';
 }
+function folderStatusLabel(status) { return ({READY:'可用',INVALID:'导入失败',PROCESSING:'处理中',ARCHIVED:'已归档'})[status] || status || '—'; }
+function folderStatusClass(status) { return status === 'READY' ? 'success' : status === 'INVALID' ? 'danger' : 'muted'; }
+function uuid() { return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
 
-function formatDateTime(epochMs) {
-  const value = Number(epochMs || 0);
-  if (!value) return '—';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '—';
-  const pad = part => String(part).padStart(2, '0');
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+function studentOptions() {
+  if (!state.students.length) return '<option value="">当前家庭还没有学生</option>';
+  return state.students.map(s => `<option value="${esc(s.id)}">${esc(s.name)} · ${esc(s.grade)} ${esc(s.semester)}</option>`).join('');
 }
-
 function populateStudents() {
-  const options = state.students.map(student =>
-    `<option value="${escapeHtml(student.id)}">${escapeHtml(student.name)} · ${escapeHtml(student.grade)} ${escapeHtml(student.semester)}</option>`
-  ).join('');
-  const empty = '<option value="">当前家庭还没有学生</option>';
-  studentSelect.innerHTML = options || empty;
-  importStudentSelect.innerHTML = options || empty;
+  for (const id of ['task-student','folder-student','create-student','import-student']) el(id).innerHTML = studentOptions();
 }
 
-function currentFilters() {
-  return {
-    studentId: studentSelect.value,
-    status: statusFilter.value,
-    subjectCode: subjectFilter.value,
-    keyword: keywordFilter.value.trim(),
-    createdFrom: createdFrom.value,
-    createdTo: createdTo.value,
-    page: state.page,
-    size: state.size,
-    sort: 'createdAt,desc'
-  };
+function renderPager(target, page, totalPages) {
+  if (totalPages <= 1) { target.innerHTML = ''; return; }
+  const out = [`<button data-page="${page-1}" ${page<=0?'disabled':''}>上一页</button>`];
+  const start=Math.max(0,page-2), end=Math.min(totalPages-1,page+2);
+  if(start>0){out.push('<button data-page="0">1</button>');if(start>1)out.push('<span>…</span>');}
+  for(let i=start;i<=end;i++)out.push(`<button data-page="${i}" class="${i===page?'active':''}">${i+1}</button>`);
+  if(end<totalPages-1){if(end<totalPages-2)out.push('<span>…</span>');out.push(`<button data-page="${totalPages-1}">${totalPages}</button>`);}
+  out.push(`<button data-page="${page+1}" ${page>=totalPages-1?'disabled':''}>下一页</button>`);
+  target.innerHTML=out.join('');
 }
 
-async function loadStudentsAndTasks() {
-  state.students = await listStudents();
-  populateStudents();
-  state.page = 0;
-  await loadTasks();
+function taskFilters() {
+  return { studentId:el('task-student').value,status:el('task-status').value,subjectCode:el('task-subject').value,
+    keyword:el('task-keyword').value.trim(),createdFrom:el('task-created-from').value,createdTo:el('task-created-to').value,
+    page:state.tasks.page,size:state.tasks.size,sort:'createdAt,desc' };
 }
-
 async function loadTasks() {
-  if (state.loading) return;
-  if (!studentSelect.value) {
-    state.items = [];
-    state.totalElements = 0;
-    state.totalPages = 0;
-    renderTaskTable();
-    return;
-  }
-  state.loading = true;
-  resultSummary.textContent = '正在查询…';
-  taskTableBody.innerHTML = '<tr><td colspan="9" class="loading-cell">正在加载查询结果…</td></tr>';
-  taskEmpty.hidden = true;
+  if(!el('task-student').value){state.tasks.items=[];state.tasks.totalElements=0;state.tasks.totalPages=0;renderTasks();return;}
+  el('task-result-summary').textContent='正在查询…';
+  el('task-table-body').innerHTML='<tr><td colspan="8" class="loading-cell">正在加载查询结果…</td></tr>';
   try {
-    const result = await searchVoiceTasks(currentFilters());
-    state.items = result.items || [];
-    state.totalElements = Number(result.totalElements || 0);
-    state.totalPages = Number(result.totalPages || 0);
-    state.page = Number(result.page || 0);
-    renderTaskTable();
-  } catch (error) {
-    state.items = [];
-    state.totalElements = 0;
-    state.totalPages = 0;
-    taskTableBody.innerHTML = `<tr><td colspan="9" class="error-cell">${escapeHtml(error?.message || '查询失败，请稍后重试。')}</td></tr>`;
-    resultSummary.textContent = '查询失败';
-    renderPagination();
-  } finally {
-    state.loading = false;
-  }
+    const r=await searchVoiceTasks(taskFilters()); Object.assign(state.tasks,{items:r.items||[],page:Number(r.page||0),totalElements:Number(r.totalElements||0),totalPages:Number(r.totalPages||0)}); renderTasks();
+  } catch(e){el('task-result-summary').textContent='查询失败';el('task-table-body').innerHTML=`<tr><td colspan="8" class="error-cell">${esc(e.message)}</td></tr>`;}
+}
+function renderTasks() {
+  el('task-result-summary').textContent=`共 ${state.tasks.totalElements} 条`; el('task-empty').hidden=state.tasks.items.length>0;
+  el('task-table-body').innerHTML=state.tasks.items.map(x=>`<tr class="clickable-row" data-task-id="${esc(x.assignmentId)}" tabindex="0">
+    <td class="primary-cell">${esc(x.taskName)}</td><td><span class="status-badge ${taskStatusClass(x.assignmentStatus)}">${esc(taskStatusLabel(x.assignmentStatus))}</span></td>
+    <td>${esc(x.studentName)}</td><td>${esc(subjectLabel(x.subjectCode))}</td><td class="folder-cell">${esc(x.directoryName)}</td>
+    <td>${x.expectedMinutes} 分钟</td><td>${esc(formatDateTime(x.taskCreatedAtEpochMs))}</td><td><button class="link-button" data-open-task="${esc(x.assignmentId)}">详情</button></td></tr>`).join('');
+  renderPager(el('task-pagination'),state.tasks.page,state.tasks.totalPages);
 }
 
-function renderTaskTable() {
-  resultSummary.textContent = `共 ${state.totalElements} 条`;
-  taskEmpty.hidden = state.items.length > 0;
-  if (state.items.length === 0) {
-    taskTableBody.innerHTML = '';
-    renderPagination();
-    return;
-  }
-
-  taskTableBody.innerHTML = state.items.map(item => {
-    const status = statusInfo(item.displayStatus);
-    const material = `${item.audioCount} 音频 · ${item.imageCount} 图片`;
-    return `
-      <tr class="clickable-row" data-package-id="${escapeHtml(item.packageId)}" tabindex="0">
-        <td class="primary-cell">${escapeHtml(item.taskName || '—')}</td>
-        <td><span class="status-badge ${status.className}">${status.label}</span></td>
-        <td>${escapeHtml(item.studentName || '—')}</td>
-        <td>${escapeHtml(subjectLabel(item.subjectCode))}</td>
-        <td class="folder-cell" title="${escapeHtml(item.directoryName)}">${escapeHtml(item.directoryName)}</td>
-        <td>${escapeHtml(material)}</td>
-        <td>${escapeHtml(item.expectedMinutes)} 分钟</td>
-        <td>${escapeHtml(formatDateTime(item.taskCreatedAtEpochMs))}</td>
-        <td><button class="link-button" type="button" data-open-detail="${escapeHtml(item.packageId)}">详情</button></td>
-      </tr>`;
-  }).join('');
-  renderPagination();
+function folderFilters(prefix='folder') {
+  const isCreate=prefix==='create';
+  return { studentId:el(`${prefix}-student`).value,status:isCreate?'READY':el('folder-status').value,
+    subjectCode:el(`${prefix}-subject`).value,keyword:el(`${prefix}-keyword`).value.trim(),
+    usage:el(`${prefix}-usage`).value,importedFrom:isCreate?'':el('folder-imported-from').value,
+    importedTo:isCreate?'':el('folder-imported-to').value,page:isCreate?state.create.page:state.folders.page,
+    size:isCreate?state.create.size:state.folders.size,sort:'importedAt,desc' };
+}
+async function loadFolders() {
+  if(!el('folder-student').value){state.folders.items=[];state.folders.totalElements=0;state.folders.totalPages=0;renderFolders();return;}
+  el('folder-result-summary').textContent='正在查询…';el('folder-table-body').innerHTML='<tr><td colspan="9" class="loading-cell">正在加载查询结果…</td></tr>';
+  try { const r=await searchVoiceFolders(folderFilters());Object.assign(state.folders,{items:r.items||[],page:Number(r.page||0),totalElements:Number(r.totalElements||0),totalPages:Number(r.totalPages||0)});renderFolders();}
+  catch(e){el('folder-result-summary').textContent='查询失败';el('folder-table-body').innerHTML=`<tr><td colspan="9" class="error-cell">${esc(e.message)}</td></tr>`;}
+}
+function renderFolders() {
+  el('folder-result-summary').textContent=`共 ${state.folders.totalElements} 条`;el('folder-empty').hidden=state.folders.items.length>0;
+  el('folder-table-body').innerHTML=state.folders.items.map(x=>`<tr class="clickable-row" data-folder-id="${esc(x.packageId)}" tabindex="0">
+    <td class="primary-cell folder-cell">${esc(x.directoryName)}</td><td><span class="status-badge ${folderStatusClass(x.folderStatus)}">${esc(folderStatusLabel(x.folderStatus))}</span></td>
+    <td>${esc(x.studentName)}</td><td>${esc(subjectLabel(x.subjectCode))}</td><td>${x.audioCount} 音频 · ${x.imageCount} 图片</td>
+    <td>${x.usageCount} 次</td><td>${esc(formatDateTime(x.lastUsedAtEpochMs))}</td><td>${esc(formatDateTime(x.importedAtEpochMs))}</td>
+    <td><button class="link-button" data-open-folder="${esc(x.packageId)}">详情</button></td></tr>`).join('');
+  renderPager(el('folder-pagination'),state.folders.page,state.folders.totalPages);
 }
 
-function renderPagination() {
-  if (state.totalPages <= 1) {
-    pagination.innerHTML = '';
-    return;
-  }
-  const buttons = [];
-  buttons.push(`<button type="button" data-page="${state.page - 1}" ${state.page <= 0 ? 'disabled' : ''}>上一页</button>`);
-  const start = Math.max(0, state.page - 2);
-  const end = Math.min(state.totalPages - 1, state.page + 2);
-  if (start > 0) {
-    buttons.push('<button type="button" data-page="0">1</button>');
-    if (start > 1) buttons.push('<span>…</span>');
-  }
-  for (let index = start; index <= end; index++) {
-    buttons.push(`<button type="button" data-page="${index}" class="${index === state.page ? 'active' : ''}">${index + 1}</button>`);
-  }
-  if (end < state.totalPages - 1) {
-    if (end < state.totalPages - 2) buttons.push('<span>…</span>');
-    buttons.push(`<button type="button" data-page="${state.totalPages - 1}">${state.totalPages}</button>`);
-  }
-  buttons.push(`<button type="button" data-page="${state.page + 1}" ${state.page >= state.totalPages - 1 ? 'disabled' : ''}>下一页</button>`);
-  pagination.innerHTML = buttons.join('');
+function switchTab(tab) {
+  state.activeTab=tab;const tasks=tab==='tasks';el('task-view').hidden=!tasks;el('folder-view').hidden=tasks;
+  el('tab-tasks').classList.toggle('active',tasks);el('tab-folders').classList.toggle('active',!tasks);
+  el('tab-tasks').setAttribute('aria-selected',String(tasks));el('tab-folders').setAttribute('aria-selected',String(!tasks));
+  if(tasks) void loadTasks(); else void loadFolders();
 }
 
-async function openDetail(packageId) {
-  detailDrawer.hidden = false;
-  detailSubtitle.textContent = '正在加载…';
-  detailContent.innerHTML = '<div class="drawer-loading">正在加载任务详情…</div>';
-  detailFooter.innerHTML = '';
-  try {
-    const detail = await getVoiceTaskDetail(packageId);
-    state.detail = detail;
-    renderDetail();
-  } catch (error) {
-    detailSubtitle.textContent = '';
-    detailContent.innerHTML = `<p class="error-text">${escapeHtml(error?.message || '详情加载失败')}</p>`;
-  }
+async function openTaskDetail(id) {
+  el('task-detail-drawer').hidden=false;el('task-detail-subtitle').textContent='正在加载…';el('task-detail-content').innerHTML='<div class="drawer-loading">正在加载任务详情…</div>';
+  try{state.taskDetail=await getVoiceTaskDetail(id);renderTaskDetail();}catch(e){el('task-detail-content').innerHTML=`<p class="error-text">${esc(e.message)}</p>`;}
+}
+function renderFiles(files=[]) {
+  return files.length?files.map(f=>`<div class="detail-file-row"><div><span class="file-kind">${f.resourceType==='AUDIO'?'语音':'图片'}</span><strong>${esc(f.relativeName)}</strong></div><button class="link-button" data-preview-asset="${esc(f.assetId)}" data-preview-name="${esc(f.relativeName)}" data-preview-type="${esc(f.resourceType)}">${f.resourceType==='AUDIO'?'播放':'预览'}</button></div>`).join(''):'<div class="detail-empty">暂无素材文件</div>';
+}
+function renderTaskDetail(){
+  const d=state.taskDetail,x=d.item;el('task-detail-subtitle').textContent=x.taskName;
+  el('task-detail-content').innerHTML=`<div class="detail-status-line"><span class="status-badge ${taskStatusClass(x.assignmentStatus)}">${esc(taskStatusLabel(x.assignmentStatus))}</span></div>
+  <section class="detail-section"><h3>基本信息</h3><dl class="detail-grid"><div><dt>任务名称</dt><dd>${esc(x.taskName)}</dd></div><div><dt>学生</dt><dd>${esc(x.studentName)}</dd></div><div><dt>科目</dt><dd>${esc(subjectLabel(x.subjectCode))}</dd></div><div><dt>预计用时</dt><dd>${x.expectedMinutes} 分钟</dd></div><div><dt>创建时间</dt><dd>${esc(formatDateTime(x.taskCreatedAtEpochMs))}</dd></div></dl></section>
+  <section class="detail-section"><h3>来源文件夹</h3><div class="source-folder-box"><div><strong>${esc(x.directoryName)}</strong></div><button class="link-button" data-jump-folder="${esc(x.packageId)}">查看文件夹</button></div></section>
+  <section class="detail-section"><h3>素材文件</h3><div class="detail-file-list">${renderFiles(d.files)}</div></section>`;
+  el('task-detail-footer').innerHTML='<div></div><button class="secondary-button" data-close-task-detail>关闭</button>';
+}
+function closeTaskDetail(){el('task-detail-drawer').hidden=true;state.taskDetail=null;}
+
+async function openFolderDetail(id){
+  el('folder-detail-drawer').hidden=false;el('folder-detail-subtitle').textContent='正在加载…';el('folder-detail-content').innerHTML='<div class="drawer-loading">正在加载文件夹详情…</div>';
+  try{state.folderDetail=await getVoiceFolderDetail(id);renderFolderDetail();}catch(e){el('folder-detail-content').innerHTML=`<p class="error-text">${esc(e.message)}</p>`;}
+}
+function renderFolderDetail(){
+  const d=state.folderDetail,x=d.item;el('folder-detail-subtitle').textContent=x.directoryName;
+  const history=(d.recentTasks||[]).map(t=>`<div class="history-task-row"><div><strong>${esc(t.taskName||'语音任务')}</strong><span>${esc(formatDateTime(t.createdAtEpochMs))} · ${esc(taskStatusLabel(t.assignmentStatus))}</span></div>${t.assignmentExists?`<button class="link-button" data-jump-task="${esc(t.assignmentId)}">查看</button>`:'<span class="muted">任务已删除</span>'}</div>`).join('')||'<div class="detail-empty">还没有创建过语音任务</div>';
+  el('folder-detail-content').innerHTML=`<div class="detail-status-line"><span class="status-badge ${folderStatusClass(x.folderStatus)}">${esc(folderStatusLabel(x.folderStatus))}</span></div>
+  ${x.folderStatus==='INVALID'?`<div class="detail-alert error"><strong>导入失败原因</strong><span>${esc(x.errorMessage||'素材校验未通过')}</span></div>`:''}
+  <section class="detail-section"><h3>基本信息</h3><dl class="detail-grid"><div><dt>文件夹名称</dt><dd>${esc(x.directoryName)}</dd></div><div><dt>学生</dt><dd>${esc(x.studentName)}</dd></div><div><dt>科目</dt><dd>${esc(subjectLabel(x.subjectCode))}</dd></div><div><dt>默认预计用时</dt><dd>${x.expectedMinutes} 分钟</dd></div><div><dt>导入时间</dt><dd>${esc(formatDateTime(x.importedAtEpochMs))}</dd></div></dl></section>
+  <section class="detail-section"><h3>素材文件</h3><div class="detail-file-list">${renderFiles(d.files)}</div></section>
+  <section class="detail-section"><h3>使用情况</h3><div class="usage-summary"><div><strong>${x.usageCount}</strong><span>已创建任务</span></div><div><strong>${x.activeTaskCount}</strong><span>当前有效任务</span></div><div><strong>${esc(formatDateTime(x.lastUsedAtEpochMs))}</strong><span>最近使用</span></div></div></section>
+  <section class="detail-section"><h3>最近关联任务</h3><div class="history-task-list">${history}</div></section>`;
+  el('folder-detail-footer').innerHTML=`<div></div><div class="footer-actions"><button class="secondary-button" data-close-folder-detail>关闭</button>${x.folderStatus==='READY'?'<button id="create-from-folder-detail" class="primary-button">创建语音任务</button>':''}</div>`;
+}
+function closeFolderDetail(){el('folder-detail-drawer').hidden=true;state.folderDetail=null;}
+
+async function loadCreateFolders(){
+  if(!el('create-student').value){state.create.items=[];state.create.totalElements=0;state.create.totalPages=0;renderCreateFolders();return;}
+  el('create-folder-body').innerHTML='<tr><td colspan="6" class="loading-cell">正在加载可用文件夹…</td></tr>';
+  try{const r=await searchVoiceFolders(folderFilters('create'));Object.assign(state.create,{items:r.items||[],page:Number(r.page||0),totalElements:Number(r.totalElements||0),totalPages:Number(r.totalPages||0)});renderCreateFolders();}
+  catch(e){el('create-folder-body').innerHTML=`<tr><td colspan="6" class="error-cell">${esc(e.message)}</td></tr>`;}
+}
+function renderCreateFolders(){
+  el('create-folder-summary').textContent=`共 ${state.create.totalElements} 个可用文件夹`;el('create-folder-empty').hidden=state.create.items.length>0;
+  el('create-folder-body').innerHTML=state.create.items.map(x=>`<tr class="selectable-row" data-select-folder="${esc(x.packageId)}"><td><input type="radio" name="create-folder" value="${esc(x.packageId)}" ${state.create.selected?.packageId===x.packageId?'checked':''}></td><td class="primary-cell">${esc(x.directoryName)}</td><td>${esc(subjectLabel(x.subjectCode))}</td><td>${x.audioCount} 音频 · ${x.imageCount} 图片</td><td>${x.usageCount===0?'从未使用':`已使用 ${x.usageCount} 次`}${x.activeTaskCount>0?' · 当前使用中':''}</td><td>${esc(formatDateTime(x.lastUsedAtEpochMs))}</td></tr>`).join('');
+  renderPager(el('create-folder-pagination'),state.create.page,state.create.totalPages);el('create-next').disabled=!state.create.selected;
+}
+function openCreate(preselected=null){
+  state.create.selected=preselected;state.create.page=0;state.create.requestId='';el('create-drawer').hidden=false;
+  el('create-folder-stage').hidden=!!preselected;el('create-settings-stage').hidden=!preselected;el('create-back').hidden=!preselected;el('create-next').hidden=!!preselected;el('create-submit').hidden=!preselected;
+  el('create-step-caption').textContent=preselected?'2 设置任务':'1 选择语音文件夹';el('create-message').hidden=true;
+  const student=preselected?.studentId||el(state.activeTab==='tasks'?'task-student':'folder-student').value;el('create-student').value=student;
+  if(preselected)prepareCreateSettings();else void loadCreateFolders();
+}
+function prepareCreateSettings(){
+  const x=state.create.selected;if(!x)return;state.create.requestId=uuid();el('create-folder-stage').hidden=true;el('create-settings-stage').hidden=false;el('create-step-caption').textContent='2 设置任务';
+  el('create-selected-folder').innerHTML=`<strong>${esc(x.directoryName)}</strong><span>${esc(subjectLabel(x.subjectCode))} · ${x.audioCount} 音频 · ${x.imageCount} 图片 · 已使用 ${x.usageCount} 次</span>`;
+  el('create-title').value=`${subjectLabel(x.subjectCode)} · 语音作业`;el('create-minutes').value=x.expectedMinutes;el('create-due-at').value='';el('create-back').hidden=false;el('create-next').hidden=true;el('create-submit').hidden=false;
+}
+function closeCreate(){el('create-drawer').hidden=true;state.create.selected=null;}
+async function submitCreate(){
+  const x=state.create.selected;if(!x)return;const minutes=Number(el('create-minutes').value);const title=el('create-title').value.trim();
+  if(!title||!Number.isInteger(minutes)||minutes<1||minutes>240){el('create-message').hidden=false;el('create-message').textContent='请填写任务名称，并将预计用时设置为 1～240 分钟。';return;}
+  const due=el('create-due-at').value;const button=el('create-submit');button.disabled=true;button.textContent='创建中…';el('create-message').hidden=true;
+  try{await createVoiceMaterialAssignment(x.packageId,{studentId:x.studentId,expectedMinutes:minutes,dueAtEpochMs:due?new Date(due).getTime():0,dueText:'',title,requestId:state.create.requestId});closeCreate();closeFolderDetail();switchTab('tasks');state.tasks.page=0;await loadTasks();void loadFolders();}
+  catch(e){el('create-message').hidden=false;el('create-message').textContent=e.message||'创建失败';}
+  finally{button.disabled=false;button.textContent='创建任务';}
 }
 
-function renderDetail() {
-  const detail = state.detail;
-  if (!detail?.item) return;
-  const item = detail.item;
-  const status = statusInfo(item.displayStatus);
-  detailSubtitle.textContent = item.directoryName;
-  const files = detail.files || [];
-  const fileHtml = files.length === 0
-    ? '<div class="detail-empty">暂无素材文件</div>'
-    : files.map(file => `
-        <div class="detail-file-row">
-          <div>
-            <span class="file-kind">${file.resourceType === 'AUDIO' ? '语音' : '图片'}</span>
-            <strong>${escapeHtml(file.relativeName)}</strong>
-          </div>
-          <button class="link-button" type="button"
-            data-preview-asset="${escapeHtml(file.assetId)}"
-            data-preview-name="${escapeHtml(file.relativeName)}"
-            data-preview-type="${escapeHtml(file.resourceType)}">
-            ${file.resourceType === 'AUDIO' ? '播放' : '预览'}
-          </button>
-        </div>`
-      ).join('');
+function openImport(){resetImport();el('import-student').value=el(state.activeTab==='tasks'?'task-student':'folder-student').value;el('import-drawer').hidden=false;}
+function resetImport(){state.importPackages=[];state.importIgnoredCount=0;state.importResults=[];state.importResultFilter='ALL';state.importing=false;el('folder-input').value='';el('import-folder-search').value='';el('import-select-stage').hidden=false;el('import-progress-stage').hidden=true;el('import-result-stage').hidden=true;el('start-import').hidden=false;el('import-cancel').hidden=false;el('import-another').hidden=true;el('import-finish').hidden=true;renderImport();}
+function closeImport(){if(!state.importing)el('import-drawer').hidden=true;}
+function importMinutes(){const n=Number(el('import-minutes').value);return Number.isInteger(n)&&n>=1&&n<=240?n:-1;}
+function mergeFiles(fileList){const m=importMinutes();if(m<0){el('import-preview-summary').textContent='默认预计用时请输入 1～240 分钟。';return;}const parsed=parseVoiceMaterialPackages(Array.from(fileList||[]),el('import-subject').value,m);const map=new Map(state.importPackages.map(x=>[x.key,x]));for(const x of parsed.packages){const cur=map.get(x.key);if(!cur){map.set(x.key,x);continue;}const known=new Set(cur.files.map(f=>`${f.resourceType}|${f.relativeName}`));for(const f of x.files){const k=`${f.resourceType}|${f.relativeName}`;if(!known.has(k))cur.files.push(f);}}state.importPackages=[...map.values()].sort((a,b)=>a.directoryName.localeCompare(b.directoryName,'zh-CN'));state.importIgnoredCount+=parsed.ignoredCount;renderImport();}
+function renderImport(){const q=el('import-folder-search').value.trim().toLowerCase();const rows=state.importPackages.map((item,index)=>({item,index})).filter(x=>!q||x.item.directoryName.toLowerCase().includes(q));const valid=state.importPackages.filter(x=>validatePackage(x).valid).length;const selected=state.importPackages.filter(x=>x.selected&&validatePackage(x).valid).length;el('import-preview-summary').textContent=state.importPackages.length?`已识别 ${state.importPackages.length} 个目录，${valid} 个可以导入${state.importIgnoredCount?`，忽略 ${state.importIgnoredCount} 个不支持文件`:''}。`:'尚未选择文件夹';el('import-selected-summary').textContent=`已选择 ${selected} 个目录`;el('start-import').disabled=!el('import-student').value||selected===0||state.importing;el('import-empty').hidden=state.importPackages.length>0;el('select-all-import').checked=state.importPackages.length>0&&state.importPackages.filter(x=>validatePackage(x).valid).every(x=>x.selected);el('import-table-body').innerHTML=rows.map(({item,index})=>{const v=validatePackage(item);return `<tr data-import-index="${index}" class="${v.valid?'':'invalid-row'}"><td><input class="import-select" type="checkbox" ${item.selected&&v.valid?'checked':''} ${v.valid?'':'disabled'}></td><td class="primary-cell">${esc(item.directoryName)}</td><td><select class="compact-select import-subject">${SUBJECTS.map(s=>`<option value="${s.code}" ${s.code===item.subjectCode?'selected':''}>${esc(s.label)}</option>`).join('')}</select></td><td><div class="minutes-cell"><input class="compact-input import-minutes" type="number" min="1" max="240" value="${item.expectedMinutes}"><span>分钟</span></div></td><td>${v.audioCount} 音频 · ${v.imageCount} 图片</td><td><span class="validation-text ${v.valid?'ok':'bad'}">${esc(v.message)}</span></td><td><button class="link-button danger-link remove-import">移除</button></td></tr>`;}).join('');}
+async function collectDirectory(entry,files,parent=''){const reader=entry.createReader(),entries=[];while(true){const chunk=await new Promise(r=>reader.readEntries(r,()=>r([])));if(!chunk.length)break;entries.push(...chunk);}for(const child of entries){const path=parent?`${parent}/${child.name}`:child.name;if(child.isDirectory)await collectDirectory(child,files,path);else await new Promise(r=>child.file(file=>{try{Object.defineProperty(file,'relativePath',{value:path});}catch{}files.push(file);r();},r));}}
+function importProgress(done,total,msg){const p=total?Math.round(done*100/total):0;el('import-progress-text').textContent=msg;el('import-progress-percent').textContent=`${p}%`;el('import-progress-bar').style.width=`${p}%`;}
+async function uploadImport(){const selected=state.importPackages.filter(x=>x.selected&&validatePackage(x).valid);if(!selected.length||state.importing)return;state.importing=true;el('import-select-stage').hidden=true;el('import-progress-stage').hidden=false;el('start-import').disabled=true;const regFailures=[];try{const batch=await createVoiceMaterialBatch(el('import-student').value);let done=0;for(const item of selected){importProgress(done,selected.length,`正在导入：${item.directoryName}`);let remote=null;try{remote=await registerVoiceMaterialPackage(batch.id,item);}catch(e){regFailures.push({directoryName:item.directoryName,subjectCode:item.subjectCode,audioCount:item.files.filter(f=>f.resourceType==='AUDIO').length,imageCount:item.files.filter(f=>f.resourceType==='IMAGE').length,resultStatus:'FAILED',errorMessage:e.message||'目录注册失败'});}if(remote){for(const f of uploadOrder(item.files)){try{await uploadVoiceMaterialFile(remote.id,f,f.sortOrder);}catch(e){console.error('file upload failed',item.directoryName,f.relativeName,e);}}}done++;importProgress(done,selected.length,`已处理 ${done} / ${selected.length} 个目录`);}const completed=await completeVoiceMaterialBatch(batch.id);state.importResults=(completed.packages||[]).map(x=>({...x,resultStatus:x.status==='READY'||x.status==='CONSUMED'?'SUCCESS':'FAILED'})).concat(regFailures);showImportResults();}catch(e){state.importResults=[{directoryName:'本次导入',subjectCode:'',audioCount:0,imageCount:0,resultStatus:'FAILED',errorMessage:e.message||'导入失败'}];showImportResults();}finally{state.importing=false;}}
+function showImportResults(){el('import-progress-stage').hidden=true;el('import-result-stage').hidden=false;el('start-import').hidden=true;el('import-cancel').hidden=true;el('import-another').hidden=false;el('import-finish').hidden=false;el('import-selected-summary').textContent='';renderImportResults();}
+function renderImportResults(){const ok=state.importResults.filter(x=>x.resultStatus==='SUCCESS').length;el('import-result-summary').textContent=`本次导入 ${state.importResults.length} 个目录 · 成功 ${ok} · 失败 ${state.importResults.length-ok}`;for(const b of el('import-result-filter').querySelectorAll('button'))b.classList.toggle('active',b.dataset.resultFilter===state.importResultFilter);const rows=state.importResults.filter(x=>state.importResultFilter==='ALL'||x.resultStatus===state.importResultFilter);el('import-result-body').innerHTML=rows.map(x=>{const success=x.resultStatus==='SUCCESS';return `<tr><td class="primary-cell">${esc(x.directoryName)}</td><td>${esc(x.subjectCode?subjectLabel(x.subjectCode):'—')}</td><td>${Number(x.audioCount||0)} 音频 · ${Number(x.imageCount||0)} 图片</td><td><span class="status-badge ${success?'success':'danger'}">${success?'导入成功':'导入失败'}</span></td><td class="${success?'':'error-text'}">${esc(success?'可用于创建语音任务':x.errorMessage||'导入失败')}</td></tr>`;}).join('');}
 
-  const history = (detail.history || []).map(entry => `
-      <div class="history-row">
-        <span>${escapeHtml(formatDateTime(entry.atEpochMs))}</span>
-        <strong>${escapeHtml(entry.label)}</strong>
-      </div>`
-    ).join('') || '<div class="detail-empty">暂无关联记录</div>';
+async function openAsset(assetId,name,type){el('asset-viewer').hidden=false;const box=el('asset-viewer-content');box.innerHTML='<p class="muted">正在加载素材…</p>';try{const blob=await fetchVoiceMaterialAsset(assetId),url=URL.createObjectURL(blob);box.innerHTML=`<h3 class="asset-viewer-title">${esc(name)}</h3>`;const node=type==='AUDIO'?document.createElement('audio'):document.createElement('img');node.controls=type==='AUDIO';node.autoplay=type==='AUDIO';node.src=url;if(type!=='AUDIO')node.alt=name;box.append(node);box.dataset.objectUrl=url;}catch(e){box.innerHTML=`<p class="error-text">${esc(e.message)}</p>`;}}
+function closeAsset(){const box=el('asset-viewer-content'),url=box.dataset.objectUrl;if(url)URL.revokeObjectURL(url);box.innerHTML='';box.dataset.objectUrl='';el('asset-viewer').hidden=true;}
 
-  const taskName = item.taskName || '—';
-  const taskCreated = item.taskCreatedAtEpochMs ? formatDateTime(item.taskCreatedAtEpochMs) : '—';
-  const errorBlock = item.displayStatus === 'INVALID'
-    ? `<div class="detail-alert error"><strong>导入失败原因</strong><span>${escapeHtml(item.errorMessage || '素材校验未通过')}</span></div>`
-    : item.displayStatus === 'USED_BEFORE'
-      ? '<div class="detail-alert"><strong>历史任务已不存在</strong><span>这个文件夹以前创建过语音任务，可以再次创建。</span></div>'
-      : '';
+el('tab-tasks').onclick=()=>switchTab('tasks');el('tab-folders').onclick=()=>switchTab('folders');
+el('task-search-form').onsubmit=e=>{e.preventDefault();state.tasks.page=0;void loadTasks();};el('task-reset').onclick=()=>{el('task-status').value='';el('task-subject').value='';el('task-keyword').value='';el('task-created-from').value='';el('task-created-to').value='';state.tasks.page=0;void loadTasks();};el('task-student').onchange=()=>{state.tasks.page=0;void loadTasks();};el('task-refresh').onclick=()=>void loadTasks();el('task-page-size').onchange=()=>{state.tasks.size=Number(el('task-page-size').value);state.tasks.page=0;void loadTasks();};el('task-pagination').onclick=e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;state.tasks.page=Number(b.dataset.page);void loadTasks();};
+el('folder-search-form').onsubmit=e=>{e.preventDefault();state.folders.page=0;void loadFolders();};el('folder-reset').onclick=()=>{el('folder-status').value='';el('folder-subject').value='';el('folder-usage').value='ALL';el('folder-keyword').value='';el('folder-imported-from').value='';el('folder-imported-to').value='';state.folders.page=0;void loadFolders();};el('folder-student').onchange=()=>{state.folders.page=0;void loadFolders();};el('folder-refresh').onclick=()=>void loadFolders();el('folder-page-size').onchange=()=>{state.folders.size=Number(el('folder-page-size').value);state.folders.page=0;void loadFolders();};el('folder-pagination').onclick=e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;state.folders.page=Number(b.dataset.page);void loadFolders();};
 
-  detailContent.innerHTML = `
-    <div class="detail-status-line"><span class="status-badge ${status.className}">${status.label}</span></div>
-    ${errorBlock}
-    <section class="detail-section">
-      <h3>基本信息</h3>
-      <dl class="detail-grid">
-        <div><dt>任务名称</dt><dd>${escapeHtml(taskName)}</dd></div>
-        <div><dt>学生</dt><dd>${escapeHtml(item.studentName)}</dd></div>
-        <div><dt>科目</dt><dd>${escapeHtml(subjectLabel(item.subjectCode))}</dd></div>
-        <div><dt>预计用时</dt><dd>${escapeHtml(item.expectedMinutes)} 分钟</dd></div>
-        <div><dt>任务创建时间</dt><dd>${escapeHtml(taskCreated)}</dd></div>
-        <div><dt>文件夹导入时间</dt><dd>${escapeHtml(formatDateTime(item.importedAtEpochMs))}</dd></div>
-      </dl>
-    </section>
-    <section class="detail-section">
-      <h3>来源文件夹</h3>
-      <div class="source-folder-box">
-        <strong>${escapeHtml(item.directoryName)}</strong>
-        <span>${item.audioCount} 个语音 · ${item.imageCount} 张图片</span>
-      </div>
-    </section>
-    <section class="detail-section">
-      <h3>素材文件</h3>
-      <div class="detail-file-list">${fileHtml}</div>
-    </section>
-    <section class="detail-section">
-      <h3>关联记录</h3>
-      <div class="history-list">${history}</div>
-    </section>`;
+el('task-table-body').onclick=e=>{const id=e.target.closest('[data-open-task]')?.dataset.openTask||e.target.closest('[data-task-id]')?.dataset.taskId;if(id)void openTaskDetail(id);};
+el('folder-table-body').onclick=e=>{const id=e.target.closest('[data-open-folder]')?.dataset.openFolder||e.target.closest('[data-folder-id]')?.dataset.folderId;if(id)void openFolderDetail(id);};
+el('close-task-detail').onclick=closeTaskDetail;el('task-detail-drawer').onclick=e=>{if(e.target.hasAttribute('data-close-task-detail'))closeTaskDetail();const p=e.target.closest('[data-preview-asset]');if(p)void openAsset(p.dataset.previewAsset,p.dataset.previewName,p.dataset.previewType);const f=e.target.closest('[data-jump-folder]');if(f){closeTaskDetail();switchTab('folders');void openFolderDetail(f.dataset.jumpFolder);}};
+el('close-folder-detail').onclick=closeFolderDetail;el('folder-detail-drawer').onclick=e=>{if(e.target.hasAttribute('data-close-folder-detail'))closeFolderDetail();const p=e.target.closest('[data-preview-asset]');if(p)void openAsset(p.dataset.previewAsset,p.dataset.previewName,p.dataset.previewType);const t=e.target.closest('[data-jump-task]');if(t){closeFolderDetail();switchTab('tasks');void openTaskDetail(t.dataset.jumpTask);}if(e.target.id==='create-from-folder-detail')openCreate(state.folderDetail.item);};
 
-  const canCreate = item.displayStatus === 'READY' || item.displayStatus === 'USED_BEFORE';
-  detailFooter.innerHTML = canCreate
-    ? `<span id="detail-action-message" class="footer-summary"></span>
-       <div class="footer-actions">
-         <button class="secondary-button" type="button" data-close-detail>关闭</button>
-         <button id="create-task-from-detail" class="primary-button" type="button">创建语音任务</button>
-       </div>`
-    : `<div></div><button class="secondary-button" type="button" data-close-detail>关闭</button>`;
+el('open-create-task').onclick=()=>openCreate();el('close-create').onclick=closeCreate;el('create-cancel').onclick=closeCreate;el('create-folder-search-form').onsubmit=e=>{e.preventDefault();state.create.page=0;void loadCreateFolders();};el('create-folder-reset').onclick=()=>{el('create-subject').value='';el('create-usage').value='ALL';el('create-keyword').value='';state.create.page=0;state.create.selected=null;void loadCreateFolders();};el('create-student').onchange=()=>{state.create.page=0;state.create.selected=null;void loadCreateFolders();};el('create-folder-pagination').onclick=e=>{const b=e.target.closest('[data-page]');if(!b||b.disabled)return;state.create.page=Number(b.dataset.page);void loadCreateFolders();};el('create-folder-body').onclick=e=>{const row=e.target.closest('[data-select-folder]');if(!row)return;const x=state.create.items.find(i=>i.packageId===row.dataset.selectFolder);if(x){state.create.selected=x;renderCreateFolders();}};el('create-next').onclick=()=>prepareCreateSettings();el('create-back').onclick=()=>{el('create-settings-stage').hidden=true;el('create-folder-stage').hidden=false;el('create-step-caption').textContent='1 选择语音文件夹';el('create-back').hidden=true;el('create-submit').hidden=true;el('create-next').hidden=false;};el('create-submit').onclick=()=>void submitCreate();
+
+el('open-import').onclick=openImport;el('close-import').onclick=closeImport;el('import-cancel').onclick=closeImport;el('folder-picker').onclick=()=>el('folder-input').click();el('folder-input').onchange=()=>{mergeFiles(el('folder-input').files);el('folder-input').value='';};el('folder-picker').ondragover=e=>{e.preventDefault();el('folder-picker').classList.add('drag-over');};el('folder-picker').ondragleave=()=>el('folder-picker').classList.remove('drag-over');el('folder-picker').ondrop=async e=>{e.preventDefault();el('folder-picker').classList.remove('drag-over');const files=[];for(const item of Array.from(e.dataTransfer?.items||[])){if(item.kind!=='file')continue;const entry=item.webkitGetAsEntry?.()||item.getAsEntry?.();if(entry?.isDirectory)await collectDirectory(entry,files,entry.name);else{const file=item.getAsFile();if(file)files.push(file);}}mergeFiles(files);};el('import-folder-search').oninput=renderImport;el('apply-import-defaults').onclick=()=>{const m=importMinutes();if(m<0)return;for(const x of state.importPackages){x.subjectCode=el('import-subject').value;x.expectedMinutes=m;}renderImport();};el('select-all-import').onchange=()=>{for(const x of state.importPackages)if(validatePackage(x).valid)x.selected=el('select-all-import').checked;renderImport();};el('import-table-body').onchange=e=>{const row=e.target.closest('[data-import-index]');if(!row)return;const x=state.importPackages[Number(row.dataset.importIndex)];if(e.target.classList.contains('import-select'))x.selected=e.target.checked;if(e.target.classList.contains('import-subject'))x.subjectCode=e.target.value;if(e.target.classList.contains('import-minutes'))x.expectedMinutes=Number(e.target.value);renderImport();};el('import-table-body').onclick=e=>{if(!e.target.classList.contains('remove-import'))return;const row=e.target.closest('[data-import-index]');state.importPackages.splice(Number(row.dataset.importIndex),1);renderImport();};el('start-import').onclick=()=>void uploadImport();el('import-another').onclick=resetImport;el('import-finish').onclick=()=>{el('import-drawer').hidden=true;switchTab('folders');state.folders.page=0;void loadFolders();};el('import-result-filter').onclick=e=>{const b=e.target.closest('[data-result-filter]');if(!b)return;state.importResultFilter=b.dataset.resultFilter;renderImportResults();};
+
+el('logout-button').onclick=async()=>{await logout();window.location.reload();};el('close-asset-viewer').onclick=closeAsset;el('asset-viewer').onclick=e=>{if(e.target.hasAttribute('data-close-viewer'))closeAsset();};
+
+async function startAdmin(){
+  if(state.initialized)return;state.initialized=true;
+  try{state.students=await listStudents();populateStudents();await Promise.all([loadTasks(),loadFolders()]);}
+  catch(e){state.initialized=false;el('task-result-summary').textContent='学生信息加载失败';el('task-table-body').innerHTML=`<tr><td colspan="8" class="error-cell">${esc(e.message||'学生信息加载失败')}</td></tr>`;}
 }
-
-async function createTaskFromDetail() {
-  const item = state.detail?.item;
-  if (!item) return;
-  const button = el('create-task-from-detail');
-  const message = el('detail-action-message');
-  if (button) {
-    button.disabled = true;
-    button.textContent = '创建中…';
-  }
-  try {
-    const result = await createVoiceMaterialAssignment(
-      item.packageId, item.studentId, item.expectedMinutes);
-    if (message) message.textContent = result.created ? '语音任务创建成功。' : '当前任务已经存在。';
-    state.detail = await getVoiceTaskDetail(item.packageId);
-    renderDetail();
-    await loadTasks();
-  } catch (error) {
-    if (message) {
-      message.textContent = error?.message || '创建语音任务失败。';
-      message.classList.add('error-text');
-    }
-    if (button) {
-      button.disabled = false;
-      button.textContent = '创建语音任务';
-    }
-  }
-}
-
-function closeDetail() {
-  detailDrawer.hidden = true;
-  detailContent.innerHTML = '';
-  detailFooter.innerHTML = '';
-  state.detail = null;
-}
-
-function openImport() {
-  resetImportWorkspace();
-  importStudentSelect.value = studentSelect.value;
-  importDrawer.hidden = false;
-}
-
-function closeImport() {
-  if (state.importing) return;
-  importDrawer.hidden = true;
-}
-
-function resetImportWorkspace() {
-  state.importPackages = [];
-  state.importIgnoredCount = 0;
-  state.importResults = [];
-  state.importResultFilter = 'ALL';
-  state.importing = false;
-  folderInput.value = '';
-  importFolderSearch.value = '';
-  importSelectStage.hidden = false;
-  importProgressStage.hidden = true;
-  importResultStage.hidden = true;
-  startImportButton.hidden = false;
-  importCancelButton.hidden = false;
-  importAnotherButton.hidden = true;
-  importFinishButton.hidden = true;
-  renderImportPackages();
-  renderImportProgress(0, 0, '准备上传…');
-}
-
-function readImportMinutes() {
-  const value = Number(importDefaultMinutes.value);
-  return Number.isInteger(value) && value >= 1 && value <= 240 ? value : -1;
-}
-
-function mergeSelectedFiles(fileList) {
-  const minutes = readImportMinutes();
-  if (minutes < 0) {
-    importPreviewSummary.textContent = '默认预计用时请输入 1～240 分钟。';
-    return;
-  }
-  const incoming = Array.from(fileList || []);
-  if (incoming.length === 0) return;
-  const parsed = parseVoiceMaterialPackages(
-    incoming, importDefaultSubject.value, minutes);
-  const existing = new Map(state.importPackages.map(item => [item.key, item]));
-  for (const item of parsed.packages) {
-    const current = existing.get(item.key);
-    if (!current) {
-      existing.set(item.key, item);
-      continue;
-    }
-    const known = new Set(current.files.map(file =>
-      `${file.resourceType}|${file.relativeName}`));
-    for (const file of item.files) {
-      const key = `${file.resourceType}|${file.relativeName}`;
-      if (!known.has(key)) current.files.push(file);
-    }
-  }
-  state.importPackages = Array.from(existing.values())
-    .sort((left, right) => left.directoryName.localeCompare(right.directoryName, 'zh-CN'));
-  state.importIgnoredCount += parsed.ignoredCount;
-  renderImportPackages();
-}
-
-function renderImportPackages() {
-  const keyword = importFolderSearch.value.trim().toLowerCase();
-  const filtered = state.importPackages
-    .map((item, index) => ({ item, index }))
-    .filter(({ item }) => !keyword || item.directoryName.toLowerCase().includes(keyword));
-  const validCount = state.importPackages.filter(item => validatePackage(item).valid).length;
-  const selectedValid = state.importPackages.filter(item =>
-    item.selected && validatePackage(item).valid).length;
-
-  importPreviewSummary.textContent = state.importPackages.length === 0
-    ? '尚未选择文件夹'
-    : `已识别 ${state.importPackages.length} 个目录，${validCount} 个可以导入${state.importIgnoredCount ? `，忽略 ${state.importIgnoredCount} 个不支持文件` : ''}。`;
-  importSelectedSummary.textContent = `已选择 ${selectedValid} 个目录`;
-  startImportButton.disabled = state.importing || !importStudentSelect.value || selectedValid === 0;
-  importEmpty.hidden = state.importPackages.length > 0;
-  selectAllImport.checked = state.importPackages.length > 0 &&
-    state.importPackages.filter(item => validatePackage(item).valid)
-      .every(item => item.selected);
-
-  importTableBody.innerHTML = filtered.map(({ item, index }) => {
-    const validation = validatePackage(item);
-    return `
-      <tr data-import-index="${index}" class="${validation.valid ? '' : 'invalid-row'}">
-        <td><input class="import-select" type="checkbox"
-          ${item.selected && validation.valid ? 'checked' : ''}
-          ${validation.valid ? '' : 'disabled'} aria-label="选择 ${escapeHtml(item.directoryName)}"></td>
-        <td class="primary-cell" title="${escapeHtml(item.directoryName)}">${escapeHtml(item.directoryName)}</td>
-        <td><select class="compact-select import-subject">${subjectOptions(item.subjectCode)}</select></td>
-        <td><div class="minutes-cell"><input class="compact-input import-minutes" type="number" min="1" max="240" value="${escapeHtml(item.expectedMinutes)}"><span>分钟</span></div></td>
-        <td>${validation.audioCount} 音频 · ${validation.imageCount} 图片</td>
-        <td><span class="validation-text ${validation.valid ? 'ok' : 'bad'}">${escapeHtml(validation.message)}</span></td>
-        <td><button class="link-button danger-link remove-import" type="button">移除</button></td>
-      </tr>`;
-  }).join('');
-}
-
-function subjectOptions(selected) {
-  return SUBJECTS.map(subject =>
-    `<option value="${subject.code}" ${subject.code === selected ? 'selected' : ''}>${escapeHtml(subject.label)}</option>`
-  ).join('');
-}
-
-function applyImportDefaults() {
-  const minutes = readImportMinutes();
-  if (minutes < 0) {
-    importPreviewSummary.textContent = '默认预计用时请输入 1～240 分钟。';
-    return;
-  }
-  for (const item of state.importPackages) {
-    item.subjectCode = importDefaultSubject.value;
-    item.expectedMinutes = minutes;
-  }
-  renderImportPackages();
-}
-
-async function collectDroppedDirectory(entry, files, parentPath = '') {
-  const reader = entry.createReader();
-  const entries = [];
-  while (true) {
-    const chunk = await new Promise(resolve =>
-      reader.readEntries(resolve, () => resolve([])));
-    if (chunk.length === 0) break;
-    entries.push(...chunk);
-  }
-  for (const child of entries) {
-    const path = parentPath ? `${parentPath}/${child.name}` : child.name;
-    if (child.isDirectory) {
-      await collectDroppedDirectory(child, files, path);
-    } else {
-      await new Promise(resolve => child.file(file => {
-        try { Object.defineProperty(file, 'relativePath', { value: path }); } catch {}
-        files.push(file);
-        resolve();
-      }, resolve));
-    }
-  }
-}
-
-function renderImportProgress(done, total, message) {
-  const percent = total <= 0 ? 0 : Math.round(done * 100 / total);
-  importProgressText.textContent = message;
-  importProgressPercent.textContent = `${percent}%`;
-  importProgressBar.style.width = `${percent}%`;
-}
-
-async function uploadSelectedPackages() {
-  const selected = state.importPackages.filter(item =>
-    item.selected && validatePackage(item).valid);
-  if (selected.length === 0 || !importStudentSelect.value || state.importing) return;
-
-  state.importing = true;
-  importSelectStage.hidden = true;
-  importProgressStage.hidden = false;
-  importResultStage.hidden = true;
-  startImportButton.disabled = true;
-  importCancelButton.disabled = true;
-  renderImportProgress(0, selected.length, '正在创建导入批次…');
-
-  const registrationFailures = [];
-  try {
-    const batch = await createVoiceMaterialBatch(importStudentSelect.value);
-    let completedCount = 0;
-    for (const item of selected) {
-      renderImportProgress(completedCount, selected.length, `正在导入：${item.directoryName}`);
-      let remotePackage = null;
-      try {
-        remotePackage = await registerVoiceMaterialPackage(batch.id, item);
-      } catch (error) {
-        registrationFailures.push({
-          directoryName: item.directoryName,
-          subjectCode: item.subjectCode,
-          expectedMinutes: item.expectedMinutes,
-          audioCount: item.files.filter(file => file.resourceType === 'AUDIO').length,
-          imageCount: item.files.filter(file => file.resourceType === 'IMAGE').length,
-          status: 'FAILED',
-          errorMessage: error?.message || '目录注册失败'
-        });
-      }
-      if (remotePackage) {
-        for (const file of uploadOrder(item.files)) {
-          try {
-            await uploadVoiceMaterialFile(remotePackage.id, file, file.sortOrder);
-          } catch (error) {
-            console.error('voice material file upload failed',
-              item.directoryName, file.relativeName, error);
-          }
-        }
-      }
-      completedCount++;
-      renderImportProgress(completedCount, selected.length,
-        `已处理 ${completedCount} / ${selected.length} 个目录`);
-    }
-
-    const completed = await completeVoiceMaterialBatch(batch.id);
-    const serverResults = (completed.packages || []).map(item => ({
-      ...item,
-      resultStatus: item.status === 'READY' || item.status === 'CONSUMED'
-        ? 'SUCCESS' : 'FAILED'
-    }));
-    state.importResults = serverResults.concat(
-      registrationFailures.map(item => ({ ...item, resultStatus: 'FAILED' }))
-    );
-    renderImportProgress(selected.length, selected.length, '导入完成');
-    showImportResults();
-  } catch (error) {
-    state.importResults = [{
-      directoryName: '本次导入',
-      subjectCode: '',
-      audioCount: 0,
-      imageCount: 0,
-      status: 'FAILED',
-      resultStatus: 'FAILED',
-      errorMessage: error?.message || '导入失败，请稍后重试'
-    }];
-    showImportResults();
-  } finally {
-    state.importing = false;
-    importCancelButton.disabled = false;
-  }
-}
-
-function showImportResults() {
-  importProgressStage.hidden = true;
-  importResultStage.hidden = false;
-  startImportButton.hidden = true;
-  importCancelButton.hidden = true;
-  importAnotherButton.hidden = false;
-  importFinishButton.hidden = false;
-  importSelectedSummary.textContent = '';
-  renderImportResults();
-}
-
-function renderImportResults() {
-  const successCount = state.importResults.filter(item => item.resultStatus === 'SUCCESS').length;
-  const failedCount = state.importResults.length - successCount;
-  importResultSummary.textContent =
-    `本次导入 ${state.importResults.length} 个目录 · 成功 ${successCount} · 失败 ${failedCount}`;
-
-  for (const button of el('import-result-filter').querySelectorAll('button')) {
-    button.classList.toggle('active', button.dataset.resultFilter === state.importResultFilter);
-  }
-  const visible = state.importResults.filter(item =>
-    state.importResultFilter === 'ALL' || item.resultStatus === state.importResultFilter);
-  importResultBody.innerHTML = visible.map(item => {
-    const success = item.resultStatus === 'SUCCESS';
-    const explanation = success ? '待创建语音任务' : (item.errorMessage || '导入失败');
-    return `
-      <tr>
-        <td class="primary-cell">${escapeHtml(item.directoryName)}</td>
-        <td>${escapeHtml(item.subjectCode ? subjectLabel(item.subjectCode) : '—')}</td>
-        <td>${Number(item.audioCount || 0)} 音频 · ${Number(item.imageCount || 0)} 图片</td>
-        <td><span class="status-badge ${success ? 'success' : 'danger'}">${success ? '导入成功' : '导入失败'}</span></td>
-        <td class="${success ? '' : 'error-text'}">${escapeHtml(explanation)}</td>
-      </tr>`;
-  }).join('');
-}
-
-async function finishImport() {
-  importDrawer.hidden = true;
-  state.page = 0;
-  await loadTasks();
-}
-
-async function openAssetViewer(assetId, name, resourceType) {
-  assetViewer.hidden = false;
-  assetViewerContent.innerHTML = '<p class="muted">正在加载素材…</p>';
-  try {
-    const blob = await fetchVoiceMaterialAsset(assetId);
-    const url = URL.createObjectURL(blob);
-    assetViewerContent.innerHTML = `<h3 class="asset-viewer-title">${escapeHtml(name)}</h3>`;
-    const node = resourceType === 'AUDIO'
-      ? document.createElement('audio')
-      : document.createElement('img');
-    node.controls = resourceType === 'AUDIO';
-    node.autoplay = resourceType === 'AUDIO';
-    node.src = url;
-    if (resourceType === 'IMAGE') node.alt = name;
-    assetViewerContent.append(node);
-    assetViewerContent.dataset.objectUrl = url;
-  } catch (error) {
-    assetViewerContent.innerHTML =
-      `<p class="error-text">${escapeHtml(error?.message || '素材加载失败')}</p>`;
-  }
-}
-
-function closeAssetViewer() {
-  const url = assetViewerContent.dataset.objectUrl;
-  if (url) URL.revokeObjectURL(url);
-  assetViewerContent.dataset.objectUrl = '';
-  assetViewerContent.innerHTML = '';
-  assetViewer.hidden = true;
-}
-
-el('task-search-form').addEventListener('submit', event => {
-  event.preventDefault();
-  state.page = 0;
-  void loadTasks();
-});
-
-el('reset-search').addEventListener('click', () => {
-  statusFilter.value = '';
-  subjectFilter.value = '';
-  keywordFilter.value = '';
-  createdFrom.value = '';
-  createdTo.value = '';
-  state.page = 0;
-  void loadTasks();
-});
-
-studentSelect.addEventListener('change', () => {
-  state.page = 0;
-  importStudentSelect.value = studentSelect.value;
-  void loadTasks();
-});
-
-el('refresh-tasks').addEventListener('click', () => void loadTasks());
-
-pageSize.addEventListener('change', () => {
-  state.size = Number(pageSize.value) || 20;
-  state.page = 0;
-  void loadTasks();
-});
-
-pagination.addEventListener('click', event => {
-  const button = event.target.closest('[data-page]');
-  if (!button || button.disabled) return;
-  const page = Number(button.dataset.page);
-  if (!Number.isInteger(page) || page < 0 || page >= state.totalPages) return;
-  state.page = page;
-  void loadTasks();
-});
-
-taskTableBody.addEventListener('click', event => {
-  const detailButton = event.target.closest('[data-open-detail]');
-  const row = event.target.closest('[data-package-id]');
-  const packageId = detailButton?.dataset.openDetail || row?.dataset.packageId;
-  if (packageId) void openDetail(packageId);
-});
-
-taskTableBody.addEventListener('keydown', event => {
-  if (event.key !== 'Enter' && event.key !== ' ') return;
-  const row = event.target.closest('[data-package-id]');
-  if (!row) return;
-  event.preventDefault();
-  void openDetail(row.dataset.packageId);
-});
-
-el('close-detail').addEventListener('click', closeDetail);
-detailDrawer.addEventListener('click', event => {
-  if (event.target.hasAttribute('data-close-detail')) closeDetail();
-  const preview = event.target.closest('[data-preview-asset]');
-  if (preview) {
-    void openAssetViewer(
-      preview.dataset.previewAsset,
-      preview.dataset.previewName,
-      preview.dataset.previewType);
-  }
-  if (event.target.id === 'create-task-from-detail') void createTaskFromDetail();
-});
-
-el('open-import').addEventListener('click', openImport);
-el('close-import').addEventListener('click', closeImport);
-importDrawer.addEventListener('click', event => {
-  if (event.target.hasAttribute('data-close-import')) closeImport();
-});
-
-folderPicker.addEventListener('click', () => folderInput.click());
-folderInput.addEventListener('change', () => {
-  mergeSelectedFiles(folderInput.files);
-  folderInput.value = '';
-});
-folderPicker.addEventListener('dragover', event => {
-  event.preventDefault();
-  folderPicker.classList.add('drag-over');
-});
-folderPicker.addEventListener('dragleave', () => folderPicker.classList.remove('drag-over'));
-folderPicker.addEventListener('drop', async event => {
-  event.preventDefault();
-  folderPicker.classList.remove('drag-over');
-  const files = [];
-  for (const item of Array.from(event.dataTransfer?.items || [])) {
-    if (item.kind !== 'file') continue;
-    const entry = item.webkitGetAsEntry?.() || item.getAsEntry?.();
-    if (entry?.isDirectory) {
-      await collectDroppedDirectory(entry, files, entry.name);
-    } else {
-      const file = item.getAsFile();
-      if (file) files.push(file);
-    }
-  }
-  mergeSelectedFiles(files);
-});
-
-importFolderSearch.addEventListener('input', renderImportPackages);
-el('apply-import-defaults').addEventListener('click', applyImportDefaults);
-
-selectAllImport.addEventListener('change', () => {
-  for (const item of state.importPackages) {
-    if (validatePackage(item).valid) item.selected = selectAllImport.checked;
-  }
-  renderImportPackages();
-});
-
-importTableBody.addEventListener('change', event => {
-  const row = event.target.closest('[data-import-index]');
-  if (!row) return;
-  const item = state.importPackages[Number(row.dataset.importIndex)];
-  if (!item) return;
-  if (event.target.classList.contains('import-select')) {
-    item.selected = event.target.checked;
-  } else if (event.target.classList.contains('import-subject')) {
-    item.subjectCode = event.target.value;
-  } else if (event.target.classList.contains('import-minutes')) {
-    item.expectedMinutes = Number(event.target.value);
-  }
-  renderImportPackages();
-});
-
-importTableBody.addEventListener('click', event => {
-  if (!event.target.classList.contains('remove-import')) return;
-  const row = event.target.closest('[data-import-index]');
-  if (!row) return;
-  state.importPackages.splice(Number(row.dataset.importIndex), 1);
-  renderImportPackages();
-});
-
-startImportButton.addEventListener('click', () => void uploadSelectedPackages());
-importCancelButton.addEventListener('click', closeImport);
-importAnotherButton.addEventListener('click', resetImportWorkspace);
-importFinishButton.addEventListener('click', () => void finishImport());
-
-el('import-result-filter').addEventListener('click', event => {
-  const button = event.target.closest('[data-result-filter]');
-  if (!button) return;
-  state.importResultFilter = button.dataset.resultFilter;
-  renderImportResults();
-});
-
-el('logout-button').addEventListener('click', async () => {
-  await logout();
-  window.location.reload();
-});
-
-el('close-asset-viewer').addEventListener('click', closeAssetViewer);
-assetViewer.addEventListener('click', event => {
-  if (event.target.hasAttribute('data-close-viewer')) closeAssetViewer();
-});
-
-async function startAdmin() {
-  if (state.initialized) return;
-  state.initialized = true;
-  try {
-    await loadStudentsAndTasks();
-  } catch (error) {
-    state.initialized = false;
-    resultSummary.textContent = '学生信息加载失败';
-    taskTableBody.innerHTML =
-      `<tr><td colspan="9" class="error-cell">${escapeHtml(error?.message || '学生信息加载失败，请刷新重试。')}</td></tr>`;
-  }
-}
-
-window.addEventListener('xiaoban-admin-authenticated', () => void startAdmin());
-if (window.__xiaobanAdminAuth) void startAdmin();
+window.addEventListener('xiaoban-admin-authenticated',()=>void startAdmin());
+if(window.__xiaobanAdminAuth)void startAdmin();
