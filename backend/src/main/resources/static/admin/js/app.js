@@ -388,20 +388,35 @@ async function uploadSelected() {
     }
 
     const completed = await completeVoiceMaterialBatch(batch.id);
-    const failures = completed.invalidCount + registrationFailures;
+    const batchPackages = await listVoiceMaterialPackages(studentSelect.value);
+    const results = batchPackages.filter(item => item.batchId === batch.id);
+    const failedResults = results.filter(item => item.status === 'INVALID');
+    const failures = failedResults.length + registrationFailures;
+
     updateProgress(selected.length, selected.length, '导入完成');
+
+    const failureDetails = failedResults
+      .map(item => `${item.directoryName}：${item.errorMessage || '素材校验未通过'}`)
+      .concat(registrationFailures > 0 ? [`${registrationFailures} 个目录注册失败，请重新导入`] : []);
+
     showResult(
       failures > 0
-        ? `导入结束：${completed.readyCount} 个可用，${failures} 个失败或素材异常。可根据结果修正后重新导入。`
+        ? `导入结束：${completed.readyCount} 个可用，${failures} 个失败。\\n${failureDetails.join('；')}`
         : `导入成功：${completed.readyCount} 个语音素材目录已保存到服务端。`,
       failures === 0
     );
 
-    if (failures === 0 && completed.readyCount > 0) {
-      await loadImportedPackages();
-      state.packages = state.packages.filter(item => !item.selected || !validatePackage(item).valid);
+    state.importedPackages = batchPackages;
+    renderImportedPackages();
+
+    if (completed.readyCount > 0) {
+      const successfulKeys = new Set(
+        results.filter(item => item.status === 'READY' || item.status === 'CONSUMED')
+          .map(item => item.directoryName)
+      );
+      state.packages = state.packages.filter(item => !item.selected || !successfulKeys.has(item.directoryName));
       renderPackages();
-      folderInput.value = '';
+      if (state.packages.length === 0) folderInput.value = '';
     }
   } catch (error) {
     showResult(error.message || '导入失败，请稍后重试', false);
