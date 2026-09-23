@@ -49,6 +49,13 @@ export interface RemoteVoiceMaterialRegisterPackageRequest {
   assignmentType: string;
 }
 
+export interface RemoteVoiceMaterialCreateAssignmentRequest {
+  studentId: string;
+  expectedMinutes: number;
+  dueAtEpochMs: number;
+  dueText: string;
+}
+
 export interface RemoteVoiceMaterialCreateAssignmentResponse {
   created: boolean;
   assignmentId: string;
@@ -148,13 +155,13 @@ export class RemoteVoiceMaterialApi {
     return JSON.parse(response.body) as RemoteVoiceMaterialPackage[];
   }
 
-  async createAssignment(packageId: string):
+  async createAssignment(packageId: string, input: RemoteVoiceMaterialCreateAssignmentRequest):
     Promise<RemoteVoiceMaterialCreateAssignmentResponse> {
     this.requireConnected();
     let response = await BackendHttpClient.instance.requestFor(
       'voice.material.assignment.create',
       `/api/v1/voice-material-packages/${encodeURIComponent(packageId)}/create-assignment`,
-      http.RequestMethod.POST);
+      http.RequestMethod.POST, input);
     this.requireSuccess(response.statusCode, '从语音素材创建任务失败');
     return JSON.parse(response.body) as RemoteVoiceMaterialCreateAssignmentResponse;
   }
