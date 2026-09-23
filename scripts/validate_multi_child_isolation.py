@@ -103,13 +103,14 @@ require("this.queryCache = [];" in assignment_repository and
         "this.remoteSummary = null;" in assignment_repository,
         "Repository refresh must clear previous-child in-memory caches synchronously")
 
-# Parent Home must still subscribe to the active child so all home data/actions re-evaluate when the
-# family context changes. The visible child identity itself is intentionally owned by AppShell's
-# persistent FamilyContextBar to avoid duplicating name/class information inside Parent Home.
-require("@Prop activeStudentId: string = '';" in parent_home and "private student(): StudentProfile" in parent_home,
-        "Parent Home data/actions must explicitly depend on active child context")
-require("this.activeStudentId.length > 0" in parent_home and "student.id !== this.activeStudentId" in parent_home,
-        "Parent Home must re-evaluate its active-student dependency after child switching")
+# Parent Home reads the active child through repository/family context and re-renders from the shared
+# repository revision. The visible child identity belongs to AppShell's persistent FamilyContextBar.
+require("@Prop revision: number = 0;" in parent_home and "private touchRevision(): number" in parent_home,
+        "Parent Home must subscribe to shared repository revision instead of duplicating activeStudentId")
+require("revision: this.storeRevision" in app_shell and "this.storeRevision++;" in app_shell,
+        "child switching must invalidate repository-backed parent home content")
+require("@Prop activeStudentId" not in parent_home,
+        "Parent Home must not keep a second active-child identity prop")
 require("FamilyContextBar" in app_shell and "currentStudent()" in app_shell,
         "Persistent family context surface must own the visible current-child identity")
 
