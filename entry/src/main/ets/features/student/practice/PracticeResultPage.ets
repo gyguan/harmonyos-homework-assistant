@@ -5,18 +5,20 @@ import {
   PracticeQuestionResult,
   PracticeResult
 } from '../../../domain/model/practice/PracticeModels';
-import { PracticeResultViewModel } from './PracticeResultViewModel';
+import { PracticeProgressSummary, PracticeResultViewModel } from './PracticeResultViewModel';
 
 @Component
 export struct PracticeResultPage {
   @Prop attemptId: string = '';
   @State private result: PracticeResult | null = null;
   @State private paperTitle: string = '';
+  @State private progress: PracticeProgressSummary | null = null;
   @State private errorMessage: string = '';
   @State private repeating: boolean = false;
   @State private wrongRetrying: boolean = false;
   @State private showDetailedStats: boolean = false;
   @State private showAllQuestions: boolean = false;
+  @State private feedbackVisible: boolean = false;
   onBack: () => void = () => {};
   onRepeatStarted: (attemptId: string) => void = (_attemptId: string) => {};
   private readonly viewModel: PracticeResultViewModel = new PracticeResultViewModel();
@@ -28,10 +30,14 @@ export struct PracticeResultPage {
   private async load(): Promise<void> {
     this.errorMessage = '';
     this.paperTitle = '';
+    this.progress = null;
+    this.feedbackVisible = false;
     try {
       let loaded = await this.viewModel.load(this.attemptId);
       this.result = loaded;
       this.paperTitle = await this.viewModel.paperTitle(loaded);
+      this.progress = await this.viewModel.progress(loaded);
+      this.feedbackVisible = true;
     } catch {
       this.result = null;
       this.errorMessage = '结果加载失败，请检查网络后重试。';
@@ -42,6 +48,55 @@ export struct PracticeResultPage {
     if (this.result === null) return this.paperTitle;
     if (this.paperTitle.length > 0) return `${this.paperTitle} · 第 ${this.result.attemptNo} 次`;
     return `第 ${this.result.attemptNo} 次`;
+  }
+
+  private feedbackTitle(result: PracticeResult): string {
+    if (result.mode === PracticeAttemptMode.WRONG_ONLY && result.wrongCount === 0) {
+      return '这些错题被你攻克啦！';
+    }
+    if (result.wrongCount === 0) return '全对啦！太棒了！';
+    if (this.hasPositiveProgress()) return '这次有进步！';
+
+    let percent = this.viewModel.percent(result);
+    if (percent >= 80) return '做得很不错！';
+    if (percent >= 60) return '完成啦，继续加油！';
+    return '坚持做完很了不起！';
+  }
+
+  private feedbackSubtitle(result: PracticeResult): string {
+    if (result.mode === PracticeAttemptMode.WRONG_ONLY) {
+      if (result.wrongCount === 0) return '上次不会的题，现在已经会啦';
+      return '已经攻克了一部分，再把剩下的弄懂';
+    }
+    if (result.wrongCount === 0) return '这些知识你已经掌握得很不错啦';
+    if (this.hasPositiveProgress()) return '你把更多题目真正弄懂了';
+
+    let percent = this.viewModel.percent(result);
+    if (percent >= 80) return '你已经掌握了大部分题目';
+    if (percent >= 60) return '已经会了不少，我们把错题再弄懂';
+    return '不着急，我们一道一道把不会的弄懂';
+  }
+
+  private hasPositiveProgress(): boolean {
+    return this.progress !== null && (this.progress.correctDelta > 0 || this.progress.percentDelta > 0);
+  }
+
+  private progressText(): string {
+    if (this.progress === null) return '';
+    if (this.progress.correctDelta > 0 && this.progress.percentDelta > 0) {
+      return `比上次多答对 ${this.progress.correctDelta} 题 · 正确率 +${this.progress.percentDelta}%`;
+    }
+    if (this.progress.correctDelta > 0) return `比上次多答对 ${this.progress.correctDelta} 题`;
+    if (this.progress.percentDelta > 0) return `正确率比上次提高 ${this.progress.percentDelta}%`;
+    return '';
+  }
+
+  private nextStepText(result: PracticeResult): string {
+    if (result.wrongCount <= 0) return '这一轮已经完成，给自己一个大大的赞！';
+    if (result.mode === PracticeAttemptMode.WRONG_ONLY) {
+      return `还剩 ${result.wrongCount} 道题，再试一次就更熟练啦`;
+    }
+    return `再把 ${result.wrongCount} 道错题弄懂就更棒啦`;
   }
 
   private async repeat(): Promise<void> {
@@ -85,6 +140,87 @@ export struct PracticeResultPage {
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
+  @Builder
+  private CompletionFeedback(result: PracticeResult) {
+    Column({ space: 8 }) {
+      Text('★')
+        .fontSize(34)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.PRIMARY);
+
+      Text(this.feedbackTitle(result))
+        .width('100%')
+        .fontSize(24)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT)
+        .textAlign(TextAlign.Center);
+
+      Text(this.feedbackSubtitle(result))
+        .width('100%')
+        .fontSize(14)
+        .lineHeight(21)
+        .fontColor(AppTheme.SUBTEXT)
+        .textAlign(TextAlign.Center);
+
+      Text(`${result.score} / ${result.maxScore}`)
+        .fontSize(42)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.PRIMARY)
+        .margin({ top: 4 });
+
+      Text(`答对 ${result.correctCount} 题 · 正确率 ${this.viewModel.percent(result)}%`)
+        .fontSize(14)
+        .fontColor(AppTheme.SUBTEXT);
+
+      if (this.progressText().length > 0) {
+        Text(this.progressText())
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.SUCCESS)
+          .padding({ left: 10, right: 10, top: 6, bottom: 6 })
+          .backgroundColor(AppTheme.SUCCESS_SOFT)
+          .borderRadius(AppTheme.CHIP_RADIUS)
+          .margin({ top: 2 });
+      }
+
+      Column({ space: 4 }) {
+        Text(`✓ 认真完成了 ${result.questions.length} 道题`)
+          .width('100%')
+          .fontSize(13)
+          .fontColor(AppTheme.TEXT)
+          .textAlign(TextAlign.Center);
+        if (result.noteCount > 0) {
+          Text(`✎ 还记录了 ${result.noteCount} 条笔记`)
+            .width('100%')
+            .fontSize(13)
+            .fontColor(AppTheme.TEXT)
+            .textAlign(TextAlign.Center);
+        }
+      }
+      .width('100%')
+      .margin({ top: 4 });
+
+      Text(this.nextStepText(result))
+        .width('100%')
+        .fontSize(13)
+        .lineHeight(20)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(result.wrongCount > 0 ? AppTheme.PRIMARY : AppTheme.SUCCESS)
+        .textAlign(TextAlign.Center)
+        .margin({ top: 2 });
+    }
+    .width('100%')
+    .padding({ left: 18, right: 18, top: 22, bottom: 20 })
+    .backgroundColor(AppTheme.SURFACE)
+    .borderRadius(AppTheme.CARD_RADIUS)
+    .opacity(this.feedbackVisible ? 1 : 0.2)
+    .scale({
+      x: this.feedbackVisible ? 1 : 0.96,
+      y: this.feedbackVisible ? 1 : 0.96
+    })
+    .animation({ duration: 360 });
+  }
+
   build() {
     Column() {
       Column() {
@@ -108,33 +244,7 @@ export struct PracticeResultPage {
       Scroll() {
         Column({ space: 16 }) {
           if (this.result !== null) {
-            Column({ space: 6 }) {
-              if (this.result.mode === PracticeAttemptMode.WRONG_ONLY) {
-                Text('错题专项')
-                  .fontSize(13)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.PRIMARY)
-                  .padding({ left: 9, right: 9, top: 4, bottom: 4 })
-                  .backgroundColor(AppTheme.PRIMARY_SOFT)
-                  .borderRadius(AppTheme.CHIP_RADIUS);
-              }
-              Text(`${this.result.score} / ${this.result.maxScore}`)
-                .fontSize(42)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(AppTheme.PRIMARY);
-              Text(`正确率 ${this.viewModel.percent(this.result)}%`)
-                .fontSize(14)
-                .fontColor(AppTheme.SUBTEXT);
-              if (this.result.noteCount > 0) {
-                Text(`本次记录 ${this.result.noteCount} 条笔记`)
-                  .fontSize(13)
-                  .fontColor(AppTheme.TERTIARY_TEXT);
-              }
-            }
-            .width('100%')
-            .padding({ top: 20, bottom: 20 })
-            .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CARD_RADIUS);
+            this.CompletionFeedback(this.result);
 
             Column({ space: 8 }) {
               Text(this.showDetailedStats ? '收起详细统计' : '查看详细统计')
@@ -181,59 +291,59 @@ export struct PracticeResultPage {
               ForEach(this.result.questions, (item: PracticeQuestionResult) => {
                 if (this.showAllQuestions || this.result!.wrongCount === 0 || !item.correct) {
                   Column({ space: 6 }) {
-                  Row() {
-                    Text(`第 ${item.orderNo} 题`)
-                      .fontSize(13)
-                      .fontWeight(FontWeight.Medium)
+                    Row() {
+                      Text(`第 ${item.orderNo} 题`)
+                        .fontSize(13)
+                        .fontWeight(FontWeight.Medium)
+                        .fontColor(AppTheme.TEXT);
+                      Blank();
+                      Text(item.correct ? '正确' : '需订正')
+                        .fontSize(13)
+                        .fontWeight(FontWeight.Medium)
+                        .fontColor(item.correct ? AppTheme.SUCCESS : AppTheme.DANGER);
+                    }
+                    .width('100%');
+                    Text(item.stem)
+                      .width('100%')
+                      .fontSize(14)
+                      .lineHeight(20)
                       .fontColor(AppTheme.TEXT);
-                    Blank();
-                    Text(item.correct ? '正确' : '需订正')
-                      .fontSize(13)
-                      .fontWeight(FontWeight.Medium)
-                      .fontColor(item.correct ? AppTheme.SUCCESS : AppTheme.DANGER);
-                  }
-                  .width('100%');
-                  Text(item.stem)
-                    .width('100%')
-                    .fontSize(14)
-                    .lineHeight(20)
-                    .fontColor(AppTheme.TEXT);
-                  Text(`我的答案：${item.answerValue.length > 0 ? item.answerValue : '未作答'}`)
-                    .width('100%')
-                    .fontSize(13)
-                    .fontColor(AppTheme.SUBTEXT);
-                  if (!item.correct) {
-                    Text(`正确答案：${item.correctAnswer}`)
+                    Text(`我的答案：${item.answerValue.length > 0 ? item.answerValue : '未作答'}`)
                       .width('100%')
                       .fontSize(13)
-                      .fontColor(AppTheme.SUCCESS);
-                  }
-                  Text(item.explanation)
-                    .width('100%')
-                    .fontSize(13)
-                    .lineHeight(18)
-                    .fontColor(AppTheme.TERTIARY_TEXT);
-                  if (item.noteContent.length > 0) {
-                    Column({ space: 4 }) {
-                      Text('我的笔记')
-                        .width('100%')
-                        .fontSize(12)
-                        .fontWeight(FontWeight.Medium)
-                        .fontColor(AppTheme.SUBTEXT);
-                      Text(item.noteContent)
+                      .fontColor(AppTheme.SUBTEXT);
+                    if (!item.correct) {
+                      Text(`正确答案：${item.correctAnswer}`)
                         .width('100%')
                         .fontSize(13)
-                        .lineHeight(18)
-                        .fontColor(AppTheme.TEXT);
+                        .fontColor(AppTheme.SUCCESS);
                     }
-                    .width('100%')
-                    .padding(10)
-                    .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                    .borderRadius(AppTheme.CONTROL_RADIUS);
+                    Text(item.explanation)
+                      .width('100%')
+                      .fontSize(13)
+                      .lineHeight(18)
+                      .fontColor(AppTheme.TERTIARY_TEXT);
+                    if (item.noteContent.length > 0) {
+                      Column({ space: 4 }) {
+                        Text('我的笔记')
+                          .width('100%')
+                          .fontSize(12)
+                          .fontWeight(FontWeight.Medium)
+                          .fontColor(AppTheme.SUBTEXT);
+                        Text(item.noteContent)
+                          .width('100%')
+                          .fontSize(13)
+                          .lineHeight(18)
+                          .fontColor(AppTheme.TEXT);
+                      }
+                      .width('100%')
+                      .padding(10)
+                      .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                      .borderRadius(AppTheme.CONTROL_RADIUS);
+                    }
                   }
-                }
-                .width('100%')
-                .padding(14)
+                  .width('100%')
+                  .padding(14)
                   .backgroundColor(AppTheme.SURFACE)
                   .borderRadius(AppTheme.CONTROL_RADIUS);
                 }
@@ -268,18 +378,19 @@ export struct PracticeResultPage {
 
       if (this.result !== null) {
         Row({ space: 10 }) {
-          Button(this.repeating ? '正在创建…' : '再练一遍', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-            .fontColor(AppTheme.TEXT)
-            .fontWeight(FontWeight.Medium)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.repeating && !this.wrongRetrying)
-            .onClick(() => void this.repeat());
-
           if (this.result.wrongCount > 0) {
-            Button(this.wrongRetrying ? '正在创建…' : '只练错题', { type: ButtonType.Normal })
+            Button(this.repeating ? '正在创建…' : '再练一遍', { type: ButtonType.Normal })
+              .layoutWeight(1)
+              .height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+              .fontColor(AppTheme.TEXT)
+              .fontWeight(FontWeight.Medium)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.repeating && !this.wrongRetrying)
+              .onClick(() => void this.repeat());
+
+            Button(this.wrongRetrying ? '正在创建…' : `再挑战 ${this.result.wrongCount} 道错题`,
+              { type: ButtonType.Normal })
               .layoutWeight(1)
               .height(AppTheme.BUTTON_HEIGHT)
               .backgroundColor(this.wrongRetrying ? AppTheme.DISABLED : AppTheme.PRIMARY)
@@ -288,6 +399,26 @@ export struct PracticeResultPage {
               .borderRadius(AppTheme.CONTROL_RADIUS)
               .enabled(!this.repeating && !this.wrongRetrying)
               .onClick(() => void this.retryWrong());
+          } else {
+            Button(this.repeating ? '正在创建…' : '再挑战一次', { type: ButtonType.Normal })
+              .layoutWeight(1)
+              .height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+              .fontColor(AppTheme.TEXT)
+              .fontWeight(FontWeight.Medium)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.repeating)
+              .onClick(() => void this.repeat());
+
+            Button('完成', { type: ButtonType.Normal })
+              .layoutWeight(1)
+              .height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.PRIMARY)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .fontWeight(FontWeight.Medium)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.repeating)
+              .onClick(() => this.onBack());
           }
         }
         .width('100%')
