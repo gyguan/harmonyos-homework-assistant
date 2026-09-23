@@ -43,10 +43,12 @@ public class VoiceMaterialAssignmentService {
 
   @Transactional
   public VoiceMaterialDtos.CreateAssignmentResponse createManually(
-      UUID familyId, UUID packageId) {
+      UUID familyId, UUID packageId, VoiceMaterialDtos.CreateAssignmentRequest input) {
     String studentId = packages.findOwnedStudentId(familyId, packageId)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
     students.requireOwnedForUpdate(familyId, studentId);
+    String targetStudentId = input.studentId().trim();
+    students.requireOwnedForUpdate(familyId, targetStudentId);
     VoiceMaterialPackageEntity item = packages.lockOwned(familyId, packageId)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
 
@@ -61,7 +63,11 @@ public class VoiceMaterialAssignmentService {
     }
 
     AssignmentDtos.Response assignment = consumeLocked(
-        familyId, item, null, "", LocalDate.now(BUSINESS_ZONE));
+        familyId, item, targetStudentId,
+        input.expectedMinutes() == null ? item.expectedMinutes : input.expectedMinutes(),
+        resolveDueAt(input.dueAtEpochMs(), item.dueAt),
+        input.dueText() == null ? "" : input.dueText().trim(),
+        LocalDate.now(BUSINESS_ZONE));
     return new VoiceMaterialDtos.CreateAssignmentResponse(
         true, assignment.id(), assignment);
   }
@@ -93,7 +99,8 @@ public class VoiceMaterialAssignmentService {
         ? businessDate.atTime(LocalTime.of(23, 59)).atZone(BUSINESS_ZONE).toInstant()
         : null;
     AssignmentDtos.Response assignment = consumeLocked(
-        familyId, item, dailyDueAt, item.dueAt == null ? "今天" : "", businessDate);
+        familyId, item, item.studentId, item.expectedMinutes, dailyDueAt,
+        item.dueAt == null ? "今天" : "", businessDate);
 
     VoiceMaterialAutoCreateRecordEntity record =
         autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
@@ -113,7 +120,8 @@ public class VoiceMaterialAssignmentService {
   }
 
   private AssignmentDtos.Response consumeLocked(UUID familyId,
-      VoiceMaterialPackageEntity item, Instant dueAtOverride, String dueTextOverride, LocalDate businessDate) {
+      VoiceMaterialPackageEntity item, String targetStudentId, int expectedMinutes,
+      Instant dueAtOverride, String dueTextOverride, LocalDate businessDate) {
     String assignmentId = "a-voicepkg-" + item.id;
     Long dueAtEpochMs = null;
     if (dueAtOverride != null) dueAtEpochMs = Long.valueOf(dueAtOverride.toEpochMilli());
@@ -122,7 +130,7 @@ public class VoiceMaterialAssignmentService {
     AssignmentDtos.Create create = new AssignmentDtos.Create(
         assignmentId,
         subjectDisplay(item.subjectCode),
-        assignments.nextVoiceMaterialTaskTitle(familyId, item.studentId, item.subjectCode, businessDate),
+        assignments.nextVoiceMaterialTaskTitle(familyId, targetStudentId, item.subjectCode, businessDate),
         "请听语音并结合图片完成任务。",
         "",
         dueTextOverride,
@@ -134,14 +142,14 @@ public class VoiceMaterialAssignmentService {
         "NOT_STARTED",
         "语音素材库",
         item.directoryName,
-        item.expectedMinutes,
+        expectedMinutes,
         0L,
         0L,
         0L,
         "");
 
     AssignmentDtos.Response assignment =
-        assignments.create(familyId, item.studentId, create);
+        assignments.create(familyId, targetStudentId, create);
 
     List<VoiceMaterialFileEntity> packageFiles =
         files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
@@ -161,6 +169,11 @@ public class VoiceMaterialAssignmentService {
     item.errorMessage = "";
     packages.save(item);
     return assignment;
+  }
+
+  private Instant resolveDueAt(Long requestedEpochMs, Instant fallback) {
+    if (requestedEpochMs != null && requestedEpochMs > 0) return Instant.ofEpochMilli(requestedEpochMs);
+    return fallback;
   }
 
   private AssignmentDtos.Response loadAssignmentIfPresent(UUID familyId, String assignmentId) {
