@@ -54,6 +54,33 @@ export interface RemoteVoiceMaterialCreateAssignmentRequest {
   expectedMinutes: number;
   dueAtEpochMs: number;
   dueText: string;
+  title?: string;
+  requestId?: string;
+}
+
+export interface RemoteVoiceFolderItem {
+  packageId: string;
+  directoryName: string;
+  folderStatus: string;
+  studentId: string;
+  studentName: string;
+  subjectCode: string;
+  expectedMinutes: number;
+  audioCount: number;
+  imageCount: number;
+  usageCount: number;
+  activeTaskCount: number;
+  lastUsedAtEpochMs: number;
+  importedAtEpochMs: number;
+  errorMessage: string;
+}
+
+export interface RemoteVoiceFolderPage {
+  items: RemoteVoiceFolderItem[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
 }
 
 export interface RemoteVoiceMaterialCreateAssignmentResponse {
@@ -153,6 +180,29 @@ export class RemoteVoiceMaterialApi {
       http.RequestMethod.GET);
     this.requireSuccess(response.statusCode, '读取语音素材库失败');
     return JSON.parse(response.body) as RemoteVoiceMaterialPackage[];
+  }
+
+  async queryFolders(studentId: string, keyword: string = '', usage: string = 'ALL',
+    page: number = 0, size: number = 20): Promise<RemoteVoiceFolderPage> {
+    if (!BackendSession.instance.isConnected()) {
+      return { items: [], page: 0, size: size, totalElements: 0, totalPages: 0 };
+    }
+    let params: string[] = [
+      `studentId=${encodeURIComponent(studentId)}`,
+      'status=READY',
+      `usage=${encodeURIComponent(usage)}`,
+      `page=${Math.max(0, page)}`,
+      `size=${Math.max(1, Math.min(100, size))}`,
+      'sort=importedAt,desc'
+    ];
+    if (keyword.trim().length > 0) {
+      params.push(`keyword=${encodeURIComponent(keyword.trim())}`);
+    }
+    let path = `/api/v1/voice-material-folders?${params.join('&')}`;
+    let response = await BackendHttpClient.instance.requestFor(
+      'voice.material.folder.query', path, http.RequestMethod.GET);
+    this.requireSuccess(response.statusCode, '读取服务器语音文件夹失败');
+    return JSON.parse(response.body) as RemoteVoiceFolderPage;
   }
 
   async createAssignment(packageId: string, input: RemoteVoiceMaterialCreateAssignmentRequest):

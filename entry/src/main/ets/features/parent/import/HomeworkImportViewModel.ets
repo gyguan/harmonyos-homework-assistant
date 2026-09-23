@@ -1,6 +1,6 @@
 import { HomeworkImportService } from '../../../application/import/HomeworkImportService';
 import { DefaultHomeworkImportDraftRepository } from '../../../data/repository/DefaultHomeworkImportDraftRepository';
-import { HomeworkImageImportResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
+import { HomeworkImageImportResult, HomeworkImageTextResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { CandidateAssignment, RawHomeworkImport } from '../../../domain/model/HomeworkModels';
 import { HomeworkImportDraftRepository } from '../../../domain/port/HomeworkImportDraftRepository';
 
@@ -13,6 +13,9 @@ export class HomeworkImportViewModel {
 
   rawImport(): RawHomeworkImport { return this.drafts.getRawImport(); }
   candidates(): CandidateAssignment[] { return this.drafts.getCandidates(); }
-  parseText(text: string): Promise<HomeworkTextImportResult> { return HomeworkImportService.instance.parseText(text); }
+  parseText(text: string, imageRef: string = ''): Promise<HomeworkTextImportResult> {
+    return HomeworkImportService.instance.parseText(text, imageRef);
+  }
+  selectImageText(): Promise<HomeworkImageTextResult> { return HomeworkImportService.instance.selectImageText(); }
   selectImageAndParse(): Promise<HomeworkImageImportResult> { return HomeworkImportService.instance.selectImageAndParse(); }
 }

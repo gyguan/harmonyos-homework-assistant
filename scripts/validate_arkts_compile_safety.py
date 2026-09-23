@@ -80,12 +80,14 @@ def main() -> int:
     require("deviceInfo.sdkApiVersion >= 26" not in voice_material_picker,
             "raw sdkApiVersion comparison must not replace ArkTS apiAvailable compatibility protection")
 
-    require("class ParentVoiceMaterialRouteParam" in app_routes,
-            "voice material navigation must declare an explicit route param type")
-    require("AppRoute.PARENT_VOICE_MATERIAL, {}" not in app_shell,
-            "AppShell must not use an untyped object literal for voice material navigation")
-    require("new ParentVoiceMaterialRouteParam()" in app_shell,
-            "AppShell must use the typed voice material route param")
+    require("class ParentVoiceCreateRouteParam" in app_routes,
+            "voice assignment creation navigation must declare an explicit route param type")
+    require("AppRoute.PARENT_VOICE_CREATE, {}" not in app_shell,
+            "AppShell must not use an untyped object literal for voice assignment creation")
+    require("new ParentVoiceCreateRouteParam()" in app_shell,
+            "AppShell must use the typed voice assignment creation route param")
+    require("PARENT_VOICE_MATERIAL" not in app_routes and "PARENT_VOICE_MATERIAL" not in app_shell,
+            "legacy standalone voice-material navigation must not reappear")
 
     syscap = "SystemCapability.Multimedia.Media.AVPlayer"
     require(audio.count(f"canIUse('{syscap}')") >= 2,

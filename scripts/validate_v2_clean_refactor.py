@@ -86,10 +86,13 @@ if app_shell_path.exists():
             fail(f"AppShell legacy navigation/layout state must be deleted: {legacy}")
     if "AppRoute.PARENT_IMPORT" not in app_shell or "HomeworkImportRoutePage" not in app_shell:
         fail("parent import must be a NavDestination deep page opened from the parent home action")
-    if "onOpenImport: () => ParentImportNavigator.openImport(this.navPathStack)" not in app_shell or             "AppRoute.PARENT_IMPORT" not in parent_import_navigator:
-        fail("parent home import action must push the parent import deep route through ParentImportNavigator")
+    if "onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack)" not in app_shell or             "AppRoute.PARENT_IMPORT" not in parent_import_navigator:
+        fail("parent home assignment action must push the unified create deep route through ParentImportNavigator")
     if "'导入', this.parentRoute" in app_shell:
         fail("parent primary navigation must not expose import as a persistent tab/rail item")
+    for legacy_route in ["PARENT_EXTRA_CREATE", "PARENT_VOICE_MATERIAL"]:
+        if legacy_route in app_shell:
+            fail(f"legacy parent creation route must not reappear in AppShell: {legacy_route}")
     if "AppRoute.PARENT_IMPORT_CONFIRMATION" not in app_shell:
         fail("parent import confirmation must use AppRoute.PARENT_IMPORT_CONFIRMATION")
     if "ParentImportNavigator.openConfirmation(this.navPathStack)" not in app_shell or             "AppRoute.PARENT_IMPORT_CONFIRMATION" not in parent_import_navigator or             "NavDestination()" not in app_shell:

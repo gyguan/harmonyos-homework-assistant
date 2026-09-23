@@ -26,7 +26,16 @@ export class ParentHomeViewModel {
       if (item.status === AssignmentStatus.OVERDUE || item.status === AssignmentStatus.NEEDS_REWORK ||
         item.status === AssignmentStatus.SUBMITTED) result.push(item);
     }
+    result.sort((left: Assignment, right: Assignment) =>
+      this.attentionPriority(left.status) - this.attentionPriority(right.status));
     return result;
+  }
+
+  private attentionPriority(status: AssignmentStatus): number {
+    if (status === AssignmentStatus.NEEDS_REWORK) return 0;
+    if (status === AssignmentStatus.SUBMITTED) return 1;
+    if (status === AssignmentStatus.OVERDUE) return 2;
+    return 9;
   }
 
   async refresh(): Promise<boolean> {

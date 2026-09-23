@@ -12,7 +12,7 @@ export struct HomeworkImportRoutePage {
   build() {
     Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
       DeepPageHeader({
-        title: '手工导入作业',
+        title: '布置作业',
         backAccessibilityText: '返回家长首页',
         onBack: () => this.onBack()
       });

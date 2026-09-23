@@ -10,8 +10,7 @@ export enum AppRoute {
   PARENT_IMPORT_INBOX = 'parent/import/inbox',
   PARENT_IMPORT_BATCH_DETAIL = 'parent/import/inbox/detail',
   PARENT_IMPORT_CONFIRMATION = 'parent/import/confirmation',
-  PARENT_EXTRA_CREATE = 'parent/extra/create',
-  PARENT_VOICE_MATERIAL = 'parent/voice/material'
+  PARENT_VOICE_CREATE = 'parent/voice/create'
 }
 
 export class AssignmentRouteParam {
@@ -38,8 +37,5 @@ export class ParentImportBatchRouteParam {
   constructor(batchId: string) { this.batchId = batchId; }
 }
 export class ParentImportConfirmationRouteParam {}
-export class ParentExtraCreateRouteParam {
-  voice: boolean;
-  constructor(voice: boolean = false) { this.voice = voice; }
-}
-export class ParentVoiceMaterialRouteParam {}
+
+export class ParentVoiceCreateRouteParam {}
