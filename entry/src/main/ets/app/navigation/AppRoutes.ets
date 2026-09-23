@@ -37,3 +37,5 @@ export class ParentImportBatchRouteParam {
   constructor(batchId: string) { this.batchId = batchId; }
 }
 export class ParentImportConfirmationRouteParam {}
+
+export class ParentVoiceCreateRouteParam {}
