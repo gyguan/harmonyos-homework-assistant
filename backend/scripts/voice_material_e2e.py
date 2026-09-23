@@ -154,7 +154,7 @@ def main() -> int:
         expect(http(base_url, "POST", f"/api/v1/voice-material-packages/{second['id']}/create-assignment",
                     token=token, payload=create_payload), (409,), "reject second active voice task")
 
-        # Delete first task. Link history must survive, and the same folder can be reused.
+        # Delete first task. Link history must survive.
         expect(http(base_url, "DELETE", f"/api/v1/assignments/{first_assignment}", token=token),
                (200, 204), "delete first voice task")
         after_delete = expect(http(base_url, "GET",
@@ -165,6 +165,28 @@ def main() -> int:
         require(any(not x.get("assignmentExists") for x in after_delete.get("recentTasks", [])),
                 "folder history must retain deleted task link")
 
+        # The same day, no active task means automatic creation must continue.
+        # Unused folders are preferred over previously used folders.
+        auto_again = expect(http(base_url, "POST",
+            f"/api/v1/students/{student_id}/voice-material-packages/auto-create-next", token=token),
+            (200,), "auto recreate after first task deletion").json()
+        require(auto_again.get("created") is True and auto_again.get("packageId") == second["id"],
+                "auto recreation must choose the next unused folder")
+        auto_second_assignment = auto_again["assignmentId"]
+        require(auto_second_assignment != first_assignment and auto_second_assignment.startswith("a-voice-"),
+                "second automatic task must be a distinct Assignment instance")
+        list_resources(base_url, token, auto_second_assignment, ["math-voice.mp3", "math-scene.png"])
+
+        second_folder = expect(http(base_url, "GET",
+            f"/api/v1/voice-material-folders/{second['id']}", token=token),
+            (200,), "second folder detail after auto recreation").json()
+        require(second_folder["item"].get("usageCount") == 1, "second folder usage count must become 1")
+        require(second_folder["item"].get("activeTaskCount") == 1, "second folder must have one active task")
+
+        # Clear the second automatic task, then manually reuse the first folder.
+        expect(http(base_url, "DELETE", f"/api/v1/assignments/{auto_second_assignment}", token=token),
+               (200, 204), "delete second automatic voice task")
+
         request_id = f"reuse-{run_id}"
         reuse_payload = {"studentId": student_id, "expectedMinutes": 18, "dueAtEpochMs": 0,
                          "dueText": "", "title": "语文 · 重复使用验证", "requestId": request_id}
@@ -172,20 +194,21 @@ def main() -> int:
             f"/api/v1/voice-material-packages/{first['id']}/create-assignment",
             token=token, payload=reuse_payload), (200,), "reuse same folder manually").json()
         require(reused.get("created") is True, "same folder must create a second task instance")
-        second_assignment = reused["assignmentId"]
-        require(second_assignment != first_assignment and second_assignment.startswith("a-voice-"),
+        reused_assignment = reused["assignmentId"]
+        require(reused_assignment not in (first_assignment, auto_second_assignment)
+                and reused_assignment.startswith("a-voice-"),
                 "folder reuse must create a distinct Assignment id")
 
         retry = expect(http(base_url, "POST",
             f"/api/v1/voice-material-packages/{first['id']}/create-assignment",
             token=token, payload=reuse_payload), (200,), "manual create idempotent retry").json()
-        require(retry.get("created") is False and retry.get("assignmentId") == second_assignment,
+        require(retry.get("created") is False and retry.get("assignmentId") == reused_assignment,
                 "same requestId must resolve to original Assignment")
-        list_resources(base_url, token, second_assignment, ["chinese-voice.mp3", "chinese-scene.png"])
+        list_resources(base_url, token, reused_assignment, ["chinese-voice.mp3", "chinese-scene.png"])
 
         reused_folder = expect(http(base_url, "GET",
             f"/api/v1/voice-material-folders/{first['id']}", token=token),
-            (200,), "folder detail after reuse").json()
+            (200,), "folder detail after manual reuse").json()
         require(reused_folder["item"].get("usageCount") == 2, "reused folder usage count must become 2")
         require(reused_folder["item"].get("activeTaskCount") == 1, "reused folder must have one active task")
         require(len(reused_folder.get("recentTasks", [])) >= 2, "folder detail must show task history")
@@ -196,28 +219,34 @@ def main() -> int:
         unused_page = expect(http(base_url, "GET",
             f"/api/v1/voice-material-folders?studentId={quote(student_id)}&usage=UNUSED&page=0&size=20",
             token=token), (200,), "filter unused folders").json()
-        require(any(x.get("packageId") == first["id"] for x in used_page.get("items", [])),
-                "reused folder must appear in USED filter")
-        require(any(x.get("packageId") == second["id"] for x in unused_page.get("items", [])),
-                "never-used folder must appear in UNUSED filter")
+        require({x.get("packageId") for x in used_page.get("items", [])} >= {first["id"], second["id"]},
+                "both historically used folders must appear in USED filter")
+        require(unused_page.get("totalElements") == 0,
+                "no folder should remain unused after two automatic selections")
 
         task_by_folder = expect(http(base_url, "GET",
             f"/api/v1/voice-tasks?studentId={quote(student_id)}&packageId={first['id']}&page=0&size=20",
             token=token), (200,), "query tasks by source folder").json()
         require(task_by_folder.get("totalElements") == 1 and
-                task_by_folder["items"][0].get("assignmentId") == second_assignment,
+                task_by_folder["items"][0].get("assignmentId") == reused_assignment,
                 "task list must include only existing Assignments while preserving folder relation")
 
         final_packages = expect(http(base_url, "GET",
             f"/api/v1/students/{student_id}/voice-material-packages", token=token),
             (200,), "legacy package list compatibility").json()
         first_legacy = next(x for x in final_packages if x.get("id") == first["id"])
-        require(first_legacy.get("status") == "READY", "reused folder must remain READY")
-        require(first_legacy.get("hasCreatedBefore") is True, "legacy response must derive historical usage")
-        require(first_legacy.get("hasActiveAssignment") is True, "legacy response must derive active link")
+        second_legacy = next(x for x in final_packages if x.get("id") == second["id"])
+        require(first_legacy.get("status") == "READY" and second_legacy.get("status") == "READY",
+                "used folders must remain reusable READY")
+        require(first_legacy.get("hasCreatedBefore") is True and second_legacy.get("hasCreatedBefore") is True,
+                "legacy response must derive historical usage from task links")
+        require(first_legacy.get("hasActiveAssignment") is True,
+                "first folder must expose the active manually reused task")
+        require(second_legacy.get("hasActiveAssignment") is False,
+                "deleted second automatic task must not remain active")
 
         print("VOICE_MATERIAL_E2E_PASS "
-              f"studentId={student_id} firstAssignment={first_assignment} reusedAssignment={second_assignment}")
+              f"studentId={student_id} firstAssignment={first_assignment} reusedAssignment={reused_assignment}")
         return 0
     except SmokeFailure as exc:
         print(f"VOICE_MATERIAL_E2E_FAIL: {exc}", file=sys.stderr)
