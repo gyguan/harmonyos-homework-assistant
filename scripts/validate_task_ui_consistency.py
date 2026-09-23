@@ -61,6 +61,9 @@ require("interactive: true" in progress and "onSelect: (key: AssignmentMetricKey
         "parent progress metric clicks must update the assignment list")
 require("Text(`${this.viewModel.student().name}" not in progress,
         "parent progress title must not duplicate the global student context")
+require("Text(this.bulkMode ? '完成' : '管理')" in progress and
+        ".constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })" in progress,
+        "parent progress title row must keep stable height when management action appears or disappears")
 
 # 3/4. Parent and student use one date+subject query model; no relative-date/type presets.
 for page, name in [(progress, "parent progress"), (student, "student assignments")]:
