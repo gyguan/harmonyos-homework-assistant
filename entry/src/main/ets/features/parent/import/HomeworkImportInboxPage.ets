@@ -110,14 +110,12 @@ export struct HomeworkImportInboxPage {
   private sourceLabel(sourceType: HomeworkImportSourceType): string {
     if (sourceType === HomeworkImportSourceType.SCREENSHOT) return '截图';
     if (sourceType === HomeworkImportSourceType.SHARE) return '系统分享';
-    if (sourceType === HomeworkImportSourceType.SCREEN_CAPTURE) return '智能采集';
     return '文字';
   }
 
   private sourceBadge(sourceType: HomeworkImportSourceType): string {
     if (sourceType === HomeworkImportSourceType.SCREENSHOT) return '图';
     if (sourceType === HomeworkImportSourceType.SHARE) return '享';
-    if (sourceType === HomeworkImportSourceType.SCREEN_CAPTURE) return '采';
     return '文';
   }
 
