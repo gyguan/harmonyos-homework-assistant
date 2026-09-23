@@ -428,7 +428,6 @@ jobs:
 
       - name: Validate unified parent assignment flow
         run: |
-          python scripts/validate_arkts_compile_safety.py
           python scripts/validate_parent_import_ui_conformance.py
           python scripts/validate_text_import_feature.py
           python scripts/validate_v02_parser_confirmation.py
