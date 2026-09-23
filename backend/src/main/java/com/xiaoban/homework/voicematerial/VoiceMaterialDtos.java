@@ -51,32 +51,59 @@ public final class VoiceMaterialDtos {
       int page, int size, long totalElements, int totalPages) {}
 
   public record VoiceTaskItemResponse(
-      String packageId,
-      String studentId,
-      String studentName,
       String assignmentId,
       String taskName,
       String assignmentStatus,
+      String studentId,
+      String studentName,
       String subjectCode,
-      String directoryName,
-      String displayStatus,
-      int audioCount,
-      int imageCount,
       int expectedMinutes,
       long taskCreatedAtEpochMs,
+      String packageId,
+      String directoryName) {}
+
+  public record VoiceTaskDetailResponse(
+      VoiceTaskItemResponse item,
+      List<FileResponse> files) {}
+
+  public record VoiceFolderPageResponse(List<VoiceFolderItemResponse> items,
+      int page, int size, long totalElements, int totalPages) {}
+
+  public record VoiceFolderItemResponse(
+      String packageId,
+      String directoryName,
+      String folderStatus,
+      String studentId,
+      String studentName,
+      String subjectCode,
+      int expectedMinutes,
+      int audioCount,
+      int imageCount,
+      long usageCount,
+      long activeTaskCount,
+      long lastUsedAtEpochMs,
       long importedAtEpochMs,
       String errorMessage) {}
 
-  public record VoiceTaskHistoryItem(long atEpochMs, String type, String label) {}
+  public record VoiceFolderTaskHistoryItem(
+      String assignmentId,
+      String taskName,
+      String assignmentStatus,
+      long createdAtEpochMs,
+      boolean assignmentExists) {}
 
-  public record VoiceTaskDetailResponse(VoiceTaskItemResponse item,
-      List<FileResponse> files, List<VoiceTaskHistoryItem> history) {}
+  public record VoiceFolderDetailResponse(
+      VoiceFolderItemResponse item,
+      List<FileResponse> files,
+      List<VoiceFolderTaskHistoryItem> recentTasks) {}
 
   public record CreateAssignmentRequest(
       @NotBlank @Size(max = 80) String studentId,
       @Min(1) @Max(240) Integer expectedMinutes,
       Long dueAtEpochMs,
-      @Size(max = 32) String dueText) {}
+      @Size(max = 32) String dueText,
+      @Size(max = 300) String title,
+      @Size(max = 120) String requestId) {}
 
   public record CreateAssignmentResponse(boolean created, String assignmentId,
       AssignmentDtos.Response assignment) {}

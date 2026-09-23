@@ -139,8 +139,8 @@ public class AssignmentService {
   public AssignmentDtos.Response findFirstVoiceMaterialTask(UUID familyId, String studentId) {
     students.requireOwned(familyId, studentId);
     AssignmentEntity current = repository
-        .findFirstByFamilyIdAndStudentIdAndContentTypeOrderByUpdatedAtDesc(
-            familyId, studentId, "AUDIO_IMAGE")
+        .findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotOrderByUpdatedAtDesc(
+            familyId, studentId, "AUDIO_IMAGE", "COMPLETED")
         .orElse(null);
     return current == null ? null : AssignmentDtos.Response.from(current);
   }
