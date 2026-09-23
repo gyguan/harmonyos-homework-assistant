@@ -12,6 +12,7 @@ import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowS
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
 import { CenteredTextBadge } from '../components/family/CenteredTextBadge';
+import { IdentitySwitcherDialog } from '../components/family/IdentitySwitcherDialog';
 import { StudentSwitcherDialog } from '../components/family/StudentSwitcherDialog';
 import { BottomPrimaryNavItem, SidePrimaryNavItem } from '../components/navigation/PrimaryNavItem';
 import { PageStateView } from '../components/state/PageStateView';
@@ -74,9 +75,37 @@ export struct AppShell {
   @State private activeStudentId: string = '';
   @State private familyStudents: StudentProfile[] = [];
   @StorageLink('shareImportToken') private shareImportToken: string = '';
+  onSwitchParent: () => void = () => {};
+  onSwitchStudent: (studentId: string) => void = (_studentId: string) => {};
   onRegisterBackHandler: (handler: () => boolean) => void = (_handler: () => boolean) => {};
 
   @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
+
+  private phoneIdentitySwitcherController: CustomDialogController = new CustomDialogController({
+    builder: IdentitySwitcherDialog({
+      students: $familyStudents,
+      activeStudentId: $activeStudentId,
+      parentActive: this.role === AppRole.PARENT,
+      onSelectParent: () => this.switchToParent(),
+      onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Bottom,
+    customStyle: true
+  });
+
+  private wideIdentitySwitcherController: CustomDialogController = new CustomDialogController({
+    builder: IdentitySwitcherDialog({
+      students: $familyStudents,
+      activeStudentId: $activeStudentId,
+      parentActive: this.role === AppRole.PARENT,
+      onSelectParent: () => this.switchToParent(),
+      onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
 
   private phoneStudentSwitcherController: CustomDialogController = new CustomDialogController({
     builder: StudentSwitcherDialog({
@@ -147,6 +176,34 @@ export struct AppShell {
     this.storeRevision++;
   }
 
+  private resetPersonaNavigation(): void {
+    this.navPathStack.clear();
+    this.studentRoute = StudentRoute.HOME;
+    this.parentRoute = ParentRoute.DASHBOARD;
+  }
+
+  private openIdentitySwitcher(): void {
+    if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideIdentitySwitcherController.open();
+    else this.phoneIdentitySwitcherController.open();
+  }
+
+  private switchToParent(): void {
+    if (this.role === AppRole.PARENT) return;
+    this.resetPersonaNavigation();
+    this.storeRevision++;
+    this.onSwitchParent();
+  }
+
+  private switchToStudent(studentId: string): void {
+    if (studentId.length === 0) return;
+    if (!this.familyContext.setActiveStudent(studentId)) return;
+    this.resetPersonaNavigation();
+    this.syncFamilyContext();
+    this.storeRevision++;
+    this.onSwitchStudent(studentId);
+    void this.refreshActiveStudent();
+  }
+
   private openStudentSwitcher(): void {
     if (this.role !== AppRole.PARENT || this.familyStudents.length <= 1) return;
     if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideStudentSwitcherController.open();
@@ -159,9 +216,7 @@ export struct AppShell {
 
     // A child switch is a family-context boundary. Drop any detail route that may still point to
     // the previous child, return to Parent Home, update visible identity immediately, then refresh.
-    this.navPathStack.clear();
-    this.studentRoute = StudentRoute.HOME;
-    this.parentRoute = ParentRoute.DASHBOARD;
+    this.resetPersonaNavigation();
     this.syncFamilyContext();
     this.storeRevision++;
     void this.refreshActiveStudent();
@@ -452,33 +507,60 @@ export struct AppShell {
   }
 
   @Builder
-  private FamilyContextBar() {
+  private IdentityContextBar() {
     Row({ space: 10 }) {
+      CenteredTextBadge({
+        badgeText: this.role === AppRole.PARENT ? '家' :
+          (this.currentStudent().name.length > 0 ? this.currentStudent().name.substring(0, 1) : '伴'),
+        badgeWidth: 34,
+        badgeHeight: 34,
+        badgeFontSize: 13,
+        badgeRadius: 11,
+        badgeBold: true,
+        badgeForeground: AppTheme.PRIMARY,
+        badgeBackground: AppTheme.PRIMARY_SOFT
+      });
       Column({ space: 1 }) {
-        Text(this.currentStudent().name)
+        Text(this.role === AppRole.PARENT ? '家长' : this.currentStudent().name)
           .fontSize(14)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text(this.currentStudent().className)
+        Text(this.role === AppRole.PARENT ?
+          '当前管理 · ' + this.currentStudent().name :
+          this.currentStudent().grade + ' · ' + this.currentStudent().className)
           .fontSize(11)
           .fontColor(AppTheme.SUBTEXT);
       }
       .alignItems(HorizontalAlign.Start);
       Blank();
-      if (this.familyStudents.length > 1) {
+
+      if (this.role === AppRole.PARENT && this.familyStudents.length > 1) {
         Row({ space: 4 }) {
-          Text('切换孩子').fontSize(12).fontColor(AppTheme.PRIMARY);
+          Text('管理 ' + this.currentStudent().name).fontSize(12).fontColor(AppTheme.PRIMARY);
           Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
         }
         .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ left: 12, right: 12, top: 8, bottom: 8 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+        .backgroundColor(AppTheme.SURFACE)
+        .border({ width: 1, color: AppTheme.BORDER })
         .borderRadius(AppTheme.CHIP_RADIUS)
-        .accessibilityGroup(true)
         .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`当前孩子 ${this.currentStudent().name}，点击选择孩子`)
+        .accessibilityText('当前管理 ' + this.currentStudent().name + '，点击切换孩子')
         .onClick(() => this.openStudentSwitcher());
       }
+
+      Row({ space: 4 }) {
+        Text('切换身份').fontSize(12).fontColor(AppTheme.PRIMARY);
+        Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
+      }
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+      .backgroundColor(AppTheme.PRIMARY_SOFT)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.role === AppRole.PARENT ?
+        '当前身份家长，点击切换身份' : '当前身份 ' + this.currentStudent().name + '，点击切换身份')
+      .onClick(() => this.openIdentitySwitcher());
     }
     .width('100%')
     .height(AppTheme.CONTEXT_BAR_HEIGHT)
@@ -577,33 +659,55 @@ export struct AppShell {
 
       Blank();
 
-      if (this.role === AppRole.PARENT) {
-        Column({ space: 2 }) {
-          Text(this.currentStudent().name)
-            .fontSize(13)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.PRIMARY);
-          Text(this.currentStudent().className)
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width(68)
-        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ top: 8, bottom: 8 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(AppTheme.CHIP_RADIUS)
-        .accessibilityGroup(true)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`当前孩子 ${this.currentStudent().name}，点击选择孩子`)
-        .onClick(() => this.openStudentSwitcher());
-      } else {
-        Text(this.currentStudent().name)
+      Column({ space: 3 }) {
+        CenteredTextBadge({
+          badgeText: this.role === AppRole.PARENT ? '家' :
+            (this.currentStudent().name.length > 0 ? this.currentStudent().name.substring(0, 1) : '伴'),
+          badgeWidth: 34,
+          badgeHeight: 34,
+          badgeFontSize: 13,
+          badgeRadius: 11,
+          badgeBold: true,
+          badgeForeground: AppTheme.PRIMARY,
+          badgeBackground: AppTheme.PRIMARY_SOFT
+        });
+        Text(this.role === AppRole.PARENT ? '家长' : this.currentStudent().name)
           .width(68)
-          .fontSize(13)
+          .fontSize(12)
           .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
           .fontColor(AppTheme.TEXT)
-          .padding({ top: 8, bottom: 8 });
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+        Text('切换')
+          .fontSize(11)
+          .fontColor(AppTheme.PRIMARY);
+      }
+      .width(68)
+      .constraintSize({ minHeight: 76 })
+      .padding({ top: 7, bottom: 7 })
+      .backgroundColor(AppTheme.PRIMARY_FAINT)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityGroup(true)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.role === AppRole.PARENT ?
+        '当前身份家长，点击切换身份' : '当前身份 ' + this.currentStudent().name + '，点击切换身份')
+      .onClick(() => this.openIdentitySwitcher());
+
+      if (this.role === AppRole.PARENT && this.familyStudents.length > 1) {
+        Text('管理 ' + this.currentStudent().name)
+          .width(68)
+          .fontSize(10)
+          .textAlign(TextAlign.Center)
+          .fontColor(AppTheme.PRIMARY)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ top: 8, bottom: 8 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('当前管理 ' + this.currentStudent().name + '，点击切换孩子')
+          .onClick(() => this.openStudentSwitcher());
       }
     }
     .width(AppTheme.SIDE_NAV_WIDTH)
@@ -617,9 +721,7 @@ export struct AppShell {
   @Builder
   private BottomNavShell() {
     Column() {
-      if (this.role === AppRole.PARENT) {
-        this.FamilyContextBar();
-      }
+      this.IdentityContextBar();
       Column() {
         this.PersonaContent();
       }
