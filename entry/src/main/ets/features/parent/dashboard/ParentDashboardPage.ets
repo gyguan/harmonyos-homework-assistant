@@ -10,7 +10,6 @@ import { ParentHomeViewModel } from './ParentHomeViewModel';
 @Component
 export struct ParentDashboardPage {
   @Prop revision: number = 0;
-  @Prop activeStudentId: string = '';
   @State private availableWidthVp: number = 390;
   onOpenAssignment: () => void = () => {};
   onOpenInbox: () => void = () => {};
