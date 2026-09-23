@@ -305,7 +305,7 @@ export struct ParentDashboardPage {
         .accessibilityRole(AccessibilityRoleType.BUTTON)
         .accessibilityText(`给 ${this.student().name} 手工导入老师作业`)
         .onClick(() => this.onOpenImport());
-
+      }
       .width('100%');
 
       Row({ space: 10 }) {
