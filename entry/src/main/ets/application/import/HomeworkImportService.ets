@@ -116,6 +116,19 @@ export class HomeworkImportService {
     };
   }
 
+  private fallbackSubject(text: string): Subject {
+    if (text.indexOf('跳绳') >= 0 || text.indexOf('跑步') >= 0 || text.indexOf('运动') >= 0 ||
+      text.indexOf('体育') >= 0 || text.indexOf('锻炼') >= 0) return Subject.SPORTS;
+    if (text.indexOf('朗读') >= 0 || text.indexOf('朗诵') >= 0) return Subject.READ_ALOUD;
+    if (text.indexOf('阅读') >= 0 || text.indexOf('读书') >= 0) return Subject.READING;
+    if (text.indexOf('实践') >= 0 || text.indexOf('实验') >= 0 || text.indexOf('劳动') >= 0) {
+      return Subject.PRACTICE;
+    }
+    if (text.indexOf('兴趣') >= 0 || text.indexOf('画画') >= 0 || text.indexOf('绘画') >= 0 ||
+      text.indexOf('音乐') >= 0) return Subject.INTEREST;
+    return Subject.OTHER;
+  }
+
   private fallbackCandidate(studentId: string, text: string, sourceLabel: string): CandidateAssignment {
     let firstLine = text.split('\n')[0].trim();
     let title = firstLine.length > 0 ? firstLine : text;
@@ -123,7 +136,7 @@ export class HomeworkImportService {
     return {
       id: `manual-fallback-${Date.now()}`,
       studentId: studentId,
-      subject: Subject.OTHER,
+      subject: this.fallbackSubject(text),
       title: title,
       instruction: text,
       textbookRef: '',
