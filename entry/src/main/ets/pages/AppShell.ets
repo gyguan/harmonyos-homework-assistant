@@ -3,7 +3,8 @@ import {
   AssignmentRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
-  PracticePaperRouteParam
+  PracticePaperRouteParam,
+  ParentVoiceCreateRouteParam
 } from '../app/navigation/AppRoutes';
 import { ParentImportNavigator } from '../app/navigation/ParentImportNavigator';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
@@ -234,7 +235,7 @@ export struct AppShell {
   }
 
   private openParentVoiceCreate(): void {
-    this.navPathStack.pushPathByName(AppRoute.PARENT_VOICE_CREATE, {});
+    this.navPathStack.pushPathByName(AppRoute.PARENT_VOICE_CREATE, new ParentVoiceCreateRouteParam());
   }
 
   private routeAssignmentId(param: Object): string {
