@@ -2,7 +2,10 @@ import {
   VoiceMaterialLocalFile,
   VoiceMaterialLocalPackage
 } from '../../../application/assignment/VoiceMaterialDirectoryPicker';
-import { RemoteVoiceMaterialPackage } from '../../../application/remote/RemoteVoiceMaterialApi';
+import {
+  RemoteVoiceMaterialPackage,
+  RemoteVoiceMaterialCreateAssignmentRequest
+} from '../../../application/remote/RemoteVoiceMaterialApi';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -20,6 +23,12 @@ export struct ParentVoiceMaterialPage {
   @State private uploading: boolean = false;
   @State private loading: boolean = false;
   @State private creatingPackageId: string = '';
+  @State private createPackageId: string = '';
+  @State private createStudentId: string = '';
+  @State private createDueOption: string = 'TODAY';
+  @State private createCustomDueDate: string = '';
+  @State private createMinutesText: string = '15';
+  @State private creatingAssignment: boolean = false;
   @State private message: string = '';
   @State private messageError: boolean = false;
 
@@ -203,14 +212,66 @@ export struct ParentVoiceMaterialPage {
     }
   }
 
-  private async createAssignment(item: RemoteVoiceMaterialPackage): Promise<void> {
-    if (this.creatingPackageId.length > 0 || item.hasActiveAssignment ||
+  private openCreateSheet(item: RemoteVoiceMaterialPackage): void {
+    if (this.creatingAssignment || item.hasActiveAssignment ||
       (item.status !== 'READY' && item.status !== 'CONSUMED')) return;
+    this.createPackageId = item.id;
+    this.createStudentId = item.studentId;
+    this.createDueOption = 'TODAY';
+    this.createCustomDueDate = '';
+    this.createMinutesText = `${item.expectedMinutes || 15}`;
+    this.clearMessage();
+  }
+
+  private closeCreateSheet(): void {
+    if (this.creatingAssignment) return;
+    this.createPackageId = '';
+  }
+
+  private creatingItem(): RemoteVoiceMaterialPackage | null {
+    for (let item of this.remotePackages) if (item.id === this.createPackageId) return item;
+    return null;
+  }
+
+  private createDue(): { epochMs: number; text: string } | null {
+    let now = new Date();
+    let base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    if (this.createDueOption === 'TODAY') return { epochMs: base.getTime(), text: '今天' };
+    if (this.createDueOption === 'TOMORROW') return { epochMs: base.getTime() + 24 * 60 * 60 * 1000, text: '明天' };
+    if (this.createDueOption === 'THREE_DAYS') return { epochMs: base.getTime() + 3 * 24 * 60 * 60 * 1000, text: '3天后' };
+    let value = this.createCustomDueDate.trim();
+    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return null;
+    let timestamp = Date.parse(value + 'T23:59:59');
+    if (!Number.isFinite(timestamp) || timestamp < base.getTime()) return null;
+    return { epochMs: timestamp, text: '自定义' };
+  }
+
+  private async confirmCreateAssignment(): Promise<void> {
+    let item = this.creatingItem();
+    if (item === null || this.creatingAssignment) return;
+    let minutes = Number(this.createMinutesText.trim());
+    if (!Number.isInteger(minutes) || minutes < 1 || minutes > 240) {
+      this.showError('预计时长请输入 1～240 分钟的整数');
+      return;
+    }
+    let due = this.createDue();
+    if (due === null) {
+      this.showError('请选择有效的截止日期');
+      return;
+    }
+    this.creatingAssignment = true;
     this.creatingPackageId = item.id;
     this.clearMessage();
     try {
-      let assignment = await this.viewModel.createAssignment(item);
+      let request: RemoteVoiceMaterialCreateAssignmentRequest = {
+        studentId: this.createStudentId,
+        expectedMinutes: minutes,
+        dueAtEpochMs: due.epochMs,
+        dueText: due.text
+      };
+      let assignment = await this.viewModel.createAssignment(item, request);
       await this.reload();
+      this.createPackageId = '';
       if (assignment !== null) {
         this.showSuccess(`已创建：${assignment.title}`);
         this.onAssignmentCreated();
@@ -221,6 +282,7 @@ export struct ParentVoiceMaterialPage {
       this.showError(error instanceof Error ? error.message : '创建语音任务失败');
     } finally {
       this.creatingPackageId = '';
+      this.creatingAssignment = false;
     }
   }
 
@@ -514,13 +576,68 @@ export struct ParentVoiceMaterialPage {
           .backgroundColor(AppTheme.PRIMARY_SOFT)
           .fontColor(AppTheme.PRIMARY)
           .enabled(this.creatingPackageId.length === 0 && !item.hasActiveAssignment)
-          .onClick(() => { void this.createAssignment(item); });
+          .onClick(() => this.openCreateSheet(item));
       }
     }
     .width('100%')
     .padding(12)
     .backgroundColor(AppTheme.SURFACE)
     .borderRadius(AppTheme.CONTROL_RADIUS);
+  }
+
+  @Builder
+  private CreateAssignmentSheet() {
+    let item = this.creatingItem();
+    if (item !== null) {
+      Column() {
+        Blank().layoutWeight(1).onClick(() => this.closeCreateSheet());
+        Column({ space: 14 }) {
+          Row() {
+            Text('创建语音任务').fontSize(18).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Blank();
+            Text('关闭').fontSize(13).fontColor(AppTheme.SUBTEXT).onClick(() => this.closeCreateSheet());
+          }.width('100%');
+          Text(item.directoryName).width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('学生').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Row({ space: 8 }) {
+            ForEach(this.viewModel.students(), (student: StudentProfile) => {
+              this.SubjectChip(student.name, student.id, this.createStudentId, () => {
+                this.createStudentId = student.id;
+              });
+            }, (student: StudentProfile) => 'create-' + student.id);
+          }.width('100%');
+          Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Row({ space: 6 }) {
+            this.SubjectChip('今天', 'TODAY', this.createDueOption, () => this.createDueOption = 'TODAY');
+            this.SubjectChip('明天', 'TOMORROW', this.createDueOption, () => this.createDueOption = 'TOMORROW');
+            this.SubjectChip('3天后', 'THREE_DAYS', this.createDueOption, () => this.createDueOption = 'THREE_DAYS');
+            this.SubjectChip('自定义', 'CUSTOM', this.createDueOption, () => this.createDueOption = 'CUSTOM');
+          }.width('100%');
+          if (this.createDueOption === 'CUSTOM') {
+            TextInput({ placeholder: 'YYYY-MM-DD', text: this.createCustomDueDate })
+              .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
+              .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+              .onChange((value: string) => this.createCustomDueDate = value);
+          }
+          Text('预计时长（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          TextInput({ text: this.createMinutesText })
+            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
+            .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => this.createMinutesText = value);
+          Row({ space: 10 }) {
+            Button('取消', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE_SUBTLE).fontColor(AppTheme.TEXT).borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.creatingAssignment).onClick(() => this.closeCreateSheet());
+            Button(this.creatingAssignment ? '创建中…' : '确认创建', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.creatingAssignment).onClick(() => { void this.confirmCreateAssignment(); });
+          }.width('100%');
+        }
+        .width('100%').padding(AppTheme.PHONE_CARD_PADDING).backgroundColor(AppTheme.SURFACE)
+        .borderRadius({ topLeft: 20, topRight: 20 });
+      }
+      .width('100%').height('100%').backgroundColor('#66000000');
+    }
   }
 
   @Builder
@@ -580,8 +697,9 @@ export struct ParentVoiceMaterialPage {
   }
 
   build() {
-    Column() {
-      Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+    Stack({ alignContent: Alignment.Bottom }) {
+      Column() {
+        Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
           title: '语音素材库',
           backAccessibilityText: '返回家长首页',
@@ -613,9 +731,15 @@ export struct ParentVoiceMaterialPage {
         top: AppTheme.DEEP_PAGE_TOP_PADDING
       });
     }
+        .width('100%')
+        .height('100%')
+        .alignItems(HorizontalAlign.Center)
+        .backgroundColor(AppTheme.BACKGROUND);
+      if (this.createPackageId.length > 0) {
+        this.CreateAssignmentSheet();
+      }
+    }
     .width('100%')
-    .height('100%')
-    .alignItems(HorizontalAlign.Center)
-    .backgroundColor(AppTheme.BACKGROUND);
+    .height('100%');
   }
 }
