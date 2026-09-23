@@ -309,18 +309,22 @@ export struct ParentProgressPage {
     return this.canUseReviewPane() && this.selectedAssignmentId === item.id;
   }
 
-  private allAssignments(): Assignment[] {
-    return this.viewModel.assignments(
-      AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL);
+  private metricAssignments(): Assignment[] {
+    if (this.allDates) {
+      return this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL);
+    }
+    return this.viewModel.assignmentsOnDay(
+      this.subjectCode, this.selectedDayEpochMs);
   }
 
   private allCount(): number {
-    return this.allAssignments().length;
+    return this.metricAssignments().length;
   }
 
   private pendingCount(): number {
     let count = 0;
-    for (let item of this.allAssignments()) {
+    for (let item of this.metricAssignments()) {
       if (item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED) count++;
     }
     return count;
@@ -328,13 +332,17 @@ export struct ParentProgressPage {
 
   private submittedCount(): number {
     let count = 0;
-    for (let item of this.allAssignments()) if (item.status === AssignmentStatus.SUBMITTED) count++;
+    for (let item of this.metricAssignments()) {
+      if (item.status === AssignmentStatus.SUBMITTED) count++;
+    }
     return count;
   }
 
   private completedCount(): number {
     let count = 0;
-    for (let item of this.allAssignments()) if (item.status === AssignmentStatus.COMPLETED) count++;
+    for (let item of this.metricAssignments()) {
+      if (item.status === AssignmentStatus.COMPLETED) count++;
+    }
     return count;
   }
 
