@@ -45,15 +45,20 @@ require("AssignmentDueDate.displayText(this.assignment)" in list_item and
 require("Text(this.assignment.dueText)" not in list_item,
         "assignment list item must not show raw relative due text")
 
-# 2. Parent home/progress share the exact same four metrics with different scopes.
+# 2. Parent Home is action-only; Progress owns the unified interactive metrics.
 for token in ["全部任务", "待完成", "待验收", "已完成"]:
     require(token in metrics, f"shared assignment metric component missing: {token}")
-require("AssignmentMetricSummary({" in home and "this.todayAssignments().length" in home,
-        "parent home metrics must use shared component scoped to today")
-require("AssignmentMetricSummary({" in progress and "private allAssignments(): Assignment[]" in progress,
-        "parent progress metrics must use shared component scoped to all assignments")
-require("interactive: true" in progress and "onSelect: (key: AssignmentMetricKey)" in progress,
-        "parent progress metrics must remain clickable status filters")
+require("AssignmentMetricSummary({" not in home and "今天的学习" not in home and "需要我处理" not in home,
+        "parent home must stay action-only without progress metrics or attention sections")
+for phrase in ["布置作业", "语音作业", "作业收件箱"]:
+    require(phrase in home, f"parent home missing required primary action: {phrase}")
+require("AssignmentMetricSummary({" in progress and "private metricAssignments(): Assignment[]" in progress,
+        "parent progress must own metrics scoped to the current date and subject query")
+require("this.subjectCode" in progress and "this.selectedDayEpochMs" in progress,
+        "parent progress metric scope must follow the same date and subject filters as the list")
+require("interactive: true" in progress and "onSelect: (key: AssignmentMetricKey)" in progress and
+        "void this.queryCurrent()" in progress,
+        "parent progress metric clicks must update the assignment list")
 require("Text(`${this.viewModel.student().name}" not in progress,
         "parent progress title must not duplicate the global student context")
 

@@ -465,9 +465,7 @@ export struct AppShell {
         revision: this.storeRevision,
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-        onOpenVoice: () => this.openParentVoiceCreate(),
-        onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
-        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
+        onOpenVoice: () => this.openParentVoiceCreate()
       });
     }
   }

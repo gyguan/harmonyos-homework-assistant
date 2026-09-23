@@ -92,25 +92,14 @@ require("LayoutPolicy.parentHomeRequirement()" in home and "availableWidthVp" in
         "Parent Home must choose wide composition from actual container width + LayoutPolicy")
 require("AppTheme.PARENT_HOME_READABLE_MAX_WIDTH" in home and "AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH" in home,
         "Parent Home must keep readable fallback and capped Pad composition")
-for phrase in ["今天的学习", "需要我处理", "布置作业", "语音作业", "作业收件箱"]:
-    require(phrase in home, f"Parent Home missing required focused content: {phrase}")
+for phrase in ["布置作业", "语音作业", "作业收件箱"]:
+    require(phrase in home, f"Parent Home missing required action: {phrase}")
+require("今天的学习" not in home and "需要我处理" not in home and "AssignmentMetricSummary" not in home,
+        "Parent Home must remain action-only; progress/status information belongs to Progress")
 require("最近动态" not in home and "ChildPerformance" not in home,
-        "Parent Home must not reintroduce removed duplicate/recent-activity sections")
-require("AssignmentStatus.OVERDUE" in home_vm and "AssignmentStatus.NEEDS_REWORK" in home_vm and
-        "AssignmentStatus.SUBMITTED" in home_vm,
-        "Parent Home attention must cover overdue, rework and submitted assignments")
-
-attention_section = home.split("private AttentionSection()", 1)
-require(len(attention_section) == 2, "Parent Home must keep an AttentionSection")
-if len(attention_section) == 2:
-    attention_block = attention_section[1].split("private CreateAssignmentAction()", 1)[0]
-    require("openAttention(item)" in attention_block,
-            "Parent Home attention items must preserve state-aware routing")
-    require("visibleAttentionAssignments" in home and "slice(0, 3)" in home,
-            "Parent Home must cap the attention list and link overflow to Progress")
-require("private AssignmentActions()" in home and "onOpenAssignment" in home and "onOpenVoice" in home,
-        "Parent Home must focus creation on unified normal and voice assignment actions")
-
+        "Parent Home must not reintroduce duplicate progress or recent-activity sections")
+require("onOpenAssignment" in home and "onOpenVoice" in home and "onOpenInbox" in home,
+        "Parent Home must expose exactly the three high-frequency parent actions")
 require("LayoutPolicy.parentProgressReviewRequirement()" in progress and "availableWidthVp" in progress,
         "Parent Progress must choose review split from actual container width + LayoutPolicy")
 require("AppTheme.PARENT_PROGRESS_READABLE_MAX_WIDTH" in progress and
@@ -207,14 +196,13 @@ if len(today_summary) == 2:
     require("due.getFullYear() === now.getFullYear()" not in today_block and
             "new Date(assignment.dueAtEpochMs)" not in today_block,
             "HomeworkStore TodaySummary must not fall back to the device-local calendar date")
-require("AssignmentDueDate.businessDayStart(Date.now())" in home and
-        "AssignmentDueDate.dayStart(item)" in home,
-        "Parent Dashboard TodayOverview must share the same business-day semantics as TodaySummary")
-
-require("this.viewModel.summary().completed" not in home and
-        "this.viewModel.summary().total" not in home and
-        "this.todayCompletedCount()" in home and "this.todayAssignments().length" in home,
-        "Parent Dashboard progress metrics must reuse the same live today snapshot as TodayOverview")
+require("private metricAssignments(): Assignment[]" in progress and
+        "this.viewModel.assignmentsOnDay(" in progress and
+        "AssignmentDateFilter.ALL" in progress,
+        "Parent Progress metrics must follow the active date scope")
+require("selectedKey: this.statusFilter" in progress and "interactive: true" in progress and
+        "onSelect: (key: AssignmentMetricKey) => this.chooseStatus(key)" in progress,
+        "Parent Progress metric cards must drive the status-filtered list")
 require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date,
         "assignment business-day semantics must remain anchored to Asia/Shanghai")
 require("candidateAnchor(candidate.id)" in batch_publish,
@@ -243,7 +231,7 @@ if len(parent_home_call) == 2:
 require("this.queryCache = AssignmentQuery.filter(mapped, filter)" in repo,
         "Repository remote query results must still apply the complete filter for multi-status parent views")
 
-for phrase in ["今天是否正常？哪里需要我处理？", "作业列表 | 提交证据 / 验收详情", "[通过]", "[退回订正]"]:
+for phrase in ["首页只承担高频操作入口", "作业列表 | 提交证据 / 验收详情", "[通过]", "[退回订正]"]:
     require(phrase in issue_spec, f"V2 UI spec missing Slice 4 contract phrase: {phrase}")
 
 if errors:
