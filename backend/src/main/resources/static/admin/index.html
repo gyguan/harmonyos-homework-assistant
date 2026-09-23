@@ -29,7 +29,7 @@
       </div>
       <nav>
         <button class="nav-item placeholder" disabled><span>首页</span><em>待扩展</em></button>
-        <button class="nav-item active"><span>语音素材</span><em>导入</em></button>
+        <button class="nav-item active"><span>语音任务</span><em>管理</em></button>
         <button class="nav-item placeholder" disabled><span>作业管理</span><em>待扩展</em></button>
         <button class="nav-item placeholder" disabled><span>系统</span><em>待扩展</em></button>
       </nav>
@@ -46,6 +46,14 @@
           <p>批量选择目录，将语音和图片直接上传到服务端素材库。</p>
         </div>
       </header>
+
+      <section class="card voice-task-card">
+        <div class="section-title-row">
+          <div><h2>语音任务</h2><p id="voice-task-summary">正在加载任务…</p></div>
+          <button id="upload-material-entry" class="primary-button" type="button">上传新文件夹</button>
+        </div>
+        <div id="voice-task-list" class="voice-task-list"></div>
+      </section>
 
       <section class="card config-card">
         <div class="section-title-row">
@@ -71,7 +79,7 @@
         <button id="apply-defaults" class="secondary-button" type="button" disabled>应用默认设置到已识别目录</button>
       </section>
 
-      <section class="card picker-card">
+      <section id="upload-section" class="card picker-card">
         <input id="folder-input" type="file" webkitdirectory multiple hidden>
         <input id="folder-files-input" type="file" webkitdirectory multiple hidden>
         <button id="folder-picker" class="drop-zone" type="button">
