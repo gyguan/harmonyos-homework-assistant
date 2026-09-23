@@ -21,6 +21,8 @@ export interface PracticeProgressSummary {
 export class PracticeResultViewModel {
   private readonly repository: PracticeRepository;
   private readonly familyContext: FamilyContextRepository;
+  private cachedPaperId: string = '';
+  private cachedAttempts: PracticeAttemptSummary[] | null = null;
 
   constructor(
     repository: PracticeRepository = DefaultPracticeRepository.instance,
@@ -47,8 +49,7 @@ export class PracticeResultViewModel {
     if (result.mode !== PracticeAttemptMode.FULL || result.attemptNo <= 1) return null;
 
     try {
-      let attempts: PracticeAttemptSummary[] =
-        await this.repository.listAttempts(this.familyContext.getActiveStudentId(), result.paperId);
+      let attempts = await this.attemptsForPaper(result.paperId);
       let previous: PracticeAttemptSummary | null = null;
 
       for (let item of attempts) {
@@ -79,8 +80,7 @@ export class PracticeResultViewModel {
 
   private async historyPaperTitle(result: PracticeResult): Promise<string> {
     try {
-      let attempts: PracticeAttemptSummary[] =
-        await this.repository.listAttempts(this.familyContext.getActiveStudentId(), result.paperId);
+      let attempts = await this.attemptsForPaper(result.paperId);
       for (let item of attempts) {
         if (item.id === result.attemptId && item.paperTitle.length > 0) return item.paperTitle;
       }
@@ -88,6 +88,15 @@ export class PracticeResultViewModel {
     } catch {
       return '';
     }
+  }
+
+  private async attemptsForPaper(paperId: string): Promise<PracticeAttemptSummary[]> {
+    if (this.cachedAttempts !== null && this.cachedPaperId === paperId) return this.cachedAttempts;
+
+    let attempts = await this.repository.listAttempts(this.familyContext.getActiveStudentId(), paperId);
+    this.cachedPaperId = paperId;
+    this.cachedAttempts = attempts;
+    return attempts;
   }
 
   repeat(attemptId: string): Promise<PracticeAttempt> {
