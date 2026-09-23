@@ -18,6 +18,17 @@ public final class VoiceMaterialDtos {
     }
   }
 
+  public record CompleteResponse(String id, String studentId, int directoryCount,
+      int readyCount, int invalidCount, List<PackageResult> packages) {
+    static CompleteResponse from(VoiceMaterialBatchEntity entity, List<PackageResult> packages) {
+      return new CompleteResponse(entity.id.toString(), entity.studentId, entity.directoryCount,
+          entity.readyCount, entity.invalidCount, packages);
+    }
+  }
+
+  public record PackageResult(String id, String batchId, String directoryName,
+      String status, String errorMessage) {}
+
   public record RegisterPackageRequest(
       @NotBlank @Size(max = 300) String directoryName,
       @NotBlank @Size(max = 64) String subjectCode,
