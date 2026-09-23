@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 
 public final class VoiceMaterialDtos {
@@ -34,6 +35,12 @@ public final class VoiceMaterialDtos {
 
   public record FileResponse(String id, String assetId, String resourceType,
       String relativeName, int sortOrder) {}
+
+  public record CreateAssignmentRequest(
+      @NotBlank @Size(max = 80) String studentId,
+      @Min(1) @Max(240) Integer expectedMinutes,
+      Long dueAtEpochMs,
+      @Size(max = 32) String dueText) {}
 
   public record CreateAssignmentResponse(boolean created, String assignmentId,
       AssignmentDtos.Response assignment) {}
