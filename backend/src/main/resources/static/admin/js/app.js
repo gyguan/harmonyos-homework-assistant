@@ -200,7 +200,10 @@ function renderImportedPackages() {
   }
   importedSummary.textContent = `共 ${state.importedPackages.length} 个已导入目录，可展开查看文件。`;
   importedList.innerHTML = state.importedPackages.map((item, index) => {
-    const status = item.status === 'READY' || item.status === 'CONSUMED' ? '可用' : item.status;
+    const status = item.status === 'READY' || item.status === 'CONSUMED' ? '可用' : item.status === 'INVALID' ? '导入失败' : item.status;
+    const error = item.status === 'INVALID' && item.errorMessage
+      ? `<p class="imported-package-error">${escapeHtml(item.errorMessage)}</p>`
+      : '';
     const files = (item.files || []).map(file => `
       <div class="imported-file">
         <span class="imported-file-name" title="${escapeHtml(file.relativeName)}">${escapeHtml(file.relativeName)}<span class="imported-file-type">${fileKindLabel(file.resourceType)}</span></span>
@@ -208,6 +211,7 @@ function renderImportedPackages() {
       </div>`).join('');
     return `<details class="imported-package" ${index === 0 ? 'open' : ''}>
       <summary><div class="imported-package-main"><strong>${escapeHtml(item.directoryName)}</strong><span>${escapeHtml(subjectLabel(item.subjectCode))} · ${escapeHtml(status)}</span></div><span class="imported-package-meta">${(item.files || []).length} 个文件</span></summary>
+      ${error}
       <div class="imported-file-list">${files}</div>
     </details>`;
   }).join('');
