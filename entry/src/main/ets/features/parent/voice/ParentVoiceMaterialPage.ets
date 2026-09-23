@@ -14,6 +14,11 @@ import { ParentVoiceMaterialViewModel } from './ParentVoiceMaterialViewModel';
 
 const VOICE_SUBJECT_CODES: string[] = ['CHINESE', 'MATH', 'ENGLISH', 'OTHER'];
 
+interface VoiceCreateDueResult {
+  epochMs: number;
+  text: string;
+}
+
 @Component
 export struct ParentVoiceMaterialPage {
   @State private defaultSubjectCode: string = 'CHINESE';
@@ -234,7 +239,7 @@ export struct ParentVoiceMaterialPage {
     return null;
   }
 
-  private createDue(): { epochMs: number; text: string } | null {
+  private createDue(): VoiceCreateDueResult | null {
     let now = new Date();
     let base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
     if (this.createDueOption === 'TODAY') return { epochMs: base.getTime(), text: '今天' };
@@ -588,8 +593,7 @@ export struct ParentVoiceMaterialPage {
 
   @Builder
   private CreateAssignmentSheet() {
-    let item = this.creatingItem();
-    if (item !== null) {
+    if (this.creatingItem() !== null) {
       Column() {
         Blank().layoutWeight(1).onClick(() => this.closeCreateSheet());
         Column({ space: 14 }) {
@@ -598,7 +602,7 @@ export struct ParentVoiceMaterialPage {
             Blank();
             Text('关闭').fontSize(13).fontColor(AppTheme.SUBTEXT).onClick(() => this.closeCreateSheet());
           }.width('100%');
-          Text(item.directoryName).width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text(this.creatingItem()!.directoryName).width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           Text('学生').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
           Row({ space: 8 }) {
             ForEach(this.viewModel.students(), (student: StudentProfile) => {
