@@ -8,7 +8,6 @@ import {
   PracticePaperRouteParam
 } from '../app/navigation/AppRoutes';
 import { ParentImportNavigator } from '../app/navigation/ParentImportNavigator';
-import { HomeworkCaptureSessionService } from '../application/capture/HomeworkCaptureSessionService';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
@@ -26,13 +25,9 @@ import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraA
 import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceAssignmentPage';
 import { ParentVoiceMaterialPage } from '../features/parent/voice/ParentVoiceMaterialPage';
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
-import { HomeworkCaptureHomePage } from '../features/parent/import/HomeworkCaptureHomePage';
 import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImportInboxPage';
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
-import { HomeworkCapturePage } from '../features/parent/import/HomeworkCapturePage';
-import { HomeworkSourceProfilePage } from '../features/parent/import/HomeworkSourceProfilePage';
-import { HomeworkCaptureDiagnosticPage } from '../features/parent/import/HomeworkCaptureDiagnosticPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
@@ -154,14 +149,12 @@ export struct AppShell {
 
   private openStudentSwitcher(): void {
     if (this.role !== AppRole.PARENT || this.familyStudents.length <= 1) return;
-    if (HomeworkCaptureSessionService.instance.getActiveSession() !== null) return;
     if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideStudentSwitcherController.open();
     else this.phoneStudentSwitcherController.open();
   }
 
   private selectStudent(studentId: string): void {
     if (this.role !== AppRole.PARENT || studentId.length === 0 || studentId === this.activeStudentId) return;
-    if (HomeworkCaptureSessionService.instance.getActiveSession() !== null) return;
     if (!this.familyContext.setActiveStudent(studentId)) return;
 
     // A child switch is a family-context boundary. Drop any detail route that may still point to
@@ -220,11 +213,6 @@ export struct AppShell {
 
   private openParentReview(assignmentId: string): void {
     this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
-  }
-
-  private finishSourceProfile(startCaptureAfterSave: boolean): void {
-    ParentImportNavigator.finishSourceProfile(this.navPathStack, startCaptureAfterSave);
-    this.notifyUiChanged();
   }
 
   private finishShareImportReady(): void {
@@ -387,70 +375,6 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_CAPTURE_HOME) {
-      NavDestination() {
-        HomeworkCaptureHomePage({
-          revision: this.storeRevision,
-          onBack: () => this.navPathStack.pop(),
-          onStartCapture: () => ParentImportNavigator.openCapture(this.navPathStack),
-          onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
-            ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave),
-          onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-          onOpenDiagnostics: () => ParentImportNavigator.openCaptureDiagnostics(this.navPathStack)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_IMPORT_INBOX) {
-      NavDestination() {
-        HomeworkImportInboxPage({
-          onBack: () => this.navPathStack.pop(),
-          onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(this.navPathStack, batchId)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_IMPORT_BATCH_DETAIL) {
-      NavDestination() {
-        HomeworkImportBatchDetailPage({
-          batchId: ParentImportNavigator.batchId(param),
-          onBack: () => this.navPathStack.pop(),
-          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_CAPTURE) {
-      NavDestination() {
-        HomeworkCapturePage({
-          onBack: () => this.navPathStack.pop(),
-          onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
-          onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
-            ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_SOURCE_PROFILE) {
-      NavDestination() {
-        HomeworkSourceProfilePage({
-          startCaptureAfterSave: ParentImportNavigator.sourceProfileStartCapture(param),
-          onBack: () => this.navPathStack.pop(),
-          onSavedAndCapture: () => this.finishSourceProfile(
-            ParentImportNavigator.sourceProfileStartCapture(param))
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_CAPTURE_DIAGNOSTIC) {
-      NavDestination() {
-        HomeworkCaptureDiagnosticPage({
-          onBack: () => this.navPathStack.pop()
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_IMPORT_CONFIRMATION) {
       NavDestination() {
         HomeworkConfirmationPage({
@@ -506,7 +430,6 @@ export struct AppShell {
         revision: this.storeRevision,
         activeStudentId: this.activeStudentId,
         onOpenImport: () => ParentImportNavigator.openImport(this.navPathStack),
-        onOpenCapture: () => ParentImportNavigator.openCaptureHome(this.navPathStack),
         onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
         onOpenExtra: () => this.openParentExtraCreate(false),
         onOpenVoice: () => this.openParentExtraCreate(true),
