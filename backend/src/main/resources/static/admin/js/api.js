@@ -49,11 +49,26 @@ export async function session() {
 }
 
 export async function logout() {
-  try { await request('/api/v1/auth/logout', { method: 'POST' }); } finally { setToken(''); }
+  try { await request('/api/v1/auth/logout', { method: 'POST' }); }
+  finally { setToken(''); }
 }
 
 export async function listStudents() {
   return await request('/api/v1/students');
+}
+
+export async function searchVoiceTasks(filters = {}) {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(filters)) {
+    if (value !== undefined && value !== null && String(value) !== '') {
+      params.set(key, String(value));
+    }
+  }
+  return await request(`/api/v1/voice-task-items?${params.toString()}`);
+}
+
+export async function getVoiceTaskDetail(packageId) {
+  return await request(`/api/v1/voice-task-items/${encodeURIComponent(packageId)}`);
 }
 
 export async function createVoiceMaterialBatch(studentId) {
@@ -84,18 +99,10 @@ export async function uploadVoiceMaterialFile(packageId, item, sortOrder) {
     relativeName: item.relativeName,
     sortOrder: String(sortOrder)
   });
-  return await request(`/api/v1/voice-material-packages/${encodeURIComponent(packageId)}/files?${params.toString()}`, {
-    method: 'POST',
-    body: form
-  });
-}
-
-export async function listVoiceMaterialPackages(studentId) { return await request(`/api/v1/students/${encodeURIComponent(studentId)}/voice-material-packages`); }
-
-export async function fetchVoiceMaterialAsset(assetId) {
-  const headers = new Headers(); const token = getToken(); if (token) headers.set('Authorization', `Bearer ${token}`);
-  const response = await fetch(`/api/v1/media-assets/${encodeURIComponent(assetId)}`, { headers });
-  if (!response.ok) throw new Error(`素材读取失败（${response.status}）`); return await response.blob();
+  return await request(
+    `/api/v1/voice-material-packages/${encodeURIComponent(packageId)}/files?${params.toString()}`,
+    { method: 'POST', body: form }
+  );
 }
 
 export async function completeVoiceMaterialBatch(batchId) {
@@ -103,7 +110,6 @@ export async function completeVoiceMaterialBatch(batchId) {
     method: 'POST'
   });
 }
-
 
 export async function createVoiceMaterialAssignment(packageId, studentId, expectedMinutes) {
   return await request(`/api/v1/voice-material-packages/${encodeURIComponent(packageId)}/create-assignment`, {
@@ -115,4 +121,18 @@ export async function createVoiceMaterialAssignment(packageId, studentId, expect
       dueText: ''
     })
   });
+}
+
+export async function fetchVoiceMaterialAsset(assetId) {
+  const headers = new Headers();
+  const token = getToken();
+  if (token) headers.set('Authorization', `Bearer ${token}`);
+  const response = await fetch(`/api/v1/media-assets/${encodeURIComponent(assetId)}`, { headers });
+  if (!response.ok) throw new Error(`素材读取失败（${response.status}）`);
+  return await response.blob();
+}
+
+// 保留旧接口给现有客户端/验证使用；Web 查询页不再依赖全量列表。
+export async function listVoiceMaterialPackages(studentId) {
+  return await request(`/api/v1/students/${encodeURIComponent(studentId)}/voice-material-packages`);
 }
