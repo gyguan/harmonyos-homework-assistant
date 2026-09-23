@@ -277,6 +277,46 @@ jobs:
       - name: Compile and test backend
         run: mvn -f backend/pom.xml test
 
+  validate-parent-flow:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate parent flow rules
+        run: |
+          python scripts/validate_arkts_compile_safety.py
+          python scripts/validate_parent_import_ui_conformance.py
+          python scripts/validate_text_import_feature.py
+          python scripts/validate_v02_parser_confirmation.py
+          python scripts/validate_assignment_editor_consistency.py
+          python scripts/validate_ui_refresh_copy.py
+          python scripts/validate_task_ui_consistency.py
+          python scripts/validate_sustainable_assignment_foundation.py
+          python scripts/validate_multi_child_isolation.py
+          python scripts/validate_harmony_ui_design.py
+          python scripts/validate_v2_clean_refactor.py
+          python scripts/validate_issue298_voice_material.py
+          python scripts/validate_v2_slice4_parent_surfaces.py
+          python scripts/validate_v2_slice6_extra_assignment.py
+          python scripts/validate_ai_expected_minutes.py
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: backend/pom.xml
+
+      - name: Test unified organizer
+        run: mvn -f backend/pom.xml -Dtest=ConfigurableHomeworkOrganizerModelClientTest test
+
   backend-real-e2e:
     runs-on: ubuntu-latest
     services:
