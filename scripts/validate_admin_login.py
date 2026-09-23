@@ -33,12 +33,12 @@ require("window.addEventListener('xiaoban-admin-authenticated'" in app and
         "admin business module must initialize from isolated authenticated state")
 require("async function handleLogin" not in app,
         "business module must not own login submission")
-require("login-shell.js?v=20260923-3" in index and
-        "app.js?v=20260923-3" in index,
+require("login-shell.js?v=20260923-4" in index and
+        "app.js?v=20260923-4" in index,
         "admin login shell and app module must be cache-busted together")
-require("api.js?v=20260923-3" in login_shell and
-        "api.js?v=20260923-3" in app and
-        "voice-material.js?v=20260923-3" in app,
+require("api.js?v=20260923-4" in login_shell and
+        "api.js?v=20260923-4" in app and
+        "voice-material.js?v=20260923-4" in app,
         "admin module dependency graph must use the same cache-bust version")
 require('id="login-form"' in index and 'id="admin-view"' in index,
         "login and admin shells must remain explicit")
