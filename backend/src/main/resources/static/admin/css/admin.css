@@ -111,7 +111,7 @@ nav { display: grid; gap: 6px; }
 .imported-package-main strong,.imported-package-main span { display:block; }
 .imported-package-main strong { font-size:14px; }
 .imported-package-main span { margin-top:4px; color:var(--muted); font-size:11px; }
-.imported-package-meta { color:var(--muted); font-size:12px; white-space:nowrap; }\n.imported-package-error { margin:0; padding:0 14px 10px; color:var(--danger); font-size:12px; }
+.imported-package-meta { color:var(--muted); font-size:12px; white-space:nowrap; }\n.imported-package-error { margin:0; padding:0 14px 10px; color:var(--danger); font-size:12px; white-space:pre-line; }
 .imported-file-list { display:grid; gap:6px; padding:0 14px 14px; }
 .imported-file { min-height:38px; padding:8px 10px; border-radius:8px; background:#f8fafc; display:flex; align-items:center; justify-content:space-between; gap:12px; }
 .imported-file-name { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; }
