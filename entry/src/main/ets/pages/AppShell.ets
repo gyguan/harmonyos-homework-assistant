@@ -229,7 +229,7 @@ export struct AppShell {
     this.parentRoute = ParentRoute.DASHBOARD;
     this.navPathStack.clear();
     // Batch publish already updates the authoritative assignment cache. Invalidate the
-    // now-visible dashboard after navigation so metrics and recent activity refresh immediately.
+    // now-visible dashboard after navigation so metrics refresh immediately.
     this.notifyUiChanged();
   }
 
@@ -406,7 +406,6 @@ export struct AppShell {
     } else {
       ParentDashboardPage({
         revision: this.storeRevision,
-        activeStudentId: this.activeStudentId,
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
         onOpenVoice: () => this.openParentVoiceCreate(),
