@@ -1,5 +1,11 @@
 import { RemoteAssignmentResourceApi } from '../../../application/remote/RemoteAssignmentResourceApi';
 import { RemoteAssignmentMapper } from '../../../application/remote/RemoteModels';
+import {
+  RemoteVoiceFolderItem,
+  RemoteVoiceFolderPage,
+  RemoteVoiceMaterialApi,
+  RemoteVoiceMaterialCreateAssignmentRequest
+} from '../../../application/remote/RemoteVoiceMaterialApi';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import {
   Assignment,
@@ -29,6 +35,42 @@ export class ParentVoiceAssignmentViewModel {
 
   student(): StudentProfile {
     return this.repository.getActiveStudent();
+  }
+
+  activeVoiceAssignment(): Assignment | null {
+    let studentId = this.student().id;
+    for (let item of this.repository.listCached()) {
+      if (item.studentId === studentId &&
+        item.contentType === AssignmentContentType.AUDIO_IMAGE &&
+        item.status !== AssignmentStatus.COMPLETED) {
+        return item;
+      }
+    }
+    return null;
+  }
+
+  queryFolders(keyword: string, usage: string, page: number, size: number = 20):
+    Promise<RemoteVoiceFolderPage> {
+    return RemoteVoiceMaterialApi.instance.queryFolders(
+      this.student().id, keyword, usage, page, size);
+  }
+
+  async createFromFolder(draft: VoiceAssignmentDraft, folder: RemoteVoiceFolderItem,
+    requestId: string): Promise<Assignment | null> {
+    let request: RemoteVoiceMaterialCreateAssignmentRequest = {
+      studentId: this.student().id,
+      expectedMinutes: draft.expectedMinutes,
+      dueAtEpochMs: draft.dueAtEpochMs,
+      dueText: draft.dueText,
+      title: draft.title.trim(),
+      requestId: requestId
+    };
+    let result = await RemoteVoiceMaterialApi.instance.createAssignment(folder.packageId, request);
+    if (result.assignment === null) return null;
+    let existing = this.repository.getCached(result.assignment.id);
+    let mapped = RemoteAssignmentMapper.toLocal(result.assignment, existing);
+    this.repository.applyAuthoritative(mapped);
+    return mapped;
   }
 
   async create(draft: VoiceAssignmentDraft, audioUri: string, imageUris: string[]): Promise<Assignment> {
@@ -66,6 +108,13 @@ export class ParentVoiceAssignmentViewModel {
     mapped.resourceLabels = result.resources.map((item) => item.originalName);
     this.repository.applyAuthoritative(mapped);
     return mapped;
+  }
+
+  subjectFromCode(subjectCode: string): Subject {
+    if (subjectCode === 'CHINESE') return Subject.CHINESE;
+    if (subjectCode === 'MATH') return Subject.MATH;
+    if (subjectCode === 'ENGLISH') return Subject.ENGLISH;
+    return Subject.OTHER;
   }
 
   private subjectCode(subject: Subject): string {
