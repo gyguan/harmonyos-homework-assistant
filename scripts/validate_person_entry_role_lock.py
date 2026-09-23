@@ -5,7 +5,6 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 errors: list[str] = []
 
-
 def read(path: str) -> str:
     file = ROOT / path
     if not file.exists():
@@ -13,57 +12,79 @@ def read(path: str) -> str:
         return ""
     return file.read_text(encoding="utf-8")
 
-
 def require(condition: bool, message: str) -> None:
     if not condition:
         errors.append(message)
 
-
 index = read("entry/src/main/ets/pages/Index.ets")
 entry_page = read("entry/src/main/ets/pages/PersonEntryPage.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
-switcher = read("entry/src/main/ets/components/family/StudentSwitcherDialog.ets")
+student_switcher = read("entry/src/main/ets/components/family/StudentSwitcherDialog.ets")
+identity_switcher = read("entry/src/main/ets/components/family/IdentitySwitcherDialog.ets")
 
 require("PersonEntryPage" in index and "AppRole.NONE" in index,
-        "Index must show a person entry page before creating AppShell")
-require("enterParent" in index and "AppRole.PARENT" in index,
-        "entry page must provide an explicit parent persona")
-require("enterStudent(studentId: string)" in index and "this.familyContext.setActiveStudent(studentId)" in index,
-        "student persona selection must bind the selected child through FamilyContextRepository before entering")
+        "Index must keep the initial person entry page")
+require("enterParent" in index and "enterStudent(studentId: string)" in index,
+        "root entry must own parent/student persona changes")
+require("this.familyContext.setActiveStudent(studentId)" in index,
+        "student identity selection must bind active student through FamilyContextRepository")
 require("AppShell({" in index and "role: this.selectedRole" in index,
-        "AppShell role must be supplied by the root entry gate")
-require("HomeworkSyncService" not in index and "DefaultAssignmentRepository.instance.requestSync()" in index,
-        "root entry must use AssignmentRepository background sync instead of legacy HomeworkSyncService")
+        "AppShell role must remain a root-owned read-only prop")
+require("onSwitchParent: () => this.enterParent()" in index and
+        "onSwitchStudent: (studentId: string) => this.enterStudent(studentId)" in index,
+        "AppShell identity changes must delegate role ownership back to Index")
+require("HomeworkSyncService" not in index and
+        "DefaultAssignmentRepository.instance.requestSync()" in index,
+        "root identity switch must keep repository background sync")
 
 require("HomeworkStore" not in entry_page and "FamilyContextRepository" in entry_page and
         "this.familyContext.getStudents()" in entry_page,
-        "person entry page must render family children through FamilyContextRepository")
+        "person entry page must continue using FamilyContextRepository")
 require("家长" in entry_page and "孩子" in entry_page and "谁在使用" in entry_page,
-        "person entry page must clearly expose parent and child choices")
+        "initial entry page must still expose parent and child choices")
 require("onSelectStudent(student.id)" in entry_page,
-        "each child choice must enter with its own studentId")
-require("CenteredTextBadge" in entry_page and "badgeText: '家'" in entry_page,
-        "parent entry badge must reuse the shared real-centering component")
+        "initial student selection must preserve the selected child id")
 
-require("@Prop role: AppRole" in app_shell,
-        "AppShell role must be read-only input from the entry page")
-require("@State private role" not in app_shell,
-        "AppShell must not keep a mutable role state")
-require("切换家长" not in app_shell and "切换学生" not in app_shell,
-        "in-app parent/student role switching must be removed")
+require("@Prop role: AppRole" in app_shell and "@State private role" not in app_shell,
+        "AppShell must not own mutable role state")
+require("IdentitySwitcherDialog" in app_shell and "@CustomDialog" in identity_switcher,
+        "AppShell must expose a reusable in-app identity switcher")
+require("private openIdentitySwitcher()" in app_shell and
+        "private switchToParent()" in app_shell and
+        "private switchToStudent(studentId: string)" in app_shell,
+        "AppShell must provide explicit identity switch actions")
+require("private resetPersonaNavigation()" in app_shell and
+        "this.navPathStack.clear()" in app_shell and
+        "this.studentRoute = StudentRoute.HOME" in app_shell and
+        "this.parentRoute = ParentRoute.DASHBOARD" in app_shell,
+        "identity changes must clear role-specific navigation state")
+require("this.familyContext.setActiveStudent(studentId)" in app_shell and
+        "void this.refreshActiveStudent()" in app_shell,
+        "student identity changes must update and refresh active-student context")
+require("private IdentityContextBar()" in app_shell and
+        "this.IdentityContextBar();" in app_shell,
+        "Phone shell must expose current identity for both roles")
+require(app_shell.count(".onClick(() => this.openIdentitySwitcher())") >= 2,
+        "Phone and wide shells must both expose identity switching")
+require("parentActive: this.role === AppRole.PARENT" in app_shell and
+        "students: $familyStudents" in app_shell and
+        "activeStudentId: $activeStudentId" in app_shell,
+        "identity switcher must bind current role and reactive student context")
+
+require("private openStudentSwitcher()" in app_shell and
+        "private selectStudent(studentId: string)" in app_shell and
+        "StudentSwitcherDialog" in app_shell and "@CustomDialog" in student_switcher,
+        "parent child-context switching must remain independently available")
 require("if (this.role !== AppRole.PARENT" in app_shell,
-        "child context switching must be guarded to parent role only")
-require("private openStudentSwitcher()" in app_shell and "private selectStudent(studentId: string)" in app_shell and
-        "this.familyContext.setActiveStudent(studentId)" in app_shell,
-        "parent shell must retain explicit child context switching through FamilyContextRepository")
-require("private FamilyContextBar()" in app_shell and "this.role === AppRole.PARENT" in app_shell,
-        "phone parent shell must show family context without exposing role switching")
-require("StudentSwitcherDialog" in app_shell and "@CustomDialog" in switcher,
-        "child switching must use an explicit selector instead of cycling to the next child")
-require(app_shell.count(".onClick(() => this.openStudentSwitcher())") >= 2,
-        "phone and wide parent child switch controls must remain actionable")
-require("activeStudentId: $activeStudentId" in app_shell and "students: $familyStudents" in app_shell,
-        "child selector must bind to the reactive family context")
+        "parent child-context switching must remain parent-only")
+require("选择家长或学生" in identity_switcher and
+        "onSelectParent" in identity_switcher and
+        "onSelectStudent" in identity_switcher,
+        "identity dialog must combine role and person selection in one surface")
+require("CenteredTextBadge" in identity_switcher and "badgeText: '家'" in identity_switcher,
+        "identity dialog must reuse shared centered identity badges")
+require(identity_switcher.count("!this.parentActive && this.activeStudentId === student.id") >= 4,
+        "student current-state marker must be guarded by non-parent identity")
 
 if errors:
     print("PERSON_ENTRY_ROLE_LOCK_GATE_FAIL")
