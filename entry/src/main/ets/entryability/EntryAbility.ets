@@ -2,7 +2,6 @@ import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { HomeworkImportService } from '../application/import/HomeworkImportService';
 import { HomeworkShareImportService } from '../application/import/HomeworkShareImportService';
-import { HomeworkCaptureSessionService } from '../application/capture/HomeworkCaptureSessionService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { RemoteAssignmentResourceApi } from '../application/remote/RemoteAssignmentResourceApi';
 import { RemoteVoiceMaterialApi } from '../application/remote/RemoteVoiceMaterialApi';
@@ -12,17 +11,11 @@ import { VoiceMaterialDirectoryPicker } from '../application/assignment/VoiceMat
 import { HomeworkSubmissionService } from '../application/submission/HomeworkSubmissionService';
 import { HomeworkLocalBootstrap } from '../data/local/HomeworkLocalBootstrap';
 import { HomeworkImportInboxBootstrap } from '../data/local/HomeworkImportInboxBootstrap';
-import { HomeworkCaptureSessionBootstrap } from '../data/local/HomeworkCaptureSessionBootstrap';
-import { HomeworkSourceProfileBootstrap } from '../data/local/HomeworkSourceProfileBootstrap';
 import { CoreVisionHomeworkTextExtractor } from '../infrastructure/ai/CoreVisionHomeworkTextExtractor';
 import { LocalHomeworkAssignmentParser } from '../infrastructure/ai/LocalHomeworkAssignmentParser';
-import { NativeHomeworkCaptureRuntime } from '../infrastructure/capture/NativeHomeworkCaptureRuntime';
-import { CoreVisionHomeworkCaptureFrameRecognizer } from '../infrastructure/capture/CoreVisionHomeworkCaptureFrameRecognizer';
 import { PreferencesBackendSessionStorage } from '../infrastructure/persistence/PreferencesBackendSessionStorage';
 import { PreferencesHomeworkPersistence } from '../infrastructure/persistence/PreferencesHomeworkPersistence';
 import { PreferencesHomeworkImportInboxPersistence } from '../infrastructure/persistence/PreferencesHomeworkImportInboxPersistence';
-import { PreferencesHomeworkCaptureSessionPersistence } from '../infrastructure/persistence/PreferencesHomeworkCaptureSessionPersistence';
-import { PreferencesHomeworkSourceProfilePersistence } from '../infrastructure/persistence/PreferencesHomeworkSourceProfilePersistence';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -59,8 +52,6 @@ export default class EntryAbility extends UIAbility {
   private async bootstrap(windowStage: window.WindowStage): Promise<void> {
     HomeworkImportService.instance.configure(new CoreVisionHomeworkTextExtractor(), new LocalHomeworkAssignmentParser());
     HomeworkShareImportService.instance.configure(this.context);
-    HomeworkCaptureSessionService.instance.configure(
-      new NativeHomeworkCaptureRuntime(), new CoreVisionHomeworkCaptureFrameRecognizer());
     HomeworkSubmissionService.instance.configure(this.context);
     VoiceAssignmentMediaService.instance.configure(this.context);
     VoiceMaterialDirectoryPicker.instance.configure(this.context);
@@ -87,27 +78,10 @@ export default class EntryAbility extends UIAbility {
       console.error('Homework import inbox initialization failed; continuing with in-memory inbox');
     }
 
-    try {
-      await HomeworkCaptureSessionBootstrap.instance.initialize(
-        new PreferencesHomeworkCaptureSessionPersistence(this.context));
-    } catch {
-      console.error('Capture session restore failed; continuing with in-memory capture state');
-    }
-
-    try {
-      await HomeworkSourceProfileBootstrap.instance.initialize(
-        new PreferencesHomeworkSourceProfilePersistence(this.context));
-    } catch {
-      console.error('Source profile restore failed; continuing without saved capture profile');
-    }
-
     this.loadMainPage(windowStage);
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void { void this.bootstrap(windowStage); }
 
-  onDestroy(): void {
-    HomeworkCaptureSessionService.instance.handleAbilityDestroy();
-    void HomeworkCaptureSessionService.instance.release();
-  }
+  onDestroy(): void {}
 }
