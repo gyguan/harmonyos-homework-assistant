@@ -34,24 +34,58 @@ export struct AssignmentEditForm {
     Column({ space: 7 }) {
       Text('科目').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
       if (this.subjectEditable) {
-        Row({ space: 8 }) {
-          ChoiceSelectionChip({
-            label: Subject.CHINESE,
-            selected: this.subject === Subject.CHINESE,
-            onSelect: () => this.onSubjectChange(Subject.CHINESE)
-          });
-          ChoiceSelectionChip({
-            label: Subject.MATH,
-            selected: this.subject === Subject.MATH,
-            onSelect: () => this.onSubjectChange(Subject.MATH)
-          });
-          ChoiceSelectionChip({
-            label: Subject.ENGLISH,
-            selected: this.subject === Subject.ENGLISH,
-            onSelect: () => this.onSubjectChange(Subject.ENGLISH)
-          });
+        Scroll() {
+          Row({ space: 8 }) {
+            ChoiceSelectionChip({
+              label: Subject.CHINESE,
+              selected: this.subject === Subject.CHINESE,
+              onSelect: () => this.onSubjectChange(Subject.CHINESE)
+            });
+            ChoiceSelectionChip({
+              label: Subject.MATH,
+              selected: this.subject === Subject.MATH,
+              onSelect: () => this.onSubjectChange(Subject.MATH)
+            });
+            ChoiceSelectionChip({
+              label: Subject.ENGLISH,
+              selected: this.subject === Subject.ENGLISH,
+              onSelect: () => this.onSubjectChange(Subject.ENGLISH)
+            });
+            ChoiceSelectionChip({
+              label: Subject.READING,
+              selected: this.subject === Subject.READING,
+              onSelect: () => this.onSubjectChange(Subject.READING)
+            });
+            ChoiceSelectionChip({
+              label: Subject.READ_ALOUD,
+              selected: this.subject === Subject.READ_ALOUD,
+              onSelect: () => this.onSubjectChange(Subject.READ_ALOUD)
+            });
+            ChoiceSelectionChip({
+              label: Subject.SPORTS,
+              selected: this.subject === Subject.SPORTS,
+              onSelect: () => this.onSubjectChange(Subject.SPORTS)
+            });
+            ChoiceSelectionChip({
+              label: Subject.PRACTICE,
+              selected: this.subject === Subject.PRACTICE,
+              onSelect: () => this.onSubjectChange(Subject.PRACTICE)
+            });
+            ChoiceSelectionChip({
+              label: Subject.INTEREST,
+              selected: this.subject === Subject.INTEREST,
+              onSelect: () => this.onSubjectChange(Subject.INTEREST)
+            });
+            ChoiceSelectionChip({
+              label: Subject.OTHER,
+              selected: this.subject === Subject.OTHER,
+              onSelect: () => this.onSubjectChange(Subject.OTHER)
+            });
+          }
         }
-        .width('100%');
+        .width('100%')
+        .scrollable(ScrollDirection.Horizontal)
+        .scrollBar(BarState.Off);
       } else {
         Row() {
           Text(this.subject)
@@ -145,7 +179,7 @@ export struct AssignmentEditForm {
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.onTitleChange(value));
 
-      Text('老师要求').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Text('完成要求').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
       TextArea({ text: this.instruction })
         .width('100%')
         .height(92)
