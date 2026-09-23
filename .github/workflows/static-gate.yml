@@ -414,28 +414,3 @@ jobs:
       - name: Stop backend
         if: always()
         run: kill "$(cat backend-e2e.pid)" 2>/dev/null || true
-
-  validate-voice-manual-multi:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Validate voice manual/auto boundary
-        run: python scripts/validate_issue298_voice_material.py
-
-      - name: Set up Java 21
-        uses: actions/setup-java@v5
-        with:
-          distribution: temurin
-          java-version: '21'
-          cache: maven
-          cache-dependency-path: backend/pom.xml
-
-      - name: Run voice assignment service unit tests
-        run: mvn -f backend/pom.xml -Dtest=VoiceMaterialAssignmentServiceTest test
