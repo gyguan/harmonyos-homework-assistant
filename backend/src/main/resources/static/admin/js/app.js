@@ -152,6 +152,7 @@ async function loadStudents() {
     studentSelect.append(option);
   }
   updateUploadState();
+  await loadImportedPackages();
 }
 
 function mergeSelectedFiles(fileList) {
