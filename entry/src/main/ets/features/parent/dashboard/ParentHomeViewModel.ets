@@ -29,14 +29,6 @@ export class ParentHomeViewModel {
     return result;
   }
 
-  recentSubmitted(): Assignment | null {
-    for (let item of this.assignments()) {
-      if (item.status === AssignmentStatus.SUBMITTED || item.status === AssignmentStatus.COMPLETED ||
-        item.status === AssignmentStatus.NEEDS_REWORK) return item;
-    }
-    return null;
-  }
-
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
   }
