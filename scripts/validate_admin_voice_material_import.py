@@ -55,7 +55,10 @@ require("completeVoiceMaterialBatch" in app and "registerVoiceMaterialPackage" i
         "fetchVoiceMaterialAsset" in api,
         "admin upload must execute the existing batch/package/file/complete workflow")
 require("registrationFailures" in app and "failures === 0" in app,
-        "partial failures must be surfaced and failed selections retained for retry")
+        "partial failures must be surfaced and failed selections retained for retry")\nrequire("batchPackages" in app and "errorMessage" in app and "batchId === batch.id" in app,
+        "completed import must refresh batch package results and expose per-directory validation errors")
+require("imported-package-error" in app and "imported-package-error" in css,
+        "invalid imported packages must show the backend validation reason in the admin UI")
 require("imported-card" in index and "loadImportedPackages" in app and "data-preview-asset" in app,
         "admin import must provide an imported material library with file preview")
 require("/api/v1/media-assets/" in api and '@GetMapping("/media-assets/{assetId}")' in read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java"),
