@@ -125,3 +125,28 @@ nav { display: grid; gap: 6px; }
 .asset-viewer-dialog img { max-width:100%; max-height:calc(100vh - 150px); object-fit:contain; border-radius:8px; }
 .asset-viewer-dialog audio { width:min(640px,100%); }
 .asset-viewer-title { margin:0 0 16px; font-size:15px; }
+
+
+.voice-task-card { margin-top: 16px; }
+.voice-task-list { display:grid; gap:8px; margin-top:18px; }
+.voice-task-row { display:grid; grid-template-columns:minmax(220px,1.3fr) minmax(190px,1fr) 88px 120px; gap:18px; align-items:center; padding:14px; border:1px solid var(--border); border-radius:12px; background:#fff; }
+.voice-task-title strong,.voice-task-title span,.voice-task-folder strong,.voice-task-folder span,.voice-task-label { display:block; }
+.voice-task-title strong { font-size:14px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.voice-task-title span,.voice-task-folder span { margin-top:4px; color:var(--muted); font-size:11px; }
+.voice-task-folder { min-width:0; }
+.voice-task-folder strong { font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.voice-task-label { color:#8a929d; font-size:10px; margin-bottom:3px; }
+.voice-task-status { justify-self:start; padding:5px 9px; border-radius:999px; font-size:11px; font-weight:650; }
+.voice-task-status.created { background:#edf8f3; color:var(--success); }
+.voice-task-status.ready { background:var(--blue-soft); color:var(--blue); }
+.voice-task-status.invalid { background:#fff0f2; color:var(--danger); }
+.voice-task-action { justify-self:end; white-space:nowrap; }
+.voice-task-action .secondary-button { min-height:34px; padding:0 12px; }
+.voice-task-done { color:var(--success); font-size:12px; }
+.voice-task-error { color:var(--danger); font-size:11px; line-height:1.4; }
+.voice-task-empty { min-height:120px; padding:26px; border:1px dashed #c8d2df; border-radius:12px; background:#fbfcfe; display:grid; place-items:center; gap:8px; text-align:center; }
+.voice-task-empty strong { font-size:14px; }
+.voice-task-empty span { color:var(--muted); font-size:12px; }
+@media (max-width: 1100px) {
+  .voice-task-row { grid-template-columns:minmax(180px,1fr) minmax(160px,1fr) 80px 110px; gap:10px; }
+}
