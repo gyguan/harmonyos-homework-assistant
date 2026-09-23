@@ -55,8 +55,8 @@ require("completeVoiceMaterialBatch" in app and "registerVoiceMaterialPackage" i
         "fetchVoiceMaterialAsset" in api,
         "admin upload must execute the existing batch/package/file/complete workflow")
 require("registrationFailures" in app and "failures === 0" in app,
-        "partial failures must be surfaced and failed selections retained for retry")\nrequire("batchPackages" in app and "errorMessage" in app and "batchId === batch.id" in app,
-        "completed import must refresh batch package results and expose per-directory validation errors")
+        "partial failures must be surfaced and failed selections retained for retry")\nrequire("completed.packages" in app and "errorMessage" in app,
+        "completed import must use per-directory results returned by the complete endpoint and expose validation errors")
 require("imported-package-error" in app and "imported-package-error" in css,
         "invalid imported packages must show the backend validation reason in the admin UI")
 require("imported-card" in index and "loadImportedPackages" in app and "data-preview-asset" in app,
