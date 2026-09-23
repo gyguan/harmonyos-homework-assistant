@@ -54,8 +54,8 @@ export interface RemoteVoiceMaterialCreateAssignmentRequest {
   expectedMinutes: number;
   dueAtEpochMs: number;
   dueText: string;
-  title: string;
-  requestId: string;
+  title?: string;
+  requestId?: string;
 }
 
 export interface RemoteVoiceFolderItem {
