@@ -42,10 +42,9 @@ class VoiceMaterialAssignmentServiceTest {
   }
 
   @Test
-  void existingAutoRecordDoesNotBlockRecreationAfterAssignmentDeletion() {
+  void existingAutoRecordBlocksSameDayRecreationAfterAssignmentDeletion() {
     UUID familyId = UUID.randomUUID();
     UUID previousPackageId = UUID.randomUUID();
-    UUID nextPackageId = UUID.randomUUID();
 
     VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
     record.id = UUID.randomUUID();
@@ -55,23 +54,7 @@ class VoiceMaterialAssignmentServiceTest {
     record.packageId = previousPackageId;
     record.assignmentId = "a-voice-deleted";
 
-    VoiceMaterialPackageEntity next =
-        packageEntity(familyId, nextPackageId, "002-数学", "READY");
-    AssignmentDtos.Response created = response("a-voice-next", "数学 · 语音作业");
-
     when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(null);
-    when(packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
-        familyId, "student-1")).thenReturn(List.of(next));
-    when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(
-        familyId, "student-1")).thenReturn(List.of());
-    when(packages.lockOwned(familyId, nextPackageId)).thenReturn(Optional.of(next));
-    when(assignments.nextVoiceMaterialTaskTitle(
-        any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
-        .thenReturn("数学 · 语音作业");
-    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
-        .thenReturn(created);
-    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
-        familyId, nextPackageId)).thenReturn(List.of());
     when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
         any(UUID.class), anyString(), any(LocalDate.class)))
         .thenReturn(Optional.of(record));
@@ -79,12 +62,13 @@ class VoiceMaterialAssignmentServiceTest {
     VoiceMaterialDtos.AutoCreateResponse result =
         service().autoCreateNext(familyId, "student-1");
 
-    assertTrue(result.created());
-    assertEquals(nextPackageId.toString(), result.packageId());
-    assertEquals(created.id(), result.assignmentId());
-    assertEquals(nextPackageId, record.packageId);
-    assertEquals(created.id(), record.assignmentId);
-    verify(autoRecords).saveAndFlush(record);
+    assertFalse(result.created());
+    assertEquals(previousPackageId.toString(), result.packageId());
+    assertEquals(record.assignmentId, result.assignmentId());
+    assertNull(result.assignment());
+    verify(packages, never()).findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+        any(), anyString());
+    verify(autoRecords, never()).saveAndFlush(any());
   }
 
   @Test
