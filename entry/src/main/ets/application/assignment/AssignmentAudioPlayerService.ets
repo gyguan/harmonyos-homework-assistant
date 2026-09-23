@@ -19,8 +19,8 @@ export class AssignmentAudioPlayerService {
     this.callbacks = callbacks;
     if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
       try {
-        let mediaModule = await import('@kit.MediaKit');
-        let player = await mediaModule.createAVPlayer();
+        let mediaModule: typeof import('@kit.MediaKit') = await import('@kit.MediaKit');
+        let player = await mediaModule.media.createAVPlayer();
         this.player = player;
         player.on('stateChange', (state: media.AVPlayerState) => {
           if (this.player !== player) return;
