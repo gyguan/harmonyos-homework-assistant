@@ -522,11 +522,9 @@ async function uploadSelectedPackages() {
     let completedCount = 0;
     for (const item of selected) {
       renderImportProgress(completedCount, selected.length, `正在导入：${item.directoryName}`);
+      let remotePackage = null;
       try {
-        const remotePackage = await registerVoiceMaterialPackage(batch.id, item);
-        for (const file of uploadOrder(item.files)) {
-          await uploadVoiceMaterialFile(remotePackage.id, file, file.sortOrder);
-        }
+        remotePackage = await registerVoiceMaterialPackage(batch.id, item);
       } catch (error) {
         registrationFailures.push({
           directoryName: item.directoryName,
@@ -535,8 +533,18 @@ async function uploadSelectedPackages() {
           audioCount: item.files.filter(file => file.resourceType === 'AUDIO').length,
           imageCount: item.files.filter(file => file.resourceType === 'IMAGE').length,
           status: 'FAILED',
-          errorMessage: error?.message || '上传失败'
+          errorMessage: error?.message || '目录注册失败'
         });
+      }
+      if (remotePackage) {
+        for (const file of uploadOrder(item.files)) {
+          try {
+            await uploadVoiceMaterialFile(remotePackage.id, file, file.sortOrder);
+          } catch (error) {
+            console.error('voice material file upload failed',
+              item.directoryName, file.relativeName, error);
+          }
+        }
       }
       completedCount++;
       renderImportProgress(completedCount, selected.length,
@@ -734,7 +742,7 @@ folderPicker.addEventListener('drop', async event => {
     if (item.kind !== 'file') continue;
     const entry = item.webkitGetAsEntry?.() || item.getAsEntry?.();
     if (entry?.isDirectory) {
-      await collectDroppedDirectory(entry, files);
+      await collectDroppedDirectory(entry, files, entry.name);
     } else {
       const file = item.getAsFile();
       if (file) files.push(file);
