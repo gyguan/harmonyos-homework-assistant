@@ -11,7 +11,6 @@ import {
   Assignment,
   AssignmentBacking,
   AssignmentContentType,
-  AssignmentStatus,
   AssignmentType,
   StudentProfile,
   Subject
@@ -35,18 +34,6 @@ export class ParentVoiceAssignmentViewModel {
 
   student(): StudentProfile {
     return this.repository.getActiveStudent();
-  }
-
-  activeVoiceAssignment(): Assignment | null {
-    let studentId = this.student().id;
-    for (let item of this.repository.listCached()) {
-      if (item.studentId === studentId &&
-        item.contentType === AssignmentContentType.AUDIO_IMAGE &&
-        item.status !== AssignmentStatus.COMPLETED) {
-        return item;
-      }
-    }
-    return null;
   }
 
   queryFolders(keyword: string, usage: string, page: number, size: number = 20):
