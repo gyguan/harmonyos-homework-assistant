@@ -14,7 +14,6 @@ export struct ParentDashboardPage {
   @Prop activeStudentId: string = '';
   @State private availableWidthVp: number = 390;
   onOpenImport: () => void = () => {};
-  onOpenCapture: () => void = () => {};
   onOpenInbox: () => void = () => {};
   onOpenExtra: () => void = () => {};
   onOpenVoice: () => void = () => {};
@@ -307,28 +306,6 @@ export struct ParentDashboardPage {
         .accessibilityText(`给 ${this.student().name} 手工导入老师作业`)
         .onClick(() => this.onOpenImport());
 
-        Row({ space: 8 }) {
-          Text('抓')
-            .width(22)
-            .fontSize(17)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.PRIMARY)
-            .textAlign(TextAlign.Center);
-          Column({ space: 2 }) {
-            Text('抓取老师作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('班级群抓取').fontSize(13).fontColor(AppTheme.SUBTEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-        }
-        .layoutWeight(1)
-        .constraintSize({ minHeight: 64 })
-        .padding(11)
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`给 ${this.student().name} 抓取老师作业`)
-        .onClick(() => this.onOpenCapture());
-      }
       .width('100%');
 
       Row({ space: 10 }) {
@@ -346,7 +323,7 @@ export struct ParentDashboardPage {
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('导入与抓取记录')
+          Text('导入记录')
             .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
