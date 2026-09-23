@@ -84,6 +84,7 @@ for badge_path in [
     "entry/src/main/ets/pages/PersonEntryPage.ets",
     "entry/src/main/ets/pages/AppShell.ets",
     "entry/src/main/ets/components/family/StudentSwitcherDialog.ets",
+    "entry/src/main/ets/components/family/IdentitySwitcherDialog.ets",
     "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
     "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
     "entry/src/main/ets/features/student/home/StudentHomePage.ets",
