@@ -278,7 +278,8 @@ public class VoiceTaskQueryService {
           (select count(*) from voice_material_file imf
             where imf.family_id = p.family_id and imf.package_id = p.id
               and imf.resource_type = 'IMAGE') as image_count,
-          """ + usageSql + """ as usage_count,
+          """ + usageSql + """
+          as usage_count,
           (select count(*) from voice_material_task_link al
              join assignment aa on aa.id = al.assignment_id and aa.family_id = al.family_id
             where al.family_id = p.family_id and al.package_id = p.id
