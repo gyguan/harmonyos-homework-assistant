@@ -17,16 +17,31 @@ def require(ok: bool, msg: str) -> None:
         errors.append(msg)
 
 app = read("backend/src/main/resources/static/admin/js/app.js")
+login_shell = read("backend/src/main/resources/static/admin/js/login-shell.js")
 index = read("backend/src/main/resources/static/admin/index.html")
-require("LoginState = Object.freeze" in app, "admin login must use explicit state")
-require("AUTHENTICATING" in app and "INITIALIZING" in app and "READY" in app, "login states must distinguish auth and initialization")
-require("showAdminShell(result.displayName)" in app, "admin shell must become visible immediately after authentication")
-require("await initializeAdmin()" in app, "student loading must be a separate initialization step")
-require("setView('admin')" in app, "authenticated state must switch to admin view")
-require("loginView.style.display = showLoginView ? '' : 'none'" in app, "login view must be explicitly hidden after authentication")
-require("adminView.style.display = showLoginView ? 'none' : 'grid'" in app, "admin view must be explicitly shown after authentication")
-require("?v=20260922" in index, "admin static assets must be cache-busted")
-require("学生信息加载失败" in app, "initialization failure must remain visible in admin shell")
+require("loginForm.addEventListener('submit', handleLogin)" in login_shell,
+        "admin login submit handling must live in the isolated login shell")
+require("publishAuthenticated(result.displayName)" in login_shell and
+        "setView('admin')" in login_shell,
+        "successful authentication must switch to the admin shell immediately")
+require("window.__xiaobanAdminAuth = detail" in login_shell and
+        "xiaoban-admin-authenticated" in login_shell,
+        "login shell must publish authenticated state independently of business modules")
+require("window.addEventListener('xiaoban-admin-authenticated'" in app and
+        "window.__xiaobanAdminAuth" in app,
+        "admin business module must initialize from the isolated authenticated state")
+require("loginForm.addEventListener('submit'" not in app and
+        "async function handleLogin" not in app,
+        "business module must not own login submission")
+require("login-shell.js?v=20260923-2" in index and
+        "app.js?v=20260923-2" in index,
+        "admin login shell and app module must be cache-busted together")
+require("api.js?v=20260923-2" in login_shell and
+        "api.js?v=20260923-2" in app and
+        "voice-material.js?v=20260923-2" in app,
+        "admin module dependency graph must use the same cache-bust version")
+require("学生信息加载失败" in app,
+        "initialization failure must remain visible in admin shell")
 require('id="login-form"' in index, "login form must remain present")
 
 if errors:

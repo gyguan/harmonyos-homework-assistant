@@ -3,21 +3,18 @@ import {
   createVoiceMaterialAssignment,
   createVoiceMaterialBatch,
   fetchVoiceMaterialAsset,
-  getToken,
   listStudents,
   listVoiceMaterialPackages,
-  login,
   logout,
   registerVoiceMaterialPackage,
-  session,
   uploadVoiceMaterialFile
-} from './api.js';
+} from './api.js?v=20260923-2';
 import {
   SUBJECTS,
   parseVoiceMaterialPackages,
   uploadOrder,
   validatePackage
-} from './voice-material.js';
+} from './voice-material.js?v=20260923-2';
 
 const state = {
   displayName: '',
@@ -29,89 +26,25 @@ const state = {
 };
 
 const el = id => document.getElementById(id);
-const loginView = el('login-view');
-const adminView = el('admin-view');
-const loginForm = el('login-form');
-const loginButton = loginForm.querySelector('button[type="submit"]');
-const loginError = el('login-error');
-const loginStatus = document.createElement('p');
-loginStatus.className = 'login-status';
-loginStatus.hidden = true;
-loginForm.insertBefore(loginStatus, loginError);
-
-const LoginState = Object.freeze({
-  LOGGED_OUT: 'logged_out',
-  AUTHENTICATING: 'authenticating',
-  INITIALIZING: 'initializing',
-  READY: 'ready'
-});
-
-let loginState = LoginState.LOGGED_OUT;
-
-function setView(view) {
-  const showLoginView = view === 'login';
-  loginView.hidden = !showLoginView;
-  adminView.hidden = showLoginView;
-  loginView.style.display = showLoginView ? '' : 'none';
-  adminView.style.display = showLoginView ? 'none' : 'grid';
-}
-
-function setLoginState(nextState, message = '', error = '') {
-  loginState = nextState;
-  const busy = nextState === LoginState.AUTHENTICATING || nextState === LoginState.INITIALIZING;
-  loginButton.disabled = busy;
-  loginButton.textContent = busy ? '登录中…' : '登录';
-  loginStatus.hidden = !message;
-  loginStatus.textContent = message;
-  loginError.hidden = !error;
-  loginError.textContent = error;
-}
-
-function authErrorMessage(error) {
-  if (error?.status === 401) {
-    return '账号或密码错误。默认密码只在首次初始化数据库时创建；已有账号不会在重启时自动覆盖。';
-  }
-  return error?.message || '登录失败，请检查后端服务是否可访问。';
-}
-
-function showLogin(error = '') {
-  setView('login');
-  setLoginState(LoginState.LOGGED_OUT, '', error);
-}
-
-function showAdminShell(displayName) {
-  state.displayName = displayName || '家长';
-  el('account-name').textContent = state.displayName;
-  setView('admin');
-  setLoginState(LoginState.READY);
-  console.debug('admin shell ready');
-}
+let adminInitialized = false;
 
 async function initializeAdmin() {
-  setLoginState(LoginState.INITIALIZING, '登录成功，正在加载学生信息…');
+  if (adminInitialized) return;
+  adminInitialized = true;
   try {
     await loadStudents();
-    setLoginState(LoginState.READY);
   } catch (error) {
     console.error('admin initialization failed', error);
     progressCard.hidden = false;
     showResult('学生信息加载失败：' + (error?.message || '请刷新重试。'), false);
-    setLoginState(LoginState.READY, '已登录，但学生信息加载失败，请刷新重试。');
   }
 }
 
-async function handleLogin(event) {
-  event.preventDefault();
-  setLoginState(LoginState.AUTHENTICATING, '正在验证账号…');
-  try {
-    const result = await login(el('login-name').value.trim(), el('login-password').value);
-    showAdminShell(result.displayName);
-    await initializeAdmin();
-  } catch (error) {
-    showLogin(authErrorMessage(error));
-  }
+function startAdmin(displayName) {
+  state.displayName = displayName || '家长';
+  el('account-name').textContent = state.displayName;
+  void initializeAdmin();
 }
-
 
 const studentSelect = el('student-select');
 const defaultMinutes = el('default-minutes');
@@ -570,15 +503,9 @@ async function uploadSelected() {
   }
 }
 
-loginForm.addEventListener('submit', handleLogin);
-
 el('logout-button').addEventListener('click', async () => {
   await logout();
-  state.packages = [];
-  state.ignoredCount = 0;
-  folderInput.value = '';
-  renderPackages();
-  showLogin();
+  window.location.reload();
 });
 
 subjectChips.addEventListener('click', event => {
@@ -698,19 +625,13 @@ el('close-asset-viewer').addEventListener('click', closeAssetViewer);
 assetViewer.addEventListener('click', event => { if (event.target.hasAttribute('data-close-viewer')) closeAssetViewer(); });
 uploadButton.addEventListener('click', () => void uploadSelected());
 
-async function bootstrap() {
-  setDefaultSubject('CHINESE');
-  showLogin();
-
-  if (!getToken()) return;
-
-  try {
-    const current = await session();
-    showAdminShell(current.displayName);
-    await initializeAdmin();
-  } catch {
-    showLogin('登录状态已失效，请重新登录。');
-  }
+function onAuthenticated(event) {
+  startAdmin(event?.detail?.displayName || '');
 }
 
-void bootstrap();
+window.addEventListener('xiaoban-admin-authenticated', onAuthenticated);
+setDefaultSubject('CHINESE');
+
+if (window.__xiaobanAdminAuth) {
+  startAdmin(window.__xiaobanAdminAuth.displayName || '');
+}

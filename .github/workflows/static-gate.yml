@@ -129,6 +129,7 @@ jobs:
       - name: Validate admin login refactor
         run: |
           python scripts/validate_admin_login.py
+          node --check backend/src/main/resources/static/admin/js/login-shell.js
           node --check backend/src/main/resources/static/admin/js/app.js
 
       - name: Validate admin voice material import
