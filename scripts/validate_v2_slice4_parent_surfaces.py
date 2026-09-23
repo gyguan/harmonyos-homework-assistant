@@ -92,29 +92,24 @@ require("LayoutPolicy.parentHomeRequirement()" in home and "availableWidthVp" in
         "Parent Home must choose wide composition from actual container width + LayoutPolicy")
 require("AppTheme.PARENT_HOME_READABLE_MAX_WIDTH" in home and "AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH" in home,
         "Parent Home must keep readable fallback and capped Pad composition")
-for phrase in ["需要我处理", "最近提交", "导入老师作业", "查看全部"]:
-    require(phrase in home, f"Parent Home missing required P01 content: {phrase}")
+for phrase in ["今天的学习", "需要我处理", "布置作业", "语音作业", "作业收件箱"]:
+    require(phrase in home, f"Parent Home missing required focused content: {phrase}")
+require("最近动态" not in home and "ChildPerformance" not in home,
+        "Parent Home must not reintroduce removed duplicate/recent-activity sections")
 require("AssignmentStatus.OVERDUE" in home_vm and "AssignmentStatus.NEEDS_REWORK" in home_vm and
         "AssignmentStatus.SUBMITTED" in home_vm,
         "Parent Home attention must cover overdue, rework and submitted assignments")
 
-require("private openRecentActivity(item: Assignment)" in home and
-        "this.onOpenReview(item.id)" in home.split("private openRecentActivity(item: Assignment)", 1)[1].split("@Builder", 1)[0],
-        "Parent Home recent activity must open the selected assignment detail directly")
-recent_activity = home.split("private RecentActivity()", 1)
-require(len(recent_activity) == 2, "Parent Home must keep a RecentActivity section")
-if len(recent_activity) == 2:
-    recent_block = recent_activity[1].split("private QuickActions()", 1)[0]
-    require("Text('查看全部')" in recent_block and "this.onOpenProgress()" in recent_block,
-            "Parent Home Recent Activity must keep an explicit View All action to Progress")
-    require("openRecentActivity(item)" in recent_block and "openAttention(item)" not in recent_block,
-            "Parent Home recent items must not reuse attention routing")
 attention_section = home.split("private AttentionSection()", 1)
 require(len(attention_section) == 2, "Parent Home must keep an AttentionSection")
 if len(attention_section) == 2:
-    attention_block = attention_section[1].split("private RecentActivity()", 1)[0]
+    attention_block = attention_section[1].split("private CreateAssignmentAction()", 1)[0]
     require("openAttention(item)" in attention_block,
             "Parent Home attention items must preserve state-aware routing")
+    require("visibleAttentionAssignments" in home and "slice(0, 3)" in home,
+            "Parent Home must cap the attention list and link overflow to Progress")
+require("private AssignmentActions()" in home and "onOpenAssignment" in home and "onOpenVoice" in home,
+        "Parent Home must focus creation on unified normal and voice assignment actions")
 
 require("LayoutPolicy.parentProgressReviewRequirement()" in progress and "availableWidthVp" in progress,
         "Parent Progress must choose review split from actual container width + LayoutPolicy")
@@ -219,14 +214,14 @@ require("AssignmentDueDate.businessDayStart(Date.now())" in home and
 require("this.viewModel.summary().completed" not in home and
         "this.viewModel.summary().total" not in home and
         "this.todayCompletedCount()" in home and "this.todayAssignments().length" in home,
-        "Parent Dashboard child-performance metrics must reuse the same live today snapshot as TodayOverview")
+        "Parent Dashboard progress metrics must reuse the same live today snapshot as TodayOverview")
 require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date,
         "assignment business-day semantics must remain anchored to Asia/Shanghai")
 require("candidateAnchor(candidate.id)" in batch_publish,
         "relative teacher deadlines must remain anchored to the Candidate/import creation time")
 require("private finishParentImportPublished(): void" in app_shell and
-        "this.navPathStack.clear();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentExtraCreate", 1)[0] and
-        "this.notifyUiChanged();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentExtraCreate", 1)[0],
+        "this.navPathStack.clear();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentVoiceCreate", 1)[0] and
+        "this.notifyUiChanged();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentVoiceCreate", 1)[0],
         "Parent import completion must invalidate the dashboard after clearing the deep navigation stack")
 require("onPublished: () => this.finishParentImportPublished()" in app_shell,
         "Homework confirmation must use the post-navigation dashboard refresh boundary")
