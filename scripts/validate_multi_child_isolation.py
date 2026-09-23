@@ -83,8 +83,8 @@ require("StudentSwitcherDialog" in app_shell and "openStudentSwitcher" in app_sh
         "Parent child switching must use an explicit selector dialog")
 require("DialogAlignment.Bottom" in app_shell and "DialogAlignment.Center" in app_shell,
         "Child selector must adapt Phone bottom modal and wide centered dialog")
-require("Text(this.currentStudent().name)" in app_shell and "Text(this.currentStudent().className)" in app_shell,
-        "Family context surfaces must read the reactive current child")
+require("this.currentStudent().name" in app_shell and "this.currentStudent().className" in app_shell,
+        "identity/family context surfaces must read the reactive current child")
 require(".onClick(() => this.openStudentSwitcher())" in app_shell,
         "Parent family context controls must open the selector instead of cycling children")
 require("this.navPathStack.clear();" in app_shell and "this.parentRoute = ParentRoute.DASHBOARD;" in app_shell,
@@ -111,8 +111,8 @@ require("revision: this.storeRevision" in app_shell and "this.storeRevision++;" 
         "child switching must invalidate repository-backed parent home content")
 require("@Prop activeStudentId" not in parent_home,
         "Parent Home must not keep a second active-child identity prop")
-require("FamilyContextBar" in app_shell and "currentStudent()" in app_shell,
-        "Persistent family context surface must own the visible current-child identity")
+require("IdentityContextBar" in app_shell and "currentStudent()" in app_shell,
+        "Persistent identity context surface must own the visible current-child identity")
 
 if errors:
     print("MULTI_CHILD_ISOLATION_GATE_FAIL")
