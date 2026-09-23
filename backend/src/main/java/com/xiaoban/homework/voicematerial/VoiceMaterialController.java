@@ -83,7 +83,7 @@ public class VoiceMaterialController {
     return materials.list(familyId, studentId);
   }
 
-  @GetMapping("/voice-task-items")
+  @GetMapping({"/voice-tasks", "/voice-task-items"})
   public VoiceMaterialDtos.VoiceTaskPageResponse queryVoiceTasks(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @RequestParam(required = false, defaultValue = "") String studentId,
@@ -92,18 +92,43 @@ public class VoiceMaterialController {
       @RequestParam(required = false, defaultValue = "") String keyword,
       @RequestParam(required = false, defaultValue = "") String createdFrom,
       @RequestParam(required = false, defaultValue = "") String createdTo,
+      @RequestParam(required = false, defaultValue = "") String packageId,
       @RequestParam(required = false, defaultValue = "0") int page,
       @RequestParam(required = false, defaultValue = "20") int size,
       @RequestParam(required = false, defaultValue = "createdAt,desc") String sort) {
-    return voiceTasks.query(familyId, studentId, status, subjectCode, keyword,
-        createdFrom, createdTo, page, size, sort);
+    return voiceTasks.queryTasks(familyId, studentId, status, subjectCode, keyword,
+        createdFrom, createdTo, packageId, page, size, sort);
   }
 
-  @GetMapping("/voice-task-items/{packageId}")
+  @GetMapping({"/voice-tasks/{assignmentId}", "/voice-task-items/{assignmentId}"})
   public VoiceMaterialDtos.VoiceTaskDetailResponse getVoiceTaskDetail(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String assignmentId) {
+    return voiceTasks.taskDetail(familyId, assignmentId);
+  }
+
+  @GetMapping("/voice-material-folders")
+  public VoiceMaterialDtos.VoiceFolderPageResponse queryVoiceFolders(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @RequestParam(required = false, defaultValue = "") String studentId,
+      @RequestParam(required = false, defaultValue = "") String status,
+      @RequestParam(required = false, defaultValue = "") String subjectCode,
+      @RequestParam(required = false, defaultValue = "") String keyword,
+      @RequestParam(required = false, defaultValue = "") String importedFrom,
+      @RequestParam(required = false, defaultValue = "") String importedTo,
+      @RequestParam(required = false, defaultValue = "ALL") String usage,
+      @RequestParam(required = false, defaultValue = "0") int page,
+      @RequestParam(required = false, defaultValue = "20") int size,
+      @RequestParam(required = false, defaultValue = "importedAt,desc") String sort) {
+    return voiceTasks.queryFolders(familyId, studentId, status, subjectCode, keyword,
+        importedFrom, importedTo, usage, page, size, sort);
+  }
+
+  @GetMapping("/voice-material-folders/{packageId}")
+  public VoiceMaterialDtos.VoiceFolderDetailResponse getVoiceFolderDetail(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable UUID packageId) {
-    return voiceTasks.detail(familyId, packageId);
+    return voiceTasks.folderDetail(familyId, packageId);
   }
 
   @GetMapping("/media-assets/{assetId}")

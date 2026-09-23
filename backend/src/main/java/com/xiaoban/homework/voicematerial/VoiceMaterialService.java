@@ -25,6 +25,7 @@ public class VoiceMaterialService {
   private final VoiceMaterialBatchRepository batches;
   private final VoiceMaterialPackageRepository packages;
   private final VoiceMaterialFileRepository files;
+  private final VoiceMaterialTaskLinkRepository taskLinks;
   private final AssignmentRepository assignments;
   private final MediaAssetRepository assets;
   private final MediaAssetService mediaAssets;
@@ -34,6 +35,7 @@ public class VoiceMaterialService {
   public VoiceMaterialService(VoiceMaterialBatchRepository batches,
       VoiceMaterialPackageRepository packages,
       VoiceMaterialFileRepository files,
+      VoiceMaterialTaskLinkRepository taskLinks,
       AssignmentRepository assignments,
       MediaAssetRepository assets,
       MediaAssetService mediaAssets,
@@ -42,6 +44,7 @@ public class VoiceMaterialService {
     this.batches = batches;
     this.packages = packages;
     this.files = files;
+    this.taskLinks = taskLinks;
     this.assignments = assignments;
     this.assets = assets;
     this.mediaAssets = mediaAssets;
@@ -172,6 +175,9 @@ public class VoiceMaterialService {
     int invalid = 0;
     for (VoiceMaterialPackageEntity item : items) {
       if ("CONSUMED".equals(item.status)) {
+        item.status = "READY";
+        item.updatedAt = Instant.now();
+        packages.save(item);
         ready++;
         continue;
       }
@@ -266,16 +272,26 @@ public class VoiceMaterialService {
     List<VoiceMaterialDtos.FileResponse> fileResponses =
         files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(item.familyId, item.id)
             .stream().map(this::fileResponse).toList();
-    boolean hasCreatedBefore = item.consumedAssignmentId != null && !item.consumedAssignmentId.isBlank();
-    boolean hasActiveAssignment = hasCreatedBefore && assignments.existsById(item.consumedAssignmentId);
+    VoiceMaterialTaskLinkEntity latest = taskLinks
+        .findFirstByFamilyIdAndPackageIdOrderByCreatedAtDesc(item.familyId, item.id)
+        .orElse(null);
+    boolean hasCreatedBefore = latest != null;
+    boolean hasActiveAssignment = latest != null && assignments.findById(latest.assignmentId)
+        .filter(assignment -> item.familyId.equals(assignment.familyId))
+        .filter(assignment -> !"COMPLETED".equals(assignment.status))
+        .isPresent();
+    String latestAssignmentId = latest == null ? "" : latest.assignmentId;
+    long latestUsedAt = latest == null || latest.createdAt == null
+        ? 0L : latest.createdAt.toEpochMilli();
+    String responseStatus = "CONSUMED".equals(item.status) ? "READY" : item.status;
     return new VoiceMaterialDtos.PackageResponse(
         item.id.toString(), item.batchId.toString(), item.studentId,
         item.directoryName, item.subjectCode, item.title, item.expectedMinutes,
         item.dueAt == null ? 0L : item.dueAt.toEpochMilli(), item.assignmentType,
-        item.status, item.errorMessage,
-        item.consumedAssignmentId == null ? "" : item.consumedAssignmentId,
+        responseStatus, item.errorMessage,
+        latestAssignmentId,
         hasCreatedBefore, hasActiveAssignment,
-        item.consumedAt == null ? 0L : item.consumedAt.toEpochMilli(), fileResponses);
+        latestUsedAt, fileResponses);
   }
 
   private VoiceMaterialDtos.FileResponse fileResponse(VoiceMaterialFileEntity file) {
