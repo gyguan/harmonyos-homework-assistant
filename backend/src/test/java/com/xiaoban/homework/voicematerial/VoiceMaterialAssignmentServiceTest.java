@@ -173,6 +173,36 @@ class VoiceMaterialAssignmentServiceTest {
   }
 
   @Test
+  void manualCreationUsesSelectedStudentDueDateAndExpectedMinutes() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    VoiceMaterialPackageEntity item = packageEntity(packageId, "001-课文朗读", "READY");
+    item.expectedMinutes = 15;
+    when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, packageId)).thenReturn(List.of());
+    when(assignments.nextVoiceMaterialTaskTitle(
+        any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
+        .thenReturn("语文 · 语音作业");
+    AssignmentDtos.Response authoritative = response("a-voicepkg-" + packageId, "语文 · 语音作业");
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenReturn(authoritative);
+
+    long dueAt = Instant.parse("2026-09-25T15:59:59Z").toEpochMilli();
+    VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
+        familyId, packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest("student-2", 30, dueAt, "自定义"));
+
+    ArgumentCaptor<AssignmentDtos.Create> input =
+        ArgumentCaptor.forClass(AssignmentDtos.Create.class);
+    verify(assignments).create(any(UUID.class), org.mockito.ArgumentMatchers.eq("student-2"), input.capture());
+    assertEquals(30, input.getValue().expectedMinutes());
+    assertEquals(dueAt, input.getValue().dueAtEpochMs());
+    assertTrue(result.created());
+  }
+
+  @Test
   void readyManualPackageWithoutDueAtKeepsAssignmentDueAtNullable() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
