@@ -83,11 +83,6 @@ public class VoiceMaterialAssignmentService {
       }
     }
 
-    AssignmentDtos.Response activeTarget =
-        assignments.findFirstVoiceMaterialTask(familyId, targetStudentId);
-    if (activeTarget != null) {
-      throw new ApiExceptions.Conflict("该学生当前已有语音任务，请完成或处理现有任务后再创建");
-    }
     if (!"READY".equals(item.status) && !"CONSUMED".equals(item.status)) {
       throw new ApiExceptions.BadRequest("当前文件夹不可用于创建任务");
     }
