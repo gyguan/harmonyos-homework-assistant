@@ -423,6 +423,26 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_IMPORT_INBOX) {
+      NavDestination() {
+        HomeworkImportInboxPage({
+          onBack: () => this.navPathStack.pop(),
+          onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(
+            this.navPathStack, batchId)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_IMPORT_BATCH_DETAIL) {
+      NavDestination() {
+        HomeworkImportBatchDetailPage({
+          batchId: ParentImportNavigator.batchId(param),
+          onBack: () => this.navPathStack.pop(),
+          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_IMPORT_CONFIRMATION) {
       NavDestination() {
         HomeworkConfirmationPage({
