@@ -302,7 +302,7 @@ jobs:
 
       - name: Verify admin import page is served
         run: |
-          curl -fsSL http://localhost:8080/admin | grep -q "语音任务"
+          curl -fsSL http://localhost:8080/admin | grep -q "语音素材导入"
           curl -fsS http://localhost:8080/admin/js/app.js | grep -q "uploadSelected"
 
       - name: Run real backend E2E smoke with Tutor fallback

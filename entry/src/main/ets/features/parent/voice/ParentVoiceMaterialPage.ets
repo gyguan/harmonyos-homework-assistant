@@ -37,7 +37,6 @@ export struct ParentVoiceMaterialPage {
   @State private creatingAssignment: boolean = false;
   @State private message: string = '';
   @State private messageError: boolean = false;
-  @Prop primaryEntry: boolean = false;
 
   onBack: () => void = () => {};
   onAssignmentCreated: () => void = () => {};
@@ -706,27 +705,11 @@ export struct ParentVoiceMaterialPage {
     Stack({ alignContent: Alignment.Bottom }) {
       Column() {
         Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
-          if (this.primaryEntry) {
-            Column({ space: 4 }) {
-              Text('语音任务')
-                .width('100%')
-                .fontSize(22)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.TEXT);
-              Text('查看语音任务与来源素材，也可以从素材目录创建新任务')
-                .width('100%')
-                .fontSize(13)
-                .fontColor(AppTheme.SUBTEXT);
-            }
-            .width('100%')
-            .alignItems(HorizontalAlign.Start);
-          } else {
-            DeepPageHeader({
-              title: '语音任务',
-              backAccessibilityText: '返回家长首页',
-              onBack: () => this.onBack()
-            });
-          }
+          DeepPageHeader({
+            title: '语音素材库',
+            backAccessibilityText: '返回家长首页',
+            onBack: () => this.onBack()
+          });
 
           Scroll() {
             Column({ space: AppTheme.PHONE_SECTION_GAP }) {

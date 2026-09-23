@@ -66,7 +66,6 @@ if app_shell:
         "selected: this.studentRoute === StudentRoute.ASSIGNMENTS",
         "selected: this.studentRoute === StudentRoute.PROFILE",
         "selected: this.parentRoute === ParentRoute.DASHBOARD",
-        "selected: this.parentRoute === ParentRoute.VOICE_TASKS",
         "selected: this.parentRoute === ParentRoute.PROGRESS",
         "selected: this.parentRoute === ParentRoute.SETTINGS",
     ]:

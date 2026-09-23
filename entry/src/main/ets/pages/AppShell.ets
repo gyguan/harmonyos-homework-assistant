@@ -57,7 +57,6 @@ enum StudentRoute {
 
 enum ParentRoute {
   DASHBOARD = 'DASHBOARD',
-  VOICE_TASKS = 'VOICE_TASKS',
   PROGRESS = 'PROGRESS',
   SETTINGS = 'SETTINGS'
 }
@@ -243,8 +242,8 @@ export struct AppShell {
   }
 
   private openParentVoiceMaterial(): void {
-    this.navPathStack.clear();
-    this.parentRoute = ParentRoute.VOICE_TASKS;
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_VOICE_MATERIAL, new ParentVoiceMaterialRouteParam());
   }
 
   private routeAssignmentId(param: Object): string {
@@ -417,13 +416,7 @@ export struct AppShell {
 
   @Builder
   private ParentContent() {
-    if (this.parentRoute === ParentRoute.VOICE_TASKS) {
-      ParentVoiceMaterialPage({
-        primaryEntry: true,
-        onBack: () => this.parentRoute = ParentRoute.DASHBOARD,
-        onAssignmentCreated: () => this.notifyUiChanged()
-      });
-    } else if (this.parentRoute === ParentRoute.PROGRESS) {
+    if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
         revision: this.storeRevision,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
@@ -519,11 +512,6 @@ export struct AppShell {
           onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
-          symbol: $r('sys.symbol.checkmark_square'), label: '语音任务',
-          selected: this.parentRoute === ParentRoute.VOICE_TASKS,
-          onSelect: () => this.parentRoute = ParentRoute.VOICE_TASKS
-        }).layoutWeight(1).height('100%');
-        BottomPrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '进度', selected: this.parentRoute === ParentRoute.PROGRESS,
           onSelect: () => this.parentRoute = ParentRoute.PROGRESS
         }).layoutWeight(1).height('100%');
@@ -576,11 +564,6 @@ export struct AppShell {
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.parentRoute === ParentRoute.DASHBOARD,
           onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
-        });
-        SidePrimaryNavItem({
-          symbol: $r('sys.symbol.checkmark_square'), label: '语音任务',
-          selected: this.parentRoute === ParentRoute.VOICE_TASKS,
-          onSelect: () => this.parentRoute = ParentRoute.VOICE_TASKS
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '进度', selected: this.parentRoute === ParentRoute.PROGRESS,
