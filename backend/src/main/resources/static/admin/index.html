@@ -27,11 +27,13 @@
         <div class="brand-mark small">小伴</div>
         <div><strong>小伴管理台</strong><span>家庭管理</span></div>
       </div>
-      <nav>
-        <button class="nav-item placeholder" disabled><span>首页</span><em>待扩展</em></button>
-        <button class="nav-item active"><span>语音任务</span><em>管理</em></button>
-        <button class="nav-item placeholder" disabled><span>作业管理</span><em>待扩展</em></button>
-        <button class="nav-item placeholder" disabled><span>系统</span><em>待扩展</em></button>
+      <nav aria-label="管理台导航">
+        <button id="nav-voice-tasks" class="nav-item active" type="button" aria-current="page">
+          <span>语音任务</span><em>管理</em>
+        </button>
+        <button class="nav-item placeholder" type="button" disabled><span>首页</span><em>待扩展</em></button>
+        <button class="nav-item placeholder" type="button" disabled><span>作业管理</span><em>待扩展</em></button>
+        <button class="nav-item placeholder" type="button" disabled><span>系统</span><em>待扩展</em></button>
       </nav>
       <div class="sidebar-footer">
         <span id="account-name">家长</span>

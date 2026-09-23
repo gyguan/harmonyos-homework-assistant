@@ -35,8 +35,12 @@ require("dragover" in app and "webkitGetAsEntry" in app and "collectDroppedDirec
 require('id="student-select"' in index and 'id="subject-chips"' in index and
         'id="default-minutes"' in index,
         "admin import must expose student, subject and expected-minute defaults")
+require('id="nav-voice-tasks"' in index and '<span>语音任务</span>' in index and 'aria-current="page"' in index,
+        "admin shell must expose a visible voice-task navigation entry")
 require('作业管理' in index and '系统' in index and '待扩展' in index,
         "admin shell must keep future navigation placeholders without implementing extra scope")
+require('CacheControl.noStore()' in controller and '"Pragma", "no-cache"' in controller,
+        "admin root must disable browser caching so pulled Web UI changes become visible after restart")
 require('sessionStorage' in api and 'localStorage' not in api,
         "admin auth token must remain session-scoped instead of persistent localStorage")
 for endpoint in [
