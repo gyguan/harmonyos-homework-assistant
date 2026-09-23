@@ -304,7 +304,9 @@ jobs:
       - name: Verify admin import page is served
         run: |
           curl -fsSL http://localhost:8080/admin | grep -q 'id="nav-voice-tasks"'
-          curl -fsS http://localhost:8080/admin/js/app.js | grep -q "uploadSelected"
+          curl -fsSL http://localhost:8080/admin | grep -q 'id="task-search-form"'
+          curl -fsSL http://localhost:8080/admin | grep -q 'id="import-result-body"'
+          curl -fsS http://localhost:8080/admin/js/app.js | grep -q "uploadSelectedPackages"
 
       - name: Run real backend E2E smoke with Tutor fallback
         run: python backend/scripts/e2e_smoke.py --expect-tutor-unavailable

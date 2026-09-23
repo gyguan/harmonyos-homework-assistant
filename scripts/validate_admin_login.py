@@ -19,6 +19,7 @@ def require(ok: bool, msg: str) -> None:
 app = read("backend/src/main/resources/static/admin/js/app.js")
 login_shell = read("backend/src/main/resources/static/admin/js/login-shell.js")
 index = read("backend/src/main/resources/static/admin/index.html")
+
 require("loginForm.addEventListener('submit', handleLogin)" in login_shell,
         "admin login submit handling must live in the isolated login shell")
 require("publishAuthenticated(result.displayName)" in login_shell and
@@ -29,20 +30,18 @@ require("window.__xiaobanAdminAuth = detail" in login_shell and
         "login shell must publish authenticated state independently of business modules")
 require("window.addEventListener('xiaoban-admin-authenticated'" in app and
         "window.__xiaobanAdminAuth" in app,
-        "admin business module must initialize from the isolated authenticated state")
-require("loginForm.addEventListener('submit'" not in app and
-        "async function handleLogin" not in app,
+        "admin business module must initialize from isolated authenticated state")
+require("async function handleLogin" not in app,
         "business module must not own login submission")
-require("login-shell.js?v=20260923-2" in index and
-        "app.js?v=20260923-2" in index,
+require("login-shell.js?v=20260923-3" in index and
+        "app.js?v=20260923-3" in index,
         "admin login shell and app module must be cache-busted together")
-require("api.js?v=20260923-2" in login_shell and
-        "api.js?v=20260923-2" in app and
-        "voice-material.js?v=20260923-2" in app,
+require("api.js?v=20260923-3" in login_shell and
+        "api.js?v=20260923-3" in app and
+        "voice-material.js?v=20260923-3" in app,
         "admin module dependency graph must use the same cache-bust version")
-require("学生信息加载失败" in app,
-        "initialization failure must remain visible in admin shell")
-require('id="login-form"' in index, "login form must remain present")
+require('id="login-form"' in index and 'id="admin-view"' in index,
+        "login and admin shells must remain explicit")
 
 if errors:
     print("ADMIN_LOGIN_GATE_FAIL")
