@@ -2,12 +2,21 @@ import { DefaultFamilyContextRepository } from '../../../data/repository/Default
 import { DefaultPracticeRepository } from '../../../data/repository/DefaultPracticeRepository';
 import {
   PracticeAttempt,
+  PracticeAttemptMode,
+  PracticeAttemptStatus,
   PracticeAttemptSummary,
   PracticePaper,
   PracticeResult
 } from '../../../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
 import { PracticeRepository } from '../../../domain/port/PracticeRepository';
+
+export interface PracticeProgressSummary {
+  previousCorrectCount: number;
+  previousPercent: number;
+  correctDelta: number;
+  percentDelta: number;
+}
 
 export class PracticeResultViewModel {
   private readonly repository: PracticeRepository;
@@ -32,6 +41,40 @@ export class PracticeResultViewModel {
     let paper: PracticePaper | null = await this.repository.getPaper(result.paperId, result.paperVersion);
     if (paper !== null && paper.title.length > 0) return paper.title;
     return result.paperId;
+  }
+
+  async progress(result: PracticeResult): Promise<PracticeProgressSummary | null> {
+    if (result.mode !== PracticeAttemptMode.FULL || result.attemptNo <= 1) return null;
+
+    try {
+      let attempts: PracticeAttemptSummary[] =
+        await this.repository.listAttempts(this.familyContext.getActiveStudentId(), result.paperId);
+      let previous: PracticeAttemptSummary | null = null;
+
+      for (let item of attempts) {
+        if (item.id === result.attemptId ||
+          item.status !== PracticeAttemptStatus.SUBMITTED ||
+          item.mode !== PracticeAttemptMode.FULL ||
+          item.attemptNo >= result.attemptNo) {
+          continue;
+        }
+
+        if (previous === null || item.attemptNo > previous.attemptNo) previous = item;
+      }
+
+      if (previous === null || previous.maxScore <= 0) return null;
+
+      let previousPercent = Math.round(previous.score * 100 / previous.maxScore);
+      let currentPercent = this.percent(result);
+      return {
+        previousCorrectCount: previous.correctCount,
+        previousPercent: previousPercent,
+        correctDelta: result.correctCount - previous.correctCount,
+        percentDelta: currentPercent - previousPercent
+      };
+    } catch {
+      return null;
+    }
   }
 
   private async historyPaperTitle(result: PracticeResult): Promise<string> {
