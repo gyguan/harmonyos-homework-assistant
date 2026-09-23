@@ -103,3 +103,16 @@ export async function completeVoiceMaterialBatch(batchId) {
     method: 'POST'
   });
 }
+
+
+export async function createVoiceMaterialAssignment(packageId, studentId, expectedMinutes) {
+  return await request(`/api/v1/voice-material-packages/${encodeURIComponent(packageId)}/create-assignment`, {
+    method: 'POST',
+    body: JSON.stringify({
+      studentId,
+      expectedMinutes,
+      dueAtEpochMs: 0,
+      dueText: ''
+    })
+  });
+}
