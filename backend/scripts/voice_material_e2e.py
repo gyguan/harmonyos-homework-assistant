@@ -200,24 +200,16 @@ def main() -> int:
         require(auto_still_blocked.get("created") is False,
                 "automatic creation must remain blocked while a manual voice task is active")
 
-        # Once every effective task is cleared, automatic creation can continue.
+        # Even after every effective task is cleared, the same business day must not auto-create again.
         expect(http(base_url, "DELETE", f"/api/v1/assignments/{manual_second_assignment}", token=token),
                (200, 204), "delete second manual voice task")
         auto_again = expect(http(base_url, "POST",
             f"/api/v1/students/{student_id}/voice-material-packages/auto-create-next", token=token),
-            (200,), "auto recreate after all active tasks cleared").json()
-        require(auto_again.get("created") is True and auto_again.get("packageId") == first["id"],
-                "auto recreation must resume only after no effective voice task remains")
-        auto_second_assignment = auto_again["assignmentId"]
-        require(auto_second_assignment not in (first_assignment, manual_second_assignment)
-                and auto_second_assignment.startswith("a-voice-"),
-                "second automatic task must be a distinct Assignment instance")
-        list_resources(base_url, token, auto_second_assignment, ["chinese-voice.mp3", "chinese-scene.png"])
+            (200,), "enforce daily auto-create limit after all tasks cleared").json()
+        require(auto_again.get("created") is False and auto_again.get("assignmentId") == first_assignment,
+                "automatic creation must run at most once per business day")
 
-        # Clear the automatic task, then create two manual tasks from the same reusable folder.
-        expect(http(base_url, "DELETE", f"/api/v1/assignments/{auto_second_assignment}", token=token),
-               (200, 204), "delete second automatic voice task")
-
+        # Manual creation remains unrestricted by the daily automatic-create limit.
         request_id = f"reuse-{run_id}"
         reuse_payload = {"studentId": student_id, "expectedMinutes": 18, "dueAtEpochMs": 0,
                          "dueText": "", "title": "语文 · 重复使用验证", "requestId": request_id}
@@ -237,7 +229,7 @@ def main() -> int:
         require(parallel.get("created") is True,
                 "parent must be able to create multiple active manual voice tasks")
         parallel_assignment = parallel["assignmentId"]
-        require(len({reused_assignment, parallel_assignment, first_assignment, auto_second_assignment}) == 4,
+        require(len({reused_assignment, parallel_assignment, first_assignment}) == 3,
                 "every business create must produce a distinct Assignment id")
 
         retry = expect(http(base_url, "POST",
@@ -251,10 +243,10 @@ def main() -> int:
         reused_folder = expect(http(base_url, "GET",
             f"/api/v1/voice-material-folders/{first['id']}", token=token),
             (200,), "folder detail after parallel manual reuse").json()
-        require(reused_folder["item"].get("usageCount") == 4, "reused folder usage count must include all task instances")
+        require(reused_folder["item"].get("usageCount") == 3, "reused folder usage count must include all task instances")
         require(reused_folder["item"].get("activeTaskCount") == 2,
                 "same reusable folder may back multiple active manual tasks")
-        require(len(reused_folder.get("recentTasks", [])) >= 4, "folder detail must preserve task history")
+        require(len(reused_folder.get("recentTasks", [])) >= 3, "folder detail must preserve task history")
 
         used_page = expect(http(base_url, "GET",
             f"/api/v1/voice-material-folders?studentId={quote(student_id)}&usage=USED&page=0&size=20",
@@ -265,7 +257,7 @@ def main() -> int:
         require({x.get("packageId") for x in used_page.get("items", [])} >= {first["id"], second["id"]},
                 "both historically used folders must appear in USED filter")
         require(unused_page.get("totalElements") == 0,
-                "no folder should remain unused after two automatic selections")
+                "no folder should remain unused after automatic and manual selections")
 
         task_by_folder = expect(http(base_url, "GET",
             f"/api/v1/voice-tasks?studentId={quote(student_id)}&packageId={first['id']}&page=0&size=20",
