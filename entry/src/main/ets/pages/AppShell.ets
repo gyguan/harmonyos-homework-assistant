@@ -1,8 +1,6 @@
 import {
   AppRoute,
   AssignmentRouteParam,
-  ParentExtraCreateRouteParam,
-  ParentVoiceMaterialRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
   PracticePaperRouteParam
@@ -21,9 +19,7 @@ import { StudentProfile } from '../domain/model/HomeworkModels';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
-import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
 import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceAssignmentPage';
-import { ParentVoiceMaterialPage } from '../features/parent/voice/ParentVoiceMaterialPage';
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
 import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImportInboxPage';
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
@@ -237,13 +233,8 @@ export struct AppShell {
     this.notifyUiChanged();
   }
 
-  private openParentExtraCreate(voice: boolean = false): void {
-    this.navPathStack.pushPathByName(AppRoute.PARENT_EXTRA_CREATE, new ParentExtraCreateRouteParam(voice));
-  }
-
-  private openParentVoiceMaterial(): void {
-    this.navPathStack.pushPathByName(
-      AppRoute.PARENT_VOICE_MATERIAL, new ParentVoiceMaterialRouteParam());
+  private openParentVoiceCreate(): void {
+    this.navPathStack.pushPathByName(AppRoute.PARENT_VOICE_CREATE, {});
   }
 
   private routeAssignmentId(param: Object): string {
@@ -386,27 +377,14 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_EXTRA_CREATE) {
+    } else if (name === AppRoute.PARENT_VOICE_CREATE) {
       NavDestination() {
-        if ((param as ParentExtraCreateRouteParam).voice) {
-          ParentVoiceAssignmentPage({
-            onBack: () => this.navPathStack.pop(),
-            onCreated: () => this.navPathStack.pop()
-          });
-        } else {
-          ParentExtraAssignmentPage({
-            onBack: () => this.navPathStack.pop(),
-            onCreated: () => this.navPathStack.pop()
-          });
-        }
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_VOICE_MATERIAL) {
-      NavDestination() {
-        ParentVoiceMaterialPage({
+        ParentVoiceAssignmentPage({
           onBack: () => this.navPathStack.pop(),
-          onAssignmentCreated: () => this.notifyUiChanged()
+          onCreated: () => {
+            this.navPathStack.pop();
+            this.notifyUiChanged();
+          }
         });
       }
       .hideTitleBar(true)
@@ -429,11 +407,9 @@ export struct AppShell {
       ParentDashboardPage({
         revision: this.storeRevision,
         activeStudentId: this.activeStudentId,
-        onOpenImport: () => ParentImportNavigator.openImport(this.navPathStack),
+        onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-        onOpenExtra: () => this.openParentExtraCreate(false),
-        onOpenVoice: () => this.openParentExtraCreate(true),
-        onOpenVoiceMaterial: () => this.openParentVoiceMaterial(),
+        onOpenVoice: () => this.openParentVoiceCreate(),
         onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
       });
