@@ -19,7 +19,8 @@ export class AssignmentAudioPlayerService {
     this.callbacks = callbacks;
     if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
       try {
-        let player = await media.createAVPlayer();
+        let mediaModule = await import('@kit.MediaKit');
+        let player = await mediaModule.createAVPlayer();
         this.player = player;
         player.on('stateChange', (state: media.AVPlayerState) => {
           if (this.player !== player) return;
@@ -83,7 +84,7 @@ export class AssignmentAudioPlayerService {
       let duration = player.duration > 0 ? player.duration : 0;
       let target = Math.floor(Math.max(0, duration > 0 ? Math.min(timeMs, duration) : timeMs));
       try {
-        player.seek(target, media.SeekMode.SEEK_PREV_SYNC);
+        player.seek(target);
       } catch {
         if (this.callbacks !== null) this.callbacks.onError('无法跳转到该播放位置');
       }
