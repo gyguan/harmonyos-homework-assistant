@@ -83,8 +83,8 @@ require("选择家长或学生" in identity_switcher and
         "identity dialog must combine role and person selection in one surface")
 require("CenteredTextBadge" in identity_switcher and "badgeText: '家'" in identity_switcher,
         "identity dialog must reuse shared centered identity badges")
-require("this.parentActive && this.activeStudentId" not in identity_switcher,
-        "student current-state marker must not be active while parent identity is selected")
+require(identity_switcher.count("!this.parentActive && this.activeStudentId === student.id") >= 4,
+        "student current-state marker must be guarded by non-parent identity")
 
 if errors:
     print("PERSON_ENTRY_ROLE_LOCK_GATE_FAIL")
