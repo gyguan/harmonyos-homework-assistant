@@ -403,11 +403,11 @@ export struct ParentDashboardPage {
           .backgroundColor(AppTheme.PRIMARY_SOFT)
           .borderRadius(9);
         Column({ space: 2 }) {
-          Text('语音素材库')
+          Text('语音任务')
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('批量导入 · 每天自动创建 1 个')
+          Text('查看任务 · 管理素材文件夹')
             .fontSize(13)
             .fontColor(AppTheme.SUBTEXT);
         }
@@ -424,7 +424,7 @@ export struct ParentDashboardPage {
       .border({ width: 1, color: AppTheme.BORDER })
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(`管理 ${this.student().name} 的语音素材库`)
+      .accessibilityText(`管理 ${this.student().name} 的语音任务`)
       .onClick(() => this.onOpenVoiceMaterial());
 
 

@@ -29,6 +29,7 @@ remote = read("entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets"
 auto = read("entry/src/main/ets/application/assignment/VoiceMaterialAutoCreateService.ets")
 index = read("entry/src/main/ets/pages/Index.ets")
 page = read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets")
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 context = read("CONTEXT.md")
 voice_e2e = read("backend/scripts/voice_material_e2e.py")
@@ -111,8 +112,13 @@ require("checkToday(studentId" in auto and
         "#298 student client must delegate daily creation policy to the backend")
 require("VoiceMaterialAutoCreateService.instance.checkToday(studentId)" in index,
         "#298 student entry must trigger the server-authoritative daily check")
-require("Text('语音素材库')" in dashboard and "onOpenVoiceMaterial" in dashboard,
-        "#298 parent dashboard must expose the voice material library")
+require("Text('语音任务')" in dashboard and "onOpenVoiceMaterial" in dashboard,
+        "#298 parent dashboard must expose the voice task entry")
+require("VOICE_TASKS = 'VOICE_TASKS'" in app_shell and
+        "label: '语音任务'" in app_shell and
+        "selected: this.parentRoute === ParentRoute.VOICE_TASKS" in app_shell and
+        "primaryEntry: true" in app_shell,
+        "#298 parent Phone/Pad primary navigation must expose the voice task page")
 require("sys.symbol.exclamationmark_circle_fill" not in page,
         "#298 parent material page must not depend on a version-sensitive feedback system symbol")
 require("private DefaultSubjectChip(label: string, code: string)" in page and
