@@ -379,6 +379,11 @@ export struct ParentVoiceAssignmentPage {
         .backgroundColor(AppTheme.PRIMARY_FAINT)
         .borderRadius(AppTheme.CONTROL_RADIUS);
       }
+
+      Text('支持 mp3 / m4a / wav，单个文件不超过 20MB。')
+        .width('100%')
+        .fontSize(12)
+        .fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
   }
