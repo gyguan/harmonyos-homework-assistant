@@ -356,6 +356,33 @@ def main() -> int:
         require(all(item.get("status") == "READY" for item in listed[:2]),
                 "fresh packages must be READY")
 
+        ready_page = expect(
+            http(
+                base_url, "GET",
+                f"/api/v1/voice-task-items?studentId={quote(student_id)}"
+                "&status=READY&page=0&size=1&sort=directoryName%2Casc",
+                token=token,
+            ),
+            (200,), "query paged READY voice task items",
+        ).json()
+        require(int(ready_page.get("totalElements", -1)) == 2,
+                "paged voice task query must report full READY total")
+        require(int(ready_page.get("totalPages", -1)) == 2,
+                "paged voice task query totalPages mismatch")
+        ready_items = ready_page.get("items") or []
+        require(len(ready_items) == 1 and ready_items[0].get("packageId") == first.get("id"),
+                "paged voice task query did not return lexically first READY package")
+
+        ready_detail = expect(
+            http(base_url, "GET",
+                 f"/api/v1/voice-task-items/{first['id']}", token=token),
+            (200,), "get READY voice task detail",
+        ).json()
+        require((ready_detail.get("item") or {}).get("displayStatus") == "READY",
+                "voice task detail must expose READY display status")
+        require(len(ready_detail.get("files") or []) == 2,
+                "voice task detail must expose source material files")
+
         auto_first = expect(
             http(base_url, "POST",
                  f"/api/v1/students/{student_id}/voice-material-packages/auto-create-next",
@@ -412,11 +439,58 @@ def main() -> int:
             ["chinese-voice.mp3", "chinese-scene.png"])
         assert_downloads(base_url, token, first_resources, "first assignment")
 
-        # Manual creation is independent of daily AUTO quota and can consume another READY package.
+        active_page = expect(
+            http(
+                base_url, "GET",
+                f"/api/v1/voice-task-items?studentId={quote(student_id)}"
+                "&status=ACTIVE&page=0&size=20",
+                token=token,
+            ),
+            (200,), "query ACTIVE voice task items",
+        ).json()
+        active_items = active_page.get("items") or []
+        require(len(active_items) == 1 and active_items[0].get("packageId") == first.get("id"),
+                "ACTIVE voice task query must return current assignment")
+        require(bool(active_items[0].get("taskName")),
+                "ACTIVE voice task query must expose actual Assignment title")
+
+        create_payload = {
+            "studentId": student_id,
+            "expectedMinutes": 15,
+            "dueAtEpochMs": 0,
+            "dueText": "",
+        }
+        expect(
+            http(base_url, "POST",
+                 f"/api/v1/voice-material-packages/{second['id']}/create-assignment",
+                 token=token, payload=create_payload),
+            (409,), "reject second manual voice task while an active task exists",
+        )
+
+        # Once the current task is removed, its source folder becomes USED_BEFORE and
+        # another READY folder may be used to create the next manual voice task.
+        expect(
+            http(base_url, "DELETE", f"/api/v1/assignments/{first_assignment_id}", token=token),
+            (200, 204), "delete first voice assignment before manual next task",
+        )
+
+        used_before = expect(
+            http(
+                base_url, "GET",
+                f"/api/v1/voice-task-items?studentId={quote(student_id)}"
+                "&status=USED_BEFORE&page=0&size=20",
+                token=token,
+            ),
+            (200,), "query USED_BEFORE voice task items",
+        ).json()
+        used_items = used_before.get("items") or []
+        require(any(item.get("packageId") == first.get("id") for item in used_items),
+                "deleted voice task source must be exposed as USED_BEFORE")
+
         manual = expect(
             http(base_url, "POST",
                  f"/api/v1/voice-material-packages/{second['id']}/create-assignment",
-                 token=token),
+                 token=token, payload=create_payload),
             (200,), "manual create second voice task",
         ).json()
         require(manual.get("created") is True, "manual package creation must create READY package")
@@ -429,7 +503,7 @@ def main() -> int:
         manual_retry = expect(
             http(base_url, "POST",
                  f"/api/v1/voice-material-packages/{second['id']}/create-assignment",
-                 token=token),
+                 token=token, payload=create_payload),
             (200,), "manual create idempotent retry",
         ).json()
         require(manual_retry.get("created") is False,
@@ -442,13 +516,10 @@ def main() -> int:
             ["math-voice.mp3", "math-scene.png"])
         assert_downloads(base_url, token, second_resources, "second assignment before shared delete")
 
-        # Both packages uploaded identical media bytes, so MediaAsset dedup should share the
-        # physical files. Deleting one unfinished Assignment must not remove media for the other.
-        expect(
-            http(base_url, "DELETE", f"/api/v1/assignments/{first_assignment_id}", token=token),
-            (200, 204), "delete first shared-media assignment",
-        )
-        assert_downloads(base_url, token, second_resources, "second assignment after shared delete")
+        # Both packages uploaded identical media bytes. The first Assignment was already
+        # deleted before creating the second one; shared MediaAsset files must still be available.
+        assert_downloads(base_url, token, second_resources,
+                         "second assignment after first shared-media assignment delete")
 
         final_packages = expect(
             http(base_url, "GET",
