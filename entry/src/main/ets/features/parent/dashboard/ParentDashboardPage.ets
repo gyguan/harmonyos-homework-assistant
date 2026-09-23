@@ -1,6 +1,5 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { AssignmentMetricSummary } from '../../../components/assignment/AssignmentMetricSummary';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, StudentProfile } from '../../../domain/model/HomeworkModels';
@@ -96,10 +95,6 @@ export struct ParentDashboardPage {
     } else {
       this.onOpenProgress();
     }
-  }
-
-  private openRecentActivity(item: Assignment): void {
-    this.onOpenReview(item.id);
   }
 
   @Builder
@@ -205,72 +200,6 @@ export struct ParentDashboardPage {
       }
       .width('100%');
     }
-  }
-
-  @Builder
-  private RecentActivity() {
-    Column({ space: 9 }) {
-      Row() {
-        Text('最近动态')
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Blank();
-        Text('查看全部')
-          .fontSize(13)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.PRIMARY)
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 8, right: 4 })
-          .onClick(() => this.onOpenProgress());
-      }
-      .width('100%');
-
-      if (this.assignments().length === 0) {
-        Text('还没有发布作业')
-          .width('100%')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT)
-          .padding({ top: 18, bottom: 18 })
-          .textAlign(TextAlign.Center);
-      } else {
-        Column({ space: 6 }) {
-          ForEach(this.assignments().slice(0, 3), (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              showChevron: true,
-              onOpen: () => this.openRecentActivity(item)
-            });
-          }, (item: Assignment) => item.id);
-        }
-        .width('100%');
-      }
-
-      if (this.viewModel.recentSubmitted() !== null) {
-        Row({ space: 8 }) {
-          SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
-            .fontSize(18)
-            .fontColor([AppTheme.SUCCESS]);
-          Text('最近提交')
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT);
-          Text(`${this.viewModel.recentSubmitted()!.subject} · ${this.viewModel.recentSubmitted()!.title}`)
-            .layoutWeight(1)
-            .fontSize(13)
-            .fontColor(AppTheme.TEXT)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis });
-        }
-        .width('100%')
-        .padding({ left: 11, right: 11, top: 9, bottom: 9 })
-        .backgroundColor(AppTheme.SUCCESS_SOFT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('查看最近提交')
-        .onClick(() => this.onOpenReview(this.viewModel.recentSubmitted()!.id));
-      }
-    }
-    .width('100%');
   }
 
   @Builder
@@ -478,7 +407,6 @@ export struct ParentDashboardPage {
         Column({ space: AppTheme.PHONE_SECTION_GAP }) {
           this.TodayOverview();
           this.AttentionSection();
-          this.RecentActivity();
           this.QuickActions();
         }
         .width('100%')
@@ -501,7 +429,6 @@ export struct ParentDashboardPage {
         Column({ space: 18 }) {
           this.TodayOverview();
           this.AttentionSection();
-          this.RecentActivity();
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
