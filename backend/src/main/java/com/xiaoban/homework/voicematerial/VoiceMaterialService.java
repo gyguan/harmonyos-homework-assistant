@@ -159,7 +159,7 @@ public class VoiceMaterialService {
   }
 
   @Transactional
-  public VoiceMaterialDtos.BatchResponse completeBatch(UUID familyId, UUID batchId) {
+  public VoiceMaterialDtos.CompleteResponse completeBatch(UUID familyId, UUID batchId) {
     String studentId = batches.findOwnedStudentId(familyId, batchId)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音素材批次不存在"));
     students.requireOwnedForUpdate(familyId, studentId);
@@ -217,7 +217,16 @@ public class VoiceMaterialService {
     batch.invalidCount = invalid;
     batch.updatedAt = Instant.now();
     batches.save(batch);
-    return VoiceMaterialDtos.BatchResponse.from(batch);
+
+    List<VoiceMaterialDtos.PackageResult> results = items.stream()
+        .map(item -> new VoiceMaterialDtos.PackageResult(
+            item.id.toString(),
+            item.batchId.toString(),
+            item.directoryName,
+            item.status,
+            item.errorMessage == null ? "" : item.errorMessage))
+        .toList();
+    return VoiceMaterialDtos.CompleteResponse.from(batch, results);
   }
 
   @Transactional(readOnly = true)
