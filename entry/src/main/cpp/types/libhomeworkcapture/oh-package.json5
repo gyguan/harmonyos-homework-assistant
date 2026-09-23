@@ -1,6 +1,0 @@
-{
-  "name": "libhomeworkcapture.so",
-  "version": "1.0.0",
-  "description": "Native AVScreenCapture bridge used only by issue #241 feasibility spike.",
-  "types": "./index.d.ts"
-}
