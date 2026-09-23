@@ -9,6 +9,7 @@ import {
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
+import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import { ParentVoiceMaterialViewModel } from './ParentVoiceMaterialViewModel';
 
 const VOICE_SUBJECT_CODES: string[] = ['CHINESE', 'MATH', 'ENGLISH', 'OTHER'];
