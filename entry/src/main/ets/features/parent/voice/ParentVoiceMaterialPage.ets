@@ -701,41 +701,42 @@ export struct ParentVoiceMaterialPage {
     Stack({ alignContent: Alignment.Bottom }) {
       Column() {
         Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
-        DeepPageHeader({
-          title: '语音素材库',
-          backAccessibilityText: '返回家长首页',
-          onBack: () => this.onBack()
-        });
+          DeepPageHeader({
+            title: '语音素材库',
+            backAccessibilityText: '返回家长首页',
+            onBack: () => this.onBack()
+          });
 
-        Scroll() {
-          Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-            this.DefaultSettings();
-            this.PendingSection();
-            this.Feedback();
-            Divider().color(AppTheme.DIVIDER);
-            this.LibrarySection();
+          Scroll() {
+            Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+              this.DefaultSettings();
+              this.PendingSection();
+              this.Feedback();
+              Divider().color(AppTheme.DIVIDER);
+              this.LibrarySection();
+            }
+            .width('100%')
+            .padding({ bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
           }
           .width('100%')
-          .padding({ bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
+          .layoutWeight(1)
+          .align(Alignment.TopStart)
+          .scrollBar(BarState.Off);
         }
         .width('100%')
-        .layoutWeight(1)
-        .align(Alignment.TopStart)
-        .scrollBar(BarState.Off);
+        .height('100%')
+        .constraintSize({ maxWidth: AppTheme.PARENT_REVIEW_READABLE_MAX_WIDTH })
+        .padding({
+          left: AppTheme.PAGE_PADDING,
+          right: AppTheme.PAGE_PADDING,
+          top: AppTheme.DEEP_PAGE_TOP_PADDING
+        });
       }
       .width('100%')
       .height('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_REVIEW_READABLE_MAX_WIDTH })
-      .padding({
-        left: AppTheme.PAGE_PADDING,
-        right: AppTheme.PAGE_PADDING,
-        top: AppTheme.DEEP_PAGE_TOP_PADDING
-      });
-    }
-        .width('100%')
-        .height('100%')
-        .alignItems(HorizontalAlign.Center)
-        .backgroundColor(AppTheme.BACKGROUND);
+      .alignItems(HorizontalAlign.Center)
+      .backgroundColor(AppTheme.BACKGROUND);
+
       if (this.createPackageId.length > 0) {
         this.CreateAssignmentSheet();
       }
