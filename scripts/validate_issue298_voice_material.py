@@ -52,6 +52,9 @@ require("uq_voice_material_task_link_request" in link_migration,
         "manual folder assignment creation must support request idempotency")
 require("update voice_material_package" in link_migration and "status = 'READY'" in link_migration,
         "legacy consumed folders must migrate back to reusable READY state")
+require("uq_voice_material_auto_daily" in asset_migration and
+        "unique (family_id, student_id, business_date)" in asset_migration,
+        "database must enforce at most one automatic voice creation record per student per business day")
 
 # Manual creation and automatic creation have different concurrency rules.
 require("VoiceMaterialTaskLinkRepository links" in assignment_service and
@@ -69,6 +72,15 @@ auto_block = assignment_service.split("public VoiceMaterialDtos.AutoCreateRespon
 require(len(auto_block) == 2 and
         "assignments.findFirstVoiceMaterialTask(familyId, studentId)" in auto_block[1],
         "automatic creation must stop when an effective voice task already exists")
+if len(auto_block) == 2:
+    auto_body = auto_block[1].split("private VoiceMaterialPackageEntity chooseAutoFolder", 1)[0]
+    require("todayRecord" in auto_body and
+            "autoRecords.findByFamilyIdAndStudentIdAndBusinessDate" in auto_body and
+            "if (todayRecord != null)" in auto_body,
+            "automatic creation must stop after the first automatic creation of the business day")
+    require("new VoiceMaterialAutoCreateRecordEntity()" in auto_body and
+            "orElseGet(VoiceMaterialAutoCreateRecordEntity::new)" not in auto_body,
+            "daily automatic creation record must be one-shot and must not be overwritten")
 require('String assignmentId = "a-voice-" + UUID.randomUUID()' in assignment_service,
         "folder reuse must create a distinct Assignment instance")
 require("link.packageId = item.id" in assignment_service and
@@ -137,6 +149,7 @@ for token in [
     "manual create while auto task active",
     "auto skip while active voice tasks exist",
     "auto skip while manual task remains active",
+    "enforce daily auto-create limit after all tasks cleared",
     "create parallel manual task from same folder",
     "manual create idempotent retry",
 ]:
