@@ -393,8 +393,7 @@ async function uploadSelected() {
     }
 
     const completed = await completeVoiceMaterialBatch(batch.id);
-    const batchPackages = await listVoiceMaterialPackages(studentSelect.value);
-    const results = batchPackages.filter(item => item.batchId === batch.id);
+    const results = completed.packages || [];
     const failedResults = results.filter(item => item.status === 'INVALID');
     const failures = failedResults.length + registrationFailures;
 
@@ -411,8 +410,7 @@ async function uploadSelected() {
       failures === 0
     );
 
-    state.importedPackages = batchPackages;
-    renderImportedPackages();
+    await loadImportedPackages();
 
     if (completed.readyCount > 0) {
       const successfulKeys = new Set(
