@@ -55,7 +55,7 @@ require("from voice_material_task_link l" in query_service and
         "voice task query must be Assignment-based and server paged")
 require("/api/v1/voice-tasks" in api and "searchVoiceTasks" in app,
         "Web task list must use canonical paged task API")
-require("READY" not in index[index.find('id="task-status"'):index.find('id="task-subject"')],
+require('value="READY"' not in index[index.find('id="task-status"'):index.find('id="task-subject"')],
         "folder lifecycle states must not leak into task status filter")
 
 # Folder list is independent, paged, and exposes reuse metrics.

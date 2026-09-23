@@ -10,6 +10,31 @@ on:
       - 'refactor/**'
 
 jobs:
+  validate-admin-voice:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Web admin voice management
+        run: |
+          python scripts/validate_admin_login.py
+          python scripts/validate_admin_voice_material_import.py
+          node --check backend/src/main/resources/static/admin/js/login-shell.js
+          node --check backend/src/main/resources/static/admin/js/api.js
+          node --check backend/src/main/resources/static/admin/js/voice-material.js
+          node --check backend/src/main/resources/static/admin/js/app.js
+
   validate-project-invariants:
     runs-on: ubuntu-latest
     steps:
