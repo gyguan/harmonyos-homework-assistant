@@ -72,6 +72,8 @@ struct Index {
       } else {
         AppShell({
           role: this.selectedRole,
+          onSwitchParent: () => this.enterParent(),
+          onSwitchStudent: (studentId: string) => this.enterStudent(studentId),
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
         });
       }
