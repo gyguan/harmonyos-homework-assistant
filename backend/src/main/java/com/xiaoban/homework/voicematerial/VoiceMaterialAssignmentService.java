@@ -42,6 +42,14 @@ public class VoiceMaterialAssignmentService {
   }
 
   @Transactional
+  public VoiceMaterialDtos.CreateAssignmentResponse createManually(UUID familyId, UUID packageId) {
+    String studentId = packages.findOwnedStudentId(familyId, packageId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
+    return createManually(familyId, packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest(studentId, null, 0L, ""));
+  }
+
+  @Transactional
   public VoiceMaterialDtos.CreateAssignmentResponse createManually(
       UUID familyId, UUID packageId, VoiceMaterialDtos.CreateAssignmentRequest input) {
     String studentId = packages.findOwnedStudentId(familyId, packageId)
