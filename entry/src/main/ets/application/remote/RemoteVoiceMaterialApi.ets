@@ -189,6 +189,7 @@ export class RemoteVoiceMaterialApi {
     }
     let params: string[] = [
       `studentId=${encodeURIComponent(studentId)}`,
+      'status=READY',
       `usage=${encodeURIComponent(usage)}`,
       `page=${Math.max(0, page)}`,
       `size=${Math.max(1, Math.min(100, size))}`,
