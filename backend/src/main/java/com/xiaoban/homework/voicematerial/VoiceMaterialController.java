@@ -95,8 +95,9 @@ public class VoiceMaterialController {
   @PostMapping("/voice-material-packages/{packageId}/create-assignment")
   public VoiceMaterialDtos.CreateAssignmentResponse createAssignment(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable UUID packageId) {
-    return assignments.createManually(familyId, packageId);
+      @PathVariable UUID packageId,
+      @Valid @RequestBody VoiceMaterialDtos.CreateAssignmentRequest request) {
+    return assignments.createManually(familyId, packageId, request);
   }
 
   @PostMapping("/students/{studentId}/voice-material-packages/auto-create-next")
