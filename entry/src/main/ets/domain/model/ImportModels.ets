@@ -95,3 +95,9 @@ export interface HomeworkImageImportResult {
   recognizedText: string;
   organizerMode: HomeworkOrganizerMode;
 }
+
+export interface HomeworkImageTextResult {
+  selected: boolean;
+  recognizedText: string;
+  imageRef: string;
+}
