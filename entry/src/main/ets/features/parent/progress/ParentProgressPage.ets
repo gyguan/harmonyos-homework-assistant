@@ -452,6 +452,7 @@ export struct ParentProgressPage {
         }
       }
       .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
       .alignItems(VerticalAlign.Center);
 
       this.StatusSummary();
