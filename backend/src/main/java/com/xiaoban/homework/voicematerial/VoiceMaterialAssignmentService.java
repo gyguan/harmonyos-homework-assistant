@@ -111,17 +111,6 @@ public class VoiceMaterialAssignmentService {
     students.requireOwnedForUpdate(familyId, studentId);
     LocalDate businessDate = LocalDate.now(BUSINESS_ZONE);
 
-    VoiceMaterialAutoCreateRecordEntity dailyRecord =
-        autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
-            familyId, studentId, businessDate).orElse(null);
-    if (dailyRecord != null) {
-      AssignmentDtos.Response previous =
-          loadAssignmentIfPresent(familyId, dailyRecord.assignmentId);
-      return new VoiceMaterialDtos.AutoCreateResponse(
-          false, businessDate.toString(), dailyRecord.packageId.toString(),
-          dailyRecord.assignmentId, previous);
-    }
-
     AssignmentDtos.Response current =
         assignments.findFirstVoiceMaterialTask(familyId, studentId);
     if (current != null) {
@@ -143,14 +132,15 @@ public class VoiceMaterialAssignmentService {
     Instant dailyDueAt = item.dueAt == null
         ? businessDate.atTime(LocalTime.of(23, 59)).atZone(BUSINESS_ZONE).toInstant()
         : null;
-    String requestId = "AUTO:" + studentId + ":" + businessDate;
     AssignmentDtos.Response assignment = createFromFolder(
         familyId, item, item.studentId, item.expectedMinutes, dailyDueAt,
         item.dueAt == null ? "今天" : "", businessDate,
-        "", requestId, "AUTO");
+        "", "", "AUTO");
 
-    VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
-    record.id = UUID.randomUUID();
+    VoiceMaterialAutoCreateRecordEntity record =
+        autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+            familyId, studentId, businessDate).orElseGet(VoiceMaterialAutoCreateRecordEntity::new);
+    if (record.id == null) record.id = UUID.randomUUID();
     record.familyId = familyId;
     record.studentId = studentId;
     record.businessDate = businessDate;
