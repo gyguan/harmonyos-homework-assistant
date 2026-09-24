@@ -26,7 +26,7 @@ export struct ParentAccessDialog {
           label: '关闭',
           kind: TextActionKind.NEUTRAL,
           accessibilityLabel: '关闭家长身份验证',
-          onAction: () => this.controller.close()
+          onAction: (): void => this.controller.close()
         });
       }
       .width('100%');
@@ -52,7 +52,7 @@ export struct ParentAccessDialog {
 
       ActionButton({
         label: '进入家长模式',
-        onAction: () => this.onConfirm()
+        onAction: (): void => this.onConfirm()
       })
       .width('100%');
     }
