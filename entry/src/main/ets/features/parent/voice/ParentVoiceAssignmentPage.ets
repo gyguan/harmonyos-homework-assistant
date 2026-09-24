@@ -221,8 +221,7 @@ export struct ParentVoiceAssignmentPage {
     this.messageError = false;
     try {
       let draft: VoiceAssignmentDraft = {
-        subject: this.sourceMode === VOICE_SOURCE_SERVER && this.selectedFolder() !== null ?
-          this.viewModel.subjectFromCode(this.selectedFolder()!.subjectCode) : this.subject,
+        subject: this.subject,
         title: taskTitle,
         instruction: taskInstruction,
         dueAtEpochMs: dueAt,
