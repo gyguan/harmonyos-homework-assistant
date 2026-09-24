@@ -740,7 +740,7 @@ export struct ParentVoiceAssignmentPage {
       }
       .width('100%')
       .height('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_REVIEW_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
       .padding({
         left: AppTheme.PAGE_PADDING,
         right: AppTheme.PAGE_PADDING,
