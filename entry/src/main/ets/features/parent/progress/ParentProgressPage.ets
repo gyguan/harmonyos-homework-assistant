@@ -170,7 +170,7 @@ export struct ParentProgressPage {
     Column({ space: 16 }) {
       Text('删除作业')
         .width('100%')
-        .fontSize(20)
+        .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.TEXT);
       Text(`确定删除选中的 ${this.selectedDeleteIds.length} 项未完成作业？删除后无法恢复。`)
