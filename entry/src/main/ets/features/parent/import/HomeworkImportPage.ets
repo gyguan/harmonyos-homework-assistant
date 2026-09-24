@@ -299,7 +299,7 @@ export struct HomeworkImportPage {
     }
     .width('100%')
     .padding(AppTheme.PHONE_CARD_PADDING)
-    .backgroundColor(AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .borderRadius(AppTheme.PHONE_CARD_RADIUS);
   }
 
