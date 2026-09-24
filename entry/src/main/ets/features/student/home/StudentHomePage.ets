@@ -283,8 +283,8 @@ export struct StudentHomePage {
       this.TodayTasks();
     }
     .width('100%')
-    .constraintSize({ maxWidth: AppTheme.HOME_READABLE_MAX_WIDTH })
-    .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
+    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+    .padding({ left: AppTheme.PAGE_PADDING_COMPACT, right: AppTheme.PAGE_PADDING_COMPACT, top: 14, bottom: 20 });
   }
 
   @Builder
@@ -334,8 +334,8 @@ export struct StudentHomePage {
       }
     }
     .width('100%')
-    .constraintSize({ maxWidth: AppTheme.HOME_PAD_CONTENT_MAX_WIDTH })
-    .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 24 });
+    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
+    .padding({ left: AppTheme.PAGE_PADDING_EXPANDED, right: AppTheme.PAGE_PADDING_EXPANDED, top: 18, bottom: 24 });
   }
 
   build() {
