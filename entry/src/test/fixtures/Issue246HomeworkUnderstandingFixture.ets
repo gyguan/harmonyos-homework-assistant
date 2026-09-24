@@ -63,7 +63,7 @@ export class Issue246HomeworkUnderstandingFixture {
         `issue246-${fixtureCase.id}`,
         'student-fixture',
         `#246 Fixture ${fixtureCase.id}`,
-        `${HomeworkImportSourceType.SCREEN_CAPTURE}`,
+        `${HomeworkImportSourceType.CLIPBOARD}`,
         messages,
         this.config());
 
@@ -390,9 +390,8 @@ export class Issue246HomeworkUnderstandingFixture {
         text: values[i].text,
         attachments: [],
         sourceEvidence: {
-          sourceType: HomeworkImportSourceType.SCREEN_CAPTURE,
+          sourceType: HomeworkImportSourceType.CLIPBOARD,
           sourceMessageIds: [id],
-          sourceFrameEvidenceIds: [`${caseId}-frame-${i + 1}`],
           rawText: values[i].text,
           imageRef: '',
           capturedAtEpochMs: 1790000000000 + i * 60000
