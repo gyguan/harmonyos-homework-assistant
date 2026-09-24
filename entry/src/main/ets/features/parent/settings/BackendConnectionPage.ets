@@ -516,7 +516,7 @@ export struct BackendConnectionPage {
       Row() {
         Column({ space: 3 }) {
           Text('家庭')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text('孩子资料和教材信息')
@@ -551,7 +551,7 @@ export struct BackendConnectionPage {
       Row() {
         Column({ space: 3 }) {
           Text('家长保护')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text('限制学生误进入家长操作')
@@ -586,7 +586,7 @@ export struct BackendConnectionPage {
       Row() {
         Column({ space: 3 }) {
           Text('AI 辅导规则')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text('设置小伴的讲解和答案规则')
@@ -621,7 +621,7 @@ export struct BackendConnectionPage {
       Row() {
         Column({ space: 3 }) {
           Text('数据与同步')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text('家庭云端和数据同步')
