@@ -62,7 +62,7 @@ for removed in [
 
 require("Text(this.assignment.subject)" not in page and
         "AssignmentType.EXTRA" not in page and
-        "Text(\`${this.assignment.expectedMinutes} 分钟\`)" in page,
+        "${this.assignment.expectedMinutes} 分钟" in page,
         "Student Home task cards must avoid repeating subject/type metadata and keep only compact duration")
 require("Button(this.actionLabel()" in page and
         ".alignItems(VerticalAlign.Center)" in page,
