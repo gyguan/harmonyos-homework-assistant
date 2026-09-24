@@ -158,7 +158,7 @@ export struct PracticePaperDetailPage {
           TextAction({
             label: '查看全部',
             accessibilityLabel: '查看当前套卷全部练习记录',
-            onAction: () => this.onOpenHistory(this.paperId)
+            onAction: (): void => this.onOpenHistory(this.paperId)
           });
         }
       }
@@ -302,7 +302,7 @@ export struct PracticePaperDetailPage {
           ActionButton({
             label: this.starting ? '正在开始…' : '开始练习',
             isEnabled: !this.starting,
-            onAction: () => void this.start()
+            onAction: (): void => void this.start()
           })
           .width('100%');
         }
