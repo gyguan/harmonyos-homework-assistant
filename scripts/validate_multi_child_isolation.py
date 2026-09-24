@@ -103,16 +103,18 @@ require("this.queryCache = [];" in assignment_repository and
         "this.remoteSummary = null;" in assignment_repository,
         "Repository refresh must clear previous-child in-memory caches synchronously")
 
-# Parent Home reads the active child through repository/family context and re-renders from the shared
-# repository revision. The visible child identity belongs to AppShell's persistent FamilyContextBar.
-require("@Prop revision: number = 0;" in parent_home and "private touchRevision(): number" in parent_home,
-        "Parent Home must subscribe to shared repository revision instead of duplicating activeStudentId")
-require("revision: this.storeRevision" in app_shell and "this.storeRevision++;" in app_shell,
-        "child switching must invalidate repository-backed parent home content")
-require("@Prop activeStudentId" not in parent_home,
-        "Parent Home must not keep a second active-child identity prop")
+# Parent Dashboard is intentionally an action-only surface. Child identity belongs to AppShell,
+# while repository-backed parent data surfaces consume the shared revision.
+require("@Prop activeStudentId" not in parent_home and
+        "DefaultAssignmentRepository" not in parent_home and
+        "DefaultFamilyContextRepository" not in parent_home,
+        "action-only Parent Dashboard must not own a second child or repository state")
+require("ParentProgressPage({" in app_shell and
+        "revision: this.storeRevision" in app_shell and
+        "this.storeRevision++;" in app_shell,
+        "child switching must invalidate repository-backed parent data surfaces")
 require("IdentityContextBar" in app_shell and "currentStudent()" in app_shell,
-        "Persistent identity context surface must own the visible current-child identity")
+        "persistent identity context surface must own the visible current-child identity")
 
 if errors:
     print("MULTI_CHILD_ISOLATION_GATE_FAIL")
