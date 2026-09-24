@@ -331,7 +331,7 @@ export struct StudentHomePage {
       .alignItems(VerticalAlign.Top);
 
       if (this.actionMessage.length > 0) {
-        Text(this.actionMessage).width('100%').fontSize(13).fontColor(AppTheme.WARNING);
+        Text(this.actionMessage).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.WARNING);
       }
     }
     .width('100%')
