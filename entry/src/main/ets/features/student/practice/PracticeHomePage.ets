@@ -385,7 +385,7 @@ export struct PracticeHomePage {
           this.PaperList();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding(AppTheme.PAGE_PADDING);
       }
       .width('100%')
