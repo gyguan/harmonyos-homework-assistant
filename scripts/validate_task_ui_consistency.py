@@ -45,26 +45,24 @@ require("AssignmentDueDate.displayText(this.assignment)" in list_item and
 require("Text(this.assignment.dueText)" not in list_item,
         "assignment list item must not show raw relative due text")
 
-# 2. Parent Home is action-only; Progress owns the unified interactive metrics.
-for token in ["全部任务", "待完成", "待验收", "已完成"]:
-    require(token in metrics, f"shared assignment metric component missing: {token}")
+# 2. Parent Home and Progress stay compact: navigation already names the surface.
 require("AssignmentMetricSummary({" not in home and "今天的学习" not in home and "需要我处理" not in home,
         "parent home must stay action-only without progress metrics or attention sections")
 for phrase in ["布置作业", "语音作业", "作业收件箱"]:
     require(phrase in home, f"parent home missing required primary action: {phrase}")
-require("AssignmentMetricSummary({" in progress and "private metricAssignments(): Assignment[]" in progress and
-        "@State private scopedAssignments: Assignment[] = []" in progress,
-        "parent progress metrics and list must share one scoped assignment snapshot")
-require("this.subjectCode" in progress and "this.selectedDayEpochMs" in progress,
-        "parent progress metric scope must follow the same date and subject filters as the list")
-require("interactive: true" in progress and "onSelect: (key: AssignmentMetricKey)" in progress and
-        "this.applyItems(this.filterByStatus(this.scopedAssignments))" in progress,
-        "parent progress metric clicks must filter the same query snapshot")
-require("Text(`${this.viewModel.student().name}" not in progress,
-        "parent progress title must not duplicate the global student context")
-require("Text(this.bulkMode ? '完成' : '管理')" in progress and
-        ".constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })" in progress,
-        "parent progress title row must keep stable height when management action appears or disappears")
+require("Text('家长操作')" not in home and "private PageIntro()" not in home,
+        "parent home must not repeat a page title already expressed by primary navigation")
+require("AssignmentMetricSummary" not in progress and "StatusSummary" not in progress and
+        "AssignmentMetricKey" not in progress,
+        "parent progress must not restore summary metric cards or metric-driven status filtering")
+require("@State private scopedAssignments: Assignment[] = []" in progress and
+        "this.applyItems(this.scopedAssignments)" in progress,
+        "parent progress list must render directly from the active date/subject scope")
+require("Text('作业进度')" not in progress and
+        "Text(this.bulkMode ? '完成' : '删除')" in progress,
+        "parent progress must remove its duplicate page title and expose a clear delete action near the list")
+require("可以调整日期或科目。" in progress,
+        "parent progress empty state must match the remaining filter dimensions")
 
 # 3/4. Parent and student share one date+subject query model, while each surface may
 # expose the common choices differently.
