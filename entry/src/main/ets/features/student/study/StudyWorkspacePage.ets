@@ -443,7 +443,7 @@ export struct StudyWorkspacePage {
         }
       }
       .width('100%')
-      .padding(13)
+      .padding(AppTheme.CARD_PADDING_COMPACT)
       .backgroundColor(AppTheme.SUCCESS_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS);
     }
