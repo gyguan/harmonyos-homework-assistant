@@ -71,6 +71,7 @@ export struct AppShell {
   @State private storeRevision: number = 0;
   @State private activeStudentId: string = '';
   @State private familyStudents: StudentProfile[] = [];
+  @State private identityParentActive: boolean = false;
   @StorageLink('shareImportToken') private shareImportToken: string = '';
   onSwitchParent: () => void = () => {};
   onSwitchStudent: (studentId: string) => void = (_studentId: string) => {};
@@ -82,7 +83,7 @@ export struct AppShell {
     builder: IdentitySwitcherDialog({
       students: $familyStudents,
       activeStudentId: $activeStudentId,
-      parentActive: this.role === AppRole.PARENT,
+      parentActive: $identityParentActive,
       onSelectParent: () => this.switchToParent(),
       onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
     }),
@@ -95,7 +96,7 @@ export struct AppShell {
     builder: IdentitySwitcherDialog({
       students: $familyStudents,
       activeStudentId: $activeStudentId,
-      parentActive: this.role === AppRole.PARENT,
+      parentActive: $identityParentActive,
       onSelectParent: () => this.switchToParent(),
       onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
     }),
@@ -180,6 +181,7 @@ export struct AppShell {
   }
 
   private openIdentitySwitcher(): void {
+    this.identityParentActive = this.role === AppRole.PARENT;
     if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideIdentitySwitcherController.open();
     else this.phoneIdentitySwitcherController.open();
   }
@@ -187,18 +189,14 @@ export struct AppShell {
   private switchToParent(): void {
     if (this.role === AppRole.PARENT) return;
     this.resetPersonaNavigation();
-    this.storeRevision++;
     this.onSwitchParent();
   }
 
   private switchToStudent(studentId: string): void {
-    if (studentId.length === 0) return;
-    if (!this.familyContext.setActiveStudent(studentId)) return;
+    if (studentId.length === 0 ||
+      (this.role === AppRole.STUDENT && studentId === this.activeStudentId)) return;
     this.resetPersonaNavigation();
-    this.syncFamilyContext();
-    this.storeRevision++;
     this.onSwitchStudent(studentId);
-    void this.refreshActiveStudent();
   }
 
   private openStudentSwitcher(): void {
