@@ -506,7 +506,7 @@ export struct StudentAssignmentsPage {
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
-        .padding(AppTheme.PAGE_PADDING);
+        .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: AppTheme.PAGE_PADDING_COMPACT, bottom: AppTheme.PAGE_PADDING_COMPACT });
       }
       .width('100%')
       .justifyContent(FlexAlign.Start)
