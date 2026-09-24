@@ -187,8 +187,8 @@ export struct ParentDashboardPage {
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding({
-          left: AppTheme.PHONE_PAGE_PADDING,
-          right: AppTheme.PHONE_PAGE_PADDING,
+          left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+          right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
           top: 18,
           bottom: 24
         });
