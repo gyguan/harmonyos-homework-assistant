@@ -423,7 +423,7 @@ export struct ParentVoiceMaterialPage {
     .width('100%')
     .padding(AppTheme.CARD_PADDING_COMPACT)
     .backgroundColor(AppTheme.CARD_SURFACE)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
