@@ -5,9 +5,6 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
-NATIVE_RUNTIME = ROOT / "entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime.ets"
-CAPTURE_DIAGNOSTIC = ROOT / "entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets"
-CAPTURE_PAGE = ROOT / "entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
 PARENT_IMPORT_NAV = ROOT / "entry/src/main/ets/app/navigation/ParentImportNavigator.ets"
 APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
@@ -57,9 +54,6 @@ def validate_qualified_model_imports() -> None:
 def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
-    native_runtime = NATIVE_RUNTIME.read_text(encoding="utf-8")
-    capture_diagnostic = CAPTURE_DIAGNOSTIC.read_text(encoding="utf-8")
-    capture_page = CAPTURE_PAGE.read_text(encoding="utf-8")
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
     parent_import_nav = PARENT_IMPORT_NAV.read_text(encoding="utf-8")
     app_shell = APP_SHELL.read_text(encoding="utf-8")
@@ -129,23 +123,22 @@ def main() -> int:
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
 
-    require("libhomeworkcapture.so" in native_runtime,
-            "native capture library must be isolated behind NativeHomeworkCaptureRuntime")
-    require("libhomeworkcapture.so" not in capture_diagnostic,
-            "HomeworkCaptureDiagnosticPage must not import the native library directly")
     require("throw error;" not in share_receive,
             "share receive flow must only throw explicit Error values")
     require("this.openCapture(stack)" not in parent_import_nav,
             "static ParentImportNavigator methods must not dispatch through this")
-    for source, name in [
-        (capture_page, "HomeworkCapturePage"),
-        (capture_diagnostic, "HomeworkCaptureDiagnosticPage"),
-    ]:
-        require("floatView" not in source and "FLOAT_VIEW" not in source,
-                f"{name} must not depend on restricted floating-window APIs")
     for method in ["finishShareImportReady", "finishShareImportEmpty", "cancelShareImport"]:
         require(f"private {method}(): void" in app_shell,
                 f"AppShell missing typed share-import callback: {method}")
+
+    for retired_capture_path in [
+        "entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets",
+        "entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets",
+        "entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets",
+        "entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets",
+    ]:
+        require(not (ROOT / retired_capture_path).exists(),
+                f"retired screen-capture source must stay removed: {retired_capture_path}")
 
     validate_qualified_model_imports()
 
