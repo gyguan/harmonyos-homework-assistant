@@ -531,11 +531,6 @@ export struct BackendConnectionPage {
       Scroll() {
         Column() {
           Column({ space: 20 }) {
-            Column({ space: 4 }) {
-              Text('我的').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-            }
-            .width('100%').alignItems(HorizontalAlign.Start);
-
             Column({ space: 10 }) {
               this.SectionTitle('家庭', '孩子资料和教材信息');
               this.FamilySection();
