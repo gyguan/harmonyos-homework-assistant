@@ -95,8 +95,9 @@ require("normalizeSubject" in organizer_model and 'normalized.contains("语文")
         "AI organizer must normalize common provider subject labels before filtering")
 require("unsupportedValues" in organizer_model and "safeSubjectForLog" in organizer_model,
         "AI organizer must expose bounded unsupported subject values for diagnosis")
-require("subject 字段必须严格只填写语文、数学或英语之一" in organizer_model,
-        "AI organizer prompt must explicitly constrain subject to the supported vocabulary")
+require("subject 字段必须严格填写语文、数学、英语、阅读、朗读、体育、实践、兴趣、其他之一" in organizer_model and
+        'List.of("语文", "数学", "英语", "阅读", "朗读", "体育", "实践", "兴趣", "其他")' in organizer_model,
+        "AI organizer prompt/schema must explicitly constrain subject to the supported vocabulary")
 require("[AI] organizer parsed" in organizer_model and "unsupportedSubject" in organizer_model and
         "blankTitle" in organizer_model,
         "AI organizer must log privacy-safe conversion counts when model output is filtered")
@@ -137,8 +138,10 @@ require("HomeworkOrganizerRemoteApi.instance.organize" in import_service and
         "HomeworkOrganizerMode.AI" in import_service and "HomeworkOrganizerMode.LOCAL" in import_service and
         "this.pipeline.parse(extracted)" in import_service,
         "import pipeline must prefer cloud AI and preserve local parser fallback")
-require("AI 已整理出" in import_page and "本地规则" in import_page,
-        "parent import UI must make AI versus local fallback visible")
+require("已整理出 ${result.candidateCount} 项作业，请继续核对" in import_page and
+        "HomeworkOrganizerMode" not in import_page and
+        "AI 已整理出" not in import_page and "本地规则" not in import_page,
+        "parent import UI must keep AI/local fallback implementation-neutral while requiring user review")
 
 require("OncePerRequestFilter" in access_log and "request.getMethod()" in access_log and
         "request.getRequestURI()" in access_log and "response.getStatus()" in access_log and
