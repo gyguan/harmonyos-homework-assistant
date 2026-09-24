@@ -88,7 +88,7 @@ export struct IdentitySwitcherDialog {
           .width('100%')
           .constraintSize({ minHeight: 64 })
           .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-          .backgroundColor(this.parentActive ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+          .backgroundColor(AppTheme.CARD_SURFACE)
           .border({ width: 1, color: this.parentActive ? AppTheme.PRIMARY : AppTheme.BORDER })
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .accessibilityGroup(true)
@@ -139,8 +139,7 @@ export struct IdentitySwitcherDialog {
             .width('100%')
             .constraintSize({ minHeight: 64 })
             .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-            .backgroundColor(!this.parentActive && this.activeStudentId === student.id ?
-              AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+            .backgroundColor(AppTheme.CARD_SURFACE)
             .border({ width: 1,
               color: !this.parentActive && this.activeStudentId === student.id ?
                 AppTheme.PRIMARY : AppTheme.BORDER })
