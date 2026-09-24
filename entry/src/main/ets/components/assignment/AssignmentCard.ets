@@ -80,21 +80,23 @@ export struct AssignmentCard {
       Text(this.assignment.title)
         .width('100%')
         .fontSize(AppTheme.CARD_TITLE_SIZE)
+        .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT)
-        .maxLines(2);
+        .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+        .textOverflow({ overflow: TextOverflow.Ellipsis });
 
       Text(this.assignment.textbookRef)
         .width('100%')
-        .fontSize(13)
-        .lineHeight(19)
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT)
         .maxLines(2);
 
       if (this.assignment.status === AssignmentStatus.NEEDS_REWORK && this.assignment.reviewNote.length > 0) {
         Column({ space: 3 }) {
-          Text('家长订正说明').width('100%').fontSize(11).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
-          Text(this.assignment.reviewNote).width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.TEXT).maxLines(3);
+          Text('家长订正说明').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
+          Text(this.assignment.reviewNote).width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT).maxLines(3);
         }.width('100%').padding(10).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
       }
 
