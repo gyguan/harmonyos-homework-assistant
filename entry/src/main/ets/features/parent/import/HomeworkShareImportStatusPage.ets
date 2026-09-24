@@ -106,7 +106,7 @@ export struct HomeworkShareImportStatusPage {
         ActionButton({
           label: '取消导入',
           kind: ActionButtonKind.NEUTRAL,
-          size: ActionButtonSize.SMALL,
+          actionSize: ActionButtonSize.SMALL,
           onAction: (): void => { void this.cancel(); }
         })
         .width('100%');
@@ -114,7 +114,7 @@ export struct HomeworkShareImportStatusPage {
         ActionButton({
           label: '完成',
           kind: ActionButtonKind.NEUTRAL,
-          size: ActionButtonSize.SMALL,
+          actionSize: ActionButtonSize.SMALL,
           onAction: (): void => this.onCancel()
         })
         .width('100%');
