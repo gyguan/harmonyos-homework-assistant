@@ -70,8 +70,10 @@ export class HomeworkImportService {
       rawText: normalized
     };
     let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
-    let candidates = output.candidates.length > 0 ?
-      output.candidates : [this.fallbackCandidate(studentId, normalized, rawImport.sourceLabel)];
+    let candidates = output.candidates;
+    if (candidates.length === 0 && output.organizerMode === HomeworkOrganizerMode.LOCAL) {
+      candidates = [this.fallbackCandidate(studentId, normalized, rawImport.sourceLabel)];
+    }
     HomeworkImportInboxService.instance.commitParsedImport(
       rawImport,
       fromScreenshot ? HomeworkImportSourceType.SCREENSHOT : HomeworkImportSourceType.CLIPBOARD,
