@@ -111,7 +111,7 @@ export struct PracticeFilterDialog {
 
       ActionButton({
         label: '确定',
-        size: ActionButtonSize.MEDIUM,
+        actionSize: ActionButtonSize.MEDIUM,
         onAction: (): void => this.confirm()
       })
       .width('100%')
