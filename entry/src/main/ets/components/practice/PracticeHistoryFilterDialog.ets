@@ -88,7 +88,7 @@ export struct PracticeHistoryFilterDialog {
     Column() {
       Row() {
         Text('筛选练习记录')
-          .fontSize(20)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
