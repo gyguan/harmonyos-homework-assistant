@@ -315,7 +315,7 @@ export struct HomeworkConfirmationPage {
               ActionButton({
                 label: '取消',
                 kind: ActionButtonKind.NEUTRAL,
-                onAction: (): void => this.batchDeleteConfirm = false
+                onAction: (): void => { this.batchDeleteConfirm = false; }
               })
               .layoutWeight(1);
               ActionButton({
@@ -332,7 +332,7 @@ export struct HomeworkConfirmationPage {
                 `删除选中的 ${this.selectedCandidateIds.length} 项` : '请选择要删除的作业',
               kind: ActionButtonKind.DANGER,
               isEnabled: this.selectedCandidateIds.length > 0,
-              onAction: (): void => this.batchDeleteConfirm = true
+              onAction: (): void => { this.batchDeleteConfirm = true; }
             })
             .width('100%');
           }
