@@ -77,7 +77,7 @@ struct StudentTodayTaskCard {
       Column({ space: 5 }) {
         Text(this.assignment.title)
           .width('100%')
-          .fontSize(this.emphasized ? 18 : 16)
+          .fontSize(this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT)
           .maxLines(2)
