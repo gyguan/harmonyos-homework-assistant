@@ -901,7 +901,7 @@ export struct StudyWorkspacePage {
 
             ActionButton({
               label: this.tutorSending ? '发送中…' : '发送',
-              compact: true,
+              size: ActionButtonSize.SMALL,
               isEnabled: !this.tutorSending && this.tutorDraft.trim().length > 0,
               onAction: (): void => { void this.askTutor(); }
             })
