@@ -325,7 +325,7 @@ export struct PracticeHistoryPage {
           } else if (this.allAttempts.length === 0) {
             Column({ space: 7 }) {
               Text(this.isPaperScoped() ? '这套卷还没有练习记录' : '还没有练习记录')
-                .fontSize(16)
+                .fontSize(AppTheme.CARD_TITLE_SIZE)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
             }
@@ -336,7 +336,7 @@ export struct PracticeHistoryPage {
           } else if (this.attempts.length === 0) {
             Column({ space: 7 }) {
               Text('没有符合条件的练习记录')
-                .fontSize(15)
+                .fontSize(AppTheme.CARD_TITLE_SIZE)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
             }
