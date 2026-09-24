@@ -153,6 +153,7 @@ for retired_capture_path in [
     "entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets",
     "entry/src/main/ets/domain/port/HomeworkCaptureRuntime.ets",
     "entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkCaptureSessionPersistence.ets",
+    "entry/src/main/ets/domain/model/ChatReconstructionModels.ets",
 ]:
     require(not (ROOT / retired_capture_path).exists(),
             f"retired screen-capture code must not reappear: {retired_capture_path}")
