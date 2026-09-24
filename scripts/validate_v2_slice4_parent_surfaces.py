@@ -118,8 +118,8 @@ require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progr
         "StatusSummary" not in progress and "AssignmentMetricSummary" not in progress and
         "AssignmentMetricKey" not in progress,
         "Parent Progress must stay list-first without summary/status metric controls")
-require("Text('作业进度')" not in progress and "Text(this.bulkMode ? '完成' : '删除')" in progress,
-        "Parent Progress must remove duplicate root title and keep delete action beside the list summary")
+require("Text('作业进度')" not in progress and "Text(this.bulkMode ? '取消' : '删除')" in progress,
+        "Parent Progress must remove duplicate root title and keep delete/cancel beside the list summary")
 for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode", "Button('查询'"]:
     require(token in shared_filter, f"shared task query missing date+subject behavior: {token}")
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
