@@ -53,11 +53,12 @@ public class VoiceTaskQueryService {
 
     if (!normalizedStudent.isBlank()) students.requireOwned(familyId, normalizedStudent);
 
-    StringBuilder where = new StringBuilder(" where l.family_id = :familyId ");
+    StringBuilder where = new StringBuilder(
+        " where a.family_id = :familyId and a.content_type = 'AUDIO_IMAGE' ");
     MapSqlParameterSource params = new MapSqlParameterSource().addValue("familyId", familyId);
 
     if (!normalizedStudent.isBlank()) {
-      where.append(" and l.student_id = :studentId ");
+      where.append(" and a.student_id = :studentId ");
       params.addValue("studentId", normalizedStudent);
     }
     if (!normalizedStatus.isBlank()) {
@@ -80,7 +81,7 @@ public class VoiceTaskQueryService {
       where.append("""
            and (
              lower(a.title) like :keyword
-             or lower(p.directory_name) like :keyword
+             or lower(coalesce(p.directory_name, '本地上传')) like :keyword
            )
           """);
       params.addValue("keyword", "%" + normalizedKeyword + "%");
@@ -102,16 +103,16 @@ public class VoiceTaskQueryService {
     }
 
     String joins = """
-        from voice_material_task_link l
-        join assignment a
-          on a.id = l.assignment_id
-         and a.family_id = l.family_id
-        join voice_material_package p
-          on p.id = l.package_id
-         and p.family_id = l.family_id
+        from assignment a
         join student s
-          on s.id = l.student_id
-         and s.family_id = l.family_id
+          on s.id = a.student_id
+         and s.family_id = a.family_id
+        left join voice_material_task_link l
+          on l.assignment_id = a.id
+         and l.family_id = a.family_id
+        left join voice_material_package p
+          on p.id = l.package_id
+         and p.family_id = a.family_id
         """;
 
     Long totalValue = jdbc.queryForObject(
@@ -160,24 +161,32 @@ public class VoiceTaskQueryService {
           a.created_at as task_created_at,
           p.id as package_id,
           p.directory_name
-        from voice_material_task_link l
-        join assignment a
-          on a.id = l.assignment_id and a.family_id = l.family_id
-        join voice_material_package p
-          on p.id = l.package_id and p.family_id = l.family_id
+        from assignment a
         join student s
-          on s.id = l.student_id and s.family_id = l.family_id
-        where l.family_id = :familyId and l.assignment_id = :assignmentId
+          on s.id = a.student_id and s.family_id = a.family_id
+        left join voice_material_task_link l
+          on l.assignment_id = a.id and l.family_id = a.family_id
+        left join voice_material_package p
+          on p.id = l.package_id and p.family_id = a.family_id
+        where a.family_id = :familyId
+          and a.id = :assignmentId
+          and a.content_type = 'AUDIO_IMAGE'
         """;
     List<VoiceMaterialDtos.VoiceTaskItemResponse> found = jdbc.query(sql, params, this::mapTask);
     if (found.isEmpty()) throw new ApiExceptions.NotFound("语音任务不存在");
     VoiceMaterialDtos.VoiceTaskItemResponse item = found.get(0);
-    UUID packageId = UUID.fromString(item.packageId());
-    List<VoiceMaterialDtos.FileResponse> materialFiles =
-        files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(familyId, packageId)
-            .stream().map(file -> new VoiceMaterialDtos.FileResponse(
-                file.id.toString(), file.assetId.toString(), file.resourceType,
-                file.relativeName, file.sortOrder)).toList();
+
+    List<VoiceMaterialDtos.FileResponse> materialFiles = jdbc.query("""
+        select id, asset_id, resource_type, original_name, sort_order
+        from assignment_resource
+        where family_id = :familyId and assignment_id = :assignmentId
+        order by sort_order asc, created_at asc
+        """, params, (rs, rowNum) -> new VoiceMaterialDtos.FileResponse(
+            rs.getString("id"),
+            rs.getString("asset_id") == null ? "" : rs.getString("asset_id"),
+            rs.getString("resource_type"),
+            rs.getString("original_name"),
+            rs.getInt("sort_order")));
     return new VoiceMaterialDtos.VoiceTaskDetailResponse(item, materialFiles);
   }
 
@@ -305,13 +314,45 @@ public class VoiceTaskQueryService {
     if (!familyId.equals(folder.familyId)) throw new ApiExceptions.NotFound("语音文件夹不存在");
     students.requireOwned(familyId, folder.studentId);
 
-    VoiceMaterialDtos.VoiceFolderPageResponse page = queryFolders(
-        familyId, folder.studentId, "", "", folder.directoryName,
-        "", "", "ALL", 0, 100, "importedAt,desc");
-    VoiceMaterialDtos.VoiceFolderItemResponse item = page.items().stream()
-        .filter(candidate -> candidate.packageId().equals(packageId.toString()))
-        .findFirst()
-        .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
+    MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("familyId", familyId)
+        .addValue("packageId", packageId);
+    String usageSql = "(select count(*) from voice_material_task_link ul"
+        + " where ul.family_id = p.family_id and ul.package_id = p.id)";
+    String itemSql = """
+        select
+          p.id as package_id,
+          p.directory_name,
+        """ + folderStatusSql() + """
+          as folder_status,
+          p.student_id,
+          s.name as student_name,
+          p.subject_code,
+          p.expected_minutes,
+          (select count(*) from voice_material_file af
+            where af.family_id = p.family_id and af.package_id = p.id
+              and af.resource_type = 'AUDIO') as audio_count,
+          (select count(*) from voice_material_file imf
+            where imf.family_id = p.family_id and imf.package_id = p.id
+              and imf.resource_type = 'IMAGE') as image_count,
+          """ + usageSql + """
+          as usage_count,
+          (select count(*) from voice_material_task_link al
+             join assignment aa on aa.id = al.assignment_id and aa.family_id = al.family_id
+            where al.family_id = p.family_id and al.package_id = p.id
+              and aa.status <> 'COMPLETED') as active_task_count,
+          (select max(ll.created_at) from voice_material_task_link ll
+            where ll.family_id = p.family_id and ll.package_id = p.id) as last_used_at,
+          p.created_at as imported_at,
+          p.error_message
+        from voice_material_package p
+        join student s on s.id = p.student_id and s.family_id = p.family_id
+        where p.family_id = :familyId and p.id = :packageId
+        """;
+    List<VoiceMaterialDtos.VoiceFolderItemResponse> found =
+        jdbc.query(itemSql, params, this::mapFolder);
+    if (found.isEmpty()) throw new ApiExceptions.NotFound("语音文件夹不存在");
+    VoiceMaterialDtos.VoiceFolderItemResponse item = found.get(0);
 
     List<VoiceMaterialDtos.FileResponse> materialFiles =
         files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(familyId, packageId)
@@ -319,9 +360,6 @@ public class VoiceTaskQueryService {
                 file.id.toString(), file.assetId.toString(), file.resourceType,
                 file.relativeName, file.sortOrder)).toList();
 
-    MapSqlParameterSource params = new MapSqlParameterSource()
-        .addValue("familyId", familyId)
-        .addValue("packageId", packageId);
     List<VoiceMaterialDtos.VoiceFolderTaskHistoryItem> recentTasks = jdbc.query("""
         select
           l.assignment_id,
@@ -358,8 +396,8 @@ public class VoiceTaskQueryService {
         rs.getString("subject_code"),
         rs.getInt("expected_minutes"),
         createdAt == null ? 0L : createdAt.toInstant().toEpochMilli(),
-        rs.getString("package_id"),
-        rs.getString("directory_name"));
+        rs.getString("package_id") == null ? "" : rs.getString("package_id"),
+        rs.getString("directory_name") == null ? "本地上传" : rs.getString("directory_name"));
   }
 
   private VoiceMaterialDtos.VoiceFolderItemResponse mapFolder(ResultSet rs, int rowNum)
