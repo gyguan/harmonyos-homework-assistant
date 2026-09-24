@@ -3,7 +3,7 @@ import { HomeworkSubmissionService } from '../../../application/submission/Homew
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { VoiceAssignmentPane } from '../../../components/assignment/VoiceAssignmentPane';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
@@ -392,8 +392,8 @@ export struct StudyWorkspacePage {
         Row({ space: 10 }) {
           ActionButton({
             label: this.selectingPhotos ? '正在打开图库…' : '从图库选择',
-            kind: ActionButtonKind.SECONDARY,
-            compact: true,
+            kind: ActionButtonKind.OUTLINE,
+            size: ActionButtonSize.SMALL,
             isEnabled: !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
               this.submissionPhotoUris.length < 6,
             onAction: (): void => { void this.selectSubmissionPhotos(); }
@@ -401,8 +401,8 @@ export struct StudyWorkspacePage {
           .layoutWeight(1);
           ActionButton({
             label: this.capturingPhoto ? '正在打开相机…' : '拍照',
-            kind: ActionButtonKind.SECONDARY,
-            compact: true,
+            kind: ActionButtonKind.OUTLINE,
+            size: ActionButtonSize.SMALL,
             isEnabled: !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
               this.submissionPhotoUris.length < 6,
             onAction: (): void => { void this.captureSubmissionPhoto(); }
@@ -652,39 +652,43 @@ export struct StudyWorkspacePage {
         if (showTutorEntry && this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
           ActionButton({
             label: '问小伴',
-            kind: ActionButtonKind.SECONDARY,
+            kind: ActionButtonKind.OUTLINE,
+            size: ActionButtonSize.SMALL,
             onAction: (): void => {
               this.tutorPanelOpen = true;
               void this.loadTutor();
             }
           })
-          .width(88);
+          .width(82);
         }
 
         if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
           ActionButton({
             label: '暂停一下',
-            kind: ActionButtonKind.SECONDARY,
+            kind: ActionButtonKind.NEUTRAL,
+            size: ActionButtonSize.SMALL,
             isEnabled: !this.actionRunning,
             accessibilityLabel: '暂停作业计时',
             onAction: (): void => { void this.pauseCurrentAssignment(); }
           })
-          .width(showTutorEntry ? 88 : 112);
+          .width(showTutorEntry ? 82 : 104);
         }
 
         if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
           ActionButton({
             label: '继续作业',
             kind: ActionButtonKind.SECONDARY,
+            size: ActionButtonSize.SMALL,
             isEnabled: !this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos,
             accessibilityLabel: '返回作业继续完成',
             onAction: (): void => this.requestResumeFromSubmission()
           })
-          .width(112);
+          .width(104);
         }
 
         ActionButton({
           label: this.primaryActionLabel(),
+          size: ActionButtonSize.MEDIUM,
           isEnabled: this.primaryActionEnabled(),
           onAction: (): void => { void this.runPrimaryAction(); }
         })
