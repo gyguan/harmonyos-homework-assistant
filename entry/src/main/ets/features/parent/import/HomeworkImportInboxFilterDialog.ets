@@ -92,7 +92,7 @@ export struct HomeworkImportInboxFilterDialog {
       Scroll() {
         Column({ space: 22 }) {
           Column({ space: 10 }) {
-            Text('来源').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('来源').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
               this.SourceOption(HomeworkImportInboxSourceFilter.ALL);
               this.SourceOption(HomeworkImportInboxSourceFilter.CLIPBOARD);
@@ -109,7 +109,7 @@ export struct HomeworkImportInboxFilterDialog {
           .width('100%');
 
           Column({ space: 10 }) {
-            Text('状态').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('状态').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
               this.StatusOption(HomeworkImportInboxStatusFilter.ALL);
               this.StatusOption(HomeworkImportInboxStatusFilter.READY);
@@ -126,7 +126,7 @@ export struct HomeworkImportInboxFilterDialog {
           .width('100%');
 
           Column({ space: 10 }) {
-            Text('时间').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('时间').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
               this.TimeOption(HomeworkImportInboxTimeFilter.ALL);
               this.TimeOption(HomeworkImportInboxTimeFilter.TODAY);
