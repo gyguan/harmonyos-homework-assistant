@@ -169,7 +169,7 @@ export struct PersonEntryPage {
       }
       .width('100%')
       .constraintSize({ maxWidth: 560 })
-      .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 48, bottom: 40 });
+      .padding({ left: AppTheme.PAGE_PADDING_COMPACT, right: AppTheme.PAGE_PADDING_COMPACT, top: 48, bottom: 40 });
     }
     .width('100%')
     .height('100%')
