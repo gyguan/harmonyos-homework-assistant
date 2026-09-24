@@ -284,7 +284,7 @@ export struct StudentHomePage {
     }
     .width('100%')
     .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
-    .padding({ left: AppTheme.PAGE_PADDING_COMPACT, right: AppTheme.PAGE_PADDING_COMPACT, top: 14, bottom: 20 });
+    .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: 14, bottom: 20 });
   }
 
   @Builder
