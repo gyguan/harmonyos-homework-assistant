@@ -1,4 +1,6 @@
 import { AppTheme } from '../../common/theme/AppTheme';
+import { ActionButton, TextAction, TextActionKind } from '../action/ActionControls';
+import { SegmentedSelectionButton } from '../selection/SelectionControls';
 import {
   PracticeGrade,
   PracticePassFilter,
@@ -21,28 +23,22 @@ export struct PracticeFilterDialog {
 
   @Builder
   private GradeOption(grade: PracticeGrade) {
-    Button(PracticeTaxonomy.gradeLabel(grade), { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(13)
-      .fontWeight(this.selectedGrade === grade ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(this.selectedGrade === grade ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(this.selectedGrade === grade ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(() => this.selectedGrade = grade);
+    SegmentedSelectionButton({
+      label: PracticeTaxonomy.gradeLabel(grade),
+      selected: this.selectedGrade === grade,
+      onSelect: () => this.selectedGrade = grade
+    })
+    .layoutWeight(1);
   }
 
   @Builder
   private TrackOption(track: PracticeTrackFilter) {
-    Button(PracticeTaxonomy.trackFilterLabel(track), { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(13)
-      .fontWeight(this.selectedTrack === track ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(this.selectedTrack === track ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(this.selectedTrack === track ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(() => this.selectedTrack = track);
+    SegmentedSelectionButton({
+      label: PracticeTaxonomy.trackFilterLabel(track),
+      selected: this.selectedTrack === track,
+      onSelect: () => this.selectedTrack = track
+    })
+    .layoutWeight(1);
   }
 
   private confirm(): void {
@@ -57,14 +53,12 @@ export struct PracticeFilterDialog {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        Text('关闭')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT)
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 12, right: 4 })
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('关闭更多筛选')
-          .onClick(() => this.controller.close());
+        TextAction({
+          label: '关闭',
+          kind: TextActionKind.NEUTRAL,
+          accessibilityLabel: '关闭更多筛选',
+          onClick: () => this.controller.close()
+        });
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 20, bottom: 12 });
@@ -115,15 +109,12 @@ export struct PracticeFilterDialog {
       .layoutWeight(1)
       .scrollBar(BarState.Off);
 
-      Button('确定', { type: ButtonType.Normal })
-        .width('100%')
-        .height(AppTheme.BUTTON_HEIGHT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .backgroundColor(AppTheme.PRIMARY)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .fontWeight(FontWeight.Medium)
-        .onClick(() => this.confirm())
-        .margin({ left: 20, right: 20, top: 12, bottom: 18 });
+      ActionButton({
+        label: '确定',
+        onClick: () => this.confirm()
+      })
+      .width('100%')
+      .margin({ left: 20, right: 20, top: 12, bottom: 18 });
     }
     .width('100%')
     .constraintSize({ maxWidth: AppTheme.FILTER_DIALOG_MAX_WIDTH })
