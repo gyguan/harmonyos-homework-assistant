@@ -67,6 +67,8 @@ require("Text(this.assignment.subject)" not in page and
 require("Button(this.actionLabel()" in page and
         ".alignItems(VerticalAlign.Center)" in page,
         "Student Home task actions must share the main task row and stay vertically centered")
+require("private Header()" not in page and "今天先完成一项" not in page,
+        "Student Home must not repeat a greeting/title block above 今天要做")
 require("${item.subjectCode}|${item.subject}|" in page,
         "Student Home render keys must refresh when authoritative subject data changes")
 
