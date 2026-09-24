@@ -349,7 +349,14 @@ export struct ParentReviewPane {
                 Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(13).fontColor(AppTheme.SUBTEXT);
               }
               .width('100%');
-              Text(this.assignment()!.title).width('100%').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Text(this.assignment()!.title)
+                .width('100%')
+                .fontSize(AppTheme.PAGE_TITLE_SIZE)
+                .lineHeight(AppTheme.PAGE_TITLE_LINE_HEIGHT)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(AppTheme.TEXT)
+                .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+                .textOverflow({ overflow: TextOverflow.Ellipsis });
               Row({ space: 8 }) {
                 Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
                   .fontSize(13).fontColor(AppTheme.SUBTEXT);
