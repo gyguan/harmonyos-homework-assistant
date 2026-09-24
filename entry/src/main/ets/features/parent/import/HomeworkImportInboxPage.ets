@@ -183,7 +183,7 @@ export struct HomeworkImportInboxPage {
         Row({ space: 8 }) {
           Text(this.batchTitle(batch))
             .layoutWeight(1)
-            .fontSize(15)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
