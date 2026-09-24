@@ -187,20 +187,24 @@ export struct PracticeHistoryPage {
   private StatisticsCard() {
     Row({ space: 6 }) {
       Text('基于当前筛选')
-        .fontSize(12)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.TERTIARY_TEXT);
       Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
       Text(`完成次数 ${this.statistics.completedCount}`)
-        .fontSize(13)
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
       Text(`正确率 ${this.viewModel.correctRateText(this.statistics)}`)
-        .fontSize(13)
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontColor(AppTheme.SUCCESS);
       Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
       Text(`平均耗时 ${this.viewModel.averageElapsedText(this.statistics)}`)
-        .fontSize(13)
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
     }
     .width('100%')
@@ -216,18 +220,23 @@ export struct PracticeHistoryPage {
           Text(item.paperTitle)
             .width('100%')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
             .fontColor(AppTheme.TEXT);
           Text(`${PracticeTaxonomy.gradeLabel(item.grade)} · ${PracticeTaxonomy.subjectLabel(item.subject)} · ${this.viewModel.modeLabel(item)} · 第 ${item.attemptNo} 次`)
             .width('100%')
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
         Text(this.viewModel.recordStatusLabel(item))
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.statusFontColor(item))
           .padding({ left: 9, right: 9, top: 5, bottom: 5 })
@@ -239,12 +248,14 @@ export struct PracticeHistoryPage {
 
       Row({ space: 8 }) {
         Text(this.viewModel.scoreText(item))
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
         Text(this.viewModel.timeText(item.startedAtEpochMs))
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
           Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
@@ -260,7 +271,8 @@ export struct PracticeHistoryPage {
         }
         Blank();
         Text('查看')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -310,7 +322,8 @@ export struct PracticeHistoryPage {
           if (this.errorMessage.length > 0) {
             Text(this.errorMessage)
               .width('100%')
-              .fontSize(13)
+              .fontSize(AppTheme.META_SIZE)
+              .lineHeight(AppTheme.META_LINE_HEIGHT)
               .fontColor(AppTheme.DANGER)
               .padding(12)
               .backgroundColor(AppTheme.DANGER_SOFT)
@@ -318,7 +331,8 @@ export struct PracticeHistoryPage {
           } else if (this.loading) {
             Text('正在加载练习记录…')
               .width('100%')
-              .fontSize(13)
+              .fontSize(AppTheme.META_SIZE)
+              .lineHeight(AppTheme.META_LINE_HEIGHT)
               .fontColor(AppTheme.SUBTEXT)
               .padding({ top: 24, bottom: 24 })
               .textAlign(TextAlign.Center);
@@ -326,6 +340,7 @@ export struct PracticeHistoryPage {
             Column({ space: 7 }) {
               Text(this.isPaperScoped() ? '这套卷还没有练习记录' : '还没有练习记录')
                 .fontSize(AppTheme.CARD_TITLE_SIZE)
+                .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
             }
