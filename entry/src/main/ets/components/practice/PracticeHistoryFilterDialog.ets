@@ -163,13 +163,13 @@ export struct PracticeHistoryFilterDialog {
         ActionButton({
           label: '重置',
           kind: ActionButtonKind.NEUTRAL,
-          size: ActionButtonSize.MEDIUM,
+          actionSize: ActionButtonSize.MEDIUM,
           onAction: (): void => this.reset()
         })
         .layoutWeight(1);
         ActionButton({
           label: '确定',
-          size: ActionButtonSize.MEDIUM,
+          actionSize: ActionButtonSize.MEDIUM,
           onAction: (): void => this.confirm()
         })
         .layoutWeight(2);
