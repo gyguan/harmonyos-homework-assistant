@@ -13,8 +13,12 @@ export class HomeworkImportViewModel {
 
   rawImport(): RawHomeworkImport { return this.drafts.getRawImport(); }
   candidates(): CandidateAssignment[] { return this.drafts.getCandidates(); }
-  parseText(text: string, imageRef: string = ''): Promise<HomeworkTextImportResult> {
-    return HomeworkImportService.instance.parseText(text, imageRef);
+  parseText(text: string, imageRef: string = '',
+    imageSourceLabel: string = ''): Promise<HomeworkTextImportResult> {
+    return HomeworkImportService.instance.parseText(text, imageRef, imageSourceLabel);
+  }
+  captureImageText(): Promise<HomeworkImageTextResult> {
+    return HomeworkImportService.instance.captureImageText();
   }
   selectImageText(): Promise<HomeworkImageTextResult> { return HomeworkImportService.instance.selectImageText(); }
   selectImageAndParse(): Promise<HomeworkImageImportResult> { return HomeworkImportService.instance.selectImageAndParse(); }
