@@ -190,18 +190,18 @@ export struct PracticeHistoryPage {
         .fontSize(AppTheme.CAPTION_SIZE)
         .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.TERTIARY_TEXT);
-      Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+      Text('·').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
       Text(`完成次数 ${this.statistics.completedCount}`)
         .fontSize(AppTheme.META_SIZE)
         .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
-      Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+      Text('·').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
       Text(`正确率 ${this.viewModel.correctRateText(this.statistics)}`)
         .fontSize(AppTheme.META_SIZE)
         .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontColor(AppTheme.SUCCESS);
-      Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+      Text('·').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
       Text(`平均耗时 ${this.viewModel.averageElapsedText(this.statistics)}`)
         .fontSize(AppTheme.META_SIZE)
         .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -252,21 +252,23 @@ export struct PracticeHistoryPage {
           .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+        Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
         Text(this.viewModel.timeText(item.startedAtEpochMs))
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
-          Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
           Text(`完成耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         if (item.noteCount > 0) {
-          Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
           Text(`${item.noteCount} 条笔记`)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         Blank();
