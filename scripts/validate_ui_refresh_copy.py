@@ -46,8 +46,11 @@ submit_confirm = read("entry/src/main/ets/components/practice/PracticeSubmitConf
 source_profile = read("entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets")
 parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 
-require("snapshotRevision" in parent_progress and "currentVisibleAssignments" in parent_progress,
-        "parent progress must invalidate cached list snapshots when revision changes")
+require("@Prop @Watch('onRevisionChanged') revision: number = 0" in parent_progress and
+        "private onRevisionChanged(): void" in parent_progress and
+        "this.rebuildView();" in parent_progress and
+        "private currentVisibleAssignments(): Assignment[]" in parent_progress,
+        "parent progress must rebuild its shared query snapshot when revision changes")
 require("this.assignmentRenderKey(item)" in parent_progress,
         "parent progress rows must use content-aware assignment keys")
 
