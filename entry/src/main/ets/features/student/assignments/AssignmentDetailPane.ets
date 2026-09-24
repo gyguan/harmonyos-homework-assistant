@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ActionButton } from '../../../components/action/ActionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, AssignmentType } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
@@ -202,15 +203,11 @@ export struct AssignmentDetailPane {
         .scrollBar(BarState.Off);
 
         if (this.canOpenStudy(this.assignment()!)) {
-          Button(this.actionLabel(this.assignment()!), { type: ButtonType.Normal })
-            .width('100%')
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .fontSize(15)
-            .fontWeight(FontWeight.Medium)
-            .backgroundColor(AppTheme.PRIMARY)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .onClick(() => this.onOpenStudy(this.assignment()!.id));
+          ActionButton({
+            label: this.actionLabel(this.assignment()!),
+            onClick: () => this.onOpenStudy(this.assignment()!.id)
+          })
+          .width('100%');
         }
       }
       .width('100%')
