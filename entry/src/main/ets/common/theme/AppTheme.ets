@@ -64,7 +64,7 @@ export class AppTheme {
   static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
   static readonly DEEP_PAGE_HEADER_HEIGHT: number = 48;
   static readonly DEEP_PAGE_HEADER_GAP: number = 10;
-  static readonly DEEP_PAGE_HEADER_TITLE_SIZE: number = 20;
+  static readonly PAGE_NAV_TITLE_SIZE: number = 20;
   static readonly DEEP_PAGE_HEADER_META_SIZE: number = 13;
   static readonly DEEP_PAGE_BACK_GLYPH_SIZE: number = 22;
   static readonly DEEP_PAGE_CONTENT_GAP: number = 12;
@@ -100,8 +100,9 @@ export class AppTheme {
   static readonly PAD_MIN_TOUCH_TARGET: number = 48;
 
   static readonly PAGE_TITLE_SIZE: number = 26;
-  static readonly SECTION_TITLE_SIZE: number = 20;
-  static readonly CARD_TITLE_SIZE: number = 17;
+  static readonly SECTION_TITLE_SIZE: number = 17;
+  static readonly CARD_TITLE_SIZE: number = 16;
+  static readonly LABEL_TITLE_SIZE: number = 14;
   static readonly BODY_SIZE: number = 14;
   static readonly CAPTION_SIZE: number = 12;
 
