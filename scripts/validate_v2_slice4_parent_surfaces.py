@@ -121,7 +121,8 @@ require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progr
 require("Text('作业进度')" not in progress and "label: this.bulkMode ? '取消' : '删除'" in progress and
         "TextAction({" in progress,
         "Parent Progress must remove duplicate root title and keep shared delete/cancel beside the list summary")
-for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode", "Button('查询'"]:
+for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode",
+              "SegmentedSelectionButton", "label: '查询'"]:
     require(token in shared_filter, f"shared task query missing date+subject behavior: {token}")
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
     require(removed not in shared_filter,
