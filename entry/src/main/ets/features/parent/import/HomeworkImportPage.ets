@@ -238,7 +238,7 @@ export struct HomeworkImportPage {
       ActionButton({
         label: this.parseBusy ? '识别中…' : '拍照识别',
         kind: ActionButtonKind.OUTLINE,
-        size: ActionButtonSize.SMALL,
+        actionSize: ActionButtonSize.SMALL,
         isEnabled: !this.parseBusy,
         onAction: (): void => { void this.recognizePhoto(); }
       })
@@ -247,7 +247,7 @@ export struct HomeworkImportPage {
       ActionButton({
         label: this.parseBusy ? '识别中…' : '相册识别',
         kind: ActionButtonKind.OUTLINE,
-        size: ActionButtonSize.SMALL,
+        actionSize: ActionButtonSize.SMALL,
         isEnabled: !this.parseBusy,
         onAction: (): void => { void this.recognizeGallery(); }
       })
