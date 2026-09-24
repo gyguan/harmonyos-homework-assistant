@@ -1,5 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { HomeworkImageTextResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { Subject } from '../../../domain/model/HomeworkModels';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
@@ -237,8 +237,8 @@ export struct HomeworkImportPage {
     Row({ space: 8 }) {
       ActionButton({
         label: this.parseBusy ? '识别中…' : '拍照识别',
-        kind: ActionButtonKind.SECONDARY,
-        compact: true,
+        kind: ActionButtonKind.OUTLINE,
+        size: ActionButtonSize.SMALL,
         isEnabled: !this.parseBusy,
         onAction: (): void => { void this.recognizePhoto(); }
       })
@@ -246,8 +246,8 @@ export struct HomeworkImportPage {
 
       ActionButton({
         label: this.parseBusy ? '识别中…' : '相册识别',
-        kind: ActionButtonKind.SECONDARY,
-        compact: true,
+        kind: ActionButtonKind.OUTLINE,
+        size: ActionButtonSize.SMALL,
         isEnabled: !this.parseBusy,
         onAction: (): void => { void this.recognizeGallery(); }
       })
