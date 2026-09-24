@@ -43,6 +43,9 @@ require("this.viewModel.performAction(assignmentId, AssignmentAction.START)" in 
         "#291 Home must start through the existing Assignment command path")
 require("onStoreChanged: () => this.notifyUiChanged()" in shell,
         "AppShell must invalidate the shared cache after a Home command")
+require("private Header()" not in home and "今天先完成一项" not in home and
+        "private TodayTasks()" in home,
+        "#291 Home must avoid a duplicate greeting/title block above Today tasks")
 
 # Assignments: active work is one list and history stays collapsed until requested.
 require("private TodoSection()" in assignments and "private HistorySection()" in assignments,
@@ -53,6 +56,12 @@ require("@State private historyExpanded: boolean = false;" in assignments and
 for removed in ["private NeedHandlingSection()", "private NotStartedSection()",
                 "private SubmittedSection()", "private CompletedSection()"]:
     require(removed not in assignments, f"#291 Assignments must remove duplicate status section: {removed}")
+require("Text('我的作业')" not in assignments and
+        "calendarMode" not in assignments and "AssignmentCalendarPanel" not in assignments,
+        "#291 Assignments must stay list-only without duplicate title or calendar switch")
+require("private QuickFilterBar()" in assignments and
+        "private selectToday()" in assignments and "private selectSubjectCode(value: string)" in assignments,
+        "#291 Assignments must expose common date/subject filters directly")
 
 # Detail: show authoritative content only; omit generic and empty cards; pin the main action.
 require("Scroll()" in detail and "Button(this.actionLabel(this.assignment()!)" in detail,
@@ -87,6 +96,10 @@ require("private QuickFilterBar()" in practice_home and
         "selectPassFilter(PracticePassFilter.NOT_PASSED)" in practice_home and
         "更多筛选：" in practice_home,
         "#291 Practice home must keep common subject/pass filters direct and low-frequency filters under More")
+require("Text('练习')" not in practice_home and
+        "Text('练习记录')" in practice_home and
+        practice_home.find("Text('练习记录')") > practice_home.find("Text('练习套卷')"),
+        "#291 Practice home must avoid a duplicate page title and keep history beside the paper list header")
 require("private MetricCard" not in practice_detail and
         "this.RecentAttemptCard(this.recentAttempts[0]);" in practice_detail and "查看全部" in practice_detail,
         "#291 Practice detail must replace duplicate metrics with a focused latest-attempt summary")
