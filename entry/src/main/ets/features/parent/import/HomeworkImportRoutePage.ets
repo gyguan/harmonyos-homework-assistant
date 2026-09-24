@@ -31,6 +31,7 @@ export struct HomeworkImportRoutePage {
     .width('100%')
     .height('100%')
     .alignItems(HorizontalAlign.Center)
+    .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
     .padding({
       left: AppTheme.PAGE_PADDING,
       right: AppTheme.PAGE_PADDING,
