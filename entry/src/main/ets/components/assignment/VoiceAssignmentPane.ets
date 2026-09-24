@@ -388,7 +388,8 @@ export struct VoiceAssignmentPane {
             Blank();
             Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
               .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-              .fontSize(11)
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .backgroundColor('#66000000')
@@ -480,11 +481,13 @@ export struct VoiceAssignmentPane {
         Row({ space: 8 }) {
           Text(this.audioLoadMessage)
             .layoutWeight(1)
-            .fontSize(11)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.WARNING);
           Text('重试')
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .fontSize(11)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY)
             .onClick(() => this.retryAudio());
@@ -536,7 +539,8 @@ export struct VoiceAssignmentPane {
         if (!this.playbackEnabled) {
           Text('开始或继续作业后可播放语音')
             .width('100%')
-            .fontSize(11)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
       }
