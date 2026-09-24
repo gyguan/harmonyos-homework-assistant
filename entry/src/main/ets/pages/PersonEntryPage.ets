@@ -30,11 +30,13 @@ export struct PersonEntryPage {
         badgeBackground: AppTheme.PRIMARY
       });
       Text('小伴作业')
-        .fontSize(28)
+        .fontSize(AppTheme.PAGE_TITLE_SIZE)
+        .lineHeight(AppTheme.PAGE_TITLE_LINE_HEIGHT)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.TEXT);
       Text('今天是谁在使用？')
-        .fontSize(18)
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
     }
@@ -59,14 +61,17 @@ export struct PersonEntryPage {
       Column({ space: 3 }) {
         Text('家长')
           .width('100%')
-          .fontSize(16)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
           .fontColor(AppTheme.TEXT);
         Text('收作业、确认任务、查看孩子完成情况')
           .width('100%')
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2);
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
@@ -96,13 +101,17 @@ export struct PersonEntryPage {
       Column({ space: 3 }) {
         Text(student.name)
           .width('100%')
-          .fontSize(16)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
           .fontColor(AppTheme.TEXT);
         Text(`${student.grade} · ${student.className}`)
           .width('100%')
-          .fontSize(12)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2);
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
@@ -124,7 +133,8 @@ export struct PersonEntryPage {
 
         Text('家长')
           .width('100%')
-          .fontSize(12)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT)
           .margin({ left: 4 });
@@ -138,7 +148,8 @@ export struct PersonEntryPage {
 
         Text('孩子')
           .width('100%')
-          .fontSize(12)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT)
           .margin({ left: 4, top: 8 });
