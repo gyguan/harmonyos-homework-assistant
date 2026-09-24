@@ -1,5 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../../../components/action/ActionControls';
 import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import {
   HomeworkImportInboxFilterLabels,
@@ -142,11 +142,13 @@ export struct HomeworkImportInboxFilterDialog {
         ActionButton({
           label: '重置',
           kind: ActionButtonKind.NEUTRAL,
+          size: ActionButtonSize.MEDIUM,
           onAction: (): void => this.reset()
         })
         .layoutWeight(1);
         ActionButton({
           label: '确定',
+          size: ActionButtonSize.MEDIUM,
           onAction: (): void => this.confirm()
         })
         .layoutWeight(2);
