@@ -99,6 +99,7 @@ public final class VoiceMaterialDtos {
 
   public record CreateAssignmentRequest(
       @NotBlank @Size(max = 80) String studentId,
+      @Size(max = 64) String subjectCode,
       @Min(1) @Max(240) Integer expectedMinutes,
       Long dueAtEpochMs,
       @Size(max = 32) String dueText,
