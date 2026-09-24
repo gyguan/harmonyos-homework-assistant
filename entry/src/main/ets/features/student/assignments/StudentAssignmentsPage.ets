@@ -385,7 +385,7 @@ export struct StudentAssignmentsPage {
         Row({ space: 8 }) {
           Text(`已提交 / 已完成 · ${this.currentHistoryAssignments().length}`)
             .layoutWeight(1)
-            .fontSize(15)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUBTEXT);
           Text(this.historyExpanded ? '收起' : '查看')
@@ -428,7 +428,7 @@ export struct StudentAssignmentsPage {
       Column({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
         Text(this.currentTotalCount() === 0 ? '暂时没有作业' : '这一天没有安排任务')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       }
       .width('100%')
       .padding({ top: 30, bottom: 30 });
