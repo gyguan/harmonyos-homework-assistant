@@ -386,7 +386,7 @@ export struct ParentVoiceMaterialPage {
         .fontColor(AppTheme.TEXT);
 
       Column({ space: 7 }) {
-        Text('科目').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('科目').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         Row({ space: 6 }) {
           this.DefaultSubjectChip('语文', 'CHINESE');
           this.DefaultSubjectChip('数学', 'MATH');
@@ -398,7 +398,7 @@ export struct ParentVoiceMaterialPage {
       .width('100%');
 
       Column({ space: 6 }) {
-        Text('预计用时（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('预计用时（分钟）').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '15', text: this.expectedMinutesText })
           .width('100%')
           .height(AppTheme.INPUT_HEIGHT)
@@ -411,7 +411,8 @@ export struct ParentVoiceMaterialPage {
 
       if (this.pendingPackages.length > 0) {
         Text('应用到已添加目录')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -488,11 +489,14 @@ export struct ParentVoiceMaterialPage {
       Row() {
         Text('待导入目录')
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
           .fontColor(AppTheme.TEXT);
         Blank();
         Text(`${this.pendingPackages.length} 个`)
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
@@ -508,8 +512,8 @@ export struct ParentVoiceMaterialPage {
 
       Text('支持目录选择的设备可直接选择文件夹；如需批量导入，可重复点击“添加目录”。不支持目录选择的设备可选择目录内的语音和图片，系统会按父目录自动归组。')
         .width('100%')
-        .fontSize(11)
-        .lineHeight(17)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
 
       ForEach(this.pendingPackages, (item: VoiceMaterialLocalPackage, index: number) => {
@@ -598,12 +602,12 @@ export struct ParentVoiceMaterialPage {
         Blank().layoutWeight(1).onClick(() => this.closeCreateSheet());
         Column({ space: 14 }) {
           Row() {
-            Text('创建语音任务').fontSize(AppTheme.PAGE_NAV_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('创建语音任务').fontSize(AppTheme.PAGE_NAV_TITLE_SIZE).lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT).maxLines(AppTheme.NAV_TITLE_MAX_LINES);
             Blank();
-            Text('关闭').fontSize(13).fontColor(AppTheme.SUBTEXT).onClick(() => this.closeCreateSheet());
+            Text('关闭').fontSize(AppTheme.ACTION_TEXT_SIZE).lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT).onClick(() => this.closeCreateSheet());
           }.width('100%');
-          Text(this.creatingItem()!.directoryName).width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('学生').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text(this.creatingItem()!.directoryName).width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT).maxLines(AppTheme.CARD_TITLE_MAX_LINES).textOverflow({ overflow: TextOverflow.Ellipsis });
+          Text('学生').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
           Row({ space: 8 }) {
             ForEach(this.viewModel.students(), (student: StudentProfile) => {
               this.SubjectChip(student.name, student.id, this.createStudentId, () => {
@@ -611,7 +615,7 @@ export struct ParentVoiceMaterialPage {
               });
             }, (student: StudentProfile) => 'create-' + student.id);
           }.width('100%');
-          Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('截止时间').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
           Row({ space: 6 }) {
             this.SubjectChip('今天', 'TODAY', this.createDueOption, () => this.createDueOption = 'TODAY');
             this.SubjectChip('明天', 'TOMORROW', this.createDueOption, () => this.createDueOption = 'TOMORROW');
@@ -620,13 +624,13 @@ export struct ParentVoiceMaterialPage {
           }.width('100%');
           if (this.createDueOption === 'CUSTOM') {
             TextInput({ placeholder: 'YYYY-MM-DD', text: this.createCustomDueDate })
-              .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
+              .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE)
               .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
               .onChange((value: string) => this.createCustomDueDate = value);
           }
-          Text('预计时长（分钟）').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('预计时长（分钟）').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
           TextInput({ text: this.createMinutesText })
-            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
+            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE)
             .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
             .onChange((value: string) => this.createMinutesText = value);
           Row({ space: 10 }) {
@@ -655,7 +659,8 @@ export struct ParentVoiceMaterialPage {
           .fontColor(AppTheme.TEXT);
         Blank();
         Text(this.loading ? '刷新中…' : `${this.remotePackages.length} 个目录`)
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
@@ -664,8 +669,8 @@ export struct ParentVoiceMaterialPage {
         Text('还没有语音素材。导入后，学生每天首次检查时最多自动创建 1 个任务。')
           .width('100%')
           .padding({ top: 16, bottom: 16 })
-          .fontSize(13)
-          .lineHeight(20)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .textAlign(TextAlign.Center);
       } else {
