@@ -1,5 +1,6 @@
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
@@ -246,22 +247,22 @@ export struct ConfirmationCandidateEditor {
           .fontSize(13)
           .fontColor(AppTheme.WARNING);
         Row({ space: 10 }) {
-          Button('继续编辑', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-            .fontColor(AppTheme.TEXT)
-            .onClick(() => this.confirmDiscard = false);
-          Button('放弃修改', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.DANGER_SOFT)
-            .fontColor(AppTheme.DANGER)
-            .onClick(() => {
+          ActionButton({
+            label: '继续编辑',
+            kind: ActionButtonKind.NEUTRAL,
+            compact: true,
+            onClick: () => this.confirmDiscard = false
+          })
+          .layoutWeight(1);
+          ActionButton({
+            label: '放弃修改',
+            kind: ActionButtonKind.DANGER_SOFT,
+            compact: true,
+            onClick: () => {
               this.onClose();
-            });
+            }
+          })
+          .layoutWeight(1);
         }
         .width('100%');
       } else if (this.confirmDelete) {
@@ -270,39 +271,35 @@ export struct ConfirmationCandidateEditor {
           .fontSize(13)
           .fontColor(AppTheme.DANGER);
         Row({ space: 10 }) {
-          Button('取消', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-            .fontColor(AppTheme.TEXT)
-            .onClick(() => this.confirmDelete = false);
-          Button('确认删除', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.DANGER)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .onClick(() => this.onDelete(this.item.id));
+          ActionButton({
+            label: '取消',
+            kind: ActionButtonKind.NEUTRAL,
+            compact: true,
+            onClick: () => this.confirmDelete = false
+          })
+          .layoutWeight(1);
+          ActionButton({
+            label: '确认删除',
+            kind: ActionButtonKind.DANGER,
+            compact: true,
+            onClick: () => this.onDelete(this.item.id)
+          })
+          .layoutWeight(1);
         }
         .width('100%');
       } else {
         Row({ space: 10 }) {
-          Button('删除', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.DANGER_SOFT)
-            .fontColor(AppTheme.DANGER)
-            .onClick(() => this.confirmDelete = true);
-          Button('保存', { type: ButtonType.Normal })
-            .layoutWeight(2)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.PRIMARY)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .fontWeight(FontWeight.Medium)
-            .onClick(() => this.saveAndClose());
+          ActionButton({
+            label: '删除',
+            kind: ActionButtonKind.DANGER_SOFT,
+            onClick: () => this.confirmDelete = true
+          })
+          .layoutWeight(1);
+          ActionButton({
+            label: '保存',
+            onClick: () => this.saveAndClose()
+          })
+          .layoutWeight(2);
         }
         .width('100%');
       }
