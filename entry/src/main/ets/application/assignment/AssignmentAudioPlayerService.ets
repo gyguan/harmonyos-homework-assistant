@@ -19,18 +19,13 @@ export class AssignmentAudioPlayerService {
     this.callbacks = callbacks;
     if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
       try {
-        let mediaModule: typeof import('@kit.MediaKit') = await import('@kit.MediaKit');
-        let player = await mediaModule.media.createAVPlayer();
+        let player = await media.createAVPlayer();
         this.player = player;
         player.on('stateChange', (state: media.AVPlayerState) => {
           if (this.player !== player) return;
           callbacks.onState(state);
           if (state === 'initialized') {
-            void player.prepare().catch((error: BusinessError) => {
-              if (this.player !== player) return;
-              callbacks.onError(error.message.length > 0 ? error.message : '语音准备失败');
-              void this.releaseFailedPlayer(player);
-            });
+            void player.prepare();
           } else if (state === 'prepared') {
             callbacks.onPrepared(player.duration > 0 ? player.duration : 0);
           } else if (state === 'completed') {
@@ -41,14 +36,12 @@ export class AssignmentAudioPlayerService {
           if (this.player === player) callbacks.onTime(timeMs);
         });
         player.on('error', (error: BusinessError) => {
-          if (this.player !== player) return;
-          callbacks.onError(error.message.length > 0 ? error.message : '语音播放失败');
-          void this.releaseFailedPlayer(player);
+          if (this.player === player) callbacks.onError(error.message);
         });
 
         let source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
         this.sourceFile = source;
-        let descriptor: media.AVFileDescriptor = { fd: source.fd };
+        let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };
         player.fdSrc = descriptor;
       } catch {
         callbacks.onError('语音准备失败');
@@ -90,18 +83,13 @@ export class AssignmentAudioPlayerService {
       let duration = player.duration > 0 ? player.duration : 0;
       let target = Math.floor(Math.max(0, duration > 0 ? Math.min(timeMs, duration) : timeMs));
       try {
-        player.seek(target);
+        player.seek(target, media.SeekMode.SEEK_PREV_SYNC);
       } catch {
         if (this.callbacks !== null) this.callbacks.onError('无法跳转到该播放位置');
       }
       return;
     }
     if (this.callbacks !== null) this.callbacks.onError('当前设备不支持语音播放');
-  }
-
-  private async releaseFailedPlayer(player: media.AVPlayer): Promise<void> {
-    if (this.player !== player) return;
-    await this.release();
   }
 
   async release(): Promise<void> {
