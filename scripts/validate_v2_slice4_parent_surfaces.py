@@ -98,6 +98,8 @@ require("最近动态" not in home and "ChildPerformance" not in home,
         "Parent Home must not reintroduce duplicate progress or recent-activity sections")
 require("onOpenAssignment" in home and "onOpenVoice" in home and "onOpenInbox" in home,
         "Parent Home must expose exactly the three high-frequency parent actions")
+require("Text('家长操作')" not in home and "private PageIntro()" not in home,
+        "Parent Home must not repeat a title already represented by primary navigation")
 require("LayoutPolicy.parentProgressReviewRequirement()" in progress and "availableWidthVp" in progress,
         "Parent Progress must choose review split from actual container width + LayoutPolicy")
 require("AppTheme.PARENT_PROGRESS_READABLE_MAX_WIDTH" in progress and
@@ -110,14 +112,14 @@ require("components/selection/SelectionControls" in progress and
         "components/selection/SelectionControls" in student_assignments,
         "Parent Progress and Student Assignments must reuse shared reactive selection controls")
 for token in ["FilterSummaryEntry({", "label: '日期'", "label: '科目'",
-              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusSummary",
-              "AssignmentMetricSummary", "AssignmentMetricKey"]:
-    require(token in progress, f"Parent Progress must align common query/metric interaction: {token}")
-require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progress,
-        "Parent Progress status selection must remain in metric cards without duplicate chips")
-for phrase in ["全部任务", "待完成", "待验收", "已完成"]:
-    require(phrase in progress or phrase in read("entry/src/main/ets/components/assignment/AssignmentMetricSummary.ets"),
-            f"Parent Progress missing unified metric: {phrase}")
+              "CustomDialogController", "alignment: DialogAlignment.Bottom"]:
+    require(token in progress, f"Parent Progress must preserve shared date/subject query interaction: {token}")
+require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progress and
+        "StatusSummary" not in progress and "AssignmentMetricSummary" not in progress and
+        "AssignmentMetricKey" not in progress,
+        "Parent Progress must stay list-first without summary/status metric controls")
+require("Text('作业进度')" not in progress and "Text(this.bulkMode ? '完成' : '删除')" in progress,
+        "Parent Progress must remove duplicate root title and keep delete action beside the list summary")
 for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode", "Button('查询'"]:
     require(token in shared_filter, f"shared task query missing date+subject behavior: {token}")
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
@@ -194,13 +196,11 @@ if len(today_summary) == 2:
     require("due.getFullYear() === now.getFullYear()" not in today_block and
             "new Date(assignment.dueAtEpochMs)" not in today_block,
             "HomeworkStore TodaySummary must not fall back to the device-local calendar date")
-require("private metricAssignments(): Assignment[]" in progress and
+require("@State private scopedAssignments: Assignment[] = []" in progress and
         "this.viewModel.assignmentsOnDay(" in progress and
-        "AssignmentDateFilter.ALL" in progress,
-        "Parent Progress metrics must follow the active date scope")
-require("selectedKey: this.statusFilter" in progress and "interactive: true" in progress and
-        "onSelect: (key: AssignmentMetricKey) => this.chooseStatus(key)" in progress,
-        "Parent Progress metric cards must drive the status-filtered list")
+        "AssignmentDateFilter.ALL" in progress and
+        "this.applyItems(this.scopedAssignments)" in progress,
+        "Parent Progress list must follow the active date/subject scope without a parallel metric filter")
 require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date,
         "assignment business-day semantics must remain anchored to Asia/Shanghai")
 require("candidateAnchor(candidate.id)" in batch_publish,
