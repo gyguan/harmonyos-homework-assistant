@@ -182,34 +182,6 @@ export struct StudentHomePage {
   }
 
   @Builder
-  private Header() {
-    Row({ space: 11 }) {
-      CenteredTextBadge({
-        badgeText: this.viewModel.student().name.substring(0, 1),
-        badgeWidth: 44,
-        badgeHeight: 44,
-        badgeFontSize: 18,
-        badgeRadius: 22,
-        badgeBold: true,
-        badgeForeground: AppTheme.PRIMARY,
-        badgeBackground: AppTheme.PRIMARY_SOFT
-      });
-      Column({ space: 2 }) {
-        Text(`${this.viewModel.student().name}，今天先完成一项`)
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
-        Text(this.viewModel.dateLabel())
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
-    }
-    .width('100%');
-  }
-
-  @Builder
   private OfflineBanner() {
     if (this.offlineMode) {
       Row({ space: 8 }) {
@@ -297,7 +269,6 @@ export struct StudentHomePage {
   @Builder
   private PhoneHome() {
     Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-      this.Header();
       this.OfflineBanner();
       this.TodayTasks();
     }
@@ -309,7 +280,6 @@ export struct StudentHomePage {
   @Builder
   private PadHome() {
     Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-      this.Header();
       this.OfflineBanner();
       Row({ space: AppTheme.SPLIT_PANE_GAP }) {
         Column({ space: 12 }) {
