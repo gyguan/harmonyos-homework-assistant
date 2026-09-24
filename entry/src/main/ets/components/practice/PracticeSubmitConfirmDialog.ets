@@ -23,12 +23,12 @@ export struct PracticeSubmitConfirmDialog {
         ActionButton({
           label: '继续作答',
           kind: ActionButtonKind.NEUTRAL,
-          onAction: () => this.controller.close()
+          onAction: (): void => this.controller.close()
         })
         .layoutWeight(1);
         ActionButton({
           label: '仍然交卷',
-          onAction: () => {
+          onAction: (): void => {
             this.controller.close();
             this.onConfirm();
           }
