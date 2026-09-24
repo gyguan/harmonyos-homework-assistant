@@ -1,5 +1,5 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../action/ActionControls';
 import { SegmentedSelectionButton } from '../selection/SelectionControls';
 
 @CustomDialog
@@ -110,11 +110,13 @@ export struct AssignmentFilterDialog {
         ActionButton({
           label: '重置',
           kind: ActionButtonKind.NEUTRAL,
+          size: ActionButtonSize.MEDIUM,
           onAction: (): void => this.reset()
         })
         .layoutWeight(1);
         ActionButton({
           label: '查询',
+          size: ActionButtonSize.MEDIUM,
           onAction: (): void => this.confirmQuery()
         })
         .layoutWeight(2);
