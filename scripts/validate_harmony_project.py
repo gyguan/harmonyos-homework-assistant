@@ -102,10 +102,11 @@ require("@ohos/hypium" not in entry_oh_package,
 require("@ohos/hypium" in local_test_runner and "1.0.19" in local_test_runner and
         "hvigorw test" in local_test_runner and "finally" in local_test_runner,
         "optional Harmony Local Test runner must inject Hypium only for the test session and restore the manifest")
-require("Issue245ChatReconstructionFixture" in test_suite and
-        "Issue246HomeworkUnderstandingFixture" in test_suite and
-        "Issue247FullClosureFixture" in test_suite,
-        "deterministic homework-import regressions must be registered in the ArkTS test suite")
+require("Issue246HomeworkUnderstandingFixture" in test_suite and
+        "Issue244CaptureSessionFixture" not in test_suite and
+        "Issue245ChatReconstructionFixture" not in test_suite and
+        "Issue247FullClosureFixture" not in test_suite,
+        "ArkTS Local Test must retain active homework understanding without retired capture fixtures")
 
 production_ets_root = ROOT / "entry/src/main/ets"
 for production_file in production_ets_root.rglob("*.ets"):
