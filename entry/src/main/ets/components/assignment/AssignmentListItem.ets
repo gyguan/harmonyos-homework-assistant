@@ -92,39 +92,53 @@ export struct AssignmentListItem {
     Row({ space: 12 }) {
       this.LeadingIndicator();
 
-      Column({ space: 4 }) {
-        Text(this.assignment.title)
-          .width('100%')
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT)
-          .maxLines(2)
-          .textOverflow({ overflow: TextOverflow.Ellipsis });
+      Column({ space: 6 }) {
+        Row({ space: 8 }) {
+          Text(this.assignment.title)
+            .layoutWeight(1)
+            .fontSize(16)
+            .lineHeight(22)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT)
+            .maxLines(2)
+            .textOverflow({ overflow: TextOverflow.Ellipsis });
+
+          Row({ space: 4 }) {
+            Text(AssignmentStateMachine.label(this.assignment.status))
+              .maxLines(1)
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(18)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.statusColor());
+            if (this.showChevron && this.interactive) {
+              Text('›')
+                .fontSize(20)
+                .lineHeight(22)
+                .fontColor(AppTheme.TERTIARY_TEXT);
+            }
+          }
+          .constraintSize({ minWidth: 52 })
+          .justifyContent(FlexAlign.End)
+          .alignItems(VerticalAlign.Center);
+        }
+        .width('100%')
+        .alignItems(VerticalAlign.Top);
+
         Text(`${this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}`)
           .width('100%')
           .maxLines(1)
+          .lineHeight(18)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(AppTheme.CAPTION_SIZE)
           .fontColor(AppTheme.SUBTEXT);
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
-
-      Column({ space: 5 }) {
-        Text(AssignmentStateMachine.label(this.assignment.status))
-          .maxLines(1)
-          .fontSize(AppTheme.CAPTION_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(this.statusColor());
-        if (this.showChevron && this.interactive) {
-          Text('›').fontSize(20).fontColor(AppTheme.TERTIARY_TEXT);
-        }
-      }
-      .alignItems(HorizontalAlign.End);
     }
     .width('100%')
-    .constraintSize({ minHeight: 60 })
+    .constraintSize({ minHeight: 78 })
     .padding({ left: 12, right: 12, top: 11, bottom: 11 })
+    .alignItems(VerticalAlign.Center)
     .backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
     .border({
       width: this.selected ? 1 : 0,
