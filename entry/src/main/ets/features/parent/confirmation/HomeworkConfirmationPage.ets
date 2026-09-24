@@ -241,7 +241,8 @@ export struct HomeworkConfirmationPage {
           .onClick(() => this.addCandidate());
         if (this.candidates().length > 0) {
           Text('管理')
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
