@@ -203,15 +203,18 @@ require("private FilterChip(" not in parent_progress and "private FilterEntry(" 
         "Parent Progress must not keep runtime selection in ordinary @Builder boolean parameters")
 require("FilterSummaryEntry" in parent_progress,
         "Parent Progress must reuse shared reactive filter summary controls")
-require("StatusSelectionChip" not in parent_progress and "AssignmentMetricSummary" in parent_progress and
-        "interactive: true" in parent_progress and "this.chooseStatus(key)" in parent_progress,
-        "Parent Progress status selection must live in the shared clickable metric summary")
+require("StatusSelectionChip" not in parent_progress and "AssignmentMetricSummary" not in parent_progress and
+        "AssignmentMetricKey" not in parent_progress,
+        "Parent Progress must stay list-first without summary metric selection")
 for expression in [
     "active: !this.allDates && !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in parent_progress,
             f"Parent Progress must bind selection directly to page state: {expression}")
+require("Text('作业进度')" not in parent_progress and
+        "Text(this.bulkMode ? '完成' : '删除')" in parent_progress,
+        "Parent Progress must avoid duplicate root title and keep delete action explicit")
 
 deadline_picker = read_optional("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker,
