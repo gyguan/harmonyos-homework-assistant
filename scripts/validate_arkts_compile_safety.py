@@ -11,6 +11,7 @@ APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
 APP_ROUTES = ROOT / "entry/src/main/ets/app/navigation/AppRoutes.ets"
 VOICE_MATERIAL_API = ROOT / "entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets"
 VOICE_MATERIAL_PICKER = ROOT / "entry/src/main/ets/application/assignment/VoiceMaterialDirectoryPicker.ets"
+ACTION_CONTROLS = ROOT / "entry/src/main/ets/components/action/ActionControls.ets"
 ETS_ROOT = ROOT / "entry/src/main/ets"
 QUALIFIED_MODEL_SYMBOLS = [
     "AssignmentStatus",
@@ -60,6 +61,7 @@ def main() -> int:
     app_routes = APP_ROUTES.read_text(encoding="utf-8")
     voice_material_api = VOICE_MATERIAL_API.read_text(encoding="utf-8")
     voice_material_picker = VOICE_MATERIAL_PICKER.read_text(encoding="utf-8")
+    action_controls = ACTION_CONTROLS.read_text(encoding="utf-8")
 
     legacy_unsafe = [
         "let writer = await fileIo.open(multipartPath",
@@ -114,6 +116,17 @@ def main() -> int:
             "AppShell must use the typed voice assignment creation route param")
     require("PARENT_VOICE_MATERIAL" not in app_routes and "PARENT_VOICE_MATERIAL" not in app_shell,
             "legacy standalone voice-material navigation must not reappear")
+
+    require("onAction: () => void = () => {};" in action_controls,
+            "shared action controls must use onAction instead of the ArkUI-reserved onClick property")
+    require("onClick: () => void = () => {};" not in action_controls,
+            "custom ActionButton/TextAction must not shadow CustomComponent.onClick")
+    for file in ETS_ROOT.rglob("*.ets"):
+        source = file.read_text(encoding="utf-8")
+        relative = file.relative_to(ROOT)
+        require(
+            re.search(r"^\s*onClick\s*:\s*\([^\n]*\)\s*=>\s*void\s*=", source, flags=re.M) is None,
+            f"{relative} declares a custom onClick callback that can collide with ArkUI CommonAttribute")
 
     syscap = "SystemCapability.Multimedia.Media.AVPlayer"
     require(audio.count(f"canIUse('{syscap}')") >= 2,
