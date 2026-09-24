@@ -1,5 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import {
   ImportBatch,
@@ -285,14 +285,14 @@ export struct HomeworkImportBatchDetailPage {
                     ActionButton({
                       label: '取消',
                       kind: ActionButtonKind.NEUTRAL,
-                      compact: true,
+                      size: ActionButtonSize.SMALL,
                       onAction: (): void => { this.abandonConfirm = false; }
                     })
                     .layoutWeight(1);
                     ActionButton({
                       label: '确认放弃',
                       kind: ActionButtonKind.DANGER,
-                      compact: true,
+                      size: ActionButtonSize.SMALL,
                       onAction: (): void => this.abandon()
                     })
                     .layoutWeight(1);
@@ -306,8 +306,8 @@ export struct HomeworkImportBatchDetailPage {
               } else {
                 ActionButton({
                   label: '放弃这个批次',
-                  kind: ActionButtonKind.DANGER_SOFT,
-                  compact: true,
+                  kind: ActionButtonKind.GHOST,
+                  size: ActionButtonSize.SMALL,
                   onAction: (): void => { this.abandonConfirm = true; }
                 })
                 .width('100%');
