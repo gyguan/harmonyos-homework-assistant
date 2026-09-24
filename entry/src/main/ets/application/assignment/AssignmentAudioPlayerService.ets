@@ -26,7 +26,11 @@ export class AssignmentAudioPlayerService {
           if (this.player !== player) return;
           callbacks.onState(state);
           if (state === 'initialized') {
-            void player.prepare();
+            void player.prepare().catch((error: BusinessError) => {
+              if (this.player !== player) return;
+              callbacks.onError(error.message.length > 0 ? error.message : '语音准备失败');
+              void this.releaseFailedPlayer(player);
+            });
           } else if (state === 'prepared') {
             callbacks.onPrepared(player.duration > 0 ? player.duration : 0);
           } else if (state === 'completed') {
@@ -37,12 +41,14 @@ export class AssignmentAudioPlayerService {
           if (this.player === player) callbacks.onTime(timeMs);
         });
         player.on('error', (error: BusinessError) => {
-          if (this.player === player) callbacks.onError(error.message);
+          if (this.player !== player) return;
+          callbacks.onError(error.message.length > 0 ? error.message : '语音播放失败');
+          void this.releaseFailedPlayer(player);
         });
 
         let source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
         this.sourceFile = source;
-        let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };
+        let descriptor: media.AVFileDescriptor = { fd: source.fd };
         player.fdSrc = descriptor;
       } catch {
         callbacks.onError('语音准备失败');
@@ -91,6 +97,11 @@ export class AssignmentAudioPlayerService {
       return;
     }
     if (this.callbacks !== null) this.callbacks.onError('当前设备不支持语音播放');
+  }
+
+  private async releaseFailedPlayer(player: media.AVPlayer): Promise<void> {
+    if (this.player !== player) return;
+    await this.release();
   }
 
   async release(): Promise<void> {
