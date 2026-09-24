@@ -128,14 +128,14 @@ export struct ParentAssignmentEditPanel {
           ActionButton({
             label: '继续编辑',
             kind: ActionButtonKind.NEUTRAL,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             onAction: (): void => { this.confirmDiscard = false; }
           })
           .layoutWeight(1);
           ActionButton({
             label: '放弃修改',
             kind: ActionButtonKind.DANGER_SOFT,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             onAction: (): void => {
               this.onCancel();
             }
