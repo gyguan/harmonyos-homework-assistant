@@ -230,7 +230,7 @@ export struct HomeworkImportInboxPage {
         .fontColor([AppTheme.TERTIARY_TEXT]);
     }
     .width('100%')
-    .constraintSize({ minHeight: 92 })
+    .constraintSize({ minHeight: AppTheme.INBOX_CARD_MIN_HEIGHT })
     .padding(AppTheme.PHONE_CARD_PADDING)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
