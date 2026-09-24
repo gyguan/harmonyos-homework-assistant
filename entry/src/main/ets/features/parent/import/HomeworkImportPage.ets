@@ -1,5 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { HomeworkImageTextResult, HomeworkOrganizerMode, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
+import { HomeworkImageTextResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { HomeworkImportViewModel } from './HomeworkImportViewModel';
 
 @Component
@@ -61,9 +61,7 @@ export struct HomeworkImportPage {
       let result: HomeworkTextImportResult =
         await this.viewModel.parseText(text, this.sourceImageRef);
       if (result.candidateCount > 0) {
-        this.parseMessage = result.organizerMode === HomeworkOrganizerMode.AI ?
-          `已整理出 ${result.candidateCount} 项作业，请继续核对` :
-          `已整理出 ${result.candidateCount} 项作业，请继续核对`;
+        this.parseMessage = `已整理出 ${result.candidateCount} 项作业，请继续核对`;
         this.afterOrganized(result.candidateCount);
       } else {
         this.parseMessage = '暂时无法整理这段内容，请修改后重试';
