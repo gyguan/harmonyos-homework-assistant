@@ -78,6 +78,7 @@ struct StudentTodayTaskCard {
         Text(this.assignment.title)
           .width('100%')
           .fontSize(this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(this.emphasized ? AppTheme.SECTION_TITLE_LINE_HEIGHT : AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT)
           .maxLines(2)
@@ -85,14 +86,17 @@ struct StudentTodayTaskCard {
 
         Row({ space: 5 }) {
           Text(this.statusLabel())
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.statusColor());
           Text('·')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.TERTIARY_TEXT);
           Text(`${this.assignment.expectedMinutes} 分钟`)
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
@@ -107,7 +111,8 @@ struct StudentTodayTaskCard {
         .enabled(!this.busy)
         .backgroundColor(this.busy ? AppTheme.DISABLED : AppTheme.PRIMARY)
         .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .fontSize(14)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .accessibilityText(`${this.actionLabel()}${this.assignment.title}`)
         .onClick(() => this.onAction(this.assignment.id));
@@ -188,7 +193,8 @@ export struct StudentHomePage {
         SymbolGlyph($r('sys.symbol.wifi_slash')).fontSize(17).fontColor([AppTheme.WARNING]);
         Text('当前离线，可以查看已缓存的今日作业。')
           .layoutWeight(1)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
@@ -206,11 +212,13 @@ export struct StudentHomePage {
         .fontColor([AppTheme.SUCCESS]);
       Column({ space: 3 }) {
         Text(this.viewModel.summary().total > 0 ? '今天的任务完成啦' : '今天没有安排任务')
-          .fontSize(17)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text('去休息一下，或者看看练习内容。')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
       .layoutWeight(1)
@@ -242,12 +250,14 @@ export struct StudentHomePage {
       Row() {
         Text('今天要做')
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
         if (this.assignments().length > 0) {
           Text(`${this.assignments().length} 项`)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
       }
@@ -259,7 +269,8 @@ export struct StudentHomePage {
       if (this.actionMessage.length > 0) {
         Text(this.actionMessage)
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.WARNING);
       }
     }
