@@ -194,7 +194,7 @@ export struct ParentExtraAssignmentPage {
             ActionButton({
               label: this.busy ? '正在布置…' : '布置任务',
               isEnabled: !this.busy,
-              onAction: () => { void this.createTask(); }
+              onAction: (): void => { void this.createTask(); }
             })
             .width('100%');
           }
