@@ -28,15 +28,17 @@ export struct DeepPageHeader {
       Column({ space: 1 }) {
         Text(this.title)
           .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+          .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT)
-          .maxLines(1)
+          .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
           .textOverflow({ overflow: TextOverflow.Ellipsis });
         if (this.subtitle.length > 0) {
           Text(this.subtitle)
-            .fontSize(AppTheme.DEEP_PAGE_HEADER_META_SIZE)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT)
-            .maxLines(1)
+            .maxLines(AppTheme.META_MAX_LINES)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
         }
       }
@@ -45,9 +47,10 @@ export struct DeepPageHeader {
 
       if (this.trailingText.length > 0) {
         Text(this.trailingText)
-          .fontSize(AppTheme.DEEP_PAGE_HEADER_META_SIZE)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
-          .maxLines(1)
+          .maxLines(AppTheme.META_MAX_LINES)
           .textOverflow({ overflow: TextOverflow.Ellipsis });
       }
     }
