@@ -7,5 +7,6 @@ export interface FamilyContextRepository {
   getActiveStudentId(): string;
   setActiveStudent(studentId: string): boolean;
   replaceStudents(students: StudentProfile[]): void;
+  updateParentAccessCode(parentAccessCode: string): void;
   updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean): void;
 }
