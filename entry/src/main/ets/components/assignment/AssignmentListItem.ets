@@ -139,7 +139,7 @@ export struct AssignmentListItem {
     .constraintSize({ minHeight: 78 })
     .padding({ left: 12, right: 12, top: 11, bottom: 11 })
     .alignItems(VerticalAlign.Center)
-    .backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({
       width: this.selected ? 1 : 0,
       color: this.selected ? AppTheme.PRIMARY : Color.Transparent
