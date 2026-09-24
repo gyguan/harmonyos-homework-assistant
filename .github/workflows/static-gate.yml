@@ -10,6 +10,20 @@ on:
       - 'refactor/**'
 
 jobs:
+  validate-arkts-compile-safety:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate ArkTS compile safety
+        run: python scripts/validate_arkts_compile_safety.py
+
   validate-parent-import-inbox:
     runs-on: ubuntu-latest
     steps:
@@ -57,6 +71,7 @@ jobs:
       - name: Validate in-app identity switching
         run: |
           python scripts/validate_person_entry_role_lock.py
+          python scripts/validate_snapshot_migration.py
           python scripts/validate_harmony_ui_design.py
 
   validate-admin-voice:
