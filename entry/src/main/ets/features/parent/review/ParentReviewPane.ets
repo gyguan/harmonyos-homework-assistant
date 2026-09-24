@@ -113,7 +113,7 @@ export struct ParentReviewPane {
             kind: ActionButtonKind.NEUTRAL,
             compact: true,
             isEnabled: !this.deleteBusy,
-            onAction: (): void => this.deleteConfirm = false
+            onAction: (): void => { this.deleteConfirm = false; }
           })
           .layoutWeight(1);
           ActionButton({
@@ -376,7 +376,7 @@ export struct ParentReviewPane {
                       kind: ActionButtonKind.DANGER_SOFT,
                       compact: true,
                       accessibilityLabel: '删除这项未完成作业',
-                      onAction: (): void => this.deleteConfirm = true
+                      onAction: (): void => { this.deleteConfirm = true; }
                     });
                   }
                 }
