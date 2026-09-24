@@ -44,10 +44,22 @@ for token in [
     "MIN_TOUCH_TARGET",
     "BUTTON_HEIGHT",
     "PAGE_TITLE_SIZE",
+    "PAGE_NAV_TITLE_SIZE",
     "SECTION_TITLE_SIZE",
+    "CARD_TITLE_SIZE",
+    "LABEL_TITLE_SIZE",
     "PARENT_DEEP_READABLE_MAX_WIDTH",
 ]:
     require(f"static readonly {token}" in theme, f"AppTheme missing durable design token: {token}")
+
+for title_contract in [
+    "static readonly PAGE_TITLE_SIZE: number = 26;",
+    "static readonly PAGE_NAV_TITLE_SIZE: number = 20;",
+    "static readonly SECTION_TITLE_SIZE: number = 17;",
+    "static readonly CARD_TITLE_SIZE: number = 16;",
+    "static readonly LABEL_TITLE_SIZE: number = 14;",
+]:
+    require(title_contract in theme, f"AppTheme title hierarchy drifted: {title_contract}")
 
 app_shell = read_optional("entry/src/main/ets/pages/AppShell.ets")
 primary_nav = read_optional("entry/src/main/ets/components/navigation/PrimaryNavItem.ets")
@@ -197,6 +209,13 @@ homework_import_route = read_optional("entry/src/main/ets/features/parent/import
 homework_import = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 homework_confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 parent_settings = read_optional("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
+parent_extra = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
+student_profile = read_optional("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
+practice_result = read_optional("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
+assignment_list_item = read_optional("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
+deep_page_header = read_optional("entry/src/main/ets/components/navigation/DeepPageHeader.ets")
+edit_sheet_header = read_optional("entry/src/main/ets/components/navigation/EditSheetHeader.ets")
+assignment_filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 for card_path, card_source in [
     ("ParentDashboardPage", parent_dashboard),
     ("IdentitySwitcherDialog", identity_switcher),
@@ -265,6 +284,27 @@ require("private SectionTitle(" not in parent_settings and
         "private FamilySettingsSection()" in parent_settings and
         "private DataSyncSettingsSection()" in parent_settings,
         "Parent My must use the same card-and-collapsible-section composition as Student My")
+
+require("AppTheme.PAGE_NAV_TITLE_SIZE" in deep_page_header and
+        "AppTheme.PAGE_NAV_TITLE_SIZE" in edit_sheet_header,
+        "page and sheet headers must use the shared navigation-title size")
+require(parent_dashboard.count("AppTheme.CARD_TITLE_SIZE") >= 3,
+        "Parent dashboard card titles must share the card-title size")
+require(parent_extra.count("AppTheme.SECTION_TITLE_SIZE") >= 3,
+        "Extra assignment top-level sections must share the section-title size")
+require(voice_assignment.count("AppTheme.SECTION_TITLE_SIZE") >= 2,
+        "Voice assignment top-level sections must share the section-title size")
+require(student_home.count("AppTheme.SECTION_TITLE_SIZE") >= 3,
+        "Student home top-level sections must share the section-title size")
+require(parent_settings.count("AppTheme.CARD_TITLE_SIZE") >= 4 and
+        student_profile.count("AppTheme.CARD_TITLE_SIZE") >= 2,
+        "Parent and student My collapsible titles must share the card-title size")
+require("AppTheme.SECTION_TITLE_SIZE" in practice_result,
+        "Practice result section titles must use the shared section-title size")
+require("AppTheme.CARD_TITLE_SIZE" in assignment_list_item,
+        "Assignment list titles must use the shared card-title size")
+require("AppTheme.LABEL_TITLE_SIZE" in assignment_filter_dialog,
+        "Filter group titles must use the shared label-title size")
 
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
