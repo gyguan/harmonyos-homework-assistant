@@ -195,7 +195,8 @@ export struct PracticeResultPage {
         if (result.noteCount > 0) {
           Text(`✎ 还记录了 ${result.noteCount} 条笔记`)
             .width('100%')
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.TEXT)
             .textAlign(TextAlign.Center);
         }
@@ -282,7 +283,8 @@ export struct PracticeResultPage {
                   .fontColor(AppTheme.TEXT);
                 if (this.result.wrongCount > 0) {
                   Text(this.showAllQuestions ? '只看错题' : '查看全部题目')
-                    .fontSize(13)
+                    .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                    .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(AppTheme.PRIMARY)
                     .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
