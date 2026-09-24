@@ -121,7 +121,7 @@ struct StudentTodayTaskCard {
     .padding(this.emphasized ? 16 : 13)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: this.emphasized ? 1 : 0, color: this.emphasized ? AppTheme.PRIMARY : Color.Transparent })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityText(`${this.assignment.subject}，${this.assignment.title}，${this.statusLabel()}，预计${this.assignment.expectedMinutes}分钟`);
 
@@ -226,7 +226,7 @@ export struct StudentHomePage {
     .width('100%')
     .padding(18)
     .backgroundColor(AppTheme.SUCCESS_SOFT)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
