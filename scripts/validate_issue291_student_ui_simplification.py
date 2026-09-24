@@ -62,6 +62,8 @@ require("Text('我的作业')" not in assignments and
 require("private QuickFilterBar()" in assignments and
         "private selectToday()" in assignments and "private selectSubjectCode(value: string)" in assignments,
         "#291 Assignments must expose common date/subject filters directly")
+require("Text('要做的')" not in assignments,
+        "#291 Assignments must not repeat a redundant todo section heading above the active task list")
 
 # Detail: show authoritative content only; omit generic and empty cards; pin the main action.
 require("Scroll()" in detail and "Button(this.actionLabel(this.assignment()!)" in detail,
