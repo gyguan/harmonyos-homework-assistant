@@ -172,7 +172,8 @@ export struct HomeworkImportPage {
       if (!this.subjectChosen) {
         Text('请先选择本次作业的科目，整理后不会自动修改')
           .width('100%')
-          .fontSize(11)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
     }
@@ -189,8 +190,8 @@ export struct HomeworkImportPage {
           .fontColor([this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS]);
         Text(this.parseMessage)
           .layoutWeight(1)
-          .fontSize(13)
-          .lineHeight(19)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS);
       }
       .width('100%')
@@ -206,18 +207,22 @@ export struct HomeworkImportPage {
       Row({ space: 10 }) {
         Column({ space: 2 }) {
           Text(`已有 ${this.pendingCandidateCount()} 项待发布作业`)
-            .fontSize(14)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
           Text('继续上次的核对与发布')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
         Text('继续核对')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -269,7 +274,8 @@ export struct HomeworkImportPage {
           .fontColor(AppTheme.TEXT);
         Blank();
         Text('输入 · 拍照 · 相册')
-          .fontSize(11)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%');
@@ -280,8 +286,8 @@ export struct HomeworkImportPage {
       })
         .width('100%')
         .height(200)
-        .fontSize(15)
-        .lineHeight(22)
+        .fontSize(AppTheme.FORM_TEXT_SIZE)
+        .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => {
@@ -295,7 +301,8 @@ export struct HomeworkImportPage {
       if (this.sourceImageRef.length > 0) {
         Text(`已从${this.sourceImageLabel.length > 0 ? this.sourceImageLabel : '图片'}识别，可继续修改文字`)
           .width('100%')
-          .fontSize(11)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
     }
@@ -315,7 +322,8 @@ export struct HomeworkImportPage {
         .height(AppTheme.BUTTON_HEIGHT)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .enabled(!this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0)
-        .fontSize(15)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .backgroundColor(this.subjectChosen && this.textDraft.trim().length > 0 ? AppTheme.PRIMARY : AppTheme.DISABLED)
         .fontColor(AppTheme.TEXT_ON_PRIMARY)
