@@ -89,7 +89,7 @@ export struct PracticeHistoryFilterDialog {
           label: '关闭',
           kind: TextActionKind.NEUTRAL,
           accessibilityLabel: '关闭练习记录筛选',
-          onClick: () => this.controller.close()
+          onAction: () => this.controller.close()
         });
       }
       .width('100%')
@@ -163,12 +163,12 @@ export struct PracticeHistoryFilterDialog {
         ActionButton({
           label: '重置',
           kind: ActionButtonKind.NEUTRAL,
-          onClick: () => this.reset()
+          onAction: () => this.reset()
         })
         .layoutWeight(1);
         ActionButton({
           label: '确定',
-          onClick: () => this.confirm()
+          onAction: () => this.confirm()
         })
         .layoutWeight(2);
       }
