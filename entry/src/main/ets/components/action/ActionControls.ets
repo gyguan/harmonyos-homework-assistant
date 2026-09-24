@@ -23,11 +23,11 @@ export struct ActionButton {
   @Prop accessibilityLabel: string = '';
   onClick: () => void = () => {};
 
-  private buttonHeight(): number {
+  private resolveButtonHeight(): number {
     return this.compact ? AppTheme.SECONDARY_BUTTON_HEIGHT : AppTheme.BUTTON_HEIGHT;
   }
 
-  private backgroundColor(): string {
+  private resolveBackgroundColor(): string {
     if (!this.isEnabled && (this.kind === ActionButtonKind.PRIMARY || this.kind === ActionButtonKind.DANGER)) {
       return AppTheme.DISABLED;
     }
@@ -38,7 +38,7 @@ export struct ActionButton {
     return AppTheme.PRIMARY;
   }
 
-  private foregroundColor(): string {
+  private resolveForegroundColor(): string {
     if (this.kind === ActionButtonKind.SECONDARY) return AppTheme.PRIMARY;
     if (this.kind === ActionButtonKind.NEUTRAL) return AppTheme.TEXT;
     if (this.kind === ActionButtonKind.DANGER_SOFT) return AppTheme.DANGER;
@@ -47,12 +47,12 @@ export struct ActionButton {
 
   build() {
     Button(this.label, { type: ButtonType.Normal })
-      .height(this.buttonHeight())
+      .height(this.resolveButtonHeight())
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .fontSize(this.compact ? 14 : 15)
       .fontWeight(FontWeight.Medium)
-      .backgroundColor(this.backgroundColor())
-      .fontColor(this.foregroundColor())
+      .backgroundColor(this.resolveBackgroundColor())
+      .fontColor(this.resolveForegroundColor())
       .enabled(this.isEnabled)
       .accessibilityText(this.accessibilityLabel.length > 0 ? this.accessibilityLabel : this.label)
       .onClick(() => this.onClick());
@@ -67,7 +67,7 @@ export struct TextAction {
   @Prop accessibilityLabel: string = '';
   onClick: () => void = () => {};
 
-  private foregroundColor(): string {
+  private resolveForegroundColor(): string {
     if (!this.isEnabled) return AppTheme.DISABLED;
     if (this.kind === TextActionKind.NEUTRAL) return AppTheme.SUBTEXT;
     if (this.kind === TextActionKind.DANGER) return AppTheme.DANGER;
@@ -78,7 +78,7 @@ export struct TextAction {
     Text(this.label)
       .fontSize(13)
       .fontWeight(FontWeight.Medium)
-      .fontColor(this.foregroundColor())
+      .fontColor(this.resolveForegroundColor())
       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
       .padding({ left: 8, right: 8 })
       .textAlign(TextAlign.Center)
