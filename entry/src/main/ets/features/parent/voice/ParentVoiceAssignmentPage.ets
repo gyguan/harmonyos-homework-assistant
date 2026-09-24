@@ -1,7 +1,7 @@
 import { VoiceAssignmentMediaService } from '../../../application/assignment/VoiceAssignmentMediaService';
 import { RemoteVoiceFolderItem } from '../../../application/remote/RemoteVoiceMaterialApi';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction } from '../../../components/action/ActionControls';
 import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
@@ -419,7 +419,8 @@ export struct ParentVoiceAssignmentPage {
       if (this.audioUri.length === 0) {
         ActionButton({
           label: this.selectingAudio ? '正在打开语音文件…' : '选择语音文件',
-          kind: ActionButtonKind.SECONDARY,
+          kind: ActionButtonKind.OUTLINE,
+          size: ActionButtonSize.MEDIUM,
           isEnabled: !this.selectingAudio && !this.busy,
           onAction: (): void => { void this.selectAudio(); }
         })
@@ -490,8 +491,8 @@ export struct ParentVoiceAssignmentPage {
       ActionButton({
         label: this.selectingImages ? '正在打开相册…' :
           (this.imageUris.length === 0 ? '选择情景图片' : '＋ 继续添加图片'),
-        kind: ActionButtonKind.SECONDARY,
-        compact: true,
+        kind: ActionButtonKind.OUTLINE,
+        size: ActionButtonSize.SMALL,
         isEnabled: !this.selectingImages && !this.busy,
         onAction: (): void => { void this.selectImages(); }
       })
@@ -506,7 +507,8 @@ export struct ParentVoiceAssignmentPage {
       label: label,
       selected: this.folderUsage === value,
       onSelect: () => this.setUsageFilter(value)
-    });
+    })
+    .layoutWeight(1);
   }
 
   @Builder
@@ -571,7 +573,8 @@ export struct ParentVoiceAssignmentPage {
           .onChange((value: string) => this.folderKeyword = value);
         ActionButton({
           label: this.loadingFolders ? '查询中…' : '查询',
-          kind: ActionButtonKind.SECONDARY,
+          kind: ActionButtonKind.OUTLINE,
+          size: ActionButtonSize.SMALL,
           isEnabled: !this.loadingFolders,
           onAction: (): void => { void this.loadFolders(true); }
         });
@@ -604,8 +607,8 @@ export struct ParentVoiceAssignmentPage {
       if (this.folderPage + 1 < this.folderTotalPages) {
         ActionButton({
           label: this.loadingFolders ? '加载中…' : '加载更多',
-          kind: ActionButtonKind.NEUTRAL,
-          compact: true,
+          kind: ActionButtonKind.GHOST,
+          size: ActionButtonSize.SMALL,
           isEnabled: !this.loadingFolders,
           onAction: (): void => { void this.loadFolders(false); }
         })
