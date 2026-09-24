@@ -109,8 +109,8 @@ for token in [
     require(token in study, f"Study/Tutor Pad composition missing behavior: {token}")
 require("WindowSizeClass." not in study and "@Prop sizeClass" not in study and "this.sizeClass" not in study,
         "Study Workspace must not regress to size-class/device branching")
-require("Button('问小伴'" in study,
-        "Phone Study flow must retain the standalone Tutor entry")
+require("ActionButton({" in study and "label: '问小伴'" in study,
+        "Phone Study flow must retain the standalone Tutor entry through the shared action control")
 
 require("Pad 不是放大的 Phone" in prototype,
         "V2 UI prototype must retain the Pad-not-enlarged-Phone principle")
