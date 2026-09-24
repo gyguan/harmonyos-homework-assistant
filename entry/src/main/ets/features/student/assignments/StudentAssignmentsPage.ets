@@ -281,7 +281,8 @@ export struct StudentAssignmentsPage {
       Row({ space: 8 }) {
         Text('日期')
           .width(42)
-          .fontSize(13)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT);
         SegmentedSelectionButton({
@@ -303,7 +304,8 @@ export struct StudentAssignmentsPage {
       Row({ space: 8 }) {
         Text('科目')
           .width(42)
-          .fontSize(13)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT);
         SegmentedSelectionButton({
@@ -339,10 +341,12 @@ export struct StudentAssignmentsPage {
           .layoutWeight(1)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
         Text(this.querying ? '查询中…' : '调整')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -386,10 +390,12 @@ export struct StudentAssignmentsPage {
           Text(`已提交 / 已完成 · ${this.currentHistoryAssignments().length}`)
             .layoutWeight(1)
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUBTEXT);
           Text(this.historyExpanded ? '收起' : '查看')
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontColor(AppTheme.PRIMARY);
           Text(this.historyExpanded ? '⌃' : '⌄')
             .fontSize(16)
@@ -428,7 +434,7 @@ export struct StudentAssignmentsPage {
       Column({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
         Text(this.currentTotalCount() === 0 ? '暂时没有作业' : '这一天没有安排任务')
-          .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          .fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       }
       .width('100%')
       .padding({ top: 30, bottom: 30 });
@@ -440,9 +446,9 @@ export struct StudentAssignmentsPage {
     Column({ space: 22 }) {
       Row() {
         Text(this.allDates ? '全部作业' : `${this.dateLabel()} 任务`)
-          .fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          .fontSize(AppTheme.SECTION_TITLE_SIZE).lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text(`${this.currentVisibleTotal()} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text(`${this.currentVisibleTotal()} 项`).fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
