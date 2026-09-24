@@ -122,12 +122,14 @@ def main() -> int:
             "AVPlayer calls must live inside a positive canIUse branch for ArkTS SysCap analysis")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
-    require("let descriptor: media.AVFileDescriptor = { fd: source.fd };" in audio,
-            "AVPlayer local cache source must use the opened file descriptor directly")
-    require("player.prepare().catch" in audio and "releaseFailedPlayer(player)" in audio,
-            "AVPlayer prepare failures must be handled and release the failed player")
-    require("offset: 0, length: -1" not in audio,
-            "AVPlayer local source must not restore the legacy open-ended descriptor")
+    require("let player = await media.createAVPlayer();" in audio,
+            "AVPlayer must use the known-good static MediaKit creation path")
+    require("await import('@kit.MediaKit')" not in audio,
+            "AVPlayer must not restore the runtime-regressing dynamic MediaKit import")
+    require("let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };" in audio,
+            "AVPlayer must keep the known-good local file descriptor shape")
+    require("player.seek(target, media.SeekMode.SEEK_PREV_SYNC);" in audio,
+            "AVPlayer seek must keep the known-good synchronized seek mode")
 
     require("throw error;" not in share_receive,
             "share receive flow must only throw explicit Error values")
