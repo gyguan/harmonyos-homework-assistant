@@ -5,6 +5,10 @@ import {
   uploadVoiceMaterialFile
 } from './api.js?v=20260923-4';
 import { SUBJECTS, parseVoiceMaterialPackages, uploadOrder, validatePackage } from './voice-material.js?v=20260923-4';
+import {
+  folderStatusClass, folderStatusLabel, renderFolderDetailContent, renderFolderRows,
+  renderTaskDetailContent, renderTaskRows, taskStatusClass, taskStatusLabel
+} from './voice-management-view.js?v=20260924-1';
 
 const el = id => document.getElementById(id);
 const state = {
@@ -23,15 +27,6 @@ function formatDateTime(ms) {
   const n = Number(ms || 0); if (!n) return '—'; const d = new Date(n); if (Number.isNaN(d.getTime())) return '—';
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-function taskStatusLabel(status) {
-  return ({NOT_STARTED:'待开始',IN_PROGRESS:'进行中',PAUSED:'已暂停',READY_TO_SUBMIT:'待提交',SUBMITTED:'待验收',NEEDS_REWORK:'需重做',OVERDUE:'已逾期',COMPLETED:'已完成'})[status] || status || '—';
-}
-function taskStatusClass(status) {
-  if (status === 'COMPLETED') return 'success'; if (status === 'OVERDUE' || status === 'NEEDS_REWORK') return 'danger';
-  if (status === 'IN_PROGRESS' || status === 'READY_TO_SUBMIT' || status === 'SUBMITTED') return 'ready'; return 'muted';
-}
-function folderStatusLabel(status) { return ({READY:'可用',INVALID:'导入失败',PROCESSING:'处理中',ARCHIVED:'已归档'})[status] || status || '—'; }
-function folderStatusClass(status) { return status === 'READY' ? 'success' : status === 'INVALID' ? 'danger' : 'muted'; }
 function uuid() { return globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`; }
 
 function studentOptions() {
@@ -68,10 +63,7 @@ async function loadTasks() {
 }
 function renderTasks() {
   el('task-result-summary').textContent=`共 ${state.tasks.totalElements} 条`; el('task-empty').hidden=state.tasks.items.length>0;
-  el('task-table-body').innerHTML=state.tasks.items.map(x=>`<tr class="clickable-row" data-task-id="${esc(x.assignmentId)}" tabindex="0">
-    <td class="primary-cell">${esc(x.taskName)}</td><td><span class="status-badge ${taskStatusClass(x.assignmentStatus)}">${esc(taskStatusLabel(x.assignmentStatus))}</span></td>
-    <td>${esc(x.studentName)}</td><td>${esc(subjectLabel(x.subjectCode))}</td><td class="folder-cell">${esc(x.directoryName)}</td>
-    <td>${x.expectedMinutes} 分钟</td><td>${esc(formatDateTime(x.taskCreatedAtEpochMs))}</td><td><button class="link-button" data-open-task="${esc(x.assignmentId)}">详情</button></td></tr>`).join('');
+  el('task-table-body').innerHTML=renderTaskRows(state.tasks.items,{esc,subjectLabel,formatDateTime});
   renderPager(el('task-pagination'),state.tasks.page,state.tasks.totalPages);
 }
 
@@ -91,11 +83,7 @@ async function loadFolders() {
 }
 function renderFolders() {
   el('folder-result-summary').textContent=`共 ${state.folders.totalElements} 条`;el('folder-empty').hidden=state.folders.items.length>0;
-  el('folder-table-body').innerHTML=state.folders.items.map(x=>`<tr class="clickable-row" data-folder-id="${esc(x.packageId)}" tabindex="0">
-    <td class="primary-cell folder-cell">${esc(x.directoryName)}</td><td><span class="status-badge ${folderStatusClass(x.folderStatus)}">${esc(folderStatusLabel(x.folderStatus))}</span></td>
-    <td>${esc(x.studentName)}</td><td>${esc(subjectLabel(x.subjectCode))}</td><td>${x.audioCount} 音频 · ${x.imageCount} 图片</td>
-    <td>${x.usageCount} 次</td><td>${esc(formatDateTime(x.lastUsedAtEpochMs))}</td><td>${esc(formatDateTime(x.importedAtEpochMs))}</td>
-    <td><button class="link-button" data-open-folder="${esc(x.packageId)}">详情</button></td></tr>`).join('');
+  el('folder-table-body').innerHTML=renderFolderRows(state.folders.items,{esc,subjectLabel,formatDateTime});
   renderPager(el('folder-pagination'),state.folders.page,state.folders.totalPages);
 }
 
@@ -110,15 +98,9 @@ async function openTaskDetail(id) {
   el('task-detail-drawer').hidden=false;el('task-detail-subtitle').textContent='正在加载…';el('task-detail-content').innerHTML='<div class="drawer-loading">正在加载任务详情…</div>';
   try{state.taskDetail=await getVoiceTaskDetail(id);renderTaskDetail();}catch(e){el('task-detail-content').innerHTML=`<p class="error-text">${esc(e.message)}</p>`;}
 }
-function renderFiles(files=[]) {
-  return files.length?files.map(f=>`<div class="detail-file-row"><div><span class="file-kind">${f.resourceType==='AUDIO'?'语音':'图片'}</span><strong>${esc(f.relativeName)}</strong></div><button class="link-button" data-preview-asset="${esc(f.assetId||'')}" data-preview-resource="${esc(f.id||'')}" data-preview-name="${esc(f.relativeName)}" data-preview-type="${esc(f.resourceType)}">${f.resourceType==='AUDIO'?'播放':'预览'}</button></div>`).join(''):'<div class="detail-empty">暂无素材文件</div>';
-}
 function renderTaskDetail(){
   const d=state.taskDetail,x=d.item;el('task-detail-subtitle').textContent=x.taskName;
-  el('task-detail-content').innerHTML=`<div class="detail-status-line"><span class="status-badge ${taskStatusClass(x.assignmentStatus)}">${esc(taskStatusLabel(x.assignmentStatus))}</span></div>
-  <section class="detail-section"><h3>基本信息</h3><dl class="detail-grid"><div><dt>任务名称</dt><dd>${esc(x.taskName)}</dd></div><div><dt>学生</dt><dd>${esc(x.studentName)}</dd></div><div><dt>科目</dt><dd>${esc(subjectLabel(x.subjectCode))}</dd></div><div><dt>预计用时</dt><dd>${x.expectedMinutes} 分钟</dd></div><div><dt>创建时间</dt><dd>${esc(formatDateTime(x.taskCreatedAtEpochMs))}</dd></div></dl></section>
-  <section class="detail-section"><h3>素材来源</h3><div class="source-folder-box"><div><strong>${esc(x.directoryName)}</strong></div>${x.packageId?`<button class="link-button" data-jump-folder="${esc(x.packageId)}">查看文件夹</button>`:'<span class="muted">APP 本地上传</span>'}</div></section>
-  <section class="detail-section"><h3>素材文件</h3><div class="detail-file-list">${renderFiles(d.files)}</div></section>`;
+  el('task-detail-content').innerHTML=renderTaskDetailContent(d,{esc,subjectLabel,formatDateTime});
   el('task-detail-footer').innerHTML='<div></div><button class="secondary-button" data-close-task-detail>关闭</button>';
 }
 function closeTaskDetail(){el('task-detail-drawer').hidden=true;state.taskDetail=null;}
@@ -129,13 +111,7 @@ async function openFolderDetail(id){
 }
 function renderFolderDetail(){
   const d=state.folderDetail,x=d.item;el('folder-detail-subtitle').textContent=x.directoryName;
-  const history=(d.recentTasks||[]).map(t=>`<div class="history-task-row"><div><strong>${esc(t.taskName||'语音任务')}</strong><span>${esc(formatDateTime(t.createdAtEpochMs))} · ${esc(taskStatusLabel(t.assignmentStatus))}</span></div>${t.assignmentExists?`<button class="link-button" data-jump-task="${esc(t.assignmentId)}">查看</button>`:'<span class="muted">任务已删除</span>'}</div>`).join('')||'<div class="detail-empty">还没有创建过语音任务</div>';
-  el('folder-detail-content').innerHTML=`<div class="detail-status-line"><span class="status-badge ${folderStatusClass(x.folderStatus)}">${esc(folderStatusLabel(x.folderStatus))}</span></div>
-  ${x.folderStatus==='INVALID'?`<div class="detail-alert error"><strong>导入失败原因</strong><span>${esc(x.errorMessage||'素材校验未通过')}</span></div>`:''}
-  <section class="detail-section"><h3>基本信息</h3><dl class="detail-grid"><div><dt>文件夹名称</dt><dd>${esc(x.directoryName)}</dd></div><div><dt>学生</dt><dd>${esc(x.studentName)}</dd></div><div><dt>科目</dt><dd>${esc(subjectLabel(x.subjectCode))}</dd></div><div><dt>默认预计用时</dt><dd>${x.expectedMinutes} 分钟</dd></div><div><dt>导入时间</dt><dd>${esc(formatDateTime(x.importedAtEpochMs))}</dd></div></dl></section>
-  <section class="detail-section"><h3>素材文件</h3><div class="detail-file-list">${renderFiles(d.files)}</div></section>
-  <section class="detail-section"><h3>使用情况</h3><div class="usage-summary"><div><strong>${x.usageCount}</strong><span>已创建任务</span></div><div><strong>${x.activeTaskCount}</strong><span>当前有效任务</span></div><div><strong>${esc(formatDateTime(x.lastUsedAtEpochMs))}</strong><span>最近使用</span></div></div></section>
-  <section class="detail-section"><h3>最近关联任务</h3><div class="history-task-list">${history}</div></section>`;
+  el('folder-detail-content').innerHTML=renderFolderDetailContent(d,{esc,subjectLabel,formatDateTime});
   el('folder-detail-footer').innerHTML=`<div></div><div class="footer-actions"><button class="secondary-button" data-close-folder-detail>关闭</button>${x.folderStatus==='READY'?'<button id="create-from-folder-detail" class="primary-button">创建语音任务</button>':''}</div>`;
 }
 function closeFolderDetail(){el('folder-detail-drawer').hidden=true;state.folderDetail=null;}
