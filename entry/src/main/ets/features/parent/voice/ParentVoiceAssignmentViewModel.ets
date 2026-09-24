@@ -51,6 +51,7 @@ export class ParentVoiceAssignmentViewModel {
       dueAtEpochMs: draft.dueAtEpochMs,
       dueText: draft.dueText,
       title: draft.title.trim(),
+      instruction: draft.instruction.trim(),
       requestId: requestId
     };
     let result = await RemoteVoiceMaterialApi.instance.createAssignment(folder.packageId, request);
