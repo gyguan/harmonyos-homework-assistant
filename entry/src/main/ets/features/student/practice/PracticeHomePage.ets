@@ -24,11 +24,15 @@ struct PracticePaperCard {
         Text(this.paper.title)
           .layoutWeight(1)
           .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(AppTheme.TEXT);
         if (this.passed) {
           Text('已通过')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUCCESS)
             .padding({ left: 9, right: 9, top: 4, bottom: 4 })
@@ -41,7 +45,8 @@ struct PracticePaperCard {
 
       Text(`${this.paper.questionCount} 题 · 约 ${this.paper.estimatedMinutes} 分钟 · ${this.difficultyLabel}`)
         .width('100%')
-        .fontSize(13)
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
 
       if (this.paper.description.length > 0) {
@@ -49,8 +54,8 @@ struct PracticePaperCard {
           .width('100%')
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(13)
-          .lineHeight(18)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
     }
@@ -217,7 +222,8 @@ export struct PracticeHomePage {
       Row({ space: 8 }) {
         Text('科目')
           .width(42)
-          .fontSize(13)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT);
         SegmentedSelectionButton({
@@ -245,7 +251,8 @@ export struct PracticeHomePage {
       Row({ space: 8 }) {
         Text('状态')
           .width(42)
-          .fontSize(13)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT);
         SegmentedSelectionButton({
@@ -275,10 +282,12 @@ export struct PracticeHomePage {
           .layoutWeight(1)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
         Text('调整')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -305,16 +314,20 @@ export struct PracticeHomePage {
         Text('练习套卷')
           .layoutWeight(1)
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
           .fontColor(AppTheme.TEXT);
         Text(this.loading ? '加载中…' : `${this.papers.length} 套`)
           .constraintSize({ minWidth: 64 })
           .maxLines(1)
           .textAlign(TextAlign.End)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
         Text('练习记录')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -329,7 +342,8 @@ export struct PracticeHomePage {
       if (this.errorMessage.length > 0) {
         Text(this.errorMessage)
           .width('100%')
-          .fontSize(14)
+          .fontSize(AppTheme.BODY_SIZE)
+          .lineHeight(AppTheme.BODY_LINE_HEIGHT)
           .fontColor(AppTheme.DANGER)
           .padding(14)
           .backgroundColor(AppTheme.DANGER_SOFT)
@@ -338,6 +352,7 @@ export struct PracticeHomePage {
         Column({ space: 7 }) {
           Text('这个分类暂时没有套卷')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
