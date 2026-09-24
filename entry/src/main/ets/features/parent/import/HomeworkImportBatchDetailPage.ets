@@ -261,13 +261,13 @@ export struct HomeworkImportBatchDetailPage {
             if (this.batch()!.status === ImportBatchStatus.RECEIVED) {
               ActionButton({
                 label: '人工确认未识别消息',
-                onAction: () => this.manualReview()
+                onAction: (): void => this.manualReview()
               })
               .width('100%');
             } else if (this.batch()!.status === ImportBatchStatus.READY) {
               ActionButton({
                 label: '继续确认并发布',
-                onAction: () => this.continueConfirmation()
+                onAction: (): void => this.continueConfirmation()
               })
               .width('100%');
             }
@@ -286,14 +286,14 @@ export struct HomeworkImportBatchDetailPage {
                       label: '取消',
                       kind: ActionButtonKind.NEUTRAL,
                       compact: true,
-                      onAction: () => this.abandonConfirm = false
+                      onAction: (): void => this.abandonConfirm = false
                     })
                     .layoutWeight(1);
                     ActionButton({
                       label: '确认放弃',
                       kind: ActionButtonKind.DANGER,
                       compact: true,
-                      onAction: () => this.abandon()
+                      onAction: (): void => this.abandon()
                     })
                     .layoutWeight(1);
                   }
@@ -308,7 +308,7 @@ export struct HomeworkImportBatchDetailPage {
                   label: '放弃这个批次',
                   kind: ActionButtonKind.DANGER_SOFT,
                   compact: true,
-                  onAction: () => this.abandonConfirm = true
+                  onAction: (): void => this.abandonConfirm = true
                 })
                 .width('100%');
               }
