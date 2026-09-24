@@ -4,7 +4,7 @@ import { AppTheme } from '../../../common/theme/AppTheme';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
-import { Assignment, AssignmentStatus, AssignmentType, Subject } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, Subject } from '../../../domain/model/HomeworkModels';
 import { StudentHomeViewModel } from './StudentHomeViewModel';
 
 @Component
@@ -62,84 +62,65 @@ struct StudentTodayTaskCard {
   }
 
   build() {
-    Column({ space: this.emphasized ? 13 : 9 }) {
-      Row({ space: 10 }) {
-        CenteredTextBadge({
-          badgeText: this.assignment.subject.substring(0, 1),
-          badgeWidth: this.emphasized ? 46 : 40,
-          badgeHeight: this.emphasized ? 46 : 40,
-          badgeFontSize: this.emphasized ? 18 : 16,
-          badgeRadius: 12,
-          badgeBold: true,
-          badgeForeground: this.subjectColor(),
-          badgeBackground: this.subjectBackground()
-        });
-        Column({ space: 4 }) {
-          Row({ space: 6 }) {
-            Text(this.assignment.subject)
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.subjectColor());
-            Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
-            Text(this.statusLabel())
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.statusColor());
-            if (this.assignment.assignmentType === AssignmentType.EXTRA) {
-              Text('课外').fontSize(12).fontColor(AppTheme.SUBTEXT);
-            }
-          }
-          .width('100%');
-          Text(this.assignment.title)
-            .width('100%')
-            .fontSize(this.emphasized ? 19 : 16)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT)
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis });
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-      }
-      .width('100%');
+    Row({ space: 10 }) {
+      CenteredTextBadge({
+        badgeText: this.assignment.subject.substring(0, 1),
+        badgeWidth: this.emphasized ? 46 : 40,
+        badgeHeight: this.emphasized ? 46 : 40,
+        badgeFontSize: this.emphasized ? 18 : 16,
+        badgeRadius: 12,
+        badgeBold: true,
+        badgeForeground: this.subjectColor(),
+        badgeBackground: this.subjectBackground()
+      });
 
-      if (this.emphasized && this.assignment.instruction.length > 0) {
-        Text(this.assignment.instruction)
+      Column({ space: 5 }) {
+        Text(this.assignment.title)
           .width('100%')
-          .fontSize(14)
-          .lineHeight(21)
-          .fontColor(AppTheme.SUBTEXT)
-          .maxLines(3)
+          .fontSize(this.emphasized ? 18 : 16)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT)
+          .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis });
-      }
 
-      Row({ space: 10 }) {
-        Text(`预计 ${this.assignment.expectedMinutes} 分钟`)
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
-        Blank();
-        Button(this.actionLabel(), { type: ButtonType.Normal })
-          .width(this.emphasized ? 104 : 84)
-          .height(AppTheme.MIN_TOUCH_TARGET)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(!this.busy)
-          .backgroundColor(this.busy ? AppTheme.DISABLED : AppTheme.PRIMARY)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .accessibilityText(`${this.actionLabel()}${this.assignment.title}`)
-          .onClick(() => this.onAction(this.assignment.id));
+        Row({ space: 5 }) {
+          Text(this.statusLabel())
+            .fontSize(12)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.statusColor());
+          Text('·')
+            .fontSize(12)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+          Text(`${this.assignment.expectedMinutes} 分钟`)
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%');
       }
-      .width('100%')
-      .alignItems(VerticalAlign.Center);
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start);
+
+      Button(this.actionLabel(), { type: ButtonType.Normal })
+        .width(this.emphasized ? 96 : 82)
+        .height(AppTheme.MIN_TOUCH_TARGET)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.busy)
+        .backgroundColor(this.busy ? AppTheme.DISABLED : AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .fontSize(14)
+        .fontWeight(FontWeight.Medium)
+        .accessibilityText(`${this.actionLabel()}${this.assignment.title}`)
+        .onClick(() => this.onAction(this.assignment.id));
     }
     .width('100%')
-    .padding(this.emphasized ? 18 : 14)
+    .alignItems(VerticalAlign.Center)
+    .padding(this.emphasized ? 16 : 13)
     .backgroundColor(this.emphasized ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
     .border({ width: this.emphasized ? 1 : 0, color: this.emphasized ? AppTheme.PRIMARY : Color.Transparent })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
     .accessibilityGroup(true)
-    .accessibilityText(`${this.assignment.subject}，${this.assignment.title}，${this.statusLabel()}`);
+    .accessibilityText(`${this.assignment.subject}，${this.assignment.title}，${this.statusLabel()}，预计${this.assignment.expectedMinutes}分钟`);
+
   }
 }
 
@@ -175,7 +156,7 @@ export struct StudentHomePage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private async openAssignment(assignmentId: string): Promise<void> {
