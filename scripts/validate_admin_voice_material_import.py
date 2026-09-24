@@ -25,6 +25,7 @@ index = read("backend/src/main/resources/static/admin/index.html")
 css = read("backend/src/main/resources/static/admin/css/admin.css")
 api = read("backend/src/main/resources/static/admin/js/api.js")
 app = read("backend/src/main/resources/static/admin/js/app.js")
+view = read("backend/src/main/resources/static/admin/js/voice-management-view.js")
 voice = read("backend/src/main/resources/static/admin/js/voice-material.js")
 admin_controller = read("backend/src/main/java/com/xiaoban/homework/admin/AdminPageController.java")
 
@@ -54,8 +55,12 @@ require("from assignment a" in query_service and
         "left join voice_material_task_link l" in query_service and
         "limit :limit offset :offset" in query_service,
         "voice task query must start from Assignment and remain server paged")
-require("fetchAssignmentResource" in api and "APP 本地上传" in app,
+require("fetchAssignmentResource" in api and "APP 本地上传" in view,
         "Web task detail must preview local-upload assignment resources without a folder link")
+require("renderTaskRows" in view and "renderFolderRows" in view and
+        "renderTaskDetailContent" in view and "renderFolderDetailContent" in view and
+        "voice-management-view.js" in app,
+        "voice task/folder presentation must stay isolated from app orchestration")
 require("/api/v1/voice-tasks" in api and "searchVoiceTasks" in app,
         "Web task list must use canonical paged task API")
 require('value="READY"' not in index[index.find('id="task-status"'):index.find('id="task-subject"')],
@@ -108,7 +113,7 @@ require("parseVoiceMaterialPackages" in app and
         "folder import must validate 1 audio + at least 1 image")
 require("renderImportResults" in app and "可用于创建语音任务" in app,
         "import must finish with a per-folder reusable result list")
-require("AdminVoiceMaterialService" not in controller + app + api,
+require("AdminVoiceMaterialService" not in controller + app + view + api,
         "admin refactor must not duplicate the voice material domain service")
 require("#1456b8" in css and "#fff" in css and ".data-table" in css and ".drawer-panel" in css,
         "admin must keep the white/deep-blue Web management visual baseline")
