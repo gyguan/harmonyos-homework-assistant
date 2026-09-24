@@ -301,20 +301,30 @@ export struct PracticeHomePage {
   @Builder
   private PaperList() {
     Column({ space: 10 }) {
-      Row({ space: 8 }) {
+      Row({ space: 10 }) {
         Text('练习套卷')
           .layoutWeight(1)
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text(this.loading ? '加载中…' : `${this.papers.length} 套`)
-          .constraintSize({ minWidth: 64 })
+          .constraintSize({ minWidth: 56 })
           .maxLines(1)
           .textAlign(TextAlign.End)
-          .fontSize(14)
+          .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
+        Text('练习记录')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 6, right: 2 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('查看练习记录')
+          .onClick(() => this.onOpenHistory());
       }
-      .width('100%');
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
 
       if (this.errorMessage.length > 0) {
         Text(this.errorMessage)
@@ -356,32 +366,8 @@ export struct PracticeHomePage {
     Scroll() {
       Column() {
         Column({ space: 18 }) {
-          Column({ space: 5 }) {
-            Row() {
-              Text('练习')
-                .fontSize(AppTheme.PAGE_TITLE_SIZE)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(AppTheme.TEXT);
-              Blank();
-              Text('练习记录')
-                .fontSize(14)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.PRIMARY)
-                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .padding({ left: 12, right: 2 })
-                .accessibilityRole(AccessibilityRoleType.BUTTON)
-                .accessibilityText('查看练习记录')
-                .onClick(() => this.onOpenHistory());
-            }
-            .width('100%');
-          }
-          .width('100%')
-          .alignItems(HorizontalAlign.Start);
-
           this.QuickFilterBar();
-
           this.PaperList();
-
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
