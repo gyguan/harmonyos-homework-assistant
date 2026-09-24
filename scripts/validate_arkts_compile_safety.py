@@ -127,6 +127,10 @@ def main() -> int:
         require(
             re.search(r"^\s*onClick\s*:\s*\([^\n]*\)\s*=>\s*void\s*=", source, flags=re.M) is None,
             f"{relative} declares a custom onClick callback that can collide with ArkUI CommonAttribute")
+        if file != ACTION_CONTROLS:
+            require(
+                "onAction: () =>" not in source,
+                f"{relative} uses an implicitly typed shared action callback; declare (): void explicitly")
 
     syscap = "SystemCapability.Multimedia.Media.AVPlayer"
     require(audio.count(f"canIUse('{syscap}')") >= 2,
