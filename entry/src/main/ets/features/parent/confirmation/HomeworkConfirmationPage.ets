@@ -205,7 +205,7 @@ export struct HomeworkConfirmationPage {
     Row({ space: 10 }) {
       Text(this.bulkMode ? `已选 ${this.selectedCandidateIds.length} 项` : '发布前最后核对')
         .layoutWeight(1)
-        .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
 
