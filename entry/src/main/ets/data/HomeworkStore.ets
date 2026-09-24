@@ -142,6 +142,7 @@ export class HomeworkStore {
     let students: StudentProfile[] = [];
     for (let student of source.students) students.push(this.cloneStudent(student));
     return { students: students, activeStudentId: source.activeStudentId,
+      parentAccessCode: source.parentAccessCode === undefined ? '' : source.parentAccessCode,
       tutorGuidanceFirst: source.tutorGuidanceFirst, directAnswerAllowed: source.directAnswerAllowed };
   }
 
@@ -243,6 +244,11 @@ export class HomeworkStore {
   }
 
   getSettings(): AppSettings { return this.settings; }
+
+  updateParentAccessCode(parentAccessCode: string): void {
+    this.settings.parentAccessCode = parentAccessCode;
+    this.requestPersist();
+  }
 
   updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean): void {
     this.settings.tutorGuidanceFirst = tutorGuidanceFirst;
