@@ -380,7 +380,7 @@ export struct PracticeAttemptPage {
           }
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding({
           left: this.scaled(AppTheme.PAGE_PADDING),
           right: this.scaled(AppTheme.PAGE_PADDING),
@@ -558,7 +558,7 @@ export struct PracticeAttemptPage {
           }
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding({
           left: this.scaled(AppTheme.PAGE_PADDING),
           right: this.scaled(AppTheme.PAGE_PADDING),
@@ -585,7 +585,7 @@ export struct PracticeAttemptPage {
         });
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
       .padding({
         left: AppTheme.PAGE_PADDING,
         right: AppTheme.PAGE_PADDING,
@@ -602,7 +602,7 @@ export struct PracticeAttemptPage {
             this.QuestionContent();
           }
           .width('100%')
-          .constraintSize({ maxWidth: AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH })
+          .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
           .padding({
             left: this.scaled(AppTheme.PAGE_PADDING),
             right: this.scaled(AppTheme.PAGE_PADDING),
