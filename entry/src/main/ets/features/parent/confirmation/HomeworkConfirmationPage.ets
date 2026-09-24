@@ -206,19 +206,23 @@ export struct HomeworkConfirmationPage {
       Text(this.bulkMode ? `已选 ${this.selectedCandidateIds.length} 项` : '发布前最后核对')
         .layoutWeight(1)
         .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
+        .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
         .fontColor(AppTheme.TEXT);
 
       if (this.bulkMode) {
         Text('全选')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 8, right: 8 })
           .onClick(() => this.selectAllCandidates());
         Text('完成')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -226,7 +230,8 @@ export struct HomeworkConfirmationPage {
           .onClick(() => this.exitBulkMode());
       } else {
         Text('＋ 新增')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -256,7 +261,7 @@ export struct HomeworkConfirmationPage {
     if (this.candidates().length === 0) {
       Column({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.checkmark_circle_fill')).fontSize(30).fontColor([AppTheme.SUCCESS]);
-        Text('没有待确认作业').fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('没有待确认作业').fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       }
       .width('100%')
       .padding({ top: 30, bottom: 30 });
@@ -304,7 +309,7 @@ export struct HomeworkConfirmationPage {
   @Builder
   private PublishFeedback() {
     if (this.publishMessage.length > 0) {
-      Text(this.publishMessage).width('100%').fontSize(13).lineHeight(18)
+      Text(this.publishMessage).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontColor(this.publishError ? AppTheme.DANGER : AppTheme.SUCCESS)
         .padding(10)
         .backgroundColor(this.publishError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
@@ -322,7 +327,8 @@ export struct HomeworkConfirmationPage {
           if (this.batchDeleteConfirm) {
             Text(`确定删除选中的 ${this.selectedCandidateIds.length} 项待确认作业？`)
               .width('100%')
-              .fontSize(13)
+              .fontSize(AppTheme.BODY_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT)
               .fontColor(AppTheme.DANGER);
             Row({ space: 10 }) {
               Button('取消', { type: ButtonType.Normal })
