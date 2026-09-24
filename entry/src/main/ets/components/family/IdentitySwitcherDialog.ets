@@ -131,13 +131,17 @@ export struct IdentitySwitcherDialog {
               Column({ space: 3 }) {
                 Text(student.name)
                   .width('100%')
-                  .fontSize(15)
+                  .fontSize(AppTheme.CARD_TITLE_SIZE)
+                  .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
+                  .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
                   .fontColor(AppTheme.TEXT);
                 Text(student.grade + ' · ' + student.className)
                   .width('100%')
-                  .fontSize(12)
-                  .fontColor(AppTheme.SUBTEXT);
+                  .fontSize(AppTheme.CAPTION_SIZE)
+                  .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+                  .fontColor(AppTheme.SUBTEXT)
+                  .maxLines(2);
               }
               .layoutWeight(1)
               .alignItems(HorizontalAlign.Start);
