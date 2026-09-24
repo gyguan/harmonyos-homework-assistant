@@ -92,6 +92,9 @@ for token in [
     "PAGE_PADDING_COMPACT",
     "PAGE_PADDING_MEDIUM",
     "PAGE_PADDING_EXPANDED",
+    "LIST_CARD_MIN_HEIGHT",
+    "METRIC_CARD_MIN_HEIGHT",
+    "INBOX_CARD_MIN_HEIGHT",
     "PARENT_HOME_ACTION_CARD_MIN_HEIGHT",
     "PARENT_HOME_ACTION_ICON_SIZE",
     "PARENT_HOME_ACTION_CARD_PADDING",
@@ -291,7 +294,7 @@ if assignment_list_item:
             ".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)" in assignment_list_item and
             ".lineHeight(AppTheme.META_LINE_HEIGHT)" in assignment_list_item and
             ".maxLines(AppTheme.CARD_TITLE_MAX_LINES)" in assignment_list_item and
-            ".constraintSize({ minHeight: 78 })" in assignment_list_item,
+            ".constraintSize({ minHeight: AppTheme.LIST_CARD_MIN_HEIGHT })" in assignment_list_item,
             "AssignmentListItem must reserve stable vertical space for title/status and metadata rows")
 
 # Persistent selectors whose visual state changes at runtime must use reactive child-component props,
