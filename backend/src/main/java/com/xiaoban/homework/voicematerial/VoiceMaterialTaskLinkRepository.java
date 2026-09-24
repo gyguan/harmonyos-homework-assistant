@@ -11,6 +11,8 @@ public interface VoiceMaterialTaskLinkRepository
   Optional<VoiceMaterialTaskLinkEntity> findByFamilyIdAndAssignmentId(UUID familyId, String assignmentId);
   Optional<VoiceMaterialTaskLinkEntity> findFirstByFamilyIdAndPackageIdOrderByCreatedAtDesc(
       UUID familyId, UUID packageId);
+  List<VoiceMaterialTaskLinkEntity> findByFamilyIdAndPackageIdOrderByCreatedAtDesc(
+      UUID familyId, UUID packageId);
   List<VoiceMaterialTaskLinkEntity> findByFamilyIdAndStudentIdOrderByCreatedAtDesc(
       UUID familyId, String studentId);
   boolean existsByFamilyIdAndPackageId(UUID familyId, UUID packageId);
