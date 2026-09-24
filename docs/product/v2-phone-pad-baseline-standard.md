@@ -14,6 +14,7 @@ V2 不接受“Phone 页面直接横向放大到 Pad”，也不要求每个切�
 - 宽容器下限制内容最大可读宽度，避免卡片和正文无限拉伸；
 - Dialog / Bottom Sheet 在宽容器下限制自身可读宽度；
 - 页面滚动、顶部对齐、触控区域和 Deep Page Chrome 在 Phone / Pad 上保持一致；
+- 字体语义层级遵循 `v2-typography-standard.md`，Phone / Pad 不维护两套标题字号；
 - Feature 不判断 Phone / Pad 型号，不读取物理 display，不维护私有设备断点；
 - Feature 不直接用 `WindowSizeClass.COMPACT / MEDIUM / EXPANDED` 决定业务组合、字号或密度；
 - 需要多栏时，统一通过 `LayoutPolicy` 根据实际内容容器宽度和 pane 最小可读宽度决定。
