@@ -219,7 +219,7 @@ export struct HomeworkImportPage {
         text: this.textDraft
       })
         .width('100%')
-        .height(150)
+        .height(200)
         .fontSize(15)
         .lineHeight(22)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
