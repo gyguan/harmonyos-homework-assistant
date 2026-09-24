@@ -585,7 +585,7 @@ export struct VoiceAssignmentPane {
         .width('100%')
         .padding(10)
         .backgroundColor(AppTheme.SURFACE)
-        .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+        .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
       }
     }
     .width('100%');
