@@ -74,7 +74,7 @@ export struct HomeworkImportInboxFilterDialog {
           label: '关闭',
           kind: TextActionKind.NEUTRAL,
           accessibilityLabel: '关闭收件箱筛选',
-          onAction: () => this.controller.close()
+          onAction: (): void => this.controller.close()
         });
       }
       .width('100%')
@@ -142,12 +142,12 @@ export struct HomeworkImportInboxFilterDialog {
         ActionButton({
           label: '重置',
           kind: ActionButtonKind.NEUTRAL,
-          onAction: () => this.reset()
+          onAction: (): void => this.reset()
         })
         .layoutWeight(1);
         ActionButton({
           label: '确定',
-          onAction: () => this.confirm()
+          onAction: (): void => this.confirm()
         })
         .layoutWeight(2);
       }
