@@ -33,6 +33,7 @@ require(len(theme) > 0, f"missing required file: {theme_path}")
 for token in [
     "SURFACE_SUBTLE",
     "SURFACE_EMPHASIS",
+    "CARD_SURFACE",
     "PRIMARY_SOFT",
     "PRIMARY_FAINT",
     "DIVIDER",
@@ -140,14 +141,14 @@ for ui_root in ui_roots:
             require(f"@Prop {forbidden_prop}:" not in text,
                     f"custom component prop must not shadow ArkUI CommonAttribute.{forbidden_prop}: {relative}")
 
-# Shared master-detail rows are persistent selections on wide layouts. A faint fill alone is too easy
-# to miss, so selected rows must combine a selected surface with a primary border.
+# Ordinary cards use one shared white surface. Persistent selection is expressed by border/control state,
+# not by changing the entire card fill.
 assignment_list_item = read_optional("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
 if assignment_list_item:
     require("accessibilityRole(AccessibilityRoleType.BUTTON)" in assignment_list_item,
             "AssignmentListItem must expose button accessibility semantics while it exists")
-    require("backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)" in assignment_list_item,
-            "AssignmentListItem selected state must keep a selected surface")
+    require("backgroundColor(AppTheme.CARD_SURFACE)" in assignment_list_item,
+            "AssignmentListItem must keep the shared card surface regardless of selection")
     require("width: this.selected ? 1 : 0" in assignment_list_item and
             "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in assignment_list_item,
             "AssignmentListItem selected state must add a primary border as a second visual cue")
@@ -182,6 +183,28 @@ if selection_controls:
             "reactive selection controls must expose a visible selected surface")
     require("border({ width: 1, color: this.selected ? AppTheme.PRIMARY : AppTheme.BORDER })" in selection_controls,
             "status selection must combine selected surface and border")
+
+parent_dashboard = read_optional("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+identity_switcher = read_optional("entry/src/main/ets/components/family/IdentitySwitcherDialog.ets")
+student_switcher = read_optional("entry/src/main/ets/components/family/StudentSwitcherDialog.ets")
+student_home = read_optional("entry/src/main/ets/features/student/home/StudentHomePage.ets")
+voice_assignment = read_optional("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+for card_path, card_source in [
+    ("ParentDashboardPage", parent_dashboard),
+    ("IdentitySwitcherDialog", identity_switcher),
+    ("StudentSwitcherDialog", student_switcher),
+    ("StudentHomePage", student_home),
+    ("ParentVoiceAssignmentPage", voice_assignment),
+]:
+    require("AppTheme.CARD_SURFACE" in card_source,
+            f"{card_path} must use the shared ordinary card surface")
+require("backgroundColor(AppTheme.PRIMARY_FAINT)" not in parent_dashboard,
+        "Parent dashboard action cards must not use a different fill for 布置作业")
+require("backgroundColor(this.parentActive ? AppTheme.PRIMARY_FAINT" not in identity_switcher and
+        "AppTheme.PRIMARY_FAINT : AppTheme.SURFACE" not in identity_switcher,
+        "Identity switcher cards must keep one surface and use border/checkmark for selection")
+require("backgroundColor(this.activeStudentId === student.id ? AppTheme.PRIMARY_FAINT" not in student_switcher,
+        "Student switcher cards must keep one surface and use border/checkmark for selection")
 
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
@@ -264,9 +287,9 @@ require(".bindSheet($$this.showEditorSheet" in confirmation and
 require(confirmation_components.count("@Prop item: CandidateAssignment;") >= 2 and
         "@Prop selected: boolean = false;" in confirmation_components,
         "Confirmation Candidate components must receive current item/selection through reactive props")
-require("backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)" in confirmation_components and
+require("backgroundColor(AppTheme.CARD_SURFACE)" in confirmation_components and
         "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in confirmation_components,
-        "Confirmation selected Candidate must combine active surface and border")
+        "Confirmation Candidate must keep the shared card surface and express selection with border")
 for expression in [
     "selected: this.subject === Subject.CHINESE",
     "selected: this.subject === Subject.MATH",
