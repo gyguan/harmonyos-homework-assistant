@@ -196,6 +196,7 @@ parent_review_page = read_optional("entry/src/main/ets/features/parent/review/Pa
 homework_import_route = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
 homework_import = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 homework_confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
+parent_settings = read_optional("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 for card_path, card_source in [
     ("ParentDashboardPage", parent_dashboard),
     ("IdentitySwitcherDialog", identity_switcher),
@@ -239,6 +240,31 @@ require("AppTheme.PHONE_PAGE_PADDING" not in homework_confirmation and
         "left: AppTheme.PAGE_PADDING" in homework_confirmation and
         "right: AppTheme.PAGE_PADDING" in homework_confirmation,
         "Homework confirmation must align to the shared parent deep-page horizontal padding")
+
+for collapsed_state in [
+    "@State private familyExpanded: boolean = false;",
+    "@State private parentAccessExpanded: boolean = false;",
+    "@State private tutorRulesExpanded: boolean = false;",
+    "@State private dataSyncExpanded: boolean = false;",
+]:
+    require(collapsed_state in parent_settings,
+            f"Parent My sections must default to collapsed: {collapsed_state}")
+for toggle_expression in [
+    "this.familyExpanded = !this.familyExpanded",
+    "this.parentAccessExpanded = !this.parentAccessExpanded",
+    "this.tutorRulesExpanded = !this.tutorRulesExpanded",
+    "this.dataSyncExpanded = !this.dataSyncExpanded",
+]:
+    require(toggle_expression in parent_settings,
+            f"Parent My section must be expandable by its header: {toggle_expression}")
+require("cloudPanelOpen" not in parent_settings,
+        "Parent My data/sync must not keep a second nested collapse state")
+require("AppTheme.PROFILE_READABLE_MAX_WIDTH" in parent_settings,
+        "Parent and student My pages must share the same readable width")
+require("private SectionTitle(" not in parent_settings and
+        "private FamilySettingsSection()" in parent_settings and
+        "private DataSyncSettingsSection()" in parent_settings,
+        "Parent My must use the same card-and-collapsible-section composition as Student My")
 
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
