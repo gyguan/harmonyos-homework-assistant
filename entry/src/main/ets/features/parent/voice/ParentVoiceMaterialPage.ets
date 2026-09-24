@@ -438,14 +438,16 @@ export struct ParentVoiceMaterialPage {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           Text(this.validationSummary(item))
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(this.validationColor(item));
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
         Text('移除')
-          .fontSize(12)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.DANGER)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 8, right: 4 })
@@ -454,7 +456,7 @@ export struct ParentVoiceMaterialPage {
       .width('100%');
 
       Row({ space: 6 }) {
-        Text('科目').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('科目').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         ForEach(VOICE_SUBJECT_CODES, (code: string) => {
           this.SubjectChip(this.subjectLabel(code), code, item.subjectCode, () => {
             this.setPackageSubject(index, code);
@@ -464,7 +466,7 @@ export struct ParentVoiceMaterialPage {
       .width('100%');
 
       Row({ space: 8 }) {
-        Text('预计用时').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('预计用时').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         TextInput({ text: `${item.expectedMinutes}` })
           .width(92)
           .height(38)
@@ -472,7 +474,7 @@ export struct ParentVoiceMaterialPage {
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CHIP_RADIUS)
           .onChange((value: string) => this.setPackageExpectedMinutes(index, value));
-        Text('分钟').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('分钟').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
     }
@@ -547,14 +549,16 @@ export struct ParentVoiceMaterialPage {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           Text(`${this.subjectLabel(item.subjectCode)} · ${item.expectedMinutes} 分钟 · ${item.files.length} 个文件`)
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
         Text(this.statusLabel(item))
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.statusColor(item))
           .padding({ left: 9, right: 9, top: 5, bottom: 5 })
@@ -566,7 +570,8 @@ export struct ParentVoiceMaterialPage {
       if (item.status === 'INVALID' && item.errorMessage.length > 0) {
         Text(item.errorMessage)
           .width('100%')
-          .fontSize(12)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.DANGER);
       }
 
@@ -695,8 +700,8 @@ export struct ParentVoiceMaterialPage {
           .textAlign(TextAlign.Center);
         Text(this.message)
           .layoutWeight(1)
-          .fontSize(13)
-          .lineHeight(19)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(this.messageError ? AppTheme.DANGER : AppTheme.SUCCESS);
       }
       .width('100%')
