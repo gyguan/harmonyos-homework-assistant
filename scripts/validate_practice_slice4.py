@@ -55,9 +55,9 @@ require("showPreviousAnswer: boolean = false" in attempt_page,
         "previous answers and notes must remain hidden by default")
 require("再挑战 ${this.result.wrongCount} 道错题" in result_page and
         "private async retryWrong()" in result_page and
-        ".onClick(() => void this.retryWrong())" in result_page and
+        "onClick: () => void this.retryWrong()" in result_page and
         "retryWrong" in result_vm,
-        "Practice result must support wrong-only retry")
+        "Practice result must support wrong-only retry through the shared action control")
 require("cachedPaperVersion" in result_vm and "cachedStudentId" in result_vm and
         "item.paperVersion === paperVersion" in result_vm,
         "Practice progress comparison must stay within the same student and paper version")
