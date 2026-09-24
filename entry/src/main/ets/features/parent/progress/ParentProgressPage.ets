@@ -385,7 +385,7 @@ export struct ParentProgressPage {
       if (this.currentVisibleAssignments().length === 0) {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
-          Text('当前筛选下没有作业').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('当前筛选下没有作业').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           Text('可以调整日期或科目。').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding({ top: 30, bottom: 30 });
