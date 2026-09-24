@@ -25,7 +25,7 @@ export struct ParentDashboardPage {
         .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(13);
+        .borderRadius(AppTheme.CHIP_RADIUS);
         Blank();
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(15)
@@ -80,7 +80,7 @@ export struct ParentDashboardPage {
         .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(13);
+        .borderRadius(AppTheme.CHIP_RADIUS);
         Blank();
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(15)
@@ -135,7 +135,7 @@ export struct ParentDashboardPage {
         .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(13);
+        .borderRadius(AppTheme.CHIP_RADIUS);
         Blank();
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(15)
