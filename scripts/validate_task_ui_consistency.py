@@ -98,9 +98,9 @@ for removed in ["private TypeOption", "private DateOption", "今天", "明天", 
 require(query_dialog.index("label: '关闭'") < query_dialog.index("DatePicker({") <
         query_dialog.index("label: '查询'"),
         "task query dialog must keep shared close top-right and query action at bottom")
-require(deadline_dialog.index("Text('关闭')") < deadline_dialog.index("DatePicker({") <
-        deadline_dialog.index("Button('确定'"),
-        "deadline dialog must keep close top-right and confirm action at bottom")
+require(deadline_dialog.index("label: '关闭'") < deadline_dialog.index("DatePicker({") <
+        deadline_dialog.index("label: '确定'"),
+        "deadline dialog must keep shared close top-right and confirm action at bottom")
 require("TextAction({" in student_switcher and "label: '关闭'" in student_switcher,
         "student switcher must keep a shared top-right close action")
 require("TextAction({" in photo_preview and "label: '关闭'" in photo_preview,
@@ -113,8 +113,9 @@ require("EditSheetHeader({" in confirmation_components and "TextAction({" in she
         "label: '关闭'" in sheet_header and "confirmDiscard" in confirmation_components,
         "candidate edit sheet must reuse the shared close-only header and protect dirty edits")
 candidate_actions = confirmation_components.split("private BottomActions()", 1)[1].split("build()", 1)[0]
-require("Button('删除'" in candidate_actions and "Button('保存'" in candidate_actions,
-        "candidate editor business actions must stay in its bottom action area")
+require("ActionButton({" in candidate_actions and "label: '删除'" in candidate_actions and
+        "label: '保存'" in candidate_actions,
+        "candidate editor business actions must stay in its bottom action area through shared actions")
 
 if errors:
     print("TASK_UI_CONSISTENCY_GATE_FAIL")
