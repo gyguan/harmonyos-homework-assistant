@@ -125,11 +125,11 @@ export struct ParentExtraAssignmentPage {
     Column({ space: 12 }) {
       Text('任务内容').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       TextInput({ placeholder: '例如：阅读《西游记》第三章', text: this.title })
-        .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(15)
+        .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE)
         .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.title = value);
       TextArea({ placeholder: '写清楚完成要求，例如：读完后用三句话复述主要内容', text: this.instruction })
-        .width('100%').height(116).fontSize(14).lineHeight(21)
+        .width('100%').height(116).fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
         .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.instruction = value);
     }
@@ -146,9 +146,9 @@ export struct ParentExtraAssignmentPage {
         onChange: (value: string) => this.dueText = value
       });
       Column({ space: 5 }) {
-        Text('预计用时（分钟）').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text('预计用时（分钟）').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         TextInput({ placeholder: '20', text: this.expectedMinutesText })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(14)
+          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE)
           .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.expectedMinutesText = value);
       }
@@ -163,7 +163,7 @@ export struct ParentExtraAssignmentPage {
       Row({ space: 8 }) {
         SymbolGlyph(this.messageError ? $r('sys.symbol.exclamationmark_circle_fill') : $r('sys.symbol.checkmark_circle_fill'))
           .fontSize(17).fontColor([this.messageError ? AppTheme.DANGER : AppTheme.SUCCESS]);
-        Text(this.message).layoutWeight(1).fontSize(13).lineHeight(19)
+        Text(this.message).layoutWeight(1).fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(this.messageError ? AppTheme.DANGER : AppTheme.SUCCESS);
       }
       .width('100%').padding(12)
@@ -196,7 +196,7 @@ export struct ParentExtraAssignmentPage {
               .width('100%').height(AppTheme.BUTTON_HEIGHT)
               .borderRadius(AppTheme.CONTROL_RADIUS)
               .enabled(!this.busy)
-              .fontSize(15).fontWeight(FontWeight.Medium)
+              .fontSize(AppTheme.FORM_TEXT_SIZE).fontWeight(FontWeight.Medium)
               .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
               .onClick(() => { void this.createTask(); });
           }
