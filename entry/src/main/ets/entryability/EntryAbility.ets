@@ -50,7 +50,8 @@ export default class EntryAbility extends UIAbility {
   }
 
   private async bootstrap(windowStage: window.WindowStage): Promise<void> {
-    HomeworkImportService.instance.configure(new CoreVisionHomeworkTextExtractor(), new LocalHomeworkAssignmentParser());
+    HomeworkImportService.instance.configure(
+      this.context, new CoreVisionHomeworkTextExtractor(), new LocalHomeworkAssignmentParser());
     HomeworkShareImportService.instance.configure(this.context);
     HomeworkSubmissionService.instance.configure(this.context);
     VoiceAssignmentMediaService.instance.configure(this.context);
