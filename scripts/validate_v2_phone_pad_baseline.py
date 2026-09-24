@@ -74,8 +74,10 @@ require("AppTheme.FILTER_DIALOG_MAX_WIDTH" in filter_dialog,
         "Assignment filter dialog must be width-capped on wide containers")
 require("AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH" in detail,
         "Assignment Detail must use the shared readable-width token")
-require("AppTheme.STUDY_READABLE_MAX_WIDTH" in study and "AppTheme.STUDY_TITLE_SIZE" in study,
-        "Study Workspace must keep shared readable-width and title tokens")
+require("AppTheme.STUDY_READABLE_MAX_WIDTH" in study and
+        "AppTheme.PAGE_TITLE_SIZE" in study and
+        "AppTheme.PAGE_TITLE_LINE_HEIGHT" in study,
+        "Study Workspace must keep shared readable-width and semantic business-title tokens")
 require("AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in practice_attempt,
         "Practice Attempt must keep a dedicated readable width on wide containers")
 require("ResponsiveContext.areaLengthToVp" in practice_attempt and "contentScale()" in practice_attempt,
