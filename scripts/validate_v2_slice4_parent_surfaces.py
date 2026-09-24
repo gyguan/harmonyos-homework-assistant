@@ -144,9 +144,9 @@ require("AssignmentStatus.SUBMITTED" in review_pane and "退回订正" in review
         "Parent Review must expose review actions only around submitted work")
 require("this.viewModel.approve" in review_pane and "this.viewModel.returnForRework" in review_pane,
         "Parent Review UI must delegate decisions to ParentReviewViewModel")
-require("ParentAssignmentEditPanel" in review_pane and "编辑任务" in review_pane and
-        "this.viewModel.updateDetails(updated)" in review_pane,
-        "Parent task detail must expose editable task definition before submission")
+require("ParentAssignmentEditPanel" in review_pane and "label: '编辑'" in review_pane and
+        "TextAction({" in review_pane and "this.viewModel.updateDetails(updated)" in review_pane,
+        "Parent task detail must expose lightweight editable task definition before submission")
 require("AssignmentEditForm" in review_editor and "保存修改" in review_editor and
         "不会修改作业状态和计时" in review_editor,
         "Parent assignment editor must reuse the shared assignment form and explain status isolation")
