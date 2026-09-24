@@ -184,14 +184,14 @@ export struct ParentProgressPage {
           label: '取消',
           kind: ActionButtonKind.NEUTRAL,
           isEnabled: !this.deleteBusy,
-          onClick: () => this.showDeleteSheet = false
+          onAction: () => this.showDeleteSheet = false
         })
         .layoutWeight(1);
         ActionButton({
           label: this.deleteBusy ? '正在删除…' : '确认删除',
           kind: ActionButtonKind.DANGER,
           isEnabled: !this.deleteBusy,
-          onClick: () => { void this.deleteSelectedAssignments(); }
+          onAction: () => { void this.deleteSelectedAssignments(); }
         })
         .layoutWeight(1);
       }
@@ -212,7 +212,7 @@ export struct ParentProgressPage {
           .fontColor(AppTheme.TEXT);
         TextAction({
           label: '全选当前',
-          onClick: () => this.selectAllDeletable()
+          onAction: () => this.selectAllDeletable()
         });
         Blank();
         ActionButton({
@@ -220,7 +220,7 @@ export struct ParentProgressPage {
           kind: ActionButtonKind.DANGER,
           compact: true,
           isEnabled: this.selectedDeleteIds.length > 0 && !this.deleteBusy,
-          onClick: () => this.openDeleteConfirm()
+          onAction: () => this.openDeleteConfirm()
         });
       }
       .width('100%')
@@ -330,7 +330,7 @@ export struct ParentProgressPage {
         kind: this.hasActiveFilters() ? TextActionKind.PRIMARY : TextActionKind.NEUTRAL,
         isEnabled: !this.querying,
         accessibilityLabel: '打开作业查询',
-        onClick: () => this.openFilterDialog()
+        onAction: () => this.openFilterDialog()
       });
     }
     .width('100%')
@@ -364,7 +364,7 @@ export struct ParentProgressPage {
             label: this.bulkMode ? '取消' : '删除',
             kind: this.bulkMode ? TextActionKind.PRIMARY : TextActionKind.DANGER,
             accessibilityLabel: this.bulkMode ? '取消删除选择' : '选择要删除的作业',
-            onClick: () => {
+            onAction: () => {
               if (this.bulkMode) this.exitBulkMode();
               else this.enterBulkMode();
             }
