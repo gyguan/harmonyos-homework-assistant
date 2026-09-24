@@ -36,7 +36,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(instructions.contains("不解答作业"));
     assertTrue(instructions.contains("不得编造"));
     assertTrue(instructions.contains("JSON"));
-    assertTrue(instructions.contains("subject 字段必须严格只填写语文、数学或英语之一"));
+    assertTrue(instructions.contains("subject 字段必须严格填写语文、数学、英语、阅读、朗读、体育、实践、兴趣、其他之一"));
+    assertTrue(instructions.contains("家长直接布置"));
   }
 
   @Test
@@ -49,7 +50,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void normalizesCommonProviderSubjectLabelsWithoutBroadeningSupportedSubjects() {
+  void normalizesSchoolAndExtracurricularSubjectLabels() {
     assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("语文作业"));
     assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("数学练习"));
     assertEquals("英语", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("英语听读"));
@@ -57,6 +58,12 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals("语文", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Chinese Language Arts"));
     assertEquals("数学", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Mathematics Homework"));
     assertEquals("英语", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("English Reading"));
+    assertEquals("阅读", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("阅读任务"));
+    assertEquals("朗读", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("朗诵练习"));
+    assertEquals("体育", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("体育运动"));
+    assertEquals("实践", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("劳动实践"));
+    assertEquals("兴趣", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("兴趣拓展"));
+    assertEquals("其他", ConfigurableHomeworkOrganizerModelClient.normalizeSubject("其他"));
     assertNull(ConfigurableHomeworkOrganizerModelClient.normalizeSubject("Science"));
   }
 

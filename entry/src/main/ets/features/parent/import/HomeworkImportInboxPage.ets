@@ -110,14 +110,12 @@ export struct HomeworkImportInboxPage {
   private sourceLabel(sourceType: HomeworkImportSourceType): string {
     if (sourceType === HomeworkImportSourceType.SCREENSHOT) return '截图';
     if (sourceType === HomeworkImportSourceType.SHARE) return '系统分享';
-    if (sourceType === HomeworkImportSourceType.SCREEN_CAPTURE) return '智能采集';
     return '文字';
   }
 
   private sourceBadge(sourceType: HomeworkImportSourceType): string {
     if (sourceType === HomeworkImportSourceType.SCREENSHOT) return '图';
     if (sourceType === HomeworkImportSourceType.SHARE) return '享';
-    if (sourceType === HomeworkImportSourceType.SCREEN_CAPTURE) return '采';
     return '文';
   }
 
@@ -185,13 +183,15 @@ export struct HomeworkImportInboxPage {
         Row({ space: 8 }) {
           Text(this.batchTitle(batch))
             .layoutWeight(1)
-            .fontSize(15)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           Text(this.statusLabel(batch.status))
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.statusColor(batch.status))
             .padding({ left: 8, right: 8, top: 4, bottom: 4 })
@@ -203,18 +203,21 @@ export struct HomeworkImportInboxPage {
 
         Text(`${this.sourceLabel(batch.sourceType)} · ${this.timeText(batch.createdAtEpochMs)}`)
           .width('100%')
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis });
 
         Row({ space: 8 }) {
           Text(`${batch.messageCount} 条消息`)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
-          Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
           Text(`${batch.candidateCount} 项作业`)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
@@ -227,11 +230,11 @@ export struct HomeworkImportInboxPage {
         .fontColor([AppTheme.TERTIARY_TEXT]);
     }
     .width('100%')
-    .constraintSize({ minHeight: 92 })
-    .padding(AppTheme.PHONE_CARD_PADDING)
+    .constraintSize({ minHeight: AppTheme.INBOX_CARD_MIN_HEIGHT })
+    .padding(AppTheme.CARD_PADDING_COMPACT)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(`${this.batchTitle(batch)}，${this.sourceLabel(batch.sourceType)}，${this.statusLabel(batch.status)}`)
@@ -245,12 +248,15 @@ export struct HomeworkImportInboxPage {
 
       Row() {
         Text(this.hasActiveFilters() ? '筛选结果' : '全部记录')
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
           .fontColor(AppTheme.TEXT);
         Blank();
         Text(`${this.batches().length} 条`)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
@@ -267,25 +273,26 @@ export struct HomeworkImportInboxPage {
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .borderRadius(11);
           Text('还没有导入记录')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
         .width('100%')
         .padding({ top: 44, bottom: 44 })
         .backgroundColor(AppTheme.SURFACE)
-        .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+        .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
       } else if (this.batches().length === 0) {
         Column({ space: 8 }) {
           Text('没有符合条件的记录')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
         .width('100%')
         .padding({ top: 36, bottom: 36 })
         .backgroundColor(AppTheme.SURFACE)
-        .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+        .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
       } else {
         Column({ space: 9 }) {
           ForEach(this.batches(), (batch: ImportBatch) => {
@@ -322,7 +329,7 @@ export struct HomeworkImportInboxPage {
       }
       .width('100%')
       .height('100%')
-      .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
       .padding({
         left: AppTheme.PAGE_PADDING,
         right: AppTheme.PAGE_PADDING,

@@ -63,11 +63,13 @@ export struct CloudSubmissionPhotoStrip {
             } else {
               Column({ space: 5 }) {
                 Text('作业照片')
-                  .fontSize(12)
+                  .fontSize(AppTheme.LABEL_TITLE_SIZE)
+                  .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.TERTIARY_TEXT);
                 Text(this.loading ? '下载中' : '暂不可用')
-                  .fontSize(10)
+                  .fontSize(AppTheme.CAPTION_SIZE)
+                  .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
                   .fontColor(AppTheme.SUBTEXT);
               }
               .width(86)
@@ -84,7 +86,7 @@ export struct CloudSubmissionPhotoStrip {
       .scrollBar(BarState.Off);
 
       if (this.loading) {
-        Text('正在从家庭云端加载照片…').width('100%').fontSize(11).fontColor(AppTheme.SUBTEXT);
+        Text('正在从家庭云端加载照片…').width('100%').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
     }
     .width('100%');

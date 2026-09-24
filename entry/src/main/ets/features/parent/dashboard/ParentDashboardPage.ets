@@ -1,512 +1,197 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
-import { AssignmentMetricSummary } from '../../../components/assignment/AssignmentMetricSummary';
-import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import { Assignment, AssignmentStatus, StudentProfile } from '../../../domain/model/HomeworkModels';
-import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
-import { ParentHomeViewModel } from './ParentHomeViewModel';
 
 @Component
 export struct ParentDashboardPage {
-  @Prop revision: number = 0;
-  @Prop activeStudentId: string = '';
   @State private availableWidthVp: number = 390;
-  onOpenImport: () => void = () => {};
-  onOpenCapture: () => void = () => {};
+  onOpenAssignment: () => void = () => {};
   onOpenInbox: () => void = () => {};
-  onOpenExtra: () => void = () => {};
   onOpenVoice: () => void = () => {};
-  onOpenVoiceMaterial: () => void = () => {};
-  onOpenProgress: () => void = () => {};
-  onOpenReview: (assignmentId: string) => void = (_assignmentId: string) => {};
-
-  private readonly viewModel: ParentHomeViewModel =
-    new ParentHomeViewModel(DefaultAssignmentRepository.instance);
-
-  private touchRevision(): number {
-    return this.revision;
-  }
-
-  private student(): StudentProfile {
-    let currentRevision = this.touchRevision();
-    let student = this.viewModel.student();
-    if (currentRevision < 0) return student;
-    if (this.activeStudentId.length > 0 && student.id !== this.activeStudentId) return student;
-    return student;
-  }
 
   private canUseWideComposition(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentHomeRequirement());
   }
 
-  private attentionAssignments(): Assignment[] {
-    let currentRevision = this.touchRevision();
-    if (currentRevision < 0) return [];
-    return this.viewModel.attentionAssignments();
-  }
-
-  private assignments(): Assignment[] {
-    let currentRevision = this.touchRevision();
-    if (currentRevision < 0) return [];
-    return this.viewModel.assignments();
-  }
-
-  private todayAssignments(): Assignment[] {
-    let result: Assignment[] = [];
-    let todayStart = AssignmentDueDate.businessDayStart(Date.now());
-    for (let item of this.assignments()) {
-      if (AssignmentDueDate.dayStart(item) === todayStart) result.push(item);
-    }
-    return result;
-  }
-
-  private todayPendingCount(): number {
-    let count = 0;
-    for (let item of this.todayAssignments()) {
-      if (item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED) count++;
-    }
-    return count;
-  }
-
-  private todaySubmittedCount(): number {
-    let count = 0;
-    for (let item of this.todayAssignments()) if (item.status === AssignmentStatus.SUBMITTED) count++;
-    return count;
-  }
-
-  private todayCompletedCount(): number {
-    let count = 0;
-    for (let item of this.todayAssignments()) if (item.status === AssignmentStatus.COMPLETED) count++;
-    return count;
-  }
-
-  private submittedCount(): number {
-    let count = 0;
-    for (let item of this.assignments()) {
-      if (item.status === AssignmentStatus.SUBMITTED) count++;
-    }
-    return count;
-  }
-
-  private openAttention(item: Assignment): void {
-    if (item.status === AssignmentStatus.SUBMITTED || item.status === AssignmentStatus.COMPLETED ||
-      item.status === AssignmentStatus.NEEDS_REWORK) {
-      this.onOpenReview(item.id);
-    } else {
-      this.onOpenProgress();
-    }
-  }
-
-  private openRecentActivity(item: Assignment): void {
-    this.onOpenReview(item.id);
-  }
-
   @Builder
-  private TodayOverview() {
-    Column({ space: 12 }) {
+  private CreateAssignmentAction() {
+    Column({ space: 14 }) {
       Row() {
-        Column({ space: 2 }) {
-          Text('今日概览')
-            .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
+        Stack() {
+          SymbolGlyph($r('sys.symbol.plus_square'))
+            .fontSize(24)
+            .fontColor([AppTheme.PRIMARY]);
         }
-        .alignItems(HorizontalAlign.Start);
-        Blank();
-        Text(`${this.todayAssignments().length} 项`)
-          .fontSize(13)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%');
-
-      AssignmentMetricSummary({
-        allCount: this.todayAssignments().length,
-        pendingCount: this.todayPendingCount(),
-        submittedCount: this.todaySubmittedCount(),
-        completedCount: this.todayCompletedCount()
-      });
-
-      Progress({
-        value: this.todayCompletedCount(),
-        total: this.todayAssignments().length > 0 ? this.todayAssignments().length : 1,
-        type: ProgressType.Linear
-      })
-        .width('100%')
-        .height(6)
-        .color(AppTheme.PRIMARY)
-        .backgroundColor(AppTheme.PRIMARY_SOFT);
-    }
-    .width('100%')
-    .padding(AppTheme.PHONE_CARD_PADDING)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
-  }
-
-  private assignmentRenderKey(item: Assignment): string {
-    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
-  }
-
-  @Builder
-  private AttentionSection() {
-    if (this.attentionAssignments().length > 0) {
-      Column({ space: 9 }) {
-        Row() {
-          Text('需要我处理')
-            .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Blank();
-          Text(`${this.attentionAssignments().length} 项`)
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%');
-
-        Column({ space: 7 }) {
-          ForEach(this.attentionAssignments(), (item: Assignment) => {
-            Row({ space: 10 }) {
-              Column({ space: 3 }) {
-                Row({ space: 6 }) {
-                  Text(item.subject)
-                    .fontSize(13)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor(AppTheme.PRIMARY);
-                  Text(item.status === AssignmentStatus.SUBMITTED ? '待验收' : AssignmentStateMachine.label(item.status))
-                    .fontSize(13)
-                    .fontColor(item.status === AssignmentStatus.SUBMITTED ? AppTheme.WARNING : AppTheme.DANGER);
-                }
-                Text(item.title)
-                  .width('100%')
-                  .fontSize(14)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT)
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis });
-              }
-              .layoutWeight(1)
-              .alignItems(HorizontalAlign.Start);
-              SymbolGlyph($r('sys.symbol.chevron_right'))
-                .fontSize(15)
-                .fontColor([AppTheme.TERTIARY_TEXT]);
-            }
-            .width('100%')
-            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .padding({ left: 12, right: 10, top: 10, bottom: 10 })
-            .backgroundColor(item.status === AssignmentStatus.SUBMITTED ? AppTheme.WARNING_SOFT : AppTheme.DANGER_SOFT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText(`${item.subject}，${item.title}，${AssignmentStateMachine.label(item.status)}`)
-            .onClick(() => this.openAttention(item));
-          }, (item: Assignment) => this.assignmentRenderKey(item));
-        }
-        .width('100%');
-      }
-      .width('100%');
-    }
-  }
-
-  @Builder
-  private RecentActivity() {
-    Column({ space: 9 }) {
-      Row() {
-        Text('最近动态')
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Blank();
-        Text('查看全部')
-          .fontSize(13)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.PRIMARY)
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 8, right: 4 })
-          .onClick(() => this.onOpenProgress());
-      }
-      .width('100%');
-
-      if (this.assignments().length === 0) {
-        Text('还没有发布作业')
-          .width('100%')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT)
-          .padding({ top: 18, bottom: 18 })
-          .textAlign(TextAlign.Center);
-      } else {
-        Column({ space: 6 }) {
-          ForEach(this.assignments().slice(0, 3), (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              showChevron: true,
-              onOpen: () => this.openRecentActivity(item)
-            });
-          }, (item: Assignment) => item.id);
-        }
-        .width('100%');
-      }
-
-      if (this.viewModel.recentSubmitted() !== null) {
-        Row({ space: 8 }) {
-          SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
-            .fontSize(18)
-            .fontColor([AppTheme.SUCCESS]);
-          Text('最近提交')
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT);
-          Text(`${this.viewModel.recentSubmitted()!.subject} · ${this.viewModel.recentSubmitted()!.title}`)
-            .layoutWeight(1)
-            .fontSize(13)
-            .fontColor(AppTheme.TEXT)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis });
-        }
-        .width('100%')
-        .padding({ left: 11, right: 11, top: 9, bottom: 9 })
-        .backgroundColor(AppTheme.SUCCESS_SOFT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('查看最近提交')
-        .onClick(() => this.onOpenReview(this.viewModel.recentSubmitted()!.id));
-      }
-    }
-    .width('100%');
-  }
-
-  @Builder
-  private QuickActions() {
-    Column({ space: 10 }) {
-      Text('快捷操作')
-        .width('100%')
-        .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.TEXT);
-
-      Text('收作业')
-        .width('100%')
-        .fontSize(13)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.SUBTEXT);
-
-      Row({ space: 8 }) {
-        Row({ space: 8 }) {
-          SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.PRIMARY]);
-          Column({ space: 2 }) {
-            Text('手工导入作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('截图或文字').fontSize(13).fontColor(AppTheme.SUBTEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-        }
-        .layoutWeight(1)
-        .constraintSize({ minHeight: 64 })
-        .padding(11)
-        .backgroundColor(AppTheme.PRIMARY_FAINT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`给 ${this.student().name} 手工导入老师作业`)
-        .onClick(() => this.onOpenImport());
-
-        Row({ space: 8 }) {
-          Text('抓')
-            .width(22)
-            .fontSize(17)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.PRIMARY)
-            .textAlign(TextAlign.Center);
-          Column({ space: 2 }) {
-            Text('抓取老师作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('班级群抓取').fontSize(13).fontColor(AppTheme.SUBTEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-        }
-        .layoutWeight(1)
-        .constraintSize({ minHeight: 64 })
-        .padding(11)
+        .width(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`给 ${this.student().name} 抓取老师作业`)
-        .onClick(() => this.onOpenCapture());
-      }
-      .width('100%');
-
-      Row({ space: 10 }) {
-        Text('箱')
-          .width(30)
-          .height(30)
-          .fontSize(13)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.PRIMARY)
-          .textAlign(TextAlign.Center)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .borderRadius(9);
-        Column({ space: 2 }) {
-          Text('作业收件箱')
-            .fontSize(14)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text('导入与抓取记录')
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
+        .borderRadius(AppTheme.CHIP_RADIUS);
+        Blank();
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(15)
           .fontColor([AppTheme.TERTIARY_TEXT]);
       }
+      .width('100%');
+
+      Column({ space: 5 }) {
+        Text('布置作业')
+          .width('100%')
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+        Text('输入文字、拍照或相册识别')
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+      }
       .width('100%')
-      .constraintSize({ minHeight: 58 })
-      .padding({ left: 12, right: 10, top: 10, bottom: 10 })
-      .backgroundColor(AppTheme.SURFACE)
-      .border({ width: 1, color: AppTheme.BORDER })
-      .borderRadius(AppTheme.CONTROL_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText('打开作业收件箱')
-      .onClick(() => this.onOpenInbox());
+      .alignItems(HorizontalAlign.Start);
+    }
+    .width('100%')
+    .constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })
+    .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText('布置作业，输入文字、拍照或相册识别')
+    .onClick(() => this.onOpenAssignment());
+  }
 
-      Text('布置任务')
-        .width('100%')
-        .fontSize(13)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.SUBTEXT)
-        .margin({ top: 2 });
-
-      Row({ space: 8 }) {
-        Row({ space: 8 }) {
-          SymbolGlyph($r('sys.symbol.plus_square')).fontSize(19).fontColor([AppTheme.SUCCESS]);
-          Column({ space: 2 }) {
-            Text('课外任务').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('阅读、体育、实践').fontSize(13).fontColor(AppTheme.SUBTEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-        }
-        .layoutWeight(1)
-        .constraintSize({ minHeight: 64 })
-        .padding(11)
-        .backgroundColor(AppTheme.SUCCESS_SOFT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`给 ${this.student().name} 布置课外任务`)
-        .onClick(() => this.onOpenExtra());
-
-        Row({ space: 8 }) {
+  @Builder
+  private CreateVoiceAction() {
+    Column({ space: 14 }) {
+      Row() {
+        Stack() {
           Text('♪')
-            .width(22)
-            .fontSize(19)
+            .fontSize(24)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.PRIMARY)
             .textAlign(TextAlign.Center);
-          Column({ space: 2 }) {
-            Text('语音作业').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('语音和情景图片').fontSize(13).fontColor(AppTheme.SUBTEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
         }
-        .layoutWeight(1)
-        .constraintSize({ minHeight: 64 })
-        .padding(11)
-        .backgroundColor(AppTheme.PRIMARY_FAINT)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`给 ${this.student().name} 布置语音作业`)
-        .onClick(() => this.onOpenVoice());
-      }
-      .width('100%');
-
-      Row({ space: 10 }) {
-        Text('库')
-          .width(30)
-          .height(30)
-          .fontSize(13)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.PRIMARY)
-          .textAlign(TextAlign.Center)
-          .backgroundColor(AppTheme.PRIMARY_SOFT)
-          .borderRadius(9);
-        Column({ space: 2 }) {
-          Text('语音素材库')
-            .fontSize(14)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text('批量导入 · 每天自动创建 1 个')
-            .fontSize(13)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
+        .width(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .alignContent(Alignment.Center)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .borderRadius(AppTheme.CHIP_RADIUS);
+        Blank();
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(15)
           .fontColor([AppTheme.TERTIARY_TEXT]);
       }
+      .width('100%');
+
+      Column({ space: 5 }) {
+        Text('语音作业')
+          .width('100%')
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+        Text('使用语音和图片快速布置')
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+      }
       .width('100%')
-      .constraintSize({ minHeight: 58 })
-      .padding({ left: 12, right: 10, top: 10, bottom: 10 })
-      .backgroundColor(AppTheme.SURFACE)
-      .border({ width: 1, color: AppTheme.BORDER })
-      .borderRadius(AppTheme.CONTROL_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(`管理 ${this.student().name} 的语音素材库`)
-      .onClick(() => this.onOpenVoiceMaterial());
-
-
-    }
-    .width('100%');
-  }
-
-  @Builder
-  private ChildPerformance() {
-    Column({ space: 12 }) {
-      Text('孩子表现')
-        .width('100%')
-        .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.TEXT);
-      Row() {
-        Text('今日完成').fontSize(13).fontColor(AppTheme.SUBTEXT);
-        Blank();
-        Text(`${this.todayCompletedCount()} / ${this.todayAssignments().length}`)
-          .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUCCESS);
-      }
-      .width('100%');
-      Divider().color(AppTheme.DIVIDER);
-      Row() {
-        Text('待家长验收').fontSize(13).fontColor(AppTheme.SUBTEXT);
-        Blank();
-        Text(`${this.submittedCount()} 项`)
-          .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.WARNING);
-      }
-      .width('100%');
-      Divider().color(AppTheme.DIVIDER);
-      Row() {
-        Text('需关注').fontSize(13).fontColor(AppTheme.SUBTEXT);
-        Blank();
-        Text(`${this.attentionAssignments().length} 项`)
-          .fontSize(13).fontWeight(FontWeight.Medium)
-          .fontColor(this.attentionAssignments().length > 0 ? AppTheme.DANGER : AppTheme.SUCCESS);
-      }
-      .width('100%');
+      .alignItems(HorizontalAlign.Start);
     }
     .width('100%')
-    .padding(AppTheme.PHONE_CARD_PADDING)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })
+    .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText('语音作业，使用语音和图片快速布置')
+    .onClick(() => this.onOpenVoice());
   }
 
   @Builder
-  private SingleColumnHome() {
+  private AssignmentInboxAction() {
+    Column({ space: 14 }) {
+      Row() {
+        Stack() {
+          Text('箱')
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center);
+        }
+        .width(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .alignContent(Alignment.Center)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .borderRadius(AppTheme.CHIP_RADIUS);
+        Blank();
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(15)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
+      }
+      .width('100%');
+
+      Column({ space: 5 }) {
+        Text('作业收件箱')
+          .width('100%')
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+        Text('查看已导入的作业内容和整理记录')
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start);
+    }
+    .width('100%')
+    .constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })
+    .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText('作业收件箱，查看已导入的作业内容和整理记录')
+    .onClick(() => this.onOpenInbox());
+  }
+
+  @Builder
+  private PhoneHome() {
     Scroll() {
       Column() {
-        Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-          this.TodayOverview();
-          this.AttentionSection();
-          this.RecentActivity();
-          this.QuickActions();
+        Column({ space: 10 }) {
+          this.CreateAssignmentAction();
+          this.CreateVoiceAction();
+          this.AssignmentInboxAction();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PARENT_HOME_READABLE_MAX_WIDTH })
-        .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+        .padding({
+          left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+          right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+          top: 18,
+          bottom: 24
+        });
       }
       .width('100%')
       .alignItems(HorizontalAlign.Center);
@@ -520,26 +205,34 @@ export struct ParentDashboardPage {
   @Builder
   private WideHome() {
     Scroll() {
-      Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-        Column({ space: 18 }) {
-          this.TodayOverview();
-          this.AttentionSection();
-          this.RecentActivity();
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
+      Column({ space: 18 }) {
+        Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+          Column() {
+            this.CreateAssignmentAction();
+          }
+          .layoutWeight(1);
 
-        Column({ space: 14 }) {
-          this.ChildPerformance();
-          this.QuickActions();
+          Column() {
+            this.CreateVoiceAction();
+          }
+          .layoutWeight(1);
+
+          Column() {
+            this.AssignmentInboxAction();
+          }
+          .layoutWeight(1);
         }
-        .width(AppTheme.PARENT_HOME_SECONDARY_MIN_WIDTH)
-        .alignItems(HorizontalAlign.Start);
+        .width('100%')
+        .alignItems(VerticalAlign.Top);
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH })
-      .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 20, bottom: 20 })
-      .alignItems(VerticalAlign.Top);
+      .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
+      .padding({
+        left: AppTheme.PAGE_PADDING_WIDE,
+        right: AppTheme.PAGE_PADDING_WIDE,
+        top: 24,
+        bottom: 24
+      });
     }
     .width('100%')
     .height('100%')
@@ -549,11 +242,8 @@ export struct ParentDashboardPage {
 
   build() {
     Column() {
-      if (this.canUseWideComposition()) {
-        this.WideHome();
-      } else {
-        this.SingleColumnHome();
-      }
+      if (this.canUseWideComposition()) this.WideHome();
+      else this.PhoneHome();
     }
     .width('100%')
     .height('100%')

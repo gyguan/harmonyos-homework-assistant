@@ -40,34 +40,51 @@ require("static displayText(item: Assignment): string" in due and
         "return `${year}-${month}-${day} ${hour}:${minute}`" in due,
         "deadline display helper must use concrete YYYY-MM-DD HH:mm format")
 require("AssignmentDueDate.displayText(this.assignment)" in list_item and
-        "Text(this.deadlineText())" in list_item,
-        "assignment list item must use the shared concrete deadline formatter")
+        "this.deadlineText()" in list_item,
+        "assignment list item must use the shared concrete deadline formatter even inside compact metadata")
 require("Text(this.assignment.dueText)" not in list_item,
         "assignment list item must not show raw relative due text")
 
-# 2. Parent home/progress share the exact same four metrics with different scopes.
-for token in ["全部任务", "待完成", "待验收", "已完成"]:
-    require(token in metrics, f"shared assignment metric component missing: {token}")
-require("AssignmentMetricSummary({" in home and "this.todayAssignments().length" in home,
-        "parent home metrics must use shared component scoped to today")
-require("AssignmentMetricSummary({" in progress and "private allAssignments(): Assignment[]" in progress,
-        "parent progress metrics must use shared component scoped to all assignments")
-require("interactive: true" in progress and "onSelect: (key: AssignmentMetricKey)" in progress,
-        "parent progress metrics must remain clickable status filters")
-require("Text(`${this.viewModel.student().name}" not in progress,
-        "parent progress title must not duplicate the global student context")
+# 2. Parent Home and Progress stay compact: navigation already names the surface.
+require("AssignmentMetricSummary({" not in home and "今天的学习" not in home and "需要我处理" not in home,
+        "parent home must stay action-only without progress metrics or attention sections")
+for phrase in ["布置作业", "语音作业", "作业收件箱"]:
+    require(phrase in home, f"parent home missing required primary action: {phrase}")
+require("Text('家长操作')" not in home and "private PageIntro()" not in home,
+        "parent home must not repeat a page title already expressed by primary navigation")
+require("AssignmentMetricSummary" not in progress and "StatusSummary" not in progress and
+        "AssignmentMetricKey" not in progress,
+        "parent progress must not restore summary metric cards or metric-driven status filtering")
+require("@State private scopedAssignments: Assignment[] = []" in progress and
+        "this.applyItems(this.scopedAssignments)" in progress,
+        "parent progress list must render directly from the active date/subject scope")
+require("Text('作业进度')" not in progress and
+        "Text(this.bulkMode ? '取消' : '删除')" in progress,
+        "parent progress must remove its duplicate page title and expose delete/cancel in one stable location")
+require("可以调整日期或科目。" in progress,
+        "parent progress empty state must match the remaining filter dimensions")
 
-# 3/4. Parent and student use one date+subject query model; no relative-date/type presets.
+# 3/4. Parent and student share one date+subject query model, while each surface may
+# expose the common choices differently.
+require("label: '日期'" in progress and "label: '科目'" in progress and
+        "active: !this.allDates && !this.isSelectedDayToday()" in progress and
+        "active: this.subjectCode !== 'ALL'" in progress,
+        "parent progress must keep reactive date and subject query entries")
+require("Text('日期')" in student and "Text('科目')" in student and
+        "private QuickFilterBar()" in student and
+        "selected: !this.allDates && this.isSelectedDayToday()" in student and
+        "selected: this.allDates" in student and
+        "selected: this.subjectCode === 'CHINESE'" in student and
+        "selected: this.subjectCode === 'MATH'" in student and
+        "selected: this.subjectCode === 'ENGLISH'" in student,
+        "student assignments must expose common date and subject filters directly")
 for page, name in [(progress, "parent progress"), (student, "student assignments")]:
-    require("label: '日期'" in page and "label: '科目'" in page,
-            f"{name} must expose date and subject query entries")
     require("label: '类型'" not in page and "label: '截止'" not in page,
             f"{name} must not expose old type/due preset query entries")
     require("allDates: $draftAllDates" in page and "AssignmentDateFilter.ALL" in page,
             f"{name} must support a real all-date query instead of UI-only selection")
-    require("active: !this.allDates && !this.isSelectedDayToday()" in page and
-            "active: this.subjectCode !== 'ALL'" in page,
-            f"{name} query state must bind to selected date and subject")
+require("calendarMode" not in student and "AssignmentCalendarPanel" not in student,
+        "student assignments must remain list-only after calendar retirement")
 require("@Link allDates: boolean" in query_dialog and
         "DateModeOption('全部日期', true)" in query_dialog and
         "DateModeOption('指定日期', false)" in query_dialog and

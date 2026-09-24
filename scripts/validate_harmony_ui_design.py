@@ -28,11 +28,27 @@ theme_path = "entry/src/main/ets/common/theme/AppTheme.ets"
 theme = read_optional(theme_path)
 require(len(theme) > 0, f"missing required file: {theme_path}")
 
+typography_standard_path = "docs/product/v2-typography-standard.md"
+typography_standard = read_optional(typography_standard_path)
+require(len(typography_standard) > 0, f"missing required file: {typography_standard_path}")
+for typography_rule in [
+    "动态文本容器用 minHeight，不用固定 height",
+    "Phone 与 Pad 使用同一语义字号",
+    "CARD_TITLE_SIZE",
+    "READING_BODY_SIZE",
+    "FORM_TEXT_SIZE",
+    "QUESTION_TEXT_SIZE",
+    "maxLines + textOverflow(Ellipsis)",
+]:
+    require(typography_rule in typography_standard,
+            f"typography standard missing durable rule: {typography_rule}")
+
 # Keep only durable design-system contracts here. Page-specific composition belongs to the
 # V2 UI spec and DevEco acceptance, not to string assertions against V1 builders.
 for token in [
     "SURFACE_SUBTLE",
     "SURFACE_EMPHASIS",
+    "CARD_SURFACE",
     "PRIMARY_SOFT",
     "PRIMARY_FAINT",
     "DIVIDER",
@@ -43,9 +59,159 @@ for token in [
     "MIN_TOUCH_TARGET",
     "BUTTON_HEIGHT",
     "PAGE_TITLE_SIZE",
+    "PAGE_TITLE_LINE_HEIGHT",
+    "PAGE_NAV_TITLE_SIZE",
+    "PAGE_NAV_TITLE_LINE_HEIGHT",
     "SECTION_TITLE_SIZE",
+    "SECTION_TITLE_LINE_HEIGHT",
+    "CARD_TITLE_SIZE",
+    "CARD_TITLE_LINE_HEIGHT",
+    "LABEL_TITLE_SIZE",
+    "LABEL_TITLE_LINE_HEIGHT",
+    "BODY_SIZE",
+    "BODY_LINE_HEIGHT",
+    "READING_BODY_SIZE",
+    "READING_BODY_LINE_HEIGHT",
+    "QUESTION_TEXT_SIZE",
+    "QUESTION_TEXT_LINE_HEIGHT",
+    "FORM_TEXT_SIZE",
+    "FORM_TEXT_LINE_HEIGHT",
+    "META_SIZE",
+    "META_LINE_HEIGHT",
+    "CAPTION_SIZE",
+    "CAPTION_LINE_HEIGHT",
+    "ACTION_TEXT_SIZE",
+    "ACTION_TEXT_LINE_HEIGHT",
+    "NAV_TITLE_MAX_LINES",
+    "SECTION_TITLE_MAX_LINES",
+    "CARD_TITLE_MAX_LINES",
+    "META_MAX_LINES",
+    "CONTENT_NARROW_MAX_WIDTH",
+    "CONTENT_STANDARD_MAX_WIDTH",
+    "CONTENT_WIDE_MAX_WIDTH",
+    "PAGE_PADDING_COMPACT",
+    "PAGE_PADDING_MEDIUM",
+    "PAGE_PADDING_EXPANDED",
+    "SECTION_GAP_COMPACT",
+    "SECTION_GAP_STANDARD",
+    "CARD_PADDING_COMPACT",
+    "PANEL_PADDING",
+    "CARD_PADDING_STANDARD",
+    "CARD_RADIUS_COMPACT",
+    "CARD_RADIUS_STANDARD",
+    "LIST_CARD_MIN_HEIGHT",
+    "METRIC_CARD_MIN_HEIGHT",
+    "INBOX_CARD_MIN_HEIGHT",
+    "PARENT_HOME_ACTION_CARD_MIN_HEIGHT",
+    "PARENT_HOME_ACTION_ICON_SIZE",
+    "PARENT_HOME_ACTION_CARD_PADDING",
 ]:
     require(f"static readonly {token}" in theme, f"AppTheme missing durable design token: {token}")
+
+for title_contract in [
+    "static readonly PAGE_TITLE_SIZE: number = 26;",
+    "static readonly PAGE_TITLE_LINE_HEIGHT: number = 34;",
+    "static readonly PAGE_NAV_TITLE_SIZE: number = 20;",
+    "static readonly PAGE_NAV_TITLE_LINE_HEIGHT: number = 28;",
+    "static readonly SECTION_TITLE_SIZE: number = 17;",
+    "static readonly SECTION_TITLE_LINE_HEIGHT: number = 24;",
+    "static readonly CARD_TITLE_SIZE: number = 16;",
+    "static readonly CARD_TITLE_LINE_HEIGHT: number = 22;",
+    "static readonly LABEL_TITLE_SIZE: number = 14;",
+    "static readonly LABEL_TITLE_LINE_HEIGHT: number = 20;",
+    "static readonly BODY_SIZE: number = 14;",
+    "static readonly BODY_LINE_HEIGHT: number = 21;",
+    "static readonly READING_BODY_SIZE: number = 16;",
+    "static readonly READING_BODY_LINE_HEIGHT: number = 24;",
+    "static readonly QUESTION_TEXT_SIZE: number = 20;",
+    "static readonly QUESTION_TEXT_LINE_HEIGHT: number = 30;",
+    "static readonly FORM_TEXT_SIZE: number = 15;",
+    "static readonly FORM_TEXT_LINE_HEIGHT: number = 22;",
+    "static readonly META_SIZE: number = 13;",
+    "static readonly META_LINE_HEIGHT: number = 18;",
+    "static readonly CAPTION_SIZE: number = 12;",
+    "static readonly CAPTION_LINE_HEIGHT: number = 17;",
+    "static readonly ACTION_TEXT_SIZE: number = 14;",
+    "static readonly ACTION_TEXT_LINE_HEIGHT: number = 20;",
+    "static readonly NAV_TITLE_MAX_LINES: number = 1;",
+    "static readonly SECTION_TITLE_MAX_LINES: number = 1;",
+    "static readonly CARD_TITLE_MAX_LINES: number = 2;",
+    "static readonly META_MAX_LINES: number = 1;",
+]:
+    require(title_contract in theme, f"AppTheme title hierarchy drifted: {title_contract}")
+# Business UI text must not regress below the project 12fp floor.
+# Device-named card/page tokens and feature-private readable widths are compatibility aliases only.
+legacy_layout_tokens = [
+    "HOME_READABLE_MAX_WIDTH",
+    "ASSIGNMENT_LIST_READABLE_MAX_WIDTH",
+    "ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH",
+    "STUDY_READABLE_MAX_WIDTH",
+    "STUDY_SPLIT_MAX_WIDTH",
+    "PARENT_HOME_READABLE_MAX_WIDTH",
+    "PARENT_HOME_PAD_CONTENT_MAX_WIDTH",
+    "PARENT_PROGRESS_READABLE_MAX_WIDTH",
+    "PARENT_PROGRESS_REVIEW_MAX_WIDTH",
+    "PARENT_DEEP_READABLE_MAX_WIDTH",
+    "IMPORT_READABLE_MAX_WIDTH",
+    "PROFILE_READABLE_MAX_WIDTH",
+    "PRACTICE_READABLE_MAX_WIDTH",
+    "PRACTICE_ATTEMPT_READABLE_MAX_WIDTH",
+    "SETTINGS_READABLE_MAX_WIDTH",
+    "PHONE_PAGE_PADDING",
+    "PHONE_SECTION_GAP",
+    "PHONE_CARD_PADDING",
+    "PHONE_CARD_RADIUS",
+]
+for ui_file in (ROOT / "entry/src/main/ets").rglob("*.ets"):
+    ui_source = ui_file.read_text(encoding="utf-8")
+    relative = ui_file.relative_to(ROOT)
+    require(".fontSize(10)" not in ui_source and ".fontSize(11)" not in ui_source,
+            f"business UI text must not use 10/11fp hardcoded sizes: {relative}")
+    if ui_file.name != "AppTheme.ets":
+        for legacy_token in legacy_layout_tokens:
+            require(f"AppTheme.{legacy_token}" not in ui_source,
+                    f"UI must use shared semantic layout tokens instead of {legacy_token}: {relative}")
+
+    # ArkUI ButtonAttribute supports fontSize/fontWeight but not lineHeight.
+    # Inspect each Button chain only until its first semicolon so later Text(...).lineHeight(...)
+    # cannot be misclassified as a Button attribute.
+    for button_match in re.finditer(r"Button\(", ui_source):
+        button_chain = ui_source[button_match.start():]
+        chain_end = button_chain.find(";")
+        if chain_end >= 0:
+            button_chain = button_chain[:chain_end + 1]
+        require(".lineHeight(" not in button_chain,
+                f"ButtonAttribute must not use unsupported lineHeight: {ui_file.relative_to(ROOT)}")
+
+practice_attempt = read_optional("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
+require("AppTheme.QUESTION_TEXT_SIZE" in practice_attempt and
+        "AppTheme.QUESTION_TEXT_LINE_HEIGHT" in practice_attempt and
+        "AppTheme.FORM_TEXT_SIZE" in practice_attempt,
+        "practice attempt must use semantic question/form typography tokens")
+require(".fontSize(this.scaled(20))" not in practice_attempt and
+        ".lineHeight(this.scaled(30))" not in practice_attempt,
+        "practice attempt must not restore hardcoded question typography")
+
+voice_assignment = read_optional("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
+require(".fontSize(10)" not in voice_assignment and ".fontSize(11)" not in voice_assignment,
+        "voice assignment player must not use undersized 10/11fp text")
+
+assignment_metrics = read_optional("entry/src/main/ets/components/assignment/AssignmentMetricSummary.ets")
+require("AppTheme.CAPTION_SIZE" in assignment_metrics and ".fontSize(11)" not in assignment_metrics,
+        "assignment metric labels must use the shared caption token")
+
+for obsolete_title_token in [
+    "PHONE_PAGE_TITLE_SIZE",
+    "PHONE_SECTION_TITLE_SIZE",
+    "PAD_PAGE_TITLE_SIZE",
+    "PAD_SECTION_TITLE_SIZE",
+    "PAD_CARD_TITLE_SIZE",
+    "DEEP_PAGE_HEADER_TITLE_SIZE",
+    "DEEP_PAGE_HEADER_META_SIZE",
+    "STUDY_TITLE_SIZE",
+]:
+    require(obsolete_title_token not in theme,
+            f"obsolete title token must not return: {obsolete_title_token}")
 
 app_shell = read_optional("entry/src/main/ets/pages/AppShell.ets")
 primary_nav = read_optional("entry/src/main/ets/components/navigation/PrimaryNavItem.ets")
@@ -84,6 +250,7 @@ for badge_path in [
     "entry/src/main/ets/pages/PersonEntryPage.ets",
     "entry/src/main/ets/pages/AppShell.ets",
     "entry/src/main/ets/components/family/StudentSwitcherDialog.ets",
+    "entry/src/main/ets/components/family/IdentitySwitcherDialog.ets",
     "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
     "entry/src/main/ets/features/student/profile/StudentProfilePage.ets",
     "entry/src/main/ets/features/student/home/StudentHomePage.ets",
@@ -139,17 +306,30 @@ for ui_root in ui_roots:
             require(f"@Prop {forbidden_prop}:" not in text,
                     f"custom component prop must not shadow ArkUI CommonAttribute.{forbidden_prop}: {relative}")
 
-# Shared master-detail rows are persistent selections on wide layouts. A faint fill alone is too easy
-# to miss, so selected rows must combine a selected surface with a primary border.
+# Ordinary cards use one shared white surface. Persistent selection is expressed by border/control state,
+# not by changing the entire card fill.
 assignment_list_item = read_optional("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
 if assignment_list_item:
     require("accessibilityRole(AccessibilityRoleType.BUTTON)" in assignment_list_item,
             "AssignmentListItem must expose button accessibility semantics while it exists")
-    require("backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)" in assignment_list_item,
-            "AssignmentListItem selected state must keep a selected surface")
+    require("backgroundColor(AppTheme.CARD_SURFACE)" in assignment_list_item,
+            "AssignmentListItem must keep the shared card surface regardless of selection")
     require("width: this.selected ? 1 : 0" in assignment_list_item and
             "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in assignment_list_item,
             "AssignmentListItem selected state must add a primary border as a second visual cue")
+    require("@Prop selectionMode: boolean = false;" in assignment_list_item and
+            "private LeadingIndicator()" in assignment_list_item and
+            "if (this.selectionMode)" in assignment_list_item,
+            "AssignmentListItem must support an in-card selection control without expanding row width")
+    require("TextOverflow.Ellipsis" in assignment_list_item and
+            "this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}" in assignment_list_item,
+            "AssignmentListItem compact metadata must truncate instead of overlapping neighboring content")
+    require("Row({ space: 8 })" in assignment_list_item and
+            ".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)" in assignment_list_item and
+            ".lineHeight(AppTheme.META_LINE_HEIGHT)" in assignment_list_item and
+            ".maxLines(AppTheme.CARD_TITLE_MAX_LINES)" in assignment_list_item and
+            ".constraintSize({ minHeight: AppTheme.LIST_CARD_MIN_HEIGHT })" in assignment_list_item,
+            "AssignmentListItem must reserve stable vertical space for title/status and metadata rows")
 
 # Persistent selectors whose visual state changes at runtime must use reactive child-component props,
 # not ordinary @Builder boolean snapshots. Keep both the binding mechanism and visible feedback guarded.
@@ -170,19 +350,192 @@ if selection_controls:
     require("border({ width: 1, color: this.selected ? AppTheme.PRIMARY : AppTheme.BORDER })" in selection_controls,
             "status selection must combine selected surface and border")
 
+parent_dashboard = read_optional("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+identity_switcher = read_optional("entry/src/main/ets/components/family/IdentitySwitcherDialog.ets")
+student_switcher = read_optional("entry/src/main/ets/components/family/StudentSwitcherDialog.ets")
+app_shell = read_optional("entry/src/main/ets/pages/AppShell.ets")
+student_home = read_optional("entry/src/main/ets/features/student/home/StudentHomePage.ets")
+voice_assignment = read_optional("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+parent_extra_assignment = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
+parent_review_page = read_optional("entry/src/main/ets/features/parent/review/ParentReviewPage.ets")
+homework_import_route = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+homework_import = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
+homework_confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
+parent_settings = read_optional("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
+parent_extra = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
+student_profile = read_optional("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
+practice_result = read_optional("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
+assignment_list_item = read_optional("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
+deep_page_header = read_optional("entry/src/main/ets/components/navigation/DeepPageHeader.ets")
+edit_sheet_header = read_optional("entry/src/main/ets/components/navigation/EditSheetHeader.ets")
+assignment_filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
+confirmation_candidates = read_optional("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+import_batch_detail = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
+import_inbox = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
+parent_review_pane = read_optional("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
+voice_material = read_optional("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets")
+for card_path, card_source in [
+    ("ParentDashboardPage", parent_dashboard),
+    ("IdentitySwitcherDialog", identity_switcher),
+    ("StudentSwitcherDialog", student_switcher),
+    ("AppShell", app_shell),
+    ("StudentHomePage", student_home),
+    ("ParentVoiceAssignmentPage", voice_assignment),
+    ("HomeworkImportPage", homework_import),
+]:
+    require("AppTheme.CARD_SURFACE" in card_source,
+            f"{card_path} must use the shared ordinary card surface")
+require("backgroundColor(AppTheme.PRIMARY_FAINT)" not in parent_dashboard,
+        "Parent dashboard action cards must not use a different fill for 布置作业")
+require(parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT") == 3 and
+        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_ICON_SIZE") >= 6 and
+        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_PADDING") == 3,
+        "Parent dashboard action cards must share one size specification")
+require(parent_dashboard.count(".fontSize(AppTheme.CARD_TITLE_SIZE)") >= 3 and
+        parent_dashboard.count(".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)") >= 3 and
+        parent_dashboard.count(".maxLines(AppTheme.CARD_TITLE_MAX_LINES)") >= 3 and
+        parent_dashboard.count(".fontSize(AppTheme.CAPTION_SIZE)") >= 3 and
+        parent_dashboard.count(".lineHeight(AppTheme.CAPTION_LINE_HEIGHT)") >= 3 and
+        parent_dashboard.count(".fontWeight(FontWeight.Bold)") >= 3,
+        "Parent dashboard action cards must use the shared typography specification")
+require(".height(AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT)" not in parent_dashboard and
+        parent_dashboard.count(".constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })") == 3,
+        "Text-bearing parent home cards must use minHeight, not fixed height")
+require("private PhoneHome()" in parent_dashboard and
+        "this.CreateAssignmentAction();" in parent_dashboard and
+        "this.CreateVoiceAction();" in parent_dashboard and
+        "this.AssignmentInboxAction();" in parent_dashboard,
+        "Parent dashboard Phone layout must keep all three actions in the same full-width stack")
+require("backgroundColor(this.parentActive ? AppTheme.PRIMARY_FAINT" not in identity_switcher and
+        "AppTheme.PRIMARY_FAINT : AppTheme.SURFACE" not in identity_switcher,
+        "Identity switcher cards must keep one surface and use border/checkmark for selection")
+require("backgroundColor(this.activeStudentId === student.id ? AppTheme.PRIMARY_FAINT" not in student_switcher,
+        "Student switcher cards must keep one surface and use border/checkmark for selection")
+require(".backgroundColor(AppTheme.CARD_SURFACE)" in app_shell and
+        ".backgroundColor(AppTheme.PRIMARY_FAINT)" not in app_shell,
+        "AppShell identity switch card must use the shared ordinary card surface")
+require("private PendingReview()" in homework_import and
+        ".backgroundColor(AppTheme.CARD_SURFACE)" in homework_import and
+        "backgroundColor(AppTheme.PRIMARY_FAINT)" not in between(homework_import, "private PendingReview()", "private RecognitionActions()"),
+        "Homework import pending-review card must use the shared ordinary card surface")
+
+for deep_page_name, deep_page_source in [
+    ("ParentExtraAssignmentPage", parent_extra_assignment),
+    ("ParentVoiceAssignmentPage", voice_assignment),
+    ("ParentReviewPage", parent_review_page),
+    ("HomeworkImportRoutePage", homework_import_route),
+    ("HomeworkConfirmationPage", homework_confirmation),
+]:
+    require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in deep_page_source,
+            f"{deep_page_name} must use the shared parent deep-page readable width")
+
+require("left: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT" in homework_import and
+        "right: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT" in homework_import,
+        "embedded HomeworkImportPage must not add a second horizontal page padding")
+require("Text('作业科目')" in homework_import and
+        "Text('作业内容')" in homework_import and
+        homework_import.count("AppTheme.SECTION_TITLE_SIZE") >= 2,
+        "Homework import subject and content headings must use the same section-title size")
+require("private clearAssignmentInput(): void" in homework_import and
+        "Text('清空')" in homework_import and
+        "this.textDraft = '';" in homework_import and
+        "this.sourceImageRef = '';" in homework_import and
+        "this.sourceImageLabel = '';" in homework_import,
+        "Homework import must keep one-tap clear and reset recognized-image source state")
+require("AppTheme.PHONE_PAGE_PADDING" not in homework_confirmation and
+        "left: AppTheme.PAGE_PADDING" in homework_confirmation and
+        "right: AppTheme.PAGE_PADDING" in homework_confirmation,
+        "Homework confirmation must align to the shared parent deep-page horizontal padding")
+
+for collapsed_state in [
+    "@State private familyExpanded: boolean = false;",
+    "@State private parentAccessExpanded: boolean = false;",
+    "@State private tutorRulesExpanded: boolean = false;",
+    "@State private dataSyncExpanded: boolean = false;",
+]:
+    require(collapsed_state in parent_settings,
+            f"Parent My sections must default to collapsed: {collapsed_state}")
+for toggle_expression in [
+    "this.familyExpanded = !this.familyExpanded",
+    "this.parentAccessExpanded = !this.parentAccessExpanded",
+    "this.tutorRulesExpanded = !this.tutorRulesExpanded",
+    "this.dataSyncExpanded = !this.dataSyncExpanded",
+]:
+    require(toggle_expression in parent_settings,
+            f"Parent My section must be expandable by its header: {toggle_expression}")
+require("cloudPanelOpen" not in parent_settings,
+        "Parent My data/sync must not keep a second nested collapse state")
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in parent_settings and
+        "AppTheme.CONTENT_STANDARD_MAX_WIDTH" in student_profile,
+        "Parent and student My pages must share the same readable width")
+require("private SectionTitle(" not in parent_settings and
+        "private FamilySettingsSection()" in parent_settings and
+        "private DataSyncSettingsSection()" in parent_settings,
+        "Parent My must use the same card-and-collapsible-section composition as Student My")
+
+require("AppTheme.PAGE_NAV_TITLE_SIZE" in deep_page_header and
+        "AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT" in deep_page_header and
+        "AppTheme.NAV_TITLE_MAX_LINES" in deep_page_header and
+        "AppTheme.META_SIZE" in deep_page_header and
+        "AppTheme.META_LINE_HEIGHT" in deep_page_header and
+        "AppTheme.PAGE_NAV_TITLE_SIZE" in edit_sheet_header and
+        "AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT" in edit_sheet_header and
+        "AppTheme.NAV_TITLE_MAX_LINES" in edit_sheet_header,
+        "page and sheet headers must use the shared navigation typography contract")
+require(".height(AppTheme.DEEP_PAGE_HEADER_HEIGHT)" not in deep_page_header and
+        ".constraintSize({ minHeight: AppTheme.DEEP_PAGE_HEADER_HEIGHT })" in deep_page_header,
+        "DeepPageHeader must use minHeight so larger system text cannot be clipped")
+require(parent_dashboard.count("AppTheme.CARD_TITLE_SIZE") >= 3,
+        "Parent dashboard card titles must share the card-title size")
+require(parent_extra.count("AppTheme.SECTION_TITLE_SIZE") >= 3,
+        "Extra assignment top-level sections must share the section-title size")
+require(voice_assignment.count("AppTheme.SECTION_TITLE_SIZE") >= 2,
+        "Voice assignment top-level sections must share the section-title size")
+require(student_home.count("AppTheme.SECTION_TITLE_SIZE") >= 3,
+        "Student home top-level sections must share the section-title size")
+require(parent_settings.count("AppTheme.CARD_TITLE_SIZE") >= 4 and
+        student_profile.count("AppTheme.CARD_TITLE_SIZE") >= 2,
+        "Parent and student My collapsible titles must share the card-title size")
+require("AppTheme.SECTION_TITLE_SIZE" in practice_result,
+        "Practice result section titles must use the shared section-title size")
+require("AppTheme.CARD_TITLE_SIZE" in assignment_list_item,
+        "Assignment list titles must use the shared card-title size")
+require("AppTheme.LABEL_TITLE_SIZE" in assignment_filter_dialog,
+        "Filter group titles must use the shared label-title size")
+for card_title_name, card_title_source in [
+    ("ConfirmationCandidateComponents", confirmation_candidates),
+    ("HomeworkImportBatchDetailPage", import_batch_detail),
+    ("HomeworkImportInboxPage", import_inbox),
+    ("BackendConnectionPage", parent_settings),
+]:
+    require("AppTheme.CARD_TITLE_SIZE" in card_title_source,
+            f"{card_title_name} visible list/card titles must use the shared card-title size")
+require("this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE" in student_home,
+        "Student home task cards must express emphasis through shared title tokens")
+require("fontSize(AppTheme.PAGE_TITLE_SIZE)" in parent_review_pane,
+        "Parent review business object title must use the shared page-title size")
+require("AppTheme.PAGE_NAV_TITLE_SIZE" in voice_material and
+        voice_material.count("AppTheme.SECTION_TITLE_SIZE") >= 3 and
+        voice_material.count("AppTheme.CARD_TITLE_SIZE") >= 3,
+        "Voice material page must use the shared page/section/card title hierarchy")
+
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
         "Student Assignments must not keep runtime selection in ordinary @Builder boolean parameters")
-require("SegmentedSelectionButton" in student_assignments and "FilterSummaryEntry" in student_assignments,
-        "Student Assignments must use shared reactive selection controls")
+require("SegmentedSelectionButton" in student_assignments and "private QuickFilterBar()" in student_assignments,
+        "Student Assignments must use shared reactive quick-filter controls")
 for expression in [
-    "selected: !this.calendarMode",
-    "selected: this.calendarMode",
-    "active: !this.allDates && !this.isSelectedDayToday()",
-    "active: this.subjectCode !== 'ALL'",
+    "selected: !this.allDates && this.isSelectedDayToday()",
+    "selected: this.allDates",
+    "selected: this.subjectCode === 'ALL'",
+    "selected: this.subjectCode === 'CHINESE'",
+    "selected: this.subjectCode === 'MATH'",
+    "selected: this.subjectCode === 'ENGLISH'",
 ]:
     require(expression in student_assignments,
-            f"Student Assignments must bind selection directly to page state: {expression}")
+            f"Student Assignments must bind quick-filter selection directly to page state: {expression}")
+require("calendarMode" not in student_assignments and "AssignmentCalendarPanel" not in student_assignments,
+        "Student Assignments must stay list-only after calendar retirement")
 
 filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 for state_expr, label in [
@@ -198,15 +551,18 @@ require("private FilterChip(" not in parent_progress and "private FilterEntry(" 
         "Parent Progress must not keep runtime selection in ordinary @Builder boolean parameters")
 require("FilterSummaryEntry" in parent_progress,
         "Parent Progress must reuse shared reactive filter summary controls")
-require("StatusSelectionChip" not in parent_progress and "AssignmentMetricSummary" in parent_progress and
-        "interactive: true" in parent_progress and "this.chooseStatus(key)" in parent_progress,
-        "Parent Progress status selection must live in the shared clickable metric summary")
+require("StatusSelectionChip" not in parent_progress and "AssignmentMetricSummary" not in parent_progress and
+        "AssignmentMetricKey" not in parent_progress,
+        "Parent Progress must stay list-first without summary metric selection")
 for expression in [
     "active: !this.allDates && !this.isSelectedDayToday()",
     "active: this.subjectCode !== 'ALL'",
 ]:
     require(expression in parent_progress,
             f"Parent Progress must bind selection directly to page state: {expression}")
+require("Text('作业进度')" not in parent_progress and
+        "Text(this.bulkMode ? '取消' : '删除')" in parent_progress,
+        "Parent Progress must avoid duplicate root title and keep delete/cancel action explicit")
 
 deadline_picker = read_optional("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker,
@@ -244,9 +600,9 @@ require(".bindSheet($$this.showEditorSheet" in confirmation and
 require(confirmation_components.count("@Prop item: CandidateAssignment;") >= 2 and
         "@Prop selected: boolean = false;" in confirmation_components,
         "Confirmation Candidate components must receive current item/selection through reactive props")
-require("backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)" in confirmation_components and
+require("backgroundColor(AppTheme.CARD_SURFACE)" in confirmation_components and
         "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in confirmation_components,
-        "Confirmation selected Candidate must combine active surface and border")
+        "Confirmation Candidate must keep the shared card surface and express selection with border")
 for expression in [
     "selected: this.subject === Subject.CHINESE",
     "selected: this.subject === Subject.MATH",
@@ -267,11 +623,9 @@ require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_con
         "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in selection_controls,
         "shared choice selection must combine active surface and border")
 
-calendar = read_optional("entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets")
-day_cell = between(calendar, "private DayCell(", "private WeekdayHeader()")
-require("backgroundColor(this.isSelected(dayEpochMs) ? AppTheme.PRIMARY" in day_cell and
-        "this.isSelected(dayEpochMs) ? AppTheme.TEXT_ON_PRIMARY" in day_cell,
-        "Calendar selected day must use a filled selected state with contrasting text")
+calendar_path = ROOT / "entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets"
+require(not calendar_path.exists(),
+        "retired Assignment calendar UI must stay deleted")
 
 # Settings use the same reactive child-component rule as navigation and status selectors. The native
 # Toggle still owns the visual switch feedback, while isEnabled avoids ArkUI CommonAttribute.enabled.

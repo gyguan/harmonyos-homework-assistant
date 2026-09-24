@@ -23,8 +23,8 @@ migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets"
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 persistence = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkPersistence.ets")
 
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 8" in migrator,
-        "snapshot migration framework must advance the current schema to V8")
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 9" in migrator,
+        "snapshot migration framework must advance the current schema to V9")
 require("migrateV4ToV5" in migrator and "schemaVersion: 5" in migrator,
         "snapshot migrator must retain the explicit V4 -> V5 step")
 require("migrateV5ToV6" in migrator and "schemaVersion: 6" in migrator,
@@ -34,6 +34,9 @@ require("migrateV6ToV7" in migrator and "schemaVersion: 7" in migrator,
 require("migrateV7ToV8" in migrator and "schemaVersion: 8" in migrator and
         "legacyBacking" in migrator and "AssignmentBacking.REMOTE" in migrator,
         "Assignment backing must use an explicit V7 -> V8 migration step")
+require("migrateV8ToV9" in migrator and "schemaVersion: 9" in migrator and
+        "parentAccessCode: ''" in migrator,
+        "device parent access code must use an explicit V8 -> V9 migration step")
 for field in [
     "settings: snapshot.settings",
     "rawImports: snapshot.rawImports",
@@ -102,6 +105,9 @@ require(persistence.index("preservePreMigrationSnapshot") < persistence.index("s
         "pre-migration backup must happen before writing the new snapshot")
 require("本地作业数据无法验证，已停止覆盖原数据" in persistence,
         "unverifiable existing data must block schema-changing overwrite")
+
+require("parentAccessCode: source.parentAccessCode === undefined ? '' : source.parentAccessCode" in store,
+        "HomeworkStore must safely clone V9 parent access code settings")
 
 if errors:
     print("SNAPSHOT_MIGRATION_GATE_FAIL")

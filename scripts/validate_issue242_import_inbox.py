@@ -44,11 +44,11 @@ shell = read("entry/src/main/ets/pages/AppShell.ets")
 fixture = read("entry/src/test/fixtures/Issue242ImportInboxFixture.ets")
 state_machine = read("entry/src/main/ets/domain/service/AssignmentStateMachine.ets")
 
-for value in ["CLIPBOARD", "SCREENSHOT", "SHARE", "SCREEN_CAPTURE"]:
+for value in ["CLIPBOARD", "SCREENSHOT", "SHARE"]:
     require(value in models, f"Import V2 source type missing: {value}")
 for value in ["ImportBatch", "ImportedMessage", "ImportSourceEvidence", "HomeworkImportInboxSnapshot"]:
     require(f"interface {value}" in models, f"Import V2 model missing: {value}")
-for field in ["messageCount", "candidateCount", "sourceProfileId", "createdAtEpochMs", "status"]:
+for field in ["messageCount", "candidateCount", "createdAtEpochMs", "status"]:
     require(field in models, f"ImportBatch missing field: {field}")
 
 for field in ["batchId?: string", "sourceMessageIds?: string[]", "rawText?: string",
@@ -127,7 +127,17 @@ require("继续确认并发布" in detail_page and "activate(this.batchId)" in d
 require("PARENT_IMPORT_INBOX" in routes and "PARENT_IMPORT_BATCH_DETAIL" in routes,
         "Import Inbox must use explicit navigation routes")
 require("HomeworkImportInboxPage" in shell and "HomeworkImportBatchDetailPage" in shell,
-        "AppShell must wire inbox and batch detail pages")
+        "AppShell must import inbox and batch detail pages")
+require("name === AppRoute.PARENT_IMPORT_INBOX" in shell and
+        "HomeworkImportInboxPage({" in shell and
+        "onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(" in shell,
+        "AppShell must register the inbox NavDestination and wire batch navigation")
+require("name === AppRoute.PARENT_IMPORT_BATCH_DETAIL" in shell and
+        "HomeworkImportBatchDetailPage({" in shell and
+        "batchId: ParentImportNavigator.batchId(param)" in shell,
+        "AppShell must register the batch detail NavDestination with its route parameter")
+require("onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack)" in shell,
+        "batch detail must preserve navigation into the existing confirmation flow")
 
 require("messageCount: 3" in fixture and "candidateCount: 2" in fixture,
         "#242 deterministic fixture must contain 3 messages and 2 candidates")

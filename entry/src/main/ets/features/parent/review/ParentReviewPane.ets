@@ -103,8 +103,8 @@ export struct ParentReviewPane {
       Column({ space: 10 }) {
         Text('删除后无法恢复，确定删除这项未完成作业？')
           .width('100%')
-          .fontSize(13)
-          .lineHeight(19)
+          .fontSize(AppTheme.BODY_SIZE)
+          .lineHeight(AppTheme.BODY_LINE_HEIGHT)
           .fontColor(AppTheme.DANGER);
         Row({ space: 10 }) {
           Button('取消', { type: ButtonType.Normal })
@@ -217,7 +217,8 @@ export struct ParentReviewPane {
         if (this.editNotice.length > 0) {
           Text(this.editNotice)
             .width('100%')
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.DANGER)
             .padding({ left: 16, right: 16, bottom: 10 });
         }
@@ -233,7 +234,7 @@ export struct ParentReviewPane {
     Column({ space: 8 }) {
       SymbolGlyph($r('sys.symbol.doc_text')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
       Text(this.assignmentId.length === 0 ? '选择一项作业查看详情' : '这项作业暂时找不到')
-        .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
@@ -266,28 +267,28 @@ export struct ParentReviewPane {
   private EvidenceSection() {
     Column({ space: 10 }) {
       Row() {
-        Text('提交证据').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('提交证据').fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
         if (this.evidence() !== null) {
-          Text(this.evidence()!.submittedAtText).fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text(this.evidence()!.submittedAtText).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         }
       }
       .width('100%');
 
       if (this.evidence() === null) {
-        Text('暂未找到提交照片').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT)
+        Text('暂未找到提交照片').width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
           .padding({ top: 12, bottom: 12 });
       } else if (this.evidence()!.remotePhotos.length > 0) {
         CloudSubmissionPhotoStrip({ photos: this.evidence()!.remotePhotos });
       } else if (this.evidence()!.localPhotoUris.length > 0) {
         this.LocalPhotos(this.evidence()!.localPhotoUris);
       } else {
-        Text('本次提交没有可展示的照片').width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text('本次提交没有可展示的照片').width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-    .padding(15)
+    .padding(AppTheme.PANEL_PADDING)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
@@ -296,12 +297,13 @@ export struct ParentReviewPane {
   @Builder
   private ReviewActions(item: Assignment) {
     Column({ space: 10 }) {
-      Text('家长验收').width('100%').fontSize(AppTheme.CARD_TITLE_SIZE)
+      Text('家长验收').width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       TextArea({ text: this.reviewNoteDraft, placeholder: '退回订正时填写原因；通过时可选填一句鼓励' })
         .width('100%')
         .height(88)
-        .fontSize(14)
+        .fontSize(AppTheme.FORM_TEXT_SIZE)
+        .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.reviewNoteDraft = value);
@@ -325,12 +327,12 @@ export struct ParentReviewPane {
       }
       .width('100%');
       if (this.operationNotice.length > 0) {
-        Text(this.operationNotice).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text(this.operationNotice).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-    .padding(15)
+    .padding(AppTheme.PANEL_PADDING)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
@@ -344,19 +346,26 @@ export struct ParentReviewPane {
           Column({ space: 12 }) {
             Column({ space: 8 }) {
               Row() {
-                Text(this.assignment()!.subject).fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+                Text(this.assignment()!.subject).fontSize(AppTheme.ACTION_TEXT_SIZE).lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
                 Blank();
-                Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(13).fontColor(AppTheme.SUBTEXT);
+                Text(AssignmentStateMachine.label(this.assignment()!.status)).fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
               }
               .width('100%');
-              Text(this.assignment()!.title).width('100%').fontSize(21).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Text(this.assignment()!.title)
+                .width('100%')
+                .fontSize(AppTheme.PAGE_TITLE_SIZE)
+                .lineHeight(AppTheme.PAGE_TITLE_LINE_HEIGHT)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(AppTheme.TEXT)
+                .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+                .textOverflow({ overflow: TextOverflow.Ellipsis });
               Row({ space: 8 }) {
                 Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
-                  .fontSize(13).fontColor(AppTheme.SUBTEXT);
-                Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+                  .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
                 Text(this.actualMinutes(this.assignment()!) > 0 ?
                   `实际 ${this.actualMinutes(this.assignment()!)} 分钟` : `预计 ${this.assignment()!.expectedMinutes} 分钟`)
-                  .fontSize(13).fontColor(AppTheme.SUBTEXT);
+                  .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
               }
               .width('100%');
 
@@ -365,7 +374,8 @@ export struct ParentReviewPane {
                   if (this.canEdit(this.assignment()!)) {
                     Text('编辑任务')
                       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                      .fontSize(13)
+                      .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                      .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                       .fontWeight(FontWeight.Medium)
                       .fontColor(AppTheme.PRIMARY)
                       .padding({ left: 10, right: 10, top: 7, bottom: 7 })
@@ -379,7 +389,8 @@ export struct ParentReviewPane {
                   if (this.canDelete(this.assignment()!)) {
                     Text('删除作业')
                       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                      .fontSize(13)
+                      .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                      .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                       .fontWeight(FontWeight.Medium)
                       .fontColor(AppTheme.DANGER)
                       .padding({ left: 10, right: 10, top: 7, bottom: 7 })
@@ -394,12 +405,12 @@ export struct ParentReviewPane {
               }
               if (this.assignment()!.reviewNote.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
                 Text(`家长备注：${this.assignment()!.reviewNote}`)
-                  .width('100%').fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+                  .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
               }
             }
             .width('100%')
             .alignItems(HorizontalAlign.Start)
-            .padding(15)
+            .padding(AppTheme.PANEL_PADDING)
             .backgroundColor(AppTheme.SURFACE)
             .border({ width: 1, color: AppTheme.BORDER })
             .borderRadius(AppTheme.CONTROL_RADIUS);
@@ -409,7 +420,8 @@ export struct ParentReviewPane {
             if (this.operationNotice.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
               Text(this.operationNotice)
                 .width('100%')
-                .fontSize(13)
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
                 .fontColor(AppTheme.SUCCESS)
                 .padding({ left: 12, right: 12, top: 9, bottom: 9 })
                 .backgroundColor(AppTheme.SUCCESS_SOFT)

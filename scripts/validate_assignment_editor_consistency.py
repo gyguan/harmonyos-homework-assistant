@@ -31,7 +31,7 @@ extra_page = read("entry/src/main/ets/features/parent/extra/ParentExtraAssignmen
 voice_page = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
 change_detector = read("entry/src/main/ets/common/state/AssignmentEditChangeDetector.ets")
 
-for token in ["作业标题", "老师要求", "截止时间", "预计用时（分钟）", "教材 / 页码"]:
+for token in ["作业标题", "完成要求", "截止时间", "预计用时（分钟）", "教材 / 页码"]:
     require(token in shared, f"shared assignment editor missing field: {token}")
 require("AssignmentEditForm({" in confirmation_components,
         "create-time confirmation editor must reuse AssignmentEditForm")

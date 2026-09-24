@@ -1,7 +1,7 @@
 import { HomeworkImportService } from '../../../application/import/HomeworkImportService';
 import { DefaultHomeworkImportDraftRepository } from '../../../data/repository/DefaultHomeworkImportDraftRepository';
-import { HomeworkImageImportResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
-import { CandidateAssignment, RawHomeworkImport } from '../../../domain/model/HomeworkModels';
+import { HomeworkImageImportResult, HomeworkImageTextResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
+import { CandidateAssignment, RawHomeworkImport, Subject } from '../../../domain/model/HomeworkModels';
 import { HomeworkImportDraftRepository } from '../../../domain/port/HomeworkImportDraftRepository';
 
 export class HomeworkImportViewModel {
@@ -13,6 +13,13 @@ export class HomeworkImportViewModel {
 
   rawImport(): RawHomeworkImport { return this.drafts.getRawImport(); }
   candidates(): CandidateAssignment[] { return this.drafts.getCandidates(); }
-  parseText(text: string): Promise<HomeworkTextImportResult> { return HomeworkImportService.instance.parseText(text); }
+  parseText(text: string, subject: Subject, imageRef: string = '',
+    imageSourceLabel: string = ''): Promise<HomeworkTextImportResult> {
+    return HomeworkImportService.instance.parseText(text, subject, imageRef, imageSourceLabel);
+  }
+  captureImageText(): Promise<HomeworkImageTextResult> {
+    return HomeworkImportService.instance.captureImageText();
+  }
+  selectImageText(): Promise<HomeworkImageTextResult> { return HomeworkImportService.instance.selectImageText(); }
   selectImageAndParse(): Promise<HomeworkImageImportResult> { return HomeworkImportService.instance.selectImageAndParse(); }
 }

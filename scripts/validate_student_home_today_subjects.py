@@ -60,6 +60,18 @@ for removed in [
     require(removed not in page,
             f"Student Home must not restore summary or subject-accordion friction: {removed}")
 
+require("Text(this.assignment.subject)" not in page and
+        "AssignmentType.EXTRA" not in page and
+        "${this.assignment.expectedMinutes} 分钟" in page,
+        "Student Home task cards must avoid repeating subject/type metadata and keep only compact duration")
+require("Button(this.actionLabel()" in page and
+        ".alignItems(VerticalAlign.Center)" in page,
+        "Student Home task actions must share the main task row and stay vertically centered")
+require("private Header()" not in page and "今天先完成一项" not in page,
+        "Student Home must not repeat a greeting/title block above 今天要做")
+require("${item.subjectCode}|${item.subject}|" in page,
+        "Student Home render keys must refresh when authoritative subject data changes")
+
 require("先做这项" in page and "接下来" in page and
         "LayoutPolicy.homeFocusSummaryRequirement()" in page,
         "Pad Student Home must keep a distinct focus + next-tasks composition")

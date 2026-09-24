@@ -3,11 +3,10 @@ import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
-import { FilterSummaryEntry, SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
+import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentDateFilter, AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
-import { AssignmentCalendarPanel } from './AssignmentCalendarPanel';
 import { AssignmentDetailPane } from './AssignmentDetailPane';
 import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 
@@ -24,8 +23,6 @@ export struct StudentAssignmentsPage {
   @State private selectedCalendarDayEpochMs: number = Date.now();
   @State private draftSelectedDayEpochMs: number = Date.now();
   @State private querying: boolean = false;
-  @State private calendarMode: boolean = false;
-  @State private calendarMonthEpochMs: number = Date.now();
   @State private historyExpanded: boolean = false;
 
   @State private needHandlingAssignments: Assignment[] = [];
@@ -79,25 +76,6 @@ export struct StudentAssignmentsPage {
     }
     this.applyItems(this.viewModel.assignmentsOnDay(
       AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs));
-  }
-
-  private calendarAssignments(): Assignment[] {
-    let currentRevision = this.revision;
-    if (currentRevision < 0) return [];
-    return this.viewModel.calendarAssignments(AssignmentTypeFilter.ALL, this.subjectCode);
-  }
-
-  private padExtraAssignments(): Assignment[] {
-    let currentRevision = this.revision;
-    if (currentRevision < 0) return [];
-    let source = this.viewModel.calendarAssignments(AssignmentTypeFilter.EXTRA, 'ALL');
-    let active: Assignment[] = [];
-    let completed: Assignment[] = [];
-    for (let item of source) {
-      if (item.status === AssignmentStatus.COMPLETED) completed.push(item);
-      else active.push(item);
-    }
-    return active.length > 0 ? active : completed;
   }
 
   private applyItems(items: Assignment[]): void {
@@ -220,15 +198,12 @@ export struct StudentAssignmentsPage {
   }
 
   private openAssignment(assignmentId: string): void {
-    if (this.canUseMasterDetail() && !this.calendarMode) {
-      this.selectedAssignmentId = assignmentId;
-    } else {
-      this.onOpenDetail(assignmentId);
-    }
+    if (this.canUseMasterDetail()) this.selectedAssignmentId = assignmentId;
+    else this.onOpenDetail(assignmentId);
   }
 
   private isSelected(assignmentId: string): boolean {
-    return this.canUseMasterDetail() && !this.calendarMode && this.selectedAssignmentId === assignmentId;
+    return this.canUseMasterDetail() && this.selectedAssignmentId === assignmentId;
   }
 
   private openFilterDialog(): void {
@@ -247,7 +222,6 @@ export struct StudentAssignmentsPage {
     this.draftSubjectCode = subjectCode;
     this.allDates = allDates;
     this.selectedCalendarDayEpochMs = selectedDayEpochMs;
-    if (!allDates) this.calendarMonthEpochMs = selectedDayEpochMs;
     this.subjectCode = subjectCode;
     this.filterDialogController.close();
     try {
@@ -260,32 +234,6 @@ export struct StudentAssignmentsPage {
     }
   }
 
-  private showCalendar(): void {
-    if (this.calendarMode) return;
-    this.calendarMode = true;
-    if (this.allDates) {
-      this.allDates = false;
-      this.draftAllDates = false;
-      this.applyItems(this.viewModel.assignmentsOnDay(
-        AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs));
-    }
-    this.calendarMonthEpochMs = this.selectedCalendarDayEpochMs;
-  }
-
-  private showList(): void {
-    if (!this.calendarMode) return;
-    this.calendarMode = false;
-  }
-
-  private selectCalendarDay(dayEpochMs: number): void {
-    this.allDates = false;
-    this.draftAllDates = false;
-    this.selectedCalendarDayEpochMs = dayEpochMs;
-    this.draftSelectedDayEpochMs = dayEpochMs;
-    this.applyItems(this.viewModel.assignmentsOnDay(
-      AssignmentTypeFilter.ALL, this.subjectCode, dayEpochMs));
-  }
-
   private isSelectedDayToday(): boolean {
     let now = new Date();
     let today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -294,8 +242,19 @@ export struct StudentAssignmentsPage {
     return selectedStart === today;
   }
 
-  private hasActiveFilters(): boolean {
-    return (!this.allDates && !this.isSelectedDayToday()) || this.subjectCode !== 'ALL';
+  private selectToday(): void {
+    if (this.querying) return;
+    void this.applyFilters(false, Date.now(), this.subjectCode);
+  }
+
+  private selectAllDates(): void {
+    if (this.querying) return;
+    void this.applyFilters(true, this.selectedCalendarDayEpochMs, this.subjectCode);
+  }
+
+  private selectSubjectCode(value: string): void {
+    if (this.querying || value === this.subjectCode) return;
+    void this.applyFilters(this.allDates, this.selectedCalendarDayEpochMs, value);
   }
 
   private dateLabel(): string {
@@ -317,45 +276,90 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
-  private ViewModeToggle() {
-    Row({ space: 4 }) {
-      SegmentedSelectionButton({ label: '列表', selected: !this.calendarMode, onSelect: () => this.showList() });
-      SegmentedSelectionButton({ label: '日历', selected: this.calendarMode, onSelect: () => this.showCalendar() });
-    }
-    .padding(3)
-    .backgroundColor(AppTheme.SURFACE)
-    .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.CONTROL_RADIUS);
-  }
+  private QuickFilterBar() {
+    Column({ space: 10 }) {
+      Row({ space: 8 }) {
+        Text('日期')
+          .width(42)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.SUBTEXT);
+        SegmentedSelectionButton({
+          label: '今天',
+          selected: !this.allDates && this.isSelectedDayToday(),
+          onSelect: () => this.selectToday()
+        })
+          .layoutWeight(1);
+        SegmentedSelectionButton({
+          label: '全部',
+          selected: this.allDates,
+          onSelect: () => this.selectAllDates()
+        })
+          .layoutWeight(1);
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
 
-  @Builder
-  private FilterBar() {
-    Row() {
-      FilterSummaryEntry({
-        label: '日期', value: this.dateLabel(),
-        active: !this.allDates && !this.isSelectedDayToday(),
-        onOpen: () => this.openFilterDialog()
-      });
-      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      FilterSummaryEntry({
-        label: '科目', value: this.subjectLabel(this.subjectCode),
-        active: this.subjectCode !== 'ALL',
-        onOpen: () => this.openFilterDialog()
-      });
-      Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      Text(this.querying ? '查询中…' : '查询')
-        .fontSize(13)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(this.hasActiveFilters() ? AppTheme.PRIMARY : AppTheme.TEXT)
-        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ left: 18, right: 18 })
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('打开作业查询')
-        .onClick(() => this.openFilterDialog());
+      Row({ space: 8 }) {
+        Text('科目')
+          .width(42)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.SUBTEXT);
+        SegmentedSelectionButton({
+          label: '全部',
+          selected: this.subjectCode === 'ALL',
+          onSelect: () => this.selectSubjectCode('ALL')
+        })
+          .layoutWeight(1);
+        SegmentedSelectionButton({
+          label: '语文',
+          selected: this.subjectCode === 'CHINESE',
+          onSelect: () => this.selectSubjectCode('CHINESE')
+        })
+          .layoutWeight(1);
+        SegmentedSelectionButton({
+          label: '数学',
+          selected: this.subjectCode === 'MATH',
+          onSelect: () => this.selectSubjectCode('MATH')
+        })
+          .layoutWeight(1);
+        SegmentedSelectionButton({
+          label: '英语',
+          selected: this.subjectCode === 'ENGLISH',
+          onSelect: () => this.selectSubjectCode('ENGLISH')
+        })
+          .layoutWeight(1);
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
+
+      Row({ space: 8 }) {
+        Text(`更多筛选：${this.dateLabel()} · ${this.subjectLabel(this.subjectCode)}`)
+          .layoutWeight(1)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+        Text(this.querying ? '查询中…' : '调整')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 10, right: 2 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('调整日期和科目筛选')
+          .onClick(() => this.openFilterDialog());
+      }
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
     }
     .width('100%')
-    .height(58)
-    .padding({ left: 8, right: 8 })
+    .padding({ left: 12, right: 12, top: 12, bottom: 10 })
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
@@ -364,29 +368,15 @@ export struct StudentAssignmentsPage {
   @Builder
   private TodoSection() {
     if (this.currentTodoAssignments().length > 0) {
-      Column({ space: 9 }) {
-        Row() {
-          Column({ space: 2 }) {
-            Text('要做的').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-          Blank();
-          Text(`${this.currentTodoAssignments().length}`)
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.TERTIARY_TEXT);
-        }
-        .width('100%');
-        Column({ space: 6 }) {
-          ForEach(this.currentTodoAssignments(), (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail() || this.calendarMode,
-              onOpen: () => this.openAssignment(item.id)
-            });
-          }, (item: Assignment) => this.assignmentRenderKey(item));
-        }
-        .width('100%');
+      Column({ space: 6 }) {
+        ForEach(this.currentTodoAssignments(), (item: Assignment) => {
+          AssignmentListItem({
+            assignment: item,
+            selected: this.isSelected(item.id),
+            showChevron: !this.canUseMasterDetail(),
+            onOpen: () => this.openAssignment(item.id)
+          });
+        }, (item: Assignment) => this.assignmentRenderKey(item));
       }
       .width('100%');
     }
@@ -399,11 +389,13 @@ export struct StudentAssignmentsPage {
         Row({ space: 8 }) {
           Text(`已提交 / 已完成 · ${this.currentHistoryAssignments().length}`)
             .layoutWeight(1)
-            .fontSize(15)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUBTEXT);
           Text(this.historyExpanded ? '收起' : '查看')
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontColor(AppTheme.PRIMARY);
           Text(this.historyExpanded ? '⌃' : '⌄')
             .fontSize(16)
@@ -424,7 +416,7 @@ export struct StudentAssignmentsPage {
               AssignmentListItem({
                 assignment: item,
                 selected: this.isSelected(item.id),
-                showChevron: !this.canUseMasterDetail() || this.calendarMode,
+                showChevron: !this.canUseMasterDetail(),
                 onOpen: () => this.openAssignment(item.id)
               });
             }, (item: Assignment) => this.assignmentRenderKey(item));
@@ -442,7 +434,7 @@ export struct StudentAssignmentsPage {
       Column({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
         Text(this.currentTotalCount() === 0 ? '暂时没有作业' : '这一天没有安排任务')
-          .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          .fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       }
       .width('100%')
       .padding({ top: 30, bottom: 30 });
@@ -454,9 +446,9 @@ export struct StudentAssignmentsPage {
     Column({ space: 22 }) {
       Row() {
         Text(this.allDates ? '全部作业' : `${this.dateLabel()} 任务`)
-          .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          .fontSize(AppTheme.SECTION_TITLE_SIZE).lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text(`${this.currentVisibleTotal()} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text(`${this.currentVisibleTotal()} 项`).fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -470,26 +462,7 @@ export struct StudentAssignmentsPage {
   @Builder
   private ListContent() {
     Column({ space: 18 }) {
-      Row({ space: 12 }) {
-        Column({ space: 4 }) {
-          Text('我的作业').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-        this.ViewModeToggle();
-      }
-      .width('100%')
-      .alignItems(VerticalAlign.Center);
-
-      this.FilterBar();
-      if (this.calendarMode) {
-        AssignmentCalendarPanel({
-          assignments: this.calendarAssignments(),
-          selectedDayEpochMs: $selectedCalendarDayEpochMs,
-          monthEpochMs: $calendarMonthEpochMs,
-          onSelectDay: (dayEpochMs: number) => this.selectCalendarDay(dayEpochMs)
-        });
-      }
+      this.QuickFilterBar();
       this.AssignmentSections();
     }
     .width('100%');
@@ -525,53 +498,6 @@ export struct StudentAssignmentsPage {
   }
 
   @Builder
-  private PadExtraAssignmentsPane() {
-    Column({ space: 12 }) {
-      Row() {
-        Column({ space: 2 }) {
-          Text('课外任务')
-            .fontSize(AppTheme.SECTION_TITLE_SIZE)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-        }
-        .alignItems(HorizontalAlign.Start);
-        Blank();
-        Text(`${this.padExtraAssignments().length} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%');
-
-      if (this.padExtraAssignments().length === 0) {
-        Column({ space: 7 }) {
-          SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
-          Text('暂无课外任务').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        }
-        .width('100%')
-        .padding({ top: 34, bottom: 34 });
-      } else {
-        Scroll() {
-          Column({ space: 7 }) {
-            ForEach(this.padExtraAssignments(), (item: Assignment) => {
-              AssignmentListItem({
-                assignment: item,
-                showChevron: true,
-                onOpen: () => this.onOpenDetail(item.id)
-              });
-            }, (item: Assignment) => this.assignmentRenderKey(item));
-          }
-          .width('100%')
-          .padding({ bottom: 12 });
-        }
-        .width('100%')
-        .layoutWeight(1)
-        .align(Alignment.TopStart)
-        .scrollBar(BarState.Off);
-      }
-    }
-    .width('100%')
-    .height('100%');
-  }
-
-  @Builder
   private AssignmentListPage() {
     Scroll() {
       Column() {
@@ -579,8 +505,8 @@ export struct StudentAssignmentsPage {
           this.ListContent();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH })
-        .padding(AppTheme.PAGE_PADDING);
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+        .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: AppTheme.PAGE_PADDING_COMPACT, bottom: AppTheme.PAGE_PADDING_COMPACT });
       }
       .width('100%')
       .justifyContent(FlexAlign.Start)
@@ -608,11 +534,7 @@ export struct StudentAssignmentsPage {
       .scrollBar(BarState.Off);
 
       Column() {
-        if (this.calendarMode) {
-          this.PadExtraAssignmentsPane();
-        } else {
-          this.AssignmentDetailSidePane();
-        }
+        this.AssignmentDetailSidePane();
       }
       .layoutWeight(1)
       .height('100%')
@@ -625,7 +547,7 @@ export struct StudentAssignmentsPage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.ASSIGNMENT_MASTER_DETAIL_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
     .alignItems(VerticalAlign.Top)
     .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 20 });
   }

@@ -20,61 +20,41 @@ def require(condition: bool, message: str) -> None:
 
 
 page = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
-panel = read("entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets")
 view_model = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsViewModel.ets")
-selection_controls = read("entry/src/main/ets/components/selection/SelectionControls.ets")
 workflow = read(".github/workflows/static-gate.yml")
+calendar_file = ROOT / "entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets"
 
-require("AssignmentCalendarPanel" in page and "calendarMode" in page,
-        "Student Assignments must expose a calendar view without creating a second feature page")
-require("SegmentedSelectionButton({ label: '列表', selected: !this.calendarMode" in page and
-        "SegmentedSelectionButton({ label: '日历', selected: this.calendarMode" in page,
-        "Student Assignments must offer an explicit reactive list/calendar switch")
-require("export struct SegmentedSelectionButton" in selection_controls and
-        "@Prop selected: boolean = false;" in selection_controls,
-        "list/calendar switch must keep selected state in a reactive child-component prop")
-require("assignmentsOnDay" in page and "queryOnDay" in view_model,
-        "calendar day selection must reuse selected-day Assignment query semantics")
-require("$selectedCalendarDayEpochMs" in page and "$calendarMonthEpochMs" in page,
-        "calendar selection/month state must stay page-local and flow through component links")
-require("LayoutPolicy.canSplit" in page and "assignmentMasterDetailRequirement" in page,
-        "calendar must preserve capability-based Pad composition")
-require("WindowSizeClass." not in page and "=== WindowSizeClass" not in page,
-        "Student Assignments must not choose its business composition from device size classes")
+# Calendar UI was intentionally retired: Assignment is now one list surface with quick filters.
+require(not calendar_file.exists(),
+        "retired Assignment calendar component must stay deleted")
+for token in ["AssignmentCalendarPanel", "calendarMode", "calendarMonthEpochMs",
+              "ViewModeToggle", "PadExtraAssignmentsPane", "showCalendar()", "showList()"]:
+    require(token not in page, f"retired Assignment calendar behavior must not return: {token}")
+require("private QuickFilterBar()" in page and "label: '今天'" in page and
+        "label: '全部'" in page and "label: '语文'" in page and
+        "label: '数学'" in page and "label: '英语'" in page,
+        "Assignment list must expose common date and subject filters directly")
+require("AssignmentFilterDialog" in page and "更多筛选：" in page,
+        "low-frequency date/subject choices must remain available through More filters")
 
-require("export struct AssignmentCalendarPanel" in panel,
-        "Slice 6 must provide a reusable Assignment calendar panel")
-require("for (let row = 0; row < 6; row++)" in panel and "column < 7" in panel,
-        "month calendar must render a stable six-week by seven-day grid")
-require("AssignmentType.SCHOOL" in panel and "AssignmentType.EXTRA" in panel,
-        "calendar must visibly distinguish school and extracurricular Assignment types")
-require("AssignmentStatus.COMPLETED" in panel,
-        "calendar must expose completed-state markers")
-require("item.dueAtEpochMs <= 0" in panel and "this.startOfDay(item.dueAtEpochMs)" in panel,
-        "calendar markers must use structured dueAt only")
-require("AssignmentDueDate" in panel and "businessDayStart" in panel and
-        "dueText" not in panel and "dueDateKey" not in panel,
-        "calendar UI must use the shared business-date service and never infer dates from legacy dueText/dueDateKey")
-
-require("calendarAssignments" in view_model and "assignmentsOnDay" in view_model,
-        "StudentAssignmentsViewModel must own calendar/day query semantics")
+# Structured selected-day query semantics remain useful for quick/custom filters.
+require("assignmentsOnDay" in view_model and "queryOnDay" in view_model,
+        "Assignment list filters must retain selected-day query semantics")
 require("item.dueAtEpochMs <= 0" in view_model and
         "AssignmentDateRange.startOfDay(item.dueAtEpochMs)" in view_model,
-        "calendar day query must use structured dueAt through the shared date-range service")
-require("AssignmentDueDate" not in view_model and "dueText" not in view_model and "dueDateKey" not in view_model,
-        "calendar query must not infer a concrete date from legacy dueText or dueDateKey")
+        "selected-day filtering must continue to use structured dueAt")
+require("dueText" not in view_model and "dueDateKey" not in view_model,
+        "Assignment filtering must never infer dates from legacy display strings")
 require("AssignmentFilterFactory" in view_model and "AssignmentDateRange" in view_model,
-        "Student Assignment day filtering must reuse shared date/query services")
-require("CalendarRepository" not in view_model and "CalendarService" not in view_model,
-        "calendar view must not introduce a parallel Calendar domain/repository")
+        "Assignment filters must reuse shared date/query services")
 
 require("Validate V2 Slice 6 calendar" in workflow and "validate_v2_slice6_calendar.py" in workflow,
-        "CI must run the Slice 6 calendar gate")
+        "CI must continue guarding the intentional calendar retirement")
 
 if errors:
-    print("V2_SLICE6_CALENDAR_GATE_FAIL")
+    print("V2_SLICE6_CALENDAR_RETIREMENT_GATE_FAIL")
     for error in errors:
         print(f"- {error}")
     sys.exit(1)
 
-print("V2_SLICE6_CALENDAR_GATE_PASS")
+print("V2_SLICE6_CALENDAR_RETIREMENT_GATE_PASS")

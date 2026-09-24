@@ -71,7 +71,6 @@ export class HomeworkImportInboxService {
       studentId: rawImport.studentId,
       sourceType: sourceType,
       sourceLabel: rawImport.sourceLabel,
-      sourceProfileId: '',
       createdAtEpochMs: createdAt,
       status: enriched.length > 0 ? ImportBatchStatus.READY : ImportBatchStatus.EMPTY,
       messageCount: 1,
@@ -132,20 +131,7 @@ export class HomeworkImportInboxService {
       studentId: batch.studentId,
       sourceType: batch.sourceType,
       sourceLabel: batch.sourceLabel,
-      sourceProfileId: batch.sourceProfileId,
-      sourceProfileName: batch.sourceProfileName,
-      expectedGroupTitle: batch.expectedGroupTitle,
-      profileStartTime: batch.profileStartTime,
-      groupValidationStatus: batch.groupValidationStatus,
-      groupConfirmedByUser: batch.groupConfirmedByUser,
-      captureSessionId: batch.captureSessionId,
       pipelineStage: batch.pipelineStage,
-      reconstructed: batch.reconstructed,
-      groupTitle: batch.groupTitle,
-      timeBoundaryReached: batch.timeBoundaryReached,
-      earliestDetectedTime: batch.earliestDetectedTime,
-      reconstructionWarnings: batch.reconstructionWarnings === undefined ?
-        undefined : batch.reconstructionWarnings.slice(),
       understood: batch.understood,
       understandingVersion: batch.understandingVersion,
       pendingReviewMessageIds: batch.pendingReviewMessageIds === undefined ?
@@ -242,7 +228,6 @@ export class HomeworkImportInboxService {
   private legacySourceKind(sourceType: HomeworkImportSourceType): HomeworkImportSourceKind {
     if (sourceType === HomeworkImportSourceType.SCREENSHOT) return HomeworkImportSourceKind.IMAGE;
     if (sourceType === HomeworkImportSourceType.SHARE) return HomeworkImportSourceKind.SHARE;
-    if (sourceType === HomeworkImportSourceType.SCREEN_CAPTURE) return HomeworkImportSourceKind.IMAGE;
     return HomeworkImportSourceKind.TEXT;
   }
 

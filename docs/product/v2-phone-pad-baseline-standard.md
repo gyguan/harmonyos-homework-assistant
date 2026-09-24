@@ -14,6 +14,7 @@ V2 不接受“Phone 页面直接横向放大到 Pad”，也不要求每个切�
 - 宽容器下限制内容最大可读宽度，避免卡片和正文无限拉伸；
 - Dialog / Bottom Sheet 在宽容器下限制自身可读宽度；
 - 页面滚动、顶部对齐、触控区域和 Deep Page Chrome 在 Phone / Pad 上保持一致；
+- 字体语义层级遵循 `v2-typography-standard.md`，Phone / Pad 不维护两套标题字号；
 - Feature 不判断 Phone / Pad 型号，不读取物理 display，不维护私有设备断点；
 - Feature 不直接用 `WindowSizeClass.COMPACT / MEDIUM / EXPANDED` 决定业务组合、字号或密度；
 - 需要多栏时，统一通过 `LayoutPolicy` 根据实际内容容器宽度和 pane 最小可读宽度决定。
@@ -92,15 +93,14 @@ primaryMinWidth
 
 基础适配阶段，宽屏页面优先使用“居中 + 最大可读宽度”，而不是把 Phone 内容铺满整个 Pad。
 
-统一 token 位于 `AppTheme`：
+统一布局规范见 `v2-card-layout-standard.md`，基础内容宽度收敛为：
 
-- `HOME_READABLE_MAX_WIDTH`
-- `ASSIGNMENT_LIST_READABLE_MAX_WIDTH`
-- `ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH`
-- `STUDY_READABLE_MAX_WIDTH`
-- `FILTER_DIALOG_MAX_WIDTH`
+- `CONTENT_NARROW_MAX_WIDTH = 760`
+- `CONTENT_STANDARD_MAX_WIDTH = 1040`
+- `CONTENT_WIDE_MAX_WIDTH = 1360`
+- `FILTER_DIALOG_MAX_WIDTH` 继续作为弹层专用上限
 
-这些值属于内容可读性约束，不是设备断点。
+普通业务页默认使用 Standard；只有 Dashboard、Master-Detail 和双栏 Workspace 使用 Wide。这些值属于内容可读性约束，不是设备断点。
 
 ## 5. 已重构页面当前基线
 

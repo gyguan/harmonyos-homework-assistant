@@ -19,17 +19,22 @@ export struct StudentSwitcherDialog {
       Row() {
         Column({ space: 3 }) {
           Text('选择孩子')
-            .fontSize(20)
-            .fontWeight(FontWeight.Bold)
+            .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+            .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
           Text('切换后首页、进度和作业都会同步到该孩子')
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT)
+            .maxLines(2);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
         Text('关闭')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 12, right: 4 })
@@ -56,13 +61,17 @@ export struct StudentSwitcherDialog {
               Column({ space: 3 }) {
                 Text(student.name)
                   .width('100%')
-                  .fontSize(15)
+                  .fontSize(AppTheme.CARD_TITLE_SIZE)
+                  .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
+                  .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
                   .fontColor(AppTheme.TEXT);
                 Text(`${student.grade} · ${student.className}`)
                   .width('100%')
-                  .fontSize(12)
-                  .fontColor(AppTheme.SUBTEXT);
+                  .fontSize(AppTheme.CAPTION_SIZE)
+                  .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+                  .fontColor(AppTheme.SUBTEXT)
+                  .maxLines(2);
               }
               .layoutWeight(1)
               .alignItems(HorizontalAlign.Start);
@@ -75,7 +84,7 @@ export struct StudentSwitcherDialog {
             .width('100%')
             .constraintSize({ minHeight: 64 })
             .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-            .backgroundColor(this.activeStudentId === student.id ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+            .backgroundColor(AppTheme.CARD_SURFACE)
             .border({ width: 1,
               color: this.activeStudentId === student.id ? AppTheme.PRIMARY : AppTheme.BORDER })
             .borderRadius(AppTheme.CONTROL_RADIUS)

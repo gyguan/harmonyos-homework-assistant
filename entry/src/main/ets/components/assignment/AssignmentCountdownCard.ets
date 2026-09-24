@@ -98,12 +98,14 @@ export struct AssignmentCountdownCard {
     Column({ space: 10 }) {
       Row({ space: 8 }) {
         Text(this.statusLabel())
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.emphasisColor());
         Blank();
         Text(`目标 ${this.assignment.expectedMinutes} 分钟`)
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%')

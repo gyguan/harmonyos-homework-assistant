@@ -30,9 +30,7 @@ prototype = read("docs/product/ui-page-spec-v2.md")
 alignment_spec = read("docs/product/v2-pad-prototype-alignment.md")
 
 for token in [
-    "HOME_PAD_CONTENT_MAX_WIDTH",
-    "ASSIGNMENT_MASTER_DETAIL_MAX_WIDTH",
-    "STUDY_SPLIT_MAX_WIDTH",
+    "CONTENT_WIDE_MAX_WIDTH",
     "HOME_PRIMARY_MIN_WIDTH",
     "HOME_SECONDARY_MIN_WIDTH",
     "SPLIT_PRIMARY_MIN_WIDTH",

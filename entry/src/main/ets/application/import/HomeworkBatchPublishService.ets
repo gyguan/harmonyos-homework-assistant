@@ -76,7 +76,7 @@ export class HomeworkBatchPublishService {
       studentId: candidate.studentId,
       candidateId: candidate.id,
       backing: AssignmentBacking.REMOTE,
-      assignmentType: AssignmentType.SCHOOL,
+      assignmentType: this.assignmentType(candidate.subject),
       subjectCode: this.subjectCode(candidate.subject),
       contentType: AssignmentContentType.NORMAL,
       subject: candidate.subject,
@@ -112,6 +112,13 @@ export class HomeworkBatchPublishService {
       if (Number.isFinite(value) && value > 0) return value;
     }
     return Date.now();
+  }
+
+  private assignmentType(subject: Subject): AssignmentType {
+    if (subject === Subject.CHINESE || subject === Subject.MATH || subject === Subject.ENGLISH) {
+      return AssignmentType.SCHOOL;
+    }
+    return AssignmentType.EXTRA;
   }
 
   private subjectCode(subject: Subject): string {

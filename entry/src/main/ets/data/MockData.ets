@@ -36,6 +36,7 @@ export class MockData {
   static readonly settings: AppSettings = {
     students: MockData.students,
     activeStudentId: 'student-xiaoyu-001',
+    parentAccessCode: '',
     tutorGuidanceFirst: true,
     directAnswerAllowed: false
   };

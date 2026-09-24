@@ -70,7 +70,6 @@ export class HomeworkShareImportService {
       studentId: studentId,
       sourceType: HomeworkImportSourceType.SHARE,
       sourceLabel: '系统分享',
-      sourceProfileId: '',
       createdAtEpochMs: pending.createdAtEpochMs,
       status: candidates.length > 0 ? ImportBatchStatus.READY : ImportBatchStatus.EMPTY,
       messageCount: messages.length,

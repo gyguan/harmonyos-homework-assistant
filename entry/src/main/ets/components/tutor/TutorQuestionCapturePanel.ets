@@ -54,7 +54,7 @@ export struct TutorQuestionCapturePanel {
         .enabled(!this.capturing)
         .backgroundColor(AppTheme.SURFACE)
         .fontColor(AppTheme.PRIMARY)
-        .fontSize(13)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
         .border({ width: 1, color: AppTheme.BORDER })
         .onClick(() => { void this.capture(); });
 
@@ -70,8 +70,8 @@ export struct TutorQuestionCapturePanel {
       Text(this.notice.length > 0 ? this.notice : '只在本机识别')
         .layoutWeight(1)
         .maxLines(2)
-        .fontSize(11)
-        .lineHeight(16)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(this.imageUri.length > 0 ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
     }
     .width('100%')

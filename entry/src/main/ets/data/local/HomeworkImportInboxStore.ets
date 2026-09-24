@@ -84,20 +84,7 @@ export class HomeworkImportInboxStore {
       studentId: source.studentId,
       sourceType: source.sourceType,
       sourceLabel: source.sourceLabel,
-      sourceProfileId: source.sourceProfileId,
-      sourceProfileName: source.sourceProfileName,
-      expectedGroupTitle: source.expectedGroupTitle,
-      profileStartTime: source.profileStartTime,
-      groupValidationStatus: source.groupValidationStatus,
-      groupConfirmedByUser: source.groupConfirmedByUser,
-      captureSessionId: source.captureSessionId,
       pipelineStage: source.pipelineStage,
-      reconstructed: source.reconstructed,
-      groupTitle: source.groupTitle,
-      timeBoundaryReached: source.timeBoundaryReached,
-      earliestDetectedTime: source.earliestDetectedTime,
-      reconstructionWarnings: source.reconstructionWarnings === undefined ?
-        undefined : source.reconstructionWarnings.slice(),
       understood: source.understood,
       understandingVersion: source.understandingVersion,
       pendingReviewMessageIds: source.pendingReviewMessageIds === undefined ?
@@ -123,8 +110,6 @@ export class HomeworkImportInboxStore {
       sourceEvidence: {
         sourceType: source.sourceEvidence.sourceType,
         sourceMessageIds: source.sourceEvidence.sourceMessageIds.slice(),
-        sourceFrameEvidenceIds: source.sourceEvidence.sourceFrameEvidenceIds === undefined ?
-          undefined : source.sourceEvidence.sourceFrameEvidenceIds.slice(),
         rawText: source.sourceEvidence.rawText,
         imageRef: source.sourceEvidence.imageRef,
         capturedAtEpochMs: source.sourceEvidence.capturedAtEpochMs

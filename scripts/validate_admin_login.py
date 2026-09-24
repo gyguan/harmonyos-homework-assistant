@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import sys
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 errors: list[str] = []
@@ -17,17 +18,35 @@ def require(ok: bool, msg: str) -> None:
         errors.append(msg)
 
 app = read("backend/src/main/resources/static/admin/js/app.js")
+login_shell = read("backend/src/main/resources/static/admin/js/login-shell.js")
 index = read("backend/src/main/resources/static/admin/index.html")
-require("LoginState = Object.freeze" in app, "admin login must use explicit state")
-require("AUTHENTICATING" in app and "INITIALIZING" in app and "READY" in app, "login states must distinguish auth and initialization")
-require("showAdminShell(result.displayName)" in app, "admin shell must become visible immediately after authentication")
-require("await initializeAdmin()" in app, "student loading must be a separate initialization step")
-require("setView('admin')" in app, "authenticated state must switch to admin view")
-require("loginView.style.display = showLoginView ? '' : 'none'" in app, "login view must be explicitly hidden after authentication")
-require("adminView.style.display = showLoginView ? 'none' : 'grid'" in app, "admin view must be explicitly shown after authentication")
-require("?v=20260922" in index, "admin static assets must be cache-busted")
-require("学生信息加载失败" in app, "initialization failure must remain visible in admin shell")
-require('id="login-form"' in index, "login form must remain present")
+
+require("loginForm.addEventListener('submit', handleLogin)" in login_shell,
+        "admin login submit handling must live in the isolated login shell")
+require("publishAuthenticated(result.displayName)" in login_shell and
+        "setView('admin')" in login_shell,
+        "successful authentication must switch to the admin shell immediately")
+require("window.__xiaobanAdminAuth = detail" in login_shell and
+        "xiaoban-admin-authenticated" in login_shell,
+        "login shell must publish authenticated state independently of business modules")
+require("window.addEventListener('xiaoban-admin-authenticated'" in app and
+        "window.__xiaobanAdminAuth" in app,
+        "admin business module must initialize from isolated authenticated state")
+require("async function handleLogin" not in app,
+        "business module must not own login submission")
+login_match = re.search(r"login-shell\.js\?v=([0-9-]+)", index)
+app_match = re.search(r"app\.js\?v=([0-9-]+)", index)
+require(login_match is not None and app_match is not None and
+        login_match.group(1) == app_match.group(1),
+        "admin login shell and app module must be cache-busted together")
+cache_version = login_match.group(1) if login_match is not None else ""
+require(f"api.js?v={cache_version}" in login_shell and
+        f"api.js?v={cache_version}" in app and
+        f"voice-material.js?v={cache_version}" in app and
+        f"voice-management-view.js?v={cache_version}" in app,
+        "admin module dependency graph must use the same cache-bust version")
+require('id="login-form"' in index and 'id="admin-view"' in index,
+        "login and admin shells must remain explicit")
 
 if errors:
     print("ADMIN_LOGIN_GATE_FAIL")

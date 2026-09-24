@@ -5,72 +5,123 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 errors: list[str] = []
 
-
 def read(path: str) -> str:
-    file = ROOT / path
-    if not file.exists():
+    p = ROOT / path
+    if not p.exists():
         errors.append(f"missing required file: {path}")
         return ""
-    return file.read_text(encoding="utf-8")
+    return p.read_text(encoding="utf-8")
 
+def require(ok: bool, msg: str) -> None:
+    if not ok:
+        errors.append(msg)
 
-def require(condition: bool, message: str) -> None:
-    if not condition:
-        errors.append(message)
-
-
-controller = read("backend/src/main/java/com/xiaoban/homework/admin/AdminPageController.java")
+controller = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java")
+query_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceTaskQueryService.java")
+assignment_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialAssignmentService.java")
+dtos = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialDtos.java")
+migration = read("backend/src/main/resources/db/migration/V17__voice_material_task_links.sql")
 index = read("backend/src/main/resources/static/admin/index.html")
 css = read("backend/src/main/resources/static/admin/css/admin.css")
 api = read("backend/src/main/resources/static/admin/js/api.js")
 app = read("backend/src/main/resources/static/admin/js/app.js")
+view = read("backend/src/main/resources/static/admin/js/voice-management-view.js")
 voice = read("backend/src/main/resources/static/admin/js/voice-material.js")
+admin_controller = read("backend/src/main/java/com/xiaoban/homework/admin/AdminPageController.java")
 
-require('@GetMapping({"/admin", "/admin/"})' in controller and 'forward:/admin/index.html' in controller,
+require('@GetMapping({"/admin", "/admin/"})' in admin_controller and
+        'forward:/admin/index.html' in admin_controller,
         "admin root must deterministically forward to the static admin shell")
-require('webkitdirectory' in index and 'multiple' in index and 'id="folder-input"' in index,
-        "admin import must support selecting multiple directories")
-require("dragover" in app and "webkitGetAsEntry" in app and "collectDroppedDirectory" in app,
-        "admin import must support dropping multiple folders into the picker")
-require('id="student-select"' in index and 'id="subject-chips"' in index and
-        'id="default-minutes"' in index,
-        "admin import must expose student, subject and expected-minute defaults")
-require('作业管理' in index and '系统' in index and '待扩展' in index,
-        "admin shell must keep future navigation placeholders without implementing extra scope")
-require('sessionStorage' in api and 'localStorage' not in api,
-        "admin auth token must remain session-scoped instead of persistent localStorage")
-for endpoint in [
-    "/api/v1/auth/login",
-    "/api/v1/students",
-    "/voice-material-batches",
-    "/voice-material-packages/",
+require('id="nav-voice-tasks"' in index and '<span>语音任务</span>' in index,
+        "admin shell must expose the voice-task navigation entry")
+require('voice-task-stats' not in index,
+        "voice management must not regress to statistic cards")
+
+# Tasks and folders must be separate Web views.
+for element_id in [
+    "tab-tasks", "tab-folders", "task-view", "folder-view",
+    "task-search-form", "task-table-body", "task-pagination",
+    "folder-search-form", "folder-table-body", "folder-pagination"
 ]:
-    require(endpoint in api, f"admin import must reuse existing API boundary: {endpoint}")
-require("webkitRelativePath" in voice and "parseVoiceMaterialPackages" in voice,
-        "browser directory import must group files using relative paths")
-require("audioCount === 0" in voice and "audioCount > 1" in voice and "imageCount === 0" in voice,
-        "admin preview must enforce 1 audio + at least 1 image before upload")
-require("completeVoiceMaterialBatch" in app and "registerVoiceMaterialPackage" in app and
-        "uploadVoiceMaterialFile" in app and "listVoiceMaterialPackages" in api and
-        "fetchVoiceMaterialAsset" in api,
-        "admin upload must execute the existing batch/package/file/complete workflow")
-require("registrationFailures" in app and "failures === 0" in app,
-        "partial failures must be surfaced and failed selections retained for retry")
-require("imported-card" in index and "loadImportedPackages" in app and "data-preview-asset" in app,
-        "admin import must provide an imported material library with file preview")
-require("/api/v1/media-assets/" in api and '@GetMapping("/media-assets/{assetId}")' in read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java"),
-        "imported files must use an authenticated media asset endpoint")
-require("registrationFailures" in app and "failures === 0" in app,
-        "partial failures must be surfaced and failed selections retained for retry")
-require("AdminVoiceMaterialService" not in controller + app + api,
-        "admin import must not introduce a second voice-material business service")
-require("#1456b8" in css and "#fff" in css,
-        "admin shell must keep the low-saturation white/deep-blue visual baseline")
+    require(f'id="{element_id}"' in index, f"missing split voice management view: {element_id}")
+require("switchTab('tasks')" in app and "switchTab('folders')" in app,
+        "task and folder views must be independently navigable")
+
+# Server-side paged task query is Assignment-based.
+require('"/voice-tasks"' in controller and '"/voice-tasks/{assignmentId}"' in controller,
+        "canonical voice task list/detail endpoints must exist")
+require("from assignment a" in query_service and
+        "a.content_type = 'AUDIO_IMAGE'" in query_service and
+        "left join voice_material_task_link l" in query_service and
+        "limit :limit offset :offset" in query_service,
+        "voice task query must start from Assignment and remain server paged")
+require("fetchAssignmentResource" in api and "APP 本地上传" in view,
+        "Web task detail must preview local-upload assignment resources without a folder link")
+require("renderTaskRows" in view and "renderFolderRows" in view and
+        "renderTaskDetailContent" in view and "renderFolderDetailContent" in view and
+        "voice-management-view.js" in app,
+        "voice task/folder presentation must stay isolated from app orchestration")
+require("/api/v1/voice-tasks" in api and "searchVoiceTasks" in app,
+        "Web task list must use canonical paged task API")
+require('value="READY"' not in index[index.find('id="task-status"'):index.find('id="task-subject"')],
+        "folder lifecycle states must not leak into task status filter")
+
+# Folder list is independent, paged, and exposes reuse metrics.
+require('@GetMapping("/voice-material-folders")' in controller and
+        '@GetMapping("/voice-material-folders/{packageId}")' in controller,
+        "voice folder list/detail endpoints must exist")
+require("VoiceFolderPageResponse" in dtos and "usageCount" in dtos and
+        "activeTaskCount" in dtos and "lastUsedAtEpochMs" in dtos,
+        "folder query contract must expose reuse information")
+require("/api/v1/voice-material-folders" in api and
+        "searchVoiceFolders" in app and "getVoiceFolderDetail" in app,
+        "Web folder list/detail must use paged folder APIs")
+require("使用次数" in index and "最近使用" in index,
+        "folder result list must visibly expose reuse history")
+
+# Folder -> N tasks relation and request idempotency.
+require("create table voice_material_task_link" in migration and
+        "assignment_id varchar(120) not null" in migration and
+        "package_id uuid not null" in migration,
+        "database must persist independent folder-task history")
+require("update voice_material_package" in migration and
+        "status = 'READY'" in migration and "status = 'CONSUMED'" in migration,
+        "legacy consumed folders must be migrated back to reusable READY")
+require('"a-voice-" + UUID.randomUUID()' in assignment_service and
+        'link.packageId = item.id' in assignment_service and
+        'links.saveAndFlush(link)' in assignment_service,
+        "task creation must create a new Assignment and independent folder link")
+require('item.status = "CONSUMED"' not in assignment_service,
+        "new task creation must not consume a reusable folder")
+require("requestId" in dtos and "findByFamilyIdAndRequestId" in assignment_service,
+        "manual task creation must have request-level idempotency")
+require('id="open-create-task"' in index and 'id="create-drawer"' in index and
+        "prepareCreateSettings" in app and "submitCreate" in app,
+        "Web must provide explicit create-task workflow over reusable folders")
+
+# Folder import remains separate with per-directory result list.
+for element_id in [
+    "open-import", "import-drawer", "folder-input", "folder-picker",
+    "import-table-body", "start-import", "import-result-stage", "import-result-body"
+]:
+    require(f'id="{element_id}"' in index, f"missing folder import UI: {element_id}")
+require("webkitdirectory" in index and "ondrop" in app and "collectDirectory" in app,
+        "folder import must support directory selection and drag/drop")
+require("parseVoiceMaterialPackages" in app and
+        "audioCount === 0" in voice and "audioCount > 1" in voice and
+        "imageCount === 0" in voice,
+        "folder import must validate 1 audio + at least 1 image")
+require("renderImportResults" in app and "可用于创建语音任务" in app,
+        "import must finish with a per-folder reusable result list")
+require("AdminVoiceMaterialService" not in controller + app + view + api,
+        "admin refactor must not duplicate the voice material domain service")
+require("#1456b8" in css and "#fff" in css and ".data-table" in css and ".drawer-panel" in css,
+        "admin must keep the white/deep-blue Web management visual baseline")
 
 if errors:
     print("ADMIN_VOICE_IMPORT_GATE_FAIL")
-    for error in errors:
-        print(f"- {error}")
+    for e in errors:
+        print(f"- {e}")
     sys.exit(1)
 
 print("ADMIN_VOICE_IMPORT_GATE_PASS")

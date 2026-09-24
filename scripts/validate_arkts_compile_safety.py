@@ -1,18 +1,27 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
-NATIVE_RUNTIME = ROOT / "entry/src/main/ets/infrastructure/capture/NativeHomeworkCaptureRuntime.ets"
-CAPTURE_DIAGNOSTIC = ROOT / "entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets"
-CAPTURE_PAGE = ROOT / "entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
 PARENT_IMPORT_NAV = ROOT / "entry/src/main/ets/app/navigation/ParentImportNavigator.ets"
 APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
 APP_ROUTES = ROOT / "entry/src/main/ets/app/navigation/AppRoutes.ets"
 VOICE_MATERIAL_API = ROOT / "entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets"
 VOICE_MATERIAL_PICKER = ROOT / "entry/src/main/ets/application/assignment/VoiceMaterialDirectoryPicker.ets"
+ETS_ROOT = ROOT / "entry/src/main/ets"
+QUALIFIED_MODEL_SYMBOLS = [
+    "AssignmentStatus",
+    "AssignmentType",
+    "AssignmentContentType",
+    "AssignmentBacking",
+    "AssignmentResourceType",
+    "Subject",
+    "SubmissionType",
+    "HomeworkImportSourceKind",
+]
 
 errors: list[str] = []
 
@@ -22,12 +31,29 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 
+def imports_symbol(source: str, symbol: str) -> bool:
+    if re.search(rf"\b(?:enum|class|interface|type)\s+{re.escape(symbol)}\b", source):
+        return True
+    for match in re.finditer(r"import\s*\{([^}]*)\}\s*from", source, flags=re.S):
+        names = [part.strip().split(" as ")[0].strip() for part in match.group(1).split(",")]
+        if symbol in names:
+            return True
+    return False
+
+
+def validate_qualified_model_imports() -> None:
+    for file in ETS_ROOT.rglob("*.ets"):
+        source = file.read_text(encoding="utf-8")
+        for symbol in QUALIFIED_MODEL_SYMBOLS:
+            if re.search(rf"\b{re.escape(symbol)}\s*\.", source) and not imports_symbol(source, symbol):
+                relative = file.relative_to(ROOT)
+                errors.append(
+                    f"{relative} uses {symbol}. but does not import or declare {symbol}")
+
+
 def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
-    native_runtime = NATIVE_RUNTIME.read_text(encoding="utf-8")
-    capture_diagnostic = CAPTURE_DIAGNOSTIC.read_text(encoding="utf-8")
-    capture_page = CAPTURE_PAGE.read_text(encoding="utf-8")
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
     parent_import_nav = PARENT_IMPORT_NAV.read_text(encoding="utf-8")
     app_shell = APP_SHELL.read_text(encoding="utf-8")
@@ -80,12 +106,14 @@ def main() -> int:
     require("deviceInfo.sdkApiVersion >= 26" not in voice_material_picker,
             "raw sdkApiVersion comparison must not replace ArkTS apiAvailable compatibility protection")
 
-    require("class ParentVoiceMaterialRouteParam" in app_routes,
-            "voice material navigation must declare an explicit route param type")
-    require("AppRoute.PARENT_VOICE_MATERIAL, {}" not in app_shell,
-            "AppShell must not use an untyped object literal for voice material navigation")
-    require("new ParentVoiceMaterialRouteParam()" in app_shell,
-            "AppShell must use the typed voice material route param")
+    require("class ParentVoiceCreateRouteParam" in app_routes,
+            "voice assignment creation navigation must declare an explicit route param type")
+    require("AppRoute.PARENT_VOICE_CREATE, {}" not in app_shell,
+            "AppShell must not use an untyped object literal for voice assignment creation")
+    require("new ParentVoiceCreateRouteParam()" in app_shell,
+            "AppShell must use the typed voice assignment creation route param")
+    require("PARENT_VOICE_MATERIAL" not in app_routes and "PARENT_VOICE_MATERIAL" not in app_shell,
+            "legacy standalone voice-material navigation must not reappear")
 
     syscap = "SystemCapability.Multimedia.Media.AVPlayer"
     require(audio.count(f"canIUse('{syscap}')") >= 2,
@@ -94,24 +122,33 @@ def main() -> int:
             "AVPlayer calls must live inside a positive canIUse branch for ArkTS SysCap analysis")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
+    require("let player = await media.createAVPlayer();" in audio,
+            "AVPlayer must use the known-good static MediaKit creation path")
+    require("await import('@kit.MediaKit')" not in audio,
+            "AVPlayer must not restore the runtime-regressing dynamic MediaKit import")
+    require("let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };" in audio,
+            "AVPlayer must keep the known-good local file descriptor shape")
+    require("player.seek(target, media.SeekMode.SEEK_PREV_SYNC);" in audio,
+            "AVPlayer seek must keep the known-good synchronized seek mode")
 
-    require("libhomeworkcapture.so" in native_runtime,
-            "native capture library must be isolated behind NativeHomeworkCaptureRuntime")
-    require("libhomeworkcapture.so" not in capture_diagnostic,
-            "HomeworkCaptureDiagnosticPage must not import the native library directly")
     require("throw error;" not in share_receive,
             "share receive flow must only throw explicit Error values")
     require("this.openCapture(stack)" not in parent_import_nav,
             "static ParentImportNavigator methods must not dispatch through this")
-    for source, name in [
-        (capture_page, "HomeworkCapturePage"),
-        (capture_diagnostic, "HomeworkCaptureDiagnosticPage"),
-    ]:
-        require("floatView" not in source and "FLOAT_VIEW" not in source,
-                f"{name} must not depend on restricted floating-window APIs")
     for method in ["finishShareImportReady", "finishShareImportEmpty", "cancelShareImport"]:
         require(f"private {method}(): void" in app_shell,
                 f"AppShell missing typed share-import callback: {method}")
+
+    for retired_capture_path in [
+        "entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets",
+        "entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets",
+        "entry/src/main/ets/features/parent/import/HomeworkCaptureDiagnosticPage.ets",
+        "entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets",
+    ]:
+        require(not (ROOT / retired_capture_path).exists(),
+                f"retired screen-capture source must stay removed: {retired_capture_path}")
+
+    validate_qualified_model_imports()
 
     if errors:
         print("ARKTS_COMPILE_SAFETY_FAIL")

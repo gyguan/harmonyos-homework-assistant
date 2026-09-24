@@ -29,7 +29,7 @@ export struct StudentAssignmentDetailPage {
       }
       .width('100%')
       .height('100%')
-      .constraintSize({ maxWidth: AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
       .justifyContent(FlexAlign.Start)
       .alignItems(HorizontalAlign.Start)
       .padding({

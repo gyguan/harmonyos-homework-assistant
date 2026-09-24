@@ -26,44 +26,74 @@ draft_port = read("entry/src/main/ets/domain/port/HomeworkImportDraftRepository.
 draft_repo = read("entry/src/main/ets/data/repository/DefaultHomeworkImportDraftRepository.ets")
 draft_local = read("entry/src/main/ets/data/local/HomeworkImportLocalDataSource.ets")
 parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
+publisher = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
 
-require("TextArea" in page, "parent import page must provide editable teacher-text input")
-require("让小伴整理" in page and "parseTypedText" in page,
-        "parent import page must expose text parsing action")
-require("HomeworkImportViewModel" in page and "this.viewModel.parseText(text)" in page,
-        "text input must flow through the import ViewModel")
-require("this.viewModel.selectImageAndParse()" in page,
-        "screenshot import must continue through the import ViewModel")
+# One parent-facing assignment input: pasted teacher copy, direct parent instructions and
+# screenshot OCR all converge before organization.
+require("TextArea" in page and "作业内容" in page,
+        "parent assignment create page must expose one editable assignment-content input")
+require("整理并继续" in page and "private async organize()" in page,
+        "parent assignment create page must expose one organize action")
+require("this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel)" in page,
+        "all editable assignment text must flow through the import ViewModel with explicit subject and source evidence")
+require("private SubjectSelector()" in page and "@State private subjectChosen: boolean = false" in page and
+        "请先选择作业科目" in page,
+        "assignment creation must require the parent to choose subject before organization")
+require("this.viewModel.selectImageText()" in page and
+        "this.viewModel.captureImageText()" in page and
+        "已识别文字，可修改后继续" in page,
+        "gallery and camera OCR must only fill editable text before organization")
+require("selectImageAndParse()" not in page and "parseTypedText" not in page and
+        "textEntryOpen" not in page,
+        "unified create page must not retain separate screenshot/text sub-flows")
 require("HomeworkStore" not in page,
-        "V2 import page must not access HomeworkStore directly")
+        "assignment create page must not access HomeworkStore directly")
 require("private afterOrganized(candidateCount: number)" in page and
         "this.onOpenConfirmation()" in page,
         "successful organization must navigate directly to the single confirmation page")
 require("CandidatePane" not in page and "继续确认" not in page,
-        "import flow must not retain a redundant intermediate confirmation step")
-require("LayoutPolicy.importOrganizeRequirement()" in page and "private canUseSplit()" in page and
-        "this.availableWidthVp" in page,
-        "import composition must use actual container width and LayoutPolicy")
-require("WindowSizeClass.COMPACT" not in page and "WindowSizeClass.EXPANDED" not in page,
-        "import page must not choose business composition from size-class breakpoints")
+        "assignment create flow must not retain a redundant intermediate confirmation step")
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in page and
+        ".alignItems(HorizontalAlign.Center)" in page,
+        "assignment create page must keep one centered readable content column")
 require("this.FeedbackBanner();" in page and "if (this.parseMessage.length > 0)" in page,
-        "organizer feedback must remain visible in the import flow")
+        "organizer feedback must remain visible in the assignment create flow")
 require("HomeworkConfirmationPage" not in page,
-        "import page must navigate to confirmation rather than duplicate confirmation UI")
+        "assignment create page must navigate to confirmation rather than duplicate confirmation UI")
 
-require("HomeworkImportService.instance.parseText(text)" in view_model and
-        "HomeworkImportService.instance.selectImageAndParse()" in view_model,
-        "import ViewModel must delegate parsing to HomeworkImportService")
+require("HomeworkImportService.instance.parseText(text, subject, imageRef, imageSourceLabel)" in view_model and
+        "HomeworkImportService.instance.selectImageText()" in view_model and
+        "HomeworkImportService.instance.captureImageText()" in view_model,
+        "import ViewModel must delegate explicit subject, unified text, gallery OCR and camera OCR actions")
 require("HomeworkImportDraftRepository" in service and "DefaultHomeworkImportDraftRepository" in service,
         "HomeworkImportService must persist drafts through the draft repository boundary")
 require("HomeworkStore" not in service,
         "HomeworkImportService must not access HomeworkStore directly")
-require("async parseText(text: string)" in service,
-        "HomeworkImportService must support direct text import")
-require("HomeworkImportSourceKind.TEXT" in service and "家长录入文字" in service,
-        "direct text import must preserve its source type and label")
-require("if (output.candidates.length === 0)" in service,
-        "failed parsing must not overwrite existing candidate homework")
+require("async parseText(text: string, subject: Subject, imageRef: string = ''" in service and
+        "imageSourceLabel: string = ''" in service,
+        "HomeworkImportService must support one explicit subject plus optional image evidence")
+require("HomeworkImportSourceKind.TEXT" in service and "家长录入文字" in service and
+        "相册作业截图" in service,
+        "unified assignment input must preserve its actual source evidence")
+require("async selectImageText()" in service and "async captureImageText()" in service and
+        "recognizeImageText" in service and "this.pipeline.extract(rawImport)" in service,
+        "image OCR actions must stop after extraction until the user chooses to organize")
+require("fallbackCandidate" in service and
+        "output.organizerMode === HomeworkOrganizerMode.LOCAL" in service,
+        "only local parser empty results may fall back to one confirmable candidate")
+require("candidates.length === 0 && output.organizerMode === HomeworkOrganizerMode.LOCAL" in service,
+        "an authoritative AI zero-task result must not be converted into a fake assignment")
+require("private applySelectedSubject(candidates: CandidateAssignment[], subject: Subject)" in service and
+        "candidates = this.applySelectedSubject(output.candidates, subject)" in service and
+        "subject: subject" in service and "fallbackSubject" not in service,
+        "organizer/parser subject inference must never override the parent-selected subject")
+
+# Unified publishing must keep the single Assignment aggregate while retaining SCHOOL vs EXTRA.
+require("this.assignmentType(candidate.subject)" in publisher and
+        "return AssignmentType.EXTRA" in publisher and
+        "return AssignmentType.SCHOOL" in publisher,
+        "unified create flow must preserve school versus extracurricular AssignmentType")
+
 require("getRawImport" in draft_port and "getCandidates" in draft_port and
         "replaceRawImport" in draft_port and "replaceCandidates" in draft_port,
         "draft repository port must own import draft reads and writes")
@@ -75,7 +105,7 @@ require("HomeworkStore.instance" in draft_local,
 require("splitSegments" in parser and "stripListMarker" in parser,
         "local parser must split teacher text into task-level segments")
 require("currentSubject" in parser,
-        "local parser must support subject inheritance across consecutive tasks")
+        "local parser must support subject inheritance across consecutive school tasks")
 for marker in ["`${i}.`", "`${i}、`", "`(${i})`", "`（${i}）`"]:
     require(marker in parser, f"local parser must support list marker {marker}")
 for subject in ["语文", "数学", "英语"]:

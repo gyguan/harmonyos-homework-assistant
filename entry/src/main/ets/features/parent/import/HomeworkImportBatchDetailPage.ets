@@ -41,11 +41,6 @@ export struct HomeworkImportBatchDetailPage {
       [] : item.sourceEvidence.sourceMessageIds;
   }
 
-  private sourceFrameIds(item: ImportedMessage): string[] {
-    return item.sourceEvidence.sourceFrameEvidenceIds === undefined ?
-      [] : item.sourceEvidence.sourceFrameEvidenceIds;
-  }
-
   private statusLabel(status: ImportBatchStatus): string {
     if (status === ImportBatchStatus.READY) return '待确认';
     if (status === ImportBatchStatus.PUBLISHED) return '已发布';
@@ -88,29 +83,25 @@ export struct HomeworkImportBatchDetailPage {
     Column({ space: 6 }) {
       Row() {
         Text(item.sender.length > 0 ? item.sender : '原始内容')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
-        Text(`#${item.orderNo}`).fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+        Text(`#${item.orderNo}`).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%');
 
       Text(item.text.length > 0 ? item.text : '（图片消息）')
         .width('100%')
-        .fontSize(13)
-        .lineHeight(20)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontColor(AppTheme.TEXT);
-
-      if (this.sourceFrameIds(item).length > 0) {
-        Text(`来源画面：${this.sourceFrameIds(item).length} 个 Frame Evidence`)
-          .fontSize(12)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-      }
 
       if (item.attachments.length > 0) {
         Text(`附件 ${item.attachments.length} 个`)
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
     }
@@ -118,7 +109,7 @@ export struct HomeworkImportBatchDetailPage {
     .padding(12)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
@@ -126,27 +117,29 @@ export struct HomeworkImportBatchDetailPage {
     Column({ space: 5 }) {
       Row() {
         Text(item.subject)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
         Blank();
-        Text(`${item.expectedMinutes} 分钟`).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text(`${item.expectedMinutes} 分钟`).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
       Text(item.title)
         .width('100%')
-        .fontSize(14)
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Text(item.sourceEvidence.excerpt)
         .width('100%')
-        .fontSize(12)
-        .lineHeight(17)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
       if (this.sourceMessageIds(item).length > 0) {
         Text(`证据消息：${this.sourceMessageIds(item).join(', ')}`)
           .width('100%')
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
     }
@@ -154,7 +147,7 @@ export struct HomeworkImportBatchDetailPage {
     .padding(12)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   build() {
@@ -173,181 +166,41 @@ export struct HomeworkImportBatchDetailPage {
           if (this.batch() === null) {
             Text('找不到这个导入批次')
               .width('100%')
-              .fontSize(14)
+              .fontSize(AppTheme.BODY_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT)
               .fontColor(AppTheme.SUBTEXT)
               .padding(18)
               .backgroundColor(AppTheme.SURFACE)
               .border({ width: 1, color: AppTheme.BORDER })
-              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+              .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
           } else {
             Column({ space: 8 }) {
               Text('来源')
                 .width('100%')
-                .fontSize(15)
+                .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
+                .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
                 .fontColor(AppTheme.TEXT);
               Text(this.batch()!.sourceLabel)
                 .width('100%')
-                .fontSize(13)
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
                 .fontColor(AppTheme.SUBTEXT);
-              if (this.batch()!.captureSessionId !== undefined &&
-                this.batch()!.captureSessionId!.length > 0) {
-                Text(`采集会话：${this.batch()!.captureSessionId}`)
-                  .width('100%')
-                  .fontSize(12)
-                  .fontColor(AppTheme.TERTIARY_TEXT);
-              }
-            }
+        }
             .width('100%')
             .padding(14)
             .backgroundColor(AppTheme.SURFACE)
             .border({ width: 1, color: AppTheme.BORDER })
-            .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+            .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
 
-            if (this.batch()!.sourceProfileId.length > 0) {
-              Column({ space: 6 }) {
-                Text('班级采集范围')
-                  .width('100%')
-                  .fontSize(15)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT);
-                if (this.batch()!.sourceProfileName !== undefined &&
-                  this.batch()!.sourceProfileName!.length > 0) {
-                  Text(`配置：${this.batch()!.sourceProfileName}`)
-                    .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-                }
-                if (this.batch()!.expectedGroupTitle !== undefined &&
-                  this.batch()!.expectedGroupTitle!.length > 0) {
-                  Text(`目标群：${this.batch()!.expectedGroupTitle}`)
-                    .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-                }
-                if (this.batch()!.profileStartTime !== undefined &&
-                  this.batch()!.profileStartTime!.length > 0) {
-                  Text(`时间范围：今天 ${this.batch()!.profileStartTime} 至采集结束`)
-                    .width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
-                }
-                if (this.batch()!.groupValidationStatus !== undefined) {
-                  Text(this.batch()!.groupValidationStatus === 'MATCHED' ? '群名校验：匹配' :
-                    (this.batch()!.groupValidationStatus === 'MISMATCH' ? '群名校验：不匹配' :
-                      (this.batch()!.groupValidationStatus === 'CONFLICT' ? '群名校验：检测到多个微信群，已阻断自动整理' :
-                        (this.batch()!.groupConfirmedByUser === true ? '群名校验：未识别，家长已确认继续' :
-                          '群名校验：未识别'))))
-                    .width('100%')
-                    .fontSize(13)
-                    .fontColor(this.batch()!.groupValidationStatus === 'MATCHED' ? AppTheme.SUCCESS :
-                      ((this.batch()!.groupValidationStatus === 'MISMATCH' ||
-                        this.batch()!.groupValidationStatus === 'CONFLICT') ? AppTheme.DANGER : AppTheme.WARNING));
-                }
-                if (this.batch()!.pipelineStage !== undefined) {
-                  Text(`处理阶段：${this.batch()!.pipelineStage}`)
-                    .width('100%')
-                    .fontSize(12)
-                    .fontColor(AppTheme.TERTIARY_TEXT);
-                }
-              }
-              .width('100%')
-              .padding(14)
-              .backgroundColor(AppTheme.SURFACE)
-              .border({ width: 1, color: AppTheme.BORDER })
-              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
-            }
-
-            if (this.batch()!.reconstructed === true) {
-              Column({ space: 6 }) {
-                Text('聊天重建')
-                  .width('100%')
-                  .fontSize(15)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT);
-                if (this.batch()!.groupTitle !== undefined && this.batch()!.groupTitle!.length > 0) {
-                  Text(`群标题：${this.batch()!.groupTitle}`)
-                    .width('100%')
-                    .fontSize(13)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                if (this.batch()!.earliestDetectedTime !== undefined &&
-                  this.batch()!.earliestDetectedTime!.length > 0) {
-                  Text(`最早识别时间：${this.batch()!.earliestDetectedTime}`)
-                    .width('100%')
-                    .fontSize(13)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                if (this.batch()!.timeBoundaryReached !== undefined) {
-                  Text(this.batch()!.timeBoundaryReached === true ? '已达到目标时间边界' : '尚未达到目标时间边界')
-                    .width('100%')
-                    .fontSize(13)
-                    .fontColor(this.batch()!.timeBoundaryReached === true ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
-                }
-                if (this.batch()!.reconstructionWarnings !== undefined &&
-                  this.batch()!.reconstructionWarnings!.length > 0) {
-                  Text(`重建提示：${this.batch()!.reconstructionWarnings!.join('、')}`)
-                    .width('100%')
-                    .fontSize(12)
-                    .lineHeight(16)
-                    .fontColor(AppTheme.TERTIARY_TEXT);
-                }
-              }
-              .width('100%')
-              .padding(14)
-              .backgroundColor(AppTheme.PRIMARY_FAINT)
-              .border({ width: 1, color: AppTheme.BORDER })
-              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
-            }
-
-            if (this.batch()!.understood !== undefined) {
-              Column({ space: 6 }) {
-                Text('作业理解')
-                  .width('100%')
-                  .fontSize(15)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT);
-                Text(this.batch()!.understood === true ? '已完成老师识别、分类与任务整理' : '理解未完成，可保留原消息后重试')
-                  .width('100%')
-                  .fontSize(13)
-                  .fontColor(this.batch()!.understood === true ? AppTheme.SUCCESS : AppTheme.WARNING);
-                if (this.batch()!.understandingVersion !== undefined &&
-                  this.batch()!.understandingVersion!.length > 0) {
-                  Text(`规则版本：${this.batch()!.understandingVersion}`)
-                    .width('100%')
-                    .fontSize(12)
-                    .fontColor(AppTheme.TERTIARY_TEXT);
-                }
-                if (this.batch()!.classificationSummary !== undefined &&
-                  this.batch()!.classificationSummary!.length > 0) {
-                  Text(this.batch()!.classificationSummary!)
-                    .width('100%')
-                    .fontSize(12)
-                    .lineHeight(16)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                if (this.batch()!.pendingReviewMessageIds !== undefined &&
-                  this.batch()!.pendingReviewMessageIds!.length > 0) {
-                  Text(`待人工确认消息：${this.batch()!.pendingReviewMessageIds!.length} 条`)
-                    .width('100%')
-                    .fontSize(13)
-                    .fontColor(AppTheme.WARNING);
-                }
-                if (this.batch()!.understandingWarnings !== undefined &&
-                  this.batch()!.understandingWarnings!.length > 0) {
-                  Text(`理解提示：${this.batch()!.understandingWarnings!.join('、')}`)
-                    .width('100%')
-                    .fontSize(12)
-                    .lineHeight(16)
-                    .fontColor(AppTheme.TERTIARY_TEXT);
-                }
-              }
-              .width('100%')
-              .padding(14)
-              .backgroundColor(AppTheme.PRIMARY_FAINT)
-              .border({ width: 1, color: AppTheme.BORDER })
-              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
-            }
-
-            Column({ space: 8 }) {
-              Text(`${this.batch()!.reconstructed === true ? '重建消息' : '原始消息'} ${this.messages().length}`)
+                        Column({ space: 8 }) {
+              Text(`原始消息 ${this.messages().length}`)
                 .width('100%')
-                .fontSize(15)
+                .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
+                .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
                 .fontColor(AppTheme.TEXT);
               ForEach(this.messages(), (item: ImportedMessage) => {
                 this.SourceMessageCard(item);
@@ -358,8 +211,10 @@ export struct HomeworkImportBatchDetailPage {
             Column({ space: 8 }) {
               Text(`候选作业 ${this.candidates().length}`)
                 .width('100%')
-                .fontSize(15)
+                .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
+                .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
                 .fontColor(AppTheme.TEXT);
               ForEach(this.candidates(), (item: CandidateAssignment) => {
                 this.CandidateCard(item);
@@ -367,20 +222,57 @@ export struct HomeworkImportBatchDetailPage {
             }
             .width('100%');
 
+            if (this.batch()!.understood !== undefined ||
+              (this.batch()!.pendingReviewMessageIds !== undefined &&
+                this.batch()!.pendingReviewMessageIds!.length > 0) ||
+              (this.batch()!.understandingWarnings !== undefined &&
+                this.batch()!.understandingWarnings!.length > 0)) {
+              Column({ space: 6 }) {
+                Text('作业理解')
+                  .width('100%')
+                  .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                  .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                Text(this.batch()!.understood === true ? '已完成规则理解' : '规则理解未完成')
+                  .width('100%')
+                  .fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT)
+                  .fontColor(this.batch()!.understood === true ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+                Text(`待人工确认消息：${this.batch()!.pendingReviewMessageIds === undefined ?
+                  0 : this.batch()!.pendingReviewMessageIds!.length}`)
+                  .width('100%')
+                  .fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT)
+                  .fontColor(AppTheme.SUBTEXT);
+                if (this.batch()!.understandingWarnings !== undefined &&
+                  this.batch()!.understandingWarnings!.length > 0) {
+                  Text(`理解提示：${this.batch()!.understandingWarnings!.join('；')}`)
+                    .width('100%')
+                    .fontSize(AppTheme.CAPTION_SIZE)
+                    .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+                    .fontColor(AppTheme.TERTIARY_TEXT);
+                }
+              }
+              .width('100%')
+              .padding(14)
+              .backgroundColor(AppTheme.SURFACE)
+              .border({ width: 1, color: AppTheme.BORDER })
+              .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
+            }
+
             if (this.message.length > 0) {
               Text(this.message)
                 .width('100%')
-                .fontSize(13)
-                .lineHeight(18)
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
                 .fontColor(AppTheme.SUBTEXT)
                 .padding(10)
                 .backgroundColor(AppTheme.SURFACE_SUBTLE)
                 .borderRadius(AppTheme.CONTROL_RADIUS);
             }
 
-            if (this.batch()!.status === ImportBatchStatus.RECEIVED &&
-              this.batch()!.pendingReviewMessageIds !== undefined &&
-              this.batch()!.pendingReviewMessageIds!.length > 0) {
+            if (this.batch()!.status === ImportBatchStatus.RECEIVED) {
               Button('人工确认未识别消息', { type: ButtonType.Normal })
                 .width('100%')
                 .height(AppTheme.BUTTON_HEIGHT)
@@ -388,9 +280,7 @@ export struct HomeworkImportBatchDetailPage {
                 .backgroundColor(AppTheme.PRIMARY)
                 .fontColor(AppTheme.TEXT_ON_PRIMARY)
                 .onClick(() => this.manualReview());
-            }
-
-            if (this.batch()!.status === ImportBatchStatus.READY) {
+            } else if (this.batch()!.status === ImportBatchStatus.READY) {
               Button('继续确认并发布', { type: ButtonType.Normal })
                 .width('100%')
                 .height(AppTheme.BUTTON_HEIGHT)
@@ -398,13 +288,16 @@ export struct HomeworkImportBatchDetailPage {
                 .backgroundColor(AppTheme.PRIMARY)
                 .fontColor(AppTheme.TEXT_ON_PRIMARY)
                 .onClick(() => this.continueConfirmation());
+            }
 
+            if (this.batch()!.status === ImportBatchStatus.RECEIVED ||
+              this.batch()!.status === ImportBatchStatus.READY) {
               if (this.abandonConfirm) {
                 Column({ space: 8 }) {
                   Text('放弃这个导入批次？候选作业会从待确认区清除；已经发布的作业不会被删除。')
                     .width('100%')
-                    .fontSize(13)
-                    .lineHeight(18)
+                    .fontSize(AppTheme.BODY_SIZE)
+                    .lineHeight(AppTheme.BODY_LINE_HEIGHT)
                     .fontColor(AppTheme.DANGER);
                   Row({ space: 8 }) {
                     Button('取消', { type: ButtonType.Normal })
@@ -448,7 +341,7 @@ export struct HomeworkImportBatchDetailPage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
     .padding({
       left: AppTheme.PAGE_PADDING,
       right: AppTheme.PAGE_PADDING,

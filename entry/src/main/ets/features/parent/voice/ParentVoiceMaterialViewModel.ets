@@ -7,10 +7,12 @@ import {
 import {
   RemoteVoiceMaterialApi,
   RemoteVoiceMaterialBatch,
-  RemoteVoiceMaterialPackage
+  RemoteVoiceMaterialPackage,
+  RemoteVoiceMaterialCreateAssignmentRequest
 } from '../../../application/remote/RemoteVoiceMaterialApi';
 import { RemoteAssignmentMapper } from '../../../application/remote/RemoteModels';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
+import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { Assignment, StudentProfile } from '../../../domain/model/HomeworkModels';
 
 export interface VoiceMaterialUploadResult {
@@ -30,6 +32,10 @@ export class ParentVoiceMaterialViewModel {
 
   constructor(repository: DefaultAssignmentRepository) {
     this.repository = repository;
+  }
+
+  students(): StudentProfile[] {
+    return DefaultFamilyContextRepository.instance.getStudents();
   }
 
   student(): StudentProfile {
@@ -108,8 +114,8 @@ export class ParentVoiceMaterialViewModel {
     return await RemoteVoiceMaterialApi.instance.list(this.student().id);
   }
 
-  async createAssignment(item: RemoteVoiceMaterialPackage): Promise<Assignment | null> {
-    let result = await RemoteVoiceMaterialApi.instance.createAssignment(item.id);
+  async createAssignment(item: RemoteVoiceMaterialPackage, request: RemoteVoiceMaterialCreateAssignmentRequest): Promise<Assignment | null> {
+    let result = await RemoteVoiceMaterialApi.instance.createAssignment(item.id, request);
     if (result.assignment === null) return null;
     let existing = this.repository.getCached(result.assignment.id);
     let mapped = RemoteAssignmentMapper.toLocal(result.assignment, existing);

@@ -74,10 +74,11 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   static String instructions() {
-    return "你是深圳小学家庭作业整理助手。只做结构化整理，不解答作业。"
-        + "把老师原文拆成可以逐项完成的作业，当前仅保留语文、数学、英语。"
-        + "每个 assignment 的 subject 字段必须严格只填写语文、数学或英语之一，不要写语文作业、Chinese Language、Mathematics Homework等扩展标签。"
-        + "同一学科一句话里有多个独立动作时要拆开；通知、缴费、带物品、家长会、值日等非作业内容忽略。"
+    return "你是深圳小学家庭任务整理助手。只做结构化整理，不解答作业。"
+        + "输入既可能是老师作业通知，也可能是家长直接布置的阅读、朗读、体育、实践或兴趣任务。"
+        + "把输入拆成可以逐项完成的任务。subject 字段必须严格填写语文、数学、英语、阅读、朗读、体育、实践、兴趣、其他之一。"
+        + "学校学科任务优先使用语文、数学、英语；非学科家庭任务按内容选择阅读、朗读、体育、实践、兴趣或其他。"
+        + "同一类任务一句话里有多个独立动作时要拆开；通知、缴费、带物品、家长会、值日等非任务内容忽略。"
         + "不得编造原文没有的页码、课次、截止时间或教材版本。"
         + "若原文未说明截止时间，dueText 使用今天；没有明确教材位置时 textbookRef 使用待家长确认。"
         + "请结合学生年级、任务类型和原文明确的题量、页数、遍数，为每一项给出 expectedMinutes。"
@@ -130,7 +131,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
 
   static Map<String, Object> structuredSchema() {
     Map<String, Object> candidateProperties = new LinkedHashMap<>();
-    candidateProperties.put("subject", Map.of("type", "string", "enum", List.of("语文", "数学", "英语")));
+    candidateProperties.put("subject", Map.of("type", "string", "enum",
+        List.of("语文", "数学", "英语", "阅读", "朗读", "体育", "实践", "兴趣", "其他")));
     candidateProperties.put("title", Map.of("type", "string"));
     candidateProperties.put("instruction", Map.of("type", "string"));
     candidateProperties.put("textbookRef", Map.of("type", "string"));
@@ -174,6 +176,12 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     if (normalized.contains("语文")) return "语文";
     if (normalized.contains("数学")) return "数学";
     if (normalized.contains("英语")) return "英语";
+    if (normalized.contains("阅读")) return "阅读";
+    if (normalized.contains("朗读") || normalized.contains("朗诵")) return "朗读";
+    if (normalized.contains("体育") || normalized.contains("运动")) return "体育";
+    if (normalized.contains("实践") || normalized.contains("劳动")) return "实践";
+    if (normalized.contains("兴趣")) return "兴趣";
+    if (normalized.contains("其他")) return "其他";
 
     String lower = normalized.toLowerCase();
     if (lower.contains("chinese")) return "语文";

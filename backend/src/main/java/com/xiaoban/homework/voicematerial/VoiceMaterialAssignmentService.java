@@ -10,9 +10,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class VoiceMaterialAssignmentService {
 
   private final VoiceMaterialPackageRepository packages;
   private final VoiceMaterialFileRepository files;
+  private final VoiceMaterialTaskLinkRepository links;
   private final VoiceMaterialAutoCreateRecordRepository autoRecords;
   private final AssignmentService assignments;
   private final AssignmentResourceService assignmentResources;
@@ -29,12 +32,14 @@ public class VoiceMaterialAssignmentService {
 
   public VoiceMaterialAssignmentService(VoiceMaterialPackageRepository packages,
       VoiceMaterialFileRepository files,
+      VoiceMaterialTaskLinkRepository links,
       VoiceMaterialAutoCreateRecordRepository autoRecords,
       AssignmentService assignments,
       AssignmentResourceService assignmentResources,
       StudentService students) {
     this.packages = packages;
     this.files = files;
+    this.links = links;
     this.autoRecords = autoRecords;
     this.assignments = assignments;
     this.assignmentResources = assignmentResources;
@@ -42,26 +47,64 @@ public class VoiceMaterialAssignmentService {
   }
 
   @Transactional
-  public VoiceMaterialDtos.CreateAssignmentResponse createManually(
-      UUID familyId, UUID packageId) {
+  public VoiceMaterialDtos.CreateAssignmentResponse createManually(UUID familyId, UUID packageId) {
     String studentId = packages.findOwnedStudentId(familyId, packageId)
-        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
-    students.requireOwnedForUpdate(familyId, studentId);
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
+    return createManually(familyId, packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest(
+            studentId, null, null, 0L, "", "", "", ""));
+  }
+
+  @Transactional
+  public VoiceMaterialDtos.CreateAssignmentResponse createManually(
+      UUID familyId, UUID packageId, VoiceMaterialDtos.CreateAssignmentRequest input) {
+    String sourceStudentId = packages.findOwnedStudentId(familyId, packageId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
+    students.requireOwnedForUpdate(familyId, sourceStudentId);
+
+    String targetStudentId = input.studentId().trim();
+    students.requireOwnedForUpdate(familyId, targetStudentId);
+    if (!sourceStudentId.equals(targetStudentId)) {
+      throw new ApiExceptions.BadRequest("语音文件夹只能用于其所属学生创建任务");
+    }
+
     VoiceMaterialPackageEntity item = packages.lockOwned(familyId, packageId)
-        .orElseThrow(() -> new ApiExceptions.NotFound("语音素材目录不存在"));
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
 
-    AssignmentDtos.Response existing = loadAssignmentIfPresent(
-        familyId, item.consumedAssignmentId);
-    if (existing != null) {
-      return new VoiceMaterialDtos.CreateAssignmentResponse(
-          false, existing.id(), existing);
+    String requestId = normalizeRequestId(input.requestId());
+    if (!requestId.isBlank()) {
+      VoiceMaterialTaskLinkEntity previous =
+          links.findByFamilyIdAndRequestId(familyId, requestId).orElse(null);
+      if (previous != null) {
+        if (!previous.packageId.equals(packageId) ||
+            !previous.studentId.equals(targetStudentId)) {
+          throw new ApiExceptions.Conflict("requestId 已用于其他语音任务创建请求");
+        }
+        AssignmentDtos.Response existing = loadAssignmentIfPresent(
+            familyId, previous.assignmentId);
+        return new VoiceMaterialDtos.CreateAssignmentResponse(
+            false, previous.assignmentId, existing);
+      }
     }
+
     if (!"READY".equals(item.status) && !"CONSUMED".equals(item.status)) {
-      throw new ApiExceptions.BadRequest("当前目录还没有准备好，不能生成任务");
+      throw new ApiExceptions.BadRequest("当前文件夹不可用于创建任务");
     }
 
-    AssignmentDtos.Response assignment = consumeLocked(
-        familyId, item, null, "", LocalDate.now(BUSINESS_ZONE));
+    String requestedSubjectCode = normalizeSubjectCode(input.subjectCode(), item.subjectCode);
+    String requestedTitle = input.title() == null ? "" : input.title().trim();
+    String requestedInstruction =
+        input.instruction() == null ? "" : input.instruction().trim();
+    AssignmentDtos.Response assignment = createFromFolder(
+        familyId, item, targetStudentId, requestedSubjectCode,
+        input.expectedMinutes() == null ? item.expectedMinutes : input.expectedMinutes(),
+        resolveDueAt(input.dueAtEpochMs(), item.dueAt),
+        input.dueText() == null ? "" : input.dueText().trim(),
+        LocalDate.now(BUSINESS_ZONE),
+        requestedTitle,
+        requestedInstruction,
+        requestId,
+        "MANUAL");
     return new VoiceMaterialDtos.CreateAssignmentResponse(
         true, assignment.id(), assignment);
   }
@@ -71,34 +114,43 @@ public class VoiceMaterialAssignmentService {
     students.requireOwnedForUpdate(familyId, studentId);
     LocalDate businessDate = LocalDate.now(BUSINESS_ZONE);
 
-    AssignmentDtos.Response current = assignments.findFirstVoiceMaterialTask(familyId, studentId);
+    AssignmentDtos.Response current =
+        assignments.findFirstVoiceMaterialTask(familyId, studentId);
     if (current != null) {
-      String packageId = packages
-          .findByFamilyIdAndStudentIdAndConsumedAssignmentId(familyId, studentId, current.id())
-          .map(item -> item.id.toString())
+      String packageId = links.findByFamilyIdAndAssignmentId(familyId, current.id())
+          .map(link -> link.packageId.toString())
           .orElse("");
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), packageId, current.id(), current);
     }
 
-    List<VoiceMaterialPackageEntity> available =
-        packages.lockNextAvailableForAutoCreate(familyId, studentId, PageRequest.of(0, 1));
-    if (available.isEmpty()) {
+    VoiceMaterialAutoCreateRecordEntity todayRecord =
+        autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
+            familyId, studentId, businessDate).orElse(null);
+    if (todayRecord != null) {
+      return new VoiceMaterialDtos.AutoCreateResponse(
+          false, businessDate.toString(), todayRecord.packageId.toString(),
+          todayRecord.assignmentId, null);
+    }
+
+    VoiceMaterialPackageEntity item = chooseAutoFolder(familyId, studentId);
+    if (item == null) {
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), "", "", null);
     }
 
-    VoiceMaterialPackageEntity item = available.get(0);
+    item = packages.lockOwned(familyId, item.id)
+        .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
     Instant dailyDueAt = item.dueAt == null
         ? businessDate.atTime(LocalTime.of(23, 59)).atZone(BUSINESS_ZONE).toInstant()
         : null;
-    AssignmentDtos.Response assignment = consumeLocked(
-        familyId, item, dailyDueAt, item.dueAt == null ? "今天" : "", businessDate);
+    AssignmentDtos.Response assignment = createFromFolder(
+        familyId, item, item.studentId, item.subjectCode, item.expectedMinutes, dailyDueAt,
+        item.dueAt == null ? "今天" : "", businessDate,
+        "", "", "", "AUTO");
 
-    VoiceMaterialAutoCreateRecordEntity record =
-        autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
-            familyId, studentId, businessDate).orElseGet(VoiceMaterialAutoCreateRecordEntity::new);
-    if (record.id == null) record.id = UUID.randomUUID();
+    VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
+    record.id = UUID.randomUUID();
     record.familyId = familyId;
     record.studentId = studentId;
     record.businessDate = businessDate;
@@ -112,55 +164,125 @@ public class VoiceMaterialAssignmentService {
         assignment.id(), assignment);
   }
 
-  private AssignmentDtos.Response consumeLocked(UUID familyId,
-      VoiceMaterialPackageEntity item, Instant dueAtOverride, String dueTextOverride, LocalDate businessDate) {
-    String assignmentId = "a-voicepkg-" + item.id;
+  private VoiceMaterialPackageEntity chooseAutoFolder(UUID familyId, String studentId) {
+    List<VoiceMaterialPackageEntity> candidates =
+        packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
+            familyId, studentId).stream()
+            .filter(item -> "READY".equals(item.status) || "CONSUMED".equals(item.status))
+            .toList();
+    if (candidates.isEmpty()) return null;
+
+    Map<UUID, Long> usageCount = new HashMap<>();
+    Map<UUID, Instant> lastUsedAt = new HashMap<>();
+    for (VoiceMaterialTaskLinkEntity link :
+        links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(familyId, studentId)) {
+      usageCount.merge(link.packageId, 1L, Long::sum);
+      lastUsedAt.putIfAbsent(link.packageId, link.createdAt);
+    }
+
+    return candidates.stream()
+        .min(Comparator
+            .comparingLong((VoiceMaterialPackageEntity item) ->
+                usageCount.getOrDefault(item.id, 0L))
+            .thenComparing(item ->
+                lastUsedAt.getOrDefault(item.id, Instant.EPOCH))
+            .thenComparing(item -> item.directoryName)
+            .thenComparing(item -> item.createdAt)
+            .thenComparing(item -> item.id))
+        .orElse(null);
+  }
+
+  private AssignmentDtos.Response createFromFolder(UUID familyId,
+      VoiceMaterialPackageEntity item, String targetStudentId, String subjectCode,
+      int expectedMinutes,
+      Instant dueAtOverride, String dueTextOverride, LocalDate businessDate,
+      String requestedTitle, String requestedInstruction, String requestId,
+      String createMode) {
+    String assignmentId = "a-voice-" + UUID.randomUUID();
     Long dueAtEpochMs = null;
-    if (dueAtOverride != null) dueAtEpochMs = Long.valueOf(dueAtOverride.toEpochMilli());
-    else if (item.dueAt != null) dueAtEpochMs = Long.valueOf(item.dueAt.toEpochMilli());
+    if (dueAtOverride != null) dueAtEpochMs = dueAtOverride.toEpochMilli();
+    else if (item.dueAt != null) dueAtEpochMs = item.dueAt.toEpochMilli();
+
+    String title = requestedTitle == null || requestedTitle.isBlank()
+        ? assignments.nextVoiceMaterialTaskTitle(
+            familyId, targetStudentId, subjectCode, businessDate)
+        : requestedTitle.trim();
 
     AssignmentDtos.Create create = new AssignmentDtos.Create(
         assignmentId,
-        subjectDisplay(item.subjectCode),
-        assignments.nextVoiceMaterialTaskTitle(familyId, item.studentId, item.subjectCode, businessDate),
-        "请听语音并结合图片完成任务。",
+        subjectDisplay(subjectCode),
+        title,
+        requestedInstruction == null || requestedInstruction.isBlank()
+            ? "请听语音并结合图片完成任务。"
+            : requestedInstruction.trim(),
         "",
         dueTextOverride,
         item.assignmentType,
-        item.subjectCode,
+        subjectCode,
         "AUDIO_IMAGE",
         dueAtEpochMs,
         BUSINESS_ZONE.getId(),
         "NOT_STARTED",
         "语音素材库",
         item.directoryName,
-        item.expectedMinutes,
+        expectedMinutes,
         0L,
         0L,
         0L,
         "");
 
     AssignmentDtos.Response assignment =
-        assignments.create(familyId, item.studentId, create);
+        assignments.create(familyId, targetStudentId, create);
 
     List<VoiceMaterialFileEntity> packageFiles =
         files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
             familyId, item.id);
-    List<AssignmentResourceService.AssetLink> links = new ArrayList<>();
+    List<AssignmentResourceService.AssetLink> resourceLinks = new ArrayList<>();
     for (VoiceMaterialFileEntity file : packageFiles) {
-      links.add(new AssignmentResourceService.AssetLink(
+      resourceLinks.add(new AssignmentResourceService.AssetLink(
           file.resourceType, file.assetId, file.sortOrder, 0L,
           file.relativeName, contentType(file.resourceType, file.relativeName)));
     }
-    assignmentResources.linkAssets(familyId, assignment.id(), links);
+    assignmentResources.linkAssets(familyId, assignment.id(), resourceLinks);
 
-    item.status = "CONSUMED";
-    item.consumedAssignmentId = assignment.id();
-    item.consumedAt = Instant.now();
-    item.updatedAt = Instant.now();
-    item.errorMessage = "";
-    packages.save(item);
+    VoiceMaterialTaskLinkEntity link = new VoiceMaterialTaskLinkEntity();
+    link.id = UUID.randomUUID().toString();
+    link.familyId = familyId;
+    link.studentId = targetStudentId;
+    link.packageId = item.id;
+    link.assignmentId = assignment.id();
+    link.assignmentTitle = assignment.title();
+    link.createMode = createMode;
+    link.requestId = requestId.isBlank() ? null : requestId;
+    link.createdAt = Instant.now();
+    links.saveAndFlush(link);
+
+    if ("CONSUMED".equals(item.status)) {
+      item.status = "READY";
+      item.updatedAt = Instant.now();
+      packages.save(item);
+    }
     return assignment;
+  }
+
+  private String normalizeRequestId(String requestId) {
+    return requestId == null ? "" : requestId.trim();
+  }
+
+  private String normalizeSubjectCode(String requested, String fallback) {
+    String value = requested == null ? "" : requested.trim().toUpperCase();
+    if ("CHINESE".equals(value) || "MATH".equals(value) ||
+        "ENGLISH".equals(value) || "OTHER".equals(value)) {
+      return value;
+    }
+    return fallback;
+  }
+
+  private Instant resolveDueAt(Long requestedEpochMs, Instant fallback) {
+    if (requestedEpochMs != null && requestedEpochMs > 0) {
+      return Instant.ofEpochMilli(requestedEpochMs);
+    }
+    return fallback;
   }
 
   private AssignmentDtos.Response loadAssignmentIfPresent(UUID familyId, String assignmentId) {

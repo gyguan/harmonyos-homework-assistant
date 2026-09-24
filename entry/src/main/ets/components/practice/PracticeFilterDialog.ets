@@ -53,7 +53,7 @@ export struct PracticeFilterDialog {
     Column() {
       Row() {
         Text('更多筛选')
-          .fontSize(20)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
@@ -74,7 +74,7 @@ export struct PracticeFilterDialog {
           Column({ space: 10 }) {
             Text('年级')
               .width('100%')
-              .fontSize(15)
+              .fontSize(AppTheme.LABEL_TITLE_SIZE)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
@@ -95,7 +95,7 @@ export struct PracticeFilterDialog {
           Column({ space: 10 }) {
             Text('题库类型')
               .width('100%')
-              .fontSize(15)
+              .fontSize(AppTheme.LABEL_TITLE_SIZE)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {

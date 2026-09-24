@@ -1,7 +1,7 @@
 import { Assignment, AssignmentBacking, AssignmentContentType, AssignmentType, Subject } from '../model/HomeworkModels';
 import { HomeworkSnapshot } from '../model/PersistenceModels';
 
-export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 8;
+export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 9;
 
 export class HomeworkSnapshotMigrator {
   static migrate(snapshot: HomeworkSnapshot): HomeworkSnapshot {
@@ -29,6 +29,10 @@ export class HomeworkSnapshotMigrator {
       }
       if (current.schemaVersion === 7) {
         current = HomeworkSnapshotMigrator.migrateV7ToV8(current);
+        continue;
+      }
+      if (current.schemaVersion === 8) {
+        current = HomeworkSnapshotMigrator.migrateV8ToV9(current);
         continue;
       }
       throw new Error(`缺少本地作业数据迁移步骤: ${current.schemaVersion}`);
@@ -174,6 +178,25 @@ export class HomeworkSnapshotMigrator {
       settings: snapshot.settings,
       rawImports: snapshot.rawImports,
       assignments: assignments,
+      candidates: snapshot.candidates,
+      submissions: snapshot.submissions,
+      tutorSessions: snapshot.tutorSessions,
+      submissionSequence: snapshot.submissionSequence
+    };
+  }
+
+  private static migrateV8ToV9(snapshot: HomeworkSnapshot): HomeworkSnapshot {
+    return {
+      schemaVersion: 9,
+      settings: {
+        students: snapshot.settings.students,
+        activeStudentId: snapshot.settings.activeStudentId,
+        parentAccessCode: '',
+        tutorGuidanceFirst: snapshot.settings.tutorGuidanceFirst,
+        directAnswerAllowed: snapshot.settings.directAnswerAllowed
+      },
+      rawImports: snapshot.rawImports,
+      assignments: snapshot.assignments,
       candidates: snapshot.candidates,
       submissions: snapshot.submissions,
       tutorSessions: snapshot.tutorSessions,

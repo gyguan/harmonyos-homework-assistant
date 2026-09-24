@@ -1,18 +1,18 @@
 import {
   AppRoute,
   AssignmentRouteParam,
-  ParentExtraCreateRouteParam,
-  ParentVoiceMaterialRouteParam,
+  ParentVoiceCreateRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
   PracticePaperRouteParam
 } from '../app/navigation/AppRoutes';
 import { ParentImportNavigator } from '../app/navigation/ParentImportNavigator';
-import { HomeworkCaptureSessionService } from '../application/capture/HomeworkCaptureSessionService';
 import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowSizeClass';
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
 import { CenteredTextBadge } from '../components/family/CenteredTextBadge';
+import { IdentityContextBar } from '../components/family/IdentityContextBar';
+import { IdentitySwitcherDialog } from '../components/family/IdentitySwitcherDialog';
 import { StudentSwitcherDialog } from '../components/family/StudentSwitcherDialog';
 import { BottomPrimaryNavItem, SidePrimaryNavItem } from '../components/navigation/PrimaryNavItem';
 import { PageStateView } from '../components/state/PageStateView';
@@ -22,17 +22,11 @@ import { StudentProfile } from '../domain/model/HomeworkModels';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
-import { ParentExtraAssignmentPage } from '../features/parent/extra/ParentExtraAssignmentPage';
 import { ParentVoiceAssignmentPage } from '../features/parent/voice/ParentVoiceAssignmentPage';
-import { ParentVoiceMaterialPage } from '../features/parent/voice/ParentVoiceMaterialPage';
 import { HomeworkImportRoutePage } from '../features/parent/import/HomeworkImportRoutePage';
-import { HomeworkCaptureHomePage } from '../features/parent/import/HomeworkCaptureHomePage';
 import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImportInboxPage';
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
-import { HomeworkCapturePage } from '../features/parent/import/HomeworkCapturePage';
-import { HomeworkSourceProfilePage } from '../features/parent/import/HomeworkSourceProfilePage';
-import { HomeworkCaptureDiagnosticPage } from '../features/parent/import/HomeworkCaptureDiagnosticPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
@@ -68,7 +62,7 @@ enum ParentRoute {
 
 @Component
 export struct AppShell {
-  @Prop role: AppRole = AppRole.STUDENT;
+  @Prop @Watch('onRoleChanged') role: AppRole = AppRole.STUDENT;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
@@ -78,10 +72,39 @@ export struct AppShell {
   @State private storeRevision: number = 0;
   @State private activeStudentId: string = '';
   @State private familyStudents: StudentProfile[] = [];
+  @State private identityParentActive: boolean = false;
   @StorageLink('shareImportToken') private shareImportToken: string = '';
+  onSwitchParent: () => void = () => {};
+  onSwitchStudent: (studentId: string) => void = (_studentId: string) => {};
   onRegisterBackHandler: (handler: () => boolean) => void = (_handler: () => boolean) => {};
 
   @Provide('NavPathStack') navPathStack: NavPathStack = new NavPathStack();
+
+  private phoneIdentitySwitcherController: CustomDialogController = new CustomDialogController({
+    builder: IdentitySwitcherDialog({
+      students: $familyStudents,
+      activeStudentId: $activeStudentId,
+      parentActive: $identityParentActive,
+      onSelectParent: () => this.switchToParent(),
+      onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Bottom,
+    customStyle: true
+  });
+
+  private wideIdentitySwitcherController: CustomDialogController = new CustomDialogController({
+    builder: IdentitySwitcherDialog({
+      students: $familyStudents,
+      activeStudentId: $activeStudentId,
+      parentActive: $identityParentActive,
+      onSelectParent: () => this.switchToParent(),
+      onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
 
   private phoneStudentSwitcherController: CustomDialogController = new CustomDialogController({
     builder: StudentSwitcherDialog({
@@ -152,23 +175,50 @@ export struct AppShell {
     this.storeRevision++;
   }
 
+  private resetPersonaNavigation(): void {
+    this.navPathStack.clear();
+    this.studentRoute = StudentRoute.HOME;
+    this.parentRoute = ParentRoute.DASHBOARD;
+  }
+
+  private onRoleChanged(): void {
+    this.resetPersonaNavigation();
+    this.identityParentActive = this.role === AppRole.PARENT;
+    this.syncFamilyContext();
+    this.storeRevision++;
+  }
+
+  private openIdentitySwitcher(): void {
+    this.identityParentActive = this.role === AppRole.PARENT;
+    if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideIdentitySwitcherController.open();
+    else this.phoneIdentitySwitcherController.open();
+  }
+
+  private switchToParent(): void {
+    if (this.role === AppRole.PARENT) return;
+    this.onSwitchParent();
+  }
+
+  private switchToStudent(studentId: string): void {
+    if (studentId.length === 0 ||
+      (this.role === AppRole.STUDENT && studentId === this.activeStudentId)) return;
+    if (this.role === AppRole.STUDENT) this.resetPersonaNavigation();
+    this.onSwitchStudent(studentId);
+  }
+
   private openStudentSwitcher(): void {
     if (this.role !== AppRole.PARENT || this.familyStudents.length <= 1) return;
-    if (HomeworkCaptureSessionService.instance.getActiveSession() !== null) return;
     if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideStudentSwitcherController.open();
     else this.phoneStudentSwitcherController.open();
   }
 
   private selectStudent(studentId: string): void {
     if (this.role !== AppRole.PARENT || studentId.length === 0 || studentId === this.activeStudentId) return;
-    if (HomeworkCaptureSessionService.instance.getActiveSession() !== null) return;
     if (!this.familyContext.setActiveStudent(studentId)) return;
 
     // A child switch is a family-context boundary. Drop any detail route that may still point to
     // the previous child, return to Parent Home, update visible identity immediately, then refresh.
-    this.navPathStack.clear();
-    this.studentRoute = StudentRoute.HOME;
-    this.parentRoute = ParentRoute.DASHBOARD;
+    this.resetPersonaNavigation();
     this.syncFamilyContext();
     this.storeRevision++;
     void this.refreshActiveStudent();
@@ -222,11 +272,6 @@ export struct AppShell {
     this.navPathStack.pushPathByName(AppRoute.PARENT_REVIEW, new AssignmentRouteParam(assignmentId));
   }
 
-  private finishSourceProfile(startCaptureAfterSave: boolean): void {
-    ParentImportNavigator.finishSourceProfile(this.navPathStack, startCaptureAfterSave);
-    this.notifyUiChanged();
-  }
-
   private finishShareImportReady(): void {
     this.shareImportToken = '';
     ParentImportNavigator.openConfirmation(this.navPathStack);
@@ -244,18 +289,13 @@ export struct AppShell {
   private finishParentImportPublished(): void {
     this.parentRoute = ParentRoute.DASHBOARD;
     this.navPathStack.clear();
-    // Batch publish already updates the authoritative assignment cache. Invalidate the
-    // now-visible dashboard after navigation so metrics and recent activity refresh immediately.
+    // Batch publish already updates the authoritative assignment cache.
     this.notifyUiChanged();
   }
 
-  private openParentExtraCreate(voice: boolean = false): void {
-    this.navPathStack.pushPathByName(AppRoute.PARENT_EXTRA_CREATE, new ParentExtraCreateRouteParam(voice));
-  }
-
-  private openParentVoiceMaterial(): void {
+  private openParentVoiceCreate(): void {
     this.navPathStack.pushPathByName(
-      AppRoute.PARENT_VOICE_MATERIAL, new ParentVoiceMaterialRouteParam());
+      AppRoute.PARENT_VOICE_CREATE, new ParentVoiceCreateRouteParam());
   }
 
   private routeAssignmentId(param: Object): string {
@@ -387,25 +427,12 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_CAPTURE_HOME) {
-      NavDestination() {
-        HomeworkCaptureHomePage({
-          revision: this.storeRevision,
-          onBack: () => this.navPathStack.pop(),
-          onStartCapture: () => ParentImportNavigator.openCapture(this.navPathStack),
-          onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
-            ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave),
-          onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-          onOpenDiagnostics: () => ParentImportNavigator.openCaptureDiagnostics(this.navPathStack)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_IMPORT_INBOX) {
       NavDestination() {
         HomeworkImportInboxPage({
           onBack: () => this.navPathStack.pop(),
-          onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(this.navPathStack, batchId)
+          onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(
+            this.navPathStack, batchId)
         });
       }
       .hideTitleBar(true)
@@ -416,37 +443,6 @@ export struct AppShell {
           batchId: ParentImportNavigator.batchId(param),
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_CAPTURE) {
-      NavDestination() {
-        HomeworkCapturePage({
-          onBack: () => this.navPathStack.pop(),
-          onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
-          onOpenSourceProfile: (startCaptureAfterSave: boolean) =>
-            ParentImportNavigator.openSourceProfile(this.navPathStack, startCaptureAfterSave)
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_SOURCE_PROFILE) {
-      NavDestination() {
-        HomeworkSourceProfilePage({
-          startCaptureAfterSave: ParentImportNavigator.sourceProfileStartCapture(param),
-          onBack: () => this.navPathStack.pop(),
-          onSavedAndCapture: () => this.finishSourceProfile(
-            ParentImportNavigator.sourceProfileStartCapture(param))
-        });
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_CAPTURE_DIAGNOSTIC) {
-      NavDestination() {
-        HomeworkCaptureDiagnosticPage({
-          onBack: () => this.navPathStack.pop()
         });
       }
       .hideTitleBar(true)
@@ -462,27 +458,14 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_EXTRA_CREATE) {
+    } else if (name === AppRoute.PARENT_VOICE_CREATE) {
       NavDestination() {
-        if ((param as ParentExtraCreateRouteParam).voice) {
-          ParentVoiceAssignmentPage({
-            onBack: () => this.navPathStack.pop(),
-            onCreated: () => this.navPathStack.pop()
-          });
-        } else {
-          ParentExtraAssignmentPage({
-            onBack: () => this.navPathStack.pop(),
-            onCreated: () => this.navPathStack.pop()
-          });
-        }
-      }
-      .hideTitleBar(true)
-      .backgroundColor(AppTheme.BACKGROUND);
-    } else if (name === AppRoute.PARENT_VOICE_MATERIAL) {
-      NavDestination() {
-        ParentVoiceMaterialPage({
+        ParentVoiceAssignmentPage({
           onBack: () => this.navPathStack.pop(),
-          onAssignmentCreated: () => this.notifyUiChanged()
+          onCreated: () => {
+            this.navPathStack.pop();
+            this.notifyUiChanged();
+          }
         });
       }
       .hideTitleBar(true)
@@ -503,16 +486,9 @@ export struct AppShell {
       });
     } else {
       ParentDashboardPage({
-        revision: this.storeRevision,
-        activeStudentId: this.activeStudentId,
-        onOpenImport: () => ParentImportNavigator.openImport(this.navPathStack),
-        onOpenCapture: () => ParentImportNavigator.openCaptureHome(this.navPathStack),
+        onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-        onOpenExtra: () => this.openParentExtraCreate(false),
-        onOpenVoice: () => this.openParentExtraCreate(true),
-        onOpenVoiceMaterial: () => this.openParentVoiceMaterial(),
-        onOpenProgress: () => this.parentRoute = ParentRoute.PROGRESS,
-        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
+        onOpenVoice: () => this.openParentVoiceCreate()
       });
     }
   }
@@ -526,41 +502,6 @@ export struct AppShell {
     } else {
       this.ParentContent();
     }
-  }
-
-  @Builder
-  private FamilyContextBar() {
-    Row({ space: 10 }) {
-      Column({ space: 1 }) {
-        Text(this.currentStudent().name)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Text(this.currentStudent().className)
-          .fontSize(11)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .alignItems(HorizontalAlign.Start);
-      Blank();
-      if (this.familyStudents.length > 1) {
-        Row({ space: 4 }) {
-          Text('切换孩子').fontSize(12).fontColor(AppTheme.PRIMARY);
-          Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
-        }
-        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ left: 12, right: 12, top: 8, bottom: 8 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(AppTheme.CHIP_RADIUS)
-        .accessibilityGroup(true)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`当前孩子 ${this.currentStudent().name}，点击选择孩子`)
-        .onClick(() => this.openStudentSwitcher());
-      }
-    }
-    .width('100%')
-    .height(AppTheme.CONTEXT_BAR_HEIGHT)
-    .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING })
-    .backgroundColor(AppTheme.BACKGROUND);
   }
 
   @Builder
@@ -654,33 +595,58 @@ export struct AppShell {
 
       Blank();
 
-      if (this.role === AppRole.PARENT) {
-        Column({ space: 2 }) {
-          Text(this.currentStudent().name)
-            .fontSize(13)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.PRIMARY);
-          Text(this.currentStudent().className)
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width(68)
-        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ top: 8, bottom: 8 })
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(AppTheme.CHIP_RADIUS)
-        .accessibilityGroup(true)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText(`当前孩子 ${this.currentStudent().name}，点击选择孩子`)
-        .onClick(() => this.openStudentSwitcher());
-      } else {
-        Text(this.currentStudent().name)
+      Column({ space: 3 }) {
+        CenteredTextBadge({
+          badgeText: this.role === AppRole.PARENT ? '家' :
+            (this.currentStudent().name.length > 0 ? this.currentStudent().name.substring(0, 1) : '伴'),
+          badgeWidth: 34,
+          badgeHeight: 34,
+          badgeFontSize: 13,
+          badgeRadius: 11,
+          badgeBold: true,
+          badgeForeground: AppTheme.PRIMARY,
+          badgeBackground: AppTheme.PRIMARY_SOFT
+        });
+        Text(this.role === AppRole.PARENT ? '家长' : this.currentStudent().name)
           .width(68)
-          .fontSize(13)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
           .fontColor(AppTheme.TEXT)
-          .padding({ top: 8, bottom: 8 });
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+        Text('切换')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.PRIMARY);
+      }
+      .width(68)
+      .constraintSize({ minHeight: 76 })
+      .padding({ top: 7, bottom: 7 })
+      .backgroundColor(AppTheme.CARD_SURFACE)
+      .border({ width: 1, color: AppTheme.BORDER })
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityGroup(true)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.role === AppRole.PARENT ?
+        '当前身份家长，点击切换身份' : '当前身份 ' + this.currentStudent().name + '，点击切换身份')
+      .onClick(() => this.openIdentitySwitcher());
+
+      if (this.role === AppRole.PARENT && this.familyStudents.length > 1) {
+        Text('管理 ' + this.currentStudent().name)
+          .width(68)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .textAlign(TextAlign.Center)
+          .fontColor(AppTheme.PRIMARY)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ top: 8, bottom: 8 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('当前管理 ' + this.currentStudent().name + '，点击切换孩子')
+          .onClick(() => this.openStudentSwitcher());
       }
     }
     .width(AppTheme.SIDE_NAV_WIDTH)
@@ -694,9 +660,15 @@ export struct AppShell {
   @Builder
   private BottomNavShell() {
     Column() {
-      if (this.role === AppRole.PARENT) {
-        this.FamilyContextBar();
-      }
+      IdentityContextBar({
+        isParent: this.role === AppRole.PARENT,
+        studentName: this.currentStudent().name,
+        studentGrade: this.currentStudent().grade,
+        studentClassName: this.currentStudent().className,
+        canSwitchStudent: this.familyStudents.length > 1,
+        onSwitchIdentity: () => this.openIdentitySwitcher(),
+        onSwitchStudent: () => this.openStudentSwitcher()
+      });
       Column() {
         this.PersonaContent();
       }

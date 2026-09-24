@@ -4,7 +4,7 @@ import { AppTheme } from '../../../common/theme/AppTheme';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
-import { Assignment, AssignmentStatus, AssignmentType, Subject } from '../../../domain/model/HomeworkModels';
+import { Assignment, AssignmentStatus, Subject } from '../../../domain/model/HomeworkModels';
 import { StudentHomeViewModel } from './StudentHomeViewModel';
 
 @Component
@@ -62,84 +62,69 @@ struct StudentTodayTaskCard {
   }
 
   build() {
-    Column({ space: this.emphasized ? 13 : 9 }) {
-      Row({ space: 10 }) {
-        CenteredTextBadge({
-          badgeText: this.assignment.subject.substring(0, 1),
-          badgeWidth: this.emphasized ? 46 : 40,
-          badgeHeight: this.emphasized ? 46 : 40,
-          badgeFontSize: this.emphasized ? 18 : 16,
-          badgeRadius: 12,
-          badgeBold: true,
-          badgeForeground: this.subjectColor(),
-          badgeBackground: this.subjectBackground()
-        });
-        Column({ space: 4 }) {
-          Row({ space: 6 }) {
-            Text(this.assignment.subject)
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.subjectColor());
-            Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
-            Text(this.statusLabel())
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.statusColor());
-            if (this.assignment.assignmentType === AssignmentType.EXTRA) {
-              Text('课外').fontSize(12).fontColor(AppTheme.SUBTEXT);
-            }
-          }
-          .width('100%');
-          Text(this.assignment.title)
-            .width('100%')
-            .fontSize(this.emphasized ? 19 : 16)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT)
-            .maxLines(2)
-            .textOverflow({ overflow: TextOverflow.Ellipsis });
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
-      }
-      .width('100%');
+    Row({ space: 10 }) {
+      CenteredTextBadge({
+        badgeText: this.assignment.subject.substring(0, 1),
+        badgeWidth: this.emphasized ? 46 : 40,
+        badgeHeight: this.emphasized ? 46 : 40,
+        badgeFontSize: this.emphasized ? 18 : 16,
+        badgeRadius: 12,
+        badgeBold: true,
+        badgeForeground: this.subjectColor(),
+        badgeBackground: this.subjectBackground()
+      });
 
-      if (this.emphasized && this.assignment.instruction.length > 0) {
-        Text(this.assignment.instruction)
+      Column({ space: 5 }) {
+        Text(this.assignment.title)
           .width('100%')
-          .fontSize(14)
-          .lineHeight(21)
-          .fontColor(AppTheme.SUBTEXT)
-          .maxLines(3)
+          .fontSize(this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(this.emphasized ? AppTheme.SECTION_TITLE_LINE_HEIGHT : AppTheme.CARD_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT)
+          .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis });
-      }
 
-      Row({ space: 10 }) {
-        Text(`预计 ${this.assignment.expectedMinutes} 分钟`)
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
-        Blank();
-        Button(this.actionLabel(), { type: ButtonType.Normal })
-          .width(this.emphasized ? 104 : 84)
-          .height(AppTheme.MIN_TOUCH_TARGET)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(!this.busy)
-          .backgroundColor(this.busy ? AppTheme.DISABLED : AppTheme.PRIMARY)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .accessibilityText(`${this.actionLabel()}${this.assignment.title}`)
-          .onClick(() => this.onAction(this.assignment.id));
+        Row({ space: 5 }) {
+          Text(this.statusLabel())
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.statusColor());
+          Text('·')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+          Text(`${this.assignment.expectedMinutes} 分钟`)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%');
       }
-      .width('100%')
-      .alignItems(VerticalAlign.Center);
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start);
+
+      Button(this.actionLabel(), { type: ButtonType.Normal })
+        .width(this.emphasized ? 96 : 82)
+        .height(AppTheme.MIN_TOUCH_TARGET)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.busy)
+        .backgroundColor(this.busy ? AppTheme.DISABLED : AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .accessibilityText(`${this.actionLabel()}${this.assignment.title}`)
+        .onClick(() => this.onAction(this.assignment.id));
     }
     .width('100%')
-    .padding(this.emphasized ? 18 : 14)
-    .backgroundColor(this.emphasized ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+    .alignItems(VerticalAlign.Center)
+    .padding(this.emphasized ? 16 : 13)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: this.emphasized ? 1 : 0, color: this.emphasized ? AppTheme.PRIMARY : Color.Transparent })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
-    .accessibilityText(`${this.assignment.subject}，${this.assignment.title}，${this.statusLabel()}`);
+    .accessibilityText(`${this.assignment.subject}，${this.assignment.title}，${this.statusLabel()}，预计${this.assignment.expectedMinutes}分钟`);
+
   }
 }
 
@@ -175,7 +160,7 @@ export struct StudentHomePage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${item.id}|${item.remoteVersion}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private async openAssignment(assignmentId: string): Promise<void> {
@@ -201,41 +186,14 @@ export struct StudentHomePage {
   }
 
   @Builder
-  private Header() {
-    Row({ space: 11 }) {
-      CenteredTextBadge({
-        badgeText: this.viewModel.student().name.substring(0, 1),
-        badgeWidth: 44,
-        badgeHeight: 44,
-        badgeFontSize: 18,
-        badgeRadius: 22,
-        badgeBold: true,
-        badgeForeground: AppTheme.PRIMARY,
-        badgeBackground: AppTheme.PRIMARY_SOFT
-      });
-      Column({ space: 2 }) {
-        Text(`${this.viewModel.student().name}，今天先完成一项`)
-          .fontSize(18)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
-        Text(this.viewModel.dateLabel())
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .layoutWeight(1)
-      .alignItems(HorizontalAlign.Start);
-    }
-    .width('100%');
-  }
-
-  @Builder
   private OfflineBanner() {
     if (this.offlineMode) {
       Row({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.wifi_slash')).fontSize(17).fontColor([AppTheme.WARNING]);
         Text('当前离线，可以查看已缓存的今日作业。')
           .layoutWeight(1)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
@@ -253,11 +211,13 @@ export struct StudentHomePage {
         .fontColor([AppTheme.SUCCESS]);
       Column({ space: 3 }) {
         Text(this.viewModel.summary().total > 0 ? '今天的任务完成啦' : '今天没有安排任务')
-          .fontSize(17)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text('去休息一下，或者看看练习内容。')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
       .layoutWeight(1)
@@ -266,7 +226,7 @@ export struct StudentHomePage {
     .width('100%')
     .padding(18)
     .backgroundColor(AppTheme.SUCCESS_SOFT)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
@@ -288,13 +248,15 @@ export struct StudentHomePage {
     Column({ space: 12 }) {
       Row() {
         Text('今天要做')
-          .fontSize(20)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
         if (this.assignments().length > 0) {
           Text(`${this.assignments().length} 项`)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
       }
@@ -306,7 +268,8 @@ export struct StudentHomePage {
       if (this.actionMessage.length > 0) {
         Text(this.actionMessage)
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.WARNING);
       }
     }
@@ -315,26 +278,24 @@ export struct StudentHomePage {
 
   @Builder
   private PhoneHome() {
-    Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-      this.Header();
+    Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
       this.TodayTasks();
     }
     .width('100%')
-    .constraintSize({ maxWidth: AppTheme.HOME_READABLE_MAX_WIDTH })
-    .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
+    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+    .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: 14, bottom: 20 });
   }
 
   @Builder
   private PadHome() {
-    Column({ space: AppTheme.PHONE_SECTION_GAP }) {
-      this.Header();
+    Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
       Row({ space: AppTheme.SPLIT_PANE_GAP }) {
         Column({ space: 12 }) {
           Text('先做这项')
             .width('100%')
-            .fontSize(20)
+            .fontSize(AppTheme.SECTION_TITLE_SIZE)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
           StudentTodayTaskCard({
@@ -350,7 +311,7 @@ export struct StudentHomePage {
         Column({ space: 12 }) {
           Row() {
             Text('接下来')
-              .fontSize(20)
+              .fontSize(AppTheme.SECTION_TITLE_SIZE)
               .fontWeight(FontWeight.Bold)
               .fontColor(AppTheme.TEXT);
             Blank();
@@ -369,12 +330,12 @@ export struct StudentHomePage {
       .alignItems(VerticalAlign.Top);
 
       if (this.actionMessage.length > 0) {
-        Text(this.actionMessage).width('100%').fontSize(13).fontColor(AppTheme.WARNING);
+        Text(this.actionMessage).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.WARNING);
       }
     }
     .width('100%')
-    .constraintSize({ maxWidth: AppTheme.HOME_PAD_CONTENT_MAX_WIDTH })
-    .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 24 });
+    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
+    .padding({ left: AppTheme.PAGE_PADDING_EXPANDED, right: AppTheme.PAGE_PADDING_EXPANDED, top: 18, bottom: 24 });
   }
 
   build() {

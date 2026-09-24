@@ -14,6 +14,8 @@ public interface AssignmentRepository extends JpaRepository<AssignmentEntity, St
   boolean existsByFamilyIdAndStudentIdAndContentType(UUID familyId, String studentId, String contentType);
   Optional<AssignmentEntity> findFirstByFamilyIdAndStudentIdAndContentTypeOrderByUpdatedAtDesc(
       UUID familyId, String studentId, String contentType);
+  Optional<AssignmentEntity> findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotOrderByUpdatedAtDesc(
+      UUID familyId, String studentId, String contentType, String status);
   long countByFamilyIdAndStudentIdAndSubjectCodeAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
       UUID familyId, String studentId, String subjectCode, Instant from, Instant to);
 }

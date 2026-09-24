@@ -3,9 +3,9 @@ package com.xiaoban.homework.voicematerial;
 import com.xiaoban.homework.auth.AuthInterceptor;
 import com.xiaoban.homework.media.MediaAssetService;
 import jakarta.validation.Valid;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.UUID;
-import java.net.MalformedURLException;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.ContentDisposition;
@@ -28,12 +28,16 @@ import org.springframework.web.multipart.MultipartFile;
 public class VoiceMaterialController {
   private final VoiceMaterialService materials;
   private final VoiceMaterialAssignmentService assignments;
+  private final VoiceTaskQueryService voiceTasks;
   private final MediaAssetService mediaAssets;
 
   public VoiceMaterialController(VoiceMaterialService materials,
-      VoiceMaterialAssignmentService assignments, MediaAssetService mediaAssets) {
+      VoiceMaterialAssignmentService assignments,
+      VoiceTaskQueryService voiceTasks,
+      MediaAssetService mediaAssets) {
     this.materials = materials;
     this.assignments = assignments;
+    this.voiceTasks = voiceTasks;
     this.mediaAssets = mediaAssets;
   }
 
@@ -66,7 +70,7 @@ public class VoiceMaterialController {
   }
 
   @PostMapping("/voice-material-batches/{batchId}/complete")
-  public VoiceMaterialDtos.BatchResponse completeBatch(
+  public VoiceMaterialDtos.CompleteResponse completeBatch(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable UUID batchId) {
     return materials.completeBatch(familyId, batchId);
@@ -79,8 +83,57 @@ public class VoiceMaterialController {
     return materials.list(familyId, studentId);
   }
 
+  @GetMapping({"/voice-tasks", "/voice-task-items"})
+  public VoiceMaterialDtos.VoiceTaskPageResponse queryVoiceTasks(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @RequestParam(required = false, defaultValue = "") String studentId,
+      @RequestParam(required = false, defaultValue = "") String status,
+      @RequestParam(required = false, defaultValue = "") String subjectCode,
+      @RequestParam(required = false, defaultValue = "") String keyword,
+      @RequestParam(required = false, defaultValue = "") String createdFrom,
+      @RequestParam(required = false, defaultValue = "") String createdTo,
+      @RequestParam(required = false, defaultValue = "") String packageId,
+      @RequestParam(required = false, defaultValue = "0") int page,
+      @RequestParam(required = false, defaultValue = "20") int size,
+      @RequestParam(required = false, defaultValue = "createdAt,desc") String sort) {
+    return voiceTasks.queryTasks(familyId, studentId, status, subjectCode, keyword,
+        createdFrom, createdTo, packageId, page, size, sort);
+  }
+
+  @GetMapping({"/voice-tasks/{assignmentId}", "/voice-task-items/{assignmentId}"})
+  public VoiceMaterialDtos.VoiceTaskDetailResponse getVoiceTaskDetail(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String assignmentId) {
+    return voiceTasks.taskDetail(familyId, assignmentId);
+  }
+
+  @GetMapping("/voice-material-folders")
+  public VoiceMaterialDtos.VoiceFolderPageResponse queryVoiceFolders(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @RequestParam(required = false, defaultValue = "") String studentId,
+      @RequestParam(required = false, defaultValue = "") String status,
+      @RequestParam(required = false, defaultValue = "") String subjectCode,
+      @RequestParam(required = false, defaultValue = "") String keyword,
+      @RequestParam(required = false, defaultValue = "") String importedFrom,
+      @RequestParam(required = false, defaultValue = "") String importedTo,
+      @RequestParam(required = false, defaultValue = "ALL") String usage,
+      @RequestParam(required = false, defaultValue = "0") int page,
+      @RequestParam(required = false, defaultValue = "20") int size,
+      @RequestParam(required = false, defaultValue = "importedAt,desc") String sort) {
+    return voiceTasks.queryFolders(familyId, studentId, status, subjectCode, keyword,
+        importedFrom, importedTo, usage, page, size, sort);
+  }
+
+  @GetMapping("/voice-material-folders/{packageId}")
+  public VoiceMaterialDtos.VoiceFolderDetailResponse getVoiceFolderDetail(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID packageId) {
+    return voiceTasks.folderDetail(familyId, packageId);
+  }
+
   @GetMapping("/media-assets/{assetId}")
-  public ResponseEntity<Resource> downloadAsset(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+  public ResponseEntity<Resource> downloadAsset(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable UUID assetId) throws MalformedURLException {
     MediaAssetService.ResolvedAsset file = mediaAssets.resolveOwned(familyId, assetId);
     Resource resource = new UrlResource(file.path().toUri());
@@ -88,15 +141,17 @@ public class VoiceMaterialController {
     try { type = MediaType.parseMediaType(file.contentType()); }
     catch (IllegalArgumentException error) { type = MediaType.APPLICATION_OCTET_STREAM; }
     return ResponseEntity.ok().contentType(type)
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(file.originalName()).build().toString())
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.inline().filename(file.originalName()).build().toString())
         .body(resource);
   }
 
   @PostMapping("/voice-material-packages/{packageId}/create-assignment")
   public VoiceMaterialDtos.CreateAssignmentResponse createAssignment(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable UUID packageId) {
-    return assignments.createManually(familyId, packageId);
+      @PathVariable UUID packageId,
+      @Valid @RequestBody VoiceMaterialDtos.CreateAssignmentRequest request) {
+    return assignments.createManually(familyId, packageId, request);
   }
 
   @PostMapping("/students/{studentId}/voice-material-packages/auto-create-next")

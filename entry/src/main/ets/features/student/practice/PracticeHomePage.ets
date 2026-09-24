@@ -24,11 +24,15 @@ struct PracticePaperCard {
         Text(this.paper.title)
           .layoutWeight(1)
           .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(AppTheme.TEXT);
         if (this.passed) {
           Text('已通过')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUCCESS)
             .padding({ left: 9, right: 9, top: 4, bottom: 4 })
@@ -41,7 +45,8 @@ struct PracticePaperCard {
 
       Text(`${this.paper.questionCount} 题 · 约 ${this.paper.estimatedMinutes} 分钟 · ${this.difficultyLabel}`)
         .width('100%')
-        .fontSize(13)
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
 
       if (this.paper.description.length > 0) {
@@ -49,16 +54,16 @@ struct PracticePaperCard {
           .width('100%')
           .maxLines(2)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(13)
-          .lineHeight(18)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
     }
     .width('100%')
-    .padding(AppTheme.PHONE_CARD_PADDING)
-    .backgroundColor(AppTheme.SURFACE)
+    .padding(AppTheme.CARD_PADDING_COMPACT)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(`${this.paper.title}，${this.paper.questionCount}题，${this.passed ? '已通过，' : ''}点击查看套卷`)
     .onClick(() => this.onOpen());
@@ -217,7 +222,8 @@ export struct PracticeHomePage {
       Row({ space: 8 }) {
         Text('科目')
           .width(42)
-          .fontSize(13)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT);
         SegmentedSelectionButton({
@@ -245,7 +251,8 @@ export struct PracticeHomePage {
       Row({ space: 8 }) {
         Text('状态')
           .width(42)
-          .fontSize(13)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT);
         SegmentedSelectionButton({
@@ -275,10 +282,12 @@ export struct PracticeHomePage {
           .layoutWeight(1)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
         Text('调整')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -292,7 +301,7 @@ export struct PracticeHomePage {
     }
     .width('100%')
     .padding({ left: 12, right: 12, top: 12, bottom: 10 })
-    .backgroundColor(AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
@@ -301,25 +310,40 @@ export struct PracticeHomePage {
   @Builder
   private PaperList() {
     Column({ space: 10 }) {
-      Row({ space: 8 }) {
+      Row({ space: 10 }) {
         Text('练习套卷')
           .layoutWeight(1)
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
           .fontColor(AppTheme.TEXT);
         Text(this.loading ? '加载中…' : `${this.papers.length} 套`)
           .constraintSize({ minWidth: 64 })
           .maxLines(1)
           .textAlign(TextAlign.End)
-          .fontSize(14)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
+        Text('练习记录')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 6, right: 2 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('查看练习记录')
+          .onClick(() => this.onOpenHistory());
       }
-      .width('100%');
+      .width('100%')
+      .alignItems(VerticalAlign.Center);
 
       if (this.errorMessage.length > 0) {
         Text(this.errorMessage)
           .width('100%')
-          .fontSize(14)
+          .fontSize(AppTheme.BODY_SIZE)
+          .lineHeight(AppTheme.BODY_LINE_HEIGHT)
           .fontColor(AppTheme.DANGER)
           .padding(14)
           .backgroundColor(AppTheme.DANGER_SOFT)
@@ -327,14 +351,15 @@ export struct PracticeHomePage {
       } else if (!this.loading && this.papers.length === 0) {
         Column({ space: 7 }) {
           Text('这个分类暂时没有套卷')
-            .fontSize(15)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
         .width('100%')
         .padding({ top: 28, bottom: 28 })
-        .backgroundColor(AppTheme.SURFACE)
-        .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+        .backgroundColor(AppTheme.CARD_SURFACE)
+        .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
       } else {
         Column({ space: 9 }) {
           ForEach(this.papers, (paper: PracticePaper) => {
@@ -356,35 +381,11 @@ export struct PracticeHomePage {
     Scroll() {
       Column() {
         Column({ space: 18 }) {
-          Column({ space: 5 }) {
-            Row() {
-              Text('练习')
-                .fontSize(AppTheme.PAGE_TITLE_SIZE)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(AppTheme.TEXT);
-              Blank();
-              Text('练习记录')
-                .fontSize(14)
-                .fontWeight(FontWeight.Medium)
-                .fontColor(AppTheme.PRIMARY)
-                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .padding({ left: 12, right: 2 })
-                .accessibilityRole(AccessibilityRoleType.BUTTON)
-                .accessibilityText('查看练习记录')
-                .onClick(() => this.onOpenHistory());
-            }
-            .width('100%');
-          }
-          .width('100%')
-          .alignItems(HorizontalAlign.Start);
-
           this.QuickFilterBar();
-
           this.PaperList();
-
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding(AppTheme.PAGE_PADDING);
       }
       .width('100%')

@@ -10,13 +10,13 @@ export struct PracticeSubmitConfirmDialog {
     Column({ space: 18 }) {
       Text('还有未作答题目')
         .width('100%')
-        .fontSize(20)
+        .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.TEXT);
       Text(`还有 ${this.unansweredCount} 题没有作答。可以继续完成，也可以直接交卷，未答题会按错误计入结果。`)
         .width('100%')
-        .fontSize(14)
-        .lineHeight(21)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
       Row({ space: 10 }) {
         Button('继续作答', { type: ButtonType.Normal })

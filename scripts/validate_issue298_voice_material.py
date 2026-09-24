@@ -19,134 +19,192 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 
-migration = read("backend/src/main/resources/db/migration/V15__voice_material_assets.sql")
+asset_migration = read("backend/src/main/resources/db/migration/V15__voice_material_assets.sql")
+link_migration = read("backend/src/main/resources/db/migration/V17__voice_material_task_links.sql")
+link_unique_migration = read("backend/src/main/resources/db/migration/V18__voice_material_task_link_assignment_unique.sql")
 assignment_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialAssignmentService.java")
-material_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialService.java")
+query_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceTaskQueryService.java")
+controller = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java")
 resource_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentResourceService.java")
 delete_service = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentService.java")
-picker = read("entry/src/main/ets/application/assignment/VoiceMaterialDirectoryPicker.ets")
 remote = read("entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets")
 auto = read("entry/src/main/ets/application/assignment/VoiceMaterialAutoCreateService.ets")
 index = read("entry/src/main/ets/pages/Index.ets")
-page = read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets")
+voice_page = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+voice_vm = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentViewModel.ets")
 dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
-context = read("CONTEXT.md")
+routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
+shell = read("entry/src/main/ets/pages/AppShell.ets")
 voice_e2e = read("backend/scripts/voice_material_e2e.py")
 
-require("create table media_asset" in migration and
-        "asset_id uuid references media_asset(id)" in migration,
-        "#298 must store reusable physical media in MediaAsset and link AssignmentResource by asset_id")
-require("uq_voice_material_auto_daily unique (family_id, student_id, business_date)" in migration,
-        "#298 daily automatic creation must be enforced by a database unique constraint")
-require("subject_code varchar(64) not null" in migration,
-        "#298 VoiceMaterialPackage must persist subjectCode instead of inferring subject from directory name")
-require('private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai")' in assignment_service and
-        "findByFamilyIdAndStudentIdAndBusinessDate" in assignment_service,
-        "#298 automatic creation must use a server-authoritative Asia/Shanghai business day")
-require("students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
-        "findFirstVoiceMaterialTask(familyId, studentId)" in assignment_service and
-        "packages.lockNextAvailableForAutoCreate" in assignment_service,
-        "#298 automatic creation must serialize per student and recheck current valid voice task before consuming the next eligible package")
-require("batches.findOwnedStudentId(familyId, batchId)" in material_service and
-        "students.requireOwnedForUpdate(familyId, studentId)" in material_service,
-        "#298 package registration/completion must resolve student as a scalar before taking the Student lock")
-require("packages.findOwnedStudentId(familyId, packageId)" in material_service and
-        "students.requireOwnedForUpdate(familyId, studentId)" in material_service and
-        "packages.lockOwned(familyId, packageId)" in material_service,
-        "#298 file upload retries must resolve student without preloading Package and then use Student -> Package lock order")
-require("packages.findOwnedStudentId(familyId, packageId)" in assignment_service and
-        "students.requireOwnedForUpdate(familyId, studentId)" in assignment_service and
-        "packages.lockOwned(familyId, packageId)" in assignment_service,
-        "#298 manual package consumption must resolve student without a stale Package snapshot and use Student -> Package lock order")
-require("LocalTime.of(23, 59)" in assignment_service and
-        'item.dueAt == null ? "今天" : ""' in assignment_service,
-        "#298 an undated package auto-created for the day must appear in the student Today view")
-require('"a-voicepkg-" + item.id' in assignment_service and
-        "assignmentResources.linkAssets" in assignment_service,
-        "#298 package consumption must use deterministic Assignment id and shared media links")
-require("item.status = \"CONSUMED\"" in assignment_service and
-        "item.consumedAssignmentId = assignment.id()" in assignment_service,
-        "#298 package consumption must be durable and idempotent")
-require("input.subjectCode().trim().toUpperCase" in material_service and
-        "directoryName" in material_service,
-        "#298 subjectCode must be explicit package metadata while directoryName stays a separate field")
-require("batch.readyCount + batch.invalidCount >= batch.directoryCount" in material_service,
-        "#298 completed material batches must reject late package registration")
-require('item.consumedAssignmentId == null ? "" : item.consumedAssignmentId' in material_service and
-        "hasCreatedBefore" in material_service and
-        "hasActiveAssignment" in material_service,
-        "#298 PackageResponse must expose historical usage and current active-assignment state")
-require("students.requireOwnedForUpdate(familyId, studentId)" in material_service,
-        "#298 material batch creation must serialize with student deletion")
-require("normalizeSortOrder" in material_service and
-        "relativeName.toLowerCase" in material_service,
-        "#298 image ordering must be normalized by file name")
-require("entity.assetId = asset.id" in resource_service and
-        "entity.storagePath = null" in resource_service,
-        "#298 new Assignment resources must reference MediaAsset without copying files")
-media_asset_service = read("backend/src/main/java/com/xiaoban/homework/media/MediaAssetService.java")
-require("families.lockById(familyId)" in media_asset_service,
-        "#298 MediaAsset dedup must serialize same-family inserts instead of recovering from a rollback-only unique-key exception")
-require("registerRollbackCleanup(stored.storagePath())" in media_asset_service and
-        "TransactionSynchronization.STATUS_ROLLED_BACK" in media_asset_service,
-        "#298 newly stored physical media must be removed when the surrounding database transaction rolls back")
-require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
-        "#298 deleting Assignment must not delete shared MediaAsset files")
-require("allowsMulFolderSelection" not in picker and
-        "deviceInfo.apiAvailable('26.0.0')" in picker and
-        "SystemCapability.FileManagement.UserFileService.FolderSelection" in picker and
-        "if (!this.supportsFolderPicker())" in picker and
-        "options.maxSelectNumber = 1" in picker and
-        "DocumentSelectMode.FOLDER" in picker and
-        "getFullDirectoryUri()" in picker and
-        "selectFilesFallback" in picker and
-        "DocumentSelectMode.FILE" in picker,
-        "#298 picker must support phone-compatible single-folder selection and fall back to file grouping only when folder selection is unavailable")
-require("createBatch(studentId" in remote and
-        "uploadFile(packageId" in remote and
-        "completeBatch(batchId" in remote,
-        "#298 parent client must upload material packages through the dedicated batch API")
-require("checkToday(studentId" in auto and
-        "autoCreateNext(studentId)" in auto,
-        "#298 student client must delegate daily creation policy to the backend")
+# Physical media remains reusable and AssignmentResource links shared assets.
+require("create table media_asset" in asset_migration and
+        "asset_id uuid references media_asset(id)" in asset_migration,
+        "#298 must store reusable physical media in MediaAsset")
+require("entity.assetId = asset.id" in resource_service and "entity.storagePath = null" in resource_service,
+        "#298 new Assignment resources must reference shared MediaAsset")
+
+# Folder and task instance are now separate durable concepts.
+require("create table voice_material_task_link" in link_migration and
+        "package_id uuid not null references voice_material_package" in link_migration and
+        "assignment_id varchar(120) not null" in link_migration,
+        "reusable voice folders must keep durable folder-to-task links")
+require("uq_voice_material_task_link_request" in link_migration,
+        "manual folder assignment creation must support request idempotency")
+require("uq_voice_material_task_link_assignment" in link_unique_migration and
+        "(family_id, assignment_id)" in link_unique_migration,
+        "one Assignment must map to at most one source voice folder")
+require("update voice_material_package" in link_migration and "status = 'READY'" in link_migration,
+        "legacy consumed folders must migrate back to reusable READY state")
+require("uq_voice_material_auto_daily" in asset_migration and
+        "unique (family_id, student_id, business_date)" in asset_migration,
+        "database must enforce at most one automatic voice creation record per student per business day")
+
+# Manual creation and automatic creation have different concurrency rules.
+require("VoiceMaterialTaskLinkRepository links" in assignment_service and
+        "links.findByFamilyIdAndRequestId" in assignment_service,
+        "manual folder creation must resolve idempotent retries through task links")
+manual_block = assignment_service.split(
+    "public VoiceMaterialDtos.CreateAssignmentResponse createManually(\n      UUID familyId, UUID packageId, VoiceMaterialDtos.CreateAssignmentRequest input)", 1)
+require(len(manual_block) == 2, "manual voice creation method must exist")
+if len(manual_block) == 2:
+    manual_body = manual_block[1].split(
+        "public VoiceMaterialDtos.AutoCreateResponse autoCreateNext", 1)[0]
+    require("findFirstVoiceMaterialTask" not in manual_body and "当前已有语音任务" not in manual_body,
+            "manual creation must allow multiple active voice tasks")
+    require("requestId 已用于其他语音任务创建请求" in manual_body and
+            "previous.packageId.equals(packageId)" in manual_body and
+            "previous.studentId.equals(targetStudentId)" in manual_body,
+            "idempotent retries must reject reuse across a different folder or student")
+auto_block = assignment_service.split("public VoiceMaterialDtos.AutoCreateResponse autoCreateNext", 1)
+require(len(auto_block) == 2 and
+        "assignments.findFirstVoiceMaterialTask(familyId, studentId)" in auto_block[1],
+        "automatic creation must stop when an effective voice task already exists")
+if len(auto_block) == 2:
+    auto_body = auto_block[1].split("private VoiceMaterialPackageEntity chooseAutoFolder", 1)[0]
+    require("todayRecord" in auto_body and
+            "autoRecords.findByFamilyIdAndStudentIdAndBusinessDate" in auto_body and
+            "if (todayRecord != null)" in auto_body,
+            "automatic creation must stop after the first automatic creation of the business day")
+    require("new VoiceMaterialAutoCreateRecordEntity()" in auto_body and
+            "orElseGet(VoiceMaterialAutoCreateRecordEntity::new)" not in auto_body,
+            "daily automatic creation record must be one-shot and must not be overwritten")
+require('String assignmentId = "a-voice-" + UUID.randomUUID()' in assignment_service,
+        "folder reuse must create a distinct Assignment instance")
+require("link.packageId = item.id" in assignment_service and
+        "link.assignmentId = assignment.id()" in assignment_service and
+        'link.createMode = createMode' in assignment_service,
+        "each created voice task must retain its source folder and creation mode")
+require("chooseAutoFolder" in assignment_service and "usageCount" in assignment_service and
+        "lastUsedAt" in assignment_service,
+        "automatic creation must rotate reusable folders by usage history")
+require('if ("CONSUMED".equals(item.status))' in assignment_service and
+        'item.status = "READY"' in assignment_service,
+        "legacy CONSUMED folders must remain reusable")
+
+# Task query must start from Assignment so local-upload voice tasks are not lost.
+require("from assignment a" in query_service and
+        "a.content_type = 'AUDIO_IMAGE'" in query_service and
+        "left join voice_material_task_link l" in query_service,
+        "voice task query must include AUDIO_IMAGE Assignments with or without source folders")
+require("from assignment_resource" in query_service and
+        '"本地上传"' in query_service,
+        "voice task detail must expose local-upload resources and source label")
+
+# Query contract must expose reusable-folder state directly.
+for token in ["USAGE_FILTERS", "usage_count", "active_task_count", "last_used_at",
+              "VoiceFolderTaskHistoryItem", "recentTasks"]:
+    require(token in query_service or token in read(
+        "backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialDtos.java"),
+        f"voice folder query contract missing reusable-folder state: {token}")
+require('"/voice-material-folders"' in controller and
+        '"/voice-material-folders/{packageId}"' in controller,
+        "backend must expose paged folder query and folder detail endpoints")
+
+# App voice creation uses one page with two material sources; no standalone material-library route.
+require("RemoteVoiceFolderItem" in remote and "RemoteVoiceFolderPage" in remote and
+        "async queryFolders(" in remote and "/api/v1/voice-material-folders" in remote,
+        "APP must query the reusable server-folder API")
+require("'status=READY'" in remote and "usage=" in remote and "page=" in remote,
+        "APP folder query must request reusable READY folders with server-side filters/paging")
+require("subjectCode?: string" in remote and "title?: string" in remote and
+        "instruction?: string" in remote and "requestId?: string" in remote,
+        "manual folder creation request must support selected subject, generated copy and idempotency")
+
+require("VOICE_SOURCE_LOCAL" in voice_page and "VOICE_SOURCE_SERVER" in voice_page and
+        "Button('从本机选择'" in voice_page and "Button('使用服务器素材'" in voice_page,
+        "voice assignment page must unify local and server material sources")
+require("folderUsageText" in voice_page and "已使用" in voice_page and "未使用" in voice_page,
+        "server folder picker must expose historical usage without treating used folders as unavailable")
+require("activeVoiceAssignment()" not in voice_vm and "activeVoiceAssignment()" not in voice_page and
+        "当前已有语音作业，请先完成或处理现有任务" not in voice_page,
+        "parent manual voice creation UI must not block multiple active tasks")
+require("createRequestId" in voice_page and "createFromFolder" in voice_vm,
+        "server-folder creation must use an idempotent request id")
+require("queryFolders(" in voice_vm,
+        "voice assignment ViewModel must use the reusable-folder query boundary")
+require("private generatedTitle(): string" in voice_page and " · 语音练习" in voice_page and
+        "this.title = item.directoryName" not in voice_page,
+        "folder reuse must auto-generate task naming independently from the folder name")
+require("Select([" in voice_page and "subjectFromIndex" in voice_page and
+        "syncGeneratedTaskCopy()" in voice_page,
+        "voice assignment subject must use a single selector and regenerate task copy")
+require("titleCustomized" not in voice_page and "instructionCustomized" not in voice_page and
+        "TextInput({ placeholder: '选择素材后自动生成" not in voice_page,
+        "generated voice task name/instruction must not require manual editing")
+require("Text('任务设置')" in voice_page and "Text('截止时间')" in voice_page and
+        "Text('预计完成时长')" in voice_page,
+        "voice assignment task metadata must use compact user-facing labels")
+require("private MaterialSection()" in voice_page and
+        voice_page.find("this.SourceSelector();") > voice_page.find("Text('作业素材')"),
+        "material source selector must live inside the assignment material card")
+require(voice_page.find("this.TaskSettingsSection()") <
+        voice_page.find("this.MaterialSection()"),
+        "task settings must appear before the assignment material card")
+require("private PublishFooter()" in voice_page and
+        voice_page.find("this.PublishFooter();") > voice_page.find(".scrollBar(BarState.Off);"),
+        "publish action must remain fixed outside the scrolling content")
+require("subjectCode: this.subjectCode(draft.subject)" in voice_vm and
+        "input.subjectCode()" in assignment_service and
+        "normalizeSubjectCode" in assignment_service,
+        "server-folder task creation must preserve the subject selected in task settings")
+require("subject: this.subject" in voice_page and
+        "subject: this.sourceMode === VOICE_SOURCE_SERVER" not in voice_page and
+        "this.viewModel.subjectFromCode(this.selectedFolder()!.subjectCode)" not in voice_page,
+        "server-folder publishing must not overwrite the parent-selected subject with folder metadata")
+require("instruction: draft.instruction.trim()" in voice_vm and
+        "input.instruction()" in assignment_service and
+        "requestedInstruction" in assignment_service,
+        "server-folder task creation must persist the generated task instruction")
+
+require("Text('语音素材库')" not in dashboard and "onOpenVoiceMaterial" not in dashboard,
+        "Parent Home must not expose the implementation concept 'voice material library'")
+require("Text('语音作业')" in dashboard and "onOpenVoice" in dashboard,
+        "Parent Home must expose the user task 'voice assignment'")
+require("PARENT_VOICE_MATERIAL" not in routes and "PARENT_VOICE_MATERIAL" not in shell,
+        "standalone voice-material APP route must not reappear")
+require("PARENT_VOICE_CREATE" in routes and "ParentVoiceAssignmentPage" in shell,
+        "voice assignment creation must use one explicit deep route")
+
+# Automatic creation and server lifecycle remain intact.
+require("checkToday(studentId" in auto and "autoCreateNext(studentId)" in auto,
+        "student client must keep the server-authoritative automatic creation check")
 require("VoiceMaterialAutoCreateService.instance.checkToday(studentId)" in index,
-        "#298 student entry must trigger the server-authoritative daily check")
-require("Text('语音素材库')" in dashboard and "onOpenVoiceMaterial" in dashboard,
-        "#298 parent dashboard must expose the voice material library")
-require("sys.symbol.exclamationmark_circle_fill" not in page,
-        "#298 parent material page must not depend on a version-sensitive feedback system symbol")
-require("private DefaultSubjectChip(label: string, code: string)" in page and
-        "this.defaultSubjectCode === code" in page and
-        "this.defaultSubjectCode = code" in page and
-        "this.DefaultSubjectChip('数学', 'MATH')" in page and
-        "this.DefaultSubjectChip('英语', 'ENGLISH')" in page,
-        "#298 batch default subject selector must bind directly to reactive state instead of passing a stale selectedCode through fixed ForEach items")
-require("private PendingSection()" in page and "private LibrarySection()" in page and
-        "setPackageSubject" in page and
-        "setPackageExpectedMinutes" in page and
-        "registrationFailureCount" in read("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialViewModel.ets") and
-        "hasCreatedBefore" in remote and
-        "hasActiveAssignment" in remote and
-        "item.hasCreatedBefore" in page and
-        "item.hasActiveAssignment" in page,
-        "#298 parent material page must support staging, per-directory subject/duration override, partial-failure feedback and historical/current usage markers")
-student_service = read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java")
-require("voiceMaterialPackages.existsByFamilyIdAndStudentId" in student_service,
-        "#298 student deletion must be rejected while actual voice-material packages still reference the student")
-require("voiceMaterials.deleteByFamilyIdAndStudentId" in student_service,
-        "#298 empty material batches must be cleaned instead of permanently blocking student deletion")
-require("StudentEntity student = requireOwnedForUpdate(familyId, id)" in student_service,
-        "#298 student deletion must lock the student row before checking voice-material ownership")
-require("legacy manual voice assignment" in voice_e2e and
-        "concurrent retry created duplicate package file" in voice_e2e and
-        "student delete/material batch race escaped business boundary" in voice_e2e and
-        "delete student after cleaning empty voice-material batch" in voice_e2e and
-        "reject student deletion while voice-material package exists" in voice_e2e and
-        "reject package registration after batch completion" in voice_e2e,
-        "#298 E2E must preserve legacy compatibility and concurrency/lifecycle boundaries")
-require("Media Asset（媒体资产）" in context and
-        "Daily Voice Auto Create（每日语音自动创建）" in context,
-        "#298 domain language must be documented in CONTEXT.md")
+        "student entry must trigger the daily voice check")
+require("if (resource.assetId == null && resource.storagePath != null" in delete_service,
+        "deleting Assignment must not delete shared MediaAsset files")
+
+# Real E2E protects manual multi-create, automatic guard, reuse and idempotent retry.
+for token in [
+    "valid batch must have two reusable READY folders",
+    "manual create while auto task active",
+    "auto skip while active voice tasks exist",
+    "auto skip while manual task remains active",
+    "enforce daily auto-create limit after all tasks cleared",
+    "create parallel manual task from same folder",
+    "manual create idempotent retry",
+]:
+    require(token in voice_e2e, f"voice material E2E missing lifecycle assertion: {token}")
 
 if errors:
     print("ISSUE_298_VOICE_MATERIAL_GATE_FAIL")

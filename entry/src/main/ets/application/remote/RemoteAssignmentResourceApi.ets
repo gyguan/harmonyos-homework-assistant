@@ -120,6 +120,10 @@ export class RemoteAssignmentResourceApi {
     }
   }
 
+  invalidate(resourceId: string): void {
+    this.cache.delete(resourceId);
+  }
+
   async download(resource: AssignmentResource): Promise<string> {
     let cached = this.cache.get(resource.id);
     if (cached !== undefined && cached.length > 0) return cached;

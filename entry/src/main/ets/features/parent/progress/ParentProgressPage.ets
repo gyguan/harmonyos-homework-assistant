@@ -3,7 +3,6 @@ import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
-import { AssignmentMetricKey, AssignmentMetricSummary } from '../../../components/assignment/AssignmentMetricSummary';
 import { FilterSummaryEntry } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentDateFilter, AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
@@ -13,7 +12,7 @@ import { ParentProgressViewModel } from './ParentProgressViewModel';
 
 @Component
 export struct ParentProgressPage {
-  @Prop revision: number = 0;
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   @State private refreshRevision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
@@ -21,12 +20,11 @@ export struct ParentProgressPage {
   @State private allDates: boolean = false;
   @State private selectedDayEpochMs: number = Date.now();
   @State private subjectCode: string = 'ALL';
-  @State private statusFilter: AssignmentMetricKey = AssignmentMetricKey.ALL;
   @State private draftAllDates: boolean = false;
   @State private draftSelectedDayEpochMs: number = Date.now();
   @State private draftSubjectCode: string = 'ALL';
+  @State private scopedAssignments: Assignment[] = [];
   @State private visibleAssignments: Assignment[] = [];
-  @State private snapshotRevision: number = -1;
   @State private querying: boolean = false;
   @State private bulkMode: boolean = false;
   @State private selectedDeleteIds: string[] = [];
@@ -58,55 +56,38 @@ export struct ParentProgressPage {
     this.rebuildView();
   }
 
-  private canUseReviewPane(): boolean {
-    return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentProgressReviewRequirement());
+  private onRevisionChanged(): void {
+    this.rebuildView();
   }
 
-  private statuses(): AssignmentStatus[] {
-    if (this.statusFilter === AssignmentMetricKey.PENDING) {
-      return [
-        AssignmentStatus.NOT_STARTED,
-        AssignmentStatus.IN_PROGRESS,
-        AssignmentStatus.PAUSED,
-        AssignmentStatus.READY_TO_SUBMIT,
-        AssignmentStatus.NEEDS_REWORK,
-        AssignmentStatus.OVERDUE
-      ];
-    }
-    if (this.statusFilter === AssignmentMetricKey.SUBMITTED) return [AssignmentStatus.SUBMITTED];
-    if (this.statusFilter === AssignmentMetricKey.COMPLETED) return [AssignmentStatus.COMPLETED];
-    return [];
+  private canUseReviewPane(): boolean {
+    return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentProgressReviewRequirement());
   }
 
   private rebuildView(): void {
     let currentRevision = this.revision + this.refreshRevision;
     if (currentRevision < 0) return;
-    if (this.allDates) {
-      this.applyItems(this.viewModel.assignments(
-        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses()));
-      return;
-    }
-    this.applyItems(this.viewModel.assignmentsOnDay(
-      this.subjectCode, this.selectedDayEpochMs, this.statuses()));
+    let scoped = this.allDates ?
+      this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL) :
+      this.viewModel.assignmentsOnDay(this.subjectCode, this.selectedDayEpochMs);
+    this.applyScopedItems(scoped);
+  }
+
+  private applyScopedItems(items: Assignment[]): void {
+    this.scopedAssignments = items.slice();
+    this.applyItems(this.scopedAssignments);
   }
 
   private applyItems(items: Assignment[]): void {
     this.visibleAssignments = items.slice();
-    this.snapshotRevision = this.revision + this.refreshRevision;
-    let stillVisible = false;
+     let stillVisible = false;
     for (let item of items) if (item.id === this.selectedAssignmentId) stillVisible = true;
     if (!stillVisible) this.selectedAssignmentId = items.length > 0 ? items[0].id : '';
   }
 
   private currentVisibleAssignments(): Assignment[] {
-    let currentRevision = this.revision + this.refreshRevision;
-    if (this.snapshotRevision === currentRevision) return this.visibleAssignments;
-    if (this.allDates) {
-      return this.viewModel.assignments(
-        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses());
-    }
-    return this.viewModel.assignmentsOnDay(
-      this.subjectCode, this.selectedDayEpochMs, this.statuses());
+    return this.visibleAssignments;
   }
 
   private assignmentRenderKey(item: Assignment): string {
@@ -189,13 +170,15 @@ export struct ParentProgressPage {
     Column({ space: 16 }) {
       Text('删除作业')
         .width('100%')
-        .fontSize(20)
-        .fontWeight(FontWeight.Bold)
+        .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+        .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+        .fontWeight(FontWeight.Medium)
+        .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
         .fontColor(AppTheme.TEXT);
       Text(`确定删除选中的 ${this.selectedDeleteIds.length} 项未完成作业？删除后无法恢复。`)
         .width('100%')
-        .fontSize(14)
-        .lineHeight(21)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
       Row({ space: 10 }) {
         Button('取消', { type: ButtonType.Normal })
@@ -227,11 +210,13 @@ export struct ParentProgressPage {
     if (this.bulkMode) {
       Row({ space: 10 }) {
         Text(`已选 ${this.selectedDeleteIds.length} 项`)
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text('全选当前')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 8, right: 8 })
@@ -278,22 +263,15 @@ export struct ParentProgressPage {
     if (this.querying) return;
     this.querying = true;
     try {
-      let items = this.allDates ?
+      let scoped = this.allDates ?
         await this.viewModel.query(
-          AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses()) :
+          AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL) :
         await this.viewModel.queryOnDay(
-          this.subjectCode, this.selectedDayEpochMs, this.statuses());
-      this.applyItems(items);
+          this.subjectCode, this.selectedDayEpochMs);
+      this.applyScopedItems(scoped);
     } finally {
       this.querying = false;
     }
-  }
-
-  private chooseStatus(value: AssignmentMetricKey): void {
-    if (this.statusFilter === value || this.querying) return;
-    this.statusFilter = value;
-    if (this.bulkMode) this.selectedDeleteIds = [];
-    void this.queryCurrent();
   }
 
   private openAssignment(item: Assignment): void {
@@ -307,35 +285,6 @@ export struct ParentProgressPage {
 
   private isSelected(item: Assignment): boolean {
     return this.canUseReviewPane() && this.selectedAssignmentId === item.id;
-  }
-
-  private allAssignments(): Assignment[] {
-    return this.viewModel.assignments(
-      AssignmentTypeFilter.ALL, 'ALL', AssignmentDateFilter.ALL);
-  }
-
-  private allCount(): number {
-    return this.allAssignments().length;
-  }
-
-  private pendingCount(): number {
-    let count = 0;
-    for (let item of this.allAssignments()) {
-      if (item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED) count++;
-    }
-    return count;
-  }
-
-  private submittedCount(): number {
-    let count = 0;
-    for (let item of this.allAssignments()) if (item.status === AssignmentStatus.SUBMITTED) count++;
-    return count;
-  }
-
-  private completedCount(): number {
-    let count = 0;
-    for (let item of this.allAssignments()) if (item.status === AssignmentStatus.COMPLETED) count++;
-    return count;
   }
 
   private isSelectedDayToday(): boolean {
@@ -368,13 +317,6 @@ export struct ParentProgressPage {
     return '全部科目';
   }
 
-  private statusLabel(value: AssignmentMetricKey): string {
-    if (value === AssignmentMetricKey.PENDING) return '待完成';
-    if (value === AssignmentMetricKey.SUBMITTED) return '待验收';
-    if (value === AssignmentMetricKey.COMPLETED) return '已完成';
-    return '全部任务';
-  }
-
   @Builder
   private FilterBar() {
     Row() {
@@ -391,7 +333,8 @@ export struct ParentProgressPage {
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
       Text(this.querying ? '查询中…' : '查询')
-        .fontSize(13)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.hasActiveFilters() ? AppTheme.PRIMARY : AppTheme.TEXT)
         .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -409,34 +352,35 @@ export struct ParentProgressPage {
   }
 
   @Builder
-  private StatusSummary() {
-    AssignmentMetricSummary({
-      allCount: this.allCount(),
-      pendingCount: this.pendingCount(),
-      submittedCount: this.submittedCount(),
-      completedCount: this.completedCount(),
-      selectedKey: this.statusFilter,
-      interactive: true,
-      onSelect: (key: AssignmentMetricKey) => this.chooseStatus(key)
-    });
-  }
-
-  @Builder
   private ListContent() {
     Column({ space: 16 }) {
-      Row({ space: 10 }) {
-        Column({ space: 3 }) {
-          Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
+      this.FilterBar();
+      this.BulkDeleteToolbar();
+      if (this.deleteMessage.length > 0) {
+        Text(this.deleteMessage).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.DANGER);
+      }
+
+      Row({ space: 8 }) {
+        Text(this.querying ? '查询中…' :
+          `${this.dateLabel()} · ${this.subjectLabel(this.subjectCode)}`)
+          .layoutWeight(1)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
+        Text(`${this.currentVisibleAssignments().length} 项`)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
         if (this.deletableVisibleAssignments().length > 0 || this.bulkMode) {
-          Text(this.bulkMode ? '完成' : '管理')
-            .fontSize(13)
+          Text(this.bulkMode ? '取消' : '删除')
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.PRIMARY)
+            .fontColor(this.bulkMode ? AppTheme.PRIMARY : AppTheme.DANGER)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .padding({ left: 10, right: 10 })
+            .padding({ left: 8, right: 2 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText(this.bulkMode ? '取消删除选择' : '选择要删除的作业')
             .onClick(() => {
               if (this.bulkMode) this.exitBulkMode();
               else this.enterBulkMode();
@@ -446,60 +390,25 @@ export struct ParentProgressPage {
       .width('100%')
       .alignItems(VerticalAlign.Center);
 
-      this.StatusSummary();
-      this.FilterBar();
-      this.BulkDeleteToolbar();
-      if (this.deleteMessage.length > 0) {
-        Text(this.deleteMessage).width('100%').fontSize(13).fontColor(AppTheme.DANGER);
-      }
-
-      Row() {
-        Text(this.querying ? '查询中…' :
-          `${this.dateLabel()} · ${this.subjectLabel(this.subjectCode)} · ${this.statusLabel(this.statusFilter)}`)
-          .fontSize(13).fontColor(AppTheme.SUBTEXT);
-        Blank();
-        Text(`${this.currentVisibleAssignments().length} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%');
-
       if (this.currentVisibleAssignments().length === 0) {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
-          Text('当前筛选下没有作业').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('可以调整日期、科目或任务状态。').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('当前筛选下没有作业').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('可以调整日期或科目。').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding({ top: 30, bottom: 30 });
       } else {
         Column({ space: 7 }) {
           ForEach(this.currentVisibleAssignments(), (item: Assignment) => {
-            Row({ space: 8 }) {
-              if (this.bulkMode) {
-                Text(this.canDelete(item) ? (this.isDeleteSelected(item.id) ? '✓' : '') : '—')
-                  .width(28)
-                  .height(28)
-                  .fontSize(15)
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor(this.isDeleteSelected(item.id) ? AppTheme.TEXT_ON_PRIMARY : AppTheme.SUBTEXT)
-                  .textAlign(TextAlign.Center)
-                  .backgroundColor(this.isDeleteSelected(item.id) ? AppTheme.PRIMARY : AppTheme.SURFACE_EMPHASIS)
-                  .border({ width: 1, color: this.isDeleteSelected(item.id) ? AppTheme.PRIMARY : AppTheme.BORDER })
-                  .borderRadius(14)
-                  .accessibilityRole(AccessibilityRoleType.BUTTON)
-                  .accessibilityText(this.canDelete(item) ?
-                    (this.isDeleteSelected(item.id) ? '取消选择这项作业' : '选择这项作业') : '已完成作业不能删除')
-                  .onClick(() => this.toggleDeleteSelection(item));
-              }
-              AssignmentListItem({
-                assignment: item,
-                selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item),
-                showChevron: !this.bulkMode && !this.canUseReviewPane(),
-                interactive: !this.bulkMode || this.canDelete(item),
-                onOpen: () => this.openAssignment(item)
-              })
-              .layoutWeight(1);
-            }
-            .width('100%')
-            .alignItems(VerticalAlign.Center);
+            AssignmentListItem({
+              assignment: item,
+              selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item),
+              showChevron: !this.bulkMode && !this.canUseReviewPane(),
+              interactive: !this.bulkMode || this.canDelete(item),
+              selectionMode: this.bulkMode,
+              selectionAvailable: this.canDelete(item),
+              onOpen: () => this.openAssignment(item)
+            });
           }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
@@ -516,8 +425,8 @@ export struct ParentProgressPage {
           this.ListContent();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PARENT_PROGRESS_READABLE_MAX_WIDTH })
-        .padding(AppTheme.PAGE_PADDING);
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+        .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: AppTheme.PAGE_PADDING_COMPACT, bottom: AppTheme.PAGE_PADDING_COMPACT });
       }
       .width('100%').alignItems(HorizontalAlign.Center);
     }
@@ -573,7 +482,7 @@ export struct ParentProgressPage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.PARENT_PROGRESS_REVIEW_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
     .alignItems(VerticalAlign.Top)
     .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 20 });
   }

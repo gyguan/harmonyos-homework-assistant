@@ -11,7 +11,7 @@ export struct SegmentedSelectionButton {
       .height(AppTheme.MIN_TOUCH_TARGET)
       .padding({ left: 13, right: 13 })
       .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(13)
+      .fontSize(AppTheme.ACTION_TEXT_SIZE)
       .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
       .backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
       .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.TEXT)
@@ -29,13 +29,14 @@ export struct FilterSummaryEntry {
 
   build() {
     Column({ space: 3 }) {
-      Text(this.label).fontSize(11).fontColor(AppTheme.TERTIARY_TEXT);
+      Text(this.label).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
       Row({ space: 3 }) {
         Text(this.value)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(this.active ? FontWeight.Medium : FontWeight.Normal)
           .fontColor(this.active ? AppTheme.PRIMARY : AppTheme.TEXT);
-        Text('⌄').fontSize(11).fontColor(this.active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
+        Text('⌄').fontSize(AppTheme.CAPTION_SIZE).fontColor(this.active ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
       }
     }
     .layoutWeight(1)
@@ -56,7 +57,8 @@ export struct StatusSelectionChip {
 
   build() {
     Text(this.label)
-      .fontSize(12)
+      .fontSize(AppTheme.ACTION_TEXT_SIZE)
+      .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
       .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.TEXT)
       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -80,8 +82,8 @@ export struct SettingsToggleRow {
   build() {
     Row({ space: 14 }) {
       Column({ space: 4 }) {
-        Text(this.title).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-        Text(this.description).width('100%').fontSize(12).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+        Text(this.title).width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT).maxLines(AppTheme.CARD_TITLE_MAX_LINES);
+        Text(this.description).width('100%').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT).maxLines(2);
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
@@ -105,19 +107,22 @@ export struct ReadonlySettingStateRow {
       Column({ space: 4 }) {
         Text(this.title)
           .width('100%')
-          .fontSize(15)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
           .fontColor(AppTheme.TEXT);
         Text(this.description)
           .width('100%')
-          .fontSize(12)
-          .lineHeight(18)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
       Text(this.isEnabled ? '已开启' : '已关闭')
-        .fontSize(12)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.isEnabled ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
     }
@@ -136,7 +141,8 @@ export struct ChoiceSelectionChip {
 
   build() {
     Text(this.label)
-      .fontSize(this.compact ? 12 : 13)
+      .fontSize(this.compact ? AppTheme.CAPTION_SIZE : AppTheme.ACTION_TEXT_SIZE)
+      .lineHeight(this.compact ? AppTheme.CAPTION_LINE_HEIGHT : AppTheme.ACTION_TEXT_LINE_HEIGHT)
       .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
       .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })

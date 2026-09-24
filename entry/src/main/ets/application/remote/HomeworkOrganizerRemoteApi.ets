@@ -84,6 +84,12 @@ export class HomeworkOrganizerRemoteApi {
     if (value === Subject.CHINESE) return Subject.CHINESE;
     if (value === Subject.MATH) return Subject.MATH;
     if (value === Subject.ENGLISH) return Subject.ENGLISH;
+    if (value === Subject.READING) return Subject.READING;
+    if (value === Subject.READ_ALOUD) return Subject.READ_ALOUD;
+    if (value === Subject.SPORTS) return Subject.SPORTS;
+    if (value === Subject.PRACTICE) return Subject.PRACTICE;
+    if (value === Subject.INTEREST) return Subject.INTEREST;
+    if (value === Subject.OTHER) return Subject.OTHER;
     return null;
   }
 

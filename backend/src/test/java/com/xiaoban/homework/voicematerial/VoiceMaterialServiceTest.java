@@ -2,7 +2,6 @@ package com.xiaoban.homework.voicematerial;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -24,6 +23,7 @@ class VoiceMaterialServiceTest {
     VoiceMaterialBatchRepository batches = mock(VoiceMaterialBatchRepository.class);
     VoiceMaterialPackageRepository packages = mock(VoiceMaterialPackageRepository.class);
     VoiceMaterialFileRepository files = mock(VoiceMaterialFileRepository.class);
+    VoiceMaterialTaskLinkRepository links = mock(VoiceMaterialTaskLinkRepository.class);
     AssignmentRepository assignments = mock(AssignmentRepository.class);
     MediaAssetRepository assets = mock(MediaAssetRepository.class);
     MediaAssetService mediaAssets = mock(MediaAssetService.class);
@@ -53,7 +53,8 @@ class VoiceMaterialServiceTest {
         .thenReturn(Optional.of(existing));
 
     VoiceMaterialService service = new VoiceMaterialService(
-        batches, packages, files, assignments, assets, mediaAssets, students, new VoiceMediaPolicy());
+        batches, packages, files, links, assignments, assets, mediaAssets, students,
+        new VoiceMediaPolicy());
 
     VoiceMaterialDtos.FileResponse result = service.uploadFile(
         familyId, packageId, "AUDIO", "voice.mp3", 0,

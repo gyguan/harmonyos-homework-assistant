@@ -10,6 +10,82 @@ on:
       - 'refactor/**'
 
 jobs:
+  validate-parent-import-inbox:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate homework inbox navigation
+        run: |
+          python scripts/validate_issue242_import_inbox.py
+          python scripts/validate_parent_import_ui_conformance.py
+
+  validate-parent-home-progress:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate parent home and progress interaction
+        run: |
+          python scripts/validate_task_ui_consistency.py
+          python scripts/validate_v2_slice4_parent_surfaces.py
+          python scripts/validate_ui_refresh_copy.py
+
+  validate-app-identity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate in-app identity switching
+        run: |
+          python scripts/validate_person_entry_role_lock.py
+          python scripts/validate_snapshot_migration.py
+          python scripts/validate_harmony_ui_design.py
+
+  validate-admin-voice:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Validate Web admin voice management
+        run: |
+          python scripts/validate_admin_login.py
+          python scripts/validate_admin_voice_material_import.py
+          node --check backend/src/main/resources/static/admin/js/login-shell.js
+          node --check backend/src/main/resources/static/admin/js/api.js
+          node --check backend/src/main/resources/static/admin/js/voice-material.js
+          node --check backend/src/main/resources/static/admin/js/voice-management-view.js
+          node --check backend/src/main/resources/static/admin/js/app.js
+
   validate-project-invariants:
     runs-on: ubuntu-latest
     steps:
@@ -27,32 +103,14 @@ jobs:
       - name: Validate ArkTS compile safety
         run: python scripts/validate_arkts_compile_safety.py
 
-      - name: Validate issue 241 capture spike
-        run: python scripts/validate_issue241_capture_spike.py
-
       - name: Validate issue 242 import inbox
         run: python scripts/validate_issue242_import_inbox.py
 
       - name: Validate issue 243 share import
         run: python scripts/validate_issue243_share_import.py
 
-      - name: Validate issue 244 guided capture
-        run: python scripts/validate_issue244_guided_capture.py
-
-      - name: Validate issue 245 chat reconstruction
-        run: python scripts/validate_issue245_chat_reconstruction.py
-
       - name: Validate issue 246 homework understanding
         run: python scripts/validate_issue246_homework_understanding.py
-
-      - name: Validate issue 247 source profile closure
-        run: python scripts/validate_issue247_source_profile_closure.py
-
-      - name: Validate issue 270 capture entry split
-        run: python scripts/validate_issue270_capture_entry_split.py
-
-      - name: Validate issue 271 capture home layout
-        run: python scripts/validate_issue271_capture_home_layout.py
 
       - name: Validate parent import UI conformance
         run: python scripts/validate_parent_import_ui_conformance.py
@@ -129,6 +187,7 @@ jobs:
       - name: Validate admin login refactor
         run: |
           python scripts/validate_admin_login.py
+          node --check backend/src/main/resources/static/admin/js/login-shell.js
           node --check backend/src/main/resources/static/admin/js/app.js
 
       - name: Validate admin voice material import
@@ -136,6 +195,7 @@ jobs:
           python scripts/validate_admin_voice_material_import.py
           node --check backend/src/main/resources/static/admin/js/api.js
           node --check backend/src/main/resources/static/admin/js/voice-material.js
+          node --check backend/src/main/resources/static/admin/js/voice-management-view.js
           node --check backend/src/main/resources/static/admin/js/app.js
 
       - name: Validate voice workspace media focus
@@ -302,8 +362,11 @@ jobs:
 
       - name: Verify admin import page is served
         run: |
-          curl -fsSL http://localhost:8080/admin | grep -q "语音素材导入"
-          curl -fsS http://localhost:8080/admin/js/app.js | grep -q "uploadSelected"
+          curl -fsSL http://localhost:8080/admin | grep -q 'id="nav-voice-tasks"'
+          curl -fsSL http://localhost:8080/admin | grep -q 'id="task-search-form"'
+          curl -fsSL http://localhost:8080/admin | grep -q 'id="folder-search-form"'
+          curl -fsSL http://localhost:8080/admin | grep -q 'id="import-result-body"'
+          curl -fsS http://localhost:8080/admin/js/app.js | grep -q "uploadImport"
 
       - name: Run real backend E2E smoke with Tutor fallback
         run: python backend/scripts/e2e_smoke.py --expect-tutor-unavailable

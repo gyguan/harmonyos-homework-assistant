@@ -24,7 +24,6 @@ theme = read("entry/src/main/ets/common/theme/AppTheme.ets")
 layout_policy = read("entry/src/main/ets/common/responsive/LayoutPolicy.ets")
 repo = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
 home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
-home_vm = read("entry/src/main/ets/features/parent/dashboard/ParentHomeViewModel.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 progress_vm = read("entry/src/main/ets/features/parent/progress/ParentProgressViewModel.ets")
 student_assignments = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
@@ -48,11 +47,8 @@ due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 issue_spec = read("docs/product/ui-page-spec-v2.md")
 
 for token in [
-    "PARENT_HOME_READABLE_MAX_WIDTH",
-    "PARENT_HOME_PAD_CONTENT_MAX_WIDTH",
-    "PARENT_PROGRESS_READABLE_MAX_WIDTH",
-    "PARENT_PROGRESS_REVIEW_MAX_WIDTH",
-    "PARENT_REVIEW_READABLE_MAX_WIDTH",
+    "CONTENT_STANDARD_MAX_WIDTH",
+    "CONTENT_WIDE_MAX_WIDTH",
     "PARENT_HOME_PRIMARY_MIN_WIDTH",
     "PARENT_HOME_SECONDARY_MIN_WIDTH",
     "PARENT_PROGRESS_LIST_MIN_WIDTH",
@@ -65,7 +61,6 @@ for token in ["parentHomeRequirement", "parentProgressReviewRequirement", "canSp
 
 for text, path in [
     (home, "ParentDashboardPage.ets"),
-    (home_vm, "ParentHomeViewModel.ets"),
     (progress, "ParentProgressPage.ets"),
     (progress_vm, "ParentProgressViewModel.ets"),
     (review_page, "ParentReviewPage.ets"),
@@ -90,36 +85,22 @@ for text, path in [
 
 require("LayoutPolicy.parentHomeRequirement()" in home and "availableWidthVp" in home,
         "Parent Home must choose wide composition from actual container width + LayoutPolicy")
-require("AppTheme.PARENT_HOME_READABLE_MAX_WIDTH" in home and "AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH" in home,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in home and "AppTheme.CONTENT_WIDE_MAX_WIDTH" in home,
         "Parent Home must keep readable fallback and capped Pad composition")
-for phrase in ["需要我处理", "最近提交", "导入老师作业", "查看全部"]:
-    require(phrase in home, f"Parent Home missing required P01 content: {phrase}")
-require("AssignmentStatus.OVERDUE" in home_vm and "AssignmentStatus.NEEDS_REWORK" in home_vm and
-        "AssignmentStatus.SUBMITTED" in home_vm,
-        "Parent Home attention must cover overdue, rework and submitted assignments")
-
-require("private openRecentActivity(item: Assignment)" in home and
-        "this.onOpenReview(item.id)" in home.split("private openRecentActivity(item: Assignment)", 1)[1].split("@Builder", 1)[0],
-        "Parent Home recent activity must open the selected assignment detail directly")
-recent_activity = home.split("private RecentActivity()", 1)
-require(len(recent_activity) == 2, "Parent Home must keep a RecentActivity section")
-if len(recent_activity) == 2:
-    recent_block = recent_activity[1].split("private QuickActions()", 1)[0]
-    require("Text('查看全部')" in recent_block and "this.onOpenProgress()" in recent_block,
-            "Parent Home Recent Activity must keep an explicit View All action to Progress")
-    require("openRecentActivity(item)" in recent_block and "openAttention(item)" not in recent_block,
-            "Parent Home recent items must not reuse attention routing")
-attention_section = home.split("private AttentionSection()", 1)
-require(len(attention_section) == 2, "Parent Home must keep an AttentionSection")
-if len(attention_section) == 2:
-    attention_block = attention_section[1].split("private RecentActivity()", 1)[0]
-    require("openAttention(item)" in attention_block,
-            "Parent Home attention items must preserve state-aware routing")
-
+for phrase in ["布置作业", "语音作业", "作业收件箱"]:
+    require(phrase in home, f"Parent Home missing required action: {phrase}")
+require("今天的学习" not in home and "需要我处理" not in home and "AssignmentMetricSummary" not in home,
+        "Parent Home must remain action-only; progress/status information belongs to Progress")
+require("最近动态" not in home and "ChildPerformance" not in home,
+        "Parent Home must not reintroduce duplicate progress or recent-activity sections")
+require("onOpenAssignment" in home and "onOpenVoice" in home and "onOpenInbox" in home,
+        "Parent Home must expose exactly the three high-frequency parent actions")
+require("Text('家长操作')" not in home and "private PageIntro()" not in home,
+        "Parent Home must not repeat a title already represented by primary navigation")
 require("LayoutPolicy.parentProgressReviewRequirement()" in progress and "availableWidthVp" in progress,
         "Parent Progress must choose review split from actual container width + LayoutPolicy")
-require("AppTheme.PARENT_PROGRESS_READABLE_MAX_WIDTH" in progress and
-        "AppTheme.PARENT_PROGRESS_REVIEW_MAX_WIDTH" in progress,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in progress and
+        "AppTheme.CONTENT_WIDE_MAX_WIDTH" in progress,
         "Parent Progress must keep readable fallback and capped list-review split")
 require("components/assignment/AssignmentFilterDialog" in progress and
         "components/assignment/AssignmentFilterDialog" in student_assignments,
@@ -128,14 +109,14 @@ require("components/selection/SelectionControls" in progress and
         "components/selection/SelectionControls" in student_assignments,
         "Parent Progress and Student Assignments must reuse shared reactive selection controls")
 for token in ["FilterSummaryEntry({", "label: '日期'", "label: '科目'",
-              "CustomDialogController", "alignment: DialogAlignment.Bottom", "StatusSummary",
-              "AssignmentMetricSummary", "AssignmentMetricKey"]:
-    require(token in progress, f"Parent Progress must align common query/metric interaction: {token}")
-require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progress,
-        "Parent Progress status selection must remain in metric cards without duplicate chips")
-for phrase in ["全部任务", "待完成", "待验收", "已完成"]:
-    require(phrase in progress or phrase in read("entry/src/main/ets/components/assignment/AssignmentMetricSummary.ets"),
-            f"Parent Progress missing unified metric: {phrase}")
+              "CustomDialogController", "alignment: DialogAlignment.Bottom"]:
+    require(token in progress, f"Parent Progress must preserve shared date/subject query interaction: {token}")
+require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progress and
+        "StatusSummary" not in progress and "AssignmentMetricSummary" not in progress and
+        "AssignmentMetricKey" not in progress,
+        "Parent Progress must stay list-first without summary/status metric controls")
+require("Text('作业进度')" not in progress and "Text(this.bulkMode ? '取消' : '删除')" in progress,
+        "Parent Progress must remove duplicate root title and keep delete/cancel beside the list summary")
 for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode", "Button('查询'"]:
     require(token in shared_filter, f"shared task query missing date+subject behavior: {token}")
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
@@ -150,7 +131,7 @@ require("this.onOpenReview(item.id)" in progress,
 
 require("DeepPageHeader" in review_page and "ParentReviewPane" in review_page,
         "Parent Review page must use shared deep-page chrome and reusable review pane")
-require("AppTheme.PARENT_REVIEW_READABLE_MAX_WIDTH" in review_page,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in review_page,
         "Parent Review page must keep a readable width cap")
 require("ParentSubmissionEvidenceService" in review_pane and "CloudSubmissionPhotoStrip" in review_pane,
         "Parent Review must show authoritative/local submission evidence through the submission boundary")
@@ -212,21 +193,18 @@ if len(today_summary) == 2:
     require("due.getFullYear() === now.getFullYear()" not in today_block and
             "new Date(assignment.dueAtEpochMs)" not in today_block,
             "HomeworkStore TodaySummary must not fall back to the device-local calendar date")
-require("AssignmentDueDate.businessDayStart(Date.now())" in home and
-        "AssignmentDueDate.dayStart(item)" in home,
-        "Parent Dashboard TodayOverview must share the same business-day semantics as TodaySummary")
-
-require("this.viewModel.summary().completed" not in home and
-        "this.viewModel.summary().total" not in home and
-        "this.todayCompletedCount()" in home and "this.todayAssignments().length" in home,
-        "Parent Dashboard child-performance metrics must reuse the same live today snapshot as TodayOverview")
+require("@State private scopedAssignments: Assignment[] = []" in progress and
+        "this.viewModel.assignmentsOnDay(" in progress and
+        "AssignmentDateFilter.ALL" in progress and
+        "this.applyItems(this.scopedAssignments)" in progress,
+        "Parent Progress list must follow the active date/subject scope without a parallel metric filter")
 require("SHANGHAI_OFFSET_HOURS: number = 8" in due_date,
         "assignment business-day semantics must remain anchored to Asia/Shanghai")
 require("candidateAnchor(candidate.id)" in batch_publish,
         "relative teacher deadlines must remain anchored to the Candidate/import creation time")
 require("private finishParentImportPublished(): void" in app_shell and
-        "this.navPathStack.clear();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentExtraCreate", 1)[0] and
-        "this.notifyUiChanged();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentExtraCreate", 1)[0],
+        "this.navPathStack.clear();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentVoiceCreate", 1)[0] and
+        "this.notifyUiChanged();" in app_shell.split("private finishParentImportPublished(): void", 1)[1].split("private openParentVoiceCreate", 1)[0],
         "Parent import completion must invalidate the dashboard after clearing the deep navigation stack")
 require("onPublished: () => this.finishParentImportPublished()" in app_shell,
         "Homework confirmation must use the post-navigation dashboard refresh boundary")
@@ -248,7 +226,7 @@ if len(parent_home_call) == 2:
 require("this.queryCache = AssignmentQuery.filter(mapped, filter)" in repo,
         "Repository remote query results must still apply the complete filter for multi-status parent views")
 
-for phrase in ["今天是否正常？哪里需要我处理？", "作业列表 | 提交证据 / 验收详情", "[通过]", "[退回订正]"]:
+for phrase in ["首页只承担高频操作入口", "作业列表 | 提交证据 / 验收详情", "[通过]", "[退回订正]"]:
     require(phrase in issue_spec, f"V2 UI spec missing Slice 4 contract phrase: {phrase}")
 
 if errors:

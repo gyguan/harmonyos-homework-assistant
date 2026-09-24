@@ -63,7 +63,7 @@ export struct HomeworkShareImportStatusPage {
   build() {
     Column({ space: 18 }) {
       Text('系统分享导入')
-        .fontSize(22)
+        .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
 
