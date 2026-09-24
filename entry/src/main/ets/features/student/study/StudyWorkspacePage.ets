@@ -418,7 +418,8 @@ export struct StudyWorkspacePage {
         if (this.submissionMessage.length > 0) {
           Text(this.submissionMessage)
             .width('100%')
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontColor(AppTheme.PRIMARY);
         }
       }
@@ -454,9 +455,9 @@ export struct StudyWorkspacePage {
         if (this.assignment()!.textbookRef.length > 0) {
           Row() {
             Column({ space: 3 }) {
-              Text('教材 / 页码').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+              Text('教材 / 页码').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
               Text(this.assignment()!.textbookRef)
-                .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+                .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             }
             .layoutWeight(1)
             .alignItems(HorizontalAlign.Start);
@@ -472,9 +473,9 @@ export struct StudyWorkspacePage {
         if (this.assignment()!.resourceLabels.length > 0) {
           Row() {
             Column({ space: 3 }) {
-              Text('老师附件').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+              Text('老师附件').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
               Text(`${this.assignment()!.resourceLabels.length} 项资料`)
-                .fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+                .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             }
             .layoutWeight(1)
             .alignItems(HorizontalAlign.Start);
@@ -498,7 +499,7 @@ export struct StudyWorkspacePage {
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('这项作业可能已经被删除或切换。').fontSize(13).fontColor(AppTheme.SUBTEXT);
+        Text('这项作业可能已经被删除或切换。').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%')
       .height('100%')
@@ -542,8 +543,8 @@ export struct StudyWorkspacePage {
                 (this.assignment()!.status === AssignmentStatus.SUBMITTED ?
                   '照片已提交，等待家长确认。' : '这项作业已经完成。'))
                 .layoutWeight(1)
-                .fontSize(15)
-                .lineHeight(22)
+                .fontSize(AppTheme.READING_BODY_SIZE)
+                .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
                 .fontColor(AppTheme.TEXT);
             }
             .width('100%')
@@ -557,13 +558,14 @@ export struct StudyWorkspacePage {
               Column({ space: 5 }) {
                 Text('需要先订正')
                   .width('100%')
-                  .fontSize(13)
+                  .fontSize(AppTheme.LABEL_TITLE_SIZE)
+                  .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.DANGER);
                 Text(this.assignment()!.reviewNote)
                   .width('100%')
-                  .fontSize(15)
-                  .lineHeight(22)
+                  .fontSize(AppTheme.READING_BODY_SIZE)
+                  .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
                   .fontColor(AppTheme.TEXT);
               }
               .width('100%')
@@ -575,8 +577,8 @@ export struct StudyWorkspacePage {
             Text(this.assignment()!.instruction.length > 0 ?
               this.assignment()!.instruction : '按课堂要求完成这项作业。')
               .width('100%')
-              .fontSize(16)
-              .lineHeight(24)
+              .fontSize(AppTheme.READING_BODY_SIZE)
+              .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
               .fontColor(AppTheme.TEXT);
 
             if (this.assignment()!.contentType === AssignmentContentType.AUDIO_IMAGE) {
@@ -619,7 +621,8 @@ export struct StudyWorkspacePage {
           if (this.actionMessage.length > 0) {
             Text(this.actionMessage)
               .width('100%')
-              .fontSize(13)
+              .fontSize(AppTheme.META_SIZE)
+              .lineHeight(AppTheme.META_LINE_HEIGHT)
               .fontColor(AppTheme.WARNING);
           }
 
@@ -631,7 +634,8 @@ export struct StudyWorkspacePage {
               .enabled(this.primaryActionEnabled())
               .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .fontSize(15)
+              .fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
               .fontWeight(FontWeight.Medium)
               .onClick(() => { void this.runPrimaryAction(); });
           }
@@ -662,7 +666,7 @@ export struct StudyWorkspacePage {
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
             .onClick(() => {
               this.tutorPanelOpen = true;
               void this.loadTutor();
@@ -677,7 +681,7 @@ export struct StudyWorkspacePage {
             .enabled(!this.actionRunning)
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
             .accessibilityText('暂停作业计时')
             .onClick(() => { void this.pauseCurrentAssignment(); });
         }
@@ -690,7 +694,7 @@ export struct StudyWorkspacePage {
             .enabled(!this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos)
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
             .accessibilityText('返回作业继续完成')
             .onClick(() => this.requestResumeFromSubmission());
         }
@@ -719,7 +723,7 @@ export struct StudyWorkspacePage {
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .backgroundColor(AppTheme.SURFACE)
       .fontColor(AppTheme.PRIMARY)
-      .fontSize(13)
+      .fontSize(AppTheme.ACTION_TEXT_SIZE)
       .border({ width: 1, color: AppTheme.BORDER })
       .onClick(() => this.fillTutorPrompt(prompt));
   }
@@ -742,6 +746,7 @@ export struct StudyWorkspacePage {
         Column({ space: 2 }) {
           Text('小伴学习助手')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
@@ -750,7 +755,8 @@ export struct StudyWorkspacePage {
 
         if (this.tutorLoading) {
           Text('同步中')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         if (this.canUseTutorSplit() && this.tutorPanelOpen) {
@@ -773,11 +779,12 @@ export struct StudyWorkspacePage {
         Column({ space: 8 }) {
           Text('小伴暂时休息一下')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text('AI 辅导暂时不可用，但作业查看、计时和提交都不受影响。')
-            .fontSize(13)
-            .lineHeight(20)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
@@ -791,7 +798,8 @@ export struct StudyWorkspacePage {
               Text(this.tutorLoadingOlder ? '正在加载更早记录…' : '查看更早的对话')
                 .width('100%')
                 .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .fontSize(13)
+                .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                 .fontColor(AppTheme.PRIMARY)
                 .textAlign(TextAlign.Center)
                 .accessibilityRole(AccessibilityRoleType.BUTTON)
@@ -813,6 +821,7 @@ export struct StudyWorkspacePage {
                 });
                 Text('有哪里卡住了？')
                   .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                  .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.TEXT);
                 Row({ space: 8 }) {
@@ -834,8 +843,8 @@ export struct StudyWorkspacePage {
                   Text(message.content)
                     .constraintSize({ maxWidth: '82%' })
                     .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-                    .fontSize(14)
-                    .lineHeight(21)
+                    .fontSize(AppTheme.BODY_SIZE)
+                    .lineHeight(AppTheme.BODY_LINE_HEIGHT)
                     .fontColor(AppTheme.TEXT_ON_PRIMARY)
                     .backgroundColor(AppTheme.PRIMARY)
                     .borderRadius(14);
@@ -857,8 +866,8 @@ export struct StudyWorkspacePage {
                   Text(message.content)
                     .constraintSize({ maxWidth: '82%' })
                     .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-                    .fontSize(14)
-                    .lineHeight(21)
+                    .fontSize(AppTheme.BODY_SIZE)
+                    .lineHeight(AppTheme.BODY_LINE_HEIGHT)
                     .fontColor(AppTheme.TEXT)
                     .backgroundColor(AppTheme.SURFACE_SUBTLE)
                     .borderRadius(14);
@@ -880,14 +889,16 @@ export struct StudyWorkspacePage {
           Text(this.tutorNotice)
             .width('100%')
             .padding({ top: 6, bottom: 6 })
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(this.tutorAvailable ? AppTheme.SUBTEXT : AppTheme.WARNING);
         }
 
         Column({ space: 8 }) {
           Row() {
             Text('你的问题')
-              .fontSize(13)
+              .fontSize(AppTheme.LABEL_TITLE_SIZE)
+              .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
           }
@@ -896,6 +907,8 @@ export struct StudyWorkspacePage {
           TextArea({ placeholder: '说说你卡在哪一步…', text: this.tutorDraft })
             .width('100%')
             .height(82)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
             .backgroundColor(AppTheme.SURFACE)
             .border({ width: 1, color: AppTheme.BORDER })
             .borderRadius(AppTheme.CONTROL_RADIUS)
