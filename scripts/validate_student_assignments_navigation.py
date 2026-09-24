@@ -148,7 +148,8 @@ require("@State private historyExpanded: boolean = false;" in page and
 require("snapshotRevision" in page and "currentVisibleAssignments" in page,
         "assignment list must invalidate cached groups when repository revision changes")
 
-require("SingleColumnWorkspace" in study and "SplitWorkspace" in study and "Button('问小伴'" in study,
+require("SingleColumnWorkspace" in study and "SplitWorkspace" in study and
+        "ActionButton({" in study and "label: '问小伴'" in study,
         "Study must keep Phone standalone Tutor flow and add Pad Study+Tutor split composition")
 require("LayoutPolicy.studyTutorRequirement()" in study and "this.TutorPane();" in study,
         "Study Pad split must use shared content capability and the existing Tutor pane")
