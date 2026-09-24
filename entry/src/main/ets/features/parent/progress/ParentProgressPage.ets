@@ -171,12 +171,14 @@ export struct ParentProgressPage {
       Text('删除作业')
         .width('100%')
         .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
-        .fontWeight(FontWeight.Bold)
+        .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+        .fontWeight(FontWeight.Medium)
+        .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
         .fontColor(AppTheme.TEXT);
       Text(`确定删除选中的 ${this.selectedDeleteIds.length} 项未完成作业？删除后无法恢复。`)
         .width('100%')
-        .fontSize(14)
-        .lineHeight(21)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
       Row({ space: 10 }) {
         Button('取消', { type: ButtonType.Normal })
@@ -208,11 +210,13 @@ export struct ParentProgressPage {
     if (this.bulkMode) {
       Row({ space: 10 }) {
         Text(`已选 ${this.selectedDeleteIds.length} 项`)
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text('全选当前')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.PRIMARY)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 8, right: 8 })
@@ -352,17 +356,19 @@ export struct ParentProgressPage {
       this.FilterBar();
       this.BulkDeleteToolbar();
       if (this.deleteMessage.length > 0) {
-        Text(this.deleteMessage).width('100%').fontSize(13).fontColor(AppTheme.DANGER);
+        Text(this.deleteMessage).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.DANGER);
       }
 
       Row({ space: 8 }) {
         Text(this.querying ? '查询中…' :
           `${this.dateLabel()} · ${this.subjectLabel(this.subjectCode)}`)
           .layoutWeight(1)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
         Text(`${this.currentVisibleAssignments().length} 项`)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
         if (this.deletableVisibleAssignments().length > 0 || this.bulkMode) {
           Text(this.bulkMode ? '取消' : '删除')
@@ -386,7 +392,7 @@ export struct ParentProgressPage {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
           Text('当前筛选下没有作业').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('可以调整日期或科目。').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('可以调整日期或科目。').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding({ top: 30, bottom: 30 });
       } else {
