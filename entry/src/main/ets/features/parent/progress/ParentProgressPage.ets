@@ -218,7 +218,7 @@ export struct ParentProgressPage {
         ActionButton({
           label: `删除${this.selectedDeleteIds.length > 0 ? ' ' + this.selectedDeleteIds.length : ''}`,
           kind: ActionButtonKind.DANGER_SOFT,
-          size: ActionButtonSize.SMALL,
+          actionSize: ActionButtonSize.SMALL,
           isEnabled: this.selectedDeleteIds.length > 0 && !this.deleteBusy,
           onAction: (): void => this.openDeleteConfirm()
         });
