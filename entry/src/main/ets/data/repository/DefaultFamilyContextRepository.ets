@@ -37,9 +37,14 @@ export class DefaultFamilyContextRepository implements FamilyContextRepository {
     return {
       students: this.getStudents(),
       activeStudentId: settings.activeStudentId,
+      parentAccessCode: settings.parentAccessCode,
       tutorGuidanceFirst: settings.tutorGuidanceFirst,
       directAnswerAllowed: settings.directAnswerAllowed
     };
+  }
+
+  updateParentAccessCode(parentAccessCode: string): void {
+    this.local.updateParentAccessCode(parentAccessCode);
   }
 
   updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean): void {
