@@ -251,7 +251,7 @@ export struct PracticeResultPage {
               TextAction({
                 label: this.showDetailedStats ? '收起详细统计' : '查看详细统计',
                 accessibilityLabel: this.showDetailedStats ? '收起详细统计' : '查看详细统计',
-                onAction: (): void => this.showDetailedStats = !this.showDetailedStats
+                onAction: (): void => { this.showDetailedStats = !this.showDetailedStats; }
               })
               .width('100%');
               if (this.showDetailedStats) {
@@ -276,7 +276,7 @@ export struct PracticeResultPage {
                   TextAction({
                     label: this.showAllQuestions ? '只看错题' : '查看全部题目',
                     accessibilityLabel: this.showAllQuestions ? '只查看错题' : '查看全部题目',
-                    onAction: (): void => this.showAllQuestions = !this.showAllQuestions
+                    onAction: (): void => { this.showAllQuestions = !this.showAllQuestions; }
                   });
                 }
               }
