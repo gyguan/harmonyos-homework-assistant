@@ -609,14 +609,16 @@ export struct AppShell {
         });
         Text(this.role === AppRole.PARENT ? '家长' : this.currentStudent().name)
           .width(68)
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .textAlign(TextAlign.Center)
           .fontColor(AppTheme.TEXT)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis });
         Text('切换')
-          .fontSize(11)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.PRIMARY);
       }
       .width(68)
@@ -634,7 +636,8 @@ export struct AppShell {
       if (this.role === AppRole.PARENT && this.familyStudents.length > 1) {
         Text('管理 ' + this.currentStudent().name)
           .width(68)
-          .fontSize(10)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .textAlign(TextAlign.Center)
           .fontColor(AppTheme.PRIMARY)
           .maxLines(1)
