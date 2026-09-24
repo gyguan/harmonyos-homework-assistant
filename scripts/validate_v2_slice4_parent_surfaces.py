@@ -24,7 +24,6 @@ theme = read("entry/src/main/ets/common/theme/AppTheme.ets")
 layout_policy = read("entry/src/main/ets/common/responsive/LayoutPolicy.ets")
 repo = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
 home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
-home_vm = read("entry/src/main/ets/features/parent/dashboard/ParentHomeViewModel.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 progress_vm = read("entry/src/main/ets/features/parent/progress/ParentProgressViewModel.ets")
 student_assignments = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
@@ -65,7 +64,6 @@ for token in ["parentHomeRequirement", "parentProgressReviewRequirement", "canSp
 
 for text, path in [
     (home, "ParentDashboardPage.ets"),
-    (home_vm, "ParentHomeViewModel.ets"),
     (progress, "ParentProgressPage.ets"),
     (progress_vm, "ParentProgressViewModel.ets"),
     (review_page, "ParentReviewPage.ets"),
