@@ -53,7 +53,7 @@ export struct PracticeFilterDialog {
     Column() {
       Row() {
         Text('更多筛选')
-          .fontSize(20)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
