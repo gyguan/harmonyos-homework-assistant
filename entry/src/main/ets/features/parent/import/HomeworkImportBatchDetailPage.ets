@@ -124,7 +124,7 @@ export struct HomeworkImportBatchDetailPage {
       .width('100%');
       Text(item.title)
         .width('100%')
-        .fontSize(14)
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       Text(item.sourceEvidence.excerpt)
