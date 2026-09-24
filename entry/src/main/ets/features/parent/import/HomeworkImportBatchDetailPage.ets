@@ -172,7 +172,7 @@ export struct HomeworkImportBatchDetailPage {
             Column({ space: 8 }) {
               Text('来源')
                 .width('100%')
-                .fontSize(15)
+                .fontSize(AppTheme.SECTION_TITLE_SIZE)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
               Text(this.batch()!.sourceLabel)
@@ -189,7 +189,7 @@ export struct HomeworkImportBatchDetailPage {
                         Column({ space: 8 }) {
               Text(`原始消息 ${this.messages().length}`)
                 .width('100%')
-                .fontSize(15)
+                .fontSize(AppTheme.SECTION_TITLE_SIZE)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
               ForEach(this.messages(), (item: ImportedMessage) => {
@@ -201,7 +201,7 @@ export struct HomeworkImportBatchDetailPage {
             Column({ space: 8 }) {
               Text(`候选作业 ${this.candidates().length}`)
                 .width('100%')
-                .fontSize(15)
+                .fontSize(AppTheme.SECTION_TITLE_SIZE)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
               ForEach(this.candidates(), (item: CandidateAssignment) => {
