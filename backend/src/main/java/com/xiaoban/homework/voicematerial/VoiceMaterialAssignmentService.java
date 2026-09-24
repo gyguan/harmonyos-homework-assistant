@@ -76,6 +76,10 @@ public class VoiceMaterialAssignmentService {
       VoiceMaterialTaskLinkEntity previous =
           links.findByFamilyIdAndRequestId(familyId, requestId).orElse(null);
       if (previous != null) {
+        if (!previous.packageId.equals(packageId) ||
+            !previous.studentId.equals(targetStudentId)) {
+          throw new ApiExceptions.Conflict("requestId 已用于其他语音任务创建请求");
+        }
         AssignmentDtos.Response existing = loadAssignmentIfPresent(
             familyId, previous.assignmentId);
         return new VoiceMaterialDtos.CreateAssignmentResponse(
