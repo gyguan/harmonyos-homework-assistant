@@ -130,8 +130,8 @@ export struct PracticeResultPage {
   @Builder
   private Metric(value: string, label: string) {
     Column({ space: 4 }) {
-      Text(value).fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text(label).fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Text(value).fontSize(AppTheme.SECTION_TITLE_SIZE).lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+      Text(label).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
     .height(72)
@@ -157,8 +157,8 @@ export struct PracticeResultPage {
 
       Text(this.feedbackSubtitle(result))
         .width('100%')
-        .fontSize(14)
-        .lineHeight(21)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT)
         .textAlign(TextAlign.Center);
 
@@ -169,12 +169,14 @@ export struct PracticeResultPage {
         .margin({ top: 4 });
 
       Text(`答对 ${result.correctCount} 题 · 正确率 ${this.viewModel.percent(result)}%`)
-        .fontSize(14)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
 
       if (this.progressText().length > 0) {
         Text(this.progressText())
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUCCESS)
           .padding({ left: 10, right: 10, top: 6, bottom: 6 })
@@ -186,7 +188,8 @@ export struct PracticeResultPage {
       Column({ space: 4 }) {
         Text(`✓ 认真完成了 ${result.questions.length} 道题`)
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.TEXT)
           .textAlign(TextAlign.Center);
         if (result.noteCount > 0) {
@@ -202,8 +205,8 @@ export struct PracticeResultPage {
 
       Text(this.nextStepText(result))
         .width('100%')
-        .fontSize(13)
-        .lineHeight(20)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(result.wrongCount > 0 ? AppTheme.PRIMARY : AppTheme.SUCCESS)
         .textAlign(TextAlign.Center)
@@ -249,7 +252,8 @@ export struct PracticeResultPage {
             Column({ space: 8 }) {
               Text(this.showDetailedStats ? '收起详细统计' : '查看详细统计')
                 .width('100%')
-                .fontSize(13)
+                .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.PRIMARY)
                 .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -272,7 +276,9 @@ export struct PracticeResultPage {
                 Text(this.result.wrongCount > 0 && !this.showAllQuestions ? '错题优先 · 答题回顾' : '答题回顾')
                   .layoutWeight(1)
                   .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                  .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
+                  .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
                   .fontColor(AppTheme.TEXT);
                 if (this.result.wrongCount > 0) {
                   Text(this.showAllQuestions ? '只看错题' : '查看全部题目')
@@ -293,47 +299,52 @@ export struct PracticeResultPage {
                   Column({ space: 6 }) {
                     Row() {
                       Text(`第 ${item.orderNo} 题`)
-                        .fontSize(13)
+                        .fontSize(AppTheme.META_SIZE)
+                        .lineHeight(AppTheme.META_LINE_HEIGHT)
                         .fontWeight(FontWeight.Medium)
                         .fontColor(AppTheme.TEXT);
                       Blank();
                       Text(item.correct ? '正确' : '需订正')
-                        .fontSize(13)
+                        .fontSize(AppTheme.META_SIZE)
+                        .lineHeight(AppTheme.META_LINE_HEIGHT)
                         .fontWeight(FontWeight.Medium)
                         .fontColor(item.correct ? AppTheme.SUCCESS : AppTheme.DANGER);
                     }
                     .width('100%');
                     Text(item.stem)
                       .width('100%')
-                      .fontSize(14)
-                      .lineHeight(20)
+                      .fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT)
                       .fontColor(AppTheme.TEXT);
                     Text(`我的答案：${item.answerValue.length > 0 ? item.answerValue : '未作答'}`)
                       .width('100%')
-                      .fontSize(13)
+                      .fontSize(AppTheme.META_SIZE)
+                      .lineHeight(AppTheme.META_LINE_HEIGHT)
                       .fontColor(AppTheme.SUBTEXT);
                     if (!item.correct) {
                       Text(`正确答案：${item.correctAnswer}`)
                         .width('100%')
-                        .fontSize(13)
+                        .fontSize(AppTheme.META_SIZE)
+                        .lineHeight(AppTheme.META_LINE_HEIGHT)
                         .fontColor(AppTheme.SUCCESS);
                     }
                     Text(item.explanation)
                       .width('100%')
-                      .fontSize(13)
-                      .lineHeight(18)
+                      .fontSize(AppTheme.META_SIZE)
+                      .lineHeight(AppTheme.META_LINE_HEIGHT)
                       .fontColor(AppTheme.TERTIARY_TEXT);
                     if (item.noteContent.length > 0) {
                       Column({ space: 4 }) {
                         Text('我的笔记')
                           .width('100%')
-                          .fontSize(12)
+                          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+                          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
                           .fontWeight(FontWeight.Medium)
                           .fontColor(AppTheme.SUBTEXT);
                         Text(item.noteContent)
                           .width('100%')
-                          .fontSize(13)
-                          .lineHeight(18)
+                          .fontSize(AppTheme.BODY_SIZE)
+                          .lineHeight(AppTheme.BODY_LINE_HEIGHT)
                           .fontColor(AppTheme.TEXT);
                       }
                       .width('100%')
@@ -355,7 +366,8 @@ export struct PracticeResultPage {
           if (this.errorMessage.length > 0) {
             Text(this.errorMessage)
               .width('100%')
-              .fontSize(13)
+              .fontSize(AppTheme.META_SIZE)
+              .lineHeight(AppTheme.META_LINE_HEIGHT)
               .fontColor(AppTheme.DANGER)
               .padding(12)
               .backgroundColor(AppTheme.DANGER_SOFT)
