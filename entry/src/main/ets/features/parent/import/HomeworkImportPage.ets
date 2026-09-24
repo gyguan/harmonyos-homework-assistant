@@ -138,6 +138,15 @@ export struct HomeworkImportPage {
     this.parseError = false;
   }
 
+  private clearAssignmentInput(): void {
+    if (this.parseBusy) return;
+    this.textDraft = '';
+    this.sourceImageRef = '';
+    this.sourceImageLabel = '';
+    this.parseMessage = '';
+    this.parseError = false;
+  }
+
   @Builder
   private SubjectSelector() {
     Column({ space: 7 }) {
@@ -273,10 +282,17 @@ export struct HomeworkImportPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
-        Text('输入 · 拍照 · 相册')
-          .fontSize(AppTheme.CAPTION_SIZE)
-          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-          .fontColor(AppTheme.TERTIARY_TEXT);
+        if (this.textDraft.length > 0 || this.sourceImageRef.length > 0) {
+          Text('清空')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 12, right: 4 })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('清空作业内容')
+            .onClick(() => this.clearAssignmentInput());
+        }
       }
       .width('100%');
 
