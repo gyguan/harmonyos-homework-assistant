@@ -65,7 +65,7 @@
 
 大字体适配优先由布局吸收，而不是牺牲可读性。
 
-### 2.3 优先让容器增长，不优先缩字
+### 2.4 优先让容器增长，不优先缩字
 
 业务标题过长时：
 
@@ -90,11 +90,15 @@
 | 卡片/折叠项标题 | `CARD_TITLE_SIZE` | 16 | 22 | Medium | 2 | Assignment 卡片、我的折叠项 |
 | 表单/筛选小标题 | `LABEL_TITLE_SIZE` | 14 | 20 | Medium | 1 | 日期、科目、来源、状态 |
 | 正文 | `BODY_SIZE` | 14 | 21 | Normal | 自然换行 | 老师要求、说明 |
+| 学生阅读正文 | `READING_BODY_SIZE` | 16 | 24 | Normal | 自然换行 | 学生端老师要求、订正说明、关键学习内容 |
+| 表单输入文字 | `FORM_TEXT_SIZE` | 15 | 22 | Normal | 控件决定 | TextInput、TextArea 的用户输入 |
 | 元信息 | `META_SIZE` | 13 | 18 | Normal / Medium | 1 | 截止时间、用时、状态辅助信息 |
 | 辅助说明 | `CAPTION_SIZE` | 12 | 17 | Normal | 1-2 | 卡片副标题、说明 |
 | 操作文案 | `ACTION_TEXT_SIZE` | 14 | 20 | Medium | 1 | 普通按钮、文本动作 |
 
 特殊数字例如倒计时、分数、统计值属于 Data Emphasis，不套用标题层级；必须在具体组件中定义，并说明其用途。
+
+学生端面向低年级儿童的核心阅读内容允许使用 `READING_BODY_SIZE`，但不能拿它替代普通卡片标题或页面标题；表单控件统一使用 `FORM_TEXT_SIZE`，避免 14/15/16 随页面漂移。
 
 ## 4. Phone / Pad 规则
 
