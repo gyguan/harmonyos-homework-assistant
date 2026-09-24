@@ -362,7 +362,7 @@ export struct ParentReviewPane {
               Row({ space: 8 }) {
                 Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
                   .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-                Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+                Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
                 Text(this.actualMinutes(this.assignment()!) > 0 ?
                   `实际 ${this.actualMinutes(this.assignment()!)} 分钟` : `预计 ${this.assignment()!.expectedMinutes} 分钟`)
                   .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
@@ -374,7 +374,8 @@ export struct ParentReviewPane {
                   if (this.canEdit(this.assignment()!)) {
                     Text('编辑任务')
                       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                      .fontSize(13)
+                      .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                      .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                       .fontWeight(FontWeight.Medium)
                       .fontColor(AppTheme.PRIMARY)
                       .padding({ left: 10, right: 10, top: 7, bottom: 7 })
@@ -388,7 +389,8 @@ export struct ParentReviewPane {
                   if (this.canDelete(this.assignment()!)) {
                     Text('删除作业')
                       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                      .fontSize(13)
+                      .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                      .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                       .fontWeight(FontWeight.Medium)
                       .fontColor(AppTheme.DANGER)
                       .padding({ left: 10, right: 10, top: 7, bottom: 7 })
@@ -418,7 +420,8 @@ export struct ParentReviewPane {
             if (this.operationNotice.length > 0 && this.assignment()!.status !== AssignmentStatus.SUBMITTED) {
               Text(this.operationNotice)
                 .width('100%')
-                .fontSize(13)
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
                 .fontColor(AppTheme.SUCCESS)
                 .padding({ left: 12, right: 12, top: 9, bottom: 9 })
                 .backgroundColor(AppTheme.SUCCESS_SOFT)
