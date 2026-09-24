@@ -308,7 +308,7 @@ export struct PracticeHomePage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text(this.loading ? '加载中…' : `${this.papers.length} 套`)
-          .constraintSize({ minWidth: 56 })
+          .constraintSize({ minWidth: 64 })
           .maxLines(1)
           .textAlign(TextAlign.End)
           .fontSize(13)
