@@ -231,10 +231,10 @@ export struct HomeworkImportInboxPage {
     }
     .width('100%')
     .constraintSize({ minHeight: AppTheme.INBOX_CARD_MIN_HEIGHT })
-    .padding(AppTheme.PHONE_CARD_PADDING)
+    .padding(AppTheme.CARD_PADDING_COMPACT)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(`${this.batchTitle(batch)}，${this.sourceLabel(batch.sourceType)}，${this.statusLabel(batch.status)}`)
@@ -281,7 +281,7 @@ export struct HomeworkImportInboxPage {
         .width('100%')
         .padding({ top: 44, bottom: 44 })
         .backgroundColor(AppTheme.SURFACE)
-        .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+        .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
       } else if (this.batches().length === 0) {
         Column({ space: 8 }) {
           Text('没有符合条件的记录')
@@ -292,7 +292,7 @@ export struct HomeworkImportInboxPage {
         .width('100%')
         .padding({ top: 36, bottom: 36 })
         .backgroundColor(AppTheme.SURFACE)
-        .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+        .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
       } else {
         Column({ space: 9 }) {
           ForEach(this.batches(), (batch: ImportBatch) => {
