@@ -5,6 +5,8 @@ export class AppTheme {
   static readonly PRIMARY_FAINT: string = '#F4F7FF';
   static readonly BACKGROUND: string = '#F5F5F7';
   static readonly SURFACE: string = '#FFFFFF';
+  // All ordinary content cards use one surface. Selection/emphasis is expressed by borders, icons or badges.
+  static readonly CARD_SURFACE: string = '#FFFFFF';
   static readonly SURFACE_SUBTLE: string = '#F7F7F8';
   static readonly SURFACE_EMPHASIS: string = '#F0F1F4';
   static readonly DIVIDER: string = '#D9DADE';
