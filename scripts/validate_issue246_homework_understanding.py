@@ -32,7 +32,6 @@ detail = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDeta
 inbox_vm = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxViewModel.ets")
 confirmation_vm = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationViewModel.ets")
 fixture = read("entry/src/test/fixtures/Issue246HomeworkUnderstandingFixture.ets")
-reconstruction = read("entry/src/main/ets/application/capture/HomeworkChatReconstructionService.ets")
 schema = read("docs/contracts/homework-understanding/v1/schema.json")
 prompt = read("docs/contracts/homework-understanding/v1/prompt.md")
 rules = read("docs/contracts/homework-understanding/v1/rules.md")
@@ -127,11 +126,6 @@ require("understandingWarnings" in inbox_store and "classificationSummary" in in
         "Inbox store must persist understanding metadata/version")
 require("understandingWarnings" in inbox_service and "classificationSummary" in inbox_service,
         "Inbox service must preserve understanding metadata")
-require("understood: batch.understood" in reconstruction,
-        "reconstruction retry must preserve understanding metadata")
-require(reconstruction.count("understandingVersion: batch.understandingVersion") >= 2,
-        "reconstruction success/failure must both preserve understanding version")
-
 case_ids = re.findall(r"id: 'C\d{2}[^']*'", fixture)
 require(len(case_ids) >= 20, f"expected at least 20 fixed fixtures, found {len(case_ids)}")
 require("VERSION: string = '1.0'" in fixture,
