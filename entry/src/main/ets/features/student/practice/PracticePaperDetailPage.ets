@@ -112,7 +112,7 @@ export struct PracticePaperDetailPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
-          Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
           Text(this.viewModel.correctRateText(item))
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -133,9 +133,10 @@ export struct PracticePaperDetailPage {
           .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
         if (item.status === PracticeAttemptStatus.SUBMITTED) {
-          Text('·').fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
           Text(`完成耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
       }
@@ -163,7 +164,8 @@ export struct PracticePaperDetailPage {
         Blank();
         if (this.attempts.length > 0) {
           Text('查看全部')
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -206,7 +208,8 @@ export struct PracticePaperDetailPage {
         Column({ space: 6 }) {
           Text('最近一次')
             .width('100%')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.TERTIARY_TEXT);
           this.RecentAttemptCard(this.recentAttempts[0]);
         }
