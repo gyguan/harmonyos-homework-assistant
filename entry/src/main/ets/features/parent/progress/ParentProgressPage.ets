@@ -425,8 +425,8 @@ export struct ParentProgressPage {
           this.ListContent();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PARENT_PROGRESS_READABLE_MAX_WIDTH })
-        .padding(AppTheme.PAGE_PADDING);
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+        .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: AppTheme.PAGE_PADDING_COMPACT, bottom: AppTheme.PAGE_PADDING_COMPACT });
       }
       .width('100%').alignItems(HorizontalAlign.Center);
     }
@@ -482,7 +482,7 @@ export struct ParentProgressPage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.PARENT_PROGRESS_REVIEW_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
     .alignItems(VerticalAlign.Top)
     .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 20 });
   }

@@ -139,7 +139,7 @@ export struct ConfirmationCandidateCard {
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: this.selected ? 1 : 0,
       color: this.selected ? AppTheme.PRIMARY : Color.Transparent })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(this.selected ?
@@ -383,7 +383,7 @@ export struct ConfirmationCandidateEditor {
               .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%')
-          .padding(13)
+          .padding(AppTheme.CARD_PADDING_COMPACT)
           .backgroundColor(this.item.confidence < 0.8 ? AppTheme.WARNING_SOFT : AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS);
         }

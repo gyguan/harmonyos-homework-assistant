@@ -25,7 +25,7 @@ export struct ParentDashboardPage {
         .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(13);
+        .borderRadius(AppTheme.CHIP_RADIUS);
         Blank();
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(15)
@@ -58,7 +58,7 @@ export struct ParentDashboardPage {
     .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText('布置作业，输入文字、拍照或相册识别')
@@ -80,7 +80,7 @@ export struct ParentDashboardPage {
         .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(13);
+        .borderRadius(AppTheme.CHIP_RADIUS);
         Blank();
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(15)
@@ -113,7 +113,7 @@ export struct ParentDashboardPage {
     .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText('语音作业，使用语音和图片快速布置')
@@ -135,7 +135,7 @@ export struct ParentDashboardPage {
         .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .borderRadius(13);
+        .borderRadius(AppTheme.CHIP_RADIUS);
         Blank();
         SymbolGlyph($r('sys.symbol.chevron_right'))
           .fontSize(15)
@@ -168,7 +168,7 @@ export struct ParentDashboardPage {
     .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText('作业收件箱，查看已导入的作业内容和整理记录')
@@ -185,10 +185,10 @@ export struct ParentDashboardPage {
           this.AssignmentInboxAction();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PARENT_HOME_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding({
-          left: AppTheme.PHONE_PAGE_PADDING,
-          right: AppTheme.PHONE_PAGE_PADDING,
+          left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+          right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
           top: 18,
           bottom: 24
         });
@@ -226,7 +226,7 @@ export struct ParentDashboardPage {
         .alignItems(VerticalAlign.Top);
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
       .padding({
         left: AppTheme.PAGE_PADDING_WIDE,
         right: AppTheme.PAGE_PADDING_WIDE,

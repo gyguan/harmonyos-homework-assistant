@@ -60,10 +60,10 @@ struct PracticePaperCard {
       }
     }
     .width('100%')
-    .padding(AppTheme.PHONE_CARD_PADDING)
+    .padding(AppTheme.CARD_PADDING_COMPACT)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(`${this.paper.title}，${this.paper.questionCount}题，${this.passed ? '已通过，' : ''}点击查看套卷`)
     .onClick(() => this.onOpen());
@@ -359,7 +359,7 @@ export struct PracticeHomePage {
         .width('100%')
         .padding({ top: 28, bottom: 28 })
         .backgroundColor(AppTheme.CARD_SURFACE)
-        .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+        .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
       } else {
         Column({ space: 9 }) {
           ForEach(this.papers, (paper: PracticePaper) => {
@@ -385,7 +385,7 @@ export struct PracticeHomePage {
           this.PaperList();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding(AppTheme.PAGE_PADDING);
       }
       .width('100%')

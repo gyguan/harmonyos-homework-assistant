@@ -121,7 +121,7 @@ struct StudentTodayTaskCard {
     .padding(this.emphasized ? 16 : 13)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: this.emphasized ? 1 : 0, color: this.emphasized ? AppTheme.PRIMARY : Color.Transparent })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityText(`${this.assignment.subject}，${this.assignment.title}，${this.statusLabel()}，预计${this.assignment.expectedMinutes}分钟`);
 
@@ -226,7 +226,7 @@ export struct StudentHomePage {
     .width('100%')
     .padding(18)
     .backgroundColor(AppTheme.SUCCESS_SOFT)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
@@ -278,18 +278,18 @@ export struct StudentHomePage {
 
   @Builder
   private PhoneHome() {
-    Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+    Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
       this.TodayTasks();
     }
     .width('100%')
-    .constraintSize({ maxWidth: AppTheme.HOME_READABLE_MAX_WIDTH })
-    .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 14, bottom: 20 });
+    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+    .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: 14, bottom: 20 });
   }
 
   @Builder
   private PadHome() {
-    Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+    Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
       Row({ space: AppTheme.SPLIT_PANE_GAP }) {
         Column({ space: 12 }) {
@@ -334,8 +334,8 @@ export struct StudentHomePage {
       }
     }
     .width('100%')
-    .constraintSize({ maxWidth: AppTheme.HOME_PAD_CONTENT_MAX_WIDTH })
-    .padding({ left: AppTheme.PAGE_PADDING_WIDE, right: AppTheme.PAGE_PADDING_WIDE, top: 18, bottom: 24 });
+    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
+    .padding({ left: AppTheme.PAGE_PADDING_EXPANDED, right: AppTheme.PAGE_PADDING_EXPANDED, top: 18, bottom: 24 });
   }
 
   build() {

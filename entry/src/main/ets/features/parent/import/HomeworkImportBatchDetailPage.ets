@@ -109,7 +109,7 @@ export struct HomeworkImportBatchDetailPage {
     .padding(12)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
@@ -147,7 +147,7 @@ export struct HomeworkImportBatchDetailPage {
     .padding(12)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   build() {
@@ -172,7 +172,7 @@ export struct HomeworkImportBatchDetailPage {
               .padding(18)
               .backgroundColor(AppTheme.SURFACE)
               .border({ width: 1, color: AppTheme.BORDER })
-              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+              .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
           } else {
             Column({ space: 8 }) {
               Text('来源')
@@ -192,7 +192,7 @@ export struct HomeworkImportBatchDetailPage {
             .padding(14)
             .backgroundColor(AppTheme.SURFACE)
             .border({ width: 1, color: AppTheme.BORDER })
-            .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+            .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
 
                         Column({ space: 8 }) {
               Text(`原始消息 ${this.messages().length}`)
@@ -258,7 +258,7 @@ export struct HomeworkImportBatchDetailPage {
               .padding(14)
               .backgroundColor(AppTheme.SURFACE)
               .border({ width: 1, color: AppTheme.BORDER })
-              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+              .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
             }
 
             if (this.message.length > 0) {
@@ -341,7 +341,7 @@ export struct HomeworkImportBatchDetailPage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
     .padding({
       left: AppTheme.PAGE_PADDING,
       right: AppTheme.PAGE_PADDING,

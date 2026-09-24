@@ -375,7 +375,7 @@ export struct HomeworkConfirmationPage {
         }
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
       .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 10, bottom: 14 });
     }
     .width('100%')
@@ -397,7 +397,7 @@ export struct HomeworkConfirmationPage {
         this.CandidateListHeader();
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
       .padding({
         left: AppTheme.PAGE_PADDING,
         right: AppTheme.PAGE_PADDING,
@@ -410,7 +410,7 @@ export struct HomeworkConfirmationPage {
           this.CandidateList();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding({
           left: AppTheme.PAGE_PADDING,
           right: AppTheme.PAGE_PADDING,

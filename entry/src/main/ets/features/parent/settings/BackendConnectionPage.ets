@@ -693,8 +693,8 @@ export struct BackendConnectionPage {
             }
           }
           .width('100%')
-          .constraintSize({ maxWidth: AppTheme.PROFILE_READABLE_MAX_WIDTH })
-          .padding(AppTheme.PAGE_PADDING);
+          .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
+          .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: AppTheme.PAGE_PADDING_COMPACT, bottom: AppTheme.PAGE_PADDING_COMPACT });
         }
         .width('100%')
         .alignItems(HorizontalAlign.Center);

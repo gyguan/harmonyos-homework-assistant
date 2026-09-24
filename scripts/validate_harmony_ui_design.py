@@ -86,7 +86,22 @@ for token in [
     "SECTION_TITLE_MAX_LINES",
     "CARD_TITLE_MAX_LINES",
     "META_MAX_LINES",
-    "PARENT_DEEP_READABLE_MAX_WIDTH",
+    "CONTENT_NARROW_MAX_WIDTH",
+    "CONTENT_STANDARD_MAX_WIDTH",
+    "CONTENT_WIDE_MAX_WIDTH",
+    "PAGE_PADDING_COMPACT",
+    "PAGE_PADDING_MEDIUM",
+    "PAGE_PADDING_EXPANDED",
+    "SECTION_GAP_COMPACT",
+    "SECTION_GAP_STANDARD",
+    "CARD_PADDING_COMPACT",
+    "PANEL_PADDING",
+    "CARD_PADDING_STANDARD",
+    "CARD_RADIUS_COMPACT",
+    "CARD_RADIUS_STANDARD",
+    "LIST_CARD_MIN_HEIGHT",
+    "METRIC_CARD_MIN_HEIGHT",
+    "INBOX_CARD_MIN_HEIGHT",
     "PARENT_HOME_ACTION_CARD_MIN_HEIGHT",
     "PARENT_HOME_ACTION_ICON_SIZE",
     "PARENT_HOME_ACTION_CARD_PADDING",
@@ -125,10 +140,37 @@ for title_contract in [
 ]:
     require(title_contract in theme, f"AppTheme title hierarchy drifted: {title_contract}")
 # Business UI text must not regress below the project 12fp floor.
+# Device-named card/page tokens and feature-private readable widths are compatibility aliases only.
+legacy_layout_tokens = [
+    "HOME_READABLE_MAX_WIDTH",
+    "ASSIGNMENT_LIST_READABLE_MAX_WIDTH",
+    "ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH",
+    "STUDY_READABLE_MAX_WIDTH",
+    "STUDY_SPLIT_MAX_WIDTH",
+    "PARENT_HOME_READABLE_MAX_WIDTH",
+    "PARENT_HOME_PAD_CONTENT_MAX_WIDTH",
+    "PARENT_PROGRESS_READABLE_MAX_WIDTH",
+    "PARENT_PROGRESS_REVIEW_MAX_WIDTH",
+    "PARENT_DEEP_READABLE_MAX_WIDTH",
+    "IMPORT_READABLE_MAX_WIDTH",
+    "PROFILE_READABLE_MAX_WIDTH",
+    "PRACTICE_READABLE_MAX_WIDTH",
+    "PRACTICE_ATTEMPT_READABLE_MAX_WIDTH",
+    "SETTINGS_READABLE_MAX_WIDTH",
+    "PHONE_PAGE_PADDING",
+    "PHONE_SECTION_GAP",
+    "PHONE_CARD_PADDING",
+    "PHONE_CARD_RADIUS",
+]
 for ui_file in (ROOT / "entry/src/main/ets").rglob("*.ets"):
     ui_source = ui_file.read_text(encoding="utf-8")
+    relative = ui_file.relative_to(ROOT)
     require(".fontSize(10)" not in ui_source and ".fontSize(11)" not in ui_source,
-            f"business UI text must not use 10/11fp hardcoded sizes: {ui_file.relative_to(ROOT)}")
+            f"business UI text must not use 10/11fp hardcoded sizes: {relative}")
+    if ui_file.name != "AppTheme.ets":
+        for legacy_token in legacy_layout_tokens:
+            require(f"AppTheme.{legacy_token}" not in ui_source,
+                    f"UI must use shared semantic layout tokens instead of {legacy_token}: {relative}")
 
     # ArkUI ButtonAttribute supports fontSize/fontWeight but not lineHeight.
     # Inspect each Button chain only until its first semicolon so later Text(...).lineHeight(...)
@@ -286,7 +328,7 @@ if assignment_list_item:
             ".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)" in assignment_list_item and
             ".lineHeight(AppTheme.META_LINE_HEIGHT)" in assignment_list_item and
             ".maxLines(AppTheme.CARD_TITLE_MAX_LINES)" in assignment_list_item and
-            ".constraintSize({ minHeight: 78 })" in assignment_list_item,
+            ".constraintSize({ minHeight: AppTheme.LIST_CARD_MIN_HEIGHT })" in assignment_list_item,
             "AssignmentListItem must reserve stable vertical space for title/status and metadata rows")
 
 # Persistent selectors whose visual state changes at runtime must use reactive child-component props,
@@ -384,11 +426,11 @@ for deep_page_name, deep_page_source in [
     ("HomeworkImportRoutePage", homework_import_route),
     ("HomeworkConfirmationPage", homework_confirmation),
 ]:
-    require("AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH" in deep_page_source,
+    require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in deep_page_source,
             f"{deep_page_name} must use the shared parent deep-page readable width")
 
-require("left: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import and
-        "right: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import,
+require("left: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT" in homework_import and
+        "right: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT" in homework_import,
         "embedded HomeworkImportPage must not add a second horizontal page padding")
 require("Text('作业科目')" in homework_import and
         "Text('作业内容')" in homework_import and
@@ -417,7 +459,8 @@ for toggle_expression in [
             f"Parent My section must be expandable by its header: {toggle_expression}")
 require("cloudPanelOpen" not in parent_settings,
         "Parent My data/sync must not keep a second nested collapse state")
-require("AppTheme.PROFILE_READABLE_MAX_WIDTH" in parent_settings,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in parent_settings and
+        "AppTheme.CONTENT_STANDARD_MAX_WIDTH" in student_profile,
         "Parent and student My pages must share the same readable width")
 require("private SectionTitle(" not in parent_settings and
         "private FamilySettingsSection()" in parent_settings and

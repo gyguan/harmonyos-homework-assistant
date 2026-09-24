@@ -724,17 +724,17 @@ export struct ParentVoiceAssignmentPage {
               this.TaskSettingsSection();
             }
             .width('100%')
-            .padding(AppTheme.PHONE_CARD_PADDING)
+            .padding(AppTheme.CARD_PADDING_COMPACT)
             .backgroundColor(AppTheme.CARD_SURFACE)
-            .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+            .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
 
             Column() {
               this.MaterialSection();
             }
             .width('100%')
-            .padding(AppTheme.PHONE_CARD_PADDING)
+            .padding(AppTheme.CARD_PADDING_COMPACT)
             .backgroundColor(AppTheme.CARD_SURFACE)
-            .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+            .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
           }
           .width('100%')
           .padding({ bottom: 8 });
@@ -748,7 +748,7 @@ export struct ParentVoiceAssignmentPage {
       }
       .width('100%')
       .height('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
       .padding({
         left: AppTheme.PAGE_PADDING,
         right: AppTheme.PAGE_PADDING,

@@ -188,9 +188,9 @@ export struct ParentExtraAssignmentPage {
               this.TimingSection();
             }
             .width('100%')
-            .padding(AppTheme.PHONE_CARD_PADDING)
+            .padding(AppTheme.CARD_PADDING_COMPACT)
             .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+            .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
             this.Feedback();
             Button(this.busy ? '正在布置…' : '布置任务', { type: ButtonType.Normal })
               .width('100%').height(AppTheme.BUTTON_HEIGHT)
@@ -206,7 +206,7 @@ export struct ParentExtraAssignmentPage {
         .width('100%').layoutWeight(1).align(Alignment.TopStart).scrollBar(BarState.Off);
       }
       .width('100%').height('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
       .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: AppTheme.DEEP_PAGE_TOP_PADDING });
     }
     .width('100%').height('100%')

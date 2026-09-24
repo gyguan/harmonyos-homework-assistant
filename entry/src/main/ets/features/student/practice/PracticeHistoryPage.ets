@@ -281,10 +281,10 @@ export struct PracticeHistoryPage {
       .width('100%');
     }
     .width('100%')
-    .padding(AppTheme.PHONE_CARD_PADDING)
+    .padding(AppTheme.CARD_PADDING_COMPACT)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(
       `${item.paperTitle}第${item.attemptNo}次练习，${this.viewModel.recordStatusLabel(item)}${item.status === PracticeAttemptStatus.SUBMITTED ?
@@ -304,7 +304,7 @@ export struct PracticeHistoryPage {
         });
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
       .padding({
         left: AppTheme.PAGE_PADDING,
         right: AppTheme.PAGE_PADDING,
@@ -360,7 +360,7 @@ export struct PracticeHistoryPage {
             .width('100%')
             .padding({ top: 28, bottom: 28 })
             .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+            .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
           } else {
             Column({ space: 9 }) {
               ForEach(this.attempts, (item: PracticeAttemptSummary) => {
@@ -371,7 +371,7 @@ export struct PracticeHistoryPage {
           }
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding({
           left: AppTheme.PAGE_PADDING,
           right: AppTheme.PAGE_PADDING,

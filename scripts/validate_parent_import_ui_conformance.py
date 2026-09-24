@@ -39,7 +39,7 @@ for name, source in [
 
 # Manual import and inbox are the supported parent import surfaces after screen-capture retirement.
 require(".alignItems(HorizontalAlign.Center)" in import_route and
-        "AppTheme.IMPORT_READABLE_MAX_WIDTH" in import_page,
+        "AppTheme.CONTENT_STANDARD_MAX_WIDTH" in import_page,
         "manual import route must center the embedded readable content column on Pad")
 
 require("Button(this.parseBusy ? '识别中…' : '拍照识别'" in import_page and
@@ -79,19 +79,19 @@ require("输入文字、拍照或相册识别" in dashboard,
 require("FilterSummaryEntry" in inbox and "label: '来源'" in inbox and
         "label: '状态'" in inbox and "label: '时间'" in inbox,
         "Import Inbox must reuse the standard filter summary interaction")
-require("AppTheme.IMPORT_READABLE_MAX_WIDTH" in inbox and
-        "AppTheme.PHONE_CARD_RADIUS" in inbox and "AppTheme.BORDER" in inbox,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in inbox and
+        "AppTheme.CARD_RADIUS_COMPACT" in inbox and "AppTheme.BORDER" in inbox,
         "Import Inbox cards must stay aligned with current Phone/Pad visual tokens")
 
 require(inbox.count(".alignItems(HorizontalAlign.Center)") >= 1 and
-        ".constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })" in inbox,
+        ".constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })" in inbox,
         "Import Inbox page shell must center the readable column on wide layouts")
 require(batch.count(".alignItems(HorizontalAlign.Center)") >= 1 and
-        ".constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })" in batch,
+        ".constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })" in batch,
         "Import batch detail page shell must center the readable column on wide layouts")
 require("backAccessibilityText: '返回作业收件箱'" in batch,
         "Import batch detail return semantics must match the current inbox title")
-require(batch.count("AppTheme.PHONE_CARD_RADIUS") >= 4 and
+require(batch.count("AppTheme.CARD_RADIUS_COMPACT") >= 4 and
         batch.count(".border({ width: 1, color: AppTheme.BORDER })") >= 4,
         "Import batch detail cards must reuse current parent card radius and border tokens")
 

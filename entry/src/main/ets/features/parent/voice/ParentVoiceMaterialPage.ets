@@ -421,9 +421,9 @@ export struct ParentVoiceMaterialPage {
       }
     }
     .width('100%')
-    .padding(AppTheme.PHONE_CARD_PADDING)
+    .padding(AppTheme.CARD_PADDING_COMPACT)
     .backgroundColor(AppTheme.CARD_SURFACE)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
@@ -647,7 +647,7 @@ export struct ParentVoiceMaterialPage {
               .enabled(!this.creatingAssignment).onClick(() => { void this.confirmCreateAssignment(); });
           }.width('100%');
         }
-        .width('100%').padding(AppTheme.PHONE_CARD_PADDING).backgroundColor(AppTheme.SURFACE)
+        .width('100%').padding(AppTheme.CARD_PADDING_COMPACT).backgroundColor(AppTheme.SURFACE)
         .borderRadius({ topLeft: 20, topRight: 20 });
       }
       .width('100%').height('100%').backgroundColor('#66000000');
@@ -722,7 +722,7 @@ export struct ParentVoiceMaterialPage {
           });
 
           Scroll() {
-            Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+            Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
               this.DefaultSettings();
               this.PendingSection();
               this.Feedback();
@@ -739,7 +739,7 @@ export struct ParentVoiceMaterialPage {
         }
         .width('100%')
         .height('100%')
-        .constraintSize({ maxWidth: AppTheme.PARENT_REVIEW_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding({
           left: AppTheme.PAGE_PADDING,
           right: AppTheme.PAGE_PADDING,

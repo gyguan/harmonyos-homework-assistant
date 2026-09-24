@@ -81,7 +81,7 @@ require("this.assignment.subject} · ${this.deadlineText()} · ${this.timingText
         ".maxLines(1)" in list_item and
         ".textOverflow({ overflow: TextOverflow.Ellipsis })" in list_item,
         "task-card secondary information must stay on one bounded line without overlap or horizontal overflow")
-require(".constraintSize({ minHeight: 78 })" in list_item and
+require(".constraintSize({ minHeight: AppTheme.LIST_CARD_MIN_HEIGHT })" in list_item and
         ".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)" in list_item and
         ".lineHeight(AppTheme.META_LINE_HEIGHT)" in list_item,
         "delete-mode task cards must preserve enough vertical height to keep status and timing metadata separated")

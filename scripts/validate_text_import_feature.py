@@ -53,7 +53,7 @@ require("private afterOrganized(candidateCount: number)" in page and
         "successful organization must navigate directly to the single confirmation page")
 require("CandidatePane" not in page and "继续确认" not in page,
         "assignment create flow must not retain a redundant intermediate confirmation step")
-require("AppTheme.IMPORT_READABLE_MAX_WIDTH" in page and
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in page and
         ".alignItems(HorizontalAlign.Center)" in page,
         "assignment create page must keep one centered readable content column")
 require("this.FeedbackBanner();" in page and "if (this.parseMessage.length > 0)" in page,

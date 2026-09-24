@@ -78,8 +78,8 @@ require("selected: this.isSelected(item.id)" in page and "showChevron: !this.can
         "Pad list items must expose local selection instead of Phone chevron navigation")
 require("AssignmentDetailPane" in detail and "DeepPageHeader" in detail,
         "Phone detail must reuse the same AssignmentDetailPane under deep-page chrome")
-require("AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH" in page and
-        "AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH" in detail,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in page and
+        "AppTheme.CONTENT_STANDARD_MAX_WIDTH" in detail,
         "list/detail must keep shared readable-width fallback constraints")
 require("private AssignmentListPage()" in page and ".align(Alignment.TopStart)" in page and
         ".justifyContent(FlexAlign.Start)" in detail and ".height('100%')" in detail,

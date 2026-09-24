@@ -307,9 +307,9 @@ export struct HomeworkImportPage {
       }
     }
     .width('100%')
-    .padding(AppTheme.PHONE_CARD_PADDING)
+    .padding(AppTheme.CARD_PADDING_COMPACT)
     .backgroundColor(AppTheme.CARD_SURFACE)
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
@@ -361,10 +361,10 @@ export struct HomeworkImportPage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
     .padding({
-      left: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING,
-      right: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING,
+      left: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT,
+      right: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT,
       top: this.embeddedInDeepPage ? 0 : 14
     })
     .alignItems(HorizontalAlign.Center)

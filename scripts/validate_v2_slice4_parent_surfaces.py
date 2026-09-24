@@ -47,11 +47,8 @@ due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 issue_spec = read("docs/product/ui-page-spec-v2.md")
 
 for token in [
-    "PARENT_HOME_READABLE_MAX_WIDTH",
-    "PARENT_HOME_PAD_CONTENT_MAX_WIDTH",
-    "PARENT_PROGRESS_READABLE_MAX_WIDTH",
-    "PARENT_PROGRESS_REVIEW_MAX_WIDTH",
-    "PARENT_DEEP_READABLE_MAX_WIDTH",
+    "CONTENT_STANDARD_MAX_WIDTH",
+    "CONTENT_WIDE_MAX_WIDTH",
     "PARENT_HOME_PRIMARY_MIN_WIDTH",
     "PARENT_HOME_SECONDARY_MIN_WIDTH",
     "PARENT_PROGRESS_LIST_MIN_WIDTH",
@@ -88,7 +85,7 @@ for text, path in [
 
 require("LayoutPolicy.parentHomeRequirement()" in home and "availableWidthVp" in home,
         "Parent Home must choose wide composition from actual container width + LayoutPolicy")
-require("AppTheme.PARENT_HOME_READABLE_MAX_WIDTH" in home and "AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH" in home,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in home and "AppTheme.CONTENT_WIDE_MAX_WIDTH" in home,
         "Parent Home must keep readable fallback and capped Pad composition")
 for phrase in ["布置作业", "语音作业", "作业收件箱"]:
     require(phrase in home, f"Parent Home missing required action: {phrase}")
@@ -102,8 +99,8 @@ require("Text('家长操作')" not in home and "private PageIntro()" not in home
         "Parent Home must not repeat a title already represented by primary navigation")
 require("LayoutPolicy.parentProgressReviewRequirement()" in progress and "availableWidthVp" in progress,
         "Parent Progress must choose review split from actual container width + LayoutPolicy")
-require("AppTheme.PARENT_PROGRESS_READABLE_MAX_WIDTH" in progress and
-        "AppTheme.PARENT_PROGRESS_REVIEW_MAX_WIDTH" in progress,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in progress and
+        "AppTheme.CONTENT_WIDE_MAX_WIDTH" in progress,
         "Parent Progress must keep readable fallback and capped list-review split")
 require("components/assignment/AssignmentFilterDialog" in progress and
         "components/assignment/AssignmentFilterDialog" in student_assignments,
@@ -134,7 +131,7 @@ require("this.onOpenReview(item.id)" in progress,
 
 require("DeepPageHeader" in review_page and "ParentReviewPane" in review_page,
         "Parent Review page must use shared deep-page chrome and reusable review pane")
-require("AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH" in review_page,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in review_page,
         "Parent Review page must keep a readable width cap")
 require("ParentSubmissionEvidenceService" in review_pane and "CloudSubmissionPhotoStrip" in review_pane,
         "Parent Review must show authoritative/local submission evidence through the submission boundary")

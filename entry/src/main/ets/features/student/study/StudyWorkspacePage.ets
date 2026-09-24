@@ -443,7 +443,7 @@ export struct StudyWorkspacePage {
         }
       }
       .width('100%')
-      .padding(13)
+      .padding(AppTheme.CARD_PADDING_COMPACT)
       .backgroundColor(AppTheme.SUCCESS_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS);
     }
@@ -1223,12 +1223,12 @@ export struct StudyWorkspacePage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.STUDY_READABLE_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start)
     .padding({
-      left: AppTheme.PAGE_PADDING,
-      right: AppTheme.PAGE_PADDING,
+      left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+      right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       top: AppTheme.DEEP_PAGE_TOP_PADDING,
       bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
     });
@@ -1246,7 +1246,7 @@ export struct StudyWorkspacePage {
           }
           .width('100%')
           .height('100%')
-          .constraintSize({ maxWidth: AppTheme.STUDY_READABLE_MAX_WIDTH });
+          .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH });
         }
         .width('100%')
         .layoutWeight(1)
@@ -1256,12 +1256,12 @@ export struct StudyWorkspacePage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.STUDY_SPLIT_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start)
     .padding({
-      left: AppTheme.PAGE_PADDING_WIDE,
-      right: AppTheme.PAGE_PADDING_WIDE,
+      left: AppTheme.PAGE_PADDING_EXPANDED,
+      right: AppTheme.PAGE_PADDING_EXPANDED,
       top: AppTheme.DEEP_PAGE_TOP_PADDING,
       bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
     });

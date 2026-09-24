@@ -288,7 +288,7 @@ export struct ParentReviewPane {
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-    .padding(15)
+    .padding(AppTheme.PANEL_PADDING)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
@@ -332,7 +332,7 @@ export struct ParentReviewPane {
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
-    .padding(15)
+    .padding(AppTheme.PANEL_PADDING)
     .backgroundColor(AppTheme.SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
@@ -410,7 +410,7 @@ export struct ParentReviewPane {
             }
             .width('100%')
             .alignItems(HorizontalAlign.Start)
-            .padding(15)
+            .padding(AppTheme.PANEL_PADDING)
             .backgroundColor(AppTheme.SURFACE)
             .border({ width: 1, color: AppTheme.BORDER })
             .borderRadius(AppTheme.CONTROL_RADIUS);
