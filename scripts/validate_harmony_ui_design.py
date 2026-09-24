@@ -190,6 +190,7 @@ student_switcher = read_optional("entry/src/main/ets/components/family/StudentSw
 app_shell = read_optional("entry/src/main/ets/pages/AppShell.ets")
 student_home = read_optional("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 voice_assignment = read_optional("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+homework_import = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 for card_path, card_source in [
     ("ParentDashboardPage", parent_dashboard),
     ("IdentitySwitcherDialog", identity_switcher),
@@ -197,6 +198,7 @@ for card_path, card_source in [
     ("AppShell", app_shell),
     ("StudentHomePage", student_home),
     ("ParentVoiceAssignmentPage", voice_assignment),
+    ("HomeworkImportPage", homework_import),
 ]:
     require("AppTheme.CARD_SURFACE" in card_source,
             f"{card_path} must use the shared ordinary card surface")
@@ -210,6 +212,10 @@ require("backgroundColor(this.activeStudentId === student.id ? AppTheme.PRIMARY_
 require(".backgroundColor(AppTheme.CARD_SURFACE)" in app_shell and
         ".backgroundColor(AppTheme.PRIMARY_FAINT)" not in app_shell,
         "AppShell identity switch card must use the shared ordinary card surface")
+require("private PendingReview()" in homework_import and
+        ".backgroundColor(AppTheme.CARD_SURFACE)" in homework_import and
+        "backgroundColor(AppTheme.PRIMARY_FAINT)" not in between(homework_import, "private PendingReview()", "private RecognitionActions()"),
+        "Homework import pending-review card must use the shared ordinary card surface")
 
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
