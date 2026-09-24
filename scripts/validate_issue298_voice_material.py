@@ -127,11 +127,11 @@ require("RemoteVoiceFolderItem" in remote and "RemoteVoiceFolderPage" in remote 
         "APP must query the reusable server-folder API")
 require("'status=READY'" in remote and "usage=" in remote and "page=" in remote,
         "APP folder query must request reusable READY folders with server-side filters/paging")
-require("title?: string" in remote and "requestId?: string" in remote,
-        "manual folder creation request must support editable title and idempotency")
+require("title?: string" in remote and "instruction?: string" in remote and "requestId?: string" in remote,
+        "manual folder creation request must support editable title/instruction and idempotency")
 
 require("VOICE_SOURCE_LOCAL" in voice_page and "VOICE_SOURCE_SERVER" in voice_page and
-        "Button('本地文件'" in voice_page and "Button('服务器文件夹'" in voice_page,
+        "Button('从本机选择'" in voice_page and "Button('使用服务器素材'" in voice_page,
         "voice assignment page must unify local and server material sources")
 require("folderUsageText" in voice_page and "已使用" in voice_page and "未使用" in voice_page,
         "server folder picker must expose historical usage without treating used folders as unavailable")
@@ -142,9 +142,25 @@ require("createRequestId" in voice_page and "createFromFolder" in voice_vm,
         "server-folder creation must use an idempotent request id")
 require("queryFolders(" in voice_vm,
         "voice assignment ViewModel must use the reusable-folder query boundary")
-require("this.title = this.subjectLabel(item.subjectCode) + ' · 语音作业'" in voice_page and
+require("private generatedTitle()" in voice_page and "' · 语音练习'" in voice_page and
         "this.title = item.directoryName" not in voice_page,
-        "folder reuse must keep task naming independent from the folder name")
+        "folder reuse must auto-generate task naming independently from the folder name")
+require("titleCustomized" in voice_page and "instructionCustomized" in voice_page and
+        "syncGeneratedTaskCopy()" in voice_page,
+        "auto-generated task copy must stop overwriting parent edits")
+require("Text('任务设置')" in voice_page and "Text('素材方式')" in voice_page and
+        "Text('截止时间')" in voice_page and "Text('预计完成时长')" in voice_page,
+        "voice assignment task metadata must use compact user-facing labels")
+require(voice_page.find("this.TaskSettingsSection()") <
+        voice_page.find("this.LocalMaterialSection()"),
+        "task settings must appear before local media selection")
+require("private PublishFooter()" in voice_page and
+        voice_page.find("this.PublishFooter();") > voice_page.find(".scrollBar(BarState.Off);"),
+        "publish action must remain fixed outside the scrolling content")
+require("instruction: draft.instruction.trim()" in voice_vm and
+        "input.instruction()" in assignment_service and
+        "requestedInstruction" in assignment_service,
+        "server-folder task creation must persist the editable task instruction")
 
 require("Text('语音素材库')" not in dashboard and "onOpenVoiceMaterial" not in dashboard,
         "Parent Home must not expose the implementation concept 'voice material library'")
