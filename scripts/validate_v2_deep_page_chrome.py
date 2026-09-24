@@ -32,8 +32,10 @@ for token in [
     "DEEP_PAGE_BOTTOM_PADDING",
     "DEEP_PAGE_HEADER_HEIGHT",
     "DEEP_PAGE_HEADER_GAP",
-    "DEEP_PAGE_HEADER_TITLE_SIZE",
-    "DEEP_PAGE_HEADER_META_SIZE",
+    "PAGE_NAV_TITLE_SIZE",
+    "PAGE_NAV_TITLE_LINE_HEIGHT",
+    "META_SIZE",
+    "META_LINE_HEIGHT",
     "DEEP_PAGE_BACK_GLYPH_SIZE",
     "DEEP_PAGE_CONTENT_GAP",
 ]:
@@ -48,6 +50,15 @@ require("MIN_TOUCH_TARGET" in header and "accessibilityText" in header,
         "shared header back control must keep touch target and accessibility semantics")
 require("backgroundColor(AppTheme.SURFACE_EMPHASIS)" in header and "borderRadius" in header,
         "shared header back control must keep the system-style subtle circular surface")
+require("AppTheme.PAGE_NAV_TITLE_SIZE" in header and
+        "AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT" in header and
+        "AppTheme.NAV_TITLE_MAX_LINES" in header and
+        "AppTheme.META_SIZE" in header and
+        "AppTheme.META_LINE_HEIGHT" in header,
+        "shared header must use the typography standard for title and metadata")
+require(".height(AppTheme.DEEP_PAGE_HEADER_HEIGHT)" not in header and
+        ".constraintSize({ minHeight: AppTheme.DEEP_PAGE_HEADER_HEIGHT })" in header,
+        "shared header must use minHeight so system font scaling cannot clip content")
 
 for path, text in [
     ("StudentAssignmentDetailPage.ets", detail),
