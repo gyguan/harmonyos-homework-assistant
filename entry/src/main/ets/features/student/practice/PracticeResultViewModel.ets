@@ -22,6 +22,8 @@ export class PracticeResultViewModel {
   private readonly repository: PracticeRepository;
   private readonly familyContext: FamilyContextRepository;
   private cachedPaperId: string = '';
+  private cachedPaperVersion: number = 0;
+  private cachedStudentId: string = '';
   private cachedAttempts: PracticeAttemptSummary[] | null = null;
 
   constructor(
@@ -49,7 +51,7 @@ export class PracticeResultViewModel {
     if (result.mode !== PracticeAttemptMode.FULL || result.attemptNo <= 1) return null;
 
     try {
-      let attempts = await this.attemptsForPaper(result.paperId);
+      let attempts = await this.attemptsForPaper(result.paperId, result.paperVersion);
       let previous: PracticeAttemptSummary | null = null;
 
       for (let item of attempts) {
@@ -80,7 +82,7 @@ export class PracticeResultViewModel {
 
   private async historyPaperTitle(result: PracticeResult): Promise<string> {
     try {
-      let attempts = await this.attemptsForPaper(result.paperId);
+      let attempts = await this.attemptsForPaper(result.paperId, result.paperVersion);
       for (let item of attempts) {
         if (item.id === result.attemptId && item.paperTitle.length > 0) return item.paperTitle;
       }
@@ -90,11 +92,23 @@ export class PracticeResultViewModel {
     }
   }
 
-  private async attemptsForPaper(paperId: string): Promise<PracticeAttemptSummary[]> {
-    if (this.cachedAttempts !== null && this.cachedPaperId === paperId) return this.cachedAttempts;
+  private async attemptsForPaper(paperId: string, paperVersion: number): Promise<PracticeAttemptSummary[]> {
+    let studentId = this.familyContext.getActiveStudentId();
+    if (this.cachedAttempts !== null &&
+      this.cachedStudentId === studentId &&
+      this.cachedPaperId === paperId &&
+      this.cachedPaperVersion === paperVersion) {
+      return this.cachedAttempts;
+    }
 
-    let attempts = await this.repository.listAttempts(this.familyContext.getActiveStudentId(), paperId);
+    let allAttempts = await this.repository.listAttempts(studentId, paperId);
+    let attempts: PracticeAttemptSummary[] = [];
+    for (let item of allAttempts) {
+      if (item.paperVersion === paperVersion) attempts.push(item);
+    }
+    this.cachedStudentId = studentId;
     this.cachedPaperId = paperId;
+    this.cachedPaperVersion = paperVersion;
     this.cachedAttempts = attempts;
     return attempts;
   }
