@@ -113,7 +113,7 @@ export struct ParentReviewPane {
             kind: ActionButtonKind.NEUTRAL,
             compact: true,
             isEnabled: !this.deleteBusy,
-            onClick: () => this.deleteConfirm = false
+            onAction: () => this.deleteConfirm = false
           })
           .layoutWeight(1);
           ActionButton({
@@ -121,7 +121,7 @@ export struct ParentReviewPane {
             kind: ActionButtonKind.DANGER,
             compact: true,
             isEnabled: !this.deleteBusy,
-            onClick: () => { void this.deleteAssignment(); }
+            onAction: () => { void this.deleteAssignment(); }
           })
           .layoutWeight(1);
         }
@@ -311,13 +311,13 @@ export struct ParentReviewPane {
           label: '退回订正',
           kind: ActionButtonKind.WARNING,
           isEnabled: !this.submitting,
-          onClick: () => void this.returnForRework()
+          onAction: () => void this.returnForRework()
         })
         .layoutWeight(1);
         ActionButton({
           label: this.submitting ? '处理中…' : '通过',
           isEnabled: !this.submitting,
-          onClick: () => void this.approve()
+          onAction: () => void this.approve()
         })
         .layoutWeight(1);
       }
@@ -366,7 +366,7 @@ export struct ParentReviewPane {
                       kind: ActionButtonKind.SECONDARY,
                       compact: true,
                       accessibilityLabel: '编辑这项作业',
-                      onClick: () => this.startEditing(this.assignment()!)
+                      onAction: () => this.startEditing(this.assignment()!)
                     });
                   }
                   Blank();
@@ -376,7 +376,7 @@ export struct ParentReviewPane {
                       kind: ActionButtonKind.DANGER_SOFT,
                       compact: true,
                       accessibilityLabel: '删除这项未完成作业',
-                      onClick: () => this.deleteConfirm = true
+                      onAction: () => this.deleteConfirm = true
                     });
                   }
                 }
