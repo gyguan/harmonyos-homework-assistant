@@ -27,16 +27,16 @@ export enum TextActionKind {
 export struct ActionButton {
   @Prop label: string;
   @Prop kind: ActionButtonKind = ActionButtonKind.PRIMARY;
-  @Prop size: ActionButtonSize = ActionButtonSize.LARGE;
+  @Prop actionSize: ActionButtonSize = ActionButtonSize.LARGE;
   @Prop isEnabled: boolean = true;
-  // Temporary compatibility for already-migrated pages. New code should use size explicitly.
+  // Temporary compatibility for already-migrated pages. New code should use actionSize explicitly.
   @Prop compact: boolean = false;
   @Prop accessibilityLabel: string = '';
   onAction: () => void = () => {};
 
   private effectiveSize(): ActionButtonSize {
     if (this.compact) return ActionButtonSize.SMALL;
-    return this.size;
+    return this.actionSize;
   }
 
   private resolveButtonHeight(): number {
