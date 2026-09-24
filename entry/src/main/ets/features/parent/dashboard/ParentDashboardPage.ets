@@ -185,7 +185,7 @@ export struct ParentDashboardPage {
           this.AssignmentInboxAction();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.PARENT_HOME_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
         .padding({
           left: AppTheme.PHONE_PAGE_PADDING,
           right: AppTheme.PHONE_PAGE_PADDING,
@@ -226,7 +226,7 @@ export struct ParentDashboardPage {
         .alignItems(VerticalAlign.Top);
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_HOME_PAD_CONTENT_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
       .padding({
         left: AppTheme.PAGE_PADDING_WIDE,
         right: AppTheme.PAGE_PADDING_WIDE,
