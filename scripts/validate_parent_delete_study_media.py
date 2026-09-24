@@ -84,8 +84,9 @@ require("this.assignment.subject} · ${this.deadlineText()} · ${this.timingText
 require(".constraintSize({ minHeight: 78 })" in list_item and
         ".lineHeight(22)" in list_item and ".lineHeight(18)" in list_item,
         "delete-mode task cards must preserve enough vertical height to keep status and timing metadata separated")
-require("删除作业" in review and "this.viewModel.deleteAssignment(item.id)" in review,
-        "parent detail must allow single unfinished assignment deletion")
+require("label: '删除'" in review and "TextAction({" in review and
+        "this.viewModel.deleteAssignment(item.id)" in review,
+        "parent detail must allow lightweight single unfinished assignment deletion")
 require("deleteAssignment(assignmentId: string)" in review_vm,
         "parent review ViewModel must delegate deletion")
 require("onDeleted" in review_page and "onDeleted" in review and "this.navPathStack.pop()" in shell,
