@@ -7,7 +7,7 @@ import {
   RemoteVoiceMaterialCreateAssignmentRequest
 } from '../../../application/remote/RemoteVoiceMaterialApi';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../../../components/action/ActionControls';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -489,8 +489,8 @@ export struct ParentVoiceMaterialPage {
 
       ActionButton({
         label: this.selecting ? '正在打开文件选择器…' : '＋ 添加目录',
-        kind: ActionButtonKind.SECONDARY,
-        compact: true,
+        kind: ActionButtonKind.OUTLINE,
+        size: ActionButtonSize.SMALL,
         isEnabled: !this.selecting && !this.uploading,
         onAction: (): void => { void this.addPackages(); }
       })
@@ -562,8 +562,8 @@ export struct ParentVoiceMaterialPage {
               : item.hasCreatedBefore
                 ? '再次创建任务'
                 : '创建语音任务',
-          kind: ActionButtonKind.SECONDARY,
-          compact: true,
+          kind: ActionButtonKind.OUTLINE,
+          size: ActionButtonSize.SMALL,
           isEnabled: this.creatingPackageId.length === 0 && !item.hasActiveAssignment,
           onAction: (): void => this.openCreateSheet(item)
         })
@@ -622,12 +622,14 @@ export struct ParentVoiceMaterialPage {
             ActionButton({
               label: '取消',
               kind: ActionButtonKind.NEUTRAL,
+              size: ActionButtonSize.MEDIUM,
               isEnabled: !this.creatingAssignment,
               onAction: (): void => this.closeCreateSheet()
             })
             .layoutWeight(1);
             ActionButton({
               label: this.creatingAssignment ? '创建中…' : '确认创建',
+              size: ActionButtonSize.MEDIUM,
               isEnabled: !this.creatingAssignment,
               onAction: (): void => { void this.confirmCreateAssignment(); }
             })
