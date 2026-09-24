@@ -1,6 +1,6 @@
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
@@ -24,31 +24,31 @@ export struct CandidateDurationControl {
           ChoiceSelectionChip({
             label: '10',
             selected: this.item.expectedMinutes === 10,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onSelect: () => this.onMinutesChange(this.item, 10)
           });
           ChoiceSelectionChip({
             label: '15',
             selected: this.item.expectedMinutes === 15,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onSelect: () => this.onMinutesChange(this.item, 15)
           });
           ChoiceSelectionChip({
             label: '20',
             selected: this.item.expectedMinutes === 20,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onSelect: () => this.onMinutesChange(this.item, 20)
           });
           ChoiceSelectionChip({
             label: '30',
             selected: this.item.expectedMinutes === 30,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onSelect: () => this.onMinutesChange(this.item, 30)
           });
           ChoiceSelectionChip({
             label: '45',
             selected: this.item.expectedMinutes === 45,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onSelect: () => this.onMinutesChange(this.item, 45)
           });
           Text('分钟')
@@ -250,14 +250,14 @@ export struct ConfirmationCandidateEditor {
           ActionButton({
             label: '继续编辑',
             kind: ActionButtonKind.NEUTRAL,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onAction: (): void => { this.confirmDiscard = false; }
           })
           .layoutWeight(1);
           ActionButton({
             label: '放弃修改',
             kind: ActionButtonKind.DANGER_SOFT,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onAction: (): void => {
               this.onClose();
             }
@@ -274,14 +274,14 @@ export struct ConfirmationCandidateEditor {
           ActionButton({
             label: '取消',
             kind: ActionButtonKind.NEUTRAL,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onAction: (): void => { this.confirmDelete = false; }
           })
           .layoutWeight(1);
           ActionButton({
             label: '确认删除',
             kind: ActionButtonKind.DANGER,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onAction: (): void => this.onDelete(this.item.id)
           })
           .layoutWeight(1);
@@ -292,11 +292,13 @@ export struct ConfirmationCandidateEditor {
           ActionButton({
             label: '删除',
             kind: ActionButtonKind.DANGER_SOFT,
+            size: ActionButtonSize.MEDIUM,
             onAction: (): void => { this.confirmDelete = true; }
           })
           .layoutWeight(1);
           ActionButton({
             label: '保存',
+            size: ActionButtonSize.MEDIUM,
             onAction: (): void => this.saveAndClose()
           })
           .layoutWeight(2);
