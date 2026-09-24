@@ -122,7 +122,7 @@ export struct HomeworkImportBatchDetailPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
         Blank();
-        Text(`${item.expectedMinutes} 分钟`).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text(`${item.expectedMinutes} 分钟`).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
       Text(item.title)
@@ -138,7 +138,8 @@ export struct HomeworkImportBatchDetailPage {
       if (this.sourceMessageIds(item).length > 0) {
         Text(`证据消息：${this.sourceMessageIds(item).join(', ')}`)
           .width('100%')
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
     }
@@ -183,7 +184,8 @@ export struct HomeworkImportBatchDetailPage {
                 .fontColor(AppTheme.TEXT);
               Text(this.batch()!.sourceLabel)
                 .width('100%')
-                .fontSize(13)
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
                 .fontColor(AppTheme.SUBTEXT);
         }
             .width('100%')
@@ -234,7 +236,8 @@ export struct HomeworkImportBatchDetailPage {
                   .fontColor(AppTheme.TEXT);
                 Text(this.batch()!.understood === true ? '已完成规则理解' : '规则理解未完成')
                   .width('100%')
-                  .fontSize(13)
+                  .fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT)
                   .fontColor(this.batch()!.understood === true ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
                 Text(`待人工确认消息：${this.batch()!.pendingReviewMessageIds === undefined ?
                   0 : this.batch()!.pendingReviewMessageIds!.length}`)
