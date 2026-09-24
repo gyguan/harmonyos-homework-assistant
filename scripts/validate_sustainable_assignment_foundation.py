@@ -32,7 +32,6 @@ date_range = read("entry/src/main/ets/domain/service/AssignmentDateRange.ets")
 due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 parent_home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 student_home = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
-calendar = read("entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets")
 selection = read("entry/src/main/ets/common/state/SelectionIds.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 confirmation = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
@@ -81,8 +80,10 @@ require("text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0" not in due_
         "generic evening text must be resolved only after explicit/relative dates so 明天晚上 does not become today")
 require("AssignmentDueDate.businessDayStart" in store and
         "AssignmentDueDate.businessDayStart" in student_home and
-        "AssignmentDueDate.businessDayStart" in calendar,
-        "parent summary, student home and calendar must use the same business-day boundary")
+        "AssignmentDueDate.businessDayStart" in date_range,
+        "parent summary, student home and assignment date filters must use the same business-day boundary")
+require(not (ROOT / "entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets").exists(),
+        "retired Assignment calendar must stay removed from the sustainable foundation")
 require("export class AssignmentFilterFactory" in filter_factory and
         "static forDay" in filter_factory and "static create" in filter_factory,
         "shared assignment filter factory is required")
