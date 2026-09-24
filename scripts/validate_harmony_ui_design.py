@@ -86,7 +86,12 @@ for token in [
     "SECTION_TITLE_MAX_LINES",
     "CARD_TITLE_MAX_LINES",
     "META_MAX_LINES",
-    "PARENT_DEEP_READABLE_MAX_WIDTH",
+    "CONTENT_NARROW_MAX_WIDTH",
+    "CONTENT_STANDARD_MAX_WIDTH",
+    "CONTENT_WIDE_MAX_WIDTH",
+    "PAGE_PADDING_COMPACT",
+    "PAGE_PADDING_MEDIUM",
+    "PAGE_PADDING_EXPANDED",
     "PARENT_HOME_ACTION_CARD_MIN_HEIGHT",
     "PARENT_HOME_ACTION_ICON_SIZE",
     "PARENT_HOME_ACTION_CARD_PADDING",
@@ -384,7 +389,7 @@ for deep_page_name, deep_page_source in [
     ("HomeworkImportRoutePage", homework_import_route),
     ("HomeworkConfirmationPage", homework_confirmation),
 ]:
-    require("AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH" in deep_page_source,
+    require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in deep_page_source,
             f"{deep_page_name} must use the shared parent deep-page readable width")
 
 require("left: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import and
@@ -417,7 +422,8 @@ for toggle_expression in [
             f"Parent My section must be expandable by its header: {toggle_expression}")
 require("cloudPanelOpen" not in parent_settings,
         "Parent My data/sync must not keep a second nested collapse state")
-require("AppTheme.PROFILE_READABLE_MAX_WIDTH" in parent_settings,
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in parent_settings and
+        "AppTheme.CONTENT_STANDARD_MAX_WIDTH" in student_profile,
         "Parent and student My pages must share the same readable width")
 require("private SectionTitle(" not in parent_settings and
         "private FamilySettingsSection()" in parent_settings and
