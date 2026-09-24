@@ -91,6 +91,22 @@ def main() -> int:
         body, ctype = multipart_voice_assignment(metadata, "legacy.mp3", "legacy.png")
         expect(http(base_url, "POST", f"/api/v1/students/{student_id}/assignments/voice",
                     token=token, raw=body, content_type=ctype), (200,), "legacy voice create")
+        local_tasks = expect(http(base_url, "GET",
+            f"/api/v1/voice-tasks?studentId={quote(student_id)}&page=0&size=20", token=token),
+            (200,), "query local-upload voice task").json()
+        require(local_tasks.get("totalElements") == 1,
+                "voice task query must include local-upload AUDIO_IMAGE Assignment")
+        local_item = local_tasks["items"][0]
+        require(local_item.get("assignmentId") == legacy_id and local_item.get("packageId") == "" and
+                local_item.get("directoryName") == "本地上传",
+                "local-upload voice task must not require a source folder link")
+        local_detail = expect(http(base_url, "GET", f"/api/v1/voice-tasks/{legacy_id}",
+            token=token), (200,), "local-upload voice task detail").json()
+        require([x.get("relativeName") for x in local_detail.get("files", [])] ==
+                ["legacy.mp3", "legacy.png"],
+                "local-upload voice task detail must expose assignment resources")
+        require(all(x.get("id") for x in local_detail.get("files", [])),
+                "local-upload resources must expose resource ids for Web preview")
         expect(http(base_url, "DELETE", f"/api/v1/assignments/{legacy_id}", token=token),
                (200, 204), "legacy voice delete")
 
@@ -237,6 +253,11 @@ def main() -> int:
             token=token, payload=reuse_payload), (200,), "manual create idempotent retry").json()
         require(retry.get("created") is False and retry.get("assignmentId") == reused_assignment,
                 "same requestId must resolve to original Assignment")
+        conflict_payload = {"studentId": student_id, "expectedMinutes": 18, "dueAtEpochMs": 0,
+                            "dueText": "", "title": "冲突幂等键", "requestId": request_id}
+        expect(http(base_url, "POST",
+            f"/api/v1/voice-material-packages/{second['id']}/create-assignment",
+            token=token, payload=conflict_payload), (409,), "reject requestId reuse across folders")
         list_resources(base_url, token, reused_assignment, ["chinese-voice.mp3", "chinese-scene.png"])
         list_resources(base_url, token, parallel_assignment, ["chinese-voice.mp3", "chinese-scene.png"])
 
