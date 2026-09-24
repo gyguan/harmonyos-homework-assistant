@@ -313,7 +313,7 @@ export struct ParentVoiceAssignmentPage {
     Column({ space: 10 }) {
       Row() {
         Text('任务设置')
-          .fontSize(16)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
