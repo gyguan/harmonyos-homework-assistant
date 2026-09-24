@@ -82,7 +82,8 @@ require("this.assignment.subject} · ${this.deadlineText()} · ${this.timingText
         ".textOverflow({ overflow: TextOverflow.Ellipsis })" in list_item,
         "task-card secondary information must stay on one bounded line without overlap or horizontal overflow")
 require(".constraintSize({ minHeight: 78 })" in list_item and
-        ".lineHeight(22)" in list_item and ".lineHeight(18)" in list_item,
+        ".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)" in list_item and
+        ".lineHeight(AppTheme.META_LINE_HEIGHT)" in list_item,
         "delete-mode task cards must preserve enough vertical height to keep status and timing metadata separated")
 require("删除作业" in review and "this.viewModel.deleteAssignment(item.id)" in review,
         "parent detail must allow single unfinished assignment deletion")
