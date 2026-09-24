@@ -33,14 +33,15 @@ app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 spec = read("docs/product/v2-phone-pad-baseline-standard.md")
 
 for token in [
-    "HOME_READABLE_MAX_WIDTH",
-    "ASSIGNMENT_LIST_READABLE_MAX_WIDTH",
-    "ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH",
-    "STUDY_READABLE_MAX_WIDTH",
+    "CONTENT_NARROW_MAX_WIDTH",
+    "CONTENT_STANDARD_MAX_WIDTH",
+    "CONTENT_WIDE_MAX_WIDTH",
+    "PAGE_PADDING_COMPACT",
+    "PAGE_PADDING_MEDIUM",
+    "PAGE_PADDING_EXPANDED",
     "FILTER_DIALOG_MAX_WIDTH",
     "STUDY_PRIMARY_MIN_WIDTH",
     "STUDY_TUTOR_MIN_WIDTH",
-    "PRACTICE_ATTEMPT_READABLE_MAX_WIDTH",
     "PRACTICE_ATTEMPT_SCALE_REFERENCE_WIDTH",
     "PRACTICE_ATTEMPT_MAX_SCALE",
 ]:
@@ -64,22 +65,23 @@ for legacy_helper in ["resolveContent", "canUseTwoPane", "twoPaneRequiredWidthVp
 
 require("LayoutPolicy" in home and "homeFocusSummaryRequirement" in home,
         "Student Home content capability must use LayoutPolicy directly")
-require("AppTheme.HOME_READABLE_MAX_WIDTH" in home,
-        "Student Home must keep a readable single-column fallback")
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in home,
+        "Student Home must use the shared standard-width fallback")
 require("alignItems(HorizontalAlign.Center)" in home,
         "Student Home must center its fallback/wide content surfaces")
-require("AppTheme.ASSIGNMENT_LIST_READABLE_MAX_WIDTH" in assignments,
-        "Assignment List must keep the shared readable-width fallback token")
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in assignments,
+        "Assignment List must use the shared standard-width fallback token")
 require("AppTheme.FILTER_DIALOG_MAX_WIDTH" in filter_dialog,
         "Assignment filter dialog must be width-capped on wide containers")
-require("AppTheme.ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH" in detail,
-        "Assignment Detail must use the shared readable-width token")
-require("AppTheme.STUDY_READABLE_MAX_WIDTH" in study and
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in detail,
+        "Assignment Detail must use the shared standard-width token")
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in study and
+        "AppTheme.CONTENT_WIDE_MAX_WIDTH" in study and
         "AppTheme.PAGE_TITLE_SIZE" in study and
         "AppTheme.PAGE_TITLE_LINE_HEIGHT" in study,
         "Study Workspace must keep shared readable-width and semantic business-title tokens")
-require("AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in practice_attempt,
-        "Practice Attempt must keep a dedicated readable width on wide containers")
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in practice_attempt,
+        "Practice Attempt must use the shared standard readable width")
 require("ResponsiveContext.areaLengthToVp" in practice_attempt and "contentScale()" in practice_attempt,
         "Practice Attempt must scale from actual container width rather than device identity")
 require("WindowSizeClass." not in practice_attempt and "@Prop sizeClass" not in practice_attempt,
