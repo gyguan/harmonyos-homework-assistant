@@ -32,13 +32,14 @@ publisher = read("entry/src/main/ets/application/import/HomeworkBatchPublishServ
 # screenshot OCR all converge before organization.
 require("TextArea" in page and "作业内容" in page,
         "parent assignment create page must expose one editable assignment-content input")
-require("整理作业" in page and "private async organize()" in page,
+require("整理并继续" in page and "private async organize()" in page,
         "parent assignment create page must expose one organize action")
-require("this.viewModel.parseText(text, this.sourceImageRef)" in page,
-        "all editable assignment text must flow through the import ViewModel")
+require("this.viewModel.parseText(text, this.sourceImageRef, this.sourceImageLabel)" in page,
+        "all editable assignment text must flow through the import ViewModel with source evidence")
 require("this.viewModel.selectImageText()" in page and
-        "已识别截图文字，可以修改后再整理" in page,
-        "screenshot must only fill editable text before organization")
+        "this.viewModel.captureImageText()" in page and
+        "已识别文字，可修改后继续" in page,
+        "gallery and camera OCR must only fill editable text before organization")
 require("selectImageAndParse()" not in page and "parseTypedText" not in page and
         "textEntryOpen" not in page,
         "unified create page must not retain separate screenshot/text sub-flows")
@@ -57,20 +58,23 @@ require("this.FeedbackBanner();" in page and "if (this.parseMessage.length > 0)"
 require("HomeworkConfirmationPage" not in page,
         "assignment create page must navigate to confirmation rather than duplicate confirmation UI")
 
-require("HomeworkImportService.instance.parseText(text, imageRef)" in view_model and
-        "HomeworkImportService.instance.selectImageText()" in view_model,
-        "import ViewModel must delegate unified text and screenshot OCR actions")
+require("HomeworkImportService.instance.parseText(text, imageRef, imageSourceLabel)" in view_model and
+        "HomeworkImportService.instance.selectImageText()" in view_model and
+        "HomeworkImportService.instance.captureImageText()" in view_model,
+        "import ViewModel must delegate unified text, gallery OCR and camera OCR actions")
 require("HomeworkImportDraftRepository" in service and "DefaultHomeworkImportDraftRepository" in service,
         "HomeworkImportService must persist drafts through the draft repository boundary")
 require("HomeworkStore" not in service,
         "HomeworkImportService must not access HomeworkStore directly")
-require("async parseText(text: string, imageRef: string = '')" in service,
-        "HomeworkImportService must support one text entry with optional screenshot evidence")
+require("async parseText(text: string, imageRef: string = ''" in service and
+        "imageSourceLabel: string = ''" in service,
+        "HomeworkImportService must support one text entry with optional image evidence")
 require("HomeworkImportSourceKind.TEXT" in service and "家长录入文字" in service and
         "相册作业截图" in service,
         "unified assignment input must preserve its actual source evidence")
-require("async selectImageText()" in service and "this.pipeline.extract(rawImport)" in service,
-        "screenshot action must stop after OCR/extraction until the user chooses to organize")
+require("async selectImageText()" in service and "async captureImageText()" in service and
+        "recognizeImageText" in service and "this.pipeline.extract(rawImport)" in service,
+        "image OCR actions must stop after extraction until the user chooses to organize")
 require("fallbackCandidate" in service and
         "output.organizerMode === HomeworkOrganizerMode.LOCAL" in service,
         "only local parser empty results may fall back to one confirmable candidate")
