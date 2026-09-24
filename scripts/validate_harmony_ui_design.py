@@ -131,13 +131,15 @@ for ui_file in (ROOT / "entry/src/main/ets").rglob("*.ets"):
             f"business UI text must not use 10/11fp hardcoded sizes: {ui_file.relative_to(ROOT)}")
 
     # ArkUI ButtonAttribute supports fontSize/fontWeight but not lineHeight.
-    # Catch chained Button(...).fontSize(...).lineHeight(...) before ArkTS compilation.
-    button_line_height = re.search(
-        r"Button\([^\n]*\)[\s\S]{0,500}?\.fontSize\([^\n]*\)\s*\n\s*\.lineHeight\(",
-        ui_source
-    )
-    require(button_line_height is None,
-            f"ButtonAttribute must not use unsupported lineHeight: {ui_file.relative_to(ROOT)}")
+    # Inspect each Button chain only until its first semicolon so later Text(...).lineHeight(...)
+    # cannot be misclassified as a Button attribute.
+    for button_match in re.finditer(r"Button\(", ui_source):
+        button_chain = ui_source[button_match.start():]
+        chain_end = button_chain.find(";")
+        if chain_end >= 0:
+            button_chain = button_chain[:chain_end + 1]
+        require(".lineHeight(" not in button_chain,
+                f"ButtonAttribute must not use unsupported lineHeight: {ui_file.relative_to(ROOT)}")
 
 practice_attempt = read_optional("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
 require("AppTheme.QUESTION_TEXT_SIZE" in practice_attempt and
