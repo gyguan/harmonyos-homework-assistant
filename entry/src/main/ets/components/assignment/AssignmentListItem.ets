@@ -9,6 +9,8 @@ export struct AssignmentListItem {
   @Prop selected: boolean = false;
   @Prop showChevron: boolean = true;
   @Prop interactive: boolean = true;
+  @Prop selectionMode: boolean = false;
+  @Prop selectionAvailable: boolean = true;
   onOpen: () => void = () => {};
 
   private statusColor(): string {
@@ -47,11 +49,32 @@ export struct AssignmentListItem {
   }
 
   private accessibilityLabel(): string {
-    return `${this.assignment.subject}，${this.assignment.title}，${this.deadlineText()}，${this.timingText()}，${AssignmentStateMachine.label(this.assignment.status)}`;
+    let base = `${this.assignment.subject}，${this.assignment.title}，${this.deadlineText()}，${this.timingText()}，${AssignmentStateMachine.label(this.assignment.status)}`;
+    if (!this.selectionMode) return base;
+    if (!this.selectionAvailable) return `不可删除，${base}`;
+    return `${this.selected ? '已选择' : '未选择'}，${base}`;
   }
 
-  build() {
-    Row({ space: 12 }) {
+  @Builder
+  private LeadingIndicator() {
+    if (this.selectionMode) {
+      Stack() {
+        Text(this.selectionAvailable && this.selected ? '✓' : (this.selectionAvailable ? '' : '—'))
+          .fontSize(16)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(this.selectionAvailable && this.selected ? AppTheme.TEXT_ON_PRIMARY : AppTheme.SUBTEXT)
+          .textAlign(TextAlign.Center);
+      }
+      .width(38)
+      .height(38)
+      .alignContent(Alignment.Center)
+      .backgroundColor(this.selectionAvailable && this.selected ? AppTheme.PRIMARY : AppTheme.SURFACE_EMPHASIS)
+      .border({
+        width: 1,
+        color: this.selectionAvailable && this.selected ? AppTheme.PRIMARY : AppTheme.BORDER
+      })
+      .borderRadius(12);
+    } else {
       Text(this.subjectInitial())
         .width(38)
         .height(38)
@@ -62,6 +85,12 @@ export struct AssignmentListItem {
         .fontColor(AppTheme.PRIMARY)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .borderRadius(12);
+    }
+  }
+
+  build() {
+    Row({ space: 12 }) {
+      this.LeadingIndicator();
 
       Column({ space: 4 }) {
         Text(this.assignment.title)
@@ -69,27 +98,21 @@ export struct AssignmentListItem {
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT)
-          .maxLines(2);
-        Row({ space: 7 }) {
-          Text(this.assignment.subject)
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.SUBTEXT);
-          Text('·').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-          Text(this.deadlineText())
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.SUBTEXT);
-          Text('·').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-          Text(this.timingText())
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        .width('100%');
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+        Text(`${this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}`)
+          .width('100%')
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .fontColor(AppTheme.SUBTEXT);
       }
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 5 }) {
         Text(AssignmentStateMachine.label(this.assignment.status))
+          .maxLines(1)
           .fontSize(AppTheme.CAPTION_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.statusColor());
