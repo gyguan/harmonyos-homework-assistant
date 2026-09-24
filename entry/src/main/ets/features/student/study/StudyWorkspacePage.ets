@@ -1223,8 +1223,8 @@ export struct StudyWorkspacePage {
     .justifyContent(FlexAlign.Start)
     .alignItems(HorizontalAlign.Start)
     .padding({
-      left: AppTheme.PAGE_PADDING,
-      right: AppTheme.PAGE_PADDING,
+      left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+      right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       top: AppTheme.DEEP_PAGE_TOP_PADDING,
       bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING
     });
