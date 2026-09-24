@@ -24,7 +24,7 @@ export struct DeadlinePickerDialog {
           label: '关闭',
           kind: TextActionKind.NEUTRAL,
           accessibilityLabel: '关闭截止时间选择',
-          onClick: () => this.controller.close()
+          onAction: () => this.controller.close()
         });
       }
       .width('100%');
@@ -63,7 +63,7 @@ export struct DeadlinePickerDialog {
 
       ActionButton({
         label: '确定',
-        onClick: () => {
+        onAction: () => {
           this.onConfirm();
           this.controller.close();
         }
@@ -165,7 +165,7 @@ export struct DeadlinePickerField {
           label: '清除',
           kind: TextActionKind.NEUTRAL,
           accessibilityLabel: '清除截止时间',
-          onClick: () => this.onChange('')
+          onAction: () => this.onChange('')
         });
       }
     }
