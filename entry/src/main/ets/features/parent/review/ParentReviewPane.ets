@@ -3,6 +3,7 @@ import {
   ParentSubmissionEvidenceService
 } from '../../../application/submission/ParentSubmissionEvidenceService';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
 import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -107,22 +108,22 @@ export struct ParentReviewPane {
           .lineHeight(19)
           .fontColor(AppTheme.DANGER);
         Row({ space: 10 }) {
-          Button('取消', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(40)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.deleteBusy)
-            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-            .fontColor(AppTheme.TEXT)
-            .onClick(() => this.deleteConfirm = false);
-          Button(this.deleteBusy ? '正在删除…' : '确认删除', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(40)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.deleteBusy)
-            .backgroundColor(AppTheme.DANGER)
-            .fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .onClick(() => { void this.deleteAssignment(); });
+          ActionButton({
+            label: '取消',
+            kind: ActionButtonKind.NEUTRAL,
+            compact: true,
+            isEnabled: !this.deleteBusy,
+            onClick: () => this.deleteConfirm = false
+          })
+          .layoutWeight(1);
+          ActionButton({
+            label: this.deleteBusy ? '正在删除…' : '确认删除',
+            kind: ActionButtonKind.DANGER,
+            compact: true,
+            isEnabled: !this.deleteBusy,
+            onClick: () => { void this.deleteAssignment(); }
+          })
+          .layoutWeight(1);
         }
         .width('100%');
       }
@@ -306,22 +307,19 @@ export struct ParentReviewPane {
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.reviewNoteDraft = value);
       Row({ space: 10 }) {
-        Button('退回订正', { type: ButtonType.Normal })
-          .layoutWeight(1)
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.WARNING_SOFT)
-          .fontColor(AppTheme.WARNING)
-          .enabled(!this.submitting)
-          .onClick(() => void this.returnForRework());
-        Button(this.submitting ? '处理中…' : '通过', { type: ButtonType.Normal })
-          .layoutWeight(1)
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.PRIMARY)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .enabled(!this.submitting)
-          .onClick(() => void this.approve());
+        ActionButton({
+          label: '退回订正',
+          kind: ActionButtonKind.WARNING,
+          isEnabled: !this.submitting,
+          onClick: () => void this.returnForRework()
+        })
+        .layoutWeight(1);
+        ActionButton({
+          label: this.submitting ? '处理中…' : '通过',
+          isEnabled: !this.submitting,
+          onClick: () => void this.approve()
+        })
+        .layoutWeight(1);
       }
       .width('100%');
       if (this.operationNotice.length > 0) {
@@ -363,31 +361,23 @@ export struct ParentReviewPane {
               if (this.canEdit(this.assignment()!) || this.canDelete(this.assignment()!)) {
                 Row({ space: 10 }) {
                   if (this.canEdit(this.assignment()!)) {
-                    Text('编辑任务')
-                      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                      .fontSize(13)
-                      .fontWeight(FontWeight.Medium)
-                      .fontColor(AppTheme.PRIMARY)
-                      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-                      .backgroundColor(AppTheme.PRIMARY_SOFT)
-                      .borderRadius(AppTheme.CONTROL_RADIUS)
-                      .accessibilityRole(AccessibilityRoleType.BUTTON)
-                      .accessibilityText('编辑这项作业')
-                      .onClick(() => this.startEditing(this.assignment()!));
+                    ActionButton({
+                      label: '编辑任务',
+                      kind: ActionButtonKind.SECONDARY,
+                      compact: true,
+                      accessibilityLabel: '编辑这项作业',
+                      onClick: () => this.startEditing(this.assignment()!)
+                    });
                   }
                   Blank();
                   if (this.canDelete(this.assignment()!)) {
-                    Text('删除作业')
-                      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                      .fontSize(13)
-                      .fontWeight(FontWeight.Medium)
-                      .fontColor(AppTheme.DANGER)
-                      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-                      .backgroundColor(AppTheme.DANGER_SOFT)
-                      .borderRadius(AppTheme.CONTROL_RADIUS)
-                      .accessibilityRole(AccessibilityRoleType.BUTTON)
-                      .accessibilityText('删除这项未完成作业')
-                      .onClick(() => this.deleteConfirm = true);
+                    ActionButton({
+                      label: '删除作业',
+                      kind: ActionButtonKind.DANGER_SOFT,
+                      compact: true,
+                      accessibilityLabel: '删除这项未完成作业',
+                      onClick: () => this.deleteConfirm = true
+                    });
                   }
                 }
                 .width('100%');
