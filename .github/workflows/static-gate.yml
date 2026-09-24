@@ -82,6 +82,7 @@ jobs:
           node --check backend/src/main/resources/static/admin/js/login-shell.js
           node --check backend/src/main/resources/static/admin/js/api.js
           node --check backend/src/main/resources/static/admin/js/voice-material.js
+          node --check backend/src/main/resources/static/admin/js/voice-management-view.js
           node --check backend/src/main/resources/static/admin/js/app.js
 
   validate-project-invariants:
@@ -211,6 +212,7 @@ jobs:
           python scripts/validate_admin_voice_material_import.py
           node --check backend/src/main/resources/static/admin/js/api.js
           node --check backend/src/main/resources/static/admin/js/voice-material.js
+          node --check backend/src/main/resources/static/admin/js/voice-management-view.js
           node --check backend/src/main/resources/static/admin/js/app.js
 
       - name: Validate voice workspace media focus
