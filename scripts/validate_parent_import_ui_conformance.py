@@ -80,7 +80,7 @@ require("FilterSummaryEntry" in inbox and "label: '来源'" in inbox and
         "label: '状态'" in inbox and "label: '时间'" in inbox,
         "Import Inbox must reuse the standard filter summary interaction")
 require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in inbox and
-        "AppTheme.PHONE_CARD_RADIUS" in inbox and "AppTheme.BORDER" in inbox,
+        "AppTheme.CARD_RADIUS_COMPACT" in inbox and "AppTheme.BORDER" in inbox,
         "Import Inbox cards must stay aligned with current Phone/Pad visual tokens")
 
 require(inbox.count(".alignItems(HorizontalAlign.Center)") >= 1 and
@@ -91,7 +91,7 @@ require(batch.count(".alignItems(HorizontalAlign.Center)") >= 1 and
         "Import batch detail page shell must center the readable column on wide layouts")
 require("backAccessibilityText: '返回作业收件箱'" in batch,
         "Import batch detail return semantics must match the current inbox title")
-require(batch.count("AppTheme.PHONE_CARD_RADIUS") >= 4 and
+require(batch.count("AppTheme.CARD_RADIUS_COMPACT") >= 4 and
         batch.count(".border({ width: 1, color: AppTheme.BORDER })") >= 4,
         "Import batch detail cards must reuse current parent card radius and border tokens")
 
