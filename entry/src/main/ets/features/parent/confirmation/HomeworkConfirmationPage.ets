@@ -368,8 +368,8 @@ export struct HomeworkConfirmationPage {
         }
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.CONFIRMATION_READABLE_MAX_WIDTH })
-      .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING, top: 10, bottom: 14 });
+      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
+      .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: 10, bottom: 14 });
     }
     .width('100%')
     .alignItems(HorizontalAlign.Center)
@@ -390,10 +390,10 @@ export struct HomeworkConfirmationPage {
         this.CandidateListHeader();
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.CONFIRMATION_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
       .padding({
-        left: AppTheme.PHONE_PAGE_PADDING,
-        right: AppTheme.PHONE_PAGE_PADDING,
+        left: AppTheme.PAGE_PADDING,
+        right: AppTheme.PAGE_PADDING,
         top: AppTheme.DEEP_PAGE_TOP_PADDING,
         bottom: 8
       });
@@ -403,10 +403,10 @@ export struct HomeworkConfirmationPage {
           this.CandidateList();
         }
         .width('100%')
-        .constraintSize({ maxWidth: AppTheme.CONFIRMATION_READABLE_MAX_WIDTH })
+        .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
         .padding({
-          left: AppTheme.PHONE_PAGE_PADDING,
-          right: AppTheme.PHONE_PAGE_PADDING,
+          left: AppTheme.PAGE_PADDING,
+          right: AppTheme.PAGE_PADDING,
           top: 4,
           bottom: 16
         });
