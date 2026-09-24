@@ -89,7 +89,7 @@ export struct HomeworkShareImportStatusPage {
       if (this.phase === ShareImportPhase.FAILED) {
         ActionButton({
           label: '重试',
-          onClick: () => this.retry()
+          onAction: () => this.retry()
         })
         .width('100%');
       }
@@ -97,7 +97,7 @@ export struct HomeworkShareImportStatusPage {
       if (this.phase === ShareImportPhase.EMPTY) {
         ActionButton({
           label: '查看作业智能收件箱',
-          onClick: () => this.onOpenInbox()
+          onAction: () => this.onOpenInbox()
         })
         .width('100%');
       }
@@ -107,7 +107,7 @@ export struct HomeworkShareImportStatusPage {
           label: '取消导入',
           kind: ActionButtonKind.NEUTRAL,
           compact: true,
-          onClick: () => { void this.cancel(); }
+          onAction: () => { void this.cancel(); }
         })
         .width('100%');
       } else if (this.phase === ShareImportPhase.EMPTY) {
@@ -115,7 +115,7 @@ export struct HomeworkShareImportStatusPage {
           label: '完成',
           kind: ActionButtonKind.NEUTRAL,
           compact: true,
-          onClick: () => this.onCancel()
+          onAction: () => this.onCancel()
         })
         .width('100%');
       }
