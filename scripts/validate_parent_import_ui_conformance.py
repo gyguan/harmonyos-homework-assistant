@@ -22,6 +22,10 @@ inbox = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.
 batch = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
 import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
+import_vm = read("entry/src/main/ets/features/parent/import/HomeworkImportViewModel.ets")
+import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
+entry = read("entry/src/main/ets/entryability/EntryAbility.ets")
+dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 
 # Current deep pages must remain top anchored and hide the system scrollbar.
 for name, source in [
@@ -37,6 +41,30 @@ for name, source in [
 require(".alignItems(HorizontalAlign.Center)" in import_route and
         "AppTheme.IMPORT_READABLE_MAX_WIDTH" in import_page,
         "manual import route must center the embedded readable content column on Pad")
+
+require("Button(this.parseBusy ? '识别中…' : '拍照识别'" in import_page and
+        "Button(this.parseBusy ? '识别中…' : '相册识别'" in import_page,
+        "manual homework must expose compact camera and gallery OCR actions")
+require("private ActionFooter()" in import_page and
+        import_page.find("this.ActionFooter();") > import_page.find(".scrollBar(BarState.Off);"),
+        "manual homework primary action must remain fixed outside scrolling content")
+require(".height(150)" in import_page and "整理并继续" in import_page,
+        "manual homework content editor must stay compact and preserve one primary continuation action")
+require("captureImageText()" in import_vm and
+        "HomeworkImportService.instance.captureImageText()" in import_vm,
+        "manual homework ViewModel must expose camera OCR through the import service")
+require("cameraPicker.pick(" in import_service and
+        "cameraPicker.PickerMediaType.PHOTO" in import_service and
+        "CameraPosition.CAMERA_POSITION_BACK" in import_service,
+        "manual homework camera OCR must use the system camera picker")
+require("recognizeImageText" in import_service and
+        "this.pipeline.extract(rawImport)" in import_service,
+        "camera and gallery OCR must reuse the existing text extraction pipeline")
+require("HomeworkImportService.instance.configure(" in entry and
+        "this.context, new CoreVisionHomeworkTextExtractor()" in entry,
+        "manual homework camera OCR must receive UIAbility context during bootstrap")
+require("输入文字、拍照或相册识别" in dashboard,
+        "parent home must make photo recognition discoverable from the homework action")
 
 require("FilterSummaryEntry" in inbox and "label: '来源'" in inbox and
         "label: '状态'" in inbox and "label: '时间'" in inbox,
