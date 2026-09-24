@@ -62,7 +62,7 @@ enum ParentRoute {
 
 @Component
 export struct AppShell {
-  @Prop role: AppRole = AppRole.STUDENT;
+  @Prop @Watch('onRoleChanged') role: AppRole = AppRole.STUDENT;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
@@ -181,6 +181,13 @@ export struct AppShell {
     this.parentRoute = ParentRoute.DASHBOARD;
   }
 
+  private onRoleChanged(): void {
+    this.resetPersonaNavigation();
+    this.identityParentActive = this.role === AppRole.PARENT;
+    this.syncFamilyContext();
+    this.storeRevision++;
+  }
+
   private openIdentitySwitcher(): void {
     this.identityParentActive = this.role === AppRole.PARENT;
     if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideIdentitySwitcherController.open();
@@ -189,14 +196,13 @@ export struct AppShell {
 
   private switchToParent(): void {
     if (this.role === AppRole.PARENT) return;
-    this.resetPersonaNavigation();
     this.onSwitchParent();
   }
 
   private switchToStudent(studentId: string): void {
     if (studentId.length === 0 ||
       (this.role === AppRole.STUDENT && studentId === this.activeStudentId)) return;
-    this.resetPersonaNavigation();
+    if (this.role === AppRole.STUDENT) this.resetPersonaNavigation();
     this.onSwitchStudent(studentId);
   }
 
