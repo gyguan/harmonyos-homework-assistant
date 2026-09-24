@@ -136,8 +136,8 @@ for token in [
     "private toggleCandidateSelection",
     "private selectAllCandidates",
     "private removeSelectedCandidates",
-    "Text('管理')",
-    "Text('全选')",
+    "label: '管理'",
+    "label: '全选'",
     "确认删除",
 ]:
     require(token in page, f"candidate batch delete missing behavior: {token}")
