@@ -278,7 +278,7 @@ export struct StudentHomePage {
 
   @Builder
   private PhoneHome() {
-    Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+    Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
       this.TodayTasks();
     }
@@ -289,7 +289,7 @@ export struct StudentHomePage {
 
   @Builder
   private PadHome() {
-    Column({ space: AppTheme.PHONE_SECTION_GAP }) {
+    Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
       Row({ space: AppTheme.SPLIT_PANE_GAP }) {
         Column({ space: 12 }) {
