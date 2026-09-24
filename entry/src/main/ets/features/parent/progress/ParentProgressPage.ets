@@ -365,14 +365,14 @@ export struct ParentProgressPage {
           .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
         if (this.deletableVisibleAssignments().length > 0 || this.bulkMode) {
-          Text(this.bulkMode ? '完成' : '删除')
+          Text(this.bulkMode ? '取消' : '删除')
             .fontSize(13)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.bulkMode ? AppTheme.PRIMARY : AppTheme.DANGER)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .padding({ left: 8, right: 2 })
             .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText(this.bulkMode ? '完成删除选择' : '选择要删除的作业')
+            .accessibilityText(this.bulkMode ? '取消删除选择' : '选择要删除的作业')
             .onClick(() => {
               if (this.bulkMode) this.exitBulkMode();
               else this.enterBulkMode();
@@ -392,34 +392,13 @@ export struct ParentProgressPage {
       } else {
         Column({ space: 7 }) {
           ForEach(this.currentVisibleAssignments(), (item: Assignment) => {
-            Row({ space: 8 }) {
-              if (this.bulkMode) {
-                Text(this.canDelete(item) ? (this.isDeleteSelected(item.id) ? '✓' : '') : '—')
-                  .width(28)
-                  .height(28)
-                  .fontSize(15)
-                  .fontWeight(FontWeight.Bold)
-                  .fontColor(this.isDeleteSelected(item.id) ? AppTheme.TEXT_ON_PRIMARY : AppTheme.SUBTEXT)
-                  .textAlign(TextAlign.Center)
-                  .backgroundColor(this.isDeleteSelected(item.id) ? AppTheme.PRIMARY : AppTheme.SURFACE_EMPHASIS)
-                  .border({ width: 1, color: this.isDeleteSelected(item.id) ? AppTheme.PRIMARY : AppTheme.BORDER })
-                  .borderRadius(14)
-                  .accessibilityRole(AccessibilityRoleType.BUTTON)
-                  .accessibilityText(this.canDelete(item) ?
-                    (this.isDeleteSelected(item.id) ? '取消选择这项作业' : '选择这项作业') : '已完成作业不能删除')
-                  .onClick(() => this.toggleDeleteSelection(item));
-              }
-              AssignmentListItem({
-                assignment: item,
-                selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item),
-                showChevron: !this.bulkMode && !this.canUseReviewPane(),
-                interactive: !this.bulkMode || this.canDelete(item),
-                onOpen: () => this.openAssignment(item)
-              })
-              .layoutWeight(1);
-            }
-            .width('100%')
-            .alignItems(VerticalAlign.Center);
+            AssignmentListItem({
+              assignment: item,
+              selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item),
+              showChevron: !this.bulkMode && !this.canUseReviewPane(),
+              interactive: !this.bulkMode || this.canDelete(item),
+              onOpen: () => this.openAssignment(item)
+            });
           }, (item: Assignment) => this.assignmentRenderKey(item));
         }
         .width('100%');
