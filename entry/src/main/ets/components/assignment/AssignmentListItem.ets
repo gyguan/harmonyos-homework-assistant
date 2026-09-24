@@ -97,17 +97,17 @@ export struct AssignmentListItem {
           Text(this.assignment.title)
             .layoutWeight(1)
             .fontSize(AppTheme.CARD_TITLE_SIZE)
-            .lineHeight(22)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
-            .maxLines(2)
+            .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
 
           Row({ space: 4 }) {
             Text(AssignmentStateMachine.label(this.assignment.status))
               .maxLines(1)
               .fontSize(AppTheme.CAPTION_SIZE)
-              .lineHeight(18)
+              .lineHeight(AppTheme.META_LINE_HEIGHT)
               .fontWeight(FontWeight.Medium)
               .fontColor(this.statusColor());
             if (this.showChevron && this.interactive) {
@@ -127,7 +127,7 @@ export struct AssignmentListItem {
         Text(`${this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}`)
           .width('100%')
           .maxLines(1)
-          .lineHeight(18)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontSize(AppTheme.CAPTION_SIZE)
           .fontColor(AppTheme.SUBTEXT);
