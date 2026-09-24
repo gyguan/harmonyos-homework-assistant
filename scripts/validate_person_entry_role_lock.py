@@ -58,18 +58,22 @@ require("private resetPersonaNavigation()" in app_shell and
         "this.studentRoute = StudentRoute.HOME" in app_shell and
         "this.parentRoute = ParentRoute.DASHBOARD" in app_shell,
         "identity changes must clear role-specific navigation state")
-require("this.familyContext.setActiveStudent(studentId)" in app_shell and
-        "void this.refreshActiveStudent()" in app_shell,
-        "student identity changes must update and refresh active-student context")
+switch_student = app_shell.split("private switchToStudent(studentId: string): void {", 1)[1].split(
+    "private openStudentSwitcher()", 1)[0]
+require("this.familyContext.setActiveStudent(studentId)" not in switch_student and
+        "this.onSwitchStudent(studentId)" in switch_student,
+        "AppShell identity switch must delegate student context ownership to Index")
 require("private IdentityContextBar()" in app_shell and
         "this.IdentityContextBar();" in app_shell,
         "Phone shell must expose current identity for both roles")
 require(app_shell.count(".onClick(() => this.openIdentitySwitcher())") >= 2,
         "Phone and wide shells must both expose identity switching")
-require("parentActive: this.role === AppRole.PARENT" in app_shell and
+require("@State private identityParentActive: boolean" in app_shell and
+        "parentActive: $identityParentActive" in app_shell and
+        "this.identityParentActive = this.role === AppRole.PARENT" in app_shell and
         "students: $familyStudents" in app_shell and
         "activeStudentId: $activeStudentId" in app_shell,
-        "identity switcher must bind current role and reactive student context")
+        "identity switcher must bind role and student context reactively")
 
 require("private openStudentSwitcher()" in app_shell and
         "private selectStudent(studentId: string)" in app_shell and
@@ -83,7 +87,8 @@ require("选择家长或学生" in identity_switcher and
         "identity dialog must combine role and person selection in one surface")
 require("CenteredTextBadge" in identity_switcher and "badgeText: '家'" in identity_switcher,
         "identity dialog must reuse shared centered identity badges")
-require(identity_switcher.count("!this.parentActive && this.activeStudentId === student.id") >= 4,
+require("@Link parentActive: boolean" in identity_switcher and
+        identity_switcher.count("!this.parentActive && this.activeStudentId === student.id") >= 4,
         "student current-state marker must be guarded by non-parent identity")
 
 if errors:
