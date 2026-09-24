@@ -250,14 +250,14 @@ export struct ConfirmationCandidateEditor {
           ActionButton({
             label: '继续编辑',
             kind: ActionButtonKind.NEUTRAL,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             onAction: (): void => { this.confirmDiscard = false; }
           })
           .layoutWeight(1);
           ActionButton({
             label: '放弃修改',
             kind: ActionButtonKind.DANGER_SOFT,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             onAction: (): void => {
               this.onClose();
             }
@@ -274,14 +274,14 @@ export struct ConfirmationCandidateEditor {
           ActionButton({
             label: '取消',
             kind: ActionButtonKind.NEUTRAL,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             onAction: (): void => { this.confirmDelete = false; }
           })
           .layoutWeight(1);
           ActionButton({
             label: '确认删除',
             kind: ActionButtonKind.DANGER,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             onAction: (): void => this.onDelete(this.item.id)
           })
           .layoutWeight(1);
@@ -292,13 +292,13 @@ export struct ConfirmationCandidateEditor {
           ActionButton({
             label: '删除',
             kind: ActionButtonKind.DANGER_SOFT,
-            size: ActionButtonSize.MEDIUM,
+            actionSize: ActionButtonSize.MEDIUM,
             onAction: (): void => { this.confirmDelete = true; }
           })
           .layoutWeight(1);
           ActionButton({
             label: '保存',
-            size: ActionButtonSize.MEDIUM,
+            actionSize: ActionButtonSize.MEDIUM,
             onAction: (): void => this.saveAndClose()
           })
           .layoutWeight(2);
