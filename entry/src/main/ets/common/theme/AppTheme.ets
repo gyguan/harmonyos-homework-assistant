@@ -88,8 +88,6 @@ export class AppTheme {
   static readonly PHONE_SECTION_GAP: number = 14;
   static readonly PHONE_CARD_PADDING: number = 14;
   static readonly PHONE_CARD_RADIUS: number = 16;
-  static readonly PHONE_PAGE_TITLE_SIZE: number = 23;
-  static readonly PHONE_SECTION_TITLE_SIZE: number = 17;
 
   // PAD-only visual scale. Use these from wide compositions instead of enlarging phone defaults.
   static readonly PAD_PAGE_TITLE_SIZE: number = 28;
@@ -99,6 +97,8 @@ export class AppTheme {
   static readonly PAD_META_SIZE: number = 13;
   static readonly PAD_MIN_TOUCH_TARGET: number = 48;
 
+  // Shared title hierarchy. Responsive layout may scale presentation, but semantic levels stay stable.
+  // PAGE_TITLE is reserved for the current business object; PAGE_NAV is for page/dialog/sheet headers.
   static readonly PAGE_TITLE_SIZE: number = 26;
   static readonly SECTION_TITLE_SIZE: number = 17;
   static readonly CARD_TITLE_SIZE: number = 16;
