@@ -131,6 +131,9 @@ def main() -> int:
             require(
                 "onAction: () =>" not in source,
                 f"{relative} uses an implicitly typed shared action callback; declare (): void explicitly")
+            require(
+                re.search(r"onAction:\s*\(\):\s*void\s*=>\s*this\.[A-Za-z0-9_]+\s*=", source) is None,
+                f"{relative} returns an assignment value from a void onAction callback; use a block body")
 
     syscap = "SystemCapability.Multimedia.Media.AVPlayer"
     require(audio.count(f"canIUse('{syscap}')") >= 2,
