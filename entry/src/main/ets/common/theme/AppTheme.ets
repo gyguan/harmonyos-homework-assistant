@@ -27,7 +27,8 @@ export class AppTheme {
   static readonly PAGE_PADDING_COMPACT: number = 16;
   static readonly PAGE_PADDING_MEDIUM: number = 24;
   static readonly PAGE_PADDING_EXPANDED: number = 32;
-  static readonly PAGE_PADDING: number = 16;
+  // Legacy generic padding stays at 20vp until remaining deep pages migrate explicitly.
+  static readonly PAGE_PADDING: number = 20;
   static readonly PAGE_PADDING_WIDE: number = 32;
   static readonly SECTION_GAP_COMPACT: number = 14;
   static readonly SECTION_GAP_STANDARD: number = 20;
