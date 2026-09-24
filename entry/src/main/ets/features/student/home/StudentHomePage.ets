@@ -301,7 +301,7 @@ export struct StudentHomePage {
         Column({ space: 12 }) {
           Row() {
             Text('接下来')
-              .fontSize(20)
+              .fontSize(AppTheme.SECTION_TITLE_SIZE)
               .fontWeight(FontWeight.Bold)
               .fontColor(AppTheme.TEXT);
             Blank();
