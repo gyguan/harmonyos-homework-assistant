@@ -106,7 +106,7 @@ struct StudentTodayTaskCard {
         compact: true,
         isEnabled: !this.busy,
         accessibilityLabel: `${this.actionLabel()}${this.assignment.title}`,
-        onClick: () => this.onAction(this.assignment.id)
+        onAction: () => this.onAction(this.assignment.id)
       })
       .width(this.emphasized ? 96 : 82);
     }
