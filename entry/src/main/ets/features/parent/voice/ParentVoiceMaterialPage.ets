@@ -602,7 +602,7 @@ export struct ParentVoiceMaterialPage {
             Blank();
             Text('关闭').fontSize(13).fontColor(AppTheme.SUBTEXT).onClick(() => this.closeCreateSheet());
           }.width('100%');
-          Text(this.creatingItem()!.directoryName).width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text(this.creatingItem()!.directoryName).width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           Text('学生').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
           Row({ space: 8 }) {
             ForEach(this.viewModel.students(), (student: StudentProfile) => {
