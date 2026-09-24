@@ -168,10 +168,15 @@ if assignment_list_item:
 # not ordinary @Builder boolean snapshots. Keep both the binding mechanism and visible feedback guarded.
 action_controls = read_optional("entry/src/main/ets/components/action/ActionControls.ets")
 require("export struct ActionButton" in action_controls and "export struct TextAction" in action_controls and
-        "ActionButtonKind.PRIMARY" in action_controls and "TextActionKind.DANGER" in action_controls,
-        "shared action controls must define primary/secondary/danger buttons and text actions")
+        "ActionButtonKind.PRIMARY" in action_controls and "ActionButtonKind.OUTLINE" in action_controls and
+        "ActionButtonKind.GHOST" in action_controls and "TextActionKind.DANGER" in action_controls,
+        "shared action controls must define primary/outline/ghost/danger buttons and text actions")
+require("export enum ActionButtonSize" in action_controls and
+        "LARGE = 'LARGE'" in action_controls and "MEDIUM = 'MEDIUM'" in action_controls and
+        "SMALL = 'SMALL'" in action_controls and "@Prop size: ActionButtonSize" in action_controls,
+        "shared action controls must expose explicit large/medium/small sizing")
 require("AppTheme.BUTTON_HEIGHT" in action_controls and "AppTheme.SECONDARY_BUTTON_HEIGHT" in action_controls and
-        "AppTheme.CONTROL_RADIUS" in action_controls,
+        "AppTheme.MIN_TOUCH_TARGET" in action_controls and "AppTheme.CONTROL_RADIUS" in action_controls,
         "shared action controls must consume durable theme sizing rather than page-local literals")
 
 # Standard business actions must reuse shared action semantics. Specialized controls such as
@@ -208,6 +213,44 @@ for filter_path in [
     require("SegmentedSelectionButton" in filter_source,
             f"persistent filter/choice controls must reuse SegmentedSelectionButton: {filter_path}")
 
+# High-frequency pages must preserve visual hierarchy instead of collapsing back to one compact blue button style.
+for explicit_size_path in [
+    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
+    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
+    "entry/src/main/ets/features/parent/review/ParentReviewPane.ets",
+    "entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets",
+    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
+    "entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets",
+    "entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets",
+    "entry/src/main/ets/features/student/home/StudentHomePage.ets",
+    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
+]:
+    explicit_size_source = read_optional(explicit_size_path)
+    require("compact: true" not in explicit_size_source,
+            f"high-frequency action layout must use explicit ActionButtonSize instead of compact: {explicit_size_path}")
+
+parent_review_actions = read_optional("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
+require("label: '编辑'" in parent_review_actions and "label: '删除'" in parent_review_actions and
+        "TextAction({" in parent_review_actions,
+        "Parent Review card management actions must stay lightweight text actions")
+
+student_home_actions = read_optional("entry/src/main/ets/features/student/home/StudentHomePage.ets")
+require("kind: this.emphasized ? ActionButtonKind.PRIMARY : ActionButtonKind.OUTLINE" in student_home_actions and
+        "size: ActionButtonSize.SMALL" in student_home_actions,
+        "Student Home card actions must use small primary/outline hierarchy")
+
+study_actions = read_optional("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
+require("label: '问小伴'" in study_actions and "kind: ActionButtonKind.OUTLINE" in study_actions and
+        "label: '暂停一下'" in study_actions and "kind: ActionButtonKind.NEUTRAL" in study_actions and
+        "size: ActionButtonSize.MEDIUM" in study_actions,
+        "Study Workspace must keep helper/pause weaker than the primary workflow action")
+
+voice_actions = read_optional("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+require("kind: ActionButtonKind.OUTLINE" in voice_actions and
+        "kind: ActionButtonKind.GHOST" in voice_actions and
+        "size: ActionButtonSize.SMALL" in voice_actions,
+        "Voice assignment preparation actions must stay weaker than Publish")
+
 selection_controls = read_optional("entry/src/main/ets/components/selection/SelectionControls.ets")
 require(len(selection_controls) > 0, "missing shared reactive selection controls")
 if selection_controls:
@@ -220,8 +263,8 @@ if selection_controls:
             "persistent selection controls must receive selected as reactive @Prop")
     require("@Prop active: boolean = false;" in selection_controls,
             "filter summary active state must be a reactive @Prop")
-    require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_controls,
-            "reactive selection controls must expose a visible selected surface")
+    require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE)" in selection_controls,
+            "reactive selection controls must use white unselected surfaces and visible selected surfaces")
     require("border({ width: 1, color: this.selected ? AppTheme.PRIMARY : AppTheme.BORDER })" in selection_controls,
             "status selection must combine selected surface and border")
 
