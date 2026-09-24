@@ -27,7 +27,10 @@ export struct BackendConnectionPage {
   @State private editClassName: string = '';
   @State private editSemester: string = '';
   @State private editTextbooks: string = '';
-  @State private cloudPanelOpen: boolean = false;
+  @State private familyExpanded: boolean = false;
+  @State private parentAccessExpanded: boolean = false;
+  @State private tutorRulesExpanded: boolean = false;
+  @State private dataSyncExpanded: boolean = false;
   @State private parentAccessCodeDraft: string = '';
   @State private parentAccessCodeConfirm: string = '';
   @State private parentAccessMessage: string = '';
@@ -225,16 +228,6 @@ export struct BackendConnectionPage {
   }
 
   @Builder
-  private SectionTitle(title: string, description: string) {
-    Column({ space: 3 }) {
-      Text(title).width('100%').fontSize(18).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      Text(description).width('100%').fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start);
-  }
-
-  @Builder
   private StudentIdentityFields() {
     if (this.canInlineStudentFields()) {
       Row({ space: 8 }) {
@@ -366,7 +359,7 @@ export struct BackendConnectionPage {
 
       this.StudentEditor();
     }
-    .width('100%').padding({ left: 16, right: 16 }).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CONTROL_RADIUS);
+    .width('100%');
   }
 
   @Builder
@@ -446,10 +439,7 @@ export struct BackendConnectionPage {
         .fontSize(12)
         .fontColor(AppTheme.TERTIARY_TEXT);
     }
-    .width('100%')
-    .padding(16)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(AppTheme.CONTROL_RADIUS);
+    .width('100%');
   }
 
   @Builder
@@ -469,7 +459,7 @@ export struct BackendConnectionPage {
         onToggle: (enabled: boolean) => this.updateTutorSettings(this.tutorGuidanceFirst(), enabled)
       });
     }
-    .width('100%').padding({ left: 16, right: 16 }).backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CONTROL_RADIUS);
+    .width('100%');
   }
 
   @Builder
@@ -483,77 +473,200 @@ export struct BackendConnectionPage {
             : '未连接 · 本地作业仍可使用')
             .fontSize(13).fontColor(BackendSession.instance.isConnected() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
         }
-        .layoutWeight(1).alignItems(HorizontalAlign.Start);
-        Text(this.cloudPanelOpen ? '⌃' : '⌄').fontSize(16).fontColor(AppTheme.TERTIARY_TEXT);
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
       }
-      .width('100%').constraintSize({ minHeight: 52 }).padding({ top: 12, bottom: 12 })
-      .accessibilityGroup(true).accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(this.cloudPanelOpen ? '家庭云端，已展开，点击收起' : '家庭云端，点击展开高级连接设置')
-      .onClick(() => this.cloudPanelOpen = !this.cloudPanelOpen);
+      .width('100%');
 
-      if (this.cloudPanelOpen) {
-        Divider().color(AppTheme.DIVIDER);
-        Text('高级连接设置').width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-        TextInput({ placeholder: '例如 http://192.168.1.10:8080', text: this.baseUrl })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.baseUrl = value);
+      Divider().color(AppTheme.DIVIDER);
+      Text('高级连接设置').width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+      TextInput({ placeholder: '例如 http://192.168.1.10:8080', text: this.baseUrl })
+        .width('100%').height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.baseUrl = value);
 
-        if (!BackendSession.instance.isConnected()) {
-          TextInput({ placeholder: '家长账号', text: this.loginName }).width('100%').height(AppTheme.INPUT_HEIGHT)
-            .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.loginName = value);
-          TextInput({ placeholder: '密码', text: this.password }).width('100%').height(AppTheme.INPUT_HEIGHT)
-            .type(InputType.Password).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.password = value);
-          Button(this.connecting ? '正在连接…' : '连接并同步', { type: ButtonType.Normal }).width('100%')
-            .height(AppTheme.BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS).enabled(!this.connecting)
-            .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
-            .onClick(() => { void this.connect(); });
-        } else {
-          Row({ space: 8 }) {
-            Button('立即同步', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
-              .onClick(() => { void this.syncCloudData(); });
-            Button('断开连接', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
-              .onClick(() => { void this.disconnect(); });
-          }
-          .width('100%');
+      if (!BackendSession.instance.isConnected()) {
+        TextInput({ placeholder: '家长账号', text: this.loginName }).width('100%').height(AppTheme.INPUT_HEIGHT)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => this.loginName = value);
+        TextInput({ placeholder: '密码', text: this.password }).width('100%').height(AppTheme.INPUT_HEIGHT)
+          .type(InputType.Password).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => this.password = value);
+        Button(this.connecting ? '正在连接…' : '连接并同步', { type: ButtonType.Normal }).width('100%')
+          .height(AppTheme.BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS).enabled(!this.connecting)
+          .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => { void this.connect(); });
+      } else {
+        Row({ space: 8 }) {
+          Button('立即同步', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+            .onClick(() => { void this.syncCloudData(); });
+          Button('断开连接', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
+            .onClick(() => { void this.disconnect(); });
         }
+        .width('100%');
       }
     }
-    .width('100%').padding({ left: 16, right: 16, bottom: 12 })
-    .backgroundColor(AppTheme.SURFACE).borderRadius(AppTheme.CONTROL_RADIUS);
+    .width('100%');
+  }
+
+  @Builder
+  private FamilySettingsSection() {
+    Column({ space: 2 }) {
+      Row() {
+        Column({ space: 3 }) {
+          Text('家庭')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('孩子资料和教材信息')
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        Text(this.familyExpanded ? '收起' : '查看')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .alignItems(VerticalAlign.Center)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.familyExpanded ? '收起家庭资料' : '查看家庭资料')
+      .onClick(() => this.familyExpanded = !this.familyExpanded);
+
+      if (this.familyExpanded) {
+        this.FamilySection();
+      }
+    }
+    .width('100%')
+    .padding(16);
+  }
+
+  @Builder
+  private ParentAccessSettingsSection() {
+    Column({ space: 2 }) {
+      Row() {
+        Column({ space: 3 }) {
+          Text('家长保护')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('限制学生误进入家长操作')
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        Text(this.parentAccessExpanded ? '收起' : '查看')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .alignItems(VerticalAlign.Center)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.parentAccessExpanded ? '收起家长保护' : '查看家长保护')
+      .onClick(() => this.parentAccessExpanded = !this.parentAccessExpanded);
+
+      if (this.parentAccessExpanded) {
+        this.ParentAccessSection();
+      }
+    }
+    .width('100%')
+    .padding(16);
+  }
+
+  @Builder
+  private TutorRulesSettingsSection() {
+    Column({ space: 2 }) {
+      Row() {
+        Column({ space: 3 }) {
+          Text('AI 辅导规则')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('设置小伴的讲解和答案规则')
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        Text(this.tutorRulesExpanded ? '收起' : '查看')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .alignItems(VerticalAlign.Center)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.tutorRulesExpanded ? '收起 AI 辅导规则' : '查看 AI 辅导规则')
+      .onClick(() => this.tutorRulesExpanded = !this.tutorRulesExpanded);
+
+      if (this.tutorRulesExpanded) {
+        this.TutorSection();
+      }
+    }
+    .width('100%')
+    .padding(16);
+  }
+
+  @Builder
+  private DataSyncSettingsSection() {
+    Column({ space: 2 }) {
+      Row() {
+        Column({ space: 3 }) {
+          Text('数据与同步')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('家庭云端和数据同步')
+            .fontSize(12)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+        Text(this.dataSyncExpanded ? '收起' : '查看')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .alignItems(VerticalAlign.Center)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(this.dataSyncExpanded ? '收起数据与同步' : '查看数据与同步')
+      .onClick(() => this.dataSyncExpanded = !this.dataSyncExpanded);
+
+      if (this.dataSyncExpanded) {
+        this.CloudPanel();
+      }
+    }
+    .width('100%')
+    .padding(16);
   }
 
   build() {
     Column() {
       Scroll() {
         Column() {
-          Column({ space: 20 }) {
-            Column({ space: 10 }) {
-              this.SectionTitle('家庭', '孩子资料和教材信息');
-              this.FamilySection();
+          Column({ space: 18 }) {
+            Column() {
+              this.FamilySettingsSection();
+              Divider().color(AppTheme.DIVIDER);
+              this.ParentAccessSettingsSection();
+              Divider().color(AppTheme.DIVIDER);
+              this.TutorRulesSettingsSection();
+              Divider().color(AppTheme.DIVIDER);
+              this.DataSyncSettingsSection();
             }
-            .width('100%');
-
-            Column({ space: 10 }) {
-              this.SectionTitle('家长保护', '限制学生误进入家长操作。');
-              this.ParentAccessSection();
-            }
-            .width('100%');
-
-            Column({ space: 10 }) {
-              this.SectionTitle('AI 辅导规则', '规则由家长设置，并应用到孩子下一次向小伴提问。');
-              this.TutorSection();
-            }
-            .width('100%');
-
-            Column({ space: 10 }) {
-              this.SectionTitle('数据与同步', '普通使用无需修改服务地址；只有自建家庭云端时才需要进入高级设置。');
-              this.CloudPanel();
-            }
-            .width('100%');
+            .width('100%')
+            .backgroundColor(AppTheme.SURFACE)
+            .borderRadius(AppTheme.CARD_RADIUS);
 
             if (this.message.length > 0) {
               Text(this.message).width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.SUBTEXT)
@@ -561,7 +674,7 @@ export struct BackendConnectionPage {
             }
           }
           .width('100%')
-          .constraintSize({ maxWidth: AppTheme.SETTINGS_READABLE_MAX_WIDTH })
+          .constraintSize({ maxWidth: AppTheme.PROFILE_READABLE_MAX_WIDTH })
           .padding(AppTheme.PAGE_PADDING);
         }
         .width('100%')
