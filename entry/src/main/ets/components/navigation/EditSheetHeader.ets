@@ -31,7 +31,8 @@ export struct EditSheetHeader {
 
       Text('关闭')
         .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .fontSize(14)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT)
         .textAlign(TextAlign.Center)
         .accessibilityRole(AccessibilityRoleType.BUTTON)
