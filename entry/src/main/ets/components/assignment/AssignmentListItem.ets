@@ -136,7 +136,7 @@ export struct AssignmentListItem {
       .alignItems(HorizontalAlign.Start);
     }
     .width('100%')
-    .constraintSize({ minHeight: 78 })
+    .constraintSize({ minHeight: AppTheme.LIST_CARD_MIN_HEIGHT })
     .padding({ left: 12, right: 12, top: 11, bottom: 11 })
     .alignItems(VerticalAlign.Center)
     .backgroundColor(AppTheme.CARD_SURFACE)
