@@ -16,9 +16,7 @@ export struct ParentVoiceAssignmentPage {
   @State private sourceMode: string = VOICE_SOURCE_LOCAL;
   @State private subject: Subject = Subject.ENGLISH;
   @State private title: string = '英语 · 语音练习';
-  @State private instruction: string = '先听语音，再结合情景图片完成跟读或练习。';
-  @State private titleCustomized: boolean = false;
-  @State private instructionCustomized: boolean = false;
+  @State private instruction: string = '先听语音，再结合情景图片完成跟读练习。';
   @State private dueText: string = '今天';
   @State private expectedMinutesText: string = '15';
   @State private audioUri: string = '';
@@ -70,29 +68,27 @@ export struct ParentVoiceAssignmentPage {
     this.sourceMode = mode;
     this.message = '';
     this.messageError = false;
-    if (mode === VOICE_SOURCE_SERVER) {
-      if (!this.titleCustomized) this.title = '';
-      if (!this.instructionCustomized) this.instruction = this.generatedInstruction();
-      if (this.folders.length === 0) void this.loadFolders(true);
-      return;
-    }
-    this.syncGeneratedTaskCopy();
+    if (mode === VOICE_SOURCE_SERVER && this.folders.length === 0) void this.loadFolders(true);
   }
 
   private selectSubject(value: Subject): void {
-    if (this.busy || this.sourceMode !== VOICE_SOURCE_LOCAL) return;
+    if (this.busy || this.subject === value) return;
     this.subject = value;
     this.syncGeneratedTaskCopy();
   }
 
-  private updateTitle(value: string): void {
-    this.title = value;
-    this.titleCustomized = true;
+  private subjectIndex(): number {
+    if (this.subject === Subject.CHINESE) return 0;
+    if (this.subject === Subject.MATH) return 1;
+    if (this.subject === Subject.ENGLISH) return 2;
+    return 3;
   }
 
-  private updateInstruction(value: string): void {
-    this.instruction = value;
-    this.instructionCustomized = true;
+  private subjectFromIndex(index: number): Subject {
+    if (index === 0) return Subject.CHINESE;
+    if (index === 1) return Subject.MATH;
+    if (index === 2) return Subject.ENGLISH;
+    return Subject.OTHER;
   }
 
   private generatedTitle(): string {
@@ -100,20 +96,27 @@ export struct ParentVoiceAssignmentPage {
   }
 
   private generatedInstruction(): string {
-    return '先听语音，再结合情景图片完成跟读或练习。';
+    if (this.subject === Subject.CHINESE) {
+      return '先听语音，再结合情景图片完成朗读练习。';
+    }
+    if (this.subject === Subject.MATH) {
+      return '先听语音，再结合情景图片完成听题练习。';
+    }
+    if (this.subject === Subject.ENGLISH) {
+      return '先听语音，再结合情景图片完成跟读练习。';
+    }
+    return '先听语音，再结合情景图片完成练习。';
   }
 
   private syncGeneratedTaskCopy(): void {
-    if (!this.titleCustomized) this.title = this.generatedTitle();
-    if (!this.instructionCustomized) this.instruction = this.generatedInstruction();
+    this.title = this.generatedTitle();
+    this.instruction = this.generatedInstruction();
   }
 
   private selectFolder(item: RemoteVoiceFolderItem): void {
     if (item.folderStatus !== 'READY' || this.busy) return;
     this.selectedFolderId = item.packageId;
-    this.subject = this.viewModel.subjectFromCode(item.subjectCode);
     this.expectedMinutesText = `${item.expectedMinutes > 0 ? item.expectedMinutes : 15}`;
-    this.syncGeneratedTaskCopy();
     this.requestId = '';
     this.message = '';
     this.messageError = false;
@@ -307,19 +310,6 @@ export struct ParentVoiceAssignmentPage {
   }
 
   @Builder
-  private SubjectOption(label: string, value: Subject) {
-    Button(label, { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(13)
-      .fontWeight(this.subject === value ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(this.subject === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(this.subject === value ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(() => this.selectSubject(value));
-  }
-
-  @Builder
   private TaskSettingsSection() {
     Column({ space: 10 }) {
       Row() {
@@ -328,63 +318,62 @@ export struct ParentVoiceAssignmentPage {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        Text('名称和说明已自动生成，可修改')
+        Text('名称和说明根据科目自动生成')
           .fontSize(11)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%');
 
-      this.SourceSelector();
-
       Column({ space: 6 }) {
         Text('作业科目').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-        if (this.sourceMode === VOICE_SOURCE_LOCAL) {
-          Row({ space: 8 }) {
-            this.SubjectOption('英语', Subject.ENGLISH);
-            this.SubjectOption('语文', Subject.CHINESE);
-            this.SubjectOption('其他', Subject.OTHER);
-          }
-          .width('100%');
-        } else {
-          Row() {
-            Text(this.selectedFolder() === null ? '选择服务器素材后自动识别' : this.subjectText(this.subject))
-              .fontSize(14)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(this.selectedFolder() === null ? AppTheme.SUBTEXT : AppTheme.TEXT);
-          }
+        Select([
+          { value: '语文' },
+          { value: '数学' },
+          { value: '英语' },
+          { value: '其他' }
+        ])
           .width('100%')
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 12, right: 12 })
+          .height(AppTheme.INPUT_HEIGHT)
+          .selected(this.subjectIndex())
+          .value(this.subjectText(this.subject))
+          .font({ size: 14, weight: FontWeight.Medium })
+          .fontColor(AppTheme.TEXT)
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
-        }
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onSelect((index: number) => this.selectSubject(this.subjectFromIndex(index)));
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 6 }) {
         Text('作业名称').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-        TextInput({ placeholder: '选择素材后自动生成，也可直接修改', text: this.title })
-          .width('100%')
-          .height(AppTheme.INPUT_HEIGHT)
-          .fontSize(14)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.updateTitle(value));
+        Row() {
+          Text(this.title)
+            .fontSize(14)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+        }
+        .width('100%')
+        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+        .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 6 }) {
         Text('作业说明').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
-        TextArea({ placeholder: '系统会生成简短说明，也可直接修改', text: this.instruction })
-          .width('100%')
-          .height(82)
-          .fontSize(14)
-          .lineHeight(20)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.updateInstruction(value));
+        Row() {
+          Text(this.instruction)
+            .fontSize(13)
+            .lineHeight(19)
+            .fontColor(AppTheme.TEXT);
+        }
+        .width('100%')
+        .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
@@ -400,22 +389,22 @@ export struct ParentVoiceAssignmentPage {
       .width('100%')
       .alignItems(HorizontalAlign.Start);
 
-      Row({ space: 8 }) {
-        Text('预计完成时长')
-          .fontSize(12)
-          .fontColor(AppTheme.SUBTEXT);
-        Blank();
-        TextInput({ placeholder: '15', text: this.expectedMinutesText })
-          .width(76)
-          .height(40)
-          .fontSize(14)
-          .textAlign(TextAlign.Center)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onChange((value: string) => this.expectedMinutesText = value);
-        Text('分钟').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Column({ space: 6 }) {
+        Text('预计完成时长').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Row({ space: 8 }) {
+          TextInput({ placeholder: '15', text: this.expectedMinutesText })
+            .layoutWeight(1)
+            .height(AppTheme.INPUT_HEIGHT)
+            .fontSize(14)
+            .backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => this.expectedMinutesText = value);
+          Text('分钟').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%');
       }
-      .width('100%');
+      .width('100%')
+      .alignItems(HorizontalAlign.Start);
     }
     .width('100%');
   }
@@ -573,19 +562,10 @@ export struct ParentVoiceAssignmentPage {
   @Builder
   private ServerFolderSection() {
     Column({ space: 12 }) {
-      Column({ space: 2 }) {
-        Text('作业素材')
-          .width('100%')
-          .fontSize(16)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
-        Text('从已上传的服务器素材中选择一组语音和图片')
-          .width('100%')
-          .fontSize(11)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start);
+      Text('从已上传的服务器素材中选择一组语音和图片')
+        .width('100%')
+        .fontSize(11)
+        .fontColor(AppTheme.TERTIARY_TEXT);
 
       Row({ space: 8 }) {
         TextInput({ placeholder: '搜索文件夹', text: this.folderKeyword })
@@ -668,23 +648,35 @@ export struct ParentVoiceAssignmentPage {
   @Builder
   private LocalMaterialSection() {
     Column({ space: 14 }) {
-      Column({ space: 2 }) {
-        Text('作业素材')
-          .width('100%')
-          .fontSize(16)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
-        Text('语音文件和情景图片会按顺序提供给学生')
-          .width('100%')
-          .fontSize(11)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-      }
-      .width('100%')
-      .alignItems(HorizontalAlign.Start);
+      Text('语音文件和情景图片会按顺序提供给学生')
+        .width('100%')
+        .fontSize(11)
+        .fontColor(AppTheme.TERTIARY_TEXT);
 
       this.AudioSection();
       Divider().color(AppTheme.DIVIDER);
       this.ImageSection();
+    }
+    .width('100%');
+  }
+
+  @Builder
+  private MaterialSection() {
+    Column({ space: 12 }) {
+      Text('作业素材')
+        .width('100%')
+        .fontSize(16)
+        .fontWeight(FontWeight.Bold)
+        .fontColor(AppTheme.TEXT);
+
+      this.SourceSelector();
+      Divider().color(AppTheme.DIVIDER);
+
+      if (this.sourceMode === VOICE_SOURCE_LOCAL) {
+        this.LocalMaterialSection();
+      } else {
+        this.ServerFolderSection();
+      }
     }
     .width('100%');
   }
@@ -730,11 +722,7 @@ export struct ParentVoiceAssignmentPage {
             .borderRadius(AppTheme.PHONE_CARD_RADIUS);
 
             Column() {
-              if (this.sourceMode === VOICE_SOURCE_LOCAL) {
-                this.LocalMaterialSection();
-              } else {
-                this.ServerFolderSection();
-              }
+              this.MaterialSection();
             }
             .width('100%')
             .padding(AppTheme.PHONE_CARD_PADDING)
