@@ -25,6 +25,7 @@ export struct ParentProgressPage {
   @State private draftAllDates: boolean = false;
   @State private draftSelectedDayEpochMs: number = Date.now();
   @State private draftSubjectCode: string = 'ALL';
+  @State private scopedAssignments: Assignment[] = [];
   @State private visibleAssignments: Assignment[] = [];
   @State private snapshotRevision: number = -1;
   @State private querying: boolean = false;
@@ -81,13 +82,26 @@ export struct ParentProgressPage {
   private rebuildView(): void {
     let currentRevision = this.revision + this.refreshRevision;
     if (currentRevision < 0) return;
-    if (this.allDates) {
-      this.applyItems(this.viewModel.assignments(
-        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses()));
-      return;
+    let scoped = this.allDates ?
+      this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL) :
+      this.viewModel.assignmentsOnDay(this.subjectCode, this.selectedDayEpochMs);
+    this.applyScopedItems(scoped);
+  }
+
+  private applyScopedItems(items: Assignment[]): void {
+    this.scopedAssignments = items.slice();
+    this.applyItems(this.filterByStatus(this.scopedAssignments));
+  }
+
+  private filterByStatus(items: Assignment[]): Assignment[] {
+    let statuses = this.statuses();
+    if (statuses.length === 0) return items.slice();
+    let accepted: Assignment[] = [];
+    for (let item of items) {
+      if (statuses.indexOf(item.status) >= 0) accepted.push(item);
     }
-    this.applyItems(this.viewModel.assignmentsOnDay(
-      this.subjectCode, this.selectedDayEpochMs, this.statuses()));
+    return accepted;
   }
 
   private applyItems(items: Assignment[]): void {
@@ -278,12 +292,12 @@ export struct ParentProgressPage {
     if (this.querying) return;
     this.querying = true;
     try {
-      let items = this.allDates ?
+      let scoped = this.allDates ?
         await this.viewModel.query(
-          AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses()) :
+          AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL) :
         await this.viewModel.queryOnDay(
-          this.subjectCode, this.selectedDayEpochMs, this.statuses());
-      this.applyItems(items);
+          this.subjectCode, this.selectedDayEpochMs);
+      this.applyScopedItems(scoped);
     } finally {
       this.querying = false;
     }
@@ -293,7 +307,7 @@ export struct ParentProgressPage {
     if (this.statusFilter === value || this.querying) return;
     this.statusFilter = value;
     if (this.bulkMode) this.selectedDeleteIds = [];
-    void this.queryCurrent();
+    this.applyItems(this.filterByStatus(this.scopedAssignments));
   }
 
   private openAssignment(item: Assignment): void {
@@ -310,12 +324,7 @@ export struct ParentProgressPage {
   }
 
   private metricAssignments(): Assignment[] {
-    if (this.allDates) {
-      return this.viewModel.assignments(
-        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL);
-    }
-    return this.viewModel.assignmentsOnDay(
-      this.subjectCode, this.selectedDayEpochMs);
+    return this.scopedAssignments;
   }
 
   private allCount(): number {
