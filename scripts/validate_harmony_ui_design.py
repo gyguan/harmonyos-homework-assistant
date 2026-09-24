@@ -370,9 +370,9 @@ for expression in [
 ]:
     require(expression in confirmation_components,
             f"Confirmation duration state must bind directly to current Candidate prop: {expression}")
-require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_controls and
-        "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in selection_controls,
-        "shared choice selection must combine active surface and border")
+require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE)" in selection_controls and
+        "color: this.selected ? AppTheme.PRIMARY : AppTheme.BORDER" in selection_controls,
+        "shared choice selection must combine selected surface with neutral unselected border")
 
 calendar_path = ROOT / "entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets"
 require(not calendar_path.exists(),
