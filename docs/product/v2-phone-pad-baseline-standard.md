@@ -93,15 +93,14 @@ primaryMinWidth
 
 基础适配阶段，宽屏页面优先使用“居中 + 最大可读宽度”，而不是把 Phone 内容铺满整个 Pad。
 
-统一 token 位于 `AppTheme`：
+统一布局规范见 `v2-card-layout-standard.md`，基础内容宽度收敛为：
 
-- `HOME_READABLE_MAX_WIDTH`
-- `ASSIGNMENT_LIST_READABLE_MAX_WIDTH`
-- `ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH`
-- `STUDY_READABLE_MAX_WIDTH`
-- `FILTER_DIALOG_MAX_WIDTH`
+- `CONTENT_NARROW_MAX_WIDTH = 760`
+- `CONTENT_STANDARD_MAX_WIDTH = 1040`
+- `CONTENT_WIDE_MAX_WIDTH = 1360`
+- `FILTER_DIALOG_MAX_WIDTH` 继续作为弹层专用上限
 
-这些值属于内容可读性约束，不是设备断点。
+普通业务页默认使用 Standard；只有 Dashboard、Master-Detail 和双栏 Workspace 使用 Wide。这些值属于内容可读性约束，不是设备断点。
 
 ## 5. 已重构页面当前基线
 
