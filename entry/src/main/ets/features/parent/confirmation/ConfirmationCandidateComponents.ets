@@ -24,31 +24,31 @@ export struct CandidateDurationControl {
           ChoiceSelectionChip({
             label: '10',
             selected: this.item.expectedMinutes === 10,
-            size: ActionButtonSize.SMALL,
+            compact: true,
             onSelect: () => this.onMinutesChange(this.item, 10)
           });
           ChoiceSelectionChip({
             label: '15',
             selected: this.item.expectedMinutes === 15,
-            size: ActionButtonSize.SMALL,
+            compact: true,
             onSelect: () => this.onMinutesChange(this.item, 15)
           });
           ChoiceSelectionChip({
             label: '20',
             selected: this.item.expectedMinutes === 20,
-            size: ActionButtonSize.SMALL,
+            compact: true,
             onSelect: () => this.onMinutesChange(this.item, 20)
           });
           ChoiceSelectionChip({
             label: '30',
             selected: this.item.expectedMinutes === 30,
-            size: ActionButtonSize.SMALL,
+            compact: true,
             onSelect: () => this.onMinutesChange(this.item, 30)
           });
           ChoiceSelectionChip({
             label: '45',
             selected: this.item.expectedMinutes === 45,
-            size: ActionButtonSize.SMALL,
+            compact: true,
             onSelect: () => this.onMinutesChange(this.item, 45)
           });
           Text('分钟')
