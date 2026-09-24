@@ -28,6 +28,18 @@ theme_path = "entry/src/main/ets/common/theme/AppTheme.ets"
 theme = read_optional(theme_path)
 require(len(theme) > 0, f"missing required file: {theme_path}")
 
+typography_standard_path = "docs/product/v2-typography-standard.md"
+typography_standard = read_optional(typography_standard_path)
+require(len(typography_standard) > 0, f"missing required file: {typography_standard_path}")
+for typography_rule in [
+    "动态文本容器用 minHeight，不用固定 height",
+    "Phone 与 Pad 使用同一语义字号",
+    "CARD_TITLE_SIZE",
+    "maxLines + textOverflow(Ellipsis)",
+]:
+    require(typography_rule in typography_standard,
+            f"typography standard missing durable rule: {typography_rule}")
+
 # Keep only durable design-system contracts here. Page-specific composition belongs to the
 # V2 UI spec and DevEco acceptance, not to string assertions against V1 builders.
 for token in [
@@ -44,10 +56,27 @@ for token in [
     "MIN_TOUCH_TARGET",
     "BUTTON_HEIGHT",
     "PAGE_TITLE_SIZE",
+    "PAGE_TITLE_LINE_HEIGHT",
     "PAGE_NAV_TITLE_SIZE",
+    "PAGE_NAV_TITLE_LINE_HEIGHT",
     "SECTION_TITLE_SIZE",
+    "SECTION_TITLE_LINE_HEIGHT",
     "CARD_TITLE_SIZE",
+    "CARD_TITLE_LINE_HEIGHT",
     "LABEL_TITLE_SIZE",
+    "LABEL_TITLE_LINE_HEIGHT",
+    "BODY_SIZE",
+    "BODY_LINE_HEIGHT",
+    "META_SIZE",
+    "META_LINE_HEIGHT",
+    "CAPTION_SIZE",
+    "CAPTION_LINE_HEIGHT",
+    "ACTION_TEXT_SIZE",
+    "ACTION_TEXT_LINE_HEIGHT",
+    "NAV_TITLE_MAX_LINES",
+    "SECTION_TITLE_MAX_LINES",
+    "CARD_TITLE_MAX_LINES",
+    "META_MAX_LINES",
     "PARENT_DEEP_READABLE_MAX_WIDTH",
     "PARENT_HOME_ACTION_CARD_MIN_HEIGHT",
     "PARENT_HOME_ACTION_ICON_SIZE",
@@ -57,10 +86,27 @@ for token in [
 
 for title_contract in [
     "static readonly PAGE_TITLE_SIZE: number = 26;",
+    "static readonly PAGE_TITLE_LINE_HEIGHT: number = 34;",
     "static readonly PAGE_NAV_TITLE_SIZE: number = 20;",
+    "static readonly PAGE_NAV_TITLE_LINE_HEIGHT: number = 28;",
     "static readonly SECTION_TITLE_SIZE: number = 17;",
+    "static readonly SECTION_TITLE_LINE_HEIGHT: number = 24;",
     "static readonly CARD_TITLE_SIZE: number = 16;",
+    "static readonly CARD_TITLE_LINE_HEIGHT: number = 22;",
     "static readonly LABEL_TITLE_SIZE: number = 14;",
+    "static readonly LABEL_TITLE_LINE_HEIGHT: number = 20;",
+    "static readonly BODY_SIZE: number = 14;",
+    "static readonly BODY_LINE_HEIGHT: number = 21;",
+    "static readonly META_SIZE: number = 13;",
+    "static readonly META_LINE_HEIGHT: number = 18;",
+    "static readonly CAPTION_SIZE: number = 12;",
+    "static readonly CAPTION_LINE_HEIGHT: number = 17;",
+    "static readonly ACTION_TEXT_SIZE: number = 14;",
+    "static readonly ACTION_TEXT_LINE_HEIGHT: number = 20;",
+    "static readonly NAV_TITLE_MAX_LINES: number = 1;",
+    "static readonly SECTION_TITLE_MAX_LINES: number = 1;",
+    "static readonly CARD_TITLE_MAX_LINES: number = 2;",
+    "static readonly META_MAX_LINES: number = 1;",
 ]:
     require(title_contract in theme, f"AppTheme title hierarchy drifted: {title_contract}")
 for obsolete_title_token in [
@@ -70,6 +116,8 @@ for obsolete_title_token in [
     "PAD_SECTION_TITLE_SIZE",
     "PAD_CARD_TITLE_SIZE",
     "DEEP_PAGE_HEADER_TITLE_SIZE",
+    "DEEP_PAGE_HEADER_META_SIZE",
+    "STUDY_TITLE_SIZE",
 ]:
     require(obsolete_title_token not in theme,
             f"obsolete title token must not return: {obsolete_title_token}")
@@ -186,8 +234,9 @@ if assignment_list_item:
             "this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}" in assignment_list_item,
             "AssignmentListItem compact metadata must truncate instead of overlapping neighboring content")
     require("Row({ space: 8 })" in assignment_list_item and
-            ".lineHeight(22)" in assignment_list_item and
-            ".lineHeight(18)" in assignment_list_item and
+            ".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)" in assignment_list_item and
+            ".lineHeight(AppTheme.META_LINE_HEIGHT)" in assignment_list_item and
+            ".maxLines(AppTheme.CARD_TITLE_MAX_LINES)" in assignment_list_item and
             ".constraintSize({ minHeight: 78 })" in assignment_list_item,
             "AssignmentListItem must reserve stable vertical space for title/status and metadata rows")
 
@@ -252,8 +301,15 @@ require(parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT") ==
         parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_PADDING") == 3,
         "Parent dashboard action cards must share one size specification")
 require(parent_dashboard.count(".fontSize(AppTheme.CARD_TITLE_SIZE)") >= 3 and
+        parent_dashboard.count(".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)") >= 3 and
+        parent_dashboard.count(".maxLines(AppTheme.CARD_TITLE_MAX_LINES)") >= 3 and
+        parent_dashboard.count(".fontSize(AppTheme.CAPTION_SIZE)") >= 3 and
+        parent_dashboard.count(".lineHeight(AppTheme.CAPTION_LINE_HEIGHT)") >= 3 and
         parent_dashboard.count(".fontWeight(FontWeight.Bold)") >= 3,
-        "Parent dashboard action card titles must use one title specification")
+        "Parent dashboard action cards must use the shared typography specification")
+require(".height(AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT)" not in parent_dashboard and
+        parent_dashboard.count(".constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })") == 3,
+        "Text-bearing parent home cards must use minHeight, not fixed height")
 require("private PhoneHome()" in parent_dashboard and
         "this.CreateAssignmentAction();" in parent_dashboard and
         "this.CreateVoiceAction();" in parent_dashboard and
@@ -320,8 +376,14 @@ require("private SectionTitle(" not in parent_settings and
         "Parent My must use the same card-and-collapsible-section composition as Student My")
 
 require("AppTheme.PAGE_NAV_TITLE_SIZE" in deep_page_header and
-        "AppTheme.PAGE_NAV_TITLE_SIZE" in edit_sheet_header,
-        "page and sheet headers must use the shared navigation-title size")
+        "AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT" in deep_page_header and
+        "AppTheme.NAV_TITLE_MAX_LINES" in deep_page_header and
+        "AppTheme.META_SIZE" in deep_page_header and
+        "AppTheme.META_LINE_HEIGHT" in deep_page_header and
+        "AppTheme.PAGE_NAV_TITLE_SIZE" in edit_sheet_header and
+        "AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT" in edit_sheet_header and
+        "AppTheme.NAV_TITLE_MAX_LINES" in edit_sheet_header,
+        "page and sheet headers must use the shared navigation typography contract")
 require(parent_dashboard.count("AppTheme.CARD_TITLE_SIZE") >= 3,
         "Parent dashboard card titles must share the card-title size")
 require(parent_extra.count("AppTheme.SECTION_TITLE_SIZE") >= 3,
