@@ -59,8 +59,8 @@ require("@State private scopedAssignments: Assignment[] = []" in progress and
         "this.applyItems(this.scopedAssignments)" in progress,
         "parent progress list must render directly from the active date/subject scope")
 require("Text('作业进度')" not in progress and
-        "Text(this.bulkMode ? '完成' : '删除')" in progress,
-        "parent progress must remove its duplicate page title and expose a clear delete action near the list")
+        "Text(this.bulkMode ? '取消' : '删除')" in progress,
+        "parent progress must remove its duplicate page title and expose delete/cancel in one stable location")
 require("可以调整日期或科目。" in progress,
         "parent progress empty state must match the remaining filter dimensions")
 
