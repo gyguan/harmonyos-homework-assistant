@@ -428,7 +428,7 @@ export struct StudentAssignmentsPage {
       Column({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.checkmark_square')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
         Text(this.currentTotalCount() === 0 ? '暂时没有作业' : '这一天没有安排任务')
-          .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          .fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       }
       .width('100%')
       .padding({ top: 30, bottom: 30 });
@@ -440,7 +440,7 @@ export struct StudentAssignmentsPage {
     Column({ space: 22 }) {
       Row() {
         Text(this.allDates ? '全部作业' : `${this.dateLabel()} 任务`)
-          .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          .fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
         Text(`${this.currentVisibleTotal()} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
       }
