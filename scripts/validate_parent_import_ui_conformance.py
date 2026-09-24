@@ -48,7 +48,7 @@ require("Button(this.parseBusy ? '识别中…' : '拍照识别'" in import_page
 require("private ActionFooter()" in import_page and
         import_page.find("this.ActionFooter();") > import_page.find(".scrollBar(BarState.Off);"),
         "manual homework primary action must remain fixed outside scrolling content")
-require(".height(150)" in import_page and "整理并继续" in import_page,
+require(".height(200)" in import_page and "整理并继续" in import_page,
         "manual homework content editor must stay compact and preserve one primary continuation action")
 require("captureImageText()" in import_vm and
         "HomeworkImportService.instance.captureImageText()" in import_vm,
