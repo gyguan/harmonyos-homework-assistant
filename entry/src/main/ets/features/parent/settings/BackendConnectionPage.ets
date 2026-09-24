@@ -298,14 +298,14 @@ export struct BackendConnectionPage {
               ActionButton({
                 label: '取消删除',
                 kind: ActionButtonKind.NEUTRAL,
-                size: ActionButtonSize.SMALL,
+                actionSize: ActionButtonSize.SMALL,
                 onAction: (): void => { this.deleteStudentConfirmId = ''; }
               })
               .layoutWeight(1);
               ActionButton({
                 label: '确认删除',
                 kind: ActionButtonKind.DANGER,
-                size: ActionButtonSize.SMALL,
+                actionSize: ActionButtonSize.SMALL,
                 onAction: (): void => { void this.deleteStudent(this.editingId); }
               })
               .layoutWeight(1);
@@ -319,13 +319,13 @@ export struct BackendConnectionPage {
               ActionButton({
                 label: '删除',
                 kind: ActionButtonKind.DANGER_SOFT,
-                size: ActionButtonSize.SMALL,
+                actionSize: ActionButtonSize.SMALL,
                 onAction: (): void => { this.deleteStudentConfirmId = this.editingId; }
               });
             }
             ActionButton({
               label: '保存',
-              size: ActionButtonSize.SMALL,
+              actionSize: ActionButtonSize.SMALL,
               onAction: (): void => { void this.saveStudent(); }
             })
             .layoutWeight(1);
@@ -434,13 +434,13 @@ export struct BackendConnectionPage {
           ActionButton({
             label: '关闭家长码',
             kind: ActionButtonKind.NEUTRAL,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             onAction: (): void => this.clearParentAccessCode()
           });
         }
         ActionButton({
           label: this.parentAccessEnabled() ? '修改家长码' : '启用家长码',
-          size: ActionButtonSize.SMALL,
+          actionSize: ActionButtonSize.SMALL,
           onAction: (): void => this.saveParentAccessCode()
         })
         .layoutWeight(1);
@@ -529,14 +529,14 @@ export struct BackendConnectionPage {
             ActionButton({
               label: '立即同步',
               kind: ActionButtonKind.OUTLINE,
-              size: ActionButtonSize.SMALL,
+              actionSize: ActionButtonSize.SMALL,
               onAction: (): void => { void this.syncCloudData(); }
             })
             .layoutWeight(1);
             ActionButton({
               label: '断开连接',
               kind: ActionButtonKind.NEUTRAL,
-              size: ActionButtonSize.SMALL,
+              actionSize: ActionButtonSize.SMALL,
               onAction: (): void => { void this.disconnect(); }
             })
             .layoutWeight(1);
