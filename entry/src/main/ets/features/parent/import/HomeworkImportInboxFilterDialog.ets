@@ -73,7 +73,7 @@ export struct HomeworkImportInboxFilterDialog {
     Column() {
       Row() {
         Text('筛选收件箱')
-          .fontSize(20)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
