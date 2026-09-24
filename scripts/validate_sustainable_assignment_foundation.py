@@ -58,9 +58,10 @@ for forbidden in [
 require("ensureRemoteCurrent" in repo and "reloadRemote" in repo and
         "current.backing === AssignmentBacking.LOCAL_SEED" in repo,
         "repository commands must share one explicit backing/hydration path")
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 8" in migrator and
-        "migrateV7ToV8" in migrator and "legacyBacking" in migrator,
-        "snapshot V8 must migrate legacy identity heuristics once")
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 9" in migrator and
+        "migrateV7ToV8" in migrator and "legacyBacking" in migrator and
+        "migrateV8ToV9" in migrator,
+        "current snapshot chain must retain the one-time V7 -> V8 legacy identity migration")
 require("backing: source.backing," in store and
         "source.backing === AssignmentBacking.REMOTE ?" not in store,
         "snapshot clone must preserve explicit backing without post-migration guessing")
@@ -78,10 +79,10 @@ require("businessDayStart" in due_date and "businessDateParts" in due_date and
 require("text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0" not in due_date and
         "if (text.indexOf('晚上') >= 0) return today;" in due_date,
         "generic evening text must be resolved only after explicit/relative dates so 明天晚上 does not become today")
-require("AssignmentDueDate.businessDayStart" in parent_home and
+require("AssignmentDueDate.businessDayStart" in store and
         "AssignmentDueDate.businessDayStart" in student_home and
         "AssignmentDueDate.businessDayStart" in calendar,
-        "parent home, student home and calendar must use the same business-day boundary")
+        "parent summary, student home and calendar must use the same business-day boundary")
 require("export class AssignmentFilterFactory" in filter_factory and
         "static forDay" in filter_factory and "static create" in filter_factory,
         "shared assignment filter factory is required")
