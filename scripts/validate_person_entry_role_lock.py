@@ -21,6 +21,8 @@ entry_page = read("entry/src/main/ets/pages/PersonEntryPage.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 student_switcher = read("entry/src/main/ets/components/family/StudentSwitcherDialog.ets")
 identity_switcher = read("entry/src/main/ets/components/family/IdentitySwitcherDialog.ets")
+parent_access = read("entry/src/main/ets/components/family/ParentAccessDialog.ets")
+settings = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 
 require("PersonEntryPage" in index and "AppRole.NONE" in index,
         "Index must keep the initial person entry page")
@@ -30,7 +32,7 @@ require("this.familyContext.setActiveStudent(studentId)" in index,
         "student identity selection must bind active student through FamilyContextRepository")
 require("AppShell({" in index and "role: this.selectedRole" in index,
         "AppShell role must remain a root-owned read-only prop")
-require("onSwitchParent: () => this.enterParent()" in index and
+require("onSwitchParent: () => this.requestParentAccess()" in index and
         "onSwitchStudent: (studentId: string) => this.enterStudent(studentId)" in index,
         "AppShell identity changes must delegate role ownership back to Index")
 require("HomeworkSyncService" not in index and
@@ -44,6 +46,15 @@ require("家长" in entry_page and "孩子" in entry_page and "谁在使用" in 
         "initial entry page must still expose parent and child choices")
 require("onSelectStudent(student.id)" in entry_page,
         "initial student selection must preserve the selected child id")
+require("onSelectParent: () => this.requestParentAccess()" in index and
+        "private requestParentAccess(): void" in index and
+        "private confirmParentAccess(): void" in index,
+        "all parent role entry must use the root-owned parent access gate")
+require("@CustomDialog" in parent_access and "请输入设备家长码" in parent_access,
+        "parent access must use an explicit local verification dialog")
+require("updateParentAccessCode" in settings and "设备家长码" in settings and
+        "家长码只保存在当前设备" in settings,
+        "parent settings must allow enabling, changing and disabling the device access code")
 
 require("@Prop role: AppRole" in app_shell and "@State private role" not in app_shell,
         "AppShell must not own mutable role state")
