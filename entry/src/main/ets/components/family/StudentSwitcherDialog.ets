@@ -19,7 +19,7 @@ export struct StudentSwitcherDialog {
       Row() {
         Column({ space: 3 }) {
           Text('选择孩子')
-            .fontSize(20)
+            .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
           Text('切换后首页、进度和作业都会同步到该孩子')
