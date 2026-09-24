@@ -17,7 +17,7 @@ export struct PhotoPreviewDialog {
         TextAction({
           label: '关闭',
           accessibilityLabel: '关闭照片预览',
-          onAction: () => this.controller.close()
+          onAction: (): void => this.controller.close()
         });
       }
       .width('100%');
