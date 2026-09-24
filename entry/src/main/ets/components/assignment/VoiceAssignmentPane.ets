@@ -453,12 +453,14 @@ export struct VoiceAssignmentPane {
       if (this.imageLoading) {
         Text('正在加载图片…')
           .width('100%')
-          .fontSize(11)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       } else if (this.imageLoadMessage.length > 0) {
         Text(this.imageLoadMessage)
           .width('100%')
-          .fontSize(11)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.WARNING);
       }
     }
@@ -471,7 +473,7 @@ export struct VoiceAssignmentPane {
       if (this.audioLoading) {
         Row({ space: 8 }) {
           LoadingProgress().width(18).height(18).color(AppTheme.PRIMARY);
-          Text('正在加载语音…').fontSize(11).fontColor(AppTheme.SUBTEXT);
+          Text('正在加载语音…').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
       } else if (this.audioLoadMessage.length > 0) {
@@ -520,9 +522,9 @@ export struct VoiceAssignmentPane {
               });
 
             Row() {
-              Text(this.formatTime(this.currentTimeMs)).fontSize(10).fontColor(AppTheme.SUBTEXT);
+              Text(this.formatTime(this.currentTimeMs)).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
               Blank();
-              Text(this.formatTime(this.durationMs)).fontSize(10).fontColor(AppTheme.SUBTEXT);
+              Text(this.formatTime(this.durationMs)).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
             }
             .width('100%');
           }
@@ -550,7 +552,7 @@ export struct VoiceAssignmentPane {
       if (this.loading) {
         Row({ space: 8 }) {
           LoadingProgress().width(20).height(20).color(AppTheme.PRIMARY);
-          Text('正在加载首张情景图片…').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('正在加载首张情景图片…').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%')
         .padding(14)
@@ -558,10 +560,10 @@ export struct VoiceAssignmentPane {
         .borderRadius(AppTheme.CONTROL_RADIUS);
       } else if (this.message.length > 0) {
         Column({ space: 8 }) {
-          Text(this.message).fontSize(12).lineHeight(18).fontColor(AppTheme.WARNING);
+          Text(this.message).fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.WARNING);
           Text('重新加载')
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .fontSize(12).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE).lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
             .onClick(() => { void this.load(this.lifecycleVersion); });
         }
         .width('100%')
