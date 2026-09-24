@@ -50,7 +50,7 @@ export struct AssignmentFilterDialog {
     Column() {
       Row() {
         Text('查询作业')
-          .fontSize(20)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
