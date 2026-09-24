@@ -263,7 +263,7 @@ export struct HomeworkImportPage {
 
       Row() {
         Text('作业内容')
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
@@ -330,7 +330,7 @@ export struct HomeworkImportPage {
       if (!this.embeddedInDeepPage) {
         Text('布置作业')
           .width('100%')
-          .fontSize(AppTheme.PHONE_PAGE_TITLE_SIZE)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT)
           .margin({ bottom: 12 });
