@@ -52,7 +52,7 @@ public class VoiceMaterialAssignmentService {
         .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
     return createManually(familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            studentId, null, 0L, "", "", "", ""));
+            studentId, null, null, 0L, "", "", "", ""));
   }
 
   @Transactional
@@ -91,11 +91,12 @@ public class VoiceMaterialAssignmentService {
       throw new ApiExceptions.BadRequest("当前文件夹不可用于创建任务");
     }
 
+    String requestedSubjectCode = normalizeSubjectCode(input.subjectCode(), item.subjectCode);
     String requestedTitle = input.title() == null ? "" : input.title().trim();
     String requestedInstruction =
         input.instruction() == null ? "" : input.instruction().trim();
     AssignmentDtos.Response assignment = createFromFolder(
-        familyId, item, targetStudentId,
+        familyId, item, targetStudentId, requestedSubjectCode,
         input.expectedMinutes() == null ? item.expectedMinutes : input.expectedMinutes(),
         resolveDueAt(input.dueAtEpochMs(), item.dueAt),
         input.dueText() == null ? "" : input.dueText().trim(),
@@ -144,7 +145,7 @@ public class VoiceMaterialAssignmentService {
         ? businessDate.atTime(LocalTime.of(23, 59)).atZone(BUSINESS_ZONE).toInstant()
         : null;
     AssignmentDtos.Response assignment = createFromFolder(
-        familyId, item, item.studentId, item.expectedMinutes, dailyDueAt,
+        familyId, item, item.studentId, item.subjectCode, item.expectedMinutes, dailyDueAt,
         item.dueAt == null ? "今天" : "", businessDate,
         "", "", "", "AUTO");
 
@@ -192,7 +193,8 @@ public class VoiceMaterialAssignmentService {
   }
 
   private AssignmentDtos.Response createFromFolder(UUID familyId,
-      VoiceMaterialPackageEntity item, String targetStudentId, int expectedMinutes,
+      VoiceMaterialPackageEntity item, String targetStudentId, String subjectCode,
+      int expectedMinutes,
       Instant dueAtOverride, String dueTextOverride, LocalDate businessDate,
       String requestedTitle, String requestedInstruction, String requestId,
       String createMode) {
@@ -203,12 +205,12 @@ public class VoiceMaterialAssignmentService {
 
     String title = requestedTitle == null || requestedTitle.isBlank()
         ? assignments.nextVoiceMaterialTaskTitle(
-            familyId, targetStudentId, item.subjectCode, businessDate)
+            familyId, targetStudentId, subjectCode, businessDate)
         : requestedTitle.trim();
 
     AssignmentDtos.Create create = new AssignmentDtos.Create(
         assignmentId,
-        subjectDisplay(item.subjectCode),
+        subjectDisplay(subjectCode),
         title,
         requestedInstruction == null || requestedInstruction.isBlank()
             ? "请听语音并结合图片完成任务。"
@@ -216,7 +218,7 @@ public class VoiceMaterialAssignmentService {
         "",
         dueTextOverride,
         item.assignmentType,
-        item.subjectCode,
+        subjectCode,
         "AUDIO_IMAGE",
         dueAtEpochMs,
         BUSINESS_ZONE.getId(),
@@ -265,6 +267,15 @@ public class VoiceMaterialAssignmentService {
 
   private String normalizeRequestId(String requestId) {
     return requestId == null ? "" : requestId.trim();
+  }
+
+  private String normalizeSubjectCode(String requested, String fallback) {
+    String value = requested == null ? "" : requested.trim().toUpperCase();
+    if ("CHINESE".equals(value) || "MATH".equals(value) ||
+        "ENGLISH".equals(value) || "OTHER".equals(value)) {
+      return value;
+    }
+    return fallback;
   }
 
   private Instant resolveDueAt(Long requestedEpochMs, Instant fallback) {
