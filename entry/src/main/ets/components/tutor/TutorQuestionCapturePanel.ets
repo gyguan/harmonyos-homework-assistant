@@ -54,7 +54,7 @@ export struct TutorQuestionCapturePanel {
         kind: ActionButtonKind.SECONDARY,
         compact: true,
         isEnabled: !this.capturing,
-        onClick: () => { void this.capture(); }
+        onAction: () => { void this.capture(); }
       });
 
       if (this.imageUri.length > 0) {
