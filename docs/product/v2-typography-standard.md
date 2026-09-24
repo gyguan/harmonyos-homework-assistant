@@ -91,6 +91,7 @@
 | 表单/筛选小标题 | `LABEL_TITLE_SIZE` | 14 | 20 | Medium | 1 | 日期、科目、来源、状态 |
 | 正文 | `BODY_SIZE` | 14 | 21 | Normal | 自然换行 | 老师要求、说明 |
 | 学生阅读正文 | `READING_BODY_SIZE` | 16 | 24 | Normal | 自然换行 | 学生端老师要求、订正说明、关键学习内容 |
+| 练习题干 | `QUESTION_TEXT_SIZE` | 20 | 30 | Medium | 自然换行 | 做题页当前题干，允许随内容容器等比放大 |
 | 表单输入文字 | `FORM_TEXT_SIZE` | 15 | 22 | Normal | 控件决定 | TextInput、TextArea 的用户输入 |
 | 元信息 | `META_SIZE` | 13 | 18 | Normal / Medium | 1 | 截止时间、用时、状态辅助信息 |
 | 辅助说明 | `CAPTION_SIZE` | 12 | 17 | Normal | 1-2 | 卡片副标题、说明 |
