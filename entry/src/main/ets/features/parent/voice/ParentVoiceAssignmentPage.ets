@@ -420,7 +420,7 @@ export struct ParentVoiceAssignmentPage {
         ActionButton({
           label: this.selectingAudio ? '正在打开语音文件…' : '选择语音文件',
           kind: ActionButtonKind.OUTLINE,
-          size: ActionButtonSize.MEDIUM,
+          actionSize: ActionButtonSize.MEDIUM,
           isEnabled: !this.selectingAudio && !this.busy,
           onAction: (): void => { void this.selectAudio(); }
         })
@@ -492,7 +492,7 @@ export struct ParentVoiceAssignmentPage {
         label: this.selectingImages ? '正在打开相册…' :
           (this.imageUris.length === 0 ? '选择情景图片' : '＋ 继续添加图片'),
         kind: ActionButtonKind.OUTLINE,
-        size: ActionButtonSize.SMALL,
+        actionSize: ActionButtonSize.SMALL,
         isEnabled: !this.selectingImages && !this.busy,
         onAction: (): void => { void this.selectImages(); }
       })
@@ -574,7 +574,7 @@ export struct ParentVoiceAssignmentPage {
         ActionButton({
           label: this.loadingFolders ? '查询中…' : '查询',
           kind: ActionButtonKind.OUTLINE,
-          size: ActionButtonSize.SMALL,
+          actionSize: ActionButtonSize.SMALL,
           isEnabled: !this.loadingFolders,
           onAction: (): void => { void this.loadFolders(true); }
         });
@@ -608,7 +608,7 @@ export struct ParentVoiceAssignmentPage {
         ActionButton({
           label: this.loadingFolders ? '加载中…' : '加载更多',
           kind: ActionButtonKind.GHOST,
-          size: ActionButtonSize.SMALL,
+          actionSize: ActionButtonSize.SMALL,
           isEnabled: !this.loadingFolders,
           onAction: (): void => { void this.loadFolders(false); }
         })
