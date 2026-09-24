@@ -1,4 +1,6 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ActionButton } from '../../../components/action/ActionControls';
+import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -89,15 +91,12 @@ export struct ParentExtraAssignmentPage {
 
   @Builder
   private CategoryOption(label: string, value: Subject) {
-    Button(label, { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(13)
-      .fontWeight(this.category === value ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(this.category === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(this.category === value ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(() => this.category = value);
+    SegmentedSelectionButton({
+      label: label,
+      selected: this.category === value,
+      onSelect: () => this.category = value
+    })
+    .layoutWeight(1);
   }
 
   @Builder
@@ -192,13 +191,12 @@ export struct ParentExtraAssignmentPage {
             .backgroundColor(AppTheme.SURFACE)
             .borderRadius(AppTheme.PHONE_CARD_RADIUS);
             this.Feedback();
-            Button(this.busy ? '正在布置…' : '布置任务', { type: ButtonType.Normal })
-              .width('100%').height(AppTheme.BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(!this.busy)
-              .fontSize(15).fontWeight(FontWeight.Medium)
-              .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .onClick(() => { void this.createTask(); });
+            ActionButton({
+              label: this.busy ? '正在布置…' : '布置任务',
+              isEnabled: !this.busy,
+              onClick: () => { void this.createTask(); }
+            })
+            .width('100%');
           }
           .width('100%')
           .padding({ bottom: AppTheme.DEEP_PAGE_BOTTOM_PADDING });
