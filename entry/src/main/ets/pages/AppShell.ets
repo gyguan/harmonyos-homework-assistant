@@ -11,6 +11,7 @@ import { ResponsiveContext, WindowSizeClass } from '../common/responsive/WindowS
 import { DemoScenario, DemoScenarioHelper } from '../common/state/DemoScenario';
 import { AppTheme } from '../common/theme/AppTheme';
 import { CenteredTextBadge } from '../components/family/CenteredTextBadge';
+import { IdentityContextBar } from '../components/family/IdentityContextBar';
 import { IdentitySwitcherDialog } from '../components/family/IdentitySwitcherDialog';
 import { StudentSwitcherDialog } from '../components/family/StudentSwitcherDialog';
 import { BottomPrimaryNavItem, SidePrimaryNavItem } from '../components/navigation/PrimaryNavItem';
@@ -498,68 +499,6 @@ export struct AppShell {
   }
 
   @Builder
-  private IdentityContextBar() {
-    Row({ space: 10 }) {
-      CenteredTextBadge({
-        badgeText: this.role === AppRole.PARENT ? '家' :
-          (this.currentStudent().name.length > 0 ? this.currentStudent().name.substring(0, 1) : '伴'),
-        badgeWidth: 34,
-        badgeHeight: 34,
-        badgeFontSize: 13,
-        badgeRadius: 11,
-        badgeBold: true,
-        badgeForeground: AppTheme.PRIMARY,
-        badgeBackground: AppTheme.PRIMARY_SOFT
-      });
-      Column({ space: 1 }) {
-        Text(this.role === AppRole.PARENT ? '家长' : this.currentStudent().name)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Text(this.role === AppRole.PARENT ?
-          '当前管理 · ' + this.currentStudent().name :
-          this.currentStudent().grade + ' · ' + this.currentStudent().className)
-          .fontSize(11)
-          .fontColor(AppTheme.SUBTEXT);
-      }
-      .alignItems(HorizontalAlign.Start);
-      Blank();
-
-      if (this.role === AppRole.PARENT && this.familyStudents.length > 1) {
-        Row({ space: 4 }) {
-          Text('管理 ' + this.currentStudent().name).fontSize(12).fontColor(AppTheme.PRIMARY);
-          Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
-        }
-        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-        .backgroundColor(AppTheme.SURFACE)
-        .border({ width: 1, color: AppTheme.BORDER })
-        .borderRadius(AppTheme.CHIP_RADIUS)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('当前管理 ' + this.currentStudent().name + '，点击切换孩子')
-        .onClick(() => this.openStudentSwitcher());
-      }
-
-      Row({ space: 4 }) {
-        Text('切换身份').fontSize(12).fontColor(AppTheme.PRIMARY);
-        Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
-      }
-      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-      .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-      .backgroundColor(AppTheme.PRIMARY_SOFT)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(this.role === AppRole.PARENT ?
-        '当前身份家长，点击切换身份' : '当前身份 ' + this.currentStudent().name + '，点击切换身份')
-      .onClick(() => this.openIdentitySwitcher());
-    }
-    .width('100%')
-    .height(AppTheme.CONTEXT_BAR_HEIGHT)
-    .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING })
-    .backgroundColor(AppTheme.BACKGROUND);
-  }
-
-  @Builder
   private BottomNavigation() {
     Row() {
       if (this.role === AppRole.STUDENT) {
@@ -712,7 +651,15 @@ export struct AppShell {
   @Builder
   private BottomNavShell() {
     Column() {
-      this.IdentityContextBar();
+      IdentityContextBar({
+        isParent: this.role === AppRole.PARENT,
+        studentName: this.currentStudent().name,
+        studentGrade: this.currentStudent().grade,
+        studentClassName: this.currentStudent().className,
+        canSwitchStudent: this.familyStudents.length > 1,
+        onSwitchIdentity: () => this.openIdentitySwitcher(),
+        onSwitchStudent: () => this.openStudentSwitcher()
+      });
       Column() {
         this.PersonaContent();
       }
