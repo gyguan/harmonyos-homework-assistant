@@ -47,6 +47,7 @@ export class ParentVoiceAssignmentViewModel {
     requestId: string): Promise<Assignment | null> {
     let request: RemoteVoiceMaterialCreateAssignmentRequest = {
       studentId: this.student().id,
+      subjectCode: this.subjectCode(draft.subject),
       expectedMinutes: draft.expectedMinutes,
       dueAtEpochMs: draft.dueAtEpochMs,
       dueText: draft.dueText,
