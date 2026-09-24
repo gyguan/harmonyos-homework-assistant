@@ -384,6 +384,9 @@ require("AppTheme.PAGE_NAV_TITLE_SIZE" in deep_page_header and
         "AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT" in edit_sheet_header and
         "AppTheme.NAV_TITLE_MAX_LINES" in edit_sheet_header,
         "page and sheet headers must use the shared navigation typography contract")
+require(".height(AppTheme.DEEP_PAGE_HEADER_HEIGHT)" not in deep_page_header and
+        ".constraintSize({ minHeight: AppTheme.DEEP_PAGE_HEADER_HEIGHT })" in deep_page_header,
+        "DeepPageHeader must use minHeight so larger system text cannot be clipped")
 require(parent_dashboard.count("AppTheme.CARD_TITLE_SIZE") >= 3,
         "Parent dashboard card titles must share the card-title size")
 require(parent_extra.count("AppTheme.SECTION_TITLE_SIZE") >= 3,
