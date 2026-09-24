@@ -523,9 +523,12 @@ export struct StudyWorkspacePage {
 
           Text(this.assignment()!.title)
             .width('100%')
-            .fontSize(AppTheme.STUDY_TITLE_SIZE)
+            .fontSize(AppTheme.PAGE_TITLE_SIZE)
+            .lineHeight(AppTheme.PAGE_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT);
+            .fontColor(AppTheme.TEXT)
+            .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+            .textOverflow({ overflow: TextOverflow.Ellipsis });
 
           if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT ||
             this.assignment()!.status === AssignmentStatus.SUBMITTED ||
