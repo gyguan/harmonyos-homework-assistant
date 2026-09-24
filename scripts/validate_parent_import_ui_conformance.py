@@ -50,6 +50,16 @@ require("private ActionFooter()" in import_page and
         "manual homework primary action must remain fixed outside scrolling content")
 require(".height(200)" in import_page and "整理并继续" in import_page,
         "manual homework content editor must stay compact and preserve one primary continuation action")
+require("private SubjectSelector()" in import_page and
+        "label: Subject.CHINESE" in import_page and "label: Subject.MATH" in import_page and
+        "label: Subject.ENGLISH" in import_page and "label: Subject.OTHER" in import_page,
+        "manual homework must expose a compact subject selector before organization")
+require("@State private subjectChosen: boolean = false" in import_page and
+        "请先选择作业科目" in import_page and
+        ".enabled(!this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0)" in import_page,
+        "manual homework must require an explicit subject before organization")
+require("this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel)" in import_page,
+        "manual homework must pass the parent-selected subject into organization")
 require("captureImageText()" in import_vm and
         "HomeworkImportService.instance.captureImageText()" in import_vm,
         "manual homework ViewModel must expose camera OCR through the import service")
