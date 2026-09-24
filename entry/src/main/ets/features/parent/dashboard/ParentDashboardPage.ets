@@ -21,8 +21,8 @@ export struct ParentDashboardPage {
             .fontSize(24)
             .fontColor([AppTheme.PRIMARY]);
         }
-        .width(44)
-        .height(44)
+        .width(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .borderRadius(13);
@@ -49,8 +49,8 @@ export struct ParentDashboardPage {
       .alignItems(HorizontalAlign.Start);
     }
     .width('100%')
-    .constraintSize({ minHeight: 132 })
-    .padding(16)
+    .constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })
+    .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
@@ -71,8 +71,8 @@ export struct ParentDashboardPage {
             .fontColor(AppTheme.PRIMARY)
             .textAlign(TextAlign.Center);
         }
-        .width(44)
-        .height(44)
+        .width(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .borderRadius(13);
@@ -99,8 +99,8 @@ export struct ParentDashboardPage {
       .alignItems(HorizontalAlign.Start);
     }
     .width('100%')
-    .constraintSize({ minHeight: 132 })
-    .padding(16)
+    .constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })
+    .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
@@ -121,8 +121,8 @@ export struct ParentDashboardPage {
             .fontColor(AppTheme.PRIMARY)
             .textAlign(TextAlign.Center);
         }
-        .width(44)
-        .height(44)
+        .width(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
         .alignContent(Alignment.Center)
         .backgroundColor(AppTheme.PRIMARY_SOFT)
         .borderRadius(13);
@@ -149,8 +149,8 @@ export struct ParentDashboardPage {
       .alignItems(HorizontalAlign.Start);
     }
     .width('100%')
-    .constraintSize({ minHeight: 132 })
-    .padding(16)
+    .constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })
+    .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
