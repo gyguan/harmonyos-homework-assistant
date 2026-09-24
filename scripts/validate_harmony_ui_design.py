@@ -35,6 +35,9 @@ for typography_rule in [
     "动态文本容器用 minHeight，不用固定 height",
     "Phone 与 Pad 使用同一语义字号",
     "CARD_TITLE_SIZE",
+    "READING_BODY_SIZE",
+    "FORM_TEXT_SIZE",
+    "QUESTION_TEXT_SIZE",
     "maxLines + textOverflow(Ellipsis)",
 ]:
     require(typography_rule in typography_standard,
@@ -67,6 +70,12 @@ for token in [
     "LABEL_TITLE_LINE_HEIGHT",
     "BODY_SIZE",
     "BODY_LINE_HEIGHT",
+    "READING_BODY_SIZE",
+    "READING_BODY_LINE_HEIGHT",
+    "QUESTION_TEXT_SIZE",
+    "QUESTION_TEXT_LINE_HEIGHT",
+    "FORM_TEXT_SIZE",
+    "FORM_TEXT_LINE_HEIGHT",
     "META_SIZE",
     "META_LINE_HEIGHT",
     "CAPTION_SIZE",
@@ -97,6 +106,12 @@ for title_contract in [
     "static readonly LABEL_TITLE_LINE_HEIGHT: number = 20;",
     "static readonly BODY_SIZE: number = 14;",
     "static readonly BODY_LINE_HEIGHT: number = 21;",
+    "static readonly READING_BODY_SIZE: number = 16;",
+    "static readonly READING_BODY_LINE_HEIGHT: number = 24;",
+    "static readonly QUESTION_TEXT_SIZE: number = 20;",
+    "static readonly QUESTION_TEXT_LINE_HEIGHT: number = 30;",
+    "static readonly FORM_TEXT_SIZE: number = 15;",
+    "static readonly FORM_TEXT_LINE_HEIGHT: number = 22;",
     "static readonly META_SIZE: number = 13;",
     "static readonly META_LINE_HEIGHT: number = 18;",
     "static readonly CAPTION_SIZE: number = 12;",
@@ -109,6 +124,29 @@ for title_contract in [
     "static readonly META_MAX_LINES: number = 1;",
 ]:
     require(title_contract in theme, f"AppTheme title hierarchy drifted: {title_contract}")
+# Business UI text must not regress below the project 12fp floor.
+for ui_file in (ROOT / "entry/src/main/ets").rglob("*.ets"):
+    ui_source = ui_file.read_text(encoding="utf-8")
+    require(".fontSize(10)" not in ui_source and ".fontSize(11)" not in ui_source,
+            f"business UI text must not use 10/11fp hardcoded sizes: {ui_file.relative_to(ROOT)}")
+
+practice_attempt = read_optional("entry/src/main/ets/features/student/practice/PracticeAttemptPage.ets")
+require("AppTheme.QUESTION_TEXT_SIZE" in practice_attempt and
+        "AppTheme.QUESTION_TEXT_LINE_HEIGHT" in practice_attempt and
+        "AppTheme.FORM_TEXT_SIZE" in practice_attempt,
+        "practice attempt must use semantic question/form typography tokens")
+require(".fontSize(this.scaled(20))" not in practice_attempt and
+        ".lineHeight(this.scaled(30))" not in practice_attempt,
+        "practice attempt must not restore hardcoded question typography")
+
+voice_assignment = read_optional("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
+require(".fontSize(10)" not in voice_assignment and ".fontSize(11)" not in voice_assignment,
+        "voice assignment player must not use undersized 10/11fp text")
+
+assignment_metrics = read_optional("entry/src/main/ets/components/assignment/AssignmentMetricSummary.ets")
+require("AppTheme.CAPTION_SIZE" in assignment_metrics and ".fontSize(11)" not in assignment_metrics,
+        "assignment metric labels must use the shared caption token")
+
 for obsolete_title_token in [
     "PHONE_PAGE_TITLE_SIZE",
     "PHONE_SECTION_TITLE_SIZE",
