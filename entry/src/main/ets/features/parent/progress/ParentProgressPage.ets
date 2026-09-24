@@ -184,7 +184,7 @@ export struct ParentProgressPage {
           label: '取消',
           kind: ActionButtonKind.NEUTRAL,
           isEnabled: !this.deleteBusy,
-          onAction: (): void => this.showDeleteSheet = false
+          onAction: (): void => { this.showDeleteSheet = false; }
         })
         .layoutWeight(1);
         ActionButton({
