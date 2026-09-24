@@ -64,7 +64,7 @@ require("ParentAssignmentEditPanel({" in parent_review and
 
 # Header exits: right-top exit is consistently Close; dirty edits warn before discard.
 require("EditSheetHeader({" in components and "EditSheetHeader({" in parent_editor and
-        "Text('关闭')" in sheet_header and "Text('关闭')" in deadline,
+        "TextAction({" in sheet_header and "label: '关闭'" in sheet_header and "Text('关闭')" in deadline,
         "editor sheets must reuse the shared Close-only header; picker must keep Close")
 require("confirmDiscard" in components and "放弃修改" in components and "继续编辑" in components,
         "candidate editor must warn before closing dirty edits")
