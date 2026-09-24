@@ -310,7 +310,7 @@ export struct PracticeAttemptPage {
         })
           .width('100%')
           .height(this.scaled(AppTheme.INPUT_HEIGHT))
-          .fontSize(this.scaled(AppTheme.READING_BODY_SIZE))
+          .fontSize(this.scaled(AppTheme.FORM_TEXT_SIZE))
           .backgroundColor(AppTheme.SURFACE)
           .border({ width: 1, color: AppTheme.BORDER })
           .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -335,7 +335,7 @@ export struct PracticeAttemptPage {
                 (this.isAnswered(question.id) ? AppTheme.SUCCESS : AppTheme.SUBTEXT))
               .backgroundColor(this.currentIndex === index ? AppTheme.PRIMARY :
                 (this.isAnswered(question.id) ? AppTheme.SUCCESS_SOFT : AppTheme.SURFACE_EMPHASIS))
-              .borderRadius(this.scaled(AppTheme.META_LINE_HEIGHT))
+              .borderRadius(this.scaled(18))
               .onClick(() => void this.moveTo(index));
           }, (question: PracticeQuestion) => question.id);
         }
@@ -351,7 +351,7 @@ export struct PracticeAttemptPage {
     if (this.attempt !== null) {
       Column() {
         Column({ space: this.scaled(8) }) {
-          Row({ space: this.scaled(AppTheme.CAPTION_SIZE) }) {
+          Row({ space: this.scaled(12) }) {
             Text(this.showQuestionNavigation ? '收起题号' : '选择题目')
               .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
               .fontWeight(FontWeight.Medium)
@@ -396,9 +396,9 @@ export struct PracticeAttemptPage {
 
   @Builder
   private QuestionContent() {
-    Column({ space: this.scaled(AppTheme.READING_BODY_SIZE) }) {
+    Column({ space: this.scaled(16) }) {
       if (this.currentQuestion() !== null) {
-        Column({ space: this.scaled(AppTheme.CAPTION_SIZE) }) {
+        Column({ space: this.scaled(12) }) {
           Text(`第 ${this.currentQuestion()!.orderNo} 题`)
             .width('100%')
             .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
@@ -457,7 +457,8 @@ export struct PracticeAttemptPage {
               if (this.previousAnswerFor(this.currentQuestion()!.id) !== null) {
                 Text(`上次作答：${this.previousAnswerFor(this.currentQuestion()!.id)!.answerValue}`)
                   .width('100%')
-                  .fontSize(this.scaled(AppTheme.ACTION_TEXT_SIZE))
+                  .fontSize(this.scaled(AppTheme.BODY_SIZE))
+                  .lineHeight(this.scaled(AppTheme.BODY_LINE_HEIGHT))
                   .fontColor(AppTheme.TEXT);
                 Text(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ? '上次答对' : '上次需订正')
                   .width('100%')
@@ -469,12 +470,12 @@ export struct PracticeAttemptPage {
                 Text(`上次笔记：${this.previousNoteFor(this.currentQuestion()!.id)!.content}`)
                   .width('100%')
                   .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
-                  .lineHeight(this.scaled(AppTheme.META_LINE_HEIGHT))
+                  .lineHeight(this.scaled(AppTheme.CAPTION_LINE_HEIGHT))
                   .fontColor(AppTheme.SUBTEXT);
               }
             }
             .width('100%')
-            .padding(this.scaled(AppTheme.CAPTION_SIZE))
+            .padding(this.scaled(12))
             .backgroundColor(AppTheme.SURFACE_SUBTLE)
             .borderRadius(AppTheme.CONTROL_RADIUS);
           }
@@ -496,12 +497,12 @@ export struct PracticeAttemptPage {
               Text(this.currentQuestion()!.hints[0])
                 .width('100%')
                 .fontSize(this.scaled(AppTheme.META_SIZE))
-                .lineHeight(this.scaled(AppTheme.QUESTION_TEXT_SIZE))
+                .lineHeight(this.scaled(AppTheme.META_LINE_HEIGHT))
                 .fontColor(AppTheme.SUBTEXT);
             }
           }
           .width('100%')
-          .padding(this.scaled(AppTheme.ACTION_TEXT_SIZE))
+          .padding(this.scaled(14))
           .backgroundColor(AppTheme.PRIMARY_FAINT)
           .borderRadius(AppTheme.CONTROL_RADIUS);
         }
@@ -562,7 +563,7 @@ export struct PracticeAttemptPage {
           left: this.scaled(AppTheme.PAGE_PADDING),
           right: this.scaled(AppTheme.PAGE_PADDING),
           top: this.scaled(10),
-          bottom: this.scaled(AppTheme.ACTION_TEXT_SIZE)
+          bottom: this.scaled(14)
         });
       }
       .width('100%')
