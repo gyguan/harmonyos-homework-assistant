@@ -333,7 +333,8 @@ export struct ParentProgressPage {
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
       Text(this.querying ? '查询中…' : '查询')
-        .fontSize(13)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(this.hasActiveFilters() ? AppTheme.PRIMARY : AppTheme.TEXT)
         .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
@@ -372,7 +373,8 @@ export struct ParentProgressPage {
           .fontColor(AppTheme.SUBTEXT);
         if (this.deletableVisibleAssignments().length > 0 || this.bulkMode) {
           Text(this.bulkMode ? '取消' : '删除')
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.bulkMode ? AppTheme.PRIMARY : AppTheme.DANGER)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
