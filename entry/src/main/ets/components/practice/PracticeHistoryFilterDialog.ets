@@ -1,5 +1,5 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../action/ActionControls';
 import { SegmentedSelectionButton } from '../selection/SelectionControls';
 import {
   PracticePassFilter,
@@ -163,11 +163,13 @@ export struct PracticeHistoryFilterDialog {
         ActionButton({
           label: '重置',
           kind: ActionButtonKind.NEUTRAL,
+          size: ActionButtonSize.MEDIUM,
           onAction: (): void => this.reset()
         })
         .layoutWeight(1);
         ActionButton({
           label: '确定',
+          size: ActionButtonSize.MEDIUM,
           onAction: (): void => this.confirm()
         })
         .layoutWeight(2);
