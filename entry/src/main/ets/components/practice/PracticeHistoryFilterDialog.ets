@@ -110,7 +110,7 @@ export struct PracticeHistoryFilterDialog {
             Column({ space: 10 }) {
               Text('科目')
                 .width('100%')
-                .fontSize(15)
+                .fontSize(AppTheme.LABEL_TITLE_SIZE)
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.TEXT);
               Row({ space: 8 }) {
@@ -130,7 +130,7 @@ export struct PracticeHistoryFilterDialog {
           Column({ space: 10 }) {
             Text('时间')
               .width('100%')
-              .fontSize(15)
+              .fontSize(AppTheme.LABEL_TITLE_SIZE)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
@@ -149,7 +149,7 @@ export struct PracticeHistoryFilterDialog {
           Column({ space: 10 }) {
             Text('通过状态')
               .width('100%')
-              .fontSize(15)
+              .fontSize(AppTheme.LABEL_TITLE_SIZE)
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
