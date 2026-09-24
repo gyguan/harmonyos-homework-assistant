@@ -55,7 +55,7 @@ export struct StudentProfilePage {
             });
             Column({ space: 4 }) {
               Text(this.student().name)
-                .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(AppTheme.TEXT);
               Text(`${this.student().grade} · ${this.student().className}`)
@@ -73,7 +73,7 @@ export struct StudentProfilePage {
               Row() {
                 Column({ space: 3 }) {
                   Text('学习资料')
-                    .fontSize(16)
+                    .fontSize(AppTheme.CARD_TITLE_SIZE)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(AppTheme.TEXT);
                   Text('学期和教材')
@@ -109,7 +109,7 @@ export struct StudentProfilePage {
               Row() {
                 Column({ space: 3 }) {
                   Text('小伴规则')
-                    .fontSize(16)
+                    .fontSize(AppTheme.CARD_TITLE_SIZE)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(AppTheme.TEXT);
                   Text('AI 辅导规则由家长设置')
