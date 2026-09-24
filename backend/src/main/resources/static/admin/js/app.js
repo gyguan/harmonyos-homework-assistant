@@ -3,8 +3,8 @@ import {
   fetchAssignmentResource, fetchVoiceMaterialAsset, getVoiceFolderDetail, getVoiceTaskDetail, listStudents,
   logout, registerVoiceMaterialPackage, searchVoiceFolders, searchVoiceTasks,
   uploadVoiceMaterialFile
-} from './api.js?v=20260923-4';
-import { SUBJECTS, parseVoiceMaterialPackages, uploadOrder, validatePackage } from './voice-material.js?v=20260923-4';
+} from './api.js?v=20260924-1';
+import { SUBJECTS, parseVoiceMaterialPackages, uploadOrder, validatePackage } from './voice-material.js?v=20260924-1';
 import {
   folderStatusClass, folderStatusLabel, renderFolderDetailContent, renderFolderRows,
   renderTaskDetailContent, renderTaskRows, taskStatusClass, taskStatusLabel
