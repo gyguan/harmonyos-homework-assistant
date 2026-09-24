@@ -40,8 +40,8 @@ require("static displayText(item: Assignment): string" in due and
         "return `${year}-${month}-${day} ${hour}:${minute}`" in due,
         "deadline display helper must use concrete YYYY-MM-DD HH:mm format")
 require("AssignmentDueDate.displayText(this.assignment)" in list_item and
-        "Text(this.deadlineText())" in list_item,
-        "assignment list item must use the shared concrete deadline formatter")
+        "this.deadlineText()" in list_item,
+        "assignment list item must use the shared concrete deadline formatter even inside compact metadata")
 require("Text(this.assignment.dueText)" not in list_item,
         "assignment list item must not show raw relative due text")
 
