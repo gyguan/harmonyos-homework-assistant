@@ -31,7 +31,7 @@ export struct AssignmentMetricSummary {
         .fontColor(AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
-    .constraintSize({ minHeight: 76 })
+    .constraintSize({ minHeight: AppTheme.METRIC_CARD_MIN_HEIGHT })
     .justifyContent(FlexAlign.Center)
     .alignItems(HorizontalAlign.Center)
     .backgroundColor(tone === 'pending' ? AppTheme.WARNING_SOFT :
