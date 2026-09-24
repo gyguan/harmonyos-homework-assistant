@@ -270,6 +270,10 @@ for deep_page_name, deep_page_source in [
 require("left: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import and
         "right: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import,
         "embedded HomeworkImportPage must not add a second horizontal page padding")
+require("Text('作业科目')" in homework_import and
+        "Text('作业内容')" in homework_import and
+        homework_import.count("AppTheme.SECTION_TITLE_SIZE") >= 2,
+        "Homework import subject and content headings must use the same section-title size")
 require("AppTheme.PHONE_PAGE_PADDING" not in homework_confirmation and
         "left: AppTheme.PAGE_PADDING" in homework_confirmation and
         "right: AppTheme.PAGE_PADDING" in homework_confirmation,
