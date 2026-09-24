@@ -1,4 +1,4 @@
-import { getToken, login, session } from './api.js?v=20260923-4';
+import { getToken, login, session } from './api.js?v=20260924-1';
 
 const el = id => document.getElementById(id);
 const loginView = el('login-view');
