@@ -52,7 +52,7 @@ public class VoiceMaterialAssignmentService {
         .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
     return createManually(familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            studentId, null, 0L, "", "", ""));
+            studentId, null, 0L, "", "", "", ""));
   }
 
   @Transactional
@@ -92,6 +92,8 @@ public class VoiceMaterialAssignmentService {
     }
 
     String requestedTitle = input.title() == null ? "" : input.title().trim();
+    String requestedInstruction =
+        input.instruction() == null ? "" : input.instruction().trim();
     AssignmentDtos.Response assignment = createFromFolder(
         familyId, item, targetStudentId,
         input.expectedMinutes() == null ? item.expectedMinutes : input.expectedMinutes(),
@@ -99,6 +101,7 @@ public class VoiceMaterialAssignmentService {
         input.dueText() == null ? "" : input.dueText().trim(),
         LocalDate.now(BUSINESS_ZONE),
         requestedTitle,
+        requestedInstruction,
         requestId,
         "MANUAL");
     return new VoiceMaterialDtos.CreateAssignmentResponse(
@@ -143,7 +146,7 @@ public class VoiceMaterialAssignmentService {
     AssignmentDtos.Response assignment = createFromFolder(
         familyId, item, item.studentId, item.expectedMinutes, dailyDueAt,
         item.dueAt == null ? "今天" : "", businessDate,
-        "", "", "AUTO");
+        "", "", "", "AUTO");
 
     VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
     record.id = UUID.randomUUID();
@@ -191,7 +194,8 @@ public class VoiceMaterialAssignmentService {
   private AssignmentDtos.Response createFromFolder(UUID familyId,
       VoiceMaterialPackageEntity item, String targetStudentId, int expectedMinutes,
       Instant dueAtOverride, String dueTextOverride, LocalDate businessDate,
-      String requestedTitle, String requestId, String createMode) {
+      String requestedTitle, String requestedInstruction, String requestId,
+      String createMode) {
     String assignmentId = "a-voice-" + UUID.randomUUID();
     Long dueAtEpochMs = null;
     if (dueAtOverride != null) dueAtEpochMs = dueAtOverride.toEpochMilli();
@@ -206,7 +210,9 @@ public class VoiceMaterialAssignmentService {
         assignmentId,
         subjectDisplay(item.subjectCode),
         title,
-        "请听语音并结合图片完成任务。",
+        requestedInstruction == null || requestedInstruction.isBlank()
+            ? "请听语音并结合图片完成任务。"
+            : requestedInstruction.trim(),
         "",
         dueTextOverride,
         item.assignmentType,
