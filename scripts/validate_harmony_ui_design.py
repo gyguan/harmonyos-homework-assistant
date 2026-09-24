@@ -174,16 +174,20 @@ if selection_controls:
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
         "Student Assignments must not keep runtime selection in ordinary @Builder boolean parameters")
-require("SegmentedSelectionButton" in student_assignments and "FilterSummaryEntry" in student_assignments,
-        "Student Assignments must use shared reactive selection controls")
+require("SegmentedSelectionButton" in student_assignments and "private QuickFilterBar()" in student_assignments,
+        "Student Assignments must use shared reactive quick-filter controls")
 for expression in [
-    "selected: !this.calendarMode",
-    "selected: this.calendarMode",
-    "active: !this.allDates && !this.isSelectedDayToday()",
-    "active: this.subjectCode !== 'ALL'",
+    "selected: !this.allDates && this.isSelectedDayToday()",
+    "selected: this.allDates",
+    "selected: this.subjectCode === 'ALL'",
+    "selected: this.subjectCode === 'CHINESE'",
+    "selected: this.subjectCode === 'MATH'",
+    "selected: this.subjectCode === 'ENGLISH'",
 ]:
     require(expression in student_assignments,
-            f"Student Assignments must bind selection directly to page state: {expression}")
+            f"Student Assignments must bind quick-filter selection directly to page state: {expression}")
+require("calendarMode" not in student_assignments and "AssignmentCalendarPanel" not in student_assignments,
+        "Student Assignments must stay list-only after calendar retirement")
 
 filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 for state_expr, label in [
@@ -268,11 +272,9 @@ require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_con
         "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in selection_controls,
         "shared choice selection must combine active surface and border")
 
-calendar = read_optional("entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets")
-day_cell = between(calendar, "private DayCell(", "private WeekdayHeader()")
-require("backgroundColor(this.isSelected(dayEpochMs) ? AppTheme.PRIMARY" in day_cell and
-        "this.isSelected(dayEpochMs) ? AppTheme.TEXT_ON_PRIMARY" in day_cell,
-        "Calendar selected day must use a filled selected state with contrasting text")
+calendar_path = ROOT / "entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets"
+require(not calendar_path.exists(),
+        "retired Assignment calendar UI must stay deleted")
 
 # Settings use the same reactive child-component rule as navigation and status selectors. The native
 # Toggle still owns the visual switch feedback, while isEnabled avoids ArkUI CommonAttribute.enabled.
