@@ -3,6 +3,7 @@ import { BackendAuthService } from '../application/remote/BackendAuthService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { FamilyCloudService } from '../application/remote/FamilyCloudService';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
+import { ParentAccessDialog } from '../components/family/ParentAccessDialog';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { AppRole, AppShell } from './AppShell';
@@ -16,7 +17,20 @@ struct Index {
   private shareImportForceParent: boolean = false;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private cloudRevision: number = 0;
+  @State private parentAccessCodeInput: string = '';
+  @State private parentAccessMessage: string = '';
   private shellBackHandler: () => boolean = () => false;
+
+  private parentAccessController: CustomDialogController = new CustomDialogController({
+    builder: ParentAccessDialog({
+      code: $parentAccessCodeInput,
+      message: $parentAccessMessage,
+      onConfirm: () => this.confirmParentAccess()
+    }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
 
   aboutToAppear(): void {
     this.applyShareImportParentRole();
@@ -29,8 +43,8 @@ struct Index {
 
   private applyShareImportParentRole(): void {
     if (!this.shareImportForceParent) return;
-    this.selectedRole = AppRole.PARENT;
     this.shareImportForceParent = false;
+    this.requestParentAccess();
   }
 
   onBackPress(): boolean {
@@ -42,6 +56,29 @@ struct Index {
     let valid = await BackendAuthService.instance.validateSession();
     if (!valid) return;
     if (await FamilyCloudService.instance.syncStudents()) this.cloudRevision++;
+  }
+
+  private requestParentAccess(): void {
+    let configuredCode = this.familyContext.getSettings().parentAccessCode;
+    if (configuredCode.length === 0) {
+      this.enterParent();
+      return;
+    }
+    this.parentAccessCodeInput = '';
+    this.parentAccessMessage = '';
+    this.parentAccessController.open();
+  }
+
+  private confirmParentAccess(): void {
+    let configuredCode = this.familyContext.getSettings().parentAccessCode;
+    if (this.parentAccessCodeInput !== configuredCode) {
+      this.parentAccessMessage = '家长码不正确';
+      return;
+    }
+    this.parentAccessController.close();
+    this.parentAccessCodeInput = '';
+    this.parentAccessMessage = '';
+    this.enterParent();
   }
 
   private enterParent(): void {
@@ -66,13 +103,13 @@ struct Index {
       if (this.selectedRole === AppRole.NONE) {
         PersonEntryPage({
           revision: this.cloudRevision,
-          onSelectParent: () => this.enterParent(),
+          onSelectParent: () => this.requestParentAccess(),
           onSelectStudent: (studentId: string) => this.enterStudent(studentId)
         });
       } else {
         AppShell({
           role: this.selectedRole,
-          onSwitchParent: () => this.enterParent(),
+          onSwitchParent: () => this.requestParentAccess(),
           onSwitchStudent: (studentId: string) => this.enterStudent(studentId),
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
         });
