@@ -47,11 +47,10 @@ require("this.assignmentType(candidate.subject)" in publisher and
 require("ExtraHomework" not in publisher + import_service + repository,
         "unified create flow must not introduce a parallel ExtraHomework domain")
 
-# Free text and AI organization must support the old extracurricular capability.
-require("fallbackSubject" in import_service and
-        "Subject.SPORTS" in import_service and "Subject.READING" in import_service and
-        "Subject.PRACTICE" in import_service,
-        "free-text fallback must recognize common extracurricular categories")
+# Parent-selected subject is authoritative during manual import; specialized extracurricular
+# categories remain correctable in confirmation and supported by the organizer contract.
+require("applySelectedSubject" in import_service and "fallbackSubject" not in import_service,
+        "manual import must not infer or overwrite the parent-selected subject from free text")
 for token in ["Subject.READING", "Subject.READ_ALOUD", "Subject.SPORTS",
               "Subject.PRACTICE", "Subject.INTEREST", "Subject.OTHER"]:
     require(token in organizer_api, f"AI organizer client must accept unified category: {token}")
