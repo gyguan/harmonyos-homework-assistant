@@ -59,7 +59,7 @@ export class HomeworkImportService {
     return await this.runSmart(input);
   }
 
-  async parseText(text: string, imageRef: string = '',
+  async parseText(text: string, subject: Subject, imageRef: string = '',
     imageSourceLabel: string = ''): Promise<HomeworkTextImportResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let normalized = text.trim();
@@ -78,9 +78,9 @@ export class HomeworkImportService {
       rawText: normalized
     };
     let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
-    let candidates = output.candidates;
+    let candidates = this.applySelectedSubject(output.candidates, subject);
     if (candidates.length === 0 && output.organizerMode === HomeworkOrganizerMode.LOCAL) {
-      candidates = [this.fallbackCandidate(studentId, normalized, rawImport.sourceLabel)];
+      candidates = [this.fallbackCandidate(studentId, normalized, rawImport.sourceLabel, subject)];
     }
     HomeworkImportInboxService.instance.commitParsedImport(
       rawImport,
@@ -151,27 +151,34 @@ export class HomeworkImportService {
     };
   }
 
-  private fallbackSubject(text: string): Subject {
-    if (text.indexOf('跳绳') >= 0 || text.indexOf('跑步') >= 0 || text.indexOf('运动') >= 0 ||
-      text.indexOf('体育') >= 0 || text.indexOf('锻炼') >= 0) return Subject.SPORTS;
-    if (text.indexOf('朗读') >= 0 || text.indexOf('朗诵') >= 0) return Subject.READ_ALOUD;
-    if (text.indexOf('阅读') >= 0 || text.indexOf('读书') >= 0) return Subject.READING;
-    if (text.indexOf('实践') >= 0 || text.indexOf('实验') >= 0 || text.indexOf('劳动') >= 0) {
-      return Subject.PRACTICE;
+  private applySelectedSubject(candidates: CandidateAssignment[], subject: Subject): CandidateAssignment[] {
+    let result: CandidateAssignment[] = [];
+    for (let candidate of candidates) {
+      result.push({
+        id: candidate.id,
+        studentId: candidate.studentId,
+        subject: subject,
+        title: candidate.title,
+        instruction: candidate.instruction,
+        textbookRef: candidate.textbookRef,
+        dueText: candidate.dueText,
+        expectedMinutes: candidate.expectedMinutes,
+        sourceEvidence: candidate.sourceEvidence,
+        confidence: candidate.confidence
+      });
     }
-    if (text.indexOf('兴趣') >= 0 || text.indexOf('画画') >= 0 || text.indexOf('绘画') >= 0 ||
-      text.indexOf('音乐') >= 0) return Subject.INTEREST;
-    return Subject.OTHER;
+    return result;
   }
 
-  private fallbackCandidate(studentId: string, text: string, sourceLabel: string): CandidateAssignment {
+  private fallbackCandidate(studentId: string, text: string, sourceLabel: string,
+    subject: Subject): CandidateAssignment {
     let firstLine = text.split('\n')[0].trim();
     let title = firstLine.length > 0 ? firstLine : text;
     if (title.length > 40) title = title.substring(0, 40);
     return {
       id: `manual-fallback-${Date.now()}`,
       studentId: studentId,
-      subject: this.fallbackSubject(text),
+      subject: subject,
       title: title,
       instruction: text,
       textbookRef: '',
