@@ -11,7 +11,7 @@ export struct EditSheetHeader {
     Row() {
       Column({ space: 2 }) {
         Text(this.title)
-          .fontSize(18)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         if (this.subtitle.length > 0) {
