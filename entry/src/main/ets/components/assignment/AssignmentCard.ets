@@ -111,7 +111,7 @@ export struct AssignmentCard {
     }
     .width('100%')
     .padding(AppTheme.CARD_PADDING)
-    .backgroundColor(AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .borderRadius(AppTheme.CARD_RADIUS);
   }
 }
