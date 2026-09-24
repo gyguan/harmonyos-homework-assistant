@@ -56,7 +56,7 @@ struct PracticePaperCard {
     }
     .width('100%')
     .padding(AppTheme.PHONE_CARD_PADDING)
-    .backgroundColor(AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
@@ -292,7 +292,7 @@ export struct PracticeHomePage {
     }
     .width('100%')
     .padding({ left: 12, right: 12, top: 12, bottom: 10 })
-    .backgroundColor(AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
@@ -343,7 +343,7 @@ export struct PracticeHomePage {
         }
         .width('100%')
         .padding({ top: 28, bottom: 28 })
-        .backgroundColor(AppTheme.SURFACE)
+        .backgroundColor(AppTheme.CARD_SURFACE)
         .borderRadius(AppTheme.PHONE_CARD_RADIUS);
       } else {
         Column({ space: 9 }) {
