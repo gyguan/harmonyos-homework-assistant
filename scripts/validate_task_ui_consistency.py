@@ -59,8 +59,8 @@ require("@State private scopedAssignments: Assignment[] = []" in progress and
         "this.applyItems(this.scopedAssignments)" in progress,
         "parent progress list must render directly from the active date/subject scope")
 require("Text('作业进度')" not in progress and
-        "Text(this.bulkMode ? '取消' : '删除')" in progress,
-        "parent progress must remove its duplicate page title and expose delete/cancel in one stable location")
+        "label: this.bulkMode ? '取消' : '删除'" in progress and "TextAction({" in progress,
+        "parent progress must remove its duplicate page title and expose shared delete/cancel in one stable location")
 require("可以调整日期或科目。" in progress,
         "parent progress empty state must match the remaining filter dimensions")
 
@@ -95,22 +95,22 @@ for removed in ["private TypeOption", "private DateOption", "今天", "明天", 
     require(removed not in query_dialog, f"shared task query retains removed preset: {removed}")
 
 # 5. Popup/sheet action convention: right-top only exit actions; primary/destructive actions at bottom.
-require(query_dialog.index("Text('关闭')") < query_dialog.index("DatePicker({") <
-        query_dialog.index("Button('查询'"),
-        "task query dialog must keep close top-right and query action at bottom")
+require(query_dialog.index("label: '关闭'") < query_dialog.index("DatePicker({") <
+        query_dialog.index("label: '查询'"),
+        "task query dialog must keep shared close top-right and query action at bottom")
 require(deadline_dialog.index("Text('关闭')") < deadline_dialog.index("DatePicker({") <
         deadline_dialog.index("Button('确定'"),
         "deadline dialog must keep close top-right and confirm action at bottom")
-require("Text('关闭')" in student_switcher,
-        "student switcher must keep a top-right close action")
-require("Text('关闭')" in photo_preview,
-        "photo preview must keep a top-right close action")
+require("TextAction({" in student_switcher and "label: '关闭'" in student_switcher,
+        "student switcher must keep a shared top-right close action")
+require("TextAction({" in photo_preview and "label: '关闭'" in photo_preview,
+        "photo preview must keep a shared top-right close action")
 parent_actions = parent_edit.split("private BottomActions()", 1)[1].split("build()", 1)[0]
-require("EditSheetHeader({" in parent_edit and "Text('关闭')" in sheet_header and
+require("EditSheetHeader({" in parent_edit and "TextAction({" in sheet_header and "label: '关闭'" in sheet_header and
         "Button(this.saving ? '保存中…' : '保存修改'" in parent_actions,
         "parent edit sheet must reuse the shared close-only header and fixed bottom save area")
-require("EditSheetHeader({" in confirmation_components and "Text('关闭')" in sheet_header and
-        "confirmDiscard" in confirmation_components,
+require("EditSheetHeader({" in confirmation_components and "TextAction({" in sheet_header and
+        "label: '关闭'" in sheet_header and "confirmDiscard" in confirmation_components,
         "candidate edit sheet must reuse the shared close-only header and protect dirty edits")
 candidate_actions = confirmation_components.split("private BottomActions()", 1)[1].split("build()", 1)[0]
 require("Button('删除'" in candidate_actions and "Button('保存'" in candidate_actions,
