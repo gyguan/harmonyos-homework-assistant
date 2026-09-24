@@ -29,6 +29,8 @@ export class AppTheme {
   static readonly PAGE_PADDING_EXPANDED: number = 32;
   static readonly PAGE_PADDING: number = 16;
   static readonly PAGE_PADDING_WIDE: number = 32;
+  static readonly SECTION_GAP_COMPACT: number = 14;
+  static readonly SECTION_GAP_STANDARD: number = 20;
   static readonly SECTION_GAP: number = 20;
   static readonly ITEM_GAP: number = 12;
   static readonly CARD_PADDING_COMPACT: number = 14;
@@ -58,6 +60,9 @@ export class AppTheme {
   static readonly FILTER_DIALOG_MAX_WIDTH: number = 640;
   static readonly PARENT_HOME_READABLE_MAX_WIDTH: number = 1040;
   static readonly PARENT_HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
+  static readonly LIST_CARD_MIN_HEIGHT: number = 78;
+  static readonly METRIC_CARD_MIN_HEIGHT: number = 76;
+  static readonly INBOX_CARD_MIN_HEIGHT: number = 92;
   static readonly PARENT_HOME_ACTION_CARD_MIN_HEIGHT: number = 132;
   static readonly PARENT_HOME_ACTION_ICON_SIZE: number = 44;
   static readonly PARENT_HOME_ACTION_CARD_PADDING: number = 16;
