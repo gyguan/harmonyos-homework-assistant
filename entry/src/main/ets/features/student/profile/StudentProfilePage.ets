@@ -27,11 +27,13 @@ export struct StudentProfilePage {
     Row({ space: 12 }) {
       Text(label)
         .width(72)
-        .fontSize(13)
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
       Text(value.length > 0 ? value : '未设置')
         .layoutWeight(1)
-        .fontSize(14)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontColor(AppTheme.TEXT);
     }
     .width('100%')
@@ -56,10 +58,13 @@ export struct StudentProfilePage {
             Column({ space: 4 }) {
               Text(this.student().name)
                 .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+                .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Bold)
+                .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
                 .fontColor(AppTheme.TEXT);
               Text(`${this.student().grade} · ${this.student().className}`)
                 .fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT)
                 .fontColor(AppTheme.SUBTEXT);
             }
             .layoutWeight(1)
@@ -74,16 +79,20 @@ export struct StudentProfilePage {
                 Column({ space: 3 }) {
                   Text('学习资料')
                     .fontSize(AppTheme.CARD_TITLE_SIZE)
+                    .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
                     .fontWeight(FontWeight.Medium)
+                    .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
                     .fontColor(AppTheme.TEXT);
                   Text('学期和教材')
-                    .fontSize(12)
+                    .fontSize(AppTheme.CAPTION_SIZE)
+                    .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
                     .fontColor(AppTheme.SUBTEXT);
                 }
                 .layoutWeight(1)
                 .alignItems(HorizontalAlign.Start);
                 Text(this.learningInfoExpanded ? '收起' : '查看')
-                  .fontSize(13)
+                  .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                  .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.PRIMARY);
               }
@@ -110,16 +119,20 @@ export struct StudentProfilePage {
                 Column({ space: 3 }) {
                   Text('小伴规则')
                     .fontSize(AppTheme.CARD_TITLE_SIZE)
+                    .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
                     .fontWeight(FontWeight.Medium)
+                    .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
                     .fontColor(AppTheme.TEXT);
                   Text('AI 辅导规则由家长设置')
-                    .fontSize(12)
+                    .fontSize(AppTheme.CAPTION_SIZE)
+                    .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
                     .fontColor(AppTheme.SUBTEXT);
                 }
                 .layoutWeight(1)
                 .alignItems(HorizontalAlign.Start);
                 Text(this.tutorRulesExpanded ? '收起' : '查看')
-                  .fontSize(13)
+                  .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                  .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.PRIMARY);
               }
@@ -155,7 +168,8 @@ export struct StudentProfilePage {
 
           Text('学习资料和小伴规则都由家长维护。')
             .width('100%')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%')
