@@ -381,7 +381,7 @@ export struct ParentVoiceMaterialPage {
     Column({ space: 12 }) {
       Text('批量默认设置')
         .width('100%')
-        .fontSize(14)
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
 
@@ -431,7 +431,7 @@ export struct ParentVoiceMaterialPage {
       Row({ space: 8 }) {
         Column({ space: 3 }) {
           Text(item.directoryName)
-            .fontSize(14)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
@@ -487,7 +487,7 @@ export struct ParentVoiceMaterialPage {
     Column({ space: 10 }) {
       Row() {
         Text('待导入目录')
-          .fontSize(14)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
@@ -537,7 +537,7 @@ export struct ParentVoiceMaterialPage {
       Row({ space: 8 }) {
         Column({ space: 3 }) {
           Text(item.directoryName)
-            .fontSize(14)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
@@ -598,7 +598,7 @@ export struct ParentVoiceMaterialPage {
         Blank().layoutWeight(1).onClick(() => this.closeCreateSheet());
         Column({ space: 14 }) {
           Row() {
-            Text('创建语音任务').fontSize(18).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('创建语音任务').fontSize(AppTheme.PAGE_NAV_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Blank();
             Text('关闭').fontSize(13).fontColor(AppTheme.SUBTEXT).onClick(() => this.closeCreateSheet());
           }.width('100%');
@@ -650,7 +650,7 @@ export struct ParentVoiceMaterialPage {
     Column({ space: 10 }) {
       Row() {
         Text('语音素材库')
-          .fontSize(14)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
