@@ -423,8 +423,8 @@ for deep_page_name, deep_page_source in [
     require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in deep_page_source,
             f"{deep_page_name} must use the shared parent deep-page readable width")
 
-require("left: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import and
-        "right: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import,
+require("left: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT" in homework_import and
+        "right: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT" in homework_import,
         "embedded HomeworkImportPage must not add a second horizontal page padding")
 require("Text('作业科目')" in homework_import and
         "Text('作业内容')" in homework_import and
