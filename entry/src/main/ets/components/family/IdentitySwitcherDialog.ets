@@ -26,7 +26,7 @@ export struct IdentitySwitcherDialog {
       Row() {
         Column({ space: 3 }) {
           Text('切换身份')
-            .fontSize(20)
+            .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
           Text('选择家长或学生，切换后自动进入对应界面')
