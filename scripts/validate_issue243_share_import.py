@@ -119,7 +119,7 @@ require("ParentImportNavigator.openInbox(this.navPathStack)" in shell and
 
 require("无法读取或识别分享图片，请重试" in status,
         "OCR failure must have an explicit retry message")
-require("Button('重试'" in status and "this.retry()" in status,
+require("ActionButton({" in status and "label: '重试'" in status and "this.retry()" in status,
         "failed share import must be retryable")
 require("HomeworkShareImportService.instance.cancel" in status,
         "share handoff cancellation must clean pending data")
