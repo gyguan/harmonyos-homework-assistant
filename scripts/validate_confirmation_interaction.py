@@ -45,6 +45,10 @@ require("TextInput" not in card and "maxLines(1)" in card,
 require("private BottomActionBar()" in page and "this.BottomActionBar();" in page and
         ".layoutWeight(1)" in page,
         "confirmation publish/batch actions must stay in a fixed bottom action bar")
+require(page.find("DeepPageHeader({") < page.find("Scroll() {") and
+        page.find("this.CandidateListHeader();") < page.find("Scroll() {") and
+        page.find("this.CandidateList();") > page.find("Scroll() {"),
+        "confirmation title and final-review header must stay fixed above the scrolling task list")
 candidate_editor = components.split("export struct ConfirmationCandidateEditor", 1)[1]
 candidate_actions = candidate_editor.split("private BottomActions()", 1)[1].split("build()", 1)[0]
 require("private BottomActions()" in candidate_editor and "this.BottomActions();" in candidate_editor and
