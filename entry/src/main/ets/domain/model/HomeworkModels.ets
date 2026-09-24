@@ -75,6 +75,7 @@ export interface StudentProfile {
 export interface AppSettings {
   students: StudentProfile[];
   activeStudentId: string;
+  parentAccessCode: string;
   tutorGuidanceFirst: boolean;
   directAnswerAllowed: boolean;
 }
