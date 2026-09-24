@@ -3,7 +3,7 @@ import {
   ParentSubmissionEvidenceService
 } from '../../../application/submission/ParentSubmissionEvidenceService';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../../../components/action/ActionControls';
 import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -111,7 +111,7 @@ export struct ParentReviewPane {
           ActionButton({
             label: '取消',
             kind: ActionButtonKind.NEUTRAL,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             isEnabled: !this.deleteBusy,
             onAction: (): void => { this.deleteConfirm = false; }
           })
@@ -119,7 +119,7 @@ export struct ParentReviewPane {
           ActionButton({
             label: this.deleteBusy ? '正在删除…' : '确认删除',
             kind: ActionButtonKind.DANGER,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             isEnabled: !this.deleteBusy,
             onAction: (): void => { void this.deleteAssignment(); }
           })
