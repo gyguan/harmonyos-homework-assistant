@@ -179,6 +179,29 @@ require("AppTheme.BUTTON_HEIGHT" in action_controls and "AppTheme.SECONDARY_BUTT
         "AppTheme.MIN_TOUCH_TARGET" in action_controls and "AppTheme.CONTROL_RADIUS" in action_controls,
         "shared action controls must consume durable theme sizing rather than page-local literals")
 
+# ActionButton uses explicit semantic sizes. Keep compact only for chip-specific controls.
+for action_scan_path in [
+    "entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets",
+    "entry/src/main/ets/components/practice/PracticeFilterDialog.ets",
+    "entry/src/main/ets/components/practice/PracticeHistoryFilterDialog.ets",
+    "entry/src/main/ets/components/tutor/TutorQuestionCapturePanel.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkImportInboxFilterDialog.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
+    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
+    "entry/src/main/ets/features/parent/review/ParentReviewPane.ets",
+    "entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets",
+    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
+    "entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets",
+    "entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkShareImportStatusPage.ets",
+    "entry/src/main/ets/features/student/home/StudentHomePage.ets",
+    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
+]:
+    action_scan_source = read_optional(action_scan_path)
+    require(re.search(r"ActionButton\(\{[\s\S]{0,420}?compact:\s*true", action_scan_source) is None,
+            f"ActionButton must use explicit ActionButtonSize instead of compact: {action_scan_path}")
+
 # Standard business actions must reuse shared action semantics. Specialized controls such as
 # quiz options, media playback, image paging, and scaled practice navigation may keep bespoke Button UI.
 for action_path in [
@@ -331,6 +354,10 @@ require("DeadlinePickerField" in extra_assignment and "placeholder: 'YYYY-MM-DD'
 confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read_optional(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+duration_control = between(confirmation_components, "export struct CandidateDurationControl", "@Component\nexport struct ConfirmationCandidateCard")
+require(duration_control.count("ChoiceSelectionChip({") >= 5 and duration_control.count("compact: true") >= 5 and
+        "ActionButtonSize" not in duration_control,
+        "Candidate duration choices must use chip-specific compact sizing, not ActionButtonSize")
 assignment_edit_form = read_optional(
     "entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 require("private SubjectChip(" not in confirmation and "private TimeChip(" not in confirmation and
