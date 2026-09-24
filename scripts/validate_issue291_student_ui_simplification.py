@@ -66,7 +66,8 @@ require("Text('要做的')" not in assignments,
         "#291 Assignments must not repeat a redundant todo section heading above the active task list")
 
 # Detail: show authoritative content only; omit generic and empty cards; pin the main action.
-require("Scroll()" in detail and "Button(this.actionLabel(this.assignment()!)" in detail,
+require("Scroll()" in detail and "ActionButton({" in detail and
+        "label: this.actionLabel(this.assignment()!)" in detail,
         "#291 Detail must scroll content independently from its primary action")
 require("textbookRef.length > 0" in detail and
         "resourceLabels.length > 0" in detail,
