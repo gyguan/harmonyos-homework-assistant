@@ -18,7 +18,7 @@ export struct SubmissionResumeConfirmDialog {
         TextAction({
           label: '关闭',
           accessibilityLabel: '取消继续作业',
-          onAction: () => this.controller.close()
+          onAction: (): void => this.controller.close()
         });
       }
       .width('100%');
@@ -33,12 +33,12 @@ export struct SubmissionResumeConfirmDialog {
         ActionButton({
           label: '先不继续',
           kind: ActionButtonKind.NEUTRAL,
-          onAction: () => this.controller.close()
+          onAction: (): void => this.controller.close()
         })
         .layoutWeight(1);
         ActionButton({
           label: '清空并继续',
-          onAction: () => {
+          onAction: (): void => {
             this.controller.close();
             this.onConfirm();
           }
