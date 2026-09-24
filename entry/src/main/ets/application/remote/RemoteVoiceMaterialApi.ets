@@ -51,6 +51,7 @@ export interface RemoteVoiceMaterialRegisterPackageRequest {
 
 export interface RemoteVoiceMaterialCreateAssignmentRequest {
   studentId: string;
+  subjectCode?: string;
   expectedMinutes: number;
   dueAtEpochMs: number;
   dueText: string;
