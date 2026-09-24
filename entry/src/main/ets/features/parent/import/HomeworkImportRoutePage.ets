@@ -10,33 +10,37 @@ export struct HomeworkImportRoutePage {
   onStoreChanged: () => void = () => {};
 
   build() {
-    Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
-      DeepPageHeader({
-        title: '布置作业',
-        backAccessibilityText: '返回家长首页',
-        onBack: () => this.onBack()
-      });
-
-      Column() {
-        HomeworkImportPage({
-          revision: this.revision,
-          embeddedInDeepPage: true,
-          onOpenConfirmation: () => this.onOpenConfirmation(),
-          onStoreChanged: () => this.onStoreChanged()
+    Column() {
+      Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
+        DeepPageHeader({
+          title: '布置作业',
+          backAccessibilityText: '返回家长首页',
+          onBack: () => this.onBack()
         });
+
+        Column() {
+          HomeworkImportPage({
+            revision: this.revision,
+            embeddedInDeepPage: true,
+            onOpenConfirmation: () => this.onOpenConfirmation(),
+            onStoreChanged: () => this.onStoreChanged()
+          });
+        }
+        .width('100%')
+        .layoutWeight(1);
       }
       .width('100%')
-      .layoutWeight(1);
+      .height('100%')
+      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
+      .padding({
+        left: AppTheme.PAGE_PADDING,
+        right: AppTheme.PAGE_PADDING,
+        top: AppTheme.DEEP_PAGE_TOP_PADDING
+      });
     }
     .width('100%')
     .height('100%')
     .alignItems(HorizontalAlign.Center)
-    .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
-    .padding({
-      left: AppTheme.PAGE_PADDING,
-      right: AppTheme.PAGE_PADDING,
-      top: AppTheme.DEEP_PAGE_TOP_PADDING
-    })
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }
