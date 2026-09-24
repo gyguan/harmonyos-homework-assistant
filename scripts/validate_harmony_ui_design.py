@@ -174,6 +174,40 @@ require("AppTheme.BUTTON_HEIGHT" in action_controls and "AppTheme.SECONDARY_BUTT
         "AppTheme.CONTROL_RADIUS" in action_controls,
         "shared action controls must consume durable theme sizing rather than page-local literals")
 
+# Standard business actions must reuse shared action semantics. Specialized controls such as
+# quiz options, media playback, image paging, and scaled practice navigation may keep bespoke Button UI.
+for action_path in [
+    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkShareImportStatusPage.ets",
+    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
+    "entry/src/main/ets/features/parent/review/ParentReviewPane.ets",
+    "entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets",
+    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
+    "entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets",
+    "entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets",
+    "entry/src/main/ets/features/student/home/StudentHomePage.ets",
+    "entry/src/main/ets/features/student/assignments/AssignmentDetailPane.ets",
+    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
+    "entry/src/main/ets/features/student/practice/PracticePaperDetailPage.ets",
+    "entry/src/main/ets/features/student/practice/PracticeResultPage.ets",
+]:
+    action_source = read_optional(action_path)
+    require("ActionButton" in action_source,
+            f"standard business actions must reuse ActionButton: {action_path}")
+
+for filter_path in [
+    "entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets",
+    "entry/src/main/ets/components/practice/PracticeFilterDialog.ets",
+    "entry/src/main/ets/components/practice/PracticeHistoryFilterDialog.ets",
+    "entry/src/main/ets/features/parent/import/HomeworkImportInboxFilterDialog.ets",
+    "entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets",
+    "entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets",
+]:
+    filter_source = read_optional(filter_path)
+    require("SegmentedSelectionButton" in filter_source,
+            f"persistent filter/choice controls must reuse SegmentedSelectionButton: {filter_path}")
+
 selection_controls = read_optional("entry/src/main/ets/components/selection/SelectionControls.ets")
 require(len(selection_controls) > 0, "missing shared reactive selection controls")
 if selection_controls:
