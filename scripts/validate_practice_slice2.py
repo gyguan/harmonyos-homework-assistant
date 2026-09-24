@@ -70,13 +70,13 @@ require("availableWidthVp" in attempt_page and "ResponsiveContext.areaLengthToVp
         "Practice attempt must derive readability from actual available container width")
 require("contentScale()" in attempt_page and "AppTheme.PRACTICE_ATTEMPT_MAX_SCALE" in attempt_page,
         "Practice attempt must use bounded continuous scaling for wide-container readability")
-require("AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in attempt_page,
-        "Practice attempt content must use its wider shared readable-width token")
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in attempt_page,
+        "Practice attempt content must use the shared standard readable-width token")
 require(".fontSize(this.scaled(AppTheme.QUESTION_TEXT_SIZE))" in attempt_page and
         ".lineHeight(this.scaled(AppTheme.QUESTION_TEXT_LINE_HEIGHT))" in attempt_page and
         ".height(this.scaled(50))" in attempt_page,
         "Practice attempt must scale semantic question typography and answer controls together")
-require("PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in theme and
+require("CONTENT_STANDARD_MAX_WIDTH" in theme and
         "PRACTICE_ATTEMPT_SCALE_REFERENCE_WIDTH" in theme and
         "PRACTICE_ATTEMPT_MAX_SCALE" in theme and
         "QUESTION_TEXT_SIZE" in theme and
