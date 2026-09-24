@@ -1,5 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { HomeworkShareImportService } from '../../../application/import/HomeworkShareImportService';
 
 enum ShareImportPhase {
@@ -106,7 +106,7 @@ export struct HomeworkShareImportStatusPage {
         ActionButton({
           label: '取消导入',
           kind: ActionButtonKind.NEUTRAL,
-          compact: true,
+          size: ActionButtonSize.SMALL,
           onAction: (): void => { void this.cancel(); }
         })
         .width('100%');
@@ -114,7 +114,7 @@ export struct HomeworkShareImportStatusPage {
         ActionButton({
           label: '完成',
           kind: ActionButtonKind.NEUTRAL,
-          compact: true,
+          size: ActionButtonSize.SMALL,
           onAction: (): void => this.onCancel()
         })
         .width('100%');
