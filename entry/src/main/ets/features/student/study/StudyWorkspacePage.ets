@@ -510,19 +510,21 @@ export struct StudyWorkspacePage {
     } else {
       Scroll() {
         Column({ space: 18 }) {
-          Row({ space: 8 }) {
-            Text(this.assignment()!.subject)
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.PRIMARY);
-            Text('·').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
-            Text(AssignmentStateMachine.label(this.assignment()!.status))
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .fontColor(AppTheme.SUBTEXT);
-            Blank();
-            Text(`截至 ${this.assignment()!.dueText}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+          if (this.assignment()!.contentType !== AssignmentContentType.AUDIO_IMAGE) {
+            Row({ space: 8 }) {
+              Text(this.assignment()!.subject)
+                .fontSize(AppTheme.CAPTION_SIZE)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.PRIMARY);
+              Text('·').fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+              Text(AssignmentStateMachine.label(this.assignment()!.status))
+                .fontSize(AppTheme.CAPTION_SIZE)
+                .fontColor(AppTheme.SUBTEXT);
+              Blank();
+              Text(`截至 ${this.assignment()!.dueText}`).fontSize(AppTheme.CAPTION_SIZE).fontColor(AppTheme.TERTIARY_TEXT);
+            }
+            .width('100%');
           }
-          .width('100%');
 
           Text(this.assignment()!.title)
             .width('100%')
@@ -576,12 +578,14 @@ export struct StudyWorkspacePage {
               .borderRadius(AppTheme.CONTROL_RADIUS);
             }
 
-            Text(this.assignment()!.instruction.length > 0 ?
-              this.assignment()!.instruction : '按课堂要求完成这项作业。')
-              .width('100%')
-              .fontSize(AppTheme.READING_BODY_SIZE)
-              .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
-              .fontColor(AppTheme.TEXT);
+            if (this.assignment()!.contentType !== AssignmentContentType.AUDIO_IMAGE) {
+              Text(this.assignment()!.instruction.length > 0 ?
+                this.assignment()!.instruction : '按课堂要求完成这项作业。')
+                .width('100%')
+                .fontSize(AppTheme.READING_BODY_SIZE)
+                .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
+                .fontColor(AppTheme.TEXT);
+            }
 
             if (this.assignment()!.contentType === AssignmentContentType.AUDIO_IMAGE) {
               VoiceAssignmentPane({
