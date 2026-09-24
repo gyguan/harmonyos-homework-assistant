@@ -38,8 +38,9 @@ require("CoreVisionHomeworkTextExtractor" in service,
 require("recognizedText" in service and "candidates.push(saveUri)" in service and
         "result.resultUri !== saveUri" in service and "resourceUri: uri" in service,
         "camera OCR must prefer the app-cache saveUri and fall back to the Picker result URI")
-require("Button(this.capturing ? '识别中…' : '拍题'" in panel and "只在本机识别" in panel,
-        "Tutor composer must expose compact camera capture and clearly explain local-only image recognition")
+require("ActionButton({" in panel and "label: this.capturing ? '识别中…' : '拍题'" in panel and
+        "kind: ActionButtonKind.SECONDARY" in panel and "只在本机识别" in panel,
+        "Tutor composer must expose shared compact camera capture and clearly explain local-only image recognition")
 require("onRecognized" in panel and "this.onRecognized(result.recognizedText)" in panel,
         "recognized question text must be handed back to the editable Tutor draft")
 require("本机文字识别暂不可用" in panel and "照片读取失败" in panel and
@@ -48,8 +49,8 @@ require("本机文字识别暂不可用" in panel and "照片读取失败" in pa
 require("TutorQuestionCapturePanel" in study and "题目识别结果" in study,
         "study workspace must put OCR text into the Tutor draft")
 require(study.find("TextArea({ placeholder: '说说你卡在哪一步") < study.find("TutorQuestionCapturePanel({") <
-        study.find("Button(this.tutorSending ? '发送中…' : '发送'"),
-        "Tutor capture must live inside the bottom composer after text entry and before send")
+        study.find("label: this.tutorSending ? '发送中…' : '发送'"),
+        "Tutor capture must live inside the bottom composer after text entry and before the shared send action")
 require("只在本机识别" in panel and ".padding(12)" not in panel,
         "Tutor capture must stay a compact input accessory instead of a standalone card")
 require("小伴学习助手" in study and "有哪里卡住了？" in study,
@@ -59,9 +60,9 @@ for suggestion in ["怎么开始？", "检查思路", "提示下一步"]:
 require("CenteredTextBadge" in study and "badgeText: '伴'" in study,
         "Tutor assistant messages must keep a visible assistant identity")
 require("Text('你的问题')" in study and "TutorQuestionCapturePanel" in study and
-        "Button(this.tutorSending ? '发送中…' : '发送'" in study and
+        "ActionButton({" in study and "label: this.tutorSending ? '发送中…' : '发送'" in study and
         "backgroundColor(AppTheme.SURFACE_SUBTLE)" in study,
-        "Tutor composer must group text, camera and send actions into one input surface without redundant helper copy")
+        "Tutor composer must group text, camera and shared send actions into one input surface without redundant helper copy")
 require("请确认或补充后再发送" in study,
         "captured question must require student review before sending instead of auto-submit")
 require("TutorRemoteApi.instance.ask(this.assignmentId, text)" in study,
