@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import {
   ImportBatch,
@@ -258,21 +259,17 @@ export struct HomeworkImportBatchDetailPage {
             }
 
             if (this.batch()!.status === ImportBatchStatus.RECEIVED) {
-              Button('人工确认未识别消息', { type: ButtonType.Normal })
-                .width('100%')
-                .height(AppTheme.BUTTON_HEIGHT)
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .backgroundColor(AppTheme.PRIMARY)
-                .fontColor(AppTheme.TEXT_ON_PRIMARY)
-                .onClick(() => this.manualReview());
+              ActionButton({
+                label: '人工确认未识别消息',
+                onClick: () => this.manualReview()
+              })
+              .width('100%');
             } else if (this.batch()!.status === ImportBatchStatus.READY) {
-              Button('继续确认并发布', { type: ButtonType.Normal })
-                .width('100%')
-                .height(AppTheme.BUTTON_HEIGHT)
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .backgroundColor(AppTheme.PRIMARY)
-                .fontColor(AppTheme.TEXT_ON_PRIMARY)
-                .onClick(() => this.continueConfirmation());
+              ActionButton({
+                label: '继续确认并发布',
+                onClick: () => this.continueConfirmation()
+              })
+              .width('100%');
             }
 
             if (this.batch()!.status === ImportBatchStatus.RECEIVED ||
@@ -285,18 +282,20 @@ export struct HomeworkImportBatchDetailPage {
                     .lineHeight(18)
                     .fontColor(AppTheme.DANGER);
                   Row({ space: 8 }) {
-                    Button('取消', { type: ButtonType.Normal })
-                      .layoutWeight(1)
-                      .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                      .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-                      .fontColor(AppTheme.TEXT)
-                      .onClick(() => this.abandonConfirm = false);
-                    Button('确认放弃', { type: ButtonType.Normal })
-                      .layoutWeight(1)
-                      .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                      .backgroundColor(AppTheme.DANGER)
-                      .fontColor(AppTheme.TEXT_ON_PRIMARY)
-                      .onClick(() => this.abandon());
+                    ActionButton({
+                      label: '取消',
+                      kind: ActionButtonKind.NEUTRAL,
+                      compact: true,
+                      onClick: () => this.abandonConfirm = false
+                    })
+                    .layoutWeight(1);
+                    ActionButton({
+                      label: '确认放弃',
+                      kind: ActionButtonKind.DANGER,
+                      compact: true,
+                      onClick: () => this.abandon()
+                    })
+                    .layoutWeight(1);
                   }
                   .width('100%');
                 }
@@ -305,13 +304,13 @@ export struct HomeworkImportBatchDetailPage {
                 .backgroundColor(AppTheme.DANGER_SOFT)
                 .borderRadius(AppTheme.CONTROL_RADIUS);
               } else {
-                Button('放弃这个批次', { type: ButtonType.Normal })
-                  .width('100%')
-                  .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                  .borderRadius(AppTheme.CONTROL_RADIUS)
-                  .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-                  .fontColor(AppTheme.DANGER)
-                  .onClick(() => this.abandonConfirm = true);
+                ActionButton({
+                  label: '放弃这个批次',
+                  kind: ActionButtonKind.DANGER_SOFT,
+                  compact: true,
+                  onClick: () => this.abandonConfirm = true
+                })
+                .width('100%');
               }
             }
           }
