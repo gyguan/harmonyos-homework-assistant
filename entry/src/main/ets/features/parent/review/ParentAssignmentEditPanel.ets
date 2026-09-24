@@ -129,14 +129,14 @@ export struct ParentAssignmentEditPanel {
             label: '继续编辑',
             kind: ActionButtonKind.NEUTRAL,
             compact: true,
-            onAction: () => this.confirmDiscard = false
+            onAction: (): void => this.confirmDiscard = false
           })
           .layoutWeight(1);
           ActionButton({
             label: '放弃修改',
             kind: ActionButtonKind.DANGER_SOFT,
             compact: true,
-            onAction: () => {
+            onAction: (): void => {
               this.onCancel();
             }
           })
@@ -147,7 +147,7 @@ export struct ParentAssignmentEditPanel {
         ActionButton({
           label: this.saving ? '保存中…' : '保存修改',
           isEnabled: this.canSave(),
-          onAction: () => this.onSave(this.buildAssignment())
+          onAction: (): void => this.onSave(this.buildAssignment())
         })
         .width('100%');
       }
