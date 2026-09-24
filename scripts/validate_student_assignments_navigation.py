@@ -95,18 +95,27 @@ for token in ["'ALL'", "'CHINESE'", "'MATH'", "'ENGLISH'", "'OTHER'"]:
 for token in ["StudentAssignmentsViewModel", "DefaultAssignmentRepository.instance", "@State private visibleTotal",
               "private applyItems(items: Assignment[]): void", "this.visibleTotal = items.length",
               "AssignmentFilterDialog", "CustomDialogController", "alignment: DialogAlignment.Bottom",
-              "this.filterDialogController.open()", "FilterSummaryEntry({", "label: '日期'", "label: '科目'",
-              "allDates: $draftAllDates", "selectedDayEpochMs: $draftSelectedDayEpochMs",
+              "this.filterDialogController.open()", "private QuickFilterBar()", "private selectToday()",
+              "private selectAllDates()", "private selectSubjectCode(value: string)",
+              "label: '今天'", "label: '全部'", "label: '语文'", "label: '数学'", "label: '英语'",
+              "更多筛选：", "allDates: $draftAllDates", "selectedDayEpochMs: $draftSelectedDayEpochMs",
               "AssignmentDateFilter.ALL", "queryOnDay"]:
-    require(token in page or token in view_model, f"assignment result page missing required date+subject behavior: {token}")
-require("@Prop active: boolean = false;" in selection_controls and
-        "export struct FilterSummaryEntry" in selection_controls,
-        "assignment filter summary must keep active state in a reactive shared component")
+    require(token in page or token in view_model, f"assignment result page missing required quick-filter behavior: {token}")
+require("export struct SegmentedSelectionButton" in selection_controls and
+        "@Prop selected: boolean = false;" in selection_controls,
+        "assignment quick filters must keep selected state in the shared segmented control")
 for expression in [
-    "active: !this.allDates && !this.isSelectedDayToday()",
-    "active: this.subjectCode !== 'ALL'",
+    "selected: !this.allDates && this.isSelectedDayToday()",
+    "selected: this.allDates",
+    "selected: this.subjectCode === 'ALL'",
+    "selected: this.subjectCode === 'CHINESE'",
+    "selected: this.subjectCode === 'MATH'",
+    "selected: this.subjectCode === 'ENGLISH'",
 ]:
-    require(expression in page, f"assignment query summary must bind directly to page state: {expression}")
+    require(expression in page, f"assignment quick filter must bind directly to page state: {expression}")
+require("Text('我的作业')" not in page and "calendarMode" not in page and
+        "AssignmentCalendarPanel" not in page and "ViewModeToggle" not in page,
+        "student assignments must stay list-only without duplicate page title or calendar mode")
 for token in ["@CustomDialog", "@Link allDates", "@Link selectedDayEpochMs", "@Link subjectCode",
               "DateModeOption('全部日期', true)", "DateModeOption('指定日期', false)",
               "DatePicker({", "private SubjectOption", "Button('重置'", "Button('查询'",
