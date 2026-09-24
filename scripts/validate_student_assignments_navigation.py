@@ -118,7 +118,8 @@ require("Text('我的作业')" not in page and "calendarMode" not in page and
         "student assignments must stay list-only without duplicate page title or calendar mode")
 for token in ["@CustomDialog", "@Link allDates", "@Link selectedDayEpochMs", "@Link subjectCode",
               "DateModeOption('全部日期', true)", "DateModeOption('指定日期', false)",
-              "DatePicker({", "private SubjectOption", "Button('重置'", "Button('查询'",
+              "DatePicker({", "private SubjectOption", "SegmentedSelectionButton",
+              "label: '重置'", "label: '查询'",
               "this.onQuery(this.allDates, this.selectedDayEpochMs, this.subjectCode)"]:
     require(token in filter_dialog, f"assignment query dialog missing required behavior: {token}")
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
