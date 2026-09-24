@@ -56,7 +56,8 @@ def validate_qualified_model_imports() -> None:
 def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
-    syscap = json.loads(SYSCAP.read_text(encoding="utf-8"))
+    require(SYSCAP.exists(), "entry module must declare syscap.json for optional AVPlayer development capability")
+    syscap = json.loads(SYSCAP.read_text(encoding="utf-8")) if SYSCAP.exists() else {}
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
     parent_import_nav = PARENT_IMPORT_NAV.read_text(encoding="utf-8")
     app_shell = APP_SHELL.read_text(encoding="utf-8")
@@ -119,7 +120,6 @@ def main() -> int:
             "legacy standalone voice-material navigation must not reappear")
 
     syscap_name = "SystemCapability.Multimedia.Media.AVPlayer"
-    require(SYSCAP.exists(), "entry module must declare syscap.json for optional AVPlayer development capability")
     general_devices = syscap.get("devices", {}).get("general", [])
     development_caps = syscap.get("development", {}).get("addedSysCaps", [])
     production_removed_caps = syscap.get("production", {}).get("removedSysCaps", [])
