@@ -90,9 +90,9 @@ require("Button('保存'" in candidate_actions and "saveAndClose()" in candidate
         "Save must be a bottom business action that persists and exits")
 
 # Manual add belongs with list management, not after all cards.
-require("private CandidateListHeader()" in page and "Text('＋ 新增')" in page and
+require("private CandidateListHeader()" in page and "label: '＋ 新增'" in page and
         "Button('＋ 手工新增一项'" not in page,
-        "manual add must live in the candidate list header")
+        "manual add must live in the candidate list header through the shared text action")
 
 manual_add = page.split("private addCandidate(): void", 1)[1].split("private removeCandidate", 1)[0]
 save_candidate = page.split("private saveCandidate(candidate: CandidateAssignment): boolean", 1)[1].split(
