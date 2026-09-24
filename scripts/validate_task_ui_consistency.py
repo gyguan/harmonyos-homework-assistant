@@ -107,8 +107,8 @@ require("TextAction({" in photo_preview and "label: '关闭'" in photo_preview,
         "photo preview must keep a shared top-right close action")
 parent_actions = parent_edit.split("private BottomActions()", 1)[1].split("build()", 1)[0]
 require("EditSheetHeader({" in parent_edit and "TextAction({" in sheet_header and "label: '关闭'" in sheet_header and
-        "Button(this.saving ? '保存中…' : '保存修改'" in parent_actions,
-        "parent edit sheet must reuse the shared close-only header and fixed bottom save area")
+        "ActionButton({" in parent_actions and "label: this.saving ? '保存中…' : '保存修改'" in parent_actions,
+        "parent edit sheet must reuse the shared close-only header and fixed shared save area")
 require("EditSheetHeader({" in confirmation_components and "TextAction({" in sheet_header and
         "label: '关闭'" in sheet_header and "confirmDiscard" in confirmation_components,
         "candidate edit sheet must reuse the shared close-only header and protect dirty edits")
