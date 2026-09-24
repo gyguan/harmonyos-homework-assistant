@@ -103,6 +103,7 @@ public final class VoiceMaterialDtos {
       Long dueAtEpochMs,
       @Size(max = 32) String dueText,
       @Size(max = 300) String title,
+      @Size(max = 1000) String instruction,
       @Size(max = 120) String requestId) {}
 
   public record CreateAssignmentResponse(boolean created, String assignmentId,
