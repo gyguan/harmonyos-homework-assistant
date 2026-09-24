@@ -158,6 +158,11 @@ if assignment_list_item:
     require("TextOverflow.Ellipsis" in assignment_list_item and
             "this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}" in assignment_list_item,
             "AssignmentListItem compact metadata must truncate instead of overlapping neighboring content")
+    require("Row({ space: 8 })" in assignment_list_item and
+            ".lineHeight(22)" in assignment_list_item and
+            ".lineHeight(18)" in assignment_list_item and
+            ".constraintSize({ minHeight: 78 })" in assignment_list_item,
+            "AssignmentListItem must reserve stable vertical space for title/status and metadata rows")
 
 # Persistent selectors whose visual state changes at runtime must use reactive child-component props,
 # not ordinary @Builder boolean snapshots. Keep both the binding mechanism and visible feedback guarded.
