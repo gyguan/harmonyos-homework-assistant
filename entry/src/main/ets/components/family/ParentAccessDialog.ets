@@ -1,5 +1,4 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, TextAction, TextActionKind } from '../action/ActionControls';
 
 @CustomDialog
 export struct ParentAccessDialog {
@@ -22,12 +21,14 @@ export struct ParentAccessDialog {
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        TextAction({
-          label: '关闭',
-          kind: TextActionKind.NEUTRAL,
-          accessibilityLabel: '关闭家长身份验证',
-          onAction: (): void => this.controller.close()
-        });
+        Text('关闭')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 12, right: 2 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('关闭家长身份验证')
+          .onClick(() => this.controller.close());
       }
       .width('100%');
 
@@ -50,11 +51,13 @@ export struct ParentAccessDialog {
           .fontColor(AppTheme.DANGER);
       }
 
-      ActionButton({
-        label: '进入家长模式',
-        onAction: (): void => this.onConfirm()
-      })
-      .width('100%');
+      Button('进入家长模式', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .onClick(() => this.onConfirm());
     }
     .width('100%')
     .constraintSize({ maxWidth: 420 })

@@ -1,6 +1,4 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../action/ActionControls';
-import { SegmentedSelectionButton } from '../selection/SelectionControls';
 import {
   PracticePassFilter,
   PracticeTaxonomy
@@ -39,32 +37,41 @@ export struct PracticeHistoryFilterDialog {
 
   @Builder
   private SubjectOption(value: PracticeHistorySubjectFilter) {
-    SegmentedSelectionButton({
-      label: this.subjectLabel(value),
-      selected: this.selectedSubject === value,
-      onSelect: () => this.selectedSubject = value
-    })
-    .layoutWeight(1);
+    Button(this.subjectLabel(value), { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(13)
+      .fontWeight(this.selectedSubject === value ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.selectedSubject === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.selectedSubject === value ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.selectedSubject = value);
   }
 
   @Builder
   private TimeOption(value: PracticeHistoryTimeFilter) {
-    SegmentedSelectionButton({
-      label: this.timeLabel(value),
-      selected: this.selectedTime === value,
-      onSelect: () => this.selectedTime = value
-    })
-    .layoutWeight(1);
+    Button(this.timeLabel(value), { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(13)
+      .fontWeight(this.selectedTime === value ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.selectedTime === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.selectedTime === value ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.selectedTime = value);
   }
 
   @Builder
   private PassOption(value: PracticePassFilter) {
-    SegmentedSelectionButton({
-      label: PracticeTaxonomy.passFilterLabel(value),
-      selected: this.selectedPass === value,
-      onSelect: () => this.selectedPass = value
-    })
-    .layoutWeight(1);
+    Button(PracticeTaxonomy.passFilterLabel(value), { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(13)
+      .fontWeight(this.selectedPass === value ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.selectedPass === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.selectedPass === value ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.selectedPass = value);
   }
 
   private reset(): void {
@@ -85,12 +92,14 @@ export struct PracticeHistoryFilterDialog {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        TextAction({
-          label: '关闭',
-          kind: TextActionKind.NEUTRAL,
-          accessibilityLabel: '关闭练习记录筛选',
-          onAction: (): void => this.controller.close()
-        });
+        Text('关闭')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 12, right: 4 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('关闭练习记录筛选')
+          .onClick(() => this.controller.close());
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 20, bottom: 12 });
@@ -160,19 +169,21 @@ export struct PracticeHistoryFilterDialog {
       .scrollBar(BarState.Off);
 
       Row({ space: 12 }) {
-        ActionButton({
-          label: '重置',
-          kind: ActionButtonKind.NEUTRAL,
-          actionSize: ActionButtonSize.MEDIUM,
-          onAction: (): void => this.reset()
-        })
-        .layoutWeight(1);
-        ActionButton({
-          label: '确定',
-          actionSize: ActionButtonSize.MEDIUM,
-          onAction: (): void => this.confirm()
-        })
-        .layoutWeight(2);
+        Button('重置', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .onClick(() => this.reset());
+        Button('确定', { type: ButtonType.Normal })
+          .layoutWeight(2)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .onClick(() => this.confirm());
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 12, bottom: 18 })

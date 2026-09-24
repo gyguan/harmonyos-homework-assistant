@@ -42,12 +42,9 @@ require(".alignItems(HorizontalAlign.Center)" in import_route and
         "AppTheme.IMPORT_READABLE_MAX_WIDTH" in import_page,
         "manual import route must center the embedded readable content column on Pad")
 
-require("ActionButton" in import_page and
-        "label: this.parseBusy ? '识别中…' : '拍照识别'" in import_page and
-        "label: this.parseBusy ? '识别中…' : '相册识别'" in import_page and
-        import_page.count("kind: ActionButtonKind.OUTLINE") >= 2 and
-        import_page.count("actionSize: ActionButtonSize.SMALL") >= 2,
-        "manual homework must expose small outline camera and gallery OCR actions")
+require("Button(this.parseBusy ? '识别中…' : '拍照识别'" in import_page and
+        "Button(this.parseBusy ? '识别中…' : '相册识别'" in import_page,
+        "manual homework must expose compact camera and gallery OCR actions")
 require("private ActionFooter()" in import_page and
         import_page.find("this.ActionFooter();") > import_page.find(".scrollBar(BarState.Off);"),
         "manual homework primary action must remain fixed outside scrolling content")
@@ -59,7 +56,7 @@ require("private SubjectSelector()" in import_page and
         "manual homework must expose a compact subject selector before organization")
 require("@State private subjectChosen: boolean = false" in import_page and
         "请先选择作业科目" in import_page and
-        "isEnabled: !this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0" in import_page,
+        ".enabled(!this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0)" in import_page,
         "manual homework must require an explicit subject before organization")
 require("this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel)" in import_page,
         "manual homework must pass the parent-selected subject into organization")

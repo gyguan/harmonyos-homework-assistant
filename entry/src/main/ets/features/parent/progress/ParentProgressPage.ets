@@ -1,7 +1,6 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../../../components/action/ActionControls';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { FilterSummaryEntry } from '../../../components/selection/SelectionControls';
@@ -180,20 +179,22 @@ export struct ParentProgressPage {
         .lineHeight(21)
         .fontColor(AppTheme.SUBTEXT);
       Row({ space: 10 }) {
-        ActionButton({
-          label: '取消',
-          kind: ActionButtonKind.NEUTRAL,
-          isEnabled: !this.deleteBusy,
-          onAction: (): void => { this.showDeleteSheet = false; }
-        })
-        .layoutWeight(1);
-        ActionButton({
-          label: this.deleteBusy ? '正在删除…' : '确认删除',
-          kind: ActionButtonKind.DANGER,
-          isEnabled: !this.deleteBusy,
-          onAction: (): void => { void this.deleteSelectedAssignments(); }
-        })
-        .layoutWeight(1);
+        Button('取消', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .enabled(!this.deleteBusy)
+          .onClick(() => this.showDeleteSheet = false);
+        Button(this.deleteBusy ? '正在删除…' : '确认删除', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.DANGER)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .enabled(!this.deleteBusy)
+          .onClick(() => { void this.deleteSelectedAssignments(); });
       }
       .width('100%');
     }
@@ -210,18 +211,20 @@ export struct ParentProgressPage {
           .fontSize(13)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        TextAction({
-          label: '全选当前',
-          onAction: (): void => this.selectAllDeletable()
-        });
+        Text('全选当前')
+          .fontSize(13)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 8 })
+          .onClick(() => this.selectAllDeletable());
         Blank();
-        ActionButton({
-          label: `删除${this.selectedDeleteIds.length > 0 ? ' ' + this.selectedDeleteIds.length : ''}`,
-          kind: ActionButtonKind.DANGER_SOFT,
-          actionSize: ActionButtonSize.SMALL,
-          isEnabled: this.selectedDeleteIds.length > 0 && !this.deleteBusy,
-          onAction: (): void => this.openDeleteConfirm()
-        });
+        Button(`删除${this.selectedDeleteIds.length > 0 ? ' ' + this.selectedDeleteIds.length : ''}`, { type: ButtonType.Normal })
+          .height(38)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(this.selectedDeleteIds.length > 0 && !this.deleteBusy)
+          .backgroundColor(this.selectedDeleteIds.length > 0 ? AppTheme.DANGER : AppTheme.DISABLED)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => this.openDeleteConfirm());
       }
       .width('100%')
       .padding({ left: 10, right: 8, top: 6, bottom: 6 })
@@ -325,13 +328,15 @@ export struct ParentProgressPage {
         onOpen: () => this.openFilterDialog()
       });
       Divider().vertical(true).height(28).color(AppTheme.DIVIDER);
-      TextAction({
-        label: this.querying ? '查询中…' : '查询',
-        kind: this.hasActiveFilters() ? TextActionKind.PRIMARY : TextActionKind.NEUTRAL,
-        isEnabled: !this.querying,
-        accessibilityLabel: '打开作业查询',
-        onAction: (): void => this.openFilterDialog()
-      });
+      Text(this.querying ? '查询中…' : '查询')
+        .fontSize(13)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(this.hasActiveFilters() ? AppTheme.PRIMARY : AppTheme.TEXT)
+        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+        .padding({ left: 18, right: 18 })
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText('打开作业查询')
+        .onClick(() => this.openFilterDialog());
     }
     .width('100%')
     .height(58)
@@ -360,15 +365,18 @@ export struct ParentProgressPage {
           .fontSize(13)
           .fontColor(AppTheme.SUBTEXT);
         if (this.deletableVisibleAssignments().length > 0 || this.bulkMode) {
-          TextAction({
-            label: this.bulkMode ? '取消' : '删除',
-            kind: this.bulkMode ? TextActionKind.PRIMARY : TextActionKind.DANGER,
-            accessibilityLabel: this.bulkMode ? '取消删除选择' : '选择要删除的作业',
-            onAction: (): void => {
+          Text(this.bulkMode ? '取消' : '删除')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.bulkMode ? AppTheme.PRIMARY : AppTheme.DANGER)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 8, right: 2 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText(this.bulkMode ? '取消删除选择' : '选择要删除的作业')
+            .onClick(() => {
               if (this.bulkMode) this.exitBulkMode();
               else this.enterBulkMode();
-            }
-          });
+            });
         }
       }
       .width('100%')

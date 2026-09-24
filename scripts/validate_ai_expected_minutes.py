@@ -58,9 +58,9 @@ require(sheet_binding in confirmation and
         "private CandidateEditorSheet()" in confirmation and
         "else this.openEditor(item.id);" in confirmation,
         "candidate editing must open in a bottom sheet outside batch-management mode")
-require("private CandidateListHeader()" in confirmation and "label: '＋ 新增'" in confirmation and
+require("private CandidateListHeader()" in confirmation and "Text('＋ 新增')" in confirmation and
         "Button('＋ 手工新增一项'" not in confirmation,
-        "manual add must live in the candidate-list header through the shared text action")
+        "manual add must live in the candidate-list header instead of below the list")
 require("CandidateDurationControl" in confirmation_components and
         confirmation_components.count("onMinutesChange(this.item") >= 5,
         "confirmation duration controls must expose common preset durations")

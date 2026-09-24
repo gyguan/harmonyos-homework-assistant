@@ -1,5 +1,4 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction } from '../action/ActionControls';
 
 @CustomDialog
 export struct SubmissionResumeConfirmDialog {
@@ -15,11 +14,14 @@ export struct SubmissionResumeConfirmDialog {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        TextAction({
-          label: '关闭',
-          accessibilityLabel: '取消继续作业',
-          onAction: (): void => this.controller.close()
-        });
+        Text('关闭')
+          .fontSize(13)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 12, right: 2 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('取消继续作业')
+          .onClick(() => this.controller.close());
       }
       .width('100%');
 
@@ -30,20 +32,23 @@ export struct SubmissionResumeConfirmDialog {
         .fontColor(AppTheme.SUBTEXT);
 
       Row({ space: 10 }) {
-        ActionButton({
-          label: '先不继续',
-          kind: ActionButtonKind.NEUTRAL,
-          onAction: (): void => this.controller.close()
-        })
-        .layoutWeight(1);
-        ActionButton({
-          label: '清空并继续',
-          onAction: (): void => {
+        Button('先不继续', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(() => this.controller.close());
+        Button('清空并继续', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(() => {
             this.controller.close();
             this.onConfirm();
-          }
-        })
-        .layoutWeight(1);
+          });
       }
       .width('100%');
     }

@@ -1,10 +1,8 @@
 import { VoiceAssignmentMediaService } from '../../../application/assignment/VoiceAssignmentMediaService';
 import { RemoteVoiceFolderItem } from '../../../application/remote/RemoteVoiceMaterialApi';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction } from '../../../components/action/ActionControls';
 import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
-import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Subject } from '../../../domain/model/HomeworkModels';
 import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
@@ -287,19 +285,23 @@ export struct ParentVoiceAssignmentPage {
         .fontColor(AppTheme.TEXT);
 
       Row({ space: 8 }) {
-        SegmentedSelectionButton({
-          label: '从本机选择',
-          selected: this.sourceMode === VOICE_SOURCE_LOCAL,
-          onSelect: () => this.switchSource(VOICE_SOURCE_LOCAL)
-        })
-        .layoutWeight(1);
+        Button('从本机选择', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.MIN_TOUCH_TARGET)
+          .borderRadius(AppTheme.CHIP_RADIUS)
+          .fontWeight(this.sourceMode === VOICE_SOURCE_LOCAL ? FontWeight.Medium : FontWeight.Normal)
+          .backgroundColor(this.sourceMode === VOICE_SOURCE_LOCAL ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+          .fontColor(this.sourceMode === VOICE_SOURCE_LOCAL ? AppTheme.PRIMARY : AppTheme.TEXT)
+          .onClick(() => this.switchSource(VOICE_SOURCE_LOCAL));
 
-        SegmentedSelectionButton({
-          label: '使用服务器素材',
-          selected: this.sourceMode === VOICE_SOURCE_SERVER,
-          onSelect: () => this.switchSource(VOICE_SOURCE_SERVER)
-        })
-        .layoutWeight(1);
+        Button('使用服务器素材', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.MIN_TOUCH_TARGET)
+          .borderRadius(AppTheme.CHIP_RADIUS)
+          .fontWeight(this.sourceMode === VOICE_SOURCE_SERVER ? FontWeight.Medium : FontWeight.Normal)
+          .backgroundColor(this.sourceMode === VOICE_SOURCE_SERVER ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+          .fontColor(this.sourceMode === VOICE_SOURCE_SERVER ? AppTheme.PRIMARY : AppTheme.TEXT)
+          .onClick(() => this.switchSource(VOICE_SOURCE_SERVER));
       }
       .width('100%');
     }
@@ -417,14 +419,12 @@ export struct ParentVoiceAssignmentPage {
       .width('100%');
 
       if (this.audioUri.length === 0) {
-        ActionButton({
-          label: this.selectingAudio ? '正在打开语音文件…' : '选择语音文件',
-          kind: ActionButtonKind.OUTLINE,
-          actionSize: ActionButtonSize.MEDIUM,
-          isEnabled: !this.selectingAudio && !this.busy,
-          onAction: (): void => { void this.selectAudio(); }
-        })
-        .width('100%');
+        Button(this.selectingAudio ? '正在打开语音文件…' : '选择语音文件', { type: ButtonType.Normal })
+          .width('100%').height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+          .enabled(!this.selectingAudio && !this.busy)
+          .onClick(() => { void this.selectAudio(); });
       } else {
         Row({ space: 10 }) {
           Text('♪')
@@ -438,10 +438,12 @@ export struct ParentVoiceAssignmentPage {
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
-          TextAction({
-            label: '更换',
-            onAction: (): void => { void this.selectAudio(); }
-          });
+          Text('更换')
+            .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 8, right: 8 })
+            .textAlign(TextAlign.Center)
+            .onClick(() => { void this.selectAudio(); });
         }
         .width('100%')
         .padding(10)
@@ -488,27 +490,28 @@ export struct ParentVoiceAssignmentPage {
         .width('100%').scrollable(ScrollDirection.Horizontal).scrollBar(BarState.Off);
       }
 
-      ActionButton({
-        label: this.selectingImages ? '正在打开相册…' :
-          (this.imageUris.length === 0 ? '选择情景图片' : '＋ 继续添加图片'),
-        kind: ActionButtonKind.OUTLINE,
-        actionSize: ActionButtonSize.SMALL,
-        isEnabled: !this.selectingImages && !this.busy,
-        onAction: (): void => { void this.selectImages(); }
-      })
-      .width('100%');
+      Button(this.selectingImages ? '正在打开相册…' :
+        (this.imageUris.length === 0 ? '选择情景图片' : '＋ 继续添加图片'), { type: ButtonType.Normal })
+        .width('100%').height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+        .enabled(!this.selectingImages && !this.busy)
+        .onClick(() => { void this.selectImages(); });
     }
     .width('100%');
   }
 
   @Builder
   private UsageChip(label: string, value: string) {
-    SegmentedSelectionButton({
-      label: label,
-      selected: this.folderUsage === value,
-      onSelect: () => this.setUsageFilter(value)
-    })
-    .layoutWeight(1);
+    Button(label, { type: ButtonType.Normal })
+      .height(36)
+      .padding({ left: 12, right: 12 })
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(12)
+      .fontWeight(this.folderUsage === value ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.folderUsage === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.folderUsage === value ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.setUsageFilter(value));
   }
 
   @Builder
@@ -571,13 +574,14 @@ export struct ParentVoiceAssignmentPage {
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.folderKeyword = value);
-        ActionButton({
-          label: this.loadingFolders ? '查询中…' : '查询',
-          kind: ActionButtonKind.OUTLINE,
-          actionSize: ActionButtonSize.SMALL,
-          isEnabled: !this.loadingFolders,
-          onAction: (): void => { void this.loadFolders(true); }
-        });
+        Button(this.loadingFolders ? '查询中…' : '查询', { type: ButtonType.Normal })
+          .height(AppTheme.INPUT_HEIGHT)
+          .padding({ left: 14, right: 14 })
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.loadingFolders)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { void this.loadFolders(true); });
       }
       .width('100%');
 
@@ -605,14 +609,14 @@ export struct ParentVoiceAssignmentPage {
       }
 
       if (this.folderPage + 1 < this.folderTotalPages) {
-        ActionButton({
-          label: this.loadingFolders ? '加载中…' : '加载更多',
-          kind: ActionButtonKind.GHOST,
-          actionSize: ActionButtonSize.SMALL,
-          isEnabled: !this.loadingFolders,
-          onAction: (): void => { void this.loadFolders(false); }
-        })
-        .width('100%');
+        Button(this.loadingFolders ? '加载中…' : '加载更多', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.loadingFolders)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { void this.loadFolders(false); });
       }
 
     }
@@ -681,12 +685,16 @@ export struct ParentVoiceAssignmentPage {
     Column({ space: 8 }) {
       this.Feedback();
 
-      ActionButton({
-        label: this.busy ? '正在发布…' : '发布语音作业',
-        isEnabled: !this.busy,
-        onAction: (): void => { void this.createTask(); }
-      })
-      .width('100%');
+      Button(this.busy ? '正在发布…' : '发布语音作业', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.busy)
+        .fontSize(15)
+        .fontWeight(FontWeight.Medium)
+        .backgroundColor(AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .onClick(() => { void this.createTask(); });
     }
     .width('100%')
     .padding({ top: 8, bottom: 10 })

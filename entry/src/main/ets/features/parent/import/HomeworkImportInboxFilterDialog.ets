@@ -1,6 +1,4 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../../../components/action/ActionControls';
-import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import {
   HomeworkImportInboxFilterLabels,
   HomeworkImportInboxSourceFilter,
@@ -24,32 +22,41 @@ export struct HomeworkImportInboxFilterDialog {
 
   @Builder
   private SourceOption(filter: HomeworkImportInboxSourceFilter) {
-    SegmentedSelectionButton({
-      label: HomeworkImportInboxFilterLabels.source(filter),
-      selected: this.selectedSource === filter,
-      onSelect: () => this.selectedSource = filter
-    })
-    .layoutWeight(1);
+    Button(HomeworkImportInboxFilterLabels.source(filter), { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(13)
+      .fontWeight(this.selectedSource === filter ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.selectedSource === filter ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.selectedSource === filter ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.selectedSource = filter);
   }
 
   @Builder
   private StatusOption(filter: HomeworkImportInboxStatusFilter) {
-    SegmentedSelectionButton({
-      label: HomeworkImportInboxFilterLabels.status(filter),
-      selected: this.selectedStatus === filter,
-      onSelect: () => this.selectedStatus = filter
-    })
-    .layoutWeight(1);
+    Button(HomeworkImportInboxFilterLabels.status(filter), { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(13)
+      .fontWeight(this.selectedStatus === filter ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.selectedStatus === filter ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.selectedStatus === filter ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.selectedStatus = filter);
   }
 
   @Builder
   private TimeOption(filter: HomeworkImportInboxTimeFilter) {
-    SegmentedSelectionButton({
-      label: HomeworkImportInboxFilterLabels.time(filter),
-      selected: this.selectedTime === filter,
-      onSelect: () => this.selectedTime = filter
-    })
-    .layoutWeight(1);
+    Button(HomeworkImportInboxFilterLabels.time(filter), { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(13)
+      .fontWeight(this.selectedTime === filter ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.selectedTime === filter ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.selectedTime === filter ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.selectedTime = filter);
   }
 
   private reset(): void {
@@ -70,12 +77,14 @@ export struct HomeworkImportInboxFilterDialog {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        TextAction({
-          label: '关闭',
-          kind: TextActionKind.NEUTRAL,
-          accessibilityLabel: '关闭收件箱筛选',
-          onAction: (): void => this.controller.close()
-        });
+        Text('关闭')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 12, right: 4 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('关闭收件箱筛选')
+          .onClick(() => this.controller.close());
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 20, bottom: 12 });
@@ -139,19 +148,21 @@ export struct HomeworkImportInboxFilterDialog {
       .scrollBar(BarState.Off);
 
       Row({ space: 12 }) {
-        ActionButton({
-          label: '重置',
-          kind: ActionButtonKind.NEUTRAL,
-          actionSize: ActionButtonSize.MEDIUM,
-          onAction: (): void => this.reset()
-        })
-        .layoutWeight(1);
-        ActionButton({
-          label: '确定',
-          actionSize: ActionButtonSize.MEDIUM,
-          onAction: (): void => this.confirm()
-        })
-        .layoutWeight(2);
+        Button('重置', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .onClick(() => this.reset());
+        Button('确定', { type: ButtonType.Normal })
+          .layoutWeight(2)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .onClick(() => this.confirm());
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 12, bottom: 18 })

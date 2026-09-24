@@ -1,7 +1,6 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
@@ -101,15 +100,17 @@ struct StudentTodayTaskCard {
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
 
-      ActionButton({
-        label: this.actionLabel(),
-        kind: this.emphasized ? ActionButtonKind.PRIMARY : ActionButtonKind.OUTLINE,
-        actionSize: ActionButtonSize.SMALL,
-        isEnabled: !this.busy,
-        accessibilityLabel: `${this.actionLabel()}${this.assignment.title}`,
-        onAction: (): void => this.onAction(this.assignment.id)
-      })
-      .width(this.emphasized ? 88 : 76);
+      Button(this.actionLabel(), { type: ButtonType.Normal })
+        .width(this.emphasized ? 96 : 82)
+        .height(AppTheme.MIN_TOUCH_TARGET)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.busy)
+        .backgroundColor(this.busy ? AppTheme.DISABLED : AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .fontSize(14)
+        .fontWeight(FontWeight.Medium)
+        .accessibilityText(`${this.actionLabel()}${this.assignment.title}`)
+        .onClick(() => this.onAction(this.assignment.id));
     }
     .width('100%')
     .alignItems(VerticalAlign.Center)

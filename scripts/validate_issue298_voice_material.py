@@ -132,10 +132,7 @@ require("subjectCode?: string" in remote and "title?: string" in remote and
         "manual folder creation request must support selected subject, generated copy and idempotency")
 
 require("VOICE_SOURCE_LOCAL" in voice_page and "VOICE_SOURCE_SERVER" in voice_page and
-        "SegmentedSelectionButton" in voice_page and
-        "label: '从本机选择'" in voice_page and "label: '使用服务器素材'" in voice_page and
-        "selected: this.sourceMode === VOICE_SOURCE_LOCAL" in voice_page and
-        "selected: this.sourceMode === VOICE_SOURCE_SERVER" in voice_page,
+        "Button('从本机选择'" in voice_page and "Button('使用服务器素材'" in voice_page,
         "voice assignment page must unify local and server material sources")
 require("folderUsageText" in voice_page and "已使用" in voice_page and "未使用" in voice_page,
         "server folder picker must expose historical usage without treating used folders as unavailable")

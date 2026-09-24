@@ -1,5 +1,4 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, TextAction, TextActionKind } from '../action/ActionControls';
 import { AssignmentDueDate } from '../../domain/service/AssignmentDueDate';
 
 @CustomDialog
@@ -20,12 +19,14 @@ export struct DeadlinePickerDialog {
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        TextAction({
-          label: '关闭',
-          kind: TextActionKind.NEUTRAL,
-          accessibilityLabel: '关闭截止时间选择',
-          onAction: (): void => this.controller.close()
-        });
+        Text('关闭')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 12, right: 4 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('关闭截止时间选择')
+          .onClick(() => this.controller.close());
       }
       .width('100%');
 
@@ -61,14 +62,17 @@ export struct DeadlinePickerDialog {
       .width('100%')
       .alignItems(HorizontalAlign.Start);
 
-      ActionButton({
-        label: '确定',
-        onAction: (): void => {
+      Button('确定', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .fontWeight(FontWeight.Medium)
+        .onClick(() => {
           this.onConfirm();
           this.controller.close();
-        }
-      })
-      .width('100%');
+        });
     }
     .width('100%')
     .constraintSize({ maxWidth: AppTheme.FILTER_DIALOG_MAX_WIDTH })
@@ -161,12 +165,14 @@ export struct DeadlinePickerField {
       .onClick(() => this.openPicker());
 
       if (this.allowClear && this.value.length > 0) {
-        TextAction({
-          label: '清除',
-          kind: TextActionKind.NEUTRAL,
-          accessibilityLabel: '清除截止时间',
-          onAction: (): void => this.onChange('')
-        });
+        Text('清除')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT)
+          .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .textAlign(TextAlign.Center)
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('清除截止时间')
+          .onClick(() => this.onChange(''));
       }
     }
     .width('100%');

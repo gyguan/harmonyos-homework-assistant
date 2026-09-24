@@ -1,5 +1,4 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { TextAction } from '../action/ActionControls';
 
 @CustomDialog
 export struct PhotoPreviewDialog {
@@ -14,11 +13,14 @@ export struct PhotoPreviewDialog {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
-        TextAction({
-          label: '关闭',
-          accessibilityLabel: '关闭照片预览',
-          onAction: (): void => this.controller.close()
-        });
+        Text('关闭')
+          .fontSize(13)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 12, right: 4 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('关闭照片预览')
+          .onClick(() => this.controller.close());
       }
       .width('100%');
 

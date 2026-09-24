@@ -118,8 +118,7 @@ require("Text('我的作业')" not in page and "calendarMode" not in page and
         "student assignments must stay list-only without duplicate page title or calendar mode")
 for token in ["@CustomDialog", "@Link allDates", "@Link selectedDayEpochMs", "@Link subjectCode",
               "DateModeOption('全部日期', true)", "DateModeOption('指定日期', false)",
-              "DatePicker({", "private SubjectOption", "SegmentedSelectionButton",
-              "label: '重置'", "label: '查询'",
+              "DatePicker({", "private SubjectOption", "Button('重置'", "Button('查询'",
               "this.onQuery(this.allDates, this.selectedDayEpochMs, this.subjectCode)"]:
     require(token in filter_dialog, f"assignment query dialog missing required behavior: {token}")
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
@@ -148,8 +147,7 @@ require("@State private historyExpanded: boolean = false;" in page and
 require("snapshotRevision" in page and "currentVisibleAssignments" in page,
         "assignment list must invalidate cached groups when repository revision changes")
 
-require("SingleColumnWorkspace" in study and "SplitWorkspace" in study and
-        "ActionButton({" in study and "label: '问小伴'" in study,
+require("SingleColumnWorkspace" in study and "SplitWorkspace" in study and "Button('问小伴'" in study,
         "Study must keep Phone standalone Tutor flow and add Pad Study+Tutor split composition")
 require("LayoutPolicy.studyTutorRequirement()" in study and "this.TutorPane();" in study,
         "Study Pad split must use shared content capability and the existing Tutor pane")

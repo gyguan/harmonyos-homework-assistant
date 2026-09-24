@@ -1,5 +1,4 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { HomeworkImageTextResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { Subject } from '../../../domain/model/HomeworkModels';
 import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
@@ -235,23 +234,23 @@ export struct HomeworkImportPage {
   @Builder
   private RecognitionActions() {
     Row({ space: 8 }) {
-      ActionButton({
-        label: this.parseBusy ? '识别中…' : '拍照识别',
-        kind: ActionButtonKind.OUTLINE,
-        actionSize: ActionButtonSize.SMALL,
-        isEnabled: !this.parseBusy,
-        onAction: (): void => { void this.recognizePhoto(); }
-      })
-      .layoutWeight(1);
+      Button(this.parseBusy ? '识别中…' : '拍照识别', { type: ButtonType.Normal })
+        .layoutWeight(1)
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .fontColor(AppTheme.PRIMARY)
+        .enabled(!this.parseBusy)
+        .onClick(() => { void this.recognizePhoto(); });
 
-      ActionButton({
-        label: this.parseBusy ? '识别中…' : '相册识别',
-        kind: ActionButtonKind.OUTLINE,
-        actionSize: ActionButtonSize.SMALL,
-        isEnabled: !this.parseBusy,
-        onAction: (): void => { void this.recognizeGallery(); }
-      })
-      .layoutWeight(1);
+      Button(this.parseBusy ? '识别中…' : '相册识别', { type: ButtonType.Normal })
+        .layoutWeight(1)
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .fontColor(AppTheme.PRIMARY)
+        .enabled(!this.parseBusy)
+        .onClick(() => { void this.recognizeGallery(); });
     }
     .width('100%');
   }
@@ -309,12 +308,16 @@ export struct HomeworkImportPage {
     Column({ space: 8 }) {
       this.FeedbackBanner();
 
-      ActionButton({
-        label: this.parseBusy ? '正在处理…' : '整理并继续',
-        isEnabled: !this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0,
-        onAction: (): void => { void this.organize(); }
-      })
-      .width('100%');
+      Button(this.parseBusy ? '正在处理…' : '整理并继续', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0)
+        .fontSize(15)
+        .fontWeight(FontWeight.Medium)
+        .backgroundColor(this.subjectChosen && this.textDraft.trim().length > 0 ? AppTheme.PRIMARY : AppTheme.DISABLED)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .onClick(() => { void this.organize(); });
     }
     .width('100%')
     .padding({ top: 8, bottom: 8 })

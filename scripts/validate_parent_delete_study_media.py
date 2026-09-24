@@ -63,9 +63,9 @@ for token in [
     require(token in progress, f"parent progress missing bulk delete behavior: {token}")
 require("deleteAssignments(assignmentIds: string[])" in progress_vm,
         "parent progress ViewModel must delegate batch deletion")
-require("label: this.bulkMode ? '取消' : '删除'" in progress and "TextAction({" in progress and
+require("Text(this.bulkMode ? '取消' : '删除')" in progress and
         "完成删除选择" not in progress,
-        "parent progress must use a stable shared delete/cancel action rather than a separate completion action")
+        "parent progress must use a stable delete/cancel action rather than a separate completion action")
 require("selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item)" in progress and
         "selectionMode: this.bulkMode" in progress and
         "selectionAvailable: this.canDelete(item)" in progress and
@@ -84,9 +84,8 @@ require("this.assignment.subject} · ${this.deadlineText()} · ${this.timingText
 require(".constraintSize({ minHeight: 78 })" in list_item and
         ".lineHeight(22)" in list_item and ".lineHeight(18)" in list_item,
         "delete-mode task cards must preserve enough vertical height to keep status and timing metadata separated")
-require("label: '删除'" in review and "TextAction({" in review and
-        "this.viewModel.deleteAssignment(item.id)" in review,
-        "parent detail must allow lightweight single unfinished assignment deletion")
+require("删除作业" in review and "this.viewModel.deleteAssignment(item.id)" in review,
+        "parent detail must allow single unfinished assignment deletion")
 require("deleteAssignment(assignmentId: string)" in review_vm,
         "parent review ViewModel must delegate deletion")
 require("onDeleted" in review_page and "onDeleted" in review and "this.navPathStack.pop()" in shell,

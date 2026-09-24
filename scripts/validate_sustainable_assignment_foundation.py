@@ -106,9 +106,8 @@ require("export class SelectionIds" in selection and "static toggle" in selectio
         "multi-selection array semantics must be shared")
 require("SelectionIds.toggle" in progress and "SelectionIds.toggle" in confirmation,
         "parent progress and confirmation must share selection semantics")
-require("export struct EditSheetHeader" in sheet_header and "TextAction({" in sheet_header and
-        "label: '关闭'" in sheet_header,
-        "edit sheets must share one close-only header backed by the common text action")
+require("export struct EditSheetHeader" in sheet_header and "Text('关闭')" in sheet_header,
+        "edit sheets must share one close-only header")
 require("EditSheetHeader({" in candidate_editor and "EditSheetHeader({" in parent_editor,
         "candidate and published-task editors must reuse the shared sheet header")
 

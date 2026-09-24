@@ -1,6 +1,5 @@
 import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction } from '../../../components/action/ActionControls';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
 import { HomeworkConfirmationViewModel } from './HomeworkConfirmationViewModel';
@@ -211,26 +210,40 @@ export struct HomeworkConfirmationPage {
         .fontColor(AppTheme.TEXT);
 
       if (this.bulkMode) {
-        TextAction({
-          label: '全选',
-          onAction: (): void => this.selectAllCandidates()
-        });
-        TextAction({
-          label: '完成',
-          onAction: (): void => this.exitBulkMode()
-        });
+        Text('全选')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 8 })
+          .onClick(() => this.selectAllCandidates());
+        Text('完成')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 4 })
+          .onClick(() => this.exitBulkMode());
       } else {
-        TextAction({
-          label: '＋ 新增',
-          accessibilityLabel: '手工新增一项作业',
-          onAction: (): void => this.addCandidate()
-        });
+        Text('＋ 新增')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 8 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('手工新增一项作业')
+          .onClick(() => this.addCandidate());
         if (this.candidates().length > 0) {
-          TextAction({
-            label: '管理',
-            accessibilityLabel: '批量管理待确认作业',
-            onAction: (): void => this.enterBulkMode()
-          });
+          Text('管理')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 8, right: 4 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('批量管理待确认作业')
+            .onClick(() => this.enterBulkMode());
         }
       }
     }
@@ -312,37 +325,46 @@ export struct HomeworkConfirmationPage {
               .fontSize(13)
               .fontColor(AppTheme.DANGER);
             Row({ space: 10 }) {
-              ActionButton({
-                label: '取消',
-                kind: ActionButtonKind.NEUTRAL,
-                onAction: (): void => { this.batchDeleteConfirm = false; }
-              })
-              .layoutWeight(1);
-              ActionButton({
-                label: '确认删除',
-                kind: ActionButtonKind.DANGER,
-                onAction: (): void => this.removeSelectedCandidates()
-              })
-              .layoutWeight(1);
+              Button('取消', { type: ButtonType.Normal })
+                .layoutWeight(1)
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                .fontColor(AppTheme.TEXT)
+                .onClick(() => this.batchDeleteConfirm = false);
+              Button('确认删除', { type: ButtonType.Normal })
+                .layoutWeight(1)
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.DANGER)
+                .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => this.removeSelectedCandidates());
             }
             .width('100%');
           } else {
-            ActionButton({
-              label: this.selectedCandidateIds.length > 0 ?
-                `删除选中的 ${this.selectedCandidateIds.length} 项` : '请选择要删除的作业',
-              kind: ActionButtonKind.DANGER,
-              isEnabled: this.selectedCandidateIds.length > 0,
-              onAction: (): void => { this.batchDeleteConfirm = true; }
-            })
-            .width('100%');
+            Button(this.selectedCandidateIds.length > 0 ?
+              `删除选中的 ${this.selectedCandidateIds.length} 项` : '请选择要删除的作业',
+              { type: ButtonType.Normal })
+              .width('100%')
+              .height(AppTheme.BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(this.selectedCandidateIds.length > 0)
+              .backgroundColor(this.selectedCandidateIds.length > 0 ? AppTheme.DANGER : AppTheme.DISABLED)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .onClick(() => this.batchDeleteConfirm = true);
           }
         } else {
-          ActionButton({
-            label: this.publishing ? '正在发布…' : `确认并发布 ${this.candidates().length} 项`,
-            isEnabled: !this.publishing && this.candidates().length > 0,
-            onAction: (): void => { void this.publish(); }
-          })
-          .width('100%');
+          Button(this.publishing ? '正在发布…' : `确认并发布 ${this.candidates().length} 项`,
+            { type: ButtonType.Normal })
+            .width('100%')
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.publishing && this.candidates().length > 0)
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .backgroundColor(this.candidates().length > 0 ? AppTheme.PRIMARY : AppTheme.DISABLED)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => { void this.publish(); });
         }
       }
       .width('100%')

@@ -46,9 +46,8 @@ require("AssignmentEditChangeDetector.hasChanges" in confirmation_components and
         "AssignmentEditChangeDetector.hasChanges" in review_editor and
         "static hasChanges" in change_detector,
         "all assignment editors must share value-based dirty detection")
-require("ActionButton({" in confirmation_components and "label: '保存'" in confirmation_components and
-        "label: '完成'" not in confirmation_components,
-        "confirmation task editor must use shared Save as the business action")
+require("Button('保存'" in confirmation_components and "Button('完成'" not in confirmation_components,
+        "confirmation task editor must use Save as the business action")
 require("onDisappear: () => this.completeEditorDismiss()" in confirmation_page and
         "onDisappear: () => this.completeEditingDismiss()" in review_pane,
         "assignment edit sheets must clean editing context only after sheet disappearance")

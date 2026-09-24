@@ -118,11 +118,9 @@ require("StatusSelectionChip" not in progress and "StatusFilterBar" not in progr
         "StatusSummary" not in progress and "AssignmentMetricSummary" not in progress and
         "AssignmentMetricKey" not in progress,
         "Parent Progress must stay list-first without summary/status metric controls")
-require("Text('作业进度')" not in progress and "label: this.bulkMode ? '取消' : '删除'" in progress and
-        "TextAction({" in progress,
-        "Parent Progress must remove duplicate root title and keep shared delete/cancel beside the list summary")
-for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode",
-              "SegmentedSelectionButton", "label: '查询'"]:
+require("Text('作业进度')" not in progress and "Text(this.bulkMode ? '取消' : '删除')" in progress,
+        "Parent Progress must remove duplicate root title and keep delete/cancel beside the list summary")
+for token in ["DatePicker({", "@Link selectedDayEpochMs", "@Link subjectCode", "Button('查询'"]:
     require(token in shared_filter, f"shared task query missing date+subject behavior: {token}")
 for removed in ["private TypeOption", "private DateOption", "今天", "明天", "本周"]:
     require(removed not in shared_filter,
@@ -144,9 +142,9 @@ require("AssignmentStatus.SUBMITTED" in review_pane and "退回订正" in review
         "Parent Review must expose review actions only around submitted work")
 require("this.viewModel.approve" in review_pane and "this.viewModel.returnForRework" in review_pane,
         "Parent Review UI must delegate decisions to ParentReviewViewModel")
-require("ParentAssignmentEditPanel" in review_pane and "label: '编辑'" in review_pane and
-        "TextAction({" in review_pane and "this.viewModel.updateDetails(updated)" in review_pane,
-        "Parent task detail must expose lightweight editable task definition before submission")
+require("ParentAssignmentEditPanel" in review_pane and "编辑任务" in review_pane and
+        "this.viewModel.updateDetails(updated)" in review_pane,
+        "Parent task detail must expose editable task definition before submission")
 require("AssignmentEditForm" in review_editor and "保存修改" in review_editor and
         "不会修改作业状态和计时" in review_editor,
         "Parent assignment editor must reuse the shared assignment form and explain status isolation")

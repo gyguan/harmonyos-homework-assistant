@@ -3,7 +3,6 @@ import { BackendSession } from '../../../application/remote/BackendSession';
 import { FamilyCloudService } from '../../../application/remote/FamilyCloudService';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction } from '../../../components/action/ActionControls';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { SettingsToggleRow } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -268,11 +267,10 @@ export struct BackendConnectionPage {
           Text(this.editingExistingStudent() ? '编辑孩子资料' : '添加孩子')
             .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           Blank();
-          TextAction({
-            label: '取消',
-            accessibilityLabel: '取消编辑孩子资料',
-            onAction: (): void => this.cancelEdit()
-          });
+          Text('取消').constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .fontSize(13).fontColor(AppTheme.PRIMARY).textAlign(TextAlign.Center)
+            .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('取消编辑孩子资料')
+            .onClick(() => this.cancelEdit());
         }
         .width('100%');
 
@@ -295,20 +293,12 @@ export struct BackendConnectionPage {
             Text('删除家庭成员属于高风险操作。已有作业的孩子或家庭最后一个孩子仍会被服务端拒绝删除。')
               .width('100%').fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
             Row({ space: 8 }) {
-              ActionButton({
-                label: '取消删除',
-                kind: ActionButtonKind.NEUTRAL,
-                actionSize: ActionButtonSize.SMALL,
-                onAction: (): void => { this.deleteStudentConfirmId = ''; }
-              })
-              .layoutWeight(1);
-              ActionButton({
-                label: '确认删除',
-                kind: ActionButtonKind.DANGER,
-                actionSize: ActionButtonSize.SMALL,
-                onAction: (): void => { void this.deleteStudent(this.editingId); }
-              })
-              .layoutWeight(1);
+              Button('取消删除', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
+                .onClick(() => this.deleteStudentConfirmId = '');
+              Button('确认删除', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.DANGER).fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => { void this.deleteStudent(this.editingId); });
             }
             .width('100%');
           }
@@ -316,19 +306,14 @@ export struct BackendConnectionPage {
         } else {
           Row({ space: 8 }) {
             if (this.editingExistingStudent()) {
-              ActionButton({
-                label: '删除',
-                kind: ActionButtonKind.DANGER_SOFT,
-                actionSize: ActionButtonSize.SMALL,
-                onAction: (): void => { this.deleteStudentConfirmId = this.editingId; }
-              });
+              Button('删除', { type: ButtonType.Normal }).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .padding({ left: 18, right: 18 }).borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.DANGER_SOFT).fontColor(AppTheme.DANGER)
+                .onClick(() => this.deleteStudentConfirmId = this.editingId);
             }
-            ActionButton({
-              label: '保存',
-              actionSize: ActionButtonSize.SMALL,
-              onAction: (): void => { void this.saveStudent(); }
-            })
-            .layoutWeight(1);
+            Button('保存', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .onClick(() => { void this.saveStudent(); });
           }
           .width('100%');
         }
@@ -431,19 +416,21 @@ export struct BackendConnectionPage {
 
       Row({ space: 8 }) {
         if (this.parentAccessEnabled()) {
-          ActionButton({
-            label: '关闭家长码',
-            kind: ActionButtonKind.NEUTRAL,
-            actionSize: ActionButtonSize.SMALL,
-            onAction: (): void => this.clearParentAccessCode()
-          });
+          Button('关闭家长码', { type: ButtonType.Normal })
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .padding({ left: 16, right: 16 })
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT)
+            .onClick(() => this.clearParentAccessCode());
         }
-        ActionButton({
-          label: this.parentAccessEnabled() ? '修改家长码' : '启用家长码',
-          actionSize: ActionButtonSize.SMALL,
-          onAction: (): void => this.saveParentAccessCode()
-        })
-        .layoutWeight(1);
+        Button(this.parentAccessEnabled() ? '修改家长码' : '启用家长码', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => this.saveParentAccessCode());
       }
       .width('100%');
 
@@ -518,28 +505,18 @@ export struct BackendConnectionPage {
           TextInput({ placeholder: '密码', text: this.password }).width('100%').height(AppTheme.INPUT_HEIGHT)
             .type(InputType.Password).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
             .onChange((value: string) => this.password = value);
-          ActionButton({
-            label: this.connecting ? '正在连接…' : '连接并同步',
-            isEnabled: !this.connecting,
-            onAction: (): void => { void this.connect(); }
-          })
-          .width('100%');
+          Button(this.connecting ? '正在连接…' : '连接并同步', { type: ButtonType.Normal }).width('100%')
+            .height(AppTheme.BUTTON_HEIGHT).borderRadius(AppTheme.CONTROL_RADIUS).enabled(!this.connecting)
+            .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => { void this.connect(); });
         } else {
           Row({ space: 8 }) {
-            ActionButton({
-              label: '立即同步',
-              kind: ActionButtonKind.OUTLINE,
-              actionSize: ActionButtonSize.SMALL,
-              onAction: (): void => { void this.syncCloudData(); }
-            })
-            .layoutWeight(1);
-            ActionButton({
-              label: '断开连接',
-              kind: ActionButtonKind.NEUTRAL,
-              actionSize: ActionButtonSize.SMALL,
-              onAction: (): void => { void this.disconnect(); }
-            })
-            .layoutWeight(1);
+            Button('立即同步', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+              .onClick(() => { void this.syncCloudData(); });
+            Button('断开连接', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
+              .onClick(() => { void this.disconnect(); });
           }
           .width('100%');
         }

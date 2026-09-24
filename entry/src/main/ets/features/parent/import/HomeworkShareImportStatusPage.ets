@@ -1,5 +1,4 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { HomeworkShareImportService } from '../../../application/import/HomeworkShareImportService';
 
 enum ShareImportPhase {
@@ -87,37 +86,41 @@ export struct HomeworkShareImportStatusPage {
         .textAlign(TextAlign.Center);
 
       if (this.phase === ShareImportPhase.FAILED) {
-        ActionButton({
-          label: '重试',
-          onAction: (): void => this.retry()
-        })
-        .width('100%');
+        Button('重试', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => this.retry());
       }
 
       if (this.phase === ShareImportPhase.EMPTY) {
-        ActionButton({
-          label: '查看作业智能收件箱',
-          onAction: (): void => this.onOpenInbox()
-        })
-        .width('100%');
+        Button('查看作业智能收件箱', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => this.onOpenInbox());
       }
 
       if (this.phase === ShareImportPhase.FAILED) {
-        ActionButton({
-          label: '取消导入',
-          kind: ActionButtonKind.NEUTRAL,
-          actionSize: ActionButtonSize.SMALL,
-          onAction: (): void => { void this.cancel(); }
-        })
-        .width('100%');
+        Button('取消导入', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .onClick(() => { void this.cancel(); });
       } else if (this.phase === ShareImportPhase.EMPTY) {
-        ActionButton({
-          label: '完成',
-          kind: ActionButtonKind.NEUTRAL,
-          actionSize: ActionButtonSize.SMALL,
-          onAction: (): void => this.onCancel()
-        })
-        .width('100%');
+        Button('完成', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .onClick(() => this.onCancel());
       }
 
     }

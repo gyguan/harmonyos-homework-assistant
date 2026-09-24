@@ -1,6 +1,4 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../action/ActionControls';
-import { SegmentedSelectionButton } from '../selection/SelectionControls';
 
 @CustomDialog
 export struct AssignmentFilterDialog {
@@ -13,22 +11,28 @@ export struct AssignmentFilterDialog {
 
   @Builder
   private DateModeOption(label: string, allDates: boolean) {
-    SegmentedSelectionButton({
-      label: label,
-      selected: this.allDates === allDates,
-      onSelect: () => this.allDates = allDates
-    })
-    .layoutWeight(1);
+    Button(label, { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(14)
+      .fontWeight(this.allDates === allDates ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.allDates === allDates ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.allDates === allDates ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.allDates = allDates);
   }
 
   @Builder
   private SubjectOption(label: string, value: string) {
-    SegmentedSelectionButton({
-      label: label,
-      selected: this.subjectCode === value,
-      onSelect: () => this.subjectCode = value
-    })
-    .layoutWeight(1);
+    Button(label, { type: ButtonType.Normal })
+      .layoutWeight(1)
+      .height(AppTheme.MIN_TOUCH_TARGET)
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(14)
+      .fontWeight(this.subjectCode === value ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.subjectCode === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.subjectCode === value ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => this.subjectCode = value);
   }
 
   private reset(): void {
@@ -50,12 +54,14 @@ export struct AssignmentFilterDialog {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        TextAction({
-          label: '关闭',
-          kind: TextActionKind.NEUTRAL,
-          accessibilityLabel: '关闭作业查询',
-          onAction: (): void => this.controller.close()
-        });
+        Text('关闭')
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 12, right: 4 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('关闭作业查询')
+          .onClick(() => this.controller.close());
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 20, bottom: 12 });
@@ -107,19 +113,21 @@ export struct AssignmentFilterDialog {
       .scrollBar(BarState.Off);
 
       Row({ space: 12 }) {
-        ActionButton({
-          label: '重置',
-          kind: ActionButtonKind.NEUTRAL,
-          actionSize: ActionButtonSize.MEDIUM,
-          onAction: (): void => this.reset()
-        })
-        .layoutWeight(1);
-        ActionButton({
-          label: '查询',
-          actionSize: ActionButtonSize.MEDIUM,
-          onAction: (): void => this.confirmQuery()
-        })
-        .layoutWeight(2);
+        Button('重置', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .onClick(() => this.reset());
+        Button('查询', { type: ButtonType.Normal })
+          .layoutWeight(2)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .fontWeight(FontWeight.Medium)
+          .onClick(() => this.confirmQuery());
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 12, bottom: 18 })

@@ -1,6 +1,5 @@
 import { common } from '@kit.AbilityKit';
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize } from '../action/ActionControls';
 import { TutorQuestionCaptureResult, TutorQuestionCaptureService } from '../../application/tutor/TutorQuestionCaptureService';
 
 @Component
@@ -49,13 +48,15 @@ export struct TutorQuestionCapturePanel {
 
   build() {
     Row({ space: 8 }) {
-      ActionButton({
-        label: this.capturing ? '识别中…' : '拍题',
-        kind: ActionButtonKind.OUTLINE,
-        actionSize: ActionButtonSize.SMALL,
-        isEnabled: !this.capturing,
-        onAction: (): void => { void this.capture(); }
-      });
+      Button(this.capturing ? '识别中…' : '拍题', { type: ButtonType.Normal })
+        .height(38)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.capturing)
+        .backgroundColor(AppTheme.SURFACE)
+        .fontColor(AppTheme.PRIMARY)
+        .fontSize(13)
+        .border({ width: 1, color: AppTheme.BORDER })
+        .onClick(() => { void this.capture(); });
 
       if (this.imageUri.length > 0) {
         Image(this.imageUri)

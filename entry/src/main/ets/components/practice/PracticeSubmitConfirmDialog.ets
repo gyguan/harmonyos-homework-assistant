@@ -1,5 +1,4 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../action/ActionControls';
 
 @CustomDialog
 export struct PracticeSubmitConfirmDialog {
@@ -20,20 +19,23 @@ export struct PracticeSubmitConfirmDialog {
         .lineHeight(21)
         .fontColor(AppTheme.SUBTEXT);
       Row({ space: 10 }) {
-        ActionButton({
-          label: '继续作答',
-          kind: ActionButtonKind.NEUTRAL,
-          onAction: (): void => this.controller.close()
-        })
-        .layoutWeight(1);
-        ActionButton({
-          label: '仍然交卷',
-          onAction: (): void => {
+        Button('继续作答', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+          .fontColor(AppTheme.TEXT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(() => this.controller.close());
+        Button('仍然交卷', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.BUTTON_HEIGHT)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(() => {
             this.controller.close();
             this.onConfirm();
-          }
-        })
-        .layoutWeight(1);
+          });
       }
       .width('100%');
     }

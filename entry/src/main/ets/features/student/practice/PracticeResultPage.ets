@@ -1,5 +1,4 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction } from '../../../components/action/ActionControls';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import {
   PracticeAttemptMode,
@@ -248,12 +247,15 @@ export struct PracticeResultPage {
             this.CompletionFeedback(this.result);
 
             Column({ space: 8 }) {
-              TextAction({
-                label: this.showDetailedStats ? '收起详细统计' : '查看详细统计',
-                accessibilityLabel: this.showDetailedStats ? '收起详细统计' : '查看详细统计',
-                onAction: (): void => { this.showDetailedStats = !this.showDetailedStats; }
-              })
-              .width('100%');
+              Text(this.showDetailedStats ? '收起详细统计' : '查看详细统计')
+                .width('100%')
+                .fontSize(13)
+                .fontWeight(FontWeight.Medium)
+                .fontColor(AppTheme.PRIMARY)
+                .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .accessibilityRole(AccessibilityRoleType.BUTTON)
+                .accessibilityText(this.showDetailedStats ? '收起详细统计' : '查看详细统计')
+                .onClick(() => this.showDetailedStats = !this.showDetailedStats);
               if (this.showDetailedStats) {
                 Row({ space: 10 }) {
                   this.Metric(`${this.result.correctCount}`, '答对');
@@ -273,11 +275,14 @@ export struct PracticeResultPage {
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.TEXT);
                 if (this.result.wrongCount > 0) {
-                  TextAction({
-                    label: this.showAllQuestions ? '只看错题' : '查看全部题目',
-                    accessibilityLabel: this.showAllQuestions ? '只查看错题' : '查看全部题目',
-                    onAction: (): void => { this.showAllQuestions = !this.showAllQuestions; }
-                  });
+                  Text(this.showAllQuestions ? '只看错题' : '查看全部题目')
+                    .fontSize(13)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor(AppTheme.PRIMARY)
+                    .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                    .accessibilityRole(AccessibilityRoleType.BUTTON)
+                    .accessibilityText(this.showAllQuestions ? '只查看错题' : '查看全部题目')
+                    .onClick(() => this.showAllQuestions = !this.showAllQuestions);
                 }
               }
               .width('100%')
@@ -374,35 +379,46 @@ export struct PracticeResultPage {
       if (this.result !== null) {
         Row({ space: 10 }) {
           if (this.result.wrongCount > 0) {
-            ActionButton({
-              label: this.repeating ? '正在创建…' : '再练一遍',
-              kind: ActionButtonKind.NEUTRAL,
-              isEnabled: !this.repeating && !this.wrongRetrying,
-              onAction: (): void => void this.repeat()
-            })
-            .layoutWeight(1);
+            Button(this.repeating ? '正在创建…' : '再练一遍', { type: ButtonType.Normal })
+              .layoutWeight(1)
+              .height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+              .fontColor(AppTheme.TEXT)
+              .fontWeight(FontWeight.Medium)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.repeating && !this.wrongRetrying)
+              .onClick(() => void this.repeat());
 
-            ActionButton({
-              label: this.wrongRetrying ? '正在创建…' : `再挑战 ${this.result.wrongCount} 道错题`,
-              isEnabled: !this.repeating && !this.wrongRetrying,
-              onAction: (): void => void this.retryWrong()
-            })
-            .layoutWeight(1);
+            Button(this.wrongRetrying ? '正在创建…' : `再挑战 ${this.result.wrongCount} 道错题`,
+              { type: ButtonType.Normal })
+              .layoutWeight(1)
+              .height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(this.wrongRetrying ? AppTheme.DISABLED : AppTheme.PRIMARY)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .fontWeight(FontWeight.Medium)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.repeating && !this.wrongRetrying)
+              .onClick(() => void this.retryWrong());
           } else {
-            ActionButton({
-              label: this.repeating ? '正在创建…' : '再挑战一次',
-              kind: ActionButtonKind.NEUTRAL,
-              isEnabled: !this.repeating,
-              onAction: (): void => void this.repeat()
-            })
-            .layoutWeight(1);
+            Button(this.repeating ? '正在创建…' : '再挑战一次', { type: ButtonType.Normal })
+              .layoutWeight(1)
+              .height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+              .fontColor(AppTheme.TEXT)
+              .fontWeight(FontWeight.Medium)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.repeating)
+              .onClick(() => void this.repeat());
 
-            ActionButton({
-              label: '完成',
-              isEnabled: !this.repeating,
-              onAction: (): void => this.onBack()
-            })
-            .layoutWeight(1);
+            Button('完成', { type: ButtonType.Normal })
+              .layoutWeight(1)
+              .height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.PRIMARY)
+              .fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .fontWeight(FontWeight.Medium)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.repeating)
+              .onClick(() => this.onBack());
           }
         }
         .width('100%')

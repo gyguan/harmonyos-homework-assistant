@@ -7,9 +7,7 @@ import {
   RemoteVoiceMaterialCreateAssignmentRequest
 } from '../../../application/remote/RemoteVoiceMaterialApi';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../../../components/action/ActionControls';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
-import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import { ParentVoiceMaterialViewModel } from './ParentVoiceMaterialViewModel';
@@ -351,23 +349,31 @@ export struct ParentVoiceMaterialPage {
 
   @Builder
   private DefaultSubjectChip(label: string, code: string) {
-    SegmentedSelectionButton({
-      label: label,
-      selected: this.defaultSubjectCode === code,
-      onSelect: () => {
+    Button(label, { type: ButtonType.Normal })
+      .height(36)
+      .padding({ left: 10, right: 10 })
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(12)
+      .fontWeight(this.defaultSubjectCode === code ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(this.defaultSubjectCode === code ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(this.defaultSubjectCode === code ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => {
         this.defaultSubjectCode = code;
-      }
-    });
+      });
   }
 
   @Builder
   private SubjectChip(label: string, code: string, selectedCode: string,
     onSelect: () => void) {
-    SegmentedSelectionButton({
-      label: label,
-      selected: selectedCode === code,
-      onSelect: () => onSelect()
-    });
+    Button(label, { type: ButtonType.Normal })
+      .height(36)
+      .padding({ left: 10, right: 10 })
+      .borderRadius(AppTheme.CHIP_RADIUS)
+      .fontSize(12)
+      .fontWeight(selectedCode === code ? FontWeight.Medium : FontWeight.Normal)
+      .backgroundColor(selectedCode === code ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
+      .fontColor(selectedCode === code ? AppTheme.PRIMARY : AppTheme.TEXT)
+      .onClick(() => onSelect());
   }
 
   @Builder
@@ -404,10 +410,13 @@ export struct ParentVoiceMaterialPage {
       .width('100%');
 
       if (this.pendingPackages.length > 0) {
-        TextAction({
-          label: '应用到已添加目录',
-          onAction: (): void => this.applyDefaultsToPending()
-        });
+        Text('应用到已添加目录')
+          .fontSize(13)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 6, right: 6 })
+          .onClick(() => this.applyDefaultsToPending());
       }
     }
     .width('100%')
@@ -434,11 +443,12 @@ export struct ParentVoiceMaterialPage {
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
 
-        TextAction({
-          label: '移除',
-          kind: TextActionKind.DANGER,
-          onAction: (): void => this.removePackage(index)
-        });
+        Text('移除')
+          .fontSize(12)
+          .fontColor(AppTheme.DANGER)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 4 })
+          .onClick(() => this.removePackage(index));
       }
       .width('100%');
 
@@ -487,14 +497,14 @@ export struct ParentVoiceMaterialPage {
       }
       .width('100%');
 
-      ActionButton({
-        label: this.selecting ? '正在打开文件选择器…' : '＋ 添加目录',
-        kind: ActionButtonKind.OUTLINE,
-        actionSize: ActionButtonSize.SMALL,
-        isEnabled: !this.selecting && !this.uploading,
-        onAction: (): void => { void this.addPackages(); }
-      })
-      .width('100%');
+      Button(this.selecting ? '正在打开文件选择器…' : '＋ 添加目录', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .fontColor(AppTheme.PRIMARY)
+        .enabled(!this.selecting && !this.uploading)
+        .onClick(() => { void this.addPackages(); });
 
       Text('支持目录选择的设备可直接选择文件夹；如需批量导入，可重复点击“添加目录”。不支持目录选择的设备可选择目录内的语音和图片，系统会按父目录自动归组。')
         .width('100%')
@@ -507,12 +517,15 @@ export struct ParentVoiceMaterialPage {
       }, (item: VoiceMaterialLocalPackage) => item.directoryUri);
 
       if (this.pendingPackages.length > 0) {
-        ActionButton({
-          label: this.uploading ? '正在导入…' : `导入 ${this.pendingPackages.length} 个目录`,
-          isEnabled: !this.uploading,
-          onAction: (): void => { void this.uploadPending(); }
-        })
-        .width('100%');
+        Button(this.uploading ? '正在导入…' : `导入 ${this.pendingPackages.length} 个目录`,
+          { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .enabled(!this.uploading)
+          .onClick(() => { void this.uploadPending(); });
       }
     }
     .width('100%');
@@ -554,20 +567,22 @@ export struct ParentVoiceMaterialPage {
       }
 
       if (item.status === 'READY' || item.status === 'CONSUMED') {
-        ActionButton({
-          label: this.creatingPackageId === item.id
+        Button(
+          this.creatingPackageId === item.id
             ? '正在创建…'
             : item.hasActiveAssignment
               ? '已有任务'
               : item.hasCreatedBefore
                 ? '再次创建任务'
                 : '创建语音任务',
-          kind: ActionButtonKind.OUTLINE,
-          actionSize: ActionButtonSize.SMALL,
-          isEnabled: this.creatingPackageId.length === 0 && !item.hasActiveAssignment,
-          onAction: (): void => this.openCreateSheet(item)
-        })
-        .width('100%');
+          { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .enabled(this.creatingPackageId.length === 0 && !item.hasActiveAssignment)
+          .onClick(() => this.openCreateSheet(item));
       }
     }
     .width('100%')
@@ -585,11 +600,7 @@ export struct ParentVoiceMaterialPage {
           Row() {
             Text('创建语音任务').fontSize(18).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Blank();
-            TextAction({
-              label: '关闭',
-              kind: TextActionKind.NEUTRAL,
-              onAction: (): void => this.closeCreateSheet()
-            });
+            Text('关闭').fontSize(13).fontColor(AppTheme.SUBTEXT).onClick(() => this.closeCreateSheet());
           }.width('100%');
           Text(this.creatingItem()!.directoryName).width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           Text('学生').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
@@ -619,21 +630,12 @@ export struct ParentVoiceMaterialPage {
             .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
             .onChange((value: string) => this.createMinutesText = value);
           Row({ space: 10 }) {
-            ActionButton({
-              label: '取消',
-              kind: ActionButtonKind.NEUTRAL,
-              actionSize: ActionButtonSize.MEDIUM,
-              isEnabled: !this.creatingAssignment,
-              onAction: (): void => this.closeCreateSheet()
-            })
-            .layoutWeight(1);
-            ActionButton({
-              label: this.creatingAssignment ? '创建中…' : '确认创建',
-              actionSize: ActionButtonSize.MEDIUM,
-              isEnabled: !this.creatingAssignment,
-              onAction: (): void => { void this.confirmCreateAssignment(); }
-            })
-            .layoutWeight(1);
+            Button('取消', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.SURFACE_SUBTLE).fontColor(AppTheme.TEXT).borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.creatingAssignment).onClick(() => this.closeCreateSheet());
+            Button(this.creatingAssignment ? '创建中…' : '确认创建', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+              .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(!this.creatingAssignment).onClick(() => { void this.confirmCreateAssignment(); });
           }.width('100%');
         }
         .width('100%').padding(AppTheme.PHONE_CARD_PADDING).backgroundColor(AppTheme.SURFACE)

@@ -1,5 +1,4 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import {
   ImportBatch,
@@ -259,17 +258,21 @@ export struct HomeworkImportBatchDetailPage {
             }
 
             if (this.batch()!.status === ImportBatchStatus.RECEIVED) {
-              ActionButton({
-                label: '人工确认未识别消息',
-                onAction: (): void => this.manualReview()
-              })
-              .width('100%');
+              Button('人工确认未识别消息', { type: ButtonType.Normal })
+                .width('100%')
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.PRIMARY)
+                .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => this.manualReview());
             } else if (this.batch()!.status === ImportBatchStatus.READY) {
-              ActionButton({
-                label: '继续确认并发布',
-                onAction: (): void => this.continueConfirmation()
-              })
-              .width('100%');
+              Button('继续确认并发布', { type: ButtonType.Normal })
+                .width('100%')
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.PRIMARY)
+                .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => this.continueConfirmation());
             }
 
             if (this.batch()!.status === ImportBatchStatus.RECEIVED ||
@@ -282,20 +285,18 @@ export struct HomeworkImportBatchDetailPage {
                     .lineHeight(18)
                     .fontColor(AppTheme.DANGER);
                   Row({ space: 8 }) {
-                    ActionButton({
-                      label: '取消',
-                      kind: ActionButtonKind.NEUTRAL,
-                      actionSize: ActionButtonSize.SMALL,
-                      onAction: (): void => { this.abandonConfirm = false; }
-                    })
-                    .layoutWeight(1);
-                    ActionButton({
-                      label: '确认放弃',
-                      kind: ActionButtonKind.DANGER,
-                      actionSize: ActionButtonSize.SMALL,
-                      onAction: (): void => this.abandon()
-                    })
-                    .layoutWeight(1);
+                    Button('取消', { type: ButtonType.Normal })
+                      .layoutWeight(1)
+                      .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                      .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                      .fontColor(AppTheme.TEXT)
+                      .onClick(() => this.abandonConfirm = false);
+                    Button('确认放弃', { type: ButtonType.Normal })
+                      .layoutWeight(1)
+                      .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                      .backgroundColor(AppTheme.DANGER)
+                      .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                      .onClick(() => this.abandon());
                   }
                   .width('100%');
                 }
@@ -304,13 +305,13 @@ export struct HomeworkImportBatchDetailPage {
                 .backgroundColor(AppTheme.DANGER_SOFT)
                 .borderRadius(AppTheme.CONTROL_RADIUS);
               } else {
-                ActionButton({
-                  label: '放弃这个批次',
-                  kind: ActionButtonKind.GHOST,
-                  actionSize: ActionButtonSize.SMALL,
-                  onAction: (): void => { this.abandonConfirm = true; }
-                })
-                .width('100%');
+                Button('放弃这个批次', { type: ButtonType.Normal })
+                  .width('100%')
+                  .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                  .borderRadius(AppTheme.CONTROL_RADIUS)
+                  .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                  .fontColor(AppTheme.DANGER)
+                  .onClick(() => this.abandonConfirm = true);
               }
             }
           }

@@ -166,114 +166,6 @@ if assignment_list_item:
 
 # Persistent selectors whose visual state changes at runtime must use reactive child-component props,
 # not ordinary @Builder boolean snapshots. Keep both the binding mechanism and visible feedback guarded.
-action_controls = read_optional("entry/src/main/ets/components/action/ActionControls.ets")
-require("export struct ActionButton" in action_controls and "export struct TextAction" in action_controls and
-        "ActionButtonKind.PRIMARY" in action_controls and "ActionButtonKind.OUTLINE" in action_controls and
-        "ActionButtonKind.GHOST" in action_controls and "TextActionKind.DANGER" in action_controls,
-        "shared action controls must define primary/outline/ghost/danger buttons and text actions")
-require("export enum ActionButtonSize" in action_controls and
-        "LARGE = 'LARGE'" in action_controls and "MEDIUM = 'MEDIUM'" in action_controls and
-        "SMALL = 'SMALL'" in action_controls and "@Prop actionSize: ActionButtonSize" in action_controls,
-        "shared action controls must expose explicit large/medium/small sizing")
-require("AppTheme.BUTTON_HEIGHT" in action_controls and "AppTheme.SECONDARY_BUTTON_HEIGHT" in action_controls and
-        "AppTheme.MIN_TOUCH_TARGET" in action_controls and "AppTheme.CONTROL_RADIUS" in action_controls,
-        "shared action controls must consume durable theme sizing rather than page-local literals")
-
-# ActionButton uses explicit semantic sizes. Keep compact only for chip-specific controls.
-for action_scan_path in [
-    "entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets",
-    "entry/src/main/ets/components/practice/PracticeFilterDialog.ets",
-    "entry/src/main/ets/components/practice/PracticeHistoryFilterDialog.ets",
-    "entry/src/main/ets/components/tutor/TutorQuestionCapturePanel.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkImportInboxFilterDialog.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
-    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
-    "entry/src/main/ets/features/parent/review/ParentReviewPane.ets",
-    "entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets",
-    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
-    "entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets",
-    "entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkShareImportStatusPage.ets",
-    "entry/src/main/ets/features/student/home/StudentHomePage.ets",
-    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
-]:
-    action_scan_source = read_optional(action_scan_path)
-    require(re.search(r"ActionButton\(\{[\s\S]{0,420}?compact:\s*true", action_scan_source) is None,
-            f"ActionButton must use explicit ActionButtonSize instead of compact: {action_scan_path}")
-
-# Standard business actions must reuse shared action semantics. Specialized controls such as
-# quiz options, media playback, image paging, and scaled practice navigation may keep bespoke Button UI.
-for action_path in [
-    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkShareImportStatusPage.ets",
-    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
-    "entry/src/main/ets/features/parent/review/ParentReviewPane.ets",
-    "entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets",
-    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
-    "entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets",
-    "entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets",
-    "entry/src/main/ets/features/student/home/StudentHomePage.ets",
-    "entry/src/main/ets/features/student/assignments/AssignmentDetailPane.ets",
-    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
-    "entry/src/main/ets/features/student/practice/PracticePaperDetailPage.ets",
-    "entry/src/main/ets/features/student/practice/PracticeResultPage.ets",
-]:
-    action_source = read_optional(action_path)
-    require("ActionButton" in action_source,
-            f"standard business actions must reuse ActionButton: {action_path}")
-
-for filter_path in [
-    "entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets",
-    "entry/src/main/ets/components/practice/PracticeFilterDialog.ets",
-    "entry/src/main/ets/components/practice/PracticeHistoryFilterDialog.ets",
-    "entry/src/main/ets/features/parent/import/HomeworkImportInboxFilterDialog.ets",
-    "entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets",
-    "entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets",
-]:
-    filter_source = read_optional(filter_path)
-    require("SegmentedSelectionButton" in filter_source,
-            f"persistent filter/choice controls must reuse SegmentedSelectionButton: {filter_path}")
-
-# High-frequency pages must preserve visual hierarchy instead of collapsing back to one compact blue button style.
-for explicit_size_path in [
-    "entry/src/main/ets/features/parent/import/HomeworkImportPage.ets",
-    "entry/src/main/ets/features/parent/progress/ParentProgressPage.ets",
-    "entry/src/main/ets/features/parent/review/ParentReviewPane.ets",
-    "entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets",
-    "entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets",
-    "entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets",
-    "entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets",
-    "entry/src/main/ets/features/student/home/StudentHomePage.ets",
-    "entry/src/main/ets/features/student/study/StudyWorkspacePage.ets",
-]:
-    explicit_size_source = read_optional(explicit_size_path)
-    require("compact: true" not in explicit_size_source,
-            f"high-frequency action layout must use explicit ActionButtonSize instead of compact: {explicit_size_path}")
-
-parent_review_actions = read_optional("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
-require("label: '编辑'" in parent_review_actions and "label: '删除'" in parent_review_actions and
-        "TextAction({" in parent_review_actions,
-        "Parent Review card management actions must stay lightweight text actions")
-
-student_home_actions = read_optional("entry/src/main/ets/features/student/home/StudentHomePage.ets")
-require("kind: this.emphasized ? ActionButtonKind.PRIMARY : ActionButtonKind.OUTLINE" in student_home_actions and
-        "actionSize: ActionButtonSize.SMALL" in student_home_actions,
-        "Student Home card actions must use small primary/outline hierarchy")
-
-study_actions = read_optional("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
-require("label: '问小伴'" in study_actions and "kind: ActionButtonKind.OUTLINE" in study_actions and
-        "label: '暂停一下'" in study_actions and "kind: ActionButtonKind.NEUTRAL" in study_actions and
-        "actionSize: ActionButtonSize.MEDIUM" in study_actions,
-        "Study Workspace must keep helper/pause weaker than the primary workflow action")
-
-voice_actions = read_optional("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
-require("kind: ActionButtonKind.OUTLINE" in voice_actions and
-        "kind: ActionButtonKind.GHOST" in voice_actions and
-        "actionSize: ActionButtonSize.SMALL" in voice_actions,
-        "Voice assignment preparation actions must stay weaker than Publish")
-
 selection_controls = read_optional("entry/src/main/ets/components/selection/SelectionControls.ets")
 require(len(selection_controls) > 0, "missing shared reactive selection controls")
 if selection_controls:
@@ -286,8 +178,8 @@ if selection_controls:
             "persistent selection controls must receive selected as reactive @Prop")
     require("@Prop active: boolean = false;" in selection_controls,
             "filter summary active state must be a reactive @Prop")
-    require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE)" in selection_controls,
-            "reactive selection controls must use white unselected surfaces and visible selected surfaces")
+    require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_controls,
+            "reactive selection controls must expose a visible selected surface")
     require("border({ width: 1, color: this.selected ? AppTheme.PRIMARY : AppTheme.BORDER })" in selection_controls,
             "status selection must combine selected surface and border")
 
@@ -311,14 +203,12 @@ require("calendarMode" not in student_assignments and "AssignmentCalendarPanel" 
 
 filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 for state_expr, label in [
-    ("selected: this.allDates === allDates", "assignment date mode"),
+    ("this.allDates === allDates ? AppTheme.PRIMARY_SOFT", "assignment date mode"),
     ("DatePicker({", "assignment date"),
-    ("selected: this.subjectCode === value", "assignment subject"),
+    ("this.subjectCode === value ? AppTheme.PRIMARY_SOFT", "assignment subject"),
 ]:
     require(state_expr in filter_dialog,
-            f"shared filter dialog {label} selection must bind to shared reactive controls")
-require("SegmentedSelectionButton" in filter_dialog,
-        "shared assignment filter must reuse the common segmented selection component")
+            f"shared filter dialog {label} selection must have an active surface")
 
 parent_progress = read_optional("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 require("private FilterChip(" not in parent_progress and "private FilterEntry(" not in parent_progress,
@@ -335,8 +225,8 @@ for expression in [
     require(expression in parent_progress,
             f"Parent Progress must bind selection directly to page state: {expression}")
 require("Text('作业进度')" not in parent_progress and
-        "label: this.bulkMode ? '取消' : '删除'" in parent_progress and "TextAction({" in parent_progress,
-        "Parent Progress must avoid duplicate root title and keep shared delete/cancel action explicit")
+        "Text(this.bulkMode ? '取消' : '删除')" in parent_progress,
+        "Parent Progress must avoid duplicate root title and keep delete/cancel action explicit")
 
 deadline_picker = read_optional("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker,
@@ -346,18 +236,14 @@ require("AssignmentDueDate.resolveDueAtEpochMs" in deadline_picker,
 
 extra_assignment = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 category_option = between(extra_assignment, "private CategoryOption(", "private CategorySection()")
-require("SegmentedSelectionButton" in category_option and "selected: this.category === value" in category_option,
-        "Extra assignment category selection must reuse the shared reactive segmented control")
+require("backgroundColor(this.category === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)" in category_option,
+        "Extra assignment category selection must have an active surface")
 require("DeadlinePickerField" in extra_assignment and "placeholder: 'YYYY-MM-DD'" not in extra_assignment,
         "Extra assignment deadline must use the shared native picker instead of a manual date field")
 
 confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 confirmation_components = read_optional(
     "entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
-duration_control = between(confirmation_components, "export struct CandidateDurationControl", "@Component\nexport struct ConfirmationCandidateCard")
-require(duration_control.count("ChoiceSelectionChip({") >= 5 and duration_control.count("compact: true") >= 5 and
-        "ActionButtonSize" not in duration_control,
-        "Candidate duration choices must use chip-specific compact sizing, not ActionButtonSize")
 assignment_edit_form = read_optional(
     "entry/src/main/ets/components/assignment/AssignmentEditForm.ets")
 require("private SubjectChip(" not in confirmation and "private TimeChip(" not in confirmation and
@@ -397,9 +283,9 @@ for expression in [
 ]:
     require(expression in confirmation_components,
             f"Confirmation duration state must bind directly to current Candidate prop: {expression}")
-require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE)" in selection_controls and
-        "color: this.selected ? AppTheme.PRIMARY : AppTheme.BORDER" in selection_controls,
-        "shared choice selection must combine selected surface with neutral unselected border")
+require("backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT" in selection_controls and
+        "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in selection_controls,
+        "shared choice selection must combine active surface and border")
 
 calendar_path = ROOT / "entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets"
 require(not calendar_path.exists(),

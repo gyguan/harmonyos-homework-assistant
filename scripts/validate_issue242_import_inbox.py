@@ -112,8 +112,7 @@ require("filterBatches(" in inbox_vm and "matchesSource(" in inbox_vm and
 require("FilterSummaryEntry" in inbox_page and "label: '来源'" in inbox_page and
         "label: '状态'" in inbox_page and "label: '时间'" in inbox_page,
         "Import Inbox page must expose the standard filter summary bar")
-for token in ["Text('来源')", "Text('状态')", "Text('时间')",
-              "SegmentedSelectionButton", "label: '重置'", "label: '确定'"]:
+for token in ["Text('来源')", "Text('状态')", "Text('时间')", "Button('重置'", "Button('确定'"]:
     require(token in inbox_filter_dialog, f"Import Inbox filter dialog missing: {token}")
 require("作业收件箱" in dashboard and "onOpenInbox" in dashboard,
         "parent dashboard must expose Import Inbox as an independent entry")

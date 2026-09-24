@@ -1,5 +1,4 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { TextAction, TextActionKind } from '../action/ActionControls';
 
 @Component
 export struct EditSheetHeader {
@@ -25,12 +24,14 @@ export struct EditSheetHeader {
       .layoutWeight(1)
       .alignItems(HorizontalAlign.Start);
 
-      TextAction({
-        label: '关闭',
-        kind: TextActionKind.NEUTRAL,
-        accessibilityLabel: this.closeAccessibilityText,
-        onAction: (): void => this.onClose()
-      });
+      Text('关闭')
+        .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
+        .fontSize(14)
+        .fontColor(AppTheme.SUBTEXT)
+        .textAlign(TextAlign.Center)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(this.closeAccessibilityText)
+        .onClick(() => this.onClose());
     }
     .width('100%')
     .padding({ left: 16, right: 16, top: 12, bottom: 10 });

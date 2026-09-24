@@ -1,5 +1,4 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, TextAction } from '../../../components/action/ActionControls';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import {
   PracticeAttemptStatus,
@@ -155,11 +154,15 @@ export struct PracticePaperDetailPage {
           .fontColor(AppTheme.TEXT);
         Blank();
         if (this.attempts.length > 0) {
-          TextAction({
-            label: '查看全部',
-            accessibilityLabel: '查看当前套卷全部练习记录',
-            onAction: (): void => this.onOpenHistory(this.paperId)
-          });
+          Text('查看全部')
+            .fontSize(13)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 12 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('查看当前套卷全部练习记录')
+            .onClick(() => this.onOpenHistory(this.paperId));
         }
       }
       .width('100%')
@@ -299,12 +302,15 @@ export struct PracticePaperDetailPage {
 
       if (this.paper !== null) {
         Column() {
-          ActionButton({
-            label: this.starting ? '正在开始…' : '开始练习',
-            isEnabled: !this.starting,
-            onAction: (): void => void this.start()
-          })
-          .width('100%');
+          Button(this.starting ? '正在开始…' : '开始练习', { type: ButtonType.Normal })
+            .width('100%')
+            .height(AppTheme.BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(this.starting ? AppTheme.DISABLED : AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .fontWeight(FontWeight.Medium)
+            .enabled(!this.starting)
+            .onClick(() => void this.start());
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.PRACTICE_READABLE_MAX_WIDTH })
