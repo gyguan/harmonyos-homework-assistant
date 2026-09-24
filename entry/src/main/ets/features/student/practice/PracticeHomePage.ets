@@ -337,7 +337,7 @@ export struct PracticeHomePage {
       } else if (!this.loading && this.papers.length === 0) {
         Column({ space: 7 }) {
           Text('这个分类暂时没有套卷')
-            .fontSize(15)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
