@@ -38,6 +38,8 @@ require(len(store_method) == 2 and "this.requestPersist();" in store_method[1].s
 
 require("AI 辅导规则" in parent and "SettingsToggleRow" in parent,
         "parent 我的 must expose both Tutor rule controls through reactive switch rows")
+require("Text('我的').fontSize(AppTheme.PAGE_TITLE_SIZE)" not in parent,
+        "parent root settings must not repeat the 我的 navigation title")
 require("private TutorRule(" not in parent and "toggleGuidanceFirst" not in parent and "toggleDirectAnswer" not in parent,
         "parent 我的 must not keep stale boolean Builder/toggle wrappers")
 require("HomeworkStore" not in parent and "FamilyContextRepository" in parent and
