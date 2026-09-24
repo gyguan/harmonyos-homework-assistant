@@ -299,7 +299,7 @@ export struct BackendConnectionPage {
                 label: '取消删除',
                 kind: ActionButtonKind.NEUTRAL,
                 compact: true,
-                onAction: (): void => this.deleteStudentConfirmId = ''
+                onAction: (): void => { this.deleteStudentConfirmId = ''; }
               })
               .layoutWeight(1);
               ActionButton({
@@ -320,7 +320,7 @@ export struct BackendConnectionPage {
                 label: '删除',
                 kind: ActionButtonKind.DANGER_SOFT,
                 compact: true,
-                onAction: (): void => this.deleteStudentConfirmId = this.editingId
+                onAction: (): void => { this.deleteStudentConfirmId = this.editingId; }
               });
             }
             ActionButton({
