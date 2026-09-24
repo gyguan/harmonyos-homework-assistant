@@ -265,7 +265,7 @@ export struct HomeworkImportInboxPage {
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .borderRadius(11);
           Text('还没有导入记录')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
@@ -276,7 +276,7 @@ export struct HomeworkImportInboxPage {
       } else if (this.batches().length === 0) {
         Column({ space: 8 }) {
           Text('没有符合条件的记录')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
