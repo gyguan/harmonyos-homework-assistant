@@ -55,7 +55,7 @@ export struct DeepPageHeader {
       }
     }
     .width('100%')
-    .height(AppTheme.DEEP_PAGE_HEADER_HEIGHT)
+    .constraintSize({ minHeight: AppTheme.DEEP_PAGE_HEADER_HEIGHT })
     .alignItems(VerticalAlign.Center);
   }
 }
