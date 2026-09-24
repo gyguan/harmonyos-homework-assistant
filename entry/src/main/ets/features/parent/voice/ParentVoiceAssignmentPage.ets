@@ -550,7 +550,7 @@ export struct ParentVoiceAssignmentPage {
     }
     .width('100%')
     .padding(12)
-    .backgroundColor(this.selectedFolderId === item.packageId ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: this.selectedFolderId === item.packageId ? AppTheme.PRIMARY : AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
@@ -717,7 +717,7 @@ export struct ParentVoiceAssignmentPage {
             }
             .width('100%')
             .padding(AppTheme.PHONE_CARD_PADDING)
-            .backgroundColor(AppTheme.SURFACE)
+            .backgroundColor(AppTheme.CARD_SURFACE)
             .borderRadius(AppTheme.PHONE_CARD_RADIUS);
 
             Column() {
@@ -725,7 +725,7 @@ export struct ParentVoiceAssignmentPage {
             }
             .width('100%')
             .padding(AppTheme.PHONE_CARD_PADDING)
-            .backgroundColor(AppTheme.SURFACE)
+            .backgroundColor(AppTheme.CARD_SURFACE)
             .borderRadius(AppTheme.PHONE_CARD_RADIUS);
           }
           .width('100%')
