@@ -251,7 +251,7 @@ export struct ConfirmationCandidateEditor {
             label: '继续编辑',
             kind: ActionButtonKind.NEUTRAL,
             compact: true,
-            onAction: (): void => this.confirmDiscard = false
+            onAction: (): void => { this.confirmDiscard = false; }
           })
           .layoutWeight(1);
           ActionButton({
@@ -275,7 +275,7 @@ export struct ConfirmationCandidateEditor {
             label: '取消',
             kind: ActionButtonKind.NEUTRAL,
             compact: true,
-            onAction: (): void => this.confirmDelete = false
+            onAction: (): void => { this.confirmDelete = false; }
           })
           .layoutWeight(1);
           ActionButton({
@@ -292,7 +292,7 @@ export struct ConfirmationCandidateEditor {
           ActionButton({
             label: '删除',
             kind: ActionButtonKind.DANGER_SOFT,
-            onAction: (): void => this.confirmDelete = true
+            onAction: (): void => { this.confirmDelete = true; }
           })
           .layoutWeight(1);
           ActionButton({
