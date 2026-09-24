@@ -139,7 +139,7 @@ export struct ConfirmationCandidateCard {
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: this.selected ? 1 : 0,
       color: this.selected ? AppTheme.PRIMARY : Color.Transparent })
-    .borderRadius(AppTheme.PHONE_CARD_RADIUS)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText(this.selected ?
