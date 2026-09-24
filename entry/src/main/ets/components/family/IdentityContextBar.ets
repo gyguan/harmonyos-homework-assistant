@@ -27,14 +27,18 @@ export struct IdentityContextBar {
 
       Column({ space: 1 }) {
         Text(this.isParent ? '家长' : this.studentName)
-          .fontSize(14)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text(this.isParent ?
           '当前管理 · ' + this.studentName :
           this.studentGrade + ' · ' + this.studentClassName)
-          .fontSize(11)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
       }
       .alignItems(HorizontalAlign.Start);
 
@@ -42,8 +46,8 @@ export struct IdentityContextBar {
 
       if (this.isParent && this.canSwitchStudent) {
         Row({ space: 4 }) {
-          Text('管理 ' + this.studentName).fontSize(12).fontColor(AppTheme.PRIMARY);
-          Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
+          Text('管理 ' + this.studentName).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+          Text('⌄').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
         }
         .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
         .padding({ left: 10, right: 10, top: 7, bottom: 7 })
@@ -56,8 +60,8 @@ export struct IdentityContextBar {
       }
 
       Row({ space: 4 }) {
-        Text('切换身份').fontSize(12).fontColor(AppTheme.PRIMARY);
-        Text('⌄').fontSize(12).fontColor(AppTheme.PRIMARY);
+        Text('切换身份').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+        Text('⌄').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
       }
       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
       .padding({ left: 10, right: 10, top: 7, bottom: 7 })
@@ -69,7 +73,7 @@ export struct IdentityContextBar {
       .onClick(() => this.onSwitchIdentity());
     }
     .width('100%')
-    .height(AppTheme.CONTEXT_BAR_HEIGHT)
+    .constraintSize({ minHeight: AppTheme.CONTEXT_BAR_HEIGHT })
     .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING })
     .backgroundColor(AppTheme.BACKGROUND);
   }
