@@ -46,6 +46,9 @@ export class AppTheme {
   static readonly STUDY_TITLE_SIZE: number = 26;
   static readonly PARENT_HOME_READABLE_MAX_WIDTH: number = 1040;
   static readonly PARENT_HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
+  static readonly PARENT_HOME_ACTION_CARD_MIN_HEIGHT: number = 132;
+  static readonly PARENT_HOME_ACTION_ICON_SIZE: number = 44;
+  static readonly PARENT_HOME_ACTION_CARD_PADDING: number = 16;
   static readonly PARENT_PROGRESS_READABLE_MAX_WIDTH: number = 1040;
   static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1400;
   // Shared readable width for parent deep pages such as create, review and confirmation flows.
