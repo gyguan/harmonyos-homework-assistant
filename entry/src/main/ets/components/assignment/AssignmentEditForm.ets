@@ -113,8 +113,9 @@ export struct AssignmentEditForm {
     Column({ space: 7 }) {
       Text('预计用时（分钟）')
         .width('100%')
-        .maxLines(1)
-        .fontSize(12)
+        .maxLines(AppTheme.META_MAX_LINES)
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
       Scroll() {
         Row({ space: 6 }) {
