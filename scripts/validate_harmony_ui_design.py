@@ -225,8 +225,8 @@ for expression in [
     require(expression in parent_progress,
             f"Parent Progress must bind selection directly to page state: {expression}")
 require("Text('作业进度')" not in parent_progress and
-        "Text(this.bulkMode ? '取消' : '删除')" in parent_progress,
-        "Parent Progress must avoid duplicate root title and keep delete/cancel action explicit")
+        "label: this.bulkMode ? '取消' : '删除'" in parent_progress and "TextAction({" in parent_progress,
+        "Parent Progress must avoid duplicate root title and keep shared delete/cancel action explicit")
 
 deadline_picker = read_optional("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
 require("DatePicker({" in deadline_picker and "TimePicker({" in deadline_picker,
