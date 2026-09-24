@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 import sys
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 errors: list[str] = []
@@ -33,12 +34,16 @@ require("window.addEventListener('xiaoban-admin-authenticated'" in app and
         "admin business module must initialize from isolated authenticated state")
 require("async function handleLogin" not in app,
         "business module must not own login submission")
-require("login-shell.js?v=20260923-4" in index and
-        "app.js?v=20260923-4" in index,
+login_match = re.search(r"login-shell\\.js\\?v=([0-9-]+)", index)
+app_match = re.search(r"app\\.js\\?v=([0-9-]+)", index)
+require(login_match is not None and app_match is not None and
+        login_match.group(1) == app_match.group(1),
         "admin login shell and app module must be cache-busted together")
-require("api.js?v=20260923-4" in login_shell and
-        "api.js?v=20260923-4" in app and
-        "voice-material.js?v=20260923-4" in app,
+cache_version = login_match.group(1) if login_match is not None else ""
+require(f"api.js?v={cache_version}" in login_shell and
+        f"api.js?v={cache_version}" in app and
+        f"voice-material.js?v={cache_version}" in app and
+        f"voice-management-view.js?v={cache_version}" in app,
         "admin module dependency graph must use the same cache-bust version")
 require('id="login-form"' in index and 'id="admin-view"' in index,
         "login and admin shells must remain explicit")
