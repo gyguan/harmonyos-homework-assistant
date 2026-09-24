@@ -243,7 +243,7 @@ export struct HomeworkImportInboxPage {
 
       Row() {
         Text(this.hasActiveFilters() ? '筛选结果' : '全部记录')
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
