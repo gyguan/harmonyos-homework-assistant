@@ -127,7 +127,7 @@ export struct ConfirmationCandidateCard {
     }
     .width('100%')
     .padding(11)
-    .backgroundColor(this.selected ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: this.selected ? 1 : 0,
       color: this.selected ? AppTheme.PRIMARY : Color.Transparent })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
