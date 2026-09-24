@@ -68,12 +68,12 @@ require("aboutToAppear(): void" not in study_route and
         "AssignmentAction.START" not in study_route and "activateAssignment" not in study_route,
         "entering Study Workspace must never auto-start timing before the student presses the action button")
 require("private WorkspaceActionBar(showTutorEntry: boolean)" in study and
-        "Button('暂停一下'" in study and "this.WorkspaceActionBar(true)" in study and
-        "this.WorkspaceActionBar(false)" in study,
-        "Study Workspace must keep pause beside the primary submit/progress action on Phone and Pad")
-require("Button('继续作业'" in study and "resumeFromSubmission" in study and
-        "AssignmentStatus.READY_TO_SUBMIT" in study,
-        "submit preparation must expose a reversible continue-working action")
+        "ActionButton({" in study and "label: '暂停一下'" in study and
+        "this.WorkspaceActionBar(true)" in study and "this.WorkspaceActionBar(false)" in study,
+        "Study Workspace must keep shared pause beside the primary submit/progress action on Phone and Pad")
+require("ActionButton({" in study and "label: '继续作业'" in study and
+        "resumeFromSubmission" in study and "AssignmentStatus.READY_TO_SUBMIT" in study,
+        "submit preparation must expose a reversible shared continue-working action")
 require("AppTheme.PRIMARY_SOFT" in study and "AppTheme.PRIMARY" in study,
         "Study Workspace secondary actions must use soft-primary styling")
 require('!"READY_TO_SUBMIT".equals(previousStatus)' in service,
