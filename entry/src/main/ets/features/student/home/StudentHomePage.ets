@@ -112,7 +112,6 @@ struct StudentTodayTaskCard {
         .backgroundColor(this.busy ? AppTheme.DISABLED : AppTheme.PRIMARY)
         .fontColor(AppTheme.TEXT_ON_PRIMARY)
         .fontSize(AppTheme.ACTION_TEXT_SIZE)
-        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .accessibilityText(`${this.actionLabel()}${this.assignment.title}`)
         .onClick(() => this.onAction(this.assignment.id));
