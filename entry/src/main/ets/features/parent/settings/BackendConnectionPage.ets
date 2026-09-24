@@ -528,7 +528,7 @@ export struct BackendConnectionPage {
           Row({ space: 8 }) {
             ActionButton({
               label: '立即同步',
-              kind: ActionButtonKind.SECONDARY,
+              kind: ActionButtonKind.OUTLINE,
               size: ActionButtonSize.SMALL,
               onAction: (): void => { void this.syncCloudData(); }
             })
