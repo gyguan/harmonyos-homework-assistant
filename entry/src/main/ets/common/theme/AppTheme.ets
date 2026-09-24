@@ -112,6 +112,9 @@ export class AppTheme {
   // Child-facing homework instructions/question content get one larger reading level.
   static readonly READING_BODY_SIZE: number = 16;
   static readonly READING_BODY_LINE_HEIGHT: number = 24;
+  // Practice question stems are the primary reading target and intentionally use a larger level.
+  static readonly QUESTION_TEXT_SIZE: number = 20;
+  static readonly QUESTION_TEXT_LINE_HEIGHT: number = 30;
   // Text inside 48vp inputs is slightly larger than ordinary body copy without changing control height.
   static readonly FORM_TEXT_SIZE: number = 15;
   static readonly FORM_TEXT_LINE_HEIGHT: number = 22;
