@@ -26,7 +26,8 @@ export struct AssignmentMetricSummary {
         .fontColor(tone === 'pending' ? AppTheme.WARNING :
           tone === 'done' ? AppTheme.SUCCESS : AppTheme.PRIMARY);
       Text(label)
-        .fontSize(11)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
     }
     .layoutWeight(1)
