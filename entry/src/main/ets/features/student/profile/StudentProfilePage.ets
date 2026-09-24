@@ -42,12 +42,6 @@ export struct StudentProfilePage {
     Scroll() {
       Column() {
         Column({ space: 18 }) {
-          Text('我的')
-            .width('100%')
-            .fontSize(AppTheme.PAGE_TITLE_SIZE)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT);
-
           Row({ space: 14 }) {
             CenteredTextBadge({
               badgeText: this.student().name.length > 0 ? this.student().name.substring(0, 1) : '伴',
