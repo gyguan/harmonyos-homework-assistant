@@ -140,7 +140,7 @@ class VoiceMaterialAssignmentServiceTest {
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-1", 18, 0L, "", "语文 · 第二次语音作业", "req-2"));
+            "student-1", 18, 0L, "", "语文 · 第二次语音作业", "", "req-2"));
 
     assertTrue(result.created());
     assertEquals(created.id(), result.assignmentId());
@@ -172,7 +172,7 @@ class VoiceMaterialAssignmentServiceTest {
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-1", 15, 0L, "", "数学 · 手工语音作业", "req-parallel"));
+            "student-1", 15, 0L, "", "数学 · 手工语音作业", "", "req-parallel"));
 
     assertTrue(result.created());
     assertEquals(created.id(), result.assignmentId());
@@ -196,7 +196,7 @@ class VoiceMaterialAssignmentServiceTest {
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-1", 15, 0L, "", "", "req-1"));
+            "student-1", 15, 0L, "", "", "", "req-1"));
 
     assertFalse(result.created());
     assertEquals(existing.id(), result.assignmentId());
@@ -221,7 +221,7 @@ class VoiceMaterialAssignmentServiceTest {
     VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-1", 30, dueAt, "自定义", "自定义语音作业", "req-custom"));
+            "student-1", 30, dueAt, "自定义", "自定义语音作业", "先听两遍并跟读。", "req-custom"));
 
     ArgumentCaptor<AssignmentDtos.Create> input =
         ArgumentCaptor.forClass(AssignmentDtos.Create.class);
@@ -229,6 +229,7 @@ class VoiceMaterialAssignmentServiceTest {
     assertEquals(30, input.getValue().expectedMinutes());
     assertEquals(dueAt, input.getValue().dueAtEpochMs());
     assertEquals("自定义语音作业", input.getValue().title());
+    assertEquals("先听两遍并跟读。", input.getValue().instruction());
     assertTrue(result.created());
   }
 
@@ -241,7 +242,7 @@ class VoiceMaterialAssignmentServiceTest {
     Executable action = () -> service().createManually(
         familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            "student-2", 15, 0L, "", "", "req-cross"));
+            "student-2", 15, 0L, "", "", "", "req-cross"));
 
     org.junit.jupiter.api.Assertions.assertThrows(ApiExceptions.BadRequest.class, action);
     verify(packages, never()).lockOwned(any(), any());
