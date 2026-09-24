@@ -287,7 +287,7 @@ export struct PracticeAttemptPage {
               Button(`${option.key}. ${option.label}`, { type: ButtonType.Normal })
                 .width('100%')
                 .height(this.scaled(50))
-                .fontSize(this.scaled(14))
+                .fontSize(this.scaled(AppTheme.ACTION_TEXT_SIZE))
                 .fontColor(this.currentAnswer === option.key ? AppTheme.PRIMARY : AppTheme.TEXT)
                 .backgroundColor(this.currentAnswer === option.key ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE)
                 .border({
@@ -310,7 +310,7 @@ export struct PracticeAttemptPage {
         })
           .width('100%')
           .height(this.scaled(AppTheme.INPUT_HEIGHT))
-          .fontSize(this.scaled(16))
+          .fontSize(this.scaled(AppTheme.READING_BODY_SIZE))
           .backgroundColor(AppTheme.SURFACE)
           .border({ width: 1, color: AppTheme.BORDER })
           .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -329,13 +329,13 @@ export struct PracticeAttemptPage {
               .width(this.scaled(36))
               .height(this.scaled(36))
               .textAlign(TextAlign.Center)
-              .fontSize(this.scaled(13))
+              .fontSize(this.scaled(AppTheme.META_SIZE))
               .fontWeight(this.currentIndex === index ? FontWeight.Bold : FontWeight.Normal)
               .fontColor(this.currentIndex === index ? AppTheme.TEXT_ON_PRIMARY :
                 (this.isAnswered(question.id) ? AppTheme.SUCCESS : AppTheme.SUBTEXT))
               .backgroundColor(this.currentIndex === index ? AppTheme.PRIMARY :
                 (this.isAnswered(question.id) ? AppTheme.SUCCESS_SOFT : AppTheme.SURFACE_EMPHASIS))
-              .borderRadius(this.scaled(18))
+              .borderRadius(this.scaled(AppTheme.META_LINE_HEIGHT))
               .onClick(() => void this.moveTo(index));
           }, (question: PracticeQuestion) => question.id);
         }
@@ -351,9 +351,9 @@ export struct PracticeAttemptPage {
     if (this.attempt !== null) {
       Column() {
         Column({ space: this.scaled(8) }) {
-          Row({ space: this.scaled(12) }) {
+          Row({ space: this.scaled(AppTheme.CAPTION_SIZE) }) {
             Text(this.showQuestionNavigation ? '收起题号' : '选择题目')
-              .fontSize(this.scaled(12))
+              .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.PRIMARY)
               .constraintSize({ minHeight: this.scaled(AppTheme.MIN_TOUCH_TARGET) })
@@ -362,7 +362,7 @@ export struct PracticeAttemptPage {
               .onClick(() => this.showQuestionNavigation = !this.showQuestionNavigation);
             if (this.hasPreviousContext()) {
               Text(this.showPreviousAnswer ? '隐藏上次作答' : '显示上次作答')
-                .fontSize(this.scaled(12))
+                .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.PRIMARY)
                 .constraintSize({ minHeight: this.scaled(AppTheme.MIN_TOUCH_TARGET) })
@@ -396,19 +396,19 @@ export struct PracticeAttemptPage {
 
   @Builder
   private QuestionContent() {
-    Column({ space: this.scaled(16) }) {
+    Column({ space: this.scaled(AppTheme.READING_BODY_SIZE) }) {
       if (this.currentQuestion() !== null) {
-        Column({ space: this.scaled(12) }) {
+        Column({ space: this.scaled(AppTheme.CAPTION_SIZE) }) {
           Text(`第 ${this.currentQuestion()!.orderNo} 题`)
             .width('100%')
-            .fontSize(this.scaled(12))
+            .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
           Text(this.currentQuestion()!.stem)
             .width('100%')
-            .fontSize(this.scaled(20))
+            .fontSize(this.scaled(AppTheme.QUESTION_TEXT_SIZE))
             .fontWeight(FontWeight.Medium)
-            .lineHeight(this.scaled(30))
+            .lineHeight(this.scaled(AppTheme.QUESTION_TEXT_LINE_HEIGHT))
             .fontColor(AppTheme.TEXT);
 
           this.CurrentQuestionAnswer();
@@ -416,7 +416,7 @@ export struct PracticeAttemptPage {
           Column({ space: this.scaled(7) }) {
             Row() {
               Text(this.showNoteEditor ? '收起笔记' : (this.currentNote.length > 0 ? '编辑笔记' : '记笔记'))
-                .fontSize(this.scaled(13))
+                .fontSize(this.scaled(AppTheme.META_SIZE))
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.PRIMARY)
                 .constraintSize({ minHeight: this.scaled(AppTheme.MIN_TOUCH_TARGET) })
@@ -426,7 +426,7 @@ export struct PracticeAttemptPage {
               Blank();
               if (this.currentNote.length > 0 && !this.showNoteEditor) {
                 Text('已记录')
-                  .fontSize(this.scaled(11))
+                  .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
                   .fontColor(AppTheme.SUCCESS);
               }
             }
@@ -436,7 +436,7 @@ export struct PracticeAttemptPage {
               TextInput({ placeholder: '记录这道题的思路、易错点…', text: this.currentNote })
                 .width('100%')
                 .height(this.scaled(AppTheme.INPUT_HEIGHT))
-                .fontSize(this.scaled(14))
+                .fontSize(this.scaled(AppTheme.FORM_TEXT_SIZE))
                 .backgroundColor(AppTheme.SURFACE_SUBTLE)
                 .border({ width: 1, color: AppTheme.BORDER })
                 .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -451,30 +451,30 @@ export struct PracticeAttemptPage {
             Column({ space: this.scaled(6) }) {
               Text('上次练习')
                 .width('100%')
-                .fontSize(this.scaled(12))
+                .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
                 .fontWeight(FontWeight.Medium)
                 .fontColor(AppTheme.SUBTEXT);
               if (this.previousAnswerFor(this.currentQuestion()!.id) !== null) {
                 Text(`上次作答：${this.previousAnswerFor(this.currentQuestion()!.id)!.answerValue}`)
                   .width('100%')
-                  .fontSize(this.scaled(14))
+                  .fontSize(this.scaled(AppTheme.ACTION_TEXT_SIZE))
                   .fontColor(AppTheme.TEXT);
                 Text(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ? '上次答对' : '上次需订正')
                   .width('100%')
-                  .fontSize(this.scaled(12))
+                  .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
                   .fontColor(this.previousAnswerFor(this.currentQuestion()!.id)!.correct ?
                     AppTheme.SUCCESS : AppTheme.WARNING);
               }
               if (this.previousNoteFor(this.currentQuestion()!.id) !== null) {
                 Text(`上次笔记：${this.previousNoteFor(this.currentQuestion()!.id)!.content}`)
                   .width('100%')
-                  .fontSize(this.scaled(12))
-                  .lineHeight(this.scaled(18))
+                  .fontSize(this.scaled(AppTheme.CAPTION_SIZE))
+                  .lineHeight(this.scaled(AppTheme.META_LINE_HEIGHT))
                   .fontColor(AppTheme.SUBTEXT);
               }
             }
             .width('100%')
-            .padding(this.scaled(12))
+            .padding(this.scaled(AppTheme.CAPTION_SIZE))
             .backgroundColor(AppTheme.SURFACE_SUBTLE)
             .borderRadius(AppTheme.CONTROL_RADIUS);
           }
@@ -488,20 +488,20 @@ export struct PracticeAttemptPage {
           Column({ space: this.scaled(8) }) {
             Text(this.hintVisible ? '收起提示' : '需要提示？')
               .width('100%')
-              .fontSize(this.scaled(13))
+              .fontSize(this.scaled(AppTheme.META_SIZE))
               .fontWeight(FontWeight.Medium)
               .fontColor(AppTheme.PRIMARY)
               .onClick(() => this.hintVisible = !this.hintVisible);
             if (this.hintVisible) {
               Text(this.currentQuestion()!.hints[0])
                 .width('100%')
-                .fontSize(this.scaled(13))
-                .lineHeight(this.scaled(20))
+                .fontSize(this.scaled(AppTheme.META_SIZE))
+                .lineHeight(this.scaled(AppTheme.QUESTION_TEXT_SIZE))
                 .fontColor(AppTheme.SUBTEXT);
             }
           }
           .width('100%')
-          .padding(this.scaled(14))
+          .padding(this.scaled(AppTheme.ACTION_TEXT_SIZE))
           .backgroundColor(AppTheme.PRIMARY_FAINT)
           .borderRadius(AppTheme.CONTROL_RADIUS);
         }
@@ -510,9 +510,9 @@ export struct PracticeAttemptPage {
       if (this.errorMessage.length > 0) {
         Text(this.errorMessage)
           .width('100%')
-          .fontSize(this.scaled(13))
+          .fontSize(this.scaled(AppTheme.META_SIZE))
           .fontColor(AppTheme.DANGER)
-          .padding(this.scaled(12))
+          .padding(this.scaled(AppTheme.CAPTION_SIZE))
           .backgroundColor(AppTheme.DANGER_SOFT)
           .borderRadius(AppTheme.CONTROL_RADIUS);
       }
@@ -528,7 +528,7 @@ export struct PracticeAttemptPage {
           Button('上一题', { type: ButtonType.Normal })
             .layoutWeight(1)
             .height(this.scaled(AppTheme.BUTTON_HEIGHT))
-            .fontSize(this.scaled(14))
+            .fontSize(this.scaled(AppTheme.ACTION_TEXT_SIZE))
             .backgroundColor(AppTheme.SURFACE_EMPHASIS)
             .fontColor(this.currentIndex > 0 ? AppTheme.TEXT : AppTheme.DISABLED)
             .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -538,7 +538,7 @@ export struct PracticeAttemptPage {
             Button('下一题', { type: ButtonType.Normal })
               .layoutWeight(2)
               .height(this.scaled(AppTheme.BUTTON_HEIGHT))
-              .fontSize(this.scaled(14))
+              .fontSize(this.scaled(AppTheme.ACTION_TEXT_SIZE))
               .backgroundColor(AppTheme.PRIMARY)
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -548,7 +548,7 @@ export struct PracticeAttemptPage {
             Button(this.submitting ? '交卷中…' : '交卷', { type: ButtonType.Normal })
               .layoutWeight(2)
               .height(this.scaled(AppTheme.BUTTON_HEIGHT))
-              .fontSize(this.scaled(14))
+              .fontSize(this.scaled(AppTheme.ACTION_TEXT_SIZE))
               .backgroundColor(this.submitting ? AppTheme.DISABLED : AppTheme.PRIMARY)
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -562,7 +562,7 @@ export struct PracticeAttemptPage {
           left: this.scaled(AppTheme.PAGE_PADDING),
           right: this.scaled(AppTheme.PAGE_PADDING),
           top: this.scaled(10),
-          bottom: this.scaled(14)
+          bottom: this.scaled(AppTheme.ACTION_TEXT_SIZE)
         });
       }
       .width('100%')
