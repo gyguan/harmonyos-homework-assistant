@@ -92,6 +92,7 @@ for token in [
     "PAGE_PADDING_COMPACT",
     "PAGE_PADDING_MEDIUM",
     "PAGE_PADDING_EXPANDED",
+    "PANEL_PADDING",
     "LIST_CARD_MIN_HEIGHT",
     "METRIC_CARD_MIN_HEIGHT",
     "INBOX_CARD_MIN_HEIGHT",
@@ -133,10 +134,37 @@ for title_contract in [
 ]:
     require(title_contract in theme, f"AppTheme title hierarchy drifted: {title_contract}")
 # Business UI text must not regress below the project 12fp floor.
+# Device-named card/page tokens and feature-private readable widths are compatibility aliases only.
+legacy_layout_tokens = [
+    "HOME_READABLE_MAX_WIDTH",
+    "ASSIGNMENT_LIST_READABLE_MAX_WIDTH",
+    "ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH",
+    "STUDY_READABLE_MAX_WIDTH",
+    "STUDY_SPLIT_MAX_WIDTH",
+    "PARENT_HOME_READABLE_MAX_WIDTH",
+    "PARENT_HOME_PAD_CONTENT_MAX_WIDTH",
+    "PARENT_PROGRESS_READABLE_MAX_WIDTH",
+    "PARENT_PROGRESS_REVIEW_MAX_WIDTH",
+    "PARENT_DEEP_READABLE_MAX_WIDTH",
+    "IMPORT_READABLE_MAX_WIDTH",
+    "PROFILE_READABLE_MAX_WIDTH",
+    "PRACTICE_READABLE_MAX_WIDTH",
+    "PRACTICE_ATTEMPT_READABLE_MAX_WIDTH",
+    "SETTINGS_READABLE_MAX_WIDTH",
+    "PHONE_PAGE_PADDING",
+    "PHONE_SECTION_GAP",
+    "PHONE_CARD_PADDING",
+    "PHONE_CARD_RADIUS",
+]
 for ui_file in (ROOT / "entry/src/main/ets").rglob("*.ets"):
     ui_source = ui_file.read_text(encoding="utf-8")
+    relative = ui_file.relative_to(ROOT)
     require(".fontSize(10)" not in ui_source and ".fontSize(11)" not in ui_source,
-            f"business UI text must not use 10/11fp hardcoded sizes: {ui_file.relative_to(ROOT)}")
+            f"business UI text must not use 10/11fp hardcoded sizes: {relative}")
+    if ui_file.name != "AppTheme.ets":
+        for legacy_token in legacy_layout_tokens:
+            require(f"AppTheme.{legacy_token}" not in ui_source,
+                    f"UI must use shared semantic layout tokens instead of {legacy_token}: {relative}")
 
     # ArkUI ButtonAttribute supports fontSize/fontWeight but not lineHeight.
     # Inspect each Button chain only until its first semicolon so later Text(...).lineHeight(...)
