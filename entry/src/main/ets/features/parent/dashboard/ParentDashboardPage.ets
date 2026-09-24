@@ -37,13 +37,18 @@ export struct ParentDashboardPage {
         Text('布置作业')
           .width('100%')
           .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
         Text('输入文字、拍照或相册识别')
           .width('100%')
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
@@ -87,13 +92,18 @@ export struct ParentDashboardPage {
         Text('语音作业')
           .width('100%')
           .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
         Text('使用语音和图片快速布置')
           .width('100%')
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
@@ -137,13 +147,18 @@ export struct ParentDashboardPage {
         Text('作业收件箱')
           .width('100%')
           .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
         Text('查看已导入的作业内容和整理记录')
           .width('100%')
-          .fontSize(12)
-          .lineHeight(18)
-          .fontColor(AppTheme.SUBTEXT);
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
       }
       .width('100%')
       .alignItems(HorizontalAlign.Start);
