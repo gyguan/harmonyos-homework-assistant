@@ -122,6 +122,12 @@ def main() -> int:
             "AVPlayer calls must live inside a positive canIUse branch for ArkTS SysCap analysis")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
+    require("let descriptor: media.AVFileDescriptor = { fd: source.fd };" in audio,
+            "AVPlayer local cache source must use the opened file descriptor directly")
+    require("player.prepare().catch" in audio and "releaseFailedPlayer(player)" in audio,
+            "AVPlayer prepare failures must be handled and release the failed player")
+    require("offset: 0, length: -1" not in audio,
+            "AVPlayer local source must not restore the legacy open-ended descriptor")
 
     require("throw error;" not in share_receive,
             "share receive flow must only throw explicit Error values")

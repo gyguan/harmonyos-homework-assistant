@@ -54,6 +54,10 @@ require("loadImage(index: number)" in pane and "prefetchNextImage" in pane and
         "student voice images must load on demand and prefetch the next image")
 require("pendingDownloads" in remote_resource,
         "resource downloads must deduplicate concurrent prefetch and foreground requests")
+require("invalidate(resourceId: string)" in remote_resource,
+        "resource cache must support invalidation after media decode failures")
+require("RemoteAssignmentResourceApi.instance.invalidate(resource.id)" in pane,
+        "voice playback failure must invalidate the cached audio before retry")
 require("void this.loadAudio(audio)" in pane and "正在加载语音…" in pane,
         "voice audio must load independently after the first image becomes visible")
 require("void this.load(this.lifecycleVersion)" in pane and

@@ -181,9 +181,11 @@ export struct VoiceAssignmentPane {
         this.currentTimeMs = timeMs;
         this.notifyMediaState();
       },
-      onError: (_message: string) => {
+      onError: (message: string) => {
         this.audioLoading = false;
         this.playing = false;
+        RemoteAssignmentResourceApi.instance.invalidate(resource.id);
+        console.error(`[VoiceAssignmentPane] audio playback failed: ${message}`);
         this.audioLoadMessage = '语音播放暂时不可用，请稍后重试';
         this.notifyMediaState();
       }
