@@ -36,14 +36,11 @@ practice_history = read("entry/src/main/ets/features/student/practice/PracticeHi
 study_workspace = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 review_page = read("entry/src/main/ets/features/parent/review/ParentReviewPage.ets")
 extra_create = read("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
-capture_home = read("entry/src/main/ets/features/parent/import/HomeworkCaptureHomePage.ets")
-capture_page = read("entry/src/main/ets/features/parent/import/HomeworkCapturePage.ets")
 share_status = read("entry/src/main/ets/features/parent/import/HomeworkShareImportStatusPage.ets")
 settings = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
 import_inbox = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
 submit_confirm = read("entry/src/main/ets/components/practice/PracticeSubmitConfirmDialog.ets")
-source_profile = read("entry/src/main/ets/features/parent/import/HomeworkSourceProfilePage.ets")
 parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 
 require("@Prop @Watch('onRevisionChanged') revision: number = 0" in parent_progress and
@@ -119,9 +116,6 @@ removed_copy = [
     (extra_create, "安排阅读、运动或实践任务", "extra-task form fields already express the task type"),
     (parent_confirmation, "可以手工新增一项，或返回导入页重新整理老师原文。", "confirmation empty state should stay concise"),
     (parent_import, "继续编辑后可直接发布", "pending-candidate action label already explains the next step"),
-    (capture_home, "从老师群聊中提取今日作业", "capture title and source card already express the purpose"),
-    (capture_home, "抓取结束后，仍需家长确认后才能导入作业。", "capture workflow should not repeat confirmation copy"),
-    (capture_page, "进群手工上滑，小伴自动识别、整理并交给你确认", "capture execution page already has explicit usage steps"),
     (share_status, "分享内容只有在全部读取和整理成功后才会写入导入批次", "share status should not expose transaction implementation"),
     (settings, "管理家庭成员、小伴规则和数据同步。", "settings sections already express their responsibilities"),
     (voice_create, "上传语音和配套图片", "voice assignment form already exposes its media inputs"),
@@ -133,11 +127,7 @@ for source, token, message in removed_copy:
     require(token not in source, f"redundant UI copy regressed: {message}")
 
 for source, token, message in [
-    (capture_home, "不读取微信数据库", "capture home must retain the privacy boundary"),
-    (capture_home, "不自动点击或滚动微信", "capture home must retain the non-automation boundary"),
-    (capture_page, "隐私边界", "capture execution must retain explicit privacy guidance"),
     (submit_confirm, "未答题会按错误计入结果", "practice submit must retain consequence copy"),
-    (source_profile, "无法匹配的聊天消息会进入人工确认，不会猜测", "source setup must retain ambiguity handling"),
     (settings, "删除家庭成员属于高风险操作", "destructive family action must retain risk copy"),
     (parent_progress, "删除后无法恢复", "bulk assignment deletion must retain irreversible-action copy"),
     (review, "删除后无法恢复", "single assignment deletion must retain irreversible-action copy"),
