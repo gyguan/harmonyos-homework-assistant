@@ -350,7 +350,8 @@ export struct ParentVoiceAssignmentPage {
         Text('作业名称').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         Row() {
           Text(this.title)
-            .fontSize(14)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
@@ -456,7 +457,8 @@ export struct ParentVoiceAssignmentPage {
 
       Text('支持 mp3 / m4a / wav，单个文件不超过 20MB。')
         .width('100%')
-        .fontSize(12)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
     }
     .width('100%');
@@ -566,7 +568,8 @@ export struct ParentVoiceAssignmentPage {
     Column({ space: 12 }) {
       Text('从已上传的服务器素材中选择一组语音和图片')
         .width('100%')
-        .fontSize(11)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.TERTIARY_TEXT);
 
       Row({ space: 8 }) {
@@ -599,7 +602,8 @@ export struct ParentVoiceAssignmentPage {
         Text('没有找到可用的服务器语音文件夹')
           .width('100%')
           .padding({ top: 20, bottom: 20 })
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .textAlign(TextAlign.Center);
       } else {
@@ -652,7 +656,8 @@ export struct ParentVoiceAssignmentPage {
     Column({ space: 14 }) {
       Text('语音文件和情景图片会按顺序提供给学生')
         .width('100%')
-        .fontSize(11)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.TERTIARY_TEXT);
 
       this.AudioSection();
