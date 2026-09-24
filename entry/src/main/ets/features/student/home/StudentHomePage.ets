@@ -115,7 +115,7 @@ struct StudentTodayTaskCard {
     .width('100%')
     .alignItems(VerticalAlign.Center)
     .padding(this.emphasized ? 16 : 13)
-    .backgroundColor(this.emphasized ? AppTheme.PRIMARY_FAINT : AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: this.emphasized ? 1 : 0, color: this.emphasized ? AppTheme.PRIMARY : Color.Transparent })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
     .accessibilityGroup(true)
