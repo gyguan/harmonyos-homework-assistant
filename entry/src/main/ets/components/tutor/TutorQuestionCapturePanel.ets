@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize } from '../action/ActionControls';
 import { TutorQuestionCaptureResult, TutorQuestionCaptureService } from '../../application/tutor/TutorQuestionCaptureService';
 
 @Component
@@ -51,8 +51,8 @@ export struct TutorQuestionCapturePanel {
     Row({ space: 8 }) {
       ActionButton({
         label: this.capturing ? '识别中…' : '拍题',
-        kind: ActionButtonKind.SECONDARY,
-        compact: true,
+        kind: ActionButtonKind.OUTLINE,
+        size: ActionButtonSize.SMALL,
         isEnabled: !this.capturing,
         onAction: (): void => { void this.capture(); }
       });
