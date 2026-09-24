@@ -271,7 +271,7 @@ export struct PracticeResultPage {
               Row() {
                 Text(this.result.wrongCount > 0 && !this.showAllQuestions ? '错题优先 · 答题回顾' : '答题回顾')
                   .layoutWeight(1)
-                  .fontSize(18)
+                  .fontSize(AppTheme.SECTION_TITLE_SIZE)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.TEXT);
                 if (this.result.wrongCount > 0) {
