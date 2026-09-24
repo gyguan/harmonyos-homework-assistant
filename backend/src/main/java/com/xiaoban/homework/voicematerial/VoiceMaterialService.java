@@ -276,10 +276,13 @@ public class VoiceMaterialService {
         .findFirstByFamilyIdAndPackageIdOrderByCreatedAtDesc(item.familyId, item.id)
         .orElse(null);
     boolean hasCreatedBefore = latest != null;
-    boolean hasActiveAssignment = latest != null && assignments.findById(latest.assignmentId)
-        .filter(assignment -> item.familyId.equals(assignment.familyId))
-        .filter(assignment -> !"COMPLETED".equals(assignment.status))
-        .isPresent();
+    boolean hasActiveAssignment = taskLinks
+        .findByFamilyIdAndPackageIdOrderByCreatedAtDesc(item.familyId, item.id)
+        .stream()
+        .anyMatch(link -> assignments.findById(link.assignmentId)
+            .filter(assignment -> item.familyId.equals(assignment.familyId))
+            .filter(assignment -> !"COMPLETED".equals(assignment.status))
+            .isPresent());
     String latestAssignmentId = latest == null ? "" : latest.assignmentId;
     long latestUsedAt = latest == null || latest.createdAt == null
         ? 0L : latest.createdAt.toEpochMilli();
