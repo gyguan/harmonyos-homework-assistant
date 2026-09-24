@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import json
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
+SYSCAP = ROOT / "entry/src/main/syscap.json"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
 PARENT_IMPORT_NAV = ROOT / "entry/src/main/ets/app/navigation/ParentImportNavigator.ets"
 APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
@@ -54,6 +56,7 @@ def validate_qualified_model_imports() -> None:
 def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
+    syscap = json.loads(SYSCAP.read_text(encoding="utf-8"))
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
     parent_import_nav = PARENT_IMPORT_NAV.read_text(encoding="utf-8")
     app_shell = APP_SHELL.read_text(encoding="utf-8")
@@ -115,10 +118,20 @@ def main() -> int:
     require("PARENT_VOICE_MATERIAL" not in app_routes and "PARENT_VOICE_MATERIAL" not in app_shell,
             "legacy standalone voice-material navigation must not reappear")
 
-    syscap = "SystemCapability.Multimedia.Media.AVPlayer"
-    require(audio.count(f"canIUse('{syscap}')") >= 2,
+    syscap_name = "SystemCapability.Multimedia.Media.AVPlayer"
+    require(SYSCAP.exists(), "entry module must declare syscap.json for optional AVPlayer development capability")
+    general_devices = syscap.get("devices", {}).get("general", [])
+    development_caps = syscap.get("development", {}).get("addedSysCaps", [])
+    production_removed_caps = syscap.get("production", {}).get("removedSysCaps", [])
+    require("default" in general_devices and "tablet" in general_devices,
+            "syscap.json must align with the app's Phone/Tablet delivery scope")
+    require(syscap_name in development_caps,
+            "AVPlayer must be in development.addedSysCaps to avoid unsupported-device compile warnings")
+    require(syscap_name in production_removed_caps,
+            "optional AVPlayer capability must stay out of the production required capability set")
+    require(audio.count(f"canIUse('{syscap_name}')") >= 2,
             "AVPlayer create/seek paths must be guarded by canIUse")
-    require(f"if (canIUse('{syscap}'))" in audio,
+    require(f"if (canIUse('{syscap_name}'))" in audio,
             "AVPlayer calls must live inside a positive canIUse branch for ArkTS SysCap analysis")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
