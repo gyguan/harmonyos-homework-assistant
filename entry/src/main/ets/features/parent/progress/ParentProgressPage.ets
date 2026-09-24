@@ -3,7 +3,6 @@ import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
-import { AssignmentMetricKey, AssignmentMetricSummary } from '../../../components/assignment/AssignmentMetricSummary';
 import { FilterSummaryEntry } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentDateFilter, AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
@@ -21,7 +20,6 @@ export struct ParentProgressPage {
   @State private allDates: boolean = false;
   @State private selectedDayEpochMs: number = Date.now();
   @State private subjectCode: string = 'ALL';
-  @State private statusFilter: AssignmentMetricKey = AssignmentMetricKey.ALL;
   @State private draftAllDates: boolean = false;
   @State private draftSelectedDayEpochMs: number = Date.now();
   @State private draftSubjectCode: string = 'ALL';
@@ -66,22 +64,6 @@ export struct ParentProgressPage {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentProgressReviewRequirement());
   }
 
-  private statuses(): AssignmentStatus[] {
-    if (this.statusFilter === AssignmentMetricKey.PENDING) {
-      return [
-        AssignmentStatus.NOT_STARTED,
-        AssignmentStatus.IN_PROGRESS,
-        AssignmentStatus.PAUSED,
-        AssignmentStatus.READY_TO_SUBMIT,
-        AssignmentStatus.NEEDS_REWORK,
-        AssignmentStatus.OVERDUE
-      ];
-    }
-    if (this.statusFilter === AssignmentMetricKey.SUBMITTED) return [AssignmentStatus.SUBMITTED];
-    if (this.statusFilter === AssignmentMetricKey.COMPLETED) return [AssignmentStatus.COMPLETED];
-    return [];
-  }
-
   private rebuildView(): void {
     let currentRevision = this.revision + this.refreshRevision;
     if (currentRevision < 0) return;
@@ -94,17 +76,7 @@ export struct ParentProgressPage {
 
   private applyScopedItems(items: Assignment[]): void {
     this.scopedAssignments = items.slice();
-    this.applyItems(this.filterByStatus(this.scopedAssignments));
-  }
-
-  private filterByStatus(items: Assignment[]): Assignment[] {
-    let statuses = this.statuses();
-    if (statuses.length === 0) return items.slice();
-    let accepted: Assignment[] = [];
-    for (let item of items) {
-      if (statuses.indexOf(item.status) >= 0) accepted.push(item);
-    }
-    return accepted;
+    this.applyItems(this.scopedAssignments);
   }
 
   private applyItems(items: Assignment[]): void {
@@ -298,13 +270,6 @@ export struct ParentProgressPage {
     }
   }
 
-  private chooseStatus(value: AssignmentMetricKey): void {
-    if (this.statusFilter === value || this.querying) return;
-    this.statusFilter = value;
-    if (this.bulkMode) this.selectedDeleteIds = [];
-    this.applyItems(this.filterByStatus(this.scopedAssignments));
-  }
-
   private openAssignment(item: Assignment): void {
     if (this.bulkMode) {
       this.toggleDeleteSelection(item);
@@ -316,38 +281,6 @@ export struct ParentProgressPage {
 
   private isSelected(item: Assignment): boolean {
     return this.canUseReviewPane() && this.selectedAssignmentId === item.id;
-  }
-
-  private metricAssignments(): Assignment[] {
-    return this.scopedAssignments;
-  }
-
-  private allCount(): number {
-    return this.metricAssignments().length;
-  }
-
-  private pendingCount(): number {
-    let count = 0;
-    for (let item of this.metricAssignments()) {
-      if (item.status !== AssignmentStatus.SUBMITTED && item.status !== AssignmentStatus.COMPLETED) count++;
-    }
-    return count;
-  }
-
-  private submittedCount(): number {
-    let count = 0;
-    for (let item of this.metricAssignments()) {
-      if (item.status === AssignmentStatus.SUBMITTED) count++;
-    }
-    return count;
-  }
-
-  private completedCount(): number {
-    let count = 0;
-    for (let item of this.metricAssignments()) {
-      if (item.status === AssignmentStatus.COMPLETED) count++;
-    }
-    return count;
   }
 
   private isSelectedDayToday(): boolean {
@@ -378,13 +311,6 @@ export struct ParentProgressPage {
     if (value === 'ENGLISH') return '英语';
     if (value === 'OTHER') return '其他';
     return '全部科目';
-  }
-
-  private statusLabel(value: AssignmentMetricKey): string {
-    if (value === AssignmentMetricKey.PENDING) return '待完成';
-    if (value === AssignmentMetricKey.SUBMITTED) return '待验收';
-    if (value === AssignmentMetricKey.COMPLETED) return '已完成';
-    return '全部任务';
   }
 
   @Builder
@@ -421,34 +347,32 @@ export struct ParentProgressPage {
   }
 
   @Builder
-  private StatusSummary() {
-    AssignmentMetricSummary({
-      allCount: this.allCount(),
-      pendingCount: this.pendingCount(),
-      submittedCount: this.submittedCount(),
-      completedCount: this.completedCount(),
-      selectedKey: this.statusFilter,
-      interactive: true,
-      onSelect: (key: AssignmentMetricKey) => this.chooseStatus(key)
-    });
-  }
-
-  @Builder
   private ListContent() {
     Column({ space: 16 }) {
-      Row({ space: 10 }) {
-        Column({ space: 3 }) {
-          Text('作业进度').fontSize(AppTheme.PAGE_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-        }
-        .layoutWeight(1)
-        .alignItems(HorizontalAlign.Start);
+      this.FilterBar();
+      this.BulkDeleteToolbar();
+      if (this.deleteMessage.length > 0) {
+        Text(this.deleteMessage).width('100%').fontSize(13).fontColor(AppTheme.DANGER);
+      }
+
+      Row({ space: 8 }) {
+        Text(this.querying ? '查询中…' :
+          `${this.dateLabel()} · ${this.subjectLabel(this.subjectCode)}`)
+          .layoutWeight(1)
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT);
+        Text(`${this.currentVisibleAssignments().length} 项`)
+          .fontSize(13)
+          .fontColor(AppTheme.SUBTEXT);
         if (this.deletableVisibleAssignments().length > 0 || this.bulkMode) {
-          Text(this.bulkMode ? '完成' : '管理')
+          Text(this.bulkMode ? '完成' : '删除')
             .fontSize(13)
             .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.PRIMARY)
+            .fontColor(this.bulkMode ? AppTheme.PRIMARY : AppTheme.DANGER)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .padding({ left: 10, right: 10 })
+            .padding({ left: 8, right: 2 })
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText(this.bulkMode ? '完成删除选择' : '选择要删除的作业')
             .onClick(() => {
               if (this.bulkMode) this.exitBulkMode();
               else this.enterBulkMode();
@@ -456,30 +380,13 @@ export struct ParentProgressPage {
         }
       }
       .width('100%')
-      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
       .alignItems(VerticalAlign.Center);
-
-      this.StatusSummary();
-      this.FilterBar();
-      this.BulkDeleteToolbar();
-      if (this.deleteMessage.length > 0) {
-        Text(this.deleteMessage).width('100%').fontSize(13).fontColor(AppTheme.DANGER);
-      }
-
-      Row() {
-        Text(this.querying ? '查询中…' :
-          `${this.dateLabel()} · ${this.subjectLabel(this.subjectCode)} · ${this.statusLabel(this.statusFilter)}`)
-          .fontSize(13).fontColor(AppTheme.SUBTEXT);
-        Blank();
-        Text(`${this.currentVisibleAssignments().length} 项`).fontSize(13).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%');
 
       if (this.currentVisibleAssignments().length === 0) {
         Column({ space: 7 }) {
           SymbolGlyph($r('sys.symbol.checkmark_circle')).fontSize(28).fontColor([AppTheme.TERTIARY_TEXT]);
           Text('当前筛选下没有作业').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Text('可以调整日期、科目或任务状态。').fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('可以调整日期或科目。').fontSize(13).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding({ top: 30, bottom: 30 });
       } else {
