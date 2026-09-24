@@ -49,6 +49,9 @@ for token in [
     "CARD_TITLE_SIZE",
     "LABEL_TITLE_SIZE",
     "PARENT_DEEP_READABLE_MAX_WIDTH",
+    "PARENT_HOME_ACTION_CARD_MIN_HEIGHT",
+    "PARENT_HOME_ACTION_ICON_SIZE",
+    "PARENT_HOME_ACTION_CARD_PADDING",
 ]:
     require(f"static readonly {token}" in theme, f"AppTheme missing durable design token: {token}")
 
@@ -244,6 +247,18 @@ for card_path, card_source in [
             f"{card_path} must use the shared ordinary card surface")
 require("backgroundColor(AppTheme.PRIMARY_FAINT)" not in parent_dashboard,
         "Parent dashboard action cards must not use a different fill for 布置作业")
+require(parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT") == 3 and
+        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_ICON_SIZE") >= 6 and
+        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_PADDING") == 3,
+        "Parent dashboard action cards must share one size specification")
+require(parent_dashboard.count(".fontSize(AppTheme.CARD_TITLE_SIZE)") >= 3 and
+        parent_dashboard.count(".fontWeight(FontWeight.Bold)") >= 3,
+        "Parent dashboard action card titles must use one title specification")
+require("private PhoneHome()" in parent_dashboard and
+        "this.CreateAssignmentAction();" in parent_dashboard and
+        "this.CreateVoiceAction();" in parent_dashboard and
+        "this.AssignmentInboxAction();" in parent_dashboard,
+        "Parent dashboard Phone layout must keep all three actions in the same full-width stack")
 require("backgroundColor(this.parentActive ? AppTheme.PRIMARY_FAINT" not in identity_switcher and
         "AppTheme.PRIMARY_FAINT : AppTheme.SURFACE" not in identity_switcher,
         "Identity switcher cards must keep one surface and use border/checkmark for selection")
