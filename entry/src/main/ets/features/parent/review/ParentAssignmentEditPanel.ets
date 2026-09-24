@@ -1,5 +1,6 @@
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { Assignment } from '../../../domain/model/HomeworkModels';
@@ -124,35 +125,31 @@ export struct ParentAssignmentEditPanel {
           .fontSize(12)
           .fontColor(AppTheme.WARNING);
         Row({ space: 10 }) {
-          Button('继续编辑', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-            .fontColor(AppTheme.TEXT)
-            .onClick(() => this.confirmDiscard = false);
-          Button('放弃修改', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.DANGER_SOFT)
-            .fontColor(AppTheme.DANGER)
-            .onClick(() => {
+          ActionButton({
+            label: '继续编辑',
+            kind: ActionButtonKind.NEUTRAL,
+            compact: true,
+            onClick: () => this.confirmDiscard = false
+          })
+          .layoutWeight(1);
+          ActionButton({
+            label: '放弃修改',
+            kind: ActionButtonKind.DANGER_SOFT,
+            compact: true,
+            onClick: () => {
               this.onCancel();
-            });
+            }
+          })
+          .layoutWeight(1);
         }
         .width('100%');
       } else {
-        Button(this.saving ? '保存中…' : '保存修改', { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(this.canSave())
-          .backgroundColor(this.canSave() ? AppTheme.PRIMARY : AppTheme.DISABLED)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .onClick(() => this.onSave(this.buildAssignment()));
+        ActionButton({
+          label: this.saving ? '保存中…' : '保存修改',
+          isEnabled: this.canSave(),
+          onClick: () => this.onSave(this.buildAssignment())
+        })
+        .width('100%');
       }
     }
     .width('100%')
