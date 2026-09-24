@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
@@ -13,6 +14,17 @@ APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
 APP_ROUTES = ROOT / "entry/src/main/ets/app/navigation/AppRoutes.ets"
 VOICE_MATERIAL_API = ROOT / "entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets"
 VOICE_MATERIAL_PICKER = ROOT / "entry/src/main/ets/application/assignment/VoiceMaterialDirectoryPicker.ets"
+ETS_ROOT = ROOT / "entry/src/main/ets"
+QUALIFIED_MODEL_SYMBOLS = [
+    "AssignmentStatus",
+    "AssignmentType",
+    "AssignmentContentType",
+    "AssignmentBacking",
+    "AssignmentResourceType",
+    "Subject",
+    "SubmissionType",
+    "HomeworkImportSourceKind",
+]
 
 errors: list[str] = []
 
@@ -20,6 +32,26 @@ errors: list[str] = []
 def require(condition: bool, message: str) -> None:
     if not condition:
         errors.append(message)
+
+
+def imports_symbol(source: str, symbol: str) -> bool:
+    if re.search(rf"\b(?:enum|class|interface|type)\s+{re.escape(symbol)}\b", source):
+        return True
+    for match in re.finditer(r"import\s*\{([^}]*)\}\s*from", source, flags=re.S):
+        names = [part.strip().split(" as ")[0].strip() for part in match.group(1).split(",")]
+        if symbol in names:
+            return True
+    return False
+
+
+def validate_qualified_model_imports() -> None:
+    for file in ETS_ROOT.rglob("*.ets"):
+        source = file.read_text(encoding="utf-8")
+        for symbol in QUALIFIED_MODEL_SYMBOLS:
+            if re.search(rf"\b{re.escape(symbol)}\s*\.", source) and not imports_symbol(source, symbol):
+                relative = file.relative_to(ROOT)
+                errors.append(
+                    f"{relative} uses {symbol}. but does not import or declare {symbol}")
 
 
 def main() -> int:
@@ -114,6 +146,8 @@ def main() -> int:
     for method in ["finishShareImportReady", "finishShareImportEmpty", "cancelShareImport"]:
         require(f"private {method}(): void" in app_shell,
                 f"AppShell missing typed share-import callback: {method}")
+
+    validate_qualified_model_imports()
 
     if errors:
         print("ARKTS_COMPILE_SAFETY_FAIL")
