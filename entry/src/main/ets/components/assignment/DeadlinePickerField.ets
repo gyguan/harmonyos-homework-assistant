@@ -13,14 +13,17 @@ export struct DeadlinePickerDialog {
       Row() {
         Column({ space: 2 }) {
           Text('选择截止时间')
-            .fontSize(20)
-            .fontWeight(FontWeight.Bold)
+            .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+            .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
         Text('关闭')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 12, right: 4 })
@@ -31,7 +34,7 @@ export struct DeadlinePickerDialog {
       .width('100%');
 
       Column({ space: 6 }) {
-        Text('日期').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('日期').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         DatePicker({
           start: new Date(),
           end: new Date(new Date().getFullYear() + 3, 11, 31),
@@ -48,7 +51,7 @@ export struct DeadlinePickerDialog {
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 6 }) {
-        Text('时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('时间').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         TimePicker({ selected: this.selectedTime })
           .width('100%')
           .height(130)
@@ -143,14 +146,18 @@ export struct DeadlinePickerField {
         Column({ space: 3 }) {
           Text(this.value.length > 0 ? this.value : '未设置截止时间')
             .width('100%')
-            .fontSize(14)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.META_MAX_LINES)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
             .fontColor(this.value.length > 0 ? AppTheme.TEXT : AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
         Text('选择')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -166,7 +173,8 @@ export struct DeadlinePickerField {
 
       if (this.allowClear && this.value.length > 0) {
         Text('清除')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
           .textAlign(TextAlign.Center)
