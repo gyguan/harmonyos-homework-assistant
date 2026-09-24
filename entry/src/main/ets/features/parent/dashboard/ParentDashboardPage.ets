@@ -56,7 +56,7 @@ export struct ParentDashboardPage {
           .fontSize(17)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
-        Text('输入文字或导入作业内容')
+        Text('输入文字、拍照或相册识别')
           .width('100%')
           .fontSize(12)
           .lineHeight(18)
@@ -73,7 +73,7 @@ export struct ParentDashboardPage {
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText('布置作业，输入文字或导入作业内容')
+    .accessibilityText('布置作业，输入文字、拍照或相册识别')
     .onClick(() => this.onOpenAssignment());
   }
 
