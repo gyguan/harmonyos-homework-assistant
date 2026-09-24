@@ -45,6 +45,7 @@ for token in [
     "BUTTON_HEIGHT",
     "PAGE_TITLE_SIZE",
     "SECTION_TITLE_SIZE",
+    "PARENT_DEEP_READABLE_MAX_WIDTH",
 ]:
     require(f"static readonly {token}" in theme, f"AppTheme missing durable design token: {token}")
 
@@ -190,7 +191,11 @@ student_switcher = read_optional("entry/src/main/ets/components/family/StudentSw
 app_shell = read_optional("entry/src/main/ets/pages/AppShell.ets")
 student_home = read_optional("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 voice_assignment = read_optional("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+parent_extra_assignment = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
+parent_review_page = read_optional("entry/src/main/ets/features/parent/review/ParentReviewPage.ets")
+homework_import_route = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
 homework_import = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
+homework_confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 for card_path, card_source in [
     ("ParentDashboardPage", parent_dashboard),
     ("IdentitySwitcherDialog", identity_switcher),
@@ -216,6 +221,24 @@ require("private PendingReview()" in homework_import and
         ".backgroundColor(AppTheme.CARD_SURFACE)" in homework_import and
         "backgroundColor(AppTheme.PRIMARY_FAINT)" not in between(homework_import, "private PendingReview()", "private RecognitionActions()"),
         "Homework import pending-review card must use the shared ordinary card surface")
+
+for deep_page_name, deep_page_source in [
+    ("ParentExtraAssignmentPage", parent_extra_assignment),
+    ("ParentVoiceAssignmentPage", voice_assignment),
+    ("ParentReviewPage", parent_review_page),
+    ("HomeworkImportRoutePage", homework_import_route),
+    ("HomeworkConfirmationPage", homework_confirmation),
+]:
+    require("AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH" in deep_page_source,
+            f"{deep_page_name} must use the shared parent deep-page readable width")
+
+require("left: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import and
+        "right: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING" in homework_import,
+        "embedded HomeworkImportPage must not add a second horizontal page padding")
+require("AppTheme.PHONE_PAGE_PADDING" not in homework_confirmation and
+        "left: AppTheme.PAGE_PADDING" in homework_confirmation and
+        "right: AppTheme.PAGE_PADDING" in homework_confirmation,
+        "Homework confirmation must align to the shared parent deep-page horizontal padding")
 
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
