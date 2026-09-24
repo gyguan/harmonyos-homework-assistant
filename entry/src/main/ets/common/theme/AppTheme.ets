@@ -50,11 +50,9 @@ export class AppTheme {
   static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1400;
   // Shared readable width for parent deep pages such as create, review and confirmation flows.
   static readonly PARENT_DEEP_READABLE_MAX_WIDTH: number = 1040;
-  static readonly PARENT_REVIEW_READABLE_MAX_WIDTH: number = 1040;
   static readonly IMPORT_READABLE_MAX_WIDTH: number = 1080;
   static readonly CAPTURE_HOME_READABLE_MAX_WIDTH: number = 720;
   static readonly IMPORT_SPLIT_MAX_WIDTH: number = 1280;
-  static readonly CONFIRMATION_READABLE_MAX_WIDTH: number = 1080;
   static readonly PROFILE_READABLE_MAX_WIDTH: number = 900;
   static readonly PRACTICE_READABLE_MAX_WIDTH: number = 1120;
   static readonly PRACTICE_ATTEMPT_READABLE_MAX_WIDTH: number = 1120;
