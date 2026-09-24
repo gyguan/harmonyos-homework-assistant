@@ -76,7 +76,9 @@ export struct ParentVoiceAssignmentPage {
     this.selectedFolderId = item.packageId;
     this.subject = this.viewModel.subjectFromCode(item.subjectCode);
     this.expectedMinutesText = `${item.expectedMinutes > 0 ? item.expectedMinutes : 15}`;
-    if (this.title.trim().length === 0) this.title = item.directoryName;
+    if (this.title.trim().length === 0) {
+      this.title = this.subjectLabel(item.subjectCode) + ' · 语音作业';
+    }
     this.requestId = '';
     this.message = '';
   }
