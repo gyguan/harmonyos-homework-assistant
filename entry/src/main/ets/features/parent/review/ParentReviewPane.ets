@@ -233,7 +233,7 @@ export struct ParentReviewPane {
     Column({ space: 8 }) {
       SymbolGlyph($r('sys.symbol.doc_text')).fontSize(30).fontColor([AppTheme.TERTIARY_TEXT]);
       Text(this.assignmentId.length === 0 ? '选择一项作业查看详情' : '这项作业暂时找不到')
-        .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
     }
     .width('100%')
     .alignItems(HorizontalAlign.Start)
