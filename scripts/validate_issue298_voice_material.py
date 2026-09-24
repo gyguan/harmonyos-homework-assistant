@@ -21,6 +21,7 @@ def require(condition: bool, message: str) -> None:
 
 asset_migration = read("backend/src/main/resources/db/migration/V15__voice_material_assets.sql")
 link_migration = read("backend/src/main/resources/db/migration/V17__voice_material_task_links.sql")
+link_unique_migration = read("backend/src/main/resources/db/migration/V18__voice_material_task_link_assignment_unique.sql")
 assignment_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialAssignmentService.java")
 query_service = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceTaskQueryService.java")
 controller = read("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java")
@@ -50,6 +51,9 @@ require("create table voice_material_task_link" in link_migration and
         "reusable voice folders must keep durable folder-to-task links")
 require("uq_voice_material_task_link_request" in link_migration,
         "manual folder assignment creation must support request idempotency")
+require("uq_voice_material_task_link_assignment" in link_unique_migration and
+        "(family_id, assignment_id)" in link_unique_migration,
+        "one Assignment must map to at most one source voice folder")
 require("update voice_material_package" in link_migration and "status = 'READY'" in link_migration,
         "legacy consumed folders must migrate back to reusable READY state")
 require("uq_voice_material_auto_daily" in asset_migration and
@@ -68,6 +72,10 @@ if len(manual_block) == 2:
         "public VoiceMaterialDtos.AutoCreateResponse autoCreateNext", 1)[0]
     require("findFirstVoiceMaterialTask" not in manual_body and "当前已有语音任务" not in manual_body,
             "manual creation must allow multiple active voice tasks")
+    require("requestId 已用于其他语音任务创建请求" in manual_body and
+            "previous.packageId.equals(packageId)" in manual_body and
+            "previous.studentId.equals(targetStudentId)" in manual_body,
+            "idempotent retries must reject reuse across a different folder or student")
 auto_block = assignment_service.split("public VoiceMaterialDtos.AutoCreateResponse autoCreateNext", 1)
 require(len(auto_block) == 2 and
         "assignments.findFirstVoiceMaterialTask(familyId, studentId)" in auto_block[1],
@@ -93,6 +101,15 @@ require("chooseAutoFolder" in assignment_service and "usageCount" in assignment_
 require('if ("CONSUMED".equals(item.status))' in assignment_service and
         'item.status = "READY"' in assignment_service,
         "legacy CONSUMED folders must remain reusable")
+
+# Task query must start from Assignment so local-upload voice tasks are not lost.
+require("from assignment a" in query_service and
+        "a.content_type = 'AUDIO_IMAGE'" in query_service and
+        "left join voice_material_task_link l" in query_service,
+        "voice task query must include AUDIO_IMAGE Assignments with or without source folders")
+require("from assignment_resource" in query_service and
+        '"本地上传"' in query_service,
+        "voice task detail must expose local-upload resources and source label")
 
 # Query contract must expose reusable-folder state directly.
 for token in ["USAGE_FILTERS", "usage_count", "active_task_count", "last_used_at",
@@ -125,6 +142,9 @@ require("createRequestId" in voice_page and "createFromFolder" in voice_vm,
         "server-folder creation must use an idempotent request id")
 require("queryFolders(" in voice_vm,
         "voice assignment ViewModel must use the reusable-folder query boundary")
+require("this.title = this.subjectLabel(item.subjectCode) + ' · 语音作业'" in voice_page and
+        "this.title = item.directoryName" not in voice_page,
+        "folder reuse must keep task naming independent from the folder name")
 
 require("Text('语音素材库')" not in dashboard and "onOpenVoiceMaterial" not in dashboard,
         "Parent Home must not expose the implementation concept 'voice material library'")
