@@ -20,7 +20,8 @@ export struct BottomPrimaryNavItem {
       .backgroundColor(this.selected ? AppTheme.PRIMARY_SOFT : Color.Transparent)
       .borderRadius(AppTheme.CHIP_RADIUS);
       Text(this.label)
-        .fontSize(11)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
         .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
     }
@@ -47,7 +48,8 @@ export struct SidePrimaryNavItem {
         .fontSize(23)
         .fontColor([this.selected ? AppTheme.PRIMARY : AppTheme.TERTIARY_TEXT]);
       Text(this.label)
-        .fontSize(13)
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
         .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
     }
