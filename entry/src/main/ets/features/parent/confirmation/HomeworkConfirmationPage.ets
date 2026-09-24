@@ -213,23 +213,23 @@ export struct HomeworkConfirmationPage {
       if (this.bulkMode) {
         TextAction({
           label: '全选',
-          onAction: () => this.selectAllCandidates()
+          onAction: (): void => this.selectAllCandidates()
         });
         TextAction({
           label: '完成',
-          onAction: () => this.exitBulkMode()
+          onAction: (): void => this.exitBulkMode()
         });
       } else {
         TextAction({
           label: '＋ 新增',
           accessibilityLabel: '手工新增一项作业',
-          onAction: () => this.addCandidate()
+          onAction: (): void => this.addCandidate()
         });
         if (this.candidates().length > 0) {
           TextAction({
             label: '管理',
             accessibilityLabel: '批量管理待确认作业',
-            onAction: () => this.enterBulkMode()
+            onAction: (): void => this.enterBulkMode()
           });
         }
       }
@@ -315,13 +315,13 @@ export struct HomeworkConfirmationPage {
               ActionButton({
                 label: '取消',
                 kind: ActionButtonKind.NEUTRAL,
-                onAction: () => this.batchDeleteConfirm = false
+                onAction: (): void => this.batchDeleteConfirm = false
               })
               .layoutWeight(1);
               ActionButton({
                 label: '确认删除',
                 kind: ActionButtonKind.DANGER,
-                onAction: () => this.removeSelectedCandidates()
+                onAction: (): void => this.removeSelectedCandidates()
               })
               .layoutWeight(1);
             }
@@ -332,7 +332,7 @@ export struct HomeworkConfirmationPage {
                 `删除选中的 ${this.selectedCandidateIds.length} 项` : '请选择要删除的作业',
               kind: ActionButtonKind.DANGER,
               isEnabled: this.selectedCandidateIds.length > 0,
-              onAction: () => this.batchDeleteConfirm = true
+              onAction: (): void => this.batchDeleteConfirm = true
             })
             .width('100%');
           }
@@ -340,7 +340,7 @@ export struct HomeworkConfirmationPage {
           ActionButton({
             label: this.publishing ? '正在发布…' : `确认并发布 ${this.candidates().length} 项`,
             isEnabled: !this.publishing && this.candidates().length > 0,
-            onAction: () => { void this.publish(); }
+            onAction: (): void => { void this.publish(); }
           })
           .width('100%');
         }
