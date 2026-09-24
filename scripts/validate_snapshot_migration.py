@@ -106,6 +106,9 @@ require(persistence.index("preservePreMigrationSnapshot") < persistence.index("s
 require("本地作业数据无法验证，已停止覆盖原数据" in persistence,
         "unverifiable existing data must block schema-changing overwrite")
 
+require("parentAccessCode: source.parentAccessCode === undefined ? '' : source.parentAccessCode" in store,
+        "HomeworkStore must safely clone V9 parent access code settings")
+
 if errors:
     print("SNAPSHOT_MIGRATION_GATE_FAIL")
     for error in errors:
@@ -113,6 +116,3 @@ if errors:
     sys.exit(1)
 
 print("SNAPSHOT_MIGRATION_GATE_PASS")
-
-require("parentAccessCode: source.parentAccessCode === undefined ? '' : source.parentAccessCode" in store,
-        "HomeworkStore must safely clone V9 parent access code settings")
