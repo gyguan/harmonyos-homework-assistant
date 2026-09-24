@@ -8,6 +8,7 @@ export interface FamilyContextLocalDataSource {
   getActiveStudentId(): string;
   setActiveStudent(studentId: string): boolean;
   replaceStudents(students: StudentProfile[]): void;
+  updateParentAccessCode(parentAccessCode: string): void;
   updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean): void;
 }
 
@@ -39,6 +40,10 @@ export class DefaultFamilyContextLocalDataSource implements FamilyContextLocalDa
 
   replaceStudents(students: StudentProfile[]): void {
     HomeworkStore.instance.replaceStudents(students);
+  }
+
+  updateParentAccessCode(parentAccessCode: string): void {
+    HomeworkStore.instance.updateParentAccessCode(parentAccessCode);
   }
 
   updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean): void {
