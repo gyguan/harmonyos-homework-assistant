@@ -72,8 +72,10 @@ require("HomeworkImportSourceKind.TEXT" in service and "家长录入文字" in s
 require("async selectImageText()" in service and "this.pipeline.extract(rawImport)" in service,
         "screenshot action must stop after OCR/extraction until the user chooses to organize")
 require("fallbackCandidate" in service and
-        "output.candidates.length > 0" in service,
-        "non-empty free text must fall back to one confirmable candidate instead of dead-ending")
+        "output.organizerMode === HomeworkOrganizerMode.LOCAL" in service,
+        "only local parser empty results may fall back to one confirmable candidate")
+require("candidates.length === 0 && output.organizerMode === HomeworkOrganizerMode.LOCAL" in service,
+        "an authoritative AI zero-task result must not be converted into a fake assignment")
 require("fallbackSubject" in service and "Subject.SPORTS" in service and
         "Subject.READING" in service,
         "free-text fallback must preserve common extracurricular category semantics")
