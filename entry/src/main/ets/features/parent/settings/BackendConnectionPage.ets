@@ -271,7 +271,7 @@ export struct BackendConnectionPage {
           TextAction({
             label: '取消',
             accessibilityLabel: '取消编辑孩子资料',
-            onAction: () => this.cancelEdit()
+            onAction: (): void => this.cancelEdit()
           });
         }
         .width('100%');
@@ -299,14 +299,14 @@ export struct BackendConnectionPage {
                 label: '取消删除',
                 kind: ActionButtonKind.NEUTRAL,
                 compact: true,
-                onAction: () => this.deleteStudentConfirmId = ''
+                onAction: (): void => this.deleteStudentConfirmId = ''
               })
               .layoutWeight(1);
               ActionButton({
                 label: '确认删除',
                 kind: ActionButtonKind.DANGER,
                 compact: true,
-                onAction: () => { void this.deleteStudent(this.editingId); }
+                onAction: (): void => { void this.deleteStudent(this.editingId); }
               })
               .layoutWeight(1);
             }
@@ -320,13 +320,13 @@ export struct BackendConnectionPage {
                 label: '删除',
                 kind: ActionButtonKind.DANGER_SOFT,
                 compact: true,
-                onAction: () => this.deleteStudentConfirmId = this.editingId
+                onAction: (): void => this.deleteStudentConfirmId = this.editingId
               });
             }
             ActionButton({
               label: '保存',
               compact: true,
-              onAction: () => { void this.saveStudent(); }
+              onAction: (): void => { void this.saveStudent(); }
             })
             .layoutWeight(1);
           }
@@ -435,13 +435,13 @@ export struct BackendConnectionPage {
             label: '关闭家长码',
             kind: ActionButtonKind.NEUTRAL,
             compact: true,
-            onAction: () => this.clearParentAccessCode()
+            onAction: (): void => this.clearParentAccessCode()
           });
         }
         ActionButton({
           label: this.parentAccessEnabled() ? '修改家长码' : '启用家长码',
           compact: true,
-          onAction: () => this.saveParentAccessCode()
+          onAction: (): void => this.saveParentAccessCode()
         })
         .layoutWeight(1);
       }
@@ -521,7 +521,7 @@ export struct BackendConnectionPage {
           ActionButton({
             label: this.connecting ? '正在连接…' : '连接并同步',
             isEnabled: !this.connecting,
-            onAction: () => { void this.connect(); }
+            onAction: (): void => { void this.connect(); }
           })
           .width('100%');
         } else {
@@ -530,14 +530,14 @@ export struct BackendConnectionPage {
               label: '立即同步',
               kind: ActionButtonKind.SECONDARY,
               compact: true,
-              onAction: () => { void this.syncCloudData(); }
+              onAction: (): void => { void this.syncCloudData(); }
             })
             .layoutWeight(1);
             ActionButton({
               label: '断开连接',
               kind: ActionButtonKind.NEUTRAL,
               compact: true,
-              onAction: () => { void this.disconnect(); }
+              onAction: (): void => { void this.disconnect(); }
             })
             .layoutWeight(1);
           }
