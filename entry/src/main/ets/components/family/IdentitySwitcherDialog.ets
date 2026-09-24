@@ -7,7 +7,7 @@ export struct IdentitySwitcherDialog {
   controller: CustomDialogController;
   @Link students: StudentProfile[];
   @Link activeStudentId: string;
-  @Prop parentActive: boolean = false;
+  @Link parentActive: boolean;
   onSelectParent: () => void = () => {};
   onSelectStudent: (studentId: string) => void = (_studentId: string) => {};
 
