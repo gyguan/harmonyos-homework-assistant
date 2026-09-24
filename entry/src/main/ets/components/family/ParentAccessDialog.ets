@@ -12,7 +12,7 @@ export struct ParentAccessDialog {
       Row() {
         Column({ space: 3 }) {
           Text('验证家长身份')
-            .fontSize(20)
+            .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
           Text('请输入设备家长码')
