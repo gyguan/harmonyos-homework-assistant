@@ -24,6 +24,11 @@
   - 学生首页、作业、详情、学习空间、Tutor、Submission；
   - 家长首页、导入三步流、Progress、Parent Review、课外任务入口；
   - Layout Capability 与 Slice 映射。
+- `product/v2-typography-standard.md`
+  - V2 全局字体与文本布局标准；
+  - 26 / 20 / 17 / 16 / 14 / 13 / 12 语义字号层级；
+  - 行高、最大行数、溢出和卡片 minHeight 规则；
+  - Phone / Pad 共用语义字体层级，禁止页面私有标题字号。
 
 ### 3. 总体技术设计
 
