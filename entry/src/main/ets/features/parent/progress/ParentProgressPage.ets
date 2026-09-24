@@ -1,7 +1,7 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction, TextActionKind } from '../../../components/action/ActionControls';
 import { AssignmentFilterDialog } from '../../../components/assignment/AssignmentFilterDialog';
 import { AssignmentListItem } from '../../../components/assignment/AssignmentListItem';
 import { FilterSummaryEntry } from '../../../components/selection/SelectionControls';
@@ -217,8 +217,8 @@ export struct ParentProgressPage {
         Blank();
         ActionButton({
           label: `删除${this.selectedDeleteIds.length > 0 ? ' ' + this.selectedDeleteIds.length : ''}`,
-          kind: ActionButtonKind.DANGER,
-          compact: true,
+          kind: ActionButtonKind.DANGER_SOFT,
+          size: ActionButtonSize.SMALL,
           isEnabled: this.selectedDeleteIds.length > 0 && !this.deleteBusy,
           onAction: (): void => this.openDeleteConfirm()
         });
