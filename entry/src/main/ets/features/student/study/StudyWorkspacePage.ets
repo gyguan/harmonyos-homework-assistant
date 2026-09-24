@@ -382,7 +382,7 @@ export struct StudyWorkspacePage {
       Column({ space: 10 }) {
         Text('提交作业照片')
           .width('100%')
-          .fontSize(16)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         if (this.submissionPhotoUris.length > 0) {
@@ -738,7 +738,7 @@ export struct StudyWorkspacePage {
 
         Column({ space: 2 }) {
           Text('小伴学习助手')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
         }
@@ -769,7 +769,7 @@ export struct StudyWorkspacePage {
       if (this.tutorUnavailable) {
         Column({ space: 8 }) {
           Text('小伴暂时休息一下')
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text('AI 辅导暂时不可用，但作业查看、计时和提交都不受影响。')
@@ -809,7 +809,7 @@ export struct StudyWorkspacePage {
                   badgeBackground: AppTheme.PRIMARY_SOFT
                 });
                 Text('有哪里卡住了？')
-                  .fontSize(17)
+                  .fontSize(AppTheme.SECTION_TITLE_SIZE)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.TEXT);
                 Row({ space: 8 }) {
