@@ -286,7 +286,7 @@ export struct HomeworkImportBatchDetailPage {
                       label: '取消',
                       kind: ActionButtonKind.NEUTRAL,
                       compact: true,
-                      onAction: (): void => this.abandonConfirm = false
+                      onAction: (): void => { this.abandonConfirm = false; }
                     })
                     .layoutWeight(1);
                     ActionButton({
@@ -308,7 +308,7 @@ export struct HomeworkImportBatchDetailPage {
                   label: '放弃这个批次',
                   kind: ActionButtonKind.DANGER_SOFT,
                   compact: true,
-                  onAction: (): void => this.abandonConfirm = true
+                  onAction: (): void => { this.abandonConfirm = true; }
                 })
                 .width('100%');
               }
