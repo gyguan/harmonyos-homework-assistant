@@ -32,7 +32,7 @@ export struct AssignmentEditForm {
   @Builder
   private SubjectSection() {
     Column({ space: 7 }) {
-      Text('科目').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Text('科目').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       if (this.subjectEditable) {
         Scroll() {
           Row({ space: 8 }) {
@@ -89,7 +89,8 @@ export struct AssignmentEditForm {
       } else {
         Row() {
           Text(this.subject)
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY)
             .padding({ left: 13, right: 13, top: 9, bottom: 9 })
@@ -97,7 +98,8 @@ export struct AssignmentEditForm {
             .borderRadius(AppTheme.CHIP_RADIUS);
           Blank();
           Text('发布后科目保持不变')
-            .fontSize(11)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
         .width('100%');
@@ -149,14 +151,15 @@ export struct AssignmentEditForm {
           TextInput({ text: `${this.expectedMinutes}`, placeholder: '自定义' })
             .width(96)
             .height(40)
-            .fontSize(12)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
             .backgroundColor(AppTheme.SURFACE_SUBTLE)
             .borderRadius(AppTheme.CHIP_RADIUS)
             .textAlign(TextAlign.Center)
             .onChange((value: string) => this.applyCustomMinutes(value));
           Text('分钟')
             .maxLines(1)
-            .fontSize(11)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
       }
@@ -171,23 +174,26 @@ export struct AssignmentEditForm {
     Column({ space: 12 }) {
       this.SubjectSection();
 
-      Text('作业标题').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Text('作业标题').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       TextInput({ text: this.title })
         .width('100%')
         .height(AppTheme.INPUT_HEIGHT)
+        .fontSize(AppTheme.FORM_TEXT_SIZE)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.onTitleChange(value));
 
-      Text('完成要求').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Text('完成要求').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       TextArea({ text: this.instruction })
         .width('100%')
         .height(92)
+        .fontSize(AppTheme.FORM_TEXT_SIZE)
+        .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.onInstructionChange(value));
 
-      Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Text('截止时间').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       DeadlinePickerField({
         value: this.dueText,
         allowClear: true,
@@ -196,10 +202,11 @@ export struct AssignmentEditForm {
 
       this.DurationSection();
 
-      Text('教材 / 页码').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+      Text('教材 / 页码').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       TextInput({ text: this.textbookRef })
         .width('100%')
         .height(AppTheme.INPUT_HEIGHT)
+        .fontSize(AppTheme.FORM_TEXT_SIZE)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.onTextbookRefChange(value));
