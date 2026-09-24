@@ -64,8 +64,8 @@ require("预计用时" in confirmation_components and
         "onMinutesChange: (candidate: CandidateAssignment, minutes: number)" in confirmation,
         "parent must be able to use quick presets or a custom expected completion time before publishing")
 # Student Home presents the time budget on each directly actionable task card.
-require("`预计 ${this.assignment.expectedMinutes} 分钟`" in student_home and "StudentTodayTaskCard" in student_home,
-        "V2 student home must show each task's time budget before starting")
+require("${this.assignment.expectedMinutes} 分钟" in student_home and "StudentTodayTaskCard" in student_home,
+        "V2 student home must show each task's compact time budget before starting")
 require("AssignmentCountdownCard" in study,
         "student study workspace must render the homework countdown")
 
