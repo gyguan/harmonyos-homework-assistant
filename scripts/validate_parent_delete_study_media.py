@@ -62,6 +62,13 @@ for token in [
     require(token in progress, f"parent progress missing bulk delete behavior: {token}")
 require("deleteAssignments(assignmentIds: string[])" in progress_vm,
         "parent progress ViewModel must delegate batch deletion")
+require("Text(this.bulkMode ? '取消' : '删除')" in progress and
+        "完成删除选择" not in progress,
+        "parent progress must use a stable delete/cancel action rather than a separate completion action")
+require("Text(this.canDelete(item) ? (this.isDeleteSelected(item.id) ? '✓' : '') : '—')" not in progress and
+        "selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item)" in progress and
+        "onOpen: () => this.openAssignment(item)" in progress,
+        "bulk delete must select the full assignment card without adding an external leading selector that can overflow")
 require("删除作业" in review and "this.viewModel.deleteAssignment(item.id)" in review,
         "parent detail must allow single unfinished assignment deletion")
 require("deleteAssignment(assignmentId: string)" in review_vm,
