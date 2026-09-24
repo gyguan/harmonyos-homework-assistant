@@ -72,12 +72,16 @@ require("contentScale()" in attempt_page and "AppTheme.PRACTICE_ATTEMPT_MAX_SCAL
         "Practice attempt must use bounded continuous scaling for wide-container readability")
 require("AppTheme.PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in attempt_page,
         "Practice attempt content must use its wider shared readable-width token")
-require(".fontSize(this.scaled(20))" in attempt_page and ".height(this.scaled(50))" in attempt_page,
-        "Practice attempt must scale question text and answer controls together")
+require(".fontSize(this.scaled(AppTheme.QUESTION_TEXT_SIZE))" in attempt_page and
+        ".lineHeight(this.scaled(AppTheme.QUESTION_TEXT_LINE_HEIGHT))" in attempt_page and
+        ".height(this.scaled(50))" in attempt_page,
+        "Practice attempt must scale semantic question typography and answer controls together")
 require("PRACTICE_ATTEMPT_READABLE_MAX_WIDTH" in theme and
         "PRACTICE_ATTEMPT_SCALE_REFERENCE_WIDTH" in theme and
-        "PRACTICE_ATTEMPT_MAX_SCALE" in theme,
-        "AppTheme must own Practice attempt readability tokens")
+        "PRACTICE_ATTEMPT_MAX_SCALE" in theme and
+        "QUESTION_TEXT_SIZE" in theme and
+        "QUESTION_TEXT_LINE_HEIGHT" in theme,
+        "AppTheme must own Practice attempt readability and question typography tokens")
 require("private CurrentQuestionAnswer()" in attempt_page,
         "choice rendering must derive directly from reactive currentIndex state")
 require("this.attempt.questions[this.currentIndex].options" in attempt_page,
