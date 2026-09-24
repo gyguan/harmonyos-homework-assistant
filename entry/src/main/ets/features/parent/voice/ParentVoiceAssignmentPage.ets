@@ -664,7 +664,7 @@ export struct ParentVoiceAssignmentPage {
     Column({ space: 12 }) {
       Text('作业素材')
         .width('100%')
-        .fontSize(16)
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
         .fontWeight(FontWeight.Bold)
         .fontColor(AppTheme.TEXT);
 
