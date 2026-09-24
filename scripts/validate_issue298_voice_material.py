@@ -168,6 +168,10 @@ require("subjectCode: this.subjectCode(draft.subject)" in voice_vm and
         "input.subjectCode()" in assignment_service and
         "normalizeSubjectCode" in assignment_service,
         "server-folder task creation must preserve the subject selected in task settings")
+require("subject: this.subject" in voice_page and
+        "subject: this.sourceMode === VOICE_SOURCE_SERVER" not in voice_page and
+        "this.viewModel.subjectFromCode(this.selectedFolder()!.subjectCode)" not in voice_page,
+        "server-folder publishing must not overwrite the parent-selected subject with folder metadata")
 require("instruction: draft.instruction.trim()" in voice_vm and
         "input.instruction()" in assignment_service and
         "requestedInstruction" in assignment_service,
