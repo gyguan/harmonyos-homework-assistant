@@ -28,6 +28,9 @@ export struct BackendConnectionPage {
   @State private editSemester: string = '';
   @State private editTextbooks: string = '';
   @State private cloudPanelOpen: boolean = false;
+  @State private parentAccessCodeDraft: string = '';
+  @State private parentAccessCodeConfirm: string = '';
+  @State private parentAccessMessage: string = '';
   @State private deleteStudentConfirmId: string = '';
   onStoreChanged: () => void = () => {};
 
@@ -48,6 +51,46 @@ export struct BackendConnectionPage {
   private students(): StudentProfile[] {
     let currentRevision = this.pageRevision;
     return this.familyStudents;
+  }
+
+  private parentAccessEnabled(): boolean {
+    return this.familyContext.getSettings().parentAccessCode.length > 0;
+  }
+
+  private validParentAccessCode(value: string): boolean {
+    if (value.length !== 4) return false;
+    for (let i = 0; i < value.length; i++) {
+      let code = value.charCodeAt(i);
+      if (code < 48 || code > 57) return false;
+    }
+    return true;
+  }
+
+  private saveParentAccessCode(): void {
+    let code = this.parentAccessCodeDraft.trim();
+    if (!this.validParentAccessCode(code)) {
+      this.parentAccessMessage = '家长码需要设置为 4 位数字';
+      return;
+    }
+    if (code !== this.parentAccessCodeConfirm.trim()) {
+      this.parentAccessMessage = '两次输入的家长码不一致';
+      return;
+    }
+    this.familyContext.updateParentAccessCode(code);
+    this.parentAccessCodeDraft = '';
+    this.parentAccessCodeConfirm = '';
+    this.parentAccessMessage = '家长码已启用';
+    this.pageRevision++;
+    this.onStoreChanged();
+  }
+
+  private clearParentAccessCode(): void {
+    this.familyContext.updateParentAccessCode('');
+    this.parentAccessCodeDraft = '';
+    this.parentAccessCodeConfirm = '';
+    this.parentAccessMessage = '家长码已关闭';
+    this.pageRevision++;
+    this.onStoreChanged();
   }
 
   private tutorGuidanceFirst(): boolean {
@@ -327,6 +370,89 @@ export struct BackendConnectionPage {
   }
 
   @Builder
+  private ParentAccessSection() {
+    Column({ space: 12 }) {
+      Row() {
+        Column({ space: 3 }) {
+          Text('设备家长码')
+            .fontSize(15)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text(this.parentAccessEnabled() ?
+            '已启用 · 学生切回家长模式时需要验证' :
+            '未启用 · 可设置 4 位数字防止孩子误入家长操作')
+            .fontSize(13)
+            .lineHeight(18)
+            .fontColor(this.parentAccessEnabled() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+      }
+      .width('100%');
+
+      TextInput({ placeholder: '输入新的 4 位家长码', text: this.parentAccessCodeDraft })
+        .width('100%')
+        .height(AppTheme.INPUT_HEIGHT)
+        .type(InputType.Password)
+        .maxLength(4)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .onChange((value: string) => {
+          this.parentAccessCodeDraft = value;
+          this.parentAccessMessage = '';
+        });
+
+      TextInput({ placeholder: '再次输入家长码', text: this.parentAccessCodeConfirm })
+        .width('100%')
+        .height(AppTheme.INPUT_HEIGHT)
+        .type(InputType.Password)
+        .maxLength(4)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .onChange((value: string) => {
+          this.parentAccessCodeConfirm = value;
+          this.parentAccessMessage = '';
+        });
+
+      Row({ space: 8 }) {
+        if (this.parentAccessEnabled()) {
+          Button('关闭家长码', { type: ButtonType.Normal })
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .padding({ left: 16, right: 16 })
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+            .fontColor(AppTheme.TEXT)
+            .onClick(() => this.clearParentAccessCode());
+        }
+        Button(this.parentAccessEnabled() ? '修改家长码' : '启用家长码', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => this.saveParentAccessCode());
+      }
+      .width('100%');
+
+      if (this.parentAccessMessage.length > 0) {
+        Text(this.parentAccessMessage)
+          .width('100%')
+          .fontSize(13)
+          .fontColor(this.parentAccessMessage.indexOf('已') === 0 ? AppTheme.SUCCESS : AppTheme.DANGER);
+      }
+
+      Text('家长码只保存在当前设备，不会上传家庭云端。')
+        .width('100%')
+        .fontSize(12)
+        .fontColor(AppTheme.TERTIARY_TEXT);
+    }
+    .width('100%')
+    .padding(16)
+    .backgroundColor(AppTheme.SURFACE)
+    .borderRadius(AppTheme.CONTROL_RADIUS);
+  }
+
+  @Builder
   private TutorSection() {
     Column({ space: 0 }) {
       SettingsToggleRow({
@@ -413,6 +539,12 @@ export struct BackendConnectionPage {
             Column({ space: 10 }) {
               this.SectionTitle('家庭', '孩子资料和教材信息');
               this.FamilySection();
+            }
+            .width('100%');
+
+            Column({ space: 10 }) {
+              this.SectionTitle('家长保护', '限制学生误进入家长操作。');
+              this.ParentAccessSection();
             }
             .width('100%');
 
