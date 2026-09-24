@@ -96,7 +96,7 @@ export struct AssignmentListItem {
         Row({ space: 8 }) {
           Text(this.assignment.title)
             .layoutWeight(1)
-            .fontSize(16)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
             .lineHeight(22)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
