@@ -68,7 +68,7 @@ export struct TextAction {
   @Prop kind: TextActionKind = TextActionKind.PRIMARY;
   @Prop isEnabled: boolean = true;
   @Prop accessibilityLabel: string = '';
-  onClick: () => void = () => {};
+  onAction: () => void = () => {};
 
   private resolveForegroundColor(): string {
     if (!this.isEnabled) return AppTheme.DISABLED;
@@ -88,6 +88,6 @@ export struct TextAction {
       .enabled(this.isEnabled)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
       .accessibilityText(this.accessibilityLabel.length > 0 ? this.accessibilityLabel : this.label)
-      .onClick(() => this.onClick());
+      .onClick(() => this.onAction());
   }
 }
