@@ -51,8 +51,7 @@ export struct HomeworkImportPage {
     if (this.parseBusy) return;
     let text = this.textDraft.trim();
     if (text.length === 0) {
-      this.parseMessage = '请先输入作业内容，或从作业截图识别文字';
-      this.parseError = true;
+      this.showParseError('请先输入作业内容，或使用拍照/相册识别');
       return;
     }
 
@@ -66,12 +65,10 @@ export struct HomeworkImportPage {
         this.parseMessage = `已整理出 ${result.candidateCount} 项作业，请继续核对`;
         this.afterOrganized(result.candidateCount);
       } else {
-        this.parseMessage = '暂时无法整理这段内容，请修改后重试';
-        this.parseError = true;
+        this.showParseError('暂时无法整理这段内容，请修改后重试');
       }
     } catch {
-      this.parseMessage = '作业整理失败，请稍后重试';
-      this.parseError = true;
+      this.showParseError('作业整理失败，请稍后重试');
     } finally {
       this.parseBusy = false;
     }
@@ -80,8 +77,7 @@ export struct HomeworkImportPage {
   private applyRecognizedImage(result: HomeworkImageTextResult, sourceLabel: string): void {
     if (!result.selected) return;
     if (result.recognizedText.trim().length === 0) {
-      this.parseMessage = '没有识别到清晰文字，请换一张图片重试';
-      this.parseError = true;
+      this.showParseError('没有识别到清晰文字，请换一张图片重试');
       return;
     }
     this.textDraft = result.recognizedText;
@@ -100,8 +96,7 @@ export struct HomeworkImportPage {
       let result: HomeworkImageTextResult = await this.viewModel.captureImageText();
       this.applyRecognizedImage(result, '现场拍照');
     } catch {
-      this.parseMessage = '拍照识别失败，请重新拍摄更清晰的作业内容';
-      this.parseError = true;
+      this.showParseError('拍照识别失败，请重新拍摄更清晰的作业内容');
     } finally {
       this.parseBusy = false;
     }
@@ -116,11 +111,15 @@ export struct HomeworkImportPage {
       let result: HomeworkImageTextResult = await this.viewModel.selectImageText();
       this.applyRecognizedImage(result, '相册作业图片');
     } catch {
-      this.parseMessage = '图片识别失败，请选择更清晰的作业图片';
-      this.parseError = true;
+      this.showParseError('图片识别失败，请选择更清晰的作业图片');
     } finally {
       this.parseBusy = false;
     }
+  }
+
+  private showParseError(message: string): void {
+    this.parseMessage = message;
+    this.parseError = true;
   }
 
   @Builder
@@ -138,7 +137,7 @@ export struct HomeworkImportPage {
           .fontColor(this.parseError ? AppTheme.DANGER : AppTheme.SUCCESS);
       }
       .width('100%')
-      .padding(12)
+      .padding(10)
       .backgroundColor(this.parseError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS);
     }
@@ -153,7 +152,7 @@ export struct HomeworkImportPage {
             .fontSize(14)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
-          Text('可以继续上次的核对与发布')
+          Text('继续上次的核对与发布')
             .fontSize(12)
             .fontColor(AppTheme.SUBTEXT);
         }
@@ -166,8 +165,8 @@ export struct HomeworkImportPage {
           .fontColor(AppTheme.PRIMARY);
       }
       .width('100%')
-      .constraintSize({ minHeight: 58 })
-      .padding({ left: 13, right: 13, top: 10, bottom: 10 })
+      .constraintSize({ minHeight: 56 })
+      .padding({ left: 12, right: 12, top: 9, bottom: 9 })
       .backgroundColor(AppTheme.PRIMARY_FAINT)
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
@@ -247,7 +246,27 @@ export struct HomeworkImportPage {
   }
 
   @Builder
-  private ActionFoot  build() {
+  private ActionFooter() {
+    Column({ space: 8 }) {
+      this.FeedbackBanner();
+
+      Button(this.parseBusy ? '正在处理…' : '整理并继续', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.BUTTON_HEIGHT)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.parseBusy && this.textDraft.trim().length > 0)
+        .fontSize(15)
+        .fontWeight(FontWeight.Medium)
+        .backgroundColor(this.textDraft.trim().length > 0 ? AppTheme.PRIMARY : AppTheme.DISABLED)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .onClick(() => { void this.organize(); });
+    }
+    .width('100%')
+    .padding({ top: 8, bottom: 8 })
+    .backgroundColor(AppTheme.BACKGROUND);
+  }
+
+  build() {
     Column() {
       if (!this.embeddedInDeepPage) {
         Text('布置作业')
