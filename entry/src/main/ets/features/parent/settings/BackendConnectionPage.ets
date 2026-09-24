@@ -330,7 +330,7 @@ export struct BackendConnectionPage {
             badgeBackground: AppTheme.PRIMARY_SOFT
           });
           Column({ space: 3 }) {
-            Text(student.name).width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text(student.name).width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Text(`${student.grade} · ${student.className} · ${student.semester}`).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1).alignItems(HorizontalAlign.Start);
