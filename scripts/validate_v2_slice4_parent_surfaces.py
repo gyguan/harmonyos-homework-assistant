@@ -51,7 +51,7 @@ for token in [
     "PARENT_HOME_PAD_CONTENT_MAX_WIDTH",
     "PARENT_PROGRESS_READABLE_MAX_WIDTH",
     "PARENT_PROGRESS_REVIEW_MAX_WIDTH",
-    "PARENT_REVIEW_READABLE_MAX_WIDTH",
+    "PARENT_DEEP_READABLE_MAX_WIDTH",
     "PARENT_HOME_PRIMARY_MIN_WIDTH",
     "PARENT_HOME_SECONDARY_MIN_WIDTH",
     "PARENT_PROGRESS_LIST_MIN_WIDTH",
@@ -134,7 +134,7 @@ require("this.onOpenReview(item.id)" in progress,
 
 require("DeepPageHeader" in review_page and "ParentReviewPane" in review_page,
         "Parent Review page must use shared deep-page chrome and reusable review pane")
-require("AppTheme.PARENT_REVIEW_READABLE_MAX_WIDTH" in review_page,
+require("AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH" in review_page,
         "Parent Review page must keep a readable width cap")
 require("ParentSubmissionEvidenceService" in review_pane and "CloudSubmissionPhotoStrip" in review_pane,
         "Parent Review must show authoritative/local submission evidence through the submission boundary")
