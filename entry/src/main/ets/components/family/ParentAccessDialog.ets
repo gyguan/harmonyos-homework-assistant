@@ -13,16 +13,20 @@ export struct ParentAccessDialog {
         Column({ space: 3 }) {
           Text('验证家长身份')
             .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
-            .fontWeight(FontWeight.Bold)
+            .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
           Text('请输入设备家长码')
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
         Text('关闭')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 12, right: 2 })
@@ -35,6 +39,7 @@ export struct ParentAccessDialog {
       TextInput({ placeholder: '4 位数字家长码', text: this.code })
         .width('100%')
         .height(AppTheme.INPUT_HEIGHT)
+        .fontSize(AppTheme.FORM_TEXT_SIZE)
         .type(InputType.Password)
         .maxLength(4)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
@@ -47,7 +52,8 @@ export struct ParentAccessDialog {
       if (this.message.length > 0) {
         Text(this.message)
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.DANGER);
       }
 
