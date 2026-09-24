@@ -63,9 +63,9 @@ for token in [
     require(token in progress, f"parent progress missing bulk delete behavior: {token}")
 require("deleteAssignments(assignmentIds: string[])" in progress_vm,
         "parent progress ViewModel must delegate batch deletion")
-require("Text(this.bulkMode ? '取消' : '删除')" in progress and
+require("label: this.bulkMode ? '取消' : '删除'" in progress and "TextAction({" in progress and
         "完成删除选择" not in progress,
-        "parent progress must use a stable delete/cancel action rather than a separate completion action")
+        "parent progress must use a stable shared delete/cancel action rather than a separate completion action")
 require("selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item)" in progress and
         "selectionMode: this.bulkMode" in progress and
         "selectionAvailable: this.canDelete(item)" in progress and
