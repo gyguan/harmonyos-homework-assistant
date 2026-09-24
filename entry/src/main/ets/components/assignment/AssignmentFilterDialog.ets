@@ -1,4 +1,5 @@
 import { AppTheme } from '../../common/theme/AppTheme';
+import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../action/ActionControls';
 
 @CustomDialog
 export struct AssignmentFilterDialog {
@@ -54,14 +55,12 @@ export struct AssignmentFilterDialog {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        Text('关闭')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT)
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 12, right: 4 })
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('关闭作业查询')
-          .onClick(() => this.controller.close());
+        TextAction({
+          label: '关闭',
+          kind: TextActionKind.NEUTRAL,
+          accessibilityLabel: '关闭作业查询',
+          onClick: () => this.controller.close()
+        });
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 20, bottom: 12 });
@@ -113,21 +112,17 @@ export struct AssignmentFilterDialog {
       .scrollBar(BarState.Off);
 
       Row({ space: 12 }) {
-        Button('重置', { type: ButtonType.Normal })
-          .layoutWeight(1)
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-          .fontColor(AppTheme.TEXT)
-          .onClick(() => this.reset());
-        Button('查询', { type: ButtonType.Normal })
-          .layoutWeight(2)
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.PRIMARY)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .fontWeight(FontWeight.Medium)
-          .onClick(() => this.confirmQuery());
+        ActionButton({
+          label: '重置',
+          kind: ActionButtonKind.NEUTRAL,
+          onClick: () => this.reset()
+        })
+        .layoutWeight(1);
+        ActionButton({
+          label: '查询',
+          onClick: () => this.confirmQuery()
+        })
+        .layoutWeight(2);
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 12, bottom: 18 })
