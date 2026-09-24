@@ -1,3 +1,5 @@
+import { common } from '@kit.AbilityKit';
+import { camera, cameraPicker } from '@kit.CameraKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { HomeworkOrganizerRemoteApi } from '../remote/HomeworkOrganizerRemoteApi';
 import { HomeworkImportInboxService } from './HomeworkImportInboxService';
@@ -20,12 +22,15 @@ import { HomeworkImportPipeline } from './HomeworkImportPipeline';
 export class HomeworkImportService {
   static readonly instance: HomeworkImportService = new HomeworkImportService();
 
+  private context: common.UIAbilityContext | null = null;
   private pipeline: HomeworkImportPipeline | null = null;
   private readonly drafts: HomeworkImportDraftRepository = DefaultHomeworkImportDraftRepository.instance;
 
   private constructor() {}
 
-  configure(extractor: HomeworkTextExtractor, parser: HomeworkAssignmentParser): void {
+  configure(context: common.UIAbilityContext,
+    extractor: HomeworkTextExtractor, parser: HomeworkAssignmentParser): void {
+    this.context = context;
     this.pipeline = new HomeworkImportPipeline(extractor, parser);
   }
 
@@ -54,7 +59,8 @@ export class HomeworkImportService {
     return await this.runSmart(input);
   }
 
-  async parseText(text: string, imageRef: string = ''): Promise<HomeworkTextImportResult> {
+  async parseText(text: string, imageRef: string = '',
+    imageSourceLabel: string = ''): Promise<HomeworkTextImportResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let normalized = text.trim();
     if (normalized.length === 0) return { candidateCount: 0, organizerMode: HomeworkOrganizerMode.LOCAL };
@@ -65,7 +71,9 @@ export class HomeworkImportService {
       id: `${fromScreenshot ? 'image-text' : 'text'}-${Date.now()}`,
       studentId: studentId,
       sourceKind: HomeworkImportSourceKind.TEXT,
-      sourceLabel: fromScreenshot ? '相册作业截图' : '家长录入文字',
+      sourceLabel: fromScreenshot ?
+        (imageSourceLabel.trim().length > 0 ? imageSourceLabel.trim() : '相册作业截图') :
+        '家长录入文字',
       resourceUri: fromScreenshot ? imageRef : '',
       rawText: normalized
     };
@@ -81,6 +89,25 @@ export class HomeworkImportService {
       candidates,
       fromScreenshot ? imageRef : '');
     return { candidateCount: candidates.length, organizerMode: output.organizerMode };
+  }
+
+  async captureImageText(): Promise<HomeworkImageTextResult> {
+    if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
+    if (this.context === null) throw new Error('拍照识别能力尚未初始化');
+
+    try {
+      let profile: cameraPicker.PickerProfile = {
+        cameraPosition: camera.CameraPosition.CAMERA_POSITION_BACK
+      };
+      let result: cameraPicker.PickerResult = await cameraPicker.pick(
+        this.context, [cameraPicker.PickerMediaType.PHOTO], profile);
+      if (result.resultUri.length === 0) {
+        return { selected: false, recognizedText: '', imageRef: '' };
+      }
+      return await this.recognizeImageText(result.resultUri, '现场拍照');
+    } catch {
+      throw new Error('无法打开相机或识别照片，请重试');
+    }
   }
 
   async selectImageText(): Promise<HomeworkImageTextResult> {
@@ -102,19 +129,25 @@ export class HomeworkImportService {
       return { selected: false, recognizedText: '', imageRef: '' };
     }
 
+    return await this.recognizeImageText(photoUris[0], '相册作业截图');
+  }
+
+  private async recognizeImageText(imageRef: string, sourceLabel: string):
+    Promise<HomeworkImageTextResult> {
+    if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let rawImport: RawHomeworkImport = {
       id: `image-preview-${Date.now()}`,
       studentId: this.drafts.getActiveStudentId(),
       sourceKind: HomeworkImportSourceKind.IMAGE,
-      sourceLabel: '相册作业截图',
-      resourceUri: photoUris[0],
+      sourceLabel: sourceLabel,
+      resourceUri: imageRef,
       rawText: ''
     };
     let extracted = await this.pipeline.extract(rawImport);
     return {
       selected: true,
       recognizedText: extracted.text,
-      imageRef: photoUris[0]
+      imageRef: imageRef
     };
   }
 
