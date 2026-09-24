@@ -421,7 +421,7 @@ export struct ParentVoiceAssignmentPage {
           label: this.selectingAudio ? '正在打开语音文件…' : '选择语音文件',
           kind: ActionButtonKind.SECONDARY,
           isEnabled: !this.selectingAudio && !this.busy,
-          onClick: () => { void this.selectAudio(); }
+          onAction: () => { void this.selectAudio(); }
         })
         .width('100%');
       } else {
@@ -439,7 +439,7 @@ export struct ParentVoiceAssignmentPage {
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           TextAction({
             label: '更换',
-            onClick: () => { void this.selectAudio(); }
+            onAction: () => { void this.selectAudio(); }
           });
         }
         .width('100%')
@@ -493,7 +493,7 @@ export struct ParentVoiceAssignmentPage {
         kind: ActionButtonKind.SECONDARY,
         compact: true,
         isEnabled: !this.selectingImages && !this.busy,
-        onClick: () => { void this.selectImages(); }
+        onAction: () => { void this.selectImages(); }
       })
       .width('100%');
     }
@@ -573,7 +573,7 @@ export struct ParentVoiceAssignmentPage {
           label: this.loadingFolders ? '查询中…' : '查询',
           kind: ActionButtonKind.SECONDARY,
           isEnabled: !this.loadingFolders,
-          onClick: () => { void this.loadFolders(true); }
+          onAction: () => { void this.loadFolders(true); }
         });
       }
       .width('100%');
@@ -607,7 +607,7 @@ export struct ParentVoiceAssignmentPage {
           kind: ActionButtonKind.NEUTRAL,
           compact: true,
           isEnabled: !this.loadingFolders,
-          onClick: () => { void this.loadFolders(false); }
+          onAction: () => { void this.loadFolders(false); }
         })
         .width('100%');
       }
@@ -681,7 +681,7 @@ export struct ParentVoiceAssignmentPage {
       ActionButton({
         label: this.busy ? '正在发布…' : '发布语音作业',
         isEnabled: !this.busy,
-        onClick: () => { void this.createTask(); }
+        onAction: () => { void this.createTask(); }
       })
       .width('100%');
     }
