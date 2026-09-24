@@ -96,15 +96,33 @@ export class AppTheme {
   static readonly PAD_META_SIZE: number = 13;
   static readonly PAD_MIN_TOUCH_TARGET: number = 48;
 
-  // Shared title hierarchy. Responsive layout may scale presentation, but semantic levels stay stable.
+  // Shared typography hierarchy. ArkUI numeric font sizes are treated as fp.
+  // Keep semantic levels stable across Phone/Pad; adapt layout width, not title semantics.
   // PAGE_TITLE is reserved for the current business object; PAGE_NAV is for page/dialog/sheet headers.
   static readonly PAGE_TITLE_SIZE: number = 26;
+  static readonly PAGE_TITLE_LINE_HEIGHT: number = 34;
   static readonly PAGE_NAV_TITLE_SIZE: number = 20;
+  static readonly PAGE_NAV_TITLE_LINE_HEIGHT: number = 28;
   static readonly SECTION_TITLE_SIZE: number = 17;
+  static readonly SECTION_TITLE_LINE_HEIGHT: number = 24;
   static readonly CARD_TITLE_SIZE: number = 16;
+  static readonly CARD_TITLE_LINE_HEIGHT: number = 22;
   static readonly LABEL_TITLE_SIZE: number = 14;
+  static readonly LABEL_TITLE_LINE_HEIGHT: number = 20;
   static readonly BODY_SIZE: number = 14;
+  static readonly BODY_LINE_HEIGHT: number = 21;
+  static readonly META_SIZE: number = 13;
+  static readonly META_LINE_HEIGHT: number = 18;
   static readonly CAPTION_SIZE: number = 12;
+  static readonly CAPTION_LINE_HEIGHT: number = 17;
+  static readonly ACTION_TEXT_SIZE: number = 14;
+  static readonly ACTION_TEXT_LINE_HEIGHT: number = 20;
+
+  // Text-bearing layout contracts. Titles should truncate before cards are given fixed text heights.
+  static readonly NAV_TITLE_MAX_LINES: number = 1;
+  static readonly SECTION_TITLE_MAX_LINES: number = 1;
+  static readonly CARD_TITLE_MAX_LINES: number = 2;
+  static readonly META_MAX_LINES: number = 1;
 
   static readonly MIN_TOUCH_TARGET: number = 40;
   static readonly BUTTON_HEIGHT: number = 48;
