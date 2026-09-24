@@ -1,5 +1,7 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { HomeworkImageTextResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
+import { Subject } from '../../../domain/model/HomeworkModels';
+import { ChoiceSelectionChip } from '../../../components/selection/SelectionControls';
 import { HomeworkImportViewModel } from './HomeworkImportViewModel';
 
 @Component
@@ -13,6 +15,8 @@ export struct HomeworkImportPage {
   @State private textDraft: string = '';
   @State private sourceImageRef: string = '';
   @State private sourceImageLabel: string = '';
+  @State private selectedSubject: Subject = Subject.CHINESE;
+  @State private subjectChosen: boolean = false;
   onOpenConfirmation: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
@@ -49,6 +53,10 @@ export struct HomeworkImportPage {
 
   private async organize(): Promise<void> {
     if (this.parseBusy) return;
+    if (!this.subjectChosen) {
+      this.showParseError('请先选择作业科目');
+      return;
+    }
     let text = this.textDraft.trim();
     if (text.length === 0) {
       this.showParseError('请先输入作业内容，或使用拍照/相册识别');
@@ -60,7 +68,7 @@ export struct HomeworkImportPage {
     this.parseError = false;
     try {
       let result: HomeworkTextImportResult =
-        await this.viewModel.parseText(text, this.sourceImageRef, this.sourceImageLabel);
+        await this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel);
       if (result.candidateCount > 0) {
         this.parseMessage = `已整理出 ${result.candidateCount} 项作业，请继续核对`;
         this.afterOrganized(result.candidateCount);
@@ -120,6 +128,54 @@ export struct HomeworkImportPage {
   private showParseError(message: string): void {
     this.parseMessage = message;
     this.parseError = true;
+  }
+
+  private selectSubject(subject: Subject): void {
+    if (this.parseBusy) return;
+    this.selectedSubject = subject;
+    this.subjectChosen = true;
+    this.parseMessage = '';
+    this.parseError = false;
+  }
+
+  @Builder
+  private SubjectSelector() {
+    Column({ space: 7 }) {
+      Text('作业科目')
+        .width('100%')
+        .fontSize(12)
+        .fontColor(AppTheme.SUBTEXT);
+      Row({ space: 8 }) {
+        ChoiceSelectionChip({
+          label: Subject.CHINESE,
+          selected: this.subjectChosen && this.selectedSubject === Subject.CHINESE,
+          onSelect: () => this.selectSubject(Subject.CHINESE)
+        });
+        ChoiceSelectionChip({
+          label: Subject.MATH,
+          selected: this.subjectChosen && this.selectedSubject === Subject.MATH,
+          onSelect: () => this.selectSubject(Subject.MATH)
+        });
+        ChoiceSelectionChip({
+          label: Subject.ENGLISH,
+          selected: this.subjectChosen && this.selectedSubject === Subject.ENGLISH,
+          onSelect: () => this.selectSubject(Subject.ENGLISH)
+        });
+        ChoiceSelectionChip({
+          label: Subject.OTHER,
+          selected: this.subjectChosen && this.selectedSubject === Subject.OTHER,
+          onSelect: () => this.selectSubject(Subject.OTHER)
+        });
+      }
+      .width('100%');
+      if (!this.subjectChosen) {
+        Text('请先选择本次作业的科目，整理后不会自动修改')
+          .width('100%')
+          .fontSize(11)
+          .fontColor(AppTheme.TERTIARY_TEXT);
+      }
+    }
+    .width('100%');
   }
 
   @Builder
@@ -201,7 +257,9 @@ export struct HomeworkImportPage {
 
   @Builder
   private AssignmentInput() {
-    Column({ space: 10 }) {
+    Column({ space: 12 }) {
+      this.SubjectSelector();
+
       Row() {
         Text('作业内容')
           .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
@@ -215,7 +273,7 @@ export struct HomeworkImportPage {
       .width('100%');
 
       TextArea({
-        placeholder: '例如：语文背诵第12课；数学口算20题；英语读课文两遍',
+        placeholder: '例如：背诵第12课并完成课后练习',
         text: this.textDraft
       })
         .width('100%')
@@ -254,10 +312,10 @@ export struct HomeworkImportPage {
         .width('100%')
         .height(AppTheme.BUTTON_HEIGHT)
         .borderRadius(AppTheme.CONTROL_RADIUS)
-        .enabled(!this.parseBusy && this.textDraft.trim().length > 0)
+        .enabled(!this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0)
         .fontSize(15)
         .fontWeight(FontWeight.Medium)
-        .backgroundColor(this.textDraft.trim().length > 0 ? AppTheme.PRIMARY : AppTheme.DISABLED)
+        .backgroundColor(this.subjectChosen && this.textDraft.trim().length > 0 ? AppTheme.PRIMARY : AppTheme.DISABLED)
         .fontColor(AppTheme.TEXT_ON_PRIMARY)
         .onClick(() => { void this.organize(); });
     }
