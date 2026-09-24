@@ -396,7 +396,7 @@ export struct StudyWorkspacePage {
             compact: true,
             isEnabled: !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
               this.submissionPhotoUris.length < 6,
-            onAction: () => { void this.selectSubmissionPhotos(); }
+            onAction: (): void => { void this.selectSubmissionPhotos(); }
           })
           .layoutWeight(1);
           ActionButton({
@@ -405,7 +405,7 @@ export struct StudyWorkspacePage {
             compact: true,
             isEnabled: !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
               this.submissionPhotoUris.length < 6,
-            onAction: () => { void this.captureSubmissionPhoto(); }
+            onAction: (): void => { void this.captureSubmissionPhoto(); }
           })
           .layoutWeight(1);
         }
@@ -625,7 +625,7 @@ export struct StudyWorkspacePage {
             ActionButton({
               label: this.primaryActionLabel(),
               isEnabled: this.primaryActionEnabled(),
-              onAction: () => { void this.runPrimaryAction(); }
+              onAction: (): void => { void this.runPrimaryAction(); }
             })
             .width('100%');
           }
@@ -653,7 +653,7 @@ export struct StudyWorkspacePage {
           ActionButton({
             label: '问小伴',
             kind: ActionButtonKind.SECONDARY,
-            onAction: () => {
+            onAction: (): void => {
               this.tutorPanelOpen = true;
               void this.loadTutor();
             }
@@ -667,7 +667,7 @@ export struct StudyWorkspacePage {
             kind: ActionButtonKind.SECONDARY,
             isEnabled: !this.actionRunning,
             accessibilityLabel: '暂停作业计时',
-            onAction: () => { void this.pauseCurrentAssignment(); }
+            onAction: (): void => { void this.pauseCurrentAssignment(); }
           })
           .width(showTutorEntry ? 88 : 112);
         }
@@ -678,7 +678,7 @@ export struct StudyWorkspacePage {
             kind: ActionButtonKind.SECONDARY,
             isEnabled: !this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos,
             accessibilityLabel: '返回作业继续完成',
-            onAction: () => this.requestResumeFromSubmission()
+            onAction: (): void => this.requestResumeFromSubmission()
           })
           .width(112);
         }
@@ -686,7 +686,7 @@ export struct StudyWorkspacePage {
         ActionButton({
           label: this.primaryActionLabel(),
           isEnabled: this.primaryActionEnabled(),
-          onAction: () => { void this.runPrimaryAction(); }
+          onAction: (): void => { void this.runPrimaryAction(); }
         })
         .layoutWeight(1);
       }
@@ -899,7 +899,7 @@ export struct StudyWorkspacePage {
               label: this.tutorSending ? '发送中…' : '发送',
               compact: true,
               isEnabled: !this.tutorSending && this.tutorDraft.trim().length > 0,
-              onAction: () => { void this.askTutor(); }
+              onAction: (): void => { void this.askTutor(); }
             })
             .width(88);
           }
