@@ -55,6 +55,9 @@ require("showPreviousAnswer: boolean = false" in attempt_page,
         "previous answers and notes must remain hidden by default")
 require("只练错题" in result_page and "retryWrong" in result_page and "retryWrong" in result_vm,
         "Practice result must support wrong-only retry")
+require("cachedPaperVersion" in result_vm and "cachedStudentId" in result_vm and
+        "item.paperVersion === paperVersion" in result_vm,
+        "Practice progress comparison must stay within the same student and paper version")
 require("item.noteContent.length > 0" in result_page and "我的笔记" in result_page,
         "submitted result must display immutable per-question notes")
 require("modeLabel" in history_vm and "错题专项" in history_vm,
