@@ -21,6 +21,15 @@ export class LayoutPolicy {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : fallbackVp;
   }
 
+  // Shared responsive page inset. Feature code should not infer Phone/Pad from a device model.
+  static pagePaddingForWidth(availableWidthVp: number): number {
+    if (!Number.isFinite(availableWidthVp) || availableWidthVp <= 600) {
+      return AppTheme.PAGE_PADDING_COMPACT;
+    }
+    if (availableWidthVp <= 840) return AppTheme.PAGE_PADDING_MEDIUM;
+    return AppTheme.PAGE_PADDING_EXPANDED;
+  }
+
   static homeFocusSummaryRequirement(): LayoutRequirement {
     return new LayoutRequirement(AppTheme.HOME_PRIMARY_MIN_WIDTH, AppTheme.HOME_SECONDARY_MIN_WIDTH,
       AppTheme.SPLIT_PANE_GAP, AppTheme.PAGE_PADDING_WIDE);
