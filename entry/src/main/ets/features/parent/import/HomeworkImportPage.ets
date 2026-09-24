@@ -143,8 +143,9 @@ export struct HomeworkImportPage {
     Column({ space: 7 }) {
       Text('作业科目')
         .width('100%')
-        .fontSize(12)
-        .fontColor(AppTheme.SUBTEXT);
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
       Row({ space: 8 }) {
         ChoiceSelectionChip({
           label: Subject.CHINESE,
