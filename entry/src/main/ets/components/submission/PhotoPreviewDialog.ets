@@ -9,7 +9,7 @@ export struct PhotoPreviewDialog {
     Column({ space: 10 }) {
       Row() {
         Text('查看作业照片')
-          .fontSize(18)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
