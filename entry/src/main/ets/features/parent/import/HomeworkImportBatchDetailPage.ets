@@ -210,6 +210,42 @@ export struct HomeworkImportBatchDetailPage {
             }
             .width('100%');
 
+            if (this.batch()!.understood !== undefined ||
+              (this.batch()!.pendingReviewMessageIds !== undefined &&
+                this.batch()!.pendingReviewMessageIds!.length > 0) ||
+              (this.batch()!.understandingWarnings !== undefined &&
+                this.batch()!.understandingWarnings!.length > 0)) {
+              Column({ space: 6 }) {
+                Text('作业理解')
+                  .width('100%')
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                Text(this.batch()!.understood === true ? '已完成规则理解' : '规则理解未完成')
+                  .width('100%')
+                  .fontSize(13)
+                  .fontColor(this.batch()!.understood === true ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+                Text(`待人工确认消息：${this.batch()!.pendingReviewMessageIds === undefined ?
+                  0 : this.batch()!.pendingReviewMessageIds!.length}`)
+                  .width('100%')
+                  .fontSize(13)
+                  .fontColor(AppTheme.SUBTEXT);
+                if (this.batch()!.understandingWarnings !== undefined &&
+                  this.batch()!.understandingWarnings!.length > 0) {
+                  Text(`理解提示：${this.batch()!.understandingWarnings!.join('；')}`)
+                    .width('100%')
+                    .fontSize(12)
+                    .lineHeight(18)
+                    .fontColor(AppTheme.TERTIARY_TEXT);
+                }
+              }
+              .width('100%')
+              .padding(14)
+              .backgroundColor(AppTheme.SURFACE)
+              .border({ width: 1, color: AppTheme.BORDER })
+              .borderRadius(AppTheme.PHONE_CARD_RADIUS);
+            }
+
             if (this.message.length > 0) {
               Text(this.message)
                 .width('100%')
@@ -221,8 +257,15 @@ export struct HomeworkImportBatchDetailPage {
                 .borderRadius(AppTheme.CONTROL_RADIUS);
             }
 
-            if (this.batch()!.status === ImportBatchStatus.RECEIVED)
-            if (this.batch()!.status === ImportBatchStatus.READY) {
+            if (this.batch()!.status === ImportBatchStatus.RECEIVED) {
+              Button('人工确认未识别消息', { type: ButtonType.Normal })
+                .width('100%')
+                .height(AppTheme.BUTTON_HEIGHT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .backgroundColor(AppTheme.PRIMARY)
+                .fontColor(AppTheme.TEXT_ON_PRIMARY)
+                .onClick(() => this.manualReview());
+            } else if (this.batch()!.status === ImportBatchStatus.READY) {
               Button('继续确认并发布', { type: ButtonType.Normal })
                 .width('100%')
                 .height(AppTheme.BUTTON_HEIGHT)
@@ -230,7 +273,10 @@ export struct HomeworkImportBatchDetailPage {
                 .backgroundColor(AppTheme.PRIMARY)
                 .fontColor(AppTheme.TEXT_ON_PRIMARY)
                 .onClick(() => this.continueConfirmation());
+            }
 
+            if (this.batch()!.status === ImportBatchStatus.RECEIVED ||
+              this.batch()!.status === ImportBatchStatus.READY) {
               if (this.abandonConfirm) {
                 Column({ space: 8 }) {
                   Text('放弃这个导入批次？候选作业会从待确认区清除；已经发布的作业不会被删除。')
