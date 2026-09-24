@@ -48,8 +48,8 @@ detail_content = detail.split("private DetailContent()", 1)[-1].split("\n  build
 require("item" not in detail_content and "this.assignment()!" in detail_content,
         "Assignment Detail content must resolve the current assignment from reactive props during render")
 require("Scroll()" in detail and ".layoutWeight(1)" in detail and
-        "Button(this.actionLabel(this.assignment()!)" in detail,
-        "Assignment Detail must keep content scrollable with a fixed primary action")
+        "ActionButton({" in detail and "label: this.actionLabel(this.assignment()!)" in detail,
+        "Assignment Detail must keep content scrollable with a fixed shared primary action")
 require("HomeworkStore.instance" not in detail,
         "V2 Assignment Detail must stay behind AssignmentRepository cache instead of direct Store access")
 require("AssignmentDetailPane" in page and "DeepPageHeader" in page,
