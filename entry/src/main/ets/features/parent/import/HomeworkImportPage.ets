@@ -240,7 +240,7 @@ export struct HomeworkImportPage {
         kind: ActionButtonKind.SECONDARY,
         compact: true,
         isEnabled: !this.parseBusy,
-        onClick: () => { void this.recognizePhoto(); }
+        onAction: () => { void this.recognizePhoto(); }
       })
       .layoutWeight(1);
 
@@ -249,7 +249,7 @@ export struct HomeworkImportPage {
         kind: ActionButtonKind.SECONDARY,
         compact: true,
         isEnabled: !this.parseBusy,
-        onClick: () => { void this.recognizeGallery(); }
+        onAction: () => { void this.recognizeGallery(); }
       })
       .layoutWeight(1);
     }
@@ -312,7 +312,7 @@ export struct HomeworkImportPage {
       ActionButton({
         label: this.parseBusy ? '正在处理…' : '整理并继续',
         isEnabled: !this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0,
-        onClick: () => { void this.organize(); }
+        onAction: () => { void this.organize(); }
       })
       .width('100%');
     }
