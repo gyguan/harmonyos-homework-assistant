@@ -149,7 +149,7 @@ export struct PracticePaperDetailPage {
     Column({ space: 10 }) {
       Row() {
         Text('我的练习记录')
-          .fontSize(16)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
