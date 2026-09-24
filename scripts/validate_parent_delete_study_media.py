@@ -23,6 +23,7 @@ port = read("entry/src/main/ets/domain/port/AssignmentRepository.ets")
 repo = read("entry/src/main/ets/data/repository/DefaultAssignmentRepository.ets")
 remote = read("entry/src/main/ets/application/remote/HomeworkRemoteApi.ets")
 progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
+list_item = read("entry/src/main/ets/components/assignment/AssignmentListItem.ets")
 progress_vm = read("entry/src/main/ets/features/parent/progress/ParentProgressViewModel.ets")
 review = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 review_vm = read("entry/src/main/ets/features/parent/review/ParentReviewViewModel.ets")
@@ -65,10 +66,21 @@ require("deleteAssignments(assignmentIds: string[])" in progress_vm,
 require("Text(this.bulkMode ? '取消' : '删除')" in progress and
         "完成删除选择" not in progress,
         "parent progress must use a stable delete/cancel action rather than a separate completion action")
-require("Text(this.canDelete(item) ? (this.isDeleteSelected(item.id) ? '✓' : '') : '—')" not in progress and
-        "selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item)" in progress and
+require("selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item)" in progress and
+        "selectionMode: this.bulkMode" in progress and
+        "selectionAvailable: this.canDelete(item)" in progress and
         "onOpen: () => this.openAssignment(item)" in progress,
-        "bulk delete must select the full assignment card without adding an external leading selector that can overflow")
+        "bulk delete must drive the reusable task card selection state")
+require("@Prop selectionMode: boolean = false;" in list_item and
+        "@Prop selectionAvailable: boolean = true;" in list_item and
+        "private LeadingIndicator()" in list_item and
+        "if (this.selectionMode)" in list_item and
+        ".width(38)" in list_item,
+        "delete selector must replace the existing 38vp subject badge inside the card instead of adding external width")
+require("this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}" in list_item and
+        ".maxLines(1)" in list_item and
+        ".textOverflow({ overflow: TextOverflow.Ellipsis })" in list_item,
+        "task-card secondary information must stay on one bounded line without overlap or horizontal overflow")
 require("删除作业" in review and "this.viewModel.deleteAssignment(item.id)" in review,
         "parent detail must allow single unfinished assignment deletion")
 require("deleteAssignment(assignmentId: string)" in review_vm,
