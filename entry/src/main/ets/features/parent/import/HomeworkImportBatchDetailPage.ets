@@ -83,23 +83,25 @@ export struct HomeworkImportBatchDetailPage {
     Column({ space: 6 }) {
       Row() {
         Text(item.sender.length > 0 ? item.sender : '原始内容')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
-        Text(`#${item.orderNo}`).fontSize(12).fontColor(AppTheme.TERTIARY_TEXT);
+        Text(`#${item.orderNo}`).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%');
 
       Text(item.text.length > 0 ? item.text : '（图片消息）')
         .width('100%')
-        .fontSize(13)
-        .lineHeight(20)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
         .fontColor(AppTheme.TEXT);
 
       if (item.attachments.length > 0) {
         Text(`附件 ${item.attachments.length} 个`)
-          .fontSize(12)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
     }
@@ -115,7 +117,8 @@ export struct HomeworkImportBatchDetailPage {
     Column({ space: 5 }) {
       Row() {
         Text(item.subject)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
         Blank();
@@ -129,8 +132,8 @@ export struct HomeworkImportBatchDetailPage {
         .fontColor(AppTheme.TEXT);
       Text(item.sourceEvidence.excerpt)
         .width('100%')
-        .fontSize(12)
-        .lineHeight(17)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.SUBTEXT);
       if (this.sourceMessageIds(item).length > 0) {
         Text(`证据消息：${this.sourceMessageIds(item).join(', ')}`)
@@ -162,7 +165,8 @@ export struct HomeworkImportBatchDetailPage {
           if (this.batch() === null) {
             Text('找不到这个导入批次')
               .width('100%')
-              .fontSize(14)
+              .fontSize(AppTheme.BODY_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT)
               .fontColor(AppTheme.SUBTEXT)
               .padding(18)
               .backgroundColor(AppTheme.SURFACE)
@@ -173,7 +177,9 @@ export struct HomeworkImportBatchDetailPage {
               Text('来源')
                 .width('100%')
                 .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
+                .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
                 .fontColor(AppTheme.TEXT);
               Text(this.batch()!.sourceLabel)
                 .width('100%')
@@ -190,7 +196,9 @@ export struct HomeworkImportBatchDetailPage {
               Text(`原始消息 ${this.messages().length}`)
                 .width('100%')
                 .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
+                .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
                 .fontColor(AppTheme.TEXT);
               ForEach(this.messages(), (item: ImportedMessage) => {
                 this.SourceMessageCard(item);
@@ -202,7 +210,9 @@ export struct HomeworkImportBatchDetailPage {
               Text(`候选作业 ${this.candidates().length}`)
                 .width('100%')
                 .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
+                .maxLines(AppTheme.SECTION_TITLE_MAX_LINES)
                 .fontColor(AppTheme.TEXT);
               ForEach(this.candidates(), (item: CandidateAssignment) => {
                 this.CandidateCard(item);
@@ -218,7 +228,8 @@ export struct HomeworkImportBatchDetailPage {
               Column({ space: 6 }) {
                 Text('作业理解')
                   .width('100%')
-                  .fontSize(15)
+                  .fontSize(AppTheme.SECTION_TITLE_SIZE)
+                  .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
                   .fontWeight(FontWeight.Medium)
                   .fontColor(AppTheme.TEXT);
                 Text(this.batch()!.understood === true ? '已完成规则理解' : '规则理解未完成')
@@ -228,14 +239,15 @@ export struct HomeworkImportBatchDetailPage {
                 Text(`待人工确认消息：${this.batch()!.pendingReviewMessageIds === undefined ?
                   0 : this.batch()!.pendingReviewMessageIds!.length}`)
                   .width('100%')
-                  .fontSize(13)
+                  .fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT)
                   .fontColor(AppTheme.SUBTEXT);
                 if (this.batch()!.understandingWarnings !== undefined &&
                   this.batch()!.understandingWarnings!.length > 0) {
                   Text(`理解提示：${this.batch()!.understandingWarnings!.join('；')}`)
                     .width('100%')
-                    .fontSize(12)
-                    .lineHeight(18)
+                    .fontSize(AppTheme.CAPTION_SIZE)
+                    .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
                     .fontColor(AppTheme.TERTIARY_TEXT);
                 }
               }
@@ -249,8 +261,8 @@ export struct HomeworkImportBatchDetailPage {
             if (this.message.length > 0) {
               Text(this.message)
                 .width('100%')
-                .fontSize(13)
-                .lineHeight(18)
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
                 .fontColor(AppTheme.SUBTEXT)
                 .padding(10)
                 .backgroundColor(AppTheme.SURFACE_SUBTLE)
@@ -281,8 +293,8 @@ export struct HomeworkImportBatchDetailPage {
                 Column({ space: 8 }) {
                   Text('放弃这个导入批次？候选作业会从待确认区清除；已经发布的作业不会被删除。')
                     .width('100%')
-                    .fontSize(13)
-                    .lineHeight(18)
+                    .fontSize(AppTheme.BODY_SIZE)
+                    .lineHeight(AppTheme.BODY_LINE_HEIGHT)
                     .fontColor(AppTheme.DANGER);
                   Row({ space: 8 }) {
                     Button('取消', { type: ButtonType.Normal })
