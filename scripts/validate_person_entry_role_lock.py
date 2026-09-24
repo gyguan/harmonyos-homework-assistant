@@ -21,6 +21,7 @@ entry_page = read("entry/src/main/ets/pages/PersonEntryPage.ets")
 app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 student_switcher = read("entry/src/main/ets/components/family/StudentSwitcherDialog.ets")
 identity_switcher = read("entry/src/main/ets/components/family/IdentitySwitcherDialog.ets")
+identity_context = read("entry/src/main/ets/components/family/IdentityContextBar.ets")
 parent_access = read("entry/src/main/ets/components/family/ParentAccessDialog.ets")
 settings = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
 
@@ -56,8 +57,10 @@ require("updateParentAccessCode" in settings and "设备家长码" in settings a
         "家长码只保存在当前设备" in settings,
         "parent settings must allow enabling, changing and disabling the device access code")
 
-require("@Prop role: AppRole" in app_shell and "@State private role" not in app_shell,
-        "AppShell must not own mutable role state")
+require("@Prop @Watch('onRoleChanged') role: AppRole" in app_shell and
+        "@State private role" not in app_shell and
+        "private onRoleChanged(): void" in app_shell,
+        "AppShell must observe root-owned role changes without owning mutable role state")
 require("IdentitySwitcherDialog" in app_shell and "@CustomDialog" in identity_switcher,
         "AppShell must expose a reusable in-app identity switcher")
 require("private openIdentitySwitcher()" in app_shell and
@@ -69,15 +72,24 @@ require("private resetPersonaNavigation()" in app_shell and
         "this.studentRoute = StudentRoute.HOME" in app_shell and
         "this.parentRoute = ParentRoute.DASHBOARD" in app_shell,
         "identity changes must clear role-specific navigation state")
+switch_parent = app_shell.split("private switchToParent(): void {", 1)[1].split(
+    "private switchToStudent(studentId: string): void {", 1)[0]
+require("this.resetPersonaNavigation()" not in switch_parent and
+        "this.onSwitchParent();" in switch_parent and
+        "this.resetPersonaNavigation();" in app_shell.split("private onRoleChanged(): void {", 1)[1].split(
+            "private openIdentitySwitcher()", 1)[0],
+        "parent navigation must reset only after parent access succeeds and role actually changes")
 switch_student = app_shell.split("private switchToStudent(studentId: string): void {", 1)[1].split(
     "private openStudentSwitcher()", 1)[0]
 require("this.familyContext.setActiveStudent(studentId)" not in switch_student and
         "this.onSwitchStudent(studentId)" in switch_student,
         "AppShell identity switch must delegate student context ownership to Index")
-require("private IdentityContextBar()" in app_shell and
-        "this.IdentityContextBar();" in app_shell,
-        "Phone shell must expose current identity for both roles")
-require(app_shell.count(".onClick(() => this.openIdentitySwitcher())") >= 2,
+require("IdentityContextBar({" in app_shell and
+        "onSwitchIdentity: () => this.openIdentitySwitcher()" in app_shell and
+        "@Component" in identity_context and "export struct IdentityContextBar" in identity_context,
+        "Phone identity context presentation must stay in the shared family component")
+require("onSwitchIdentity: () => this.openIdentitySwitcher()" in app_shell and
+        ".onClick(() => this.openIdentitySwitcher())" in app_shell,
         "Phone and wide shells must both expose identity switching")
 require("@State private identityParentActive: boolean" in app_shell and
         "parentActive: $identityParentActive" in app_shell and
