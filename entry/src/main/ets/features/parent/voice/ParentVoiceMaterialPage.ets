@@ -406,7 +406,7 @@ export struct ParentVoiceMaterialPage {
       if (this.pendingPackages.length > 0) {
         TextAction({
           label: '应用到已添加目录',
-          onClick: () => this.applyDefaultsToPending()
+          onAction: () => this.applyDefaultsToPending()
         });
       }
     }
@@ -437,7 +437,7 @@ export struct ParentVoiceMaterialPage {
         TextAction({
           label: '移除',
           kind: TextActionKind.DANGER,
-          onClick: () => this.removePackage(index)
+          onAction: () => this.removePackage(index)
         });
       }
       .width('100%');
@@ -492,7 +492,7 @@ export struct ParentVoiceMaterialPage {
         kind: ActionButtonKind.SECONDARY,
         compact: true,
         isEnabled: !this.selecting && !this.uploading,
-        onClick: () => { void this.addPackages(); }
+        onAction: () => { void this.addPackages(); }
       })
       .width('100%');
 
@@ -510,7 +510,7 @@ export struct ParentVoiceMaterialPage {
         ActionButton({
           label: this.uploading ? '正在导入…' : `导入 ${this.pendingPackages.length} 个目录`,
           isEnabled: !this.uploading,
-          onClick: () => { void this.uploadPending(); }
+          onAction: () => { void this.uploadPending(); }
         })
         .width('100%');
       }
@@ -565,7 +565,7 @@ export struct ParentVoiceMaterialPage {
           kind: ActionButtonKind.SECONDARY,
           compact: true,
           isEnabled: this.creatingPackageId.length === 0 && !item.hasActiveAssignment,
-          onClick: () => this.openCreateSheet(item)
+          onAction: () => this.openCreateSheet(item)
         })
         .width('100%');
       }
@@ -588,7 +588,7 @@ export struct ParentVoiceMaterialPage {
             TextAction({
               label: '关闭',
               kind: TextActionKind.NEUTRAL,
-              onClick: () => this.closeCreateSheet()
+              onAction: () => this.closeCreateSheet()
             });
           }.width('100%');
           Text(this.creatingItem()!.directoryName).width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
@@ -623,13 +623,13 @@ export struct ParentVoiceMaterialPage {
               label: '取消',
               kind: ActionButtonKind.NEUTRAL,
               isEnabled: !this.creatingAssignment,
-              onClick: () => this.closeCreateSheet()
+              onAction: () => this.closeCreateSheet()
             })
             .layoutWeight(1);
             ActionButton({
               label: this.creatingAssignment ? '创建中…' : '确认创建',
               isEnabled: !this.creatingAssignment,
-              onClick: () => { void this.confirmCreateAssignment(); }
+              onAction: () => { void this.confirmCreateAssignment(); }
             })
             .layoutWeight(1);
           }.width('100%');
