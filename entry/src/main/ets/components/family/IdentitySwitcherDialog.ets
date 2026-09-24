@@ -27,16 +27,21 @@ export struct IdentitySwitcherDialog {
         Column({ space: 3 }) {
           Text('切换身份')
             .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
-            .fontWeight(FontWeight.Bold)
+            .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
           Text('选择家长或学生，切换后自动进入对应界面')
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT)
+            .maxLines(2);
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
         Text('关闭')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
           .padding({ left: 12, right: 4 })
@@ -51,7 +56,8 @@ export struct IdentitySwitcherDialog {
         Column({ space: 12 }) {
           Text('家长')
             .width('100%')
-            .fontSize(12)
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUBTEXT);
 
@@ -69,13 +75,17 @@ export struct IdentitySwitcherDialog {
             Column({ space: 3 }) {
               Text('家长')
                 .width('100%')
-                .fontSize(15)
+                .fontSize(AppTheme.CARD_TITLE_SIZE)
+                .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
                 .fontWeight(FontWeight.Medium)
+                .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
                 .fontColor(AppTheme.TEXT);
               Text('布置作业、查看进度、验收任务')
                 .width('100%')
-                .fontSize(12)
-                .fontColor(AppTheme.SUBTEXT);
+                .fontSize(AppTheme.CAPTION_SIZE)
+                .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+                .fontColor(AppTheme.SUBTEXT)
+                .maxLines(2);
             }
             .layoutWeight(1)
             .alignItems(HorizontalAlign.Start);
@@ -98,7 +108,8 @@ export struct IdentitySwitcherDialog {
 
           Text('学生')
             .width('100%')
-            .fontSize(12)
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUBTEXT)
             .margin({ top: 4 });
