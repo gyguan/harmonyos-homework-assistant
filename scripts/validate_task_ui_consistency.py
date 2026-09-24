@@ -52,13 +52,14 @@ require("AssignmentMetricSummary({" not in home and "今天的学习" not in hom
         "parent home must stay action-only without progress metrics or attention sections")
 for phrase in ["布置作业", "语音作业", "作业收件箱"]:
     require(phrase in home, f"parent home missing required primary action: {phrase}")
-require("AssignmentMetricSummary({" in progress and "private metricAssignments(): Assignment[]" in progress,
-        "parent progress must own metrics scoped to the current date and subject query")
+require("AssignmentMetricSummary({" in progress and "private metricAssignments(): Assignment[]" in progress and
+        "@State private scopedAssignments: Assignment[] = []" in progress,
+        "parent progress metrics and list must share one scoped assignment snapshot")
 require("this.subjectCode" in progress and "this.selectedDayEpochMs" in progress,
         "parent progress metric scope must follow the same date and subject filters as the list")
 require("interactive: true" in progress and "onSelect: (key: AssignmentMetricKey)" in progress and
-        "void this.queryCurrent()" in progress,
-        "parent progress metric clicks must update the assignment list")
+        "this.applyItems(this.filterByStatus(this.scopedAssignments))" in progress,
+        "parent progress metric clicks must filter the same query snapshot")
 require("Text(`${this.viewModel.student().name}" not in progress,
         "parent progress title must not duplicate the global student context")
 require("Text(this.bulkMode ? '完成' : '管理')" in progress and
