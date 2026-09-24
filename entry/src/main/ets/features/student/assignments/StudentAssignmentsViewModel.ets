@@ -19,13 +19,8 @@ export class StudentAssignmentsViewModel {
     return this.repository.listCached(AssignmentFilterFactory.create(typeFilter, subjectCode, dateFilter, statuses));
   }
 
-  calendarAssignments(typeFilter: AssignmentTypeFilter, subjectCode: string): Assignment[] {
-    return this.repository.listCached(
-      AssignmentFilterFactory.create(typeFilter, subjectCode, AssignmentDateFilter.ALL, []));
-  }
-
   assignmentsOnDay(typeFilter: AssignmentTypeFilter, subjectCode: string, dayEpochMs: number): Assignment[] {
-    let source = this.calendarAssignments(typeFilter, subjectCode);
+    let source = this.assignments(typeFilter, subjectCode, AssignmentDateFilter.ALL);
     let targetDay = AssignmentDateRange.startOfDay(dayEpochMs);
     let result: Assignment[] = [];
     for (let item of source) {
