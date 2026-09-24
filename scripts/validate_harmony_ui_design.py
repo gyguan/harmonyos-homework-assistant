@@ -166,6 +166,14 @@ if assignment_list_item:
 
 # Persistent selectors whose visual state changes at runtime must use reactive child-component props,
 # not ordinary @Builder boolean snapshots. Keep both the binding mechanism and visible feedback guarded.
+action_controls = read_optional("entry/src/main/ets/components/action/ActionControls.ets")
+require("export struct ActionButton" in action_controls and "export struct TextAction" in action_controls and
+        "ActionButtonKind.PRIMARY" in action_controls and "TextActionKind.DANGER" in action_controls,
+        "shared action controls must define primary/secondary/danger buttons and text actions")
+require("AppTheme.BUTTON_HEIGHT" in action_controls and "AppTheme.SECONDARY_BUTTON_HEIGHT" in action_controls and
+        "AppTheme.CONTROL_RADIUS" in action_controls,
+        "shared action controls must consume durable theme sizing rather than page-local literals")
+
 selection_controls = read_optional("entry/src/main/ets/components/selection/SelectionControls.ets")
 require(len(selection_controls) > 0, "missing shared reactive selection controls")
 if selection_controls:
@@ -203,12 +211,14 @@ require("calendarMode" not in student_assignments and "AssignmentCalendarPanel" 
 
 filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
 for state_expr, label in [
-    ("this.allDates === allDates ? AppTheme.PRIMARY_SOFT", "assignment date mode"),
+    ("selected: this.allDates === allDates", "assignment date mode"),
     ("DatePicker({", "assignment date"),
-    ("this.subjectCode === value ? AppTheme.PRIMARY_SOFT", "assignment subject"),
+    ("selected: this.subjectCode === value", "assignment subject"),
 ]:
     require(state_expr in filter_dialog,
-            f"shared filter dialog {label} selection must have an active surface")
+            f"shared filter dialog {label} selection must bind to shared reactive controls")
+require("SegmentedSelectionButton" in filter_dialog,
+        "shared assignment filter must reuse the common segmented selection component")
 
 parent_progress = read_optional("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
 require("private FilterChip(" not in parent_progress and "private FilterEntry(" not in parent_progress,
