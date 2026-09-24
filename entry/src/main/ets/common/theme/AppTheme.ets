@@ -109,6 +109,12 @@ export class AppTheme {
   static readonly LABEL_TITLE_LINE_HEIGHT: number = 20;
   static readonly BODY_SIZE: number = 14;
   static readonly BODY_LINE_HEIGHT: number = 21;
+  // Child-facing homework instructions/question content get one larger reading level.
+  static readonly READING_BODY_SIZE: number = 16;
+  static readonly READING_BODY_LINE_HEIGHT: number = 24;
+  // Text inside 48vp inputs is slightly larger than ordinary body copy without changing control height.
+  static readonly FORM_TEXT_SIZE: number = 15;
+  static readonly FORM_TEXT_LINE_HEIGHT: number = 22;
   static readonly META_SIZE: number = 13;
   static readonly META_LINE_HEIGHT: number = 18;
   static readonly CAPTION_SIZE: number = 12;
