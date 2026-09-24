@@ -3,7 +3,7 @@ import { BackendSession } from '../../../application/remote/BackendSession';
 import { FamilyCloudService } from '../../../application/remote/FamilyCloudService';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind, TextAction } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize, TextAction } from '../../../components/action/ActionControls';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { SettingsToggleRow } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -298,14 +298,14 @@ export struct BackendConnectionPage {
               ActionButton({
                 label: '取消删除',
                 kind: ActionButtonKind.NEUTRAL,
-                compact: true,
+                size: ActionButtonSize.SMALL,
                 onAction: (): void => { this.deleteStudentConfirmId = ''; }
               })
               .layoutWeight(1);
               ActionButton({
                 label: '确认删除',
                 kind: ActionButtonKind.DANGER,
-                compact: true,
+                size: ActionButtonSize.SMALL,
                 onAction: (): void => { void this.deleteStudent(this.editingId); }
               })
               .layoutWeight(1);
@@ -319,13 +319,13 @@ export struct BackendConnectionPage {
               ActionButton({
                 label: '删除',
                 kind: ActionButtonKind.DANGER_SOFT,
-                compact: true,
+                size: ActionButtonSize.SMALL,
                 onAction: (): void => { this.deleteStudentConfirmId = this.editingId; }
               });
             }
             ActionButton({
               label: '保存',
-              compact: true,
+              size: ActionButtonSize.SMALL,
               onAction: (): void => { void this.saveStudent(); }
             })
             .layoutWeight(1);
@@ -434,13 +434,13 @@ export struct BackendConnectionPage {
           ActionButton({
             label: '关闭家长码',
             kind: ActionButtonKind.NEUTRAL,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onAction: (): void => this.clearParentAccessCode()
           });
         }
         ActionButton({
           label: this.parentAccessEnabled() ? '修改家长码' : '启用家长码',
-          compact: true,
+          size: ActionButtonSize.SMALL,
           onAction: (): void => this.saveParentAccessCode()
         })
         .layoutWeight(1);
@@ -529,14 +529,14 @@ export struct BackendConnectionPage {
             ActionButton({
               label: '立即同步',
               kind: ActionButtonKind.SECONDARY,
-              compact: true,
+              size: ActionButtonSize.SMALL,
               onAction: (): void => { void this.syncCloudData(); }
             })
             .layoutWeight(1);
             ActionButton({
               label: '断开连接',
               kind: ActionButtonKind.NEUTRAL,
-              compact: true,
+              size: ActionButtonSize.SMALL,
               onAction: (): void => { void this.disconnect(); }
             })
             .layoutWeight(1);
