@@ -206,7 +206,7 @@ export struct ParentExtraAssignmentPage {
         .width('100%').layoutWeight(1).align(Alignment.TopStart).scrollBar(BarState.Off);
       }
       .width('100%').height('100%')
-      .constraintSize({ maxWidth: AppTheme.PARENT_REVIEW_READABLE_MAX_WIDTH })
+      .constraintSize({ maxWidth: AppTheme.PARENT_DEEP_READABLE_MAX_WIDTH })
       .padding({ left: AppTheme.PAGE_PADDING, right: AppTheme.PAGE_PADDING, top: AppTheme.DEEP_PAGE_TOP_PADDING });
     }
     .width('100%').height('100%')
