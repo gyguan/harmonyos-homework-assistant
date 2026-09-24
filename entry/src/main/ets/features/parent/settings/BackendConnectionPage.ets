@@ -693,7 +693,7 @@ export struct BackendConnectionPage {
             }
           }
           .width('100%')
-          .constraintSize({ maxWidth: AppTheme.PROFILE_READABLE_MAX_WIDTH })
+          .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
           .padding(AppTheme.PAGE_PADDING);
         }
         .width('100%')
