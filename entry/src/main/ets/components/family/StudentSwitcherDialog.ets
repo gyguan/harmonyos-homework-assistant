@@ -1,4 +1,5 @@
 import { AppTheme } from '../../common/theme/AppTheme';
+import { TextAction, TextActionKind } from '../action/ActionControls';
 import { CenteredTextBadge } from './CenteredTextBadge';
 import { StudentProfile } from '../../domain/model/HomeworkModels';
 
@@ -28,14 +29,12 @@ export struct StudentSwitcherDialog {
         }
         .alignItems(HorizontalAlign.Start);
         Blank();
-        Text('关闭')
-          .fontSize(13)
-          .fontColor(AppTheme.SUBTEXT)
-          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 12, right: 4 })
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('关闭孩子选择')
-          .onClick(() => this.controller.close());
+        TextAction({
+          label: '关闭',
+          kind: TextActionKind.NEUTRAL,
+          accessibilityLabel: '关闭孩子选择',
+          onClick: () => this.controller.close()
+        });
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 20, bottom: 12 });
