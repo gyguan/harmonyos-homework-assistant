@@ -229,6 +229,8 @@ assignment_filter_dialog = read_optional("entry/src/main/ets/components/assignme
 confirmation_candidates = read_optional("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 import_batch_detail = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 import_inbox = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
+parent_review_pane = read_optional("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
+voice_material = read_optional("entry/src/main/ets/features/parent/voice/ParentVoiceMaterialPage.ets")
 for card_path, card_source in [
     ("ParentDashboardPage", parent_dashboard),
     ("IdentitySwitcherDialog", identity_switcher),
@@ -328,6 +330,12 @@ for card_title_name, card_title_source in [
             f"{card_title_name} visible list/card titles must use the shared card-title size")
 require("this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE" in student_home,
         "Student home task cards must express emphasis through shared title tokens")
+require("fontSize(AppTheme.PAGE_TITLE_SIZE)" in parent_review_pane,
+        "Parent review business object title must use the shared page-title size")
+require("AppTheme.PAGE_NAV_TITLE_SIZE" in voice_material and
+        voice_material.count("AppTheme.SECTION_TITLE_SIZE") >= 3 and
+        voice_material.count("AppTheme.CARD_TITLE_SIZE") >= 3,
+        "Voice material page must use the shared page/section/card title hierarchy")
 
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
