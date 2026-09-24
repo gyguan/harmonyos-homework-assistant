@@ -361,7 +361,7 @@ export struct HomeworkImportPage {
     }
     .width('100%')
     .height('100%')
-    .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
+    .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
     .padding({
       left: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING,
       right: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING,
