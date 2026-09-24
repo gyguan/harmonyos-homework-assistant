@@ -3,7 +3,7 @@ import {
   ParentSubmissionEvidenceService
 } from '../../../application/submission/ParentSubmissionEvidenceService';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../../../components/action/ActionControls';
 import { CloudSubmissionPhotoStrip } from '../../../components/submission/CloudSubmissionPhotoStrip';
 import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
@@ -359,22 +359,19 @@ export struct ParentReviewPane {
               .width('100%');
 
               if (this.canEdit(this.assignment()!) || this.canDelete(this.assignment()!)) {
-                Row({ space: 10 }) {
+                Row({ space: 6 }) {
                   if (this.canEdit(this.assignment()!)) {
-                    ActionButton({
-                      label: '编辑任务',
-                      kind: ActionButtonKind.SECONDARY,
-                      compact: true,
+                    TextAction({
+                      label: '编辑',
                       accessibilityLabel: '编辑这项作业',
                       onAction: (): void => this.startEditing(this.assignment()!)
                     });
                   }
                   Blank();
                   if (this.canDelete(this.assignment()!)) {
-                    ActionButton({
-                      label: '删除作业',
-                      kind: ActionButtonKind.DANGER_SOFT,
-                      compact: true,
+                    TextAction({
+                      label: '删除',
+                      kind: TextActionKind.DANGER,
                       accessibilityLabel: '删除这项未完成作业',
                       onAction: (): void => { this.deleteConfirm = true; }
                     });
