@@ -304,7 +304,7 @@ export struct PracticeHomePage {
       Row({ space: 10 }) {
         Text('练习套卷')
           .layoutWeight(1)
-          .fontSize(AppTheme.PHONE_SECTION_TITLE_SIZE)
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text(this.loading ? '加载中…' : `${this.papers.length} 套`)
