@@ -36,7 +36,7 @@ export struct ParentDashboardPage {
       Column({ space: 5 }) {
         Text('布置作业')
           .width('100%')
-          .fontSize(17)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Text('输入文字、拍照或相册识别')
@@ -86,7 +86,7 @@ export struct ParentDashboardPage {
       Column({ space: 5 }) {
         Text('语音作业')
           .width('100%')
-          .fontSize(17)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Text('使用语音和图片快速布置')
@@ -129,7 +129,7 @@ export struct ParentDashboardPage {
       Column({ space: 3 }) {
         Text('作业收件箱')
           .width('100%')
-          .fontSize(15)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Text('查看已导入的作业内容和整理记录')
