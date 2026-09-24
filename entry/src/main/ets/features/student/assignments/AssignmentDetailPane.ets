@@ -205,7 +205,7 @@ export struct AssignmentDetailPane {
         if (this.canOpenStudy(this.assignment()!)) {
           ActionButton({
             label: this.actionLabel(this.assignment()!),
-            onAction: () => this.onOpenStudy(this.assignment()!.id)
+            onAction: (): void => this.onOpenStudy(this.assignment()!.id)
           })
           .width('100%');
         }
