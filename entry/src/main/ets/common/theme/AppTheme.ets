@@ -48,6 +48,8 @@ export class AppTheme {
   static readonly PARENT_HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
   static readonly PARENT_PROGRESS_READABLE_MAX_WIDTH: number = 1040;
   static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1400;
+  // Shared readable width for parent deep pages such as create, review and confirmation flows.
+  static readonly PARENT_DEEP_READABLE_MAX_WIDTH: number = 1040;
   static readonly PARENT_REVIEW_READABLE_MAX_WIDTH: number = 1040;
   static readonly IMPORT_READABLE_MAX_WIDTH: number = 1080;
   static readonly CAPTURE_HOME_READABLE_MAX_WIDTH: number = 720;
