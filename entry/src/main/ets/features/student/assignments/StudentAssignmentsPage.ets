@@ -364,29 +364,15 @@ export struct StudentAssignmentsPage {
   @Builder
   private TodoSection() {
     if (this.currentTodoAssignments().length > 0) {
-      Column({ space: 9 }) {
-        Row() {
-          Column({ space: 2 }) {
-            Text('要做的').fontSize(17).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          }
-          .alignItems(HorizontalAlign.Start);
-          Blank();
-          Text(`${this.currentTodoAssignments().length}`)
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .fontColor(AppTheme.TERTIARY_TEXT);
-        }
-        .width('100%');
-        Column({ space: 6 }) {
-          ForEach(this.currentTodoAssignments(), (item: Assignment) => {
-            AssignmentListItem({
-              assignment: item,
-              selected: this.isSelected(item.id),
-              showChevron: !this.canUseMasterDetail(),
-              onOpen: () => this.openAssignment(item.id)
-            });
-          }, (item: Assignment) => this.assignmentRenderKey(item));
-        }
-        .width('100%');
+      Column({ space: 6 }) {
+        ForEach(this.currentTodoAssignments(), (item: Assignment) => {
+          AssignmentListItem({
+            assignment: item,
+            selected: this.isSelected(item.id),
+            showChevron: !this.canUseMasterDetail(),
+            onOpen: () => this.openAssignment(item.id)
+          });
+        }, (item: Assignment) => this.assignmentRenderKey(item));
       }
       .width('100%');
     }
