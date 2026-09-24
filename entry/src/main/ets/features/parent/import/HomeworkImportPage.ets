@@ -355,8 +355,8 @@ export struct HomeworkImportPage {
     .height('100%')
     .constraintSize({ maxWidth: AppTheme.IMPORT_READABLE_MAX_WIDTH })
     .padding({
-      left: AppTheme.PHONE_PAGE_PADDING,
-      right: AppTheme.PHONE_PAGE_PADDING,
+      left: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING,
+      right: this.embeddedInDeepPage ? 0 : AppTheme.PHONE_PAGE_PADDING,
       top: this.embeddedInDeepPage ? 0 : 14
     })
     .alignItems(HorizontalAlign.Center)
