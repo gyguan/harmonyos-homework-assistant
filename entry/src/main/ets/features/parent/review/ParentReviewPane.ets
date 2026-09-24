@@ -111,7 +111,7 @@ export struct ParentReviewPane {
           ActionButton({
             label: '取消',
             kind: ActionButtonKind.NEUTRAL,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             isEnabled: !this.deleteBusy,
             onAction: (): void => { this.deleteConfirm = false; }
           })
@@ -119,7 +119,7 @@ export struct ParentReviewPane {
           ActionButton({
             label: this.deleteBusy ? '正在删除…' : '确认删除',
             kind: ActionButtonKind.DANGER,
-            size: ActionButtonSize.SMALL,
+            actionSize: ActionButtonSize.SMALL,
             isEnabled: !this.deleteBusy,
             onAction: (): void => { void this.deleteAssignment(); }
           })
