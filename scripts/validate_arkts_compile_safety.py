@@ -121,6 +121,10 @@ def main() -> int:
             "shared action controls must use onAction instead of the ArkUI-reserved onClick property")
     require("onClick: () => void = () => {};" not in action_controls,
             "custom ActionButton/TextAction must not shadow CustomComponent.onClick")
+    require("@Prop size:" not in action_controls,
+            "custom ActionButton must not shadow CustomComponent.size")
+    require("@Prop actionSize: ActionButtonSize" in action_controls,
+            "ActionButton must expose ArkUI-safe actionSize instead of size")
     for file in ETS_ROOT.rglob("*.ets"):
         source = file.read_text(encoding="utf-8")
         relative = file.relative_to(ROOT)
