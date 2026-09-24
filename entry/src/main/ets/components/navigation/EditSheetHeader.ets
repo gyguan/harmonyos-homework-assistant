@@ -12,13 +12,18 @@ export struct EditSheetHeader {
       Column({ space: 2 }) {
         Text(this.title)
           .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+          .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
         if (this.subtitle.length > 0) {
           Text(this.subtitle)
-            .maxLines(1)
-            .fontSize(12)
-            .fontColor(AppTheme.SUBTEXT);
+            .maxLines(AppTheme.META_MAX_LINES)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT)
+            .textOverflow({ overflow: TextOverflow.Ellipsis });
         }
       }
       .layoutWeight(1)
