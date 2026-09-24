@@ -34,6 +34,7 @@ export class AppTheme {
   static readonly SECTION_GAP: number = 20;
   static readonly ITEM_GAP: number = 12;
   static readonly CARD_PADDING_COMPACT: number = 14;
+  static readonly PANEL_PADDING: number = 16;
   static readonly CARD_PADDING_STANDARD: number = 18;
   static readonly CARD_PADDING: number = 18;
   static readonly CARD_RADIUS_COMPACT: number = 16;
