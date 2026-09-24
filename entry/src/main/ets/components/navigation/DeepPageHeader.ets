@@ -27,7 +27,7 @@ export struct DeepPageHeader {
 
       Column({ space: 1 }) {
         Text(this.title)
-          .fontSize(AppTheme.DEEP_PAGE_HEADER_TITLE_SIZE)
+          .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT)
           .maxLines(1)
