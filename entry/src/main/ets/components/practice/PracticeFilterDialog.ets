@@ -57,7 +57,7 @@ export struct PracticeFilterDialog {
           label: '关闭',
           kind: TextActionKind.NEUTRAL,
           accessibilityLabel: '关闭更多筛选',
-          onClick: () => this.controller.close()
+          onAction: () => this.controller.close()
         });
       }
       .width('100%')
@@ -111,7 +111,7 @@ export struct PracticeFilterDialog {
 
       ActionButton({
         label: '确定',
-        onClick: () => this.confirm()
+        onAction: () => this.confirm()
       })
       .width('100%')
       .margin({ left: 20, right: 20, top: 12, bottom: 18 });
