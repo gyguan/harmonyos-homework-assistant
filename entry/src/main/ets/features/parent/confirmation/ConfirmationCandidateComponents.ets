@@ -15,7 +15,8 @@ export struct CandidateDurationControl {
     Column({ space: 5 }) {
       Text('预计用时')
         .width('100%')
-        .fontSize(13)
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
         .fontColor(AppTheme.TERTIARY_TEXT);
 
       Scroll() {
@@ -51,7 +52,8 @@ export struct CandidateDurationControl {
             onSelect: () => this.onMinutesChange(this.item, 45)
           });
           Text('分钟')
-            .fontSize(13)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.TERTIARY_TEXT);
         }
       }
@@ -76,12 +78,14 @@ export struct ConfirmationCandidateCard {
       Row() {
         Row({ space: 7 }) {
           Text(this.item.subject)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY);
           if (this.item.confidence < 0.8) {
             Text('重点确认')
-              .fontSize(13)
+              .fontSize(AppTheme.META_SIZE)
+              .lineHeight(AppTheme.META_LINE_HEIGHT)
               .fontColor(AppTheme.WARNING)
               .padding({ left: 7, right: 7, top: 3, bottom: 3 })
               .backgroundColor(AppTheme.WARNING_SOFT)
@@ -90,7 +94,8 @@ export struct ConfirmationCandidateCard {
         }
         Blank();
         Text(this.item.dueText)
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .maxLines(1);
       }
@@ -99,14 +104,17 @@ export struct ConfirmationCandidateCard {
       Text(this.item.title)
         .width('100%')
         .fontSize(AppTheme.CARD_TITLE_SIZE)
+        .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT)
-        .maxLines(2);
+        .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+        .textOverflow({ overflow: TextOverflow.Ellipsis });
 
       if (this.item.textbookRef.length > 0) {
         Text(this.item.textbookRef)
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT)
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis });
@@ -120,7 +128,8 @@ export struct ConfirmationCandidateCard {
 
       Text(`来源 · ${this.item.sourceEvidence.excerpt}`)
         .width('100%')
-        .fontSize(13)
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
         .fontColor(this.item.confidence < 0.8 ? AppTheme.WARNING : AppTheme.TERTIARY_TEXT)
         .maxLines(1)
         .textOverflow({ overflow: TextOverflow.Ellipsis });
