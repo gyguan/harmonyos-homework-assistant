@@ -33,7 +33,7 @@ export struct StudentSwitcherDialog {
           label: '关闭',
           kind: TextActionKind.NEUTRAL,
           accessibilityLabel: '关闭孩子选择',
-          onAction: () => this.controller.close()
+          onAction: (): void => this.controller.close()
         });
       }
       .width('100%')
