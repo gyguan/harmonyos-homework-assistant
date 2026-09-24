@@ -104,7 +104,7 @@ struct StudentTodayTaskCard {
       ActionButton({
         label: this.actionLabel(),
         kind: this.emphasized ? ActionButtonKind.PRIMARY : ActionButtonKind.OUTLINE,
-        size: ActionButtonSize.SMALL,
+        actionSize: ActionButtonSize.SMALL,
         isEnabled: !this.busy,
         accessibilityLabel: `${this.actionLabel()}${this.assignment.title}`,
         onAction: (): void => this.onAction(this.assignment.id)
