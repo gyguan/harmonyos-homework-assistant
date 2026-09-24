@@ -1,7 +1,7 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
@@ -103,12 +103,13 @@ struct StudentTodayTaskCard {
 
       ActionButton({
         label: this.actionLabel(),
-        compact: true,
+        kind: this.emphasized ? ActionButtonKind.PRIMARY : ActionButtonKind.OUTLINE,
+        size: ActionButtonSize.SMALL,
         isEnabled: !this.busy,
         accessibilityLabel: `${this.actionLabel()}${this.assignment.title}`,
         onAction: (): void => this.onAction(this.assignment.id)
       })
-      .width(this.emphasized ? 96 : 82);
+      .width(this.emphasized ? 88 : 76);
     }
     .width('100%')
     .alignItems(VerticalAlign.Center)
