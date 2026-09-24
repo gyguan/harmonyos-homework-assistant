@@ -43,7 +43,6 @@ export class AppTheme {
   static readonly STUDY_READABLE_MAX_WIDTH: number = 1040;
   static readonly STUDY_SPLIT_MAX_WIDTH: number = 1400;
   static readonly FILTER_DIALOG_MAX_WIDTH: number = 640;
-  static readonly STUDY_TITLE_SIZE: number = 26;
   static readonly PARENT_HOME_READABLE_MAX_WIDTH: number = 1040;
   static readonly PARENT_HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
   static readonly PARENT_HOME_ACTION_CARD_MIN_HEIGHT: number = 132;
@@ -67,7 +66,6 @@ export class AppTheme {
   static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
   static readonly DEEP_PAGE_HEADER_HEIGHT: number = 48;
   static readonly DEEP_PAGE_HEADER_GAP: number = 10;
-  static readonly DEEP_PAGE_HEADER_META_SIZE: number = 13;
   static readonly DEEP_PAGE_BACK_GLYPH_SIZE: number = 22;
   static readonly DEEP_PAGE_CONTENT_GAP: number = 12;
 
