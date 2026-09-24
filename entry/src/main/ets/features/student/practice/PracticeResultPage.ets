@@ -251,7 +251,7 @@ export struct PracticeResultPage {
               TextAction({
                 label: this.showDetailedStats ? '收起详细统计' : '查看详细统计',
                 accessibilityLabel: this.showDetailedStats ? '收起详细统计' : '查看详细统计',
-                onAction: () => this.showDetailedStats = !this.showDetailedStats
+                onAction: (): void => this.showDetailedStats = !this.showDetailedStats
               })
               .width('100%');
               if (this.showDetailedStats) {
@@ -276,7 +276,7 @@ export struct PracticeResultPage {
                   TextAction({
                     label: this.showAllQuestions ? '只看错题' : '查看全部题目',
                     accessibilityLabel: this.showAllQuestions ? '只查看错题' : '查看全部题目',
-                    onAction: () => this.showAllQuestions = !this.showAllQuestions
+                    onAction: (): void => this.showAllQuestions = !this.showAllQuestions
                   });
                 }
               }
@@ -378,14 +378,14 @@ export struct PracticeResultPage {
               label: this.repeating ? '正在创建…' : '再练一遍',
               kind: ActionButtonKind.NEUTRAL,
               isEnabled: !this.repeating && !this.wrongRetrying,
-              onAction: () => void this.repeat()
+              onAction: (): void => void this.repeat()
             })
             .layoutWeight(1);
 
             ActionButton({
               label: this.wrongRetrying ? '正在创建…' : `再挑战 ${this.result.wrongCount} 道错题`,
               isEnabled: !this.repeating && !this.wrongRetrying,
-              onAction: () => void this.retryWrong()
+              onAction: (): void => void this.retryWrong()
             })
             .layoutWeight(1);
           } else {
@@ -393,14 +393,14 @@ export struct PracticeResultPage {
               label: this.repeating ? '正在创建…' : '再挑战一次',
               kind: ActionButtonKind.NEUTRAL,
               isEnabled: !this.repeating,
-              onAction: () => void this.repeat()
+              onAction: (): void => void this.repeat()
             })
             .layoutWeight(1);
 
             ActionButton({
               label: '完成',
               isEnabled: !this.repeating,
-              onAction: () => this.onBack()
+              onAction: (): void => this.onBack()
             })
             .layoutWeight(1);
           }
