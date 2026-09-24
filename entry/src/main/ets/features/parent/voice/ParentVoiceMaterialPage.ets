@@ -421,7 +421,7 @@ export struct ParentVoiceMaterialPage {
     }
     .width('100%')
     .padding(AppTheme.PHONE_CARD_PADDING)
-    .backgroundColor(AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .borderRadius(AppTheme.PHONE_CARD_RADIUS);
   }
 
@@ -477,7 +477,7 @@ export struct ParentVoiceMaterialPage {
     }
     .width('100%')
     .padding(12)
-    .backgroundColor(AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
@@ -587,7 +587,7 @@ export struct ParentVoiceMaterialPage {
     }
     .width('100%')
     .padding(12)
-    .backgroundColor(AppTheme.SURFACE)
+    .backgroundColor(AppTheme.CARD_SURFACE)
     .borderRadius(AppTheme.CONTROL_RADIUS);
   }
 
