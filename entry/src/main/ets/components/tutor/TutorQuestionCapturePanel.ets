@@ -52,7 +52,7 @@ export struct TutorQuestionCapturePanel {
       ActionButton({
         label: this.capturing ? '识别中…' : '拍题',
         kind: ActionButtonKind.OUTLINE,
-        size: ActionButtonSize.SMALL,
+        actionSize: ActionButtonSize.SMALL,
         isEnabled: !this.capturing,
         onAction: (): void => { void this.capture(); }
       });
