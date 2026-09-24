@@ -52,8 +52,9 @@ require(page.find("DeepPageHeader({") < page.find("Scroll() {") and
 candidate_editor = components.split("export struct ConfirmationCandidateEditor", 1)[1]
 candidate_actions = candidate_editor.split("private BottomActions()", 1)[1].split("build()", 1)[0]
 require("private BottomActions()" in candidate_editor and "this.BottomActions();" in candidate_editor and
-        "Button('删除'" in candidate_actions and "Button('保存'" in candidate_actions,
-        "candidate editor must keep Save/Delete in its fixed bottom action area")
+        "ActionButton({" in candidate_actions and "label: '删除'" in candidate_actions and
+        "label: '保存'" in candidate_actions,
+        "candidate editor must keep Save/Delete in its fixed bottom action area through shared actions")
 require("private BottomActions()" in parent_editor and "this.BottomActions();" in parent_editor and
         parent_editor.index("Scroll() {") < parent_editor.index("this.BottomActions();"),
         "published-task editor must keep Save outside the scroll area")
@@ -64,8 +65,9 @@ require("ParentAssignmentEditPanel({" in parent_review and
 
 # Header exits: right-top exit is consistently Close; dirty edits warn before discard.
 require("EditSheetHeader({" in components and "EditSheetHeader({" in parent_editor and
-        "TextAction({" in sheet_header and "label: '关闭'" in sheet_header and "Text('关闭')" in deadline,
-        "editor sheets must reuse the shared Close-only header; picker must keep Close")
+        "TextAction({" in sheet_header and "label: '关闭'" in sheet_header and
+        "TextAction({" in deadline and "label: '关闭'" in deadline,
+        "editor sheets and deadline picker must reuse shared Close actions")
 require("confirmDiscard" in components and "放弃修改" in components and "继续编辑" in components,
         "candidate editor must warn before closing dirty edits")
 require("confirmDiscard" in parent_editor and "放弃修改" in parent_editor and "继续编辑" in parent_editor,
@@ -86,8 +88,8 @@ require("private closeEditor(): void" in page and "this.showEditorSheet = false;
 require("private cancelEditing(): void" in parent_review and "this.showEditSheet = false;" in parent_review and
         "onDisappear: () => this.completeEditingDismiss()" in parent_review,
         "published-task sheet must use the same two-phase dismissal lifecycle")
-require("Button('保存'" in candidate_actions and "saveAndClose()" in candidate_actions,
-        "Save must be a bottom business action that persists and exits")
+require("label: '保存'" in candidate_actions and "saveAndClose()" in candidate_actions,
+        "Save must be a shared bottom business action that persists and exits")
 
 # Manual add belongs with list management, not after all cards.
 require("private CandidateListHeader()" in page and "label: '＋ 新增'" in page and
