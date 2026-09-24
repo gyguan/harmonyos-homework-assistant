@@ -3,7 +3,6 @@ import { AppTheme } from '../../../common/theme/AppTheme';
 
 @Component
 export struct ParentDashboardPage {
-  @Prop revision: number = 0;
   @State private availableWidthVp: number = 390;
   onOpenAssignment: () => void = () => {};
   onOpenInbox: () => void = () => {};
