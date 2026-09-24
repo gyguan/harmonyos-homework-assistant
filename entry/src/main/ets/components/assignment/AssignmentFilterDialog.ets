@@ -69,7 +69,7 @@ export struct AssignmentFilterDialog {
       Scroll() {
         Column({ space: 22 }) {
           Column({ space: 10 }) {
-            Text('日期').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('日期').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
               this.DateModeOption('全部日期', true);
               this.DateModeOption('指定日期', false);
@@ -89,7 +89,7 @@ export struct AssignmentFilterDialog {
           .width('100%');
 
           Column({ space: 10 }) {
-            Text('科目').width('100%').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            Text('科目').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
             Row({ space: 8 }) {
               this.SubjectOption('全部科目', 'ALL');
               this.SubjectOption('语文', 'CHINESE');
