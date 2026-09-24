@@ -49,10 +49,13 @@ require("switchTab('tasks')" in app and "switchTab('folders')" in app,
 # Server-side paged task query is Assignment-based.
 require('"/voice-tasks"' in controller and '"/voice-tasks/{assignmentId}"' in controller,
         "canonical voice task list/detail endpoints must exist")
-require("from voice_material_task_link l" in query_service and
-        "join assignment a" in query_service and
+require("from assignment a" in query_service and
+        "a.content_type = 'AUDIO_IMAGE'" in query_service and
+        "left join voice_material_task_link l" in query_service and
         "limit :limit offset :offset" in query_service,
-        "voice task query must be Assignment-based and server paged")
+        "voice task query must start from Assignment and remain server paged")
+require("fetchAssignmentResource" in api and "APP 本地上传" in app,
+        "Web task detail must preview local-upload assignment resources without a folder link")
 require("/api/v1/voice-tasks" in api and "searchVoiceTasks" in app,
         "Web task list must use canonical paged task API")
 require('value="READY"' not in index[index.find('id="task-status"'):index.find('id="task-subject"')],
