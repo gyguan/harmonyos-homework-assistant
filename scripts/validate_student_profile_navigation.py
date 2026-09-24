@@ -29,6 +29,8 @@ require(shell.count("() => this.studentRoute = StudentRoute.PROFILE") >= 2,
         "both phone bottom navigation and pad side navigation must open student profile")
 require("'我的', false, () => {}" not in shell,
         "student 我的 must never regress to an empty navigation action")
+require("Text('我的')" not in profile,
+        "student profile root must not repeat the 我的 navigation title")
 
 require("HomeworkStore" not in profile and "FamilyContextRepository" in profile and
         "DefaultFamilyContextRepository.instance" in profile,
