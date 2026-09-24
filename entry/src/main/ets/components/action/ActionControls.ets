@@ -22,7 +22,7 @@ export struct ActionButton {
   @Prop isEnabled: boolean = true;
   @Prop compact: boolean = false;
   @Prop accessibilityLabel: string = '';
-  onClick: () => void = () => {};
+  onAction: () => void = () => {};
 
   private resolveButtonHeight(): number {
     return this.compact ? AppTheme.SECONDARY_BUTTON_HEIGHT : AppTheme.BUTTON_HEIGHT;
@@ -58,7 +58,7 @@ export struct ActionButton {
       .fontColor(this.resolveForegroundColor())
       .enabled(this.isEnabled)
       .accessibilityText(this.accessibilityLabel.length > 0 ? this.accessibilityLabel : this.label)
-      .onClick(() => this.onClick());
+      .onClick(() => this.onAction());
   }
 }
 
