@@ -354,7 +354,7 @@ export struct BackendConnectionPage {
         .onClick(() => this.beginAdd());
       } else {
         Text('连接家庭云端后可新增或修改家庭成员。').width('100%').padding({ top: 12, bottom: 12 })
-          .fontSize(13).fontColor(AppTheme.SUBTEXT);
+          .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
 
       this.StudentEditor();
