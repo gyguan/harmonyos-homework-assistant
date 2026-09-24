@@ -39,8 +39,9 @@ require("recognizedText" in service and "candidates.push(saveUri)" in service an
         "result.resultUri !== saveUri" in service and "resourceUri: uri" in service,
         "camera OCR must prefer the app-cache saveUri and fall back to the Picker result URI")
 require("ActionButton({" in panel and "label: this.capturing ? '识别中…' : '拍题'" in panel and
-        "kind: ActionButtonKind.SECONDARY" in panel and "只在本机识别" in panel,
-        "Tutor composer must expose shared compact camera capture and clearly explain local-only image recognition")
+        "kind: ActionButtonKind.OUTLINE" in panel and "size: ActionButtonSize.SMALL" in panel and
+        "只在本机识别" in panel,
+        "Tutor composer must expose a small outline camera capture and clearly explain local-only image recognition")
 require("onRecognized" in panel and "this.onRecognized(result.recognizedText)" in panel,
         "recognized question text must be handed back to the editable Tutor draft")
 require("本机文字识别暂不可用" in panel and "照片读取失败" in panel and
