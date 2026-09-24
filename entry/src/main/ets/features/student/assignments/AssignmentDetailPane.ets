@@ -180,8 +180,8 @@ export struct AssignmentDetailPane {
                 .fontColor([AppTheme.PRIMARY]);
               Text(label)
                 .layoutWeight(1)
-                .fontSize(14)
-                .lineHeight(21)
+                .fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT)
                 .fontColor(AppTheme.TEXT);
             }
             .width('100%')
