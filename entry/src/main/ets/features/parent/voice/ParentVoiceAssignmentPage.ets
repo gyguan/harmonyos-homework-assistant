@@ -280,7 +280,8 @@ export struct ParentVoiceAssignmentPage {
     Column({ space: 8 }) {
       Text('素材方式')
         .width('100%')
-        .fontSize(14)
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
 
@@ -318,13 +319,14 @@ export struct ParentVoiceAssignmentPage {
           .fontColor(AppTheme.TEXT);
         Blank();
         Text('名称和说明根据科目自动生成')
-          .fontSize(11)
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
       }
       .width('100%');
 
       Column({ space: 6 }) {
-        Text('作业科目').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('作业科目').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         Select([
           { value: '语文' },
           { value: '数学' },
@@ -345,7 +347,7 @@ export struct ParentVoiceAssignmentPage {
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 6 }) {
-        Text('作业名称').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('作业名称').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         Row() {
           Text(this.title)
             .fontSize(14)
@@ -362,7 +364,7 @@ export struct ParentVoiceAssignmentPage {
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 6 }) {
-        Text('作业说明').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('作业说明').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         Row() {
           Text(this.instruction)
             .fontSize(13)
@@ -378,7 +380,7 @@ export struct ParentVoiceAssignmentPage {
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 6 }) {
-        Text('截止时间').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('截止时间').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         DeadlinePickerField({
           value: this.dueText,
           allowClear: true,
@@ -389,16 +391,16 @@ export struct ParentVoiceAssignmentPage {
       .alignItems(HorizontalAlign.Start);
 
       Column({ space: 6 }) {
-        Text('预计完成时长').width('100%').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('预计完成时长').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         Row({ space: 8 }) {
           TextInput({ placeholder: '15', text: this.expectedMinutesText })
             .layoutWeight(1)
             .height(AppTheme.INPUT_HEIGHT)
-            .fontSize(14)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
             .backgroundColor(AppTheme.SURFACE_SUBTLE)
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .onChange((value: string) => this.expectedMinutesText = value);
-          Text('分钟').fontSize(12).fontColor(AppTheme.SUBTEXT);
+          Text('分钟').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
       }
@@ -412,9 +414,9 @@ export struct ParentVoiceAssignmentPage {
   private AudioSection() {
     Column({ space: 10 }) {
       Row() {
-        Text('语音文件').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('语音文件').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text('1 个').fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text('1 个').fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
@@ -433,13 +435,14 @@ export struct ParentVoiceAssignmentPage {
             .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(10);
           Text(this.audioName)
             .layoutWeight(1)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
           Text('更换')
-            .fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE).lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .padding({ left: 8, right: 8 })
             .textAlign(TextAlign.Center)
@@ -463,9 +466,9 @@ export struct ParentVoiceAssignmentPage {
   private ImageSection() {
     Column({ space: 10 }) {
       Row() {
-        Text('情景图片').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+        Text('情景图片').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
         Blank();
-        Text(`已选择 ${this.imageUris.length} 张`).fontSize(12).fontColor(AppTheme.SUBTEXT);
+        Text(`已选择 ${this.imageUris.length} 张`).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
