@@ -46,7 +46,7 @@ require("ActionButton" in import_page and
         "label: this.parseBusy ? '识别中…' : '拍照识别'" in import_page and
         "label: this.parseBusy ? '识别中…' : '相册识别'" in import_page and
         import_page.count("kind: ActionButtonKind.OUTLINE") >= 2 and
-        import_page.count("size: ActionButtonSize.SMALL") >= 2,
+        import_page.count("actionSize: ActionButtonSize.SMALL") >= 2,
         "manual homework must expose small outline camera and gallery OCR actions")
 require("private ActionFooter()" in import_page and
         import_page.find("this.ActionFooter();") > import_page.find(".scrollBar(BarState.Off);"),
