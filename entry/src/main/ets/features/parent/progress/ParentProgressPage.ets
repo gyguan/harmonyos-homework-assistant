@@ -397,6 +397,8 @@ export struct ParentProgressPage {
               selected: this.bulkMode ? this.isDeleteSelected(item.id) : this.isSelected(item),
               showChevron: !this.bulkMode && !this.canUseReviewPane(),
               interactive: !this.bulkMode || this.canDelete(item),
+              selectionMode: this.bulkMode,
+              selectionAvailable: this.canDelete(item),
               onOpen: () => this.openAssignment(item)
             });
           }, (item: Assignment) => this.assignmentRenderKey(item));
