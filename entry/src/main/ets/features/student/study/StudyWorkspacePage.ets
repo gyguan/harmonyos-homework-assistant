@@ -637,7 +637,6 @@ export struct StudyWorkspacePage {
               .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
               .fontWeight(FontWeight.Medium)
               .onClick(() => { void this.runPrimaryAction(); });
           }
