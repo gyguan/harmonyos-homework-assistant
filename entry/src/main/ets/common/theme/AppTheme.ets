@@ -23,25 +23,38 @@ export class AppTheme {
   static readonly DANGER_SOFT: string = '#FDECEF';
   static readonly DISABLED: string = '#7D818A';
 
-  static readonly PAGE_PADDING: number = 20;
+  // Shared layout scale. Feature pages should consume semantic tokens instead of device-specific values.
+  static readonly PAGE_PADDING_COMPACT: number = 16;
+  static readonly PAGE_PADDING_MEDIUM: number = 24;
+  static readonly PAGE_PADDING_EXPANDED: number = 32;
+  static readonly PAGE_PADDING: number = 16;
   static readonly PAGE_PADDING_WIDE: number = 32;
   static readonly SECTION_GAP: number = 20;
   static readonly ITEM_GAP: number = 12;
+  static readonly CARD_PADDING_COMPACT: number = 14;
+  static readonly CARD_PADDING_STANDARD: number = 18;
   static readonly CARD_PADDING: number = 18;
+  static readonly CARD_RADIUS_COMPACT: number = 16;
+  static readonly CARD_RADIUS_STANDARD: number = 20;
   static readonly CARD_RADIUS: number = 20;
   static readonly CONTROL_RADIUS: number = 14;
   static readonly CHIP_RADIUS: number = 12;
 
-  // Readable-width tokens are upper bounds: compact layouts still size to the actual container.
-  // Issue #266 widens only large-container ceilings so Phone composition remains unchanged.
-  static readonly HOME_READABLE_MAX_WIDTH: number = 760;
+  // Content containers are intentionally limited to three shared width tiers.
+  static readonly CONTENT_NARROW_MAX_WIDTH: number = 760;
+  static readonly CONTENT_STANDARD_MAX_WIDTH: number = 1040;
+  static readonly CONTENT_WIDE_MAX_WIDTH: number = 1360;
+
+  // Legacy feature aliases remain temporarily for incremental migration. Their values now map to
+  // the shared content tiers so switching between pages no longer changes the visual content boundary.
+  static readonly HOME_READABLE_MAX_WIDTH: number = 1040;
   static readonly HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
   static readonly HOME_PAD_PRIMARY_ACTION_MAX_WIDTH: number = 320;
-  static readonly ASSIGNMENT_LIST_READABLE_MAX_WIDTH: number = 760;
+  static readonly ASSIGNMENT_LIST_READABLE_MAX_WIDTH: number = 1040;
   static readonly ASSIGNMENT_DETAIL_READABLE_MAX_WIDTH: number = 1040;
   static readonly ASSIGNMENT_MASTER_DETAIL_MAX_WIDTH: number = 1360;
   static readonly STUDY_READABLE_MAX_WIDTH: number = 1040;
-  static readonly STUDY_SPLIT_MAX_WIDTH: number = 1400;
+  static readonly STUDY_SPLIT_MAX_WIDTH: number = 1360;
   static readonly FILTER_DIALOG_MAX_WIDTH: number = 640;
   static readonly PARENT_HOME_READABLE_MAX_WIDTH: number = 1040;
   static readonly PARENT_HOME_PAD_CONTENT_MAX_WIDTH: number = 1360;
@@ -49,18 +62,18 @@ export class AppTheme {
   static readonly PARENT_HOME_ACTION_ICON_SIZE: number = 44;
   static readonly PARENT_HOME_ACTION_CARD_PADDING: number = 16;
   static readonly PARENT_PROGRESS_READABLE_MAX_WIDTH: number = 1040;
-  static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1400;
+  static readonly PARENT_PROGRESS_REVIEW_MAX_WIDTH: number = 1360;
   // Shared readable width for parent deep pages such as create, review and confirmation flows.
   static readonly PARENT_DEEP_READABLE_MAX_WIDTH: number = 1040;
-  static readonly IMPORT_READABLE_MAX_WIDTH: number = 1080;
-  static readonly CAPTURE_HOME_READABLE_MAX_WIDTH: number = 720;
-  static readonly IMPORT_SPLIT_MAX_WIDTH: number = 1280;
-  static readonly PROFILE_READABLE_MAX_WIDTH: number = 900;
-  static readonly PRACTICE_READABLE_MAX_WIDTH: number = 1120;
-  static readonly PRACTICE_ATTEMPT_READABLE_MAX_WIDTH: number = 1120;
+  static readonly IMPORT_READABLE_MAX_WIDTH: number = 1040;
+  static readonly CAPTURE_HOME_READABLE_MAX_WIDTH: number = 760;
+  static readonly IMPORT_SPLIT_MAX_WIDTH: number = 1360;
+  static readonly PROFILE_READABLE_MAX_WIDTH: number = 1040;
+  static readonly PRACTICE_READABLE_MAX_WIDTH: number = 1040;
+  static readonly PRACTICE_ATTEMPT_READABLE_MAX_WIDTH: number = 1040;
   static readonly PRACTICE_ATTEMPT_SCALE_REFERENCE_WIDTH: number = 640;
   static readonly PRACTICE_ATTEMPT_MAX_SCALE: number = 1.35;
-  static readonly SETTINGS_READABLE_MAX_WIDTH: number = 1000;
+  static readonly SETTINGS_READABLE_MAX_WIDTH: number = 1040;
 
   static readonly DEEP_PAGE_TOP_PADDING: number = 8;
   static readonly DEEP_PAGE_BOTTOM_PADDING: number = 24;
@@ -84,6 +97,7 @@ export class AppTheme {
   static readonly SETTINGS_INLINE_FIELD_MIN_WIDTH: number = 220;
   static readonly SPLIT_PANE_GAP: number = 18;
 
+  // Compatibility aliases. New code should prefer the semantic COMPACT/STANDARD tokens above.
   static readonly PHONE_PAGE_PADDING: number = 16;
   static readonly PHONE_SECTION_GAP: number = 14;
   static readonly PHONE_CARD_PADDING: number = 14;
