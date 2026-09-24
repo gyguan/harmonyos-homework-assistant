@@ -60,5 +60,12 @@ export async function fetchVoiceMaterialAsset(assetId) {
   return response.blob();
 }
 
+export async function fetchAssignmentResource(resourceId) {
+  const headers = new Headers(); const token = getToken(); if (token) headers.set('Authorization', `Bearer ${token}`);
+  const response = await fetch(`/api/v1/assignment-resources/${encodeURIComponent(resourceId)}`, { headers });
+  if (!response.ok) throw new Error(`作业素材读取失败（${response.status}）`);
+  return response.blob();
+}
+
 // Legacy compatibility for non-Web clients.
 export const listVoiceMaterialPackages = studentId => request(`/api/v1/students/${encodeURIComponent(studentId)}/voice-material-packages`);
