@@ -45,7 +45,7 @@ export struct AssignmentDetailPane {
     Column({ space: 10 }) {
       SymbolGlyph($r('sys.symbol.doc_text')).fontSize(32).fontColor([AppTheme.TERTIARY_TEXT]);
       Text(this.assignmentId.length === 0 ? '选择左侧作业查看详情' : '这项作业暂时找不到')
-        .fontSize(17)
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       if (this.assignmentId.length > 0) {
