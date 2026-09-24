@@ -55,6 +55,7 @@ export interface RemoteVoiceMaterialCreateAssignmentRequest {
   dueAtEpochMs: number;
   dueText: string;
   title?: string;
+  instruction?: string;
   requestId?: string;
 }
 
