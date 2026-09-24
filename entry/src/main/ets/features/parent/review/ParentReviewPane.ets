@@ -113,7 +113,7 @@ export struct ParentReviewPane {
             kind: ActionButtonKind.NEUTRAL,
             compact: true,
             isEnabled: !this.deleteBusy,
-            onAction: () => this.deleteConfirm = false
+            onAction: (): void => this.deleteConfirm = false
           })
           .layoutWeight(1);
           ActionButton({
@@ -121,7 +121,7 @@ export struct ParentReviewPane {
             kind: ActionButtonKind.DANGER,
             compact: true,
             isEnabled: !this.deleteBusy,
-            onAction: () => { void this.deleteAssignment(); }
+            onAction: (): void => { void this.deleteAssignment(); }
           })
           .layoutWeight(1);
         }
@@ -311,13 +311,13 @@ export struct ParentReviewPane {
           label: '退回订正',
           kind: ActionButtonKind.WARNING,
           isEnabled: !this.submitting,
-          onAction: () => void this.returnForRework()
+          onAction: (): void => void this.returnForRework()
         })
         .layoutWeight(1);
         ActionButton({
           label: this.submitting ? '处理中…' : '通过',
           isEnabled: !this.submitting,
-          onAction: () => void this.approve()
+          onAction: (): void => void this.approve()
         })
         .layoutWeight(1);
       }
@@ -366,7 +366,7 @@ export struct ParentReviewPane {
                       kind: ActionButtonKind.SECONDARY,
                       compact: true,
                       accessibilityLabel: '编辑这项作业',
-                      onAction: () => this.startEditing(this.assignment()!)
+                      onAction: (): void => this.startEditing(this.assignment()!)
                     });
                   }
                   Blank();
@@ -376,7 +376,7 @@ export struct ParentReviewPane {
                       kind: ActionButtonKind.DANGER_SOFT,
                       compact: true,
                       accessibilityLabel: '删除这项未完成作业',
-                      onAction: () => this.deleteConfirm = true
+                      onAction: (): void => this.deleteConfirm = true
                     });
                   }
                 }
