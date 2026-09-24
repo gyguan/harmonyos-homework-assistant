@@ -13,7 +13,7 @@ import { ParentProgressViewModel } from './ParentProgressViewModel';
 
 @Component
 export struct ParentProgressPage {
-  @Prop revision: number = 0;
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   @State private refreshRevision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
@@ -27,7 +27,6 @@ export struct ParentProgressPage {
   @State private draftSubjectCode: string = 'ALL';
   @State private scopedAssignments: Assignment[] = [];
   @State private visibleAssignments: Assignment[] = [];
-  @State private snapshotRevision: number = -1;
   @State private querying: boolean = false;
   @State private bulkMode: boolean = false;
   @State private selectedDeleteIds: string[] = [];
@@ -56,6 +55,10 @@ export struct ParentProgressPage {
   });
 
   aboutToAppear(): void {
+    this.rebuildView();
+  }
+
+  private onRevisionChanged(): void {
     this.rebuildView();
   }
 
@@ -106,21 +109,13 @@ export struct ParentProgressPage {
 
   private applyItems(items: Assignment[]): void {
     this.visibleAssignments = items.slice();
-    this.snapshotRevision = this.revision + this.refreshRevision;
-    let stillVisible = false;
+     let stillVisible = false;
     for (let item of items) if (item.id === this.selectedAssignmentId) stillVisible = true;
     if (!stillVisible) this.selectedAssignmentId = items.length > 0 ? items[0].id : '';
   }
 
   private currentVisibleAssignments(): Assignment[] {
-    let currentRevision = this.revision + this.refreshRevision;
-    if (this.snapshotRevision === currentRevision) return this.visibleAssignments;
-    if (this.allDates) {
-      return this.viewModel.assignments(
-        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL, this.statuses());
-    }
-    return this.viewModel.assignmentsOnDay(
-      this.subjectCode, this.selectedDayEpochMs, this.statuses());
+    return this.visibleAssignments;
   }
 
   private assignmentRenderKey(item: Assignment): string {
