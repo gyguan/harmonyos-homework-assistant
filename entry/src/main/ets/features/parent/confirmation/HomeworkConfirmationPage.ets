@@ -379,26 +379,37 @@ export struct HomeworkConfirmationPage {
 
   build() {
     Column() {
+      Column({ space: 10 }) {
+        DeepPageHeader({
+          title: '确认发布',
+          subtitle: `${this.candidates().length} 项待确认`,
+          backAccessibilityText: '返回导入',
+          onBack: () => this.onBack()
+        });
+
+        this.CandidateListHeader();
+      }
+      .width('100%')
+      .constraintSize({ maxWidth: AppTheme.CONFIRMATION_READABLE_MAX_WIDTH })
+      .padding({
+        left: AppTheme.PHONE_PAGE_PADDING,
+        right: AppTheme.PHONE_PAGE_PADDING,
+        top: AppTheme.DEEP_PAGE_TOP_PADDING,
+        bottom: 8
+      });
+
       Scroll() {
         Column() {
-          Column({ space: 14 }) {
-            DeepPageHeader({
-              title: '确认发布',
-              subtitle: `${this.candidates().length} 项待确认`,
-              backAccessibilityText: '返回导入',
-              onBack: () => this.onBack()
-            });
-
-            this.CandidateListHeader();
-            this.CandidateList();
-          }
-          .width('100%')
-          .constraintSize({ maxWidth: AppTheme.CONFIRMATION_READABLE_MAX_WIDTH })
-          .padding({ left: AppTheme.PHONE_PAGE_PADDING, right: AppTheme.PHONE_PAGE_PADDING,
-            top: AppTheme.DEEP_PAGE_TOP_PADDING, bottom: 16 });
+          this.CandidateList();
         }
         .width('100%')
-        .alignItems(HorizontalAlign.Center);
+        .constraintSize({ maxWidth: AppTheme.CONFIRMATION_READABLE_MAX_WIDTH })
+        .padding({
+          left: AppTheme.PHONE_PAGE_PADDING,
+          right: AppTheme.PHONE_PAGE_PADDING,
+          top: 4,
+          bottom: 16
+        });
       }
       .width('100%')
       .layoutWeight(1)
