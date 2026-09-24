@@ -4,6 +4,7 @@ export enum ActionButtonKind {
   PRIMARY = 'PRIMARY',
   SECONDARY = 'SECONDARY',
   NEUTRAL = 'NEUTRAL',
+  WARNING = 'WARNING',
   DANGER = 'DANGER',
   DANGER_SOFT = 'DANGER_SOFT'
 }
@@ -33,6 +34,7 @@ export struct ActionButton {
     }
     if (this.kind === ActionButtonKind.SECONDARY) return AppTheme.PRIMARY_SOFT;
     if (this.kind === ActionButtonKind.NEUTRAL) return AppTheme.SURFACE_EMPHASIS;
+    if (this.kind === ActionButtonKind.WARNING) return AppTheme.WARNING_SOFT;
     if (this.kind === ActionButtonKind.DANGER) return AppTheme.DANGER;
     if (this.kind === ActionButtonKind.DANGER_SOFT) return AppTheme.DANGER_SOFT;
     return AppTheme.PRIMARY;
@@ -41,6 +43,7 @@ export struct ActionButton {
   private resolveForegroundColor(): string {
     if (this.kind === ActionButtonKind.SECONDARY) return AppTheme.PRIMARY;
     if (this.kind === ActionButtonKind.NEUTRAL) return AppTheme.TEXT;
+    if (this.kind === ActionButtonKind.WARNING) return AppTheme.WARNING;
     if (this.kind === ActionButtonKind.DANGER_SOFT) return AppTheme.DANGER;
     return AppTheme.TEXT_ON_PRIMARY;
   }
