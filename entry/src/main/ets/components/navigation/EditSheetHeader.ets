@@ -29,7 +29,7 @@ export struct EditSheetHeader {
         label: '关闭',
         kind: TextActionKind.NEUTRAL,
         accessibilityLabel: this.closeAccessibilityText,
-        onAction: () => this.onClose()
+        onAction: (): void => this.onClose()
       });
     }
     .width('100%')
