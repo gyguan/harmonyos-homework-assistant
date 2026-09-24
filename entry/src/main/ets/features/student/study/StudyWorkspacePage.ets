@@ -413,7 +413,8 @@ export struct StudyWorkspacePage {
           '可从图库选择或直接拍照，最多 6 张。' :
           '请确认照片清晰、完整，页数和顺序无误。')
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
         if (this.submissionMessage.length > 0) {
           Text(this.submissionMessage)
@@ -433,7 +434,8 @@ export struct StudyWorkspacePage {
       Column({ space: 8 }) {
         Text(`已提交 · ${this.submissions()[0].fileLabel}`)
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUCCESS);
         if (this.submissions()[0].photoUris.length > 0) {
@@ -761,7 +763,8 @@ export struct StudyWorkspacePage {
         }
         if (this.canUseTutorSplit() && this.tutorPanelOpen) {
           Text('收起')
-            .fontSize(13)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
             .fontColor(AppTheme.PRIMARY)
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .padding({ left: 10, right: 2 })
@@ -1089,9 +1092,9 @@ export struct StudyWorkspacePage {
           });
 
         Row() {
-          Text(this.formatVoiceTime(this.voiceCurrentTimeMs)).fontSize(12).fontColor('#D8D8D8');
+          Text(this.formatVoiceTime(this.voiceCurrentTimeMs)).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor('#D8D8D8');
           Blank();
-          Text(this.formatVoiceTime(this.voiceDurationMs)).fontSize(12).fontColor('#D8D8D8');
+          Text(this.formatVoiceTime(this.voiceDurationMs)).fontSize(AppTheme.CAPTION_SIZE).lineHeight(AppTheme.CAPTION_LINE_HEIGHT).fontColor('#D8D8D8');
         }
         .width('100%');
       }
