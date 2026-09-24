@@ -66,17 +66,27 @@ require("Text(this.bulkMode ? '完成' : '管理')" in progress and
         ".constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })" in progress,
         "parent progress title row must keep stable height when management action appears or disappears")
 
-# 3/4. Parent and student use one date+subject query model; no relative-date/type presets.
+# 3/4. Parent and student share one date+subject query model, while each surface may
+# expose the common choices differently.
+require("label: '日期'" in progress and "label: '科目'" in progress and
+        "active: !this.allDates && !this.isSelectedDayToday()" in progress and
+        "active: this.subjectCode !== 'ALL'" in progress,
+        "parent progress must keep reactive date and subject query entries")
+require("Text('日期')" in student and "Text('科目')" in student and
+        "private QuickFilterBar()" in student and
+        "selected: !this.allDates && this.isSelectedDayToday()" in student and
+        "selected: this.allDates" in student and
+        "selected: this.subjectCode === 'CHINESE'" in student and
+        "selected: this.subjectCode === 'MATH'" in student and
+        "selected: this.subjectCode === 'ENGLISH'" in student,
+        "student assignments must expose common date and subject filters directly")
 for page, name in [(progress, "parent progress"), (student, "student assignments")]:
-    require("label: '日期'" in page and "label: '科目'" in page,
-            f"{name} must expose date and subject query entries")
     require("label: '类型'" not in page and "label: '截止'" not in page,
             f"{name} must not expose old type/due preset query entries")
     require("allDates: $draftAllDates" in page and "AssignmentDateFilter.ALL" in page,
             f"{name} must support a real all-date query instead of UI-only selection")
-    require("active: !this.allDates && !this.isSelectedDayToday()" in page and
-            "active: this.subjectCode !== 'ALL'" in page,
-            f"{name} query state must bind to selected date and subject")
+require("calendarMode" not in student and "AssignmentCalendarPanel" not in student,
+        "student assignments must remain list-only after calendar retirement")
 require("@Link allDates: boolean" in query_dialog and
         "DateModeOption('全部日期', true)" in query_dialog and
         "DateModeOption('指定日期', false)" in query_dialog and
