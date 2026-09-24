@@ -60,6 +60,13 @@ for title_contract in [
     "static readonly LABEL_TITLE_SIZE: number = 14;",
 ]:
     require(title_contract in theme, f"AppTheme title hierarchy drifted: {title_contract}")
+for obsolete_title_token in [
+    "PHONE_PAGE_TITLE_SIZE",
+    "PHONE_SECTION_TITLE_SIZE",
+    "DEEP_PAGE_HEADER_TITLE_SIZE",
+]:
+    require(obsolete_title_token not in theme,
+            f"obsolete title token must not return: {obsolete_title_token}")
 
 app_shell = read_optional("entry/src/main/ets/pages/AppShell.ets")
 primary_nav = read_optional("entry/src/main/ets/components/navigation/PrimaryNavItem.ets")
