@@ -139,7 +139,7 @@ export struct ChoiceSelectionChip {
     Text(this.label)
       .fontSize(this.compact ? 12 : 13)
       .fontWeight(this.selected ? FontWeight.Medium : FontWeight.Normal)
-      .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT)
+      .fontColor(this.selected ? AppTheme.PRIMARY : AppTheme.TEXT)
       .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
       .padding({ left: this.compact ? 10 : 13, right: this.compact ? 10 : 13,
         top: this.compact ? 8 : 9, bottom: this.compact ? 8 : 9 })
