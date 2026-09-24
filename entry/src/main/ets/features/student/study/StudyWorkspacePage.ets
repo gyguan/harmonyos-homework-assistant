@@ -3,6 +3,7 @@ import { HomeworkSubmissionService } from '../../../application/submission/Homew
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
 import { VoiceAssignmentPane } from '../../../components/assignment/VoiceAssignmentPane';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
@@ -389,24 +390,24 @@ export struct StudyWorkspacePage {
           this.PhotoStrip(this.submissionPhotoUris, true);
         }
         Row({ space: 10 }) {
-          Button(this.selectingPhotos ? '正在打开图库…' : '从图库选择', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
-              this.submissionPhotoUris.length < 6)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .onClick(() => { void this.selectSubmissionPhotos(); });
-          Button(this.capturingPhoto ? '正在打开相机…' : '拍照', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
-              this.submissionPhotoUris.length < 6)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .onClick(() => { void this.captureSubmissionPhoto(); });
+          ActionButton({
+            label: this.selectingPhotos ? '正在打开图库…' : '从图库选择',
+            kind: ActionButtonKind.SECONDARY,
+            compact: true,
+            isEnabled: !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
+              this.submissionPhotoUris.length < 6,
+            onClick: () => { void this.selectSubmissionPhotos(); }
+          })
+          .layoutWeight(1);
+          ActionButton({
+            label: this.capturingPhoto ? '正在打开相机…' : '拍照',
+            kind: ActionButtonKind.SECONDARY,
+            compact: true,
+            isEnabled: !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
+              this.submissionPhotoUris.length < 6,
+            onClick: () => { void this.captureSubmissionPhoto(); }
+          })
+          .layoutWeight(1);
         }
         .width('100%');
         Text(this.submissionPhotoUris.length === 0 ?
@@ -621,16 +622,12 @@ export struct StudyWorkspacePage {
           }
 
           if (showPrimaryAction) {
-            Button(this.primaryActionLabel(), { type: ButtonType.Normal })
-              .width('100%')
-              .height(AppTheme.BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(this.primaryActionEnabled())
-              .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .fontSize(15)
-              .fontWeight(FontWeight.Medium)
-              .onClick(() => { void this.runPrimaryAction(); });
+            ActionButton({
+              label: this.primaryActionLabel(),
+              isEnabled: this.primaryActionEnabled(),
+              onClick: () => { void this.runPrimaryAction(); }
+            })
+            .width('100%');
           }
         }
         .width('100%')
@@ -653,55 +650,45 @@ export struct StudyWorkspacePage {
       this.assignment()!.status !== AssignmentStatus.COMPLETED) {
       Row({ space: 10 }) {
         if (showTutorEntry && this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
-          Button('问小伴', { type: ButtonType.Normal })
-            .width(88)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .fontSize(13)
-            .onClick(() => {
+          ActionButton({
+            label: '问小伴',
+            kind: ActionButtonKind.SECONDARY,
+            onClick: () => {
               this.tutorPanelOpen = true;
               void this.loadTutor();
-            });
+            }
+          })
+          .width(88);
         }
 
         if (this.assignment()!.status === AssignmentStatus.IN_PROGRESS) {
-          Button('暂停一下', { type: ButtonType.Normal })
-            .width(showTutorEntry ? 88 : 112)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.actionRunning)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .fontSize(13)
-            .accessibilityText('暂停作业计时')
-            .onClick(() => { void this.pauseCurrentAssignment(); });
+          ActionButton({
+            label: '暂停一下',
+            kind: ActionButtonKind.SECONDARY,
+            isEnabled: !this.actionRunning,
+            accessibilityLabel: '暂停作业计时',
+            onClick: () => { void this.pauseCurrentAssignment(); }
+          })
+          .width(showTutorEntry ? 88 : 112);
         }
 
         if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
-          Button('继续作业', { type: ButtonType.Normal })
-            .width(112)
-            .height(AppTheme.BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .fontSize(13)
-            .accessibilityText('返回作业继续完成')
-            .onClick(() => this.requestResumeFromSubmission());
+          ActionButton({
+            label: '继续作业',
+            kind: ActionButtonKind.SECONDARY,
+            isEnabled: !this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos,
+            accessibilityLabel: '返回作业继续完成',
+            onClick: () => this.requestResumeFromSubmission()
+          })
+          .width(112);
         }
 
-        Button(this.primaryActionLabel(), { type: ButtonType.Normal })
-          .layoutWeight(1)
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(this.primaryActionEnabled())
-          .backgroundColor(this.primaryActionEnabled() ? AppTheme.PRIMARY : AppTheme.DISABLED)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .fontSize(14)
-          .fontWeight(FontWeight.Medium)
-          .onClick(() => { void this.runPrimaryAction(); });
+        ActionButton({
+          label: this.primaryActionLabel(),
+          isEnabled: this.primaryActionEnabled(),
+          onClick: () => { void this.runPrimaryAction(); }
+        })
+        .layoutWeight(1);
       }
       .width('100%')
       .padding({ top: 2, bottom: 4 });
@@ -908,17 +895,13 @@ export struct StudyWorkspacePage {
             })
             .layoutWeight(1);
 
-            Button(this.tutorSending ? '发送中…' : '发送', { type: ButtonType.Normal })
-              .width(88)
-              .height(38)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(!this.tutorSending && this.tutorDraft.trim().length > 0)
-              .backgroundColor(!this.tutorSending && this.tutorDraft.trim().length > 0 ?
-                AppTheme.PRIMARY : AppTheme.DISABLED)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .fontSize(13)
-              .fontWeight(FontWeight.Medium)
-              .onClick(() => { void this.askTutor(); });
+            ActionButton({
+              label: this.tutorSending ? '发送中…' : '发送',
+              compact: true,
+              isEnabled: !this.tutorSending && this.tutorDraft.trim().length > 0,
+              onClick: () => { void this.askTutor(); }
+            })
+            .width(88);
           }
           .width('100%')
           .alignItems(VerticalAlign.Center);
