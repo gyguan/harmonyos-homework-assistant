@@ -45,9 +45,9 @@ require(".alignItems(HorizontalAlign.Center)" in import_route and
 require("ActionButton" in import_page and
         "label: this.parseBusy ? '识别中…' : '拍照识别'" in import_page and
         "label: this.parseBusy ? '识别中…' : '相册识别'" in import_page and
-        import_page.count("kind: ActionButtonKind.SECONDARY") >= 2 and
-        import_page.count("compact: true") >= 2,
-        "manual homework must expose compact shared camera and gallery OCR actions")
+        import_page.count("kind: ActionButtonKind.OUTLINE") >= 2 and
+        import_page.count("size: ActionButtonSize.SMALL") >= 2,
+        "manual homework must expose small outline camera and gallery OCR actions")
 require("private ActionFooter()" in import_page and
         import_page.find("this.ActionFooter();") > import_page.find(".scrollBar(BarState.Off);"),
         "manual homework primary action must remain fixed outside scrolling content")
