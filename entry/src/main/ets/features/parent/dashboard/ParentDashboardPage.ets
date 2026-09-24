@@ -48,7 +48,7 @@ export struct ParentDashboardPage {
       .width('100%')
       .alignItems(HorizontalAlign.Start);
     }
-    .layoutWeight(1)
+    .width('100%')
     .constraintSize({ minHeight: 132 })
     .padding(16)
     .backgroundColor(AppTheme.CARD_SURFACE)
@@ -98,7 +98,7 @@ export struct ParentDashboardPage {
       .width('100%')
       .alignItems(HorizontalAlign.Start);
     }
-    .layoutWeight(1)
+    .width('100%')
     .constraintSize({ minHeight: 132 })
     .padding(16)
     .backgroundColor(AppTheme.CARD_SURFACE)
@@ -112,47 +112,51 @@ export struct ParentDashboardPage {
 
   @Builder
   private AssignmentInboxAction() {
-    Row({ space: 12 }) {
-      Stack() {
-        Text('箱')
-          .fontSize(13)
-          .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.PRIMARY)
-          .textAlign(TextAlign.Center);
+    Column({ space: 14 }) {
+      Row() {
+        Stack() {
+          Text('箱')
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center);
+        }
+        .width(44)
+        .height(44)
+        .alignContent(Alignment.Center)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .borderRadius(13);
+        Blank();
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(15)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
       }
-      .width(40)
-      .height(40)
-      .alignContent(Alignment.Center)
-      .backgroundColor(AppTheme.PRIMARY_SOFT)
-      .borderRadius(12);
+      .width('100%');
 
-      Column({ space: 3 }) {
+      Column({ space: 5 }) {
         Text('作业收件箱')
           .width('100%')
           .fontSize(AppTheme.CARD_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
+          .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Text('查看已导入的作业内容和整理记录')
           .width('100%')
           .fontSize(12)
+          .lineHeight(18)
           .fontColor(AppTheme.SUBTEXT);
       }
-      .layoutWeight(1)
+      .width('100%')
       .alignItems(HorizontalAlign.Start);
-
-      SymbolGlyph($r('sys.symbol.chevron_right'))
-        .fontSize(15)
-        .fontColor([AppTheme.TERTIARY_TEXT]);
     }
     .width('100%')
-    .constraintSize({ minHeight: 72 })
-    .padding({ left: 14, right: 12, top: 12, bottom: 12 })
+    .constraintSize({ minHeight: 132 })
+    .padding(16)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .border({ width: 1, color: AppTheme.BORDER })
     .borderRadius(AppTheme.PHONE_CARD_RADIUS)
     .accessibilityGroup(true)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
-    .accessibilityText('打开作业收件箱')
+    .accessibilityText('作业收件箱，查看已导入的作业内容和整理记录')
     .onClick(() => this.onOpenInbox());
   }
 
@@ -160,13 +164,9 @@ export struct ParentDashboardPage {
   private PhoneHome() {
     Scroll() {
       Column() {
-        Column({ space: 16 }) {
-          Row({ space: 10 }) {
-            this.CreateAssignmentAction();
-            this.CreateVoiceAction();
-          }
-          .width('100%')
-          .alignItems(VerticalAlign.Top);
+        Column({ space: 10 }) {
+          this.CreateAssignmentAction();
+          this.CreateVoiceAction();
           this.AssignmentInboxAction();
         }
         .width('100%')
@@ -192,13 +192,20 @@ export struct ParentDashboardPage {
     Scroll() {
       Column({ space: 18 }) {
         Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-          this.CreateAssignmentAction();
-          this.CreateVoiceAction();
+          Column() {
+            this.CreateAssignmentAction();
+          }
+          .layoutWeight(1);
+
+          Column() {
+            this.CreateVoiceAction();
+          }
+          .layoutWeight(1);
+
           Column() {
             this.AssignmentInboxAction();
           }
-          .layoutWeight(1)
-          .alignItems(HorizontalAlign.Start);
+          .layoutWeight(1);
         }
         .width('100%')
         .alignItems(VerticalAlign.Top);
