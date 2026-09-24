@@ -1,6 +1,6 @@
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
+import { ActionButton, ActionButtonKind, ActionButtonSize } from '../../../components/action/ActionControls';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { Assignment } from '../../../domain/model/HomeworkModels';
@@ -128,14 +128,14 @@ export struct ParentAssignmentEditPanel {
           ActionButton({
             label: '继续编辑',
             kind: ActionButtonKind.NEUTRAL,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onAction: (): void => { this.confirmDiscard = false; }
           })
           .layoutWeight(1);
           ActionButton({
             label: '放弃修改',
             kind: ActionButtonKind.DANGER_SOFT,
-            compact: true,
+            size: ActionButtonSize.SMALL,
             onAction: (): void => {
               this.onCancel();
             }
