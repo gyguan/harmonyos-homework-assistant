@@ -246,8 +246,8 @@ require("AssignmentDueDate.resolveDueAtEpochMs" in deadline_picker,
 
 extra_assignment = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 category_option = between(extra_assignment, "private CategoryOption(", "private CategorySection()")
-require("backgroundColor(this.category === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)" in category_option,
-        "Extra assignment category selection must have an active surface")
+require("SegmentedSelectionButton" in category_option and "selected: this.category === value" in category_option,
+        "Extra assignment category selection must reuse the shared reactive segmented control")
 require("DeadlinePickerField" in extra_assignment and "placeholder: 'YYYY-MM-DD'" not in extra_assignment,
         "Extra assignment deadline must use the shared native picker instead of a manual date field")
 
