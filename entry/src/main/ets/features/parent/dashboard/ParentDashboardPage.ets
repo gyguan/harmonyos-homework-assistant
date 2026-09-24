@@ -13,23 +13,6 @@ export struct ParentDashboardPage {
   }
 
   @Builder
-  private PageIntro() {
-    Column({ space: 4 }) {
-      Text('家长操作')
-        .width('100%')
-        .fontSize(AppTheme.PAGE_TITLE_SIZE)
-        .fontWeight(FontWeight.Bold)
-        .fontColor(AppTheme.TEXT);
-      Text('选择要进行的操作')
-        .width('100%')
-        .fontSize(13)
-        .fontColor(AppTheme.SUBTEXT);
-    }
-    .width('100%')
-    .alignItems(HorizontalAlign.Start);
-  }
-
-  @Builder
   private CreateAssignmentAction() {
     Column({ space: 14 }) {
       Row() {
@@ -178,7 +161,6 @@ export struct ParentDashboardPage {
     Scroll() {
       Column() {
         Column({ space: 16 }) {
-          this.PageIntro();
           Row({ space: 10 }) {
             this.CreateAssignmentAction();
             this.CreateVoiceAction();
@@ -209,7 +191,6 @@ export struct ParentDashboardPage {
   private WideHome() {
     Scroll() {
       Column({ space: 18 }) {
-        this.PageIntro();
         Row({ space: AppTheme.SPLIT_PANE_GAP }) {
           this.CreateAssignmentAction();
           this.CreateVoiceAction();
