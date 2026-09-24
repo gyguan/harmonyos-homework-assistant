@@ -63,6 +63,9 @@ for title_contract in [
 for obsolete_title_token in [
     "PHONE_PAGE_TITLE_SIZE",
     "PHONE_SECTION_TITLE_SIZE",
+    "PAD_PAGE_TITLE_SIZE",
+    "PAD_SECTION_TITLE_SIZE",
+    "PAD_CARD_TITLE_SIZE",
     "DEEP_PAGE_HEADER_TITLE_SIZE",
 ]:
     require(obsolete_title_token not in theme,
@@ -223,6 +226,9 @@ assignment_list_item = read_optional("entry/src/main/ets/components/assignment/A
 deep_page_header = read_optional("entry/src/main/ets/components/navigation/DeepPageHeader.ets")
 edit_sheet_header = read_optional("entry/src/main/ets/components/navigation/EditSheetHeader.ets")
 assignment_filter_dialog = read_optional("entry/src/main/ets/components/assignment/AssignmentFilterDialog.ets")
+confirmation_candidates = read_optional("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
+import_batch_detail = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
+import_inbox = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
 for card_path, card_source in [
     ("ParentDashboardPage", parent_dashboard),
     ("IdentitySwitcherDialog", identity_switcher),
@@ -312,6 +318,16 @@ require("AppTheme.CARD_TITLE_SIZE" in assignment_list_item,
         "Assignment list titles must use the shared card-title size")
 require("AppTheme.LABEL_TITLE_SIZE" in assignment_filter_dialog,
         "Filter group titles must use the shared label-title size")
+for card_title_name, card_title_source in [
+    ("ConfirmationCandidateComponents", confirmation_candidates),
+    ("HomeworkImportBatchDetailPage", import_batch_detail),
+    ("HomeworkImportInboxPage", import_inbox),
+    ("BackendConnectionPage", parent_settings),
+]:
+    require("AppTheme.CARD_TITLE_SIZE" in card_title_source,
+            f"{card_title_name} visible list/card titles must use the shared card-title size")
+require("this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE" in student_home,
+        "Student home task cards must express emphasis through shared title tokens")
 
 student_assignments = read_optional("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
 require("private ViewModeButton(" not in student_assignments and "private FilterEntry(" not in student_assignments,
