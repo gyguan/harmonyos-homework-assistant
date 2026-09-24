@@ -622,7 +622,7 @@ export struct AppShell {
       .width(68)
       .constraintSize({ minHeight: 76 })
       .padding({ top: 7, bottom: 7 })
-      .backgroundColor(AppTheme.PRIMARY_FAINT)
+      .backgroundColor(AppTheme.CARD_SURFACE)
       .border({ width: 1, color: AppTheme.BORDER })
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityGroup(true)
