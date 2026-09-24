@@ -285,14 +285,14 @@ export struct HomeworkImportBatchDetailPage {
                     ActionButton({
                       label: '取消',
                       kind: ActionButtonKind.NEUTRAL,
-                      size: ActionButtonSize.SMALL,
+                      actionSize: ActionButtonSize.SMALL,
                       onAction: (): void => { this.abandonConfirm = false; }
                     })
                     .layoutWeight(1);
                     ActionButton({
                       label: '确认放弃',
                       kind: ActionButtonKind.DANGER,
-                      size: ActionButtonSize.SMALL,
+                      actionSize: ActionButtonSize.SMALL,
                       onAction: (): void => this.abandon()
                     })
                     .layoutWeight(1);
@@ -307,7 +307,7 @@ export struct HomeworkImportBatchDetailPage {
                 ActionButton({
                   label: '放弃这个批次',
                   kind: ActionButtonKind.GHOST,
-                  size: ActionButtonSize.SMALL,
+                  actionSize: ActionButtonSize.SMALL,
                   onAction: (): void => { this.abandonConfirm = true; }
                 })
                 .width('100%');
