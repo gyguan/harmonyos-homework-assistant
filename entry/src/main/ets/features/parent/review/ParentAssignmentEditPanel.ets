@@ -129,7 +129,7 @@ export struct ParentAssignmentEditPanel {
             label: '继续编辑',
             kind: ActionButtonKind.NEUTRAL,
             compact: true,
-            onAction: (): void => this.confirmDiscard = false
+            onAction: (): void => { this.confirmDiscard = false; }
           })
           .layoutWeight(1);
           ActionButton({
