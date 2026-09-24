@@ -110,13 +110,13 @@ export struct AssignmentFilterDialog {
         ActionButton({
           label: '重置',
           kind: ActionButtonKind.NEUTRAL,
-          size: ActionButtonSize.MEDIUM,
+          actionSize: ActionButtonSize.MEDIUM,
           onAction: (): void => this.reset()
         })
         .layoutWeight(1);
         ActionButton({
           label: '查询',
-          size: ActionButtonSize.MEDIUM,
+          actionSize: ActionButtonSize.MEDIUM,
           onAction: (): void => this.confirmQuery()
         })
         .layoutWeight(2);
