@@ -28,6 +28,8 @@ require("assignment.contentType !== AssignmentContentType.AUDIO_IMAGE" in route,
         "voice assignments must hide the duplicated extracurricular context banner")
 require("contentType !== AssignmentContentType.AUDIO_IMAGE" in study,
         "voice assignments must hide the duplicated generic ResourcePane")
+require(study.count("contentType !== AssignmentContentType.AUDIO_IMAGE") >= 3,
+        "voice assignments must also hide duplicated metadata and generic instruction copy")
 require("Text('情景图片')" not in pane and "Text('情景对话语音')" not in pane,
         "voice media pane must not repeat section titles")
 require(".height(286)" in pane,
