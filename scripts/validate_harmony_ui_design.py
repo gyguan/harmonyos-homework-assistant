@@ -436,6 +436,12 @@ require("Text('作业科目')" in homework_import and
         "Text('作业内容')" in homework_import and
         homework_import.count("AppTheme.SECTION_TITLE_SIZE") >= 2,
         "Homework import subject and content headings must use the same section-title size")
+require("private clearAssignmentInput(): void" in homework_import and
+        "Text('清空')" in homework_import and
+        "this.textDraft = '';" in homework_import and
+        "this.sourceImageRef = '';" in homework_import and
+        "this.sourceImageLabel = '';" in homework_import,
+        "Homework import must keep one-tap clear and reset recognized-image source state")
 require("AppTheme.PHONE_PAGE_PADDING" not in homework_confirmation and
         "left: AppTheme.PAGE_PADDING" in homework_confirmation and
         "right: AppTheme.PAGE_PADDING" in homework_confirmation,
