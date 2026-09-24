@@ -323,7 +323,6 @@ export struct HomeworkImportPage {
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .enabled(!this.parseBusy && this.subjectChosen && this.textDraft.trim().length > 0)
         .fontSize(AppTheme.ACTION_TEXT_SIZE)
-        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .backgroundColor(this.subjectChosen && this.textDraft.trim().length > 0 ? AppTheme.PRIMARY : AppTheme.DISABLED)
         .fontColor(AppTheme.TEXT_ON_PRIMARY)
