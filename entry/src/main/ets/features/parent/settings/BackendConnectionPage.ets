@@ -232,20 +232,20 @@ export struct BackendConnectionPage {
     if (this.canInlineStudentFields()) {
       Row({ space: 8 }) {
         TextInput({ placeholder: '年级，如 三年级', text: this.editGrade })
-          .layoutWeight(1).height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE)
+          .layoutWeight(1).height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editGrade = value);
         TextInput({ placeholder: '班级，如 三（2）班', text: this.editClassName })
-          .layoutWeight(1).height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE)
+          .layoutWeight(1).height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editClassName = value);
       }
       .width('100%');
     } else {
       Column({ space: 8 }) {
         TextInput({ placeholder: '年级，如 三年级', text: this.editGrade })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE)
+          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editGrade = value);
         TextInput({ placeholder: '班级，如 三（2）班', text: this.editClassName })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE)
+          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editClassName = value);
       }
       .width('100%');
@@ -258,33 +258,33 @@ export struct BackendConnectionPage {
       Column({ space: 10 }) {
         Row() {
           Text(this.editingExistingStudent() ? '编辑孩子资料' : '添加孩子')
-            .fontSize(16).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+            .fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           Blank();
           Text('取消').constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .fontSize(13).fontColor(AppTheme.PRIMARY).textAlign(TextAlign.Center)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE).lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT).fontColor(AppTheme.PRIMARY).textAlign(TextAlign.Center)
             .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('取消编辑孩子资料')
             .onClick(() => this.cancelEdit());
         }
         .width('100%');
 
         TextInput({ placeholder: '姓名', text: this.editName })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE)
+          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editName = value);
 
         this.StudentIdentityFields();
 
         TextInput({ placeholder: '学期', text: this.editSemester })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE)
+          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editSemester = value);
         TextArea({ placeholder: '教材版本，如 语文部编版 · 数学北师大版', text: this.editTextbooks })
-          .width('100%').height(86).backgroundColor(AppTheme.SURFACE)
+          .width('100%').height(86).fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT).backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editTextbooks = value);
 
         if (this.deleteStudentConfirmId === this.editingId) {
           Column({ space: 8 }) {
-            Text('确认删除这个孩子？').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
+            Text('确认删除这个孩子？').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
             Text('删除家庭成员属于高风险操作。已有作业的孩子或家庭最后一个孩子仍会被服务端拒绝删除。')
-              .width('100%').fontSize(13).lineHeight(18).fontColor(AppTheme.SUBTEXT);
+              .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
             Row({ space: 8 }) {
               Button('取消删除', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
                 .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
@@ -331,7 +331,7 @@ export struct BackendConnectionPage {
           });
           Column({ space: 3 }) {
             Text(student.name).width('100%').fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text(`${student.grade} · ${student.className} · ${student.semester}`).width('100%').fontSize(13).fontColor(AppTheme.SUBTEXT);
+            Text(`${student.grade} · ${student.className} · ${student.semester}`).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
           }
           .layoutWeight(1).alignItems(HorizontalAlign.Start);
           Text('›').fontSize(22).fontColor(AppTheme.TERTIARY_TEXT);
@@ -347,7 +347,7 @@ export struct BackendConnectionPage {
       if (BackendSession.instance.isConnected()) {
         Row({ space: 10 }) {
           SymbolGlyph($r('sys.symbol.plus_square')).fontSize(18).fontColor([AppTheme.PRIMARY]);
-          Text('添加孩子').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+          Text('添加孩子').fontSize(AppTheme.ACTION_TEXT_SIZE).lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
         }
         .width('100%').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET }).padding({ top: 13, bottom: 13 })
         .accessibilityGroup(true).accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('添加孩子')
@@ -368,14 +368,15 @@ export struct BackendConnectionPage {
       Row() {
         Column({ space: 3 }) {
           Text('设备家长码')
-            .fontSize(15)
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text(this.parentAccessEnabled() ?
             '已启用 · 学生切回家长模式时需要验证' :
             '未启用 · 可设置 4 位数字防止孩子误入家长操作')
-            .fontSize(13)
-            .lineHeight(18)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(this.parentAccessEnabled() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
@@ -430,13 +431,15 @@ export struct BackendConnectionPage {
       if (this.parentAccessMessage.length > 0) {
         Text(this.parentAccessMessage)
           .width('100%')
-          .fontSize(13)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(this.parentAccessMessage.indexOf('已') === 0 ? AppTheme.SUCCESS : AppTheme.DANGER);
       }
 
       Text('家长码只保存在当前设备，不会上传家庭云端。')
         .width('100%')
-        .fontSize(12)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%');
@@ -467,11 +470,11 @@ export struct BackendConnectionPage {
     Column({ space: 12 }) {
       Row() {
         Column({ space: 3 }) {
-          Text('家庭云端').fontSize(15).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Text('家庭云端').fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
           Text(BackendSession.instance.isConnected()
             ? `已连接${BackendSession.instance.getDisplayName().length > 0 ? ' · ' + BackendSession.instance.getDisplayName() : ''}`
             : '未连接 · 本地作业仍可使用')
-            .fontSize(13).fontColor(BackendSession.instance.isConnected() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
+            .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(BackendSession.instance.isConnected() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
@@ -479,9 +482,9 @@ export struct BackendConnectionPage {
       .width('100%');
 
       Divider().color(AppTheme.DIVIDER);
-      Text('高级连接设置').width('100%').fontSize(13).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+      Text('高级连接设置').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
       TextInput({ placeholder: '例如 http://192.168.1.10:8080', text: this.baseUrl })
-        .width('100%').height(AppTheme.INPUT_HEIGHT).backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE_SUBTLE)
         .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.baseUrl = value);
 
       if (!BackendSession.instance.isConnected()) {
@@ -517,16 +520,20 @@ export struct BackendConnectionPage {
         Column({ space: 3 }) {
           Text('家庭')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
           Text('孩子资料和教材信息')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
         Text(this.familyExpanded ? '收起' : '查看')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -552,16 +559,20 @@ export struct BackendConnectionPage {
         Column({ space: 3 }) {
           Text('家长保护')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
           Text('限制学生误进入家长操作')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
         Text(this.parentAccessExpanded ? '收起' : '查看')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -587,16 +598,20 @@ export struct BackendConnectionPage {
         Column({ space: 3 }) {
           Text('AI 辅导规则')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
           Text('设置小伴的讲解和答案规则')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
         Text(this.tutorRulesExpanded ? '收起' : '查看')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -622,16 +637,20 @@ export struct BackendConnectionPage {
         Column({ space: 3 }) {
           Text('数据与同步')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
+            .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
           Text('家庭云端和数据同步')
-            .fontSize(12)
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .layoutWeight(1)
         .alignItems(HorizontalAlign.Start);
         Text(this.dataSyncExpanded ? '收起' : '查看')
-          .fontSize(13)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.PRIMARY);
       }
@@ -669,7 +688,7 @@ export struct BackendConnectionPage {
             .borderRadius(AppTheme.CARD_RADIUS);
 
             if (this.message.length > 0) {
-              Text(this.message).width('100%').fontSize(13).lineHeight(19).fontColor(AppTheme.SUBTEXT)
+              Text(this.message).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
                 .padding(12).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
             }
           }
