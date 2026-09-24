@@ -56,19 +56,20 @@ V2 页面不再由各 Feature 私自实现返回按钮、标题栏和顶部留�
 规则：
 
 1. 返回区域固定使用至少 `MIN_TOUCH_TARGET` 的触控面积，并使用圆形浅色容器表达可点击性；
-2. 返回图标统一使用 HarmonyOS Symbol `sys.symbol.chevron_left`，字号和颜色通过 `AppTheme` 统一；
-3. 主标题固定使用 `PAGE_NAV_TITLE_SIZE`，与返回控件垂直居中；
-4. 副标题和右侧 metadata 使用 `META_SIZE`；
-5. 页面不得使用 `‹ 作业列表`、`返回学习任务` 等私有视觉写法作为 header；语义通过 accessibilityText 表达；
-6. 页面可根据当前子状态修改标题，例如 Study Workspace 内进入 Tutor 时标题由“学习空间”变为“问小伴”，但仍复用同一个 Header；
-7. 系统返回和 Header 返回必须保持同一 Navigation stack 语义。
+2. Header 使用 `DEEP_PAGE_HEADER_HEIGHT` 作为最小高度，禁止固定高度裁剪大字体；
+3. 返回图标统一使用 HarmonyOS Symbol `sys.symbol.chevron_left`，字号和颜色通过 `AppTheme` 统一；
+4. 主标题固定使用 `PAGE_NAV_TITLE_SIZE`，与返回控件垂直居中；
+5. 副标题和右侧 metadata 使用 `META_SIZE`；
+6. 页面不得使用 `‹ 作业列表`、`返回学习任务` 等私有视觉写法作为 header；语义通过 accessibilityText 表达；
+7. 页面可根据当前子状态修改标题，例如 Study Workspace 内进入 Tutor 时标题由“学习空间”变为“问小伴”，但仍复用同一个 Header；
+8. 系统返回和 Header 返回必须保持同一 Navigation stack 语义。
 
 ## 4. 顶部留白与内容节奏
 
 字体层级统一遵循 `v2-typography-standard.md`，深层页面结构统一使用 `AppTheme` chrome token：
 
 - `DEEP_PAGE_TOP_PADDING = 8`
-- `DEEP_PAGE_HEADER_HEIGHT = 48`
+- `DEEP_PAGE_HEADER_HEIGHT = 48`（最小高度，不是固定高度）
 - `DEEP_PAGE_CONTENT_GAP = 12`
 - `DEEP_PAGE_BOTTOM_PADDING = 24`
 
