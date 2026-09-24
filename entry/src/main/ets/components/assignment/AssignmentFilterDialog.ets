@@ -1,5 +1,6 @@
 import { AppTheme } from '../../common/theme/AppTheme';
 import { ActionButton, ActionButtonKind, TextAction, TextActionKind } from '../action/ActionControls';
+import { SegmentedSelectionButton } from '../selection/SelectionControls';
 
 @CustomDialog
 export struct AssignmentFilterDialog {
@@ -12,28 +13,22 @@ export struct AssignmentFilterDialog {
 
   @Builder
   private DateModeOption(label: string, allDates: boolean) {
-    Button(label, { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(14)
-      .fontWeight(this.allDates === allDates ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(this.allDates === allDates ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(this.allDates === allDates ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(() => this.allDates = allDates);
+    SegmentedSelectionButton({
+      label: label,
+      selected: this.allDates === allDates,
+      onSelect: () => this.allDates = allDates
+    })
+    .layoutWeight(1);
   }
 
   @Builder
   private SubjectOption(label: string, value: string) {
-    Button(label, { type: ButtonType.Normal })
-      .layoutWeight(1)
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .fontSize(14)
-      .fontWeight(this.subjectCode === value ? FontWeight.Medium : FontWeight.Normal)
-      .backgroundColor(this.subjectCode === value ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .fontColor(this.subjectCode === value ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .onClick(() => this.subjectCode = value);
+    SegmentedSelectionButton({
+      label: label,
+      selected: this.subjectCode === value,
+      onSelect: () => this.subjectCode = value
+    })
+    .layoutWeight(1);
   }
 
   private reset(): void {
