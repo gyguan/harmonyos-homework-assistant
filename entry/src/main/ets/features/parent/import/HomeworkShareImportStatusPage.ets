@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ActionButton, ActionButtonKind } from '../../../components/action/ActionControls';
 import { HomeworkShareImportService } from '../../../application/import/HomeworkShareImportService';
 
 enum ShareImportPhase {
@@ -86,41 +87,37 @@ export struct HomeworkShareImportStatusPage {
         .textAlign(TextAlign.Center);
 
       if (this.phase === ShareImportPhase.FAILED) {
-        Button('重试', { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.PRIMARY)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .onClick(() => this.retry());
+        ActionButton({
+          label: '重试',
+          onClick: () => this.retry()
+        })
+        .width('100%');
       }
 
       if (this.phase === ShareImportPhase.EMPTY) {
-        Button('查看作业智能收件箱', { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.PRIMARY)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .onClick(() => this.onOpenInbox());
+        ActionButton({
+          label: '查看作业智能收件箱',
+          onClick: () => this.onOpenInbox()
+        })
+        .width('100%');
       }
 
       if (this.phase === ShareImportPhase.FAILED) {
-        Button('取消导入', { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-          .fontColor(AppTheme.TEXT)
-          .onClick(() => { void this.cancel(); });
+        ActionButton({
+          label: '取消导入',
+          kind: ActionButtonKind.NEUTRAL,
+          compact: true,
+          onClick: () => { void this.cancel(); }
+        })
+        .width('100%');
       } else if (this.phase === ShareImportPhase.EMPTY) {
-        Button('完成', { type: ButtonType.Normal })
-          .width('100%')
-          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .backgroundColor(AppTheme.SURFACE_EMPHASIS)
-          .fontColor(AppTheme.TEXT)
-          .onClick(() => this.onCancel());
+        ActionButton({
+          label: '完成',
+          kind: ActionButtonKind.NEUTRAL,
+          compact: true,
+          onClick: () => this.onCancel()
+        })
+        .width('100%');
       }
 
     }
