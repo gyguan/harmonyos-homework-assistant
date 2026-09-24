@@ -35,9 +35,11 @@ export struct AssignmentDetailPane {
   private SectionTitle(title: string) {
     Text(title)
       .width('100%')
-      .fontSize(13)
+      .fontSize(AppTheme.SECTION_TITLE_SIZE)
+      .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
       .fontWeight(FontWeight.Medium)
-      .fontColor(AppTheme.SUBTEXT);
+      .fontColor(AppTheme.TEXT)
+      .maxLines(AppTheme.SECTION_TITLE_MAX_LINES);
   }
 
   @Builder
@@ -46,12 +48,13 @@ export struct AssignmentDetailPane {
       SymbolGlyph($r('sys.symbol.doc_text')).fontSize(32).fontColor([AppTheme.TERTIARY_TEXT]);
       Text(this.assignmentId.length === 0 ? '选择左侧作业查看详情' : '这项作业暂时找不到')
         .fontSize(AppTheme.CARD_TITLE_SIZE)
+        .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT);
       if (this.assignmentId.length > 0) {
         Text('作业可能已经删除或尚未同步完成。')
-          .fontSize(13)
-          .lineHeight(20)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
     }
@@ -67,19 +70,22 @@ export struct AssignmentDetailPane {
       Column({ space: 14 }) {
         Row({ space: 8 }) {
           Text(this.typeLabel(this.assignment()!))
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.PRIMARY)
             .padding({ left: 10, right: 10, top: 6, bottom: 6 })
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .borderRadius(AppTheme.CHIP_RADIUS);
           Text(this.assignment()!.subject)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUBTEXT);
           Blank();
           Text(AssignmentStateMachine.label(this.assignment()!.status))
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
@@ -87,16 +93,21 @@ export struct AssignmentDetailPane {
         Text(this.assignment()!.title)
           .width('100%')
           .fontSize(AppTheme.PAGE_TITLE_SIZE)
+          .lineHeight(AppTheme.PAGE_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
-          .fontColor(AppTheme.TEXT);
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
 
         Row({ space: 8 }) {
           Text(this.assignment()!.dueText.length > 0 ? this.assignment()!.dueText : '未设置截止时间')
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
-          Text('·').fontSize(13).fontColor(AppTheme.TERTIARY_TEXT);
+          Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
           Text(`预计 ${this.assignment()!.expectedMinutes} 分钟`)
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
         }
         .width('100%');
@@ -112,13 +123,14 @@ export struct AssignmentDetailPane {
         Column({ space: 5 }) {
           Text('需要先订正')
             .width('100%')
-            .fontSize(13)
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.DANGER);
           Text(this.assignment()!.reviewNote)
             .width('100%')
-            .fontSize(15)
-            .lineHeight(22)
+            .fontSize(AppTheme.READING_BODY_SIZE)
+            .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
             .fontColor(AppTheme.TEXT);
         }
         .width('100%')
@@ -132,8 +144,8 @@ export struct AssignmentDetailPane {
         this.SectionTitle('老师要求');
         Text(this.assignment()!.instruction.length > 0 ? this.assignment()!.instruction : '按课堂要求完成这项作业。')
           .width('100%')
-          .fontSize(16)
-          .lineHeight(24)
+          .fontSize(AppTheme.READING_BODY_SIZE)
+          .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
           .fontColor(AppTheme.TEXT);
       }
       .width('100%')
@@ -145,11 +157,11 @@ export struct AssignmentDetailPane {
 
       if (this.assignment()!.textbookRef.length > 0) {
         Row({ space: 12 }) {
-          Text('教材 / 页码').width(76).fontSize(13).fontColor(AppTheme.SUBTEXT);
+          Text('教材 / 页码').width(76).fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
           Text(this.assignment()!.textbookRef)
             .layoutWeight(1)
-            .fontSize(14)
-            .lineHeight(21)
+            .fontSize(AppTheme.BODY_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT)
             .fontColor(AppTheme.TEXT);
         }
         .width('100%')
