@@ -151,6 +151,13 @@ if assignment_list_item:
     require("width: this.selected ? 1 : 0" in assignment_list_item and
             "color: this.selected ? AppTheme.PRIMARY : Color.Transparent" in assignment_list_item,
             "AssignmentListItem selected state must add a primary border as a second visual cue")
+    require("@Prop selectionMode: boolean = false;" in assignment_list_item and
+            "private LeadingIndicator()" in assignment_list_item and
+            "if (this.selectionMode)" in assignment_list_item,
+            "AssignmentListItem must support an in-card selection control without expanding row width")
+    require("TextOverflow.Ellipsis" in assignment_list_item and
+            "this.assignment.subject} · ${this.deadlineText()} · ${this.timingText()}" in assignment_list_item,
+            "AssignmentListItem compact metadata must truncate instead of overlapping neighboring content")
 
 # Persistent selectors whose visual state changes at runtime must use reactive child-component props,
 # not ordinary @Builder boolean snapshots. Keep both the binding mechanism and visible feedback guarded.
