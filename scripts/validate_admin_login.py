@@ -34,8 +34,8 @@ require("window.addEventListener('xiaoban-admin-authenticated'" in app and
         "admin business module must initialize from isolated authenticated state")
 require("async function handleLogin" not in app,
         "business module must not own login submission")
-login_match = re.search(r"login-shell\\.js\\?v=([0-9-]+)", index)
-app_match = re.search(r"app\\.js\\?v=([0-9-]+)", index)
+login_match = re.search(r"login-shell\.js\?v=([0-9-]+)", index)
+app_match = re.search(r"app\.js\?v=([0-9-]+)", index)
 require(login_match is not None and app_match is not None and
         login_match.group(1) == app_match.group(1),
         "admin login shell and app module must be cache-busted together")
