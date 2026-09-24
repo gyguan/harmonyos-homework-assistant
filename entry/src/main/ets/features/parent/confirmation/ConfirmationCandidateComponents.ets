@@ -98,7 +98,7 @@ export struct ConfirmationCandidateCard {
 
       Text(this.item.title)
         .width('100%')
-        .fontSize(15)
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
         .fontWeight(FontWeight.Medium)
         .fontColor(AppTheme.TEXT)
         .maxLines(2);
