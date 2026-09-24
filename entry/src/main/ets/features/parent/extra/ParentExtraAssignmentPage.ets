@@ -103,7 +103,7 @@ export struct ParentExtraAssignmentPage {
   @Builder
   private CategorySection() {
     Column({ space: 10 }) {
-      Text('任务分类').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+      Text('任务分类').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       Row({ space: 8 }) {
         this.CategoryOption('阅读', Subject.READING);
         this.CategoryOption('朗读', Subject.READ_ALOUD);
@@ -123,7 +123,7 @@ export struct ParentExtraAssignmentPage {
   @Builder
   private BasicSection() {
     Column({ space: 12 }) {
-      Text('任务内容').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+      Text('任务内容').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       TextInput({ placeholder: '例如：阅读《西游记》第三章', text: this.title })
         .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(15)
         .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -139,7 +139,7 @@ export struct ParentExtraAssignmentPage {
   @Builder
   private TimingSection() {
     Column({ space: 10 }) {
-      Text('时间安排').width('100%').fontSize(14).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+      Text('时间安排').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
       DeadlinePickerField({
         value: this.dueText,
         allowClear: true,
