@@ -1,5 +1,5 @@
 import { AppTheme } from '../../common/theme/AppTheme';
-import { ActionButton, TextAction, TextActionKind } from '../action/ActionControls';
+import { ActionButton, ActionButtonSize, TextAction, TextActionKind } from '../action/ActionControls';
 import { SegmentedSelectionButton } from '../selection/SelectionControls';
 import {
   PracticeGrade,
@@ -111,6 +111,7 @@ export struct PracticeFilterDialog {
 
       ActionButton({
         label: '确定',
+        size: ActionButtonSize.MEDIUM,
         onAction: (): void => this.confirm()
       })
       .width('100%')
