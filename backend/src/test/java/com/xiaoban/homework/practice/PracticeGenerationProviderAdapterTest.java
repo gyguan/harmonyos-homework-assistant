@@ -229,6 +229,70 @@ class PracticeGenerationProviderAdapterTest {
   }
 
   @Test
+  void acceptsQuestionsOnlyPayloadWithSystemMetadataDefaults() throws Exception {
+    String input = """
+        {
+          "questions": [
+            {
+              "type": "NUMBER",
+              "stem": "12 - 5 = ?",
+              "answerSpec": "7",
+              "explanation": "12减5等于7。",
+              "hints": ["关键词：12、减5"],
+              "tags": ["减法"]
+            }
+          ]
+        }
+        """;
+    PracticeGenerationProviderAdapter.MetadataDefaults defaults =
+        new PracticeGenerationProviderAdapter.MetadataDefaults(
+            "退位减法训练",
+            "AI生成的数学教材同步练习",
+            10,
+            List.of("数学", "教材同步"));
+
+    PracticeGenerationProviderAdapter.Result result =
+        PracticeGenerationProviderAdapter.adapt(mapper, input, defaults);
+
+    assertEquals("退位减法训练", result.paper().title());
+    assertEquals("AI生成的数学教材同步练习", result.paper().description());
+    assertEquals(10, result.paper().estimatedMinutes());
+    assertEquals(List.of("数学", "教材同步"), result.paper().tags());
+    assertEquals("7", result.paper().questions().get(0).answerSpec());
+    assertTrue(result.paper().questions().get(0).options().isEmpty());
+    assertTrue(result.coercedPaths().contains("$.title"));
+    assertTrue(result.coercedPaths().contains("$.description"));
+    assertTrue(result.coercedPaths().contains("$.estimatedMinutes"));
+    assertTrue(result.coercedPaths().contains("$.tags"));
+  }
+
+  @Test
+  void keepsProviderMetadataWhenQuestionsPayloadAlsoContainsIt() throws Exception {
+    String input = paperWithQuestion("""
+        {
+          "type": "NUMBER",
+          "stem": "12 - 5 = ?",
+          "options": [],
+          "answerSpec": "7",
+          "explanation": "12减5等于7。",
+          "hints": ["关键词：12、减5"],
+          "tags": ["减法"]
+        }
+        """);
+    PracticeGenerationProviderAdapter.MetadataDefaults defaults =
+        new PracticeGenerationProviderAdapter.MetadataDefaults(
+            "系统标题", "系统描述", 6, List.of("数学", "教材同步"));
+
+    PracticeGenerationProviderAdapter.Result result =
+        PracticeGenerationProviderAdapter.adapt(mapper, input, defaults);
+
+    assertEquals("测试练习", result.paper().title());
+    assertEquals("Provider Adapter 测试", result.paper().description());
+    assertEquals(10, result.paper().estimatedMinutes());
+    assertEquals(List.of("测试"), result.paper().tags());
+  }
+
+  @Test
   void rejectsMissingOptionsForSingleChoiceQuestion() {
     String input = paperWithQuestion("""
         {
@@ -327,7 +391,7 @@ class PracticeGenerationProviderAdapterTest {
         IllegalArgumentException.class,
         () -> PracticeGenerationProviderAdapter.adapt(mapper, input));
 
-    assertTrue(error.getMessage().contains("does not contain a canonical paper object"));
+    assertTrue(error.getMessage().contains("does not contain a practice question set"));
     assertTrue(error.getMessage().contains("rootKeys="));
     assertTrue(error.getMessage().contains("payload"));
   }
@@ -351,7 +415,7 @@ class PracticeGenerationProviderAdapterTest {
         IllegalArgumentException.class,
         () -> PracticeGenerationProviderAdapter.adapt(mapper, input));
 
-    assertTrue(error.getMessage().contains("multiple canonical paper candidates"));
+    assertTrue(error.getMessage().contains("multiple practice question set candidates"));
   }
 
   @Test
