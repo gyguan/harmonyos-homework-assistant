@@ -10,12 +10,15 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ScheduledAssignmentAttemptService {
+  private static final Logger log = LoggerFactory.getLogger(ScheduledAssignmentAttemptService.class);
   private static final int MAX_RETRIES = 3;
   private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
 
@@ -41,10 +44,34 @@ public class ScheduledAssignmentAttemptService {
   @Transactional(propagation = Propagation.REQUIRES_NEW)
   public void executeScheduler(UUID planId, Instant expectedFireAt, Instant executionAt) {
     ScheduledAssignmentPlanEntity plan = plans.lockById(planId).orElse(null);
-    if (plan == null || !"ENABLED".equals(plan.status) || plan.nextFireAt == null ||
-        !plan.nextFireAt.equals(expectedFireAt) || expectedFireAt.isAfter(executionAt)) {
+    if (plan == null) {
+      log.info("scheduled_assignment attempt_exit planId={} triggerSource=SCHEDULER reason=PLAN_NOT_FOUND expectedFireAt={}",
+          planId, expectedFireAt);
       return;
     }
+    if (!"ENABLED".equals(plan.status)) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} planType={} triggerSource=SCHEDULER reason=PLAN_NOT_ENABLED status={} expectedFireAt={}",
+          plan.id, plan.studentId, plan.planType, plan.status, expectedFireAt);
+      return;
+    }
+    if (plan.nextFireAt == null) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} planType={} triggerSource=SCHEDULER reason=NEXT_FIRE_AT_EMPTY expectedFireAt={}",
+          plan.id, plan.studentId, plan.planType, expectedFireAt);
+      return;
+    }
+    if (!plan.nextFireAt.equals(expectedFireAt)) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} planType={} triggerSource=SCHEDULER reason=FIRE_AT_CHANGED expectedFireAt={} actualNextFireAt={}",
+          plan.id, plan.studentId, plan.planType, expectedFireAt, plan.nextFireAt);
+      return;
+    }
+    if (expectedFireAt.isAfter(executionAt)) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} planType={} triggerSource=SCHEDULER reason=NOT_DUE expectedFireAt={} executionAt={}",
+          plan.id, plan.studentId, plan.planType, expectedFireAt, executionAt);
+      return;
+    }
+
+    log.info("scheduled_assignment attempt_branch planId={} studentId={} planType={} triggerSource=SCHEDULER fireAt={} executionAt={}",
+        plan.id, plan.studentId, plan.planType, expectedFireAt, executionAt);
     if ("VOICE_MATERIAL_AUTO".equals(plan.planType)) {
       executeVoiceLocked(plan, expectedFireAt, "SCHEDULER", executionAt);
     } else {
@@ -56,16 +83,46 @@ public class ScheduledAssignmentAttemptService {
   public VoiceMaterialDtos.AutoCreateResponse executeStudentEntry(
       UUID familyId, String studentId, UUID planId, Instant fireAt, Instant executionAt) {
     ScheduledAssignmentPlanEntity plan = plans.lockById(planId).orElse(null);
-    if (plan == null || !familyId.equals(plan.familyId) || !studentId.equals(plan.studentId) ||
-        !"ENABLED".equals(plan.status) || !"VOICE_MATERIAL_AUTO".equals(plan.planType)) {
+    if (plan == null) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} triggerSource=STUDENT_ENTRY reason=PLAN_NOT_FOUND fireAt={}",
+          planId, studentId, fireAt);
+      return emptyVoiceResponse();
+    }
+    if (!familyId.equals(plan.familyId) || !studentId.equals(plan.studentId)) {
+      log.warn("scheduled_assignment attempt_exit planId={} studentId={} triggerSource=STUDENT_ENTRY reason=OWNERSHIP_MISMATCH planStudentId={} fireAt={}",
+          planId, studentId, plan.studentId, fireAt);
+      return emptyVoiceResponse();
+    }
+    if (!"ENABLED".equals(plan.status)) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} triggerSource=STUDENT_ENTRY reason=PLAN_NOT_ENABLED status={} fireAt={}",
+          planId, studentId, plan.status, fireAt);
+      return emptyVoiceResponse();
+    }
+    if (!"VOICE_MATERIAL_AUTO".equals(plan.planType)) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} triggerSource=STUDENT_ENTRY reason=NOT_VOICE_PLAN planType={} fireAt={}",
+          planId, studentId, plan.planType, fireAt);
       return emptyVoiceResponse();
     }
 
     LocalDate businessDate = executionAt.atZone(ScheduledAssignmentSchedule.BUSINESS_ZONE).toLocalDate();
     Instant todayFireAt = ScheduledAssignmentSchedule.fireAt(plan, businessDate);
-    if (todayFireAt == null || !todayFireAt.equals(fireAt) || fireAt.isAfter(executionAt)) {
+    if (todayFireAt == null) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} triggerSource=STUDENT_ENTRY reason=NOT_ELIGIBLE_TODAY businessDate={} fireAt={}",
+          planId, studentId, businessDate, fireAt);
       return emptyVoiceResponse();
     }
+    if (!todayFireAt.equals(fireAt)) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} triggerSource=STUDENT_ENTRY reason=FIRE_AT_MISMATCH expectedTodayFireAt={} suppliedFireAt={}",
+          planId, studentId, todayFireAt, fireAt);
+      return emptyVoiceResponse();
+    }
+    if (fireAt.isAfter(executionAt)) {
+      log.info("scheduled_assignment attempt_exit planId={} studentId={} triggerSource=STUDENT_ENTRY reason=BEFORE_SCHEDULED_TIME fireAt={} executionAt={}",
+          planId, studentId, fireAt, executionAt);
+      return emptyVoiceResponse();
+    }
+    log.info("scheduled_assignment attempt_branch planId={} studentId={} planType={} triggerSource=STUDENT_ENTRY fireAt={} executionAt={}",
+        plan.id, plan.studentId, plan.planType, fireAt, executionAt);
     return executeVoiceLocked(plan, fireAt, "STUDENT_ENTRY", executionAt);
   }
 
@@ -87,8 +144,14 @@ public class ScheduledAssignmentAttemptService {
     run.finishedAt = executionAt;
     runs.save(run);
 
+    log.warn("scheduled_assignment attempt_failed planId={} studentId={} planType={} triggerSource={} fireAt={} retryCount={} maxRetries={} errorType={} message={}",
+        plan.id, plan.studentId, plan.planType, triggerSource, fireAt,
+        run.retryCount, MAX_RETRIES, error.getClass().getSimpleName(), run.errorMessage);
+
     if (run.retryCount >= MAX_RETRIES && "ENABLED".equals(plan.status) &&
         plan.nextFireAt != null && plan.nextFireAt.equals(fireAt)) {
+      log.warn("scheduled_assignment retries_exhausted planId={} studentId={} planType={} triggerSource={} fireAt={} retryCount={}",
+          plan.id, plan.studentId, plan.planType, triggerSource, fireAt, run.retryCount);
       advance(plan, fireAt, executionAt);
     }
   }
@@ -97,6 +160,8 @@ public class ScheduledAssignmentAttemptService {
       ScheduledAssignmentPlanEntity plan, Instant fireAt, Instant executionAt) {
     ScheduledAssignmentRunEntity run = prepareRun(plan.id, fireAt, "SCHEDULER", executionAt);
     if (isFinal(run)) {
+      log.info("scheduled_assignment manual_exit planId={} studentId={} fireAt={} reason=RUN_ALREADY_FINAL runStatus={} skipReason={} assignmentId={}",
+          plan.id, plan.studentId, fireAt, run.status, run.skipReason, run.assignmentId);
       advance(plan, fireAt, executionAt);
       return;
     }
@@ -106,6 +171,8 @@ public class ScheduledAssignmentAttemptService {
     Instant dueAt = dueAt(plan, template, executionAt);
     if ("SAME_DAY_AT".equals(template.duePolicy) &&
         dueAt != null && !dueAt.isAfter(executionAt)) {
+      log.info("scheduled_assignment manual_skip planId={} studentId={} fireAt={} reason=MISSED_DUE_WINDOW dueAt={} executionAt={}",
+          plan.id, plan.studentId, fireAt, dueAt, executionAt);
       finishSkipped(run, "MISSED_DUE_WINDOW", executionAt);
       advance(plan, fireAt, executionAt);
       return;
@@ -133,6 +200,8 @@ public class ScheduledAssignmentAttemptService {
         0L,
         "");
 
+    log.info("scheduled_assignment manual_create_start planId={} studentId={} fireAt={} assignmentId={} title={} dueAt={}",
+        plan.id, plan.studentId, fireAt, assignmentId, template.title, dueAt);
     AssignmentDtos.Response assignment =
         assignments.create(plan.familyId, plan.studentId, create);
     run.status = "SUCCESS";
@@ -141,6 +210,8 @@ public class ScheduledAssignmentAttemptService {
     run.errorMessage = "";
     run.finishedAt = executionAt;
     runs.save(run);
+    log.info("scheduled_assignment manual_success planId={} studentId={} fireAt={} assignmentId={}",
+        plan.id, plan.studentId, fireAt, assignment.id());
     advance(plan, fireAt, executionAt);
   }
 
@@ -148,8 +219,15 @@ public class ScheduledAssignmentAttemptService {
       ScheduledAssignmentPlanEntity plan, Instant fireAt, String triggerSource,
       Instant executionAt) {
     ScheduledAssignmentRunEntity run = prepareRun(plan.id, fireAt, triggerSource, executionAt);
-    if (isFinal(run)) return emptyVoiceResponse();
+    if (isFinal(run)) {
+      log.info("scheduled_assignment voice_exit planId={} studentId={} triggerSource={} fireAt={} reason=RUN_ALREADY_FINAL runStatus={} skipReason={} assignmentId={}",
+          plan.id, plan.studentId, triggerSource, fireAt,
+          run.status, run.skipReason, run.assignmentId);
+      return emptyVoiceResponse();
+    }
 
+    log.info("scheduled_assignment voice_auto_create_start planId={} studentId={} triggerSource={} fireAt={}",
+        plan.id, plan.studentId, triggerSource, fireAt);
     VoiceMaterialDtos.AutoCreateResponse result =
         voiceAssignments.autoCreateNext(plan.familyId, plan.studentId);
     if (result.created()) {
@@ -165,6 +243,16 @@ public class ScheduledAssignmentAttemptService {
     run.finishedAt = executionAt;
     runs.save(run);
 
+    if (result.created()) {
+      log.info("scheduled_assignment voice_success planId={} studentId={} triggerSource={} fireAt={} assignmentId={} packageId={}",
+          plan.id, plan.studentId, triggerSource, fireAt,
+          result.assignmentId(), result.packageId());
+    } else {
+      log.info("scheduled_assignment voice_skip planId={} studentId={} triggerSource={} fireAt={} reason={} assignmentId={} packageId={} businessDate={}",
+          plan.id, plan.studentId, triggerSource, fireAt, run.skipReason,
+          text(result.assignmentId()), text(result.packageId()), result.businessDate());
+    }
+
     // Scheduler advances after every handled attempt so it does not poll a blocked/no-material
     // plan every 30 seconds. Student entry can still retry today's retryable SKIPPED run.
     advance(plan, fireAt, executionAt);
@@ -177,6 +265,9 @@ public class ScheduledAssignmentAttemptService {
         runs.findByPlanIdAndScheduledFireAt(planId, fireAt).orElse(null);
     if (existing != null) {
       if (!isFinal(existing)) existing.triggerSource = triggerSource;
+      log.info("scheduled_assignment run_reuse planId={} fireAt={} triggerSource={} runId={} runStatus={} skipReason={} retryCount={}",
+          planId, fireAt, triggerSource, existing.id, existing.status,
+          existing.skipReason, existing.retryCount);
       return existing;
     }
 
@@ -192,7 +283,10 @@ public class ScheduledAssignmentAttemptService {
     run.retryCount = 0;
     run.createdAt = executionAt;
     run.finishedAt = null;
-    return runs.saveAndFlush(run);
+    ScheduledAssignmentRunEntity saved = runs.saveAndFlush(run);
+    log.info("scheduled_assignment run_created planId={} fireAt={} triggerSource={} runId={}",
+        planId, fireAt, triggerSource, saved.id);
+    return saved;
   }
 
   private boolean isFinal(ScheduledAssignmentRunEntity run) {
@@ -220,6 +314,8 @@ public class ScheduledAssignmentAttemptService {
     if (next == null) plan.status = "ENDED";
     plan.updatedAt = executionAt;
     plans.save(plan);
+    log.info("scheduled_assignment plan_advanced planId={} studentId={} planType={} firedAt={} nextFireAt={} status={}",
+        plan.id, plan.studentId, plan.planType, fireAt, next, plan.status);
   }
 
   private Instant dueAt(ScheduledAssignmentPlanEntity plan,
