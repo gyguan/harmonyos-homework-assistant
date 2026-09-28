@@ -6,6 +6,7 @@ import {
   PracticePaper,
   PracticePassFilter,
   PracticeSemester,
+  PracticeSourceType,
   PracticeSubject,
   PracticeTrackFilter
 } from '../../../domain/model/practice/PracticeModels';
@@ -29,6 +30,16 @@ struct PracticePaperCard {
           .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .fontColor(AppTheme.TEXT);
+        if (this.paper.sourceType === PracticeSourceType.AI_GENERATED) {
+          Text('AI生成')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .padding({ left: 9, right: 9, top: 4, bottom: 4 })
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .borderRadius(AppTheme.CHIP_RADIUS);
+        }
         if (this.passed) {
           Text('已通过')
             .fontSize(AppTheme.CAPTION_SIZE)
