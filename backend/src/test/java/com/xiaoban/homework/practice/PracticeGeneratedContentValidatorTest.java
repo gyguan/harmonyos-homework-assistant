@@ -29,6 +29,19 @@ class PracticeGeneratedContentValidatorTest {
   }
 
   @Test
+  void rejectsWrongAnswerForSimpleMathNumberQuestion() {
+    PracticeContentCatalog.Paper base = validPaper("MATH");
+    List<PracticeContentCatalog.Question> questions = new ArrayList<>(base.questions());
+    PracticeContentCatalog.Question first = questions.get(0);
+    questions.set(0, new PracticeContentCatalog.Question(
+        first.id(), first.orderNo(), "NUMBER", "42 - 5 = ?",
+        List.of(), "38", "42减5等于38。",
+        List.of("关键词：42、减5"), first.tags()));
+    PracticeContentCatalog.Paper invalid = copy(base, questions);
+    assertThrows(IllegalStateException.class, () -> validator.validate(invalid, 5));
+  }
+
+  @Test
   void rejectsEnglishStemWithoutChineseInstruction() {
     PracticeContentCatalog.Paper base = validPaper("ENGLISH");
     List<PracticeContentCatalog.Question> questions = new ArrayList<>(base.questions());
