@@ -1,7 +1,7 @@
 create table scheduled_assignment_plan (
   id uuid primary key,
   family_id uuid not null references family(id),
-  student_id varchar(80) not null references student(id),
+  student_id varchar(80) not null references student(id) on delete cascade,
   plan_type varchar(32) not null,
   name varchar(300) not null,
   schedule_type varchar(24) not null,
