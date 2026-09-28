@@ -1,5 +1,6 @@
 package com.xiaoban.homework.practice;
 
+import com.xiaoban.homework.ai.StructuredJsonNormalizer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,7 +24,7 @@ final class PracticeGenerationProviderAdapter {
       "value", "minutes", "estimatedMinutes");
   private static final Set<String> PAPER_REQUIRED_FIELDS = Set.of(
       "title", "description", "estimatedMinutes", "tags", "questions");
-  private static final int PAPER_ENVELOPE_MAX_DEPTH = 3;
+  private static final int PAPER_ENVELOPE_MAX_DEPTH = 6;
 
   private PracticeGenerationProviderAdapter() {}
 
@@ -39,7 +40,7 @@ final class PracticeGenerationProviderAdapter {
     Object parsed = mapper.readValue(json, Object.class);
     Map<String, Object> root = objectMap(parsed, "$");
     Tracker tracker = new Tracker();
-    root = resolvePaperRoot(root, tracker);
+    root = resolvePaperRoot(mapper, root, tracker);
 
     String title = requiredString(root, "title", "$.title", tracker);
     String description = requiredString(root, "description", "$.description", tracker);
@@ -58,12 +59,15 @@ final class PracticeGenerationProviderAdapter {
   private record PaperCandidate(String path, Map<String, Object> value) {}
 
   private static Map<String, Object> resolvePaperRoot(
-      Map<String, Object> root, Tracker tracker) {
+      JsonMapper mapper, Map<String, Object> root, Tracker tracker) {
     if (isCanonicalPaperObject(root)) return root;
 
     List<PaperCandidate> candidates = new ArrayList<>();
-    collectPaperCandidates(root, "$", 0, candidates);
-    if (candidates.isEmpty()) return root;
+    collectPaperCandidates(mapper, root, "$", 0, candidates);
+    if (candidates.isEmpty()) {
+      throw invalid("$", "does not contain a canonical paper object; rootKeys="
+          + root.keySet());
+    }
     if (candidates.size() > 1) {
       throw invalid("$", "contains multiple canonical paper candidates: "
           + candidates.stream().map(PaperCandidate::path).toList());
@@ -75,27 +79,65 @@ final class PracticeGenerationProviderAdapter {
   }
 
   private static void collectPaperCandidates(
-      Map<String, Object> object,
+      JsonMapper mapper,
+      Object value,
       String path,
       int depth,
       List<PaperCandidate> candidates) {
-    if (depth >= PAPER_ENVELOPE_MAX_DEPTH) return;
+    if (depth > PAPER_ENVELOPE_MAX_DEPTH || value == null) return;
 
-    for (Map.Entry<String, Object> entry : object.entrySet()) {
-      if (!(entry.getValue() instanceof Map<?, ?>)) continue;
-
-      String childPath = path + "." + entry.getKey();
-      Map<String, Object> child = objectMap(entry.getValue(), childPath);
-      if (isCanonicalPaperObject(child)) {
-        candidates.add(new PaperCandidate(childPath, child));
-        continue;
+    if (value instanceof Map<?, ?>) {
+      Map<String, Object> object = objectMap(value, path);
+      if (isCanonicalPaperObject(object)) {
+        candidates.add(new PaperCandidate(path, object));
+        return;
       }
-      collectPaperCandidates(child, childPath, depth + 1, candidates);
+
+      for (Map.Entry<String, Object> entry : object.entrySet()) {
+        if (isDomainCollectionField(entry.getKey())) continue;
+        collectPaperCandidates(
+            mapper, entry.getValue(), path + "." + entry.getKey(), depth + 1, candidates);
+      }
+      return;
+    }
+
+    if (value instanceof List<?> values) {
+      if (values.size() == 1) {
+        collectPaperCandidates(
+            mapper, values.get(0), path + "[0]", depth + 1, candidates);
+      }
+      return;
+    }
+
+    if (value instanceof String text && looksLikeStructuredJson(text)) {
+      try {
+        StructuredJsonNormalizer.Result normalized =
+            StructuredJsonNormalizer.normalize(mapper, text);
+        Object nested = mapper.readValue(normalized.json(), Object.class);
+        collectPaperCandidates(
+            mapper, nested, path + "<json>", depth + 1, candidates);
+      } catch (Exception ignored) {
+        // Not a valid structured JSON envelope. Leave it as ordinary provider text.
+      }
     }
   }
 
   private static boolean isCanonicalPaperObject(Map<String, Object> object) {
     return object.keySet().containsAll(PAPER_REQUIRED_FIELDS);
+  }
+
+  private static boolean isDomainCollectionField(String key) {
+    return "questions".equals(key)
+        || "options".equals(key)
+        || "hints".equals(key)
+        || "tags".equals(key);
+  }
+
+  private static boolean looksLikeStructuredJson(String value) {
+    String text = value == null ? "" : value.trim();
+    return text.startsWith("{")
+        || text.startsWith("[")
+        || text.startsWith("```");
   }
 
   private static List<PracticeGenerationCanonicalContract.Question> questions(
