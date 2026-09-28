@@ -2,6 +2,7 @@ package com.xiaoban.homework.voicematerial;
 
 import com.xiaoban.homework.auth.AuthInterceptor;
 import com.xiaoban.homework.media.MediaAssetService;
+import com.xiaoban.homework.scheduledassignment.ScheduledAssignmentService;
 import jakarta.validation.Valid;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -30,15 +31,18 @@ public class VoiceMaterialController {
   private final VoiceMaterialAssignmentService assignments;
   private final VoiceTaskQueryService voiceTasks;
   private final MediaAssetService mediaAssets;
+  private final ScheduledAssignmentService scheduledAssignments;
 
   public VoiceMaterialController(VoiceMaterialService materials,
       VoiceMaterialAssignmentService assignments,
       VoiceTaskQueryService voiceTasks,
-      MediaAssetService mediaAssets) {
+      MediaAssetService mediaAssets,
+      ScheduledAssignmentService scheduledAssignments) {
     this.materials = materials;
     this.assignments = assignments;
     this.voiceTasks = voiceTasks;
     this.mediaAssets = mediaAssets;
+    this.scheduledAssignments = scheduledAssignments;
   }
 
   @PostMapping("/students/{studentId}/voice-material-batches")
@@ -158,6 +162,6 @@ public class VoiceMaterialController {
   public VoiceMaterialDtos.AutoCreateResponse autoCreateNext(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String studentId) {
-    return assignments.autoCreateNext(familyId, studentId);
+    return scheduledAssignments.autoCreateOnStudentEntry(familyId, studentId);
   }
 }

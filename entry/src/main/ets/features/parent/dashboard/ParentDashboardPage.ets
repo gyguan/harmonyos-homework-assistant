@@ -7,6 +7,7 @@ export struct ParentDashboardPage {
   onOpenAssignment: () => void = () => {};
   onOpenInbox: () => void = () => {};
   onOpenVoice: () => void = () => {};
+  onOpenScheduled: () => void = () => {};
 
   private canUseWideComposition(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentHomeRequirement());
@@ -121,6 +122,61 @@ export struct ParentDashboardPage {
   }
 
   @Builder
+  private ScheduledAssignmentAction() {
+    Column({ space: 14 }) {
+      Row() {
+        Stack() {
+          Text('时')
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center);
+        }
+        .width(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .alignContent(Alignment.Center)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .borderRadius(AppTheme.CHIP_RADIUS);
+        Blank();
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(15)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
+      }
+      .width('100%');
+
+      Column({ space: 5 }) {
+        Text('定时作业')
+          .width('100%')
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+        Text('按计划自动创建普通或语音作业')
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start);
+    }
+    .width('100%')
+    .constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })
+    .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText('定时作业，按计划自动创建普通或语音作业')
+    .onClick(() => this.onOpenScheduled());
+  }
+
+  @Builder
   private AssignmentInboxAction() {
     Column({ space: 14 }) {
       Row() {
@@ -182,6 +238,7 @@ export struct ParentDashboardPage {
         Column({ space: 10 }) {
           this.CreateAssignmentAction();
           this.CreateVoiceAction();
+          this.ScheduledAssignmentAction();
           this.AssignmentInboxAction();
         }
         .width('100%')
@@ -214,6 +271,15 @@ export struct ParentDashboardPage {
 
           Column() {
             this.CreateVoiceAction();
+          }
+          .layoutWeight(1);
+        }
+        .width('100%')
+        .alignItems(VerticalAlign.Top);
+
+        Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+          Column() {
+            this.ScheduledAssignmentAction();
           }
           .layoutWeight(1);
 

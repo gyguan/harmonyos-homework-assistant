@@ -48,7 +48,7 @@ require("Text(this.assignment.dueText)" not in list_item,
 # 2. Parent Home and Progress stay compact: navigation already names the surface.
 require("AssignmentMetricSummary({" not in home and "今天的学习" not in home and "需要我处理" not in home,
         "parent home must stay action-only without progress metrics or attention sections")
-for phrase in ["布置作业", "语音作业", "作业收件箱"]:
+for phrase in ["布置作业", "语音作业", "定时作业", "作业收件箱"]:
     require(phrase in home, f"parent home missing required primary action: {phrase}")
 require("Text('家长操作')" not in home and "private PageIntro()" not in home,
         "parent home must not repeat a page title already expressed by primary navigation")

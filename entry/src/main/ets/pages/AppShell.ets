@@ -1,6 +1,7 @@
 import {
   AppRoute,
   AssignmentRouteParam,
+  ParentScheduledAssignmentsRouteParam,
   ParentVoiceCreateRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
@@ -28,6 +29,7 @@ import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImpor
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
+import { ParentScheduledAssignmentPage } from '../features/parent/scheduled/ParentScheduledAssignmentPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
 import { StudentAssignmentDetailPage } from '../features/student/assignments/StudentAssignmentDetailPage';
@@ -298,6 +300,11 @@ export struct AppShell {
       AppRoute.PARENT_VOICE_CREATE, new ParentVoiceCreateRouteParam());
   }
 
+  private openParentScheduledAssignments(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_SCHEDULED_ASSIGNMENTS, new ParentScheduledAssignmentsRouteParam());
+  }
+
   private routeAssignmentId(param: Object): string {
     return (param as AssignmentRouteParam).assignmentId;
   }
@@ -458,6 +465,14 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_SCHEDULED_ASSIGNMENTS) {
+      NavDestination() {
+        ParentScheduledAssignmentPage({
+          onBack: () => this.navPathStack.pop()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_VOICE_CREATE) {
       NavDestination() {
         ParentVoiceAssignmentPage({
@@ -488,7 +503,8 @@ export struct AppShell {
       ParentDashboardPage({
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-        onOpenVoice: () => this.openParentVoiceCreate()
+        onOpenVoice: () => this.openParentVoiceCreate(),
+        onOpenScheduled: () => this.openParentScheduledAssignments()
       });
     }
   }
