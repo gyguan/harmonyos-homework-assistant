@@ -67,6 +67,10 @@ public class PracticeContentService {
     return questions.findByPaperKeyOrderByOrderNo(paper.paperKey);
   }
 
+  private String text(String value) {
+    return value == null ? "" : value.trim();
+  }
+
   public PracticeDtos.PaperResponse response(PracticePaperEntity paper) {
     return new PracticeDtos.PaperResponse(
         paper.paperId, paper.version, paper.grade, paper.subject, paper.semester, paper.track, paper.title, paper.description,
