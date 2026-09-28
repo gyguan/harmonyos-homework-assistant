@@ -48,8 +48,13 @@ public final class PracticeGenerationDtos {
       DraftPaper paper,
       String errorMessage) {}
 
+  public record PublishRequest(
+      @NotBlank String scope,
+      List<String> targetStudentIds) {}
+
   public record PublishResponse(
       String generationId,
       String status,
-      PracticeDtos.PaperResponse paper) {}
+      PracticeDtos.PaperResponse paper,
+      List<String> targetStudentIds) {}
 }
