@@ -87,7 +87,9 @@ public class PracticeGenerationService {
     PracticeGenerationEntity generation = new PracticeGenerationEntity();
     generation.id = generationId;
     generation.familyId = familyId;
-    generation.studentId = studentId;
+    generation.referenceStudentId = studentId;
+    generation.referenceTextbookSummary =
+        student.textbookSummary == null ? "" : student.textbookSummary;
     generation.subject = subject;
     generation.semester = semester;
     generation.track = track;
@@ -234,7 +236,7 @@ public class PracticeGenerationService {
       throw new ApiExceptions.BadRequest("不支持的发布范围");
     }
 
-    StudentEntity reference = students.requireOwned(familyId, generation.studentId);
+    StudentEntity reference = students.requireOwned(familyId, generation.referenceStudentId);
     Map<String, StudentEntity> targets = new LinkedHashMap<>();
 
     if ("CURRENT".equals(scope)) {
@@ -259,7 +261,7 @@ public class PracticeGenerationService {
 
     List<String> incompatible = new ArrayList<>();
     for (StudentEntity target : targets.values()) {
-      String reason = incompatibility(reference, target, draft);
+      String reason = incompatibility(generation, target, draft);
       if (!reason.isBlank()) {
         incompatible.add(target.name + "（" + reason + "）");
       }
@@ -272,7 +274,9 @@ public class PracticeGenerationService {
   }
 
   private String incompatibility(
-      StudentEntity reference, StudentEntity target, PracticeContentCatalog.Paper draft) {
+      PracticeGenerationEntity generation,
+      StudentEntity target,
+      PracticeContentCatalog.Paper draft) {
     String targetGrade = audiencePolicy.gradeCode(target.grade);
     if (!draft.grade().equals(targetGrade)) return "年级不匹配";
 
@@ -280,7 +284,7 @@ public class PracticeGenerationService {
     if (!draft.semester().equals(targetSemester)) return "学期不匹配";
 
     if ("TEXTBOOK_SYNC".equals(draft.track())) {
-      String referenceTextbook = normalizeText(reference.textbookSummary);
+      String referenceTextbook = normalizeText(generation.referenceTextbookSummary);
       String targetTextbook = normalizeText(target.textbookSummary);
       if (targetTextbook.isBlank()) return "未配置教材";
       if (!referenceTextbook.equals(targetTextbook)) return "教材配置不一致";
