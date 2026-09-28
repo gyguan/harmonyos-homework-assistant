@@ -1,6 +1,7 @@
 import {
   AppRoute,
   AssignmentRouteParam,
+  ParentScheduledAssignmentsRouteParam,
   ParentVoiceCreateRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
@@ -300,7 +301,8 @@ export struct AppShell {
   }
 
   private openParentScheduledAssignments(): void {
-    this.navPathStack.pushPathByName(AppRoute.PARENT_SCHEDULED_ASSIGNMENTS, {});
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_SCHEDULED_ASSIGNMENTS, new ParentScheduledAssignmentsRouteParam());
   }
 
   private routeAssignmentId(param: Object): string {
