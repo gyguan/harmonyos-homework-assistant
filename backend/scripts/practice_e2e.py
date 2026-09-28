@@ -19,6 +19,20 @@ def main() -> int:
         student_id = "student-xiaoyu-001"
         paper_id = "MATH-G2-S1-SYNC-ADD-SUB-001"
 
+        catalog = expect(
+            http(
+                base_url,
+                "GET",
+                f"/api/v1/students/{student_id}/practice/papers"
+                "?grade=G2&subject=MATH&semester=S1&track=TEXTBOOK_SYNC",
+                token=token,
+            ),
+            (200,),
+            "list visible textbook-sync practice papers",
+        ).json()
+        require(isinstance(catalog, list) and any(item.get("id") == paper_id for item in catalog),
+                "visible practice catalog must include the expected PRESET paper")
+
         paper = expect(
             http(base_url, "GET", f"/api/v1/practice/papers/{paper_id}?version=3", token=token),
             (200,),
