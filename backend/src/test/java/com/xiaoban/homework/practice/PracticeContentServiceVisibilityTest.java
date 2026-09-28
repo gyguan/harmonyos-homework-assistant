@@ -24,13 +24,9 @@ class PracticeContentServiceVisibilityTest {
     UUID familyId = UUID.randomUUID();
     PracticePaperEntity preset = paper("preset-1", null, "PRESET");
     PracticePaperEntity owned = paper("ai-owned", familyId, "AI_GENERATED");
-    PracticePaperEntity otherStudent = paper("ai-other-student", familyId, "AI_GENERATED");
-    PracticePaperEntity otherFamily = paper("ai-other-family", UUID.randomUUID(), "AI_GENERATED");
-    when(papers.findAll()).thenReturn(List.of(preset, owned, otherStudent, otherFamily));
-    when(audiences.existsByFamilyIdAndStudentIdAndPaperKey(
-        familyId, "student-1", "ai-owned@1")).thenReturn(true);
-    when(audiences.existsByFamilyIdAndStudentIdAndPaperKey(
-        familyId, "student-1", "ai-other-student@1")).thenReturn(false);
+    when(papers.findVisibleForStudent(
+        familyId, "student-1", "G2", "MATH", "S1", "TEXTBOOK_SYNC"))
+        .thenReturn(List.of(owned, preset));
 
     List<PracticeDtos.PaperResponse> result = service.listForStudent(
         familyId, "student-1", "G2", "MATH", "S1", "TEXTBOOK_SYNC");
