@@ -35,7 +35,7 @@ class PracticeGenerationServiceAudienceTest {
     JsonMapper mapper = JsonMapper.builder().build();
 
     PracticeGenerationEntity generation = generation(familyId, mapper);
-    when(generations.findById(generation.id)).thenReturn(Optional.of(generation));
+    when(generations.lockByIdAndFamilyId(generation.id, familyId)).thenReturn(Optional.of(generation));
     when(papers.findByPaperIdAndVersion("ai-test", 1)).thenReturn(Optional.empty());
 
     StudentEntity reference = student("ref", "小宇", "二年级", "上学期", "人教版数学二年级上册");
@@ -48,7 +48,7 @@ class PracticeGenerationServiceAudienceTest {
 
     PracticeGenerationService service = new PracticeGenerationService(
         generations, papers, questions, audiences, students, audiencePolicy,
-        model, validator, content, mapper);
+        model, mock(PracticeGenerationReviewClient.class), validator, content, mapper);
 
     PracticeGenerationDtos.PublishResponse response = service.publish(
         familyId,
@@ -76,7 +76,7 @@ class PracticeGenerationServiceAudienceTest {
     JsonMapper mapper = JsonMapper.builder().build();
 
     PracticeGenerationEntity generation = generation(familyId, mapper);
-    when(generations.findById(generation.id)).thenReturn(Optional.of(generation));
+    when(generations.lockByIdAndFamilyId(generation.id, familyId)).thenReturn(Optional.of(generation));
     when(papers.findByPaperIdAndVersion("ai-test", 1)).thenReturn(Optional.empty());
 
     StudentEntity reference = student("ref", "小宇", "二年级", "上学期", "人教版数学二年级上册");
@@ -93,6 +93,7 @@ class PracticeGenerationServiceAudienceTest {
     PracticeGenerationService service = new PracticeGenerationService(
         generations, papers, questions, audiences, students, audiencePolicy,
         mock(PracticeGenerationModelClient.class),
+        mock(PracticeGenerationReviewClient.class),
         mock(PracticeGeneratedContentValidator.class),
         content, mapper);
 
@@ -121,7 +122,7 @@ class PracticeGenerationServiceAudienceTest {
     JsonMapper mapper = JsonMapper.builder().build();
 
     PracticeGenerationEntity generation = generation(familyId, mapper);
-    when(generations.findById(generation.id)).thenReturn(Optional.of(generation));
+    when(generations.lockByIdAndFamilyId(generation.id, familyId)).thenReturn(Optional.of(generation));
 
     StudentEntity reference = student("ref", "小宇", "二年级", "上学期", "人教版数学二年级上册");
     StudentEntity older = student("older", "小华", "三年级", "上学期", "人教版数学三年级上册");
@@ -153,7 +154,7 @@ class PracticeGenerationServiceAudienceTest {
     generation.id = UUID.randomUUID();
     generation.familyId = familyId;
     generation.referenceStudentId = "ref";
-    generation.referenceTextbookSummary = "人教版数学二年级上册";
+    generation.referenceTextbookContext = "人教版数学二年级上册";
     generation.subject = "MATH";
     generation.semester = "S1";
     generation.track = "TEXTBOOK_SYNC";
