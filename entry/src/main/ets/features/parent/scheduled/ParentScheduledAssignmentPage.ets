@@ -60,7 +60,7 @@ export struct ParentScheduledAssignmentPage {
     }
   }
 
-  private openCreate(): void {
+  private resetEditorState(): void {
     this.editingId = '';
     this.planType = ScheduledAssignmentPlanType.MANUAL_ASSIGNMENT;
     this.name = '';
@@ -78,10 +78,16 @@ export struct ParentScheduledAssignmentPage {
     this.dueOffsetMinutesText = '120';
     this.recentRuns = [];
     this.message = '';
+    this.messageError = false;
+  }
+
+  private openCreate(): void {
+    this.resetEditorState();
     this.showEditor = true;
   }
 
   private async openEdit(plan: ScheduledAssignmentPlan): Promise<void> {
+    this.resetEditorState();
     this.editingId = plan.id;
     this.planType = plan.planType;
     this.name = plan.name;
