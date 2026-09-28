@@ -42,11 +42,20 @@ public final class PracticeGenerationDtos {
       String sourceType,
       List<DraftQuestion> questions) {}
 
+  public record AudienceCandidate(
+      String studentId,
+      String studentName,
+      String grade,
+      String semester,
+      boolean compatible,
+      String reason) {}
+
   public record GenerationResponse(
       String generationId,
       String status,
       DraftPaper paper,
-      String errorMessage) {}
+      String errorMessage,
+      List<AudienceCandidate> audienceCandidates) {}
 
   public record PublishRequest(
       @NotBlank String scope,
