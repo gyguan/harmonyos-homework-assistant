@@ -21,6 +21,9 @@ final class PracticeGenerationProviderAdapter {
       "text", "value", "content", "answer", "label", "key", "type", "name");
   private static final List<String> INTEGER_WRAPPER_KEYS = List.of(
       "value", "minutes", "estimatedMinutes");
+  private static final Set<String> PAPER_REQUIRED_FIELDS = Set.of(
+      "title", "description", "estimatedMinutes", "tags", "questions");
+  private static final int PAPER_ENVELOPE_MAX_DEPTH = 3;
 
   private PracticeGenerationProviderAdapter() {}
 
@@ -36,6 +39,7 @@ final class PracticeGenerationProviderAdapter {
     Object parsed = mapper.readValue(json, Object.class);
     Map<String, Object> root = objectMap(parsed, "$");
     Tracker tracker = new Tracker();
+    root = resolvePaperRoot(root, tracker);
 
     String title = requiredString(root, "title", "$.title", tracker);
     String description = requiredString(root, "description", "$.description", tracker);
@@ -49,6 +53,49 @@ final class PracticeGenerationProviderAdapter {
         new PracticeGenerationCanonicalContract.Paper(
             title, description, estimatedMinutes, tags, questions),
         tracker.paths());
+  }
+
+  private record PaperCandidate(String path, Map<String, Object> value) {}
+
+  private static Map<String, Object> resolvePaperRoot(
+      Map<String, Object> root, Tracker tracker) {
+    if (isCanonicalPaperObject(root)) return root;
+
+    List<PaperCandidate> candidates = new ArrayList<>();
+    collectPaperCandidates(root, "$", 0, candidates);
+    if (candidates.isEmpty()) return root;
+    if (candidates.size() > 1) {
+      throw invalid("$", "contains multiple canonical paper candidates: "
+          + candidates.stream().map(PaperCandidate::path).toList());
+    }
+
+    PaperCandidate candidate = candidates.get(0);
+    tracker.add(candidate.path());
+    return candidate.value();
+  }
+
+  private static void collectPaperCandidates(
+      Map<String, Object> object,
+      String path,
+      int depth,
+      List<PaperCandidate> candidates) {
+    if (depth >= PAPER_ENVELOPE_MAX_DEPTH) return;
+
+    for (Map.Entry<String, Object> entry : object.entrySet()) {
+      if (!(entry.getValue() instanceof Map<?, ?>)) continue;
+
+      String childPath = path + "." + entry.getKey();
+      Map<String, Object> child = objectMap(entry.getValue(), childPath);
+      if (isCanonicalPaperObject(child)) {
+        candidates.add(new PaperCandidate(childPath, child));
+        continue;
+      }
+      collectPaperCandidates(child, childPath, depth + 1, candidates);
+    }
+  }
+
+  private static boolean isCanonicalPaperObject(Map<String, Object> object) {
+    return object.keySet().containsAll(PAPER_REQUIRED_FIELDS);
   }
 
   private static List<PracticeGenerationCanonicalContract.Question> questions(
