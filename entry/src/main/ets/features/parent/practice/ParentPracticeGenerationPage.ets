@@ -72,7 +72,7 @@ export struct ParentPracticeGenerationPage {
 
   private async publish(): Promise<void> {
     if (this.result === null || this.result.paper === null || this.publishing || this.generating) return;
-    let blocked = this.publishBlockedReason(this.result.paper);
+    let blocked = this.publishBlockedReason();
     if (blocked.length > 0) {
       this.showMessage(blocked, true);
       return;
