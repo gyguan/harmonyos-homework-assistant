@@ -22,8 +22,6 @@ final class PracticeGenerationProviderAdapter {
       "text", "value", "content", "answer", "label", "key", "type", "name");
   private static final List<String> INTEGER_WRAPPER_KEYS = List.of(
       "value", "minutes", "estimatedMinutes");
-  private static final Set<String> PAPER_REQUIRED_FIELDS = Set.of(
-      "title", "description", "estimatedMinutes", "tags", "questions");
   private static final int PAPER_ENVELOPE_MAX_DEPTH = 6;
 
   private PracticeGenerationProviderAdapter() {}
@@ -32,21 +30,37 @@ final class PracticeGenerationProviderAdapter {
       PracticeGenerationCanonicalContract.Paper paper,
       List<String> coercedPaths) {}
 
+  record MetadataDefaults(
+      String title,
+      String description,
+      int estimatedMinutes,
+      List<String> tags) {}
+
   private record AdaptedOptions(
       List<PracticeGenerationCanonicalContract.Option> options,
       Set<String> generatedKeys) {}
 
   static Result adapt(JsonMapper mapper, String json) throws Exception {
+    return adapt(mapper, json, null);
+  }
+
+  static Result adapt(
+      JsonMapper mapper, String json, MetadataDefaults defaults) throws Exception {
     Object parsed = mapper.readValue(json, Object.class);
     Map<String, Object> root = objectMap(parsed, "$");
     Tracker tracker = new Tracker();
-    root = resolvePaperRoot(mapper, root, tracker);
+    root = resolveGenerationRoot(mapper, root, tracker);
 
-    String title = requiredString(root, "title", "$.title", tracker);
-    String description = requiredString(root, "description", "$.description", tracker);
-    int estimatedMinutes =
-        requiredInteger(root, "estimatedMinutes", "$.estimatedMinutes", tracker);
-    List<String> tags = requiredStringList(root, "tags", "$.tags", tracker);
+    String title = stringOrDefault(
+        root, "title", "$.title", defaults == null ? null : defaults.title(), tracker);
+    String description = stringOrDefault(
+        root, "description", "$.description",
+        defaults == null ? null : defaults.description(), tracker);
+    int estimatedMinutes = integerOrDefault(
+        root, "estimatedMinutes", "$.estimatedMinutes",
+        defaults == null ? null : defaults.estimatedMinutes(), tracker);
+    List<String> tags = stringListOrDefault(
+        root, "tags", "$.tags", defaults == null ? null : defaults.tags(), tracker);
     List<PracticeGenerationCanonicalContract.Question> questions =
         questions(requiredValue(root, "questions", "$.questions"), tracker);
 
@@ -56,46 +70,46 @@ final class PracticeGenerationProviderAdapter {
         tracker.paths());
   }
 
-  private record PaperCandidate(String path, Map<String, Object> value) {}
+  private record GenerationCandidate(String path, Map<String, Object> value) {}
 
-  private static Map<String, Object> resolvePaperRoot(
+  private static Map<String, Object> resolveGenerationRoot(
       JsonMapper mapper, Map<String, Object> root, Tracker tracker) {
-    if (isCanonicalPaperObject(root)) return root;
+    if (isQuestionSetObject(root)) return root;
 
-    List<PaperCandidate> candidates = new ArrayList<>();
-    collectPaperCandidates(mapper, root, "$", 0, candidates);
+    List<GenerationCandidate> candidates = new ArrayList<>();
+    collectGenerationCandidates(mapper, root, "$", 0, candidates);
     if (candidates.isEmpty()) {
-      throw invalid("$", "does not contain a canonical paper object; rootKeys="
+      throw invalid("$", "does not contain a practice question set; rootKeys="
           + root.keySet());
     }
     if (candidates.size() > 1) {
-      throw invalid("$", "contains multiple canonical paper candidates: "
-          + candidates.stream().map(PaperCandidate::path).toList());
+      throw invalid("$", "contains multiple practice question set candidates: "
+          + candidates.stream().map(GenerationCandidate::path).toList());
     }
 
-    PaperCandidate candidate = candidates.get(0);
+    GenerationCandidate candidate = candidates.get(0);
     tracker.add(candidate.path());
     return candidate.value();
   }
 
-  private static void collectPaperCandidates(
+  private static void collectGenerationCandidates(
       JsonMapper mapper,
       Object value,
       String path,
       int depth,
-      List<PaperCandidate> candidates) {
+      List<GenerationCandidate> candidates) {
     if (depth > PAPER_ENVELOPE_MAX_DEPTH || value == null) return;
 
     if (value instanceof Map<?, ?>) {
       Map<String, Object> object = objectMap(value, path);
-      if (isCanonicalPaperObject(object)) {
-        candidates.add(new PaperCandidate(path, object));
+      if (isQuestionSetObject(object)) {
+        candidates.add(new GenerationCandidate(path, object));
         return;
       }
 
       for (Map.Entry<String, Object> entry : object.entrySet()) {
         if (isDomainCollectionField(entry.getKey())) continue;
-        collectPaperCandidates(
+        collectGenerationCandidates(
             mapper, entry.getValue(), path + "." + entry.getKey(), depth + 1, candidates);
       }
       return;
@@ -103,7 +117,7 @@ final class PracticeGenerationProviderAdapter {
 
     if (value instanceof List<?> values) {
       if (values.size() == 1) {
-        collectPaperCandidates(
+        collectGenerationCandidates(
             mapper, values.get(0), path + "[0]", depth + 1, candidates);
       }
       return;
@@ -114,7 +128,7 @@ final class PracticeGenerationProviderAdapter {
         StructuredJsonNormalizer.Result normalized =
             StructuredJsonNormalizer.normalize(mapper, text);
         Object nested = mapper.readValue(normalized.json(), Object.class);
-        collectPaperCandidates(
+        collectGenerationCandidates(
             mapper, nested, path + "<json>", depth + 1, candidates);
       } catch (Exception ignored) {
         // Not a valid structured JSON envelope. Leave it as ordinary provider text.
@@ -122,8 +136,8 @@ final class PracticeGenerationProviderAdapter {
     }
   }
 
-  private static boolean isCanonicalPaperObject(Map<String, Object> object) {
-    return object.keySet().containsAll(PAPER_REQUIRED_FIELDS);
+  private static boolean isQuestionSetObject(Map<String, Object> object) {
+    return object.containsKey("questions");
   }
 
   private static boolean isDomainCollectionField(String key) {
@@ -318,6 +332,48 @@ final class PracticeGenerationProviderAdapter {
       throw invalid(path, "cannot auto-generate option key beyond D");
     }
     return String.valueOf((char) ('A' + index));
+  }
+
+  private static String stringOrDefault(
+      Map<String, Object> object,
+      String field,
+      String path,
+      String fallback,
+      Tracker tracker) {
+    if (!object.containsKey(field) || object.get(field) == null) {
+      if (fallback == null || fallback.isBlank()) return requiredString(object, field, path, tracker);
+      tracker.add(path);
+      return fallback.trim();
+    }
+    return stringValue(object.get(field), path, tracker);
+  }
+
+  private static int integerOrDefault(
+      Map<String, Object> object,
+      String field,
+      String path,
+      Integer fallback,
+      Tracker tracker) {
+    if (!object.containsKey(field) || object.get(field) == null) {
+      if (fallback == null) return requiredInteger(object, field, path, tracker);
+      tracker.add(path);
+      return fallback;
+    }
+    return requiredInteger(object, field, path, tracker);
+  }
+
+  private static List<String> stringListOrDefault(
+      Map<String, Object> object,
+      String field,
+      String path,
+      List<String> fallback,
+      Tracker tracker) {
+    if (!object.containsKey(field) || object.get(field) == null) {
+      if (fallback == null || fallback.isEmpty()) return requiredStringList(object, field, path, tracker);
+      tracker.add(path);
+      return List.copyOf(fallback);
+    }
+    return requiredStringList(object, field, path, tracker);
   }
 
   private static String requiredString(
