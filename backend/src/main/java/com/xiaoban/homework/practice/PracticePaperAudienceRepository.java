@@ -8,4 +8,5 @@ public interface PracticePaperAudienceRepository extends JpaRepository<PracticeP
   boolean existsByFamilyIdAndStudentIdAndPaperKey(UUID familyId, String studentId, String paperKey);
   boolean existsByFamilyIdAndStudentId(UUID familyId, String studentId);
   List<PracticePaperAudienceEntity> findByFamilyIdAndStudentId(UUID familyId, String studentId);
+  List<PracticePaperAudienceEntity> findByFamilyIdAndPaperKey(UUID familyId, String paperKey);
 }
