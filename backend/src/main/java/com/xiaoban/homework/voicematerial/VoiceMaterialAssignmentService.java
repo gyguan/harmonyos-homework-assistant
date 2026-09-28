@@ -120,13 +120,13 @@ public class VoiceMaterialAssignmentService {
         studentId, businessDate);
 
     AssignmentDtos.Response current =
-        assignments.findFirstVoiceMaterialTask(familyId, studentId);
+        assignments.findFirstVoiceMaterialTaskForDate(familyId, studentId, businessDate);
     if (current != null) {
       String packageId = links.findByFamilyIdAndAssignmentId(familyId, current.id())
           .map(link -> link.packageId.toString())
           .orElse("");
-      log.info("voice_material auto_create_exit studentId={} businessDate={} reason=ACTIVE_TASK_EXISTS assignmentId={} packageId={} status={}",
-          studentId, businessDate, current.id(), packageId, current.status());
+      log.info("voice_material auto_create_exit studentId={} businessDate={} reason=ACTIVE_TASK_EXISTS assignmentId={} packageId={} status={} dueAtEpochMs={}",
+          studentId, businessDate, current.id(), packageId, current.status(), current.dueAtEpochMs());
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), packageId, current.id(), current);
     }

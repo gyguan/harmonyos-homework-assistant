@@ -78,8 +78,12 @@ if len(manual_block) == 2:
             "idempotent retries must reject reuse across a different folder or student")
 auto_block = assignment_service.split("public VoiceMaterialDtos.AutoCreateResponse autoCreateNext", 1)
 require(len(auto_block) == 2 and
-        "assignments.findFirstVoiceMaterialTask(familyId, studentId)" in auto_block[1],
-        "automatic creation must stop when an effective voice task already exists")
+        "assignments.findFirstVoiceMaterialTaskForDate(familyId, studentId, businessDate)" in auto_block[1],
+        "automatic creation must only stop for an effective voice task due on the current business day")
+require("findFirstVoiceMaterialTaskForDate" in delete_service and
+        "DueAtGreaterThanEqualAndDueAtLessThan" in read(
+            "backend/src/main/java/com/xiaoban/homework/assignment/AssignmentRepository.java"),
+        "current-day active voice task lookup must be bounded by structured dueAt")
 if len(auto_block) == 2:
     auto_body = auto_block[1].split("private VoiceMaterialPackageEntity chooseAutoFolder", 1)[0]
     require("todayRecord" in auto_body and

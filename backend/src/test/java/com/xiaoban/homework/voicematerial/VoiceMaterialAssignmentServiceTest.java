@@ -54,7 +54,8 @@ class VoiceMaterialAssignmentServiceTest {
     record.packageId = previousPackageId;
     record.assignmentId = "a-voice-deleted";
 
-    when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(null);
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
     when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
         any(UUID.class), anyString(), any(LocalDate.class)))
         .thenReturn(Optional.of(record));
@@ -72,10 +73,11 @@ class VoiceMaterialAssignmentServiceTest {
   }
 
   @Test
-  void currentVoiceTaskBlocksAutomaticCreation() {
+  void currentBusinessDayVoiceTaskBlocksAutomaticCreation() {
     UUID familyId = UUID.randomUUID();
     AssignmentDtos.Response current = response("a-voice-existing", "数学 · 语音作业");
-    when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(current);
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(current);
     VoiceMaterialTaskLinkEntity link = link(UUID.randomUUID(), current.id(), "student-1");
     when(links.findByFamilyIdAndAssignmentId(familyId, current.id()))
         .thenReturn(Optional.of(link));
@@ -91,7 +93,7 @@ class VoiceMaterialAssignmentServiceTest {
   }
 
   @Test
-  void automaticCreationUsesUnusedFolderAndKeepsItReady() {
+  void historicalVoiceTaskOutsideBusinessDayDoesNotBlockAutomaticCreation() {
     UUID familyId = UUID.randomUUID();
     UUID packageId = UUID.randomUUID();
     VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-语文", "READY");
@@ -99,7 +101,8 @@ class VoiceMaterialAssignmentServiceTest {
 
     when(autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
         any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(Optional.empty());
-    when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(null);
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(null);
     when(packages.findByFamilyIdAndStudentIdOrderByDirectoryNameAscCreatedAtAsc(
         familyId, "student-1")).thenReturn(List.of(item));
     when(links.findByFamilyIdAndStudentIdOrderByCreatedAtDesc(
@@ -163,7 +166,8 @@ class VoiceMaterialAssignmentServiceTest {
 
     when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
-    when(assignments.findFirstVoiceMaterialTask(familyId, "student-1")).thenReturn(active);
+    when(assignments.findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class))).thenReturn(active);
     when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
         .thenReturn(created);
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
@@ -176,7 +180,8 @@ class VoiceMaterialAssignmentServiceTest {
 
     assertTrue(result.created());
     assertEquals(created.id(), result.assignmentId());
-    verify(assignments, never()).findFirstVoiceMaterialTask(familyId, "student-1");
+    verify(assignments, never()).findFirstVoiceMaterialTaskForDate(
+        any(UUID.class), anyString(), any(LocalDate.class));
   }
 
   @Test

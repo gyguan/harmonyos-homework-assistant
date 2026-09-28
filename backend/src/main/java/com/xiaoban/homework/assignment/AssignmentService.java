@@ -145,6 +145,20 @@ public class AssignmentService {
     return current == null ? null : AssignmentDtos.Response.from(current);
   }
 
+  @Transactional(readOnly = true)
+  public AssignmentDtos.Response findFirstVoiceMaterialTaskForDate(
+      UUID familyId, String studentId, LocalDate businessDate) {
+    students.requireOwned(familyId, studentId);
+    ZoneId zone = ZoneId.of(DEFAULT_DUE_TIMEZONE);
+    Instant dueFrom = businessDate.atStartOfDay(zone).toInstant();
+    Instant dueTo = businessDate.plusDays(1).atStartOfDay(zone).toInstant();
+    AssignmentEntity current = repository
+        .findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotAndDueAtGreaterThanEqualAndDueAtLessThanOrderByUpdatedAtDesc(
+            familyId, studentId, "AUDIO_IMAGE", "COMPLETED", dueFrom, dueTo)
+        .orElse(null);
+    return current == null ? null : AssignmentDtos.Response.from(current);
+  }
+
   @Transactional
   public AssignmentDtos.Response create(UUID familyId, String studentId, AssignmentDtos.Create input) {
     students.requireOwned(familyId, studentId);
