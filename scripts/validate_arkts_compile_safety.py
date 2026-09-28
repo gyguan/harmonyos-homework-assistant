@@ -5,6 +5,7 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
+PARENT_PRACTICE_GENERATION = ROOT / "entry/src/main/ets/features/parent/practice/ParentPracticeGenerationPage.ets"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
 PARENT_IMPORT_NAV = ROOT / "entry/src/main/ets/app/navigation/ParentImportNavigator.ets"
 APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
@@ -54,6 +55,7 @@ def validate_qualified_model_imports() -> None:
 def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
+    parent_practice_generation = PARENT_PRACTICE_GENERATION.read_text(encoding="utf-8")
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
     parent_import_nav = PARENT_IMPORT_NAV.read_text(encoding="utf-8")
     app_shell = APP_SHELL.read_text(encoding="utf-8")
@@ -117,13 +119,10 @@ def main() -> int:
 
     media_core_syscap = "SystemCapability.Multimedia.Media.Core"
     avplayer_syscap = "SystemCapability.Multimedia.Media.AVPlayer"
-    require(audio.count(f"canIUse('{media_core_syscap}')") >= 2,
-            "Media namespace and SeekMode access must be guarded by Media.Core canIUse")
-    require(audio.count(f"canIUse('{avplayer_syscap}')") >= 2,
-            "AVPlayer create/seek paths must be guarded by AVPlayer canIUse")
-    require(f"if (canIUse('{media_core_syscap}'))" in audio and
-            f"if (canIUse('{avplayer_syscap}'))" in audio,
-            "media APIs must live inside positive Media.Core + AVPlayer SysCap branches")
+    require(audio.count(f"if (canIUse('{avplayer_syscap}'))") >= 2,
+            "AVPlayer create/seek paths must be directly guarded by AVPlayer canIUse")
+    require(f"if (canIUse('{media_core_syscap}'))" in audio,
+            "SeekMode access must be directly guarded by Media.Core canIUse")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
     require("let player = await media.createAVPlayer();" in audio,
@@ -134,6 +133,17 @@ def main() -> int:
             "AVPlayer must keep the known-good local file descriptor shape")
     require("player.seek(target, media.SeekMode.SEEK_PREV_SYNC);" in audio,
             "AVPlayer seek must keep the known-good synchronized seek mode")
+    require("player.seek(target);" in audio,
+            "AVPlayer seek must have a capability-safe fallback when SeekMode is unavailable")
+
+    builder_sections = re.findall(
+        r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
+        parent_practice_generation)
+    require(len(builder_sections) >= 5,
+            "ParentPracticeGenerationPage builder sections could not be identified")
+    builder_source = "\n".join(builder_sections)
+    require(re.search(r"(?m)^\s+let\s+", builder_source) is None,
+            "ParentPracticeGenerationPage @Builder bodies must not contain local let declarations")
 
     require("throw error;" not in share_receive,
             "share receive flow must only throw explicit Error values")
