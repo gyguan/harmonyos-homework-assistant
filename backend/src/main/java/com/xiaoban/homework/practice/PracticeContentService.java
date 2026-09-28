@@ -3,8 +3,6 @@ package com.xiaoban.homework.practice;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import com.xiaoban.homework.common.ApiExceptions;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -52,26 +50,16 @@ public class PracticeContentService {
   @Transactional(readOnly = true)
   public List<PracticeDtos.PaperResponse> listForStudent(
       UUID familyId, String studentId, String grade, String subject, String semester, String track) {
-    List<PracticePaperEntity> visible = new ArrayList<>();
-    for (PracticePaperEntity paper : papers.findAll()) {
-      if (!"PUBLISHED".equals(paper.status)) continue;
-      boolean global = paper.familyId == null;
-      boolean assigned = familyId.equals(paper.familyId)
-          && audiences.existsByFamilyIdAndStudentIdAndPaperKey(
-              familyId, studentId, paper.paperKey);
-      if (!global && !assigned) continue;
-      if (grade != null && !grade.isBlank() && !grade.equalsIgnoreCase(paper.grade)) continue;
-      if (subject != null && !subject.isBlank() && !subject.equalsIgnoreCase(paper.subject)) continue;
-      if (semester != null && !semester.isBlank() && !"ALL".equalsIgnoreCase(semester)
-          && !"ALL".equalsIgnoreCase(paper.semester) && !semester.equalsIgnoreCase(paper.semester)) continue;
-      if (track != null && !track.isBlank() && !"ALL".equalsIgnoreCase(track)
-          && !track.equalsIgnoreCase(paper.track)) continue;
-      visible.add(paper);
-    }
-    visible.sort(Comparator.comparing((PracticePaperEntity p) -> "AI_GENERATED".equals(p.sourceType) ? 0 : 1)
-        .thenComparing((PracticePaperEntity p) -> p.updatedAt, Comparator.nullsLast(Comparator.reverseOrder()))
-        .thenComparing(p -> p.title));
-    return visible.stream().map(this::response).toList();
+    return papers.findVisibleForStudent(
+            familyId,
+            studentId,
+            text(grade),
+            text(subject),
+            text(semester),
+            text(track))
+        .stream()
+        .map(this::response)
+        .toList();
   }
 
   @Transactional(readOnly = true)
