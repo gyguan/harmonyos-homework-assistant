@@ -52,14 +52,14 @@ public class PracticeGenerationModelClient {
     if (output.isEmpty()) return Optional.empty();
 
     String shape = "<unparsed>";
-    List<String> coercedFields = List.of();
+    List<String> adaptations = List.of();
     try {
       StructuredJsonNormalizer.Result normalized =
           StructuredJsonNormalizer.normalize(mapper, output.get());
       shape = normalized.shape();
       PracticeGenerationProviderAdapter.Result adapted =
           new PracticeGenerationProviderAdapter(mapper).adapt(normalized.json());
-      coercedFields = adapted.adaptations();
+      adaptations = adapted.adaptations();
       PracticeGenerationContract.Paper canonical = adapted.paper();
 
       ArrayList<PracticeContentCatalog.Question> questions = new ArrayList<>();
@@ -98,13 +98,13 @@ public class PracticeGenerationModelClient {
           "PUBLISHED",
           questions);
       log.info(
-          "[AI] practice generation parsed model={} paperId={} questions={} shape={} coercedFields={}",
-          properties.getPracticeModel(), paperId, questions.size(), shape, coercedFields);
+          "[AI] practice generation parsed model={} paperId={} questions={} shape={} adaptations={}",
+          properties.getPracticeModel(), paperId, questions.size(), shape, adaptations);
       return Optional.of(paper);
     } catch (Exception error) {
       log.warn(
-          "[AI] practice generation parse failed model={} paperId={} outputChars={} shape={} coercedFields={} exception={} message={}",
-          properties.getPracticeModel(), paperId, output.get().length(), shape, coercedFields,
+          "[AI] practice generation parse failed model={} paperId={} outputChars={} shape={} adaptations={} exception={} message={}",
+          properties.getPracticeModel(), paperId, output.get().length(), shape, adaptations,
           error.getClass().getSimpleName(), safeMessage(error.getMessage()));
       return Optional.empty();
     }
