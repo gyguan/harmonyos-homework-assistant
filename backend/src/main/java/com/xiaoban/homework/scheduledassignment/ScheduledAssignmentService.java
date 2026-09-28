@@ -1,18 +1,13 @@
 package com.xiaoban.homework.scheduledassignment;
 
-import com.xiaoban.homework.assignment.AssignmentDtos;
-import com.xiaoban.homework.assignment.AssignmentService;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentService;
 import com.xiaoban.homework.voicematerial.VoiceMaterialAssignmentService;
 import com.xiaoban.homework.voicematerial.VoiceMaterialDtos;
-import java.time.DateTimeException;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -26,30 +21,28 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ScheduledAssignmentService {
-  private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
   private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
-  private static final int MAX_RETRIES = 3;
 
   private final ScheduledAssignmentPlanRepository plans;
   private final ScheduledAssignmentTemplateRepository templates;
   private final ScheduledAssignmentRunRepository runs;
   private final StudentService students;
-  private final AssignmentService assignments;
   private final VoiceMaterialAssignmentService voiceAssignments;
+  private final ScheduledAssignmentAttemptService attempts;
 
   public ScheduledAssignmentService(
       ScheduledAssignmentPlanRepository plans,
       ScheduledAssignmentTemplateRepository templates,
       ScheduledAssignmentRunRepository runs,
       StudentService students,
-      AssignmentService assignments,
-      VoiceMaterialAssignmentService voiceAssignments) {
+      VoiceMaterialAssignmentService voiceAssignments,
+      ScheduledAssignmentAttemptService attempts) {
     this.plans = plans;
     this.templates = templates;
     this.runs = runs;
     this.students = students;
-    this.assignments = assignments;
     this.voiceAssignments = voiceAssignments;
+    this.attempts = attempts;
   }
 
   @Transactional(readOnly = true)
@@ -81,7 +74,7 @@ public class ScheduledAssignmentService {
     ensureVoicePlanUnique(plan);
     plan.createdAt = now;
     plan.updatedAt = now;
-    plan.nextFireAt = nextFire(plan, now.minusMillis(1));
+    plan.nextFireAt = ScheduledAssignmentSchedule.nextFire(plan, now.minusMillis(1));
     if (plan.nextFireAt == null) {
       throw new ApiExceptions.BadRequest("计划没有可执行的未来时间");
     }
@@ -104,7 +97,7 @@ public class ScheduledAssignmentService {
     if ("ENDED".equals(plan.status)) plan.status = "ENABLED";
     plan.updatedAt = Instant.now();
     plan.nextFireAt = "ENABLED".equals(plan.status)
-        ? nextFire(plan, Instant.now().minusMillis(1)) : null;
+        ? ScheduledAssignmentSchedule.nextFire(plan, Instant.now().minusMillis(1)) : null;
     if ("ENABLED".equals(plan.status) && plan.nextFireAt == null) {
       throw new ApiExceptions.BadRequest("计划没有可执行的未来时间");
     }
@@ -126,7 +119,7 @@ public class ScheduledAssignmentService {
       plan.nextFireAt = null;
     } else if ("ENABLE".equals(action)) {
       plan.status = "ENABLED";
-      plan.nextFireAt = nextFire(plan, Instant.now().minusMillis(1));
+      plan.nextFireAt = ScheduledAssignmentSchedule.nextFire(plan, Instant.now().minusMillis(1));
       if (plan.nextFireAt == null) plan.status = "ENDED";
     } else {
       throw new ApiExceptions.BadRequest("不支持的计划动作: " + input.action());
@@ -148,20 +141,25 @@ public class ScheduledAssignmentService {
         .stream().map(item -> item.id).toList();
   }
 
-  @Transactional
   public void executeDuePlan(UUID planId, Instant now) {
-    ScheduledAssignmentPlanEntity plan = plans.lockById(planId).orElse(null);
-    if (plan == null || !"ENABLED".equals(plan.status) || plan.nextFireAt == null ||
-        plan.nextFireAt.isAfter(now)) {
+    ScheduledAssignmentPlanEntity snapshot = plans.findById(planId).orElse(null);
+    if (snapshot == null || !"ENABLED".equals(snapshot.status) || snapshot.nextFireAt == null ||
+        snapshot.nextFireAt.isAfter(now)) {
       return;
     }
-    executePlan(plan, plan.nextFireAt, "SCHEDULER", now);
+
+    Instant fireAt = snapshot.nextFireAt;
+    try {
+      attempts.executeScheduler(planId, fireAt, now);
+    } catch (RuntimeException error) {
+      attempts.recordFailure(planId, fireAt, "SCHEDULER", now, error);
+    }
   }
 
-  @Transactional
   public VoiceMaterialDtos.AutoCreateResponse autoCreateOnStudentEntry(
       UUID familyId, String studentId) {
-    students.requireOwnedForUpdate(familyId, studentId);
+    // Read-only ownership check: actual scheduled execution always locks Plan before Student.
+    students.requireOwned(familyId, studentId);
     List<ScheduledAssignmentPlanEntity> voicePlans =
         plans.findByFamilyIdAndStudentIdAndPlanTypeOrderByCreatedAtDesc(
             familyId, studentId, "VOICE_MATERIAL_AUTO");
@@ -169,213 +167,21 @@ public class ScheduledAssignmentService {
       return voiceAssignments.autoCreateNext(familyId, studentId);
     }
 
-    ScheduledAssignmentPlanEntity eligible = null;
     Instant now = Instant.now();
+    LocalDate businessDate =
+        now.atZone(ScheduledAssignmentSchedule.ScheduledAssignmentSchedule.BUSINESS_ZONE).toLocalDate();
     for (ScheduledAssignmentPlanEntity plan : voicePlans) {
-      if (!"ENABLED".equals(plan.status) || plan.nextFireAt == null) continue;
-      if (!plan.nextFireAt.isAfter(now)) {
-        eligible = plans.lockById(plan.id).orElse(null);
-        break;
+      if (!"ENABLED".equals(plan.status)) continue;
+      Instant fireAt = ScheduledAssignmentSchedule.fireAt(plan, businessDate);
+      if (fireAt == null || fireAt.isAfter(now)) continue;
+      try {
+        return attempts.executeStudentEntry(familyId, studentId, plan.id, fireAt, now);
+      } catch (RuntimeException error) {
+        attempts.recordFailure(plan.id, fireAt, "STUDENT_ENTRY", now, error);
+        return emptyVoiceResponse();
       }
     }
-    if (eligible == null || eligible.nextFireAt == null || eligible.nextFireAt.isAfter(now)) {
-      return emptyVoiceResponse();
-    }
-    return executeVoicePlan(eligible, eligible.nextFireAt, "STUDENT_ENTRY", now);
-  }
-
-  private void executePlan(
-      ScheduledAssignmentPlanEntity plan, Instant fireAt, String triggerSource,
-      Instant executionAt) {
-    if ("VOICE_MATERIAL_AUTO".equals(plan.planType)) {
-      executeVoicePlan(plan, fireAt, triggerSource, executionAt);
-      return;
-    }
-
-    ScheduledAssignmentRunEntity run = prepareRun(plan.id, fireAt, triggerSource);
-    if (isFinal(run)) {
-      advance(plan, fireAt, executionAt);
-      return;
-    }
-    try {
-      AssignmentDtos.Response assignment = createManualAssignment(plan, fireAt, executionAt);
-      run.status = "SUCCESS";
-      run.assignmentId = assignment.id();
-      run.skipReason = "";
-      run.errorMessage = "";
-      run.finishedAt = Instant.now();
-      runs.save(run);
-      advance(plan, fireAt, executionAt);
-    } catch (RuntimeException error) {
-      failRun(plan, run, fireAt, executionAt, error);
-    }
-  }
-
-  private VoiceMaterialDtos.AutoCreateResponse executeVoicePlan(
-      ScheduledAssignmentPlanEntity plan, Instant fireAt, String triggerSource,
-      Instant executionAt) {
-    ScheduledAssignmentRunEntity run = prepareRun(plan.id, fireAt, triggerSource);
-    if (isFinal(run)) {
-      advance(plan, fireAt, executionAt);
-      return emptyVoiceResponse();
-    }
-    try {
-      VoiceMaterialDtos.AutoCreateResponse result =
-          voiceAssignments.autoCreateNext(plan.familyId, plan.studentId);
-      run.status = result.created() ? "SUCCESS" : "SKIPPED";
-      run.assignmentId = blankToNull(result.assignmentId());
-      run.skipReason = result.created() ? "" : voiceSkipReason(result);
-      run.errorMessage = "";
-      run.finishedAt = Instant.now();
-      runs.save(run);
-      advance(plan, fireAt, executionAt);
-      return result;
-    } catch (RuntimeException error) {
-      failRun(plan, run, fireAt, executionAt, error);
-      return emptyVoiceResponse();
-    }
-  }
-
-  private ScheduledAssignmentRunEntity prepareRun(
-      UUID planId, Instant fireAt, String triggerSource) {
-    ScheduledAssignmentRunEntity existing =
-        runs.findByPlanIdAndScheduledFireAt(planId, fireAt).orElse(null);
-    if (existing != null) {
-      if (!isFinal(existing)) existing.triggerSource = triggerSource;
-      return existing;
-    }
-    ScheduledAssignmentRunEntity run = new ScheduledAssignmentRunEntity();
-    run.id = UUID.randomUUID();
-    run.planId = planId;
-    run.scheduledFireAt = fireAt;
-    run.triggerSource = triggerSource;
-    run.status = "PENDING";
-    run.assignmentId = null;
-    run.skipReason = "";
-    run.errorMessage = "";
-    run.retryCount = 0;
-    run.createdAt = Instant.now();
-    run.finishedAt = null;
-    return runs.saveAndFlush(run);
-  }
-
-  private boolean isFinal(ScheduledAssignmentRunEntity run) {
-    return "SUCCESS".equals(run.status) || "SKIPPED".equals(run.status);
-  }
-
-  private void failRun(ScheduledAssignmentPlanEntity plan, ScheduledAssignmentRunEntity run,
-      Instant fireAt, Instant executionAt, RuntimeException error) {
-    run.status = "FAILED";
-    run.retryCount++;
-    String message = error.getMessage();
-    run.errorMessage = message == null ? error.getClass().getSimpleName() :
-        message.substring(0, Math.min(message.length(), 500));
-    run.finishedAt = Instant.now();
-    runs.save(run);
-    if (run.retryCount >= MAX_RETRIES) advance(plan, fireAt, executionAt);
-  }
-
-  private AssignmentDtos.Response createManualAssignment(
-      ScheduledAssignmentPlanEntity plan, Instant fireAt, Instant executionAt) {
-    ScheduledAssignmentTemplateEntity template = templates.findById(plan.id)
-        .orElseThrow(() -> new ApiExceptions.BadRequest("普通定时作业缺少任务模板"));
-    Instant dueAt = dueAt(plan, template, executionAt);
-    String dueText = dueText(template);
-    String assignmentId = "a-scheduled-" + plan.id + "-" + fireAt.toEpochMilli();
-    AssignmentDtos.Create create = new AssignmentDtos.Create(
-        assignmentId,
-        template.subject,
-        template.title,
-        template.instruction,
-        "",
-        dueText,
-        template.assignmentType,
-        template.subjectCode,
-        "NORMAL",
-        dueAt == null ? null : dueAt.toEpochMilli(),
-        plan.timezone,
-        "NOT_STARTED",
-        "定时作业",
-        plan.name,
-        template.expectedMinutes,
-        0L,
-        0L,
-        0L,
-        "");
-    return assignments.create(plan.familyId, plan.studentId, create);
-  }
-
-  private Instant dueAt(ScheduledAssignmentPlanEntity plan,
-      ScheduledAssignmentTemplateEntity template, Instant fireAt) {
-    ZoneId zone = zone(plan.timezone);
-    LocalDate date = fireAt.atZone(zone).toLocalDate();
-    return switch (template.duePolicy) {
-      case "SAME_DAY_AT" -> date.atTime(template.dueTime).atZone(zone).toInstant();
-      case "NEXT_DAY_AT" -> date.plusDays(1).atTime(template.dueTime).atZone(zone).toInstant();
-      case "AFTER_MINUTES" -> fireAt.plusSeconds((long) template.dueOffsetMinutes * 60L);
-      case "NONE" -> null;
-      default -> throw new ApiExceptions.BadRequest("不支持的截止规则: " + template.duePolicy);
-    };
-  }
-
-  private String dueText(ScheduledAssignmentTemplateEntity template) {
-    return switch (template.duePolicy) {
-      case "SAME_DAY_AT" -> "今天 " + template.dueTime.format(TIME_FORMAT);
-      case "NEXT_DAY_AT" -> "明天 " + template.dueTime.format(TIME_FORMAT);
-      case "AFTER_MINUTES" -> "创建后 " + template.dueOffsetMinutes + " 分钟";
-      default -> "未定";
-    };
-  }
-
-  private void advance(ScheduledAssignmentPlanEntity plan, Instant fireAt,
-      Instant executionAt) {
-    plan.lastFireAt = fireAt;
-    Instant next = nextFire(plan, executionAt);
-    plan.nextFireAt = next;
-    if (next == null) plan.status = "ENDED";
-    plan.updatedAt = executionAt;
-    plans.save(plan);
-  }
-
-  private Instant nextFire(ScheduledAssignmentPlanEntity plan, Instant after) {
-    ZoneId zone = zone(plan.timezone);
-    LocalDate cursor = after.atZone(zone).toLocalDate();
-    if (cursor.isBefore(plan.startDate)) cursor = plan.startDate;
-    for (int i = 0; i < 3660; i++) {
-      LocalDate date = cursor.plusDays(i);
-      if (plan.endDate != null && date.isAfter(plan.endDate)) return null;
-      if (!eligibleDate(plan, date)) continue;
-      Instant candidate = LocalDateTime.of(date, plan.scheduleTime).atZone(zone).toInstant();
-      if (candidate.isAfter(after)) return candidate;
-    }
-    return null;
-  }
-
-  private boolean eligibleDate(ScheduledAssignmentPlanEntity plan, LocalDate date) {
-    if (date.isBefore(plan.startDate)) return false;
-    if ("ONCE".equals(plan.scheduleType)) return date.equals(plan.startDate);
-    if ("DAILY".equals(plan.scheduleType)) return true;
-    if ("WEEKDAYS".equals(plan.scheduleType)) {
-      return date.getDayOfWeek() != DayOfWeek.SATURDAY &&
-          date.getDayOfWeek() != DayOfWeek.SUNDAY;
-    }
-    return weekdaySet(plan.weekdays).contains(date.getDayOfWeek());
-  }
-
-  private void applyPlanInput(ScheduledAssignmentPlanEntity plan,
-      String planType, String name, String scheduleType, String timeOfDay,
-      List<String> weekdays, String startDate, String endDate, UUID selfId) {
-    plan.planType = planType(planType);
-    plan.name = name.trim();
-    plan.scheduleType = scheduleType(scheduleType);
-    plan.scheduleTime = time(timeOfDay, "创建时间");
-    plan.weekdays = weekdays(weekdays, plan.scheduleType);
-    plan.startDate = date(startDate, "开始日期");
-    plan.endDate = nullableDate(endDate, "结束日期");
-    if (plan.endDate != null && plan.endDate.isBefore(plan.startDate)) {
-      throw new ApiExceptions.BadRequest("结束日期不能早于开始日期");
-    }
-    plan.timezone = BUSINESS_ZONE.getId();
+    return emptyVoiceResponse();
   }
 
   private void saveTemplate(ScheduledAssignmentPlanEntity plan,
@@ -471,7 +277,7 @@ public class ScheduledAssignmentService {
 
   private VoiceMaterialDtos.AutoCreateResponse emptyVoiceResponse() {
     return new VoiceMaterialDtos.AutoCreateResponse(
-        false, LocalDate.now(BUSINESS_ZONE).toString(), "", "", null);
+        false, LocalDate.now(ScheduledAssignmentSchedule.BUSINESS_ZONE).toString(), "", "", null);
   }
 
   private String voiceSkipReason(VoiceMaterialDtos.AutoCreateResponse result) {
@@ -575,14 +381,6 @@ public class ScheduledAssignmentService {
 
   private LocalDate nullableDate(String value, String label) {
     return value == null || value.isBlank() ? null : date(value, label);
-  }
-
-  private ZoneId zone(String value) {
-    try {
-      return ZoneId.of(value);
-    } catch (DateTimeException error) {
-      throw new ApiExceptions.BadRequest("无效的计划时区: " + value);
-    }
   }
 
   private long epoch(Instant value) { return value == null ? 0L : value.toEpochMilli(); }
