@@ -1,11 +1,14 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
+import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import {
   PracticeDifficulty,
+  PracticeGenerationDraft,
   PracticeGenerationDraftQuestion,
   PracticeGenerationResult,
   PracticeQuestionOption,
+  PracticePublishScope,
   PracticeQuestionType,
   PracticeSubject,
   PracticeTrack
@@ -20,6 +23,8 @@ export struct ParentPracticeGenerationPage {
   @State private questionCount: number = 12;
   @State private requirement: string = '';
   @State private result: PracticeGenerationResult | null = null;
+  @State private publishScope: PracticePublishScope = PracticePublishScope.CURRENT;
+  @State private selectedStudentIds: string[] = [];
   @State private generating: boolean = false;
   @State private publishing: boolean = false;
   @State private message: string = '';
@@ -30,6 +35,15 @@ export struct ParentPracticeGenerationPage {
 
   private readonly viewModel: ParentPracticeGenerationViewModel =
     new ParentPracticeGenerationViewModel();
+
+  aboutToAppear(): void {
+    this.resetAudienceSelection();
+  }
+
+  private resetAudienceSelection(): void {
+    this.publishScope = PracticePublishScope.CURRENT;
+    this.selectedStudentIds = [this.viewModel.activeStudentId()];
+  }
 
   private async generate(): Promise<void> {
     if (this.generating || this.publishing) return;
@@ -46,7 +60,8 @@ export struct ParentPracticeGenerationPage {
         this.showMessage(this.result.errorMessage.length > 0 ?
           this.result.errorMessage : 'AI没有生成可预览的练习，请重新生成', true);
       } else {
-        this.showMessage('已生成练习，请预览后再发布给孩子', false);
+        this.resetAudienceSelection();
+        this.showMessage('已生成练习，请预览并选择发布对象', false);
       }
     } catch (error) {
       this.result = null;
@@ -58,11 +73,17 @@ export struct ParentPracticeGenerationPage {
 
   private async publish(): Promise<void> {
     if (this.result === null || this.result.paper === null || this.publishing || this.generating) return;
+    let blocked = this.publishBlockedReason(this.result.paper);
+    if (blocked.length > 0) {
+      this.showMessage(blocked, true);
+      return;
+    }
+    let targets = this.targetStudentIds();
     this.publishing = true;
     this.message = '';
     try {
-      await this.viewModel.publish(this.result.generationId);
-      this.showMessage('练习已发布，学生端练习列表可以开始作答', false);
+      await this.viewModel.publish(this.result.generationId, this.publishScope, targets);
+      this.showMessage(`练习已发布给${targets.length}个学生`, false);
       this.onPublished();
     } catch (error) {
       this.showMessage(error instanceof Error ? error.message : '发布练习失败，请稍后重试', true);
@@ -98,6 +119,64 @@ export struct ParentPracticeGenerationPage {
     if (this.generating || this.publishing) return;
     this.questionCount = value;
     this.result = null;
+  }
+
+  private selectPublishScope(scope: PracticePublishScope): void {
+    if (this.generating || this.publishing) return;
+    this.publishScope = scope;
+    if (scope === PracticePublishScope.CURRENT) {
+      this.selectedStudentIds = [this.viewModel.activeStudentId()];
+    }
+  }
+
+  private isStudentSelected(studentId: string): boolean {
+    return this.selectedStudentIds.indexOf(studentId) >= 0;
+  }
+
+  private toggleStudent(student: StudentProfile): void {
+    if (this.result === null || this.result.paper === null || this.generating || this.publishing) return;
+    if (this.viewModel.incompatibility(student, this.result.paper).length > 0) return;
+    let next: string[] = [];
+    let found = false;
+    for (let id of this.selectedStudentIds) {
+      if (id === student.id) found = true;
+      else next.push(id);
+    }
+    if (!found) next.push(student.id);
+    this.selectedStudentIds = next;
+  }
+
+  private targetStudentIds(): string[] {
+    if (this.publishScope === PracticePublishScope.CURRENT) {
+      return [this.viewModel.activeStudentId()];
+    }
+    if (this.publishScope === PracticePublishScope.ALL) {
+      let all: string[] = [];
+      for (let student of this.viewModel.students()) all.push(student.id);
+      return all;
+    }
+    return this.selectedStudentIds.slice();
+  }
+
+  private publishBlockedReason(paper: PracticeGenerationDraft): string {
+    let students = this.viewModel.students();
+    if (this.publishScope === PracticePublishScope.CURRENT) {
+      let current = this.viewModel.student();
+      let reason = this.viewModel.incompatibility(current, paper);
+      return reason.length === 0 ? '' : `${current.name}：${reason}`;
+    }
+    if (this.publishScope === PracticePublishScope.SELECTED && this.selectedStudentIds.length === 0) {
+      return '请至少选择一个学生';
+    }
+
+    let incompatible: string[] = [];
+    for (let student of students) {
+      let included = this.publishScope === PracticePublishScope.ALL || this.isStudentSelected(student.id);
+      if (!included) continue;
+      let reason = this.viewModel.incompatibility(student, paper);
+      if (reason.length > 0) incompatible.push(`${student.name}：${reason}`);
+    }
+    return incompatible.length === 0 ? '' : '以下学生暂不能使用本套练习：' + incompatible.join('；');
   }
 
   private questionTypeLabel(type: PracticeQuestionType): string {
@@ -345,6 +424,102 @@ export struct ParentPracticeGenerationPage {
   }
 
   @Builder
+  private AudienceSelection(paper: PracticeGenerationDraft) {
+    Column({ space: 10 }) {
+      Text('发布对象')
+        .width('100%')
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+
+      Row({ space: 6 }) {
+        SegmentedSelectionButton({
+          label: '当前学生',
+          selected: this.publishScope === PracticePublishScope.CURRENT,
+          onSelect: () => this.selectPublishScope(PracticePublishScope.CURRENT)
+        });
+        SegmentedSelectionButton({
+          label: '选择学生',
+          selected: this.publishScope === PracticePublishScope.SELECTED,
+          onSelect: () => this.selectPublishScope(PracticePublishScope.SELECTED)
+        });
+        SegmentedSelectionButton({
+          label: '全部学生',
+          selected: this.publishScope === PracticePublishScope.ALL,
+          onSelect: () => this.selectPublishScope(PracticePublishScope.ALL)
+        });
+      }
+      .width('100%');
+
+      if (this.publishScope === PracticePublishScope.CURRENT) {
+        let current = this.viewModel.student();
+        Text(`将发布给：${current.name} · ${current.grade} · ${current.semester}`)
+          .width('100%')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
+      } else if (this.publishScope === PracticePublishScope.SELECTED) {
+        Column({ space: 7 }) {
+          ForEach(this.viewModel.students(), (student: StudentProfile) => {
+            let reason = this.viewModel.incompatibility(student, paper);
+            let selected = this.isStudentSelected(student.id);
+            Row({ space: 10 }) {
+              Text(selected ? '✓' : '○')
+                .fontSize(AppTheme.BODY_SIZE)
+                .fontWeight(FontWeight.Bold)
+                .fontColor(reason.length > 0 ? AppTheme.DISABLED :
+                  selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
+              Column({ space: 2 }) {
+                Text(student.name)
+                  .width('100%')
+                  .fontSize(AppTheme.BODY_SIZE)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(reason.length > 0 ? AppTheme.DISABLED : AppTheme.TEXT);
+                Text(reason.length > 0 ? reason : `${student.grade} · ${student.semester}`)
+                  .width('100%')
+                  .fontSize(AppTheme.CAPTION_SIZE)
+                  .fontColor(reason.length > 0 ? AppTheme.WARNING : AppTheme.SUBTEXT);
+              }
+              .layoutWeight(1)
+              .alignItems(HorizontalAlign.Start);
+            }
+            .width('100%')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 10, right: 10, top: 7, bottom: 7 })
+            .backgroundColor(selected && reason.length === 0 ?
+              AppTheme.PRIMARY_FAINT : AppTheme.SURFACE_SUBTLE)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(() => this.toggleStudent(student));
+          }, (student: StudentProfile) => student.id);
+        }
+        .width('100%');
+      } else {
+        Text(`将发布给家庭当前全部${this.viewModel.students().length}个学生；以后新增的学生不会自动获得这套历史练习。`)
+          .width('100%')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+
+      if (this.publishBlockedReason(paper).length > 0) {
+        Text(this.publishBlockedReason(paper))
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.WARNING)
+          .padding(10)
+          .backgroundColor(AppTheme.WARNING_SOFT)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+    }
+    .width('100%')
+    .padding(AppTheme.CARD_PADDING_COMPACT)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
+  }
+
+  @Builder
   private Preview() {
     if (this.result !== null && this.result.paper !== null) {
       Column({ space: 12 }) {
@@ -379,17 +554,20 @@ export struct ParentPracticeGenerationPage {
           this.QuestionPreview(question);
         }, (question: PracticeGenerationDraftQuestion) => question.id);
 
+        this.AudienceSelection(this.result.paper);
+
         Row({ space: 10 }) {
           Button('重新生成', { type: ButtonType.Normal })
             .layoutWeight(1)
             .height(AppTheme.BUTTON_HEIGHT)
-            .enabled(!this.generating && !this.publishing)
+            .enabled(!this.generating && !this.publishing &&
+              this.publishBlockedReason(this.result.paper).length === 0)
             .fontSize(AppTheme.ACTION_TEXT_SIZE)
             .backgroundColor(AppTheme.SURFACE_EMPHASIS)
             .fontColor(AppTheme.TEXT)
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .onClick(() => { void this.generate(); });
-          Button(this.publishing ? '正在发布…' : '发布给孩子', { type: ButtonType.Normal })
+          Button(this.publishing ? '正在发布…' : `发布给${this.targetStudentIds().length}个学生`, { type: ButtonType.Normal })
             .layoutWeight(1)
             .height(AppTheme.BUTTON_HEIGHT)
             .enabled(!this.generating && !this.publishing)
