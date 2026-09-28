@@ -15,11 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class VoiceMaterialAssignmentService {
+  private static final Logger log = LoggerFactory.getLogger(VoiceMaterialAssignmentService.class);
   private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
 
   private final VoiceMaterialPackageRepository packages;
@@ -113,6 +116,8 @@ public class VoiceMaterialAssignmentService {
   public VoiceMaterialDtos.AutoCreateResponse autoCreateNext(UUID familyId, String studentId) {
     students.requireOwnedForUpdate(familyId, studentId);
     LocalDate businessDate = LocalDate.now(BUSINESS_ZONE);
+    log.info("voice_material auto_create_start studentId={} businessDate={}",
+        studentId, businessDate);
 
     AssignmentDtos.Response current =
         assignments.findFirstVoiceMaterialTask(familyId, studentId);
@@ -120,6 +125,8 @@ public class VoiceMaterialAssignmentService {
       String packageId = links.findByFamilyIdAndAssignmentId(familyId, current.id())
           .map(link -> link.packageId.toString())
           .orElse("");
+      log.info("voice_material auto_create_exit studentId={} businessDate={} reason=ACTIVE_TASK_EXISTS assignmentId={} packageId={} status={}",
+          studentId, businessDate, current.id(), packageId, current.status());
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), packageId, current.id(), current);
     }
@@ -128,6 +135,8 @@ public class VoiceMaterialAssignmentService {
         autoRecords.findByFamilyIdAndStudentIdAndBusinessDate(
             familyId, studentId, businessDate).orElse(null);
     if (todayRecord != null) {
+      log.info("voice_material auto_create_exit studentId={} businessDate={} reason=ALREADY_CREATED_TODAY assignmentId={} packageId={} recordId={}",
+          studentId, businessDate, todayRecord.assignmentId, todayRecord.packageId, todayRecord.id);
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), todayRecord.packageId.toString(),
           todayRecord.assignmentId, null);
@@ -135,9 +144,14 @@ public class VoiceMaterialAssignmentService {
 
     VoiceMaterialPackageEntity item = chooseAutoFolder(familyId, studentId);
     if (item == null) {
+      log.info("voice_material auto_create_exit studentId={} businessDate={} reason=NO_MATERIAL",
+          studentId, businessDate);
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), "", "", null);
     }
+
+    log.info("voice_material auto_create_package_selected studentId={} businessDate={} packageId={} directoryName={} subjectCode={} status={}",
+        studentId, businessDate, item.id, item.directoryName, item.subjectCode, item.status);
 
     item = packages.lockOwned(familyId, item.id)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
@@ -159,6 +173,8 @@ public class VoiceMaterialAssignmentService {
     record.createdAt = Instant.now();
     autoRecords.saveAndFlush(record);
 
+    log.info("voice_material auto_create_success studentId={} businessDate={} packageId={} assignmentId={} title={}",
+        studentId, businessDate, item.id, assignment.id(), assignment.title());
     return new VoiceMaterialDtos.AutoCreateResponse(
         true, businessDate.toString(), item.id.toString(),
         assignment.id(), assignment);
@@ -170,7 +186,12 @@ public class VoiceMaterialAssignmentService {
             familyId, studentId).stream()
             .filter(item -> "READY".equals(item.status) || "CONSUMED".equals(item.status))
             .toList();
-    if (candidates.isEmpty()) return null;
+    if (candidates.isEmpty()) {
+      log.info("voice_material auto_folder_candidates studentId={} candidateCount=0", studentId);
+      return null;
+    }
+    log.info("voice_material auto_folder_candidates studentId={} candidateCount={}",
+        studentId, candidates.size());
 
     Map<UUID, Long> usageCount = new HashMap<>();
     Map<UUID, Instant> lastUsedAt = new HashMap<>();
@@ -180,7 +201,7 @@ public class VoiceMaterialAssignmentService {
       lastUsedAt.putIfAbsent(link.packageId, link.createdAt);
     }
 
-    return candidates.stream()
+    VoiceMaterialPackageEntity selected = candidates.stream()
         .min(Comparator
             .comparingLong((VoiceMaterialPackageEntity item) ->
                 usageCount.getOrDefault(item.id, 0L))
@@ -190,6 +211,13 @@ public class VoiceMaterialAssignmentService {
             .thenComparing(item -> item.createdAt)
             .thenComparing(item -> item.id))
         .orElse(null);
+    if (selected != null) {
+      log.info("voice_material auto_folder_selected studentId={} packageId={} directoryName={} usageCount={} lastUsedAt={}",
+          studentId, selected.id, selected.directoryName,
+          usageCount.getOrDefault(selected.id, 0L),
+          lastUsedAt.getOrDefault(selected.id, Instant.EPOCH));
+    }
+    return selected;
   }
 
   private AssignmentDtos.Response createFromFolder(UUID familyId,
