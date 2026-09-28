@@ -19,7 +19,8 @@ create index if not exists idx_practice_paper_audience_student
 create table if not exists practice_generation (
   id uuid primary key,
   family_id uuid not null references family(id),
-  student_id varchar(120) not null references student(id),
+  reference_student_id varchar(120) not null references student(id),
+  reference_textbook_summary text not null default '',
   subject varchar(32) not null,
   semester varchar(16) not null,
   track varchar(32) not null,
@@ -36,5 +37,5 @@ create table if not exists practice_generation (
   updated_at timestamp with time zone not null
 );
 
-create index if not exists idx_practice_generation_family_student
-  on practice_generation (family_id, student_id, created_at desc);
+create index if not exists idx_practice_generation_family_reference_student
+  on practice_generation (family_id, reference_student_id, created_at desc);
