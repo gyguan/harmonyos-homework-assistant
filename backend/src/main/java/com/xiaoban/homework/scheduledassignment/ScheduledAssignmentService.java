@@ -399,6 +399,10 @@ public class ScheduledAssignmentService {
     template.dueOffsetMinutes = null;
     if ("SAME_DAY_AT".equals(template.duePolicy) || "NEXT_DAY_AT".equals(template.duePolicy)) {
       template.dueTime = time(input.dueTime(), "截止时间");
+      if ("SAME_DAY_AT".equals(template.duePolicy) &&
+          !template.dueTime.isAfter(plan.scheduleTime)) {
+        throw new ApiExceptions.BadRequest("当天截止时间必须晚于创建时间");
+      }
     } else if ("AFTER_MINUTES".equals(template.duePolicy)) {
       int offset = input.dueOffsetMinutes() == null ? 0 : input.dueOffsetMinutes();
       if (offset < 1 || offset > 10080) {
