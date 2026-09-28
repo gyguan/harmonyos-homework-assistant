@@ -20,7 +20,7 @@ create table if not exists practice_generation (
   id uuid primary key,
   family_id uuid not null references family(id),
   reference_student_id varchar(120) not null references student(id),
-  reference_textbook_summary text not null default '',
+  reference_textbook_context text not null default '',
   subject varchar(32) not null,
   semester varchar(16) not null,
   track varchar(32) not null,
