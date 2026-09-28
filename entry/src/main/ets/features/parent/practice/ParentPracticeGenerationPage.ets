@@ -193,6 +193,21 @@ export struct ParentPracticeGenerationPage {
     return incompatible.length === 0 ? '' : '以下学生暂不能使用本套练习：' + incompatible.join('；');
   }
 
+  private currentCandidateExists(): boolean {
+    return this.candidate(this.viewModel.activeStudentId()) !== null;
+  }
+
+  private currentCandidateSummary(): string {
+    let current = this.candidate(this.viewModel.activeStudentId());
+    if (current === null) return '';
+    return `将发布给：${current.studentName} · ${current.grade} · ${current.semester}`;
+  }
+
+  private currentCandidateCompatible(): boolean {
+    let current = this.candidate(this.viewModel.activeStudentId());
+    return current !== null && current.compatible;
+  }
+
   private questionTypeLabel(type: PracticeQuestionType): string {
     if (type === PracticeQuestionType.SINGLE_CHOICE) return '单选题';
     if (type === PracticeQuestionType.FILL_BLANK) return '填空题';
@@ -202,7 +217,6 @@ export struct ParentPracticeGenerationPage {
 
   @Builder
   private ContextCard() {
-    let student = this.viewModel.student();
     Column({ space: 6 }) {
       Row() {
         Text('出题对象')
@@ -210,18 +224,18 @@ export struct ParentPracticeGenerationPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.SUBTEXT);
         Blank();
-        Text(student.name)
+        Text(this.viewModel.student().name)
           .fontSize(AppTheme.BODY_SIZE)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
       }
       .width('100%');
-      Text(`${student.grade} · ${student.semester}`)
+      Text(`${this.viewModel.student().grade} · ${this.viewModel.student().semester}`)
         .width('100%')
         .fontSize(AppTheme.META_SIZE)
         .fontColor(AppTheme.SUBTEXT);
-      if (student.textbookSummary.length > 0) {
-        Text('教材：' + student.textbookSummary)
+      if (this.viewModel.student().textbookSummary.length > 0) {
+        Text('教材：' + this.viewModel.student().textbookSummary)
           .width('100%')
           .fontSize(AppTheme.CAPTION_SIZE)
           .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
@@ -466,24 +480,22 @@ export struct ParentPracticeGenerationPage {
       .width('100%');
 
       if (this.result !== null && this.publishScope === PracticePublishScope.CURRENT) {
-        let current = this.candidate(this.viewModel.activeStudentId());
-        if (current !== null) {
-          Text(`将发布给：${current.studentName} · ${current.grade} · ${current.semester}`)
+        if (this.currentCandidateExists()) {
+          Text(this.currentCandidateSummary())
             .width('100%')
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
-            .fontColor(current.compatible ? AppTheme.SUBTEXT : AppTheme.WARNING);
+            .fontColor(this.currentCandidateCompatible() ? AppTheme.SUBTEXT : AppTheme.WARNING);
         }
       } else if (this.result !== null && this.publishScope === PracticePublishScope.SELECTED) {
         Column({ space: 7 }) {
           ForEach(this.result.audienceCandidates, (candidate: PracticeAudienceCandidate) => {
-            let selected = this.isStudentSelected(candidate.studentId);
             Row({ space: 10 }) {
-              Text(selected ? '✓' : '○')
+              Text(this.isStudentSelected(candidate.studentId) ? '✓' : '○')
                 .fontSize(AppTheme.BODY_SIZE)
                 .fontWeight(FontWeight.Bold)
                 .fontColor(!candidate.compatible ? AppTheme.DISABLED :
-                  selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
+                  this.isStudentSelected(candidate.studentId) ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
               Column({ space: 2 }) {
                 Text(candidate.studentName)
                   .width('100%')
@@ -502,7 +514,7 @@ export struct ParentPracticeGenerationPage {
             .width('100%')
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-            .backgroundColor(selected && candidate.compatible ?
+            .backgroundColor(this.isStudentSelected(candidate.studentId) && candidate.compatible ?
               AppTheme.PRIMARY_FAINT : AppTheme.SURFACE_SUBTLE)
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .onClick(() => this.toggleStudent(candidate));
