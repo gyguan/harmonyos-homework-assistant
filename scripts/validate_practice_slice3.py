@@ -126,7 +126,8 @@ require("STUDENT_PRACTICE_HISTORY" in routes and "STUDENT_PRACTICE_HISTORY" in s
 require("onRepeatStarted" in result_page and "onRepeatStarted" in shell,
         "repeat result flow must navigate to the new attempt instance")
 require("replacePracticeResultWithAttempt" in shell and
-        "onRepeatStarted: (attemptId: string) => this.replacePracticeResultWithAttempt(attemptId)" in shell,
+        "onRepeatStarted: (attemptId: string) => {" in shell and
+        "this.replacePracticeResultWithAttempt(attemptId);" in shell,
         "repeat and wrong-only flows must replace the old result route instead of stacking it")
 require("onBack: () => this.navPathStack.pop()" in shell,
         "Practice result back action must preserve the caller navigation context")
