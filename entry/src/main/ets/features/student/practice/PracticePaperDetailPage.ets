@@ -12,6 +12,7 @@ import { PracticePaperDetailViewModel } from './PracticePaperDetailViewModel';
 export struct PracticePaperDetailPage {
   @Prop paperId: string = '';
   @Prop version: number = 1;
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   @State private paper: PracticePaper | null = null;
   @State private attempts: PracticeAttemptSummary[] = [];
   @State private recentAttempts: PracticeAttemptSummary[] = [];
@@ -20,6 +21,7 @@ export struct PracticePaperDetailPage {
   @State private starting: boolean = false;
   @State private errorMessage: string = '';
   @State private historyErrorMessage: string = '';
+  private loadSequence: number = 0;
   onBack: () => void = () => {};
   onStarted: (attemptId: string) => void = (_attemptId: string) => {};
   onOpenAttempt: (attemptId: string) => void = (_attemptId: string) => {};
@@ -31,13 +33,20 @@ export struct PracticePaperDetailPage {
     void this.load();
   }
 
+  private onRevisionChanged(): void {
+    void this.load();
+  }
+
   private async load(): Promise<void> {
+    let sequence = ++this.loadSequence;
     this.loading = true;
     this.historyLoading = true;
     this.errorMessage = '';
     this.historyErrorMessage = '';
     try {
-      this.paper = await this.viewModel.getPaper(this.paperId, this.version);
+      let loadedPaper = await this.viewModel.getPaper(this.paperId, this.version);
+      if (sequence !== this.loadSequence) return;
+      this.paper = loadedPaper;
       if (this.paper === null) {
         this.errorMessage = '套卷不存在或已下架。';
         this.attempts = [];
@@ -45,21 +54,27 @@ export struct PracticePaperDetailPage {
         return;
       }
       try {
-        this.attempts = await this.viewModel.listAttempts(this.paperId);
-        this.recentAttempts = this.viewModel.recentAttempts(this.attempts);
+        let attempts = await this.viewModel.listAttempts(this.paperId);
+        if (sequence !== this.loadSequence) return;
+        this.attempts = attempts;
+        this.recentAttempts = this.viewModel.recentAttempts(attempts);
       } catch {
+        if (sequence !== this.loadSequence) return;
         this.attempts = [];
         this.recentAttempts = [];
         this.historyErrorMessage = '练习记录暂时无法加载。';
       }
     } catch {
+      if (sequence !== this.loadSequence) return;
       this.paper = null;
       this.attempts = [];
       this.recentAttempts = [];
       this.errorMessage = '套卷加载失败，请稍后重试。';
     } finally {
-      this.loading = false;
-      this.historyLoading = false;
+      if (sequence === this.loadSequence) {
+        this.loading = false;
+        this.historyLoading = false;
+      }
     }
   }
 

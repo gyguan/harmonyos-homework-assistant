@@ -17,9 +17,10 @@ import { HomeworkImportInboxViewModel } from './HomeworkImportInboxViewModel';
 
 @Component
 export struct HomeworkImportInboxPage {
+  @Prop revision: number = 0;
   onBack: () => void = () => {};
   onOpenBatch: (batchId: string) => void = (_batchId: string) => {};
-  @State private revision: number = 0;
+  @State private localRevision: number = 0;
   @State private selectedSource: HomeworkImportInboxSourceFilter = HomeworkImportInboxSourceFilter.ALL;
   @State private selectedStatus: HomeworkImportInboxStatusFilter = HomeworkImportInboxStatusFilter.ALL;
   @State private selectedTime: HomeworkImportInboxTimeFilter = HomeworkImportInboxTimeFilter.ALL;
@@ -45,11 +46,11 @@ export struct HomeworkImportInboxPage {
   });
 
   aboutToAppear(): void {
-    this.revision++;
+    this.localRevision++;
   }
 
   private allBatches(): ImportBatch[] {
-    let currentRevision = this.revision;
+    let currentRevision = this.revision + this.localRevision;
     if (currentRevision < 0) return [];
     return this.viewModel.listBatches();
   }
