@@ -68,11 +68,15 @@ public class PracticeGenerationModelClient {
     if (output.isEmpty()) return Optional.empty();
 
     String shape = "<unparsed>";
+    List<String> coercedFields = List.of();
     try {
       StructuredJsonNormalizer.Result normalized =
           StructuredJsonNormalizer.normalize(mapper, output.get());
       shape = normalized.shape();
-      ModelPaper modelPaper = mapper.readValue(normalized.json(), ModelPaper.class);
+      PracticeGenerationPayloadNormalizer.Result payload =
+          PracticeGenerationPayloadNormalizer.normalize(mapper, normalized.json());
+      coercedFields = payload.coercedPaths();
+      ModelPaper modelPaper = mapper.readValue(payload.json(), ModelPaper.class);
       if (modelPaper == null || modelPaper.questions() == null) return Optional.empty();
       ArrayList<PracticeContentCatalog.Question> questions = new ArrayList<>();
       for (int i = 0; i < modelPaper.questions().size(); i++) {
@@ -111,13 +115,14 @@ public class PracticeGenerationModelClient {
           "AI_GENERATED",
           "PUBLISHED",
           questions);
-      log.info("[AI] practice generation parsed model={} paperId={} questions={}",
-          properties.getPracticeModel(), paperId, questions.size());
+      log.info(
+          "[AI] practice generation parsed model={} paperId={} questions={} shape={} coercedFields={}",
+          properties.getPracticeModel(), paperId, questions.size(), shape, coercedFields);
       return Optional.of(paper);
     } catch (Exception error) {
       log.warn(
-          "[AI] practice generation parse failed model={} paperId={} outputChars={} shape={} exception={} message={}",
-          properties.getPracticeModel(), paperId, output.get().length(), shape,
+          "[AI] practice generation parse failed model={} paperId={} outputChars={} shape={} coercedFields={} exception={} message={}",
+          properties.getPracticeModel(), paperId, output.get().length(), shape, coercedFields,
           error.getClass().getSimpleName(), safeMessage(error.getMessage()));
       return Optional.empty();
     }
