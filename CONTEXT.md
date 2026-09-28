@@ -70,7 +70,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 11. 家长看到的是作业进度，不做摄像头监控、键盘记录等过度监控能力。
 12. SCHOOL / EXTRA 共用 Assignment，不建设两套平行业务体系。
 13. Practice 题库新增或更新必须遵守 `docs/product/practice-question-content-standard.md`；预置题库以 `backend/src/main/resources/practice/preset/` 为唯一源数据，已发布内容通过新 version 演进，不覆盖历史 Attempt / Result。
-14. AI 练习由家长创建、学生消费：AI_GENERATED Paper 必须按 familyId 隔离，并通过 Practice Paper Audience 显式授权给一个、多个或发布当时的全部学生；生成结果先作为 Draft 保存，经过后端质量门禁和家长预览确认后才能发布，学生端不得直接发起出题。生成参考学生负责提供年级/学期/教材上下文，发布对象与生成参考学生分离；发布对象必须满足年级/学期兼容，教材同步还要求教材配置一致。
+14. AI 练习由家长创建、学生消费：AI_GENERATED Paper 必须按 familyId 隔离，并通过 Practice Paper Audience 显式授权给一个、多个或发布当时的全部学生；生成结果先作为 Draft 保存，经过后端质量门禁和家长预览确认后才能发布，学生端不得直接发起出题。生成参考学生负责提供年级/学期/教材上下文，Practice Generation 保存 referenceStudentId 与生成时教材快照；发布对象与生成参考学生分离。发布对象必须满足年级/学期兼容，教材同步还要求与生成时教材快照一致。
 15. 定时创建能力只负责在计划时间生成现有 Assignment；暂停、恢复、编辑或删除计划只影响未来执行，不修改已生成 Assignment。语音定时计划与学生进入兜底必须复用同一服务端幂等边界。
 
 ## Technical direction
