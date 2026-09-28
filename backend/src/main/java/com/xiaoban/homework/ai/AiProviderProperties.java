@@ -13,7 +13,7 @@ public class AiProviderProperties {
   private String chatCompletionsPath = "/v1/chat/completions";
   private String tutorModel = "gpt-5.6-luna";
   private String organizerModel = "gpt-5.6-luna";
-  private String practiceModel = "gpt-5.6-luna";
+  private String practiceModel = "";
   private boolean allowUnauthenticated = false;
   private boolean structuredOutput = true;
   private boolean logPayloads = false;
@@ -32,8 +32,10 @@ public class AiProviderProperties {
   public void setTutorModel(String tutorModel) { this.tutorModel = value(tutorModel, "gpt-5.6-luna"); }
   public String getOrganizerModel() { return organizerModel; }
   public void setOrganizerModel(String organizerModel) { this.organizerModel = value(organizerModel, "gpt-5.6-luna"); }
-  public String getPracticeModel() { return practiceModel; }
-  public void setPracticeModel(String practiceModel) { this.practiceModel = value(practiceModel, "gpt-5.6-luna"); }
+  public String getPracticeModel() { return blank(practiceModel) ? organizerModel : practiceModel; }
+  public void setPracticeModel(String practiceModel) {
+    this.practiceModel = practiceModel == null ? "" : practiceModel.trim();
+  }
   public boolean isAllowUnauthenticated() { return allowUnauthenticated; }
   public void setAllowUnauthenticated(boolean allowUnauthenticated) { this.allowUnauthenticated = allowUnauthenticated; }
   public boolean isStructuredOutput() { return structuredOutput; }
