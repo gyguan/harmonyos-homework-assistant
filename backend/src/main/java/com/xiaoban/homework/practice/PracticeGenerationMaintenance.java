@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class PracticeGenerationMaintenance {
-  static final Duration STALE_AFTER = Duration.ofMinutes(15);
+  public static final Duration STALE_AFTER = Duration.ofMinutes(15);
   private static final Logger log = LoggerFactory.getLogger(PracticeGenerationMaintenance.class);
 
   private final PracticeGenerationRepository generations;
