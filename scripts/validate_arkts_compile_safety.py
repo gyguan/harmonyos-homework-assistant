@@ -115,11 +115,15 @@ def main() -> int:
     require("PARENT_VOICE_MATERIAL" not in app_routes and "PARENT_VOICE_MATERIAL" not in app_shell,
             "legacy standalone voice-material navigation must not reappear")
 
-    syscap = "SystemCapability.Multimedia.Media.AVPlayer"
-    require(audio.count(f"canIUse('{syscap}')") >= 2,
-            "AVPlayer create/seek paths must be guarded by canIUse")
-    require(f"if (canIUse('{syscap}'))" in audio,
-            "AVPlayer calls must live inside a positive canIUse branch for ArkTS SysCap analysis")
+    media_core_syscap = "SystemCapability.Multimedia.Media.Core"
+    avplayer_syscap = "SystemCapability.Multimedia.Media.AVPlayer"
+    require(audio.count(f"canIUse('{media_core_syscap}')") >= 2,
+            "Media namespace and SeekMode access must be guarded by Media.Core canIUse")
+    require(audio.count(f"canIUse('{avplayer_syscap}')") >= 2,
+            "AVPlayer create/seek paths must be guarded by AVPlayer canIUse")
+    require(f"if (canIUse('{media_core_syscap}'))" in audio and
+            f"if (canIUse('{avplayer_syscap}'))" in audio,
+            "media APIs must live inside positive Media.Core + AVPlayer SysCap branches")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
     require("let player = await media.createAVPlayer();" in audio,
