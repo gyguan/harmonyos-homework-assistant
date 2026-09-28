@@ -1,5 +1,6 @@
 import { BackendSession } from '../../application/remote/BackendSession';
 import { PracticeRemoteApi } from '../../application/remote/PracticeRemoteApi';
+import { DefaultFamilyContextRepository } from './DefaultFamilyContextRepository';
 import {
   PracticeAnswer,
   PracticeAttempt,
@@ -28,16 +29,33 @@ export class DefaultPracticeRepository implements PracticeRepository {
     this.remoteApi = remoteApi;
   }
 
-  listPapers(
+  async listPapers(
     grade: PracticeGrade,
     subject: PracticeSubject,
     semester: PracticeSemester,
     track: PracticeTrackFilter
   ): Promise<PracticePaper[]> {
+    if (BackendSession.instance.isConnected()) {
+      try {
+        return await this.remoteApi.listPapers(
+          DefaultFamilyContextRepository.instance.getActiveStudentId(),
+          grade, subject, semester, track);
+      } catch {
+        // Preserve offline/read-only usability if the server catalog is temporarily unavailable.
+      }
+    }
     return this.contentProvider.listPapers(grade, subject, semester, track);
   }
 
-  getPaper(paperId: string, version: number): Promise<PracticePaper | null> {
+  async getPaper(paperId: string, version: number): Promise<PracticePaper | null> {
+    if (BackendSession.instance.isConnected()) {
+      try {
+        return await this.remoteApi.getPaper(
+          DefaultFamilyContextRepository.instance.getActiveStudentId(), paperId, version);
+      } catch {
+        // PRESET content can still fall back locally. AI_GENERATED content will naturally be absent.
+      }
+    }
     return this.contentProvider.getPaper(paperId, version);
   }
 
