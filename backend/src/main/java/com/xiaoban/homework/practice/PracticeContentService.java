@@ -3,7 +3,10 @@ package com.xiaoban.homework.practice;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import com.xiaoban.homework.common.ApiExceptions;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +29,40 @@ public class PracticeContentService {
         .orElseThrow(() -> new ApiExceptions.NotFound("练习套卷不存在"));
     if (!"PUBLISHED".equals(paper.status)) throw new ApiExceptions.NotFound("练习套卷不存在");
     return paper;
+  }
+
+  @Transactional(readOnly = true)
+  public PracticePaperEntity requirePaperForStudent(
+      UUID familyId, String studentId, String paperId, int version) {
+    PracticePaperEntity paper = requirePaper(paperId, version);
+    if (paper.familyId == null && paper.studentId == null) return paper;
+    if (!familyId.equals(paper.familyId) || !studentId.equals(paper.studentId)) {
+      throw new ApiExceptions.NotFound("练习套卷不存在");
+    }
+    return paper;
+  }
+
+  @Transactional(readOnly = true)
+  public List<PracticeDtos.PaperResponse> listForStudent(
+      UUID familyId, String studentId, String grade, String subject, String semester, String track) {
+    List<PracticePaperEntity> visible = new ArrayList<>();
+    for (PracticePaperEntity paper : papers.findAll()) {
+      if (!"PUBLISHED".equals(paper.status)) continue;
+      boolean global = paper.familyId == null && paper.studentId == null;
+      boolean owned = familyId.equals(paper.familyId) && studentId.equals(paper.studentId);
+      if (!global && !owned) continue;
+      if (grade != null && !grade.isBlank() && !grade.equalsIgnoreCase(paper.grade)) continue;
+      if (subject != null && !subject.isBlank() && !subject.equalsIgnoreCase(paper.subject)) continue;
+      if (semester != null && !semester.isBlank() && !"ALL".equalsIgnoreCase(semester)
+          && !"ALL".equalsIgnoreCase(paper.semester) && !semester.equalsIgnoreCase(paper.semester)) continue;
+      if (track != null && !track.isBlank() && !"ALL".equalsIgnoreCase(track)
+          && !track.equalsIgnoreCase(paper.track)) continue;
+      visible.add(paper);
+    }
+    visible.sort(Comparator.comparing((PracticePaperEntity p) -> "AI_GENERATED".equals(p.sourceType) ? 0 : 1)
+        .thenComparing((PracticePaperEntity p) -> p.updatedAt, Comparator.nullsLast(Comparator.reverseOrder()))
+        .thenComparing(p -> p.title));
+    return visible.stream().map(this::response).toList();
   }
 
   @Transactional(readOnly = true)
