@@ -16,11 +16,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ScheduledAssignmentService {
+  private static final Logger log = LoggerFactory.getLogger(ScheduledAssignmentService.class);
   private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
 
   private final ScheduledAssignmentPlanRepository plans;
@@ -143,15 +146,36 @@ public class ScheduledAssignmentService {
 
   public void executeDuePlan(UUID planId, Instant now) {
     ScheduledAssignmentPlanEntity snapshot = plans.findById(planId).orElse(null);
-    if (snapshot == null || !"ENABLED".equals(snapshot.status) || snapshot.nextFireAt == null ||
-        snapshot.nextFireAt.isAfter(now)) {
+    if (snapshot == null) {
+      log.info("scheduled_assignment execution_exit planId={} triggerSource=SCHEDULER reason=PLAN_NOT_FOUND now={}",
+          planId, now);
+      return;
+    }
+    if (!"ENABLED".equals(snapshot.status)) {
+      log.info("scheduled_assignment execution_exit planId={} studentId={} planType={} triggerSource=SCHEDULER reason=PLAN_NOT_ENABLED status={} now={}",
+          planId, snapshot.studentId, snapshot.planType, snapshot.status, now);
+      return;
+    }
+    if (snapshot.nextFireAt == null) {
+      log.info("scheduled_assignment execution_exit planId={} studentId={} planType={} triggerSource=SCHEDULER reason=NEXT_FIRE_AT_EMPTY now={}",
+          planId, snapshot.studentId, snapshot.planType, now);
+      return;
+    }
+    if (snapshot.nextFireAt.isAfter(now)) {
+      log.info("scheduled_assignment execution_exit planId={} studentId={} planType={} triggerSource=SCHEDULER reason=NOT_DUE nextFireAt={} now={}",
+          planId, snapshot.studentId, snapshot.planType, snapshot.nextFireAt, now);
       return;
     }
 
     Instant fireAt = snapshot.nextFireAt;
+    log.info("scheduled_assignment execution_start planId={} studentId={} planType={} triggerSource=SCHEDULER fireAt={} now={}",
+        planId, snapshot.studentId, snapshot.planType, fireAt, now);
     try {
       attempts.executeScheduler(planId, fireAt, now);
     } catch (RuntimeException error) {
+      log.error("scheduled_assignment execution_error planId={} studentId={} planType={} triggerSource=SCHEDULER fireAt={} errorType={} message={}",
+          planId, snapshot.studentId, snapshot.planType, fireAt,
+          error.getClass().getSimpleName(), error.getMessage(), error);
       attempts.recordFailure(planId, fireAt, "SCHEDULER", now, error);
     }
   }
@@ -164,6 +188,8 @@ public class ScheduledAssignmentService {
         plans.findByFamilyIdAndStudentIdAndPlanTypeOrderByCreatedAtDesc(
             familyId, studentId, "VOICE_MATERIAL_AUTO");
     if (voicePlans.isEmpty()) {
+      log.info("scheduled_assignment student_entry_legacy_auto_create studentId={} reason=NO_VOICE_PLAN",
+          studentId);
       return voiceAssignments.autoCreateNext(familyId, studentId);
     }
 
@@ -171,16 +197,35 @@ public class ScheduledAssignmentService {
     LocalDate businessDate =
         now.atZone(ScheduledAssignmentSchedule.BUSINESS_ZONE).toLocalDate();
     for (ScheduledAssignmentPlanEntity plan : voicePlans) {
-      if (!"ENABLED".equals(plan.status)) continue;
+      if (!"ENABLED".equals(plan.status)) {
+        log.info("scheduled_assignment student_entry_skip planId={} studentId={} reason=PLAN_NOT_ENABLED status={}",
+            plan.id, studentId, plan.status);
+        continue;
+      }
       Instant fireAt = ScheduledAssignmentSchedule.fireAt(plan, businessDate);
-      if (fireAt == null || fireAt.isAfter(now)) continue;
+      if (fireAt == null) {
+        log.info("scheduled_assignment student_entry_skip planId={} studentId={} reason=NOT_ELIGIBLE_TODAY businessDate={}",
+            plan.id, studentId, businessDate);
+        continue;
+      }
+      if (fireAt.isAfter(now)) {
+        log.info("scheduled_assignment student_entry_skip planId={} studentId={} reason=BEFORE_SCHEDULED_TIME fireAt={} now={}",
+            plan.id, studentId, fireAt, now);
+        continue;
+      }
+      log.info("scheduled_assignment student_entry_retry planId={} studentId={} fireAt={} now={}",
+          plan.id, studentId, fireAt, now);
       try {
         return attempts.executeStudentEntry(familyId, studentId, plan.id, fireAt, now);
       } catch (RuntimeException error) {
+        log.error("scheduled_assignment student_entry_error planId={} studentId={} fireAt={} errorType={} message={}",
+            plan.id, studentId, fireAt, error.getClass().getSimpleName(), error.getMessage(), error);
         attempts.recordFailure(plan.id, fireAt, "STUDENT_ENTRY", now, error);
         return emptyVoiceResponse();
       }
     }
+    log.info("scheduled_assignment student_entry_exit studentId={} reason=NO_DUE_ENABLED_VOICE_PLAN businessDate={} now={}",
+        studentId, businessDate, now);
     return emptyVoiceResponse();
   }
 
