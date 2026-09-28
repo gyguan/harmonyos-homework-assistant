@@ -21,22 +21,6 @@ public class PracticeGenerationModelClient {
   private final OpenAiCompatibleTransport transport;
   private final JsonMapper mapper;
 
-  record ModelOption(String key, String label) {}
-  record ModelQuestion(
-      String type,
-      String stem,
-      List<ModelOption> options,
-      String answerSpec,
-      String explanation,
-      List<String> hints,
-      List<String> tags) {}
-  record ModelPaper(
-      String title,
-      String description,
-      int estimatedMinutes,
-      List<String> tags,
-      List<ModelQuestion> questions) {}
-
   public PracticeGenerationModelClient(AiProviderProperties properties,
       OpenAiCompatibleTransport transport, JsonMapper mapper) {
     this.properties = properties;
@@ -73,19 +57,17 @@ public class PracticeGenerationModelClient {
       StructuredJsonNormalizer.Result normalized =
           StructuredJsonNormalizer.normalize(mapper, output.get());
       shape = normalized.shape();
-      PracticeGenerationPayloadNormalizer.Result payload =
-          PracticeGenerationPayloadNormalizer.normalize(mapper, normalized.json());
-      coercedFields = payload.coercedPaths();
-      ModelPaper modelPaper = mapper.readValue(payload.json(), ModelPaper.class);
-      if (modelPaper == null || modelPaper.questions() == null) return Optional.empty();
+      PracticeGenerationProviderAdapter.Result adapted =
+          PracticeGenerationProviderAdapter.adapt(mapper, normalized.json());
+      coercedFields = adapted.coercedPaths();
+      PracticeGenerationCanonicalContract.Paper modelPaper = adapted.paper();
+
       ArrayList<PracticeContentCatalog.Question> questions = new ArrayList<>();
       for (int i = 0; i < modelPaper.questions().size(); i++) {
-        ModelQuestion source = modelPaper.questions().get(i);
+        PracticeGenerationCanonicalContract.Question source = modelPaper.questions().get(i);
         ArrayList<PracticeContentCatalog.Option> options = new ArrayList<>();
-        if (source.options() != null) {
-          for (ModelOption option : source.options()) {
-            options.add(new PracticeContentCatalog.Option(option.key(), option.label()));
-          }
+        for (PracticeGenerationCanonicalContract.Option option : source.options()) {
+          options.add(new PracticeContentCatalog.Option(option.key(), option.label()));
         }
         String questionId = paperId + "-Q" + String.format("%02d", i + 1);
         questions.add(new PracticeContentCatalog.Question(
