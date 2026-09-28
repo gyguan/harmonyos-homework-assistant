@@ -12,6 +12,7 @@ def require(condition: bool, message: str) -> None:
 
 migration = text("backend/src/main/resources/db/migration/V19__scheduled_assignments.sql")
 service = text("backend/src/main/java/com/xiaoban/homework/scheduledassignment/ScheduledAssignmentService.java")
+attempt = text("backend/src/main/java/com/xiaoban/homework/scheduledassignment/ScheduledAssignmentAttemptService.java")
 scheduler = text("backend/src/main/java/com/xiaoban/homework/scheduledassignment/ScheduledAssignmentScheduler.java")
 controller = text("backend/src/main/java/com/xiaoban/homework/scheduledassignment/ScheduledAssignmentController.java")
 voice_controller = text("backend/src/main/java/com/xiaoban/homework/voicematerial/VoiceMaterialController.java")
@@ -27,23 +28,40 @@ for table in ("scheduled_assignment_plan", "scheduled_assignment_template", "sch
 
 require("unique (plan_id, scheduled_fire_at)" in migration,
         "scheduled run must be unique by plan and fire time")
-require('"a-scheduled-" + plan.id + "-" + fireAt.toEpochMilli()' in service,
+require('"a-scheduled-" + plan.id + "-" + fireAt.toEpochMilli()' in attempt,
         "manual scheduled Assignment id must be deterministic")
-require("voiceAssignments.autoCreateNext" in service,
+require("voiceAssignments.autoCreateNext" in attempt,
         "voice schedule must reuse VoiceMaterialAssignmentService.autoCreateNext")
 require("autoCreateOnStudentEntry" in service,
         "student-entry server gate missing")
 require("@Scheduled(fixedDelay = 30000)" in scheduler,
         "lightweight Spring scheduler missing")
-require("nextFire(plan, executionAt)" in service and
-        "dueAt(plan, template, executionAt)" in service,
+require("Propagation.REQUIRES_NEW" in attempt and
+        attempt.count("Propagation.REQUIRES_NEW") >= 3,
+        "scheduled execution and failure recording must use isolated transactions")
+require("ScheduledAssignmentSchedule.nextFire(plan, executionAt)" in attempt and
+        "dueAt(plan, template, executionAt)" in attempt,
         "scheduled recovery must use one execution clock and fast-forward missed recurrences")
+require("MISSED_DUE_WINDOW" in attempt,
+        "same-day missed deadline must skip instead of creating an expired assignment")
+require("ScheduledAssignmentSchedule.fireAt(plan, businessDate)" in service,
+        "student entry must evaluate today's fire time even when nextFireAt already advanced")
+require("students.requireOwned(familyId, studentId)" in service and
+        "students.requireOwnedForUpdate(familyId, studentId)" not in
+        service[service.index("autoCreateOnStudentEntry"):service.index("private void saveTemplate")],
+        "student-entry orchestration must not lock Student before Plan")
+require("try {" in scheduler and "catch (RuntimeException error)" in scheduler,
+        "scheduler must isolate failures per plan")
 require("scheduledAssignments.autoCreateOnStudentEntry" in voice_controller,
         "voice auto-create endpoint must use scheduled eligibility gate")
 require("/scheduled-assignment-plans" in controller,
         "scheduled assignment API missing")
 
 require("DeepPageHeader" in page, "scheduled page must use shared deep-page chrome")
+require("resetEditorState()" in page and
+        "private resetEditorState()" in page and
+        "private async openEdit" in page,
+        "scheduled editor state must reset before switching plans")
 require("SegmentedSelectionButton" in page and "private OptionButton(" not in page,
         "scheduled plan selectors must reuse reactive shared selection controls")
 require("HomeworkStore" not in page and "HomeworkStore" not in view_model,
