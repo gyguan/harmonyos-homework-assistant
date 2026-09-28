@@ -12,7 +12,7 @@ public class PracticeGenerationEntity {
   @Id public UUID id;
   public UUID familyId;
   public String referenceStudentId;
-  public String referenceTextbookSummary;
+  public String referenceTextbookContext;
   public String subject;
   public String semester;
   public String track;
