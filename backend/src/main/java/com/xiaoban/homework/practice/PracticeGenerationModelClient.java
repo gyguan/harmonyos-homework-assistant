@@ -2,7 +2,6 @@ package com.xiaoban.homework.practice;
 
 import com.xiaoban.homework.ai.AiProviderProperties;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
-import com.xiaoban.homework.student.StudentEntity;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -53,7 +52,7 @@ public class PracticeGenerationModelClient {
   }
 
   public Optional<PracticeContentCatalog.Paper> generate(
-      StudentEntity student,
+      String textbookContext,
       String paperId,
       String grade,
       String semester,
@@ -61,7 +60,7 @@ public class PracticeGenerationModelClient {
     Optional<String> output = transport.complete(
         properties.getPracticeModel(),
         instructions(),
-        input(student, grade, semester, request),
+        input(textbookContext, grade, semester, request),
         7000,
         "practice_generation",
         schema(request.questionCount()));
@@ -136,9 +135,9 @@ public class PracticeGenerationModelClient {
         + "最终只输出符合JSON Schema的对象，不输出Markdown或额外说明。";
   }
 
-  static String input(StudentEntity student, String grade, String semester,
+  static String input(String textbookContext, String grade, String semester,
       PracticeGenerationDtos.GenerateRequest request) {
-    String textbooks = student.textbookSummary == null ? "" : student.textbookSummary.trim();
+    String textbooks = textbookContext == null ? "" : textbookContext.trim();
     return "学生年级：" + grade
         + "\n学期：" + semester
         + "\n科目：" + request.subject()
