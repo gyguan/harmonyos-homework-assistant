@@ -12,7 +12,7 @@ final class PracticeTextbookContext {
     String label = subjectLabel(subject);
     if (label.isBlank()) return text;
 
-    String[] segments = text.split("[\\r\\n;；|]+");
+    String[] segments = text.split("[\\r\\n;；|,，]+");
     for (String segment : segments) {
       String value = segment.trim();
       if (value.contains(label) && subjectKindCount(value) == 1) return value;
