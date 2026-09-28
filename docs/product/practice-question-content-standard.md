@@ -149,6 +149,7 @@ AI 生成练习与预置题库共用 Practice Paper / Question / Attempt / Resul
 - AI 生成内容属于家庭私有空间，Paper 按 `familyId` 隔离，并通过 Audience 关系显式授权给一个、多个或发布当时的全部学生；
 - 生成结果先保存为 Draft，不允许模型输出后直接对学生发布；
 - Draft 必须依次通过 strict structured output、服务端确定性 validator 和独立答案复核；数学明确算式优先使用确定性计算复核，其他题型由第二次独立 AI review 检查 answerSpec、解析一致性与歧义；
+- 不同 AI Provider 的输出差异只能在 Provider Adapter 层处理；业务层只接受 Canonical Practice Contract。Canonical 单选题固定为 `options=[{key,label}]` 且 `answerSpec=key`，禁止业务逻辑直接感知字符串 options、数字 key、label answer 等 Provider 个性格式；
 - 家长必须能够预览题干、选项、答案、解析与提示，再确认发布，并选择当前学生、多个学生或发布当时的全部学生；发布候选及不兼容原因由后端统一计算，前端不得复制一套兼容判断；
 - 生成参考学生提供年级、学期和当前科目教材上下文，并在 Generation 中保留生成时的当前科目教材快照；目标学生必须与套卷年级/学期兼容，教材同步练习只比较当前科目教材，不比较整段学生教材摘要；
 - 第一阶段只允许 `SINGLE_CHOICE`、`FILL_BLANK`、`NUMBER`；

@@ -125,4 +125,58 @@ class PracticeGenerationModelClientParsingTest {
     assertEquals("36", result.get().questions().get(0).answerSpec());
     assertEquals("关键词：41、减5", result.get().questions().get(0).hints().get(0));
   }
+
+  @Test
+  void parsesStringChoiceOptionsFromDeepSeekCompatibleProvider() throws Exception {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setTutorModel("deepseek-v4-flash-0731");
+    properties.setPracticeModel("");
+
+    OpenAiCompatibleTransport transport = mock(OpenAiCompatibleTransport.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    String output = """
+        {
+          "title":"认识人民币",
+          "description":"购物场景专项练习",
+          "estimatedMinutes":8,
+          "tags":["人民币","生活应用"],
+          "questions":[{
+            "type":"SINGLE_CHOICE",
+            "stem":"小明买一支铅笔需要5元，应该选择哪个价格？",
+            "options":["5元","6元","7元"],
+            "answerSpec":"5元",
+            "explanation":"题目已经说明铅笔价格是5元。",
+            "hints":["关键词：铅笔、5元"],
+            "tags":["人民币"]
+          }]
+        }
+        """;
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        any(String.class),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class)))
+        .thenReturn(Optional.of(output));
+
+    PracticeGenerationModelClient client =
+        new PracticeGenerationModelClient(properties, transport, mapper);
+
+    Optional<PracticeContentCatalog.Paper> result = client.generate(
+        "人教版数学二年级上册",
+        "ai-string-options",
+        "G2",
+        "S1",
+        new PracticeGenerationDtos.GenerateRequest(
+            "MATH", "TEXTBOOK_SYNC", "L1", 1, "练习人民币"));
+
+    assertTrue(result.isPresent());
+    PracticeContentCatalog.Question question = result.get().questions().get(0);
+    assertEquals("A", question.options().get(0).key());
+    assertEquals("5元", question.options().get(0).label());
+    assertEquals("A", question.answerSpec());
+  }
 }
