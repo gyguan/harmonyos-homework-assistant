@@ -29,6 +29,8 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Media Asset（媒体资产）**：家庭私有的物理媒体文件所有权实体。Assignment Resource 与语音素材目录只引用 Asset，不因创建任务而复制文件。
 - **Voice Material Package（语音素材目录）**：家长预先导入的一组“1 个语音 + 至少 1 张图片”的待发布素材，携带 studentId、subjectCode、标题和预计用时等结构化属性；目录名用于展示与队列排序，不作为科目识别来源。
 - **Daily Voice Auto Create（每日语音自动创建）**：按 studentId + Asia/Shanghai 业务日最多自动消费一个 READY Voice Material Package；家长手工创建不占每日自动额度。
+- **Scheduled Assignment Plan（定时作业计划）**：家长配置的未来作业创建规则，只保存学生、重复方式、创建时间与任务模板；到达触发时间后才生成真实 Assignment，不是第二套 Assignment 状态机。
+- **Scheduled Assignment Run（定时作业执行）**：某个 Plan 在一个 scheduledFireAt 上的一次幂等执行记录；普通计划创建 Assignment，语音计划复用 Daily Voice Auto Create，执行成功、跳过或失败均可追溯。
 - **Requirement（完成要求）**：某项 Assignment 的结构化完成要求，如完成题目、朗读、拍照、文字说明等。
 - **Submission（提交）**：学生对某个 Assignment 提交的照片、录音、视频或文本，以及提交时间与状态。
 - **Textbook（教材）**：按城市、学段、年级、学期、学科、出版社、册、单元、课组织的教材目录元数据。
@@ -67,6 +69,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 11. 家长看到的是作业进度，不做摄像头监控、键盘记录等过度监控能力。
 12. SCHOOL / EXTRA 共用 Assignment，不建设两套平行业务体系。
 13. Practice 题库新增或更新必须遵守 `docs/product/practice-question-content-standard.md`；预置题库以 `backend/src/main/resources/practice/preset/` 为唯一源数据，已发布内容通过新 version 演进，不覆盖历史 Attempt / Result。
+14. 定时创建能力只负责在计划时间生成现有 Assignment；暂停、恢复、编辑或删除计划只影响未来执行，不修改已生成 Assignment。语音定时计划与学生进入兜底必须复用同一服务端幂等边界。
 
 ## Technical direction
 
@@ -92,6 +95,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - 历史 Flyway migration 不修改，通过 V7+ 增量演进。
 - Assignment 状态流转和权威计时逐步从通用 PATCH 收敛到后端 Action Command。
 - `OVERDUE` 优先作为派生属性，不为此引入定时任务。
+- 家庭级定时作业使用 Spring `@Scheduled` + PostgreSQL 持久化计划/执行记录；不为调度引入 Quartz、Redis、MQ 或工作流引擎。
 
 ### Homework Import / Capture
 
