@@ -17,8 +17,9 @@ export class AssignmentAudioPlayerService {
   async prepare(sourceUri: string, callbacks: AssignmentAudioPlayerCallbacks): Promise<void> {
     await this.release();
     this.callbacks = callbacks;
-    if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
-      try {
+    if (canIUse('SystemCapability.Multimedia.Media.Core')) {
+      if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
+        try {
         let player = await media.createAVPlayer();
         this.player = player;
         player.on('stateChange', (state: media.AVPlayerState) => {
@@ -43,11 +44,12 @@ export class AssignmentAudioPlayerService {
         this.sourceFile = source;
         let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };
         player.fdSrc = descriptor;
-      } catch {
-        callbacks.onError('语音准备失败');
-        await this.release();
+        } catch {
+          callbacks.onError('语音准备失败');
+          await this.release();
+        }
+        return;
       }
-      return;
     }
     callbacks.onError('当前设备不支持语音播放');
     this.callbacks = null;
@@ -75,7 +77,11 @@ export class AssignmentAudioPlayerService {
   }
 
   seek(timeMs: number): void {
-    if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
+    if (canIUse('SystemCapability.Multimedia.Media.Core')) {
+      if (!canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
+        if (this.callbacks !== null) this.callbacks.onError('当前设备不支持语音播放');
+        return;
+      }
       let player = this.player;
       if (player === null) return;
       if (player.state !== 'prepared' && player.state !== 'playing' &&
