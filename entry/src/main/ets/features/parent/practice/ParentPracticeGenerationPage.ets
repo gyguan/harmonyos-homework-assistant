@@ -1,10 +1,9 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
-import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import {
+  PracticeAudienceCandidate,
   PracticeDifficulty,
-  PracticeGenerationDraft,
   PracticeGenerationDraftQuestion,
   PracticeGenerationResult,
   PracticeQuestionOption,
@@ -82,8 +81,8 @@ export struct ParentPracticeGenerationPage {
     this.publishing = true;
     this.message = '';
     try {
-      await this.viewModel.publish(this.result.generationId, this.publishScope, targets);
-      this.showMessage(`练习已发布给${targets.length}个学生`, false);
+      let published = await this.viewModel.publish(this.result.generationId, this.publishScope, targets);
+      this.showMessage(`练习已发布给${published.targetStudentIds.length}个学生`, false);
       this.onPublished();
     } catch (error) {
       this.showMessage(error instanceof Error ? error.message : '发布练习失败，请稍后重试', true);
@@ -133,16 +132,24 @@ export struct ParentPracticeGenerationPage {
     return this.selectedStudentIds.indexOf(studentId) >= 0;
   }
 
-  private toggleStudent(student: StudentProfile): void {
+  private candidate(studentId: string): PracticeAudienceCandidate | null {
+    if (this.result === null) return null;
+    for (let candidate of this.result.audienceCandidates) {
+      if (candidate.studentId === studentId) return candidate;
+    }
+    return null;
+  }
+
+  private toggleStudent(candidate: PracticeAudienceCandidate): void {
     if (this.result === null || this.result.paper === null || this.generating || this.publishing) return;
-    if (this.viewModel.incompatibility(student, this.result.paper).length > 0) return;
+    if (!candidate.compatible) return;
     let next: string[] = [];
     let found = false;
     for (let id of this.selectedStudentIds) {
-      if (id === student.id) found = true;
+      if (id === candidate.studentId) found = true;
       else next.push(id);
     }
-    if (!found) next.push(student.id);
+    if (!found) next.push(candidate.studentId);
     this.selectedStudentIds = next;
   }
 
@@ -152,29 +159,36 @@ export struct ParentPracticeGenerationPage {
     }
     if (this.publishScope === PracticePublishScope.ALL) {
       let all: string[] = [];
-      for (let student of this.viewModel.students()) all.push(student.id);
+      if (this.result !== null) {
+        for (let candidate of this.result.audienceCandidates) all.push(candidate.studentId);
+      }
       return all;
     }
     return this.selectedStudentIds.slice();
   }
 
-  private publishBlockedReason(paper: PracticeGenerationDraft): string {
-    let students = this.viewModel.students();
+  private publishBlockedReason(): string {
+    if (this.result === null || this.result.paper === null) return '请先生成练习';
+
     if (this.publishScope === PracticePublishScope.CURRENT) {
-      let current = this.viewModel.student();
-      let reason = this.viewModel.incompatibility(current, paper);
-      return reason.length === 0 ? '' : `${current.name}：${reason}`;
+      let current = this.candidate(this.viewModel.activeStudentId());
+      if (current === null) return '当前学生不在可发布范围';
+      return current.compatible ? '' : `${current.studentName}：${current.reason}`;
     }
+
     if (this.publishScope === PracticePublishScope.SELECTED && this.selectedStudentIds.length === 0) {
       return '请至少选择一个学生';
     }
 
+    if (this.result.audienceCandidates.length === 0) return '当前家庭没有可发布学生';
+
     let incompatible: string[] = [];
-    for (let student of students) {
-      let included = this.publishScope === PracticePublishScope.ALL || this.isStudentSelected(student.id);
-      if (!included) continue;
-      let reason = this.viewModel.incompatibility(student, paper);
-      if (reason.length > 0) incompatible.push(`${student.name}：${reason}`);
+    for (let candidate of this.result.audienceCandidates) {
+      let included = this.publishScope === PracticePublishScope.ALL ||
+        this.isStudentSelected(candidate.studentId);
+      if (included && !candidate.compatible) {
+        incompatible.push(`${candidate.studentName}：${candidate.reason}`);
+      }
     }
     return incompatible.length === 0 ? '' : '以下学生暂不能使用本套练习：' + incompatible.join('；');
   }
@@ -424,7 +438,7 @@ export struct ParentPracticeGenerationPage {
   }
 
   @Builder
-  private AudienceSelection(paper: PracticeGenerationDraft) {
+  private AudienceSelection() {
     Column({ space: 10 }) {
       Text('发布对象')
         .width('100%')
@@ -451,34 +465,36 @@ export struct ParentPracticeGenerationPage {
       }
       .width('100%');
 
-      if (this.publishScope === PracticePublishScope.CURRENT) {
-        let current = this.viewModel.student();
-        Text(`将发布给：${current.name} · ${current.grade} · ${current.semester}`)
-          .width('100%')
-          .fontSize(AppTheme.META_SIZE)
-          .lineHeight(AppTheme.META_LINE_HEIGHT)
-          .fontColor(AppTheme.SUBTEXT);
-      } else if (this.publishScope === PracticePublishScope.SELECTED) {
+      if (this.result !== null && this.publishScope === PracticePublishScope.CURRENT) {
+        let current = this.candidate(this.viewModel.activeStudentId());
+        if (current !== null) {
+          Text(`将发布给：${current.studentName} · ${current.grade} · ${current.semester}`)
+            .width('100%')
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontColor(current.compatible ? AppTheme.SUBTEXT : AppTheme.WARNING);
+        }
+      } else if (this.result !== null && this.publishScope === PracticePublishScope.SELECTED) {
         Column({ space: 7 }) {
-          ForEach(this.viewModel.students(), (student: StudentProfile) => {
-            let reason = this.viewModel.incompatibility(student, paper);
-            let selected = this.isStudentSelected(student.id);
+          ForEach(this.result.audienceCandidates, (candidate: PracticeAudienceCandidate) => {
+            let selected = this.isStudentSelected(candidate.studentId);
             Row({ space: 10 }) {
               Text(selected ? '✓' : '○')
                 .fontSize(AppTheme.BODY_SIZE)
                 .fontWeight(FontWeight.Bold)
-                .fontColor(reason.length > 0 ? AppTheme.DISABLED :
+                .fontColor(!candidate.compatible ? AppTheme.DISABLED :
                   selected ? AppTheme.PRIMARY : AppTheme.SUBTEXT);
               Column({ space: 2 }) {
-                Text(student.name)
+                Text(candidate.studentName)
                   .width('100%')
                   .fontSize(AppTheme.BODY_SIZE)
                   .fontWeight(FontWeight.Medium)
-                  .fontColor(reason.length > 0 ? AppTheme.DISABLED : AppTheme.TEXT);
-                Text(reason.length > 0 ? reason : `${student.grade} · ${student.semester}`)
+                  .fontColor(!candidate.compatible ? AppTheme.DISABLED : AppTheme.TEXT);
+                Text(!candidate.compatible ? candidate.reason :
+                  `${candidate.grade} · ${candidate.semester}`)
                   .width('100%')
                   .fontSize(AppTheme.CAPTION_SIZE)
-                  .fontColor(reason.length > 0 ? AppTheme.WARNING : AppTheme.SUBTEXT);
+                  .fontColor(!candidate.compatible ? AppTheme.WARNING : AppTheme.SUBTEXT);
               }
               .layoutWeight(1)
               .alignItems(HorizontalAlign.Start);
@@ -486,23 +502,23 @@ export struct ParentPracticeGenerationPage {
             .width('100%')
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .padding({ left: 10, right: 10, top: 7, bottom: 7 })
-            .backgroundColor(selected && reason.length === 0 ?
+            .backgroundColor(selected && candidate.compatible ?
               AppTheme.PRIMARY_FAINT : AppTheme.SURFACE_SUBTLE)
             .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(() => this.toggleStudent(student));
-          }, (student: StudentProfile) => student.id);
+            .onClick(() => this.toggleStudent(candidate));
+          }, (candidate: PracticeAudienceCandidate) => candidate.studentId);
         }
         .width('100%');
-      } else {
-        Text(`将发布给家庭当前全部${this.viewModel.students().length}个学生；以后新增的学生不会自动获得这套历史练习。`)
+      } else if (this.result !== null) {
+        Text(`将发布给家庭当前全部${this.result.audienceCandidates.length}个学生；以后新增的学生不会自动获得这套历史练习。`)
           .width('100%')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
 
-      if (this.publishBlockedReason(paper).length > 0) {
-        Text(this.publishBlockedReason(paper))
+      if (this.publishBlockedReason().length > 0) {
+        Text(this.publishBlockedReason())
           .width('100%')
           .fontSize(AppTheme.CAPTION_SIZE)
           .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
@@ -554,7 +570,7 @@ export struct ParentPracticeGenerationPage {
           this.QuestionPreview(question);
         }, (question: PracticeGenerationDraftQuestion) => question.id);
 
-        this.AudienceSelection(this.result.paper);
+        this.AudienceSelection();
 
         Row({ space: 10 }) {
           Button('重新生成', { type: ButtonType.Normal })
@@ -570,7 +586,7 @@ export struct ParentPracticeGenerationPage {
             .layoutWeight(1)
             .height(AppTheme.BUTTON_HEIGHT)
             .enabled(!this.generating && !this.publishing &&
-              this.publishBlockedReason(this.result.paper).length === 0)
+              this.publishBlockedReason().length === 0)
             .fontSize(AppTheme.ACTION_TEXT_SIZE)
             .fontWeight(FontWeight.Medium)
             .backgroundColor(this.publishing ? AppTheme.DISABLED : AppTheme.PRIMARY)
