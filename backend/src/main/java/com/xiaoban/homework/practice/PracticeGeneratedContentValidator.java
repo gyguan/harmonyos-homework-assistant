@@ -1,7 +1,6 @@
 package com.xiaoban.homework.practice;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -92,10 +91,12 @@ public class PracticeGeneratedContentValidator {
           if (BigDecimal.ZERO.compareTo(right) == 0) {
             throw new IllegalStateException("数学题包含除以0");
           }
-          yield left.divide(right, MathContext.DECIMAL64);
+          BigDecimal[] division = left.divideAndRemainder(right);
+          yield BigDecimal.ZERO.compareTo(division[1]) == 0 ? division[0] : null;
         }
         default -> throw new IllegalStateException("不支持的算术运算符");
       };
+      if (expected == null) return;
       BigDecimal actual = new BigDecimal(text(question.answerSpec()));
       if (expected.compareTo(actual) != 0) {
         throw new IllegalStateException(
