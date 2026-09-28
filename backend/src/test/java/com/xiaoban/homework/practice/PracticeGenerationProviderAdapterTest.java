@@ -248,6 +248,55 @@ class PracticeGenerationProviderAdapterTest {
   }
 
   @Test
+  void unwrapsUnknownAndNestedProviderEnvelopeByCanonicalShape() throws Exception {
+    String canonical = paperWithQuestion("""
+        {
+          "type": "NUMBER",
+          "stem": "8 + 7 = ?",
+          "options": [],
+          "answerSpec": "15",
+          "explanation": "8加7等于15。",
+          "hints": ["关键词：8、加7"],
+          "tags": ["加法"]
+        }
+        """);
+
+    String unknownWrapper = "{\"practicePayload\":" + canonical + "}";
+    PracticeGenerationProviderAdapter.Result direct =
+        PracticeGenerationProviderAdapter.adapt(mapper, unknownWrapper);
+    assertEquals("测试练习", direct.paper().title());
+    assertTrue(direct.coercedPaths().contains("$.practicePayload"));
+
+    String nestedWrapper = "{\"vendorEnvelope\":{\"generatedContent\":" + canonical + "}}";
+    PracticeGenerationProviderAdapter.Result nested =
+        PracticeGenerationProviderAdapter.adapt(mapper, nestedWrapper);
+    assertEquals("测试练习", nested.paper().title());
+    assertTrue(nested.coercedPaths().contains("$.vendorEnvelope.generatedContent"));
+  }
+
+  @Test
+  void rejectsAmbiguousGenericPaperEnvelope() {
+    String canonical = paperWithQuestion("""
+        {
+          "type": "NUMBER",
+          "stem": "8 + 7 = ?",
+          "options": [],
+          "answerSpec": "15",
+          "explanation": "8加7等于15。",
+          "hints": ["关键词：8、加7"],
+          "tags": ["加法"]
+        }
+        """);
+    String input = "{\"first\":" + canonical + ",\"second\":" + canonical + "}";
+
+    IllegalArgumentException error = assertThrows(
+        IllegalArgumentException.class,
+        () -> PracticeGenerationProviderAdapter.adapt(mapper, input));
+
+    assertTrue(error.getMessage().contains("multiple canonical paper candidates"));
+  }
+
+  @Test
   void rejectsConflictingScalarWrapperCandidates() {
     String input = paperWithQuestion("""
         {
