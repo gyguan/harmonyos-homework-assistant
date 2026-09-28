@@ -120,14 +120,15 @@ class PracticeGenerationServiceAudienceTest {
     generation.errorMessage = "";
     generation.createdAt = Instant.parse("2026-09-28T00:00:00Z");
     generation.updatedAt = generation.createdAt;
-    generation.generatedJson = mapper.writeValueAsString(new PracticeContentCatalog.Paper(
+    PracticeContentCatalog.Question question = new PracticeContentCatalog.Question(
+        "ai-test-Q01", 1, "NUMBER", "42-5等于多少？",
+        List.of(), "37", "42减5等于37。",
+        List.of("关键词：42、减5"), List.of("退位减法"));
+    PracticeContentCatalog.Paper paper = new PracticeContentCatalog.Paper(
         "ai-test", 1, "G2", "MATH", "S1", "TEXTBOOK_SYNC",
         "退位减法专项", "测试", "L1", 1, 5, List.of("退位减法"),
-        "AI_GENERATED", "PUBLISHED",
-        List.of(new PracticeContentCatalog.Question(
-            "ai-test-Q01", 1, "NUMBER", "42-5等于多少？",
-            List.of(), "37", "42减5等于37。",
-            List.of("关键词：42、减5"), List.of("退位减法"))))));
+        "AI_GENERATED", "PUBLISHED", List.of(question));
+    generation.generatedJson = mapper.writeValueAsString(paper);
     return generation;
   }
 
