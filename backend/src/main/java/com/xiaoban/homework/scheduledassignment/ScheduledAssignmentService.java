@@ -155,7 +155,7 @@ public class ScheduledAssignmentService {
         plan.nextFireAt.isAfter(now)) {
       return;
     }
-    executePlan(plan, plan.nextFireAt, "SCHEDULER");
+    executePlan(plan, plan.nextFireAt, "SCHEDULER", now);
   }
 
   @Transactional
@@ -181,40 +181,42 @@ public class ScheduledAssignmentService {
     if (eligible == null || eligible.nextFireAt == null || eligible.nextFireAt.isAfter(now)) {
       return emptyVoiceResponse();
     }
-    return executeVoicePlan(eligible, eligible.nextFireAt, "STUDENT_ENTRY");
+    return executeVoicePlan(eligible, eligible.nextFireAt, "STUDENT_ENTRY", now);
   }
 
   private void executePlan(
-      ScheduledAssignmentPlanEntity plan, Instant fireAt, String triggerSource) {
+      ScheduledAssignmentPlanEntity plan, Instant fireAt, String triggerSource,
+      Instant executionAt) {
     if ("VOICE_MATERIAL_AUTO".equals(plan.planType)) {
-      executeVoicePlan(plan, fireAt, triggerSource);
+      executeVoicePlan(plan, fireAt, triggerSource, executionAt);
       return;
     }
 
     ScheduledAssignmentRunEntity run = prepareRun(plan.id, fireAt, triggerSource);
     if (isFinal(run)) {
-      advance(plan, fireAt);
+      advance(plan, fireAt, executionAt);
       return;
     }
     try {
-      AssignmentDtos.Response assignment = createManualAssignment(plan, fireAt);
+      AssignmentDtos.Response assignment = createManualAssignment(plan, fireAt, executionAt);
       run.status = "SUCCESS";
       run.assignmentId = assignment.id();
       run.skipReason = "";
       run.errorMessage = "";
       run.finishedAt = Instant.now();
       runs.save(run);
-      advance(plan, fireAt);
+      advance(plan, fireAt, executionAt);
     } catch (RuntimeException error) {
-      failRun(plan, run, fireAt, error);
+      failRun(plan, run, fireAt, executionAt, error);
     }
   }
 
   private VoiceMaterialDtos.AutoCreateResponse executeVoicePlan(
-      ScheduledAssignmentPlanEntity plan, Instant fireAt, String triggerSource) {
+      ScheduledAssignmentPlanEntity plan, Instant fireAt, String triggerSource,
+      Instant executionAt) {
     ScheduledAssignmentRunEntity run = prepareRun(plan.id, fireAt, triggerSource);
     if (isFinal(run)) {
-      advance(plan, fireAt);
+      advance(plan, fireAt, executionAt);
       return emptyVoiceResponse();
     }
     try {
@@ -226,10 +228,10 @@ public class ScheduledAssignmentService {
       run.errorMessage = "";
       run.finishedAt = Instant.now();
       runs.save(run);
-      advance(plan, fireAt);
+      advance(plan, fireAt, executionAt);
       return result;
     } catch (RuntimeException error) {
-      failRun(plan, run, fireAt, error);
+      failRun(plan, run, fireAt, executionAt, error);
       return emptyVoiceResponse();
     }
   }
@@ -262,7 +264,7 @@ public class ScheduledAssignmentService {
   }
 
   private void failRun(ScheduledAssignmentPlanEntity plan, ScheduledAssignmentRunEntity run,
-      Instant fireAt, RuntimeException error) {
+      Instant fireAt, Instant executionAt, RuntimeException error) {
     run.status = "FAILED";
     run.retryCount++;
     String message = error.getMessage();
@@ -270,14 +272,14 @@ public class ScheduledAssignmentService {
         message.substring(0, Math.min(message.length(), 500));
     run.finishedAt = Instant.now();
     runs.save(run);
-    if (run.retryCount >= MAX_RETRIES) advance(plan, fireAt);
+    if (run.retryCount >= MAX_RETRIES) advance(plan, fireAt, executionAt);
   }
 
   private AssignmentDtos.Response createManualAssignment(
-      ScheduledAssignmentPlanEntity plan, Instant fireAt) {
+      ScheduledAssignmentPlanEntity plan, Instant fireAt, Instant executionAt) {
     ScheduledAssignmentTemplateEntity template = templates.findById(plan.id)
         .orElseThrow(() -> new ApiExceptions.BadRequest("普通定时作业缺少任务模板"));
-    Instant dueAt = dueAt(plan, template, Instant.now());
+    Instant dueAt = dueAt(plan, template, executionAt);
     String dueText = dueText(template);
     String assignmentId = "a-scheduled-" + plan.id + "-" + fireAt.toEpochMilli();
     AssignmentDtos.Create create = new AssignmentDtos.Create(
@@ -325,12 +327,13 @@ public class ScheduledAssignmentService {
     };
   }
 
-  private void advance(ScheduledAssignmentPlanEntity plan, Instant fireAt) {
+  private void advance(ScheduledAssignmentPlanEntity plan, Instant fireAt,
+      Instant executionAt) {
     plan.lastFireAt = fireAt;
-    Instant next = nextFire(plan, Instant.now());
+    Instant next = nextFire(plan, executionAt);
     plan.nextFireAt = next;
     if (next == null) plan.status = "ENDED";
-    plan.updatedAt = Instant.now();
+    plan.updatedAt = executionAt;
     plans.save(plan);
   }
 
