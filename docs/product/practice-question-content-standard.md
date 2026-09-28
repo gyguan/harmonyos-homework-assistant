@@ -139,7 +139,7 @@
 - `TEXTBOOK_SYNC` 与 `EXTRACURRICULAR` 必须明确区分；
 - 难度以 L1/L2 为当前主范围，拓展不等于超纲。
 
-## 9. AI 生成题库规则
+## 8.1 AI 生成题库规则
 
 AI 生成练习与预置题库共用 Practice Paper / Question / Attempt / Result，不建设第二套练习模型。
 
@@ -156,7 +156,7 @@ AI 生成练习与预置题库共用 Practice Paper / Question / Attempt / Resul
 - AI 生成失败或校验失败时不得写入正式 `practice_paper`；
 - 发布后的 AI 练习与 PRESET 一样必须保持历史 Attempt / Result 可追溯，不原地覆盖已发布版本。
 
-## 10. 发布与版本规则
+## 9. 发布与版本规则
 
 预置题库的**唯一源文件**位于：
 
@@ -182,7 +182,7 @@ AI 生成练习与预置题库共用 Practice Paper / Question / Attempt / Resul
 
 `python scripts/validate_practice_content.py`
 
-## 11. 练习过程体验不可回退
+## 10. 练习过程体验不可回退
 
 内容更新不得破坏已经确立的练习体验：
 
@@ -197,7 +197,7 @@ AI 生成练习与预置题库共用 Practice Paper / Question / Attempt / Resul
 - 结果页显示套卷名称、练习次数、得分、正确率、耗时、答题回顾、答案、解析和笔记；
 - 结果页使用标准返回语义，不返回已提交答题页。
 
-## 12. Phone / Pad 可读性不可回退
+## 11. Phone / Pad 可读性不可回退
 
 Phone 与 Pad 都是一等形态：
 
@@ -209,7 +209,7 @@ Phone 与 Pad 都是一等形态：
 - 深层练习页面复用 `DeepPageHeader`；
 - 不新增 Feature 私有 600/840/1080 等设备断点。
 
-## 13. 新增/修改练习题的 Definition of Done
+## 12. 新增/修改练习题的 Definition of Done
 
 提交前逐项确认：
 
@@ -229,7 +229,7 @@ Phone 与 Pad 都是一等形态：
 - [ ] 已运行 `validate_practice_content.py`；
 - [ ] CI Practice content catalog gate 通过。
 
-## 14. 规范变更
+## 13. 规范变更
 
 本规范是 Practice 内容的长期基线。后续如果产品范围扩展到其他年级、学期、地区、教材版本、视觉题或新的题型：
 
