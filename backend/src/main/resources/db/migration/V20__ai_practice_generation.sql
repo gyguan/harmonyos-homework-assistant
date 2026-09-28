@@ -1,9 +1,20 @@
 alter table practice_paper
-  add column if not exists family_id uuid references family(id),
-  add column if not exists student_id varchar(120) references student(id);
+  add column if not exists family_id uuid references family(id);
 
-create index if not exists idx_practice_paper_family_student
-  on practice_paper (family_id, student_id, status, updated_at desc);
+create index if not exists idx_practice_paper_family
+  on practice_paper (family_id, status, updated_at desc);
+
+create table if not exists practice_paper_audience (
+  id uuid primary key,
+  paper_key varchar(180) not null references practice_paper(paper_key) on delete cascade,
+  family_id uuid not null references family(id),
+  student_id varchar(120) not null references student(id),
+  assigned_at timestamp with time zone not null,
+  constraint uk_practice_paper_audience unique (paper_key, student_id)
+);
+
+create index if not exists idx_practice_paper_audience_student
+  on practice_paper_audience (family_id, student_id, assigned_at desc);
 
 create table if not exists practice_generation (
   id uuid primary key,
