@@ -152,7 +152,8 @@ class PracticeGenerationServiceAudienceTest {
     PracticeGenerationEntity generation = new PracticeGenerationEntity();
     generation.id = UUID.randomUUID();
     generation.familyId = familyId;
-    generation.studentId = "ref";
+    generation.referenceStudentId = "ref";
+    generation.referenceTextbookSummary = "人教版数学二年级上册";
     generation.subject = "MATH";
     generation.semester = "S1";
     generation.track = "TEXTBOOK_SYNC";
