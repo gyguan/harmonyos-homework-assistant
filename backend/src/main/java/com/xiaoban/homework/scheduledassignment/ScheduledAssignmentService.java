@@ -277,7 +277,7 @@ public class ScheduledAssignmentService {
       ScheduledAssignmentPlanEntity plan, Instant fireAt) {
     ScheduledAssignmentTemplateEntity template = templates.findById(plan.id)
         .orElseThrow(() -> new ApiExceptions.BadRequest("普通定时作业缺少任务模板"));
-    Instant dueAt = dueAt(plan, template, fireAt);
+    Instant dueAt = dueAt(plan, template, Instant.now());
     String dueText = dueText(template);
     String assignmentId = "a-scheduled-" + plan.id + "-" + fireAt.toEpochMilli();
     AssignmentDtos.Create create = new AssignmentDtos.Create(
@@ -327,7 +327,7 @@ public class ScheduledAssignmentService {
 
   private void advance(ScheduledAssignmentPlanEntity plan, Instant fireAt) {
     plan.lastFireAt = fireAt;
-    Instant next = nextFire(plan, fireAt.plusMillis(1));
+    Instant next = nextFire(plan, Instant.now());
     plan.nextFireAt = next;
     if (next == null) plan.status = "ENDED";
     plan.updatedAt = Instant.now();
