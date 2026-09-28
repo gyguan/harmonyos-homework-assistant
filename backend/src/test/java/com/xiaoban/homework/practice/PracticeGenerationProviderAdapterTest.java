@@ -193,6 +193,60 @@ class PracticeGenerationProviderAdapterTest {
   }
 
   @Test
+  void canonicalizesMissingOptionsAndScalarListsForNonChoiceQuestion() throws Exception {
+    String input = """
+        {
+          "title": "退位减法练习",
+          "description": "专项练习",
+          "estimatedMinutes": 8,
+          "tags": "退位减法",
+          "questions": [
+            {
+              "type": "NUMBER",
+              "stem": "41 - 5 = ?",
+              "answerSpec": "36",
+              "explanation": "41减5等于36。",
+              "hints": "关键词：41、减5",
+              "tags": {"text": "退位减法"}
+            }
+          ]
+        }
+        """;
+
+    PracticeGenerationProviderAdapter.Result result =
+        PracticeGenerationProviderAdapter.adapt(mapper, input);
+
+    PracticeGenerationCanonicalContract.Question question = result.paper().questions().get(0);
+    assertTrue(question.options().isEmpty());
+    assertEquals(List.of("退位减法"), result.paper().tags());
+    assertEquals(List.of("关键词：41、减5"), question.hints());
+    assertEquals(List.of("退位减法"), question.tags());
+    assertTrue(result.coercedPaths().contains("$.questions[0].options"));
+    assertTrue(result.coercedPaths().contains("$.tags"));
+    assertTrue(result.coercedPaths().contains("$.questions[0].hints"));
+  }
+
+  @Test
+  void rejectsMissingOptionsForSingleChoiceQuestion() {
+    String input = paperWithQuestion("""
+        {
+          "type": "SINGLE_CHOICE",
+          "stem": "哪一个等于6？",
+          "answerSpec": "B",
+          "explanation": "6就是6。",
+          "hints": ["关键词：等于6"],
+          "tags": ["数的认识"]
+        }
+        """);
+
+    IllegalArgumentException error = assertThrows(
+        IllegalArgumentException.class,
+        () -> PracticeGenerationProviderAdapter.adapt(mapper, input));
+
+    assertTrue(error.getMessage().contains("$.questions[0].options is required for SINGLE_CHOICE"));
+  }
+
+  @Test
   void rejectsConflictingScalarWrapperCandidates() {
     String input = paperWithQuestion("""
         {
