@@ -11,7 +11,8 @@ import java.util.UUID;
 public class PracticeGenerationEntity {
   @Id public UUID id;
   public UUID familyId;
-  public String studentId;
+  public String referenceStudentId;
+  public String referenceTextbookSummary;
   public String subject;
   public String semester;
   public String track;
