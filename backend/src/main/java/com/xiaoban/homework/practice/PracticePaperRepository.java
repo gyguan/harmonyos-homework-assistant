@@ -11,7 +11,7 @@ public interface PracticePaperRepository extends JpaRepository<PracticePaperEnti
   Optional<PracticePaperEntity> findByPaperIdAndVersion(String paperId, int version);
 
   @Query(value = """
-      select distinct p.*
+      select p.*
       from practice_paper p
       left join practice_paper_audience a
         on a.paper_key = p.paper_key
