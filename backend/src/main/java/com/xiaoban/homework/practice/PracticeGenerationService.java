@@ -5,7 +5,10 @@ import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -17,10 +20,12 @@ public class PracticeGenerationService {
   private static final Set<String> SUBJECTS = Set.of("CHINESE", "MATH", "ENGLISH");
   private static final Set<String> TRACKS = Set.of("TEXTBOOK_SYNC", "EXTRACURRICULAR");
   private static final Set<String> DIFFICULTIES = Set.of("L1", "L2", "L3");
+  private static final Set<String> PUBLISH_SCOPES = Set.of("CURRENT", "SELECTED", "ALL");
 
   private final PracticeGenerationRepository generations;
   private final PracticePaperRepository papers;
   private final PracticeQuestionRepository questions;
+  private final PracticePaperAudienceRepository audiences;
   private final StudentService students;
   private final PracticeAudiencePolicy audiencePolicy;
   private final PracticeGenerationModelClient model;
@@ -32,6 +37,7 @@ public class PracticeGenerationService {
       PracticeGenerationRepository generations,
       PracticePaperRepository papers,
       PracticeQuestionRepository questions,
+      PracticePaperAudienceRepository audiences,
       StudentService students,
       PracticeAudiencePolicy audiencePolicy,
       PracticeGenerationModelClient model,
@@ -41,6 +47,7 @@ public class PracticeGenerationService {
     this.generations = generations;
     this.papers = papers;
     this.questions = questions;
+    this.audiences = audiences;
     this.students = students;
     this.audiencePolicy = audiencePolicy;
     this.model = model;
@@ -129,13 +136,18 @@ public class PracticeGenerationService {
   }
 
   @Transactional
-  public PracticeGenerationDtos.PublishResponse publish(UUID familyId, UUID generationId) {
+  public PracticeGenerationDtos.PublishResponse publish(
+      UUID familyId, UUID generationId, PracticeGenerationDtos.PublishRequest input) {
     PracticeGenerationEntity generation = requireOwned(familyId, generationId);
+
     if ("PUBLISHED".equals(generation.status)) {
-      PracticePaperEntity existing = content.requirePaperForStudent(
-          familyId, generation.studentId, generation.paperId, generation.paperVersion);
+      PracticePaperEntity existing = content.requirePaper(generation.paperId, generation.paperVersion);
+      if (!familyId.equals(existing.familyId)) {
+        throw new ApiExceptions.NotFound("练习套卷不存在");
+      }
       return new PracticeGenerationDtos.PublishResponse(
-          generation.id.toString(), generation.status, content.response(existing));
+          generation.id.toString(), generation.status, content.response(existing),
+          audienceStudentIds(familyId, existing.paperKey));
     }
     if (!"READY".equals(generation.status)) {
       throw new ApiExceptions.Conflict("只有已生成并通过校验的练习才能发布");
@@ -144,6 +156,9 @@ public class PracticeGenerationService {
     PracticeContentCatalog.Paper draft = readDraft(generation);
     if (draft == null) throw new ApiExceptions.Conflict("练习草稿内容不存在");
     validator.validate(draft, generation.questionCount);
+
+    List<StudentEntity> targets = resolveTargets(familyId, generation, draft, input);
+    if (targets.isEmpty()) throw new ApiExceptions.BadRequest("至少选择一个发布对象");
 
     if (papers.findByPaperIdAndVersion(draft.id(), draft.version()).isPresent()) {
       throw new ApiExceptions.Conflict("练习套卷已存在");
@@ -154,7 +169,6 @@ public class PracticeGenerationService {
     paper.paperId = draft.id();
     paper.version = draft.version();
     paper.familyId = generation.familyId;
-    paper.studentId = generation.studentId;
     paper.grade = draft.grade();
     paper.subject = draft.subject();
     paper.semester = draft.semester();
@@ -188,11 +202,96 @@ public class PracticeGenerationService {
     }
     questions.saveAll(entities);
 
+    Instant assignedAt = Instant.now();
+    List<PracticePaperAudienceEntity> audienceEntities = new ArrayList<>();
+    for (StudentEntity target : targets) {
+      PracticePaperAudienceEntity audience = new PracticePaperAudienceEntity();
+      audience.id = UUID.randomUUID();
+      audience.paperKey = paper.paperKey;
+      audience.familyId = familyId;
+      audience.studentId = target.id;
+      audience.assignedAt = assignedAt;
+      audienceEntities.add(audience);
+    }
+    audiences.saveAll(audienceEntities);
+
     generation.status = "PUBLISHED";
     generation.updatedAt = Instant.now();
     generations.save(generation);
+
+    List<String> targetStudentIds = targets.stream().map(target -> target.id).toList();
     return new PracticeGenerationDtos.PublishResponse(
-        generation.id.toString(), generation.status, content.response(paper));
+        generation.id.toString(), generation.status, content.response(paper), targetStudentIds);
+  }
+
+  private List<StudentEntity> resolveTargets(
+      UUID familyId,
+      PracticeGenerationEntity generation,
+      PracticeContentCatalog.Paper draft,
+      PracticeGenerationDtos.PublishRequest input) {
+    String scope = normalize(input.scope());
+    if (!PUBLISH_SCOPES.contains(scope)) {
+      throw new ApiExceptions.BadRequest("不支持的发布范围");
+    }
+
+    StudentEntity reference = students.requireOwned(familyId, generation.studentId);
+    Map<String, StudentEntity> targets = new LinkedHashMap<>();
+
+    if ("CURRENT".equals(scope)) {
+      targets.put(reference.id, reference);
+    } else if ("ALL".equals(scope)) {
+      for (var item : students.list(familyId)) {
+        StudentEntity target = students.requireOwned(familyId, item.id());
+        targets.put(target.id, target);
+      }
+    } else {
+      List<String> requested = input.targetStudentIds() == null ? List.of() : input.targetStudentIds();
+      for (String studentId : requested) {
+        String id = studentId == null ? "" : studentId.trim();
+        if (id.isBlank()) continue;
+        StudentEntity target = students.requireOwned(familyId, id);
+        targets.put(target.id, target);
+      }
+      if (targets.isEmpty()) {
+        throw new ApiExceptions.BadRequest("请选择至少一个学生");
+      }
+    }
+
+    List<String> incompatible = new ArrayList<>();
+    for (StudentEntity target : targets.values()) {
+      String reason = incompatibility(reference, target, draft);
+      if (!reason.isBlank()) {
+        incompatible.add(target.name + "（" + reason + "）");
+      }
+    }
+    if (!incompatible.isEmpty()) {
+      throw new ApiExceptions.BadRequest(
+          "以下学生与本套练习不兼容：" + String.join("、", incompatible));
+    }
+    return new ArrayList<>(targets.values());
+  }
+
+  private String incompatibility(
+      StudentEntity reference, StudentEntity target, PracticeContentCatalog.Paper draft) {
+    String targetGrade = audiencePolicy.gradeCode(target.grade);
+    if (!draft.grade().equals(targetGrade)) return "年级不匹配";
+
+    String targetSemester = audiencePolicy.semesterCode(target.semester);
+    if (!draft.semester().equals(targetSemester)) return "学期不匹配";
+
+    if ("TEXTBOOK_SYNC".equals(draft.track())) {
+      String referenceTextbook = normalizeText(reference.textbookSummary);
+      String targetTextbook = normalizeText(target.textbookSummary);
+      if (targetTextbook.isBlank()) return "未配置教材";
+      if (!referenceTextbook.equals(targetTextbook)) return "教材配置不一致";
+    }
+    return "";
+  }
+
+  private List<String> audienceStudentIds(UUID familyId, String paperKey) {
+    return audiences.findByFamilyIdAndPaperKey(familyId, paperKey).stream()
+        .map(item -> item.studentId)
+        .toList();
   }
 
   private PracticeGenerationDtos.GenerationResponse response(
@@ -254,7 +353,11 @@ public class PracticeGenerationService {
   }
 
   private static String normalize(String value) {
-    return value == null ? "" : value.trim().toUpperCase();
+    return value == null ? "" : value.trim().toUpperCase(Locale.ROOT);
+  }
+
+  private static String normalizeText(String value) {
+    return value == null ? "" : value.replaceAll("\\s+", "").trim().toLowerCase(Locale.ROOT);
   }
 
   private static String safe(String value) {
