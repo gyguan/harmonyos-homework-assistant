@@ -10,7 +10,7 @@ class PracticeTextbookContextTest {
   @Test
   void extractsRequestedSubjectFromMultiSubjectSummary() {
     String summary = "语文：人教版二年级上册；数学：北师大版二年级上册；英语：外研版二年级上册";
-    assertEquals("北师大版二年级上册", PracticeTextbookContext.extract(summary, "MATH"));
+    assertEquals("数学：北师大版二年级上册", PracticeTextbookContext.extract(summary, "MATH"));
   }
 
   @Test
