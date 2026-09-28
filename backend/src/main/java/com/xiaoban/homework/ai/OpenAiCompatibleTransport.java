@@ -46,10 +46,10 @@ public class OpenAiCompatibleTransport {
         .build();
 
     log.info(
-        "[AI] config protocol={} baseUrl={} responsesPath={} chatCompletionsPath={} tutorModel={} organizerModel={} structuredOutput={} logPayloads={} keyConfigured={} allowUnauthenticated={}",
+        "[AI] config protocol={} baseUrl={} responsesPath={} chatCompletionsPath={} tutorModel={} organizerModel={} practiceModel={} structuredOutput={} logPayloads={} keyConfigured={} allowUnauthenticated={}",
         properties.getProtocol(), safeBaseUrl(properties.getBaseUrl()), properties.getResponsesPath(),
         properties.getChatCompletionsPath(), properties.getTutorModel(), properties.getOrganizerModel(),
-        properties.isStructuredOutput(), properties.isLogPayloads(), keyConfigured(),
+        properties.getPracticeModel(), properties.isStructuredOutput(), properties.isLogPayloads(), keyConfigured(),
         properties.isAllowUnauthenticated());
   }
 
