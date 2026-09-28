@@ -560,8 +560,7 @@ export struct ParentPracticeGenerationPage {
           Button('重新生成', { type: ButtonType.Normal })
             .layoutWeight(1)
             .height(AppTheme.BUTTON_HEIGHT)
-            .enabled(!this.generating && !this.publishing &&
-              this.publishBlockedReason(this.result.paper).length === 0)
+            .enabled(!this.generating && !this.publishing)
             .fontSize(AppTheme.ACTION_TEXT_SIZE)
             .backgroundColor(AppTheme.SURFACE_EMPHASIS)
             .fontColor(AppTheme.TEXT)
@@ -570,7 +569,8 @@ export struct ParentPracticeGenerationPage {
           Button(this.publishing ? '正在发布…' : `发布给${this.targetStudentIds().length}个学生`, { type: ButtonType.Normal })
             .layoutWeight(1)
             .height(AppTheme.BUTTON_HEIGHT)
-            .enabled(!this.generating && !this.publishing)
+            .enabled(!this.generating && !this.publishing &&
+              this.publishBlockedReason(this.result.paper).length === 0)
             .fontSize(AppTheme.ACTION_TEXT_SIZE)
             .fontWeight(FontWeight.Medium)
             .backgroundColor(this.publishing ? AppTheme.DISABLED : AppTheme.PRIMARY)
