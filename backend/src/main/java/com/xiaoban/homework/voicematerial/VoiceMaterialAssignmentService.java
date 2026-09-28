@@ -150,8 +150,8 @@ public class VoiceMaterialAssignmentService {
           false, businessDate.toString(), "", "", null);
     }
 
-    log.info("voice_material auto_create_package_selected studentId={} businessDate={} packageId={} directoryName={} subjectCode={} status={}",
-        studentId, businessDate, item.id, item.directoryName, item.subjectCode, item.status);
+    log.info("voice_material auto_create_package_selected studentId={} businessDate={} packageId={} subjectCode={} status={}",
+        studentId, businessDate, item.id, item.subjectCode, item.status);
 
     item = packages.lockOwned(familyId, item.id)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
@@ -173,8 +173,8 @@ public class VoiceMaterialAssignmentService {
     record.createdAt = Instant.now();
     autoRecords.saveAndFlush(record);
 
-    log.info("voice_material auto_create_success studentId={} businessDate={} packageId={} assignmentId={} title={}",
-        studentId, businessDate, item.id, assignment.id(), assignment.title());
+    log.info("voice_material auto_create_success studentId={} businessDate={} packageId={} assignmentId={}",
+        studentId, businessDate, item.id, assignment.id());
     return new VoiceMaterialDtos.AutoCreateResponse(
         true, businessDate.toString(), item.id.toString(),
         assignment.id(), assignment);
@@ -212,9 +212,8 @@ public class VoiceMaterialAssignmentService {
             .thenComparing(item -> item.id))
         .orElse(null);
     if (selected != null) {
-      log.info("voice_material auto_folder_selected studentId={} packageId={} directoryName={} usageCount={} lastUsedAt={}",
-          studentId, selected.id, selected.directoryName,
-          usageCount.getOrDefault(selected.id, 0L),
+      log.info("voice_material auto_folder_selected studentId={} packageId={} usageCount={} lastUsedAt={}",
+          studentId, selected.id, usageCount.getOrDefault(selected.id, 0L),
           lastUsedAt.getOrDefault(selected.id, Instant.EPOCH));
     }
     return selected;
