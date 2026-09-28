@@ -109,8 +109,8 @@ class VoiceMaterialAssignmentServiceTest {
         familyId, "student-1")).thenReturn(List.of());
     when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
     when(assignments.nextVoiceMaterialTaskTitle(
-        any(UUID.class), anyString(), anyString(), any(LocalDate.class)))
-        .thenReturn("语文 · 语音作业");
+        any(UUID.class), anyString(), anyString(), any(LocalDate.class), anyString()))
+        .thenReturn("语文 · 9月28日 · 课文朗读");
     when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
         .thenReturn(created);
     when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
