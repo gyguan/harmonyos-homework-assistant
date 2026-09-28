@@ -11,7 +11,6 @@ import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.practice.PracticeAttemptRepository;
 import com.xiaoban.homework.practice.PracticeGenerationEntity;
 import com.xiaoban.homework.practice.PracticeGenerationRepository;
-import com.xiaoban.homework.practice.PracticePaperAudienceRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialBatchRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialPackageRepository;
 import java.time.Instant;
@@ -34,6 +33,19 @@ class StudentServicePracticeGenerationTest {
 
     verify(fixture.generations).deleteAll(List.of(failed, ready));
     verify(fixture.students).delete(fixture.student);
+  }
+
+  @Test
+  void publishedGenerationDoesNotBlockDeletionWithoutAttempts() {
+    Fixture fixture = new Fixture();
+    PracticeGenerationEntity published = generation("PUBLISHED", Instant.now());
+    when(fixture.generations.findByFamilyIdAndReferenceStudentId(
+        fixture.familyId, fixture.student.id)).thenReturn(List.of(published));
+
+    fixture.service.delete(fixture.familyId, fixture.student.id);
+
+    verify(fixture.students).delete(fixture.student);
+    verify(fixture.generations, never()).deleteAll(List.of(published));
   }
 
   @Test
@@ -89,7 +101,6 @@ class StudentServicePracticeGenerationTest {
           students,
           mock(AssignmentRepository.class),
           mock(PracticeAttemptRepository.class),
-          mock(PracticePaperAudienceRepository.class),
           generations,
           mock(VoiceMaterialBatchRepository.class),
           mock(VoiceMaterialPackageRepository.class));
