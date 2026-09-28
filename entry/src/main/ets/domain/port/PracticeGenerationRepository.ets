@@ -1,7 +1,7 @@
 import {
   PracticeGenerationRequest,
   PracticeGenerationResult,
-  PracticePaper,
+  PracticePublishResult,
   PracticePublishScope
 } from '../model/practice/PracticeModels';
 
@@ -12,5 +12,5 @@ export interface PracticeGenerationRepository {
     generationId: string,
     scope: PracticePublishScope,
     targetStudentIds: string[]
-  ): Promise<PracticePaper>;
+  ): Promise<PracticePublishResult>;
 }
