@@ -125,4 +125,63 @@ class PracticeGenerationModelClientParsingTest {
     assertEquals("36", result.get().questions().get(0).answerSpec());
     assertEquals("关键词：41、减5", result.get().questions().get(0).hints().get(0));
   }
+
+  @Test
+  void adaptsProviderStringOptionsAndAnswerLabelBeforeDomainMapping() throws Exception {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setTutorModel("deepseek-v4-flash-0731");
+    properties.setPracticeModel("");
+
+    OpenAiCompatibleTransport transport = mock(OpenAiCompatibleTransport.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    String output = """
+        {
+          "title": "生活加法练习",
+          "description": "练习简单加法",
+          "estimatedMinutes": 8,
+          "tags": ["加法"],
+          "questions": [
+            {
+              "type": "single-choice",
+              "stem": "小明有5元，又得到1元，一共有多少元？",
+              "options": ["5元", "6元", "7元"],
+              "answerSpec": "6元",
+              "explanation": "5加1等于6。",
+              "hints": ["关键词：5元、又得到1元"],
+              "tags": ["加法"]
+            }
+          ]
+        }
+        """;
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        any(String.class),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class)))
+        .thenReturn(Optional.of(output));
+
+    PracticeGenerationModelClient client =
+        new PracticeGenerationModelClient(properties, transport, mapper);
+
+    Optional<PracticeContentCatalog.Paper> result = client.generate(
+        "人教版数学二年级上册",
+        "ai-string-options",
+        "G2",
+        "S1",
+        new PracticeGenerationDtos.GenerateRequest(
+            "MATH", "TEXTBOOK_SYNC", "L1", 1, "练习简单加法"));
+
+    assertTrue(result.isPresent());
+    PracticeContentCatalog.Question question = result.get().questions().get(0);
+    assertEquals("SINGLE_CHOICE", question.type());
+    assertEquals("A", question.options().get(0).key());
+    assertEquals("B", question.options().get(1).key());
+    assertEquals("6元", question.options().get(1).label());
+    assertEquals("B", question.answerSpec());
+  }
+
 }
