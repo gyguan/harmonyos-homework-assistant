@@ -198,14 +198,14 @@ export struct ParentPracticeGenerationPage {
   }
 
   private currentCandidateSummary(): string {
-    let current = this.candidate(this.viewModel.activeStudentId());
-    if (current === null) return '';
-    return `将发布给：${current.studentName} · ${current.grade} · ${current.semester}`;
+    let selectedCandidate = this.candidate(this.viewModel.activeStudentId());
+    if (selectedCandidate === null) return '';
+    return `将发布给：${selectedCandidate.studentName} · ${selectedCandidate.grade} · ${selectedCandidate.semester}`;
   }
 
   private currentCandidateCompatible(): boolean {
-    let current = this.candidate(this.viewModel.activeStudentId());
-    return current !== null && current.compatible;
+    let selectedCandidate = this.candidate(this.viewModel.activeStudentId());
+    return selectedCandidate !== null && selectedCandidate.compatible;
   }
 
   private questionTypeLabel(type: PracticeQuestionType): string {
