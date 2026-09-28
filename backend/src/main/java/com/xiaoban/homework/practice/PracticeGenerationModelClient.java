@@ -21,22 +21,6 @@ public class PracticeGenerationModelClient {
   private final OpenAiCompatibleTransport transport;
   private final JsonMapper mapper;
 
-  record ModelOption(String key, String label) {}
-  record ModelQuestion(
-      String type,
-      String stem,
-      List<ModelOption> options,
-      String answerSpec,
-      String explanation,
-      List<String> hints,
-      List<String> tags) {}
-  record ModelPaper(
-      String title,
-      String description,
-      int estimatedMinutes,
-      List<String> tags,
-      List<ModelQuestion> questions) {}
-
   public PracticeGenerationModelClient(AiProviderProperties properties,
       OpenAiCompatibleTransport transport, JsonMapper mapper) {
     this.properties = properties;
@@ -73,19 +57,17 @@ public class PracticeGenerationModelClient {
       StructuredJsonNormalizer.Result normalized =
           StructuredJsonNormalizer.normalize(mapper, output.get());
       shape = normalized.shape();
-      PracticeGenerationPayloadNormalizer.Result payload =
-          PracticeGenerationPayloadNormalizer.normalize(mapper, normalized.json());
-      coercedFields = payload.coercedPaths();
-      ModelPaper modelPaper = mapper.readValue(payload.json(), ModelPaper.class);
-      if (modelPaper == null || modelPaper.questions() == null) return Optional.empty();
+      PracticeGenerationProviderAdapter.Result adapted =
+          new PracticeGenerationProviderAdapter(mapper).adapt(normalized.json());
+      coercedFields = adapted.adaptations();
+      PracticeGenerationContract.Paper canonical = adapted.paper();
+
       ArrayList<PracticeContentCatalog.Question> questions = new ArrayList<>();
-      for (int i = 0; i < modelPaper.questions().size(); i++) {
-        ModelQuestion source = modelPaper.questions().get(i);
+      for (int i = 0; i < canonical.questions().size(); i++) {
+        PracticeGenerationContract.Question source = canonical.questions().get(i);
         ArrayList<PracticeContentCatalog.Option> options = new ArrayList<>();
-        if (source.options() != null) {
-          for (ModelOption option : source.options()) {
-            options.add(new PracticeContentCatalog.Option(option.key(), option.label()));
-          }
+        for (PracticeGenerationContract.Option option : source.options()) {
+          options.add(new PracticeContentCatalog.Option(option.key(), option.label()));
         }
         String questionId = paperId + "-Q" + String.format("%02d", i + 1);
         questions.add(new PracticeContentCatalog.Question(
@@ -106,12 +88,12 @@ public class PracticeGenerationModelClient {
           request.subject().trim().toUpperCase(),
           semester,
           request.track().trim().toUpperCase(),
-          modelPaper.title(),
-          modelPaper.description(),
+          canonical.title(),
+          canonical.description(),
           request.difficulty().trim().toUpperCase(),
           questions.size(),
-          Math.max(1, Math.min(120, modelPaper.estimatedMinutes())),
-          modelPaper.tags(),
+          Math.max(1, Math.min(120, canonical.estimatedMinutes())),
+          canonical.tags(),
           "AI_GENERATED",
           "PUBLISHED",
           questions);
@@ -135,7 +117,7 @@ public class PracticeGenerationModelClient {
         + "课外拓展可以生活化和有趣，但不得用高年级知识包装成拓展。"
         + "题目必须自包含，禁止依赖图片、看图、上图、画面或外部材料。"
         + "第一版只允许 SINGLE_CHOICE、FILL_BLANK、NUMBER。"
-        + "单选题必须提供3到4个互不重复选项，answerSpec只能是一个真实存在的选项key。"
+        + "单选题必须提供3到4个互不重复选项；标准输出格式为options=[{key:\"A\",label:\"...\"}]，answerSpec只能是一个真实存在的选项key。"
         + "填空题 answerSpec 用竖线分隔可接受答案；NUMBER 的 answerSpec 必须是纯数字。"
         + "英语题干必须包含中文操作说明。"
         + "每题 hints 必须只有1条，并以“关键词：”开头，提示来自本题关键条件但不能泄露答案。"
