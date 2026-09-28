@@ -3,10 +3,9 @@ import { DefaultPracticeGenerationRepository } from '../../../data/repository/De
 import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import {
   PracticeDifficulty,
-  PracticeGenerationDraft,
   PracticeGenerationRequest,
   PracticeGenerationResult,
-  PracticePaper,
+  PracticePublishResult,
   PracticePublishScope,
   PracticeSubject,
   PracticeTrack,
@@ -60,24 +59,8 @@ export class ParentPracticeGenerationViewModel {
     generationId: string,
     scope: PracticePublishScope,
     targetStudentIds: string[]
-  ): Promise<PracticePaper> {
+  ): Promise<PracticePublishResult> {
     return this.repository.publish(generationId, scope, targetStudentIds);
-  }
-
-  incompatibility(student: StudentProfile, paper: PracticeGenerationDraft): string {
-    if (PracticeTaxonomy.gradeFromStudentProfile(student.grade) !== paper.grade) return '年级不匹配';
-    if (PracticeTaxonomy.semesterFromStudentProfile(student.semester) !== paper.semester) return '学期不匹配';
-    if (paper.track === PracticeTrack.TEXTBOOK_SYNC) {
-      let reference = this.normalizeTextbook(this.familyContext.getStudent().textbookSummary);
-      let target = this.normalizeTextbook(student.textbookSummary);
-      if (target.length === 0) return '未配置教材';
-      if (target !== reference) return '教材配置不一致';
-    }
-    return '';
-  }
-
-  private normalizeTextbook(value: string): string {
-    return value.replace(/\s+/g, '').trim().toLowerCase();
   }
 
   subjectLabel(subject: PracticeSubject): string {
