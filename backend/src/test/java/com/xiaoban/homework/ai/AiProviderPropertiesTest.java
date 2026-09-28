@@ -6,6 +6,17 @@ import org.junit.jupiter.api.Test;
 
 class AiProviderPropertiesTest {
   @Test
+  void organizerAndPracticeFallBackToTutorModelWhenSpecializedModelsAreUnset() {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setTutorModel("provider-supported-model");
+    properties.setOrganizerModel("");
+    properties.setPracticeModel("");
+
+    assertEquals("provider-supported-model", properties.getOrganizerModel());
+    assertEquals("provider-supported-model", properties.getPracticeModel());
+  }
+
+  @Test
   void practiceModelFallsBackToOrganizerModelWhenUnset() {
     AiProviderProperties properties = new AiProviderProperties();
     properties.setOrganizerModel("provider-supported-model");
