@@ -185,6 +185,62 @@ class PracticeGenerationModelClientParsingTest {
   }
 
   @Test
+  void parsesFencedStringAndSingletonArrayEnvelopeFromCompatibleProvider() throws Exception {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setTutorModel("deepseek-v4-flash-0731");
+    properties.setPracticeModel("");
+
+    OpenAiCompatibleTransport transport = mock(OpenAiCompatibleTransport.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    String canonical = """
+        {
+          "title": "20以内加法",
+          "description": "生活化加法练习",
+          "estimatedMinutes": 8,
+          "tags": ["加法"],
+          "questions": [
+            {
+              "type": "NUMBER",
+              "stem": "9 + 6 = ?",
+              "options": [],
+              "answerSpec": "15",
+              "explanation": "9加6等于15。",
+              "hints": ["关键词：9、加6"],
+              "tags": ["加法"]
+            }
+          ]
+        }
+        """;
+    String encodedCanonical = mapper.writeValueAsString(canonical);
+    String output = "```json\n{\"providerPayload\":[{\"content\":" + encodedCanonical + "}]}\n```";
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        any(String.class),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class)))
+        .thenReturn(Optional.of(output));
+
+    PracticeGenerationModelClient client =
+        new PracticeGenerationModelClient(properties, transport, mapper);
+
+    Optional<PracticeContentCatalog.Paper> result = client.generate(
+        "人教版数学二年级上册",
+        "ai-envelope-values",
+        "G2",
+        "S1",
+        new PracticeGenerationDtos.GenerateRequest(
+            "MATH", "TEXTBOOK_SYNC", "L1", 1, "练习20以内加法"));
+
+    assertTrue(result.isPresent());
+    assertEquals("20以内加法", result.get().title());
+    assertEquals("15", result.get().questions().get(0).answerSpec());
+  }
+
+  @Test
   void adaptsProviderStringOptionsAndAnswerLabelBeforeDomainMapping() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
     properties.setTutorModel("deepseek-v4-flash-0731");
