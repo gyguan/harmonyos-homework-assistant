@@ -42,3 +42,7 @@ create table if not exists practice_generation (
 
 create index if not exists idx_practice_generation_family_reference_student
   on practice_generation (family_id, reference_student_id, created_at desc);
+
+
+create index if not exists idx_practice_generation_status_updated
+  on practice_generation (status, updated_at);
