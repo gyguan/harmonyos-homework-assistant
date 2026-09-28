@@ -64,7 +64,7 @@ class StudentServicePracticeGenerationTest {
   }
 
   private static PracticeGenerationEntity generation(String status, Instant updatedAt) {
-    PracticeGenerationEntity generation = new PracticeGenerationEntity();
+    PracticeGenerationEntity generation = mock(PracticeGenerationEntity.class);
     generation.id = UUID.randomUUID();
     generation.status = status;
     generation.updatedAt = updatedAt;
