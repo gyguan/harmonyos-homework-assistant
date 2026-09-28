@@ -28,7 +28,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Resource（资料）**：老师或家长提供的图片、文档、音频、视频、文本等学习材料，可与 Assignment 关联。
 - **Media Asset（媒体资产）**：家庭私有的物理媒体文件所有权实体。Assignment Resource 与语音素材目录只引用 Asset，不因创建任务而复制文件。
 - **Voice Material Package（语音素材目录）**：家长预先导入的一组“1 个语音 + 至少 1 张图片”的待发布素材，携带 studentId、subjectCode、标题和预计用时等结构化属性；目录名用于展示与队列排序，不作为科目识别来源。
-- **Daily Voice Auto Create（每日语音自动创建）**：按 studentId + Asia/Shanghai 业务日最多自动消费一个 READY Voice Material Package；家长手工创建不占每日自动额度。
+- **Daily Voice Auto Create（每日语音自动创建）**：按 studentId + Asia/Shanghai 业务日最多自动消费一个 READY Voice Material Package；家长手工创建不占每日自动额度。自动创建只检查 dueAt 落在当前业务日且未完成的有效语音任务，历史日期遗留的未完成语音任务不阻塞今天自动创建。
 - **Scheduled Assignment Plan（定时作业计划）**：家长配置的未来作业创建规则，只保存学生、重复方式、创建时间与任务模板；到达触发时间后才生成真实 Assignment，不是第二套 Assignment 状态机。
 - **Scheduled Assignment Run（定时作业执行）**：某个 Plan 在一个 scheduledFireAt 上的一次幂等执行记录；普通计划创建 Assignment，语音计划复用 Daily Voice Auto Create，执行成功、跳过或失败均可追溯。
 - **Requirement（完成要求）**：某项 Assignment 的结构化完成要求，如完成题目、朗读、拍照、文字说明等。
