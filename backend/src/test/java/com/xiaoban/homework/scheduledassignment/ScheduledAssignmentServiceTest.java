@@ -2,7 +2,6 @@ package com.xiaoban.homework.scheduledassignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -10,8 +9,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.xiaoban.homework.assignment.AssignmentDtos;
-import com.xiaoban.homework.assignment.AssignmentService;
 import com.xiaoban.homework.student.StudentService;
 import com.xiaoban.homework.voicematerial.VoiceMaterialAssignmentService;
 import com.xiaoban.homework.voicematerial.VoiceMaterialDtos;
@@ -19,10 +16,8 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class ScheduledAssignmentServiceTest {
   private final ScheduledAssignmentPlanRepository plans =
@@ -32,13 +27,14 @@ class ScheduledAssignmentServiceTest {
   private final ScheduledAssignmentRunRepository runs =
       mock(ScheduledAssignmentRunRepository.class);
   private final StudentService students = mock(StudentService.class);
-  private final AssignmentService assignments = mock(AssignmentService.class);
   private final VoiceMaterialAssignmentService voiceAssignments =
       mock(VoiceMaterialAssignmentService.class);
+  private final ScheduledAssignmentAttemptService attempts =
+      mock(ScheduledAssignmentAttemptService.class);
 
   private ScheduledAssignmentService service() {
     return new ScheduledAssignmentService(
-        plans, templates, runs, students, assignments, voiceAssignments);
+        plans, templates, runs, students, voiceAssignments, attempts);
   }
 
   @Test
@@ -54,14 +50,16 @@ class ScheduledAssignmentServiceTest {
         service().autoCreateOnStudentEntry(familyId, "student-1");
 
     assertEquals(expected, result);
+    verify(students).requireOwned(familyId, "student-1");
+    verify(students, never()).requireOwnedForUpdate(any(UUID.class), anyString());
     verify(voiceAssignments).autoCreateNext(familyId, "student-1");
   }
 
   @Test
-  void studentEntryDoesNotCreateVoiceTaskBeforeScheduledTime() {
+  void studentEntryDoesNotCreateVoiceTaskBeforePlanStartDate() {
     UUID familyId = UUID.randomUUID();
-    ScheduledAssignmentPlanEntity plan = voicePlan(familyId);
-    plan.nextFireAt = Instant.now().plusSeconds(3600);
+    LocalDate tomorrow = LocalDate.now(ScheduledAssignmentSchedule.BUSINESS_ZONE).plusDays(1);
+    ScheduledAssignmentPlanEntity plan = voicePlan(familyId, tomorrow, LocalTime.of(0, 0));
     when(plans.findByFamilyIdAndStudentIdAndPlanTypeOrderByCreatedAtDesc(
         familyId, "student-1", "VOICE_MATERIAL_AUTO")).thenReturn(List.of(plan));
 
@@ -69,74 +67,43 @@ class ScheduledAssignmentServiceTest {
         service().autoCreateOnStudentEntry(familyId, "student-1");
 
     assertFalse(result.created());
+    verify(attempts, never()).executeStudentEntry(
+        any(UUID.class), anyString(), any(UUID.class), any(Instant.class), any(Instant.class));
     verify(voiceAssignments, never()).autoCreateNext(any(UUID.class), anyString());
   }
 
   @Test
-  void dueManualPlanCreatesDeterministicAssignmentAndAdvancesSchedule() {
+  void studentEntryUsesTodayFireEvenWhenSchedulerAdvancedNextFireToTomorrow() {
     UUID familyId = UUID.randomUUID();
-    UUID planId = UUID.randomUUID();
-    Instant fireAt = Instant.parse("2026-09-28T09:00:00Z");
+    LocalDate today = LocalDate.now(ScheduledAssignmentSchedule.BUSINESS_ZONE);
+    ScheduledAssignmentPlanEntity plan = voicePlan(familyId, today.minusDays(1), LocalTime.MIDNIGHT);
+    plan.nextFireAt = today.plusDays(1).atStartOfDay(ScheduledAssignmentSchedule.BUSINESS_ZONE).toInstant();
 
-    ScheduledAssignmentPlanEntity plan = new ScheduledAssignmentPlanEntity();
-    plan.id = planId;
-    plan.familyId = familyId;
-    plan.studentId = "student-1";
-    plan.planType = "MANUAL_ASSIGNMENT";
-    plan.name = "每天阅读";
-    plan.scheduleType = "DAILY";
-    plan.scheduleTime = LocalTime.of(17, 0);
-    plan.weekdays = "";
-    plan.startDate = LocalDate.of(2026, 9, 1);
-    plan.timezone = "Asia/Shanghai";
-    plan.status = "ENABLED";
-    plan.nextFireAt = fireAt;
-    plan.createdAt = fireAt.minusSeconds(3600);
-    plan.updatedAt = plan.createdAt;
-
-    ScheduledAssignmentTemplateEntity template = new ScheduledAssignmentTemplateEntity();
-    template.planId = planId;
-    template.assignmentType = "EXTRA";
-    template.subject = "语文";
-    template.subjectCode = "CHINESE";
-    template.title = "阅读 20 分钟";
-    template.instruction = "阅读后复述主要内容";
-    template.expectedMinutes = 20;
-    template.duePolicy = "SAME_DAY_AT";
-    template.dueTime = LocalTime.of(21, 0);
-
-    when(plans.lockById(planId)).thenReturn(Optional.of(plan));
-    when(runs.findByPlanIdAndScheduledFireAt(planId, fireAt)).thenReturn(Optional.empty());
-    when(runs.saveAndFlush(any(ScheduledAssignmentRunEntity.class)))
-        .thenAnswer(invocation -> invocation.getArgument(0));
-    when(templates.findById(planId)).thenReturn(Optional.of(template));
-    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
-        .thenReturn(assignment("a-result"));
-
-    service().executeDuePlan(planId, fireAt.plusSeconds(1));
-
-    ArgumentCaptor<AssignmentDtos.Create> create =
-        ArgumentCaptor.forClass(AssignmentDtos.Create.class);
-    verify(assignments).create(
+    VoiceMaterialDtos.AutoCreateResponse expected =
+        new VoiceMaterialDtos.AutoCreateResponse(true, today.toString(), "pkg-1", "a-1", null);
+    when(plans.findByFamilyIdAndStudentIdAndPlanTypeOrderByCreatedAtDesc(
+        familyId, "student-1", "VOICE_MATERIAL_AUTO")).thenReturn(List.of(plan));
+    when(attempts.executeStudentEntry(
         org.mockito.ArgumentMatchers.eq(familyId),
         org.mockito.ArgumentMatchers.eq("student-1"),
-        create.capture());
+        org.mockito.ArgumentMatchers.eq(plan.id),
+        any(Instant.class),
+        any(Instant.class))).thenReturn(expected);
 
-    assertEquals("a-scheduled-" + planId + "-" + fireAt.toEpochMilli(), create.getValue().id());
-    assertEquals(Instant.parse("2026-09-28T13:00:00Z").toEpochMilli(),
-        create.getValue().dueAtEpochMs());
-    assertEquals("定时作业", create.getValue().sourceLabel());
-    assertEquals(Instant.parse("2026-09-29T09:00:00Z"), plan.nextFireAt);
+    VoiceMaterialDtos.AutoCreateResponse result =
+        service().autoCreateOnStudentEntry(familyId, "student-1");
 
-    ArgumentCaptor<ScheduledAssignmentRunEntity> run =
-        ArgumentCaptor.forClass(ScheduledAssignmentRunEntity.class);
-    verify(runs).save(run.capture());
-    assertEquals("SUCCESS", run.getValue().status);
-    assertEquals("a-result", run.getValue().assignmentId);
-    assertTrue(run.getValue().finishedAt != null);
+    assertEquals(expected, result);
+    verify(attempts).executeStudentEntry(
+        org.mockito.ArgumentMatchers.eq(familyId),
+        org.mockito.ArgumentMatchers.eq("student-1"),
+        org.mockito.ArgumentMatchers.eq(plan.id),
+        any(Instant.class),
+        any(Instant.class));
   }
 
-  private ScheduledAssignmentPlanEntity voicePlan(UUID familyId) {
+  private ScheduledAssignmentPlanEntity voicePlan(
+      UUID familyId, LocalDate startDate, LocalTime scheduleTime) {
     ScheduledAssignmentPlanEntity plan = new ScheduledAssignmentPlanEntity();
     plan.id = UUID.randomUUID();
     plan.familyId = familyId;
@@ -144,22 +111,13 @@ class ScheduledAssignmentServiceTest {
     plan.planType = "VOICE_MATERIAL_AUTO";
     plan.name = "每日语音作业";
     plan.scheduleType = "DAILY";
-    plan.scheduleTime = LocalTime.of(6, 30);
+    plan.scheduleTime = scheduleTime;
     plan.weekdays = "";
-    plan.startDate = LocalDate.of(2026, 9, 1);
+    plan.startDate = startDate;
     plan.timezone = "Asia/Shanghai";
     plan.status = "ENABLED";
     plan.createdAt = Instant.now();
     plan.updatedAt = plan.createdAt;
     return plan;
-  }
-
-  private AssignmentDtos.Response assignment(String id) {
-    return new AssignmentDtos.Response(
-        id, "student-1", "EXTRA", "CHINESE", "NORMAL",
-        "语文", "阅读 20 分钟", "阅读后复述主要内容", "",
-        0L, "Asia/Shanghai", "", "NOT_STARTED",
-        "定时作业", "每天阅读", 20,
-        0L, 0L, 0L, "", 0L);
   }
 }
