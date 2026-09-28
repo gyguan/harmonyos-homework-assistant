@@ -275,6 +275,63 @@ class PracticeGenerationProviderAdapterTest {
   }
 
   @Test
+  void unwrapsJsonStringAndSingletonArrayEnvelopes() throws Exception {
+    String canonical = paperWithQuestion("""
+        {
+          "type": "NUMBER",
+          "stem": "9 + 6 = ?",
+          "options": [],
+          "answerSpec": "15",
+          "explanation": "9加6等于15。",
+          "hints": ["关键词：9、加6"],
+          "tags": ["加法"]
+        }
+        """);
+
+    String jsonStringEnvelope = mapper.writeValueAsString(
+        Map.of("payloadText", canonical));
+    PracticeGenerationProviderAdapter.Result stringResult =
+        PracticeGenerationProviderAdapter.adapt(mapper, jsonStringEnvelope);
+    assertEquals("测试练习", stringResult.paper().title());
+    assertTrue(stringResult.coercedPaths().stream()
+        .anyMatch(path -> path.startsWith("$.payloadText")));
+
+    String singletonArrayEnvelope =
+        "{\"payload\":[{\"generated\":" + canonical + "}]}";
+    PracticeGenerationProviderAdapter.Result arrayResult =
+        PracticeGenerationProviderAdapter.adapt(mapper, singletonArrayEnvelope);
+    assertEquals("15", arrayResult.paper().questions().get(0).answerSpec());
+    assertTrue(arrayResult.coercedPaths().contains("$.payload[0].generated"));
+
+    String mixedEnvelope = mapper.writeValueAsString(
+        Map.of("outer", List.of(Map.of("innerText", canonical))));
+    PracticeGenerationProviderAdapter.Result mixedResult =
+        PracticeGenerationProviderAdapter.adapt(mapper, mixedEnvelope);
+    assertEquals("测试练习", mixedResult.paper().title());
+  }
+
+  @Test
+  void reportsRootKeysWhenNoCanonicalPaperCanBeFound() {
+    String input = """
+        {
+          "payload": {
+            "name": "非标准练习",
+            "items": []
+          },
+          "provider": "test"
+        }
+        """;
+
+    IllegalArgumentException error = assertThrows(
+        IllegalArgumentException.class,
+        () -> PracticeGenerationProviderAdapter.adapt(mapper, input));
+
+    assertTrue(error.getMessage().contains("does not contain a canonical paper object"));
+    assertTrue(error.getMessage().contains("rootKeys="));
+    assertTrue(error.getMessage().contains("payload"));
+  }
+
+  @Test
   void rejectsAmbiguousGenericPaperEnvelope() {
     String canonical = paperWithQuestion("""
         {
