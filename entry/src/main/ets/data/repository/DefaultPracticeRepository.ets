@@ -36,27 +36,17 @@ export class DefaultPracticeRepository implements PracticeRepository {
     track: PracticeTrackFilter
   ): Promise<PracticePaper[]> {
     if (BackendSession.instance.isConnected()) {
-      try {
-        return await this.remoteApi.listPapers(
-          DefaultFamilyContextRepository.instance.getActiveStudentId(),
-          grade, subject, semester, track);
-      } catch (_error) {
-        // PRESET remains a deliberate read-only fallback when the cloud catalog is unavailable.
-        return this.contentProvider.listPapers(grade, subject, semester, track);
-      }
+      return this.remoteApi.listPapers(
+        DefaultFamilyContextRepository.instance.getActiveStudentId(),
+        grade, subject, semester, track);
     }
     return this.contentProvider.listPapers(grade, subject, semester, track);
   }
 
   async getPaper(paperId: string, version: number): Promise<PracticePaper | null> {
     if (BackendSession.instance.isConnected()) {
-      try {
-        return await this.remoteApi.getPaper(
-          DefaultFamilyContextRepository.instance.getActiveStudentId(), paperId, version);
-      } catch (_error) {
-        // PRESET remains available offline; AI_GENERATED intentionally has no local shadow copy.
-        return this.contentProvider.getPaper(paperId, version);
-      }
+      return this.remoteApi.getPaper(
+        DefaultFamilyContextRepository.instance.getActiveStudentId(), paperId, version);
     }
     return this.contentProvider.getPaper(paperId, version);
   }
