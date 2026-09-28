@@ -1,6 +1,7 @@
 package com.xiaoban.homework.practice;
 
 import com.xiaoban.homework.common.ApiExceptions;
+import com.xiaoban.homework.student.StudentDtos;
 import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Instant;
@@ -29,6 +30,7 @@ public class PracticeGenerationService {
   private final StudentService students;
   private final PracticeAudiencePolicy audiencePolicy;
   private final PracticeGenerationModelClient model;
+  private final PracticeGenerationReviewClient reviewer;
   private final PracticeGeneratedContentValidator validator;
   private final PracticeContentService content;
   private final JsonMapper mapper;
@@ -41,6 +43,7 @@ public class PracticeGenerationService {
       StudentService students,
       PracticeAudiencePolicy audiencePolicy,
       PracticeGenerationModelClient model,
+      PracticeGenerationReviewClient reviewer,
       PracticeGeneratedContentValidator validator,
       PracticeContentService content,
       JsonMapper mapper) {
@@ -51,6 +54,7 @@ public class PracticeGenerationService {
     this.students = students;
     this.audiencePolicy = audiencePolicy;
     this.model = model;
+    this.reviewer = reviewer;
     this.validator = validator;
     this.content = content;
     this.mapper = mapper;
@@ -73,9 +77,10 @@ public class PracticeGenerationService {
     if (grade.isBlank() || semester.isBlank()) {
       throw new ApiExceptions.BadRequest("请先完善孩子的年级和学期信息");
     }
-    if ("TEXTBOOK_SYNC".equals(track)
-        && (student.textbookSummary == null || student.textbookSummary.isBlank())) {
-      throw new ApiExceptions.BadRequest("教材同步出题前请先配置孩子的教材信息");
+
+    String textbookContext = PracticeTextbookContext.extract(student.textbookSummary, subject);
+    if ("TEXTBOOK_SYNC".equals(track) && textbookContext.isBlank()) {
+      throw new ApiExceptions.BadRequest("教材同步出题前请先配置当前科目的教材信息");
     }
     if (!model.available()) {
       throw new ApiExceptions.ServiceUnavailable("AI出题服务尚未配置");
@@ -88,8 +93,7 @@ public class PracticeGenerationService {
     generation.id = generationId;
     generation.familyId = familyId;
     generation.referenceStudentId = studentId;
-    generation.referenceTextbookSummary =
-        student.textbookSummary == null ? "" : student.textbookSummary;
+    generation.referenceTextbookContext = textbookContext;
     generation.subject = subject;
     generation.semester = semester;
     generation.track = track;
@@ -110,7 +114,7 @@ public class PracticeGenerationService {
         new PracticeGenerationDtos.GenerateRequest(
             subject, track, difficulty, input.questionCount(), requirement);
     PracticeContentCatalog.Paper generated =
-        model.generate(student, paperId, grade, semester, normalized).orElse(null);
+        model.generate(textbookContext, paperId, grade, semester, normalized).orElse(null);
     if (generated == null) {
       fail(generation, "AI未返回可解析的练习内容");
       throw new ApiExceptions.ServiceUnavailable("AI出题失败，请稍后重试");
@@ -118,6 +122,15 @@ public class PracticeGenerationService {
 
     try {
       validator.validate(generated, input.questionCount());
+
+      PracticeGenerationReviewClient.ReviewResult review = reviewer.review(generated).orElse(null);
+      if (review == null) {
+        throw new IllegalStateException("AI答案复核未返回有效结果");
+      }
+      if (!review.passed()) {
+        throw new IllegalStateException("AI答案复核未通过：" + reviewSummary(review));
+      }
+
       generation.generatedJson = mapper.writeValueAsString(generated);
       generation.status = "READY";
       generation.errorMessage = "";
@@ -140,7 +153,7 @@ public class PracticeGenerationService {
   @Transactional
   public PracticeGenerationDtos.PublishResponse publish(
       UUID familyId, UUID generationId, PracticeGenerationDtos.PublishRequest input) {
-    PracticeGenerationEntity generation = requireOwned(familyId, generationId);
+    PracticeGenerationEntity generation = requireOwnedForUpdate(familyId, generationId);
 
     if ("PUBLISHED".equals(generation.status)) {
       PracticePaperEntity existing = content.requirePaper(generation.paperId, generation.paperVersion);
@@ -242,7 +255,7 @@ public class PracticeGenerationService {
     if ("CURRENT".equals(scope)) {
       targets.put(reference.id, reference);
     } else if ("ALL".equals(scope)) {
-      for (var item : students.list(familyId)) {
+      for (StudentDtos.Response item : students.list(familyId)) {
         StudentEntity target = students.requireOwned(familyId, item.id());
         targets.put(target.id, target);
       }
@@ -261,7 +274,8 @@ public class PracticeGenerationService {
 
     List<String> incompatible = new ArrayList<>();
     for (StudentEntity target : targets.values()) {
-      String reason = incompatibility(generation, target, draft);
+      String reason = incompatibility(
+          generation, target.grade, target.semester, target.textbookSummary, draft);
       if (!reason.isBlank()) {
         incompatible.add(target.name + "（" + reason + "）");
       }
@@ -273,21 +287,43 @@ public class PracticeGenerationService {
     return new ArrayList<>(targets.values());
   }
 
+  private List<PracticeGenerationDtos.AudienceCandidate> audienceCandidates(
+      PracticeGenerationEntity generation, PracticeContentCatalog.Paper draft) {
+    if (draft == null) return List.of();
+    List<PracticeGenerationDtos.AudienceCandidate> result = new ArrayList<>();
+    for (StudentDtos.Response student : students.list(generation.familyId)) {
+      String reason = incompatibility(
+          generation, student.grade(), student.semester(), student.textbookSummary(), draft);
+      result.add(new PracticeGenerationDtos.AudienceCandidate(
+          student.id(),
+          student.name(),
+          student.grade(),
+          student.semester(),
+          reason.isBlank(),
+          reason));
+    }
+    return result;
+  }
+
   private String incompatibility(
       PracticeGenerationEntity generation,
-      StudentEntity target,
+      String grade,
+      String semester,
+      String textbookSummary,
       PracticeContentCatalog.Paper draft) {
-    String targetGrade = audiencePolicy.gradeCode(target.grade);
+    String targetGrade = audiencePolicy.gradeCode(grade);
     if (!draft.grade().equals(targetGrade)) return "年级不匹配";
 
-    String targetSemester = audiencePolicy.semesterCode(target.semester);
+    String targetSemester = audiencePolicy.semesterCode(semester);
     if (!draft.semester().equals(targetSemester)) return "学期不匹配";
 
     if ("TEXTBOOK_SYNC".equals(draft.track())) {
-      String referenceTextbook = normalizeText(generation.referenceTextbookSummary);
-      String targetTextbook = normalizeText(target.textbookSummary);
-      if (targetTextbook.isBlank()) return "未配置教材";
-      if (!referenceTextbook.equals(targetTextbook)) return "教材配置不一致";
+      String targetContext = PracticeTextbookContext.extract(textbookSummary, draft.subject());
+      if (targetContext.isBlank()) return "未配置当前科目教材";
+      if (!PracticeTextbookContext.compatible(
+          generation.referenceTextbookContext, textbookSummary, draft.subject())) {
+        return "当前科目教材配置不一致";
+      }
     }
     return "";
   }
@@ -304,7 +340,8 @@ public class PracticeGenerationService {
         generation.id.toString(),
         generation.status,
         paper == null ? null : draftResponse(paper),
-        generation.errorMessage == null ? "" : generation.errorMessage);
+        generation.errorMessage == null ? "" : generation.errorMessage,
+        audienceCandidates(generation, paper));
   }
 
   private PracticeGenerationDtos.DraftPaper draftResponse(PracticeContentCatalog.Paper paper) {
@@ -341,6 +378,11 @@ public class PracticeGenerationService {
     return generation;
   }
 
+  private PracticeGenerationEntity requireOwnedForUpdate(UUID familyId, UUID generationId) {
+    return generations.lockByIdAndFamilyId(generationId, familyId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("AI练习生成记录不存在"));
+  }
+
   private void fail(PracticeGenerationEntity generation, String message) {
     generation.status = "FAILED";
     generation.errorMessage = message;
@@ -356,12 +398,17 @@ public class PracticeGenerationService {
     }
   }
 
-  private static String normalize(String value) {
-    return value == null ? "" : value.trim().toUpperCase(Locale.ROOT);
+  private String reviewSummary(PracticeGenerationReviewClient.ReviewResult review) {
+    if (review.issues().isEmpty()) return "存在未通过的答案或歧义";
+    return review.issues().stream()
+        .limit(3)
+        .map(issue -> issue.questionId() + " " + issue.reason())
+        .reduce((left, right) -> left + "；" + right)
+        .orElse("存在未通过的答案或歧义");
   }
 
-  private static String normalizeText(String value) {
-    return value == null ? "" : value.replaceAll("\\s+", "").trim().toLowerCase(Locale.ROOT);
+  private static String normalize(String value) {
+    return value == null ? "" : value.trim().toUpperCase(Locale.ROOT);
   }
 
   private static String safe(String value) {
