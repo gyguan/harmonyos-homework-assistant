@@ -40,8 +40,9 @@ export class DefaultPracticeRepository implements PracticeRepository {
         return await this.remoteApi.listPapers(
           DefaultFamilyContextRepository.instance.getActiveStudentId(),
           grade, subject, semester, track);
-      } catch {
-        // Preserve offline/read-only usability if the server catalog is temporarily unavailable.
+      } catch (_error) {
+        // PRESET remains a deliberate read-only fallback when the cloud catalog is unavailable.
+        return this.contentProvider.listPapers(grade, subject, semester, track);
       }
     }
     return this.contentProvider.listPapers(grade, subject, semester, track);
@@ -52,8 +53,9 @@ export class DefaultPracticeRepository implements PracticeRepository {
       try {
         return await this.remoteApi.getPaper(
           DefaultFamilyContextRepository.instance.getActiveStudentId(), paperId, version);
-      } catch {
-        // PRESET content can still fall back locally. AI_GENERATED content will naturally be absent.
+      } catch (_error) {
+        // PRESET remains available offline; AI_GENERATED intentionally has no local shadow copy.
+        return this.contentProvider.getPaper(paperId, version);
       }
     }
     return this.contentProvider.getPaper(paperId, version);
