@@ -110,14 +110,20 @@ public class AssignmentService {
   }
 
   @Transactional(readOnly = true)
-  public String nextVoiceMaterialTaskTitle(UUID familyId, String studentId, String subjectCode, LocalDate businessDate) {
+  public String nextVoiceMaterialTaskTitle(UUID familyId, String studentId, String subjectCode,
+      LocalDate businessDate, String materialTitle) {
     students.requireOwned(familyId, studentId);
     ZoneId zone = ZoneId.of(DEFAULT_DUE_TIMEZONE);
     Instant from = businessDate.atStartOfDay(zone).toInstant();
     Instant to = businessDate.plusDays(1).atStartOfDay(zone).toInstant();
-    long count = repository.countByFamilyIdAndStudentIdAndSubjectCodeAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
-        familyId, studentId, subjectCode, from, to);
-    String base = subjectDisplay(subjectCode) + " · 语音作业";
+    String dateLabel = businessDate.getMonthValue() + "月" + businessDate.getDayOfMonth() + "日";
+    String normalizedMaterialTitle = text(materialTitle).trim();
+    String base = normalizedMaterialTitle.isBlank()
+        ? subjectDisplay(subjectCode) + " · " + dateLabel + "语音作业"
+        : subjectDisplay(subjectCode) + " · " + dateLabel + " · " + normalizedMaterialTitle;
+    long count = repository
+        .countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
+            familyId, studentId, subjectCode, "AUDIO_IMAGE", base, from, to);
     return count == 0 ? base : base + " " + toCircledNumber(count + 1);
   }
 

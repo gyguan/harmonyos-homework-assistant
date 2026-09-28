@@ -22,4 +22,7 @@ public interface AssignmentRepository extends JpaRepository<AssignmentEntity, St
           Instant dueFrom, Instant dueTo);
   long countByFamilyIdAndStudentIdAndSubjectCodeAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
       UUID familyId, String studentId, String subjectCode, Instant from, Instant to);
+  long countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
+      UUID familyId, String studentId, String subjectCode, String contentType, String titlePrefix,
+      Instant from, Instant to);
 }

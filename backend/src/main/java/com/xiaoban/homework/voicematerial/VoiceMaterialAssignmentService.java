@@ -232,7 +232,7 @@ public class VoiceMaterialAssignmentService {
 
     String title = requestedTitle == null || requestedTitle.isBlank()
         ? assignments.nextVoiceMaterialTaskTitle(
-            familyId, targetStudentId, subjectCode, businessDate)
+            familyId, targetStudentId, subjectCode, businessDate, item.title)
         : requestedTitle.trim();
 
     AssignmentDtos.Create create = new AssignmentDtos.Create(
