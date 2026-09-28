@@ -11,7 +11,7 @@ create table if not exists practice_paper_audience (
   id uuid primary key,
   paper_key varchar(180) not null references practice_paper(paper_key) on delete cascade,
   family_id uuid not null references family(id),
-  student_id varchar(120) not null references student(id),
+  student_id varchar(120) not null references student(id) on delete cascade,
   assigned_at timestamp with time zone not null,
   constraint uk_practice_paper_audience unique (paper_key, student_id)
 );
@@ -22,7 +22,7 @@ create index if not exists idx_practice_paper_audience_student
 create table if not exists practice_generation (
   id uuid primary key,
   family_id uuid not null references family(id),
-  reference_student_id varchar(120) not null references student(id),
+  reference_student_id varchar(120) references student(id) on delete set null,
   reference_textbook_context text not null default '',
   subject varchar(32) not null,
   semester varchar(16) not null,
