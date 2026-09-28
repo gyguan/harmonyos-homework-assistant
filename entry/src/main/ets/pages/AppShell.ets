@@ -74,6 +74,8 @@ export struct AppShell {
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
   @State private storeRevision: number = 0;
+  @State private practiceRevision: number = 0;
+  @State private importRevision: number = 0;
   @State private activeStudentId: string = '';
   @State private familyStudents: StudentProfile[] = [];
   @State private identityParentActive: boolean = false;
@@ -179,6 +181,14 @@ export struct AppShell {
     this.storeRevision++;
   }
 
+  private notifyPracticeChanged(): void {
+    this.practiceRevision++;
+  }
+
+  private notifyImportChanged(): void {
+    this.importRevision++;
+  }
+
   private resetPersonaNavigation(): void {
     this.navPathStack.clear();
     this.studentRoute = StudentRoute.HOME;
@@ -190,6 +200,8 @@ export struct AppShell {
     this.identityParentActive = this.role === AppRole.PARENT;
     this.syncFamilyContext();
     this.storeRevision++;
+    this.practiceRevision++;
+    this.importRevision++;
   }
 
   private openIdentitySwitcher(): void {
@@ -225,6 +237,8 @@ export struct AppShell {
     this.resetPersonaNavigation();
     this.syncFamilyContext();
     this.storeRevision++;
+    this.practiceRevision++;
+    this.importRevision++;
     void this.refreshActiveStudent();
   }
 
@@ -278,11 +292,13 @@ export struct AppShell {
 
   private finishShareImportReady(): void {
     this.shareImportToken = '';
+    this.notifyImportChanged();
     ParentImportNavigator.openConfirmation(this.navPathStack);
   }
 
   private finishShareImportEmpty(): void {
     this.shareImportToken = '';
+    this.notifyImportChanged();
     ParentImportNavigator.openInbox(this.navPathStack);
   }
 
@@ -293,8 +309,9 @@ export struct AppShell {
   private finishParentImportPublished(): void {
     this.parentRoute = ParentRoute.DASHBOARD;
     this.navPathStack.clear();
-    // Batch publish already updates the authoritative assignment cache.
+    // Batch publish updates both the assignment cache and the import batch status.
     this.notifyUiChanged();
+    this.notifyImportChanged();
   }
 
   private openParentVoiceCreate(): void {
@@ -332,7 +349,7 @@ export struct AppShell {
       });
     } else if (this.studentRoute === StudentRoute.PRACTICE) {
       PracticeHomePage({
-        revision: this.storeRevision,
+        revision: this.practiceRevision,
         onOpenPaper: (paperId: string, version: number) => this.openPracticePaper(paperId, version),
         onOpenHistory: () => this.openPracticeHistory()
       });
@@ -378,6 +395,7 @@ export struct AppShell {
       NavDestination() {
         PracticeHistoryPage({
           paperId: (param as PracticeHistoryRouteParam).paperId,
+          revision: this.practiceRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenAttempt: (attemptId: string) => this.openPracticeAttempt(attemptId),
           onOpenResult: (attemptId: string) => this.openPracticeResult(attemptId)
@@ -390,8 +408,12 @@ export struct AppShell {
         PracticePaperDetailPage({
           paperId: (param as PracticePaperRouteParam).paperId,
           version: (param as PracticePaperRouteParam).version,
+          revision: this.practiceRevision,
           onBack: () => this.navPathStack.pop(),
-          onStarted: (attemptId: string) => this.openPracticeAttempt(attemptId),
+          onStarted: (attemptId: string) => {
+            this.notifyPracticeChanged();
+            this.openPracticeAttempt(attemptId);
+          },
           onOpenAttempt: (attemptId: string) => this.openPracticeAttempt(attemptId),
           onOpenHistory: (paperId: string) => this.openPracticeHistory(paperId)
         });
@@ -403,7 +425,10 @@ export struct AppShell {
         PracticeAttemptPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
           onBack: () => this.navPathStack.pop(),
-          onSubmitted: (attemptId: string) => this.replacePracticeAttemptWithResult(attemptId)
+          onSubmitted: (attemptId: string) => {
+            this.notifyPracticeChanged();
+            this.replacePracticeAttemptWithResult(attemptId);
+          }
         });
       }
       .hideTitleBar(true)
@@ -413,7 +438,10 @@ export struct AppShell {
         PracticeResultPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
           onBack: () => this.navPathStack.pop(),
-          onRepeatStarted: (attemptId: string) => this.replacePracticeResultWithAttempt(attemptId)
+          onRepeatStarted: (attemptId: string) => {
+            this.notifyPracticeChanged();
+            this.replacePracticeResultWithAttempt(attemptId);
+          }
         });
       }
       .hideTitleBar(true)
@@ -444,6 +472,7 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_IMPORT_INBOX) {
       NavDestination() {
         HomeworkImportInboxPage({
+          revision: this.importRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(
             this.navPathStack, batchId)
@@ -455,8 +484,10 @@ export struct AppShell {
       NavDestination() {
         HomeworkImportBatchDetailPage({
           batchId: ParentImportNavigator.batchId(param),
+          revision: this.importRevision,
           onBack: () => this.navPathStack.pop(),
-          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack)
+          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
+          onChanged: () => this.notifyImportChanged()
         });
       }
       .hideTitleBar(true)
@@ -486,7 +517,7 @@ export struct AppShell {
           onBack: () => this.navPathStack.pop(),
           onPublished: () => {
             this.navPathStack.pop();
-            this.notifyUiChanged();
+            this.notifyPracticeChanged();
           }
         });
       }

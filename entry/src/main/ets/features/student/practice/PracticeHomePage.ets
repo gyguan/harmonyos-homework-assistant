@@ -83,7 +83,7 @@ struct PracticePaperCard {
 
 @Component
 export struct PracticeHomePage {
-  @Prop revision: number = 0;
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   onOpenPaper: (paperId: string, version: number) => void = (_paperId: string, _version: number) => {};
   onOpenHistory: () => void = () => {};
   @State private selectedGrade: PracticeGrade = PracticeGrade.G3;
@@ -127,6 +127,10 @@ export struct PracticeHomePage {
     this.draftSelectedSubject = this.selectedSubject;
     this.draftSelectedTrack = this.selectedTrack;
     this.draftSelectedPassFilter = this.selectedPassFilter;
+    void this.reloadPapers();
+  }
+
+  private onRevisionChanged(): void {
     void this.reloadPapers();
   }
 

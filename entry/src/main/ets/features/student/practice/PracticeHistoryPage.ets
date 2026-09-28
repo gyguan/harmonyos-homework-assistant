@@ -20,6 +20,7 @@ import {
 @Component
 export struct PracticeHistoryPage {
   @Prop paperId: string = '';
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   @State private allAttempts: PracticeAttemptSummary[] = [];
   @State private attempts: PracticeAttemptSummary[] = [];
   @State private statistics: PracticeHistoryStatistics = new PracticeHistoryStatistics();
@@ -31,6 +32,7 @@ export struct PracticeHistoryPage {
   @State private draftSelectedPass: PracticePassFilter = PracticePassFilter.ALL;
   @State private loading: boolean = true;
   @State private errorMessage: string = '';
+  private loadSequence: number = 0;
   onBack: () => void = () => {};
   onOpenAttempt: (attemptId: string) => void = (_attemptId: string) => {};
   onOpenResult: (attemptId: string) => void = (_attemptId: string) => {};
@@ -78,19 +80,27 @@ export struct PracticeHistoryPage {
     void this.load();
   }
 
+  private onRevisionChanged(): void {
+    void this.load();
+  }
+
   private async load(): Promise<void> {
+    let sequence = ++this.loadSequence;
     this.loading = true;
     this.errorMessage = '';
     try {
-      this.allAttempts = await this.viewModel.list(this.paperId);
+      let allAttempts = await this.viewModel.list(this.paperId);
+      if (sequence !== this.loadSequence) return;
+      this.allAttempts = allAttempts;
       this.refreshPresentation();
     } catch {
+      if (sequence !== this.loadSequence) return;
       this.allAttempts = [];
       this.attempts = [];
       this.statistics = new PracticeHistoryStatistics();
       this.errorMessage = '练习记录加载失败，请检查网络后重试。';
     } finally {
-      this.loading = false;
+      if (sequence === this.loadSequence) this.loading = false;
     }
   }
 

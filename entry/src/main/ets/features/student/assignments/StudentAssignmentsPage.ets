@@ -12,7 +12,7 @@ import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 
 @Component
 export struct StudentAssignmentsPage {
-  @Prop revision: number = 0;
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
 
@@ -54,6 +54,10 @@ export struct StudentAssignmentsPage {
   });
 
   aboutToAppear(): void {
+    this.rebuildView();
+  }
+
+  private onRevisionChanged(): void {
     this.rebuildView();
   }
 

@@ -13,8 +13,8 @@ import { ParentAssignmentEditPanel } from './ParentAssignmentEditPanel';
 
 @Component
 export struct ParentReviewPane {
-  @Prop assignmentId: string = '';
-  @Prop revision: number = 0;
+  @Prop @Watch('onAssignmentChanged') assignmentId: string = '';
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   @State private localRevision: number = 0;
   @State private reviewNoteDraft: string = '';
   @State private operationNotice: string = '';
@@ -26,6 +26,7 @@ export struct ParentReviewPane {
   @State private previewUri: string = '';
   @State private deleteConfirm: boolean = false;
   @State private deleteBusy: boolean = false;
+  private evidenceLoadSequence: number = 0;
 
   private previewController: CustomDialogController = new CustomDialogController({
     builder: PhotoPreviewDialog({ uri: $previewUri }),
@@ -43,6 +44,20 @@ export struct ParentReviewPane {
     void this.refreshEvidence();
   }
 
+  private onAssignmentChanged(): void {
+    this.reviewNoteDraft = '';
+    this.operationNotice = '';
+    this.editingAssignmentId = '';
+    this.showEditSheet = false;
+    this.editNotice = '';
+    this.deleteConfirm = false;
+    void this.refreshEvidence();
+  }
+
+  private onRevisionChanged(): void {
+    void this.refreshEvidence();
+  }
+
   private assignment(): Assignment | null {
     let currentRevision = this.revision + this.localRevision;
     if (currentRevision < 0 || this.assignmentId.length === 0) return null;
@@ -56,9 +71,16 @@ export struct ParentReviewPane {
   }
 
   private async refreshEvidence(): Promise<void> {
-    if (this.assignmentId.length === 0) return;
-    await ParentSubmissionEvidenceService.instance.refreshLatest(this.assignmentId);
-    this.localRevision++;
+    let assignmentId = this.assignmentId;
+    if (assignmentId.length === 0) return;
+    let sequence = ++this.evidenceLoadSequence;
+    try {
+      await ParentSubmissionEvidenceService.instance.refreshLatest(assignmentId);
+    } finally {
+      if (sequence === this.evidenceLoadSequence && assignmentId === this.assignmentId) {
+        this.localRevision++;
+      }
+    }
   }
 
   private openPreview(uri: string): void {
