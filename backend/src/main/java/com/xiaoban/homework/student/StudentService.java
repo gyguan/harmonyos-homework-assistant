@@ -4,7 +4,6 @@ import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.practice.PracticeAttemptRepository;
 import com.xiaoban.homework.practice.PracticeGenerationRepository;
-import com.xiaoban.homework.practice.PracticePaperAudienceRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialBatchRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialPackageRepository;
 import java.time.Instant;
@@ -19,19 +18,17 @@ public class StudentService {
   private final StudentRepository repository;
   private final AssignmentRepository assignments;
   private final PracticeAttemptRepository practiceAttempts;
-  private final PracticePaperAudienceRepository practicePaperAudiences;
   private final PracticeGenerationRepository practiceGenerations;
   private final VoiceMaterialBatchRepository voiceMaterials;
   private final VoiceMaterialPackageRepository voiceMaterialPackages;
 
   public StudentService(StudentRepository repository, AssignmentRepository assignments,
-      PracticeAttemptRepository practiceAttempts, PracticePaperAudienceRepository practicePaperAudiences,
+      PracticeAttemptRepository practiceAttempts,
       PracticeGenerationRepository practiceGenerations, VoiceMaterialBatchRepository voiceMaterials,
       VoiceMaterialPackageRepository voiceMaterialPackages) {
     this.repository = repository;
     this.assignments = assignments;
     this.practiceAttempts = practiceAttempts;
-    this.practicePaperAudiences = practicePaperAudiences;
     this.practiceGenerations = practiceGenerations;
     this.voiceMaterials = voiceMaterials;
     this.voiceMaterialPackages = voiceMaterialPackages;
@@ -64,18 +61,12 @@ public class StudentService {
     if (practiceAttempts.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有练习记录，不能直接删除；练习历史需要保留");
     }
-    if (practicePaperAudiences.existsByFamilyIdAndStudentId(familyId, id)) {
-      throw new ApiExceptions.Conflict("该孩子已有已发布AI练习，不能直接删除；请保留练习历史");
-    }
-
     Instant now = Instant.now();
     List<com.xiaoban.homework.practice.PracticeGenerationEntity> generationHistory =
         practiceGenerations.findByFamilyIdAndReferenceStudentId(familyId, id);
     List<com.xiaoban.homework.practice.PracticeGenerationEntity> disposable = new ArrayList<>();
     for (com.xiaoban.homework.practice.PracticeGenerationEntity generation : generationHistory) {
-      if ("PUBLISHED".equals(generation.status)) {
-        throw new ApiExceptions.Conflict("该孩子作为参考学生已有已发布AI练习，不能直接删除；请保留练习历史");
-      }
+      if ("PUBLISHED".equals(generation.status)) continue;
       if ("GENERATING".equals(generation.status)
           && generation.updatedAt != null
           && generation.updatedAt.isAfter(
