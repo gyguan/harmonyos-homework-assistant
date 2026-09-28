@@ -184,6 +184,22 @@ public class ScheduledAssignmentService {
     return emptyVoiceResponse();
   }
 
+  private void applyPlanInput(ScheduledAssignmentPlanEntity plan,
+      String planType, String name, String scheduleType, String timeOfDay,
+      List<String> weekdays, String startDate, String endDate, UUID selfId) {
+    plan.planType = planType(planType);
+    plan.name = name.trim();
+    plan.scheduleType = scheduleType(scheduleType);
+    plan.scheduleTime = time(timeOfDay, "创建时间");
+    plan.weekdays = weekdays(weekdays, plan.scheduleType);
+    plan.startDate = date(startDate, "开始日期");
+    plan.endDate = nullableDate(endDate, "结束日期");
+    if (plan.endDate != null && plan.endDate.isBefore(plan.startDate)) {
+      throw new ApiExceptions.BadRequest("结束日期不能早于开始日期");
+    }
+    plan.timezone = ScheduledAssignmentSchedule.BUSINESS_ZONE.getId();
+  }
+
   private void saveTemplate(ScheduledAssignmentPlanEntity plan,
       ScheduledAssignmentDtos.TemplateInput input, Instant now) {
     if ("VOICE_MATERIAL_AUTO".equals(plan.planType)) {
