@@ -2,6 +2,7 @@ package com.xiaoban.homework.practice;
 
 import com.xiaoban.homework.ai.AiProviderProperties;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
+import com.xiaoban.homework.ai.StructuredJsonNormalizer;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -66,8 +67,12 @@ public class PracticeGenerationModelClient {
         schema(request.questionCount()));
     if (output.isEmpty()) return Optional.empty();
 
+    String shape = "<unparsed>";
     try {
-      ModelPaper modelPaper = mapper.readValue(output.get().trim(), ModelPaper.class);
+      StructuredJsonNormalizer.Result normalized =
+          StructuredJsonNormalizer.normalize(mapper, output.get());
+      shape = normalized.shape();
+      ModelPaper modelPaper = mapper.readValue(normalized.json(), ModelPaper.class);
       if (modelPaper == null || modelPaper.questions() == null) return Optional.empty();
       ArrayList<PracticeContentCatalog.Question> questions = new ArrayList<>();
       for (int i = 0; i < modelPaper.questions().size(); i++) {
@@ -110,9 +115,10 @@ public class PracticeGenerationModelClient {
           properties.getPracticeModel(), paperId, questions.size());
       return Optional.of(paper);
     } catch (Exception error) {
-      log.warn("[AI] practice generation parse failed model={} paperId={} outputChars={} exception={}",
-          properties.getPracticeModel(), paperId, output.get().length(),
-          error.getClass().getSimpleName());
+      log.warn(
+          "[AI] practice generation parse failed model={} paperId={} outputChars={} shape={} exception={} message={}",
+          properties.getPracticeModel(), paperId, output.get().length(), shape,
+          error.getClass().getSimpleName(), safeMessage(error.getMessage()));
       return Optional.empty();
     }
   }
@@ -197,6 +203,12 @@ public class PracticeGenerationModelClient {
     return object(
         paperProps,
         List.of("title", "description", "estimatedMinutes", "tags", "questions"));
+  }
+
+  private static String safeMessage(String value) {
+    if (value == null || value.isBlank()) return "<empty>";
+    String compact = value.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').trim();
+    return compact.length() <= 300 ? compact : compact.substring(0, 300);
   }
 
   private static Map<String, Object> object(Map<String, Object> properties, List<String> required) {
