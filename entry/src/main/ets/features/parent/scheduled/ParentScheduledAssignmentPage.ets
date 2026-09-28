@@ -1,5 +1,6 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
+import { SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import {
   ScheduledAssignmentDuePolicy,
   ScheduledAssignmentPlan,
@@ -351,18 +352,6 @@ export struct ParentScheduledAssignmentPage {
   }
 
   @Builder
-  private OptionButton(label: string, selected: boolean, kind: string, value: string) {
-    Button(label, { type: ButtonType.Normal })
-      .height(AppTheme.MIN_TOUCH_TARGET)
-      .padding({ left: 10, right: 10 })
-      .fontSize(AppTheme.ACTION_TEXT_SIZE)
-      .fontColor(selected ? AppTheme.PRIMARY : AppTheme.TEXT)
-      .backgroundColor(selected ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE)
-      .borderRadius(AppTheme.CHIP_RADIUS)
-      .onClick(() => this.selectOption(kind, value));
-  }
-
-  @Builder
   private PlanCard(plan: ScheduledAssignmentPlan) {
     Column({ space: 10 }) {
       Row({ space: 10 }) {
@@ -441,13 +430,13 @@ export struct ParentScheduledAssignmentPage {
   @Builder
   private WeekdayOptions() {
     Row({ space: 5 }) {
-      this.OptionButton('一', this.hasWeekday('MONDAY'), 'WEEKDAY', 'MONDAY');
-      this.OptionButton('二', this.hasWeekday('TUESDAY'), 'WEEKDAY', 'TUESDAY');
-      this.OptionButton('三', this.hasWeekday('WEDNESDAY'), 'WEEKDAY', 'WEDNESDAY');
-      this.OptionButton('四', this.hasWeekday('THURSDAY'), 'WEEKDAY', 'THURSDAY');
-      this.OptionButton('五', this.hasWeekday('FRIDAY'), 'WEEKDAY', 'FRIDAY');
-      this.OptionButton('六', this.hasWeekday('SATURDAY'), 'WEEKDAY', 'SATURDAY');
-      this.OptionButton('日', this.hasWeekday('SUNDAY'), 'WEEKDAY', 'SUNDAY');
+      SegmentedSelectionButton({ label: '一', selected: this.hasWeekday('MONDAY'), onSelect: () => this.selectOption('WEEKDAY', 'MONDAY') });
+      SegmentedSelectionButton({ label: '二', selected: this.hasWeekday('TUESDAY'), onSelect: () => this.selectOption('WEEKDAY', 'TUESDAY') });
+      SegmentedSelectionButton({ label: '三', selected: this.hasWeekday('WEDNESDAY'), onSelect: () => this.selectOption('WEEKDAY', 'WEDNESDAY') });
+      SegmentedSelectionButton({ label: '四', selected: this.hasWeekday('THURSDAY'), onSelect: () => this.selectOption('WEEKDAY', 'THURSDAY') });
+      SegmentedSelectionButton({ label: '五', selected: this.hasWeekday('FRIDAY'), onSelect: () => this.selectOption('WEEKDAY', 'FRIDAY') });
+      SegmentedSelectionButton({ label: '六', selected: this.hasWeekday('SATURDAY'), onSelect: () => this.selectOption('WEEKDAY', 'SATURDAY') });
+      SegmentedSelectionButton({ label: '日', selected: this.hasWeekday('SUNDAY'), onSelect: () => this.selectOption('WEEKDAY', 'SUNDAY') });
     }
     .width('100%');
   }
@@ -476,12 +465,8 @@ export struct ParentScheduledAssignmentPage {
         .fontSize(AppTheme.LABEL_TITLE_SIZE)
         .fontColor(AppTheme.SUBTEXT);
       Row({ space: 8 }) {
-        this.OptionButton('普通作业',
-          this.planType === ScheduledAssignmentPlanType.MANUAL_ASSIGNMENT,
-          'PLAN_TYPE', ScheduledAssignmentPlanType.MANUAL_ASSIGNMENT);
-        this.OptionButton('自动语音作业',
-          this.planType === ScheduledAssignmentPlanType.VOICE_MATERIAL_AUTO,
-          'PLAN_TYPE', ScheduledAssignmentPlanType.VOICE_MATERIAL_AUTO);
+        SegmentedSelectionButton({ label: '普通作业', selected: this.planType === ScheduledAssignmentPlanType.MANUAL_ASSIGNMENT, onSelect: () => this.selectOption('PLAN_TYPE', ScheduledAssignmentPlanType.MANUAL_ASSIGNMENT) });
+        SegmentedSelectionButton({ label: '自动语音作业', selected: this.planType === ScheduledAssignmentPlanType.VOICE_MATERIAL_AUTO, onSelect: () => this.selectOption('PLAN_TYPE', ScheduledAssignmentPlanType.VOICE_MATERIAL_AUTO) });
       }
       .width('100%');
 
@@ -498,14 +483,10 @@ export struct ParentScheduledAssignmentPage {
         .fontSize(AppTheme.LABEL_TITLE_SIZE)
         .fontColor(AppTheme.SUBTEXT);
       Row({ space: 5 }) {
-        this.OptionButton('仅一次', this.scheduleType === ScheduledAssignmentScheduleType.ONCE,
-          'SCHEDULE', ScheduledAssignmentScheduleType.ONCE);
-        this.OptionButton('每天', this.scheduleType === ScheduledAssignmentScheduleType.DAILY,
-          'SCHEDULE', ScheduledAssignmentScheduleType.DAILY);
-        this.OptionButton('工作日', this.scheduleType === ScheduledAssignmentScheduleType.WEEKDAYS,
-          'SCHEDULE', ScheduledAssignmentScheduleType.WEEKDAYS);
-        this.OptionButton('自定义', this.scheduleType === ScheduledAssignmentScheduleType.WEEKLY,
-          'SCHEDULE', ScheduledAssignmentScheduleType.WEEKLY);
+        SegmentedSelectionButton({ label: '仅一次', selected: this.scheduleType === ScheduledAssignmentScheduleType.ONCE, onSelect: () => this.selectOption('SCHEDULE', ScheduledAssignmentScheduleType.ONCE) });
+        SegmentedSelectionButton({ label: '每天', selected: this.scheduleType === ScheduledAssignmentScheduleType.DAILY, onSelect: () => this.selectOption('SCHEDULE', ScheduledAssignmentScheduleType.DAILY) });
+        SegmentedSelectionButton({ label: '工作日', selected: this.scheduleType === ScheduledAssignmentScheduleType.WEEKDAYS, onSelect: () => this.selectOption('SCHEDULE', ScheduledAssignmentScheduleType.WEEKDAYS) });
+        SegmentedSelectionButton({ label: '自定义', selected: this.scheduleType === ScheduledAssignmentScheduleType.WEEKLY, onSelect: () => this.selectOption('SCHEDULE', ScheduledAssignmentScheduleType.WEEKLY) });
       }
       .width('100%');
       if (this.scheduleType === ScheduledAssignmentScheduleType.WEEKLY) {
@@ -562,10 +543,10 @@ export struct ParentScheduledAssignmentPage {
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Row({ space: 6 }) {
-          this.OptionButton('语文', this.subjectCode === 'CHINESE', 'SUBJECT', 'CHINESE');
-          this.OptionButton('数学', this.subjectCode === 'MATH', 'SUBJECT', 'MATH');
-          this.OptionButton('英语', this.subjectCode === 'ENGLISH', 'SUBJECT', 'ENGLISH');
-          this.OptionButton('其他', this.subjectCode === 'OTHER', 'SUBJECT', 'OTHER');
+          SegmentedSelectionButton({ label: '语文', selected: this.subjectCode === 'CHINESE', onSelect: () => this.selectOption('SUBJECT', 'CHINESE') });
+          SegmentedSelectionButton({ label: '数学', selected: this.subjectCode === 'MATH', onSelect: () => this.selectOption('SUBJECT', 'MATH') });
+          SegmentedSelectionButton({ label: '英语', selected: this.subjectCode === 'ENGLISH', onSelect: () => this.selectOption('SUBJECT', 'ENGLISH') });
+          SegmentedSelectionButton({ label: '其他', selected: this.subjectCode === 'OTHER', onSelect: () => this.selectOption('SUBJECT', 'OTHER') });
         }
         .width('100%');
 
@@ -598,14 +579,10 @@ export struct ParentScheduledAssignmentPage {
           .fontSize(AppTheme.LABEL_TITLE_SIZE)
           .fontColor(AppTheme.SUBTEXT);
         Row({ space: 5 }) {
-          this.OptionButton('当天', this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT,
-            'DUE', ScheduledAssignmentDuePolicy.SAME_DAY_AT);
-          this.OptionButton('次日', this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT,
-            'DUE', ScheduledAssignmentDuePolicy.NEXT_DAY_AT);
-          this.OptionButton('创建后', this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES,
-            'DUE', ScheduledAssignmentDuePolicy.AFTER_MINUTES);
-          this.OptionButton('不设置', this.duePolicy === ScheduledAssignmentDuePolicy.NONE,
-            'DUE', ScheduledAssignmentDuePolicy.NONE);
+          SegmentedSelectionButton({ label: '当天', selected: this.duePolicy === ScheduledAssignmentDuePolicy.SAME_DAY_AT, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.SAME_DAY_AT) });
+          SegmentedSelectionButton({ label: '次日', selected: this.duePolicy === ScheduledAssignmentDuePolicy.NEXT_DAY_AT, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.NEXT_DAY_AT) });
+          SegmentedSelectionButton({ label: '创建后', selected: this.duePolicy === ScheduledAssignmentDuePolicy.AFTER_MINUTES, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.AFTER_MINUTES) });
+          SegmentedSelectionButton({ label: '不设置', selected: this.duePolicy === ScheduledAssignmentDuePolicy.NONE, onSelect: () => this.selectOption('DUE', ScheduledAssignmentDuePolicy.NONE) });
         }
         .width('100%');
 
