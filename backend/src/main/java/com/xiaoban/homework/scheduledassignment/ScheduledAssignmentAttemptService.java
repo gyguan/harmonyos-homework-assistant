@@ -87,7 +87,8 @@ public class ScheduledAssignmentAttemptService {
     run.finishedAt = executionAt;
     runs.save(run);
 
-    if (run.retryCount >= MAX_RETRIES && "ENABLED".equals(plan.status)) {
+    if (run.retryCount >= MAX_RETRIES && "ENABLED".equals(plan.status) &&
+        plan.nextFireAt != null && plan.nextFireAt.equals(fireAt)) {
       advance(plan, fireAt, executionAt);
     }
   }
