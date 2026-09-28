@@ -71,6 +71,7 @@ interface RemotePublish {
   status: string;
   paper: RemotePaper;
 }
+interface RemoteErrorBody { message?: string; }
 interface GenerateBody {
   subject: string;
   track: string;
@@ -193,8 +194,8 @@ export class PracticeGenerationRemoteApi {
 
   private message(body: string, fallback: string): string {
     try {
-      let parsed = JSON.parse(body) as Record<string, string>;
-      return parsed['message'] ?? fallback;
+      let parsed = JSON.parse(body) as RemoteErrorBody;
+      return parsed.message ?? fallback;
     } catch {
       return fallback;
     }
