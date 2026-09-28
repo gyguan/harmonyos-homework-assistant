@@ -329,3 +329,10 @@ export interface PracticeGenerationResult {
   paper: PracticeGenerationDraft | null;
   errorMessage: string;
 }
+
+
+export enum PracticePublishScope {
+  CURRENT = 'CURRENT',
+  SELECTED = 'SELECTED',
+  ALL = 'ALL'
+}
