@@ -26,6 +26,9 @@ final class PracticeGenerationProviderAdapter {
   }
 
   record Result(PracticeGenerationContract.Paper paper, List<String> adaptations) {}
+  private record OptionSet(
+      List<PracticeGenerationContract.Option> options,
+      Map<String, String> answerAliases) {}
 
   Result adapt(String json) throws Exception {
     PracticeGenerationPayloadNormalizer.Result scalarNormalized =
@@ -69,15 +72,17 @@ final class PracticeGenerationProviderAdapter {
 
       String type = canonicalQuestionType(requiredString(question.get("type"), path + ".type"));
       String stem = requiredString(question.get("stem"), path + ".stem");
-      List<PracticeGenerationContract.Option> options =
+      OptionSet optionSet =
           adaptOptions(question.get("options"), path + ".options", adaptations);
+      List<PracticeGenerationContract.Option> options = optionSet.options();
       String answerSpec = requiredStringFromAliases(question, ANSWER_KEYS, path + ".answerSpec");
       String explanation = requiredString(question.get("explanation"), path + ".explanation");
       List<String> hints = requiredStringList(question.get("hints"), path + ".hints");
       List<String> tags = requiredStringList(question.get("tags"), path + ".tags");
 
       if ("SINGLE_CHOICE".equals(type)) {
-        String canonicalAnswer = canonicalChoiceAnswer(answerSpec, options);
+        String canonicalAnswer = canonicalChoiceAnswer(
+            answerSpec, options, optionSet.answerAliases());
         if (!canonicalAnswer.equals(answerSpec)) {
           adaptations.add(path + ".answerSpec(label->key)");
           answerSpec = canonicalAnswer;
@@ -90,20 +95,24 @@ final class PracticeGenerationProviderAdapter {
     return questions;
   }
 
-  private List<PracticeGenerationContract.Option> adaptOptions(
+  private OptionSet adaptOptions(
       Object value, String path, List<String> adaptations) {
-    if (value == null) return List.of();
+    if (value == null) return new OptionSet(List.of(), Map.of());
 
     if (value instanceof Map<?, ?> rawMap) {
       Map<String, Object> source = stringKeyMap(rawMap);
       List<PracticeGenerationContract.Option> options = new ArrayList<>();
+      Map<String, String> aliases = new LinkedHashMap<>();
       for (Map.Entry<String, Object> entry : source.entrySet()) {
-        String key = canonicalOptionKey(entry.getKey(), options.size());
+        String originalKey = entry.getKey().trim();
+        String key = canonicalOptionKey(originalKey, options.size());
         String label = requiredString(entry.getValue(), path + "." + entry.getKey());
         options.add(new PracticeGenerationContract.Option(key, label));
+        aliases.put(originalKey, key);
+        aliases.put(label.trim(), key);
       }
       adaptations.add(path + "(map->options)");
-      return options;
+      return new OptionSet(options, aliases);
     }
 
     if (!(value instanceof List<?> source)) {
@@ -111,13 +120,16 @@ final class PracticeGenerationProviderAdapter {
     }
 
     List<PracticeGenerationContract.Option> options = new ArrayList<>();
+    Map<String, String> aliases = new LinkedHashMap<>();
     for (int i = 0; i < source.size(); i++) {
       Object item = source.get(i);
       String itemPath = path + "[" + i + "]";
 
       if (isScalar(item)) {
-        options.add(new PracticeGenerationContract.Option(
-            optionKey(i), String.valueOf(item)));
+        String key = optionKey(i);
+        String label = String.valueOf(item);
+        options.add(new PracticeGenerationContract.Option(key, label));
+        aliases.put(label.trim(), key);
         adaptations.add(itemPath + "(scalar->option)");
         continue;
       }
@@ -142,24 +154,32 @@ final class PracticeGenerationProviderAdapter {
       if (label == null) {
         throw new IllegalArgumentException(itemPath + " is missing an option label");
       }
-      if (key == null || key.isBlank()) {
+      String originalKey = key == null ? "" : key.trim();
+      if (originalKey.isBlank()) {
         key = optionKey(i);
         adaptations.add(itemPath + ".key(auto)");
       } else {
-        key = canonicalOptionKey(key, i);
+        key = canonicalOptionKey(originalKey, i);
+        aliases.put(originalKey, key);
       }
+      aliases.put(label.trim(), key);
       options.add(new PracticeGenerationContract.Option(key, label));
     }
-    return options;
+    return new OptionSet(options, aliases);
   }
 
   private static String canonicalChoiceAnswer(
-      String answerSpec, List<PracticeGenerationContract.Option> options) {
+      String answerSpec,
+      List<PracticeGenerationContract.Option> options,
+      Map<String, String> aliases) {
     String answer = answerSpec.trim();
 
     for (PracticeGenerationContract.Option option : options) {
       if (option.key().equalsIgnoreCase(answer)) return option.key();
     }
+
+    String aliasMatch = aliases.get(answer);
+    if (aliasMatch != null) return aliasMatch;
 
     PracticeGenerationContract.Option matched = null;
     for (PracticeGenerationContract.Option option : options) {
