@@ -139,7 +139,24 @@
 - `TEXTBOOK_SYNC` 与 `EXTRACURRICULAR` 必须明确区分；
 - 难度以 L1/L2 为当前主范围，拓展不等于超纲。
 
-## 9. 发布与版本规则
+## 9. AI 生成题库规则
+
+AI 生成练习与预置题库共用 Practice Paper / Question / Attempt / Result，不建设第二套练习模型。
+
+第一阶段 AI 生成必须遵守：
+
+- 只允许家长端发起，学生端只消费已发布套卷；
+- AI 生成内容属于家庭私有空间，按 `familyId + studentId` 隔离；
+- 生成结果先保存为 Draft，不允许模型输出后直接对学生发布；
+- Draft 必须同时通过 strict structured output 与服务端确定性 validator；
+- 家长必须能够预览题干、选项、答案、解析与提示，再确认发布；
+- 第一阶段只允许 `SINGLE_CHOICE`、`FILL_BLANK`、`NUMBER`；
+- 教材同步生成必须有明确教材信息，不允许模型自行猜测版本、单元或课文；
+- 继续遵守纯文本题约束、英语中文引导、逐题提示、唯一答案与不机械重复等本规范全部要求；
+- AI 生成失败或校验失败时不得写入正式 `practice_paper`；
+- 发布后的 AI 练习与 PRESET 一样必须保持历史 Attempt / Result 可追溯，不原地覆盖已发布版本。
+
+## 10. 发布与版本规则
 
 预置题库的**唯一源文件**位于：
 
@@ -165,7 +182,7 @@
 
 `python scripts/validate_practice_content.py`
 
-## 10. 练习过程体验不可回退
+## 11. 练习过程体验不可回退
 
 内容更新不得破坏已经确立的练习体验：
 
@@ -180,7 +197,7 @@
 - 结果页显示套卷名称、练习次数、得分、正确率、耗时、答题回顾、答案、解析和笔记；
 - 结果页使用标准返回语义，不返回已提交答题页。
 
-## 11. Phone / Pad 可读性不可回退
+## 12. Phone / Pad 可读性不可回退
 
 Phone 与 Pad 都是一等形态：
 
@@ -192,7 +209,7 @@ Phone 与 Pad 都是一等形态：
 - 深层练习页面复用 `DeepPageHeader`；
 - 不新增 Feature 私有 600/840/1080 等设备断点。
 
-## 12. 新增/修改练习题的 Definition of Done
+## 13. 新增/修改练习题的 Definition of Done
 
 提交前逐项确认：
 
@@ -212,7 +229,7 @@ Phone 与 Pad 都是一等形态：
 - [ ] 已运行 `validate_practice_content.py`；
 - [ ] CI Practice content catalog gate 通过。
 
-## 13. 规范变更
+## 14. 规范变更
 
 本规范是 Practice 内容的长期基线。后续如果产品范围扩展到其他年级、学期、地区、教材版本、视觉题或新的题型：
 
