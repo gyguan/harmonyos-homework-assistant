@@ -3,7 +3,8 @@ import { PracticeGenerationRemoteApi } from '../../application/remote/PracticeGe
 import {
   PracticeGenerationRequest,
   PracticeGenerationResult,
-  PracticePaper
+  PracticePaper,
+  PracticePublishScope
 } from '../../domain/model/practice/PracticeModels';
 import { PracticeGenerationRepository } from '../../domain/port/PracticeGenerationRepository';
 
@@ -27,9 +28,13 @@ export class DefaultPracticeGenerationRepository implements PracticeGenerationRe
     return this.remote.get(generationId);
   }
 
-  publish(generationId: string): Promise<PracticePaper> {
+  publish(
+    generationId: string,
+    scope: PracticePublishScope,
+    targetStudentIds: string[]
+  ): Promise<PracticePaper> {
     this.requireConnected();
-    return this.remote.publish(generationId);
+    return this.remote.publish(generationId, scope, targetStudentIds);
   }
 
   private requireConnected(): void {
