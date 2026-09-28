@@ -14,12 +14,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class PracticeContentService {
   private final PracticePaperRepository papers;
   private final PracticeQuestionRepository questions;
+  private final PracticePaperAudienceRepository audiences;
   private final JsonMapper mapper;
 
-  public PracticeContentService(PracticePaperRepository papers, PracticeQuestionRepository questions,
+  public PracticeContentService(
+      PracticePaperRepository papers,
+      PracticeQuestionRepository questions,
+      PracticePaperAudienceRepository audiences,
       JsonMapper mapper) {
     this.papers = papers;
     this.questions = questions;
+    this.audiences = audiences;
     this.mapper = mapper;
   }
 
@@ -35,8 +40,10 @@ public class PracticeContentService {
   public PracticePaperEntity requirePaperForStudent(
       UUID familyId, String studentId, String paperId, int version) {
     PracticePaperEntity paper = requirePaper(paperId, version);
-    if (paper.familyId == null && paper.studentId == null) return paper;
-    if (!familyId.equals(paper.familyId) || !studentId.equals(paper.studentId)) {
+    if (paper.familyId == null) return paper;
+    if (!familyId.equals(paper.familyId)
+        || !audiences.existsByFamilyIdAndStudentIdAndPaperKey(
+            familyId, studentId, paper.paperKey)) {
       throw new ApiExceptions.NotFound("练习套卷不存在");
     }
     return paper;
@@ -48,9 +55,11 @@ public class PracticeContentService {
     List<PracticePaperEntity> visible = new ArrayList<>();
     for (PracticePaperEntity paper : papers.findAll()) {
       if (!"PUBLISHED".equals(paper.status)) continue;
-      boolean global = paper.familyId == null && paper.studentId == null;
-      boolean owned = familyId.equals(paper.familyId) && studentId.equals(paper.studentId);
-      if (!global && !owned) continue;
+      boolean global = paper.familyId == null;
+      boolean assigned = familyId.equals(paper.familyId)
+          && audiences.existsByFamilyIdAndStudentIdAndPaperKey(
+              familyId, studentId, paper.paperKey);
+      if (!global && !assigned) continue;
       if (grade != null && !grade.isBlank() && !grade.equalsIgnoreCase(paper.grade)) continue;
       if (subject != null && !subject.isBlank() && !subject.equalsIgnoreCase(paper.subject)) continue;
       if (semester != null && !semester.isBlank() && !"ALL".equalsIgnoreCase(semester)
