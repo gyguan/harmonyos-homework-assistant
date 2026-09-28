@@ -4,6 +4,9 @@ alter table practice_paper
 create index if not exists idx_practice_paper_family
   on practice_paper (family_id, status, updated_at desc);
 
+create index if not exists idx_practice_paper_catalog
+  on practice_paper (status, grade, subject, semester, track, family_id);
+
 create table if not exists practice_paper_audience (
   id uuid primary key,
   paper_key varchar(180) not null references practice_paper(paper_key) on delete cascade,
