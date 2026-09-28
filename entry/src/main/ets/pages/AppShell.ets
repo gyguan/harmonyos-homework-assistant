@@ -484,7 +484,10 @@ export struct AppShell {
       NavDestination() {
         ParentPracticeGenerationPage({
           onBack: () => this.navPathStack.pop(),
-          onPublished: () => this.notifyUiChanged()
+          onPublished: () => {
+            this.navPathStack.pop();
+            this.notifyUiChanged();
+          }
         });
       }
       .hideTitleBar(true)
