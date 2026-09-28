@@ -119,7 +119,11 @@ final class PracticeGenerationPayloadNormalizer {
   }
 
   private static Object scalarString(Object value) {
-    if (!(value instanceof Map<?, ?> rawMap)) return value;
+    return scalarString(value, 0);
+  }
+
+  private static Object scalarString(Object value, int depth) {
+    if (depth > 3 || !(value instanceof Map<?, ?> rawMap)) return value;
     Map<String, Object> map = stringKeyMap(rawMap);
     for (String key : STRING_WRAPPER_KEYS) {
       if (!map.containsKey(key)) continue;
@@ -127,12 +131,16 @@ final class PracticeGenerationPayloadNormalizer {
       if (nested instanceof String || nested instanceof Number || nested instanceof Boolean) {
         return String.valueOf(nested);
       }
+      Object unwrapped = scalarString(nested, depth + 1);
+      if (unwrapped != nested) return unwrapped;
     }
     if (map.size() == 1) {
       Object only = map.values().iterator().next();
       if (only instanceof String || only instanceof Number || only instanceof Boolean) {
         return String.valueOf(only);
       }
+      Object unwrapped = scalarString(only, depth + 1);
+      if (unwrapped != only) return unwrapped;
     }
     return value;
   }
