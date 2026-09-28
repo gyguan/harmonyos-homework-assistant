@@ -28,6 +28,10 @@ final class PracticeGenerationProviderAdapter {
       PracticeGenerationCanonicalContract.Paper paper,
       List<String> coercedPaths) {}
 
+  private record AdaptedOptions(
+      List<PracticeGenerationCanonicalContract.Option> options,
+      Set<String> generatedKeys) {}
+
   static Result adapt(JsonMapper mapper, String json) throws Exception {
     Object parsed = mapper.readValue(json, Object.class);
     Map<String, Object> root = objectMap(parsed, "$");
@@ -62,12 +66,13 @@ final class PracticeGenerationProviderAdapter {
           base + ".type",
           tracker);
       String stem = requiredString(question, "stem", base + ".stem", tracker);
-      List<PracticeGenerationCanonicalContract.Option> options =
+      AdaptedOptions adaptedOptions =
           options(requiredValue(question, "options", base + ".options"), base + ".options", tracker);
+      List<PracticeGenerationCanonicalContract.Option> options = adaptedOptions.options();
       String answerSpec = normalizeAnswerSpec(
           type,
           requiredString(question, "answerSpec", base + ".answerSpec", tracker),
-          options,
+          adaptedOptions,
           base + ".answerSpec",
           tracker);
       String explanation =
@@ -83,9 +88,10 @@ final class PracticeGenerationProviderAdapter {
     return List.copyOf(result);
   }
 
-  private static List<PracticeGenerationCanonicalContract.Option> options(
+  private static AdaptedOptions options(
       Object value, String path, Tracker tracker) {
     List<PracticeGenerationCanonicalContract.Option> result = new ArrayList<>();
+    Set<String> generatedKeys = new LinkedHashSet<>();
 
     if (value instanceof List<?> source) {
       for (int i = 0; i < source.size(); i++) {
@@ -107,6 +113,7 @@ final class PracticeGenerationProviderAdapter {
                   tracker);
             } else {
               key = generatedOptionKey(i, optionPath + ".key");
+              generatedKeys.add(key);
               tracker.add(optionPath + ".key");
             }
             result.add(new PracticeGenerationCanonicalContract.Option(key, label));
@@ -115,8 +122,9 @@ final class PracticeGenerationProviderAdapter {
         }
 
         String label = stringValue(item, optionPath, tracker);
-        result.add(new PracticeGenerationCanonicalContract.Option(
-            generatedOptionKey(i, optionPath + ".key"), label));
+        String generatedKey = generatedOptionKey(i, optionPath + ".key");
+        generatedKeys.add(generatedKey);
+        result.add(new PracticeGenerationCanonicalContract.Option(generatedKey, label));
         tracker.add(optionPath);
       }
     } else if (value instanceof Map<?, ?>) {
@@ -138,34 +146,45 @@ final class PracticeGenerationProviderAdapter {
         throw invalid(path, "contains duplicate option key " + option.key());
       }
     }
-    return List.copyOf(result);
+    return new AdaptedOptions(List.copyOf(result), Set.copyOf(generatedKeys));
   }
 
   private static String normalizeAnswerSpec(
       String type,
       String answerSpec,
-      List<PracticeGenerationCanonicalContract.Option> options,
+      AdaptedOptions adaptedOptions,
       String path,
       Tracker tracker) {
     if (!"SINGLE_CHOICE".equals(type)) return answerSpec;
 
+    List<PracticeGenerationCanonicalContract.Option> options = adaptedOptions.options();
     String normalizedKey = answerSpec.trim().toUpperCase(Locale.ROOT);
-    for (PracticeGenerationCanonicalContract.Option option : options) {
-      if (option.key().equals(normalizedKey)) {
-        if (!answerSpec.equals(option.key())) tracker.add(path);
-        return option.key();
-      }
-    }
+    PracticeGenerationCanonicalContract.Option keyMatch = options.stream()
+        .filter(option -> option.key().equals(normalizedKey))
+        .findFirst()
+        .orElse(null);
 
     List<PracticeGenerationCanonicalContract.Option> labelMatches = options.stream()
         .filter(option -> option.label().equals(answerSpec))
         .toList();
+    if (labelMatches.size() > 1) {
+      throw invalid(path, "matches multiple option labels");
+    }
+
+    if (keyMatch != null) {
+      if (adaptedOptions.generatedKeys().contains(keyMatch.key())
+          && labelMatches.size() == 1
+          && !labelMatches.get(0).key().equals(keyMatch.key())) {
+        tracker.add(path);
+        return labelMatches.get(0).key();
+      }
+      if (!answerSpec.equals(keyMatch.key())) tracker.add(path);
+      return keyMatch.key();
+    }
+
     if (labelMatches.size() == 1) {
       tracker.add(path);
       return labelMatches.get(0).key();
-    }
-    if (labelMatches.size() > 1) {
-      throw invalid(path, "matches multiple option labels");
     }
     throw invalid(path, "must match an option key or one unique option label");
   }
