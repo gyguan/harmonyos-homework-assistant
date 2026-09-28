@@ -50,7 +50,8 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Parent Review（家长验收）**：家长查看 Submission 后执行通过或退回订正，并可附加 review note。
 - **Parent Intervention（家长介入）**：AI 判断不适合继续自主辅导、学生主动求助或任务异常时，请求家长处理的状态/动作。
 - **Weekly Review（周报）**：面向家长的周期性总结，关注完成率、用时、困难、辅导使用情况和需要关注事项，不做孩子排名。
-- **Practice Paper（练习套卷）**：围绕明确年级、学期、科目、题库类型和能力点组织的一组练习题，是预置练习内容的发布与版本边界。
+- **Practice Paper（练习套卷）**：围绕明确年级、学期、科目、题库类型和能力点组织的一组练习题，是练习内容统一的发布与版本边界。PRESET 为全局内容；AI_GENERATED 为 Family + Student 私有内容，但二者共用同一 Paper / Question / Attempt / Result 模型。
+- **Practice Generation（AI练习生成）**：家长为指定学生提交训练目标，由后端 AI 生成纯文本练习草稿；草稿通过结构化与确定性质量校验、家长预览确认后，才发布为 AI_GENERATED Practice Paper。
 - **Practice Attempt（练习实例）**：学生每次开始某套卷时创建的独立作答实例；答案、笔记、提交时间、耗时与结果均归属于该 Attempt，不覆盖历史练习。
 - **Practice Track（题库类型）**：`TEXTBOOK_SYNC` 表示教材同步，`EXTRACURRICULAR` 表示课外拓展。二者共享 Practice 领域模型，但内容设计目标不同。
 
@@ -69,7 +70,8 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 11. 家长看到的是作业进度，不做摄像头监控、键盘记录等过度监控能力。
 12. SCHOOL / EXTRA 共用 Assignment，不建设两套平行业务体系。
 13. Practice 题库新增或更新必须遵守 `docs/product/practice-question-content-standard.md`；预置题库以 `backend/src/main/resources/practice/preset/` 为唯一源数据，已发布内容通过新 version 演进，不覆盖历史 Attempt / Result。
-14. 定时创建能力只负责在计划时间生成现有 Assignment；暂停、恢复、编辑或删除计划只影响未来执行，不修改已生成 Assignment。语音定时计划与学生进入兜底必须复用同一服务端幂等边界。
+14. AI 练习由家长创建、学生消费：AI_GENERATED Paper 必须按 familyId + studentId 隔离；AI 生成结果先作为 Draft 保存，经过后端质量门禁和家长预览确认后才能发布，学生端不得直接发起出题。
+15. 定时创建能力只负责在计划时间生成现有 Assignment；暂停、恢复、编辑或删除计划只影响未来执行，不修改已生成 Assignment。语音定时计划与学生进入兜底必须复用同一服务端幂等边界。
 
 ## Technical direction
 
@@ -109,6 +111,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 
 - 导入：OCR / 任务拆分 / 学科识别 / due-time extraction / textbook matching / source evidence。
 - Tutor：assignment context / teacher resources / textbook context / graded hints / parent policy。
+- Practice Generation：student profile / explicit textbook context / parent requirement / strict structured output / deterministic content validation / parent publish confirmation。
 - 服务商密钥只存在后端；客户端不保存 AI Provider credential。
 
 ## V2 migration and compatibility defaults
