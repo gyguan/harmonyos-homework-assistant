@@ -121,13 +121,11 @@ final class PracticeGenerationProviderAdapter {
       }
     } else if (value instanceof Map<?, ?>) {
       Map<String, Object> source = objectMap(value, path);
-      int index = 0;
       for (Map.Entry<String, Object> entry : source.entrySet()) {
         String optionPath = path + "." + entry.getKey();
         String key = normalizeOptionKey(entry.getKey(), optionPath + ".key", tracker);
         String label = stringValue(entry.getValue(), optionPath + ".label", tracker);
         result.add(new PracticeGenerationCanonicalContract.Option(key, label));
-        index++;
       }
       tracker.add(path);
     } else {
@@ -188,16 +186,16 @@ final class PracticeGenerationProviderAdapter {
 
   private static String normalizeOptionKey(String raw, String path, Tracker tracker) {
     String normalized = raw.trim().toUpperCase(Locale.ROOT);
-    if (!normalized.matches("[A-Z]")) {
-      throw invalid(path, "option key must be one letter A-Z");
+    if (!normalized.matches("[A-D]")) {
+      throw invalid(path, "option key must be one of A/B/C/D");
     }
     if (!raw.equals(normalized)) tracker.add(path);
     return normalized;
   }
 
   private static String generatedOptionKey(int index, String path) {
-    if (index < 0 || index >= 26) {
-      throw invalid(path, "cannot auto-generate option key beyond Z");
+    if (index < 0 || index >= 4) {
+      throw invalid(path, "cannot auto-generate option key beyond D");
     }
     return String.valueOf((char) ('A' + index));
   }
