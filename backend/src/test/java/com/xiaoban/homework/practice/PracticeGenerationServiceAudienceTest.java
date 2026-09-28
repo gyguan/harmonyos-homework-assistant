@@ -135,6 +135,7 @@ class PracticeGenerationServiceAudienceTest {
     PracticeGenerationService service = new PracticeGenerationService(
         generations, papers, questions, audiences, students, audiencePolicy,
         mock(PracticeGenerationModelClient.class),
+        mock(PracticeGenerationReviewClient.class),
         mock(PracticeGeneratedContentValidator.class),
         mock(PracticeContentService.class),
         mapper);
