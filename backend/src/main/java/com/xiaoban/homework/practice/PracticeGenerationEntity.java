@@ -7,26 +7,26 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "practice_paper")
-public class PracticePaperEntity {
-  @Id public String paperKey;
-  public String paperId;
-  public int version;
+@Table(name = "practice_generation")
+public class PracticeGenerationEntity {
+  @Id public UUID id;
   public UUID familyId;
-  public String grade;
+  public String referenceStudentId;
+  public String referenceTextbookContext;
   public String subject;
   public String semester;
   public String track;
-  public String title;
-  public String description;
   public String difficulty;
   public int questionCount;
-  public int estimatedMinutes;
-  public String tagsJson;
-  public String sourceType;
+  public String requirement;
   public String status;
+  public String generatedJson;
+  public String paperId;
+  public Integer paperVersion;
+  public String model;
+  public String errorMessage;
   public Instant createdAt;
   public Instant updatedAt;
 
-  protected PracticePaperEntity() {}
+  protected PracticeGenerationEntity() {}
 }

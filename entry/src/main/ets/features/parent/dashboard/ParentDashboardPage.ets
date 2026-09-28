@@ -8,6 +8,7 @@ export struct ParentDashboardPage {
   onOpenInbox: () => void = () => {};
   onOpenVoice: () => void = () => {};
   onOpenScheduled: () => void = () => {};
+  onOpenPracticeGeneration: () => void = () => {};
 
   private canUseWideComposition(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentHomeRequirement());
@@ -232,6 +233,61 @@ export struct ParentDashboardPage {
   }
 
   @Builder
+  private AiPracticeAction() {
+    Column({ space: 14 }) {
+      Row() {
+        Stack() {
+          Text('AI')
+            .fontSize(15)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center);
+        }
+        .width(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .height(AppTheme.PARENT_HOME_ACTION_ICON_SIZE)
+        .alignContent(Alignment.Center)
+        .backgroundColor(AppTheme.PRIMARY_SOFT)
+        .borderRadius(AppTheme.CHIP_RADIUS);
+        Blank();
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(15)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
+      }
+      .width('100%');
+
+      Column({ space: 5 }) {
+        Text('AI生成练习')
+          .width('100%')
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+        Text('按训练目标生成题库，预览后发布给孩子')
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis });
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Start);
+    }
+    .width('100%')
+    .constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })
+    .padding(AppTheme.PARENT_HOME_ACTION_CARD_PADDING)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: AppTheme.BORDER })
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText('AI生成练习，按训练目标生成题库，预览后发布给孩子')
+    .onClick(() => this.onOpenPracticeGeneration());
+  }
+
+  @Builder
   private PhoneHome() {
     Scroll() {
       Column() {
@@ -240,6 +296,7 @@ export struct ParentDashboardPage {
           this.CreateVoiceAction();
           this.ScheduledAssignmentAction();
           this.AssignmentInboxAction();
+          this.AiPracticeAction();
         }
         .width('100%')
         .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
@@ -290,6 +347,8 @@ export struct ParentDashboardPage {
         }
         .width('100%')
         .alignItems(VerticalAlign.Top);
+
+        this.AiPracticeAction();
       }
       .width('100%')
       .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })

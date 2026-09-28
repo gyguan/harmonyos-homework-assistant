@@ -26,9 +26,25 @@ public class PracticeController {
     this.attempts = attempts;
   }
 
+  @GetMapping("/students/{studentId}/practice/papers")
+  public List<PracticeDtos.PaperResponse> papers(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId,
+      @RequestParam(required = false) String grade,
+      @RequestParam(required = false) String subject,
+      @RequestParam(required = false) String semester,
+      @RequestParam(required = false) String track) {
+    return content.listForStudent(familyId, studentId, grade, subject, semester, track);
+  }
+
   @GetMapping("/practice/papers/{paperId}")
-  public PracticeDtos.PaperResponse paper(@PathVariable String paperId, @RequestParam int version) {
-    return content.response(content.requirePaper(paperId, version));
+  public PracticeDtos.PaperResponse paper(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String paperId,
+      @RequestParam int version,
+      @RequestParam(required = false, defaultValue = "") String studentId) {
+    return content.response(content.requirePaperForStudent(
+        familyId, studentId, paperId, version));
   }
 
   @PostMapping("/students/{studentId}/practice/attempts")

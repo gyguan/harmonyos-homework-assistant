@@ -1,6 +1,7 @@
 import {
   AppRoute,
   AssignmentRouteParam,
+  ParentPracticeGenerationRouteParam,
   ParentScheduledAssignmentsRouteParam,
   ParentVoiceCreateRouteParam,
   PracticeAttemptRouteParam,
@@ -29,6 +30,7 @@ import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImpor
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
+import { ParentPracticeGenerationPage } from '../features/parent/practice/ParentPracticeGenerationPage';
 import { ParentScheduledAssignmentPage } from '../features/parent/scheduled/ParentScheduledAssignmentPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
@@ -305,6 +307,11 @@ export struct AppShell {
       AppRoute.PARENT_SCHEDULED_ASSIGNMENTS, new ParentScheduledAssignmentsRouteParam());
   }
 
+  private openParentPracticeGeneration(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_PRACTICE_GENERATION, new ParentPracticeGenerationRouteParam());
+  }
+
   private routeAssignmentId(param: Object): string {
     return (param as AssignmentRouteParam).assignmentId;
   }
@@ -473,6 +480,18 @@ export struct AppShell {
       }
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_PRACTICE_GENERATION) {
+      NavDestination() {
+        ParentPracticeGenerationPage({
+          onBack: () => this.navPathStack.pop(),
+          onPublished: () => {
+            this.navPathStack.pop();
+            this.notifyUiChanged();
+          }
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_VOICE_CREATE) {
       NavDestination() {
         ParentVoiceAssignmentPage({
@@ -504,7 +523,8 @@ export struct AppShell {
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
         onOpenVoice: () => this.openParentVoiceCreate(),
-        onOpenScheduled: () => this.openParentScheduledAssignments()
+        onOpenScheduled: () => this.openParentScheduledAssignments(),
+        onOpenPracticeGeneration: () => this.openParentPracticeGeneration()
       });
     }
   }

@@ -46,7 +46,8 @@ public class PracticeAttemptService {
   @Transactional
   public PracticeDtos.AttemptResponse start(UUID familyId, String studentId, PracticeDtos.StartRequest input) {
     StudentEntity student = students.requireOwned(familyId, studentId);
-    PracticePaperEntity paper = content.requirePaper(input.paperId(), input.paperVersion());
+    PracticePaperEntity paper = content.requirePaperForStudent(
+        familyId, studentId, input.paperId(), input.paperVersion());
     audiencePolicy.requireFreshStartAllowed(student, paper);
     List<PracticeQuestionEntity> questions = content.questions(paper);
     if (questions.isEmpty()) throw new ApiExceptions.BadRequest("套卷暂无可练习题目");

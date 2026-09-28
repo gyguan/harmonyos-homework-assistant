@@ -11,7 +11,8 @@ export enum AppRoute {
   PARENT_IMPORT_BATCH_DETAIL = 'parent/import/inbox/detail',
   PARENT_IMPORT_CONFIRMATION = 'parent/import/confirmation',
   PARENT_VOICE_CREATE = 'parent/voice/create',
-  PARENT_SCHEDULED_ASSIGNMENTS = 'parent/scheduled-assignments'
+  PARENT_SCHEDULED_ASSIGNMENTS = 'parent/scheduled-assignments',
+  PARENT_PRACTICE_GENERATION = 'parent/practice/generation'
 }
 
 export class AssignmentRouteParam {
@@ -41,3 +42,4 @@ export class ParentImportConfirmationRouteParam {}
 
 export class ParentVoiceCreateRouteParam {}
 export class ParentScheduledAssignmentsRouteParam {}
+export class ParentPracticeGenerationRouteParam {}

@@ -4,6 +4,7 @@ import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.json.JsonMapper;
 import com.xiaoban.homework.common.ApiExceptions;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,12 +12,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class PracticeContentService {
   private final PracticePaperRepository papers;
   private final PracticeQuestionRepository questions;
+  private final PracticePaperAudienceRepository audiences;
   private final JsonMapper mapper;
 
-  public PracticeContentService(PracticePaperRepository papers, PracticeQuestionRepository questions,
+  public PracticeContentService(
+      PracticePaperRepository papers,
+      PracticeQuestionRepository questions,
+      PracticePaperAudienceRepository audiences,
       JsonMapper mapper) {
     this.papers = papers;
     this.questions = questions;
+    this.audiences = audiences;
     this.mapper = mapper;
   }
 
@@ -29,8 +35,40 @@ public class PracticeContentService {
   }
 
   @Transactional(readOnly = true)
+  public PracticePaperEntity requirePaperForStudent(
+      UUID familyId, String studentId, String paperId, int version) {
+    PracticePaperEntity paper = requirePaper(paperId, version);
+    if (paper.familyId == null) return paper;
+    if (!familyId.equals(paper.familyId)
+        || !audiences.existsByFamilyIdAndStudentIdAndPaperKey(
+            familyId, studentId, paper.paperKey)) {
+      throw new ApiExceptions.NotFound("练习套卷不存在");
+    }
+    return paper;
+  }
+
+  @Transactional(readOnly = true)
+  public List<PracticeDtos.PaperResponse> listForStudent(
+      UUID familyId, String studentId, String grade, String subject, String semester, String track) {
+    return papers.findVisibleForStudent(
+            familyId,
+            studentId,
+            text(grade),
+            text(subject),
+            text(semester),
+            text(track))
+        .stream()
+        .map(this::response)
+        .toList();
+  }
+
+  @Transactional(readOnly = true)
   public List<PracticeQuestionEntity> questions(PracticePaperEntity paper) {
     return questions.findByPaperKeyOrderByOrderNo(paper.paperKey);
+  }
+
+  private String text(String value) {
+    return value == null ? "" : value.trim();
   }
 
   public PracticeDtos.PaperResponse response(PracticePaperEntity paper) {

@@ -3,9 +3,11 @@ package com.xiaoban.homework.student;
 import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.practice.PracticeAttemptRepository;
+import com.xiaoban.homework.practice.PracticeGenerationRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialBatchRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialPackageRepository;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -16,15 +18,18 @@ public class StudentService {
   private final StudentRepository repository;
   private final AssignmentRepository assignments;
   private final PracticeAttemptRepository practiceAttempts;
+  private final PracticeGenerationRepository practiceGenerations;
   private final VoiceMaterialBatchRepository voiceMaterials;
   private final VoiceMaterialPackageRepository voiceMaterialPackages;
 
   public StudentService(StudentRepository repository, AssignmentRepository assignments,
-      PracticeAttemptRepository practiceAttempts, VoiceMaterialBatchRepository voiceMaterials,
+      PracticeAttemptRepository practiceAttempts,
+      PracticeGenerationRepository practiceGenerations, VoiceMaterialBatchRepository voiceMaterials,
       VoiceMaterialPackageRepository voiceMaterialPackages) {
     this.repository = repository;
     this.assignments = assignments;
     this.practiceAttempts = practiceAttempts;
+    this.practiceGenerations = practiceGenerations;
     this.voiceMaterials = voiceMaterials;
     this.voiceMaterialPackages = voiceMaterialPackages;
   }
@@ -56,6 +61,21 @@ public class StudentService {
     if (practiceAttempts.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有练习记录，不能直接删除；练习历史需要保留");
     }
+    Instant now = Instant.now();
+    List<com.xiaoban.homework.practice.PracticeGenerationEntity> generationHistory =
+        practiceGenerations.findByFamilyIdAndReferenceStudentId(familyId, id);
+    List<com.xiaoban.homework.practice.PracticeGenerationEntity> disposable = new ArrayList<>();
+    for (com.xiaoban.homework.practice.PracticeGenerationEntity generation : generationHistory) {
+      if ("PUBLISHED".equals(generation.status)) continue;
+      if ("GENERATING".equals(generation.status)
+          && generation.updatedAt != null
+          && generation.updatedAt.isAfter(
+              now.minus(com.xiaoban.homework.practice.PracticeGenerationMaintenance.STALE_AFTER))) {
+        throw new ApiExceptions.Conflict("该孩子当前有AI练习正在生成，请稍后再删除");
+      }
+      disposable.add(generation);
+    }
+    if (!disposable.isEmpty()) practiceGenerations.deleteAll(disposable);
     if (voiceMaterialPackages.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有语音素材，不能直接删除；请先保留或处理素材库");
     }
