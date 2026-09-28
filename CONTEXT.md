@@ -51,7 +51,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Parent Intervention（家长介入）**：AI 判断不适合继续自主辅导、学生主动求助或任务异常时，请求家长处理的状态/动作。
 - **Weekly Review（周报）**：面向家长的周期性总结，关注完成率、用时、困难、辅导使用情况和需要关注事项，不做孩子排名。
 - **Practice Paper（练习套卷）**：围绕明确年级、学期、科目、题库类型和能力点组织的一组练习题，是练习内容统一的发布与版本边界。PRESET 为全局内容；AI_GENERATED 为 Family 私有内容，通过 Practice Paper Audience 关联一个、多个或发布当时的全部学生，题目本体只保存一份；二者共用同一 Paper / Question / Attempt / Result 模型。
-- **Practice Generation（AI练习生成）**：家长以一个参考学生的年级/学期/当前科目教材作为上下文提交训练目标，由后端 AI 生成纯文本练习草稿；草稿必须依次通过结构化校验、确定性校验和独立答案复核，家长预览确认后，才发布为 AI_GENERATED Practice Paper。
+- **Practice Generation（AI练习生成）**：家长以一个参考学生的年级/学期/当前科目教材作为上下文提交训练目标，由后端 AI 生成纯文本练习草稿；Provider 原始输出必须先经过 Structured JSON Normalizer + Practice Provider Adapter，收敛为唯一 Canonical Practice Contract，再依次通过结构化校验、确定性校验和独立答案复核，家长预览确认后，才发布为 AI_GENERATED Practice Paper。
 - **Practice Attempt（练习实例）**：学生每次开始某套卷时创建的独立作答实例；答案、笔记、提交时间、耗时与结果均归属于该 Attempt，不覆盖历史练习。
 - **Practice Track（题库类型）**：`TEXTBOOK_SYNC` 表示教材同步，`EXTRACURRICULAR` 表示课外拓展。二者共享 Practice 领域模型，但内容设计目标不同。
 
@@ -111,7 +111,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 
 - 导入：OCR / 任务拆分 / 学科识别 / due-time extraction / textbook matching / source evidence。
 - Tutor：assignment context / teacher resources / textbook context / graded hints / parent policy。
-- Practice Generation：student profile / subject-specific textbook context / parent requirement / strict structured output / deterministic validation / independent answer review / backend-owned audience compatibility / parent publish confirmation。
+- Practice Generation：student profile / subject-specific textbook context / parent requirement / provider-neutral canonical contract / strict structured output / provider adapter / deterministic validation / independent answer review / backend-owned audience compatibility / parent publish confirmation。
 - 服务商密钥只存在后端；客户端不保存 AI Provider credential。
 
 ## V2 migration and compatibility defaults
