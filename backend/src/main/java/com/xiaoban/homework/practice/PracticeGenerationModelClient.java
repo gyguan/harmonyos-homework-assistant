@@ -48,6 +48,10 @@ public class PracticeGenerationModelClient {
     return properties.getPracticeModel();
   }
 
+  public boolean available() {
+    return transport.available(properties.getPracticeModel());
+  }
+
   public Optional<PracticeContentCatalog.Paper> generate(
       StudentEntity student,
       String paperId,
