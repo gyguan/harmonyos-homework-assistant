@@ -67,7 +67,7 @@ final class PracticeGenerationProviderAdapter {
           tracker);
       String stem = requiredString(question, "stem", base + ".stem", tracker);
       AdaptedOptions adaptedOptions =
-          options(requiredValue(question, "options", base + ".options"), base + ".options", tracker);
+          questionOptions(question, type, base + ".options", tracker);
       List<PracticeGenerationCanonicalContract.Option> options = adaptedOptions.options();
       String answerSpec = normalizeAnswerSpec(
           type,
@@ -86,6 +86,18 @@ final class PracticeGenerationProviderAdapter {
           type, stem, options, answerSpec, explanation, hints, tags));
     }
     return List.copyOf(result);
+  }
+
+  private static AdaptedOptions questionOptions(
+      Map<String, Object> question, String type, String path, Tracker tracker) {
+    if (!question.containsKey("options") || question.get("options") == null) {
+      if ("SINGLE_CHOICE".equals(type)) {
+        throw invalid(path, "is required for SINGLE_CHOICE");
+      }
+      tracker.add(path);
+      return new AdaptedOptions(List.of(), Set.of());
+    }
+    return options(question.get("options"), path, tracker);
   }
 
   private static AdaptedOptions options(
@@ -244,14 +256,16 @@ final class PracticeGenerationProviderAdapter {
   private static List<String> requiredStringList(
       Map<String, Object> object, String field, String path, Tracker tracker) {
     Object value = requiredValue(object, field, path);
-    if (!(value instanceof List<?> source)) {
-      throw invalid(path, "must be an array");
+    if (value instanceof List<?> source) {
+      List<String> result = new ArrayList<>();
+      for (int i = 0; i < source.size(); i++) {
+        result.add(stringValue(source.get(i), path + "[" + i + "]", tracker));
+      }
+      return List.copyOf(result);
     }
-    List<String> result = new ArrayList<>();
-    for (int i = 0; i < source.size(); i++) {
-      result.add(stringValue(source.get(i), path + "[" + i + "]", tracker));
-    }
-    return List.copyOf(result);
+
+    tracker.add(path);
+    return List.of(stringValue(value, path, tracker));
   }
 
   private static String stringValue(Object value, String path, Tracker tracker) {
