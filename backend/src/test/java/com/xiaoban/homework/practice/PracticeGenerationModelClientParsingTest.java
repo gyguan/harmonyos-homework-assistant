@@ -16,6 +16,70 @@ import tools.jackson.databind.json.JsonMapper;
 
 class PracticeGenerationModelClientParsingTest {
   @Test
+  void parsesQuestionsOnlyRootAndBuildsPaperMetadataFromRequest() throws Exception {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setTutorModel("deepseek-v4-flash-0731");
+    properties.setPracticeModel("");
+
+    OpenAiCompatibleTransport transport = mock(OpenAiCompatibleTransport.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    String output = """
+        ```json
+        {
+          "questions": [
+            {
+              "type": "NUMBER",
+              "stem": "12 - 5 = ?",
+              "options": [],
+              "answerSpec": "7",
+              "explanation": "12减5等于7。",
+              "hints": ["关键词：12、减5"],
+              "tags": ["减法"]
+            }
+          ]
+        }
+        ```
+        """;
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        any(String.class),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class)))
+        .thenReturn(Optional.of(output));
+
+    PracticeGenerationModelClient client =
+        new PracticeGenerationModelClient(properties, transport, mapper);
+
+    Optional<PracticeContentCatalog.Paper> result = client.generate(
+        "人教版数学二年级上册",
+        "ai-questions-only",
+        "G2",
+        "S1",
+        new PracticeGenerationDtos.GenerateRequest(
+            "MATH", "TEXTBOOK_SYNC", "L1", 1, "练习退位减法"));
+
+    assertTrue(result.isPresent());
+    assertEquals("练习退位减法", result.get().title());
+    assertEquals("AI根据家长训练要求生成的数学教材同步练习", result.get().description());
+    assertEquals(5, result.get().estimatedMinutes());
+    assertEquals("7", result.get().questions().get(0).answerSpec());
+  }
+
+  @Test
+  void schemaRequiresOnlyQuestionsAtTopLevel() {
+    Map<String, Object> schema = PracticeGenerationModelClient.schema(5);
+
+    Map<?, ?> properties = (Map<?, ?>) schema.get("properties");
+    assertEquals(1, properties.size());
+    assertTrue(properties.containsKey("questions"));
+    assertEquals(java.util.List.of("questions"), schema.get("required"));
+  }
+
+  @Test
   void parsesMarkdownAndPaperWrapperFromCompatibleProvider() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
     properties.setTutorModel("deepseek-v4-flash-0731");
