@@ -136,13 +136,14 @@ def main() -> int:
     require("player.seek(target);" in audio,
             "AVPlayer seek must have a capability-safe fallback when SeekMode is unavailable")
 
-    for forbidden_builder_local in [
-        "let student = this.viewModel.student();",
-        "let current = this.candidate(this.viewModel.activeStudentId());",
-        "let selected = this.isStudentSelected(candidate.studentId);",
-    ]:
-        require(forbidden_builder_local not in parent_practice_generation,
-                f"ParentPracticeGenerationPage @Builder must not contain local declaration: {forbidden_builder_local}")
+    builder_sections = re.findall(
+        r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
+        parent_practice_generation)
+    require(len(builder_sections) >= 5,
+            "ParentPracticeGenerationPage builder sections could not be identified")
+    builder_source = "\n".join(builder_sections)
+    require(re.search(r"(?m)^\s+let\s+", builder_source) is None,
+            "ParentPracticeGenerationPage @Builder bodies must not contain local let declarations")
 
     require("throw error;" not in share_receive,
             "share receive flow must only throw explicit Error values")
