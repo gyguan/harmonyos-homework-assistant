@@ -38,7 +38,8 @@ public class PracticeGenerationController {
   @PostMapping("/practice/generations/{generationId}/publish")
   public PracticeGenerationDtos.PublishResponse publish(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable UUID generationId) {
-    return service.publish(familyId, generationId);
+      @PathVariable UUID generationId,
+      @Valid @RequestBody PracticeGenerationDtos.PublishRequest input) {
+    return service.publish(familyId, generationId, input);
   }
 }
