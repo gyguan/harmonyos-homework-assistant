@@ -42,7 +42,7 @@ public class PracticeController {
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String paperId,
       @RequestParam int version,
-      @RequestParam String studentId) {
+      @RequestParam(required = false, defaultValue = "") String studentId) {
     return content.response(content.requirePaperForStudent(
         familyId, studentId, paperId, version));
   }
