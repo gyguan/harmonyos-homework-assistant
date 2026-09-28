@@ -184,6 +184,9 @@ jobs:
       - name: Validate issue 298 voice material automation
         run: python scripts/validate_issue298_voice_material.py
 
+      - name: Validate issue 316 scheduled assignments
+        run: python scripts/validate_issue316_scheduled_assignment.py
+
       - name: Validate admin login refactor
         run: |
           python scripts/validate_admin_login.py
@@ -385,6 +388,9 @@ jobs:
 
       - name: Run voice material daily automation E2E
         run: python backend/scripts/voice_material_e2e.py
+
+      - name: Run scheduled assignment E2E
+        run: python backend/scripts/scheduled_assignment_e2e.py
 
       - name: Run API efficiency P1 E2E
         run: python backend/scripts/api_efficiency_p1_e2e.py
