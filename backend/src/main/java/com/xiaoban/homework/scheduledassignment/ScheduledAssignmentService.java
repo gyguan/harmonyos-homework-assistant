@@ -169,7 +169,7 @@ public class ScheduledAssignmentService {
 
     Instant now = Instant.now();
     LocalDate businessDate =
-        now.atZone(ScheduledAssignmentSchedule.ScheduledAssignmentSchedule.BUSINESS_ZONE).toLocalDate();
+        now.atZone(ScheduledAssignmentSchedule.BUSINESS_ZONE).toLocalDate();
     for (ScheduledAssignmentPlanEntity plan : voicePlans) {
       if (!"ENABLED".equals(plan.status)) continue;
       Instant fireAt = ScheduledAssignmentSchedule.fireAt(plan, businessDate);
@@ -280,14 +280,6 @@ public class ScheduledAssignmentService {
         false, LocalDate.now(ScheduledAssignmentSchedule.BUSINESS_ZONE).toString(), "", "", null);
   }
 
-  private String voiceSkipReason(VoiceMaterialDtos.AutoCreateResponse result) {
-    if (result.assignment() != null) return "ACTIVE_TASK_EXISTS";
-    if (!text(result.packageId()).isBlank() || !text(result.assignmentId()).isBlank()) {
-      return "ALREADY_CREATED_TODAY";
-    }
-    return "NO_MATERIAL";
-  }
-
   private String planType(String value) {
     String normalized = text(value).trim().toUpperCase(Locale.ROOT);
     if (!"MANUAL_ASSIGNMENT".equals(normalized) &&
@@ -351,13 +343,6 @@ public class ScheduledAssignmentService {
     return String.join(",", ordered);
   }
 
-  private Set<DayOfWeek> weekdaySet(String value) {
-    Set<DayOfWeek> result = EnumSet.noneOf(DayOfWeek.class);
-    if (value == null || value.isBlank()) return result;
-    for (String raw : value.split(",")) result.add(DayOfWeek.valueOf(raw));
-    return result;
-  }
-
   private List<String> weekdayList(String value) {
     if (value == null || value.isBlank()) return List.of();
     return List.of(value.split(","));
@@ -385,8 +370,4 @@ public class ScheduledAssignmentService {
 
   private long epoch(Instant value) { return value == null ? 0L : value.toEpochMilli(); }
   private String text(String value) { return value == null ? "" : value; }
-  private String blankToNull(String value) {
-    String normalized = text(value).trim();
-    return normalized.isBlank() ? null : normalized;
-  }
 }
