@@ -5,6 +5,7 @@ import {
   PracticeDifficulty,
   PracticeGenerationDraftQuestion,
   PracticeGenerationResult,
+  PracticeQuestionOption,
   PracticeQuestionType,
   PracticeSubject,
   PracticeTrack
@@ -308,13 +309,13 @@ export struct ParentPracticeGenerationPage {
 
       if (question.options.length > 0) {
         Column({ space: 5 }) {
-          ForEach(question.options, (option) => {
+          ForEach(question.options, (option: PracticeQuestionOption) => {
             Text(`${option.key}. ${option.label}`)
               .width('100%')
               .fontSize(AppTheme.META_SIZE)
               .lineHeight(AppTheme.META_LINE_HEIGHT)
               .fontColor(AppTheme.SUBTEXT);
-          }, (option) => option.key);
+          }, (option: PracticeQuestionOption) => option.key);
         }
         .width('100%');
       }
