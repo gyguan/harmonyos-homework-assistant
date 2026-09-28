@@ -58,7 +58,8 @@ public class PracticeGenerationModelClient {
           StructuredJsonNormalizer.normalize(mapper, output.get());
       shape = normalized.shape();
       PracticeGenerationProviderAdapter.Result adapted =
-          PracticeGenerationProviderAdapter.adapt(mapper, normalized.json());
+          PracticeGenerationProviderAdapter.adapt(
+              mapper, normalized.json(), metadataDefaults(request));
       coercedFields = adapted.coercedPaths();
       PracticeGenerationCanonicalContract.Paper modelPaper = adapted.paper();
 
@@ -125,6 +126,7 @@ public class PracticeGenerationModelClient {
         + "同卷题目要覆盖不同角度，禁止只替换数字、姓名或物品形成机械重复。"
         + "正确答案位置要自然分散，不能长期固定在第一个选项。"
         + "生成前自行复核每题答案、选项唯一性、数学计算和年级适配。"
+        + "顶层只输出 questions 数组，不需要生成 title、description、estimatedMinutes 或 tags。"
         + "最终只输出符合JSON Schema的对象，不输出Markdown或额外说明。";
   }
 
@@ -173,23 +175,50 @@ public class PracticeGenerationModelClient {
         questionProps,
         List.of("type", "stem", "options", "answerSpec", "explanation", "hints", "tags"));
 
-    Map<String, Object> paperProps = new LinkedHashMap<>();
-    paperProps.put("title", Map.of("type", "string"));
-    paperProps.put("description", Map.of("type", "string"));
-    paperProps.put("estimatedMinutes", Map.of("type", "integer", "minimum", 1, "maximum", 120));
-    paperProps.put("tags", Map.of(
-        "type", "array",
-        "minItems", 1,
-        "maxItems", 8,
-        "items", Map.of("type", "string")));
-    paperProps.put("questions", Map.of(
+    Map<String, Object> generationProps = new LinkedHashMap<>();
+    generationProps.put("questions", Map.of(
         "type", "array",
         "minItems", questionCount,
         "maxItems", questionCount,
         "items", question));
-    return object(
-        paperProps,
-        List.of("title", "description", "estimatedMinutes", "tags", "questions"));
+    return object(generationProps, List.of("questions"));
+  }
+
+  static PracticeGenerationProviderAdapter.MetadataDefaults metadataDefaults(
+      PracticeGenerationDtos.GenerateRequest request) {
+    String subject = normalizeCode(request.subject());
+    String track = normalizeCode(request.track());
+    String subjectLabel = switch (subject) {
+      case "CHINESE" -> "语文";
+      case "MATH" -> "数学";
+      case "ENGLISH" -> "英语";
+      default -> "练习";
+    };
+    String trackLabel = switch (track) {
+      case "TEXTBOOK_SYNC" -> "教材同步";
+      case "EXTRACURRICULAR" -> "课外拓展";
+      default -> "专项";
+    };
+    String requirement = compactText(request.requirement());
+    String title = requirement.length() <= 32
+        ? requirement
+        : subjectLabel + trackLabel + "练习";
+    if (title.isBlank()) title = subjectLabel + trackLabel + "练习";
+    String description = "AI根据家长训练要求生成的" + subjectLabel + trackLabel + "练习";
+    int estimatedMinutes = Math.max(5, Math.min(120, request.questionCount() * 2));
+    return new PracticeGenerationProviderAdapter.MetadataDefaults(
+        title,
+        description,
+        estimatedMinutes,
+        List.of(subjectLabel, trackLabel));
+  }
+
+  private static String normalizeCode(String value) {
+    return value == null ? "" : value.trim().toUpperCase();
+  }
+
+  private static String compactText(String value) {
+    return value == null ? "" : value.trim().replaceAll("\\s+", " ");
   }
 
   private static String safeMessage(String value) {
