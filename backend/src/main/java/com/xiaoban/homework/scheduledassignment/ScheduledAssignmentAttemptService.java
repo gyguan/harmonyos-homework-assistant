@@ -200,8 +200,8 @@ public class ScheduledAssignmentAttemptService {
         0L,
         "");
 
-    log.info("scheduled_assignment manual_create_start planId={} studentId={} fireAt={} assignmentId={} title={} dueAt={}",
-        plan.id, plan.studentId, fireAt, assignmentId, template.title, dueAt);
+    log.info("scheduled_assignment manual_create_start planId={} studentId={} fireAt={} assignmentId={} subjectCode={} dueAt={}",
+        plan.id, plan.studentId, fireAt, assignmentId, template.subjectCode, dueAt);
     AssignmentDtos.Response assignment =
         assignments.create(plan.familyId, plan.studentId, create);
     run.status = "SUCCESS";
