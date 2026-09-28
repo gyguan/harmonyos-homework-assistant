@@ -112,6 +112,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - 导入：OCR / 任务拆分 / 学科识别 / due-time extraction / textbook matching / source evidence。
 - Tutor：assignment context / teacher resources / textbook context / graded hints / parent policy。
 - Practice Generation：student profile / subject-specific textbook context / parent requirement / strict structured output / deterministic validation / independent answer review / backend-owned audience compatibility / parent publish confirmation。
+- Practice Generation Provider Compatibility：Provider raw output 必须依次经过 `StructuredJsonNormalizer` 与 `PracticeGenerationProviderAdapter` 收敛为唯一 Canonical Practice Contract；后续 validator / answer review / publish 只消费 canonical 结构，禁止在业务层按模型或供应商增加兼容分支。
 - 服务商密钥只存在后端；客户端不保存 AI Provider credential。
 
 ## V2 migration and compatibility defaults
