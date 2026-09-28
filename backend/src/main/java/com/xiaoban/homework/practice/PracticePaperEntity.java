@@ -4,6 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Table(name = "practice_paper")
@@ -11,6 +12,8 @@ public class PracticePaperEntity {
   @Id public String paperKey;
   public String paperId;
   public int version;
+  public UUID familyId;
+  public String studentId;
   public String grade;
   public String subject;
   public String semester;
