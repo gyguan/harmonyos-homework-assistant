@@ -111,6 +111,54 @@ class PracticeGenerationServiceAudienceTest {
   }
 
   @Test
+  void repeatedPublishReturnsExistingAudienceWithoutMutatingIt() throws Exception {
+    UUID familyId = UUID.randomUUID();
+    PracticeGenerationRepository generations = mock(PracticeGenerationRepository.class);
+    PracticePaperRepository papers = mock(PracticePaperRepository.class);
+    PracticeQuestionRepository questions = mock(PracticeQuestionRepository.class);
+    PracticePaperAudienceRepository audiences = mock(PracticePaperAudienceRepository.class);
+    PracticeContentService content = mock(PracticeContentService.class);
+    PracticeGenerationEntity generation = generation(familyId, JsonMapper.builder().build());
+    generation.status = "PUBLISHED";
+    when(generations.lockByIdAndFamilyId(generation.id, familyId)).thenReturn(Optional.of(generation));
+
+    PracticePaperEntity paper = new PracticePaperEntity();
+    paper.paperKey = "ai-test@1";
+    paper.paperId = "ai-test";
+    paper.version = 1;
+    paper.familyId = familyId;
+    when(content.requirePaper("ai-test", 1)).thenReturn(paper);
+    when(content.response(paper)).thenReturn(paperResponse());
+
+    PracticePaperAudienceEntity existing = new PracticePaperAudienceEntity();
+    existing.id = UUID.randomUUID();
+    existing.familyId = familyId;
+    existing.paperKey = paper.paperKey;
+    existing.studentId = "ref";
+    when(audiences.findByFamilyIdAndPaperKey(familyId, paper.paperKey))
+        .thenReturn(List.of(existing));
+
+    PracticeGenerationService service = new PracticeGenerationService(
+        generations, papers, questions, audiences,
+        mock(StudentService.class),
+        mock(PracticeAudiencePolicy.class),
+        mock(PracticeGenerationModelClient.class),
+        mock(PracticeGenerationReviewClient.class),
+        mock(PracticeGeneratedContentValidator.class),
+        content,
+        JsonMapper.builder().build());
+
+    PracticeGenerationDtos.PublishResponse response = service.publish(
+        familyId,
+        generation.id,
+        new PracticeGenerationDtos.PublishRequest("ALL", List.of()));
+
+    assertEquals(List.of("ref"), response.targetStudentIds());
+    verify(papers, never()).saveAndFlush(any(PracticePaperEntity.class));
+    verify(audiences, never()).saveAll(any());
+  }
+
+  @Test
   void rejectsSelectedStudentWithDifferentGrade() throws Exception {
     UUID familyId = UUID.randomUUID();
     PracticeGenerationRepository generations = mock(PracticeGenerationRepository.class);
