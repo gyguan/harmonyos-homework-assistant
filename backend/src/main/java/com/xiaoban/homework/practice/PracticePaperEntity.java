@@ -13,7 +13,6 @@ public class PracticePaperEntity {
   public String paperId;
   public int version;
   public UUID familyId;
-  public String studentId;
   public String grade;
   public String subject;
   public String semester;
