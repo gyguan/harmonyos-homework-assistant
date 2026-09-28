@@ -70,4 +70,59 @@ class PracticeGenerationModelClientParsingTest {
     assertEquals(1, result.get().questions().size());
     assertEquals("36", result.get().questions().get(0).answerSpec());
   }
+
+  @Test
+  void parsesObjectWrappedScalarFieldsFromDeepSeekCompatibleProvider() throws Exception {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setTutorModel("deepseek-v4-flash-0731");
+    properties.setPracticeModel("");
+
+    OpenAiCompatibleTransport transport = mock(OpenAiCompatibleTransport.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    String output = """
+        {
+          "title": {"text": "退位减法练习"},
+          "description": {"value": "专项练习"},
+          "estimatedMinutes": {"value": 8},
+          "tags": [{"text": "退位减法"}],
+          "questions": [
+            {
+              "type": {"value": "NUMBER"},
+              "stem": {"text": "41 - 5 = ?"},
+              "options": [],
+              "answerSpec": {"answer": {"value": 36}},
+              "explanation": {"text": "41减5等于36。"},
+              "hints": [{"text": "关键词：41、减5"}],
+              "tags": [{"text": "退位减法"}]
+            }
+          ]
+        }
+        """;
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        any(String.class),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class)))
+        .thenReturn(Optional.of(output));
+
+    PracticeGenerationModelClient client =
+        new PracticeGenerationModelClient(properties, transport, mapper);
+
+    Optional<PracticeContentCatalog.Paper> result = client.generate(
+        "人教版数学二年级上册",
+        "ai-object-fields",
+        "G2",
+        "S1",
+        new PracticeGenerationDtos.GenerateRequest(
+            "MATH", "TEXTBOOK_SYNC", "L1", 1, "练习退位减法"));
+
+    assertTrue(result.isPresent());
+    assertEquals("退位减法练习", result.get().title());
+    assertEquals("36", result.get().questions().get(0).answerSpec());
+    assertEquals("关键词：41、减5", result.get().questions().get(0).hints().get(0));
+  }
 }
