@@ -1,5 +1,6 @@
 import { http } from '@kit.NetworkKit';
 import {
+  PracticeAudienceCandidate,
   PracticeDifficulty,
   PracticeGenerationDraft,
   PracticeGenerationDraftQuestion,
@@ -8,6 +9,7 @@ import {
   PracticeGrade,
   PracticePaper,
   PracticePaperStatus,
+  PracticePublishResult,
   PracticePublishScope,
   PracticeQuestionOption,
   PracticeQuestionType,
@@ -46,11 +48,20 @@ interface RemoteDraftPaper {
   sourceType: string;
   questions: RemoteDraftQuestion[];
 }
+interface RemoteAudienceCandidate {
+  studentId: string;
+  studentName: string;
+  grade: string;
+  semester: string;
+  compatible: boolean;
+  reason: string;
+}
 interface RemoteGeneration {
   generationId: string;
   status: string;
   paper: RemoteDraftPaper | null;
   errorMessage: string;
+  audienceCandidates: RemoteAudienceCandidate[];
 }
 interface RemotePaper {
   id: string;
@@ -126,7 +137,7 @@ export class PracticeGenerationRemoteApi {
     generationId: string,
     scope: PracticePublishScope,
     targetStudentIds: string[]
-  ): Promise<PracticePaper> {
+  ): Promise<PracticePublishResult> {
     let body: PublishBody = {
       scope: scope,
       targetStudentIds: targetStudentIds.slice()
@@ -141,15 +152,30 @@ export class PracticeGenerationRemoteApi {
       throw new Error(`发布AI练习失败: ${response.statusCode}`);
     }
     let remote = JSON.parse(response.body) as RemotePublish;
-    return this.mapPaper(remote.paper);
+    return {
+      paper: this.mapPaper(remote.paper),
+      targetStudentIds: remote.targetStudentIds.slice()
+    };
   }
 
   private mapGeneration(remote: RemoteGeneration): PracticeGenerationResult {
+    let candidates: PracticeAudienceCandidate[] = [];
+    for (let item of remote.audienceCandidates) {
+      candidates.push({
+        studentId: item.studentId,
+        studentName: item.studentName,
+        grade: item.grade,
+        semester: item.semester,
+        compatible: item.compatible,
+        reason: item.reason
+      });
+    }
     return {
       generationId: remote.generationId,
       status: remote.status,
       paper: remote.paper === null ? null : this.mapDraft(remote.paper),
-      errorMessage: remote.errorMessage
+      errorMessage: remote.errorMessage,
+      audienceCandidates: candidates
     };
   }
 
