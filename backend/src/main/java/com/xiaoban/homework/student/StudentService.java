@@ -8,6 +8,7 @@ import com.xiaoban.homework.practice.PracticePaperAudienceRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialBatchRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialPackageRepository;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -63,10 +64,27 @@ public class StudentService {
     if (practiceAttempts.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有练习记录，不能直接删除；练习历史需要保留");
     }
-    if (practicePaperAudiences.existsByFamilyIdAndStudentId(familyId, id)
-        || practiceGenerations.existsByFamilyIdAndReferenceStudentId(familyId, id)) {
-      throw new ApiExceptions.Conflict("该孩子已有AI练习题库或生成记录，不能直接删除；请保留练习历史");
+    if (practicePaperAudiences.existsByFamilyIdAndStudentId(familyId, id)) {
+      throw new ApiExceptions.Conflict("该孩子已有已发布AI练习，不能直接删除；请保留练习历史");
     }
+
+    Instant now = Instant.now();
+    List<com.xiaoban.homework.practice.PracticeGenerationEntity> generationHistory =
+        practiceGenerations.findByFamilyIdAndReferenceStudentId(familyId, id);
+    List<com.xiaoban.homework.practice.PracticeGenerationEntity> disposable = new ArrayList<>();
+    for (com.xiaoban.homework.practice.PracticeGenerationEntity generation : generationHistory) {
+      if ("PUBLISHED".equals(generation.status)) {
+        throw new ApiExceptions.Conflict("该孩子作为参考学生已有已发布AI练习，不能直接删除；请保留练习历史");
+      }
+      if ("GENERATING".equals(generation.status)
+          && generation.updatedAt != null
+          && generation.updatedAt.isAfter(
+              now.minus(com.xiaoban.homework.practice.PracticeGenerationMaintenance.STALE_AFTER))) {
+        throw new ApiExceptions.Conflict("该孩子当前有AI练习正在生成，请稍后再删除");
+      }
+      disposable.add(generation);
+    }
+    if (!disposable.isEmpty()) practiceGenerations.deleteAll(disposable);
     if (voiceMaterialPackages.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有语音素材，不能直接删除；请先保留或处理素材库");
     }
