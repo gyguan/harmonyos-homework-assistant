@@ -3,6 +3,8 @@ package com.xiaoban.homework.student;
 import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.practice.PracticeAttemptRepository;
+import com.xiaoban.homework.practice.PracticeGenerationRepository;
+import com.xiaoban.homework.practice.PracticePaperRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialBatchRepository;
 import com.xiaoban.homework.voicematerial.VoiceMaterialPackageRepository;
 import java.time.Instant;
@@ -16,15 +18,20 @@ public class StudentService {
   private final StudentRepository repository;
   private final AssignmentRepository assignments;
   private final PracticeAttemptRepository practiceAttempts;
+  private final PracticePaperRepository practicePapers;
+  private final PracticeGenerationRepository practiceGenerations;
   private final VoiceMaterialBatchRepository voiceMaterials;
   private final VoiceMaterialPackageRepository voiceMaterialPackages;
 
   public StudentService(StudentRepository repository, AssignmentRepository assignments,
-      PracticeAttemptRepository practiceAttempts, VoiceMaterialBatchRepository voiceMaterials,
+      PracticeAttemptRepository practiceAttempts, PracticePaperRepository practicePapers,
+      PracticeGenerationRepository practiceGenerations, VoiceMaterialBatchRepository voiceMaterials,
       VoiceMaterialPackageRepository voiceMaterialPackages) {
     this.repository = repository;
     this.assignments = assignments;
     this.practiceAttempts = practiceAttempts;
+    this.practicePapers = practicePapers;
+    this.practiceGenerations = practiceGenerations;
     this.voiceMaterials = voiceMaterials;
     this.voiceMaterialPackages = voiceMaterialPackages;
   }
@@ -55,6 +62,10 @@ public class StudentService {
     }
     if (practiceAttempts.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有练习记录，不能直接删除；练习历史需要保留");
+    }
+    if (practicePapers.existsByFamilyIdAndStudentId(familyId, id)
+        || practiceGenerations.existsByFamilyIdAndStudentId(familyId, id)) {
+      throw new ApiExceptions.Conflict("该孩子已有AI练习题库或生成记录，不能直接删除；请保留练习历史");
     }
     if (voiceMaterialPackages.existsByFamilyIdAndStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有语音素材，不能直接删除；请先保留或处理素材库");
