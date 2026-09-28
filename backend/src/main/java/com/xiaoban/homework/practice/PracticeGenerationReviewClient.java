@@ -2,6 +2,7 @@ package com.xiaoban.homework.practice;
 
 import com.xiaoban.homework.ai.AiProviderProperties;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
+import com.xiaoban.homework.ai.StructuredJsonNormalizer;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,9 @@ public class PracticeGenerationReviewClient {
           schema());
       if (output.isEmpty()) return Optional.empty();
 
-      ReviewResult result = mapper.readValue(output.get().trim(), ReviewResult.class);
+      StructuredJsonNormalizer.Result normalized =
+          StructuredJsonNormalizer.normalize(mapper, output.get());
+      ReviewResult result = mapper.readValue(normalized.json(), ReviewResult.class);
       if (result == null || result.issues() == null) return Optional.empty();
       if (result.passed() && !result.issues().isEmpty()) {
         log.warn("[AI] practice review inconsistent paperId={} passed=true issues={}",
@@ -54,8 +57,8 @@ public class PracticeGenerationReviewClient {
           paper.id(), result.passed(), result.issues().size());
       return Optional.of(result);
     } catch (Exception error) {
-      log.warn("[AI] practice review parse failed paperId={} exception={}",
-          paper.id(), error.getClass().getSimpleName());
+      log.warn("[AI] practice review parse failed paperId={} exception={} message={}",
+          paper.id(), error.getClass().getSimpleName(), safeMessage(error.getMessage()));
       return Optional.empty();
     }
   }
@@ -84,6 +87,12 @@ public class PracticeGenerationReviewClient {
         "maxItems", 20,
         "items", issue));
     return object(rootProps, List.of("passed", "issues"));
+  }
+
+  private static String safeMessage(String value) {
+    if (value == null || value.isBlank()) return "<empty>";
+    String compact = value.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').trim();
+    return compact.length() <= 300 ? compact : compact.substring(0, 300);
   }
 
   private static Map<String, Object> object(
