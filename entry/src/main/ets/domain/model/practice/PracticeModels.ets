@@ -323,11 +323,21 @@ export interface PracticeGenerationDraft {
   questions: PracticeGenerationDraftQuestion[];
 }
 
+export interface PracticeAudienceCandidate {
+  studentId: string;
+  studentName: string;
+  grade: string;
+  semester: string;
+  compatible: boolean;
+  reason: string;
+}
+
 export interface PracticeGenerationResult {
   generationId: string;
   status: string;
   paper: PracticeGenerationDraft | null;
   errorMessage: string;
+  audienceCandidates: PracticeAudienceCandidate[];
 }
 
 
@@ -335,4 +345,9 @@ export enum PracticePublishScope {
   CURRENT = 'CURRENT',
   SELECTED = 'SELECTED',
   ALL = 'ALL'
+}
+
+export interface PracticePublishResult {
+  paper: PracticePaper;
+  targetStudentIds: string[];
 }
