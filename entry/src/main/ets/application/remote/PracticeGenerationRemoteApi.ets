@@ -8,6 +8,7 @@ import {
   PracticeGrade,
   PracticePaper,
   PracticePaperStatus,
+  PracticePublishScope,
   PracticeQuestionOption,
   PracticeQuestionType,
   PracticeSemester,
@@ -70,6 +71,7 @@ interface RemotePublish {
   generationId: string;
   status: string;
   paper: RemotePaper;
+  targetStudentIds: string[];
 }
 interface RemoteErrorBody { message?: string; }
 interface GenerateBody {
@@ -78,6 +80,10 @@ interface GenerateBody {
   difficulty: string;
   questionCount: number;
   requirement: string;
+}
+interface PublishBody {
+  scope: string;
+  targetStudentIds: string[];
 }
 
 export class PracticeGenerationRemoteApi {
@@ -116,11 +122,20 @@ export class PracticeGenerationRemoteApi {
     return this.mapGeneration(JSON.parse(response.body) as RemoteGeneration);
   }
 
-  async publish(generationId: string): Promise<PracticePaper> {
+  async publish(
+    generationId: string,
+    scope: PracticePublishScope,
+    targetStudentIds: string[]
+  ): Promise<PracticePaper> {
+    let body: PublishBody = {
+      scope: scope,
+      targetStudentIds: targetStudentIds.slice()
+    };
     let response = await BackendHttpClient.instance.requestFor(
       'practice.generation.publish',
       `/api/v1/practice/generations/${encodeURIComponent(generationId)}/publish`,
-      http.RequestMethod.POST);
+      http.RequestMethod.POST,
+      body);
     if (response.statusCode === 409) throw new Error(this.message(response.body, '当前练习草稿不能发布'));
     if (response.statusCode < 200 || response.statusCode >= 300) {
       throw new Error(`发布AI练习失败: ${response.statusCode}`);
