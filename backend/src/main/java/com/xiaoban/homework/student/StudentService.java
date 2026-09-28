@@ -64,7 +64,7 @@ public class StudentService {
       throw new ApiExceptions.Conflict("该孩子已有练习记录，不能直接删除；练习历史需要保留");
     }
     if (practicePaperAudiences.existsByFamilyIdAndStudentId(familyId, id)
-        || practiceGenerations.existsByFamilyIdAndStudentId(familyId, id)) {
+        || practiceGenerations.existsByFamilyIdAndReferenceStudentId(familyId, id)) {
       throw new ApiExceptions.Conflict("该孩子已有AI练习题库或生成记录，不能直接删除；请保留练习历史");
     }
     if (voiceMaterialPackages.existsByFamilyIdAndStudentId(familyId, id)) {
