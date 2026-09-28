@@ -144,6 +144,54 @@ class PracticeGenerationProviderAdapterTest {
     assertTrue(result.coercedPaths().contains("$.questions[0].answerSpec"));
   }
 
+
+  @Test
+  void prefersUniqueLabelWhenGeneratedKeyCollidesWithProviderAnswerText() throws Exception {
+    String input = paperWithQuestion("""
+        {
+          "type": "SINGLE_CHOICE",
+          "stem": "请选择正确选项。",
+          "options": ["B", "X", "Y"],
+          "answerSpec": "B",
+          "explanation": "选项文本 B 是正确答案。",
+          "hints": ["关键词：正确选项"],
+          "tags": ["测试"]
+        }
+        """);
+
+    PracticeGenerationProviderAdapter.Result result =
+        PracticeGenerationProviderAdapter.adapt(mapper, input);
+
+    PracticeGenerationCanonicalContract.Question question = result.paper().questions().get(0);
+    assertEquals("A", question.answerSpec());
+    assertEquals("B", question.options().get(0).label());
+    assertEquals("B", question.options().get(1).key());
+  }
+
+  @Test
+  void keepsExplicitProviderKeyWhenLabelTextMatchesAnotherOptionKey() throws Exception {
+    String input = paperWithQuestion("""
+        {
+          "type": "SINGLE_CHOICE",
+          "stem": "请选择正确选项。",
+          "options": [
+            {"key": "A", "label": "B"},
+            {"key": "B", "label": "X"},
+            {"key": "C", "label": "Y"}
+          ],
+          "answerSpec": "B",
+          "explanation": "Provider 明确返回 key B。",
+          "hints": ["关键词：正确选项"],
+          "tags": ["测试"]
+        }
+        """);
+
+    PracticeGenerationProviderAdapter.Result result =
+        PracticeGenerationProviderAdapter.adapt(mapper, input);
+
+    assertEquals("B", result.paper().questions().get(0).answerSpec());
+  }
+
   @Test
   void rejectsConflictingScalarWrapperCandidates() {
     String input = paperWithQuestion("""
