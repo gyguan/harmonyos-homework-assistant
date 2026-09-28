@@ -44,7 +44,7 @@ app:
     chat-completions-path: ${AI_CHAT_COMPLETIONS_PATH:/v1/chat/completions}
     tutor-model: ${AI_TUTOR_MODEL:${OPENAI_MODEL:gpt-5.6-luna}}
     organizer-model: ${AI_ORGANIZER_MODEL:${OPENAI_ORGANIZER_MODEL:gpt-5.6-luna}}
-    practice-model: ${AI_PRACTICE_MODEL:${OPENAI_PRACTICE_MODEL:gpt-5.6-luna}}
+    practice-model: ${AI_PRACTICE_MODEL:${OPENAI_PRACTICE_MODEL:${AI_ORGANIZER_MODEL:${OPENAI_ORGANIZER_MODEL:${OPENAI_MODEL:}}}}}
     allow-unauthenticated: ${AI_ALLOW_UNAUTHENTICATED:false}
     structured-output: ${AI_STRUCTURED_OUTPUT:true}
     log-payloads: ${AI_LOG_PAYLOADS:false}
