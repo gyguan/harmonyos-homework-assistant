@@ -14,10 +14,22 @@ import {
   PracticePreviousAnswer,
   PracticePreviousNote,
   PracticeResult,
-  PracticeSubject
+  PracticeSubject,
+  PracticePaper,
+  PracticePaperStatus,
+  PracticeSemester,
+  PracticeTrack,
+  PracticeTrackFilter,
+  PracticeDifficulty,
+  PracticeSourceType
 } from '../../domain/model/practice/PracticeModels';
 import { BackendHttpClient } from './BackendHttpClient';
 
+interface RemotePracticePaper {
+  id: string; version: number; grade: string; subject: string; semester: string; track: string;
+  title: string; description: string; difficulty: string; questionCount: number; estimatedMinutes: number;
+  tags: string[]; sourceType: string;
+}
 interface RemotePracticeOption { key: string; label: string; }
 interface RemotePracticeQuestion {
   id: string; orderNo: number; type: string; stem: string;
@@ -58,6 +70,39 @@ interface SaveNoteBody { content: string; }
 export class PracticeRemoteApi {
   static readonly instance: PracticeRemoteApi = new PracticeRemoteApi();
   private constructor() {}
+
+  async listPapers(
+    studentId: string,
+    grade: PracticeGrade,
+    subject: PracticeSubject,
+    semester: PracticeSemester,
+    track: PracticeTrackFilter
+  ): Promise<PracticePaper[]> {
+    let query = `grade=${encodeURIComponent(grade)}&subject=${encodeURIComponent(subject)}&semester=${encodeURIComponent(semester)}&track=${encodeURIComponent(track)}`;
+    let response = await BackendHttpClient.instance.requestFor(
+      'practice.paper.list',
+      `/api/v1/students/${encodeURIComponent(studentId)}/practice/papers?${query}`,
+      http.RequestMethod.GET);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`读取练习题库失败: ${response.statusCode}`);
+    }
+    let remote = JSON.parse(response.body) as RemotePracticePaper[];
+    let result: PracticePaper[] = [];
+    for (let item of remote) result.push(this.mapPaper(item));
+    return result;
+  }
+
+  async getPaper(studentId: string, paperId: string, version: number): Promise<PracticePaper | null> {
+    let response = await BackendHttpClient.instance.requestFor(
+      'practice.paper.get',
+      `/api/v1/practice/papers/${encodeURIComponent(paperId)}?version=${version}&studentId=${encodeURIComponent(studentId)}`,
+      http.RequestMethod.GET);
+    if (response.statusCode === 404) return null;
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error(`读取练习套卷失败: ${response.statusCode}`);
+    }
+    return this.mapPaper(JSON.parse(response.body) as RemotePracticePaper);
+  }
 
   async startAttempt(studentId: string, paperId: string, version: number): Promise<PracticeAttempt> {
     let body: StartAttemptBody = { paperId: paperId, paperVersion: version };
@@ -167,6 +212,25 @@ export class PracticeRemoteApi {
       http.RequestMethod.GET);
     if (response.statusCode < 200 || response.statusCode >= 300) throw new Error(`读取练习结果失败: ${response.statusCode}`);
     return this.mapResult(JSON.parse(response.body) as RemotePracticeResult);
+  }
+
+  private mapPaper(remote: RemotePracticePaper): PracticePaper {
+    return {
+      id: remote.id,
+      version: remote.version,
+      grade: remote.grade as PracticeGrade,
+      subject: remote.subject as PracticeSubject,
+      semester: remote.semester as PracticeSemester,
+      track: remote.track as PracticeTrack,
+      title: remote.title,
+      description: remote.description,
+      difficulty: remote.difficulty as PracticeDifficulty,
+      questionCount: remote.questionCount,
+      estimatedMinutes: remote.estimatedMinutes,
+      tags: remote.tags.slice(),
+      sourceType: remote.sourceType as PracticeSourceType,
+      status: PracticePaperStatus.PUBLISHED
+    };
   }
 
   private mapAttempt(remote: RemotePracticeAttempt): PracticeAttempt {
