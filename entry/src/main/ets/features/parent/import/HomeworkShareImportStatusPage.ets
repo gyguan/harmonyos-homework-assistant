@@ -11,7 +11,7 @@ enum ShareImportPhase {
 export struct HomeworkShareImportStatusPage {
   @Prop token: string = '';
   onReady: () => void = () => {};
-  onOpenInbox: () => void = () => {};
+  onOpenRecords: () => void = () => {};
   onCancel: () => void = () => {};
   @State private phase: ShareImportPhase = ShareImportPhase.PROCESSING;
   @State private message: string = '正在整理分享的老师作业…';
@@ -37,7 +37,7 @@ export struct HomeworkShareImportStatusPage {
         return;
       }
       this.phase = ShareImportPhase.EMPTY;
-      this.message = '没有识别到可发布作业，本次分享已记录到作业智能收件箱。';
+      this.message = '没有识别到可发布作业。你可以返回，历史导入信息仍可在“导入记录”中查看。';
     } catch (error) {
       this.phase = ShareImportPhase.FAILED;
       let detail = `${error}`;
@@ -96,13 +96,13 @@ export struct HomeworkShareImportStatusPage {
       }
 
       if (this.phase === ShareImportPhase.EMPTY) {
-        Button('查看作业智能收件箱', { type: ButtonType.Normal })
+        Button('查看导入记录', { type: ButtonType.Normal })
           .width('100%')
           .height(AppTheme.BUTTON_HEIGHT)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .backgroundColor(AppTheme.PRIMARY)
           .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .onClick(() => this.onOpenInbox());
+          .onClick(() => this.onOpenRecords());
       }
 
       if (this.phase === ShareImportPhase.FAILED) {

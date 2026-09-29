@@ -39,6 +39,7 @@ inbox_filter_dialog = read("entry/src/main/ets/features/parent/import/HomeworkIm
 detail_page = read("entry/src/main/ets/features/parent/import/HomeworkImportBatchDetailPage.ets")
 dashboard = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
 import_home = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
+import_page = read("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 routes = read("entry/src/main/ets/app/navigation/AppRoutes.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 fixture = read("entry/src/test/fixtures/Issue242ImportInboxFixture.ets")
@@ -98,8 +99,8 @@ require("markActiveBatchPublished" in publish and
 require("PreferencesHomeworkImportInboxPersistence" in entry and "HomeworkImportInboxBootstrap" in entry,
         "EntryAbility must initialize Import Inbox persistence")
 
-require("title: '作业收件箱'" in inbox_page and "messageCount" in inbox_page and "candidateCount" in inbox_page,
-        "parent UI must expose the shared homework inbox and batch counts")
+require("title: '导入记录'" in inbox_page and "messageCount" in inbox_page and "candidateCount" in inbox_page,
+        "parent UI must expose import history and batch counts without inbox terminology")
 for token in [
     "HomeworkImportInboxSourceFilter",
     "HomeworkImportInboxStatusFilter",
@@ -114,12 +115,15 @@ require("FilterSummaryEntry" in inbox_page and "label: '来源'" in inbox_page a
         "Import Inbox page must expose the standard filter summary bar")
 for token in ["Text('来源')", "Text('状态')", "Text('时间')", "Button('重置'", "Button('确定'"]:
     require(token in inbox_filter_dialog, f"Import Inbox filter dialog missing: {token}")
-require("作业收件箱" in dashboard and "onOpenInbox" in dashboard,
-        "parent dashboard must expose Import Inbox as an independent entry")
-require("onOpenInbox: () => ParentImportNavigator.openInbox" in shell,
-        "parent dashboard inbox entry must use ParentImportNavigator")
-require("作业收件箱" not in import_home and "onOpenInbox" not in import_home,
-        "manual import page must not own the shared Import Inbox entry")
+require("作业收件箱" not in dashboard and "onOpenInbox" not in dashboard and
+        "AssignmentInboxAction" not in dashboard,
+        "parent dashboard must not expose import history as an independent primary action")
+require("Text('导入记录')" in import_page and "onOpenRecords" in import_page,
+        "manual import page must expose import history as a secondary records entry")
+require("onOpenRecords: () => ParentImportNavigator.openRecords(this.navPathStack)" in shell,
+        "manual import route must navigate to import records through ParentImportNavigator")
+require("onOpenRecords: () => this.onOpenRecords()" in import_home,
+        "manual import route must forward the import records action")
 require("原始消息" in detail_page and "候选作业" in detail_page and "sourceMessageIds" in detail_page,
         "batch detail must show source messages, candidates and provenance")
 require("继续确认并发布" in detail_page and "activate(this.batchId)" in detail_page,

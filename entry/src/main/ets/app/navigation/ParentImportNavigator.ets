@@ -11,8 +11,12 @@ export class ParentImportNavigator {
     stack.pushPathByName(AppRoute.PARENT_IMPORT, new ParentImportRouteParam());
   }
 
-  static openInbox(stack: NavPathStack): void {
+  static openRecords(stack: NavPathStack): void {
     stack.pushPathByName(AppRoute.PARENT_IMPORT_INBOX, new ParentImportInboxRouteParam());
+  }
+
+  static openInbox(stack: NavPathStack): void {
+    ParentImportNavigator.openRecords(stack);
   }
 
   static openBatch(stack: NavPathStack, batchId: string): void {

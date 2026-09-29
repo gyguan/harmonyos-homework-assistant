@@ -160,7 +160,7 @@ export struct HomeworkImportBatchDetailPage {
         title: '导入批次详情',
         subtitle: this.batch() === null ? '批次不存在' :
           `${this.statusLabel(this.batch()!.status)} · ${this.batch()!.messageCount} 条消息 · ${this.batch()!.candidateCount} 项作业`,
-        backAccessibilityText: '返回作业收件箱',
+        backAccessibilityText: '返回导入记录',
         onBack: () => this.onBack()
       });
 
