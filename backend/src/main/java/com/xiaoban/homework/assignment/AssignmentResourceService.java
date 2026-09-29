@@ -4,6 +4,7 @@ import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.media.MediaAssetEntity;
 import com.xiaoban.homework.media.MediaAssetService;
 import com.xiaoban.homework.storage.FileStorage;
+import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -18,15 +19,18 @@ public class AssignmentResourceService {
   private final AssignmentService assignments;
   private final AssignmentResourceRepository resources;
   private final FileStorage storage;
+  private final FileTransactionCoordinator fileTransactions;
   private final MediaAssetService mediaAssets;
   private final VoiceMediaPolicy mediaPolicy;
 
   public AssignmentResourceService(AssignmentService assignments,
       AssignmentResourceRepository resources, FileStorage storage,
+      FileTransactionCoordinator fileTransactions,
       MediaAssetService mediaAssets, VoiceMediaPolicy mediaPolicy) {
     this.assignments = assignments;
     this.resources = resources;
     this.storage = storage;
+    this.fileTransactions = fileTransactions;
     this.mediaAssets = mediaAssets;
     this.mediaPolicy = mediaPolicy;
   }
@@ -136,6 +140,7 @@ public class AssignmentResourceService {
       String resourceType, MultipartFile file, int sortOrder, List<String> savedPaths) {
     UUID id = UUID.randomUUID();
     FileStorage.StoredFile stored = storage.save(id, file);
+    fileTransactions.deleteOnRollback(stored.storagePath());
     savedPaths.add(stored.storagePath());
 
     AssignmentResourceEntity entity = new AssignmentResourceEntity();
