@@ -226,11 +226,19 @@ export class RemoteSubmissionApi {
   }
 
   private uploadExtension(uri: string): string {
-    let normalized = uri.toLowerCase().split('?')[0].split('#')[0];
-    if (normalized.endsWith('.png')) return 'png';
-    if (normalized.endsWith('.webp')) return 'webp';
-    if (normalized.endsWith('.heic') || normalized.endsWith('.heif')) return 'heic';
-    if (normalized.endsWith('.jpeg')) return 'jpeg';
+    let normalized = uri.toLowerCase();
+    let queryIndex = normalized.indexOf('?');
+    if (queryIndex >= 0) normalized = normalized.substring(0, queryIndex);
+    let fragmentIndex = normalized.indexOf('#');
+    if (fragmentIndex >= 0) normalized = normalized.substring(0, fragmentIndex);
+
+    let dotIndex = normalized.lastIndexOf('.');
+    if (dotIndex < 0 || dotIndex >= normalized.length - 1) return 'jpg';
+    let extension = normalized.substring(dotIndex + 1);
+    if (extension === 'png') return 'png';
+    if (extension === 'webp') return 'webp';
+    if (extension === 'heic' || extension === 'heif') return 'heic';
+    if (extension === 'jpeg') return 'jpeg';
     return 'jpg';
   }
 

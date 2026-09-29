@@ -78,7 +78,9 @@ export class HomeworkImportInboxService {
     };
     this.inbox.saveBatch(batch, [message], enriched);
 
-    if (enriched.length === 0 || rawImport.studentId !== this.drafts.getActiveStudentId()) return;
+    if (enriched.length === 0) return;
+    let activeStudentId = this.drafts.getActiveStudentId();
+    if (rawImport.studentId !== activeStudentId) return;
     this.inbox.setActiveBatch(batchId);
     this.drafts.replaceRawImport({
       id: rawImport.id,
@@ -192,9 +194,9 @@ export class HomeworkImportInboxService {
     let batch = this.inbox.getBatch(batchId);
     let abandoned = this.inbox.abandon(batchId);
     if (!abandoned) return false;
-    if (active === batchId && batch !== null &&
-      batch.studentId === this.drafts.getActiveStudentId()) {
-      this.drafts.clearCandidates();
+    if (active === batchId && batch !== null) {
+      let activeStudentId = this.drafts.getActiveStudentId();
+      if (batch.studentId === activeStudentId) this.drafts.clearCandidates();
     }
     return true;
   }

@@ -37,9 +37,20 @@ $root = Split-Path -Parent $PSScriptRoot
 Push-Location $root
 try {
   $hvigorw = Resolve-Hvigorw
+  $env:NODE_OPTIONS = '--max_old_space_size=8192'
   Invoke-Hvigor $hvigorw @('-v')
-  Invoke-Hvigor $hvigorw @('--sync', '--no-daemon')
-  Invoke-Hvigor $hvigorw @('assembleHap', '--mode', 'module', '-p', 'product=default', '-p', 'buildMode=debug', '--no-daemon', '--no-parallel')
+  Invoke-Hvigor $hvigorw @('--stop-daemon')
+
+  foreach ($cachePath in @('.hvigor', 'build', 'entry\build')) {
+    $fullPath = Join-Path $root $cachePath
+    if (Test-Path $fullPath) {
+      Write-Host ('Removing stale Harmony build cache: ' + $fullPath)
+      Remove-Item -Recurse -Force $fullPath
+    }
+  }
+
+  Invoke-Hvigor $hvigorw @('--sync', '--no-daemon', '--no-parallel')
+  Invoke-Hvigor $hvigorw @('assembleHap', '--mode', 'module', '-p', 'product=default', '-p', 'buildMode=debug', '--no-daemon', '--no-parallel', '--stacktrace')
   Write-Host 'HARMONY_CLIENT_BUILD_PASS'
 } finally {
   Pop-Location

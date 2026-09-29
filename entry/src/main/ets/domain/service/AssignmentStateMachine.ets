@@ -3,29 +3,52 @@ import { AssignmentStatus } from '../model/HomeworkModels';
 export class AssignmentStateMachine {
   static canTransition(from: AssignmentStatus, to: AssignmentStatus): boolean {
     if (from === to) return true;
+
     if (from === AssignmentStatus.NOT_STARTED) {
-      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.OVERDUE;
+      if (to === AssignmentStatus.IN_PROGRESS) return true;
+      if (to === AssignmentStatus.OVERDUE) return true;
+      return false;
     }
+
     if (from === AssignmentStatus.IN_PROGRESS) {
-      return to === AssignmentStatus.PAUSED || to === AssignmentStatus.READY_TO_SUBMIT ||
-        to === AssignmentStatus.NOT_STARTED || to === AssignmentStatus.OVERDUE;
+      if (to === AssignmentStatus.PAUSED) return true;
+      if (to === AssignmentStatus.READY_TO_SUBMIT) return true;
+      if (to === AssignmentStatus.NOT_STARTED) return true;
+      if (to === AssignmentStatus.OVERDUE) return true;
+      return false;
     }
+
     if (from === AssignmentStatus.PAUSED) {
-      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.NOT_STARTED ||
-        to === AssignmentStatus.OVERDUE;
+      if (to === AssignmentStatus.IN_PROGRESS) return true;
+      if (to === AssignmentStatus.NOT_STARTED) return true;
+      if (to === AssignmentStatus.OVERDUE) return true;
+      return false;
     }
+
     if (from === AssignmentStatus.READY_TO_SUBMIT) {
-      return to === AssignmentStatus.SUBMITTED || to === AssignmentStatus.IN_PROGRESS;
+      if (to === AssignmentStatus.SUBMITTED) return true;
+      if (to === AssignmentStatus.IN_PROGRESS) return true;
+      return false;
     }
+
     if (from === AssignmentStatus.SUBMITTED) {
-      return to === AssignmentStatus.COMPLETED || to === AssignmentStatus.NEEDS_REWORK;
+      if (to === AssignmentStatus.COMPLETED) return true;
+      if (to === AssignmentStatus.NEEDS_REWORK) return true;
+      return false;
     }
+
     if (from === AssignmentStatus.NEEDS_REWORK) {
-      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.READY_TO_SUBMIT;
+      if (to === AssignmentStatus.IN_PROGRESS) return true;
+      if (to === AssignmentStatus.READY_TO_SUBMIT) return true;
+      return false;
     }
+
     if (from === AssignmentStatus.OVERDUE) {
-      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.READY_TO_SUBMIT;
+      if (to === AssignmentStatus.IN_PROGRESS) return true;
+      if (to === AssignmentStatus.READY_TO_SUBMIT) return true;
+      return false;
     }
+
     return false;
   }
 

@@ -73,11 +73,21 @@ require("uploadContentType" in submission_client and "uploadExtension" in submis
         "Harmony multipart uploads must preserve the selected image type")
 
 for transition in [
-    "READY_TO_SUBMIT) {\n      return to === AssignmentStatus.SUBMITTED || to === AssignmentStatus.IN_PROGRESS",
-    "NEEDS_REWORK) {\n      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.READY_TO_SUBMIT",
-    "OVERDUE) {\n      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.READY_TO_SUBMIT",
+    ("READY_TO_SUBMIT", ["AssignmentStatus.SUBMITTED", "AssignmentStatus.IN_PROGRESS"]),
+    ("NEEDS_REWORK", ["AssignmentStatus.IN_PROGRESS", "AssignmentStatus.READY_TO_SUBMIT"]),
+    ("OVERDUE", ["AssignmentStatus.IN_PROGRESS", "AssignmentStatus.READY_TO_SUBMIT"]),
 ]:
-    require(transition in frontend_state, f"frontend state policy missing transition contract: {transition}")
+    state, targets = transition
+    start = frontend_state.find(f"if (from === AssignmentStatus.{state})")
+    require(start >= 0, f"frontend state policy missing state block: {state}")
+    if start < 0:
+        continue
+    end = frontend_state.find("\n    if (from === AssignmentStatus.", start + 1)
+    if end < 0:
+        end = frontend_state.find("\n    return false;", start + 1)
+    block = frontend_state[start:end]
+    for target in targets:
+        require(target in block, f"frontend state policy missing transition {state} -> {target}")
 for transition in [
     '"READY_TO_SUBMIT", Set.of("SUBMITTED", "IN_PROGRESS")',
     '"NEEDS_REWORK", Set.of("IN_PROGRESS", "READY_TO_SUBMIT")',

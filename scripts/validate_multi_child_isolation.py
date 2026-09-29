@@ -77,7 +77,8 @@ require("studentId: input.studentId" in ocr,
         "OCR must preserve child context")
 require("studentId: input.studentId" in parser,
         "Parser must preserve child context")
-require("rawImport.studentId !== this.drafts.getActiveStudentId()" in import_inbox_service,
+require("let activeStudentId = this.drafts.getActiveStudentId();" in import_inbox_service and
+        "rawImport.studentId !== activeStudentId" in import_inbox_service,
         "late AI/OCR import results must not overwrite a newly selected child's draft")
 
 # Parent child switching is a persistent family-context selection, not a cycle button. The active

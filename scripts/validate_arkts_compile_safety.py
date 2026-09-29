@@ -13,6 +13,9 @@ APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
 APP_ROUTES = ROOT / "entry/src/main/ets/app/navigation/AppRoutes.ets"
 VOICE_MATERIAL_API = ROOT / "entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets"
 VOICE_MATERIAL_PICKER = ROOT / "entry/src/main/ets/application/assignment/VoiceMaterialDirectoryPicker.ets"
+SUBMISSION_API = ROOT / "entry/src/main/ets/application/remote/RemoteSubmissionApi.ets"
+HVIGOR_CONFIG = ROOT / "hvigor/hvigor-config.json5"
+VERIFY_HARMONY = ROOT / "scripts/verify_harmony_client.ps1"
 ETS_ROOT = ROOT / "entry/src/main/ets"
 QUALIFIED_MODEL_SYMBOLS = [
     "AssignmentStatus",
@@ -64,6 +67,9 @@ def main() -> int:
     app_routes = APP_ROUTES.read_text(encoding="utf-8")
     voice_material_api = VOICE_MATERIAL_API.read_text(encoding="utf-8")
     voice_material_picker = VOICE_MATERIAL_PICKER.read_text(encoding="utf-8")
+    submission_api = SUBMISSION_API.read_text(encoding="utf-8")
+    hvigor_config = HVIGOR_CONFIG.read_text(encoding="utf-8")
+    verify_harmony = VERIFY_HARMONY.read_text(encoding="utf-8")
 
     legacy_unsafe = [
         "let writer = await fileIo.open(multipartPath",
@@ -97,6 +103,34 @@ def main() -> int:
     for helper in ["requestUpload(", "openFile(", "writeText(", "readBuffer(", "writeBuffer("]:
         require(helper in voice_material_api,
                 f"RemoteVoiceMaterialApi missing handled helper: {helper}")
+
+    require(".split('?')[0].split('#')[0]" not in submission_api,
+            "RemoteSubmissionApi must avoid chained split/index expressions that can destabilize es2abc")
+    require("endsWith('.png')" not in submission_api and "lastIndexOf('.')" in submission_api and
+            "substring(dotIndex + 1)" in submission_api,
+            "submission media extension parsing must keep the compiler-safe index/substring form")
+    require('"daemon": false' in hvigor_config and
+            '"incremental": false' in hvigor_config and '"parallel": false' in hvigor_config,
+            "Hvigor must use daemon-free non-incremental non-parallel compilation for es2abc stability")
+    require('"maxOldSpaceSize": 8192' in hvigor_config,
+            "Hvigor must keep the documented 8GB Node heap for stable compilation")
+    require("@('--stop-daemon')" in verify_harmony and
+            "Removing stale Harmony build cache" in verify_harmony and
+            "'.hvigor'" in verify_harmony and "'entry\\build'" in verify_harmony and
+            "'--no-daemon', '--no-parallel', '--stacktrace'" in verify_harmony,
+            "Harmony verification must stop stale daemons, purge compiler caches, build serially, and retain diagnostics")
+
+    batch_publish = (ROOT / "entry/src/main/ets/application/import/HomeworkBatchPublishService.ets").read_text(encoding="utf-8")
+    inbox_service = (ROOT / "entry/src/main/ets/application/import/HomeworkImportInboxService.ets").read_text(encoding="utf-8")
+    state_machine = (ROOT / "entry/src/main/ets/domain/service/AssignmentStateMachine.ets").read_text(encoding="utf-8")
+    require("sourceEvidence.batchId === undefined ?" not in batch_publish and
+            "private sourceBatchId(candidate: CandidateAssignment)" in batch_publish,
+            "batch publish must avoid nested optional-field ternaries in es2abc-sensitive code")
+    require("enriched.length === 0 || rawImport.studentId" not in inbox_service,
+            "import inbox must keep asynchronous student guards as simple branches")
+    require("to === AssignmentStatus.PAUSED ||" not in state_machine and
+            "to === AssignmentStatus.READY_TO_SUBMIT ||" not in state_machine,
+            "assignment state machine must keep transition codegen flattened")
 
     require("deviceInfo.apiAvailable('26.0.0')" in voice_material_picker,
             "voice material folder selection must use apiAvailable for API 26 compatibility")
