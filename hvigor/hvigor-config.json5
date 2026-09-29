@@ -7,8 +7,12 @@
   "execution": {
     "analyze": "normal",
     "daemon": true,
-    "incremental": true,
-    "parallel": true,
+    "incremental": false,
+    "parallel": false,
     "typeCheck": true
+  },
+  "nodeOptions": {
+    "maxOldSpaceSize": 12288,
+    "exposeGC": true
   }
 }
