@@ -1,5 +1,6 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { AssignmentAttentionKind } from '../../../domain/service/AssignmentAttentionPolicy';
 import { ParentDashboardViewModel } from './ParentDashboardViewModel';
 
 @Component
@@ -11,6 +12,7 @@ export struct ParentDashboardPage {
   onOpenVoice: () => void = () => {};
   onOpenScheduled: () => void = () => {};
   onOpenPracticeGeneration: () => void = () => {};
+  onOpenAttention: (kind: AssignmentAttentionKind) => void = (_kind: AssignmentAttentionKind) => {};
 
   private canUseWideComposition(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentHomeRequirement());
@@ -36,13 +38,19 @@ export struct ParentDashboardPage {
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.TEXT);
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(14)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
       }
       .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
       .padding({ left: 12, right: 12, top: 10, bottom: 10 })
       .backgroundColor(AppTheme.WARNING_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityGroup(true)
-      .accessibilityText(`需要关注，${this.attentionText()}`);
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(`需要关注，${this.attentionText()}，点击查看`)
+      .onClick(() => this.onOpenAttention(this.viewModel.attentionKind()));
     }
   }
 
