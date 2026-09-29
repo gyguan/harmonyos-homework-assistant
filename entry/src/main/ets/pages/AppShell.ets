@@ -22,6 +22,7 @@ import { PageStateView } from '../components/state/PageStateView';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import { AssignmentAttentionKind } from '../domain/service/AssignmentAttentionPolicy';
 import {
   PracticeDifficulty,
   PracticeSubject,
@@ -79,6 +80,8 @@ export struct AppShell {
   @State private heightVp: number = 844;
   @State private studentRoute: StudentRoute = StudentRoute.HOME;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
+  @State private studentAttentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
+  @State private parentAttentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
   @State private storeRevision: number = 0;
   @State private practiceRevision: number = 0;
@@ -200,6 +203,30 @@ export struct AppShell {
     this.navPathStack.clear();
     this.studentRoute = StudentRoute.HOME;
     this.parentRoute = ParentRoute.DASHBOARD;
+    this.studentAttentionKind = AssignmentAttentionKind.NONE;
+    this.parentAttentionKind = AssignmentAttentionKind.NONE;
+  }
+
+  private selectStudentRoute(route: StudentRoute): void {
+    this.studentAttentionKind = AssignmentAttentionKind.NONE;
+    this.studentRoute = route;
+  }
+
+  private selectParentRoute(route: ParentRoute): void {
+    this.parentAttentionKind = AssignmentAttentionKind.NONE;
+    this.parentRoute = route;
+  }
+
+  private openStudentAttention(kind: AssignmentAttentionKind): void {
+    if (kind === AssignmentAttentionKind.NONE) return;
+    this.studentAttentionKind = kind;
+    this.studentRoute = StudentRoute.ASSIGNMENTS;
+  }
+
+  private openParentAttention(kind: AssignmentAttentionKind): void {
+    if (kind === AssignmentAttentionKind.NONE) return;
+    this.parentAttentionKind = kind;
+    this.parentRoute = ParentRoute.PROGRESS;
   }
 
   private onRoleChanged(): void {
@@ -370,8 +397,10 @@ export struct AppShell {
     if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
       StudentAssignmentsPage({
         revision: this.storeRevision,
+        attentionKind: this.studentAttentionKind,
         onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
+        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onAttentionFilterCleared: () => this.studentAttentionKind = AssignmentAttentionKind.NONE
       });
     } else if (this.studentRoute === StudentRoute.PRACTICE) {
       PracticeHomePage({
@@ -388,6 +417,7 @@ export struct AppShell {
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onOpenAttention: (kind: AssignmentAttentionKind) => this.openStudentAttention(kind),
         onStoreChanged: () => this.notifyUiChanged()
       });
     }
@@ -592,7 +622,9 @@ export struct AppShell {
     if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
         revision: this.storeRevision,
-        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
+        attentionKind: this.parentAttentionKind,
+        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),
+        onAttentionFilterCleared: () => this.parentAttentionKind = AssignmentAttentionKind.NONE
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
       BackendConnectionPage({
@@ -604,7 +636,8 @@ export struct AppShell {
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenVoice: () => this.openParentVoiceCreate(),
         onOpenScheduled: () => this.openParentScheduledAssignments(),
-        onOpenPracticeGeneration: () => this.openParentPracticeGeneration()
+        onOpenPracticeGeneration: () => this.openParentPracticeGeneration(),
+        onOpenAttention: (kind: AssignmentAttentionKind) => this.openParentAttention(kind)
       });
     }
   }
@@ -626,32 +659,32 @@ export struct AppShell {
       if (this.role === AppRole.STUDENT) {
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.studentRoute === StudentRoute.HOME,
-          onSelect: () => this.studentRoute = StudentRoute.HOME
+          onSelect: () => this.selectStudentRoute(StudentRoute.HOME)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_square'), label: '作业', selected: this.studentRoute === StudentRoute.ASSIGNMENTS,
-          onSelect: () => this.studentRoute = StudentRoute.ASSIGNMENTS
+          onSelect: () => this.selectStudentRoute(StudentRoute.ASSIGNMENTS)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '练习', selected: this.studentRoute === StudentRoute.PRACTICE,
-          onSelect: () => this.studentRoute = StudentRoute.PRACTICE
+          onSelect: () => this.selectStudentRoute(StudentRoute.PRACTICE)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.studentRoute === StudentRoute.PROFILE,
-          onSelect: () => this.studentRoute = StudentRoute.PROFILE
+          onSelect: () => this.selectStudentRoute(StudentRoute.PROFILE)
         }).layoutWeight(1).height('100%');
       } else {
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.parentRoute === ParentRoute.DASHBOARD,
-          onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
+          onSelect: () => this.selectParentRoute(ParentRoute.DASHBOARD)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '学生作业', selected: this.parentRoute === ParentRoute.PROGRESS,
-          onSelect: () => this.parentRoute = ParentRoute.PROGRESS
+          onSelect: () => this.selectParentRoute(ParentRoute.PROGRESS)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.parentRoute === ParentRoute.SETTINGS,
-          onSelect: () => this.parentRoute = ParentRoute.SETTINGS
+          onSelect: () => this.selectParentRoute(ParentRoute.SETTINGS)
         }).layoutWeight(1).height('100%');
       }
     }
@@ -680,32 +713,32 @@ export struct AppShell {
       if (this.role === AppRole.STUDENT) {
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.studentRoute === StudentRoute.HOME,
-          onSelect: () => this.studentRoute = StudentRoute.HOME
+          onSelect: () => this.selectStudentRoute(StudentRoute.HOME)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_square'), label: '作业', selected: this.studentRoute === StudentRoute.ASSIGNMENTS,
-          onSelect: () => this.studentRoute = StudentRoute.ASSIGNMENTS
+          onSelect: () => this.selectStudentRoute(StudentRoute.ASSIGNMENTS)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '练习', selected: this.studentRoute === StudentRoute.PRACTICE,
-          onSelect: () => this.studentRoute = StudentRoute.PRACTICE
+          onSelect: () => this.selectStudentRoute(StudentRoute.PRACTICE)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.studentRoute === StudentRoute.PROFILE,
-          onSelect: () => this.studentRoute = StudentRoute.PROFILE
+          onSelect: () => this.selectStudentRoute(StudentRoute.PROFILE)
         });
       } else {
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.parentRoute === ParentRoute.DASHBOARD,
-          onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
+          onSelect: () => this.selectParentRoute(ParentRoute.DASHBOARD)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '学生作业', selected: this.parentRoute === ParentRoute.PROGRESS,
-          onSelect: () => this.parentRoute = ParentRoute.PROGRESS
+          onSelect: () => this.selectParentRoute(ParentRoute.PROGRESS)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.parentRoute === ParentRoute.SETTINGS,
-          onSelect: () => this.parentRoute = ParentRoute.SETTINGS
+          onSelect: () => this.selectParentRoute(ParentRoute.SETTINGS)
         });
       }
 
