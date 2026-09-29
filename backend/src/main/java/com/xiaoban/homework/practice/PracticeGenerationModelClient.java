@@ -115,14 +115,22 @@ public class PracticeGenerationModelClient {
       String generationInstructions,
       Map<String, Object> outputSchema,
       OpenAiCompatibleTransport.StructuredOutputMode mode) {
-    Optional<String> output = transport.complete(
-        properties.getPracticeModel(),
-        generationInstructions,
-        generationInput,
-        7000,
-        "practice_generation",
-        outputSchema,
-        mode);
+    Optional<String> output = mode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
+        ? transport.complete(
+            properties.getPracticeModel(),
+            generationInstructions,
+            generationInput,
+            7000,
+            "practice_generation",
+            outputSchema)
+        : transport.complete(
+            properties.getPracticeModel(),
+            generationInstructions,
+            generationInput,
+            7000,
+            "practice_generation",
+            outputSchema,
+            mode);
     if (output.isEmpty()) {
       return new GenerationAttempt(
           Optional.empty(), mode, "<empty>", 0, List.of(), "EmptyOutput", "<empty>");
