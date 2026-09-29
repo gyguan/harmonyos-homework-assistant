@@ -15,6 +15,7 @@ def require(condition: bool, message: str) -> None:
 submission = read("entry/src/main/ets/application/submission/HomeworkSubmissionService.ets")
 study = read("entry/src/main/ets/features/student/study/StudyWorkspacePage.ets")
 attention = read("entry/src/main/ets/domain/service/AssignmentAttentionPolicy.ets")
+due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 student_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 parent_home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
@@ -31,6 +32,8 @@ require(study.find("HomeworkSubmissionService.instance.preflight") <
 require("class AssignmentAttentionPolicy" in attention and "AssignmentAttentionPolicy.student" in student_vm and
         "AssignmentDueDate.matches" in attention and "DueDateFilterKey.OVERDUE" in attention,
         "attention must reuse the canonical due-date policy for overdue detection")
+require("if (item.dueAtEpochMs > 0) return item.dueAtEpochMs <= nowEpochMs;" in due_date,
+        "canonical overdue detection must honor precise dueAt time, not only calendar day")
 require("AttentionBanner" in student_home and "AttentionBanner" in parent_home,
         "attention must stay embedded in existing home pages")
 require("questionCount: 5" in result_vm and "PracticePublishPurpose.REINFORCEMENT" in result_vm and
