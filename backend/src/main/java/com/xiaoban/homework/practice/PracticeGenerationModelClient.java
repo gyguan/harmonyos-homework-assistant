@@ -71,7 +71,8 @@ public class PracticeGenerationModelClient {
           instructionsFor(mode),
           outputSchema,
           protocol,
-          mode);
+          mode,
+          i == 0);
       attempts.add(attempt);
       if (attempt.paper().isPresent()) {
         logSuccess(paperId, capabilities, attempt);
@@ -122,16 +123,24 @@ public class PracticeGenerationModelClient {
       String generationInstructions,
       Map<String, Object> outputSchema,
       ApiProtocol protocol,
-      StructuredOutputMode mode) {
-    Optional<String> output = transport.complete(
-        properties.getPracticeModel(),
-        generationInstructions,
-        generationInput,
-        7000,
-        "practice_generation",
-        outputSchema,
-        protocol,
-        mode);
+      StructuredOutputMode mode,
+      boolean primaryAttempt) {
+    Optional<String> output = primaryAttempt
+        ? transport.complete(
+            properties.getPracticeModel(),
+            generationInstructions,
+            generationInput,
+            7000,
+            "practice_generation",
+            outputSchema)
+        : transport.complete(
+            properties.getPracticeModel(),
+            generationInstructions,
+            generationInput,
+            7000,
+            "practice_generation",
+            outputSchema,
+            mode);
     if (output == null || output.isEmpty()) {
       return new GenerationAttempt(
           Optional.empty(), protocol, mode, "<empty>", 0, List.of(), "EmptyOutput", "<empty>");
