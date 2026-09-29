@@ -87,7 +87,7 @@ public class PracticeAttemptService {
 
   @Transactional
   public PracticeDtos.AttemptResponse wrongOnly(UUID familyId, UUID sourceAttemptId, int limit) {
-    if (limit < 0 || limit > 20) throw new ApiExceptions.BadRequest("错题重练数量必须在 1 到 20 之间");
+    if (limit < 0 || limit > 20) throw new ApiExceptions.BadRequest("错题重练数量不能超过 20");
     PracticeAttemptEntity source = requireSubmittedSource(familyId, sourceAttemptId);
     List<PracticeQuestionEntity> sourceQuestions = questionsForAttempt(source);
     Map<String, PracticeAnswerEntity> sourceAnswers = answerMap(source.id);
