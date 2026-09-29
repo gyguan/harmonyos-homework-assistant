@@ -28,8 +28,13 @@ export class StudentTextbookProfile {
       student.mathTextbook,
       student.englishTextbook,
       student.otherTextbooks);
-    if (!StudentTextbookProfile.empty(structured)) return structured;
-    return StudentTextbookProfile.parseLegacy(student.textbookSummary);
+    let legacy = StudentTextbookProfile.parseLegacy(student.textbookSummary);
+    return StudentTextbookProfile.fields(
+      structured.chineseTextbook.length > 0 ? structured.chineseTextbook : legacy.chineseTextbook,
+      structured.mathTextbook.length > 0 ? structured.mathTextbook : legacy.mathTextbook,
+      structured.englishTextbook.length > 0 ? structured.englishTextbook : legacy.englishTextbook,
+      structured.otherTextbooks.length > 0 ? structured.otherTextbooks : legacy.otherTextbooks
+    );
   }
 
   static parseLegacy(summary: string): StudentTextbookFields {
@@ -46,7 +51,13 @@ export class StudentTextbookProfile {
       if (value.indexOf('语文') === 0) result.chineseTextbook = StudentTextbookProfile.afterSubject(value, '语文');
       else if (value.indexOf('数学') === 0) result.mathTextbook = StudentTextbookProfile.afterSubject(value, '数学');
       else if (value.indexOf('英语') === 0) result.englishTextbook = StudentTextbookProfile.afterSubject(value, '英语');
-      else others.push(value);
+      else if (value.indexOf('语文') >= 0 && value.indexOf('数学') < 0 && value.indexOf('英语') < 0) {
+        result.chineseTextbook = StudentTextbookProfile.clean(value.split('语文').join(''));
+      } else if (value.indexOf('数学') >= 0 && value.indexOf('语文') < 0 && value.indexOf('英语') < 0) {
+        result.mathTextbook = StudentTextbookProfile.clean(value.split('数学').join(''));
+      } else if (value.indexOf('英语') >= 0 && value.indexOf('语文') < 0 && value.indexOf('数学') < 0) {
+        result.englishTextbook = StudentTextbookProfile.clean(value.split('英语').join(''));
+      } else others.push(value);
     }
     result.otherTextbooks = others.join('；');
     return result;
