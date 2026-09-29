@@ -498,7 +498,7 @@ final class PracticeGenerationProviderAdapter {
 
   private static Object requiredValue(Map<String, Object> object, String field, String path) {
     if (!object.containsKey(field) || object.get(field) == null) {
-      throw invalid(path, "is required");
+      throw invalid(path, "is required; availableFields=" + object.keySet());
     }
     return object.get(field);
   }
