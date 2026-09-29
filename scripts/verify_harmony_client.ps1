@@ -38,8 +38,10 @@ Push-Location $root
 try {
   $hvigorw = Resolve-Hvigorw
   Invoke-Hvigor $hvigorw @('-v')
-  Invoke-Hvigor $hvigorw @('--sync', '--no-daemon')
-  Invoke-Hvigor $hvigorw @('assembleHap', '--mode', 'module', '-p', 'product=default', '-p', 'buildMode=debug', '--no-daemon', '--no-parallel')
+  Invoke-Hvigor $hvigorw @('--stop-daemon')
+  Invoke-Hvigor $hvigorw @('clean', '--no-daemon', '--no-parallel')
+  Invoke-Hvigor $hvigorw @('--sync', '--no-daemon', '--no-parallel')
+  Invoke-Hvigor $hvigorw @('assembleHap', '--mode', 'module', '-p', 'product=default', '-p', 'buildMode=debug', '--no-daemon', '--no-parallel', '--stacktrace')
   Write-Host 'HARMONY_CLIENT_BUILD_PASS'
 } finally {
   Pop-Location
