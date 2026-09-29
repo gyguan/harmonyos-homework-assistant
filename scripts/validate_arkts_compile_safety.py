@@ -13,6 +13,9 @@ APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
 APP_ROUTES = ROOT / "entry/src/main/ets/app/navigation/AppRoutes.ets"
 VOICE_MATERIAL_API = ROOT / "entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets"
 VOICE_MATERIAL_PICKER = ROOT / "entry/src/main/ets/application/assignment/VoiceMaterialDirectoryPicker.ets"
+SUBMISSION_API = ROOT / "entry/src/main/ets/application/remote/RemoteSubmissionApi.ets"
+BUILD_PROFILE = ROOT / "build-profile.json5"
+HARMONY_VERIFY = ROOT / "scripts/verify_harmony_client.ps1"
 ETS_ROOT = ROOT / "entry/src/main/ets"
 QUALIFIED_MODEL_SYMBOLS = [
     "AssignmentStatus",
@@ -64,6 +67,9 @@ def main() -> int:
     app_routes = APP_ROUTES.read_text(encoding="utf-8")
     voice_material_api = VOICE_MATERIAL_API.read_text(encoding="utf-8")
     voice_material_picker = VOICE_MATERIAL_PICKER.read_text(encoding="utf-8")
+    submission_api = SUBMISSION_API.read_text(encoding="utf-8")
+    build_profile = BUILD_PROFILE.read_text(encoding="utf-8")
+    harmony_verify = HARMONY_VERIFY.read_text(encoding="utf-8")
 
     legacy_unsafe = [
         "let writer = await fileIo.open(multipartPath",
@@ -97,6 +103,17 @@ def main() -> int:
     for helper in ["requestUpload(", "openFile(", "writeText(", "readBuffer(", "writeBuffer("]:
         require(helper in voice_material_api,
                 f"RemoteVoiceMaterialApi missing handled helper: {helper}")
+
+    require('"useNormalizedOHMUrl": false' in build_profile,
+            "build-profile must keep useNormalizedOHMUrl=false to avoid es2abc ABC record/cache conflicts")
+    require(".split('?')[0].split('#')[0]" not in submission_api and
+            "queryIndex = normalized.indexOf('?')" in submission_api and
+            "fragmentIndex = normalized.indexOf('#')" in submission_api,
+            "submission URI parsing must use explicit ArkTS string steps instead of chained split indexing")
+    require("Invoke-Hvigor $hvigorw @('clean', '--no-daemon')" in harmony_verify and
+            harmony_verify.index("@('clean', '--no-daemon')") <
+            harmony_verify.index("@('--sync', '--no-daemon')"),
+            "Harmony verification must clean generated ABC artifacts before sync/assemble")
 
     require("deviceInfo.apiAvailable('26.0.0')" in voice_material_picker,
             "voice material folder selection must use apiAvailable for API 26 compatibility")
