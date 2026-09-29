@@ -205,15 +205,14 @@ export struct StudentHomePage {
 
   @Builder
   private AttentionBanner() {
-    let attention = this.viewModel.attentionText();
-    if (attention.length > 0) {
+    if (this.viewModel.attentionText().length > 0) {
       Row({ space: 8 }) {
         Text('提醒')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.WARNING);
-        Text(attention)
+        Text(this.viewModel.attentionText())
           .layoutWeight(1)
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -224,7 +223,7 @@ export struct StudentHomePage {
       .backgroundColor(AppTheme.WARNING_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityGroup(true)
-      .accessibilityText(`提醒，${attention}`);
+      .accessibilityText(`提醒，${this.viewModel.attentionText()}`);
     }
   }
 
