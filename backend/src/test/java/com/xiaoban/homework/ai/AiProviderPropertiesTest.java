@@ -6,6 +6,19 @@ import org.junit.jupiter.api.Test;
 
 class AiProviderPropertiesTest {
   @Test
+  void providerDefaultsToAutoAndCanBeOverridden() {
+    AiProviderProperties properties = new AiProviderProperties();
+
+    assertEquals("AUTO", properties.getProvider());
+
+    properties.setProvider("ZHIPU_GLM");
+    assertEquals("ZHIPU_GLM", properties.getProvider());
+
+    properties.setProvider("   ");
+    assertEquals("AUTO", properties.getProvider());
+  }
+
+  @Test
   void organizerAndPracticeFallBackToTutorModelWhenSpecializedModelsAreUnset() {
     AiProviderProperties properties = new AiProviderProperties();
     properties.setTutorModel("provider-supported-model");
