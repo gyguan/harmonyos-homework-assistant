@@ -47,7 +47,13 @@ public class StudentService {
     if (entity.createdAt == null) entity.createdAt = now;
     entity.id = input.id(); entity.familyId = familyId; entity.name = input.name(); entity.grade = input.grade();
     entity.className = input.className(); entity.semester = input.semester();
-    entity.textbookSummary = input.textbookSummary() == null ? "" : input.textbookSummary(); entity.updatedAt = now;
+    StudentTextbooks textbooks = StudentTextbooks.from(input);
+    entity.chineseTextbook = textbooks.chinese();
+    entity.mathTextbook = textbooks.math();
+    entity.englishTextbook = textbooks.english();
+    entity.otherTextbooks = textbooks.others();
+    entity.textbookSummary = textbooks.summary();
+    entity.updatedAt = now;
     return StudentDtos.Response.from(repository.save(entity));
   }
 
