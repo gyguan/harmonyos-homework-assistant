@@ -14,6 +14,7 @@ APP_ROUTES = ROOT / "entry/src/main/ets/app/navigation/AppRoutes.ets"
 VOICE_MATERIAL_API = ROOT / "entry/src/main/ets/application/remote/RemoteVoiceMaterialApi.ets"
 VOICE_MATERIAL_PICKER = ROOT / "entry/src/main/ets/application/assignment/VoiceMaterialDirectoryPicker.ets"
 SUBMISSION_API = ROOT / "entry/src/main/ets/application/remote/RemoteSubmissionApi.ets"
+ASSIGNMENT_ATTENTION = ROOT / "entry/src/main/ets/domain/service/AssignmentAttentionPolicy.ets"
 HVIGOR_CONFIG = ROOT / "hvigor/hvigor-config.json5"
 VERIFY_HARMONY = ROOT / "scripts/verify_harmony_client.ps1"
 ETS_ROOT = ROOT / "entry/src/main/ets"
@@ -68,6 +69,7 @@ def main() -> int:
     voice_material_api = VOICE_MATERIAL_API.read_text(encoding="utf-8")
     voice_material_picker = VOICE_MATERIAL_PICKER.read_text(encoding="utf-8")
     submission_api = SUBMISSION_API.read_text(encoding="utf-8")
+    assignment_attention = ASSIGNMENT_ATTENTION.read_text(encoding="utf-8")
     hvigor_config = HVIGOR_CONFIG.read_text(encoding="utf-8")
     verify_harmony = VERIFY_HARMONY.read_text(encoding="utf-8")
 
@@ -131,6 +133,13 @@ def main() -> int:
     require("to === AssignmentStatus.PAUSED ||" not in state_machine and
             "to === AssignmentStatus.READY_TO_SUBMIT ||" not in state_machine,
             "assignment state machine must keep transition codegen flattened")
+    require("""if (item.status === AssignmentStatus.NEEDS_REWORK) {
+        reworkCount++;
+        continue;
+      }""" in assignment_attention and
+            """item.status !== AssignmentStatus.NEEDS_REWORK &&
+        AssignmentDueDate.matches""" not in assignment_attention,
+            "assignment attention must not compare NEEDS_REWORK again after continue-based narrowing")
 
     require("deviceInfo.apiAvailable('26.0.0')" in voice_material_picker,
             "voice material folder selection must use apiAvailable for API 26 compatibility")
