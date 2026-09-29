@@ -127,7 +127,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 4. V2 日期筛选只依据结构化 `dueAt`；历史未结构化日期不伪造成某个具体日期。
 5. 当前 HarmonyOS Snapshot schema 为 V10；V4→V5→V6→V7→V8→V9→V10 均保留显式逐版本 migration。任何后续版本升级仍必须增加明确迁移步骤，不得 schema mismatch 后 seed MockData。
 6. schema-changing save 前保留一次 `homework_snapshot_pre_migration_backup`；迁移失败不得覆盖原主快照。
-7. 已发布 PostgreSQL Flyway migration 永不修改；后续一律通过新的 forward migration 演进。当前已演进到 V22，V22 为 Assignment 状态域增加数据库 CHECK 约束。
+7. 已发布 PostgreSQL Flyway migration 永不修改；后续一律通过新的 forward migration 演进。当前已演进到 V23：V22 为 Assignment 状态域增加数据库 CHECK 约束，V23 增加 Assignment 创建请求指纹，用于同 ID 重试的严格幂等校验。
 8. API 升级顺序为 **backend first**：迁移期支持 `V1 Client -> V2 Backend`，最迟在 Slice 5 结束；**不支持 `V2 Client -> V1 Backend`**，避免在新客户端引入旧后端 fallback。
 9. Slice 3 再将 `OVERDUE` 从 canonical status 迁移为派生属性：历史 OVERDUE 且 `elapsedSeconds > 0` -> `PAUSED`，否则 -> `NOT_STARTED`；不塞入 V7。
 10. Flyway 与 Snapshot 均以 forward migration / forward-fix 为主，不建设自动 down migration。
