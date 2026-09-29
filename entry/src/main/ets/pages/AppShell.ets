@@ -558,14 +558,13 @@ export struct AppShell {
       .hideTitleBar(true)
       .backgroundColor(AppTheme.BACKGROUND);
     } else if (name === AppRoute.PARENT_PRACTICE_GENERATION_RESULT) {
-      let route = param as ParentPracticeGenerationResultRouteParam;
       NavDestination() {
         ParentPracticeGenerationResultPage({
-          subject: route.subject as PracticeSubject,
-          track: route.track as PracticeTrack,
-          difficulty: route.difficulty as PracticeDifficulty,
-          questionCount: route.questionCount,
-          requirement: route.requirement,
+          subject: (param as ParentPracticeGenerationResultRouteParam).subject as PracticeSubject,
+          track: (param as ParentPracticeGenerationResultRouteParam).track as PracticeTrack,
+          difficulty: (param as ParentPracticeGenerationResultRouteParam).difficulty as PracticeDifficulty,
+          questionCount: (param as ParentPracticeGenerationResultRouteParam).questionCount,
+          requirement: (param as ParentPracticeGenerationResultRouteParam).requirement,
           onBack: () => this.navPathStack.pop(),
           onPublished: () => this.finishParentPracticePublished()
         });
