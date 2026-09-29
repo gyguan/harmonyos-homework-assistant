@@ -227,8 +227,9 @@ if len(parent_home_call) == 2:
     require("sizeClass:" not in call,
             "AppShell must not pass shell WindowSizeClass into migrated Parent Home")
 
-require("this.queryCache = AssignmentQuery.filter(mapped, filter)" in repo,
-        "Repository remote query results must still apply the complete filter for multi-status parent views")
+require("let result = AssignmentQuery.filter(mapped, filter)" in repo and
+        "this.replaceQueryCacheIfCurrent(studentId, result)" in repo,
+        "Repository remote query results must still apply the complete filter and keep cache ownership student-scoped")
 
 for phrase in ["首页只承担高频操作入口", "作业列表 | 提交证据 / 验收详情", "[通过]", "[退回订正]"]:
     require(phrase in issue_spec, f"V2 UI spec missing Slice 4 contract phrase: {phrase}")
