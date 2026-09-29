@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 
 class ApiPayloadLogAdviceTest {
   @Test
-  void payloadLoggingIsEnabledByDefaultWithBoundedSize() {
+  void payloadLoggingIsDisabledByDefaultWithBoundedSize() {
     HttpLogProperties properties = new HttpLogProperties();
-    assertTrue(properties.isLogPayloads());
+    assertFalse(properties.isLogPayloads());
     assertTrue(properties.getMaxPayloadChars() >= 1000);
   }
 
