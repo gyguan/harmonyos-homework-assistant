@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.xiaoban.homework.ai.AiProviderProperties;
@@ -15,6 +16,208 @@ import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 
 class PracticeGenerationModelClientParsingTest {
+  @Test
+  void usesJsonObjectAsPrimaryModeForChatCompletions() throws Exception {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setProtocol("chat-completions");
+    properties.setTutorModel("deepseek-v4-flash-0731");
+    properties.setPracticeModel("");
+
+    OpenAiCompatibleTransport transport = mock(OpenAiCompatibleTransport.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    String canonicalOutput = """
+        {
+          "questions": [
+            {
+              "type": "NUMBER",
+              "stem": "14 - 6 = ?",
+              "options": [],
+              "answerSpec": "8",
+              "explanation": "14减6等于8。",
+              "hints": ["关键词：14、减6"],
+              "tags": ["减法"]
+            }
+          ]
+        }
+        """;
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        eq(PracticeGenerationModelClient.jsonObjectInstructions()),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class),
+        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT)))
+        .thenReturn(Optional.of(canonicalOutput));
+
+    PracticeGenerationModelClient client =
+        new PracticeGenerationModelClient(properties, transport, mapper);
+
+    Optional<PracticeContentCatalog.Paper> result = client.generate(
+        "人教版数学二年级上册",
+        "ai-chat-json-object",
+        "G2",
+        "S1",
+        new PracticeGenerationDtos.GenerateRequest(
+            "MATH", "TEXTBOOK_SYNC", "L1", 1, "练习退位减法"));
+
+    assertTrue(result.isPresent());
+    assertEquals("14 - 6 = ?", result.get().questions().get(0).stem());
+
+    verify(transport).complete(
+        eq("deepseek-v4-flash-0731"),
+        eq(PracticeGenerationModelClient.jsonObjectInstructions()),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class),
+        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT));
+  }
+
+  @Test
+  void retriesJsonObjectWhenSchemaRequestReturnsEmpty() throws Exception {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setTutorModel("deepseek-v4-flash-0731");
+    properties.setPracticeModel("");
+
+    OpenAiCompatibleTransport transport = mock(OpenAiCompatibleTransport.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        eq(PracticeGenerationModelClient.instructions()),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class)))
+        .thenReturn(Optional.empty());
+
+    String canonicalRetryOutput = """
+        {
+          "questions": [
+            {
+              "type": "NUMBER",
+              "stem": "13 - 5 = ?",
+              "options": [],
+              "answerSpec": "8",
+              "explanation": "13减5等于8。",
+              "hints": ["关键词：13、减5"],
+              "tags": ["减法"]
+            }
+          ]
+        }
+        """;
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        eq(PracticeGenerationModelClient.jsonObjectInstructions()),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class),
+        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT)))
+        .thenReturn(Optional.of(canonicalRetryOutput));
+
+    PracticeGenerationModelClient client =
+        new PracticeGenerationModelClient(properties, transport, mapper);
+
+    Optional<PracticeContentCatalog.Paper> result = client.generate(
+        "人教版数学二年级上册",
+        "ai-empty-schema-retry",
+        "G2",
+        "S1",
+        new PracticeGenerationDtos.GenerateRequest(
+            "MATH", "TEXTBOOK_SYNC", "L1", 1, "练习退位减法"));
+
+    assertTrue(result.isPresent());
+    assertEquals("8", result.get().questions().get(0).answerSpec());
+  }
+
+  @Test
+  void retriesWithJsonObjectWhenSchemaOutputIsStructurallyInvalid() throws Exception {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setTutorModel("deepseek-v4-flash-0731");
+    properties.setPracticeModel("");
+
+    OpenAiCompatibleTransport transport = mock(OpenAiCompatibleTransport.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    String invalidSchemaOutput = """
+        {
+          "questions": [
+            {
+              "type": "NUMBER",
+              "question": "12 - 5 = ?",
+              "options": [],
+              "answerSpec": "7",
+              "explanation": "12减5等于7。",
+              "hints": ["关键词：12、减5"],
+              "tags": ["减法"]
+            }
+          ]
+        }
+        """;
+    String canonicalRetryOutput = """
+        {
+          "questions": [
+            {
+              "type": "NUMBER",
+              "stem": "12 - 5 = ?",
+              "options": [],
+              "answerSpec": "7",
+              "explanation": "12减5等于7。",
+              "hints": ["关键词：12、减5"],
+              "tags": ["减法"]
+            }
+          ]
+        }
+        """;
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        eq(PracticeGenerationModelClient.instructions()),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class)))
+        .thenReturn(Optional.of(invalidSchemaOutput));
+
+    when(transport.complete(
+        eq("deepseek-v4-flash-0731"),
+        eq(PracticeGenerationModelClient.jsonObjectInstructions()),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class),
+        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT)))
+        .thenReturn(Optional.of(canonicalRetryOutput));
+
+    PracticeGenerationModelClient client =
+        new PracticeGenerationModelClient(properties, transport, mapper);
+
+    Optional<PracticeContentCatalog.Paper> result = client.generate(
+        "人教版数学二年级上册",
+        "ai-negotiated-output",
+        "G2",
+        "S1",
+        new PracticeGenerationDtos.GenerateRequest(
+            "MATH", "TEXTBOOK_SYNC", "L1", 1, "练习退位减法"));
+
+    assertTrue(result.isPresent());
+    assertEquals("12 - 5 = ?", result.get().questions().get(0).stem());
+    assertEquals("7", result.get().questions().get(0).answerSpec());
+
+    verify(transport).complete(
+        eq("deepseek-v4-flash-0731"),
+        eq(PracticeGenerationModelClient.jsonObjectInstructions()),
+        any(String.class),
+        eq(7000),
+        eq("practice_generation"),
+        any(Map.class),
+        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT));
+  }
+
   @Test
   void parsesQuestionsOnlyRootAndBuildsPaperMetadataFromRequest() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();

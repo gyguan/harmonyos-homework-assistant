@@ -37,6 +37,12 @@ public class OpenAiCompatibleTransport {
   public record ChatChoice(ChatMessage message) {}
   public record ChatResponse(List<ChatChoice> choices) {}
 
+  public enum StructuredOutputMode {
+    JSON_SCHEMA,
+    JSON_OBJECT,
+    TEXT
+  }
+
   public OpenAiCompatibleTransport(AiProviderProperties properties, JsonMapper jsonMapper) {
     this.properties = properties;
     this.jsonMapper = jsonMapper;
@@ -59,6 +65,24 @@ public class OpenAiCompatibleTransport {
 
   public Optional<String> complete(String model, String instructions, String input, int maxTokens,
       String schemaName, Map<String, Object> schema) {
+    return complete(
+        model,
+        instructions,
+        input,
+        maxTokens,
+        schemaName,
+        schema,
+        StructuredOutputMode.JSON_SCHEMA);
+  }
+
+  public Optional<String> complete(
+      String model,
+      String instructions,
+      String input,
+      int maxTokens,
+      String schemaName,
+      Map<String, Object> schema,
+      StructuredOutputMode outputMode) {
     String path = properties.usesChatCompletions()
         ? properties.getChatCompletionsPath()
         : properties.getResponsesPath();
@@ -73,12 +97,14 @@ public class OpenAiCompatibleTransport {
     }
 
     long started = System.nanoTime();
-    log.info("[AI] request protocol={} model={} path={} structuredOutput={} maxTokens={}",
-        protocol, model, path, schema != null && properties.isStructuredOutput(), maxTokens);
+    StructuredOutputMode resolvedMode =
+        outputMode == null ? StructuredOutputMode.JSON_SCHEMA : outputMode;
+    log.info("[AI] request protocol={} model={} path={} structuredOutput={} outputMode={} maxTokens={}",
+        protocol, model, path, schema != null && properties.isStructuredOutput(), resolvedMode, maxTokens);
     try {
       Optional<String> result = properties.usesChatCompletions()
-          ? chatCompletion(model, instructions, input, maxTokens, schemaName, schema)
-          : responses(model, instructions, input, maxTokens, schemaName, schema);
+          ? chatCompletion(model, instructions, input, maxTokens, schemaName, schema, resolvedMode)
+          : responses(model, instructions, input, maxTokens, schemaName, schema, resolvedMode);
       long elapsedMs = elapsedMs(started);
       if (result.isPresent()) {
         log.info("[AI] response ok protocol={} model={} path={} elapsedMs={} outputChars={}",
@@ -105,8 +131,14 @@ public class OpenAiCompatibleTransport {
     }
   }
 
-  private Optional<String> responses(String model, String instructions, String input, int maxTokens,
-      String schemaName, Map<String, Object> schema) throws Exception {
+  private Optional<String> responses(
+      String model,
+      String instructions,
+      String input,
+      int maxTokens,
+      String schemaName,
+      Map<String, Object> schema,
+      StructuredOutputMode outputMode) throws Exception {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("model", model);
     body.put("store", false);
@@ -115,14 +147,21 @@ public class OpenAiCompatibleTransport {
     body.put("input", input);
     body.put("max_output_tokens", maxTokens);
     if (schema != null && properties.isStructuredOutput()) {
-      body.put("text", Map.of("format", jsonSchemaFormat(schemaName, schema)));
+      Map<String, Object> format = structuredFormat(outputMode, schemaName, schema);
+      if (format != null) body.put("text", Map.of("format", format));
     }
     ResponsesResponse response = post(properties.getResponsesPath(), body, ResponsesResponse.class);
     return extractResponsesText(response);
   }
 
-  private Optional<String> chatCompletion(String model, String instructions, String input, int maxTokens,
-      String schemaName, Map<String, Object> schema) throws Exception {
+  private Optional<String> chatCompletion(
+      String model,
+      String instructions,
+      String input,
+      int maxTokens,
+      String schemaName,
+      Map<String, Object> schema,
+      StructuredOutputMode outputMode) throws Exception {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("model", model);
     body.put("stream", false);
@@ -131,12 +170,9 @@ public class OpenAiCompatibleTransport {
         Map.of("role", "user", "content", input)));
     body.put("max_tokens", maxTokens);
     if (schema != null && properties.isStructuredOutput()) {
-      body.put("response_format", Map.of(
-          "type", "json_schema",
-          "json_schema", Map.of(
-              "name", safeSchemaName(schemaName),
-              "strict", true,
-              "schema", schema)));
+      Map<String, Object> responseFormat =
+          chatStructuredResponseFormat(outputMode, schemaName, schema);
+      if (responseFormat != null) body.put("response_format", responseFormat);
     }
     ChatResponse response = post(properties.getChatCompletionsPath(), body, ChatResponse.class);
     return extractChatText(response);
@@ -262,6 +298,29 @@ public class OpenAiCompatibleTransport {
     if (value == null) return "<empty>";
     if (value.length() <= maxChars) return value;
     return value.substring(0, maxChars) + "...";
+  }
+
+  static Map<String, Object> structuredFormat(
+      StructuredOutputMode mode, String schemaName, Map<String, Object> schema) {
+    return switch (mode == null ? StructuredOutputMode.JSON_SCHEMA : mode) {
+      case JSON_SCHEMA -> jsonSchemaFormat(schemaName, schema);
+      case JSON_OBJECT -> Map.of("type", "json_object");
+      case TEXT -> null;
+    };
+  }
+
+  static Map<String, Object> chatStructuredResponseFormat(
+      StructuredOutputMode mode, String schemaName, Map<String, Object> schema) {
+    return switch (mode == null ? StructuredOutputMode.JSON_SCHEMA : mode) {
+      case JSON_SCHEMA -> Map.of(
+          "type", "json_schema",
+          "json_schema", Map.of(
+              "name", safeSchemaName(schemaName),
+              "strict", true,
+              "schema", schema));
+      case JSON_OBJECT -> Map.of("type", "json_object");
+      case TEXT -> null;
+    };
   }
 
   private static Map<String, Object> jsonSchemaFormat(String schemaName, Map<String, Object> schema) {

@@ -42,73 +42,201 @@ public class PracticeGenerationModelClient {
       String grade,
       String semester,
       PracticeGenerationDtos.GenerateRequest request) {
-    Optional<String> output = transport.complete(
-        properties.getPracticeModel(),
-        instructions(),
-        input(textbookContext, grade, semester, request),
-        7000,
-        "practice_generation",
-        schema(request.questionCount()));
-    if (output.isEmpty()) return Optional.empty();
+    Map<String, Object> outputSchema = schema(request.questionCount());
+    String generationInput = input(textbookContext, grade, semester, request);
 
+    OpenAiCompatibleTransport.StructuredOutputMode primaryMode =
+        properties.usesChatCompletions()
+            ? OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT
+            : OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA;
+    OpenAiCompatibleTransport.StructuredOutputMode fallbackMode =
+        primaryMode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
+            ? OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT
+            : OpenAiCompatibleTransport.StructuredOutputMode.TEXT;
+
+    GenerationAttempt primaryAttempt = requestAndParse(
+        paperId,
+        grade,
+        semester,
+        request,
+        generationInput,
+        instructionsFor(primaryMode),
+        outputSchema,
+        primaryMode);
+    if (primaryAttempt.paper().isPresent()) {
+      logSuccess(paperId, primaryAttempt);
+      return primaryAttempt.paper();
+    }
+
+    log.info(
+        "[AI] practice generation structured attempt rejected model={} paperId={} mode={} shape={} outputChars={} exception={} message={} retryMode={}",
+        properties.getPracticeModel(),
+        paperId,
+        primaryMode,
+        primaryAttempt.shape(),
+        primaryAttempt.outputChars(),
+        primaryAttempt.exception(),
+        primaryAttempt.message(),
+        fallbackMode);
+
+    GenerationAttempt fallbackAttempt = requestAndParse(
+        paperId,
+        grade,
+        semester,
+        request,
+        generationInput,
+        instructionsFor(fallbackMode),
+        outputSchema,
+        fallbackMode);
+    if (fallbackAttempt.paper().isPresent()) {
+      logSuccess(paperId, fallbackAttempt);
+      return fallbackAttempt.paper();
+    }
+
+    log.warn(
+        "[AI] practice generation failed after structured-output negotiation model={} paperId={} firstMode={} firstShape={} firstOutputChars={} firstException={} firstMessage={} retryMode={} retryShape={} retryOutputChars={} retryException={} retryMessage={}",
+        properties.getPracticeModel(),
+        paperId,
+        primaryMode,
+        primaryAttempt.shape(),
+        primaryAttempt.outputChars(),
+        primaryAttempt.exception(),
+        primaryAttempt.message(),
+        fallbackMode,
+        fallbackAttempt.shape(),
+        fallbackAttempt.outputChars(),
+        fallbackAttempt.exception(),
+        fallbackAttempt.message());
+    return Optional.empty();
+  }
+
+  private record GenerationAttempt(
+      Optional<PracticeContentCatalog.Paper> paper,
+      OpenAiCompatibleTransport.StructuredOutputMode mode,
+      String shape,
+      int outputChars,
+      List<String> coercedFields,
+      String exception,
+      String message) {}
+
+  private GenerationAttempt requestAndParse(
+      String paperId,
+      String grade,
+      String semester,
+      PracticeGenerationDtos.GenerateRequest request,
+      String generationInput,
+      String generationInstructions,
+      Map<String, Object> outputSchema,
+      OpenAiCompatibleTransport.StructuredOutputMode mode) {
+    Optional<String> output = mode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
+        ? transport.complete(
+            properties.getPracticeModel(),
+            generationInstructions,
+            generationInput,
+            7000,
+            "practice_generation",
+            outputSchema)
+        : transport.complete(
+            properties.getPracticeModel(),
+            generationInstructions,
+            generationInput,
+            7000,
+            "practice_generation",
+            outputSchema,
+            mode);
+    if (output == null || output.isEmpty()) {
+      return new GenerationAttempt(
+          Optional.empty(), mode, "<empty>", 0, List.of(), "EmptyOutput", "<empty>");
+    }
+    return parseOutput(paperId, grade, semester, request, output.get(), mode);
+  }
+
+  private GenerationAttempt parseOutput(
+      String paperId,
+      String grade,
+      String semester,
+      PracticeGenerationDtos.GenerateRequest request,
+      String output,
+      OpenAiCompatibleTransport.StructuredOutputMode mode) {
     String shape = "<unparsed>";
     List<String> coercedFields = List.of();
     try {
       StructuredJsonNormalizer.Result normalized =
-          StructuredJsonNormalizer.normalize(mapper, output.get());
+          StructuredJsonNormalizer.normalize(mapper, output);
       shape = normalized.shape();
       PracticeGenerationProviderAdapter.Result adapted =
           PracticeGenerationProviderAdapter.adapt(
               mapper, normalized.json(), metadataDefaults(request));
       coercedFields = adapted.coercedPaths();
-      PracticeGenerationCanonicalContract.Paper modelPaper = adapted.paper();
-
-      ArrayList<PracticeContentCatalog.Question> questions = new ArrayList<>();
-      for (int i = 0; i < modelPaper.questions().size(); i++) {
-        PracticeGenerationCanonicalContract.Question source = modelPaper.questions().get(i);
-        ArrayList<PracticeContentCatalog.Option> options = new ArrayList<>();
-        for (PracticeGenerationCanonicalContract.Option option : source.options()) {
-          options.add(new PracticeContentCatalog.Option(option.key(), option.label()));
-        }
-        String questionId = paperId + "-Q" + String.format("%02d", i + 1);
-        questions.add(new PracticeContentCatalog.Question(
-            questionId,
-            i + 1,
-            source.type(),
-            source.stem(),
-            options,
-            source.answerSpec(),
-            source.explanation(),
-            source.hints(),
-            source.tags()));
-      }
-      PracticeContentCatalog.Paper paper = new PracticeContentCatalog.Paper(
-          paperId,
-          1,
-          grade,
-          request.subject().trim().toUpperCase(),
-          semester,
-          request.track().trim().toUpperCase(),
-          modelPaper.title(),
-          modelPaper.description(),
-          request.difficulty().trim().toUpperCase(),
-          questions.size(),
-          Math.max(1, Math.min(120, modelPaper.estimatedMinutes())),
-          modelPaper.tags(),
-          "AI_GENERATED",
-          "PUBLISHED",
-          questions);
-      log.info(
-          "[AI] practice generation parsed model={} paperId={} questions={} shape={} coercedFields={}",
-          properties.getPracticeModel(), paperId, questions.size(), shape, coercedFields);
-      return Optional.of(paper);
+      PracticeContentCatalog.Paper paper =
+          toPaper(paperId, grade, semester, request, adapted.paper());
+      return new GenerationAttempt(
+          Optional.of(paper), mode, shape, output.length(), coercedFields, "", "");
     } catch (Exception error) {
-      log.warn(
-          "[AI] practice generation parse failed model={} paperId={} outputChars={} shape={} coercedFields={} exception={} message={}",
-          properties.getPracticeModel(), paperId, output.get().length(), shape, coercedFields,
-          error.getClass().getSimpleName(), safeMessage(error.getMessage()));
-      return Optional.empty();
+      return new GenerationAttempt(
+          Optional.empty(),
+          mode,
+          shape,
+          output.length(),
+          coercedFields,
+          error.getClass().getSimpleName(),
+          safeMessage(error.getMessage()));
     }
+  }
+
+  private PracticeContentCatalog.Paper toPaper(
+      String paperId,
+      String grade,
+      String semester,
+      PracticeGenerationDtos.GenerateRequest request,
+      PracticeGenerationCanonicalContract.Paper modelPaper) {
+    ArrayList<PracticeContentCatalog.Question> questions = new ArrayList<>();
+    for (int i = 0; i < modelPaper.questions().size(); i++) {
+      PracticeGenerationCanonicalContract.Question source = modelPaper.questions().get(i);
+      ArrayList<PracticeContentCatalog.Option> options = new ArrayList<>();
+      for (PracticeGenerationCanonicalContract.Option option : source.options()) {
+        options.add(new PracticeContentCatalog.Option(option.key(), option.label()));
+      }
+      String questionId = paperId + "-Q" + String.format("%02d", i + 1);
+      questions.add(new PracticeContentCatalog.Question(
+          questionId,
+          i + 1,
+          source.type(),
+          source.stem(),
+          options,
+          source.answerSpec(),
+          source.explanation(),
+          source.hints(),
+          source.tags()));
+    }
+    return new PracticeContentCatalog.Paper(
+        paperId,
+        1,
+        grade,
+        request.subject().trim().toUpperCase(),
+        semester,
+        request.track().trim().toUpperCase(),
+        modelPaper.title(),
+        modelPaper.description(),
+        request.difficulty().trim().toUpperCase(),
+        questions.size(),
+        Math.max(1, Math.min(120, modelPaper.estimatedMinutes())),
+        modelPaper.tags(),
+        "AI_GENERATED",
+        "PUBLISHED",
+        questions);
+  }
+
+  private void logSuccess(String paperId, GenerationAttempt attempt) {
+    PracticeContentCatalog.Paper paper = attempt.paper().orElseThrow();
+    log.info(
+        "[AI] practice generation parsed model={} paperId={} questions={} outputMode={} shape={} coercedFields={}",
+        properties.getPracticeModel(),
+        paperId,
+        paper.questions().size(),
+        attempt.mode(),
+        attempt.shape(),
+        attempt.coercedFields());
   }
 
   static String instructions() {
@@ -128,6 +256,22 @@ public class PracticeGenerationModelClient {
         + "生成前自行复核每题答案、选项唯一性、数学计算和年级适配。"
         + "顶层只输出 questions 数组，不需要生成 title、description、estimatedMinutes 或 tags。"
         + "最终只输出符合JSON Schema的对象，不输出Markdown或额外说明。";
+  }
+
+  static String instructionsFor(OpenAiCompatibleTransport.StructuredOutputMode mode) {
+    return mode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
+        ? instructions()
+        : jsonObjectInstructions();
+  }
+
+  static String jsonObjectInstructions() {
+    return instructions()
+        + " 当前Provider使用JSON Object兼容模式，必须严格使用以下固定字段名，禁止改名、翻译字段名或增加替代字段："
+        + " 顶层只能是questions；每题只能使用type、stem、options、answerSpec、explanation、hints、tags。"
+        + " JSON示例：{\"questions\":[{\"type\":\"NUMBER\",\"stem\":\"8 + 7 = ?\",\"options\":[],"
+        + "\"answerSpec\":\"15\",\"explanation\":\"8加7等于15。\","
+        + "\"hints\":[\"关键词：8、加7\"],\"tags\":[\"加法\"]}]}。"
+        + " 必须生成输入要求的题量，不要输出Markdown代码块或任何JSON之外的文字。";
   }
 
   static String input(String textbookContext, String grade, String semester,
