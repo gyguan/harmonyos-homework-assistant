@@ -12,7 +12,7 @@
     "typeCheck": true
   },
   "nodeOptions": {
-    "maxOldSpaceSize": 12288,
+    "maxOldSpaceSize": 8192,
     "exposeGC": true
   }
 }
