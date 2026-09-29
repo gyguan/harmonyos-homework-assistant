@@ -311,7 +311,7 @@ export struct HomeworkImportInboxPage {
     Column() {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
-          title: '作业收件箱',
+          title: '导入记录',
           backAccessibilityText: '返回上一页',
           onBack: () => this.onBack()
         });
