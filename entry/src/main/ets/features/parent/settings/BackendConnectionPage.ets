@@ -4,6 +4,7 @@ import { FamilyCloudService } from '../../../application/remote/FamilyCloudServi
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
+import { StudentProfileEditorDialog } from '../../../components/family/StudentProfileEditorDialog';
 import { SettingsToggleRow } from '../../../components/selection/SelectionControls';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
@@ -31,6 +32,9 @@ export struct BackendConnectionPage {
   @State private editMathTextbook: string = '';
   @State private editEnglishTextbook: string = '';
   @State private editOtherTextbooks: string = '';
+  @State private editingExisting: boolean = false;
+  @State private studentEditorBusy: boolean = false;
+  @State private studentEditorMessage: string = '';
   @State private familyExpanded: boolean = false;
   @State private parentAccessExpanded: boolean = false;
   @State private tutorRulesExpanded: boolean = false;
@@ -40,6 +44,54 @@ export struct BackendConnectionPage {
   @State private parentAccessMessage: string = '';
   @State private deleteStudentConfirmId: string = '';
   onStoreChanged: () => void = () => {};
+
+  private phoneStudentEditorController: CustomDialogController = new CustomDialogController({
+    builder: StudentProfileEditorDialog({
+      editingId: $editingId,
+      editingExisting: $editingExisting,
+      editName: $editName,
+      editGrade: $editGrade,
+      editClassName: $editClassName,
+      editSemester: $editSemester,
+      editChineseTextbook: $editChineseTextbook,
+      editMathTextbook: $editMathTextbook,
+      editEnglishTextbook: $editEnglishTextbook,
+      editOtherTextbooks: $editOtherTextbooks,
+      deleteStudentConfirmId: $deleteStudentConfirmId,
+      busy: $studentEditorBusy,
+      message: $studentEditorMessage,
+      onCancel: () => this.cancelEdit(),
+      onSave: () => { void this.saveStudent(); },
+      onDelete: () => { void this.deleteStudent(this.editingId); }
+    }),
+    autoCancel: false,
+    alignment: DialogAlignment.Bottom,
+    customStyle: true
+  });
+
+  private wideStudentEditorController: CustomDialogController = new CustomDialogController({
+    builder: StudentProfileEditorDialog({
+      editingId: $editingId,
+      editingExisting: $editingExisting,
+      editName: $editName,
+      editGrade: $editGrade,
+      editClassName: $editClassName,
+      editSemester: $editSemester,
+      editChineseTextbook: $editChineseTextbook,
+      editMathTextbook: $editMathTextbook,
+      editEnglishTextbook: $editEnglishTextbook,
+      editOtherTextbooks: $editOtherTextbooks,
+      deleteStudentConfirmId: $deleteStudentConfirmId,
+      busy: $studentEditorBusy,
+      message: $studentEditorMessage,
+      onCancel: () => this.cancelEdit(),
+      onSave: () => { void this.saveStudent(); },
+      onDelete: () => { void this.deleteStudent(this.editingId); }
+    }),
+    autoCancel: false,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
 
   aboutToAppear(): void {
     this.baseUrl = BackendSession.instance.getBaseUrl();
@@ -156,8 +208,21 @@ export struct BackendConnectionPage {
     this.onStoreChanged();
   }
 
+  private openStudentEditorDialog(): void {
+    if (this.canInlineStudentFields()) this.wideStudentEditorController.open();
+    else this.phoneStudentEditorController.open();
+  }
+
+  private closeStudentEditorDialog(): void {
+    this.phoneStudentEditorController.close();
+    this.wideStudentEditorController.close();
+  }
+
   private beginAdd(): void {
     this.deleteStudentConfirmId = '';
+    this.editingExisting = false;
+    this.studentEditorBusy = false;
+    this.studentEditorMessage = '';
     this.editingId = `student-${Date.now()}`;
     this.editName = '';
     this.editGrade = '';
@@ -167,10 +232,14 @@ export struct BackendConnectionPage {
     this.editMathTextbook = '';
     this.editEnglishTextbook = '';
     this.editOtherTextbooks = '';
+    this.openStudentEditorDialog();
   }
 
   private beginEdit(student: StudentProfile): void {
     this.deleteStudentConfirmId = '';
+    this.editingExisting = true;
+    this.studentEditorBusy = false;
+    this.studentEditorMessage = '';
     this.editingId = student.id;
     this.editName = student.name;
     this.editGrade = student.grade;
@@ -181,25 +250,25 @@ export struct BackendConnectionPage {
     this.editMathTextbook = textbooks.mathTextbook;
     this.editEnglishTextbook = textbooks.englishTextbook;
     this.editOtherTextbooks = textbooks.otherTextbooks;
+    this.openStudentEditorDialog();
   }
 
   private cancelEdit(): void {
     this.deleteStudentConfirmId = '';
+    this.studentEditorMessage = '';
+    this.studentEditorBusy = false;
+    this.editingExisting = false;
     this.editingId = '';
   }
 
-  private editingExistingStudent(): boolean {
-    for (let student of this.students()) if (student.id === this.editingId) return true;
-    return false;
-  }
-
   private async saveStudent(): Promise<void> {
+    if (this.studentEditorBusy) return;
     if (this.editName.trim().length === 0 || this.editGrade.trim().length === 0 || this.editClassName.trim().length === 0) {
-      this.message = '姓名、年级、班级不能为空';
+      this.studentEditorMessage = '姓名、年级、班级不能为空';
       return;
     }
     if (!StudentTextbookProfile.validOtherTextbooks(this.editOtherTextbooks)) {
-      this.message = '其他教材格式应为“科目=教材版本”，多个科目使用中文分号分隔';
+      this.studentEditorMessage = '其他教材格式应为“科目=教材版本”，多个科目使用中文分号分隔';
       return;
     }
     let textbooks = StudentTextbookProfile.fields(
@@ -219,29 +288,46 @@ export struct BackendConnectionPage {
       otherTextbooks: textbooks.otherTextbooks,
       textbookSummary: StudentTextbookProfile.summary(textbooks)
     };
-    if (await FamilyCloudService.instance.saveStudent(student)) {
-      this.editingId = '';
-      this.deleteStudentConfirmId = '';
-      this.syncLocalStudents();
-      this.pageRevision++;
-      this.message = '';
-      this.onStoreChanged();
-    } else {
-      this.message = '保存失败，请确认云端连接';
+    this.studentEditorBusy = true;
+    this.studentEditorMessage = '';
+    try {
+      if (await FamilyCloudService.instance.saveStudent(student)) {
+        this.deleteStudentConfirmId = '';
+        this.syncLocalStudents();
+        this.pageRevision++;
+        this.message = '';
+        this.onStoreChanged();
+        this.closeStudentEditorDialog();
+        this.editingExisting = false;
+        this.editingId = '';
+      } else {
+        this.studentEditorMessage = '保存失败，请确认云端连接';
+      }
+    } finally {
+      this.studentEditorBusy = false;
     }
   }
 
   private async deleteStudent(studentId: string): Promise<void> {
-    if (await FamilyCloudService.instance.deleteStudent(studentId)) {
-      this.editingId = '';
-      this.deleteStudentConfirmId = '';
-      this.syncLocalStudents();
-      this.pageRevision++;
-      this.message = '';
-      this.onStoreChanged();
-    } else {
-      this.deleteStudentConfirmId = '';
-      this.message = '删除失败：已有作业的孩子或家庭最后一个孩子不能直接删除';
+    if (this.studentEditorBusy) return;
+    this.studentEditorBusy = true;
+    this.studentEditorMessage = '';
+    try {
+      if (await FamilyCloudService.instance.deleteStudent(studentId)) {
+        this.deleteStudentConfirmId = '';
+        this.syncLocalStudents();
+        this.pageRevision++;
+        this.message = '';
+        this.onStoreChanged();
+        this.closeStudentEditorDialog();
+        this.editingExisting = false;
+        this.editingId = '';
+      } else {
+        this.deleteStudentConfirmId = '';
+        this.studentEditorMessage = '删除失败：已有作业的孩子或家庭最后一个孩子不能直接删除';
+      }
+    } finally {
+      this.studentEditorBusy = false;
     }
   }
 
@@ -249,183 +335,6 @@ export struct BackendConnectionPage {
     await BackendAuthService.instance.logout();
     this.message = '';
     this.pageRevision++;
-  }
-
-  @Builder
-  private StudentIdentityFields() {
-    if (this.canInlineStudentFields()) {
-      Row({ space: 8 }) {
-        TextInput({ placeholder: '年级，如 三年级', text: this.editGrade })
-          .layoutWeight(1).height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editGrade = value);
-        TextInput({ placeholder: '班级，如 三（2）班', text: this.editClassName })
-          .layoutWeight(1).height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editClassName = value);
-      }
-      .width('100%');
-    } else {
-      Column({ space: 8 }) {
-        TextInput({ placeholder: '年级，如 三年级', text: this.editGrade })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editGrade = value);
-        TextInput({ placeholder: '班级，如 三（2）班', text: this.editClassName })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editClassName = value);
-      }
-      .width('100%');
-    }
-  }
-
-  @Builder
-  private StudentEditor() {
-    if (this.editingId.length > 0) {
-      Column({ space: 10 }) {
-        Row() {
-          Text(this.editingExistingStudent() ? '编辑孩子资料' : '添加孩子')
-            .fontSize(AppTheme.CARD_TITLE_SIZE).lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Blank();
-          Text('取消').constraintSize({ minWidth: AppTheme.MIN_TOUCH_TARGET, minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .fontSize(AppTheme.ACTION_TEXT_SIZE).lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT).fontColor(AppTheme.PRIMARY).textAlign(TextAlign.Center)
-            .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('取消编辑孩子资料')
-            .onClick(() => this.cancelEdit());
-        }
-        .width('100%');
-
-        TextInput({ placeholder: '姓名', text: this.editName })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editName = value);
-
-        this.StudentIdentityFields();
-
-        TextInput({ placeholder: '学期', text: this.editSemester })
-          .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editSemester = value);
-
-        Column({ space: 8 }) {
-          Text('教材版本')
-            .width('100%')
-            .fontSize(AppTheme.LABEL_TITLE_SIZE)
-            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.TEXT);
-          Text('只填写教材版本即可，年级和学期由孩子资料自动组合。')
-            .width('100%')
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-            .fontColor(AppTheme.SUBTEXT);
-
-          Row() {
-            Text('语文').fontSize(AppTheme.LABEL_TITLE_SIZE).fontColor(AppTheme.SUBTEXT);
-            Blank();
-            if (this.editChineseTextbook.length > 0) {
-              Text('清空').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .padding({ left: 12, right: 4 }).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-                .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空语文教材')
-                .onClick(() => this.editChineseTextbook = '');
-            }
-          }.width('100%');
-          TextInput({ placeholder: '例如：部编版', text: this.editChineseTextbook })
-            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editChineseTextbook = value);
-
-          Row() {
-            Text('数学').fontSize(AppTheme.LABEL_TITLE_SIZE).fontColor(AppTheme.SUBTEXT);
-            Blank();
-            if (this.editMathTextbook.length > 0) {
-              Text('清空').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .padding({ left: 12, right: 4 }).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-                .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空数学教材')
-                .onClick(() => this.editMathTextbook = '');
-            }
-          }.width('100%');
-          TextInput({ placeholder: '例如：北师大版', text: this.editMathTextbook })
-            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editMathTextbook = value);
-
-          Row() {
-            Text('英语').fontSize(AppTheme.LABEL_TITLE_SIZE).fontColor(AppTheme.SUBTEXT);
-            Blank();
-            if (this.editEnglishTextbook.length > 0) {
-              Text('清空').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .padding({ left: 12, right: 4 }).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-                .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空英语教材')
-                .onClick(() => this.editEnglishTextbook = '');
-            }
-          }.width('100%');
-          TextInput({ placeholder: '例如：人教版', text: this.editEnglishTextbook })
-            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editEnglishTextbook = value);
-
-          Row() {
-            Text('其他教材（可选）')
-              .fontSize(AppTheme.LABEL_TITLE_SIZE)
-              .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
-              .fontColor(AppTheme.SUBTEXT);
-            Blank();
-            if (this.editOtherTextbooks.length > 0) {
-              Text('清空').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-                .padding({ left: 12, right: 4 }).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-                .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空其他教材')
-                .onClick(() => this.editOtherTextbooks = '');
-            }
-          }
-          .width('100%');
-          TextArea({
-            placeholder: '例如：科学=教科版；道德与法治=人教版',
-            text: this.editOtherTextbooks
-          })
-            .width('100%')
-            .height(82)
-            .fontSize(AppTheme.FORM_TEXT_SIZE)
-            .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
-            .backgroundColor(AppTheme.SURFACE)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onChange((value: string) => this.editOtherTextbooks = value);
-          Text('格式：科目=教材版本；多个科目使用中文分号“；”分隔')
-            .width('100%')
-            .fontSize(AppTheme.CAPTION_SIZE)
-            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-            .fontColor(AppTheme.TERTIARY_TEXT);
-        }
-        .width('100%');
-
-        if (this.deleteStudentConfirmId === this.editingId) {
-          Column({ space: 8 }) {
-            Text('确认删除这个孩子？').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontWeight(FontWeight.Medium).fontColor(AppTheme.DANGER);
-            Text('删除家庭成员属于高风险操作。已有作业的孩子或家庭最后一个孩子仍会被服务端拒绝删除。')
-              .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            Row({ space: 8 }) {
-              Button('取消删除', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.SURFACE_EMPHASIS).fontColor(AppTheme.TEXT)
-                .onClick(() => this.deleteStudentConfirmId = '');
-              Button('确认删除', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.DANGER).fontColor(AppTheme.TEXT_ON_PRIMARY)
-                .onClick(() => { void this.deleteStudent(this.editingId); });
-            }
-            .width('100%');
-          }
-          .width('100%').padding(12).backgroundColor(AppTheme.DANGER_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
-        } else {
-          Row({ space: 8 }) {
-            if (this.editingExistingStudent()) {
-              Button('删除', { type: ButtonType.Normal }).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                .padding({ left: 18, right: 18 }).borderRadius(AppTheme.CONTROL_RADIUS)
-                .backgroundColor(AppTheme.DANGER_SOFT).fontColor(AppTheme.DANGER)
-                .onClick(() => this.deleteStudentConfirmId = this.editingId);
-            }
-            Button('保存', { type: ButtonType.Normal }).layoutWeight(1).height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-              .borderRadius(AppTheme.CONTROL_RADIUS).backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .onClick(() => { void this.saveStudent(); });
-          }
-          .width('100%');
-        }
-      }
-      .width('100%').padding(14).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
-    }
   }
 
   @Builder
@@ -470,7 +379,6 @@ export struct BackendConnectionPage {
           .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
 
-      this.StudentEditor();
     }
     .width('100%');
   }
