@@ -22,6 +22,11 @@ import { PageStateView } from '../components/state/PageStateView';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import {
+  PracticeDifficulty,
+  PracticeSubject,
+  PracticeTrack
+} from '../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
@@ -332,9 +337,9 @@ export struct AppShell {
   }
 
   private openParentPracticeGenerationResult(
-    subject: string,
-    track: string,
-    difficulty: string,
+    subject: PracticeSubject,
+    track: PracticeTrack,
+    difficulty: PracticeDifficulty,
     questionCount: number,
     requirement: string
   ): void {
@@ -556,9 +561,9 @@ export struct AppShell {
       let route = param as ParentPracticeGenerationResultRouteParam;
       NavDestination() {
         ParentPracticeGenerationResultPage({
-          subject: route.subject,
-          track: route.track,
-          difficulty: route.difficulty,
+          subject: route.subject as PracticeSubject,
+          track: route.track as PracticeTrack,
+          difficulty: route.difficulty as PracticeDifficulty,
           questionCount: route.questionCount,
           requirement: route.requirement,
           onBack: () => this.navPathStack.pop(),
