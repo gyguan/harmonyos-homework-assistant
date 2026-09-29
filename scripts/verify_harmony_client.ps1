@@ -41,7 +41,7 @@ try {
   Invoke-Hvigor $hvigorw @('-v')
   Invoke-Hvigor $hvigorw @('--stop-daemon')
 
-  foreach ($cachePath in @('.hvigor', 'build', 'entry\\build')) {
+  foreach ($cachePath in @('.hvigor', 'build', 'entry\build')) {
     $fullPath = Join-Path $root $cachePath
     if (Test-Path $fullPath) {
       Write-Host ('Removing stale Harmony build cache: ' + $fullPath)
