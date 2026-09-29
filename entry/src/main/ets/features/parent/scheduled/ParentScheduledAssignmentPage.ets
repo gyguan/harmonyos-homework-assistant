@@ -712,7 +712,17 @@ export struct ParentScheduledAssignmentPage {
 
   @Builder
   private EditorFooter() {
-    Column() {
+    Column({ space: 8 }) {
+      if (this.message.length > 0) {
+        Text(this.message)
+          .width('100%')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(this.messageError ? AppTheme.DANGER : AppTheme.SUCCESS)
+          .padding(10)
+          .backgroundColor(this.messageError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
       Button(this.busy ? '正在保存…' : '保存计划', { type: ButtonType.Normal })
         .width('100%')
         .height(AppTheme.BUTTON_HEIGHT)
@@ -763,7 +773,7 @@ export struct ParentScheduledAssignmentPage {
             }
             .width('100%');
 
-            if (this.message.length > 0) {
+            if (this.message.length > 0 && !this.showEditor) {
               Text(this.message)
                 .width('100%')
                 .fontSize(AppTheme.META_SIZE)
