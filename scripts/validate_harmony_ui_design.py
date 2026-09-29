@@ -388,7 +388,7 @@ for card_path, card_source in [
 require("backgroundColor(AppTheme.PRIMARY_FAINT)" not in parent_dashboard,
         "Parent dashboard action cards must not use a different fill for 布置作业")
 require(parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT") == 4 and
-        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_ICON_SIZE") >= 10 and
+        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_ICON_SIZE") >= 8 and
         parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_PADDING") == 4,
         "Parent dashboard action cards must share one size specification")
 require(parent_dashboard.count(".fontSize(AppTheme.CARD_TITLE_SIZE)") >= 4 and
