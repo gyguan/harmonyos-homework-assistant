@@ -5,6 +5,7 @@ import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge'
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { Assignment, AssignmentStatus, Subject } from '../../../domain/model/HomeworkModels';
+import { AssignmentAttentionKind } from '../../../domain/service/AssignmentAttentionPolicy';
 import { StudentHomeViewModel } from './StudentHomeViewModel';
 
 @Component
@@ -136,6 +137,7 @@ export struct StudentHomePage {
   @State private actionAssignmentId: string = '';
   @State private actionMessage: string = '';
   onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
+  onOpenAttention: (kind: AssignmentAttentionKind) => void = (_kind: AssignmentAttentionKind) => {};
   onStoreChanged: () => void = () => {};
 
   private readonly viewModel: StudentHomeViewModel =
@@ -217,13 +219,19 @@ export struct StudentHomePage {
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.TEXT);
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(14)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
       }
       .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
       .padding({ left: 12, right: 12, top: 10, bottom: 10 })
       .backgroundColor(AppTheme.WARNING_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityGroup(true)
-      .accessibilityText(`提醒，${this.viewModel.attentionText()}`);
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(`提醒，${this.viewModel.attentionText()}，点击查看`)
+      .onClick(() => this.onOpenAttention(this.viewModel.attentionKind()));
     }
   }
 
