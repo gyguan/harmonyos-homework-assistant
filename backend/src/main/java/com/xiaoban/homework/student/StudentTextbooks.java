@@ -18,23 +18,23 @@ public record StudentTextbooks(
   }
 
   public static StudentTextbooks from(StudentEntity entity) {
-    StudentTextbooks structured = new StudentTextbooks(
+    StudentTextbooks legacy = parseLegacy(entity.textbookSummary);
+    return merge(
         entity.chineseTextbook,
         entity.mathTextbook,
         entity.englishTextbook,
-        entity.otherTextbooks);
-    if (!structured.isEmpty()) return structured;
-    return parseLegacy(entity.textbookSummary);
+        entity.otherTextbooks,
+        legacy);
   }
 
   public static StudentTextbooks from(StudentDtos.Upsert input) {
-    StudentTextbooks structured = new StudentTextbooks(
+    StudentTextbooks legacy = parseLegacy(input.textbookSummary());
+    return merge(
         input.chineseTextbook(),
         input.mathTextbook(),
         input.englishTextbook(),
-        input.otherTextbooks());
-    if (!structured.isEmpty()) return structured;
-    return parseLegacy(input.textbookSummary());
+        input.otherTextbooks(),
+        legacy);
   }
 
   public String forSubject(String subject) {
@@ -49,6 +49,21 @@ public record StudentTextbooks(
     return chinese.isBlank() && math.isBlank() && english.isBlank() && others.isBlank();
   }
 
+  public static boolean validOthers(String value) {
+    String text = clean(value);
+    if (text.isBlank()) return true;
+    String[] pieces = text.split("[；;]");
+    for (String piece : pieces) {
+      String item = clean(piece);
+      if (item.isBlank()) continue;
+      int separator = item.indexOf('=');
+      if (separator <= 0 || separator >= item.length() - 1) return false;
+      if (clean(item.substring(0, separator)).isBlank()) return false;
+      if (clean(item.substring(separator + 1)).isBlank()) return false;
+    }
+    return true;
+  }
+
   public String summary() {
     List<String> parts = new ArrayList<>();
     if (!chinese.isBlank()) parts.add("语文=" + chinese);
@@ -56,6 +71,19 @@ public record StudentTextbooks(
     if (!english.isBlank()) parts.add("英语=" + english);
     if (!others.isBlank()) parts.add(others);
     return String.join("；", parts);
+  }
+
+  private static StudentTextbooks merge(
+      String chinese,
+      String math,
+      String english,
+      String others,
+      StudentTextbooks fallback) {
+    return new StudentTextbooks(
+        clean(chinese).isBlank() ? fallback.chinese() : clean(chinese),
+        clean(math).isBlank() ? fallback.math() : clean(math),
+        clean(english).isBlank() ? fallback.english() : clean(english),
+        clean(others).isBlank() ? fallback.others() : clean(others));
   }
 
   static StudentTextbooks parseLegacy(String summary) {
