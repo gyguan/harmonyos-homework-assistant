@@ -28,6 +28,10 @@ export class DefaultAssignmentLocalDataSource implements AssignmentLocalDataSour
       grade: student.grade,
       className: student.className,
       semester: student.semester,
+      chineseTextbook: student.chineseTextbook,
+      mathTextbook: student.mathTextbook,
+      englishTextbook: student.englishTextbook,
+      otherTextbooks: student.otherTextbooks,
       textbookSummary: student.textbookSummary
     };
   }

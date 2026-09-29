@@ -24,7 +24,7 @@ export struct StudentSwitcherDialog {
             .fontWeight(FontWeight.Medium)
             .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
-          Text('切换后首页、进度和作业都会同步到该孩子')
+          Text('切换后首页、学生作业和其他作业页面都会同步到该孩子')
             .fontSize(AppTheme.CAPTION_SIZE)
             .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT)
