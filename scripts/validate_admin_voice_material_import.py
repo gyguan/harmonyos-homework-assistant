@@ -105,8 +105,12 @@ for element_id in [
     "import-table-body", "start-import", "import-result-stage", "import-result-body"
 ]:
     require(f'id="{element_id}"' in index, f"missing folder import UI: {element_id}")
-require("webkitdirectory" in index and "ondrop" in app and "collectDirectory" in app,
-        "folder import must support directory selection and drag/drop")
+require('id="folder-input" type="file" webkitdirectory directory multiple' in index and
+        "Ctrl/Shift" in index and "ondrop" in app and "collectDirectory" in app,
+        "folder import must support one-shot multi-directory selection and drag/drop")
+require("multipleTopLevelRoots" in voice and "singleRootIsPackage" in voice and
+        "parts.slice(2).join('/')" in voice,
+        "multi-folder parser must distinguish direct multi-root selection from common-parent selection and preserve nested relative names")
 require("parseVoiceMaterialPackages" in app and
         "audioCount === 0" in voice and "audioCount > 1" in voice and
         "imageCount === 0" in voice,
