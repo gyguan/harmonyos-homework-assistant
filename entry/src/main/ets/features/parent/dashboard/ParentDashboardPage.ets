@@ -1,12 +1,12 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
-import { AssignmentAttentionPolicy } from '../../../domain/service/AssignmentAttentionPolicy';
+import { ParentDashboardViewModel } from './ParentDashboardViewModel';
 
 @Component
 export struct ParentDashboardPage {
   @Prop revision: number = 0;
   @State private availableWidthVp: number = 390;
+  private readonly viewModel: ParentDashboardViewModel = new ParentDashboardViewModel();
   onOpenAssignment: () => void = () => {};
   onOpenVoice: () => void = () => {};
   onOpenScheduled: () => void = () => {};
@@ -19,20 +19,19 @@ export struct ParentDashboardPage {
   private attentionText(): string {
     let currentRevision = this.revision;
     if (currentRevision < 0) return '';
-    return AssignmentAttentionPolicy.parent(DefaultAssignmentRepository.instance.listCached());
+    return this.viewModel.attentionText();
   }
 
   @Builder
   private AttentionBanner() {
-    let attention = this.attentionText();
-    if (attention.length > 0) {
+    if (this.attentionText().length > 0) {
       Row({ space: 8 }) {
         Text('需要关注')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.WARNING);
-        Text(attention)
+        Text(this.attentionText())
           .layoutWeight(1)
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -43,7 +42,7 @@ export struct ParentDashboardPage {
       .backgroundColor(AppTheme.WARNING_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityGroup(true)
-      .accessibilityText(`需要关注，${attention}`);
+      .accessibilityText(`需要关注，${this.attentionText()}`);
     }
   }
 
