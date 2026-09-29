@@ -408,7 +408,7 @@ export struct StudentProfileEditorDialog {
       }
       .width('100%')
       .constraintSize({ maxHeight: 540 })
-      .scrollBar(BarState.Auto);
+      .scrollBar(BarState.Off);
 
       Divider().color(AppTheme.DIVIDER);
 
