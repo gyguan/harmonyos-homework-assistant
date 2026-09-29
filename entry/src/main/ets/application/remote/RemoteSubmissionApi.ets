@@ -162,9 +162,10 @@ export class RemoteSubmissionApi {
       let totalBytes = 0;
       try {
         for (let i = 0; i < sourceUris.length; i++) {
-          let fileName = `homework-upload-${i + 1}.jpg`;
+          let fileName = this.uploadFileName(sourceUris[i], i + 1);
+          let contentType = this.uploadContentType(sourceUris[i]);
           let header = `--${boundary}\r\nContent-Disposition: form-data; name="photos"; filename="${fileName}"\r\n` +
-            'Content-Type: image/jpeg\r\n\r\n';
+            `Content-Type: ${contentType}\r\n\r\n`;
           totalBytes += await fileIo.write(writer.fd, header);
 
           let source = await fileIo.open(sourceUris[i], fileIo.OpenMode.READ_ONLY);
@@ -209,6 +210,28 @@ export class RemoteSubmissionApi {
     } finally {
       try { await fileIo.unlink(multipartPath); } catch {}
     }
+  }
+
+  private uploadFileName(uri: string, index: number): string {
+    let ext = this.uploadExtension(uri);
+    return `homework-upload-${index}.${ext}`;
+  }
+
+  private uploadContentType(uri: string): string {
+    let ext = this.uploadExtension(uri);
+    if (ext === 'png') return 'image/png';
+    if (ext === 'webp') return 'image/webp';
+    if (ext === 'heic') return 'image/heic';
+    return 'image/jpeg';
+  }
+
+  private uploadExtension(uri: string): string {
+    let normalized = uri.toLowerCase().split('?')[0].split('#')[0];
+    if (normalized.endsWith('.png')) return 'png';
+    if (normalized.endsWith('.webp')) return 'webp';
+    if (normalized.endsWith('.heic') || normalized.endsWith('.heif')) return 'heic';
+    if (normalized.endsWith('.jpeg')) return 'jpeg';
+    return 'jpg';
   }
 
   private extension(contentType: string): string {
