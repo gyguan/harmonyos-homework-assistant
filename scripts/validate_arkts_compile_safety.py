@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
 PARENT_PRACTICE_GENERATION = ROOT / "entry/src/main/ets/features/parent/practice/ParentPracticeGenerationPage.ets"
+PARENT_PRACTICE_GENERATION_RESULT = ROOT / "entry/src/main/ets/features/parent/practice/ParentPracticeGenerationResultPage.ets"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
 PARENT_IMPORT_NAV = ROOT / "entry/src/main/ets/app/navigation/ParentImportNavigator.ets"
 APP_SHELL = ROOT / "entry/src/main/ets/pages/AppShell.ets"
@@ -56,6 +57,7 @@ def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
     parent_practice_generation = PARENT_PRACTICE_GENERATION.read_text(encoding="utf-8")
+    parent_practice_generation_result = PARENT_PRACTICE_GENERATION_RESULT.read_text(encoding="utf-8")
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
     parent_import_nav = PARENT_IMPORT_NAV.read_text(encoding="utf-8")
     app_shell = APP_SHELL.read_text(encoding="utf-8")
@@ -136,14 +138,37 @@ def main() -> int:
     require("player.seek(target);" in audio,
             "AVPlayer seek must have a capability-safe fallback when SeekMode is unavailable")
 
-    builder_sections = re.findall(
+    setup_builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
         parent_practice_generation)
-    require(len(builder_sections) >= 5,
-            "ParentPracticeGenerationPage builder sections could not be identified")
-    builder_source = "\n".join(builder_sections)
-    require(re.search(r"(?m)^\s+let\s+", builder_source) is None,
+    require(len(setup_builder_sections) >= 3,
+            "ParentPracticeGenerationPage setup builder sections could not be identified")
+    setup_builder_source = "\n".join(setup_builder_sections)
+    require(re.search(r"(?m)^\s+let\s+", setup_builder_source) is None,
             "ParentPracticeGenerationPage @Builder bodies must not contain local let declarations")
+    require("Button('AI生成练习'" in parent_practice_generation,
+            "practice generation setup page must expose the generate action")
+    require("PracticeGenerationResult" not in parent_practice_generation,
+            "practice generation setup page must not own generated result state")
+    require("this.BottomActionBar();" in parent_practice_generation,
+            "practice generation setup page must keep its primary action in a dedicated footer")
+
+    result_builder_sections = re.findall(
+        r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
+        parent_practice_generation_result)
+    require(len(result_builder_sections) >= 5,
+            "ParentPracticeGenerationResultPage builder sections could not be identified")
+    result_builder_source = "\n".join(result_builder_sections)
+    require(re.search(r"(?m)^\s+let\s+", result_builder_source) is None,
+            "ParentPracticeGenerationResultPage @Builder bodies must not contain local let declarations")
+    require("LoadingProgress()" in parent_practice_generation_result,
+            "practice generation result page must show explicit loading feedback")
+    require("this.BottomActionBar();" in parent_practice_generation_result,
+            "practice generation result page must keep preview actions in a dedicated footer")
+    require("PARENT_PRACTICE_GENERATION_RESULT" in app_routes,
+            "practice generation result must have an explicit app route")
+    require("ParentPracticeGenerationResultPage" in app_shell,
+            "AppShell must register the dedicated practice generation result page")
 
     require("throw error;" not in share_receive,
             "share receive flow must only throw explicit Error values")
