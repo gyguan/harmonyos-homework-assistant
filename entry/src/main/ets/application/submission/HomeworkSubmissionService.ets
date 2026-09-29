@@ -11,6 +11,7 @@ import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
 
 const MAX_SUBMISSION_PHOTOS: number = 6;
 const MIN_SUBMISSION_PHOTO_EDGE: number = 640;
+const MIN_SUBMISSION_PHOTO_BYTES: number = 24 * 1024;
 
 export interface SubmissionPreflightResult {
   passed: boolean;
@@ -83,17 +84,32 @@ export class HomeworkSubmissionService {
       return { passed: false, message: '请添加 1-6 张作业照片后再提交' };
     }
 
+    let seenUris: Set<string> = new Set<string>();
     for (let index = 0; index < photoUris.length; index++) {
+      let sourceUri = photoUris[index].trim();
+      if (seenUris.has(sourceUri)) {
+        return { passed: false, message: `第 ${index + 1} 张照片重复了，请删除重复照片后再提交` };
+      }
+      seenUris.add(sourceUri);
+
       let source: fileIo.File | null = null;
       let imageSource: image.ImageSource | null = null;
       try {
-        source = await fileIo.open(photoUris[index], fileIo.OpenMode.READ_ONLY);
+        source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
+        let stat = fileIo.statSync(source.fd);
+        if (stat.size < MIN_SUBMISSION_PHOTO_BYTES) {
+          return {
+            passed: false,
+            message: `第 ${index + 1} 张照片文件过小，请重新拍摄或选择原图`
+          };
+        }
+
         imageSource = image.createImageSource(source.fd);
         let info = await imageSource.getImageInfo(0);
         if (info.size.width < MIN_SUBMISSION_PHOTO_EDGE || info.size.height < MIN_SUBMISSION_PHOTO_EDGE) {
           return {
             passed: false,
-            message: `第 ${index + 1} 张照片分辨率偏低，请重新拍清楚后再提交`
+            message: `第 ${index + 1} 张照片尺寸过小，请重新拍摄或选择原图`
           };
         }
       } catch {
