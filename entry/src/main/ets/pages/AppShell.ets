@@ -645,7 +645,7 @@ export struct AppShell {
           onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
-          symbol: $r('sys.symbol.checkmark_circle'), label: '进度', selected: this.parentRoute === ParentRoute.PROGRESS,
+          symbol: $r('sys.symbol.checkmark_circle'), label: '学生作业', selected: this.parentRoute === ParentRoute.PROGRESS,
           onSelect: () => this.parentRoute = ParentRoute.PROGRESS
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
@@ -699,7 +699,7 @@ export struct AppShell {
           onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
         });
         SidePrimaryNavItem({
-          symbol: $r('sys.symbol.checkmark_circle'), label: '进度', selected: this.parentRoute === ParentRoute.PROGRESS,
+          symbol: $r('sys.symbol.checkmark_circle'), label: '学生作业', selected: this.parentRoute === ParentRoute.PROGRESS,
           onSelect: () => this.parentRoute = ParentRoute.PROGRESS
         });
         SidePrimaryNavItem({
