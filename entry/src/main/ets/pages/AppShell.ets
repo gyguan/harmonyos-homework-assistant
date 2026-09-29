@@ -600,6 +600,7 @@ export struct AppShell {
       });
     } else {
       ParentDashboardPage({
+        revision: this.storeRevision,
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenVoice: () => this.openParentVoiceCreate(),
         onOpenScheduled: () => this.openParentScheduledAssignments(),
