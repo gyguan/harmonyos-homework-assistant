@@ -7,12 +7,14 @@ import { SegmentedSelectionButton } from '../../../components/selection/Selectio
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentDateFilter, AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
+import { AssignmentAttentionKind, AssignmentAttentionPolicy } from '../../../domain/service/AssignmentAttentionPolicy';
 import { AssignmentDetailPane } from './AssignmentDetailPane';
 import { StudentAssignmentsViewModel } from './StudentAssignmentsViewModel';
 
 @Component
 export struct StudentAssignmentsPage {
   @Prop @Watch('onRevisionChanged') revision: number = 0;
+  @Prop @Watch('onAttentionKindChanged') attentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
 
@@ -24,6 +26,7 @@ export struct StudentAssignmentsPage {
   @State private draftSelectedDayEpochMs: number = Date.now();
   @State private querying: boolean = false;
   @State private historyExpanded: boolean = false;
+  @State private activeAttentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
 
   @State private needHandlingAssignments: Assignment[] = [];
   @State private notStartedAssignments: Assignment[] = [];
@@ -35,6 +38,7 @@ export struct StudentAssignmentsPage {
 
   onOpenDetail: (assignmentId: string) => void = (_assignmentId: string) => {};
   onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
+  onAttentionFilterCleared: () => void = () => {};
 
   private readonly viewModel: StudentAssignmentsViewModel =
     new StudentAssignmentsViewModel(DefaultAssignmentRepository.instance);
@@ -54,11 +58,36 @@ export struct StudentAssignmentsPage {
   });
 
   aboutToAppear(): void {
+    this.applyIncomingAttention();
     this.rebuildView();
   }
 
   private onRevisionChanged(): void {
     this.rebuildView();
+  }
+
+  private onAttentionKindChanged(): void {
+    this.applyIncomingAttention();
+    this.rebuildView();
+  }
+
+  private applyIncomingAttention(): void {
+    this.activeAttentionKind = this.attentionKind;
+    if (this.activeAttentionKind === AssignmentAttentionKind.NONE) return;
+    this.allDates = true;
+    this.draftAllDates = true;
+    this.subjectCode = 'ALL';
+    this.draftSubjectCode = 'ALL';
+  }
+
+  private clearAttentionPreset(): void {
+    if (this.activeAttentionKind === AssignmentAttentionKind.NONE) return;
+    this.activeAttentionKind = AssignmentAttentionKind.NONE;
+    this.onAttentionFilterCleared();
+  }
+
+  private filterByAttention(items: Assignment[]): Assignment[] {
+    return AssignmentAttentionPolicy.filter(items, this.activeAttentionKind);
   }
 
   private canUseMasterDetail(): boolean {
@@ -74,12 +103,12 @@ export struct StudentAssignmentsPage {
 
   private rebuildResults(): void {
     if (this.allDates) {
-      this.applyItems(this.viewModel.assignments(
-        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL));
+      this.applyItems(this.filterByAttention(this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL)));
       return;
     }
-    this.applyItems(this.viewModel.assignmentsOnDay(
-      AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs));
+    this.applyItems(this.filterByAttention(this.viewModel.assignmentsOnDay(
+      AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs)));
   }
 
   private applyItems(items: Assignment[]): void {
@@ -121,11 +150,11 @@ export struct StudentAssignmentsPage {
       return items;
     }
     if (this.allDates) {
-      return this.viewModel.assignments(
-        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL);
+      return this.filterByAttention(this.viewModel.assignments(
+        AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL));
     }
-    return this.viewModel.assignmentsOnDay(
-      AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs);
+    return this.filterByAttention(this.viewModel.assignmentsOnDay(
+      AssignmentTypeFilter.ALL, this.subjectCode, this.selectedCalendarDayEpochMs));
   }
 
   private currentNeedHandlingAssignments(): Assignment[] {
@@ -220,6 +249,7 @@ export struct StudentAssignmentsPage {
 
   private async applyFilters(allDates: boolean, selectedDayEpochMs: number, subjectCode: string): Promise<void> {
     if (this.querying) return;
+    this.clearAttentionPreset();
     this.querying = true;
     this.draftAllDates = allDates;
     this.draftSelectedDayEpochMs = selectedDayEpochMs;
@@ -232,7 +262,7 @@ export struct StudentAssignmentsPage {
       let items = allDates ?
         await this.viewModel.query(AssignmentTypeFilter.ALL, subjectCode, AssignmentDateFilter.ALL) :
         await this.viewModel.queryOnDay(subjectCode, selectedDayEpochMs);
-      this.applyItems(items);
+      this.applyItems(this.filterByAttention(items));
     } finally {
       this.querying = false;
     }
@@ -277,6 +307,40 @@ export struct StudentAssignmentsPage {
     if (value === 'ENGLISH') return '英语';
     if (value === 'OTHER') return '其他';
     return '全部科目';
+  }
+
+  @Builder
+  private AttentionFilterBanner() {
+    if (this.activeAttentionKind !== AssignmentAttentionKind.NONE) {
+      Row({ space: 8 }) {
+        Text('提醒筛选')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.WARNING);
+        Text(AssignmentAttentionPolicy.label(this.activeAttentionKind))
+          .layoutWeight(1)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.TEXT);
+        Text('清除')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 2 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('清除提醒筛选')
+          .onClick(() => {
+            this.clearAttentionPreset();
+            this.rebuildResults();
+          });
+      }
+      .width('100%')
+      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      .backgroundColor(AppTheme.WARNING_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
   }
 
   @Builder
@@ -466,6 +530,7 @@ export struct StudentAssignmentsPage {
   @Builder
   private ListContent() {
     Column({ space: 18 }) {
+      this.AttentionFilterBanner();
       this.QuickFilterBar();
       this.AssignmentSections();
     }
