@@ -106,12 +106,14 @@ export class HomeworkSubmissionService {
           try {
             await imageSource.release();
           } catch {
+            // Cleanup is best-effort and must not replace the photo validation result.
           }
         }
         if (source !== null) {
           try {
             await fileIo.close(source);
           } catch {
+            // Cleanup is best-effort and must not replace the photo validation result.
           }
         }
       }
