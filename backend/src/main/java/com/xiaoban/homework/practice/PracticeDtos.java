@@ -34,7 +34,14 @@ public final class PracticeDtos {
       List<String> hints,
       List<String> tags) {}
 
-  public record StartRequest(@NotBlank String paperId, @Min(1) int paperVersion) {}
+  public record StartRequest(
+      @NotBlank String paperId,
+      @Min(1) int paperVersion,
+      String sourceAttemptId) {
+    public StartRequest(String paperId, int paperVersion) {
+      this(paperId, paperVersion, "");
+    }
+  }
 
   public record AnswerRequest(@NotNull String answerValue) {}
 
