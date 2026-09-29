@@ -8,6 +8,7 @@ on:
       - 'feat/**'
       - 'ci/**'
       - 'refactor/**'
+      - 'fix/**'
 
 jobs:
   validate-parent-import-inbox:
@@ -316,6 +317,11 @@ jobs:
 
   backend-real-e2e:
     runs-on: ubuntu-latest
+    env:
+      BOOTSTRAP_ENABLED: 'true'
+      BOOTSTRAP_LOGIN: parent
+      BOOTSTRAP_PASSWORD: parent123
+      HTTP_LOG_PAYLOADS: 'true'
     services:
       postgres:
         image: postgres:17-alpine
