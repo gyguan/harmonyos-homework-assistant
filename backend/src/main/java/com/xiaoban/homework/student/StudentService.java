@@ -41,6 +41,9 @@ public class StudentService {
 
   @Transactional
   public StudentDtos.Response upsert(UUID familyId, StudentDtos.Upsert input) {
+    if (!StudentTextbooks.validOthers(input.otherTextbooks())) {
+      throw new ApiExceptions.BadRequest("其他教材格式应为“科目=教材版本”，多个科目使用分号分隔");
+    }
     StudentEntity entity = repository.findById(input.id()).orElseGet(StudentEntity::new);
     if (entity.familyId != null && !familyId.equals(entity.familyId)) throw new ApiExceptions.Conflict("孩子 ID 已属于其他家庭");
     Instant now = Instant.now();
