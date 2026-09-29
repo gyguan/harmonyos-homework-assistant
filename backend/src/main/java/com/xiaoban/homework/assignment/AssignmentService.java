@@ -1,7 +1,7 @@
 package com.xiaoban.homework.assignment;
 
 import com.xiaoban.homework.common.ApiExceptions;
-import com.xiaoban.homework.storage.FileStorage;
+import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import com.xiaoban.homework.student.StudentService;
 import com.xiaoban.homework.submission.SubmissionEntity;
 import com.xiaoban.homework.submission.SubmissionPhotoEntity;
@@ -36,17 +36,17 @@ public class AssignmentService {
   private final SubmissionRepository submissions;
   private final SubmissionPhotoRepository photos;
   private final AssignmentResourceRepository resources;
-  private final FileStorage storage;
+  private final FileTransactionCoordinator fileTransactions;
 
   public AssignmentService(AssignmentRepository repository, StudentService students,
       SubmissionRepository submissions, SubmissionPhotoRepository photos,
-      AssignmentResourceRepository resources, FileStorage storage) {
+      AssignmentResourceRepository resources, FileTransactionCoordinator fileTransactions) {
     this.repository = repository;
     this.students = students;
     this.submissions = submissions;
     this.photos = photos;
     this.resources = resources;
-    this.storage = storage;
+    this.fileTransactions = fileTransactions;
   }
 
   @Transactional(readOnly = true)
@@ -333,12 +333,12 @@ public class AssignmentService {
     }
     for (SubmissionEntity submission : submissions.findByFamilyIdAndAssignmentIdOrderBySubmittedAtDesc(familyId, id)) {
       for (SubmissionPhotoEntity photo : photos.findBySubmissionIdOrderById(submission.id)) {
-        storage.delete(photo.storagePath);
+        fileTransactions.deleteAfterCommit(photo.storagePath);
       }
     }
     for (AssignmentResourceEntity resource : resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, id)) {
       if (resource.assetId == null && resource.storagePath != null && !resource.storagePath.isBlank()) {
-        storage.delete(resource.storagePath);
+        fileTransactions.deleteAfterCommit(resource.storagePath);
       }
     }
     resources.deleteByFamilyIdAndAssignmentId(familyId, id);
