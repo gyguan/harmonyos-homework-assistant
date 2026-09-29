@@ -73,8 +73,9 @@ public class PracticeController {
   @PostMapping("/practice/attempts/{attemptId}/wrong-only")
   public PracticeDtos.AttemptResponse wrongOnly(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable UUID attemptId) {
-    return attempts.wrongOnly(familyId, attemptId);
+      @PathVariable UUID attemptId,
+      @RequestParam(defaultValue = "0") int limit) {
+    return attempts.wrongOnly(familyId, attemptId, limit);
   }
 
   @GetMapping("/practice/attempts/{attemptId}")
