@@ -19,6 +19,9 @@ due_date = read("entry/src/main/ets/domain/service/AssignmentDueDate.ets")
 student_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 student_home = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 parent_home = read("entry/src/main/ets/features/parent/dashboard/ParentDashboardPage.ets")
+student_assignments = read("entry/src/main/ets/features/student/assignments/StudentAssignmentsPage.ets")
+parent_progress = read("entry/src/main/ets/features/parent/progress/ParentProgressPage.ets")
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
 result_vm = read("entry/src/main/ets/features/student/practice/PracticeResultViewModel.ets")
 result_page = read("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
 module_config = read("entry/src/main/module.json5")
@@ -36,6 +39,26 @@ require("if (item.dueAtEpochMs > 0) return item.dueAtEpochMs <= nowEpochMs;" in 
         "canonical overdue detection must honor precise dueAt time, not only calendar day")
 require("AttentionBanner" in student_home and "AttentionBanner" in parent_home,
         "attention must stay embedded in existing home pages")
+require("AssignmentAttentionKind" in attention and "studentResult" in attention and "parentResult" in attention and
+        "static filter(" in attention and "static label(" in attention,
+        "attention policy must expose one shared navigation/filter contract")
+require("onOpenAttention" in student_home and "onOpenAttention" in parent_home and
+        "accessibilityRole(AccessibilityRoleType.BUTTON)" in student_home and
+        "accessibilityRole(AccessibilityRoleType.BUTTON)" in parent_home,
+        "attention banners must be actionable without adding a new page")
+require("openStudentAttention" in app_shell and "openParentAttention" in app_shell and
+        "studentAttentionKind" in app_shell and "parentAttentionKind" in app_shell,
+        "AppShell must carry attention context into existing assignment root pages")
+require("attentionKind: AssignmentAttentionKind" in student_assignments and
+        "AttentionFilterBanner" in student_assignments and
+        "AssignmentAttentionPolicy.filter" in student_assignments and
+        "onAttentionFilterCleared" in student_assignments,
+        "student reminder navigation must open the existing assignment list with a visible default filter")
+require("attentionKind: AssignmentAttentionKind" in parent_progress and
+        "AttentionFilterBanner" in parent_progress and
+        "AssignmentAttentionPolicy.filter" in parent_progress and
+        "onAttentionFilterCleared" in parent_progress,
+        "parent reminder navigation must open student assignments with a visible default filter")
 require("questionCount: 5" in result_vm and "PracticePublishPurpose.REINFORCEMENT" in result_vm and
         "retryWrongAttempt(attemptId, 5)" in result_vm and "let studentId = attempt.studentId" in result_vm and
         "reinforcementGenerationId" in result_vm and "reinforcementPaperId" in result_vm,
