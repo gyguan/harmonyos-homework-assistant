@@ -306,7 +306,7 @@ export struct AppShell {
   private finishShareImportEmpty(): void {
     this.shareImportToken = '';
     this.notifyImportChanged();
-    ParentImportNavigator.openInbox(this.navPathStack);
+    ParentImportNavigator.openRecords(this.navPathStack);
   }
 
   private cancelShareImport(): void {
@@ -490,6 +490,7 @@ export struct AppShell {
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
+          onOpenRecords: () => ParentImportNavigator.openRecords(this.navPathStack),
           onStoreChanged: () => this.notifyUiChanged()
         });
       }
@@ -600,7 +601,6 @@ export struct AppShell {
     } else {
       ParentDashboardPage({
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
-        onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
         onOpenVoice: () => this.openParentVoiceCreate(),
         onOpenScheduled: () => this.openParentScheduledAssignments(),
         onOpenPracticeGeneration: () => this.openParentPracticeGeneration()
