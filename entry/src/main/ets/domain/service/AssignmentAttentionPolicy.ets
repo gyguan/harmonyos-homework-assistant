@@ -1,4 +1,5 @@
 import { Assignment, AssignmentStatus } from '../model/HomeworkModels';
+import { AssignmentDueDate, DueDateFilterKey } from './AssignmentDueDate';
 
 const NEAR_DUE_WINDOW_MS: number = 60 * 60 * 1000;
 
@@ -14,7 +15,10 @@ export class AssignmentAttentionPolicy {
         reworkCount++;
         continue;
       }
-      if (item.status === AssignmentStatus.OVERDUE) {
+      if (item.status !== AssignmentStatus.SUBMITTED &&
+        item.status !== AssignmentStatus.COMPLETED &&
+        item.status !== AssignmentStatus.NEEDS_REWORK &&
+        AssignmentDueDate.matches(item, DueDateFilterKey.OVERDUE, nowEpochMs)) {
         overdueCount++;
         continue;
       }
@@ -34,14 +38,15 @@ export class AssignmentAttentionPolicy {
     return '';
   }
 
-  static parent(assignments: Assignment[]): string {
+  static parent(assignments: Assignment[], nowEpochMs: number = Date.now()): string {
     let pendingReview = 0;
     let rework = 0;
     let overdue = 0;
     for (let item of assignments) {
       if (item.status === AssignmentStatus.SUBMITTED) pendingReview++;
       else if (item.status === AssignmentStatus.NEEDS_REWORK) rework++;
-      else if (item.status === AssignmentStatus.OVERDUE) overdue++;
+      else if (item.status !== AssignmentStatus.COMPLETED &&
+        AssignmentDueDate.matches(item, DueDateFilterKey.OVERDUE, nowEpochMs)) overdue++;
     }
 
     if (pendingReview > 0) return pendingReview === 1 ? '有 1 项作业等待验收' : `有 ${pendingReview} 项作业等待验收`;
