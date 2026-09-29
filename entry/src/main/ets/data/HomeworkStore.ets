@@ -134,8 +134,18 @@ export class HomeworkStore {
   }
 
   private cloneStudent(source: StudentProfile): StudentProfile {
-    return { id: source.id, name: source.name, grade: source.grade, className: source.className,
-      semester: source.semester, textbookSummary: source.textbookSummary };
+    return {
+      id: source.id,
+      name: source.name,
+      grade: source.grade,
+      className: source.className,
+      semester: source.semester,
+      chineseTextbook: source.chineseTextbook,
+      mathTextbook: source.mathTextbook,
+      englishTextbook: source.englishTextbook,
+      otherTextbooks: source.otherTextbooks,
+      textbookSummary: source.textbookSummary
+    };
   }
 
   private cloneSettings(source: AppSettings): AppSettings {
