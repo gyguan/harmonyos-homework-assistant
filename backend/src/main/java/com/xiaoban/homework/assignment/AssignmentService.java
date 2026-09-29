@@ -191,7 +191,7 @@ public class AssignmentService {
     e.dueText = text(input.dueText());
     e.dueAt = dueAt(input.dueAtEpochMs());
     e.dueTimezone = dueTimezone(input.dueTimezone());
-    e.status = input.status();
+    e.status = initialStatus(input.status());
     e.sourceLabel = text(input.sourceLabel());
     e.sourceExcerpt = text(input.sourceExcerpt());
     e.expectedMinutes = expectedMinutes(input.expectedMinutes());
@@ -527,6 +527,14 @@ public class AssignmentService {
       case "COMPLETED" -> 7;
       default -> 100;
     };
+  }
+
+  private String initialStatus(String value) {
+    String normalized = value == null ? "" : value.trim().toUpperCase();
+    if (!"NOT_STARTED".equals(normalized)) {
+      throw new ApiExceptions.BadRequest("新建作业初始状态必须为 NOT_STARTED");
+    }
+    return normalized;
   }
 
   private String assignmentType(String value) {
