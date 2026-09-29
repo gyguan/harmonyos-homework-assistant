@@ -362,6 +362,7 @@ homework_import_route = read_optional("entry/src/main/ets/features/parent/import
 homework_import = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 homework_confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 parent_settings = read_optional("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
+student_profile_editor = read_optional("entry/src/main/ets/components/family/StudentProfileEditorDialog.ets")
 parent_extra = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 student_profile = read_optional("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
 practice_result = read_optional("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
@@ -474,6 +475,26 @@ require("private SectionTitle(" not in parent_settings and
         "private FamilySettingsSection()" in parent_settings and
         "private DataSyncSettingsSection()" in parent_settings,
         "Parent My must use the same card-and-collapsible-section composition as Student My")
+require("StudentProfileEditorDialog" in parent_settings and
+        "phoneStudentEditorController" in parent_settings and
+        "wideStudentEditorController" in parent_settings and
+        "DialogAlignment.Bottom" in parent_settings and
+        "DialogAlignment.Center" in parent_settings,
+        "Parent student editing must open through adaptive modal dialogs")
+require("this.StudentEditor();" not in parent_settings and
+        "private StudentEditor()" not in parent_settings and
+        "private StudentIdentityFields()" not in parent_settings,
+        "Parent My must not expand the student editor inline inside the family section")
+require("@CustomDialog" in student_profile_editor and
+        "Text(this.editingExisting ? '编辑孩子资料' : '添加孩子')" in student_profile_editor and
+        "this.FooterActions();" in student_profile_editor and
+        "this.DeleteWarning();" in student_profile_editor and
+        ".constraintSize({ maxHeight: 540 })" in student_profile_editor,
+        "student profile dialog must keep one scrollable add/edit/delete surface")
+require("studentEditorMessage" in parent_settings and
+        "studentEditorBusy" in parent_settings and
+        "this.closeStudentEditorDialog();" in parent_settings,
+        "student profile save/delete feedback must stay inside the modal and close only on success")
 
 require("AppTheme.PAGE_NAV_TITLE_SIZE" in deep_page_header and
         "AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT" in deep_page_header and
