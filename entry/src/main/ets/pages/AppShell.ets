@@ -2,6 +2,7 @@ import {
   AppRoute,
   AssignmentRouteParam,
   ParentPracticeGenerationRouteParam,
+  ParentPracticeGenerationResultRouteParam,
   ParentScheduledAssignmentsRouteParam,
   ParentVoiceCreateRouteParam,
   PracticeAttemptRouteParam,
@@ -31,6 +32,7 @@ import { HomeworkImportBatchDetailPage } from '../features/parent/import/Homewor
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentPracticeGenerationPage } from '../features/parent/practice/ParentPracticeGenerationPage';
+import { ParentPracticeGenerationResultPage } from '../features/parent/practice/ParentPracticeGenerationResultPage';
 import { ParentScheduledAssignmentPage } from '../features/parent/scheduled/ParentScheduledAssignmentPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
@@ -329,6 +331,25 @@ export struct AppShell {
       AppRoute.PARENT_PRACTICE_GENERATION, new ParentPracticeGenerationRouteParam());
   }
 
+  private openParentPracticeGenerationResult(
+    subject: string,
+    track: string,
+    difficulty: string,
+    questionCount: number,
+    requirement: string
+  ): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_PRACTICE_GENERATION_RESULT,
+      new ParentPracticeGenerationResultRouteParam(
+        subject, track, difficulty, questionCount, requirement));
+  }
+
+  private finishParentPracticePublished(): void {
+    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    this.notifyPracticeChanged();
+  }
+
   private routeAssignmentId(param: Object): string {
     return (param as AssignmentRouteParam).assignmentId;
   }
@@ -515,10 +536,33 @@ export struct AppShell {
       NavDestination() {
         ParentPracticeGenerationPage({
           onBack: () => this.navPathStack.pop(),
-          onPublished: () => {
-            this.navPathStack.pop();
-            this.notifyPracticeChanged();
-          }
+          onGenerate: (
+            subject,
+            track,
+            difficulty,
+            questionCount,
+            requirement
+          ) => this.openParentPracticeGenerationResult(
+            subject,
+            track,
+            difficulty,
+            questionCount,
+            requirement)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_PRACTICE_GENERATION_RESULT) {
+      let route = param as ParentPracticeGenerationResultRouteParam;
+      NavDestination() {
+        ParentPracticeGenerationResultPage({
+          subject: route.subject,
+          track: route.track,
+          difficulty: route.difficulty,
+          questionCount: route.questionCount,
+          requirement: route.requirement,
+          onBack: () => this.navPathStack.pop(),
+          onPublished: () => this.finishParentPracticePublished()
         });
       }
       .hideTitleBar(true)
