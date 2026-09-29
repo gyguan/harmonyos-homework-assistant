@@ -1,5 +1,6 @@
 package com.xiaoban.homework.ai;
 
+import com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -22,20 +23,20 @@ class OpenAiCompatibleTransportTest {
     Map<String, Object> schema = Map.of("type", "object");
 
     Map<String, Object> responsesSchema = OpenAiCompatibleTransport.structuredFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA,
+        StructuredOutputMode.JSON_SCHEMA,
         "practice_generation",
         schema);
     assertEquals("json_schema", responsesSchema.get("type"));
     assertEquals(schema, responsesSchema.get("schema"));
 
     Map<String, Object> responsesJsonObject = OpenAiCompatibleTransport.structuredFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT,
+        StructuredOutputMode.JSON_OBJECT,
         "practice_generation",
         schema);
     assertEquals(Map.of("type", "json_object"), responsesJsonObject);
 
     Map<String, Object> chatSchema = OpenAiCompatibleTransport.chatStructuredResponseFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA,
+        StructuredOutputMode.JSON_SCHEMA,
         "practice_generation",
         schema);
     assertEquals("json_schema", chatSchema.get("type"));
@@ -44,17 +45,17 @@ class OpenAiCompatibleTransportTest {
     assertEquals(schema, nested.get("schema"));
 
     Map<String, Object> chatJsonObject = OpenAiCompatibleTransport.chatStructuredResponseFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT,
+        StructuredOutputMode.JSON_OBJECT,
         "practice_generation",
         schema);
     assertEquals(Map.of("type", "json_object"), chatJsonObject);
 
     assertNull(OpenAiCompatibleTransport.structuredFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.TEXT,
+        StructuredOutputMode.TEXT,
         "practice_generation",
         schema));
     assertNull(OpenAiCompatibleTransport.chatStructuredResponseFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.TEXT,
+        StructuredOutputMode.TEXT,
         "practice_generation",
         schema));
   }
