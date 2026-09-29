@@ -111,12 +111,13 @@ def main() -> int:
             "submission media extension parsing must keep the compiler-safe index/substring form")
     require('"incremental": false' in hvigor_config and '"parallel": false' in hvigor_config,
             "Hvigor must use non-incremental non-parallel compilation for es2abc stability")
-    require('"maxOldSpaceSize": 12288' in hvigor_config and '"exposeGC": true' in hvigor_config,
-            "Hvigor daemon must reserve enough memory and expose explicit GC")
+    require('"maxOldSpaceSize": 8192' in hvigor_config and '"exposeGC": true' in hvigor_config,
+            "Hvigor daemon must keep a bounded 8GB heap and expose explicit GC")
     require("@('--stop-daemon')" in verify_harmony and
-            "@('clean', '--no-daemon', '--no-parallel')" in verify_harmony and
-            "'--stacktrace'" in verify_harmony,
-            "Harmony verification must stop stale daemons, clean caches, build serially, and retain diagnostics")
+            "Removing stale Harmony build cache" in verify_harmony and
+            "'.hvigor'" in verify_harmony and "'entry\\\\build'" in verify_harmony and
+            "'--no-daemon', '--no-parallel', '--stacktrace'" in verify_harmony,
+            "Harmony verification must stop stale daemons, purge compiler caches, build serially, and retain diagnostics")
 
     require("deviceInfo.apiAvailable('26.0.0')" in voice_material_picker,
             "voice material folder selection must use apiAvailable for API 26 compatibility")
