@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.xiaoban.homework.storage.FileStorage;
+import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import com.xiaoban.homework.student.StudentService;
 import com.xiaoban.homework.submission.SubmissionPhotoRepository;
 import com.xiaoban.homework.submission.SubmissionRepository;
@@ -26,7 +26,7 @@ class AssignmentServiceBusinessDateTest {
         mock(SubmissionRepository.class),
         mock(SubmissionPhotoRepository.class),
         mock(AssignmentResourceRepository.class),
-        mock(FileStorage.class));
+        mock(FileTransactionCoordinator.class));
 
     UUID familyId = UUID.randomUUID();
     LocalDate businessDate = LocalDate.of(2026, 9, 28);
