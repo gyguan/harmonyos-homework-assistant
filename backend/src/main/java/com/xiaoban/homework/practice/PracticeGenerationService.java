@@ -4,6 +4,7 @@ import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentDtos;
 import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentService;
+import com.xiaoban.homework.student.StudentTextbooks;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -78,7 +79,7 @@ public class PracticeGenerationService {
       throw new ApiExceptions.BadRequest("请先完善孩子的年级和学期信息");
     }
 
-    String textbookContext = PracticeTextbookContext.extract(student.textbookSummary, subject);
+    String textbookContext = StudentTextbooks.from(student).forSubject(subject);
     if ("TEXTBOOK_SYNC".equals(track) && textbookContext.isBlank()) {
       throw new ApiExceptions.BadRequest("教材同步出题前请先配置当前科目的教材信息");
     }
@@ -275,7 +276,11 @@ public class PracticeGenerationService {
     List<String> incompatible = new ArrayList<>();
     for (StudentEntity target : targets.values()) {
       String reason = incompatibility(
-          generation, target.grade, target.semester, target.textbookSummary, draft);
+          generation,
+          target.grade,
+          target.semester,
+          StudentTextbooks.from(target).forSubject(draft.subject()),
+          draft);
       if (!reason.isBlank()) {
         incompatible.add(target.name + "（" + reason + "）");
       }
@@ -293,7 +298,11 @@ public class PracticeGenerationService {
     List<PracticeGenerationDtos.AudienceCandidate> result = new ArrayList<>();
     for (StudentDtos.Response student : students.list(generation.familyId)) {
       String reason = incompatibility(
-          generation, student.grade(), student.semester(), student.textbookSummary(), draft);
+          generation,
+          student.grade(),
+          student.semester(),
+          textbookForSubject(student, draft.subject()),
+          draft);
       result.add(new PracticeGenerationDtos.AudienceCandidate(
           student.id(),
           student.name(),
@@ -309,7 +318,7 @@ public class PracticeGenerationService {
       PracticeGenerationEntity generation,
       String grade,
       String semester,
-      String textbookSummary,
+      String textbookContext,
       PracticeContentCatalog.Paper draft) {
     String targetGrade = audiencePolicy.gradeCode(grade);
     if (!draft.grade().equals(targetGrade)) return "年级不匹配";
@@ -318,13 +327,19 @@ public class PracticeGenerationService {
     if (!draft.semester().equals(targetSemester)) return "学期不匹配";
 
     if ("TEXTBOOK_SYNC".equals(draft.track())) {
-      String targetContext = PracticeTextbookContext.extract(textbookSummary, draft.subject());
-      if (targetContext.isBlank()) return "未配置当前科目教材";
-      if (!PracticeTextbookContext.compatible(
-          generation.referenceTextbookContext, textbookSummary, draft.subject())) {
-        return "当前科目教材配置不一致";
-      }
+      if (textbookContext == null || textbookContext.isBlank()) return "未配置当前科目教材";
+      String reference = PracticeTextbookContext.comparable(
+          generation.referenceTextbookContext, draft.subject());
+      String target = PracticeTextbookContext.comparable(textbookContext, draft.subject());
+      if (reference.isBlank() || !reference.equals(target)) return "当前科目教材配置不一致";
     }
+    return "";
+  }
+
+  private String textbookForSubject(StudentDtos.Response student, String subject) {
+    if ("CHINESE".equalsIgnoreCase(subject)) return student.chineseTextbook();
+    if ("MATH".equalsIgnoreCase(subject)) return student.mathTextbook();
+    if ("ENGLISH".equalsIgnoreCase(subject)) return student.englishTextbook();
     return "";
   }
 
