@@ -413,7 +413,7 @@ export struct PracticeResultPage {
               .enabled(!this.wrongRetrying)
               .onClick(() => void this.reinforceFive());
           } else {
-            Button(this.repeating ? '正在创建…' : '再挑战一次', { type: ButtonType.Normal })
+            Button(this.repeating ? '正在创建…' : '再练一遍', { type: ButtonType.Normal })
               .layoutWeight(1)
               .height(AppTheme.BUTTON_HEIGHT)
               .backgroundColor(AppTheme.SURFACE_EMPHASIS)
