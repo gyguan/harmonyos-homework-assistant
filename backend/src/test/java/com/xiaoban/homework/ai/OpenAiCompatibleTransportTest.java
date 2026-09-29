@@ -75,7 +75,7 @@ class OpenAiCompatibleTransportTest {
               "message": {
                 "role": "assistant",
                 "reasoning_content": "内部推理字段",
-                "content": "{\"questions\":[]}"
+                "content": "{\\\"questions\\\":[]}"
               },
               "finish_reason": "stop"
             }
