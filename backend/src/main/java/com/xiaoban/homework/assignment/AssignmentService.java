@@ -11,8 +11,12 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -168,10 +172,15 @@ public class AssignmentService {
   @Transactional
   public AssignmentDtos.Response create(UUID familyId, String studentId, AssignmentDtos.Create input) {
     students.requireOwned(familyId, studentId);
+    String createFingerprint = createFingerprint(studentId, input);
     AssignmentEntity existing = repository.findById(input.id()).orElse(null);
     if (existing != null) {
       if (!familyId.equals(existing.familyId) || !studentId.equals(existing.studentId)) {
         throw new ApiExceptions.Conflict("作业 ID 冲突");
+      }
+      if (existing.createFingerprint != null && !existing.createFingerprint.isBlank() &&
+          !existing.createFingerprint.equals(createFingerprint)) {
+        throw new ApiExceptions.Conflict("作业 ID 已存在，但创建内容与原请求不一致");
       }
       return AssignmentDtos.Response.from(existing);
     }
@@ -194,6 +203,7 @@ public class AssignmentService {
     e.status = initialStatus(input.status());
     e.sourceLabel = text(input.sourceLabel());
     e.sourceExcerpt = text(input.sourceExcerpt());
+    e.createFingerprint = createFingerprint;
     e.expectedMinutes = expectedMinutes(input.expectedMinutes());
     e.startedAtEpochMs = nonNegative(input.startedAtEpochMs());
     e.finishedAtEpochMs = nonNegative(input.finishedAtEpochMs());
@@ -527,6 +537,31 @@ public class AssignmentService {
       case "COMPLETED" -> 7;
       default -> 100;
     };
+  }
+
+  private String createFingerprint(String studentId, AssignmentDtos.Create input) {
+    String canonical = String.join("\n",
+        text(studentId),
+        assignmentType(input.assignmentType()),
+        text(input.subject()),
+        subjectCode(input.subjectCode(), input.subject()),
+        contentType(input.contentType()),
+        text(input.title()),
+        text(input.instruction()),
+        text(input.textbookRef()),
+        text(input.dueText()),
+        Long.toString(input.dueAtEpochMs() == null ? 0L : Math.max(0L, input.dueAtEpochMs())),
+        dueTimezone(input.dueTimezone()),
+        initialStatus(input.status()),
+        text(input.sourceLabel()),
+        text(input.sourceExcerpt()),
+        Integer.toString(expectedMinutes(input.expectedMinutes())));
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      return HexFormat.of().formatHex(digest.digest(canonical.getBytes(StandardCharsets.UTF_8)));
+    } catch (NoSuchAlgorithmException error) {
+      throw new IllegalStateException("无法计算作业创建幂等指纹", error);
+    }
   }
 
   private String initialStatus(String value) {
