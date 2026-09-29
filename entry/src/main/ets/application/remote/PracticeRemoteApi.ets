@@ -63,7 +63,7 @@ interface RemotePracticeResult {
   score: number; maxScore: number; correctCount: number; wrongCount: number; noteCount: number;
   elapsedSeconds: number; questions: RemotePracticeQuestionResult[];
 }
-interface StartAttemptBody { paperId: string; paperVersion: number; }
+interface StartAttemptBody { paperId: string; paperVersion: number; sourceAttemptId: string; }
 interface SaveAnswerBody { answerValue: string; }
 interface SaveNoteBody { content: string; }
 
@@ -104,8 +104,17 @@ export class PracticeRemoteApi {
     return this.mapPaper(JSON.parse(response.body) as RemotePracticePaper);
   }
 
-  async startAttempt(studentId: string, paperId: string, version: number): Promise<PracticeAttempt> {
-    let body: StartAttemptBody = { paperId: paperId, paperVersion: version };
+  async startAttempt(
+    studentId: string,
+    paperId: string,
+    version: number,
+    sourceAttemptId?: string
+  ): Promise<PracticeAttempt> {
+    let body: StartAttemptBody = {
+      paperId: paperId,
+      paperVersion: version,
+      sourceAttemptId: sourceAttemptId === undefined ? '' : sourceAttemptId
+    };
     let response = await BackendHttpClient.instance.requestFor(
       'practice.attempt.start', `/api/v1/students/${encodeURIComponent(studentId)}/practice/attempts`,
       http.RequestMethod.POST, body);
@@ -140,10 +149,11 @@ export class PracticeRemoteApi {
     return this.mapAttempt(JSON.parse(response.body) as RemotePracticeAttempt);
   }
 
-  async retryWrongAttempt(attemptId: string): Promise<PracticeAttempt> {
+  async retryWrongAttempt(attemptId: string, limit?: number): Promise<PracticeAttempt> {
+    let suffix = limit === undefined || limit <= 0 ? '' : `?limit=${limit}`;
     let response = await BackendHttpClient.instance.requestFor(
       'practice.attempt.wrongOnly',
-      `/api/v1/practice/attempts/${encodeURIComponent(attemptId)}/wrong-only`,
+      `/api/v1/practice/attempts/${encodeURIComponent(attemptId)}/wrong-only${suffix}`,
       http.RequestMethod.POST);
     if (response.statusCode === 409) throw new Error('本次没有错题，无需专项重练');
     if (response.statusCode < 200 || response.statusCode >= 300) {
