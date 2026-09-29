@@ -1,9 +1,12 @@
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { ParentDashboardViewModel } from './ParentDashboardViewModel';
 
 @Component
 export struct ParentDashboardPage {
+  @Prop revision: number = 0;
   @State private availableWidthVp: number = 390;
+  private readonly viewModel: ParentDashboardViewModel = new ParentDashboardViewModel();
   onOpenAssignment: () => void = () => {};
   onOpenVoice: () => void = () => {};
   onOpenScheduled: () => void = () => {};
@@ -11,6 +14,36 @@ export struct ParentDashboardPage {
 
   private canUseWideComposition(): boolean {
     return LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.parentHomeRequirement());
+  }
+
+  private attentionText(): string {
+    let currentRevision = this.revision;
+    if (currentRevision < 0) return '';
+    return this.viewModel.attentionText();
+  }
+
+  @Builder
+  private AttentionBanner() {
+    if (this.attentionText().length > 0) {
+      Row({ space: 8 }) {
+        Text('需要关注')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.WARNING);
+        Text(this.attentionText())
+          .layoutWeight(1)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.TEXT);
+      }
+      .width('100%')
+      .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+      .backgroundColor(AppTheme.WARNING_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityGroup(true)
+      .accessibilityText(`需要关注，${this.attentionText()}`);
+    }
   }
 
   @Builder
@@ -236,6 +269,7 @@ export struct ParentDashboardPage {
     Scroll() {
       Column() {
         Column({ space: 10 }) {
+          this.AttentionBanner();
           this.CreateAssignmentAction();
           this.CreateVoiceAction();
           this.ScheduledAssignmentAction();
@@ -263,6 +297,7 @@ export struct ParentDashboardPage {
   private WideHome() {
     Scroll() {
       Column({ space: 18 }) {
+        this.AttentionBanner();
         Row({ space: AppTheme.SPLIT_PANE_GAP }) {
           Column() {
             this.CreateAssignmentAction();

@@ -111,6 +111,44 @@ class PracticeGenerationServiceAudienceTest {
   }
 
   @Test
+  void reinforcementPublishUsesHiddenSourceType() throws Exception {
+    UUID familyId = UUID.randomUUID();
+    PracticeGenerationRepository generations = mock(PracticeGenerationRepository.class);
+    PracticePaperRepository papers = mock(PracticePaperRepository.class);
+    PracticeQuestionRepository questions = mock(PracticeQuestionRepository.class);
+    PracticePaperAudienceRepository audiences = mock(PracticePaperAudienceRepository.class);
+    StudentService students = mock(StudentService.class);
+    PracticeAudiencePolicy audiencePolicy = mock(PracticeAudiencePolicy.class);
+    JsonMapper mapper = JsonMapper.builder().build();
+
+    PracticeGenerationEntity generation = generation(familyId, mapper);
+    when(generations.lockByIdAndFamilyId(generation.id, familyId)).thenReturn(Optional.of(generation));
+    when(papers.findByPaperIdAndVersion("ai-test", 1)).thenReturn(Optional.empty());
+
+    StudentEntity reference = student("ref", "小宇", "二年级", "上学期", "人教版数学二年级上册");
+    when(students.requireOwned(familyId, "ref")).thenReturn(reference);
+    when(audiencePolicy.gradeCode("二年级")).thenReturn("G2");
+    when(audiencePolicy.semesterCode("上学期")).thenReturn("S1");
+    PracticeContentService content = mock(PracticeContentService.class);
+    when(content.response(any(PracticePaperEntity.class))).thenReturn(paperResponse());
+
+    PracticeGenerationService service = new PracticeGenerationService(
+        generations, papers, questions, audiences, students, audiencePolicy,
+        mock(PracticeGenerationModelClient.class),
+        mock(PracticeGenerationReviewClient.class),
+        mock(PracticeGeneratedContentValidator.class),
+        content, mapper);
+
+    service.publish(
+        familyId,
+        generation.id,
+        new PracticeGenerationDtos.PublishRequest("CURRENT", List.of(), "REINFORCEMENT"));
+
+    verify(papers).saveAndFlush(org.mockito.ArgumentMatchers.argThat(
+        paper -> "AI_REINFORCEMENT".equals(paper.sourceType)));
+  }
+
+  @Test
   void repeatedPublishReturnsExistingAudienceWithoutMutatingIt() throws Exception {
     UUID familyId = UUID.randomUUID();
     PracticeGenerationRepository generations = mock(PracticeGenerationRepository.class);

@@ -51,9 +51,14 @@ export class DefaultPracticeRepository implements PracticeRepository {
     return this.contentProvider.getPaper(paperId, version);
   }
 
-  startAttempt(studentId: string, paperId: string, version: number): Promise<PracticeAttempt> {
+  startAttempt(
+    studentId: string,
+    paperId: string,
+    version: number,
+    sourceAttemptId?: string
+  ): Promise<PracticeAttempt> {
     this.requireConnected();
-    return this.remoteApi.startAttempt(studentId, paperId, version);
+    return this.remoteApi.startAttempt(studentId, paperId, version, sourceAttemptId);
   }
 
   getAttempt(attemptId: string): Promise<PracticeAttempt> {
@@ -71,9 +76,9 @@ export class DefaultPracticeRepository implements PracticeRepository {
     return this.remoteApi.repeatAttempt(attemptId);
   }
 
-  retryWrongAttempt(attemptId: string): Promise<PracticeAttempt> {
+  retryWrongAttempt(attemptId: string, limit?: number): Promise<PracticeAttempt> {
     this.requireConnected();
-    return this.remoteApi.retryWrongAttempt(attemptId);
+    return this.remoteApi.retryWrongAttempt(attemptId, limit);
   }
 
   saveAnswer(attemptId: string, questionId: string, answerValue: string): Promise<PracticeAnswer> {

@@ -1,6 +1,7 @@
 import {
   PracticeGenerationRequest,
   PracticeGenerationResult,
+  PracticePublishPurpose,
   PracticePublishResult,
   PracticePublishScope
 } from '../model/practice/PracticeModels';
@@ -11,6 +12,7 @@ export interface PracticeGenerationRepository {
   publish(
     generationId: string,
     scope: PracticePublishScope,
-    targetStudentIds: string[]
+    targetStudentIds: string[],
+    purpose?: PracticePublishPurpose
   ): Promise<PracticePublishResult>;
 }

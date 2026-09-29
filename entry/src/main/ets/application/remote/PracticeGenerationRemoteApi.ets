@@ -9,6 +9,7 @@ import {
   PracticeGrade,
   PracticePaper,
   PracticePaperStatus,
+  PracticePublishPurpose,
   PracticePublishResult,
   PracticePublishScope,
   PracticeQuestionOption,
@@ -95,6 +96,7 @@ interface GenerateBody {
 interface PublishBody {
   scope: string;
   targetStudentIds: string[];
+  purpose: string;
 }
 
 export class PracticeGenerationRemoteApi {
@@ -136,11 +138,13 @@ export class PracticeGenerationRemoteApi {
   async publish(
     generationId: string,
     scope: PracticePublishScope,
-    targetStudentIds: string[]
+    targetStudentIds: string[],
+    purpose?: PracticePublishPurpose
   ): Promise<PracticePublishResult> {
     let body: PublishBody = {
       scope: scope,
-      targetStudentIds: targetStudentIds.slice()
+      targetStudentIds: targetStudentIds.slice(),
+      purpose: purpose === undefined ? PracticePublishPurpose.STANDARD : purpose
     };
     let response = await BackendHttpClient.instance.requestFor(
       'practice.generation.publish',

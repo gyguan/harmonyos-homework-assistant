@@ -195,7 +195,9 @@ public class PracticeGenerationService {
     paper.questionCount = draft.questionCount();
     paper.estimatedMinutes = draft.estimatedMinutes();
     paper.tagsJson = json(draft.tags());
-    paper.sourceType = "AI_GENERATED";
+    paper.sourceType = "REINFORCEMENT".equals(normalize(input.purpose()))
+        ? "AI_REINFORCEMENT"
+        : "AI_GENERATED";
     paper.status = "PUBLISHED";
     paper.createdAt = Instant.now();
     paper.updatedAt = paper.createdAt;

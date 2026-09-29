@@ -18,6 +18,7 @@ public interface PracticePaperRepository extends JpaRepository<PracticePaperEnti
        and a.family_id = :familyId
        and a.student_id = :studentId
       where p.status = 'PUBLISHED'
+        and (p.source_type is null or p.source_type <> 'AI_REINFORCEMENT')
         and (p.family_id is null or (p.family_id = :familyId and a.id is not null))
         and (:grade = '' or upper(p.grade) = upper(:grade))
         and (:subject = '' or upper(p.subject) = upper(:subject))

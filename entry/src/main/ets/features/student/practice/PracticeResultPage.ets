@@ -113,15 +113,15 @@ export struct PracticeResultPage {
     }
   }
 
-  private async retryWrong(): Promise<void> {
+  private async reinforceFive(): Promise<void> {
     if (this.repeating || this.wrongRetrying || this.result === null || this.result.wrongCount <= 0) return;
     this.wrongRetrying = true;
     this.errorMessage = '';
     try {
-      let repeated = await this.viewModel.retryWrong(this.attemptId);
-      this.onRepeatStarted(repeated.id);
+      let reinforced = await this.viewModel.reinforceFive(this.attemptId);
+      this.onRepeatStarted(reinforced.id);
     } catch {
-      this.errorMessage = '错题专项创建失败，请检查网络后重试。';
+      this.errorMessage = '巩固练习创建失败，请检查网络后重试。';
     } finally {
       this.wrongRetrying = false;
     }
@@ -393,28 +393,27 @@ export struct PracticeResultPage {
       if (this.result !== null) {
         Row({ space: 10 }) {
           if (this.result.wrongCount > 0) {
-            Button(this.repeating ? '正在创建…' : '再练一遍', { type: ButtonType.Normal })
+            Button('完成', { type: ButtonType.Normal })
               .layoutWeight(1)
               .height(AppTheme.BUTTON_HEIGHT)
               .backgroundColor(AppTheme.SURFACE_EMPHASIS)
               .fontColor(AppTheme.TEXT)
               .fontWeight(FontWeight.Medium)
               .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(!this.repeating && !this.wrongRetrying)
-              .onClick(() => void this.repeat());
+              .enabled(!this.wrongRetrying)
+              .onClick(() => this.onBack());
 
-            Button(this.wrongRetrying ? '正在创建…' : `再挑战 ${this.result.wrongCount} 道错题`,
-              { type: ButtonType.Normal })
+            Button(this.wrongRetrying ? '正在准备…' : '再巩固', { type: ButtonType.Normal })
               .layoutWeight(1)
               .height(AppTheme.BUTTON_HEIGHT)
               .backgroundColor(this.wrongRetrying ? AppTheme.DISABLED : AppTheme.PRIMARY)
               .fontColor(AppTheme.TEXT_ON_PRIMARY)
               .fontWeight(FontWeight.Medium)
               .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(!this.repeating && !this.wrongRetrying)
-              .onClick(() => void this.retryWrong());
+              .enabled(!this.wrongRetrying)
+              .onClick(() => void this.reinforceFive());
           } else {
-            Button(this.repeating ? '正在创建…' : '再挑战一次', { type: ButtonType.Normal })
+            Button(this.repeating ? '正在创建…' : '再练一遍', { type: ButtonType.Normal })
               .layoutWeight(1)
               .height(AppTheme.BUTTON_HEIGHT)
               .backgroundColor(AppTheme.SURFACE_EMPHASIS)

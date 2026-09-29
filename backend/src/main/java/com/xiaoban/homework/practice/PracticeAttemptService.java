@@ -52,9 +52,19 @@ public class PracticeAttemptService {
     List<PracticeQuestionEntity> questions = content.questions(paper);
     if (questions.isEmpty()) throw new ApiExceptions.BadRequest("套卷暂无可练习题目");
 
+    UUID sourceAttemptId = reinforcementSourceAttemptId(
+        familyId, studentId, paper, input.sourceAttemptId());
+    if (sourceAttemptId != null) {
+      PracticeAttemptEntity existing = attempts
+          .findFirstByFamilyIdAndStudentIdAndPaperIdAndPaperVersionAndSourceAttemptIdAndStatusOrderByStartedAtDesc(
+              familyId, studentId, paper.paperId, paper.version, sourceAttemptId, "IN_PROGRESS")
+          .orElse(null);
+      if (existing != null) return response(existing, questions);
+    }
+
     PracticeAttemptEntity attempt = newAttempt(
         familyId, studentId, paper.paperId, paper.version,
-        writeQuestionIds(questions), null, "FULL");
+        writeQuestionIds(questions), sourceAttemptId, "FULL");
     attempts.save(attempt);
     return response(attempt, questions);
   }
@@ -72,6 +82,12 @@ public class PracticeAttemptService {
 
   @Transactional
   public PracticeDtos.AttemptResponse wrongOnly(UUID familyId, UUID sourceAttemptId) {
+    return wrongOnly(familyId, sourceAttemptId, 0);
+  }
+
+  @Transactional
+  public PracticeDtos.AttemptResponse wrongOnly(UUID familyId, UUID sourceAttemptId, int limit) {
+    if (limit < 0 || limit > 20) throw new ApiExceptions.BadRequest("错题重练数量不能超过 20");
     PracticeAttemptEntity source = requireSubmittedSource(familyId, sourceAttemptId);
     List<PracticeQuestionEntity> sourceQuestions = questionsForAttempt(source);
     Map<String, PracticeAnswerEntity> sourceAnswers = answerMap(source.id);
@@ -81,6 +97,9 @@ public class PracticeAttemptService {
       if (answer == null || !Boolean.TRUE.equals(answer.isCorrect)) wrongQuestions.add(question);
     }
     if (wrongQuestions.isEmpty()) throw new ApiExceptions.Conflict("本次练习没有错题，无需专项重练");
+    if (limit > 0 && wrongQuestions.size() > limit) {
+      wrongQuestions = new ArrayList<>(wrongQuestions.subList(0, limit));
+    }
 
     PracticeAttemptEntity repeated = newAttempt(
         familyId, source.studentId, source.paperId, source.paperVersion,
@@ -323,6 +342,30 @@ public class PracticeAttemptService {
   private PracticeDtos.NoteResponse noteResponse(PracticeNoteEntity note) {
     return new PracticeDtos.NoteResponse(
         note.questionId, note.content, note.createdAt.toEpochMilli(), note.updatedAt.toEpochMilli());
+  }
+
+  private UUID reinforcementSourceAttemptId(
+      UUID familyId,
+      String studentId,
+      PracticePaperEntity paper,
+      String rawSourceAttemptId) {
+    String value = rawSourceAttemptId == null ? "" : rawSourceAttemptId.trim();
+    if (value.isBlank()) return null;
+    if (!"AI_REINFORCEMENT".equals(paper.sourceType)) {
+      throw new ApiExceptions.BadRequest("只有巩固练习可以携带来源练习");
+    }
+
+    UUID sourceAttemptId;
+    try {
+      sourceAttemptId = UUID.fromString(value);
+    } catch (IllegalArgumentException error) {
+      throw new ApiExceptions.BadRequest("来源练习ID无效");
+    }
+    PracticeAttemptEntity source = requireSubmittedSource(familyId, sourceAttemptId);
+    if (!studentId.equals(source.studentId)) {
+      throw new ApiExceptions.BadRequest("巩固练习与来源学生不一致");
+    }
+    return source.id;
   }
 
   private PracticeAttemptEntity requireSubmittedSource(UUID familyId, UUID attemptId) {
