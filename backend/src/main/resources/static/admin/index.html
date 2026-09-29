@@ -271,12 +271,12 @@
             <label>默认预计用时<div class="inline-input"><input id="import-minutes" type="number" min="1" max="240" value="15"><span>分钟</span></div></label>
             <button id="apply-import-defaults" class="secondary-button align-end" type="button">应用到已识别目录</button>
           </div>
-          <input id="folder-input" type="file" webkitdirectory multiple hidden>
-          <button id="folder-picker" class="drop-zone" type="button"><span class="folder-icon">＋</span><strong>选择语音文件夹</strong><span>也可以将多个文件夹拖到这里</span><small>支持 mp3 / m4a / wav / jpg / jpeg / png / webp / heic</small></button>
+          <input id="folder-input" type="file" webkitdirectory directory multiple hidden aria-label="批量选择语音文件夹">
+          <button id="folder-picker" class="drop-zone" type="button"><span class="folder-icon">＋</span><strong>批量选择语音文件夹</strong><span>可 Ctrl/Shift 一次选择多个文件夹；也可选择共同上级目录或直接拖入多个文件夹</span><small>支持 mp3 / m4a / wav / jpg / jpeg / png / webp / heic</small></button>
           <div class="import-list-toolbar"><div><h3>待导入目录</h3><p id="import-preview-summary">尚未选择文件夹</p></div><input id="import-folder-search" type="search" placeholder="搜索文件夹名称"></div>
           <div class="table-shell import-table-shell">
             <table class="data-table"><thead><tr><th class="checkbox-column"><input id="select-all-import" type="checkbox"></th><th>文件夹名称</th><th>科目</th><th>预计用时</th><th>素材</th><th>校验结果</th><th class="operation-column">操作</th></tr></thead><tbody id="import-table-body"></tbody></table>
-            <div id="import-empty" class="table-empty"><strong>请选择需要导入的语音文件夹</strong><span>可以选择一个根目录，也可以拖入多个文件夹。</span></div>
+            <div id="import-empty" class="table-empty"><strong>请选择需要导入的语音文件夹</strong><span>支持一次多选同级文件夹；若系统选择器不便多选，也可选择它们的共同上级目录。</span></div>
           </div>
         </section>
         <section id="import-progress-stage" hidden><div class="progress-heading"><div><h3>正在导入</h3><p id="import-progress-text">准备上传…</p></div><strong id="import-progress-percent">0%</strong></div><div class="progress-track"><div id="import-progress-bar" class="progress-bar"></div></div></section>
@@ -292,6 +292,6 @@
   <div id="asset-viewer" class="asset-viewer" hidden><div class="asset-viewer-backdrop" data-close-viewer></div><section class="asset-viewer-dialog" role="dialog" aria-modal="true"><button id="close-asset-viewer" class="asset-viewer-close" type="button">×</button><div id="asset-viewer-content"></div></section></div>
 
   <script type="module" src="/admin/js/login-shell.js?v=20260924-1"></script>
-  <script type="module" src="/admin/js/app.js?v=20260924-1"></script>
+  <script type="module" src="/admin/js/app.js?v=20260929-1"></script>
 </body>
 </html>
