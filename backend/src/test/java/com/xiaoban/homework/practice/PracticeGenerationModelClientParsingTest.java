@@ -75,8 +75,7 @@ class PracticeGenerationModelClientParsingTest {
         any(String.class),
         eq(7000),
         eq("practice_generation"),
-        any(Map.class),
-        eq(StructuredOutputMode.JSON_OBJECT));
+        any(Map.class));
   }
 
   @Test
