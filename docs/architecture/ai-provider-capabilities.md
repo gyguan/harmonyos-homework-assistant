@@ -37,14 +37,14 @@ Provider Capability 只决定协议与结构化输出能力。业务 Canonical C
 | 环境变量 | 推荐值 |
 | --- | --- |
 | `AI_PROVIDER` | `ZHIPU_GLM` 或 `AUTO` |
-| `AI_BASE_URL` | `https://open.bigmodel.cn/api/paas/v4` |
-| `AI_CHAT_COMPLETIONS_PATH` | `/chat/completions` |
+| `AI_BASE_URL` | `https://open.bigmodel.cn` |
+| `AI_CHAT_COMPLETIONS_PATH` | `/api/paas/v4/chat/completions` |
 | `AI_PROTOCOL` | `chat-completions` |
 | `AI_TUTOR_MODEL` | `glm-4.7` 或更高版本 |
 | `AI_ORGANIZER_MODEL` | 可留空，默认继承 Tutor Model |
 | `AI_PRACTICE_MODEL` | 可留空，默认继承 Organizer/Tutor Model |
 
-Z.ai 国际端点可将 `AI_BASE_URL` 配置为 `https://api.z.ai/api/paas/v4`，其余配置保持一致。
+Z.ai 国际端点可配置 `AI_BASE_URL=https://api.z.ai`、`AI_CHAT_COMPLETIONS_PATH=/api/paas/v4/chat/completions`。将 host 与 API path 分开配置，可避免不同 HTTP URI 解析器对带路径 base URL 的拼接差异。
 
 `AUTO` 会在 capability resolver 内根据 base URL / model 识别 Provider。生产环境如果通过企业代理网关转发，建议显式设置 `AI_PROVIDER=ZHIPU_GLM`，避免代理域名丢失 Provider 特征。
 
