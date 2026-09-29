@@ -5,11 +5,11 @@ import sys
 import time
 import uuid
 
-from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, require
+from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, multipart_png, require
 
 
 def create_assignment(base_url: str, token: str, student_id: str, assignment_id: str, status: str) -> dict:
-    return expect(
+    created = expect(
         http(
             base_url,
             "POST",
@@ -26,19 +26,53 @@ def create_assignment(base_url: str, token: str, student_id: str, assignment_id:
                 "dueText": "今天",
                 "dueAtEpochMs": int(time.time() * 1000) + 3600000,
                 "dueTimezone": "Asia/Shanghai",
-                "status": status,
+                "status": "NOT_STARTED",
                 "sourceLabel": "parent review e2e",
                 "sourceExcerpt": "",
                 "expectedMinutes": 10,
                 "startedAtEpochMs": 0,
-                "finishedAtEpochMs": int(time.time() * 1000) if status == "SUBMITTED" else 0,
-                "elapsedSeconds": 60,
+                "finishedAtEpochMs": 0,
+                "elapsedSeconds": 0,
                 "reviewNote": "",
             },
         ),
         (200,),
-        f"create {status} assignment",
+        "create NOT_STARTED assignment",
     ).json()
+    if status == "NOT_STARTED":
+        return created
+    require(status == "SUBMITTED", f"unsupported review fixture target status: {status}")
+
+    started = expect(
+        http(
+            base_url, "POST", f"/api/v1/assignments/{assignment_id}/actions", token=token,
+            payload={"action": "START", "version": int(created["version"])},
+        ),
+        (200,), "start review fixture assignment",
+    ).json()
+    ready = expect(
+        http(
+            base_url, "POST", f"/api/v1/assignments/{assignment_id}/actions", token=token,
+            payload={"action": "READY_TO_SUBMIT", "version": int(started["version"])},
+        ),
+        (200,), "ready review fixture assignment",
+    ).json()
+    body, content_type = multipart_png()
+    submission = expect(
+        http(
+            base_url,
+            "POST",
+            f"/api/v1/assignments/{assignment_id}/submissions?version={int(ready['version'])}",
+            token=token,
+            raw=body,
+            content_type=content_type,
+        ),
+        (200,), "submit review fixture assignment",
+    ).json()
+    submitted = submission.get("assignment") or {}
+    require(submitted.get("status") == "SUBMITTED",
+            "review fixture did not reach SUBMITTED through legal lifecycle")
+    return submitted
 
 
 def review(base_url: str, token: str, assignment_id: str, version: int, decision: str, note: str) -> dict:
