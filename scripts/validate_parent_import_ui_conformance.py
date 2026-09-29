@@ -89,8 +89,8 @@ require(inbox.count(".alignItems(HorizontalAlign.Center)") >= 1 and
 require(batch.count(".alignItems(HorizontalAlign.Center)") >= 1 and
         ".constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })" in batch,
         "Import batch detail page shell must center the readable column on wide layouts")
-require("backAccessibilityText: '返回作业收件箱'" in batch,
-        "Import batch detail return semantics must match the current inbox title")
+require("backAccessibilityText: '返回导入记录'" in batch,
+        "Import batch detail return semantics must match the current records title")
 require(batch.count("AppTheme.CARD_RADIUS_COMPACT") >= 4 and
         batch.count(".border({ width: 1, color: AppTheme.BORDER })") >= 4,
         "Import batch detail cards must reuse current parent card radius and border tokens")
