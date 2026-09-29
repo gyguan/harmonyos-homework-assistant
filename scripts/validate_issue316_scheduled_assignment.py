@@ -64,6 +64,14 @@ require("resetEditorState()" in page and
         "scheduled editor state must reset before switching plans")
 require("SegmentedSelectionButton" in page and "private OptionButton(" not in page,
         "scheduled plan selectors must reuse reactive shared selection controls")
+require("private EditorFooter()" in page and "this.EditorFooter();" in page and
+        page.index("this.EditorFooter();") > page.index(".scrollBar(BarState.Off);"),
+        "scheduled Save Plan action must stay fixed outside scrolling editor content")
+editor = page.split("private Editor()", 1)[1].split("private EditorFooter()", 1)[0]
+require("保存计划" not in editor,
+        "scheduled Save Plan action must not return inside the scrolling Editor builder")
+for clear_text in ["清空计划名称", "清空任务名称", "清空完成要求"]:
+    require(clear_text in page, f"scheduled free-text field missing clear action: {clear_text}")
 require("HomeworkStore" not in page and "HomeworkStore" not in view_model,
         "new scheduled feature must not depend on HomeworkStore")
 require("DefaultScheduledAssignmentRepository" in view_model,

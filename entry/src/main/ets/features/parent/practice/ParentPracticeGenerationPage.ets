@@ -210,10 +210,27 @@ export struct ParentPracticeGenerationPage {
       .width('100%');
 
       Column({ space: 6 }) {
-        Text('我希望重点练习')
-          .width('100%')
-          .fontSize(AppTheme.LABEL_TITLE_SIZE)
-          .fontColor(AppTheme.SUBTEXT);
+        Row() {
+          Text('我希望重点练习')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+          Blank();
+          if (this.requirement.length > 0) {
+            Text('清空')
+              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+              .padding({ left: 12, right: 4 })
+              .fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('清空训练要求')
+              .onClick(() => {
+                this.requirement = '';
+                this.message = '';
+              });
+          }
+        }
+        .width('100%');
         TextArea({
           placeholder: '例如：100以内退位减法，多一些生活应用题，重点区分加法和减法',
           text: this.requirement
