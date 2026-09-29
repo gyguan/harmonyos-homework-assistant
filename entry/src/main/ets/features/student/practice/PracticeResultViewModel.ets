@@ -132,8 +132,13 @@ export class PracticeResultViewModel {
     let result = await this.repository.getResult(attemptId);
     if (result.wrongCount <= 0) return this.repository.repeatAttempt(attemptId);
 
+    let attempt = await this.repository.getAttempt(attemptId);
+    let studentId = attempt.studentId;
+    if (studentId !== this.familyContext.getActiveStudentId()) {
+      throw new Error('已切换孩子，请返回当前孩子后再开始巩固练习');
+    }
+
     try {
-      let attempt = await this.repository.getAttempt(attemptId);
       let paper = await this.repository.getPaper(result.paperId, result.paperVersion);
       if (paper === null) throw new Error('练习套卷不存在');
 
@@ -164,16 +169,24 @@ export class PracticeResultViewModel {
         questionCount: 5,
         requirement: `围绕${focus}生成 5 道同类巩固题，不重复原题，难度保持接近，提示要帮助理解而不是直接给答案。`
       };
-      let studentId = this.familyContext.getActiveStudentId();
       let generated = await this.generationRepository.generate(studentId, input);
       if (generated.status !== 'READY' || generated.paper === null) {
         throw new Error('AI巩固练习尚未准备好');
       }
+      if (studentId !== this.familyContext.getActiveStudentId()) {
+        throw new Error('已切换孩子，请返回当前孩子后再开始巩固练习');
+      }
 
       let published = await this.generationRepository.publish(
         generated.generationId, PracticePublishScope.CURRENT, []);
+      if (studentId !== this.familyContext.getActiveStudentId()) {
+        throw new Error('已切换孩子，请返回当前孩子后再开始巩固练习');
+      }
       return this.repository.startAttempt(studentId, published.paper.id, published.paper.version);
     } catch {
+      if (studentId !== this.familyContext.getActiveStudentId()) {
+        throw new Error('已切换孩子，请返回当前孩子后再开始巩固练习');
+      }
       return this.repository.retryWrongAttempt(attemptId);
     }
   }
