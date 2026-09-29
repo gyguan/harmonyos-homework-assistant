@@ -277,7 +277,7 @@ export struct StudentProfileEditorDialog {
           .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.DANGER);
-        Text('已有作业的孩子或家庭最后一个孩子仍会被服务端拒绝删除。')
+        Text('删除家庭成员属于高风险操作。已有作业的孩子或家庭最后一个孩子仍会被服务端拒绝删除。')
           .width('100%')
           .fontSize(AppTheme.CAPTION_SIZE)
           .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
