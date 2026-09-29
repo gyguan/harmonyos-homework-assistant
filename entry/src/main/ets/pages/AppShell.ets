@@ -824,7 +824,7 @@ export struct AppShell {
           HomeworkShareImportStatusPage({
             token: this.shareImportToken,
             onReady: () => this.finishShareImportReady(),
-            onOpenInbox: () => this.finishShareImportEmpty(),
+            onOpenRecords: () => this.finishShareImportEmpty(),
             onCancel: () => this.cancelShareImport()
           });
         }
