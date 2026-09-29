@@ -17,7 +17,6 @@ export class AssignmentAttentionPolicy {
       }
       if (item.status !== AssignmentStatus.SUBMITTED &&
         item.status !== AssignmentStatus.COMPLETED &&
-        item.status !== AssignmentStatus.NEEDS_REWORK &&
         AssignmentDueDate.matches(item, DueDateFilterKey.OVERDUE, nowEpochMs)) {
         overdueCount++;
         continue;
