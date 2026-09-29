@@ -93,9 +93,10 @@ for field in ["batchId: source.sourceEvidence.batchId",
               "imageRef: source.sourceEvidence.imageRef"]:
     require(field in legacy_store,
             f"legacy HomeworkStore clone must preserve Import V2 provenance: {field}")
-require("markActiveBatchPublished" in publish and
-        publish.index("markActiveBatchPublished") < publish.index("clearCandidates()"),
-        "successful atomic publish must preserve and mark batch history before clearing active drafts")
+require("markBatchPublished(batchId)" in publish and
+        publish.index("markBatchPublished(batchId)") < publish.index("clearCandidates()") and
+        "clearCurrentDraft" in publish and "getActiveBatchId() === batchId" in publish,
+        "successful atomic publish must mark the originating batch and only clear the still-active matching draft")
 require("PreferencesHomeworkImportInboxPersistence" in entry and "HomeworkImportInboxBootstrap" in entry,
         "EntryAbility must initialize Import Inbox persistence")
 
