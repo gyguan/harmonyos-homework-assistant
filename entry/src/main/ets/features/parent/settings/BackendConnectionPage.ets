@@ -314,21 +314,66 @@ export struct BackendConnectionPage {
             .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
 
-          TextInput({ placeholder: '语文，例如：部编版', text: this.editChineseTextbook })
+          Row() {
+            Text('语文').fontSize(AppTheme.LABEL_TITLE_SIZE).fontColor(AppTheme.SUBTEXT);
+            Blank();
+            if (this.editChineseTextbook.length > 0) {
+              Text('清空').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .padding({ left: 12, right: 4 }).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+                .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空语文教材')
+                .onClick(() => this.editChineseTextbook = '');
+            }
+          }.width('100%');
+          TextInput({ placeholder: '例如：部编版', text: this.editChineseTextbook })
             .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
             .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editChineseTextbook = value);
-          TextInput({ placeholder: '数学，例如：北师大版', text: this.editMathTextbook })
+
+          Row() {
+            Text('数学').fontSize(AppTheme.LABEL_TITLE_SIZE).fontColor(AppTheme.SUBTEXT);
+            Blank();
+            if (this.editMathTextbook.length > 0) {
+              Text('清空').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .padding({ left: 12, right: 4 }).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+                .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空数学教材')
+                .onClick(() => this.editMathTextbook = '');
+            }
+          }.width('100%');
+          TextInput({ placeholder: '例如：北师大版', text: this.editMathTextbook })
             .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
             .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editMathTextbook = value);
-          TextInput({ placeholder: '英语，例如：人教版', text: this.editEnglishTextbook })
+
+          Row() {
+            Text('英语').fontSize(AppTheme.LABEL_TITLE_SIZE).fontColor(AppTheme.SUBTEXT);
+            Blank();
+            if (this.editEnglishTextbook.length > 0) {
+              Text('清空').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .padding({ left: 12, right: 4 }).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+                .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空英语教材')
+                .onClick(() => this.editEnglishTextbook = '');
+            }
+          }.width('100%');
+          TextInput({ placeholder: '例如：人教版', text: this.editEnglishTextbook })
             .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
             .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editEnglishTextbook = value);
 
-          Text('其他教材（可选）')
-            .width('100%')
-            .fontSize(AppTheme.LABEL_TITLE_SIZE)
-            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
-            .fontColor(AppTheme.SUBTEXT);
+          Row() {
+            Text('其他教材（可选）')
+              .fontSize(AppTheme.LABEL_TITLE_SIZE)
+              .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+            Blank();
+            if (this.editOtherTextbooks.length > 0) {
+              Text('清空').constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+                .padding({ left: 12, right: 4 }).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+                .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空其他教材')
+                .onClick(() => this.editOtherTextbooks = '');
+            }
+          }
+          .width('100%');
           TextArea({
             placeholder: '例如：科学=教科版；道德与法治=人教版',
             text: this.editOtherTextbooks
