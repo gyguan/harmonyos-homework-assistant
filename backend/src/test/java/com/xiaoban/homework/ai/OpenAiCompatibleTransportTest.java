@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 class OpenAiCompatibleTransportTest {
   @Test
@@ -58,6 +59,39 @@ class OpenAiCompatibleTransportTest {
         StructuredOutputMode.TEXT,
         "practice_generation",
         schema));
+  }
+
+  @Test
+  void deserializesOpenAiCompatibleChatResponseWithProviderExtraFields() throws Exception {
+    JsonMapper mapper = JsonMapper.builder().build();
+    String raw = """
+        {
+          "id": "glm-response",
+          "request_id": "req-1",
+          "model": "glm-4.7",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": "内部推理字段",
+                "content": "{\"questions\":[]}"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 12,
+            "completion_tokens": 8
+          }
+        }
+        """;
+
+    OpenAiCompatibleTransport.ChatResponse response =
+        mapper.readValue(raw, OpenAiCompatibleTransport.ChatResponse.class);
+
+    assertEquals("{\"questions\":[]}",
+        OpenAiCompatibleTransport.extractChatText(response).orElseThrow());
   }
 
   @Test
