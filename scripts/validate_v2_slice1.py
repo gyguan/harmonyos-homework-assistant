@@ -86,6 +86,9 @@ require("HomeworkStore.instance" not in repository_impl and "../HomeworkStore" n
 require("DefaultAssignmentLocalDataSource" in local_data_source and
         "HomeworkStore.instance" in local_data_source,
         "legacy Store access must be isolated inside AssignmentLocalDataSource")
+for field in ["chineseTextbook", "mathTextbook", "englishTextbook", "otherTextbooks", "textbookSummary"]:
+    require(f"{field}: student.{field}" in local_data_source,
+            f"AssignmentLocalDataSource StudentProfile clone must preserve field: {field}")
 require("HomeworkStore.instance" not in view_model and "HomeworkStore.instance" not in home,
         "V2 ViewModel/Page must not directly access HomeworkStore")
 require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,
