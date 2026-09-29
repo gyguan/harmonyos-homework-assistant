@@ -1,5 +1,9 @@
 package com.xiaoban.homework.practice;
 
+import com.xiaoban.homework.ai.AiProviderCapabilities;
+import com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol;
+import com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode;
+import com.xiaoban.homework.ai.AiProviderCapabilityResolver;
 import com.xiaoban.homework.ai.AiProviderProperties;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
 import com.xiaoban.homework.ai.StructuredJsonNormalizer;
@@ -18,12 +22,17 @@ public class PracticeGenerationModelClient {
   private static final Logger log = LoggerFactory.getLogger(PracticeGenerationModelClient.class);
 
   private final AiProviderProperties properties;
+  private final AiProviderCapabilityResolver capabilityResolver;
   private final OpenAiCompatibleTransport transport;
   private final JsonMapper mapper;
 
-  public PracticeGenerationModelClient(AiProviderProperties properties,
-      OpenAiCompatibleTransport transport, JsonMapper mapper) {
+  public PracticeGenerationModelClient(
+      AiProviderProperties properties,
+      AiProviderCapabilityResolver capabilityResolver,
+      OpenAiCompatibleTransport transport,
+      JsonMapper mapper) {
     this.properties = properties;
+    this.capabilityResolver = capabilityResolver;
     this.transport = transport;
     this.mapper = mapper;
   }
@@ -45,74 +54,60 @@ public class PracticeGenerationModelClient {
     Map<String, Object> outputSchema = schema(request.questionCount());
     String generationInput = input(textbookContext, grade, semester, request);
 
-    OpenAiCompatibleTransport.StructuredOutputMode primaryMode =
-        properties.usesChatCompletions()
-            ? OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT
-            : OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA;
-    OpenAiCompatibleTransport.StructuredOutputMode fallbackMode =
-        primaryMode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
-            ? OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT
-            : OpenAiCompatibleTransport.StructuredOutputMode.TEXT;
+    AiProviderCapabilities capabilities =
+        capabilityResolver.resolve(properties.getPracticeModel());
+    ApiProtocol protocol = capabilities.preferredProtocol();
+    List<StructuredOutputMode> modes = capabilities.modes(protocol);
+    List<GenerationAttempt> attempts = new ArrayList<>();
 
-    GenerationAttempt primaryAttempt = requestAndParse(
-        paperId,
-        grade,
-        semester,
-        request,
-        generationInput,
-        instructionsFor(primaryMode),
-        outputSchema,
-        primaryMode);
-    if (primaryAttempt.paper().isPresent()) {
-      logSuccess(paperId, primaryAttempt);
-      return primaryAttempt.paper();
-    }
+    for (int i = 0; i < modes.size(); i++) {
+      StructuredOutputMode mode = modes.get(i);
+      GenerationAttempt attempt = requestAndParse(
+          paperId,
+          grade,
+          semester,
+          request,
+          generationInput,
+          instructionsFor(mode),
+          outputSchema,
+          protocol,
+          mode,
+          i == 0);
+      attempts.add(attempt);
+      if (attempt.paper().isPresent()) {
+        logSuccess(paperId, capabilities, attempt);
+        return attempt.paper();
+      }
 
-    log.info(
-        "[AI] practice generation structured attempt rejected model={} paperId={} mode={} shape={} outputChars={} exception={} message={} retryMode={}",
-        properties.getPracticeModel(),
-        paperId,
-        primaryMode,
-        primaryAttempt.shape(),
-        primaryAttempt.outputChars(),
-        primaryAttempt.exception(),
-        primaryAttempt.message(),
-        fallbackMode);
-
-    GenerationAttempt fallbackAttempt = requestAndParse(
-        paperId,
-        grade,
-        semester,
-        request,
-        generationInput,
-        instructionsFor(fallbackMode),
-        outputSchema,
-        fallbackMode);
-    if (fallbackAttempt.paper().isPresent()) {
-      logSuccess(paperId, fallbackAttempt);
-      return fallbackAttempt.paper();
+      StructuredOutputMode nextMode = i + 1 < modes.size() ? modes.get(i + 1) : null;
+      log.info(
+          "[AI] practice generation structured attempt rejected provider={} model={} paperId={} protocol={} mode={} shape={} outputChars={} exception={} message={} nextMode={}",
+          capabilities.provider(),
+          properties.getPracticeModel(),
+          paperId,
+          protocol,
+          mode,
+          attempt.shape(),
+          attempt.outputChars(),
+          attempt.exception(),
+          attempt.message(),
+          nextMode);
     }
 
     log.warn(
-        "[AI] practice generation failed after structured-output negotiation model={} paperId={} firstMode={} firstShape={} firstOutputChars={} firstException={} firstMessage={} retryMode={} retryShape={} retryOutputChars={} retryException={} retryMessage={}",
+        "[AI] practice generation failed after capability negotiation provider={} model={} paperId={} protocol={} attempts={}",
+        capabilities.provider(),
         properties.getPracticeModel(),
         paperId,
-        primaryMode,
-        primaryAttempt.shape(),
-        primaryAttempt.outputChars(),
-        primaryAttempt.exception(),
-        primaryAttempt.message(),
-        fallbackMode,
-        fallbackAttempt.shape(),
-        fallbackAttempt.outputChars(),
-        fallbackAttempt.exception(),
-        fallbackAttempt.message());
+        protocol,
+        attemptSummary(attempts));
     return Optional.empty();
   }
 
   private record GenerationAttempt(
       Optional<PracticeContentCatalog.Paper> paper,
-      OpenAiCompatibleTransport.StructuredOutputMode mode,
+      ApiProtocol protocol,
+      StructuredOutputMode mode,
       String shape,
       int outputChars,
       List<String> coercedFields,
@@ -127,8 +122,10 @@ public class PracticeGenerationModelClient {
       String generationInput,
       String generationInstructions,
       Map<String, Object> outputSchema,
-      OpenAiCompatibleTransport.StructuredOutputMode mode) {
-    Optional<String> output = mode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
+      ApiProtocol protocol,
+      StructuredOutputMode mode,
+      boolean primaryAttempt) {
+    Optional<String> output = primaryAttempt
         ? transport.complete(
             properties.getPracticeModel(),
             generationInstructions,
@@ -146,9 +143,9 @@ public class PracticeGenerationModelClient {
             mode);
     if (output == null || output.isEmpty()) {
       return new GenerationAttempt(
-          Optional.empty(), mode, "<empty>", 0, List.of(), "EmptyOutput", "<empty>");
+          Optional.empty(), protocol, mode, "<empty>", 0, List.of(), "EmptyOutput", "<empty>");
     }
-    return parseOutput(paperId, grade, semester, request, output.get(), mode);
+    return parseOutput(paperId, grade, semester, request, output.get(), protocol, mode);
   }
 
   private GenerationAttempt parseOutput(
@@ -157,7 +154,8 @@ public class PracticeGenerationModelClient {
       String semester,
       PracticeGenerationDtos.GenerateRequest request,
       String output,
-      OpenAiCompatibleTransport.StructuredOutputMode mode) {
+      ApiProtocol protocol,
+      StructuredOutputMode mode) {
     String shape = "<unparsed>";
     List<String> coercedFields = List.of();
     try {
@@ -171,10 +169,11 @@ public class PracticeGenerationModelClient {
       PracticeContentCatalog.Paper paper =
           toPaper(paperId, grade, semester, request, adapted.paper());
       return new GenerationAttempt(
-          Optional.of(paper), mode, shape, output.length(), coercedFields, "", "");
+          Optional.of(paper), protocol, mode, shape, output.length(), coercedFields, "", "");
     } catch (Exception error) {
       return new GenerationAttempt(
           Optional.empty(),
+          protocol,
           mode,
           shape,
           output.length(),
@@ -227,16 +226,30 @@ public class PracticeGenerationModelClient {
         questions);
   }
 
-  private void logSuccess(String paperId, GenerationAttempt attempt) {
+  private void logSuccess(
+      String paperId, AiProviderCapabilities capabilities, GenerationAttempt attempt) {
     PracticeContentCatalog.Paper paper = attempt.paper().orElseThrow();
     log.info(
-        "[AI] practice generation parsed model={} paperId={} questions={} outputMode={} shape={} coercedFields={}",
+        "[AI] practice generation parsed provider={} model={} paperId={} questions={} protocol={} outputMode={} shape={} coercedFields={}",
+        capabilities.provider(),
         properties.getPracticeModel(),
         paperId,
         paper.questions().size(),
+        attempt.protocol(),
         attempt.mode(),
         attempt.shape(),
         attempt.coercedFields());
+  }
+
+  private static String attemptSummary(List<GenerationAttempt> attempts) {
+    return attempts.stream()
+        .map(attempt -> attempt.mode()
+            + "{shape=" + attempt.shape()
+            + ",chars=" + attempt.outputChars()
+            + ",exception=" + attempt.exception()
+            + ",message=" + attempt.message() + "}")
+        .toList()
+        .toString();
   }
 
   static String instructions() {
@@ -258,8 +271,8 @@ public class PracticeGenerationModelClient {
         + "最终只输出符合JSON Schema的对象，不输出Markdown或额外说明。";
   }
 
-  static String instructionsFor(OpenAiCompatibleTransport.StructuredOutputMode mode) {
-    return mode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
+  static String instructionsFor(StructuredOutputMode mode) {
+    return mode == StructuredOutputMode.JSON_SCHEMA
         ? instructions()
         : jsonObjectInstructions();
   }

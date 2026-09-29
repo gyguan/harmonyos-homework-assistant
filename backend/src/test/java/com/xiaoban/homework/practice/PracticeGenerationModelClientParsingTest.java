@@ -8,6 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode;
+import com.xiaoban.homework.ai.AiProviderCapabilityResolver;
 import com.xiaoban.homework.ai.AiProviderProperties;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
 import java.util.Map;
@@ -19,6 +21,7 @@ class PracticeGenerationModelClientParsingTest {
   @Test
   void usesJsonObjectAsPrimaryModeForChatCompletions() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setProtocol("chat-completions");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
@@ -48,12 +51,12 @@ class PracticeGenerationModelClientParsingTest {
         any(String.class),
         eq(7000),
         eq("practice_generation"),
-        any(Map.class),
-        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT)))
+        any(Map.class)))
         .thenReturn(Optional.of(canonicalOutput));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",
@@ -72,13 +75,13 @@ class PracticeGenerationModelClientParsingTest {
         any(String.class),
         eq(7000),
         eq("practice_generation"),
-        any(Map.class),
-        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT));
+        any(Map.class));
   }
 
   @Test
   void retriesJsonObjectWhenSchemaRequestReturnsEmpty() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
 
@@ -116,11 +119,12 @@ class PracticeGenerationModelClientParsingTest {
         eq(7000),
         eq("practice_generation"),
         any(Map.class),
-        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT)))
+        eq(StructuredOutputMode.JSON_OBJECT)))
         .thenReturn(Optional.of(canonicalRetryOutput));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",
@@ -137,6 +141,7 @@ class PracticeGenerationModelClientParsingTest {
   @Test
   void retriesWithJsonObjectWhenSchemaOutputIsStructurallyInvalid() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
 
@@ -190,11 +195,12 @@ class PracticeGenerationModelClientParsingTest {
         eq(7000),
         eq("practice_generation"),
         any(Map.class),
-        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT)))
+        eq(StructuredOutputMode.JSON_OBJECT)))
         .thenReturn(Optional.of(canonicalRetryOutput));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",
@@ -215,12 +221,13 @@ class PracticeGenerationModelClientParsingTest {
         eq(7000),
         eq("practice_generation"),
         any(Map.class),
-        eq(OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT));
+        eq(StructuredOutputMode.JSON_OBJECT));
   }
 
   @Test
   void parsesQuestionsOnlyRootAndBuildsPaperMetadataFromRequest() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
 
@@ -255,7 +262,8 @@ class PracticeGenerationModelClientParsingTest {
         .thenReturn(Optional.of(output));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",
@@ -285,6 +293,7 @@ class PracticeGenerationModelClientParsingTest {
   @Test
   void parsesMarkdownAndPaperWrapperFromCompatibleProvider() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
 
@@ -322,7 +331,8 @@ class PracticeGenerationModelClientParsingTest {
         .thenReturn(Optional.of(wrapped));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",
@@ -341,6 +351,7 @@ class PracticeGenerationModelClientParsingTest {
   @Test
   void parsesObjectWrappedScalarFieldsFromDeepSeekCompatibleProvider() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
 
@@ -377,7 +388,8 @@ class PracticeGenerationModelClientParsingTest {
         .thenReturn(Optional.of(output));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",
@@ -396,6 +408,7 @@ class PracticeGenerationModelClientParsingTest {
   @Test
   void parsesFencedUnknownPaperEnvelopeFromCompatibleProvider() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
 
@@ -436,7 +449,8 @@ class PracticeGenerationModelClientParsingTest {
         .thenReturn(Optional.of(output));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",
@@ -454,6 +468,7 @@ class PracticeGenerationModelClientParsingTest {
   @Test
   void parsesFencedStringAndSingletonArrayEnvelopeFromCompatibleProvider() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
 
@@ -492,7 +507,8 @@ class PracticeGenerationModelClientParsingTest {
         .thenReturn(Optional.of(output));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",
@@ -510,6 +526,7 @@ class PracticeGenerationModelClientParsingTest {
   @Test
   void adaptsProviderStringOptionsAndAnswerLabelBeforeDomainMapping() throws Exception {
     AiProviderProperties properties = new AiProviderProperties();
+    properties.setProvider("DEEPSEEK");
     properties.setTutorModel("deepseek-v4-flash-0731");
     properties.setPracticeModel("");
 
@@ -546,7 +563,8 @@ class PracticeGenerationModelClientParsingTest {
         .thenReturn(Optional.of(output));
 
     PracticeGenerationModelClient client =
-        new PracticeGenerationModelClient(properties, transport, mapper);
+        new PracticeGenerationModelClient(
+            properties, new AiProviderCapabilityResolver(properties), transport, mapper);
 
     Optional<PracticeContentCatalog.Paper> result = client.generate(
         "人教版数学二年级上册",

@@ -59,6 +59,11 @@
   - Action Command；
   - Progress Query；
   - Flyway V7+。
+- `architecture/ai-provider-capabilities.md`
+  - AI Provider Capability 分层；
+  - OpenAI / DeepSeek / GLM-4.7+ / Generic OpenAI-compatible 能力矩阵；
+  - Structured Output 协商与 GLM-4.7+ 接入配置；
+  - 新 Provider Contract Test Gate。
 
 ### 6. 重构开工与迁移基线
 

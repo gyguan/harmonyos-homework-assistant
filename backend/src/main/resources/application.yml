@@ -37,6 +37,7 @@ app:
     log-payloads: ${HTTP_LOG_PAYLOADS:true}
     max-payload-chars: ${HTTP_MAX_PAYLOAD_CHARS:20000}
   ai:
+    provider: ${AI_PROVIDER:AUTO}
     protocol: ${AI_PROTOCOL:responses}
     api-key: ${AI_API_KEY:${OPENAI_API_KEY:}}
     base-url: ${AI_BASE_URL:${OPENAI_BASE_URL:https://api.openai.com}}

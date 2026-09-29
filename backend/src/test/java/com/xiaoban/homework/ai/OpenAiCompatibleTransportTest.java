@@ -1,11 +1,13 @@
 package com.xiaoban.homework.ai;
 
+import com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 class OpenAiCompatibleTransportTest {
   @Test
@@ -22,20 +24,20 @@ class OpenAiCompatibleTransportTest {
     Map<String, Object> schema = Map.of("type", "object");
 
     Map<String, Object> responsesSchema = OpenAiCompatibleTransport.structuredFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA,
+        StructuredOutputMode.JSON_SCHEMA,
         "practice_generation",
         schema);
     assertEquals("json_schema", responsesSchema.get("type"));
     assertEquals(schema, responsesSchema.get("schema"));
 
     Map<String, Object> responsesJsonObject = OpenAiCompatibleTransport.structuredFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT,
+        StructuredOutputMode.JSON_OBJECT,
         "practice_generation",
         schema);
     assertEquals(Map.of("type", "json_object"), responsesJsonObject);
 
     Map<String, Object> chatSchema = OpenAiCompatibleTransport.chatStructuredResponseFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA,
+        StructuredOutputMode.JSON_SCHEMA,
         "practice_generation",
         schema);
     assertEquals("json_schema", chatSchema.get("type"));
@@ -44,19 +46,52 @@ class OpenAiCompatibleTransportTest {
     assertEquals(schema, nested.get("schema"));
 
     Map<String, Object> chatJsonObject = OpenAiCompatibleTransport.chatStructuredResponseFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT,
+        StructuredOutputMode.JSON_OBJECT,
         "practice_generation",
         schema);
     assertEquals(Map.of("type", "json_object"), chatJsonObject);
 
     assertNull(OpenAiCompatibleTransport.structuredFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.TEXT,
+        StructuredOutputMode.TEXT,
         "practice_generation",
         schema));
     assertNull(OpenAiCompatibleTransport.chatStructuredResponseFormat(
-        OpenAiCompatibleTransport.StructuredOutputMode.TEXT,
+        StructuredOutputMode.TEXT,
         "practice_generation",
         schema));
+  }
+
+  @Test
+  void deserializesOpenAiCompatibleChatResponseWithProviderExtraFields() throws Exception {
+    JsonMapper mapper = JsonMapper.builder().build();
+    String raw = """
+        {
+          "id": "glm-response",
+          "request_id": "req-1",
+          "model": "glm-4.7",
+          "choices": [
+            {
+              "index": 0,
+              "message": {
+                "role": "assistant",
+                "reasoning_content": "内部推理字段",
+                "content": "{\\\"questions\\\":[]}"
+              },
+              "finish_reason": "stop"
+            }
+          ],
+          "usage": {
+            "prompt_tokens": 12,
+            "completion_tokens": 8
+          }
+        }
+        """;
+
+    OpenAiCompatibleTransport.ChatResponse response =
+        mapper.readValue(raw, OpenAiCompatibleTransport.ChatResponse.class);
+
+    assertEquals("{\"questions\":[]}",
+        OpenAiCompatibleTransport.extractChatText(response).orElseThrow());
   }
 
   @Test
