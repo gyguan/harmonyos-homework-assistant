@@ -32,8 +32,8 @@ require("class AssignmentAttentionPolicy" in attention and "AssignmentAttentionP
 require("AttentionBanner" in student_home and "AttentionBanner" in parent_home,
         "attention must stay embedded in existing home pages")
 require("questionCount: 5" in result_vm and "PracticePublishScope.CURRENT" in result_vm and
-        "retryWrongAttempt(attemptId)" in result_vm,
-        "five-question reinforcement must generate for current student and retain wrong-only fallback")
+        "retryWrongAttempt(attemptId)" in result_vm and "let studentId = attempt.studentId" in result_vm,
+        "five-question reinforcement must stay bound to the source student and retain wrong-only fallback")
 require("'再练 5 题'" in result_page and "再挑战 ${this.result.wrongCount} 道错题" not in result_page,
         "result page must expose one simple reinforcement action")
 require("PUBLISH_AGENT_REMINDER" not in module_config,
