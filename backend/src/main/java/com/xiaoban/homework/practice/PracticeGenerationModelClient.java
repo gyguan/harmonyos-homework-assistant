@@ -45,55 +45,68 @@ public class PracticeGenerationModelClient {
     Map<String, Object> outputSchema = schema(request.questionCount());
     String generationInput = input(textbookContext, grade, semester, request);
 
-    GenerationAttempt schemaAttempt = requestAndParse(
+    OpenAiCompatibleTransport.StructuredOutputMode primaryMode =
+        properties.usesChatCompletions()
+            ? OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT
+            : OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA;
+    OpenAiCompatibleTransport.StructuredOutputMode fallbackMode =
+        primaryMode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
+            ? OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT
+            : OpenAiCompatibleTransport.StructuredOutputMode.TEXT;
+
+    GenerationAttempt primaryAttempt = requestAndParse(
         paperId,
         grade,
         semester,
         request,
         generationInput,
-        instructions(),
+        instructionsFor(primaryMode),
         outputSchema,
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA);
-    if (schemaAttempt.paper().isPresent()) {
-      logSuccess(paperId, schemaAttempt);
-      return schemaAttempt.paper();
+        primaryMode);
+    if (primaryAttempt.paper().isPresent()) {
+      logSuccess(paperId, primaryAttempt);
+      return primaryAttempt.paper();
     }
 
     log.info(
-        "[AI] practice generation schema attempt rejected model={} paperId={} shape={} outputChars={} exception={} message={} retryMode=JSON_OBJECT",
+        "[AI] practice generation structured attempt rejected model={} paperId={} mode={} shape={} outputChars={} exception={} message={} retryMode={}",
         properties.getPracticeModel(),
         paperId,
-        schemaAttempt.shape(),
-        schemaAttempt.outputChars(),
-        schemaAttempt.exception(),
-        schemaAttempt.message());
+        primaryMode,
+        primaryAttempt.shape(),
+        primaryAttempt.outputChars(),
+        primaryAttempt.exception(),
+        primaryAttempt.message(),
+        fallbackMode);
 
-    GenerationAttempt jsonObjectAttempt = requestAndParse(
+    GenerationAttempt fallbackAttempt = requestAndParse(
         paperId,
         grade,
         semester,
         request,
         generationInput,
-        jsonObjectInstructions(),
+        instructionsFor(fallbackMode),
         outputSchema,
-        OpenAiCompatibleTransport.StructuredOutputMode.JSON_OBJECT);
-    if (jsonObjectAttempt.paper().isPresent()) {
-      logSuccess(paperId, jsonObjectAttempt);
-      return jsonObjectAttempt.paper();
+        fallbackMode);
+    if (fallbackAttempt.paper().isPresent()) {
+      logSuccess(paperId, fallbackAttempt);
+      return fallbackAttempt.paper();
     }
 
     log.warn(
-        "[AI] practice generation failed after structured-output negotiation model={} paperId={} firstMode=JSON_SCHEMA firstShape={} firstOutputChars={} firstException={} firstMessage={} retryMode=JSON_OBJECT retryShape={} retryOutputChars={} retryException={} retryMessage={}",
+        "[AI] practice generation failed after structured-output negotiation model={} paperId={} firstMode={} firstShape={} firstOutputChars={} firstException={} firstMessage={} retryMode={} retryShape={} retryOutputChars={} retryException={} retryMessage={}",
         properties.getPracticeModel(),
         paperId,
-        schemaAttempt.shape(),
-        schemaAttempt.outputChars(),
-        schemaAttempt.exception(),
-        schemaAttempt.message(),
-        jsonObjectAttempt.shape(),
-        jsonObjectAttempt.outputChars(),
-        jsonObjectAttempt.exception(),
-        jsonObjectAttempt.message());
+        primaryMode,
+        primaryAttempt.shape(),
+        primaryAttempt.outputChars(),
+        primaryAttempt.exception(),
+        primaryAttempt.message(),
+        fallbackMode,
+        fallbackAttempt.shape(),
+        fallbackAttempt.outputChars(),
+        fallbackAttempt.exception(),
+        fallbackAttempt.message());
     return Optional.empty();
   }
 
@@ -131,7 +144,7 @@ public class PracticeGenerationModelClient {
             "practice_generation",
             outputSchema,
             mode);
-    if (output.isEmpty()) {
+    if (output == null || output.isEmpty()) {
       return new GenerationAttempt(
           Optional.empty(), mode, "<empty>", 0, List.of(), "EmptyOutput", "<empty>");
     }
@@ -243,6 +256,12 @@ public class PracticeGenerationModelClient {
         + "生成前自行复核每题答案、选项唯一性、数学计算和年级适配。"
         + "顶层只输出 questions 数组，不需要生成 title、description、estimatedMinutes 或 tags。"
         + "最终只输出符合JSON Schema的对象，不输出Markdown或额外说明。";
+  }
+
+  static String instructionsFor(OpenAiCompatibleTransport.StructuredOutputMode mode) {
+    return mode == OpenAiCompatibleTransport.StructuredOutputMode.JSON_SCHEMA
+        ? instructions()
+        : jsonObjectInstructions();
   }
 
   static String jsonObjectInstructions() {
