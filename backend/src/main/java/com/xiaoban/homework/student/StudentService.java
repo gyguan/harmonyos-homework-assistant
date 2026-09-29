@@ -41,13 +41,22 @@ public class StudentService {
 
   @Transactional
   public StudentDtos.Response upsert(UUID familyId, StudentDtos.Upsert input) {
+    if (!StudentTextbooks.validOthers(input.otherTextbooks())) {
+      throw new ApiExceptions.BadRequest("其他教材格式应为“科目=教材版本”，多个科目使用分号分隔");
+    }
     StudentEntity entity = repository.findById(input.id()).orElseGet(StudentEntity::new);
     if (entity.familyId != null && !familyId.equals(entity.familyId)) throw new ApiExceptions.Conflict("孩子 ID 已属于其他家庭");
     Instant now = Instant.now();
     if (entity.createdAt == null) entity.createdAt = now;
     entity.id = input.id(); entity.familyId = familyId; entity.name = input.name(); entity.grade = input.grade();
     entity.className = input.className(); entity.semester = input.semester();
-    entity.textbookSummary = input.textbookSummary() == null ? "" : input.textbookSummary(); entity.updatedAt = now;
+    StudentTextbooks textbooks = StudentTextbooks.from(input);
+    entity.chineseTextbook = textbooks.chinese();
+    entity.mathTextbook = textbooks.math();
+    entity.englishTextbook = textbooks.english();
+    entity.otherTextbooks = textbooks.others();
+    entity.textbookSummary = textbooks.summary();
+    entity.updatedAt = now;
     return StudentDtos.Response.from(repository.save(entity));
   }
 

@@ -26,6 +26,14 @@ parent = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage
 student = read("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
 selection_controls = read("entry/src/main/ets/components/selection/SelectionControls.ets")
 tutor = read("entry/src/main/ets/application/remote/TutorRemoteApi.ets")
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+homework_models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
+student_remote = read("entry/src/main/ets/application/remote/StudentRemoteApi.ets")
+textbook_profile = read("entry/src/main/ets/domain/service/StudentTextbookProfile.ets")
+student_dtos = read("backend/src/main/java/com/xiaoban/homework/student/StudentDtos.java")
+student_service = read("backend/src/main/java/com/xiaoban/homework/student/StudentService.java")
+practice_generation = read("backend/src/main/java/com/xiaoban/homework/practice/PracticeGenerationService.java")
+textbook_migration = read("backend/src/main/resources/db/migration/V21__student_structured_textbooks.sql")
 
 require("updateTutorSettings(tutorGuidanceFirst: boolean, directAnswerAllowed: boolean)" in store,
         "HomeworkStore must expose an explicit Tutor settings mutation")
@@ -63,6 +71,27 @@ require(parent.count("this.syncLocalStudents();") >= 5,
         "parent 我的 must refresh reactive family state on appear, sync, save and delete paths")
 require("${student.id}:${student.name}:${student.grade}:${student.className}:${student.semester}:${student.textbookSummary}" in parent,
         "parent family list key must change when edited student profile fields change")
+for field in ["chineseTextbook", "mathTextbook", "englishTextbook", "otherTextbooks"]:
+    require(field in homework_models and field in student_remote and field in student_dtos,
+            f"student textbook structure missing cross-layer field: {field}")
+require("StudentTextbookProfile.fromStudent(student)" in parent and
+        "StudentTextbookProfile.validOtherTextbooks" in parent and
+        "格式：科目=教材版本" in parent and
+        "科学=教科版；道德与法治=人教版" in parent,
+        "parent student editor must expose structured textbooks and explicit other-textbook format")
+for subject_label in ["Text('语文')", "Text('数学')", "Text('英语')", "Text('其他教材（可选）')"]:
+    require(subject_label in parent, f"parent student editor missing textbook field: {subject_label}")
+require("StudentTextbooks.from(input)" in student_service and
+        "entity.chineseTextbook = textbooks.chinese()" in student_service and
+        "entity.textbookSummary = textbooks.summary()" in student_service,
+        "student service must persist structured textbooks and derive compatibility summary")
+require("StudentTextbooks.from(student).forSubject(subject)" in practice_generation,
+        "AI practice generation must consume the current subject structured textbook")
+for column in ["chinese_textbook", "math_textbook", "english_textbook", "other_textbooks"]:
+    require(column in textbook_migration, f"student textbook migration missing column: {column}")
+require(app_shell.count("label: '学生作业'") == 2 and "label: '进度'" not in app_shell,
+        "parent Phone and Pad navigation must label PROGRESS as 学生作业")
+
 require("export struct SettingsToggleRow" in selection_controls and
         "@Prop isEnabled: boolean = false;" in selection_controls and
         "Toggle({ type: ToggleType.Switch, isOn: this.isEnabled })" in selection_controls and
