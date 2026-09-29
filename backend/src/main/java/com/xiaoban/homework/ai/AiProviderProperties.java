@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "app.ai")
 public class AiProviderProperties {
+  private String provider = "AUTO";
   private String protocol = "responses";
   private String apiKey = "";
   private String baseUrl = "https://api.openai.com";
@@ -18,6 +19,8 @@ public class AiProviderProperties {
   private boolean structuredOutput = true;
   private boolean logPayloads = false;
 
+  public String getProvider() { return provider; }
+  public void setProvider(String provider) { this.provider = value(provider, "AUTO"); }
   public String getProtocol() { return protocol; }
   public void setProtocol(String protocol) { this.protocol = value(protocol, "responses"); }
   public String getApiKey() { return apiKey; }
