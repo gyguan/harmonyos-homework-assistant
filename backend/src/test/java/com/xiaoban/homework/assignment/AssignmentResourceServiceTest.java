@@ -41,7 +41,8 @@ class AssignmentResourceServiceTest {
     List<MultipartFile> images = new ArrayList<>();
     for (int i = 0; i < 12; i++) {
       images.add(new MockMultipartFile(
-          "images", "scene-" + i + ".jpg", "image/jpeg", new byte[] {1}));
+          "images", "scene-" + i + ".jpg", "image/jpeg",
+          new byte[] {(byte) 0xff, (byte) 0xd8, (byte) 0xff, 0x00}));
     }
 
     assertDoesNotThrow(() -> service.validateImages(images));
