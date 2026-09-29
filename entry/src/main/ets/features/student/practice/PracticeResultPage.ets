@@ -403,7 +403,7 @@ export struct PracticeResultPage {
               .enabled(!this.wrongRetrying)
               .onClick(() => this.onBack());
 
-            Button(this.wrongRetrying ? '正在准备…' : '再练 5 题', { type: ButtonType.Normal })
+            Button(this.wrongRetrying ? '正在准备…' : '再巩固', { type: ButtonType.Normal })
               .layoutWeight(1)
               .height(AppTheme.BUTTON_HEIGHT)
               .backgroundColor(this.wrongRetrying ? AppTheme.DISABLED : AppTheme.PRIMARY)
