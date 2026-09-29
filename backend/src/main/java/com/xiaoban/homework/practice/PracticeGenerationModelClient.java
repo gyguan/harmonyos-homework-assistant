@@ -3,6 +3,7 @@ package com.xiaoban.homework.practice;
 import com.xiaoban.homework.ai.AiProviderCapabilities;
 import com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol;
 import com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode;
+import com.xiaoban.homework.ai.AiProviderCapabilityResolver;
 import com.xiaoban.homework.ai.AiProviderProperties;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
 import com.xiaoban.homework.ai.StructuredJsonNormalizer;
@@ -21,12 +22,17 @@ public class PracticeGenerationModelClient {
   private static final Logger log = LoggerFactory.getLogger(PracticeGenerationModelClient.class);
 
   private final AiProviderProperties properties;
+  private final AiProviderCapabilityResolver capabilityResolver;
   private final OpenAiCompatibleTransport transport;
   private final JsonMapper mapper;
 
-  public PracticeGenerationModelClient(AiProviderProperties properties,
-      OpenAiCompatibleTransport transport, JsonMapper mapper) {
+  public PracticeGenerationModelClient(
+      AiProviderProperties properties,
+      AiProviderCapabilityResolver capabilityResolver,
+      OpenAiCompatibleTransport transport,
+      JsonMapper mapper) {
     this.properties = properties;
+    this.capabilityResolver = capabilityResolver;
     this.transport = transport;
     this.mapper = mapper;
   }
@@ -49,7 +55,7 @@ public class PracticeGenerationModelClient {
     String generationInput = input(textbookContext, grade, semester, request);
 
     AiProviderCapabilities capabilities =
-        transport.capabilities(properties.getPracticeModel());
+        capabilityResolver.resolve(properties.getPracticeModel());
     ApiProtocol protocol = capabilities.preferredProtocol();
     List<StructuredOutputMode> modes = capabilities.modes(protocol);
     List<GenerationAttempt> attempts = new ArrayList<>();
