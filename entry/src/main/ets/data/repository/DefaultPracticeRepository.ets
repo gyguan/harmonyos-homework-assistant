@@ -1,5 +1,6 @@
 import { BackendSession } from '../../application/remote/BackendSession';
 import { PracticeRemoteApi } from '../../application/remote/PracticeRemoteApi';
+import { DefaultFamilyContextRepository } from './DefaultFamilyContextRepository';
 import {
   PracticeAnswer,
   PracticeAttempt,
@@ -28,22 +29,36 @@ export class DefaultPracticeRepository implements PracticeRepository {
     this.remoteApi = remoteApi;
   }
 
-  listPapers(
+  async listPapers(
     grade: PracticeGrade,
     subject: PracticeSubject,
     semester: PracticeSemester,
     track: PracticeTrackFilter
   ): Promise<PracticePaper[]> {
+    if (BackendSession.instance.isConnected()) {
+      return this.remoteApi.listPapers(
+        DefaultFamilyContextRepository.instance.getActiveStudentId(),
+        grade, subject, semester, track);
+    }
     return this.contentProvider.listPapers(grade, subject, semester, track);
   }
 
-  getPaper(paperId: string, version: number): Promise<PracticePaper | null> {
+  async getPaper(paperId: string, version: number): Promise<PracticePaper | null> {
+    if (BackendSession.instance.isConnected()) {
+      return this.remoteApi.getPaper(
+        DefaultFamilyContextRepository.instance.getActiveStudentId(), paperId, version);
+    }
     return this.contentProvider.getPaper(paperId, version);
   }
 
-  startAttempt(studentId: string, paperId: string, version: number): Promise<PracticeAttempt> {
+  startAttempt(
+    studentId: string,
+    paperId: string,
+    version: number,
+    sourceAttemptId?: string
+  ): Promise<PracticeAttempt> {
     this.requireConnected();
-    return this.remoteApi.startAttempt(studentId, paperId, version);
+    return this.remoteApi.startAttempt(studentId, paperId, version, sourceAttemptId);
   }
 
   getAttempt(attemptId: string): Promise<PracticeAttempt> {
@@ -61,9 +76,9 @@ export class DefaultPracticeRepository implements PracticeRepository {
     return this.remoteApi.repeatAttempt(attemptId);
   }
 
-  retryWrongAttempt(attemptId: string): Promise<PracticeAttempt> {
+  retryWrongAttempt(attemptId: string, limit?: number): Promise<PracticeAttempt> {
     this.requireConnected();
-    return this.remoteApi.retryWrongAttempt(attemptId);
+    return this.remoteApi.retryWrongAttempt(attemptId, limit);
   }
 
   saveAnswer(attemptId: string, questionId: string, answerValue: string): Promise<PracticeAnswer> {

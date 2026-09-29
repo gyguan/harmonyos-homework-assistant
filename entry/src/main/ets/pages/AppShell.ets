@@ -1,6 +1,9 @@
 import {
   AppRoute,
   AssignmentRouteParam,
+  ParentPracticeGenerationRouteParam,
+  ParentPracticeGenerationResultRouteParam,
+  ParentScheduledAssignmentsRouteParam,
   ParentVoiceCreateRouteParam,
   PracticeAttemptRouteParam,
   PracticeHistoryRouteParam,
@@ -19,6 +22,12 @@ import { PageStateView } from '../components/state/PageStateView';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import { AssignmentAttentionKind } from '../domain/service/AssignmentAttentionPolicy';
+import {
+  PracticeDifficulty,
+  PracticeSubject,
+  PracticeTrack
+} from '../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
@@ -28,6 +37,9 @@ import { HomeworkImportInboxPage } from '../features/parent/import/HomeworkImpor
 import { HomeworkImportBatchDetailPage } from '../features/parent/import/HomeworkImportBatchDetailPage';
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
+import { ParentPracticeGenerationPage } from '../features/parent/practice/ParentPracticeGenerationPage';
+import { ParentPracticeGenerationResultPage } from '../features/parent/practice/ParentPracticeGenerationResultPage';
+import { ParentScheduledAssignmentPage } from '../features/parent/scheduled/ParentScheduledAssignmentPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
 import { StudentAssignmentDetailPage } from '../features/student/assignments/StudentAssignmentDetailPage';
@@ -68,8 +80,12 @@ export struct AppShell {
   @State private heightVp: number = 844;
   @State private studentRoute: StudentRoute = StudentRoute.HOME;
   @State private parentRoute: ParentRoute = ParentRoute.DASHBOARD;
+  @State private studentAttentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
+  @State private parentAttentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
   @State private demoScenario: DemoScenario = DemoScenario.NORMAL;
   @State private storeRevision: number = 0;
+  @State private practiceRevision: number = 0;
+  @State private importRevision: number = 0;
   @State private activeStudentId: string = '';
   @State private familyStudents: StudentProfile[] = [];
   @State private identityParentActive: boolean = false;
@@ -175,10 +191,42 @@ export struct AppShell {
     this.storeRevision++;
   }
 
+  private notifyPracticeChanged(): void {
+    this.practiceRevision++;
+  }
+
+  private notifyImportChanged(): void {
+    this.importRevision++;
+  }
+
   private resetPersonaNavigation(): void {
     this.navPathStack.clear();
     this.studentRoute = StudentRoute.HOME;
     this.parentRoute = ParentRoute.DASHBOARD;
+    this.studentAttentionKind = AssignmentAttentionKind.NONE;
+    this.parentAttentionKind = AssignmentAttentionKind.NONE;
+  }
+
+  private selectStudentRoute(route: StudentRoute): void {
+    this.studentAttentionKind = AssignmentAttentionKind.NONE;
+    this.studentRoute = route;
+  }
+
+  private selectParentRoute(route: ParentRoute): void {
+    this.parentAttentionKind = AssignmentAttentionKind.NONE;
+    this.parentRoute = route;
+  }
+
+  private openStudentAttention(kind: AssignmentAttentionKind): void {
+    if (kind === AssignmentAttentionKind.NONE) return;
+    this.studentAttentionKind = kind;
+    this.studentRoute = StudentRoute.ASSIGNMENTS;
+  }
+
+  private openParentAttention(kind: AssignmentAttentionKind): void {
+    if (kind === AssignmentAttentionKind.NONE) return;
+    this.parentAttentionKind = kind;
+    this.parentRoute = ParentRoute.PROGRESS;
   }
 
   private onRoleChanged(): void {
@@ -186,6 +234,8 @@ export struct AppShell {
     this.identityParentActive = this.role === AppRole.PARENT;
     this.syncFamilyContext();
     this.storeRevision++;
+    this.practiceRevision++;
+    this.importRevision++;
   }
 
   private openIdentitySwitcher(): void {
@@ -221,6 +271,8 @@ export struct AppShell {
     this.resetPersonaNavigation();
     this.syncFamilyContext();
     this.storeRevision++;
+    this.practiceRevision++;
+    this.importRevision++;
     void this.refreshActiveStudent();
   }
 
@@ -274,12 +326,14 @@ export struct AppShell {
 
   private finishShareImportReady(): void {
     this.shareImportToken = '';
+    this.notifyImportChanged();
     ParentImportNavigator.openConfirmation(this.navPathStack);
   }
 
   private finishShareImportEmpty(): void {
     this.shareImportToken = '';
-    ParentImportNavigator.openInbox(this.navPathStack);
+    this.notifyImportChanged();
+    ParentImportNavigator.openRecords(this.navPathStack);
   }
 
   private cancelShareImport(): void {
@@ -289,13 +343,43 @@ export struct AppShell {
   private finishParentImportPublished(): void {
     this.parentRoute = ParentRoute.DASHBOARD;
     this.navPathStack.clear();
-    // Batch publish already updates the authoritative assignment cache.
+    // Batch publish updates both the assignment cache and the import batch status.
     this.notifyUiChanged();
+    this.notifyImportChanged();
   }
 
   private openParentVoiceCreate(): void {
     this.navPathStack.pushPathByName(
       AppRoute.PARENT_VOICE_CREATE, new ParentVoiceCreateRouteParam());
+  }
+
+  private openParentScheduledAssignments(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_SCHEDULED_ASSIGNMENTS, new ParentScheduledAssignmentsRouteParam());
+  }
+
+  private openParentPracticeGeneration(): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_PRACTICE_GENERATION, new ParentPracticeGenerationRouteParam());
+  }
+
+  private openParentPracticeGenerationResult(
+    subject: PracticeSubject,
+    track: PracticeTrack,
+    difficulty: PracticeDifficulty,
+    questionCount: number,
+    requirement: string
+  ): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_PRACTICE_GENERATION_RESULT,
+      new ParentPracticeGenerationResultRouteParam(
+        subject, track, difficulty, questionCount, requirement));
+  }
+
+  private finishParentPracticePublished(): void {
+    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    this.notifyPracticeChanged();
   }
 
   private routeAssignmentId(param: Object): string {
@@ -313,12 +397,14 @@ export struct AppShell {
     if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
       StudentAssignmentsPage({
         revision: this.storeRevision,
+        attentionKind: this.studentAttentionKind,
         onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
-        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId)
+        onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onAttentionFilterCleared: () => this.studentAttentionKind = AssignmentAttentionKind.NONE
       });
     } else if (this.studentRoute === StudentRoute.PRACTICE) {
       PracticeHomePage({
-        revision: this.storeRevision,
+        revision: this.practiceRevision,
         onOpenPaper: (paperId: string, version: number) => this.openPracticePaper(paperId, version),
         onOpenHistory: () => this.openPracticeHistory()
       });
@@ -331,6 +417,7 @@ export struct AppShell {
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
+        onOpenAttention: (kind: AssignmentAttentionKind) => this.openStudentAttention(kind),
         onStoreChanged: () => this.notifyUiChanged()
       });
     }
@@ -364,6 +451,7 @@ export struct AppShell {
       NavDestination() {
         PracticeHistoryPage({
           paperId: (param as PracticeHistoryRouteParam).paperId,
+          revision: this.practiceRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenAttempt: (attemptId: string) => this.openPracticeAttempt(attemptId),
           onOpenResult: (attemptId: string) => this.openPracticeResult(attemptId)
@@ -376,8 +464,12 @@ export struct AppShell {
         PracticePaperDetailPage({
           paperId: (param as PracticePaperRouteParam).paperId,
           version: (param as PracticePaperRouteParam).version,
+          revision: this.practiceRevision,
           onBack: () => this.navPathStack.pop(),
-          onStarted: (attemptId: string) => this.openPracticeAttempt(attemptId),
+          onStarted: (attemptId: string) => {
+            this.notifyPracticeChanged();
+            this.openPracticeAttempt(attemptId);
+          },
           onOpenAttempt: (attemptId: string) => this.openPracticeAttempt(attemptId),
           onOpenHistory: (paperId: string) => this.openPracticeHistory(paperId)
         });
@@ -389,7 +481,10 @@ export struct AppShell {
         PracticeAttemptPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
           onBack: () => this.navPathStack.pop(),
-          onSubmitted: (attemptId: string) => this.replacePracticeAttemptWithResult(attemptId)
+          onSubmitted: (attemptId: string) => {
+            this.notifyPracticeChanged();
+            this.replacePracticeAttemptWithResult(attemptId);
+          }
         });
       }
       .hideTitleBar(true)
@@ -399,7 +494,10 @@ export struct AppShell {
         PracticeResultPage({
           attemptId: (param as PracticeAttemptRouteParam).attemptId,
           onBack: () => this.navPathStack.pop(),
-          onRepeatStarted: (attemptId: string) => this.replacePracticeResultWithAttempt(attemptId)
+          onRepeatStarted: (attemptId: string) => {
+            this.notifyPracticeChanged();
+            this.replacePracticeResultWithAttempt(attemptId);
+          }
         });
       }
       .hideTitleBar(true)
@@ -422,6 +520,7 @@ export struct AppShell {
           revision: this.storeRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
+          onOpenRecords: () => ParentImportNavigator.openRecords(this.navPathStack),
           onStoreChanged: () => this.notifyUiChanged()
         });
       }
@@ -430,6 +529,7 @@ export struct AppShell {
     } else if (name === AppRoute.PARENT_IMPORT_INBOX) {
       NavDestination() {
         HomeworkImportInboxPage({
+          revision: this.importRevision,
           onBack: () => this.navPathStack.pop(),
           onOpenBatch: (batchId: string) => ParentImportNavigator.openBatch(
             this.navPathStack, batchId)
@@ -441,8 +541,10 @@ export struct AppShell {
       NavDestination() {
         HomeworkImportBatchDetailPage({
           batchId: ParentImportNavigator.batchId(param),
+          revision: this.importRevision,
           onBack: () => this.navPathStack.pop(),
-          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack)
+          onOpenConfirmation: () => ParentImportNavigator.openConfirmation(this.navPathStack),
+          onChanged: () => this.notifyImportChanged()
         });
       }
       .hideTitleBar(true)
@@ -454,6 +556,48 @@ export struct AppShell {
           onBack: () => this.navPathStack.pop(),
           onPublished: () => this.finishParentImportPublished(),
           onStoreChanged: () => this.notifyUiChanged()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_SCHEDULED_ASSIGNMENTS) {
+      NavDestination() {
+        ParentScheduledAssignmentPage({
+          onBack: () => this.navPathStack.pop()
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_PRACTICE_GENERATION) {
+      NavDestination() {
+        ParentPracticeGenerationPage({
+          onBack: () => this.navPathStack.pop(),
+          onGenerate: (
+            subject,
+            track,
+            difficulty,
+            questionCount,
+            requirement
+          ) => this.openParentPracticeGenerationResult(
+            subject,
+            track,
+            difficulty,
+            questionCount,
+            requirement)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_PRACTICE_GENERATION_RESULT) {
+      NavDestination() {
+        ParentPracticeGenerationResultPage({
+          subject: (param as ParentPracticeGenerationResultRouteParam).subject as PracticeSubject,
+          track: (param as ParentPracticeGenerationResultRouteParam).track as PracticeTrack,
+          difficulty: (param as ParentPracticeGenerationResultRouteParam).difficulty as PracticeDifficulty,
+          questionCount: (param as ParentPracticeGenerationResultRouteParam).questionCount,
+          requirement: (param as ParentPracticeGenerationResultRouteParam).requirement,
+          onBack: () => this.navPathStack.pop(),
+          onPublished: () => this.finishParentPracticePublished()
         });
       }
       .hideTitleBar(true)
@@ -478,7 +622,9 @@ export struct AppShell {
     if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
         revision: this.storeRevision,
-        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId)
+        attentionKind: this.parentAttentionKind,
+        onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),
+        onAttentionFilterCleared: () => this.parentAttentionKind = AssignmentAttentionKind.NONE
       });
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
       BackendConnectionPage({
@@ -486,9 +632,12 @@ export struct AppShell {
       });
     } else {
       ParentDashboardPage({
+        revision: this.storeRevision,
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
-        onOpenInbox: () => ParentImportNavigator.openInbox(this.navPathStack),
-        onOpenVoice: () => this.openParentVoiceCreate()
+        onOpenVoice: () => this.openParentVoiceCreate(),
+        onOpenScheduled: () => this.openParentScheduledAssignments(),
+        onOpenPracticeGeneration: () => this.openParentPracticeGeneration(),
+        onOpenAttention: (kind: AssignmentAttentionKind) => this.openParentAttention(kind)
       });
     }
   }
@@ -510,32 +659,32 @@ export struct AppShell {
       if (this.role === AppRole.STUDENT) {
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.studentRoute === StudentRoute.HOME,
-          onSelect: () => this.studentRoute = StudentRoute.HOME
+          onSelect: () => this.selectStudentRoute(StudentRoute.HOME)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_square'), label: '作业', selected: this.studentRoute === StudentRoute.ASSIGNMENTS,
-          onSelect: () => this.studentRoute = StudentRoute.ASSIGNMENTS
+          onSelect: () => this.selectStudentRoute(StudentRoute.ASSIGNMENTS)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '练习', selected: this.studentRoute === StudentRoute.PRACTICE,
-          onSelect: () => this.studentRoute = StudentRoute.PRACTICE
+          onSelect: () => this.selectStudentRoute(StudentRoute.PRACTICE)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.studentRoute === StudentRoute.PROFILE,
-          onSelect: () => this.studentRoute = StudentRoute.PROFILE
+          onSelect: () => this.selectStudentRoute(StudentRoute.PROFILE)
         }).layoutWeight(1).height('100%');
       } else {
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.parentRoute === ParentRoute.DASHBOARD,
-          onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
+          onSelect: () => this.selectParentRoute(ParentRoute.DASHBOARD)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
-          symbol: $r('sys.symbol.checkmark_circle'), label: '进度', selected: this.parentRoute === ParentRoute.PROGRESS,
-          onSelect: () => this.parentRoute = ParentRoute.PROGRESS
+          symbol: $r('sys.symbol.checkmark_circle'), label: '学生作业', selected: this.parentRoute === ParentRoute.PROGRESS,
+          onSelect: () => this.selectParentRoute(ParentRoute.PROGRESS)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.parentRoute === ParentRoute.SETTINGS,
-          onSelect: () => this.parentRoute = ParentRoute.SETTINGS
+          onSelect: () => this.selectParentRoute(ParentRoute.SETTINGS)
         }).layoutWeight(1).height('100%');
       }
     }
@@ -564,32 +713,32 @@ export struct AppShell {
       if (this.role === AppRole.STUDENT) {
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.studentRoute === StudentRoute.HOME,
-          onSelect: () => this.studentRoute = StudentRoute.HOME
+          onSelect: () => this.selectStudentRoute(StudentRoute.HOME)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_square'), label: '作业', selected: this.studentRoute === StudentRoute.ASSIGNMENTS,
-          onSelect: () => this.studentRoute = StudentRoute.ASSIGNMENTS
+          onSelect: () => this.selectStudentRoute(StudentRoute.ASSIGNMENTS)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '练习', selected: this.studentRoute === StudentRoute.PRACTICE,
-          onSelect: () => this.studentRoute = StudentRoute.PRACTICE
+          onSelect: () => this.selectStudentRoute(StudentRoute.PRACTICE)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.studentRoute === StudentRoute.PROFILE,
-          onSelect: () => this.studentRoute = StudentRoute.PROFILE
+          onSelect: () => this.selectStudentRoute(StudentRoute.PROFILE)
         });
       } else {
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.house'), label: '首页', selected: this.parentRoute === ParentRoute.DASHBOARD,
-          onSelect: () => this.parentRoute = ParentRoute.DASHBOARD
+          onSelect: () => this.selectParentRoute(ParentRoute.DASHBOARD)
         });
         SidePrimaryNavItem({
-          symbol: $r('sys.symbol.checkmark_circle'), label: '进度', selected: this.parentRoute === ParentRoute.PROGRESS,
-          onSelect: () => this.parentRoute = ParentRoute.PROGRESS
+          symbol: $r('sys.symbol.checkmark_circle'), label: '学生作业', selected: this.parentRoute === ParentRoute.PROGRESS,
+          onSelect: () => this.selectParentRoute(ParentRoute.PROGRESS)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.parentRoute === ParentRoute.SETTINGS,
-          onSelect: () => this.parentRoute = ParentRoute.SETTINGS
+          onSelect: () => this.selectParentRoute(ParentRoute.SETTINGS)
         });
       }
 
@@ -709,7 +858,7 @@ export struct AppShell {
           HomeworkShareImportStatusPage({
             token: this.shareImportToken,
             onReady: () => this.finishShareImportReady(),
-            onOpenInbox: () => this.finishShareImportEmpty(),
+            onOpenRecords: () => this.finishShareImportEmpty(),
             onCancel: () => this.cancelShareImport()
           });
         }

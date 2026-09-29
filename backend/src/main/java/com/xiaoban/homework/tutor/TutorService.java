@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,7 +87,12 @@ public class TutorService {
     TutorSessionEntity session = new TutorSessionEntity();
     session.id = UUID.randomUUID(); session.familyId = familyId; session.studentId = studentId; session.assignmentId = assignmentId;
     session.createdAt = now; session.updatedAt = now;
-    return sessions.save(session);
+    try {
+      return sessions.saveAndFlush(session);
+    } catch (DataIntegrityViolationException collision) {
+      return sessions.findByFamilyIdAndAssignmentId(familyId, assignmentId)
+          .orElseThrow(() -> collision);
+    }
   }
 
   private TutorDtos.Conversation response(TutorSessionEntity session, boolean available, String notice,

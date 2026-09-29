@@ -2,6 +2,7 @@ import { common } from '@kit.AbilityKit';
 import { fileIo, fileUri } from '@kit.CoreFileKit';
 import { camera, cameraPicker } from '@kit.CameraKit';
 import { photoAccessHelper } from '@kit.MediaLibraryKit';
+import { image } from '@kit.ImageKit';
 import { DefaultSubmissionLocalDataSource, SubmissionLocalDataSource } from '../../data/local/SubmissionLocalDataSource';
 import { DefaultAssignmentRepository } from '../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, Submission } from '../../domain/model/HomeworkModels';
@@ -9,6 +10,13 @@ import { RemoteAssignmentMapper } from '../remote/RemoteModels';
 import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
 
 const MAX_SUBMISSION_PHOTOS: number = 6;
+const MIN_SUBMISSION_PHOTO_EDGE: number = 640;
+const MIN_SUBMISSION_PHOTO_BYTES: number = 24 * 1024;
+
+export interface SubmissionPreflightResult {
+  passed: boolean;
+  message: string;
+}
 
 export class HomeworkSubmissionService {
   static readonly instance: HomeworkSubmissionService = new HomeworkSubmissionService();
@@ -69,6 +77,65 @@ export class HomeworkSubmissionService {
     } catch {
       return '';
     }
+  }
+
+  async preflight(photoUris: string[]): Promise<SubmissionPreflightResult> {
+    if (photoUris.length === 0 || photoUris.length > MAX_SUBMISSION_PHOTOS) {
+      return { passed: false, message: '请添加 1-6 张作业照片后再提交' };
+    }
+
+    let seenUris: Set<string> = new Set<string>();
+    for (let index = 0; index < photoUris.length; index++) {
+      let sourceUri = photoUris[index].trim();
+      if (seenUris.has(sourceUri)) {
+        return { passed: false, message: `第 ${index + 1} 张照片重复了，请删除重复照片后再提交` };
+      }
+      seenUris.add(sourceUri);
+
+      let source: fileIo.File | null = null;
+      let imageSource: image.ImageSource | null = null;
+      try {
+        source = await fileIo.open(sourceUri, fileIo.OpenMode.READ_ONLY);
+        let stat = fileIo.statSync(source.fd);
+        if (stat.size < MIN_SUBMISSION_PHOTO_BYTES) {
+          return {
+            passed: false,
+            message: `第 ${index + 1} 张照片文件过小，请重新拍摄或选择原图`
+          };
+        }
+
+        imageSource = image.createImageSource(source.fd);
+        let info = await imageSource.getImageInfo(0);
+        if (info.size.width < MIN_SUBMISSION_PHOTO_EDGE || info.size.height < MIN_SUBMISSION_PHOTO_EDGE) {
+          return {
+            passed: false,
+            message: `第 ${index + 1} 张照片尺寸过小，请重新拍摄或选择原图`
+          };
+        }
+      } catch {
+        return {
+          passed: false,
+          message: `第 ${index + 1} 张照片无法读取，请重新选择或拍照`
+        };
+      } finally {
+        if (imageSource !== null) {
+          try {
+            await imageSource.release();
+          } catch {
+            // Cleanup is best-effort and must not replace the photo validation result.
+          }
+        }
+        if (source !== null) {
+          try {
+            await fileIo.close(source);
+          } catch {
+            // Cleanup is best-effort and must not replace the photo validation result.
+          }
+        }
+      }
+    }
+
+    return { passed: true, message: '' };
   }
 
   async submit(assignmentId: string, photoUris: string[]): Promise<boolean> {

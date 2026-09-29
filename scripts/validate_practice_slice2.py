@@ -105,7 +105,8 @@ require("subtitle: this.headerSubtitle()" in result_page and "paperTitle" in res
 require("paperTitle(result: PracticeResult)" in result_vm and "item.paperTitle" in result_vm,
         "Practice result must resolve the paper title without changing backend result DTOs")
 require("replacePracticeAttemptWithResult" in shell and
-        "onSubmitted: (attemptId: string) => this.replacePracticeAttemptWithResult(attemptId)" in shell,
+        "onSubmitted: (attemptId: string) => {" in shell and
+        "this.replacePracticeAttemptWithResult(attemptId);" in shell,
         "Submitting practice must replace the completed attempt route with the result route")
 
 for route in ["STUDENT_PRACTICE_PAPER", "STUDENT_PRACTICE_ATTEMPT", "STUDENT_PRACTICE_RESULT"]:

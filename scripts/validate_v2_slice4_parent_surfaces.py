@@ -87,14 +87,18 @@ require("LayoutPolicy.parentHomeRequirement()" in home and "availableWidthVp" in
         "Parent Home must choose wide composition from actual container width + LayoutPolicy")
 require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in home and "AppTheme.CONTENT_WIDE_MAX_WIDTH" in home,
         "Parent Home must keep readable fallback and capped Pad composition")
-for phrase in ["布置作业", "语音作业", "作业收件箱"]:
+for phrase in ["布置作业", "语音作业", "定时作业", "AI生成练习"]:
     require(phrase in home, f"Parent Home missing required action: {phrase}")
+require("作业收件箱" not in home and "AssignmentInboxAction" not in home,
+        "Parent Home must not expose import history as a primary action")
 require("今天的学习" not in home and "需要我处理" not in home and "AssignmentMetricSummary" not in home,
         "Parent Home must remain action-only; progress/status information belongs to Progress")
 require("最近动态" not in home and "ChildPerformance" not in home,
         "Parent Home must not reintroduce duplicate progress or recent-activity sections")
-require("onOpenAssignment" in home and "onOpenVoice" in home and "onOpenInbox" in home,
-        "Parent Home must expose exactly the three high-frequency parent actions")
+require("onOpenAssignment" in home and "onOpenVoice" in home and
+        "onOpenScheduled" in home and "onOpenPracticeGeneration" in home and
+        "onOpenInbox" not in home,
+        "Parent Home must expose only the four high-frequency parent actions")
 require("Text('家长操作')" not in home and "private PageIntro()" not in home,
         "Parent Home must not repeat a title already represented by primary navigation")
 require("LayoutPolicy.parentProgressReviewRequirement()" in progress and "availableWidthVp" in progress,
@@ -223,8 +227,9 @@ if len(parent_home_call) == 2:
     require("sizeClass:" not in call,
             "AppShell must not pass shell WindowSizeClass into migrated Parent Home")
 
-require("this.queryCache = AssignmentQuery.filter(mapped, filter)" in repo,
-        "Repository remote query results must still apply the complete filter for multi-status parent views")
+require("let result = AssignmentQuery.filter(mapped, filter)" in repo and
+        "this.replaceQueryCacheIfCurrent(studentId, result)" in repo,
+        "Repository remote query results must still apply the complete filter and keep cache ownership student-scoped")
 
 for phrase in ["首页只承担高频操作入口", "作业列表 | 提交证据 / 验收详情", "[通过]", "[退回订正]"]:
     require(phrase in issue_spec, f"V2 UI spec missing Slice 4 contract phrase: {phrase}")

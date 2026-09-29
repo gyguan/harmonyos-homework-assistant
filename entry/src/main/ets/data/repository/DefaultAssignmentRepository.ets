@@ -14,6 +14,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   private remoteSummary: TodaySummary | null = null;
   private remoteSummaryStudentId: string = '';
   private queryCache: Assignment[] = [];
+  private queryCacheStudentId: string = '';
   private readonly local: AssignmentLocalDataSource = DefaultAssignmentLocalDataSource.instance;
   private syncRunning: boolean = false;
   private syncRequested: boolean = false;
@@ -50,32 +51,40 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   }
 
   async query(filter: AssignmentFilter): Promise<Assignment[]> {
+    let studentId = this.local.getActiveStudentId();
     if (!BackendSession.instance.isConnected()) {
-      this.queryCache = this.listCached(filter);
-      return this.queryCache.slice();
+      let cached = AssignmentQuery.filter(this.local.listAssignmentsForStudent(studentId), filter);
+      this.replaceQueryCacheIfCurrent(studentId, cached);
+      return cached.slice();
     }
     try {
-      let studentId = this.local.getActiveStudentId();
       let remoteItems = await HomeworkRemoteApi.instance.listFiltered(studentId, filter);
       let mapped: Assignment[] = [];
       for (let remote of remoteItems) {
-        let existing = this.local.getAssignment(remote.id);
+        let existing = this.local.getAssignmentForStudent(studentId, remote.id);
         mapped.push(RemoteAssignmentMapper.toLocal(remote, existing));
       }
       // The backend query can intentionally receive only filters it supports efficiently
       // (for example a single status). Always apply the complete V2 filter locally too so
       // multi-status views such as Parent "需关注" have exact semantics.
-      this.queryCache = AssignmentQuery.filter(mapped, filter);
-      return this.queryCache.slice();
+      let result = AssignmentQuery.filter(mapped, filter);
+      this.replaceQueryCacheIfCurrent(studentId, result);
+      return result.slice();
     } catch {
-      this.queryCache = this.listCached(filter);
-      return this.queryCache.slice();
+      let cached = AssignmentQuery.filter(this.local.listAssignmentsForStudent(studentId), filter);
+      this.replaceQueryCacheIfCurrent(studentId, cached);
+      return cached.slice();
     }
   }
 
   getCached(assignmentId: string): Assignment | null {
-    for (let item of this.queryCache) if (item.id === assignmentId) return item;
-    return this.local.getAssignment(assignmentId);
+    let studentId = this.local.getActiveStudentId();
+    if (this.queryCacheStudentId === studentId) {
+      for (let item of this.queryCache) {
+        if (item.id === assignmentId && item.studentId === studentId) return item;
+      }
+    }
+    return this.local.getAssignmentForStudent(studentId, assignmentId);
   }
 
   getCachedSummary(): TodaySummary {
@@ -198,11 +207,12 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
   }
 
   async deleteAssignments(assignmentIds: string[]): Promise<number> {
+    let studentId = this.local.getActiveStudentId();
     let ids: string[] = [];
     let seen: Set<string> = new Set<string>();
     for (let assignmentId of assignmentIds) {
       if (assignmentId.length === 0 || seen.has(assignmentId)) continue;
-      let current = this.getCached(assignmentId);
+      let current = this.local.getAssignmentForStudent(studentId, assignmentId);
       if (current === null) continue;
       if (current.status === AssignmentStatus.COMPLETED) {
         throw new Error('已完成作业不能删除');
@@ -214,7 +224,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
     let remoteIds: string[] = [];
     for (let assignmentId of ids) {
-      let current = this.getCached(assignmentId);
+      let current = this.local.getAssignmentForStudent(studentId, assignmentId);
       if (current !== null && current.backing === AssignmentBacking.REMOTE) {
         remoteIds.push(assignmentId);
       }
@@ -225,38 +235,40 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
     let deleted: Set<string> = new Set<string>();
     for (let assignmentId of ids) {
-      let current = this.getCached(assignmentId);
+      let current = this.local.getAssignmentForStudent(studentId, assignmentId);
       let isRemote = current !== null && current.backing === AssignmentBacking.REMOTE;
       if (isRemote) {
         let success = await HomeworkRemoteApi.instance.delete(assignmentId);
         if (!success) {
-          this.removeCachedAssignments(deleted);
+          this.removeCachedAssignments(studentId, deleted);
           throw new Error(deleted.size > 0 ? '部分作业已删除，其余删除失败，请刷新后重试' : '删除作业失败，请刷新后重试');
         }
       }
       deleted.add(assignmentId);
     }
 
-    this.removeCachedAssignments(deleted);
+    this.removeCachedAssignments(studentId, deleted);
     return deleted.size;
   }
 
-  private removeCachedAssignments(ids: Set<string>): void {
+  private removeCachedAssignments(studentId: string, ids: Set<string>): void {
     if (ids.size === 0) return;
     let remaining: Assignment[] = [];
-    for (let item of this.local.listAssignments()) {
+    for (let item of this.local.listAssignmentsForStudent(studentId)) {
       if (!ids.has(item.id)) remaining.push(item);
     }
-    this.local.replaceAssignmentsForActiveStudent(remaining);
+    this.local.replaceAssignmentsForStudent(studentId, remaining);
 
-    let queryRemaining: Assignment[] = [];
-    for (let item of this.queryCache) {
-      if (!ids.has(item.id)) queryRemaining.push(item);
+    if (this.queryCacheStudentId === studentId) {
+      let queryRemaining: Assignment[] = [];
+      for (let item of this.queryCache) {
+        if (!ids.has(item.id)) queryRemaining.push(item);
+      }
+      this.queryCache = queryRemaining;
     }
-    this.queryCache = queryRemaining;
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
-    this.emitChanged();
+    if (this.local.getActiveStudentId() === studentId) this.emitChanged();
   }
 
   applyAuthoritative(updated: Assignment): void {
@@ -265,8 +277,9 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
   applyAuthoritativeBatch(updatedItems: Assignment[]): void {
     if (updatedItems.length === 0) return;
-    let assignments = this.local.listAssignments();
+    let activeChanged = false;
     for (let updated of updatedItems) {
+      let assignments = this.local.listAssignmentsForStudent(updated.studentId);
       let replaced = false;
       for (let i = 0; i < assignments.length; i++) {
         if (assignments[i].id !== updated.id) continue;
@@ -275,36 +288,37 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
         break;
       }
       if (!replaced) assignments.push(updated);
+      this.local.replaceAssignmentsForStudent(updated.studentId, assignments);
       this.replaceQueryCacheItem(updated);
+      if (this.local.getActiveStudentId() === updated.studentId) activeChanged = true;
     }
-    this.local.replaceAssignmentsForActiveStudent(assignments);
     // Any authoritative mutation can change nextAssignmentId/progress counters.
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
-    this.emitChanged();
+    if (activeChanged) this.emitChanged();
   }
 
   async refresh(): Promise<boolean> {
-    // One authoritative assignment snapshot is enough to rebuild every cached home/progress metric.
-    // Submission evidence is deliberately loaded on demand by ParentSubmissionEvidenceService;
-    // never fan out one submissions request per assignment during a general refresh.
-    this.queryCache = [];
+    // Capture identity before the first await. Async responses are always written back to the
+    // student that started the request, never to whoever happens to be active when it returns.
+    let studentId = this.local.getActiveStudentId();
+    if (this.queryCacheStudentId === studentId) this.queryCache = [];
+    this.queryCacheStudentId = studentId;
     this.remoteSummary = null;
     this.remoteSummaryStudentId = '';
     if (!BackendSession.instance.isConnected()) return false;
-    let synced = await this.syncActiveStudentAssignments();
+    let synced = await this.syncStudentAssignments(studentId);
     if (!synced) return false;
 
-    let activeStudentId = this.local.getActiveStudentId();
+    if (this.local.getActiveStudentId() !== studentId) return true;
     this.remoteSummary = this.local.getTodaySummary();
-    this.remoteSummaryStudentId = activeStudentId;
+    this.remoteSummaryStudentId = studentId;
     this.emitChanged();
     return true;
   }
 
-  private async syncActiveStudentAssignments(): Promise<boolean> {
+  private async syncStudentAssignments(studentId: string): Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;
-    let studentId = this.local.getActiveStudentId();
     try {
       // Fetch the server snapshot exactly once. Mutating commands below already return the
       // authoritative Assignment, so there is no reason to GET the same list a second time.
@@ -316,7 +330,7 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
         remoteOrder.push(item.id);
       }
 
-      let localAssignments = this.local.listAssignments();
+      let localAssignments = this.local.listAssignmentsForStudent(studentId);
       let dirtyEntries: AssignmentSyncEntry[] = [];
       for (let assignment of localAssignments) {
         let existing = remoteById.get(assignment.id);
@@ -353,9 +367,10 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
       for (let assignmentId of remoteOrder) {
         let item = remoteById.get(assignmentId);
         if (item === undefined) continue;
-        merged.push(RemoteAssignmentMapper.toLocal(item, this.local.getAssignment(item.id)));
+        merged.push(RemoteAssignmentMapper.toLocal(
+          item, this.local.getAssignmentForStudent(studentId, item.id)));
       }
-      this.local.replaceAssignmentsForActiveStudent(merged);
+      this.local.replaceAssignmentsForStudent(studentId, merged);
       return true;
     } catch {
       return false;
@@ -371,7 +386,8 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
 
   private async reloadRemote(assignmentId: string): Promise<Assignment> {
     let latestRemote = await HomeworkRemoteApi.instance.get(assignmentId);
-    let latest = RemoteAssignmentMapper.toLocal(latestRemote, this.local.getAssignment(assignmentId));
+    let latest = RemoteAssignmentMapper.toLocal(
+      latestRemote, this.local.getAssignmentForStudent(latestRemote.studentId, assignmentId));
     this.applyAuthoritative(latest);
     return latest;
   }
@@ -431,7 +447,14 @@ export class DefaultAssignmentRepository implements AssignmentRepository {
     return updated;
   }
 
+  private replaceQueryCacheIfCurrent(studentId: string, items: Assignment[]): void {
+    if (this.local.getActiveStudentId() !== studentId) return;
+    this.queryCacheStudentId = studentId;
+    this.queryCache = items.slice();
+  }
+
   private replaceQueryCacheItem(updated: Assignment): void {
+    if (this.queryCacheStudentId !== updated.studentId) return;
     for (let i = 0; i < this.queryCache.length; i++) {
       if (this.queryCache[i].id !== updated.id) continue;
       this.queryCache[i] = updated;

@@ -81,7 +81,7 @@ Final Cleanup 期间增加结构约束：除 `data/HomeworkStore.ets` 自身外�
 | `domain/model/PersistenceModels.ets` | EVOLVE | versioned snapshot DTO | 始终保留 schemaVersion | KEEP |
 | `domain/port/HomeworkPersistence.ets` | KEEP | 本地快照端口 | 无 | KEEP |
 | Preferences persistence adapter | KEEP/EVOLVE | Snapshot storage | migration framework 接入 | Slice 0 |
-| `SNAPSHOT_SCHEMA_VERSION = 4` | EVOLVE | explicit migrator chain | migration tests 完成 | Slice 0 |
+| `HOMEWORK_SNAPSHOT_SCHEMA_VERSION = 10` | KEEP/EVOLVE | explicit V4→V10 migrator chain | 后续 schema 变化必须继续逐版本迁移 | KEEP |
 
 V2 不通过“默认值兼容”替代显式 snapshot migration。
 

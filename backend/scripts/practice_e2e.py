@@ -19,6 +19,20 @@ def main() -> int:
         student_id = "student-xiaoyu-001"
         paper_id = "MATH-G2-S1-SYNC-ADD-SUB-001"
 
+        catalog = expect(
+            http(
+                base_url,
+                "GET",
+                f"/api/v1/students/{student_id}/practice/papers"
+                "?grade=G2&subject=MATH&semester=S1&track=TEXTBOOK_SYNC",
+                token=token,
+            ),
+            (200,),
+            "list visible textbook-sync practice papers",
+        ).json()
+        require(isinstance(catalog, list) and any(item.get("id") == paper_id for item in catalog),
+                "visible practice catalog must include the expected PRESET paper")
+
         paper = expect(
             http(base_url, "GET", f"/api/v1/practice/papers/{paper_id}?version=3", token=token),
             (200,),
@@ -298,6 +312,14 @@ def main() -> int:
         ).json()
         require(int(repeated_result.get("score", -1)) == 0,
                 "repeated attempt must be judged independently from the source attempt")
+
+        bounded_wrong_only = expect(
+            http(base_url, "POST", f"/api/v1/practice/attempts/{attempt_id}/wrong-only?limit=5", token=token),
+            (200,),
+            "create bounded wrong-only reinforcement fallback",
+        ).json()
+        require(len(bounded_wrong_only.get("questions") or []) == 5,
+                "bounded wrong-only fallback must contain at most five source mistakes")
 
         wrong_only = expect(
             http(base_url, "POST", f"/api/v1/practice/attempts/{attempt_id}/wrong-only", token=token),

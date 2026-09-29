@@ -134,8 +134,18 @@ export class HomeworkStore {
   }
 
   private cloneStudent(source: StudentProfile): StudentProfile {
-    return { id: source.id, name: source.name, grade: source.grade, className: source.className,
-      semester: source.semester, textbookSummary: source.textbookSummary };
+    return {
+      id: source.id,
+      name: source.name,
+      grade: source.grade,
+      className: source.className,
+      semester: source.semester,
+      chineseTextbook: source.chineseTextbook,
+      mathTextbook: source.mathTextbook,
+      englishTextbook: source.englishTextbook,
+      otherTextbooks: source.otherTextbooks,
+      textbookSummary: source.textbookSummary
+    };
   }
 
   private cloneSettings(source: AppSettings): AppSettings {
@@ -299,17 +309,29 @@ export class HomeworkStore {
   }
 
   getAssignments(): Assignment[] {
+    return this.getAssignmentsForStudent(this.getActiveStudentId());
+  }
+
+  getAssignmentsForStudent(studentId: string): Assignment[] {
     let result: Assignment[] = [];
-    let studentId = this.getActiveStudentId();
-    for (let assignment of this.assignments) if (assignment.studentId === studentId) result.push(assignment);
+    for (let assignment of this.assignments) {
+      if (assignment.studentId === studentId) result.push(this.cloneAssignment(assignment));
+    }
     return result;
   }
 
   replaceAssignmentsForActiveStudent(assignments: Assignment[]): void {
-    let studentId = this.getActiveStudentId();
+    this.replaceAssignmentsForStudent(this.getActiveStudentId(), assignments);
+  }
+
+  replaceAssignmentsForStudent(studentId: string, assignments: Assignment[]): void {
     let next: Assignment[] = [];
-    for (let existing of this.assignments) if (existing.studentId !== studentId) next.push(this.cloneAssignment(existing));
-    for (let assignment of assignments) if (assignment.studentId === studentId) next.push(this.cloneAssignment(assignment));
+    for (let existing of this.assignments) {
+      if (existing.studentId !== studentId) next.push(this.cloneAssignment(existing));
+    }
+    for (let assignment of assignments) {
+      if (assignment.studentId === studentId) next.push(this.cloneAssignment(assignment));
+    }
     this.assignments = next;
     this.requestPersist();
   }
@@ -321,9 +343,13 @@ export class HomeworkStore {
   }
 
   getAssignment(assignmentId: string): Assignment | null {
+    return this.getAssignmentForStudent(this.getActiveStudentId(), assignmentId);
+  }
+
+  getAssignmentForStudent(studentId: string, assignmentId: string): Assignment | null {
     let index = this.assignmentIndex(assignmentId);
-    if (index < 0 || this.assignments[index].studentId !== this.getActiveStudentId()) return null;
-    return this.assignments[index];
+    if (index < 0 || this.assignments[index].studentId !== studentId) return null;
+    return this.cloneAssignment(this.assignments[index]);
   }
 
   getNextAssignment(): Assignment | null {

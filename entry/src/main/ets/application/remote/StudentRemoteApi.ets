@@ -8,6 +8,10 @@ export interface RemoteStudent {
   grade: string;
   className: string;
   semester: string;
+  chineseTextbook: string;
+  mathTextbook: string;
+  englishTextbook: string;
+  otherTextbooks: string;
   textbookSummary: string;
 }
 

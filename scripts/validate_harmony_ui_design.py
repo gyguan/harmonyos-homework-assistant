@@ -362,6 +362,7 @@ homework_import_route = read_optional("entry/src/main/ets/features/parent/import
 homework_import = read_optional("entry/src/main/ets/features/parent/import/HomeworkImportPage.ets")
 homework_confirmation = read_optional("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 parent_settings = read_optional("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
+student_profile_editor = read_optional("entry/src/main/ets/components/family/StudentProfileEditorDialog.ets")
 parent_extra = read_optional("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 student_profile = read_optional("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
 practice_result = read_optional("entry/src/main/ets/features/student/practice/PracticeResultPage.ets")
@@ -387,25 +388,27 @@ for card_path, card_source in [
             f"{card_path} must use the shared ordinary card surface")
 require("backgroundColor(AppTheme.PRIMARY_FAINT)" not in parent_dashboard,
         "Parent dashboard action cards must not use a different fill for 布置作业")
-require(parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT") == 3 and
-        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_ICON_SIZE") >= 6 and
-        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_PADDING") == 3,
+require(parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT") == 4 and
+        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_ICON_SIZE") >= 8 and
+        parent_dashboard.count("AppTheme.PARENT_HOME_ACTION_CARD_PADDING") == 4,
         "Parent dashboard action cards must share one size specification")
-require(parent_dashboard.count(".fontSize(AppTheme.CARD_TITLE_SIZE)") >= 3 and
-        parent_dashboard.count(".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)") >= 3 and
-        parent_dashboard.count(".maxLines(AppTheme.CARD_TITLE_MAX_LINES)") >= 3 and
-        parent_dashboard.count(".fontSize(AppTheme.CAPTION_SIZE)") >= 3 and
-        parent_dashboard.count(".lineHeight(AppTheme.CAPTION_LINE_HEIGHT)") >= 3 and
-        parent_dashboard.count(".fontWeight(FontWeight.Bold)") >= 3,
+require(parent_dashboard.count(".fontSize(AppTheme.CARD_TITLE_SIZE)") >= 4 and
+        parent_dashboard.count(".lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)") >= 4 and
+        parent_dashboard.count(".maxLines(AppTheme.CARD_TITLE_MAX_LINES)") >= 4 and
+        parent_dashboard.count(".fontSize(AppTheme.CAPTION_SIZE)") >= 4 and
+        parent_dashboard.count(".lineHeight(AppTheme.CAPTION_LINE_HEIGHT)") >= 4 and
+        parent_dashboard.count(".fontWeight(FontWeight.Bold)") >= 4,
         "Parent dashboard action cards must use the shared typography specification")
 require(".height(AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT)" not in parent_dashboard and
-        parent_dashboard.count(".constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })") == 3,
+        parent_dashboard.count(".constraintSize({ minHeight: AppTheme.PARENT_HOME_ACTION_CARD_MIN_HEIGHT })") == 4,
         "Text-bearing parent home cards must use minHeight, not fixed height")
 require("private PhoneHome()" in parent_dashboard and
         "this.CreateAssignmentAction();" in parent_dashboard and
         "this.CreateVoiceAction();" in parent_dashboard and
-        "this.AssignmentInboxAction();" in parent_dashboard,
-        "Parent dashboard Phone layout must keep all three actions in the same full-width stack")
+        "this.ScheduledAssignmentAction();" in parent_dashboard and
+        "this.AiPracticeAction();" in parent_dashboard and
+        "this.AssignmentInboxAction();" not in parent_dashboard,
+        "Parent dashboard Phone layout must keep only the four primary parent actions")
 require("backgroundColor(this.parentActive ? AppTheme.PRIMARY_FAINT" not in identity_switcher and
         "AppTheme.PRIMARY_FAINT : AppTheme.SURFACE" not in identity_switcher,
         "Identity switcher cards must keep one surface and use border/checkmark for selection")
@@ -472,6 +475,26 @@ require("private SectionTitle(" not in parent_settings and
         "private FamilySettingsSection()" in parent_settings and
         "private DataSyncSettingsSection()" in parent_settings,
         "Parent My must use the same card-and-collapsible-section composition as Student My")
+require("StudentProfileEditorDialog" in parent_settings and
+        "phoneStudentEditorController" in parent_settings and
+        "wideStudentEditorController" in parent_settings and
+        "DialogAlignment.Bottom" in parent_settings and
+        "DialogAlignment.Center" in parent_settings,
+        "Parent student editing must open through adaptive modal dialogs")
+require("this.StudentEditor();" not in parent_settings and
+        "private StudentEditor()" not in parent_settings and
+        "private StudentIdentityFields()" not in parent_settings,
+        "Parent My must not expand the student editor inline inside the family section")
+require("@CustomDialog" in student_profile_editor and
+        "Text(this.editingExisting ? '编辑孩子资料' : '添加孩子')" in student_profile_editor and
+        "this.FooterActions();" in student_profile_editor and
+        "this.DeleteWarning();" in student_profile_editor and
+        ".constraintSize({ maxHeight: 540 })" in student_profile_editor,
+        "student profile dialog must keep one scrollable add/edit/delete surface")
+require("studentEditorMessage" in parent_settings and
+        "studentEditorBusy" in parent_settings and
+        "this.closeStudentEditorDialog();" in parent_settings,
+        "student profile save/delete feedback must stay inside the modal and close only on success")
 
 require("AppTheme.PAGE_NAV_TITLE_SIZE" in deep_page_header and
         "AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT" in deep_page_header and
@@ -485,7 +508,7 @@ require("AppTheme.PAGE_NAV_TITLE_SIZE" in deep_page_header and
 require(".height(AppTheme.DEEP_PAGE_HEADER_HEIGHT)" not in deep_page_header and
         ".constraintSize({ minHeight: AppTheme.DEEP_PAGE_HEADER_HEIGHT })" in deep_page_header,
         "DeepPageHeader must use minHeight so larger system text cannot be clipped")
-require(parent_dashboard.count("AppTheme.CARD_TITLE_SIZE") >= 3,
+require(parent_dashboard.count("AppTheme.CARD_TITLE_SIZE") >= 4,
         "Parent dashboard card titles must share the card-title size")
 require(parent_extra.count("AppTheme.SECTION_TITLE_SIZE") >= 3,
         "Extra assignment top-level sections must share the section-title size")

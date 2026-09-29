@@ -23,8 +23,8 @@ migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets"
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 persistence = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkPersistence.ets")
 
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 9" in migrator,
-        "snapshot migration framework must advance the current schema to V9")
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 10" in migrator,
+        "snapshot migration framework must advance the current schema to V10")
 require("migrateV4ToV5" in migrator and "schemaVersion: 5" in migrator,
         "snapshot migrator must retain the explicit V4 -> V5 step")
 require("migrateV5ToV6" in migrator and "schemaVersion: 6" in migrator,
@@ -37,6 +37,11 @@ require("migrateV7ToV8" in migrator and "schemaVersion: 8" in migrator and
 require("migrateV8ToV9" in migrator and "schemaVersion: 9" in migrator and
         "parentAccessCode: ''" in migrator,
         "device parent access code must use an explicit V8 -> V9 migration step")
+require("migrateV9ToV10" in migrator and "schemaVersion: 10" in migrator and
+        "StudentTextbookProfile.parseLegacy" in migrator and
+        "chineseTextbook:" in migrator and "mathTextbook:" in migrator and
+        "englishTextbook:" in migrator and "otherTextbooks:" in migrator,
+        "student textbook structure must use an explicit V9 -> V10 migration step")
 for field in [
     "settings: snapshot.settings",
     "rawImports: snapshot.rawImports",

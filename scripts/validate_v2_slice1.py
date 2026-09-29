@@ -55,11 +55,12 @@ require("assignments/summary" in controller and "TodaySummary" in dtos and "toda
 require("undated" in dtos and "assignment.dueAt == null" in service,
         "historical undated tasks must stay explicit instead of receiving guessed dates")
 
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 9" in migrator and
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 10" in migrator and
         "migrateV5ToV6" in migrator and
         "migrateV7ToV8" in migrator and
-        "migrateV8ToV9" in migrator,
-        "Assignment V2 client fields must retain V5 -> V6 while later schemas advance through V9")
+        "migrateV8ToV9" in migrator and
+        "migrateV9ToV10" in migrator,
+        "Assignment V2 client fields must retain V5 -> V6 while later schemas advance through V10")
 require("assignmentType: AssignmentType.SCHOOL" in migrator and "dueAtEpochMs: 0" in migrator,
         "V5 -> V6 must use deterministic historical defaults without guessing due time")
 
@@ -85,6 +86,9 @@ require("HomeworkStore.instance" not in repository_impl and "../HomeworkStore" n
 require("DefaultAssignmentLocalDataSource" in local_data_source and
         "HomeworkStore.instance" in local_data_source,
         "legacy Store access must be isolated inside AssignmentLocalDataSource")
+for field in ["chineseTextbook", "mathTextbook", "englishTextbook", "otherTextbooks", "textbookSummary"]:
+    require(f"{field}: student.{field}" in local_data_source,
+            f"AssignmentLocalDataSource StudentProfile clone must preserve field: {field}")
 require("HomeworkStore.instance" not in view_model and "HomeworkStore.instance" not in home,
         "V2 ViewModel/Page must not directly access HomeworkStore")
 require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,

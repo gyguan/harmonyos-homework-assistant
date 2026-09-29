@@ -5,6 +5,7 @@ import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge'
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { Assignment, AssignmentStatus, Subject } from '../../../domain/model/HomeworkModels';
+import { AssignmentAttentionKind } from '../../../domain/service/AssignmentAttentionPolicy';
 import { StudentHomeViewModel } from './StudentHomeViewModel';
 
 @Component
@@ -136,6 +137,7 @@ export struct StudentHomePage {
   @State private actionAssignmentId: string = '';
   @State private actionMessage: string = '';
   onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
+  onOpenAttention: (kind: AssignmentAttentionKind) => void = (_kind: AssignmentAttentionKind) => {};
   onStoreChanged: () => void = () => {};
 
   private readonly viewModel: StudentHomeViewModel =
@@ -200,6 +202,36 @@ export struct StudentHomePage {
       .padding({ left: 12, right: 12, top: 10, bottom: 10 })
       .backgroundColor(AppTheme.WARNING_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
+  }
+
+  @Builder
+  private AttentionBanner() {
+    if (this.viewModel.attentionText().length > 0) {
+      Row({ space: 8 }) {
+        Text('提醒')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.WARNING);
+        Text(this.viewModel.attentionText())
+          .layoutWeight(1)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.TEXT);
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(14)
+          .fontColor([AppTheme.TERTIARY_TEXT]);
+      }
+      .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+      .backgroundColor(AppTheme.WARNING_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityGroup(true)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(`提醒，${this.viewModel.attentionText()}，点击查看`)
+      .onClick(() => this.onOpenAttention(this.viewModel.attentionKind()));
     }
   }
 
@@ -280,6 +312,7 @@ export struct StudentHomePage {
   private PhoneHome() {
     Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
+      this.AttentionBanner();
       this.TodayTasks();
     }
     .width('100%')
@@ -291,6 +324,7 @@ export struct StudentHomePage {
   private PadHome() {
     Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
+      this.AttentionBanner();
       Row({ space: AppTheme.SPLIT_PANE_GAP }) {
         Column({ space: 12 }) {
           Text('先做这项')

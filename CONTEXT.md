@@ -28,7 +28,9 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Resource（资料）**：老师或家长提供的图片、文档、音频、视频、文本等学习材料，可与 Assignment 关联。
 - **Media Asset（媒体资产）**：家庭私有的物理媒体文件所有权实体。Assignment Resource 与语音素材目录只引用 Asset，不因创建任务而复制文件。
 - **Voice Material Package（语音素材目录）**：家长预先导入的一组“1 个语音 + 至少 1 张图片”的待发布素材，携带 studentId、subjectCode、标题和预计用时等结构化属性；目录名用于展示与队列排序，不作为科目识别来源。
-- **Daily Voice Auto Create（每日语音自动创建）**：按 studentId + Asia/Shanghai 业务日最多自动消费一个 READY Voice Material Package；家长手工创建不占每日自动额度。
+- **Daily Voice Auto Create（每日语音自动创建）**：按 studentId + Asia/Shanghai 业务日最多自动消费一个 READY Voice Material Package；家长手工创建不占每日自动额度。自动创建只检查 dueAt 落在当前业务日且未完成的有效语音任务，历史日期遗留的未完成语音任务不阻塞今天自动创建。自动生成任务名使用“科目 · 月日 · 素材标题”，素材标题为空时使用“科目 · 月日语音作业”，同日同名追加序号；不得直接使用目录名作为任务名。
+- **Scheduled Assignment Plan（定时作业计划）**：家长配置的未来作业创建规则，只保存学生、重复方式、创建时间与任务模板；到达触发时间后才生成真实 Assignment，不是第二套 Assignment 状态机。
+- **Scheduled Assignment Run（定时作业执行）**：某个 Plan 在一个 scheduledFireAt 上的一次幂等执行记录；普通计划创建 Assignment，语音计划复用 Daily Voice Auto Create，执行成功、跳过或失败均可追溯。
 - **Requirement（完成要求）**：某项 Assignment 的结构化完成要求，如完成题目、朗读、拍照、文字说明等。
 - **Submission（提交）**：学生对某个 Assignment 提交的照片、录音、视频或文本，以及提交时间与状态。
 - **Textbook（教材）**：按城市、学段、年级、学期、学科、出版社、册、单元、课组织的教材目录元数据。
@@ -48,7 +50,8 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - **Parent Review（家长验收）**：家长查看 Submission 后执行通过或退回订正，并可附加 review note。
 - **Parent Intervention（家长介入）**：AI 判断不适合继续自主辅导、学生主动求助或任务异常时，请求家长处理的状态/动作。
 - **Weekly Review（周报）**：面向家长的周期性总结，关注完成率、用时、困难、辅导使用情况和需要关注事项，不做孩子排名。
-- **Practice Paper（练习套卷）**：围绕明确年级、学期、科目、题库类型和能力点组织的一组练习题，是预置练习内容的发布与版本边界。
+- **Practice Paper（练习套卷）**：围绕明确年级、学期、科目、题库类型和能力点组织的一组练习题，是练习内容统一的发布与版本边界。PRESET 为全局内容；AI_GENERATED 为 Family 私有内容，通过 Practice Paper Audience 关联一个、多个或发布当时的全部学生，题目本体只保存一份；二者共用同一 Paper / Question / Attempt / Result 模型。
+- **Practice Generation（AI练习生成）**：家长以一个参考学生的年级/学期/当前科目教材作为上下文提交训练目标，由后端 AI 生成纯文本练习草稿；草稿必须依次通过结构化校验、确定性校验和独立答案复核，家长预览确认后，才发布为 AI_GENERATED Practice Paper。
 - **Practice Attempt（练习实例）**：学生每次开始某套卷时创建的独立作答实例；答案、笔记、提交时间、耗时与结果均归属于该 Attempt，不覆盖历史练习。
 - **Practice Track（题库类型）**：`TEXTBOOK_SYNC` 表示教材同步，`EXTRACURRICULAR` 表示课外拓展。二者共享 Practice 领域模型，但内容设计目标不同。
 
@@ -67,6 +70,10 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 11. 家长看到的是作业进度，不做摄像头监控、键盘记录等过度监控能力。
 12. SCHOOL / EXTRA 共用 Assignment，不建设两套平行业务体系。
 13. Practice 题库新增或更新必须遵守 `docs/product/practice-question-content-standard.md`；预置题库以 `backend/src/main/resources/practice/preset/` 为唯一源数据，已发布内容通过新 version 演进，不覆盖历史 Attempt / Result。
+14. AI 练习由家长创建、学生消费：AI_GENERATED Paper 必须按 familyId 隔离，并通过 Practice Paper Audience 显式授权给一个、多个或发布当时的全部学生；生成结果先作为 Draft 保存，经过后端质量门禁和家长预览确认后才能发布，学生端不得直接发起出题。生成参考学生负责提供年级/学期/当前科目教材上下文，Practice Generation 保存 referenceStudentId 与生成时的 subject-specific textbook context；发布对象与生成参考学生分离。发布候选兼容性由后端统一计算，目标学生必须满足年级/学期兼容，教材同步还要求当前科目教材与生成快照一致。首次发布后 Audience 不在生成页继续修改。
+15. 定时创建能力只负责在计划时间生成现有 Assignment；暂停、恢复、编辑或删除计划只影响未来执行，不修改已生成 Assignment。语音定时计划与学生进入兜底必须复用同一服务端幂等边界。
+16. 当前家长端一级导航固定为“首页 / 学生作业 / 我的”；文字、截图、系统分享等老师作业输入统一属于“布置作业”流程，历史批次仅作为二级“导入记录”保留。没有被动自动来源时，不单独设置“作业收件箱”一级入口。
+17. 所有跨网络异步操作必须在第一次 await 前捕获 studentId，并以显式 student-scoped API 写回；禁止使用“响应返回时的 activeStudent”决定缓存或草稿写入目标。
 
 ## Technical direction
 
@@ -92,6 +99,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 - 历史 Flyway migration 不修改，通过 V7+ 增量演进。
 - Assignment 状态流转和权威计时逐步从通用 PATCH 收敛到后端 Action Command。
 - `OVERDUE` 优先作为派生属性，不为此引入定时任务。
+- 家庭级定时作业使用 Spring `@Scheduled` + PostgreSQL 持久化计划/执行记录；不为调度引入 Quartz、Redis、MQ 或工作流引擎。
 
 ### Homework Import / Capture
 
@@ -105,6 +113,8 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 
 - 导入：OCR / 任务拆分 / 学科识别 / due-time extraction / textbook matching / source evidence。
 - Tutor：assignment context / teacher resources / textbook context / graded hints / parent policy。
+- Practice Generation：student profile / subject-specific textbook context / parent requirement / strict structured output / deterministic validation / independent answer review / backend-owned audience compatibility / parent publish confirmation。
+- Practice Generation Provider Compatibility：Provider raw output 必须依次经过 `StructuredJsonNormalizer` 与 `PracticeGenerationProviderAdapter` 收敛为唯一 Canonical Practice Contract；后续 validator / answer review / publish 只消费 canonical 结构，禁止在业务层按模型或供应商增加兼容分支。
 - 服务商密钥只存在后端；客户端不保存 AI Provider credential。
 
 ## V2 migration and compatibility defaults
@@ -115,9 +125,9 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 2. 旧科目只做确定性映射：`语文 -> CHINESE`、`数学 -> MATH`、`英语 -> ENGLISH`，其他值统一 `OTHER`。
 3. **禁止从历史 `dueText` 猜测 `dueAt`**。历史 `dueText` 原值保留，无法确定的 `dueAt` 保持空值，默认 `dueTimezone=Asia/Shanghai`。
 4. V2 日期筛选只依据结构化 `dueAt`；历史未结构化日期不伪造成某个具体日期。
-5. 当前 HarmonyOS Snapshot schema 为 V8；V4→V5→V6→V7→V8 均保留显式逐版本 migration。任何后续版本升级仍必须增加明确迁移步骤，不得 schema mismatch 后 seed MockData。
+5. 当前 HarmonyOS Snapshot schema 为 V10；V4→V5→V6→V7→V8→V9→V10 均保留显式逐版本 migration。任何后续版本升级仍必须增加明确迁移步骤，不得 schema mismatch 后 seed MockData。
 6. schema-changing save 前保留一次 `homework_snapshot_pre_migration_backup`；迁移失败不得覆盖原主快照。
-7. PostgreSQL V1–V6 永不修改；V7 采用 add -> deterministic backfill -> verify -> tighten constraints，破坏性删除后置。
+7. 已发布 PostgreSQL Flyway migration 永不修改；后续一律通过新的 forward migration 演进。当前已演进到 V23：V22 为 Assignment 状态域增加数据库 CHECK 约束，V23 增加 Assignment 创建请求指纹，用于同 ID 重试的严格幂等校验。
 8. API 升级顺序为 **backend first**：迁移期支持 `V1 Client -> V2 Backend`，最迟在 Slice 5 结束；**不支持 `V2 Client -> V1 Backend`**，避免在新客户端引入旧后端 fallback。
 9. Slice 3 再将 `OVERDUE` 从 canonical status 迁移为派生属性：历史 OVERDUE 且 `elapsedSeconds > 0` -> `PAUSED`，否则 -> `NOT_STARTED`；不塞入 V7。
 10. Flyway 与 Snapshot 均以 forward migration / forward-fix 为主，不建设自动 down migration。

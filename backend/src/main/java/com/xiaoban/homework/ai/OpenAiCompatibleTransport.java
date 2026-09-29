@@ -1,5 +1,7 @@
 package com.xiaoban.homework.ai;
 
+import com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol;
+import com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode;
 import java.net.URI;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -27,6 +29,7 @@ public class OpenAiCompatibleTransport {
   private static final int MAX_PAYLOAD_LOG_CHARS = 20000;
 
   private final AiProviderProperties properties;
+  private final AiProviderCapabilityResolver capabilityResolver;
   private final JsonMapper jsonMapper;
   private final RestClient client;
 
@@ -37,8 +40,12 @@ public class OpenAiCompatibleTransport {
   public record ChatChoice(ChatMessage message) {}
   public record ChatResponse(List<ChatChoice> choices) {}
 
-  public OpenAiCompatibleTransport(AiProviderProperties properties, JsonMapper jsonMapper) {
+  public OpenAiCompatibleTransport(
+      AiProviderProperties properties,
+      AiProviderCapabilityResolver capabilityResolver,
+      JsonMapper jsonMapper) {
     this.properties = properties;
+    this.capabilityResolver = capabilityResolver;
     this.jsonMapper = jsonMapper;
     this.client = RestClient.builder()
         .baseUrl(properties.getBaseUrl())
@@ -46,10 +53,10 @@ public class OpenAiCompatibleTransport {
         .build();
 
     log.info(
-        "[AI] config protocol={} baseUrl={} responsesPath={} chatCompletionsPath={} tutorModel={} organizerModel={} structuredOutput={} logPayloads={} keyConfigured={} allowUnauthenticated={}",
-        properties.getProtocol(), safeBaseUrl(properties.getBaseUrl()), properties.getResponsesPath(),
+        "[AI] config provider={} protocol={} baseUrl={} responsesPath={} chatCompletionsPath={} tutorModel={} organizerModel={} practiceModel={} structuredOutput={} logPayloads={} keyConfigured={} allowUnauthenticated={}",
+        properties.getProvider(), properties.getProtocol(), safeBaseUrl(properties.getBaseUrl()), properties.getResponsesPath(),
         properties.getChatCompletionsPath(), properties.getTutorModel(), properties.getOrganizerModel(),
-        properties.isStructuredOutput(), properties.isLogPayloads(), keyConfigured(),
+        properties.getPracticeModel(), properties.isStructuredOutput(), properties.isLogPayloads(), keyConfigured(),
         properties.isAllowUnauthenticated());
   }
 
@@ -57,12 +64,68 @@ public class OpenAiCompatibleTransport {
     return properties.available(model);
   }
 
+  public AiProviderCapabilities capabilities(String model) {
+    return capabilityResolver.resolve(model);
+  }
+
   public Optional<String> complete(String model, String instructions, String input, int maxTokens,
       String schemaName, Map<String, Object> schema) {
-    String path = properties.usesChatCompletions()
+    AiProviderCapabilities capabilities = capabilities(model);
+    return complete(
+        model,
+        instructions,
+        input,
+        maxTokens,
+        schemaName,
+        schema,
+        capabilities.preferredProtocol(),
+        capabilities.primaryMode());
+  }
+
+  public Optional<String> complete(
+      String model,
+      String instructions,
+      String input,
+      int maxTokens,
+      String schemaName,
+      Map<String, Object> schema,
+      StructuredOutputMode outputMode) {
+    AiProviderCapabilities capabilities = capabilities(model);
+    return complete(
+        model,
+        instructions,
+        input,
+        maxTokens,
+        schemaName,
+        schema,
+        capabilities.preferredProtocol(),
+        outputMode);
+  }
+
+  public Optional<String> complete(
+      String model,
+      String instructions,
+      String input,
+      int maxTokens,
+      String schemaName,
+      Map<String, Object> schema,
+      ApiProtocol apiProtocol,
+      StructuredOutputMode outputMode) {
+    AiProviderCapabilities capabilities = capabilities(model);
+    ApiProtocol resolvedProtocol =
+        apiProtocol == null ? capabilities.preferredProtocol() : apiProtocol;
+    if (!capabilities.supports(resolvedProtocol)) {
+      log.warn(
+          "[AI] unsupported provider protocol provider={} model={} protocol={} preferredProtocol={}",
+          capabilities.provider(), model, resolvedProtocol, capabilities.preferredProtocol());
+      return Optional.empty();
+    }
+    String path = resolvedProtocol == ApiProtocol.CHAT_COMPLETIONS
         ? properties.getChatCompletionsPath()
         : properties.getResponsesPath();
-    String protocol = properties.usesChatCompletions() ? "chat-completions" : "responses";
+    String protocol = resolvedProtocol == ApiProtocol.CHAT_COMPLETIONS
+        ? "chat-completions"
+        : "responses";
 
     if (!available(model)) {
       log.warn(
@@ -73,12 +136,15 @@ public class OpenAiCompatibleTransport {
     }
 
     long started = System.nanoTime();
-    log.info("[AI] request protocol={} model={} path={} structuredOutput={} maxTokens={}",
-        protocol, model, path, schema != null && properties.isStructuredOutput(), maxTokens);
+    StructuredOutputMode resolvedMode =
+        outputMode == null ? StructuredOutputMode.JSON_SCHEMA : outputMode;
+    log.info("[AI] request provider={} protocol={} model={} path={} structuredOutput={} outputMode={} maxTokens={}",
+        capabilities.provider(), protocol, model, path,
+        schema != null && properties.isStructuredOutput(), resolvedMode, maxTokens);
     try {
-      Optional<String> result = properties.usesChatCompletions()
-          ? chatCompletion(model, instructions, input, maxTokens, schemaName, schema)
-          : responses(model, instructions, input, maxTokens, schemaName, schema);
+      Optional<String> result = resolvedProtocol == ApiProtocol.CHAT_COMPLETIONS
+          ? chatCompletion(model, instructions, input, maxTokens, schemaName, schema, resolvedMode)
+          : responses(model, instructions, input, maxTokens, schemaName, schema, resolvedMode);
       long elapsedMs = elapsedMs(started);
       if (result.isPresent()) {
         log.info("[AI] response ok protocol={} model={} path={} elapsedMs={} outputChars={}",
@@ -105,8 +171,14 @@ public class OpenAiCompatibleTransport {
     }
   }
 
-  private Optional<String> responses(String model, String instructions, String input, int maxTokens,
-      String schemaName, Map<String, Object> schema) throws Exception {
+  private Optional<String> responses(
+      String model,
+      String instructions,
+      String input,
+      int maxTokens,
+      String schemaName,
+      Map<String, Object> schema,
+      StructuredOutputMode outputMode) throws Exception {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("model", model);
     body.put("store", false);
@@ -115,14 +187,21 @@ public class OpenAiCompatibleTransport {
     body.put("input", input);
     body.put("max_output_tokens", maxTokens);
     if (schema != null && properties.isStructuredOutput()) {
-      body.put("text", Map.of("format", jsonSchemaFormat(schemaName, schema)));
+      Map<String, Object> format = structuredFormat(outputMode, schemaName, schema);
+      if (format != null) body.put("text", Map.of("format", format));
     }
     ResponsesResponse response = post(properties.getResponsesPath(), body, ResponsesResponse.class);
     return extractResponsesText(response);
   }
 
-  private Optional<String> chatCompletion(String model, String instructions, String input, int maxTokens,
-      String schemaName, Map<String, Object> schema) throws Exception {
+  private Optional<String> chatCompletion(
+      String model,
+      String instructions,
+      String input,
+      int maxTokens,
+      String schemaName,
+      Map<String, Object> schema,
+      StructuredOutputMode outputMode) throws Exception {
     Map<String, Object> body = new LinkedHashMap<>();
     body.put("model", model);
     body.put("stream", false);
@@ -131,12 +210,9 @@ public class OpenAiCompatibleTransport {
         Map.of("role", "user", "content", input)));
     body.put("max_tokens", maxTokens);
     if (schema != null && properties.isStructuredOutput()) {
-      body.put("response_format", Map.of(
-          "type", "json_schema",
-          "json_schema", Map.of(
-              "name", safeSchemaName(schemaName),
-              "strict", true,
-              "schema", schema)));
+      Map<String, Object> responseFormat =
+          chatStructuredResponseFormat(outputMode, schemaName, schema);
+      if (responseFormat != null) body.put("response_format", responseFormat);
     }
     ChatResponse response = post(properties.getChatCompletionsPath(), body, ChatResponse.class);
     return extractChatText(response);
@@ -262,6 +338,29 @@ public class OpenAiCompatibleTransport {
     if (value == null) return "<empty>";
     if (value.length() <= maxChars) return value;
     return value.substring(0, maxChars) + "...";
+  }
+
+  static Map<String, Object> structuredFormat(
+      StructuredOutputMode mode, String schemaName, Map<String, Object> schema) {
+    return switch (mode == null ? StructuredOutputMode.JSON_SCHEMA : mode) {
+      case JSON_SCHEMA -> jsonSchemaFormat(schemaName, schema);
+      case JSON_OBJECT -> Map.of("type", "json_object");
+      case TEXT -> null;
+    };
+  }
+
+  static Map<String, Object> chatStructuredResponseFormat(
+      StructuredOutputMode mode, String schemaName, Map<String, Object> schema) {
+    return switch (mode == null ? StructuredOutputMode.JSON_SCHEMA : mode) {
+      case JSON_SCHEMA -> Map.of(
+          "type", "json_schema",
+          "json_schema", Map.of(
+              "name", safeSchemaName(schemaName),
+              "strict", true,
+              "schema", schema));
+      case JSON_OBJECT -> Map.of("type", "json_object");
+      case TEXT -> null;
+    };
   }
 
   private static Map<String, Object> jsonSchemaFormat(String schemaName, Map<String, Object> schema) {

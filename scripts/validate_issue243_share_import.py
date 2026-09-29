@@ -113,9 +113,9 @@ require("HomeworkShareImportStatusPage" in shell,
 require("ParentImportNavigator.openConfirmation(this.navPathStack)" in shell and
         "AppRoute.PARENT_IMPORT_CONFIRMATION" in parent_import_navigator,
         "successful share import must reuse HomeworkConfirmationPage route")
-require("ParentImportNavigator.openInbox(this.navPathStack)" in shell and
+require("ParentImportNavigator.openRecords(this.navPathStack)" in shell and
         "AppRoute.PARENT_IMPORT_INBOX" in parent_import_navigator,
-        "empty share import must remain inspectable in Import Inbox")
+        "empty share import must remain inspectable in Import Records")
 
 require("无法读取或识别分享图片，请重试" in status,
         "OCR failure must have an explicit retry message")
@@ -123,8 +123,9 @@ require("Button('重试'" in status and "this.retry()" in status,
         "failed share import must be retryable")
 require("HomeworkShareImportService.instance.cancel" in status,
         "share handoff cancellation must clean pending data")
-require("半成品作业" not in status,
-        "share status UI should not expose transactional implementation details")
+require("半成品作业" not in status and "作业智能收件箱" not in status and
+        "查看导入记录" in status,
+        "share status UI should use records language and not expose inbox/transactional implementation details")
 
 for source in [extension, receiver, processor]:
     require("AssignmentStateMachine" not in source and "AssignmentRepository" not in source,

@@ -58,7 +58,8 @@ class VoiceMaterialServiceTest {
 
     VoiceMaterialDtos.FileResponse result = service.uploadFile(
         familyId, packageId, "AUDIO", "voice.mp3", 0,
-        new MockMultipartFile("file", "voice.mp3", "audio/mpeg", new byte[] {1, 2, 3}));
+        new MockMultipartFile("file", "voice.mp3", "audio/mpeg",
+            new byte[] {'I', 'D', '3', 4, 0, 0, 0, 0, 0, 0}));
 
     assertEquals(existing.id.toString(), result.id());
     verify(students).requireOwnedForUpdate(familyId, "student-1");

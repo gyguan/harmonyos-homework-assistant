@@ -1,7 +1,7 @@
 package com.xiaoban.homework.assignment;
 
 import com.xiaoban.homework.common.ApiExceptions;
-import com.xiaoban.homework.storage.FileStorage;
+import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import com.xiaoban.homework.student.StudentService;
 import com.xiaoban.homework.submission.SubmissionEntity;
 import com.xiaoban.homework.submission.SubmissionPhotoEntity;
@@ -11,8 +11,12 @@ import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -36,17 +40,17 @@ public class AssignmentService {
   private final SubmissionRepository submissions;
   private final SubmissionPhotoRepository photos;
   private final AssignmentResourceRepository resources;
-  private final FileStorage storage;
+  private final FileTransactionCoordinator fileTransactions;
 
   public AssignmentService(AssignmentRepository repository, StudentService students,
       SubmissionRepository submissions, SubmissionPhotoRepository photos,
-      AssignmentResourceRepository resources, FileStorage storage) {
+      AssignmentResourceRepository resources, FileTransactionCoordinator fileTransactions) {
     this.repository = repository;
     this.students = students;
     this.submissions = submissions;
     this.photos = photos;
     this.resources = resources;
-    this.storage = storage;
+    this.fileTransactions = fileTransactions;
   }
 
   @Transactional(readOnly = true)
@@ -110,14 +114,20 @@ public class AssignmentService {
   }
 
   @Transactional(readOnly = true)
-  public String nextVoiceMaterialTaskTitle(UUID familyId, String studentId, String subjectCode, LocalDate businessDate) {
+  public String nextVoiceMaterialTaskTitle(UUID familyId, String studentId, String subjectCode,
+      LocalDate businessDate, String materialTitle) {
     students.requireOwned(familyId, studentId);
     ZoneId zone = ZoneId.of(DEFAULT_DUE_TIMEZONE);
     Instant from = businessDate.atStartOfDay(zone).toInstant();
     Instant to = businessDate.plusDays(1).atStartOfDay(zone).toInstant();
-    long count = repository.countByFamilyIdAndStudentIdAndSubjectCodeAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
-        familyId, studentId, subjectCode, from, to);
-    String base = subjectDisplay(subjectCode) + " · 语音作业";
+    String dateLabel = businessDate.getMonthValue() + "月" + businessDate.getDayOfMonth() + "日";
+    String normalizedMaterialTitle = text(materialTitle).trim();
+    String base = normalizedMaterialTitle.isBlank()
+        ? subjectDisplay(subjectCode) + " · " + dateLabel + "语音作业"
+        : subjectDisplay(subjectCode) + " · " + dateLabel + " · " + normalizedMaterialTitle;
+    long count = repository
+        .countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
+            familyId, studentId, subjectCode, "AUDIO_IMAGE", base, from, to);
     return count == 0 ? base : base + " " + toCircledNumber(count + 1);
   }
 
@@ -145,13 +155,32 @@ public class AssignmentService {
     return current == null ? null : AssignmentDtos.Response.from(current);
   }
 
+  @Transactional(readOnly = true)
+  public AssignmentDtos.Response findFirstVoiceMaterialTaskForDate(
+      UUID familyId, String studentId, LocalDate businessDate) {
+    students.requireOwned(familyId, studentId);
+    ZoneId zone = ZoneId.of(DEFAULT_DUE_TIMEZONE);
+    Instant dueFrom = businessDate.atStartOfDay(zone).toInstant();
+    Instant dueTo = businessDate.plusDays(1).atStartOfDay(zone).toInstant();
+    AssignmentEntity current = repository
+        .findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotAndDueAtGreaterThanEqualAndDueAtLessThanOrderByUpdatedAtDesc(
+            familyId, studentId, "AUDIO_IMAGE", "COMPLETED", dueFrom, dueTo)
+        .orElse(null);
+    return current == null ? null : AssignmentDtos.Response.from(current);
+  }
+
   @Transactional
   public AssignmentDtos.Response create(UUID familyId, String studentId, AssignmentDtos.Create input) {
     students.requireOwned(familyId, studentId);
+    String createFingerprint = createFingerprint(studentId, input);
     AssignmentEntity existing = repository.findById(input.id()).orElse(null);
     if (existing != null) {
       if (!familyId.equals(existing.familyId) || !studentId.equals(existing.studentId)) {
         throw new ApiExceptions.Conflict("作业 ID 冲突");
+      }
+      if (existing.createFingerprint != null && !existing.createFingerprint.isBlank() &&
+          !existing.createFingerprint.equals(createFingerprint)) {
+        throw new ApiExceptions.Conflict("作业 ID 已存在，但创建内容与原请求不一致");
       }
       return AssignmentDtos.Response.from(existing);
     }
@@ -171,9 +200,10 @@ public class AssignmentService {
     e.dueText = text(input.dueText());
     e.dueAt = dueAt(input.dueAtEpochMs());
     e.dueTimezone = dueTimezone(input.dueTimezone());
-    e.status = input.status();
+    e.status = initialStatus(input.status());
     e.sourceLabel = text(input.sourceLabel());
     e.sourceExcerpt = text(input.sourceExcerpt());
+    e.createFingerprint = createFingerprint;
     e.expectedMinutes = expectedMinutes(input.expectedMinutes());
     e.startedAtEpochMs = nonNegative(input.startedAtEpochMs());
     e.finishedAtEpochMs = nonNegative(input.finishedAtEpochMs());
@@ -313,12 +343,12 @@ public class AssignmentService {
     }
     for (SubmissionEntity submission : submissions.findByFamilyIdAndAssignmentIdOrderBySubmittedAtDesc(familyId, id)) {
       for (SubmissionPhotoEntity photo : photos.findBySubmissionIdOrderById(submission.id)) {
-        storage.delete(photo.storagePath);
+        fileTransactions.deleteAfterCommit(photo.storagePath);
       }
     }
     for (AssignmentResourceEntity resource : resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, id)) {
       if (resource.assetId == null && resource.storagePath != null && !resource.storagePath.isBlank()) {
-        storage.delete(resource.storagePath);
+        fileTransactions.deleteAfterCommit(resource.storagePath);
       }
     }
     resources.deleteByFamilyIdAndAssignmentId(familyId, id);
@@ -507,6 +537,39 @@ public class AssignmentService {
       case "COMPLETED" -> 7;
       default -> 100;
     };
+  }
+
+  private String createFingerprint(String studentId, AssignmentDtos.Create input) {
+    String canonical = String.join("\n",
+        text(studentId),
+        assignmentType(input.assignmentType()),
+        text(input.subject()),
+        subjectCode(input.subjectCode(), input.subject()),
+        contentType(input.contentType()),
+        text(input.title()),
+        text(input.instruction()),
+        text(input.textbookRef()),
+        text(input.dueText()),
+        Long.toString(input.dueAtEpochMs() == null ? 0L : Math.max(0L, input.dueAtEpochMs())),
+        dueTimezone(input.dueTimezone()),
+        initialStatus(input.status()),
+        text(input.sourceLabel()),
+        text(input.sourceExcerpt()),
+        Integer.toString(expectedMinutes(input.expectedMinutes())));
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      return HexFormat.of().formatHex(digest.digest(canonical.getBytes(StandardCharsets.UTF_8)));
+    } catch (NoSuchAlgorithmException error) {
+      throw new IllegalStateException("无法计算作业创建幂等指纹", error);
+    }
+  }
+
+  private String initialStatus(String value) {
+    String normalized = value == null ? "" : value.trim().toUpperCase();
+    if (!"NOT_STARTED".equals(normalized)) {
+      throw new ApiExceptions.BadRequest("新建作业初始状态必须为 NOT_STARTED");
+    }
+    return normalized;
   }
 
   private String assignmentType(String value) {

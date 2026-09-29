@@ -286,14 +286,51 @@ def run_full(args: argparse.Namespace) -> None:
     completed_payload.update({
         "id": completed_assignment_id,
         "title": "E2E 已完成作业",
-        "status": "COMPLETED",
+        "status": "NOT_STARTED",
     })
-    expect(
+    completed_source = expect(
         http(base_url, "POST", f"/api/v1/students/{student_id}/assignments",
              token=token, payload=completed_payload),
         (200,),
-        "create completed assignment for delete guard",
-    )
+        "create assignment for completed delete guard",
+    ).json()
+    completed_started = patch_assignment(
+        base_url, token, completed_assignment_id, int(completed_source["version"]),
+        status="IN_PROGRESS")
+    completed_ready = patch_assignment(
+        base_url, token, completed_assignment_id, int(completed_started["version"]),
+        status="READY_TO_SUBMIT")
+    completed_body, completed_content_type = multipart_png()
+    completed_submission = expect(
+        http(
+            base_url,
+            "POST",
+            f"/api/v1/assignments/{completed_assignment_id}/submissions?version={int(completed_ready['version'])}",
+            token=token,
+            raw=completed_body,
+            content_type=completed_content_type,
+        ),
+        (200,),
+        "submit assignment for completed delete guard",
+    ).json()
+    completed_submitted = completed_submission.get("assignment") or {}
+    completed = expect(
+        http(
+            base_url,
+            "POST",
+            f"/api/v1/assignments/{completed_assignment_id}/review",
+            token=token,
+            payload={
+                "decision": "APPROVE",
+                "version": int(completed_submitted["version"]),
+                "note": "E2E delete guard",
+            },
+        ),
+        (200,),
+        "complete assignment through review",
+    ).json()
+    require(completed.get("status") == "COMPLETED",
+            "delete guard fixture did not reach COMPLETED through legal lifecycle")
     expect(
         http(base_url, "DELETE", f"/api/v1/assignments/{completed_assignment_id}", token=token),
         (400,),

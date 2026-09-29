@@ -11,27 +11,29 @@ import { HomeworkImportInboxViewModel } from './HomeworkImportInboxViewModel';
 @Component
 export struct HomeworkImportBatchDetailPage {
   @Prop batchId: string = '';
+  @Prop revision: number = 0;
   onBack: () => void = () => {};
   onOpenConfirmation: () => void = () => {};
-  @State private revision: number = 0;
+  onChanged: () => void = () => {};
+  @State private localRevision: number = 0;
   @State private message: string = '';
   @State private abandonConfirm: boolean = false;
   private readonly viewModel: HomeworkImportInboxViewModel = new HomeworkImportInboxViewModel();
 
   private batch(): ImportBatch | null {
-    let currentRevision = this.revision;
+    let currentRevision = this.revision + this.localRevision;
     if (currentRevision < 0) return null;
     return this.viewModel.batch(this.batchId);
   }
 
   private messages(): ImportedMessage[] {
-    let currentRevision = this.revision;
+    let currentRevision = this.revision + this.localRevision;
     if (currentRevision < 0) return [];
     return this.viewModel.messages(this.batchId);
   }
 
   private candidates(): CandidateAssignment[] {
-    let currentRevision = this.revision;
+    let currentRevision = this.revision + this.localRevision;
     if (currentRevision < 0) return [];
     return this.viewModel.candidates(this.batchId);
   }
@@ -74,7 +76,8 @@ export struct HomeworkImportBatchDetailPage {
       return;
     }
     this.abandonConfirm = false;
-    this.revision++;
+    this.localRevision++;
+    this.onChanged();
     this.message = '已放弃这个导入批次；已发布作业不会受影响。';
   }
 
@@ -157,7 +160,7 @@ export struct HomeworkImportBatchDetailPage {
         title: '导入批次详情',
         subtitle: this.batch() === null ? '批次不存在' :
           `${this.statusLabel(this.batch()!.status)} · ${this.batch()!.messageCount} 条消息 · ${this.batch()!.candidateCount} 项作业`,
-        backAccessibilityText: '返回作业收件箱',
+        backAccessibilityText: '返回导入记录',
         onBack: () => this.onBack()
       });
 

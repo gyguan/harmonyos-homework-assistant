@@ -18,6 +18,7 @@ export struct HomeworkImportPage {
   @State private selectedSubject: Subject = Subject.CHINESE;
   @State private subjectChosen: boolean = false;
   onOpenConfirmation: () => void = () => {};
+  onOpenRecords: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
   private readonly viewModel: HomeworkImportViewModel = new HomeworkImportViewModel();
@@ -248,6 +249,27 @@ export struct HomeworkImportPage {
   }
 
   @Builder
+  private ImportRecordsEntry() {
+    Row({ space: 6 }) {
+      Text('导入记录')
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.PRIMARY);
+      SymbolGlyph($r('sys.symbol.chevron_right'))
+        .fontSize(13)
+        .fontColor([AppTheme.PRIMARY]);
+    }
+    .width('100%')
+    .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+    .justifyContent(FlexAlign.End)
+    .alignItems(VerticalAlign.Center)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText('查看历史导入记录')
+    .onClick(() => this.onOpenRecords());
+  }
+
+  @Builder
   private RecognitionActions() {
     Row({ space: 8 }) {
       Button(this.parseBusy ? '识别中…' : '拍照识别', { type: ButtonType.Normal })
@@ -363,6 +385,7 @@ export struct HomeworkImportPage {
       Scroll() {
         Column({ space: 10 }) {
           this.PendingReview();
+          this.ImportRecordsEntry();
           this.AssignmentInput();
         }
         .width('100%')

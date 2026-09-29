@@ -38,10 +38,13 @@ export class HomeworkBatchPublishService {
     }
 
     let studentId = this.drafts.getActiveStudentId();
+    let batchId = this.sourceBatchId(candidates[0]);
     let entries: BatchPublishEntry[] = [];
     let localByCandidateId: Map<string, Assignment> = new Map<string, Assignment>();
     for (let candidate of candidates) {
       if (candidate.studentId !== studentId) throw new Error('待发布作业不属于当前孩子');
+      let candidateBatchId = this.sourceBatchId(candidate);
+      if (candidateBatchId !== batchId) throw new Error('待发布作业不属于同一导入批次');
       let assignment = this.toAssignment(candidate);
       entries.push({ candidateId: candidate.id, assignment: assignment });
       localByCandidateId.set(candidate.id, assignment);
@@ -64,10 +67,23 @@ export class HomeworkBatchPublishService {
     }
     if (seen.size !== candidates.length) throw new Error('云端批量发布响应不完整');
 
+    let inbox = HomeworkImportInboxService.instance;
+    let clearCurrentDraft = false;
+    let activeStudentId = this.drafts.getActiveStudentId();
+    if (activeStudentId === studentId) {
+      let activeBatchId = inbox.getActiveBatchId();
+      if (activeBatchId === batchId) clearCurrentDraft = true;
+    }
     DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped);
-    HomeworkImportInboxService.instance.markActiveBatchPublished();
-    this.drafts.clearCandidates();
+    inbox.markBatchPublished(batchId);
+    if (clearCurrentDraft) this.drafts.clearCandidates();
     return { publishedCount: mapped.length };
+  }
+
+  private sourceBatchId(candidate: CandidateAssignment): string {
+    let batchId = candidate.sourceEvidence.batchId;
+    if (batchId === undefined) return '';
+    return batchId;
   }
 
   private toAssignment(candidate: CandidateAssignment): Assignment {

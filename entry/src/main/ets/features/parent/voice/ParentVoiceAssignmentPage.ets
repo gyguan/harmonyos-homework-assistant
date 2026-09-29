@@ -576,10 +576,24 @@ export struct ParentVoiceAssignmentPage {
         TextInput({ placeholder: '搜索文件夹', text: this.folderKeyword })
           .layoutWeight(1)
           .height(AppTheme.INPUT_HEIGHT)
-          .fontSize(14)
+          .fontSize(AppTheme.FORM_TEXT_SIZE)
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.folderKeyword = value);
+        if (this.folderKeyword.length > 0) {
+          Text('清空')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 6, right: 6 })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('清空文件夹搜索')
+            .onClick(() => {
+              this.folderKeyword = '';
+              void this.loadFolders(true);
+            });
+        }
         Button(this.loadingFolders ? '查询中…' : '查询', { type: ButtonType.Normal })
           .height(AppTheme.INPUT_HEIGHT)
           .padding({ left: 14, right: 14 })

@@ -175,7 +175,19 @@ export struct AssignmentEditForm {
     Column({ space: 12 }) {
       this.SubjectSection();
 
-      Text('作业标题').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+      Row() {
+        Text('作业标题').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+        Blank();
+        if (this.title.length > 0) {
+          Text('清空')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 12, right: 4 })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空作业标题')
+            .onClick(() => this.onTitleChange(''));
+        }
+      }
+      .width('100%');
       TextInput({ text: this.title })
         .width('100%')
         .height(AppTheme.INPUT_HEIGHT)
@@ -184,7 +196,19 @@ export struct AssignmentEditForm {
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .onChange((value: string) => this.onTitleChange(value));
 
-      Text('完成要求').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+      Row() {
+        Text('完成要求').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+        Blank();
+        if (this.instruction.length > 0) {
+          Text('清空')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 12, right: 4 })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空完成要求')
+            .onClick(() => this.onInstructionChange(''));
+        }
+      }
+      .width('100%');
       TextArea({ text: this.instruction })
         .width('100%')
         .height(92)
@@ -203,7 +227,19 @@ export struct AssignmentEditForm {
 
       this.DurationSection();
 
-      Text('教材 / 页码').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+      Row() {
+        Text('教材 / 页码').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+        Blank();
+        if (this.textbookRef.length > 0) {
+          Text('清空')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 12, right: 4 })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空教材页码')
+            .onClick(() => this.onTextbookRefChange(''));
+        }
+      }
+      .width('100%');
       TextInput({ text: this.textbookRef })
         .width('100%')
         .height(AppTheme.INPUT_HEIGHT)

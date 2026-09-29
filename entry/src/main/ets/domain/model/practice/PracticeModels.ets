@@ -46,6 +46,7 @@ export enum PracticeDifficulty {
 export enum PracticeSourceType {
   PRESET = 'PRESET',
   AI_GENERATED = 'AI_GENERATED',
+  AI_REINFORCEMENT = 'AI_REINFORCEMENT',
   PARENT_CREATED = 'PARENT_CREATED',
   IMPORTED = 'IMPORTED'
 }
@@ -283,4 +284,76 @@ export class PracticeTaxonomy {
     if (label.indexOf('六年级') >= 0 || label.indexOf('六（') >= 0) return PracticeGrade.G6;
     return PracticeGrade.G2;
   }
+}
+
+
+export interface PracticeGenerationRequest {
+  subject: PracticeSubject;
+  track: PracticeTrack;
+  difficulty: PracticeDifficulty;
+  questionCount: number;
+  requirement: string;
+}
+
+export interface PracticeGenerationDraftQuestion {
+  id: string;
+  orderNo: number;
+  type: PracticeQuestionType;
+  stem: string;
+  options: PracticeQuestionOption[];
+  answerSpec: string;
+  explanation: string;
+  hints: string[];
+  tags: string[];
+}
+
+export interface PracticeGenerationDraft {
+  id: string;
+  version: number;
+  grade: PracticeGrade;
+  subject: PracticeSubject;
+  semester: PracticeSemester;
+  track: PracticeTrack;
+  title: string;
+  description: string;
+  difficulty: PracticeDifficulty;
+  questionCount: number;
+  estimatedMinutes: number;
+  tags: string[];
+  sourceType: PracticeSourceType;
+  questions: PracticeGenerationDraftQuestion[];
+}
+
+export interface PracticeAudienceCandidate {
+  studentId: string;
+  studentName: string;
+  grade: string;
+  semester: string;
+  compatible: boolean;
+  reason: string;
+}
+
+export interface PracticeGenerationResult {
+  generationId: string;
+  status: string;
+  paper: PracticeGenerationDraft | null;
+  errorMessage: string;
+  audienceCandidates: PracticeAudienceCandidate[];
+}
+
+
+export enum PracticePublishScope {
+  CURRENT = 'CURRENT',
+  SELECTED = 'SELECTED',
+  ALL = 'ALL'
+}
+
+export enum PracticePublishPurpose {
+  STANDARD = 'STANDARD',
+  REINFORCEMENT = 'REINFORCEMENT'
+}
+
+export interface PracticePublishResult {
+  paper: PracticePaper;
+  targetStudentIds: string[];
 }

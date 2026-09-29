@@ -197,7 +197,7 @@ export struct StudyWorkspacePage {
       case AssignmentStatus.READY_TO_SUBMIT:
         if (this.selectingPhotos) return '正在打开图库…';
         if (this.capturingPhoto) return '正在打开相机…';
-        if (this.submittingPhotos) return '正在保存并提交…';
+        if (this.submittingPhotos) return '正在检查并提交…';
         return this.submissionPhotoUris.length === 0 ? '请先添加照片' : `确认提交 ${this.submissionPhotoUris.length} 张照片`;
       case AssignmentStatus.SUBMITTED: return '已提交';
       case AssignmentStatus.COMPLETED: return '已完成';
@@ -309,8 +309,14 @@ export struct StudyWorkspacePage {
   private async submitSelectedPhotos(assignmentId: string): Promise<void> {
     if (this.submittingPhotos || this.submissionPhotoUris.length === 0) return;
     this.submittingPhotos = true;
-    this.submissionMessage = '正在把照片保存到本地…';
+    this.submissionMessage = '正在检查照片…';
     try {
+      let preflight = await HomeworkSubmissionService.instance.preflight(this.submissionPhotoUris);
+      if (!preflight.passed) {
+        this.submissionMessage = preflight.message;
+        return;
+      }
+      this.submissionMessage = '正在保存并提交…';
       let submitted = await HomeworkSubmissionService.instance.submit(assignmentId, this.submissionPhotoUris);
       if (!submitted) {
         this.submissionMessage = '提交失败，请确认作业状态后重试';

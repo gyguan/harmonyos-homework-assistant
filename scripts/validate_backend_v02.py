@@ -165,13 +165,14 @@ require("password|token|api[-_]?key|authorization" in payload_log and
         "Bearer ***" in payload_log and "sk-***" in payload_log,
         "API payload logs must redact credential-like fields")
 require('@ConfigurationProperties(prefix = "app.http")' in http_log_properties and
-        "private boolean logPayloads = true;" in http_log_properties and
-        "HTTP_LOG_PAYLOADS:true" in app_yml and "HTTP_MAX_PAYLOAD_CHARS:20000" in app_yml,
-        "HTTP request/response payload logging must be enabled and bounded by configuration")
+        "private boolean logPayloads = false;" in http_log_properties and
+        "HTTP_LOG_PAYLOADS:false" in app_yml and "HTTP_MAX_PAYLOAD_CHARS:20000" in app_yml,
+        "HTTP request/response payload logging must remain bounded and explicitly opt-in")
 require("PreferencesBackendSessionStorage" in session_storage and "initialize(storage" in backend_session,
         "HarmonyOS must restore its backend session from app-private storage")
-require("AppConfig.BACKEND_BASE_URL" in backend_session and "http://10.37.255.92:8080" in app_config,
-        "HarmonyOS default cloud server must be centralized in AppConfig")
+require("AppConfig.BACKEND_BASE_URL" in backend_session and
+        "BACKEND_BASE_URL: string = ''" in app_config and "http://" not in app_config,
+        "HarmonyOS backend default must be centralized in AppConfig without shipping a plaintext LAN endpoint")
 require("FamilyCloudService" in settings_page and "StudentRemoteApi" in family_cloud,
         "parent settings must manage cloud-backed family members")
 require("TutorRemoteApi" in study and "/tutor/messages" in tutor_remote,

@@ -58,6 +58,10 @@ export class DefaultFamilyContextRepository implements FamilyContextRepository {
       grade: student.grade,
       className: student.className,
       semester: student.semester,
+      chineseTextbook: student.chineseTextbook,
+      mathTextbook: student.mathTextbook,
+      englishTextbook: student.englishTextbook,
+      otherTextbooks: student.otherTextbooks,
       textbookSummary: student.textbookSummary
     };
   }

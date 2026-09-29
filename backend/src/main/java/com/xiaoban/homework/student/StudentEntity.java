@@ -14,6 +14,10 @@ public class StudentEntity {
   public String className;
   public String semester;
   public String textbookSummary;
+  public String chineseTextbook;
+  public String mathTextbook;
+  public String englishTextbook;
+  public String otherTextbooks;
   public Instant createdAt;
   public Instant updatedAt;
 

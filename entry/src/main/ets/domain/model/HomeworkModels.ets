@@ -69,6 +69,10 @@ export interface StudentProfile {
   grade: string;
   className: string;
   semester: string;
+  chineseTextbook: string;
+  mathTextbook: string;
+  englishTextbook: string;
+  otherTextbooks: string;
   textbookSummary: string;
 }
 

@@ -17,9 +17,10 @@ import { HomeworkImportInboxViewModel } from './HomeworkImportInboxViewModel';
 
 @Component
 export struct HomeworkImportInboxPage {
+  @Prop revision: number = 0;
   onBack: () => void = () => {};
   onOpenBatch: (batchId: string) => void = (_batchId: string) => {};
-  @State private revision: number = 0;
+  @State private localRevision: number = 0;
   @State private selectedSource: HomeworkImportInboxSourceFilter = HomeworkImportInboxSourceFilter.ALL;
   @State private selectedStatus: HomeworkImportInboxStatusFilter = HomeworkImportInboxStatusFilter.ALL;
   @State private selectedTime: HomeworkImportInboxTimeFilter = HomeworkImportInboxTimeFilter.ALL;
@@ -45,11 +46,11 @@ export struct HomeworkImportInboxPage {
   });
 
   aboutToAppear(): void {
-    this.revision++;
+    this.localRevision++;
   }
 
   private allBatches(): ImportBatch[] {
-    let currentRevision = this.revision;
+    let currentRevision = this.revision + this.localRevision;
     if (currentRevision < 0) return [];
     return this.viewModel.listBatches();
   }
@@ -244,6 +245,15 @@ export struct HomeworkImportInboxPage {
   @Builder
   private InboxContent() {
     Column({ space: 12 }) {
+      Text('这里保留通过文字、截图和系统分享导入的原始内容及整理结果，便于追溯；不是孩子的作业列表。')
+        .width('100%')
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+        .fontColor(AppTheme.SUBTEXT)
+        .padding(12)
+        .backgroundColor(AppTheme.PRIMARY_FAINT)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+
       this.FilterBar();
 
       Row() {
@@ -263,7 +273,7 @@ export struct HomeworkImportInboxPage {
 
       if (this.allBatches().length === 0) {
         Column({ space: 8 }) {
-          Text('箱')
+          Text('记')
             .width(36)
             .height(36)
             .fontSize(14)
@@ -310,7 +320,7 @@ export struct HomeworkImportInboxPage {
     Column() {
       Column({ space: AppTheme.DEEP_PAGE_CONTENT_GAP }) {
         DeepPageHeader({
-          title: '作业收件箱',
+          title: '导入记录',
           backAccessibilityText: '返回上一页',
           onBack: () => this.onBack()
         });

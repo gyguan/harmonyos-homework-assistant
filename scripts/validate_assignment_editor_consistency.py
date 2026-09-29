@@ -29,6 +29,7 @@ deadline = read("entry/src/main/ets/components/assignment/DeadlinePickerField.et
 import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
 extra_page = read("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 voice_page = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
+practice_generation = read("entry/src/main/ets/features/parent/practice/ParentPracticeGenerationPage.ets")
 change_detector = read("entry/src/main/ets/common/state/AssignmentEditChangeDetector.ets")
 
 for token in ["作业标题", "完成要求", "截止时间", "预计用时（分钟）", "教材 / 页码"]:
@@ -37,6 +38,16 @@ require("AssignmentEditForm({" in confirmation_components,
         "create-time confirmation editor must reuse AssignmentEditForm")
 require("AssignmentEditForm({" in review_editor,
         "published assignment editor must reuse AssignmentEditForm")
+for clear_text in ["清空作业标题", "清空完成要求", "清空教材页码"]:
+    require(clear_text in shared, f"shared assignment editor missing clear action: {clear_text}")
+require("private ActionFooter()" in extra_page and
+        extra_page.index("this.ActionFooter();") > extra_page.index(".scrollBar(BarState.Off);") and
+        "清空任务名称" in extra_page and "清空完成要求" in extra_page,
+        "extra assignment form must keep its main action fixed and expose free-text clear actions")
+require("清空训练要求" in practice_generation,
+        "practice generation requirement must expose a clear action")
+require("清空文件夹搜索" in voice_page,
+        "voice material folder search must expose a clear action")
 require("bindSheet($$this.showEditSheet" in review_pane and "preferType: SheetType.BOTTOM" in review_pane,
         "published assignment editing must use a bottom sheet")
 require("ParentAssignmentEditPanel({" in review_pane and "AssignmentEditorSheet" in review_pane,

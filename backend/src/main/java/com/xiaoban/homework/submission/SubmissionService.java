@@ -4,8 +4,10 @@ import com.xiaoban.homework.assignment.AssignmentDtos;
 import com.xiaoban.homework.assignment.AssignmentEntity;
 import com.xiaoban.homework.assignment.AssignmentRepository;
 import com.xiaoban.homework.assignment.AssignmentService;
+import com.xiaoban.homework.assignment.VoiceMediaPolicy;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.storage.FileStorage;
+import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -22,14 +24,19 @@ public class SubmissionService {
   private final AssignmentService assignments;
   private final AssignmentRepository assignmentRepository;
   private final FileStorage storage;
+  private final FileTransactionCoordinator fileTransactions;
+  private final VoiceMediaPolicy mediaPolicy;
 
   public SubmissionService(SubmissionRepository submissions, SubmissionPhotoRepository photos,
-      AssignmentService assignments, AssignmentRepository assignmentRepository, FileStorage storage) {
+      AssignmentService assignments, AssignmentRepository assignmentRepository, FileStorage storage,
+      FileTransactionCoordinator fileTransactions, VoiceMediaPolicy mediaPolicy) {
     this.submissions = submissions;
     this.photos = photos;
     this.assignments = assignments;
     this.assignmentRepository = assignmentRepository;
     this.storage = storage;
+    this.fileTransactions = fileTransactions;
+    this.mediaPolicy = mediaPolicy;
   }
 
   @Transactional
@@ -38,6 +45,7 @@ public class SubmissionService {
     if (files == null || files.isEmpty() || files.size() > 6) {
       throw new ApiExceptions.BadRequest("作业照片数量必须为 1-6 张");
     }
+    for (MultipartFile file : files) mediaPolicy.validateImage(file);
 
     AssignmentEntity assignment = assignments.requireOwned(familyId, assignmentId);
     if (assignment.version != expectedVersion) {
@@ -61,6 +69,7 @@ public class SubmissionService {
     for (MultipartFile file : files) {
       UUID photoId = UUID.randomUUID();
       FileStorage.StoredFile stored = storage.save(photoId, file);
+      fileTransactions.deleteOnRollback(stored.storagePath());
       SubmissionPhotoEntity photo = new SubmissionPhotoEntity();
       photo.id = photoId;
       photo.submissionId = submissionId;

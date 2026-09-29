@@ -12,7 +12,7 @@ from urllib.parse import quote
 
 from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, require
 
-AUDIO_BYTES = b"xiaoban-voice-material-e2e-audio"
+AUDIO_BYTES = b"ID3\x04\x00\x00\x00\x00\x00\x00xiaoban-voice-material-e2e-audio"
 IMAGE_BYTES = b"\x89PNG\r\n\x1a\nvoice-material-e2e-image"
 
 def multipart_voice_assignment(metadata: dict, audio_name: str, image_name: str) -> tuple[bytes, str]:

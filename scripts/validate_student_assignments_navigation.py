@@ -162,8 +162,9 @@ require("query(filter: AssignmentFilter): Promise<Assignment[]>" in repository_p
         "Repository must expose filtered query")
 require("HomeworkRemoteApi.instance.listFiltered" in repository_impl and "RemoteAssignmentMapper.toLocal" in repository_impl,
         "online queries must use backend filtering")
-require("!BackendSession.instance.isConnected()" in repository_impl and "this.listCached(filter)" in repository_impl,
-        "offline query must fall back to cache")
+require("!BackendSession.instance.isConnected()" in repository_impl and
+        "AssignmentQuery.filter(this.local.listAssignmentsForStudent(studentId), filter)" in repository_impl,
+        "offline query must fall back to the originating child's cache")
 require("async listFiltered(studentId: string, filter: AssignmentFilter)" in remote_api and
         "type=${encodeURIComponent(filter.assignmentType)}" in remote_api and
         "subjectCode=${encodeURIComponent(filter.subjectCode)}" in remote_api and "undated=true" in remote_api,

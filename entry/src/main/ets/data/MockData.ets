@@ -21,7 +21,11 @@ export class MockData {
       grade: '二年级',
       className: '二（2）班',
       semester: '上学期',
-      textbookSummary: '语文部编版 · 数学北师大版 · 英语沪教版'
+      chineseTextbook: '部编版',
+      mathTextbook: '北师大版',
+      englishTextbook: '沪教版',
+      otherTextbooks: '',
+      textbookSummary: '语文=部编版；数学=北师大版；英语=沪教版'
     },
     {
       id: 'student-xiaomi-002',
@@ -29,7 +33,11 @@ export class MockData {
       grade: '一年级',
       className: '一（5）班',
       semester: '上学期',
-      textbookSummary: '语文部编版 · 数学北师大版 · 英语沪教版'
+      chineseTextbook: '部编版',
+      mathTextbook: '北师大版',
+      englishTextbook: '沪教版',
+      otherTextbooks: '',
+      textbookSummary: '语文=部编版；数学=北师大版；英语=沪教版'
     }
   ];
 

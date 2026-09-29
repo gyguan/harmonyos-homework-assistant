@@ -7,6 +7,7 @@ export struct HomeworkImportRoutePage {
   @Prop revision: number = 0;
   onBack: () => void = () => {};
   onOpenConfirmation: () => void = () => {};
+  onOpenRecords: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
   build() {
@@ -23,6 +24,7 @@ export struct HomeworkImportRoutePage {
             revision: this.revision,
             embeddedInDeepPage: true,
             onOpenConfirmation: () => this.onOpenConfirmation(),
+            onOpenRecords: () => this.onOpenRecords(),
             onStoreChanged: () => this.onStoreChanged()
           });
         }

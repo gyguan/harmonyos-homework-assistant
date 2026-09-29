@@ -38,6 +38,7 @@ review_page = read("entry/src/main/ets/features/parent/review/ParentReviewPage.e
 extra_create = read("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 share_status = read("entry/src/main/ets/features/parent/import/HomeworkShareImportStatusPage.ets")
 settings = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
+student_profile_editor = read("entry/src/main/ets/components/family/StudentProfileEditorDialog.ets")
 import_route = read("entry/src/main/ets/features/parent/import/HomeworkImportRoutePage.ets")
 import_inbox = read("entry/src/main/ets/features/parent/import/HomeworkImportInboxPage.ets")
 submit_confirm = read("entry/src/main/ets/components/practice/PracticeSubmitConfirmDialog.ets")
@@ -128,7 +129,7 @@ for source, token, message in removed_copy:
 
 for source, token, message in [
     (submit_confirm, "未答题会按错误计入结果", "practice submit must retain consequence copy"),
-    (settings, "删除家庭成员属于高风险操作", "destructive family action must retain risk copy"),
+    (student_profile_editor, "删除家庭成员属于高风险操作", "destructive family action must retain risk copy"),
     (parent_progress, "删除后无法恢复", "bulk assignment deletion must retain irreversible-action copy"),
     (review, "删除后无法恢复", "single assignment deletion must retain irreversible-action copy"),
     (voice_create, "单个文件不超过 20MB", "voice upload must retain file-size constraints"),

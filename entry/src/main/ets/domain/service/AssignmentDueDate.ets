@@ -259,6 +259,7 @@ export class AssignmentDueDate {
   private static isOverdue(item: Assignment, nowEpochMs: number): boolean {
     if (item.status === AssignmentStatus.COMPLETED || item.status === AssignmentStatus.SUBMITTED) return false;
     if (item.status === AssignmentStatus.OVERDUE) return true;
+    if (item.dueAtEpochMs > 0) return item.dueAtEpochMs <= nowEpochMs;
     let dueDay = AssignmentDueDate.dayStart(item, nowEpochMs);
     return dueDay >= 0 && dueDay < AssignmentDueDate.businessDayStart(nowEpochMs);
   }

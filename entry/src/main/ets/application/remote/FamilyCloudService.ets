@@ -52,6 +52,10 @@ export class FamilyCloudService {
         grade: item.grade,
         className: item.className,
         semester: item.semester,
+        chineseTextbook: item.chineseTextbook,
+        mathTextbook: item.mathTextbook,
+        englishTextbook: item.englishTextbook,
+        otherTextbooks: item.otherTextbooks,
         textbookSummary: item.textbookSummary
       });
     }

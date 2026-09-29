@@ -24,6 +24,7 @@ public class AssignmentEntity {
   public String status;
   public String sourceLabel;
   public String sourceExcerpt;
+  public String createFingerprint;
   public int expectedMinutes;
   public long startedAtEpochMs;
   public long finishedAtEpochMs;

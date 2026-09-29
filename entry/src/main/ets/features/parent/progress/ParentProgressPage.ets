@@ -7,12 +7,14 @@ import { FilterSummaryEntry } from '../../../components/selection/SelectionContr
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { AssignmentDateFilter, AssignmentTypeFilter } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
+import { AssignmentAttentionKind, AssignmentAttentionPolicy } from '../../../domain/service/AssignmentAttentionPolicy';
 import { ParentReviewPane } from '../review/ParentReviewPane';
 import { ParentProgressViewModel } from './ParentProgressViewModel';
 
 @Component
 export struct ParentProgressPage {
   @Prop @Watch('onRevisionChanged') revision: number = 0;
+  @Prop @Watch('onAttentionKindChanged') attentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
   @State private refreshRevision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private selectedAssignmentId: string = '';
@@ -31,9 +33,11 @@ export struct ParentProgressPage {
   @State private deleteBusy: boolean = false;
   @State private deleteMessage: string = '';
   @State private showDeleteSheet: boolean = false;
+  @State private activeAttentionKind: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
 
   onOpenReview: (assignmentId: string) => void = (_assignmentId: string) => {};
   onStoreChanged: () => void = () => {};
+  onAttentionFilterCleared: () => void = () => {};
 
   private readonly viewModel: ParentProgressViewModel =
     new ParentProgressViewModel(DefaultAssignmentRepository.instance);
@@ -53,11 +57,36 @@ export struct ParentProgressPage {
   });
 
   aboutToAppear(): void {
+    this.applyIncomingAttention();
     this.rebuildView();
   }
 
   private onRevisionChanged(): void {
     this.rebuildView();
+  }
+
+  private onAttentionKindChanged(): void {
+    this.applyIncomingAttention();
+    this.rebuildView();
+  }
+
+  private applyIncomingAttention(): void {
+    this.activeAttentionKind = this.attentionKind;
+    if (this.activeAttentionKind === AssignmentAttentionKind.NONE) return;
+    this.allDates = true;
+    this.draftAllDates = true;
+    this.subjectCode = 'ALL';
+    this.draftSubjectCode = 'ALL';
+  }
+
+  private clearAttentionPreset(): void {
+    if (this.activeAttentionKind === AssignmentAttentionKind.NONE) return;
+    this.activeAttentionKind = AssignmentAttentionKind.NONE;
+    this.onAttentionFilterCleared();
+  }
+
+  private filterByAttention(items: Assignment[]): Assignment[] {
+    return AssignmentAttentionPolicy.filter(items, this.activeAttentionKind);
   }
 
   private canUseReviewPane(): boolean {
@@ -71,7 +100,7 @@ export struct ParentProgressPage {
       this.viewModel.assignments(
         AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL) :
       this.viewModel.assignmentsOnDay(this.subjectCode, this.selectedDayEpochMs);
-    this.applyScopedItems(scoped);
+    this.applyScopedItems(this.filterByAttention(scoped));
   }
 
   private applyScopedItems(items: Assignment[]): void {
@@ -248,6 +277,7 @@ export struct ParentProgressPage {
 
   private async applyFilters(allDates: boolean, selectedDayEpochMs: number, subjectCode: string): Promise<void> {
     if (this.querying) return;
+    this.clearAttentionPreset();
     this.draftAllDates = allDates;
     this.draftSelectedDayEpochMs = selectedDayEpochMs;
     this.draftSubjectCode = subjectCode;
@@ -268,7 +298,7 @@ export struct ParentProgressPage {
           AssignmentTypeFilter.ALL, this.subjectCode, AssignmentDateFilter.ALL) :
         await this.viewModel.queryOnDay(
           this.subjectCode, this.selectedDayEpochMs);
-      this.applyScopedItems(scoped);
+      this.applyScopedItems(this.filterByAttention(scoped));
     } finally {
       this.querying = false;
     }
@@ -318,6 +348,40 @@ export struct ParentProgressPage {
   }
 
   @Builder
+  private AttentionFilterBanner() {
+    if (this.activeAttentionKind !== AssignmentAttentionKind.NONE) {
+      Row({ space: 8 }) {
+        Text('提醒筛选')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.WARNING);
+        Text(AssignmentAttentionPolicy.label(this.activeAttentionKind))
+          .layoutWeight(1)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.TEXT);
+        Text('清除')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+          .fontColor(AppTheme.PRIMARY)
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .padding({ left: 8, right: 2 })
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('清除提醒筛选')
+          .onClick(() => {
+            this.clearAttentionPreset();
+            this.rebuildView();
+          });
+      }
+      .width('100%')
+      .padding({ left: 12, right: 12, top: 8, bottom: 8 })
+      .backgroundColor(AppTheme.WARNING_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
+  }
+
+  @Builder
   private FilterBar() {
     Row() {
       FilterSummaryEntry({
@@ -354,6 +418,7 @@ export struct ParentProgressPage {
   @Builder
   private ListContent() {
     Column({ space: 16 }) {
+      this.AttentionFilterBanner();
       this.FilterBar();
       this.BulkDeleteToolbar();
       if (this.deleteMessage.length > 0) {

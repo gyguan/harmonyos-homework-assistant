@@ -162,9 +162,10 @@ export class RemoteSubmissionApi {
       let totalBytes = 0;
       try {
         for (let i = 0; i < sourceUris.length; i++) {
-          let fileName = `homework-upload-${i + 1}.jpg`;
+          let fileName = this.uploadFileName(sourceUris[i], i + 1);
+          let contentType = this.uploadContentType(sourceUris[i]);
           let header = `--${boundary}\r\nContent-Disposition: form-data; name="photos"; filename="${fileName}"\r\n` +
-            'Content-Type: image/jpeg\r\n\r\n';
+            `Content-Type: ${contentType}\r\n\r\n`;
           totalBytes += await fileIo.write(writer.fd, header);
 
           let source = await fileIo.open(sourceUris[i], fileIo.OpenMode.READ_ONLY);
@@ -209,6 +210,36 @@ export class RemoteSubmissionApi {
     } finally {
       try { await fileIo.unlink(multipartPath); } catch {}
     }
+  }
+
+  private uploadFileName(uri: string, index: number): string {
+    let ext = this.uploadExtension(uri);
+    return `homework-upload-${index}.${ext}`;
+  }
+
+  private uploadContentType(uri: string): string {
+    let ext = this.uploadExtension(uri);
+    if (ext === 'png') return 'image/png';
+    if (ext === 'webp') return 'image/webp';
+    if (ext === 'heic') return 'image/heic';
+    return 'image/jpeg';
+  }
+
+  private uploadExtension(uri: string): string {
+    let normalized = uri.toLowerCase();
+    let queryIndex = normalized.indexOf('?');
+    if (queryIndex >= 0) normalized = normalized.substring(0, queryIndex);
+    let fragmentIndex = normalized.indexOf('#');
+    if (fragmentIndex >= 0) normalized = normalized.substring(0, fragmentIndex);
+
+    let dotIndex = normalized.lastIndexOf('.');
+    if (dotIndex < 0 || dotIndex >= normalized.length - 1) return 'jpg';
+    let extension = normalized.substring(dotIndex + 1);
+    if (extension === 'png') return 'png';
+    if (extension === 'webp') return 'webp';
+    if (extension === 'heic' || extension === 'heif') return 'heic';
+    if (extension === 'jpeg') return 'jpeg';
+    return 'jpg';
   }
 
   private extension(contentType: string): string {

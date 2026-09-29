@@ -24,31 +24,80 @@ function normalizePath(file) {
   return (file.relativePath || file.webkitRelativePath || file.name).replaceAll('\\', '/');
 }
 
-function packageLocation(file) {
-  const relativePath = normalizePath(file);
-  const parts = relativePath.split('/').filter(Boolean);
+function pathParts(file) {
+  return normalizePath(file).split('/').filter(Boolean);
+}
+
+function buildSelectionContext(files) {
+  const supported = files
+    .filter(file => resourceType(file))
+    .map(file => ({ file, parts: pathParts(file) }))
+    .filter(item => item.parts.length > 1);
+  const roots = new Set(supported.map(item => item.parts[0]));
+  if (roots.size > 1) {
+    return { multipleTopLevelRoots: true, singleRootIsPackage: false };
+  }
+  if (roots.size === 0) {
+    return { multipleTopLevelRoots: false, singleRootIsPackage: false };
+  }
+
+  // A selected task folder normally contains its media files directly. When a selected
+  // directory only contains child folders, treat those first-level children as packages so
+  // selecting one common parent directory becomes a one-shot multi-folder import.
+  const hasDirectSupportedFile = supported.some(item => item.parts.length === 2);
+  return {
+    multipleTopLevelRoots: false,
+    singleRootIsPackage: hasDirectSupportedFile
+  };
+}
+
+function packageLocation(file, context) {
+  const parts = pathParts(file);
   if (parts.length <= 1) {
-    return { key: 'selected-files', directoryName: '选择的素材' };
+    return {
+      key: 'selected-files',
+      directoryName: '选择的素材',
+      relativeName: file.name
+    };
   }
+
   const root = parts[0];
-  const parentParts = parts.slice(1, -1);
-  if (parentParts.length === 0) {
-    return { key: root, directoryName: root };
+  if (context.multipleTopLevelRoots || context.singleRootIsPackage) {
+    return {
+      key: root,
+      directoryName: root,
+      relativeName: parts.slice(1).join('/') || file.name
+    };
   }
-  return { key: parentParts.join('/'), directoryName: parentParts.join(' / ') };
+
+  const childDirectory = parts[1];
+  if (!childDirectory || parts.length === 2) {
+    return {
+      key: root,
+      directoryName: root,
+      relativeName: file.name
+    };
+  }
+  return {
+    key: childDirectory,
+    directoryName: childDirectory,
+    relativeName: parts.slice(2).join('/') || file.name
+  };
 }
 
 export function parseVoiceMaterialPackages(fileList, defaultSubjectCode, defaultMinutes) {
+  const files = Array.from(fileList);
+  const context = buildSelectionContext(files);
   const groups = new Map();
   let ignoredCount = 0;
 
-  for (const file of Array.from(fileList)) {
+  for (const file of files) {
     const type = resourceType(file);
     if (!type) {
       ignoredCount++;
       continue;
     }
-    const location = packageLocation(file);
+    const location = packageLocation(file, context);
     if (!groups.has(location.key)) {
       groups.set(location.key, {
         key: location.key,
@@ -62,7 +111,7 @@ export function parseVoiceMaterialPackages(fileList, defaultSubjectCode, default
     groups.get(location.key).files.push({
       file,
       resourceType: type,
-      relativeName: file.name
+      relativeName: location.relativeName
     });
   }
 

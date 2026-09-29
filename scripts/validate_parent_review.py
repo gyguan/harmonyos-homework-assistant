@@ -59,8 +59,9 @@ require("async delete(assignmentId: string)" in remote_api and "http.RequestMeth
         "HarmonyOS remote API must expose assignment DELETE")
 require("@DeleteMapping(\"/assignments/{id}\")" in controller and "service.delete(familyId, id)" in controller,
         "backend must expose owned assignment deletion")
-require("public void delete(UUID familyId, String id)" in service and "storage.delete(photo.storagePath)" in service,
-        "backend assignment deletion must clean stored submission photos")
+require("public void delete(UUID familyId, String id)" in service and
+        "fileTransactions.deleteAfterCommit(photo.storagePath)" in service,
+        "backend assignment deletion must clean stored submission photos only after the database commit")
 require("on delete cascade" in delete_migration.lower() and "submission_assignment_id_fkey" in delete_migration,
         "assignment deletion migration must cascade submission relations")
 require("void delete(String storagePath)" in file_storage,

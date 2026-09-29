@@ -50,9 +50,9 @@ require("[HTTP-REQUEST-BODY]" in payload and "[HTTP-RESPONSE]" in payload,
         "API observability must include request and response payload logs")
 require("sanitizeAndTruncate" in payload and "password|token|api[-_]?key|authorization" in payload,
         "payload logs must redact credential-like fields before output")
-require("private boolean logPayloads = true;" in http_config and
+require("private boolean logPayloads = false;" in http_config and
         "private int maxPayloadChars = 20000;" in http_config,
-        "HTTP payload logging must be enabled by default with a bounded payload size")
+        "HTTP payload logging must be disabled by default and remain explicitly opt-in")
 
 for scene in [
     "assignment.sync.snapshot", "assignment.query", "assignment.get", "assignment.create", "assignment.batchPublish",

@@ -79,6 +79,8 @@ export class HomeworkImportInboxService {
     this.inbox.saveBatch(batch, [message], enriched);
 
     if (enriched.length === 0) return;
+    let activeStudentId = this.drafts.getActiveStudentId();
+    if (rawImport.studentId !== activeStudentId) return;
     this.inbox.setActiveBatch(batchId);
     this.drafts.replaceRawImport({
       id: rawImport.id,
@@ -189,15 +191,26 @@ export class HomeworkImportInboxService {
 
   abandonBatch(batchId: string): boolean {
     let active = this.inbox.getActiveBatchId();
+    let batch = this.inbox.getBatch(batchId);
     let abandoned = this.inbox.abandon(batchId);
     if (!abandoned) return false;
-    if (active === batchId) this.drafts.clearCandidates();
+    if (active === batchId && batch !== null) {
+      let activeStudentId = this.drafts.getActiveStudentId();
+      if (batch.studentId === activeStudentId) this.drafts.clearCandidates();
+    }
     return true;
   }
 
-  markActiveBatchPublished(): void {
-    let batchId = this.inbox.getActiveBatchId();
+  getActiveBatchId(): string {
+    return this.inbox.getActiveBatchId();
+  }
+
+  markBatchPublished(batchId: string): void {
     if (batchId.length > 0) this.inbox.markPublished(batchId);
+  }
+
+  markActiveBatchPublished(): void {
+    this.markBatchPublished(this.inbox.getActiveBatchId());
   }
 
   private withEvidence(candidate: CandidateAssignment, batchId: string,

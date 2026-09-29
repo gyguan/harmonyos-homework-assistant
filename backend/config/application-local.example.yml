@@ -9,13 +9,15 @@ spring:
 
 app:
   bootstrap:
+    # Local development only. Production should keep bootstrap disabled and provision accounts explicitly.
+    enabled: true
     login-name: parent
-    password: parent123
+    password: change-me-local-only
 
   http:
-    # API request/response payload logging. Business payloads are printed; credential-like fields are redacted.
-    # Binary/multipart contents are represented by metadata rather than raw bytes.
-    log-payloads: true
+    # Keep business request/response bodies out of logs by default. Enable temporarily only when troubleshooting.
+    # Credential-like fields are redacted, but homework/child/Tutor content is still sensitive business data.
+    log-payloads: false
     max-payload-chars: 20000
 
   ai:

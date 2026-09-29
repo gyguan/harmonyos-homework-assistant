@@ -10,7 +10,10 @@ export enum AppRoute {
   PARENT_IMPORT_INBOX = 'parent/import/inbox',
   PARENT_IMPORT_BATCH_DETAIL = 'parent/import/inbox/detail',
   PARENT_IMPORT_CONFIRMATION = 'parent/import/confirmation',
-  PARENT_VOICE_CREATE = 'parent/voice/create'
+  PARENT_VOICE_CREATE = 'parent/voice/create',
+  PARENT_SCHEDULED_ASSIGNMENTS = 'parent/scheduled-assignments',
+  PARENT_PRACTICE_GENERATION = 'parent/practice/generation',
+  PARENT_PRACTICE_GENERATION_RESULT = 'parent/practice/generation/result'
 }
 
 export class AssignmentRouteParam {
@@ -39,3 +42,27 @@ export class ParentImportBatchRouteParam {
 export class ParentImportConfirmationRouteParam {}
 
 export class ParentVoiceCreateRouteParam {}
+export class ParentScheduledAssignmentsRouteParam {}
+export class ParentPracticeGenerationRouteParam {}
+
+export class ParentPracticeGenerationResultRouteParam {
+  subject: string;
+  track: string;
+  difficulty: string;
+  questionCount: number;
+  requirement: string;
+
+  constructor(
+    subject: string,
+    track: string,
+    difficulty: string,
+    questionCount: number,
+    requirement: string
+  ) {
+    this.subject = subject;
+    this.track = track;
+    this.difficulty = difficulty;
+    this.questionCount = questionCount;
+    this.requirement = requirement;
+  }
+}

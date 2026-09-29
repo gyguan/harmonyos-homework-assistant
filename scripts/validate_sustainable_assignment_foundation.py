@@ -57,10 +57,10 @@ for forbidden in [
 require("ensureRemoteCurrent" in repo and "reloadRemote" in repo and
         "current.backing === AssignmentBacking.LOCAL_SEED" in repo,
         "repository commands must share one explicit backing/hydration path")
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 9" in migrator and
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 10" in migrator and
         "migrateV7ToV8" in migrator and "legacyBacking" in migrator and
-        "migrateV8ToV9" in migrator,
-        "current snapshot chain must retain the one-time V7 -> V8 legacy identity migration")
+        "migrateV8ToV9" in migrator and "migrateV9ToV10" in migrator,
+        "current snapshot chain must retain the V7 -> V8 identity migration and newer explicit migrations")
 require("backing: source.backing," in store and
         "source.backing === AssignmentBacking.REMOTE ?" not in store,
         "snapshot clone must preserve explicit backing without post-migration guessing")

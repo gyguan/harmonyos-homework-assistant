@@ -5,9 +5,12 @@ export interface AssignmentLocalDataSource {
   getActiveStudent(): StudentProfile;
   getActiveStudentId(): string;
   listAssignments(): Assignment[];
+  listAssignmentsForStudent(studentId: string): Assignment[];
   getAssignment(assignmentId: string): Assignment | null;
+  getAssignmentForStudent(studentId: string, assignmentId: string): Assignment | null;
   getTodaySummary(): TodaySummary;
   replaceAssignmentsForActiveStudent(assignments: Assignment[]): void;
+  replaceAssignmentsForStudent(studentId: string, assignments: Assignment[]): void;
   reviewAssignment(assignmentId: string, completed: boolean, note: string): boolean;
   startAssignment(assignmentId: string): boolean;
   pauseAssignment(assignmentId: string): boolean;
@@ -28,6 +31,10 @@ export class DefaultAssignmentLocalDataSource implements AssignmentLocalDataSour
       grade: student.grade,
       className: student.className,
       semester: student.semester,
+      chineseTextbook: student.chineseTextbook,
+      mathTextbook: student.mathTextbook,
+      englishTextbook: student.englishTextbook,
+      otherTextbooks: student.otherTextbooks,
       textbookSummary: student.textbookSummary
     };
   }
@@ -40,8 +47,16 @@ export class DefaultAssignmentLocalDataSource implements AssignmentLocalDataSour
     return HomeworkStore.instance.getAssignments().slice();
   }
 
+  listAssignmentsForStudent(studentId: string): Assignment[] {
+    return HomeworkStore.instance.getAssignmentsForStudent(studentId);
+  }
+
   getAssignment(assignmentId: string): Assignment | null {
     return HomeworkStore.instance.getAssignment(assignmentId);
+  }
+
+  getAssignmentForStudent(studentId: string, assignmentId: string): Assignment | null {
+    return HomeworkStore.instance.getAssignmentForStudent(studentId, assignmentId);
   }
 
   getTodaySummary(): TodaySummary {
@@ -50,6 +65,10 @@ export class DefaultAssignmentLocalDataSource implements AssignmentLocalDataSour
 
   replaceAssignmentsForActiveStudent(assignments: Assignment[]): void {
     HomeworkStore.instance.replaceAssignmentsForActiveStudent(assignments);
+  }
+
+  replaceAssignmentsForStudent(studentId: string, assignments: Assignment[]): void {
+    HomeworkStore.instance.replaceAssignmentsForStudent(studentId, assignments);
   }
 
   reviewAssignment(assignmentId: string, completed: boolean, note: string): boolean {

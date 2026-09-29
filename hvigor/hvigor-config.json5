@@ -6,9 +6,12 @@
   },
   "execution": {
     "analyze": "normal",
-    "daemon": true,
-    "incremental": true,
-    "parallel": true,
+    "daemon": false,
+    "incremental": false,
+    "parallel": false,
     "typeCheck": true
+  },
+  "nodeOptions": {
+    "maxOldSpaceSize": 8192
   }
 }
