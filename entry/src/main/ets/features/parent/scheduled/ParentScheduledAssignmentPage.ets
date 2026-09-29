@@ -476,7 +476,26 @@ export struct ParentScheduledAssignmentPage {
       }
       .width('100%');
 
-      TextInput({ placeholder: '计划名称，例如：每天阅读 20 分钟', text: this.name })
+      Row() {
+        Text('计划名称')
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .fontColor(AppTheme.SUBTEXT);
+        Blank();
+        if (this.name.length > 0) {
+          Text('清空')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 12, right: 4 })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('清空计划名称')
+            .onClick(() => this.name = '');
+        }
+      }
+      .width('100%');
+
+      TextInput({ placeholder: '例如：每天阅读 20 分钟', text: this.name })
         .width('100%')
         .height(AppTheme.INPUT_HEIGHT)
         .fontSize(AppTheme.FORM_TEXT_SIZE)
@@ -556,6 +575,25 @@ export struct ParentScheduledAssignmentPage {
         }
         .width('100%');
 
+        Row() {
+          Text('任务名称')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+          Blank();
+          if (this.taskTitle.length > 0) {
+            Text('清空')
+              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+              .padding({ left: 12, right: 4 })
+              .fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('清空任务名称')
+              .onClick(() => this.taskTitle = '');
+          }
+        }
+        .width('100%');
+
         TextInput({ placeholder: '任务名称', text: this.taskTitle })
           .width('100%')
           .height(AppTheme.INPUT_HEIGHT)
@@ -563,6 +601,25 @@ export struct ParentScheduledAssignmentPage {
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onChange((value: string) => this.taskTitle = value);
+
+        Row() {
+          Text('完成要求')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .fontColor(AppTheme.SUBTEXT);
+          Blank();
+          if (this.instruction.length > 0) {
+            Text('清空')
+              .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+              .padding({ left: 12, right: 4 })
+              .fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.PRIMARY)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('清空完成要求')
+              .onClick(() => this.instruction = '');
+          }
+        }
+        .width('100%');
 
         TextArea({ placeholder: '完成要求', text: this.instruction })
           .width('100%')
@@ -621,17 +678,6 @@ export struct ParentScheduledAssignmentPage {
           .borderRadius(AppTheme.CONTROL_RADIUS);
       }
 
-      Button(this.busy ? '正在保存…' : '保存计划', { type: ButtonType.Normal })
-        .width('100%')
-        .height(AppTheme.BUTTON_HEIGHT)
-        .enabled(!this.busy)
-        .fontSize(AppTheme.FORM_TEXT_SIZE)
-        .fontWeight(FontWeight.Medium)
-        .backgroundColor(AppTheme.PRIMARY)
-        .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onClick(() => { void this.save(); });
-
       if (this.editingId.length > 0 && this.recentRuns.length > 0) {
         Text('最近执行')
           .width('100%')
@@ -662,6 +708,25 @@ export struct ParentScheduledAssignmentPage {
     .padding(AppTheme.CARD_PADDING_STANDARD)
     .backgroundColor(AppTheme.CARD_SURFACE)
     .borderRadius(AppTheme.CARD_RADIUS_STANDARD);
+  }
+
+  @Builder
+  private EditorFooter() {
+    Column() {
+      Button(this.busy ? '正在保存…' : '保存计划', { type: ButtonType.Normal })
+        .width('100%')
+        .height(AppTheme.BUTTON_HEIGHT)
+        .enabled(!this.busy)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .backgroundColor(AppTheme.PRIMARY)
+        .fontColor(AppTheme.TEXT_ON_PRIMARY)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .onClick(() => { void this.save(); });
+    }
+    .width('100%')
+    .padding({ top: 10, bottom: 14 })
+    .backgroundColor(AppTheme.BACKGROUND);
   }
 
   build() {
@@ -755,6 +820,10 @@ export struct ParentScheduledAssignmentPage {
         .layoutWeight(1)
         .align(Alignment.TopStart)
         .scrollBar(BarState.Off);
+
+        if (this.showEditor) {
+          this.EditorFooter();
+        }
       }
       .width('100%')
       .height('100%')
