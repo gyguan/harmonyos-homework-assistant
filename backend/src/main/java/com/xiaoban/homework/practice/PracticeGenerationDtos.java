@@ -59,7 +59,12 @@ public final class PracticeGenerationDtos {
 
   public record PublishRequest(
       @NotBlank String scope,
-      List<String> targetStudentIds) {}
+      List<String> targetStudentIds,
+      String purpose) {
+    public PublishRequest(String scope, List<String> targetStudentIds) {
+      this(scope, targetStudentIds, "STANDARD");
+    }
+  }
 
   public record PublishResponse(
       String generationId,
