@@ -3,6 +3,7 @@ package com.xiaoban.homework.media;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.family.FamilyRepository;
 import com.xiaoban.homework.storage.FileStorage;
+import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -13,20 +14,20 @@ import java.util.HexFormat;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class MediaAssetService {
   private final MediaAssetRepository assets;
   private final FileStorage storage;
+  private final FileTransactionCoordinator fileTransactions;
   private final FamilyRepository families;
 
   public MediaAssetService(MediaAssetRepository assets, FileStorage storage,
-      FamilyRepository families) {
+      FileTransactionCoordinator fileTransactions, FamilyRepository families) {
     this.assets = assets;
     this.storage = storage;
+    this.fileTransactions = fileTransactions;
     this.families = families;
   }
 
@@ -42,6 +43,7 @@ public class MediaAssetService {
 
     UUID id = UUID.randomUUID();
     FileStorage.StoredFile stored = storage.save(id, file);
+    fileTransactions.deleteOnRollback(stored.storagePath());
     MediaAssetEntity entity = new MediaAssetEntity();
     entity.id = id;
     entity.familyId = familyId;
@@ -52,9 +54,7 @@ public class MediaAssetService {
     entity.sha256 = sha256;
     entity.createdAt = Instant.now();
     try {
-      MediaAssetEntity saved = assets.saveAndFlush(entity);
-      registerRollbackCleanup(stored.storagePath());
-      return saved;
+      return assets.saveAndFlush(entity);
     } catch (RuntimeException error) {
       try {
         storage.delete(stored.storagePath());
@@ -63,21 +63,6 @@ public class MediaAssetService {
       }
       throw error;
     }
-  }
-
-  private void registerRollbackCleanup(String storagePath) {
-    if (!TransactionSynchronizationManager.isSynchronizationActive()) return;
-    TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-      @Override
-      public void afterCompletion(int status) {
-        if (status != TransactionSynchronization.STATUS_ROLLED_BACK) return;
-        try {
-          storage.delete(storagePath);
-        } catch (RuntimeException ignored) {
-          // Database rollback remains authoritative. Orphan cleanup can be retried operationally.
-        }
-      }
-    });
   }
 
   public MediaAssetEntity requireOwned(UUID familyId, UUID assetId) {

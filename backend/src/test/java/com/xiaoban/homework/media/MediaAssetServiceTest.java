@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import com.xiaoban.homework.family.FamilyEntity;
 import com.xiaoban.homework.family.FamilyRepository;
 import com.xiaoban.homework.storage.FileStorage;
+import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -39,7 +40,7 @@ class MediaAssetServiceTest {
 
     TransactionSynchronizationManager.initSynchronization();
     try {
-      MediaAssetEntity result = new MediaAssetService(repository, storage, families).store(
+      MediaAssetEntity result = new MediaAssetService(repository, storage, new FileTransactionCoordinator(storage), families).store(
           familyId,
           new MockMultipartFile("file", "voice.mp3", "audio/mpeg", new byte[] {1, 2, 3}));
 
@@ -73,7 +74,7 @@ class MediaAssetServiceTest {
     when(repository.saveAndFlush(any(MediaAssetEntity.class)))
         .thenAnswer(invocation -> invocation.getArgument(0));
 
-    MediaAssetService service = new MediaAssetService(repository, storage, families);
+    MediaAssetService service = new MediaAssetService(repository, storage, new FileTransactionCoordinator(storage), families);
     MediaAssetEntity first = service.store(familyId,
         new MockMultipartFile("file", "5.png", "image/png", new byte[] {1, 2, 3}));
     MediaAssetEntity second = service.store(familyId,
@@ -102,7 +103,7 @@ class MediaAssetServiceTest {
         any(UUID.class), anyString(), anyLong()))
         .thenReturn(Optional.of(existing));
 
-    MediaAssetEntity result = new MediaAssetService(repository, storage, families).store(
+    MediaAssetEntity result = new MediaAssetService(repository, storage, new FileTransactionCoordinator(storage), families).store(
         familyId,
         new MockMultipartFile("file", "voice.mp3", "audio/mpeg", new byte[] {1, 2, 3}));
 

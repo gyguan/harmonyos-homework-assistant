@@ -72,6 +72,8 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 13. Practice 题库新增或更新必须遵守 `docs/product/practice-question-content-standard.md`；预置题库以 `backend/src/main/resources/practice/preset/` 为唯一源数据，已发布内容通过新 version 演进，不覆盖历史 Attempt / Result。
 14. AI 练习由家长创建、学生消费：AI_GENERATED Paper 必须按 familyId 隔离，并通过 Practice Paper Audience 显式授权给一个、多个或发布当时的全部学生；生成结果先作为 Draft 保存，经过后端质量门禁和家长预览确认后才能发布，学生端不得直接发起出题。生成参考学生负责提供年级/学期/当前科目教材上下文，Practice Generation 保存 referenceStudentId 与生成时的 subject-specific textbook context；发布对象与生成参考学生分离。发布候选兼容性由后端统一计算，目标学生必须满足年级/学期兼容，教材同步还要求当前科目教材与生成快照一致。首次发布后 Audience 不在生成页继续修改。
 15. 定时创建能力只负责在计划时间生成现有 Assignment；暂停、恢复、编辑或删除计划只影响未来执行，不修改已生成 Assignment。语音定时计划与学生进入兜底必须复用同一服务端幂等边界。
+16. 当前家长端一级导航固定为“首页 / 学生作业 / 我的”；文字、截图、系统分享等老师作业输入统一属于“布置作业”流程，历史批次仅作为二级“导入记录”保留。没有被动自动来源时，不单独设置“作业收件箱”一级入口。
+17. 所有跨网络异步操作必须在第一次 await 前捕获 studentId，并以显式 student-scoped API 写回；禁止使用“响应返回时的 activeStudent”决定缓存或草稿写入目标。
 
 ## Technical direction
 
@@ -123,9 +125,9 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 2. 旧科目只做确定性映射：`语文 -> CHINESE`、`数学 -> MATH`、`英语 -> ENGLISH`，其他值统一 `OTHER`。
 3. **禁止从历史 `dueText` 猜测 `dueAt`**。历史 `dueText` 原值保留，无法确定的 `dueAt` 保持空值，默认 `dueTimezone=Asia/Shanghai`。
 4. V2 日期筛选只依据结构化 `dueAt`；历史未结构化日期不伪造成某个具体日期。
-5. 当前 HarmonyOS Snapshot schema 为 V8；V4→V5→V6→V7→V8 均保留显式逐版本 migration。任何后续版本升级仍必须增加明确迁移步骤，不得 schema mismatch 后 seed MockData。
+5. 当前 HarmonyOS Snapshot schema 为 V10；V4→V5→V6→V7→V8→V9→V10 均保留显式逐版本 migration。任何后续版本升级仍必须增加明确迁移步骤，不得 schema mismatch 后 seed MockData。
 6. schema-changing save 前保留一次 `homework_snapshot_pre_migration_backup`；迁移失败不得覆盖原主快照。
-7. PostgreSQL V1–V6 永不修改；V7 采用 add -> deterministic backfill -> verify -> tighten constraints，破坏性删除后置。
+7. 已发布 PostgreSQL Flyway migration 永不修改；后续一律通过新的 forward migration 演进。当前已演进到 V23：V22 为 Assignment 状态域增加数据库 CHECK 约束，V23 增加 Assignment 创建请求指纹，用于同 ID 重试的严格幂等校验。
 8. API 升级顺序为 **backend first**：迁移期支持 `V1 Client -> V2 Backend`，最迟在 Slice 5 结束；**不支持 `V2 Client -> V1 Backend`**，避免在新客户端引入旧后端 fallback。
 9. Slice 3 再将 `OVERDUE` 从 canonical status 迁移为派生属性：历史 OVERDUE 且 `elapsedSeconds > 0` -> `PAUSED`，否则 -> `NOT_STARTED`；不塞入 V7。
 10. Flyway 与 Snapshot 均以 forward migration / forward-fix 为主，不建设自动 down migration。

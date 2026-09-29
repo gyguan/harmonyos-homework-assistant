@@ -2,26 +2,29 @@ import { AssignmentStatus } from '../model/HomeworkModels';
 
 export class AssignmentStateMachine {
   static canTransition(from: AssignmentStatus, to: AssignmentStatus): boolean {
+    if (from === to) return true;
     if (from === AssignmentStatus.NOT_STARTED) {
       return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.OVERDUE;
     }
     if (from === AssignmentStatus.IN_PROGRESS) {
-      return to === AssignmentStatus.PAUSED || to === AssignmentStatus.READY_TO_SUBMIT || to === AssignmentStatus.OVERDUE;
+      return to === AssignmentStatus.PAUSED || to === AssignmentStatus.READY_TO_SUBMIT ||
+        to === AssignmentStatus.NOT_STARTED || to === AssignmentStatus.OVERDUE;
     }
     if (from === AssignmentStatus.PAUSED) {
-      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.OVERDUE;
+      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.NOT_STARTED ||
+        to === AssignmentStatus.OVERDUE;
     }
     if (from === AssignmentStatus.READY_TO_SUBMIT) {
-      return to === AssignmentStatus.SUBMITTED;
+      return to === AssignmentStatus.SUBMITTED || to === AssignmentStatus.IN_PROGRESS;
     }
     if (from === AssignmentStatus.SUBMITTED) {
       return to === AssignmentStatus.COMPLETED || to === AssignmentStatus.NEEDS_REWORK;
     }
     if (from === AssignmentStatus.NEEDS_REWORK) {
-      return to === AssignmentStatus.IN_PROGRESS;
+      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.READY_TO_SUBMIT;
     }
     if (from === AssignmentStatus.OVERDUE) {
-      return to === AssignmentStatus.IN_PROGRESS;
+      return to === AssignmentStatus.IN_PROGRESS || to === AssignmentStatus.READY_TO_SUBMIT;
     }
     return false;
   }

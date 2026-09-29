@@ -25,16 +25,16 @@ spring:
 
 app:
   bootstrap:
-    enabled: ${BOOTSTRAP_ENABLED:true}
-    login-name: ${BOOTSTRAP_LOGIN:parent}
-    password: ${BOOTSTRAP_PASSWORD:parent123}
+    enabled: ${BOOTSTRAP_ENABLED:false}
+    login-name: ${BOOTSTRAP_LOGIN:}
+    password: ${BOOTSTRAP_PASSWORD:}
     family-name: ${BOOTSTRAP_FAMILY_NAME:我的家庭}
   auth:
     token-ttl-hours: ${AUTH_TOKEN_TTL_HOURS:168}
   storage:
     root: ${APP_STORAGE_ROOT:./data/uploads}
   http:
-    log-payloads: ${HTTP_LOG_PAYLOADS:true}
+    log-payloads: ${HTTP_LOG_PAYLOADS:false}
     max-payload-chars: ${HTTP_MAX_PAYLOAD_CHARS:20000}
   ai:
     provider: ${AI_PROVIDER:AUTO}

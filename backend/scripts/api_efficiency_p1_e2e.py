@@ -114,9 +114,25 @@ def main() -> int:
         require(len(results) == 2 and all(item.get("applied") is True for item in results),
                 "batch sync must apply both current-version updates")
 
-        ready = create_assignment(
+        ready_source = create_assignment(
             base_url, token, student_id, f"p1-submit-{run_id}",
-            "提交最新证据", "数学", "MATH", status="READY_TO_SUBMIT")
+            "提交最新证据", "数学", "MATH")
+        started = expect(
+            http(
+                base_url, "POST", f"/api/v1/assignments/{ready_source['id']}/actions",
+                token=token,
+                payload={"action": "START", "version": int(ready_source["version"])},
+            ),
+            (200,), "start P1 submission assignment",
+        ).json()
+        ready = expect(
+            http(
+                base_url, "POST", f"/api/v1/assignments/{ready_source['id']}/actions",
+                token=token,
+                payload={"action": "READY_TO_SUBMIT", "version": int(started["version"])},
+            ),
+            (200,), "ready P1 submission assignment",
+        ).json()
         body, content_type = multipart_png()
         created = expect(
             http(

@@ -24,6 +24,7 @@ models = read("entry/src/main/ets/domain/model/HomeworkModels.ets")
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 mock_data = read("entry/src/main/ets/data/MockData.ets")
 import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
+import_inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
 parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
 ocr = read("entry/src/main/ets/infrastructure/ai/CoreVisionHomeworkTextExtractor.ets")
 persistence = read("entry/src/main/ets/domain/model/PersistenceModels.ets")
@@ -57,6 +58,10 @@ require("candidate.studentId === studentId" in store,
         "Candidate reads must remain isolated by studentId")
 require("existing.studentId !== studentId" in store,
         "Replacing one child's state must preserve siblings' state")
+require("getAssignmentsForStudent(studentId: string)" in store and
+        "replaceAssignmentsForStudent(studentId: string" in store and
+        "getAssignmentForStudent(studentId: string" in store,
+        "async repository writes must have explicit student-scoped cache primitives")
 require("input.studentId !== this.getActiveStudentId()" in store,
         "current raw-import write path must reject another child's import")
 
@@ -72,6 +77,8 @@ require("studentId: input.studentId" in ocr,
         "OCR must preserve child context")
 require("studentId: input.studentId" in parser,
         "Parser must preserve child context")
+require("rawImport.studentId !== this.drafts.getActiveStudentId()" in import_inbox_service,
+        "late AI/OCR import results must not overwrite a newly selected child's draft")
 
 # Parent child switching is a persistent family-context selection, not a cycle button. The active
 # child must be an explicit reactive state so the identity bar and wide rail re-render immediately.
@@ -99,6 +106,12 @@ require("this.activeStudentId === student.id" in switcher and "当前孩子" in 
 require("remoteSummaryStudentId" in assignment_repository and
         "this.remoteSummaryStudentId === activeStudentId" in assignment_repository,
         "Today summary cache must be scoped to the active child")
+require("syncStudentAssignments(studentId: string)" in assignment_repository and
+        "replaceAssignmentsForStudent(studentId, merged)" in assignment_repository and
+        "getAssignmentForStudent(studentId" in assignment_repository,
+        "assignment sync must retain the initiating child identity across awaits")
+require("replaceAssignmentsForActiveStudent(merged)" not in assignment_repository,
+        "async remote assignment sync must never write through active-child indirection")
 require("this.queryCache = [];" in assignment_repository and
         "this.remoteSummary = null;" in assignment_repository,
         "Repository refresh must clear previous-child in-memory caches synchronously")

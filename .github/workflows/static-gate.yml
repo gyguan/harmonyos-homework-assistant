@@ -8,6 +8,7 @@ on:
       - 'feat/**'
       - 'ci/**'
       - 'refactor/**'
+      - 'fix/**'
 
 jobs:
   validate-parent-import-inbox:
@@ -303,6 +304,9 @@ jobs:
       - name: Validate API observability invariants
         run: python scripts/validate_api_observability.py
 
+      - name: Validate repository quality hardening
+        run: python scripts/validate_quality_hardening.py
+
       - name: Set up Java 21
         uses: actions/setup-java@v5
         with:
@@ -316,6 +320,11 @@ jobs:
 
   backend-real-e2e:
     runs-on: ubuntu-latest
+    env:
+      BOOTSTRAP_ENABLED: 'true'
+      BOOTSTRAP_LOGIN: parent
+      BOOTSTRAP_PASSWORD: parent123
+      HTTP_LOG_PAYLOADS: 'true'
     services:
       postgres:
         image: postgres:17-alpine

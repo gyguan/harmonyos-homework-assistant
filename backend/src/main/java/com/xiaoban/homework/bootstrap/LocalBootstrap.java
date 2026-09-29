@@ -20,14 +20,19 @@ public class LocalBootstrap implements ApplicationRunner {
   private final PasswordEncoder encoder; private final boolean enabled; private final String login; private final String password; private final String familyName;
 
   public LocalBootstrap(FamilyRepository families, AccountRepository accounts, StudentService students, PasswordEncoder encoder,
-      @Value("${app.bootstrap.enabled:true}") boolean enabled, @Value("${app.bootstrap.login-name:parent}") String login,
-      @Value("${app.bootstrap.password:parent123}") String password, @Value("${app.bootstrap.family-name:我的家庭}") String familyName) {
+      @Value("${app.bootstrap.enabled:false}") boolean enabled, @Value("${app.bootstrap.login-name:}") String login,
+      @Value("${app.bootstrap.password:}") String password, @Value("${app.bootstrap.family-name:我的家庭}") String familyName) {
     this.families = families; this.accounts = accounts; this.students = students; this.encoder = encoder;
     this.enabled = enabled; this.login = login; this.password = password; this.familyName = familyName;
   }
 
   @Override public void run(ApplicationArguments args) {
-    if (!enabled || accounts.findByLoginName(login).isPresent()) return;
+    if (!enabled) return;
+    if (login == null || login.isBlank() || password == null || password.isBlank()) {
+      throw new IllegalStateException(
+          "BOOTSTRAP_ENABLED=true 时必须显式配置 BOOTSTRAP_LOGIN 和 BOOTSTRAP_PASSWORD");
+    }
+    if (accounts.findByLoginName(login).isPresent()) return;
     Instant now = Instant.now(); UUID familyId = UUID.randomUUID();
     families.save(new FamilyEntity(familyId, familyName, now));
     accounts.save(new AccountEntity(UUID.randomUUID(), familyId, login, encoder.encode(password), "家长", now));
