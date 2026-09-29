@@ -204,6 +204,31 @@ export struct StudentHomePage {
   }
 
   @Builder
+  private AttentionBanner() {
+    let attention = this.viewModel.attentionText();
+    if (attention.length > 0) {
+      Row({ space: 8 }) {
+        Text('提醒')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.WARNING);
+        Text(attention)
+          .layoutWeight(1)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.TEXT);
+      }
+      .width('100%')
+      .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+      .backgroundColor(AppTheme.WARNING_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityGroup(true)
+      .accessibilityText(`提醒，${attention}`);
+    }
+  }
+
+  @Builder
   private EmptyState() {
     Row({ space: 11 }) {
       SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
@@ -280,6 +305,7 @@ export struct StudentHomePage {
   private PhoneHome() {
     Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
+      this.AttentionBanner();
       this.TodayTasks();
     }
     .width('100%')
@@ -291,6 +317,7 @@ export struct StudentHomePage {
   private PadHome() {
     Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
+      this.AttentionBanner();
       Row({ space: AppTheme.SPLIT_PANE_GAP }) {
         Column({ space: 12 }) {
           Text('先做这项')
