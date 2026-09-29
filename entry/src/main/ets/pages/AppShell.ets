@@ -2,6 +2,7 @@ import {
   AppRoute,
   AssignmentRouteParam,
   ParentPracticeGenerationRouteParam,
+  ParentPracticeGenerationResultRouteParam,
   ParentScheduledAssignmentsRouteParam,
   ParentVoiceCreateRouteParam,
   PracticeAttemptRouteParam,
@@ -21,6 +22,11 @@ import { PageStateView } from '../components/state/PageStateView';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import {
+  PracticeDifficulty,
+  PracticeSubject,
+  PracticeTrack
+} from '../domain/model/practice/PracticeModels';
 import { FamilyContextRepository } from '../domain/port/FamilyContextRepository';
 import { HomeworkConfirmationPage } from '../features/parent/confirmation/HomeworkConfirmationPage';
 import { ParentDashboardPage } from '../features/parent/dashboard/ParentDashboardPage';
@@ -31,6 +37,7 @@ import { HomeworkImportBatchDetailPage } from '../features/parent/import/Homewor
 import { HomeworkShareImportStatusPage } from '../features/parent/import/HomeworkShareImportStatusPage';
 import { ParentProgressPage } from '../features/parent/progress/ParentProgressPage';
 import { ParentPracticeGenerationPage } from '../features/parent/practice/ParentPracticeGenerationPage';
+import { ParentPracticeGenerationResultPage } from '../features/parent/practice/ParentPracticeGenerationResultPage';
 import { ParentScheduledAssignmentPage } from '../features/parent/scheduled/ParentScheduledAssignmentPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
@@ -329,6 +336,25 @@ export struct AppShell {
       AppRoute.PARENT_PRACTICE_GENERATION, new ParentPracticeGenerationRouteParam());
   }
 
+  private openParentPracticeGenerationResult(
+    subject: PracticeSubject,
+    track: PracticeTrack,
+    difficulty: PracticeDifficulty,
+    questionCount: number,
+    requirement: string
+  ): void {
+    this.navPathStack.pushPathByName(
+      AppRoute.PARENT_PRACTICE_GENERATION_RESULT,
+      new ParentPracticeGenerationResultRouteParam(
+        subject, track, difficulty, questionCount, requirement));
+  }
+
+  private finishParentPracticePublished(): void {
+    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    if (this.navPathStack.size() > 0) this.navPathStack.pop();
+    this.notifyPracticeChanged();
+  }
+
   private routeAssignmentId(param: Object): string {
     return (param as AssignmentRouteParam).assignmentId;
   }
@@ -515,10 +541,32 @@ export struct AppShell {
       NavDestination() {
         ParentPracticeGenerationPage({
           onBack: () => this.navPathStack.pop(),
-          onPublished: () => {
-            this.navPathStack.pop();
-            this.notifyPracticeChanged();
-          }
+          onGenerate: (
+            subject,
+            track,
+            difficulty,
+            questionCount,
+            requirement
+          ) => this.openParentPracticeGenerationResult(
+            subject,
+            track,
+            difficulty,
+            questionCount,
+            requirement)
+        });
+      }
+      .hideTitleBar(true)
+      .backgroundColor(AppTheme.BACKGROUND);
+    } else if (name === AppRoute.PARENT_PRACTICE_GENERATION_RESULT) {
+      NavDestination() {
+        ParentPracticeGenerationResultPage({
+          subject: (param as ParentPracticeGenerationResultRouteParam).subject as PracticeSubject,
+          track: (param as ParentPracticeGenerationResultRouteParam).track as PracticeTrack,
+          difficulty: (param as ParentPracticeGenerationResultRouteParam).difficulty as PracticeDifficulty,
+          questionCount: (param as ParentPracticeGenerationResultRouteParam).questionCount,
+          requirement: (param as ParentPracticeGenerationResultRouteParam).requirement,
+          onBack: () => this.navPathStack.pop(),
+          onPublished: () => this.finishParentPracticePublished()
         });
       }
       .hideTitleBar(true)
