@@ -46,6 +46,7 @@ export enum PracticeDifficulty {
 export enum PracticeSourceType {
   PRESET = 'PRESET',
   AI_GENERATED = 'AI_GENERATED',
+  AI_REINFORCEMENT = 'AI_REINFORCEMENT',
   PARENT_CREATED = 'PARENT_CREATED',
   IMPORTED = 'IMPORTED'
 }
@@ -345,6 +346,11 @@ export enum PracticePublishScope {
   CURRENT = 'CURRENT',
   SELECTED = 'SELECTED',
   ALL = 'ALL'
+}
+
+export enum PracticePublishPurpose {
+  STANDARD = 'STANDARD',
+  REINFORCEMENT = 'REINFORCEMENT'
 }
 
 export interface PracticePublishResult {
