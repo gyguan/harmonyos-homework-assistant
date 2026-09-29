@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties(prefix = "app.http")
 public class HttpLogProperties {
-  private boolean logPayloads = true;
+  private boolean logPayloads = false;
   private int maxPayloadChars = 20000;
 
   public boolean isLogPayloads() { return logPayloads; }
