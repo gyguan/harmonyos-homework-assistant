@@ -38,6 +38,16 @@ public final class StudentDtos {
       String englishTextbook,
       String otherTextbooks,
       String textbookSummary) {
+    public Response(
+        String id,
+        String name,
+        String grade,
+        String className,
+        String semester,
+        String textbookSummary) {
+      this(id, name, grade, className, semester, "", "", "", "", textbookSummary);
+    }
+
     static Response from(StudentEntity e) {
       StudentTextbooks textbooks = StudentTextbooks.from(e);
       return new Response(
