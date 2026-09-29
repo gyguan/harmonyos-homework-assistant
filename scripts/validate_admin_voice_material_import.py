@@ -106,8 +106,12 @@ for element_id in [
 ]:
     require(f'id="{element_id}"' in index, f"missing folder import UI: {element_id}")
 require('id="folder-input" type="file" webkitdirectory directory multiple' in index and
-        "Ctrl/Shift" in index and "ondrop" in app and "collectDirectory" in app,
-        "folder import must support one-shot multi-directory selection and drag/drop")
+        'id="add-folder-picker"' in index and "共同上级目录" in index and
+        "Ctrl/Shift" not in index and "ondrop" in app and "collectDirectory" in app,
+        "folder import must provide browser-safe parent-folder, repeated-add and drag/drop paths")
+require("openFolderInput" in app and "继续添加文件夹" in app and
+        "state.importPackages.map" in app and "mergeFiles" in app,
+        "repeated directory picks must accumulate in the same pending import list")
 require("multipleTopLevelRoots" in voice and "singleRootIsPackage" in voice and
         "parts.slice(2).join('/')" in voice,
         "multi-folder parser must distinguish direct multi-root selection from common-parent selection and preserve nested relative names")
