@@ -33,6 +33,9 @@ submission_client = read("entry/src/main/ets/application/remote/RemoteSubmission
 frontend_state = read("entry/src/main/ets/domain/service/AssignmentStateMachine.ets")
 backend_state = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentStatePolicy.java")
 migration = read("backend/src/main/resources/db/migration/V22__assignment_status_constraint.sql")
+idempotency_migration = read("backend/src/main/resources/db/migration/V23__assignment_create_fingerprint.sql")
+assignment_entity = read("backend/src/main/java/com/xiaoban/homework/assignment/AssignmentEntity.java")
+tutor_service = read("backend/src/main/java/com/xiaoban/homework/tutor/TutorService.java")
 harmony_workflow = read(".github/workflows/harmony-client-build.yml")
 
 require("BACKEND_BASE_URL: string = ''" in app_config and "http://" not in app_config,
@@ -89,6 +92,17 @@ for status in [
     "SUBMITTED", "COMPLETED", "NEEDS_REWORK", "OVERDUE",
 ]:
     require(f"'{status}'" in migration, f"database status constraint missing {status}")
+
+require("createFingerprint" in assignment_entity and
+        "createFingerprint(studentId, input)" in assignment and
+        "创建内容与原请求不一致" in assignment,
+        "assignment create retries must be protected by a stable creation fingerprint")
+require("create_fingerprint varchar(64)" in idempotency_migration,
+        "assignment create fingerprint must be persisted through a forward Flyway migration")
+require("DataIntegrityViolationException" in tutor_service and
+        "saveAndFlush(session)" in tutor_service and
+        "findByFamilyIdAndAssignmentId" in tutor_service,
+        "concurrent first Tutor questions must recover the unique-session race")
 
 require("pull_request:" in harmony_workflow and "HARMONYOS_RUNNER_ENABLED" in harmony_workflow and
         "verify_harmony_client.ps1" in harmony_workflow,
