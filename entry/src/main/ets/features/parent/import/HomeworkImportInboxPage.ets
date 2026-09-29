@@ -245,6 +245,15 @@ export struct HomeworkImportInboxPage {
   @Builder
   private InboxContent() {
     Column({ space: 12 }) {
+      Text('这里保留通过文字、截图和系统分享导入的原始内容及整理结果，便于追溯；不是孩子的作业列表。')
+        .width('100%')
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+        .fontColor(AppTheme.SUBTEXT)
+        .padding(12)
+        .backgroundColor(AppTheme.PRIMARY_FAINT)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+
       this.FilterBar();
 
       Row() {
@@ -264,7 +273,7 @@ export struct HomeworkImportInboxPage {
 
       if (this.allBatches().length === 0) {
         Column({ space: 8 }) {
-          Text('箱')
+          Text('记')
             .width(36)
             .height(36)
             .fontSize(14)
