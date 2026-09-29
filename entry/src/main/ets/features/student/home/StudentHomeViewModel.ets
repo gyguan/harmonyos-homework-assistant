@@ -7,6 +7,7 @@ import {
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
 import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
+import { AssignmentAttentionPolicy } from '../../../domain/service/AssignmentAttentionPolicy';
 
 export class StudentHomeViewModel {
   private readonly repository: AssignmentRepository;
@@ -33,6 +34,10 @@ export class StudentHomeViewModel {
 
   async performAction(assignmentId: string, action: AssignmentAction): Promise<Assignment> {
     return this.repository.performAction(assignmentId, action);
+  }
+
+  attentionText(): string {
+    return AssignmentAttentionPolicy.student(this.assignments());
   }
 
   todayActionableAssignments(): Assignment[] {
