@@ -9,6 +9,7 @@ import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAss
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
+import { StudentTextbookProfile } from '../../../domain/service/StudentTextbookProfile';
 
 @Component
 export struct BackendConnectionPage {
@@ -26,7 +27,10 @@ export struct BackendConnectionPage {
   @State private editGrade: string = '';
   @State private editClassName: string = '';
   @State private editSemester: string = '';
-  @State private editTextbooks: string = '';
+  @State private editChineseTextbook: string = '';
+  @State private editMathTextbook: string = '';
+  @State private editEnglishTextbook: string = '';
+  @State private editOtherTextbooks: string = '';
   @State private familyExpanded: boolean = false;
   @State private parentAccessExpanded: boolean = false;
   @State private tutorRulesExpanded: boolean = false;
@@ -159,7 +163,10 @@ export struct BackendConnectionPage {
     this.editGrade = '';
     this.editClassName = '';
     this.editSemester = '上学期';
-    this.editTextbooks = '';
+    this.editChineseTextbook = '';
+    this.editMathTextbook = '';
+    this.editEnglishTextbook = '';
+    this.editOtherTextbooks = '';
   }
 
   private beginEdit(student: StudentProfile): void {
@@ -169,7 +176,11 @@ export struct BackendConnectionPage {
     this.editGrade = student.grade;
     this.editClassName = student.className;
     this.editSemester = student.semester;
-    this.editTextbooks = student.textbookSummary;
+    let textbooks = StudentTextbookProfile.fromStudent(student);
+    this.editChineseTextbook = textbooks.chineseTextbook;
+    this.editMathTextbook = textbooks.mathTextbook;
+    this.editEnglishTextbook = textbooks.englishTextbook;
+    this.editOtherTextbooks = textbooks.otherTextbooks;
   }
 
   private cancelEdit(): void {
@@ -187,13 +198,26 @@ export struct BackendConnectionPage {
       this.message = '姓名、年级、班级不能为空';
       return;
     }
+    if (!StudentTextbookProfile.validOtherTextbooks(this.editOtherTextbooks)) {
+      this.message = '其他教材格式应为“科目=教材版本”，多个科目使用中文分号分隔';
+      return;
+    }
+    let textbooks = StudentTextbookProfile.fields(
+      this.editChineseTextbook,
+      this.editMathTextbook,
+      this.editEnglishTextbook,
+      this.editOtherTextbooks);
     let student: StudentProfile = {
       id: this.editingId,
       name: this.editName.trim(),
       grade: this.editGrade.trim(),
       className: this.editClassName.trim(),
       semester: this.editSemester.trim().length === 0 ? '上学期' : this.editSemester.trim(),
-      textbookSummary: this.editTextbooks.trim()
+      chineseTextbook: textbooks.chineseTextbook,
+      mathTextbook: textbooks.mathTextbook,
+      englishTextbook: textbooks.englishTextbook,
+      otherTextbooks: textbooks.otherTextbooks,
+      textbookSummary: StudentTextbookProfile.summary(textbooks)
     };
     if (await FamilyCloudService.instance.saveStudent(student)) {
       this.editingId = '';
@@ -276,9 +300,53 @@ export struct BackendConnectionPage {
         TextInput({ placeholder: '学期', text: this.editSemester })
           .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
           .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editSemester = value);
-        TextArea({ placeholder: '教材版本，如 语文部编版 · 数学北师大版', text: this.editTextbooks })
-          .width('100%').height(86).fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT).backgroundColor(AppTheme.SURFACE)
-          .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editTextbooks = value);
+
+        Column({ space: 8 }) {
+          Text('教材版本')
+            .width('100%')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('只填写教材版本即可，年级和学期由孩子资料自动组合。')
+            .width('100%')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+
+          TextInput({ placeholder: '语文，例如：部编版', text: this.editChineseTextbook })
+            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
+            .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editChineseTextbook = value);
+          TextInput({ placeholder: '数学，例如：北师大版', text: this.editMathTextbook })
+            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
+            .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editMathTextbook = value);
+          TextInput({ placeholder: '英语，例如：人教版', text: this.editEnglishTextbook })
+            .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE).backgroundColor(AppTheme.SURFACE)
+            .borderRadius(AppTheme.CONTROL_RADIUS).onChange((value: string) => this.editEnglishTextbook = value);
+
+          Text('其他教材（可选）')
+            .width('100%')
+            .fontSize(AppTheme.LABEL_TITLE_SIZE)
+            .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+          TextArea({
+            placeholder: '例如：科学=教科版；道德与法治=人教版',
+            text: this.editOtherTextbooks
+          })
+            .width('100%')
+            .height(82)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
+            .backgroundColor(AppTheme.SURFACE)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => this.editOtherTextbooks = value);
+          Text('格式：科目=教材版本；多个科目使用中文分号“；”分隔')
+            .width('100%')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+        }
+        .width('100%');
 
         if (this.deleteStudentConfirmId === this.editingId) {
           Column({ space: 8 }) {
