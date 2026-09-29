@@ -1,7 +1,15 @@
-import { Assignment, AssignmentBacking, AssignmentContentType, AssignmentType, Subject } from '../model/HomeworkModels';
+import {
+  Assignment,
+  AssignmentBacking,
+  AssignmentContentType,
+  AssignmentType,
+  StudentProfile,
+  Subject
+} from '../model/HomeworkModels';
+import { StudentTextbookProfile } from './StudentTextbookProfile';
 import { HomeworkSnapshot } from '../model/PersistenceModels';
 
-export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 9;
+export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 10;
 
 export class HomeworkSnapshotMigrator {
   static migrate(snapshot: HomeworkSnapshot): HomeworkSnapshot {
@@ -33,6 +41,10 @@ export class HomeworkSnapshotMigrator {
       }
       if (current.schemaVersion === 8) {
         current = HomeworkSnapshotMigrator.migrateV8ToV9(current);
+        continue;
+      }
+      if (current.schemaVersion === 9) {
+        current = HomeworkSnapshotMigrator.migrateV9ToV10(current);
         continue;
       }
       throw new Error(`缺少本地作业数据迁移步骤: ${current.schemaVersion}`);
@@ -192,6 +204,41 @@ export class HomeworkSnapshotMigrator {
         students: snapshot.settings.students,
         activeStudentId: snapshot.settings.activeStudentId,
         parentAccessCode: '',
+        tutorGuidanceFirst: snapshot.settings.tutorGuidanceFirst,
+        directAnswerAllowed: snapshot.settings.directAnswerAllowed
+      },
+      rawImports: snapshot.rawImports,
+      assignments: snapshot.assignments,
+      candidates: snapshot.candidates,
+      submissions: snapshot.submissions,
+      tutorSessions: snapshot.tutorSessions,
+      submissionSequence: snapshot.submissionSequence
+    };
+  }
+
+  private static migrateV9ToV10(snapshot: HomeworkSnapshot): HomeworkSnapshot {
+    let students: StudentProfile[] = [];
+    for (let source of snapshot.settings.students) {
+      let fields = StudentTextbookProfile.parseLegacy(source.textbookSummary);
+      students.push({
+        id: source.id,
+        name: source.name,
+        grade: source.grade,
+        className: source.className,
+        semester: source.semester,
+        chineseTextbook: fields.chineseTextbook,
+        mathTextbook: fields.mathTextbook,
+        englishTextbook: fields.englishTextbook,
+        otherTextbooks: fields.otherTextbooks,
+        textbookSummary: StudentTextbookProfile.summary(fields)
+      });
+    }
+    return {
+      schemaVersion: 10,
+      settings: {
+        students: students,
+        activeStudentId: snapshot.settings.activeStudentId,
+        parentAccessCode: snapshot.settings.parentAccessCode,
         tutorGuidanceFirst: snapshot.settings.tutorGuidanceFirst,
         directAnswerAllowed: snapshot.settings.directAnswerAllowed
       },
