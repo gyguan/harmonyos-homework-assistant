@@ -51,8 +51,9 @@ require("files.size() > 6" in submission_service and "FileStorage" in submission
 require('"ohos.permission.INTERNET"' in module, "HarmonyOS module must declare INTERNET permission")
 require("replaceAssignmentsForActiveStudent" in store,
         "HomeworkStore must expose a child-scoped remote snapshot replacement method")
-require("HomeworkRemoteApi.instance.list" in sync and "replaceAssignmentsForActiveStudent" in sync,
-        "Assignment Repository sync must push/pull through HomeworkRemoteApi and update the local cache")
+require("HomeworkRemoteApi.instance.list" in sync and
+        "replaceAssignmentsForStudent(studentId, merged)" in sync,
+        "Assignment Repository sync must push/pull through HomeworkRemoteApi and update the originating child's cache")
 require("assignment.syncDirty && assignment.remoteVersion === existing.version" in sync and
         "dirtyEntries.push({ assignment: assignment, version: assignment.remoteVersion })" in sync and
         "HomeworkRemoteApi.instance.sync(studentId, chunk)" in sync,
