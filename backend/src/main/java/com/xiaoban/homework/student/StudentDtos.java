@@ -15,7 +15,17 @@ public final class StudentDtos {
       String mathTextbook,
       String englishTextbook,
       String otherTextbooks,
-      String textbookSummary) {}
+      String textbookSummary) {
+    public Upsert(
+        String id,
+        String name,
+        String grade,
+        String className,
+        String semester,
+        String textbookSummary) {
+      this(id, name, grade, className, semester, "", "", "", "", textbookSummary);
+    }
+  }
 
   public record Response(
       String id,
