@@ -67,6 +67,19 @@ Practice 内容维护必须遵守：
 6. 内容变更必须运行 `python scripts/generate_practice_catalog.py` 和 `python scripts/validate_practice_content.py`；
 7. 不允许通过放宽校验、跳过 CI、测试特判或临时兼容分支绕过练习题规范。
 
+## TOEIC content standard
+
+任何 Agent / 开发者只要涉及 `entry/src/main/ets/toeic/` 下的题目、词汇、训练计划、解析或未来 Listening 音频内容，**必须先阅读** `docs/product/toeic-coach-content-standard.md`。
+
+TOEIC 内容维护必须遵守：
+
+1. 内容准确性优先于题量，未通过校验与复核的内容不得进入正式训练；
+2. 米小勒等备考经验用于方法和重点提炼，ETS / IIBC 用于考试边界校准，正式题目与解析必须为自建内容；
+3. Part 7 正式题必须有明确 evidence，无法定位证据的题目不得发布；
+4. 做题结果必须同时记录正确性与速度，SLOW_CORRECT 不直接视为完全掌握；
+5. TOEIC 模块不得依赖 HomeworkStore、Assignment、Practice、StudentProfile 等小伴作业业务领域；
+6. 数据模型从首版兼容 LISTENING / READING，新增 Listening 不得复制第二套学习进度与训练引擎。
+
 ## V2 refactor invariants
 
 V2 是一次受控替换，不是继续修补 V1。后续任何 Agent / 开发者在修改代码前必须阅读：
