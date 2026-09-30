@@ -285,19 +285,21 @@ export struct VoiceAssignmentPane {
     }
 
     let requestVersion = ++this.imageRequestVersion;
-    this.imageIndex = index;
     this.imageLoading = true;
     this.imageLoadMessage = '';
     this.notifyMediaState();
+
     let uri = await this.loadImage(index);
     if (requestVersion !== this.imageRequestVersion) return;
 
     this.imageLoading = false;
     if (uri.length === 0) {
       this.imageLoadMessage = `第 ${index + 1} 张图片加载失败，请重试`;
+      this.notifyMediaState();
       return;
     }
 
+    this.imageIndex = index;
     this.notifyMediaState();
   }
 
