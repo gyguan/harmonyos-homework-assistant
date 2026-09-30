@@ -63,10 +63,22 @@ export class ToeicDiagnosticSummary {
   part7Correct:number=0; part7Total:number=0;
 }
 
+export class ToeicQuestionHistory {
+  questionId:string;
+  attemptCount:number;
+  wrongCount:number;
+
+  constructor(questionId:string, attemptCount:number=0, wrongCount:number=0) {
+    this.questionId=questionId;
+    this.attemptCount=attemptCount;
+    this.wrongCount=wrongCount;
+  }
+}
+
 export class ToeicLearningSnapshot {
-  schemaVersion:number=2; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=3; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string=ToeicSkill.PARAPHRASE;
-  reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[];
+  reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
 }
 
 export class ToeicStudyPlan {
@@ -82,13 +94,15 @@ export class ToeicTrainingSession {
 export class ToeicSentenceDrill {
   id:string;
   sentence:string;
+  translation:string;
   core:string;
   focus:string;
   explanation:string;
 
-  constructor(id:string, sentence:string, core:string, focus:string, explanation:string) {
+  constructor(id:string, sentence:string, translation:string, core:string, focus:string, explanation:string) {
     this.id=id;
     this.sentence=sentence;
+    this.translation=translation;
     this.core=core;
     this.focus=focus;
     this.explanation=explanation;
