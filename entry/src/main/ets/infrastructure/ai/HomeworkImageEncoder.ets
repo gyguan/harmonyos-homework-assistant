@@ -9,11 +9,17 @@ export interface EncodedHomeworkImage {
 
 export class HomeworkImageEncoder {
   static async encode(uri: string): Promise<EncodedHomeworkImage> {
-    let file = await fileIo.open(uri, fileIo.OpenMode.READ_ONLY);
+    let file: fileIo.File | null = null;
     let source: image.ImageSource | null = null;
     let pixelMap: image.PixelMap | null = null;
     let packer: image.ImagePacker | null = null;
     try {
+      try {
+        file = await fileIo.open(uri, fileIo.OpenMode.READ_ONLY);
+      } catch {
+        throw new Error('无法读取所选图片，请重新选择后重试');
+      }
+
       source = image.createImageSource(file.fd);
       let info = await source.getImageInfo();
       let width = info.size.width;
@@ -31,7 +37,7 @@ export class HomeworkImageEncoder {
       pixelMap = await source.createPixelMap(options);
       packer = image.createImagePacker();
       let packing: image.PackingOption = { format: 'image/jpeg', quality: 90 };
-      let encoded = await packer.packing(pixelMap, packing);
+      let encoded = await packer.packToData(pixelMap, packing);
       if (encoded.byteLength === 0 || encoded.byteLength > 4 * 1024 * 1024) {
         throw new Error('图片处理后超过4MB，请裁剪后重试');
       }
@@ -51,7 +57,9 @@ export class HomeworkImageEncoder {
       if (source !== null) {
         try { await source.release(); } catch { console.warn('Homework image source cleanup failed'); }
       }
-      try { await fileIo.close(file); } catch { console.warn('Homework image file cleanup failed'); }
+      if (file !== null) {
+        try { await fileIo.close(file); } catch { console.warn('Homework image file cleanup failed'); }
+      }
     }
   }
 }
