@@ -24,7 +24,8 @@ export class ToeicCoachViewModel {
   contentErrors():string[] {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
     let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
-    return questionErrors.concat(vocabularyErrors);
+    let sentenceErrors=ToeicContentValidator.validateSentenceDrills(PresetToeicContent.sentenceDrills()).errors;
+    return questionErrors.concat(vocabularyErrors).concat(sentenceErrors);
   }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
   todayPlan():ToeicStudyDay { return PresetToeicContent.studyDay(this.snapshot().currentDay); }
