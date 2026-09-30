@@ -10,7 +10,7 @@ export class ToeicCoachViewModel {
   diagnosticQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.diagnosticQuestions(); }
   dailyQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.dailyQuestions(this.snapshot()); }
   dailyQuestionsForDay(day:number):ToeicQuestion[] {
-    return ToeicTrainingService.instance.dailyQuestions(this.snapshot(),10,day);
+    return ToeicTrainingService.instance.studyDayQuestions(this.snapshot(),day);
   }
   createAttempt(question:ToeicQuestion,selectedIndex:number,elapsedSeconds:number):ToeicQuestionAttempt {
     return ToeicTrainingService.instance.createAttempt(question,selectedIndex,elapsedSeconds);

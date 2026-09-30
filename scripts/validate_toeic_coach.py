@@ -114,7 +114,10 @@ def main() -> None:
 
     training = read("entry/src/main/ets/toeic/application/ToeicTrainingService.ets")
     require("PresetToeicContent.questionsForDay(studyDay)" in training,
-            "daily queue must include the explicitly selected study day")
+            "adaptive daily queue must include the explicitly selected study day")
+    require("studyDayQuestions(snapshot:ToeicLearningSnapshot, studyDay:number)" in training and
+            "let planned=PresetToeicContent.questionsForDay(studyDay)" in training,
+            "manual day entry must use a day-scoped queue")
     require("recoveryLimit=Math.min(4,limit)" in training,
             "daily queue must cap remediation so planned content still fits")
     require("containsQuestionId(selected,q.id)" in training and
@@ -131,11 +134,13 @@ def main() -> None:
             "review or preview sessions must be recordable without advancing currentDay")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
-    for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "WeekPlanCard",
-                  "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'",
-                  "selectedStudyDay", "selectStudyDay(day:number)", "effectiveStudyDay()",
-                  ".onClick(()=>this.selectStudyDay(plan.day))", "dailyQuestionsForDay(day)"]:
-        require(token in ui, f"week-one learning UI missing: {token}")
+    for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "DaySelector",
+                  "DayButton", "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'",
+                  "selectedStudyDay", "selectedDayTitle", "selectStudyDay(day:number)", "effectiveStudyDay()",
+                  "this.DayButton(1,currentDay)", "this.DayButton(7,currentDay)",
+                  ".onClick(()=>this.selectStudyDay(day))", "dailyQuestionsForDay(day)",
+                  "'进入 Day '+selectedDay+' 训练'"]:
+        require(token in ui, f"week-one free-day UI missing: {token}")
     builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
         ui,
@@ -184,8 +189,19 @@ def main() -> None:
             "answer option styling must not depend on stale ToeicQuestion objects")
     require("this.activeSessionAdvancesProgress=day===this.viewModel.snapshot().currentDay" in ui,
             "only the real current progress day may advance currentDay")
-    require("if (advanceProgress) this.selectedStudyDay=0" in ui,
-            "after completing the real current day the UI must follow the new currentDay")
+    require("this.activeSessionAdvancesProgress=!this.viewModel.snapshot().diagnosticCompleted" in ui,
+            "Day 1 should advance only on the first diagnostic")
+    require("else if (!snapshot.diagnosticCompleted)" not in ui,
+            "diagnostic state must not hide the Day 1-7 selector or block free day entry")
+    require("this.DaySelector(snapshot.currentDay);" in ui and
+            "this.TodayCard(snapshot,selectedDay);" in ui,
+            "day selector and selected-day training card must always render when content is valid")
+    require("this.selectedDayTitle=plan.title" in ui and
+            "this.selectedDayFocus=plan.focus" in ui,
+            "selected day must load explicit plan snapshot fields")
+    require("this.selectedStudyDay=this.viewModel.snapshot().currentDay" in ui and
+            "this.loadStudyDay(this.selectedStudyDay)" in ui,
+            "after completing the real current day the UI must follow and load the new currentDay")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
