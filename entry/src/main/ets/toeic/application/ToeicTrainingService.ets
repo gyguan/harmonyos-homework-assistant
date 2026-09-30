@@ -16,24 +16,31 @@ export class ToeicTrainingService {
 
   diagnosticQuestions():ToeicQuestion[] { return PresetToeicContent.diagnosticQuestions(); }
 
-  dailyQuestions(snapshot:ToeicLearningSnapshot, limit:number=8):ToeicQuestion[] {
+  dailyQuestions(snapshot:ToeicLearningSnapshot, limit:number=10):ToeicQuestion[] {
     let all=PresetToeicContent.publishedQuestions();
     let selected:ToeicQuestion[]=[];
-    this.appendByIds(selected,all,snapshot.reviewQuestionIds,limit);
-    this.appendByIds(selected,all,snapshot.slowQuestionIds,limit);
+    let recoveryLimit=Math.min(4,limit);
+
+    this.appendByIds(selected,all,snapshot.reviewQuestionIds,recoveryLimit);
+    this.appendByIds(selected,all,snapshot.slowQuestionIds,recoveryLimit);
+
+    let weakLimit=Math.min(6,limit);
     let weak=snapshot.weakSkill as ToeicSkill;
     for (let q of all) {
-      if (selected.length>=limit) break;
+      if (selected.length>=weakLimit) break;
       if (q.skill===weak && selected.indexOf(q)<0) selected.push(q);
     }
+
+    let planned=PresetToeicContent.questionsForDay(snapshot.currentDay);
+    for (let q of planned) {
+      if (selected.length>=limit) break;
+      if (selected.indexOf(q)<0) selected.push(q);
+    }
+
     let diagnostic=PresetToeicContent.diagnosticQuestions();
     for (let q of all) {
       if (selected.length>=limit) break;
       if (selected.indexOf(q)<0 && diagnostic.indexOf(q)<0) selected.push(q);
-    }
-    for (let q of all) {
-      if (selected.length>=limit) break;
-      if (selected.indexOf(q)<0) selected.push(q);
     }
     return selected;
   }
