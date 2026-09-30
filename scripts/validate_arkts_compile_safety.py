@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 from pathlib import Path
+import json
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
+HOMEWORK_IMAGE_ENCODER = ROOT / "entry/src/main/ets/infrastructure/ai/HomeworkImageEncoder.ets"
+SYSCAP_CONFIG = ROOT / "entry/src/main/syscap.json"
 PARENT_PRACTICE_GENERATION = ROOT / "entry/src/main/ets/features/parent/practice/ParentPracticeGenerationPage.ets"
 PARENT_PRACTICE_GENERATION_RESULT = ROOT / "entry/src/main/ets/features/parent/practice/ParentPracticeGenerationResultPage.ets"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
@@ -61,6 +64,8 @@ def validate_qualified_model_imports() -> None:
 def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
+    image_encoder = HOMEWORK_IMAGE_ENCODER.read_text(encoding="utf-8")
+    syscap = json.loads(SYSCAP_CONFIG.read_text(encoding="utf-8"))
     parent_practice_generation = PARENT_PRACTICE_GENERATION.read_text(encoding="utf-8")
     parent_practice_generation_result = PARENT_PRACTICE_GENERATION_RESULT.read_text(encoding="utf-8")
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
@@ -181,6 +186,25 @@ def main() -> int:
             "AVPlayer seek must keep the known-good synchronized seek mode")
     require("player.seek(target);" in audio,
             "AVPlayer seek must have a capability-safe fallback when SeekMode is unavailable")
+
+    require("encoded = await packer.packToData(pixelMap, packing);" in image_encoder and
+            "try {" in image_encoder and
+            "catch {" in image_encoder and
+            "图片压缩失败，请重新选择后重试" in image_encoder,
+            "HomeworkImageEncoder.packToData must have explicit exception handling")
+    require("let encoded = await packer.packToData(pixelMap, packing);" not in image_encoder,
+            "HomeworkImageEncoder must not restore unhandled packToData assignment")
+
+    development_syscaps = syscap.get("development", {}).get("addedSysCaps", [])
+    production_syscaps = syscap.get("production", {}).get("addedSysCaps", [])
+    for required_syscap in [avplayer_syscap, media_core_syscap]:
+        require(required_syscap in development_syscaps,
+                f"syscap.json development.addedSysCaps missing {required_syscap}")
+        require(required_syscap not in production_syscaps,
+                f"Media SysCap must stay optional at runtime, not production-required: {required_syscap}")
+    require("default" in syscap.get("devices", {}).get("general", []) and
+            "tablet" in syscap.get("devices", {}).get("general", []),
+            "syscap.json must keep phone/default and tablet development device coverage")
 
     setup_builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
