@@ -1,7 +1,7 @@
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { ToeicLearningSnapshot, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue, ToeicSentenceDrill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicPart, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 
@@ -22,14 +22,74 @@ export struct ToeicHomePage {
   @State private selectedStudyDay:number=0;
   @State private activeSessionDay:number=0;
   @State private activeSessionAdvancesProgress:boolean=false;
+  @State private currentQuestionId:string='';
+  @State private currentPassage:string='';
+  @State private currentStem:string='';
+  @State private currentOptionCount:number=0;
+  @State private currentOptionA:string='';
+  @State private currentOptionB:string='';
+  @State private currentOptionC:string='';
+  @State private currentOptionD:string='';
+  @State private currentCorrectIndex:number=-1;
+  @State private currentExplanation:string='';
+  @State private currentEvidence:string='';
+  @State private currentParaphrase:string='';
+  @State private currentRecommendedSeconds:number=0;
+  @State private currentPart:ToeicPart=ToeicPart.PART_5;
+  @State private currentSkill:ToeicSkill=ToeicSkill.WORD_FORM;
+  @State private currentScoreValue:ToeicScoreValue=ToeicScoreValue.MUST_GET;
   private readonly viewModel:ToeicCoachViewModel=new ToeicCoachViewModel();
   private attempts:ToeicQuestionAttempt[]=[];
 
   aboutToAppear():void { this.refreshRevision++; }
 
-  private currentQuestion():ToeicQuestion|null {
-    if (this.currentIndex<0 || this.currentIndex>=this.questions.length) return null;
-    return this.questions[this.currentIndex];
+  private currentQuestionForAttempt():ToeicQuestion|null {
+    if (this.currentQuestionId.length===0) return null;
+    for (let question of this.questions) {
+      if (question.id===this.currentQuestionId) return question;
+    }
+    return null;
+  }
+
+  private loadQuestion(index:number):boolean {
+    if (index<0 || index>=this.questions.length) return false;
+    let question=this.questions[index];
+    this.currentQuestionId=question.id;
+    this.currentPassage=question.passage;
+    this.currentStem=question.stem;
+    this.currentOptionCount=question.options.length;
+    this.currentOptionA=question.options.length>0?question.options[0]:'';
+    this.currentOptionB=question.options.length>1?question.options[1]:'';
+    this.currentOptionC=question.options.length>2?question.options[2]:'';
+    this.currentOptionD=question.options.length>3?question.options[3]:'';
+    this.currentCorrectIndex=question.correctIndex;
+    this.currentExplanation=question.explanation;
+    this.currentEvidence=question.evidence;
+    this.currentParaphrase=question.paraphrase;
+    this.currentRecommendedSeconds=question.recommendedSeconds;
+    this.currentPart=question.part;
+    this.currentSkill=question.skill;
+    this.currentScoreValue=question.scoreValue;
+    return true;
+  }
+
+  private clearQuestionSnapshot():void {
+    this.currentQuestionId='';
+    this.currentPassage='';
+    this.currentStem='';
+    this.currentOptionCount=0;
+    this.currentOptionA='';
+    this.currentOptionB='';
+    this.currentOptionC='';
+    this.currentOptionD='';
+    this.currentCorrectIndex=-1;
+    this.currentExplanation='';
+    this.currentEvidence='';
+    this.currentParaphrase='';
+    this.currentRecommendedSeconds=0;
+    this.currentPart=ToeicPart.PART_5;
+    this.currentSkill=ToeicSkill.WORD_FORM;
+    this.currentScoreValue=ToeicScoreValue.MUST_GET;
   }
 
   private effectiveStudyDay():number {
@@ -85,27 +145,48 @@ export struct ToeicHomePage {
 
   private startSession(mode:ToeicPageMode,questions:ToeicQuestion[]):void {
     if (questions.length===0) return;
-    this.mode=mode; this.questions=questions; this.currentIndex=0; this.selectedIndex=-1;
-    this.answerLocked=false; this.answerCorrect=false; this.questionStartedAtMs=Date.now(); this.attempts=[];
+    this.questions=questions;
+    this.currentIndex=0;
+    this.selectedIndex=-1;
+    this.answerLocked=false;
+    this.answerCorrect=false;
+    this.questionStartedAtMs=Date.now();
+    this.attempts=[];
+    this.loadQuestion(0);
+    this.mode=mode;
   }
 
   private cancelSession():void {
-    this.mode=ToeicPageMode.HOME; this.questions=[]; this.attempts=[]; this.answerLocked=false; this.selectedIndex=-1;
+    this.mode=ToeicPageMode.HOME;
+    this.questions=[];
+    this.attempts=[];
+    this.answerLocked=false;
+    this.selectedIndex=-1;
+    this.clearQuestionSnapshot();
   }
 
   private chooseAnswer(index:number):void {
     if (this.answerLocked) return;
-    let question=this.currentQuestion();
-    if (question===null) return;
+    let question=this.currentQuestionForAttempt();
+    if (question===null || question.id!==this.currentQuestionId) return;
     let elapsed=Math.max(1,Math.round((Date.now()-this.questionStartedAtMs)/1000));
     let attempt=this.viewModel.createAttempt(question,index,elapsed);
-    this.attempts.push(attempt); this.selectedIndex=index; this.answerCorrect=attempt.correct; this.answerLocked=true;
+    this.attempts.push(attempt);
+    this.selectedIndex=index;
+    this.answerCorrect=attempt.correct;
+    this.answerLocked=true;
   }
 
   private nextQuestion():void {
     if (!this.answerLocked) return;
-    if (this.currentIndex+1>=this.questions.length) { void this.finishSession(); return; }
-    this.currentIndex++; this.selectedIndex=-1; this.answerLocked=false; this.answerCorrect=false; this.questionStartedAtMs=Date.now();
+    let nextIndex=this.currentIndex+1;
+    if (nextIndex>=this.questions.length) { void this.finishSession(); return; }
+    this.currentIndex=nextIndex;
+    this.selectedIndex=-1;
+    this.answerLocked=false;
+    this.answerCorrect=false;
+    this.questionStartedAtMs=Date.now();
+    this.loadQuestion(nextIndex);
   }
 
   private async finishSession():Promise<void> {
@@ -118,26 +199,27 @@ export struct ToeicHomePage {
     if (advanceProgress) this.selectedStudyDay=0;
     this.refreshRevision++; this.mode=ToeicPageMode.HOME; this.questions=[]; this.attempts=[];
     this.answerLocked=false; this.selectedIndex=-1;
+    this.clearQuestionSnapshot();
     this.activeSessionDay=0; this.activeSessionAdvancesProgress=false;
   }
 
-  private optionBackground(index:number,question:ToeicQuestion):string {
+  private optionBackground(index:number):string {
     if (!this.answerLocked) return AppTheme.SURFACE;
-    if (index===question.correctIndex) return AppTheme.SUCCESS_SOFT;
+    if (index===this.currentCorrectIndex) return AppTheme.SUCCESS_SOFT;
     if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER_SOFT;
     return AppTheme.SURFACE;
   }
 
-  private optionBorder(index:number,question:ToeicQuestion):string {
+  private optionBorder(index:number):string {
     if (!this.answerLocked) return AppTheme.BORDER;
-    if (index===question.correctIndex) return AppTheme.SUCCESS;
+    if (index===this.currentCorrectIndex) return AppTheme.SUCCESS;
     if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER;
     return AppTheme.BORDER;
   }
 
-  private optionText(index:number,question:ToeicQuestion):string {
+  private optionText(index:number):string {
     if (!this.answerLocked) return AppTheme.TEXT;
-    if (index===question.correctIndex) return AppTheme.SUCCESS;
+    if (index===this.currentCorrectIndex) return AppTheme.SUCCESS;
     if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER;
     return AppTheme.TEXT;
   }
@@ -496,90 +578,114 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private QuestionContent(questionIndex:number,questionId:string) {
+  private QuestionContent() {
     Scroll() {
-        Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
-          DeepPageHeader({
-            title:this.mode===ToeicPageMode.DIAGNOSTIC?'Reading 快速诊断':'今日训练',
-            subtitle:String(questionIndex+1)+' / '+this.questions.length+' · '+
-              this.viewModel.partLabel(this.questions[questionIndex].part),
-            trailingText:'建议 '+this.questions[questionIndex].recommendedSeconds+'s',
-            onBack:()=>this.cancelSession()
-          });
-          Column({space:12}) {
-            Row() {
-              Text(this.viewModel.skillLabel(this.questions[questionIndex].skill))
-                .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-                .padding({left:9,right:9,top:5,bottom:5}).backgroundColor(AppTheme.PRIMARY_SOFT)
-                .borderRadius(AppTheme.CHIP_RADIUS);
-              Blank();
-              Text(this.questions[questionIndex].scoreValue===ToeicScoreValue.MUST_GET?'基础分优先':
-                (this.questions[questionIndex].scoreValue===ToeicScoreValue.OPTIONAL?'难题可取舍':'正常作答'))
-                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            }
-            .width('100%');
+      Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
+        DeepPageHeader({
+          title:this.mode===ToeicPageMode.DIAGNOSTIC?'Reading 快速诊断':'今日训练',
+          subtitle:String(this.currentIndex+1)+' / '+this.questions.length+' · '+
+            this.viewModel.partLabel(this.currentPart),
+          trailingText:'建议 '+this.currentRecommendedSeconds+'s',
+          onBack:()=>this.cancelSession()
+        });
 
-            if (this.questions[questionIndex].passage.length>0) {
-              Text(this.questions[questionIndex].passage)
-                .width('100%').fontSize(AppTheme.READING_BODY_SIZE).lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
-                .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
-                .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
-            }
+        Column({space:12}) {
+          Row() {
+            Text(this.viewModel.skillLabel(this.currentSkill))
+              .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
+              .padding({left:9,right:9,top:5,bottom:5}).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .borderRadius(AppTheme.CHIP_RADIUS);
+            Blank();
+            Text(this.currentScoreValue===ToeicScoreValue.MUST_GET?'基础分优先':
+              (this.currentScoreValue===ToeicScoreValue.OPTIONAL?'难题可取舍':'正常作答'))
+              .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%');
 
-            Text(this.questions[questionIndex].stem)
-              .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE).lineHeight(AppTheme.QUESTION_TEXT_LINE_HEIGHT)
-              .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          if (this.currentPassage.length>0) {
+            Text(this.currentPassage)
+              .width('100%').fontSize(AppTheme.READING_BODY_SIZE).lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
+              .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
+          }
 
-            Column({space:9}) {
-              ForEach(this.questions[questionIndex].options,(option:string,index:number)=>{
-                Button(this.optionPrefix(index)+'. '+option,{type:ButtonType.Normal})
-                  .width('100%').constraintSize({minHeight:50})
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .fontColor(this.optionText(index,this.questions[questionIndex]))
-                  .backgroundColor(this.optionBackground(index,this.questions[questionIndex]))
-                  .border({width:1,color:this.optionBorder(index,this.questions[questionIndex])})
-                  .borderRadius(AppTheme.CONTROL_RADIUS)
-                  .onClick(()=>this.chooseAnswer(index));
-              },(option:string)=>questionId+':'+option);
-            }
-            .width('100%');
+          Text(this.currentStem)
+            .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE).lineHeight(AppTheme.QUESTION_TEXT_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
 
-            if (this.answerLocked) {
-              Column({space:7}) {
-                Text(this.answerCorrect?'✓ 判断正确':'× 这题需要再巩固')
-                  .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold)
-                  .fontColor(this.answerCorrect?AppTheme.SUCCESS:AppTheme.DANGER);
-                Text(this.questions[questionIndex].explanation)
-                  .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-                if (this.questions[questionIndex].evidence.length>0) {
-                  Text('证据：'+this.questions[questionIndex].evidence)
-                    .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-                }
-                if (this.questions[questionIndex].paraphrase.length>0) {
-                  Text('替换关系：'+this.questions[questionIndex].paraphrase)
-                    .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
-                }
-              }
-              .width('100%').padding(AppTheme.CARD_PADDING)
-              .backgroundColor(this.answerCorrect?AppTheme.SUCCESS_SOFT:AppTheme.DANGER_SOFT)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
+          Column({space:9}) {
+            Button('A. '+this.currentOptionA,{type:ButtonType.Normal})
+              .width('100%').constraintSize({minHeight:50})
+              .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(0))
+              .backgroundColor(this.optionBackground(0))
+              .border({width:1,color:this.optionBorder(0)})
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .onClick(()=>this.chooseAnswer(0));
 
-              Button(questionIndex+1>=this.questions.length?'完成本轮':'下一题',{type:ButtonType.Normal})
-                .width('100%').height(AppTheme.BUTTON_HEIGHT)
-                .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
-                .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
-                .onClick(()=>this.nextQuestion());
+            Button('B. '+this.currentOptionB,{type:ButtonType.Normal})
+              .width('100%').constraintSize({minHeight:50})
+              .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(1))
+              .backgroundColor(this.optionBackground(1))
+              .border({width:1,color:this.optionBorder(1)})
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .onClick(()=>this.chooseAnswer(1));
+
+            Button('C. '+this.currentOptionC,{type:ButtonType.Normal})
+              .width('100%').constraintSize({minHeight:50})
+              .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(2))
+              .backgroundColor(this.optionBackground(2))
+              .border({width:1,color:this.optionBorder(2)})
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .onClick(()=>this.chooseAnswer(2));
+
+            if (this.currentOptionCount>3) {
+              Button('D. '+this.currentOptionD,{type:ButtonType.Normal})
+                .width('100%').constraintSize({minHeight:50})
+                .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(3))
+                .backgroundColor(this.optionBackground(3))
+                .border({width:1,color:this.optionBorder(3)})
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .onClick(()=>this.chooseAnswer(3));
             }
           }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+          .width('100%');
+
+          if (this.answerLocked) {
+            Column({space:7}) {
+              Text(this.answerCorrect?'✓ 判断正确':'× 这题需要再巩固')
+                .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold)
+                .fontColor(this.answerCorrect?AppTheme.SUCCESS:AppTheme.DANGER);
+              Text(this.currentExplanation)
+                .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+              if (this.currentEvidence.length>0) {
+                Text('证据：'+this.currentEvidence)
+                  .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              }
+              if (this.currentParaphrase.length>0) {
+                Text('替换关系：'+this.currentParaphrase)
+                  .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+              }
+            }
+            .width('100%').padding(AppTheme.CARD_PADDING)
+            .backgroundColor(this.answerCorrect?AppTheme.SUCCESS_SOFT:AppTheme.DANGER_SOFT)
+            .borderRadius(AppTheme.CONTROL_RADIUS);
+
+            Button(this.currentIndex+1>=this.questions.length?'完成本轮':'下一题',{type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
+              .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
+              .onClick(()=>this.nextQuestion());
+          }
         }
-        .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
-        .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
-          right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
-          top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_BOTTOM_PADDING});
+        .width('100%').padding(AppTheme.CARD_PADDING)
+        .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
       }
-      .width('100%').height('100%').scrollBar(BarState.Off).align(Alignment.TopStart);
+      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+        right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+        top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_BOTTOM_PADDING});
+    }
+    .width('100%').height('100%').scrollBar(BarState.Off).align(Alignment.TopStart);
   }
 
   build() {
@@ -601,8 +707,8 @@ export struct ToeicHomePage {
           this.viewModel.planForDay(this.effectiveStudyDay()),
           this.viewModel.sentenceDrillsForDay(this.effectiveStudyDay())
         );
-      } else if (this.currentIndex>=0 && this.currentIndex<this.questions.length) {
-        this.QuestionContent(this.currentIndex,this.questions[this.currentIndex].id);
+      } else if (this.currentQuestionId.length>0) {
+        this.QuestionContent();
       }
     }
     .width('100%').height('100%').alignItems(HorizontalAlign.Center).backgroundColor(AppTheme.BACKGROUND)
