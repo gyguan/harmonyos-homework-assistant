@@ -5,6 +5,8 @@ import re
 ROOT = Path(__file__).resolve().parents[1]
 RESOURCE_API = ROOT / "entry/src/main/ets/application/remote/RemoteAssignmentResourceApi.ets"
 AUDIO = ROOT / "entry/src/main/ets/application/assignment/AssignmentAudioPlayerService.ets"
+IMAGE_ENCODER = ROOT / "entry/src/main/ets/infrastructure/ai/HomeworkImageEncoder.ets"
+SYSCAP_CONFIG = ROOT / "syscap.json"
 PARENT_PRACTICE_GENERATION = ROOT / "entry/src/main/ets/features/parent/practice/ParentPracticeGenerationPage.ets"
 PARENT_PRACTICE_GENERATION_RESULT = ROOT / "entry/src/main/ets/features/parent/practice/ParentPracticeGenerationResultPage.ets"
 SHARE_RECEIVE = ROOT / "entry/src/main/ets/application/import/HomeworkShareReceiveService.ets"
@@ -60,6 +62,8 @@ def validate_qualified_model_imports() -> None:
 def main() -> int:
     resource_api = RESOURCE_API.read_text(encoding="utf-8")
     audio = AUDIO.read_text(encoding="utf-8")
+    image_encoder = IMAGE_ENCODER.read_text(encoding="utf-8")
+    syscap_config = SYSCAP_CONFIG.read_text(encoding="utf-8")
     parent_practice_generation = PARENT_PRACTICE_GENERATION.read_text(encoding="utf-8")
     parent_practice_generation_result = PARENT_PRACTICE_GENERATION_RESULT.read_text(encoding="utf-8")
     share_receive = SHARE_RECEIVE.read_text(encoding="utf-8")
@@ -162,8 +166,15 @@ def main() -> int:
     require("PARENT_VOICE_MATERIAL" not in app_routes and "PARENT_VOICE_MATERIAL" not in app_shell,
             "legacy standalone voice-material navigation must not reappear")
 
+    require("encoded = await packer.packToData(pixelMap, packing);" in image_encoder and
+            "图片编码失败，请重新选择后重试" in image_encoder,
+            "HomeworkImageEncoder must explicitly handle packToData exceptions")
+
     media_core_syscap = "SystemCapability.Multimedia.Media.Core"
     avplayer_syscap = "SystemCapability.Multimedia.Media.AVPlayer"
+    require(syscap_config.count(avplayer_syscap) >= 2 and
+            syscap_config.count(media_core_syscap) >= 2,
+            "syscap.json must include AVPlayer and Media.Core in development and production capability sets")
     require(audio.count(f"if (canIUse('{avplayer_syscap}'))") >= 2,
             "AVPlayer create/seek paths must be directly guarded by AVPlayer canIUse")
     require(f"if (canIUse('{media_core_syscap}'))" in audio,
