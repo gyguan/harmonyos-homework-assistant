@@ -5,6 +5,7 @@ import { ToeicTrainingService } from '../application/ToeicTrainingService';
 
 const STORE_NAME:string='toeic_coach_progress';
 const SNAPSHOT_KEY:string='toeic_learning_snapshot_v1';
+const MAX_AVAILABLE_STUDY_DAY:number=7;
 
 export class ToeicProgressStore {
   static readonly instance:ToeicProgressStore=new ToeicProgressStore();
@@ -35,7 +36,7 @@ export class ToeicProgressStore {
       this.snapshot.currentDay=2;
     } else {
       this.snapshot.completedTrainingSessions++;
-      this.snapshot.currentDay=Math.min(21,this.snapshot.completedTrainingSessions+2);
+      this.snapshot.currentDay=Math.min(MAX_AVAILABLE_STUDY_DAY,this.snapshot.completedTrainingSessions+2);
     }
     for (let attempt of attempts) this.applyAttempt(attempt);
     await this.save();
