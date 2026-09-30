@@ -1,4 +1,5 @@
 import { ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicSection, ToeicSentenceDrill, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicQuestionTranslation } from './ToeicQuestionTranslationModels';
 
 export class ToeicContentValidationResult {
   valid:boolean; errors:string[];
@@ -60,6 +61,37 @@ export class ToeicContentValidator {
       if (item.core.trim().length===0) errors.push(item.id + ': core is required');
       if (item.focus.trim().length===0) errors.push(item.id + ': focus is required');
       if (item.explanation.trim().length===0) errors.push(item.id + ': explanation is required');
+    }
+    return new ToeicContentValidationResult(errors.length===0,errors);
+  }
+
+  static validateQuestionTranslations(questions:ToeicQuestion[],
+    translations:ToeicQuestionTranslation[]):ToeicContentValidationResult {
+    let errors:string[]=[];
+    let ids:string[]=[];
+    for (let item of translations) {
+      if (ids.indexOf(item.questionId)>=0) errors.push(item.questionId + ': duplicate question translation id');
+      else ids.push(item.questionId);
+      if (item.stem.trim().length===0) errors.push(item.questionId + ': translated stem is required');
+      for (let option of item.options) {
+        if (option.trim().length===0) errors.push(item.questionId + ': translated option is required');
+      }
+    }
+    for (let question of questions) {
+      let translation:ToeicQuestionTranslation|null=null;
+      for (let item of translations) {
+        if (item.questionId===question.id) { translation=item; break; }
+      }
+      if (translation===null) {
+        errors.push(question.id + ': Chinese translation is required for Day 1-13 training');
+        continue;
+      }
+      if (question.passage.trim().length>0 && translation.passage.trim().length===0) {
+        errors.push(question.id + ': translated passage is required');
+      }
+      if (translation.options.length!==question.options.length) {
+        errors.push(question.id + ': translated option count must match question options');
+      }
     }
     return new ToeicContentValidationResult(errors.length===0,errors);
   }

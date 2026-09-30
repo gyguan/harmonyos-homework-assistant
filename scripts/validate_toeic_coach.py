@@ -54,6 +54,10 @@ def main() -> None:
     require("listening transcript is required" in validator, "Listening transcript gate is missing")
     require("validateSentenceDrills" in validator and "translation is required" in validator,
             "sentence drill translation gate is missing")
+    require("validateQuestionTranslations" in validator and
+            "Chinese translation is required for Day 1-13 training" in validator and
+            "translated option count must match question options" in validator,
+            "question translation content gate is missing")
 
     preset = read("entry/src/main/ets/toeic/content/PresetToeicContent.ets")
     week_one = read("entry/src/main/ets/toeic/content/ToeicWeekOneContent.ets")
@@ -94,6 +98,20 @@ def main() -> None:
             f"expected 36 week-two drills + 100 mock questions, found {week_two_question_count}")
     require(week_three_question_count == 164,
             f"expected 64 week-three sprint questions + 100 second-mock questions, found {week_three_question_count}")
+
+    translation_week_one = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekOneCatalog.ets")
+    translation_week_two = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekTwoCatalog.ets")
+    translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
+    translation_ids = re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_one + "\n" + translation_week_two)
+    translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two)
+    require(len(translation_ids) == 84,
+            f"Day 1-13 must have exactly 84 question translations, found {len(translation_ids)}")
+    require(len(translation_ids) == len(set(translation_ids)),
+            "TOEIC question translation ids must be unique")
+    require(not any(question_id.startswith("R-M1-") or question_id.startswith("R-M2-") for question_id in translation_ids),
+            "full mock questions must not have Chinese translations")
+    require("ToeicQuestionTranslationWeekOneCatalog.items().concat(ToeicQuestionTranslationWeekTwoCatalog.items())" in translation_catalog,
+            "question translation catalog must aggregate week-one and week-two translations")
 
     diagnostic_match = re.search(
         r"let ids:string\[\]=\[(.*?)\];",
@@ -190,6 +208,7 @@ def main() -> None:
         "isWeaknessDay(day:number)",
         "isHighErrorReviewDay(day:number)",
         "questionsThroughDay(maxDay:number)",
+        "questionsRequiringTranslation():ToeicQuestion[]",
     ]
     for token in preset_api:
         require(token in preset, f"week-one catalog API missing: {token}")
@@ -233,6 +252,14 @@ def main() -> None:
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
+    view_model = read("entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets")
+    require("questionTranslation(questionId:string)" in view_model and
+            "ToeicQuestionTranslationCatalog.find(questionId)" in view_model,
+            "TOEIC view model must expose question translations by stable question id")
+    require("validateQuestionTranslations" in view_model and
+            "PresetToeicContent.questionsRequiringTranslation()" in view_model,
+            "TOEIC contentErrors must include question translation validation")
+
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
     for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "DaySelector",
                   "DayButton", "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'",
@@ -242,7 +269,9 @@ def main() -> None:
                   ".onClick(()=>this.selectStudyDay(day))", "dailyQuestionsForDay(day)",
                   "'进入 Day '+this.selectedStudyDay+' 训练'", "currentAttemptCount", "currentWrongCount",
                   "'已做 '+this.currentAttemptCount+' 次'", "'错 '+this.currentWrongCount+' 次'",
-                  "'译：'+item.translation"]:
+                  "'译：'+item.translation", "showQuestionTranslation",
+                  "currentTranslationStem", "toggleQuestionTranslation()",
+                  "'查看中文翻译'", "'收起中文翻译'", "QuestionTranslationOption"]:
         require(token in ui, f"week-one free-day UI missing: {token}")
     builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
@@ -264,6 +293,9 @@ def main() -> None:
         "@State private currentCorrectIndex:number=-1",
         "@State private currentAttemptCount:number=0",
         "@State private currentWrongCount:number=0",
+        "@State private showQuestionTranslation:boolean=false",
+        "@State private currentTranslationPassage:string=''",
+        "@State private currentTranslationStem:string=''",
         "private loadQuestion(index:number):boolean",
         "this.loadQuestion(0)",
         "this.loadQuestion(previousIndex)",
@@ -296,6 +328,15 @@ def main() -> None:
             "next question navigation must not skip unanswered questions")
     require("this.attempts.push(attempt)" in ui,
             "session attempts must remain the source of answered-question state")
+    require("this.showQuestionTranslation=false;" in ui,
+            "question translation must reset to collapsed whenever a question snapshot loads")
+    require("if (!this.isMockSession() && this.currentTranslationStem.length>0)" in ui,
+            "question translation entry must be hidden from full mock sessions")
+    require("if (this.isMockSession() || this.currentTranslationStem.length===0) return;" in ui,
+            "translation toggle must refuse mock sessions and missing translations")
+    require("this.currentTranslationPassage=translation===null?'':translation.passage" in ui and
+            "this.currentTranslationStem=translation===null?'':translation.stem" in ui,
+            "question translation must load by current question id into reactive snapshot state")
 
     question_builder_match = re.search(
         r"(?ms)^\s*@Builder\s*\n\s*private QuestionContent\(\).*?(?=^\s*build\(\))",

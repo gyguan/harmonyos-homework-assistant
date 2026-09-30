@@ -1,5 +1,7 @@
 import { PresetToeicContent } from '../content/PresetToeicContent';
 import { ToeicContentValidator } from '../content/ToeicContentValidator';
+import { ToeicQuestionTranslationCatalog } from '../content/ToeicQuestionTranslationCatalog';
+import { ToeicQuestionTranslation } from '../content/ToeicQuestionTranslationModels';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { ToeicProgressStore } from '../data/ToeicProgressStore';
 import { ToeicPronunciationService, ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
@@ -14,6 +16,9 @@ export class ToeicCoachViewModel {
   }
   attemptCount(questionId:string):number { return ToeicProgressStore.instance.attemptCount(questionId); }
   wrongCount(questionId:string):number { return ToeicProgressStore.instance.wrongCount(questionId); }
+  questionTranslation(questionId:string):ToeicQuestionTranslation|null {
+    return ToeicQuestionTranslationCatalog.find(questionId);
+  }
 
   createAttempt(question:ToeicQuestion,selectedIndex:number,elapsedSeconds:number):ToeicQuestionAttempt {
     return ToeicTrainingService.instance.createAttempt(question,selectedIndex,elapsedSeconds);
@@ -25,7 +30,11 @@ export class ToeicCoachViewModel {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
     let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
     let sentenceErrors=ToeicContentValidator.validateSentenceDrills(PresetToeicContent.sentenceDrills()).errors;
-    return questionErrors.concat(vocabularyErrors).concat(sentenceErrors);
+    let translationErrors=ToeicContentValidator.validateQuestionTranslations(
+      PresetToeicContent.questionsRequiringTranslation(),
+      ToeicQuestionTranslationCatalog.items()
+    ).errors;
+    return questionErrors.concat(vocabularyErrors).concat(sentenceErrors).concat(translationErrors);
   }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
   todayPlan():ToeicStudyDay { return PresetToeicContent.studyDay(this.snapshot().currentDay); }
