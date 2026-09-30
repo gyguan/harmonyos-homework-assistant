@@ -2,6 +2,7 @@ import { PresetToeicContent } from '../content/PresetToeicContent';
 import { ToeicContentValidator } from '../content/ToeicContentValidator';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { ToeicProgressStore } from '../data/ToeicProgressStore';
+import { ToeicPronunciationService, ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 import { ToeicLearningSnapshot, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
 
 export class ToeicCoachViewModel {
@@ -14,12 +15,19 @@ export class ToeicCoachViewModel {
   async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean):Promise<void> {
     await ToeicProgressStore.instance.recordSession(attempts,diagnostic);
   }
-  contentErrors():string[] { return ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors; }
+  contentErrors():string[] {
+    let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
+    let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
+    return questionErrors.concat(vocabularyErrors);
+  }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
   todayPlan():ToeicStudyDay { return PresetToeicContent.studyDay(this.snapshot().currentDay); }
   weekOnePlans():ToeicStudyDay[] { return PresetToeicContent.studyDays(); }
   todayVocabulary():ToeicVocabularyItem[] { return PresetToeicContent.vocabularyForDay(this.snapshot().currentDay); }
   todaySentenceDrills():ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(this.snapshot().currentDay); }
+  async pronounce(item:ToeicVocabularyItem):Promise<ToeicPronunciationStatus> {
+    return await ToeicPronunciationService.instance.speak(item);
+  }
 
   skillLabel(value:string):string {
     let skill=value as ToeicSkill;

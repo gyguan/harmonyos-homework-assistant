@@ -4,6 +4,7 @@ import {
 } from '../domain/ToeicModels';
 import { ToeicContentValidator } from './ToeicContentValidator';
 import { ToeicWeekOneContent } from './ToeicWeekOneContent';
+import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
 
 export class PresetToeicContent {
   static questions():ToeicQuestion[] {
@@ -170,7 +171,7 @@ export class PresetToeicContent {
       new ToeicVocabularyItem('V-029','retain','v.','保留；保持',ToeicVocabularyLevel.L2,'办公/人事',['retain records'],['keep']),
       new ToeicVocabularyItem('V-030','supplier','n.','供应商',ToeicVocabularyLevel.L1,'采购',['contact a supplier'],['vendor'])
     ];
-    return base.concat(ToeicWeekOneContent.vocabulary());
+    return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()));
   }
 
   static studyDays():ToeicStudyDay[] {
