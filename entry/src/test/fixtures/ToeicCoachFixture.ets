@@ -54,6 +54,20 @@ export class ToeicCoachFixture {
     if (queue.length!==4 || queue[0].id!==snapshot.reviewQuestionIds[0]) {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,sentenceDrills.length,studyDays.length);
     }
+
+    let duplicateRiskSnapshot=new ToeicLearningSnapshot();
+    duplicateRiskSnapshot.currentDay=2;
+    duplicateRiskSnapshot.weakSkill=PresetToeicContent.questionsForDay(2)[0].skill;
+    duplicateRiskSnapshot.reviewQuestionIds=[PresetToeicContent.questionsForDay(2)[0].id];
+    let daily=ToeicTrainingService.instance.dailyQuestions(duplicateRiskSnapshot,10);
+    let dailyIds:string[]=[];
+    for (let item of daily) {
+      if (dailyIds.indexOf(item.id)>=0) {
+        return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,sentenceDrills.length,studyDays.length);
+      }
+      dailyIds.push(item.id);
+    }
+
     return new ToeicCoachFixtureResult(true,questions.length,diagnostic.length,vocabulary.length,sentenceDrills.length,studyDays.length);
   }
 }
