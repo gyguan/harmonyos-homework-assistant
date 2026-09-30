@@ -32,10 +32,10 @@ export class ToeicProgressStore {
     this.snapshot.weakSkill=summary.weakSkill;
     if (diagnostic) {
       this.snapshot.diagnosticCompleted=true;
-      this.snapshot.currentDay=1;
+      this.snapshot.currentDay=2;
     } else {
       this.snapshot.completedTrainingSessions++;
-      this.snapshot.currentDay=Math.min(21,this.snapshot.completedTrainingSessions+1);
+      this.snapshot.currentDay=Math.min(21,this.snapshot.completedTrainingSessions+2);
     }
     for (let attempt of attempts) this.applyAttempt(attempt);
     await this.save();
@@ -70,6 +70,10 @@ export class ToeicProgressStore {
       if (typeof parsed.weakSkill==='string') restored.weakSkill=parsed.weakSkill as string;
       if (Array.isArray(parsed.reviewQuestionIds)) restored.reviewQuestionIds=parsed.reviewQuestionIds as string[];
       if (Array.isArray(parsed.slowQuestionIds)) restored.slowQuestionIds=parsed.slowQuestionIds as string[];
+      if (restored.schemaVersion<2 && restored.diagnosticCompleted && restored.currentDay===1) {
+        restored.currentDay=2;
+      }
+      restored.schemaVersion=2;
       this.snapshot=restored;
     } catch {
       this.snapshot=new ToeicLearningSnapshot();
