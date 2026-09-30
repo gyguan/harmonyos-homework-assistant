@@ -11,6 +11,20 @@ on:
       - 'fix/**'
 
 jobs:
+  validate-backend-logging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate backend logging standard
+        run: python scripts/validate_backend_logging.py
+
   validate-parent-import-inbox:
     runs-on: ubuntu-latest
     steps:
@@ -306,9 +320,6 @@ jobs:
 
       - name: Validate API observability invariants
         run: python scripts/validate_api_observability.py
-
-      - name: Validate backend logging standard
-        run: python scripts/validate_backend_logging.py
 
 
       - name: Validate repository quality hardening
