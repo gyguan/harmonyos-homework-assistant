@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.ai.AiProviderProperties;
@@ -11,6 +13,21 @@ import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 
 class ConfigurableHomeworkOrganizerModelClientTest {
+  @Test
+  void imageUpstreamStatusReachesServiceUnavailableResponse() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
+        anyString(), anyMap())).thenThrow(new com.xiaoban.homework.ai.ImageAiRequestException(
+            406, com.xiaoban.homework.ai.ImageAiRequestException.Reason.REQUEST_REJECTED));
+    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
+        JsonMapper.builder().build());
+    var error = assertThrows(com.xiaoban.homework.common.ApiExceptions.ServiceUnavailable.class,
+        () -> client.organizeImage(new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE"));
+    assertTrue(error.getMessage().contains("HTTP 406"));
+    assertTrue(error.getMessage().contains("data URL"));
+    assertFalse(error.getMessage().contains("PRIVATE"));
+  }
+
   @Test
   void imageResultKeepsMultipleSubjectsAndRejectsIncompleteOutput() {
     var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), null,

@@ -168,8 +168,17 @@ public class OpenAiCompatibleTransport {
       }
       return result;
     } catch (RestClientResponseException error) {
+      if (imageDataUrl != null) {
+        var reason = imageFailureReason(error.getStatusCode().value(), error.getResponseBodyAsString());
+        log.warn(
+            "[AI] image_request_rejected provider={} protocol={} model={} path={} status={} elapsedMs={} reason={} responseType={}",
+            capabilities.provider(), protocol, model, path, error.getStatusCode().value(),
+            elapsedMs(started), reason, responseType(error.getResponseHeaders()));
+        // Do not attach the original exception: its message/body can echo images or credentials.
+        throw new ImageAiRequestException(error.getStatusCode().value(), reason);
+      }
       String providerError = redactExact(
-          imageDataUrl == null ? sanitizeProviderError(error.getResponseBodyAsString()) : "<image-request-error>",
+          sanitizeProviderError(error.getResponseBodyAsString()),
           properties.getApiKey());
       log.warn(
           "[AI] response error protocol={} model={} path={} status={} elapsedMs={} exception={} providerError={}",
@@ -183,6 +192,46 @@ public class OpenAiCompatibleTransport {
           imageDataUrl == null ? safeMessage(error.getMessage()) : "<image-request-error>");
       return Optional.empty();
     }
+  }
+
+  ImageAiRequestException.Reason imageFailureReason(int status, String body) {
+    // Authentication/rate-limit status is authoritative. Provider codes are used only from a
+    // small allowlist, with a bounded parser; neither free-form message nor raw code is exposed.
+    if (status == 401 || status == 403) return ImageAiRequestException.Reason.AUTHENTICATION;
+    if (status == 429) return ImageAiRequestException.Reason.RATE_LIMIT;
+    if (status == 413) return ImageAiRequestException.Reason.REQUEST_TOO_LARGE;
+    if (status >= 500) return ImageAiRequestException.Reason.UPSTREAM_UNAVAILABLE;
+    if (body != null && body.length() <= 16384) {
+      try {
+        String code = jsonMapper.readTree(body).path("error").path("code").asText("");
+        var reason = switch (code) {
+          case "unsupported_image", "image_not_supported", "vision_not_supported", "unsupported_modality" ->
+              ImageAiRequestException.Reason.IMAGE_UNSUPPORTED;
+          case "invalid_image", "invalid_image_format", "invalid_image_url" ->
+              ImageAiRequestException.Reason.IMAGE_INVALID;
+          case "model_not_found" -> ImageAiRequestException.Reason.MODEL_NOT_FOUND;
+          default -> null;
+        };
+        if (reason != null) return reason;
+      } catch (Exception ignored) {
+        // Non-JSON errors are normal for gateways. Classify by HTTP status without logging body.
+      }
+    }
+    return status == 406 ? ImageAiRequestException.Reason.REQUEST_REJECTED
+        : ImageAiRequestException.Reason.HTTP_ERROR;
+  }
+
+  private static String responseType(HttpHeaders headers) {
+    if (headers == null) return "MISSING";
+    String value = headers.getFirst(HttpHeaders.CONTENT_TYPE);
+    if (value == null) return "MISSING";
+    String type = value.split(";", 2)[0].trim().toLowerCase(java.util.Locale.ROOT);
+    return switch (type) {
+      case "application/json", "application/problem+json" -> "JSON";
+      case "text/html" -> "HTML";
+      case "text/plain" -> "TEXT";
+      default -> "OTHER";
+    };
   }
 
   private Optional<String> responses(
