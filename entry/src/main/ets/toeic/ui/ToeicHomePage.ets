@@ -287,7 +287,7 @@ export struct ToeicHomePage {
                   .border({width:1,color:this.optionBorder(index,question)})
                   .borderRadius(AppTheme.CONTROL_RADIUS)
                   .onClick(()=>this.chooseAnswer(index));
-              },(option:string,index:number)=>question.id+':'+index+':'+option);
+              },(option:string)=>question.id+':'+option);
             }
             .width('100%');
 
