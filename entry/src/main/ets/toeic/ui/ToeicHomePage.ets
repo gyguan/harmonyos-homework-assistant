@@ -125,6 +125,7 @@ export struct ToeicHomePage {
     if (day<1 || day>7) return;
     this.selectedStudyDay=day;
     this.loadStudyDay(day);
+    this.refreshRevision++;
     this.pronunciationMessage='';
   }
 
@@ -287,11 +288,11 @@ export struct ToeicHomePage {
 
 
   @Builder
-  private TodayCard(snapshot:ToeicLearningSnapshot,selectedDay:number) {
+  private TodayCard(snapshot:ToeicLearningSnapshot) {
     Column({space:14}) {
       Row() {
         Column({space:4}) {
-          Text('Day '+selectedDay+' / 21 · '+this.dayContextLabel(selectedDay,snapshot.currentDay))
+          Text('Day '+this.selectedStudyDay+' / 21 · '+this.dayContextLabel(this.selectedStudyDay,snapshot.currentDay))
             .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
           Text(this.selectedDayTitle)
             .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
@@ -328,10 +329,10 @@ export struct ToeicHomePage {
       }
       .width('100%');
 
-      Text('进入 Day '+selectedDay+' 后只训练这一天的计划题；本日错题和慢题会优先出现。')
+      Text('进入 Day '+this.selectedStudyDay+' 后只训练这一天的计划题；本日错题和慢题会优先出现。')
         .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
 
-      Button(selectedDay===1?(snapshot.diagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断'):'进入 Day '+selectedDay+' 训练',{type:ButtonType.Normal})
+      Button(this.selectedStudyDay===1?(snapshot.diagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断'):'进入 Day '+this.selectedStudyDay+' 训练',{type:ButtonType.Normal})
         .width('100%').height(AppTheme.BUTTON_HEIGHT)
         .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
         .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -398,7 +399,7 @@ export struct ToeicHomePage {
 
 
   @Builder
-  private HomeContent(snapshot:ToeicLearningSnapshot,selectedDay:number) {
+  private HomeContent(snapshot:ToeicLearningSnapshot) {
     Scroll() {
       Column({space:AppTheme.SECTION_GAP_STANDARD}) {
         Row() {
@@ -422,8 +423,8 @@ export struct ToeicHomePage {
             .borderRadius(AppTheme.CONTROL_RADIUS);
         } else {
           this.DaySelector(snapshot.currentDay);
-          this.TodayCard(snapshot,selectedDay);
-          if (!snapshot.diagnosticCompleted && selectedDay!==1) {
+          this.TodayCard(snapshot);
+          if (!snapshot.diagnosticCompleted && this.selectedStudyDay!==1) {
             Text('建议先完成 Day 1 快速诊断，但你也可以直接进入当前选择的训练日。')
               .width('100%').fontSize(AppTheme.META_SIZE)
               .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
@@ -726,8 +727,7 @@ export struct ToeicHomePage {
     Column() {
       if (this.mode===ToeicPageMode.HOME) {
         this.HomeContent(
-          this.viewModel.snapshot(),
-          this.effectiveStudyDay()
+          this.viewModel.snapshot()
         );
       } else if (this.mode===ToeicPageMode.VOCABULARY) {
         this.VocabularyContent(
