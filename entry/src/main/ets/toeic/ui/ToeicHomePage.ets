@@ -1,7 +1,7 @@
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { ToeicLearningSnapshot, ToeicPart, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue, ToeicSentenceDrill, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicPart, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue, ToeicSentenceDrill, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 
@@ -25,6 +25,14 @@ export struct ToeicHomePage {
   @State private selectedDayMinutes:number=0;
   @State private selectedDayVocabularyCount:number=0;
   @State private selectedDaySentenceCount:number=0;
+  @State private progressCurrentDay:number=1;
+  @State private progressDiagnosticCompleted:boolean=false;
+  @State private progressWeakSkill:string=ToeicSkill.PARAPHRASE;
+  @State private progressReviewCount:number=0;
+  @State private progressSlowCount:number=0;
+  @State private progressAnswered:number=0;
+  @State private progressCorrect:number=0;
+  @State private progressAccuracy:string='--';
   @State private activeSessionDay:number=0;
   @State private activeSessionAdvancesProgress:boolean=false;
   @State private currentQuestionId:string='';
@@ -49,7 +57,8 @@ export struct ToeicHomePage {
   private attempts:ToeicQuestionAttempt[]=[];
 
   aboutToAppear():void {
-    if (this.selectedStudyDay<=0) this.selectedStudyDay=this.viewModel.snapshot().currentDay;
+    this.loadProgressSnapshot();
+    if (this.selectedStudyDay<=0) this.selectedStudyDay=this.progressCurrentDay;
     this.loadStudyDay(this.selectedStudyDay);
     this.refreshRevision++;
   }
@@ -107,9 +116,21 @@ export struct ToeicHomePage {
     this.currentScoreValue=ToeicScoreValue.MUST_GET;
   }
 
+  private loadProgressSnapshot():void {
+    let snapshot=this.viewModel.snapshot();
+    this.progressCurrentDay=snapshot.currentDay;
+    this.progressDiagnosticCompleted=snapshot.diagnosticCompleted;
+    this.progressWeakSkill=snapshot.weakSkill;
+    this.progressReviewCount=snapshot.reviewQuestionIds.length;
+    this.progressSlowCount=snapshot.slowQuestionIds.length;
+    this.progressAnswered=snapshot.totalAnswered;
+    this.progressCorrect=snapshot.totalCorrect;
+    this.progressAccuracy=this.viewModel.accuracyValue(snapshot);
+  }
+
   private effectiveStudyDay():number {
     if (this.selectedStudyDay>0) return this.selectedStudyDay;
-    return this.viewModel.snapshot().currentDay;
+    return this.progressCurrentDay;
   }
 
   private loadStudyDay(day:number):void {
@@ -129,15 +150,15 @@ export struct ToeicHomePage {
     this.pronunciationMessage='';
   }
 
-  private dayContextLabel(day:number,currentDay:number):string {
-    if (day===currentDay) return '当前进度';
-    if (day<currentDay) return '复习';
+  private dayContextLabel(day:number):string {
+    if (day===this.progressCurrentDay) return '当前进度';
+    if (day<this.progressCurrentDay) return '复习';
     return '预习';
   }
 
   private startDiagnostic():void {
     this.activeSessionDay=1;
-    this.activeSessionAdvancesProgress=true;
+    this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted;
     this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions());
   }
 
@@ -145,12 +166,12 @@ export struct ToeicHomePage {
     let day=this.effectiveStudyDay();
     if (day===1) {
       this.activeSessionDay=1;
-      this.activeSessionAdvancesProgress=!this.viewModel.snapshot().diagnosticCompleted;
+      this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted;
       this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions());
       return;
     }
     this.activeSessionDay=day;
-    this.activeSessionAdvancesProgress=day===this.viewModel.snapshot().currentDay;
+    this.activeSessionAdvancesProgress=day===this.progressCurrentDay;
     this.startSession(ToeicPageMode.TRAINING,this.viewModel.dailyQuestionsForDay(day));
   }
 
@@ -224,8 +245,9 @@ export struct ToeicHomePage {
       this.mode===ToeicPageMode.DIAGNOSTIC,
       advanceProgress
     );
+    this.loadProgressSnapshot();
     if (advanceProgress) {
-      this.selectedStudyDay=this.viewModel.snapshot().currentDay;
+      this.selectedStudyDay=this.progressCurrentDay;
       this.loadStudyDay(this.selectedStudyDay);
     }
     this.refreshRevision++; this.mode=ToeicPageMode.HOME; this.questions=[]; this.attempts=[];
@@ -288,11 +310,11 @@ export struct ToeicHomePage {
 
 
   @Builder
-  private TodayCard(snapshot:ToeicLearningSnapshot) {
+  private TodayCard() {
     Column({space:14}) {
       Row() {
         Column({space:4}) {
-          Text('Day '+this.selectedStudyDay+' / 21 · '+this.dayContextLabel(this.selectedStudyDay,snapshot.currentDay))
+          Text('Day '+this.selectedStudyDay+' / 21 · '+this.dayContextLabel(this.selectedStudyDay))
             .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
           Text(this.selectedDayTitle)
             .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
@@ -305,9 +327,9 @@ export struct ToeicHomePage {
       .width('100%').alignItems(VerticalAlign.Top);
 
       Row({space:10}) {
-        this.Metric(this.viewModel.skillLabel(snapshot.weakSkill),'当前薄弱点');
-        this.Metric(String(snapshot.reviewQuestionIds.length),'待复习错题');
-        this.Metric(String(snapshot.slowQuestionIds.length),'做对但偏慢');
+        this.Metric(this.viewModel.skillLabel(this.progressWeakSkill),'当前薄弱点');
+        this.Metric(String(this.progressReviewCount),'待复习错题');
+        this.Metric(String(this.progressSlowCount),'做对但偏慢');
       }
       .width('100%');
 
@@ -332,7 +354,7 @@ export struct ToeicHomePage {
       Text('进入 Day '+this.selectedStudyDay+' 后只训练这一天的计划题；本日错题和慢题会优先出现。')
         .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
 
-      Button(this.selectedStudyDay===1?(snapshot.diagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断'):'进入 Day '+this.selectedStudyDay+' 训练',{type:ButtonType.Normal})
+      Button(this.selectedStudyDay===1?(this.progressDiagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断'):'进入 Day '+this.selectedStudyDay+' 训练',{type:ButtonType.Normal})
         .width('100%').height(AppTheme.BUTTON_HEIGHT)
         .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
         .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -345,44 +367,44 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private DayButton(day:number,currentDay:number) {
+  private DayButton(day:number) {
     Button('Day '+day,{type:ButtonType.Normal})
       .layoutWeight(1)
       .height(40)
       .fontSize(AppTheme.META_SIZE)
       .fontWeight(day===this.selectedStudyDay?FontWeight.Bold:FontWeight.Regular)
       .fontColor(day===this.selectedStudyDay?AppTheme.TEXT_ON_PRIMARY:
-        (day===currentDay?AppTheme.PRIMARY:AppTheme.TEXT))
+        (day===this.progressCurrentDay?AppTheme.PRIMARY:AppTheme.TEXT))
       .backgroundColor(day===this.selectedStudyDay?AppTheme.PRIMARY:
-        (day===currentDay?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE))
+        (day===this.progressCurrentDay?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE))
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .onClick(()=>this.selectStudyDay(day));
   }
 
   @Builder
-  private DaySelector(currentDay:number) {
+  private DaySelector() {
     Column({space:10}) {
       Row() {
         Text('选择训练日')
           .fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
         Blank();
-        Text('当前进度 Day '+currentDay)
+        Text('当前进度 Day '+this.progressCurrentDay)
           .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%');
 
       Row({space:8}) {
-        this.DayButton(1,currentDay);
-        this.DayButton(2,currentDay);
-        this.DayButton(3,currentDay);
-        this.DayButton(4,currentDay);
+        this.DayButton(1);
+        this.DayButton(2);
+        this.DayButton(3);
+        this.DayButton(4);
       }
       .width('100%');
 
       Row({space:8}) {
-        this.DayButton(5,currentDay);
-        this.DayButton(6,currentDay);
-        this.DayButton(7,currentDay);
+        this.DayButton(5);
+        this.DayButton(6);
+        this.DayButton(7);
         Blank().layoutWeight(1);
       }
       .width('100%');
@@ -399,7 +421,7 @@ export struct ToeicHomePage {
 
 
   @Builder
-  private HomeContent(snapshot:ToeicLearningSnapshot) {
+  private HomeContent() {
     Scroll() {
       Column({space:AppTheme.SECTION_GAP_STANDARD}) {
         Row() {
@@ -422,9 +444,9 @@ export struct ToeicHomePage {
             .padding(AppTheme.CARD_PADDING_COMPACT).backgroundColor(AppTheme.DANGER_SOFT)
             .borderRadius(AppTheme.CONTROL_RADIUS);
         } else {
-          this.DaySelector(snapshot.currentDay);
-          this.TodayCard(snapshot);
-          if (!snapshot.diagnosticCompleted && this.selectedStudyDay!==1) {
+          this.DaySelector();
+          this.TodayCard();
+          if (!this.progressDiagnosticCompleted && this.selectedStudyDay!==1) {
             Text('建议先完成 Day 1 快速诊断，但你也可以直接进入当前选择的训练日。')
               .width('100%').fontSize(AppTheme.META_SIZE)
               .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
@@ -437,9 +459,9 @@ export struct ToeicHomePage {
               .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
               .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
             Row({space:10}) {
-              this.Metric(String(snapshot.totalAnswered),'累计答题');
-              this.Metric(String(snapshot.totalCorrect),'累计正确');
-              this.Metric(this.viewModel.accuracyValue(snapshot),'正确率');
+              this.Metric(String(this.progressAnswered),'累计答题');
+              this.Metric(String(this.progressCorrect),'累计正确');
+              this.Metric(this.progressAccuracy,'正确率');
             }
             .width('100%');
           }
@@ -726,9 +748,7 @@ export struct ToeicHomePage {
   build() {
     Column() {
       if (this.mode===ToeicPageMode.HOME) {
-        this.HomeContent(
-          this.viewModel.snapshot()
-        );
+        this.HomeContent();
       } else if (this.mode===ToeicPageMode.VOCABULARY) {
         this.VocabularyContent(
           this.viewModel.vocabularyForDay(this.effectiveStudyDay())
