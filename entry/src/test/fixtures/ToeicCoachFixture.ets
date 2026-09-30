@@ -40,6 +40,22 @@ export class ToeicCoachFixture {
       }
     }
 
+    let day2=ToeicTrainingService.instance.dailyQuestions(new ToeicLearningSnapshot(),10,2);
+    let day3=ToeicTrainingService.instance.dailyQuestions(new ToeicLearningSnapshot(),10,3);
+    let day2Planned=PresetToeicContent.questionsForDay(2);
+    let day3Planned=PresetToeicContent.questionsForDay(3);
+    let day2HasPlanned:boolean=false;
+    let day3HasPlanned:boolean=false;
+    for (let item of day2) {
+      for (let planned of day2Planned) if (item.id===planned.id) day2HasPlanned=true;
+    }
+    for (let item of day3) {
+      for (let planned of day3Planned) if (item.id===planned.id) day3HasPlanned=true;
+    }
+    if (!day2HasPlanned || !day3HasPlanned) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,sentenceDrills.length,studyDays.length);
+    }
+
     let q=diagnostic[0];
     let fast=ToeicTrainingService.instance.createAttempt(q,q.correctIndex,1);
     let wrongIndex=q.correctIndex===0?1:0;
