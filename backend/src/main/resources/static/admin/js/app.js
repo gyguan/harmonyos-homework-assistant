@@ -3,12 +3,12 @@ import {
   fetchAssignmentResource, fetchVoiceMaterialAsset, getVoiceFolderDetail, getVoiceTaskDetail, listStudents,
   logout, registerVoiceMaterialPackage, searchVoiceFolders, searchVoiceTasks,
   uploadVoiceMaterialFile
-} from './api.js?v=20260924-1';
-import { SUBJECTS, parseVoiceMaterialPackages, uploadOrder, validatePackage } from './voice-material.js?v=20260929-1';
+} from './api.js?v=20260930-1';
+import { SUBJECTS, parseVoiceMaterialPackages, uploadOrder, validatePackage } from './voice-material.js?v=20260930-1';
 import {
   folderStatusClass, folderStatusLabel, renderFolderDetailContent, renderFolderRows,
   renderTaskDetailContent, renderTaskRows, taskStatusClass, taskStatusLabel
-} from './voice-management-view.js?v=20260924-1';
+} from './voice-management-view.js?v=20260930-1';
 
 const el = id => document.getElementById(id);
 const state = {

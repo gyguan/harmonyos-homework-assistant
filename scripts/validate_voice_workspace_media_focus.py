@@ -51,9 +51,15 @@ require("imageUris.length > 9" not in remote_resource and
 require("images.sort(" in pane and "compareImageResources" in pane and
         "originalName.toLowerCase()" in pane,
         "student voice images must use natural filename ordering")
-require("loadImage(index: number)" in pane and "prefetchNextImage" in pane and
-        "void this.prefetchNextImage(0)" in pane,
-        "student voice images must load on demand and prefetch the next image")
+require("loadImage(index: number)" in pane and
+        "IMAGE_PREFETCH_CONCURRENCY: number = 2" in pane and
+        "startImagePrefetch(1, lifecycleVersion)" in pane and
+        "prefetchImageWorker" in pane and
+        "RemoteAssignmentResourceApi.instance.preload" in pane,
+        "student voice images must cache all remaining images in the background with bounded concurrency")
+require("async preload(resource: AssignmentResource): Promise<void>" in remote_resource and
+        "await this.download(resource)" in remote_resource,
+        "resource API must expose cache-only preloading without binding every image to UI state")
 require("pendingDownloads" in remote_resource,
         "resource downloads must deduplicate concurrent prefetch and foreground requests")
 require("invalidate(resourceId: string)" in remote_resource,

@@ -9,6 +9,8 @@ import {
   AssignmentAudioPlayerService
 } from '../../application/assignment/AssignmentAudioPlayerService';
 
+const IMAGE_PREFETCH_CONCURRENCY: number = 2;
+
 @Component
 export struct VoiceAssignmentPane {
   @Prop assignmentId: string = '';
@@ -137,8 +139,8 @@ export struct VoiceAssignmentPane {
       this.imageIndex = 0;
       this.notifyMediaState();
       this.loading = false;
-      void this.prefetchNextImage(0);
       void this.loadAudio(audio);
+      this.startImagePrefetch(1, lifecycleVersion);
     } catch {
       this.message = '作业资料加载失败，请检查网络后重试';
     } finally {
@@ -257,16 +259,28 @@ export struct VoiceAssignmentPane {
     return uri;
   }
 
-  private async prefetchNextImage(index: number): Promise<void> {
-    let next = index + 1;
-    if (next < 0 || next >= this.imageResources.length) return;
-    await this.loadImage(next);
+  private startImagePrefetch(startIndex: number, lifecycleVersion: number): void {
+    for (let worker = 0; worker < IMAGE_PREFETCH_CONCURRENCY; worker++) {
+      let index = startIndex + worker;
+      if (index >= this.imageResources.length) return;
+      void this.prefetchImageWorker(index, IMAGE_PREFETCH_CONCURRENCY, lifecycleVersion);
+    }
+  }
+
+  private async prefetchImageWorker(index: number, stride: number,
+    lifecycleVersion: number): Promise<void> {
+    let cursor = index;
+    while (cursor < this.imageResources.length) {
+      if (lifecycleVersion !== this.lifecycleVersion) return;
+      await RemoteAssignmentResourceApi.instance.preload(this.imageResources[cursor]);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
+      cursor += stride;
+    }
   }
 
   private async showImage(index: number): Promise<void> {
     if (index < 0 || index >= this.imageResources.length) return;
     if (index === this.imageIndex && index < this.imageUris.length && this.imageUris[index].length > 0) {
-      void this.prefetchNextImage(index);
       return;
     }
 
@@ -285,7 +299,6 @@ export struct VoiceAssignmentPane {
     }
 
     this.notifyMediaState();
-    void this.prefetchNextImage(index);
   }
 
   private async toggleAudio(): Promise<void> {
