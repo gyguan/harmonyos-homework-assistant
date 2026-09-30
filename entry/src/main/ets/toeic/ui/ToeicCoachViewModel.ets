@@ -12,6 +12,9 @@ export class ToeicCoachViewModel {
   dailyQuestionsForDay(day:number):ToeicQuestion[] {
     return ToeicTrainingService.instance.studyDayQuestions(this.snapshot(),day);
   }
+  attemptCount(questionId:string):number { return ToeicProgressStore.instance.attemptCount(questionId); }
+  wrongCount(questionId:string):number { return ToeicProgressStore.instance.wrongCount(questionId); }
+
   createAttempt(question:ToeicQuestion,selectedIndex:number,elapsedSeconds:number):ToeicQuestionAttempt {
     return ToeicTrainingService.instance.createAttempt(question,selectedIndex,elapsedSeconds);
   }
@@ -21,7 +24,8 @@ export class ToeicCoachViewModel {
   contentErrors():string[] {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
     let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
-    return questionErrors.concat(vocabularyErrors);
+    let sentenceErrors=ToeicContentValidator.validateSentenceDrills(PresetToeicContent.sentenceDrills()).errors;
+    return questionErrors.concat(vocabularyErrors).concat(sentenceErrors);
   }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
   todayPlan():ToeicStudyDay { return PresetToeicContent.studyDay(this.snapshot().currentDay); }

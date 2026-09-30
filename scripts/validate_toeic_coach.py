@@ -43,7 +43,8 @@ def main() -> None:
     for token in [
         "LISTENING", "READING", "PART_1", "PART_2", "PART_3", "PART_4",
         "PART_5", "PART_6", "PART_7", "FAST_CORRECT", "SLOW_CORRECT",
-        "FAST_WRONG", "SLOW_WRONG",
+        "FAST_WRONG", "SLOW_WRONG", "ToeicQuestionHistory", "questionHistories",
+        "translation:string",
     ]:
         require(token in models, f"shared L/R model missing {token}")
 
@@ -51,6 +52,8 @@ def main() -> None:
     require("Part 7 evidence is required" in validator, "Part 7 evidence gate is missing")
     require("listening audioAssetId is required" in validator, "Listening audio gate is missing")
     require("listening transcript is required" in validator, "Listening transcript gate is missing")
+    require("validateSentenceDrills" in validator and "translation is required" in validator,
+            "sentence drill translation gate is missing")
 
     preset = read("entry/src/main/ets/toeic/content/PresetToeicContent.ets")
     week_one = read("entry/src/main/ets/toeic/content/ToeicWeekOneContent.ets")
@@ -61,6 +64,14 @@ def main() -> None:
     require(question_count >= 54, f"expected >=54 reviewed week-one questions, found {question_count}")
     require(vocabulary_count >= 90, f"expected >=90 week-one vocabulary items, found {vocabulary_count}")
     require(sentence_drill_count == 30, f"expected 30 sentence drills, found {sentence_drill_count}")
+    translated_drills = re.findall(
+        r"new ToeicSentenceDrill\('([^']+)','[^']+','([^']+)'",
+        week_one,
+    )
+    require(len(translated_drills) == sentence_drill_count,
+            "every TOEIC sentence drill must include a Chinese translation")
+    for drill_id, translation in translated_drills:
+        require(translation.strip(), f"{drill_id}: sentence drill translation is required")
     require(study_day_count == 7, f"expected 7 study days, found {study_day_count}")
 
     diagnostic_match = re.search(
@@ -132,6 +143,13 @@ def main() -> None:
     require("advanceProgress:boolean=true" in progress and
             "if (advanceProgress)" in progress,
             "review or preview sessions must be recordable without advancing currentDay")
+    for token in [
+        "attemptCount(questionId:string)", "wrongCount(questionId:string)",
+        "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
+        "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
+        "restored.schemaVersion=3",
+    ]:
+        require(token in progress, f"question history persistence missing: {token}")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
     for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "DaySelector",
@@ -139,7 +157,9 @@ def main() -> None:
                   "selectedStudyDay", "selectedDayTitle", "selectStudyDay(day:number)", "effectiveStudyDay()",
                   "this.DayButton(1,currentDay)", "this.DayButton(7,currentDay)",
                   ".onClick(()=>this.selectStudyDay(day))", "dailyQuestionsForDay(day)",
-                  "'进入 Day '+selectedDay+' 训练'"]:
+                  "'进入 Day '+selectedDay+' 训练'", "currentAttemptCount", "currentWrongCount",
+                  "'已做 '+this.currentAttemptCount+' 次'", "'错 '+this.currentWrongCount+' 次'",
+                  "'译：'+item.translation"]:
         require(token in ui, f"week-one free-day UI missing: {token}")
     builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
@@ -159,6 +179,8 @@ def main() -> None:
         "@State private currentStem:string=''",
         "@State private currentPassage:string=''",
         "@State private currentCorrectIndex:number=-1",
+        "@State private currentAttemptCount:number=0",
+        "@State private currentWrongCount:number=0",
         "private loadQuestion(index:number):boolean",
         "this.loadQuestion(0)",
         "this.loadQuestion(nextIndex)",
@@ -166,6 +188,12 @@ def main() -> None:
         "question.id===this.currentQuestionId",
     ]:
         require(token in ui, f"reactive question snapshot missing: {token}")
+    require("this.currentAttemptCount=this.viewModel.attemptCount(question.id)" in ui and
+            "this.currentWrongCount=this.viewModel.wrongCount(question.id)" in ui,
+            "question history badges must load from persisted history")
+    require("this.currentAttemptCount++" in ui and
+            "if (!attempt.correct) this.currentWrongCount++" in ui,
+            "question history badges must update immediately after answering")
 
     question_builder_match = re.search(
         r"(?ms)^\s*@Builder\s*\n\s*private QuestionContent\(\).*?(?=^\s*build\(\))",

@@ -1,4 +1,4 @@
-import { ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicSection, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicSection, ToeicSentenceDrill, ToeicVocabularyItem } from '../domain/ToeicModels';
 
 export class ToeicContentValidationResult {
   valid:boolean; errors:string[];
@@ -46,6 +46,20 @@ export class ToeicContentValidator {
       if (item.ipa.trim().length===0) errors.push(item.id + ': IPA is required');
       if (item.pronunciationLocale!=='en-US') errors.push(item.id + ': pronunciationLocale must be en-US in current content pack');
       if (item.pronunciationText.trim().length===0) errors.push(item.id + ': pronunciationText is required');
+    }
+    return new ToeicContentValidationResult(errors.length===0,errors);
+  }
+
+  static validateSentenceDrills(items:ToeicSentenceDrill[]):ToeicContentValidationResult {
+    let errors:string[]=[];
+    let ids:string[]=[];
+    for (let item of items) {
+      if (ids.indexOf(item.id)>=0) errors.push(item.id + ': duplicate sentence drill id'); else ids.push(item.id);
+      if (item.sentence.trim().length===0) errors.push(item.id + ': sentence is required');
+      if (item.translation.trim().length===0) errors.push(item.id + ': translation is required');
+      if (item.core.trim().length===0) errors.push(item.id + ': core is required');
+      if (item.focus.trim().length===0) errors.push(item.id + ': focus is required');
+      if (item.explanation.trim().length===0) errors.push(item.id + ': explanation is required');
     }
     return new ToeicContentValidationResult(errors.length===0,errors);
   }
