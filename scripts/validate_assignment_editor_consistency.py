@@ -32,14 +32,20 @@ voice_page = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmen
 practice_generation = read("entry/src/main/ets/features/parent/practice/ParentPracticeGenerationPage.ets")
 change_detector = read("entry/src/main/ets/common/state/AssignmentEditChangeDetector.ets")
 
-for token in ["作业标题", "完成要求", "截止时间", "预计用时（分钟）", "教材 / 页码"]:
+for token in ["作业标题", "完成要求", "截止时间", "预计用时（分钟）"]:
     require(token in shared, f"shared assignment editor missing field: {token}")
 require("AssignmentEditForm({" in confirmation_components,
         "create-time confirmation editor must reuse AssignmentEditForm")
 require("AssignmentEditForm({" in review_editor,
         "published assignment editor must reuse AssignmentEditForm")
-for clear_text in ["清空作业标题", "清空完成要求", "清空教材页码"]:
+for clear_text in ["清空作业标题", "清空完成要求"]:
     require(clear_text in shared, f"shared assignment editor missing clear action: {clear_text}")
+require("教材 / 页码" not in shared and "onTextbookRefChange" not in shared,
+        "textbook/page editing must stay hidden in the shared assignment editor")
+for editor in [confirmation_components, review_editor]:
+    require("this.textbookRefDraft = this.item.textbookRef" in editor and
+            "textbookRef: this.textbookRefDraft" in editor,
+            "hiding textbook/page editing must preserve existing metadata when saving")
 require("private ActionFooter()" in extra_page and
         extra_page.index("this.ActionFooter();") > extra_page.index(".scrollBar(BarState.Off);") and
         "清空任务名称" in extra_page and "清空完成要求" in extra_page,

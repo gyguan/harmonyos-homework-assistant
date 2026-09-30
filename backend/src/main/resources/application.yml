@@ -1,6 +1,10 @@
 server:
   port: ${SERVER_PORT:8080}
 
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [requestId=%X{requestId} scene=%X{scene}] %logger{36} - %msg%n"
+
 spring:
   config:
     import: optional:file:./config/application-local.yml
@@ -45,6 +49,7 @@ app:
     chat-completions-path: ${AI_CHAT_COMPLETIONS_PATH:/v1/chat/completions}
     tutor-model: ${AI_TUTOR_MODEL:${OPENAI_MODEL:gpt-5.6-luna}}
     organizer-model: ${AI_ORGANIZER_MODEL:${OPENAI_ORGANIZER_MODEL:}}
+    image-organizer-model: ${AI_IMAGE_ORGANIZER_MODEL:}
     practice-model: ${AI_PRACTICE_MODEL:${OPENAI_PRACTICE_MODEL:}}
     allow-unauthenticated: ${AI_ALLOW_UNAUTHENTICATED:false}
     structured-output: ${AI_STRUCTURED_OUTPUT:true}

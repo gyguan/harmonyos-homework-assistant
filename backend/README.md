@@ -90,6 +90,8 @@ python backend/scripts/e2e_smoke.py --token-file D:\temp\xiaoban-e2e-session.jso
 
 ## 配置
 
+布置作业支持「AI图片解析 / 文字识别」两种模式，学科默认自动识别。图片模型通过 `AI_IMAGE_ORGANIZER_MODEL` / `app.ai.image-organizer-model` 单独指定，未配置时沿用整理模型；必须支持图片输入，复用当前 provider/base URL/key/protocol。原系统 OCR 与文字整理完整保留，切换后可对同一图片重试。配置及验收见 [Issue #393 使用说明](../docs/development/issue-393-image-ai-import.md)。
+
 - `DB_URL` / `DB_USERNAME` / `DB_PASSWORD`：PostgreSQL。
 - `AUTH_TOKEN_TTL_HOURS`：登录会话有效期，默认 168 小时。随机 Bearer token 保存于 PostgreSQL，后端重启后仍有效。
 - `APP_STORAGE_ROOT`：作业照片目录，默认 `./data/uploads`。

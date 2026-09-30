@@ -256,37 +256,50 @@ export struct PracticeHistoryPage {
       .width('100%')
       .alignItems(VerticalAlign.Top);
 
-      Row({ space: 8 }) {
-        Text(this.viewModel.scoreText(item))
-          .fontSize(AppTheme.ACTION_TEXT_SIZE)
-          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
-        Text(this.viewModel.timeText(item.startedAtEpochMs))
-          .fontSize(AppTheme.META_SIZE)
-          .lineHeight(AppTheme.META_LINE_HEIGHT)
-          .fontColor(AppTheme.SUBTEXT);
-        if (item.status === PracticeAttemptStatus.SUBMITTED) {
-          Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
-          Text(`完成耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
+      Column({ space: 4 }) {
+        Row({ space: 8 }) {
+          Text(this.viewModel.scoreText(item))
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('·')
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
-            .fontColor(AppTheme.SUBTEXT);
-        }
-        if (item.noteCount > 0) {
-          Text('·').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
-          Text(`${item.noteCount} 条笔记`)
+            .fontColor(AppTheme.TERTIARY_TEXT);
+          Text(this.viewModel.timeText(item.startedAtEpochMs))
+            .layoutWeight(1)
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
-            .fontColor(AppTheme.SUBTEXT);
+            .fontColor(AppTheme.SUBTEXT)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis });
         }
-        Blank();
-        Text('查看')
-          .fontSize(AppTheme.ACTION_TEXT_SIZE)
-          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.PRIMARY);
+        .width('100%');
+
+        if (item.status === PracticeAttemptStatus.SUBMITTED || item.noteCount > 0) {
+          Row({ space: 8 }) {
+            if (item.status === PracticeAttemptStatus.SUBMITTED) {
+              Text(`完成耗时 ${this.viewModel.elapsedText(item.elapsedSeconds)}`)
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
+                .fontColor(AppTheme.SUBTEXT);
+            }
+            if (item.status === PracticeAttemptStatus.SUBMITTED && item.noteCount > 0) {
+              Text('·')
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
+                .fontColor(AppTheme.TERTIARY_TEXT);
+            }
+            if (item.noteCount > 0) {
+              Text(`${item.noteCount} 条笔记`)
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
+                .fontColor(AppTheme.SUBTEXT);
+            }
+          }
+          .width('100%');
+        }
       }
       .width('100%');
     }

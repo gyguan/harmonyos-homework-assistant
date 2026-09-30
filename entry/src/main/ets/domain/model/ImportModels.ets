@@ -1,5 +1,10 @@
 import { CandidateAssignment } from './HomeworkModels';
 
+export enum HomeworkImageRecognitionMode {
+  AI_IMAGE = 'AI_IMAGE',
+  OCR = 'OCR'
+}
+
 export enum HomeworkOrganizerMode {
   AI = 'AI',
   LOCAL = 'LOCAL'

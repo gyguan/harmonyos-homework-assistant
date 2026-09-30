@@ -9,6 +9,8 @@ import {
   AssignmentAudioPlayerService
 } from '../../application/assignment/AssignmentAudioPlayerService';
 
+const IMAGE_PREFETCH_CONCURRENCY: number = 2;
+
 @Component
 export struct VoiceAssignmentPane {
   @Prop assignmentId: string = '';
@@ -137,8 +139,8 @@ export struct VoiceAssignmentPane {
       this.imageIndex = 0;
       this.notifyMediaState();
       this.loading = false;
-      void this.prefetchNextImage(0);
       void this.loadAudio(audio);
+      this.startImagePrefetch(1, lifecycleVersion);
     } catch {
       this.message = '作业资料加载失败，请检查网络后重试';
     } finally {
@@ -257,35 +259,48 @@ export struct VoiceAssignmentPane {
     return uri;
   }
 
-  private async prefetchNextImage(index: number): Promise<void> {
-    let next = index + 1;
-    if (next < 0 || next >= this.imageResources.length) return;
-    await this.loadImage(next);
+  private startImagePrefetch(startIndex: number, lifecycleVersion: number): void {
+    for (let worker = 0; worker < IMAGE_PREFETCH_CONCURRENCY; worker++) {
+      let index = startIndex + worker;
+      if (index >= this.imageResources.length) return;
+      void this.prefetchImageWorker(index, IMAGE_PREFETCH_CONCURRENCY, lifecycleVersion);
+    }
+  }
+
+  private async prefetchImageWorker(index: number, stride: number,
+    lifecycleVersion: number): Promise<void> {
+    let cursor = index;
+    while (cursor < this.imageResources.length) {
+      if (lifecycleVersion !== this.lifecycleVersion) return;
+      await RemoteAssignmentResourceApi.instance.preload(this.imageResources[cursor]);
+      if (lifecycleVersion !== this.lifecycleVersion) return;
+      cursor += stride;
+    }
   }
 
   private async showImage(index: number): Promise<void> {
     if (index < 0 || index >= this.imageResources.length) return;
     if (index === this.imageIndex && index < this.imageUris.length && this.imageUris[index].length > 0) {
-      void this.prefetchNextImage(index);
       return;
     }
 
     let requestVersion = ++this.imageRequestVersion;
-    this.imageIndex = index;
     this.imageLoading = true;
     this.imageLoadMessage = '';
     this.notifyMediaState();
+
     let uri = await this.loadImage(index);
     if (requestVersion !== this.imageRequestVersion) return;
 
     this.imageLoading = false;
     if (uri.length === 0) {
       this.imageLoadMessage = `第 ${index + 1} 张图片加载失败，请重试`;
+      this.notifyMediaState();
       return;
     }
 
+    this.imageIndex = index;
     this.notifyMediaState();
-    void this.prefetchNextImage(index);
   }
 
   private async toggleAudio(): Promise<void> {
@@ -361,6 +376,31 @@ export struct VoiceAssignmentPane {
         .onChange((index: number) => { void this.showImage(index); })
         .borderRadius(AppTheme.CONTROL_RADIUS);
 
+        Row({ space: 6 }) {
+          Blank();
+          Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
+            .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .backgroundColor('#66000000')
+            .borderRadius(12);
+          Button('全屏查看', { type: ButtonType.Normal })
+            .width(88)
+            .height(36)
+            .padding({ left: 10, right: 10 })
+            .fontSize(12)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .backgroundColor(AppTheme.PRIMARY)
+            .borderRadius(18)
+            .accessibilityText('全屏查看图片和语音')
+            .onClick(() => this.openFullscreen());
+        }
+        .width('100%')
+        .padding({ right: 10 })
+        .position({ x: 0, y: 10 });
         if (this.imageUris.length > 1) {
           Row() {
             Button('←', { type: ButtonType.Circle })
@@ -385,35 +425,6 @@ export struct VoiceAssignmentPane {
           .padding({ left: 10, right: 10 });
         }
 
-        Column() {
-          Row({ space: 6 }) {
-            Blank();
-            Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
-              .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .backgroundColor('#66000000')
-              .borderRadius(12);
-            Button('全屏查看', { type: ButtonType.Normal })
-              .width(88)
-              .height(36)
-              .padding({ left: 10, right: 10 })
-              .fontSize(12)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .backgroundColor(AppTheme.PRIMARY)
-              .borderRadius(18)
-              .accessibilityText('全屏查看图片和语音')
-              .onClick(() => this.openFullscreen());
-          }
-          .width('100%')
-          .padding({ top: 10, right: 10 });
-          Blank();
-        }
-        .width('100%')
-        .height(286);
       }
       .width('100%');
 

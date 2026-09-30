@@ -10,6 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class TutorService {
+  private static final Logger log = LoggerFactory.getLogger(TutorService.class);
   private static final String NOT_CONFIGURED = "AI Tutor 尚未配置模型服务；作业查看与提交不受影响。";
   private static final String TEMPORARILY_UNAVAILABLE = "AI Tutor 暂时不可用，请稍后再试；作业查看与提交不受影响。";
   private static final int DEFAULT_PAGE_SIZE = 40;
@@ -52,9 +56,14 @@ public class TutorService {
   }
 
   public TutorDtos.Conversation ask(UUID familyId, String assignmentId, TutorDtos.AskRequest request) {
+    long startedNanos = System.nanoTime();
     AssignmentEntity assignment = assignments.requireOwned(familyId, assignmentId);
     StudentEntity student = students.requireOwned(familyId, assignment.studentId);
-    if (!model.available()) return conversationWithNotice(familyId, assignmentId, NOT_CONFIGURED);
+    if (!model.available()) {
+      log.warn("tutor ask_unavailable assignmentId={} studentId={} reason=MODEL_UNAVAILABLE",
+          assignmentId, student.id);
+      return conversationWithNotice(familyId, assignmentId, NOT_CONFIGURED);
+    }
 
     TutorSessionEntity session = getOrCreateSession(familyId, student.id, assignment.id);
     List<TutorMessageEntity> history = recentHistory(session.id, MODEL_CONTEXT_MESSAGES);
@@ -62,7 +71,12 @@ public class TutorService {
         TutorPromptBuilder.instructions(request.guidanceFirstValue(), request.directAnswerAllowedValue()),
         TutorPromptBuilder.input(student, assignment, history, request.text().trim()));
     Optional<String> reply = model.answer(modelRequest);
-    if (reply.isEmpty()) return response(session, false, TEMPORARILY_UNAVAILABLE, null, DEFAULT_PAGE_SIZE);
+    if (reply.isEmpty()) {
+      log.warn("tutor ask_failed sessionId={} assignmentId={} studentId={} reason=EMPTY_RESPONSE elapsedMs={}",
+          session.id, assignmentId, student.id,
+          TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedNanos));
+      return response(session, false, TEMPORARILY_UNAVAILABLE, null, DEFAULT_PAGE_SIZE);
+    }
 
     Instant now = Instant.now();
     TutorMessageEntity user = new TutorMessageEntity();
@@ -71,6 +85,9 @@ public class TutorService {
     assistant.id = UUID.randomUUID(); assistant.sessionId = session.id; assistant.role = "ASSISTANT"; assistant.content = reply.get(); assistant.createdAt = now.plusMillis(1);
     messages.save(user); messages.save(assistant);
     session.updatedAt = assistant.createdAt; sessions.save(session);
+    log.info("tutor ask_success sessionId={} assignmentId={} studentId={} historyCount={} replyChars={} elapsedMs={}",
+        session.id, assignmentId, student.id, history.size(), reply.get().length(),
+        TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedNanos));
     return response(session, true, "", null, DEFAULT_PAGE_SIZE);
   }
 

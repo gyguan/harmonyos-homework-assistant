@@ -33,16 +33,17 @@ for token in [
 ]:
     require(token in models, f"practice pass filter model missing: {token}")
 
-require("static readonly PASS_PERCENT: number = 60;" in policy,
-        "practice pass threshold must remain centralized at 60 percent")
+require("PASS_PERCENT" not in policy,
+        "practice pass policy must not use a percentage threshold")
 require("item.status !== PracticeAttemptStatus.SUBMITTED" in policy and
         "item.mode !== PracticeAttemptMode.FULL" in policy,
         "only submitted full-paper attempts may pass the whole paper")
-require("item.maxScore > 0 ? item.maxScore : item.questionCount" in policy and
-        "item.maxScore > 0 ? item.score : item.correctCount" in policy,
-        "practice pass policy must fall back to correctCount/questionCount for legacy summaries")
-require("numerator * 100 >= denominator * PracticePassPolicy.PASS_PERCENT" in policy,
-        "practice pass policy must compare normalized score against the shared threshold")
+require("item.questionCount > 0" in policy and
+        "item.correctCount === item.questionCount" in policy,
+        "practice pass policy must require every question to be correct")
+require("item.maxScore > 0" in policy and
+        "item.score === item.maxScore" in policy,
+        "practice pass policy must only use full-score equality as the legacy fallback")
 require("static matchesAttemptPassFilter(item: PracticeAttemptSummary, filter: PracticePassFilter)" in policy,
         "practice pass filtering must be centralized in PracticePassPolicy")
 require("static passedPaperIds(attempts: PracticeAttemptSummary[])" in policy and

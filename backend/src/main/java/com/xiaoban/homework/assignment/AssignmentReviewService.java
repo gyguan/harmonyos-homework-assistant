@@ -3,11 +3,14 @@ package com.xiaoban.homework.assignment;
 import com.xiaoban.homework.common.ApiExceptions;
 import java.time.Instant;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AssignmentReviewService {
+  private static final Logger log = LoggerFactory.getLogger(AssignmentReviewService.class);
   private final AssignmentRepository repository;
 
   public AssignmentReviewService(AssignmentRepository repository) {
@@ -43,6 +46,9 @@ public class AssignmentReviewService {
       default -> throw new ApiExceptions.BadRequest("不支持的验收决定: " + input.decision());
     }
     assignment.updatedAt = Instant.now();
-    return AssignmentDtos.Response.from(repository.saveAndFlush(assignment));
+    AssignmentEntity saved = repository.saveAndFlush(assignment);
+    log.info("assignment_review completed assignmentId={} studentId={} decision={} from=SUBMITTED to={} notePresent={}",
+        saved.id, saved.studentId, decision, saved.status, !note.isEmpty());
+    return AssignmentDtos.Response.from(saved);
   }
 }

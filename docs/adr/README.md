@@ -8,4 +8,4 @@ Current accepted decisions:
 
 - `0001-phone-pad-ui-composition.md`
 - `0002-v2-clean-refactor-and-migration.md`
-- `0003-guided-screen-capture-homework-import.md`
+- `0003-homework-image-ai-and-ocr-rollback.md`

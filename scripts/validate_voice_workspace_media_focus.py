@@ -38,6 +38,14 @@ require("ForEach(this.imageUris" in pane and "this.selectImage(index)" in pane,
         "voice media pane must provide direct thumbnail image switching")
 require("Swiper()" in pane and ".onChange((index: number) => { void this.showImage(index); })" in pane,
         "voice media pane must support direct touch swipe paging")
+image_viewer = pane.split("@Builder\n  private ImageViewer()", 1)[1].split(
+    "@Builder\n  private AudioControls()", 1)[0]
+require(".position({ x: 0, y: 10 })" in image_viewer and
+        "Blank();\n        }\n        .width('100%')\n        .height(286);" not in image_viewer,
+        "voice image top controls must leave the swiper gesture area uncovered")
+require(image_viewer.index("Button('全屏查看'") <
+        image_viewer.index(".accessibilityText('上一张情景图片')"),
+        "voice image navigation arrows must be declared above the full-size control overlay in Stack z-order")
 require("let merged = this.imageUris.slice()" in parent and
         "existing: Set<string>" in parent and
         "＋ 继续添加图片" in parent,
@@ -51,11 +59,22 @@ require("imageUris.length > 9" not in remote_resource and
 require("images.sort(" in pane and "compareImageResources" in pane and
         "originalName.toLowerCase()" in pane,
         "student voice images must use natural filename ordering")
-require("loadImage(index: number)" in pane and "prefetchNextImage" in pane and
-        "void this.prefetchNextImage(0)" in pane,
-        "student voice images must load on demand and prefetch the next image")
+require("loadImage(index: number)" in pane and
+        "IMAGE_PREFETCH_CONCURRENCY: number = 2" in pane and
+        "startImagePrefetch(1, lifecycleVersion)" in pane and
+        "prefetchImageWorker" in pane and
+        "RemoteAssignmentResourceApi.instance.preload" in pane,
+        "student voice images must cache all remaining images in the background with bounded concurrency")
+require("async preload(resource: AssignmentResource): Promise<void>" in remote_resource and
+        "await this.download(resource)" in remote_resource,
+        "resource API must expose cache-only preloading without binding every image to UI state")
 require("pendingDownloads" in remote_resource,
         "resource downloads must deduplicate concurrent prefetch and foreground requests")
+show_image = pane.split("private async showImage(index: number)", 1)[1].split(
+    "private async toggleAudio()", 1)[0]
+require(show_image.index("let uri = await this.loadImage(index)") <
+        show_image.index("this.imageIndex = index"),
+        "voice image switching must load the target before committing imageIndex")
 require("invalidate(resourceId: string)" in remote_resource,
         "resource cache must support invalidation after media decode failures")
 require("RemoteAssignmentResourceApi.instance.invalidate(resource.id)" in pane,

@@ -36,13 +36,21 @@ require("整理并继续" in page and "private async organize()" in page,
         "parent assignment create page must expose one organize action")
 require("this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel)" in page,
         "all editable assignment text must flow through the import ViewModel with explicit subject and source evidence")
-require("private SubjectSelector()" in page and "@State private subjectChosen: boolean = false" in page and
-        "请先选择作业科目" in page,
-        "assignment creation must require the parent to choose subject before organization")
-require("this.viewModel.selectImageText()" in page and
-        "this.viewModel.captureImageText()" in page and
+require("private SubjectSelector()" in page and "@State private selectedSubject: Subject | null = null" in page and
+        "label: '自动识别'" in page and "this.selectSubject(null)" in page and
+        "请先选择作业科目" not in page and ".enabled(this.canOrganize())" in page,
+        "assignment creation must default to automatic subject inference without a required subject gate")
+require("this.viewModel.recognizeSelectedImageText(this.sourceImageRef, this.sourceImageLabel)" in page and
+        "this.imageMode = HomeworkImageRecognitionMode.OCR" in page and
         "已识别文字，可修改后继续" in page,
-        "gallery and camera OCR must only fill editable text before organization")
+        "explicit OCR fallback must fill editable text before organization, preserving source image")
+require("this.viewModel.parseImage(this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, text)" in page and
+        "sourceLabel, text)" in view_model and "text: text.trim()" in service and
+        "补充文字：" in service,
+        "image organization must submit and preserve parent supplementary text in source evidence")
+selected_image = page.split("private applySelectedImage(", 1)[-1].split("private async recognizeImageAsText", 1)[0]
+require("this.textDraft = ''" not in selected_image,
+        "selecting an image must not erase the parent's existing text")
 require("selectImageAndParse()" not in page and "parseTypedText" not in page and
         "textEntryOpen" not in page,
         "unified create page must not retain separate screenshot/text sub-flows")
@@ -69,9 +77,9 @@ require("HomeworkImportDraftRepository" in service and "DefaultHomeworkImportDra
         "HomeworkImportService must persist drafts through the draft repository boundary")
 require("HomeworkStore" not in service,
         "HomeworkImportService must not access HomeworkStore directly")
-require("async parseText(text: string, subject: Subject, imageRef: string = ''" in service and
+require("async parseText(text: string, subject: Subject | null = null, imageRef: string = ''" in service and
         "imageSourceLabel: string = ''" in service,
-        "HomeworkImportService must support one explicit subject plus optional image evidence")
+        "HomeworkImportService must support optional subject override plus image evidence")
 require("HomeworkImportSourceKind.TEXT" in service and "家长录入文字" in service and
         "相册作业截图" in service,
         "unified assignment input must preserve its actual source evidence")
@@ -83,10 +91,11 @@ require("fallbackCandidate" in service and
         "only local parser empty results may fall back to one confirmable candidate")
 require("candidates.length === 0 && output.organizerMode === HomeworkOrganizerMode.LOCAL" in service,
         "an authoritative AI zero-task result must not be converted into a fake assignment")
-require("private applySelectedSubject(candidates: CandidateAssignment[], subject: Subject)" in service and
+require("private applySelectedSubject(candidates: CandidateAssignment[], subject: Subject | null)" in service and
+        "if (subject === null) return candidates;" in service and
         "candidates = this.applySelectedSubject(output.candidates, subject)" in service and
         "subject: subject" in service and "fallbackSubject" not in service,
-        "organizer/parser subject inference must never override the parent-selected subject")
+        "automatic inference must preserve multi-subject output and explicit subject overrides must remain authoritative")
 
 # Unified publishing must keep the single Assignment aggregate while retaining SCHOOL vs EXTRA.
 require("this.assignmentType(candidate.subject)" in publisher and

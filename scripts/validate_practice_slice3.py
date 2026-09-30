@@ -68,6 +68,12 @@ for token in ["科目", "时间", "通过状态", "重置", "确定"]:
     require(token in history_filter_dialog, f"Practice history filter dialog missing {token}")
 require("完成耗时 " in history and "elapsedText(item.elapsedSeconds)" in history,
         "Submitted practice history must label completion elapsed time explicitly")
+require("Text('查看')" not in history,
+        "Practice history cards must rely on whole-card click instead of a redundant View action")
+require("if (item.status === PracticeAttemptStatus.SUBMITTED || item.noteCount > 0)" in history and
+        "Text(this.viewModel.timeText(item.startedAtEpochMs))" in history and
+        ".textOverflow({ overflow: TextOverflow.Ellipsis })" in history,
+        "Practice history metadata must split secondary details and constrain the primary time row on compact widths")
 require("recordStatusLabel(item)" in history and "statusLabel(item)" not in history and "passLabel(item)" not in history,
         "Practice history cards must keep one consolidated status badge")
 require("完成耗时 " in detail_page and "recordStatusLabel(item)" in detail_page and
@@ -75,9 +81,10 @@ require("完成耗时 " in detail_page and "recordStatusLabel(item)" in detail_p
         "Paper detail recent attempts must keep one consolidated status badge plus completion duration")
 require("PracticePassPolicy" in history_vm and "PracticePassPolicy" in detail_vm,
         "History pass state must reuse the shared PracticePassPolicy")
-require("PASS_PERCENT: number = 60" in pass_policy and
+require("PASS_PERCENT" not in pass_policy and
+        "item.correctCount === item.questionCount" in pass_policy and
         "item.mode !== PracticeAttemptMode.FULL" in pass_policy,
-        "Practice history pass display must preserve the shared 60% full-paper policy")
+        "Practice history pass display must preserve the shared all-correct full-paper policy")
 require("'进行中'" in history_vm and "'已通过'" in history_vm and "'未通过'" in history_vm and
         "'专项练习'" in history_vm,
         "Practice history must consolidate record state into in-progress/passed/not-passed/special labels")

@@ -21,6 +21,7 @@ public class ScheduledAssignmentAttemptService {
   private static final Logger log = LoggerFactory.getLogger(ScheduledAssignmentAttemptService.class);
   private static final int MAX_RETRIES = 3;
   private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm");
+  private static final DateTimeFormatter INSTANCE_DATE_FORMAT = DateTimeFormatter.ofPattern("MM-dd");
 
   private final ScheduledAssignmentPlanRepository plans;
   private final ScheduledAssignmentTemplateRepository templates;
@@ -182,7 +183,7 @@ public class ScheduledAssignmentAttemptService {
     AssignmentDtos.Create create = new AssignmentDtos.Create(
         assignmentId,
         template.subject,
-        template.title,
+        instanceTitle(plan, template, fireAt),
         template.instruction,
         "",
         dueText(template),
@@ -329,6 +330,13 @@ public class ScheduledAssignmentAttemptService {
       case "NONE" -> null;
       default -> throw new ApiExceptions.BadRequest("不支持的截止规则: " + template.duePolicy);
     };
+  }
+
+  private String instanceTitle(ScheduledAssignmentPlanEntity plan,
+      ScheduledAssignmentTemplateEntity template, Instant fireAt) {
+    String fireDate = fireAt.atZone(ScheduledAssignmentSchedule.zone(plan.timezone))
+        .toLocalDate().format(INSTANCE_DATE_FORMAT);
+    return template.title + " · " + fireDate;
   }
 
   private String dueText(ScheduledAssignmentTemplateEntity template) {

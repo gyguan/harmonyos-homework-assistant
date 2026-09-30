@@ -11,6 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -45,6 +46,8 @@ public class AccessLogFilter extends OncePerRequestFilter {
     request.setAttribute(ATTR_REQUEST_ID, requestId);
     request.setAttribute(ATTR_CLIENT_SCENE, scene);
     response.setHeader(REQUEST_ID_HEADER, requestId);
+    MDC.put("requestId", requestId);
+    MDC.put("scene", scene);
     if (httpLogProperties.isLogPayloads()) {
       log.info("[HTTP-REQUEST] requestId={} scene={} {} {} query={} contentType={} contentLength={}",
           requestId, scene, request.getMethod(), sanitize(request.getRequestURI()),
@@ -66,6 +69,8 @@ public class AccessLogFilter extends OncePerRequestFilter {
         log.warn("[HTTP-DUPLICATE] requestId={} scene={} {} {} within={}ms",
             requestId, scene, request.getMethod(), sanitize(request.getRequestURI()), DUPLICATE_WINDOW_MS);
       }
+      MDC.remove("requestId");
+      MDC.remove("scene");
     }
   }
 

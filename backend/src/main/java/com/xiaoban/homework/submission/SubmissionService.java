@@ -13,12 +13,15 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class SubmissionService {
+  private static final Logger log = LoggerFactory.getLogger(SubmissionService.class);
   private final SubmissionRepository submissions;
   private final SubmissionPhotoRepository photos;
   private final AssignmentService assignments;
@@ -66,6 +69,7 @@ public class SubmissionService {
     submissions.save(submission);
 
     List<SubmissionDtos.Photo> result = new ArrayList<>();
+    long totalBytes = 0;
     for (MultipartFile file : files) {
       UUID photoId = UUID.randomUUID();
       FileStorage.StoredFile stored = storage.save(photoId, file);
@@ -80,6 +84,7 @@ public class SubmissionService {
       photo.contentType = stored.contentType();
       photo.sizeBytes = stored.sizeBytes();
       photos.save(photo);
+      totalBytes += stored.sizeBytes();
       result.add(toDto(photo));
     }
 
@@ -90,6 +95,8 @@ public class SubmissionService {
         AssignmentDtos.Response.from(assignmentRepository.saveAndFlush(assignment));
 
     SubmissionDtos.Response created = new SubmissionDtos.Response(submissionId, assignmentId, now, result);
+    log.info("submission created assignmentId={} studentId={} submissionId={} photoCount={} totalBytes={} from=READY_TO_SUBMIT to=SUBMITTED",
+        assignmentId, assignment.studentId, submissionId, result.size(), totalBytes);
     return new SubmissionDtos.CreateResponse(created, authoritative);
   }
 

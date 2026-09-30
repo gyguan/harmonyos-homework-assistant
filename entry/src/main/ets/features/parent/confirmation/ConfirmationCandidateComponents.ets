@@ -342,7 +342,6 @@ export struct ConfirmationCandidateEditor {
             instruction: this.instructionDraft,
             dueText: this.dueTextDraft,
             expectedMinutes: this.expectedMinutesDraft,
-            textbookRef: this.textbookRefDraft,
             onSubjectChange: (subject: Subject) => {
               this.subjectDraft = subject;
               this.markChanged();
@@ -361,10 +360,6 @@ export struct ConfirmationCandidateEditor {
             },
             onMinutesChange: (minutes: number) => {
               this.expectedMinutesDraft = minutes;
-              this.markChanged();
-            },
-            onTextbookRefChange: (value: string) => {
-              this.textbookRefDraft = value;
               this.markChanged();
             }
           });

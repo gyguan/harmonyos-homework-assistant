@@ -97,7 +97,7 @@ export struct ParentAssignmentEditPanel {
       subject: this.item.subject,
       title: this.titleDraft.trim(),
       instruction: this.instructionDraft.trim(),
-      textbookRef: this.textbookRefDraft.trim(),
+      textbookRef: this.textbookRefDraft,
       dueAtEpochMs: dueAt > 0 ? dueAt : 0,
       dueTimezone: this.item.dueTimezone,
       dueText: dueText,
@@ -180,7 +180,6 @@ export struct ParentAssignmentEditPanel {
           instruction: this.instructionDraft,
           dueText: this.dueTextDraft,
           expectedMinutes: this.parsedMinutes() > 0 ? this.parsedMinutes() : 20,
-          textbookRef: this.textbookRefDraft,
           onTitleChange: (value: string) => {
             this.titleDraft = value;
             this.markChanged();
@@ -193,11 +192,7 @@ export struct ParentAssignmentEditPanel {
             this.dueTextDraft = value;
             this.markChanged();
           },
-          onMinutesChange: (minutes: number) => this.setMinutes(minutes),
-          onTextbookRefChange: (value: string) => {
-            this.textbookRefDraft = value;
-            this.markChanged();
-          }
+          onMinutesChange: (minutes: number) => this.setMinutes(minutes)
         })
         .padding({ left: 16, right: 16, top: 12, bottom: 16 });
       }

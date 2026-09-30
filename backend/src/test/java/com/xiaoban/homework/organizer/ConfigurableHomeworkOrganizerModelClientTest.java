@@ -4,11 +4,69 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.*;
 
 import com.xiaoban.homework.student.StudentEntity;
+import com.xiaoban.homework.ai.AiProviderProperties;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 
 class ConfigurableHomeworkOrganizerModelClientTest {
+  @Test
+  void submitsSupplementaryTextAlongsideImageAndKeepsItOutOfInstructions() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
+        anyString(), anyMap())).thenReturn(java.util.Optional.of(
+            "{\"recognizedText\":\"语文朗读\",\"assignments\":[]} "));
+    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
+        JsonMapper.builder().build());
+    client.organizeImage(new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE", " 数学口算20题 ");
+    var instructions = org.mockito.ArgumentCaptor.forClass(String.class);
+    var input = org.mockito.ArgumentCaptor.forClass(String.class);
+    verify(transport).completeWithImage(anyString(), instructions.capture(), input.capture(),
+        eq("data:image/jpeg;base64,PRIVATE"), eq(6000), anyString(), anyMap());
+    assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
+    assertTrue(instructions.getValue().contains("重复任务只保留一项"));
+    assertFalse(instructions.getValue().contains("数学口算20题"));
+    assertFalse(ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null)
+        .endsWith("null"));
+  }
+
+  @Test
+  void imageUpstreamStatusReachesServiceUnavailableResponse() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
+        anyString(), anyMap())).thenThrow(new com.xiaoban.homework.ai.ImageAiRequestException(
+            406, com.xiaoban.homework.ai.ImageAiRequestException.Reason.REQUEST_REJECTED));
+    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
+        JsonMapper.builder().build());
+    var error = assertThrows(com.xiaoban.homework.common.ApiExceptions.ServiceUnavailable.class,
+        () -> client.organizeImage(new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE", null));
+    assertTrue(error.getMessage().contains("HTTP 406"));
+    assertTrue(error.getMessage().contains("data URL"));
+    assertFalse(error.getMessage().contains("PRIVATE"));
+  }
+
+  @Test
+  void imageResultKeepsMultipleSubjectsAndRejectsIncompleteOutput() {
+    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), null,
+        JsonMapper.builder().build());
+    String output = """
+        {"recognizedText":"语文背诵；数学口算", "assignments":[
+          {"subject":"语文","title":"背诵","instruction":"背诵课文","expectedMinutes":10,"confidence":0.9},
+          {"subject":"数学","title":"口算","instruction":"口算20题","expectedMinutes":15,"confidence":0.8}
+        ]}
+        """;
+    var result = client.parseImageOutput(output).orElseThrow();
+    assertEquals(java.util.List.of("语文", "数学"), result.assignments().stream()
+        .map(HomeworkOrganizerDtos.Candidate::subject).toList());
+    assertEquals("语文背诵；数学口算", result.recognizedText());
+    assertTrue(client.parseImageOutput(output.replace("\"recognizedText\"", "\"unused\"")).isEmpty());
+    assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
+    assertTrue(client.parseImageOutput("{\"recognizedText\":\"班级通知\",\"assignments\":[]}")
+        .orElseThrow().assignments().isEmpty());
+  }
   static class TestStudent extends StudentEntity {
     TestStudent() { super(); }
   }

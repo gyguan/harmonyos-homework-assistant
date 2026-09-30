@@ -58,6 +58,7 @@ def main() -> int:
         require(plan.get("status") == "ENABLED", "new scheduled plan must be enabled")
         require(plan.get("nextFireAtEpochMs", 0) > 0, "new scheduled plan missing next fire time")
 
+        expected_title = "E2E 定时阅读任务 · " + target.strftime("%m-%d")
         deadline = time.time() + 95
         created = None
         while time.time() < deadline:
@@ -65,7 +66,7 @@ def main() -> int:
                 "/api/v1/students/" + student_id + "/assignments",
                 token=token), (200,), "poll scheduled assignment").json()
             matches = [item for item in assignments
-                       if item.get("title") == "E2E 定时阅读任务"
+                       if item.get("title") == expected_title
                        and item.get("sourceLabel") == "定时作业"]
             if matches:
                 created = matches[0]
@@ -76,6 +77,8 @@ def main() -> int:
         require(created["id"].startswith("a-scheduled-"), "scheduled assignment id is not deterministic")
         require(created.get("status") == "NOT_STARTED", "scheduled assignment must start NOT_STARTED")
         require(created.get("assignmentType") == "EXTRA", "scheduled assignment must reuse Assignment EXTRA")
+        require(created.get("title") == expected_title,
+                "scheduled assignment title must include scheduled fire date")
         require(created.get("dueAtEpochMs", 0) > plan["nextFireAtEpochMs"],
                 "AFTER_MINUTES due time must be after scheduled fire time")
 
@@ -97,7 +100,7 @@ def main() -> int:
         assignments = expect(http(base_url, "GET",
             "/api/v1/students/" + student_id + "/assignments",
             token=token), (200,), "verify scheduled idempotency").json()
-        matches = [item for item in assignments if item.get("title") == "E2E 定时阅读任务"]
+        matches = [item for item in assignments if item.get("title") == expected_title]
         require(len(matches) == 1, "one scheduled fire created duplicate Assignments")
 
         print("PASS: scheduled assignment E2E")

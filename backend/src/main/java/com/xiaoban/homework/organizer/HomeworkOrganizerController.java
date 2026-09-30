@@ -26,4 +26,12 @@ public class HomeworkOrganizerController {
       @Valid @RequestBody HomeworkOrganizerDtos.Request request) {
     return service.organize(familyId, studentId, request);
   }
+
+  @PostMapping("/organize-image")
+  public HomeworkOrganizerDtos.ImageResponse organizeImage(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String studentId,
+      @Valid @RequestBody HomeworkOrganizerDtos.ImageRequest request) {
+    return service.organizeImage(familyId, studentId, request);
+  }
 }

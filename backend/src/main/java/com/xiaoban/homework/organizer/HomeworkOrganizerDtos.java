@@ -22,4 +22,12 @@ public final class HomeworkOrganizerDtos {
       double confidence) {}
 
   public record Response(List<Candidate> assignments, String mode) {}
+
+  public record ImageRequest(
+      @NotBlank @Size(max = 5592408) String imageBase64,
+      @NotBlank @Size(max = 30) String contentType,
+      @Size(max = 200) String sourceLabel,
+      @Size(max = 12000) String text) {}
+
+  public record ImageResponse(List<Candidate> assignments, String mode, String recognizedText) {}
 }

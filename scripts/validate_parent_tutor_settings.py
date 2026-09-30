@@ -23,6 +23,7 @@ family_context_port = read("entry/src/main/ets/domain/port/FamilyContextReposito
 family_context_repository = read("entry/src/main/ets/data/repository/DefaultFamilyContextRepository.ets")
 family_context_local = read("entry/src/main/ets/data/local/FamilyContextLocalDataSource.ets")
 parent = read("entry/src/main/ets/features/parent/settings/BackendConnectionPage.ets")
+student_editor = read("entry/src/main/ets/components/family/StudentProfileEditorDialog.ets")
 student = read("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
 selection_controls = read("entry/src/main/ets/components/selection/SelectionControls.ets")
 tutor = read("entry/src/main/ets/application/remote/TutorRemoteApi.ets")
@@ -76,11 +77,11 @@ for field in ["chineseTextbook", "mathTextbook", "englishTextbook", "otherTextbo
             f"student textbook structure missing cross-layer field: {field}")
 require("StudentTextbookProfile.fromStudent(student)" in parent and
         "StudentTextbookProfile.validOtherTextbooks" in parent and
-        "格式：科目=教材版本" in parent and
-        "科学=教科版；道德与法治=人教版" in parent,
+        "格式：科目=教材版本" in student_editor and
+        "科学=教科版；道德与法治=人教版" in student_editor,
         "parent student editor must expose structured textbooks and explicit other-textbook format")
 for subject_label in ["Text('语文')", "Text('数学')", "Text('英语')", "Text('其他教材（可选）')"]:
-    require(subject_label in parent, f"parent student editor missing textbook field: {subject_label}")
+    require(subject_label in student_editor, f"parent student editor missing textbook field: {subject_label}")
 require("StudentTextbooks.from(input)" in student_service and
         "entity.chineseTextbook = textbooks.chinese()" in student_service and
         "entity.textbookSummary = textbooks.summary()" in student_service,

@@ -12,11 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class PracticeAttemptService {
+  private static final Logger log = LoggerFactory.getLogger(PracticeAttemptService.class);
   private final PracticeAttemptRepository attempts;
   private final PracticeAnswerRepository answers;
   private final PracticeNoteRepository notes;
@@ -66,6 +69,9 @@ public class PracticeAttemptService {
         familyId, studentId, paper.paperId, paper.version,
         writeQuestionIds(questions), sourceAttemptId, "FULL");
     attempts.save(attempt);
+    log.info("practice_attempt started attemptId={} paperId={} studentId={} mode={} questionCount={} sourceAttemptId={}",
+        attempt.id, attempt.paperId, attempt.studentId, attempt.mode, questions.size(),
+        attempt.sourceAttemptId == null ? "-" : attempt.sourceAttemptId);
     return response(attempt, questions);
   }
 
@@ -77,6 +83,8 @@ public class PracticeAttemptService {
         familyId, source.studentId, source.paperId, source.paperVersion,
         source.questionIdsJson, source.id, "FULL");
     attempts.save(repeated);
+    log.info("practice_attempt started attemptId={} paperId={} studentId={} mode={} questionCount={} sourceAttemptId={}",
+        repeated.id, repeated.paperId, repeated.studentId, repeated.mode, questions.size(), sourceAttemptId);
     return response(repeated, questions);
   }
 
@@ -105,6 +113,8 @@ public class PracticeAttemptService {
         familyId, source.studentId, source.paperId, source.paperVersion,
         writeQuestionIds(wrongQuestions), source.id, "WRONG_ONLY");
     attempts.save(repeated);
+    log.info("practice_attempt started attemptId={} paperId={} studentId={} mode={} questionCount={} sourceAttemptId={}",
+        repeated.id, repeated.paperId, repeated.studentId, repeated.mode, wrongQuestions.size(), sourceAttemptId);
     return response(repeated, wrongQuestions);
   }
 
@@ -226,6 +236,9 @@ public class PracticeAttemptService {
     attempt.correctCount = correct;
     attempt.wrongCount = questions.size() - correct;
     attempts.save(attempt);
+    log.info("practice_attempt submitted attemptId={} paperId={} studentId={} mode={} score={} maxScore={} correctCount={} wrongCount={} elapsedSeconds={}",
+        attempt.id, attempt.paperId, attempt.studentId, attempt.mode, attempt.score, attempt.maxScore,
+        attempt.correctCount, attempt.wrongCount, attempt.elapsedSeconds);
     return result(attempt);
   }
 

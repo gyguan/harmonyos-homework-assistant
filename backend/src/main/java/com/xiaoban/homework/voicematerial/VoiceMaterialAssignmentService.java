@@ -75,6 +75,8 @@ public class VoiceMaterialAssignmentService {
         .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
 
     String requestId = normalizeRequestId(input.requestId());
+    log.info("voice_material manual_create_start studentId={} packageId={} requestIdPresent={}",
+        targetStudentId, packageId, !requestId.isBlank());
     if (!requestId.isBlank()) {
       VoiceMaterialTaskLinkEntity previous =
           links.findByFamilyIdAndRequestId(familyId, requestId).orElse(null);
@@ -85,6 +87,8 @@ public class VoiceMaterialAssignmentService {
         }
         AssignmentDtos.Response existing = loadAssignmentIfPresent(
             familyId, previous.assignmentId);
+        log.info("voice_material manual_create_reused studentId={} packageId={} assignmentId={} requestIdPresent=true",
+            targetStudentId, packageId, previous.assignmentId);
         return new VoiceMaterialDtos.CreateAssignmentResponse(
             false, previous.assignmentId, existing);
       }
@@ -108,6 +112,8 @@ public class VoiceMaterialAssignmentService {
         requestedInstruction,
         requestId,
         "MANUAL");
+    log.info("voice_material manual_create_success studentId={} packageId={} assignmentId={} subjectCode={} requestIdPresent={}",
+        targetStudentId, packageId, assignment.id(), requestedSubjectCode, !requestId.isBlank());
     return new VoiceMaterialDtos.CreateAssignmentResponse(
         true, assignment.id(), assignment);
   }

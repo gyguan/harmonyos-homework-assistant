@@ -13,12 +13,16 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class PracticeGenerationService {
+  private static final Logger log = LoggerFactory.getLogger(PracticeGenerationService.class);
   private static final Set<String> SUBJECTS = Set.of("CHINESE", "MATH", "ENGLISH");
   private static final Set<String> TRACKS = Set.of("TEXTBOOK_SYNC", "EXTRACURRICULAR");
   private static final Set<String> DIFFICULTIES = Set.of("L1", "L2", "L3");
@@ -87,6 +91,7 @@ public class PracticeGenerationService {
       throw new ApiExceptions.ServiceUnavailable("AI出题服务尚未配置");
     }
 
+    long startedNanos = System.nanoTime();
     UUID generationId = UUID.randomUUID();
     String paperId = "ai-" + generationId;
     Instant now = Instant.now();
@@ -110,6 +115,8 @@ public class PracticeGenerationService {
     generation.createdAt = now;
     generation.updatedAt = now;
     generations.saveAndFlush(generation);
+    log.info("practice_generation started generationId={} paperId={} studentId={} subject={} track={} difficulty={} questionCount={} model={}",
+        generationId, paperId, studentId, subject, track, difficulty, input.questionCount(), generation.model);
 
     PracticeGenerationDtos.GenerateRequest normalized =
         new PracticeGenerationDtos.GenerateRequest(
@@ -118,6 +125,8 @@ public class PracticeGenerationService {
         model.generate(textbookContext, paperId, grade, semester, normalized).orElse(null);
     if (generated == null) {
       fail(generation, "AI未返回可解析的练习内容");
+      log.warn("practice_generation failed generationId={} paperId={} phase=MODEL reason=EMPTY_RESULT elapsedMs={}",
+          generationId, paperId, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedNanos));
       throw new ApiExceptions.ServiceUnavailable("AI出题失败，请稍后重试");
     }
 
@@ -137,9 +146,16 @@ public class PracticeGenerationService {
       generation.errorMessage = "";
       generation.updatedAt = Instant.now();
       generations.saveAndFlush(generation);
+      log.info("practice_generation ready generationId={} paperId={} questionCount={} elapsedMs={}",
+          generationId, paperId, generated.questionCount(),
+          TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedNanos));
       return response(generation, generated);
     } catch (Exception error) {
-      fail(generation, safe(error.getMessage()));
+      String reason = safe(error.getMessage());
+      fail(generation, reason);
+      log.warn("practice_generation failed generationId={} paperId={} phase=VALIDATE_OR_REVIEW exception={} reason={} elapsedMs={}",
+          generationId, paperId, error.getClass().getSimpleName(), reason,
+          TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startedNanos));
       throw new ApiExceptions.ServiceUnavailable(
           "AI生成内容未通过质量校验，请重新生成：" + safe(error.getMessage()));
     }
@@ -238,6 +254,8 @@ public class PracticeGenerationService {
     generations.save(generation);
 
     List<String> targetStudentIds = targets.stream().map(target -> target.id).toList();
+    log.info("practice_generation published generationId={} paperId={} scope={} targetCount={} sourceType={}",
+        generation.id, generation.paperId, normalize(input.scope()), targetStudentIds.size(), paper.sourceType);
     return new PracticeGenerationDtos.PublishResponse(
         generation.id.toString(), generation.status, content.response(paper), targetStudentIds);
   }

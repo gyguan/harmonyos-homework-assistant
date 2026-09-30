@@ -1,0 +1,21 @@
+{
+  "devices": {
+    "general": [
+      "default",
+      "tablet"
+    ],
+    "custom": []
+  },
+  "development": {
+    "addedSysCaps": [
+      "SystemCapability.Multimedia.Media.AVPlayer",
+      "SystemCapability.AI.TextToSpeech"
+    ]
+  },
+  "production": {
+    "addedSysCaps": [
+      "SystemCapability.AI.TextToSpeech"
+    ],
+    "removedSysCaps": []
+  }
+}

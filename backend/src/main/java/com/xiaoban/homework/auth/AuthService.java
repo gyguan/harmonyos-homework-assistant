@@ -2,11 +2,14 @@ package com.xiaoban.homework.auth;
 
 import com.xiaoban.homework.common.ApiExceptions;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class AuthService {
+  private static final Logger log = LoggerFactory.getLogger(AuthService.class);
   private final AccountRepository accounts;
   private final PasswordEncoder passwordEncoder;
   private final AuthTokenService tokens;
@@ -16,12 +19,14 @@ public class AuthService {
   }
 
   public LoginResponse login(LoginRequest request) {
-    AccountEntity account = accounts.findByLoginName(request.loginName())
-        .orElseThrow(() -> new ApiExceptions.Unauthorized("账号或密码错误"));
-    if (!passwordEncoder.matches(request.password(), account.passwordHash)) {
+    AccountEntity account = accounts.findByLoginName(request.loginName()).orElse(null);
+    if (account == null || !passwordEncoder.matches(request.password(), account.passwordHash)) {
+      log.warn("auth login_failed reason=INVALID_CREDENTIALS");
       throw new ApiExceptions.Unauthorized("账号或密码错误");
     }
-    return new LoginResponse(tokens.issue(account.id, account.familyId), account.displayName, account.familyId.toString());
+    String token = tokens.issue(account.id, account.familyId);
+    log.info("auth login_success accountId={} familyId={}", account.id, account.familyId);
+    return new LoginResponse(token, account.displayName, account.familyId.toString());
   }
 
   public SessionResponse session(UUID accountId, UUID familyId) {
