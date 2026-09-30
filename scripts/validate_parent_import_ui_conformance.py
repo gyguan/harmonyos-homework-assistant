@@ -64,10 +64,11 @@ require("@State private subjectOptionsOpen: boolean = false" in import_page and
 require("this.RecognitionActions();" in import_page and
         import_page.find("this.RecognitionActions();") < import_page.find("TextArea({"),
         "image actions must be discoverable before the editable text input")
-require("if (this.sourceImageRef.length > 0) {\n        Text(" in import_page and
-        "this.ImageModeSelector();" in import_page and
+require("private ImageInput()" in import_page and
+        "if (this.sourceImageRef.length > 0) {" in import_page and
+        "ImageModeSelector" not in import_page and
         "Flex({ wrap: FlexWrap.Wrap })" in import_page,
-        "image parsing settings must be contextual and options must wrap in narrow/large-text layouts")
+        "image controls must be contextual without permanent parsing tabs; subject options must wrap")
 require("下一步核对作业，确认后再发布" in import_page,
         "manual homework primary action must clarify that publishing follows parent confirmation")
 require("private SubjectSelector()" in import_page and
@@ -80,9 +81,14 @@ require("@State private selectedSubject: Subject | null = null" in import_page a
         "manual homework must allow automatic subject inference before organization")
 require("HomeworkImageRecognitionMode.AI_IMAGE" in import_page and
         "HomeworkImageRecognitionMode.OCR" in import_page and
-        "label: 'AI图片解析'" in import_page and "label: '文字识别'" in import_page and
+        "识别图片文字" in import_page and "重新用图片解析" in import_page and
         "this.viewModel.parseImage(" in import_page and "this.viewModel.recognizeSelectedImageText(" in import_page,
-        "manual homework must offer direct image AI parsing and OCR rollback on the selected image")
+        "manual homework must default to image AI parsing and retain explicit same-image OCR rollback")
+input_section = import_page.split("private AssignmentInput()", 1)[-1].split("private ActionFooter()", 1)[0]
+require("this.ImageInput();" in input_section and "TextArea({" in input_section and
+        "} else {" not in input_section and
+        "this.viewModel.parseImage(this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, text)" in import_page,
+        "image and text must coexist and supplemental text must reach image organization")
 require("this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel)" in import_page,
         "manual homework must pass the parent-selected subject into organization")
 require("captureImageText()" in import_vm and

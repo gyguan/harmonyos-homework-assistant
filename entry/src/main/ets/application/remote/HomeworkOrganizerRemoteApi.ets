@@ -30,6 +30,7 @@ interface ImageOrganizePayload {
   imageBase64: string;
   contentType: string;
   sourceLabel: string;
+  text: string;
 }
 
 interface ImageOrganizeResponse {
@@ -50,12 +51,13 @@ export class HomeworkOrganizerRemoteApi {
   private constructor() {}
 
   async organizeImage(input: ExtractedHomeworkText, imageRef: string): Promise<OrganizedHomeworkImage> {
-    if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端，或切换文字识别');
+    if (!BackendSession.instance.isConnected()) throw new Error('请先连接后端，或点击识别图片文字');
     let encoded = await HomeworkImageEncoder.encode(imageRef);
     let payload: ImageOrganizePayload = {
       imageBase64: encoded.imageBase64,
       contentType: encoded.contentType,
-      sourceLabel: input.sourceLabel
+      sourceLabel: input.sourceLabel,
+      text: input.text
     };
     let response = await BackendHttpClient.instance.requestFor(
       'homework.organize.image',
@@ -63,7 +65,7 @@ export class HomeworkOrganizerRemoteApi {
       http.RequestMethod.POST, payload, true, 120000);
     if (response.statusCode === 401) throw new Error('登录已失效，请重新登录后重试');
     if (response.statusCode < 200 || response.statusCode >= 300) {
-      let message = 'AI图片解析失败，可切换文字识别后重试';
+      let message = 'AI图片解析失败，可点击识别图片文字后重试';
       try {
         let error = JSON.parse(response.body) as OrganizerErrorResponse;
         if (typeof error.message === 'string' && error.message.length > 0) message = error.message;
@@ -75,11 +77,11 @@ export class HomeworkOrganizerRemoteApi {
     let parsed = JSON.parse(response.body) as ImageOrganizeResponse;
     if (parsed.mode !== 'AI_IMAGE' || typeof parsed.recognizedText !== 'string' ||
       parsed.recognizedText.trim().length === 0 || !Array.isArray(parsed.assignments)) {
-      throw new Error('AI图片解析结果不完整，可切换文字识别后重试');
+      throw new Error('AI图片解析结果不完整，可点击识别图片文字后重试');
     }
     let candidates = this.toCandidates(input, parsed.assignments);
     if (candidates.length !== parsed.assignments.length) {
-      throw new Error('AI返回的作业科目或标题无效，请重试或切换文字识别');
+      throw new Error('AI返回的作业科目或标题无效，请重试或点击识别图片文字');
     }
     return { candidates: candidates, recognizedText: parsed.recognizedText.trim() };
   }

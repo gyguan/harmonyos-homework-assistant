@@ -8,5 +8,6 @@ public interface HomeworkOrganizerModelClient {
   boolean available();
   Optional<List<HomeworkOrganizerDtos.Candidate>> organize(StudentEntity student, String sourceLabel, String text);
   boolean imageAvailable();
-  Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student, String sourceLabel, String imageDataUrl);
+  Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student, String sourceLabel,
+      String imageDataUrl, String text);
 }

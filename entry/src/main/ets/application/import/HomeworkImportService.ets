@@ -93,7 +93,7 @@ export class HomeworkImportService {
   }
 
   async parseImage(imageRef: string, subject: Subject | null = null,
-    sourceLabel: string = '相册作业图片'): Promise<HomeworkTextImportResult> {
+    sourceLabel: string = '相册作业图片', text: string = ''): Promise<HomeworkTextImportResult> {
     let studentId = this.drafts.getActiveStudentId();
     if (imageRef.length === 0) throw new Error('请先拍照或选择图片');
     let rawImport: RawHomeworkImport = {
@@ -102,15 +102,17 @@ export class HomeworkImportService {
       sourceKind: HomeworkImportSourceKind.IMAGE,
       sourceLabel: sourceLabel,
       resourceUri: imageRef,
-      rawText: ''
+      rawText: text.trim()
     };
     let input: ExtractedHomeworkText = {
-      importId: rawImport.id, studentId: studentId, sourceLabel: sourceLabel, text: ''
+      importId: rawImport.id, studentId: studentId, sourceLabel: sourceLabel, text: text.trim()
     };
     let output = await HomeworkOrganizerRemoteApi.instance.organizeImage(input, imageRef);
     let candidates = this.applySelectedSubject(this.normalizeCandidateDates(output.candidates), subject);
+    let sourceText = output.recognizedText;
+    if (text.trim().length > 0) sourceText += `\n\n补充文字：\n${text.trim()}`;
     HomeworkImportInboxService.instance.commitParsedImport(
-      rawImport, HomeworkImportSourceType.SCREENSHOT, output.recognizedText, candidates, imageRef);
+      rawImport, HomeworkImportSourceType.SCREENSHOT, sourceText, candidates, imageRef);
     this.ensureCurrentStudent(studentId);
     return { candidateCount: candidates.length, organizerMode: HomeworkOrganizerMode.AI };
   }

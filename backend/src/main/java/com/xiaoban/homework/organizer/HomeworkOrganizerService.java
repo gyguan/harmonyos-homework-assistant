@@ -38,9 +38,9 @@ public class HomeworkOrganizerService {
         .orElseThrow(() -> new ApiExceptions.NotFound("孩子不存在"));
     if (!familyId.equals(student.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
     String imageDataUrl = HomeworkImageInput.dataUrl(request);
-    if (!model.imageAvailable()) throw new ApiExceptions.ServiceUnavailable("AI图片解析暂未配置，请使用文字识别");
-    var result = model.organizeImage(student, request.sourceLabel(), imageDataUrl)
-        .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片，或切换文字识别"));
+    if (!model.imageAvailable()) throw new ApiExceptions.ServiceUnavailable("AI图片解析暂未配置，请使用识别图片文字");
+    var result = model.organizeImage(student, request.sourceLabel(), imageDataUrl, request.text())
+        .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片，或点击识别图片文字"));
     log.info("homework_import image_parsed studentId={} assignments={}", studentId, result.assignments().size());
     return result;
   }

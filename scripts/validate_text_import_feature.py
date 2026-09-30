@@ -40,10 +40,17 @@ require("private SubjectSelector()" in page and "@State private selectedSubject:
         "label: '自动识别'" in page and "this.selectSubject(null)" in page and
         "请先选择作业科目" not in page and ".enabled(this.canOrganize())" in page,
         "assignment creation must default to automatic subject inference without a required subject gate")
-require("this.viewModel.selectImageText()" in page and
-        "this.viewModel.captureImageText()" in page and
+require("this.viewModel.recognizeSelectedImageText(this.sourceImageRef, this.sourceImageLabel)" in page and
+        "this.imageMode = HomeworkImageRecognitionMode.OCR" in page and
         "已识别文字，可修改后继续" in page,
-        "gallery and camera OCR must only fill editable text before organization")
+        "explicit OCR fallback must fill editable text before organization, preserving source image")
+require("this.viewModel.parseImage(this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, text)" in page and
+        "sourceLabel, text)" in view_model and "text: text.trim()" in service and
+        "补充文字：" in service,
+        "image organization must submit and preserve parent supplementary text in source evidence")
+selected_image = page.split("private applySelectedImage(", 1)[-1].split("private async recognizeImageAsText", 1)[0]
+require("this.textDraft = ''" not in selected_image,
+        "selecting an image must not erase the parent's existing text")
 require("selectImageAndParse()" not in page and "parseTypedText" not in page and
         "textEntryOpen" not in page,
         "unified create page must not retain separate screenshot/text sub-flows")

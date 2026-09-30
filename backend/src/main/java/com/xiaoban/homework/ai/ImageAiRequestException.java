@@ -11,7 +11,7 @@ public final class ImageAiRequestException extends RuntimeException {
   private final Reason reason;
 
   public ImageAiRequestException(int status, Reason reason) {
-    super("AI图片请求失败：上游HTTP " + status + "，" + description(reason) + "；可切换文字识别");
+    super("AI图片请求失败：上游HTTP " + status + "，" + description(reason) + "；可点击识别图片文字");
     this.status = status;
     this.reason = reason;
   }

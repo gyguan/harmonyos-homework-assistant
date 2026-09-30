@@ -28,7 +28,8 @@ export class HomeworkImportViewModel {
   recognizeSelectedImageText(imageRef: string, sourceLabel: string): Promise<HomeworkImageTextResult> {
     return HomeworkImportService.instance.recognizeSelectedImageText(imageRef, sourceLabel);
   }
-  parseImage(imageRef: string, subject: Subject | null, sourceLabel: string): Promise<HomeworkTextImportResult> {
-    return HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel);
+  parseImage(imageRef: string, subject: Subject | null, sourceLabel: string,
+    text: string = ''): Promise<HomeworkTextImportResult> {
+    return HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel, text);
   }
 }

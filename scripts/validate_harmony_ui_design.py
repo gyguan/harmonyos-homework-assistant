@@ -440,13 +440,15 @@ require("Text('作业内容')" in homework_import and
         "Text('科目（可选）')" in homework_import and
         "AppTheme.LABEL_TITLE_SIZE" in between(homework_import, "private SubjectOptions()", "private FeedbackBanner()"),
         "Homework import content must lead with a section heading and optional subject must use a subordinate form label")
-require("private clearAssignmentInput(): void" in homework_import and
-        ".accessibilityText('清空作业内容')" in homework_import and
-        "this.clearAssignmentInput()" in homework_import and
-        "this.textDraft = '';" in homework_import and
-        "this.sourceImageRef = '';" in homework_import and
-        "this.sourceImageLabel = '';" in homework_import,
-        "Homework import must keep one-tap clear and reset recognized-image source state")
+clear_text = between(homework_import, "private clearAssignmentText(): void", "private removeSourceImage(): void")
+remove_image = between(homework_import, "private removeSourceImage(): void", "private SubjectSelector()")
+require(".accessibilityText('清空作业文字，保留图片')" in homework_import and
+        ".accessibilityText('移除作业图片，保留文字')" in homework_import and
+        "this.clearAssignmentText()" in homework_import and "this.removeSourceImage()" in homework_import and
+        "this.textDraft = '';" in clear_text and "this.sourceImageRef = '';" not in clear_text and
+        "this.sourceImageRef = '';" in remove_image and "this.sourceImageLabel = '';" in remove_image and
+        "this.textDraft = '';" not in remove_image,
+        "Homework import must independently clear text and image without erasing the other input")
 require("AppTheme.PHONE_PAGE_PADDING" not in homework_confirmation and
         "left: AppTheme.PAGE_PADDING" in homework_confirmation and
         "right: AppTheme.PAGE_PADDING" in homework_confirmation,

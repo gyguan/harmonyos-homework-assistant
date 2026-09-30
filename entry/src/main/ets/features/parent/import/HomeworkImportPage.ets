@@ -58,7 +58,7 @@ export struct HomeworkImportPage {
     let studentId = this.viewModel.activeStudentId();
     let text = this.textDraft.trim();
     if (text.length === 0 && this.sourceImageRef.length === 0) {
-      this.showParseError('请先输入作业内容，或使用拍照/相册识别');
+      this.showParseError('请先输入作业内容，或添加作业图片');
       return;
     }
 
@@ -66,15 +66,9 @@ export struct HomeworkImportPage {
     this.parseMessage = '';
     this.parseError = false;
     try {
-      if (this.imageMode === HomeworkImageRecognitionMode.OCR && this.sourceImageRef.length > 0 && text.length === 0) {
-        let extracted = await this.viewModel.recognizeSelectedImageText(this.sourceImageRef, this.sourceImageLabel);
-        if (studentId !== this.viewModel.activeStudentId()) return;
-        this.applyRecognizedImage(extracted, this.sourceImageLabel);
-        return;
-      }
       let result: HomeworkTextImportResult;
       if (this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE && this.sourceImageRef.length > 0) {
-        result = await this.viewModel.parseImage(this.sourceImageRef, this.selectedSubject, this.sourceImageLabel);
+        result = await this.viewModel.parseImage(this.sourceImageRef, this.selectedSubject, this.sourceImageLabel, text);
       } else {
         result = await this.viewModel.parseText(text, this.selectedSubject, this.sourceImageRef, this.sourceImageLabel);
       }
@@ -83,7 +77,7 @@ export struct HomeworkImportPage {
         this.parseMessage = `已整理出 ${result.candidateCount} 项作业，请继续核对`;
         this.afterOrganized(result.candidateCount);
       } else {
-        this.showParseError('没有整理出作业，请核对内容或切换文字识别后重试');
+        this.showParseError('没有整理出作业，请核对内容或点击识别图片文字后重试');
       }
     } catch (error) {
       if (studentId !== this.viewModel.activeStudentId()) return;
@@ -99,9 +93,14 @@ export struct HomeworkImportPage {
       this.showParseError('没有识别到清晰文字，请换一张图片重试');
       return;
     }
-    this.textDraft = result.recognizedText;
+    let recognizedText = result.recognizedText.trim();
+    if (this.textDraft.indexOf(recognizedText) < 0) {
+      this.textDraft = this.textDraft.trim().length > 0 ?
+        `${this.textDraft.trim()}\n\n${recognizedText}` : recognizedText;
+    }
     this.sourceImageRef = result.imageRef;
     this.sourceImageLabel = sourceLabel;
+    this.imageMode = HomeworkImageRecognitionMode.OCR;
     this.parseMessage = '已识别文字，可修改后继续';
     this.parseError = false;
   }
@@ -113,14 +112,8 @@ export struct HomeworkImportPage {
     this.parseMessage = '';
     this.parseError = false;
     try {
-      if (this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE) {
-        let imageRef = await this.viewModel.captureImage();
-        if (studentId === this.viewModel.activeStudentId()) this.applySelectedImage(imageRef, '现场拍照');
-        return;
-      }
-      let result: HomeworkImageTextResult = await this.viewModel.captureImageText();
-      if (studentId !== this.viewModel.activeStudentId()) return;
-      this.applyRecognizedImage(result, '现场拍照');
+      let imageRef = await this.viewModel.captureImage();
+      if (studentId === this.viewModel.activeStudentId()) this.applySelectedImage(imageRef, '现场拍照');
     } catch (error) {
       if (studentId !== this.viewModel.activeStudentId()) return;
       this.showParseError(error instanceof Error ? error.message : '拍照识别失败，请重试');
@@ -136,14 +129,8 @@ export struct HomeworkImportPage {
     this.parseMessage = '';
     this.parseError = false;
     try {
-      if (this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE) {
-        let imageRef = await this.viewModel.selectImage();
-        if (studentId === this.viewModel.activeStudentId()) this.applySelectedImage(imageRef, '相册作业图片');
-        return;
-      }
-      let result: HomeworkImageTextResult = await this.viewModel.selectImageText();
-      if (studentId !== this.viewModel.activeStudentId()) return;
-      this.applyRecognizedImage(result, '相册作业图片');
+      let imageRef = await this.viewModel.selectImage();
+      if (studentId === this.viewModel.activeStudentId()) this.applySelectedImage(imageRef, '相册作业图片');
     } catch (error) {
       if (studentId !== this.viewModel.activeStudentId()) return;
       this.showParseError(error instanceof Error ? error.message : '图片识别失败，请重试');
@@ -161,15 +148,32 @@ export struct HomeworkImportPage {
     if (imageRef.length === 0) return;
     this.sourceImageRef = imageRef;
     this.sourceImageLabel = sourceLabel;
-    this.textDraft = '';
+    this.imageMode = HomeworkImageRecognitionMode.AI_IMAGE;
     this.parseMessage = '';
     this.parseError = false;
   }
 
-  private selectImageMode(mode: HomeworkImageRecognitionMode): void {
-    if (this.parseBusy || mode === this.imageMode) return;
-    this.imageMode = mode;
-    if (this.sourceImageRef.length > 0) this.textDraft = '';
+  private async recognizeImageAsText(): Promise<void> {
+    if (this.parseBusy || this.sourceImageRef.length === 0) return;
+    let studentId = this.viewModel.activeStudentId();
+    this.parseBusy = true;
+    this.parseMessage = '';
+    this.parseError = false;
+    try {
+      let result = await this.viewModel.recognizeSelectedImageText(this.sourceImageRef, this.sourceImageLabel);
+      if (studentId !== this.viewModel.activeStudentId()) return;
+      this.applyRecognizedImage(result, this.sourceImageLabel);
+    } catch (error) {
+      if (studentId !== this.viewModel.activeStudentId()) return;
+      this.showParseError(error instanceof Error ? error.message : '图片文字识别失败，请重试');
+    } finally {
+      this.parseBusy = false;
+    }
+  }
+
+  private useImageAgain(): void {
+    if (this.parseBusy) return;
+    this.imageMode = HomeworkImageRecognitionMode.AI_IMAGE;
     this.parseMessage = '';
     this.parseError = false;
   }
@@ -181,11 +185,18 @@ export struct HomeworkImportPage {
     this.parseError = false;
   }
 
-  private clearAssignmentInput(): void {
+  private clearAssignmentText(): void {
     if (this.parseBusy) return;
     this.textDraft = '';
+    this.parseMessage = '';
+    this.parseError = false;
+  }
+
+  private removeSourceImage(): void {
+    if (this.parseBusy) return;
     this.sourceImageRef = '';
     this.sourceImageLabel = '';
+    this.imageMode = HomeworkImageRecognitionMode.AI_IMAGE;
     this.parseMessage = '';
     this.parseError = false;
   }
@@ -393,81 +404,69 @@ export struct HomeworkImportPage {
     .width('100%');
   }
 
+  private canOrganize(): boolean {
+    return !this.parseBusy && (this.textDraft.trim().length > 0 ||
+      (this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE && this.sourceImageRef.length > 0));
+  }
+
   @Builder
-  private ImageModeSelector() {
-    Column({ space: 8 }) {
-      Text('图片解析方式')
-        .width('100%')
-        .fontSize(AppTheme.LABEL_TITLE_SIZE)
-        .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.SUBTEXT);
-      Flex({ wrap: FlexWrap.Wrap }) {
-        Row() {
-          ChoiceSelectionChip({
-            label: 'AI图片解析',
-            selected: this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE,
-            onSelect: () => this.selectImageMode(HomeworkImageRecognitionMode.AI_IMAGE)
-          });
-        }
-        .margin({ right: 8, bottom: 8 });
-        Row() {
-          ChoiceSelectionChip({
-            label: '文字识别',
-            selected: this.imageMode === HomeworkImageRecognitionMode.OCR,
-            onSelect: () => this.selectImageMode(HomeworkImageRecognitionMode.OCR)
-          });
-        }
-        .margin({ right: 8, bottom: 8 });
+  private ImageInput() {
+    if (this.sourceImageRef.length > 0) {
+      Row({ space: 8 }) {
+        Text('已添加作业图片')
+          .layoutWeight(1)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
+        Text('移除图片')
+          .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(AppTheme.PRIMARY)
+          .accessibilityRole(AccessibilityRoleType.BUTTON)
+          .accessibilityText('移除作业图片，保留文字')
+          .enabled(!this.parseBusy)
+          .onClick(() => this.removeSourceImage());
       }
-      .width('100%')
-      .enabled(!this.parseBusy);
+      .width('100%');
+      Image(this.sourceImageRef)
+        .width('100%')
+        .height(200)
+        .objectFit(ImageFit.Contain)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       Text(this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ?
-        '图片将发送给AI解析；效果不佳时可用同一图片切换文字识别' :
-        '先识别图片中的文字，修改后再整理作业')
+        '图片与下方文字将一并交给AI解析' : '已转为文字整理，请核对下方识别结果')
         .width('100%')
         .fontSize(AppTheme.CAPTION_SIZE)
         .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.TERTIARY_TEXT);
+      Text(this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ? '识别图片文字' : '重新用图片解析')
+        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .fontColor(AppTheme.PRIMARY)
+        .accessibilityRole(AccessibilityRoleType.BUTTON)
+        .accessibilityText(this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ?
+          '用系统文字识别读取此图片，之后可编辑文字' : '重新把图片和下方文字交给AI解析')
+        .enabled(!this.parseBusy)
+        .onClick(() => {
+          if (this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE) {
+            void this.recognizeImageAsText();
+          } else {
+            this.useImageAgain();
+          }
+        });
     }
-    .width('100%');
-  }
-
-  private needsImageOcr(): boolean {
-    return this.imageMode === HomeworkImageRecognitionMode.OCR &&
-      this.sourceImageRef.length > 0 && this.textDraft.trim().length === 0;
-  }
-
-  private canOrganize(): boolean {
-    return !this.parseBusy && (this.textDraft.trim().length > 0 || this.sourceImageRef.length > 0);
   }
 
   @Builder
   private AssignmentInput() {
     Column({ space: 12 }) {
-      Row() {
-        Text('作业内容')
-          .fontSize(AppTheme.SECTION_TITLE_SIZE)
-          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        Blank();
-        if (this.textDraft.length > 0 || this.sourceImageRef.length > 0) {
-          Text(this.sourceImageRef.length > 0 && this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ?
-            '移除图片' : '清空内容')
-            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .padding({ left: 12, right: 4 })
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(AppTheme.PRIMARY)
-            .accessibilityRole(AccessibilityRoleType.BUTTON)
-            .accessibilityText('清空作业内容')
-            .enabled(!this.parseBusy)
-            .onClick(() => this.clearAssignmentInput());
-        }
-      }
-      .width('100%');
-
+      Text('作业内容')
+        .width('100%')
+        .fontSize(AppTheme.SECTION_TITLE_SIZE)
+        .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
       if (this.sourceImageRef.length === 0 && this.textDraft.length === 0) {
         Text('拍照或选择老师通知，也可直接输入文字')
           .width('100%')
@@ -475,49 +474,44 @@ export struct HomeworkImportPage {
           .lineHeight(AppTheme.BODY_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
       }
-
       this.RecognitionActions();
-
-      if (this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE && this.sourceImageRef.length > 0) {
-        Image(this.sourceImageRef)
-          .width('100%')
-          .height(200)
-          .objectFit(ImageFit.Contain)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS);
-      } else {
-        Text(this.sourceImageRef.length > 0 ? '识别文字，可修改' : '粘贴或输入文字')
-          .width('100%')
+      this.ImageInput();
+      Row({ space: 8 }) {
+        Text(this.sourceImageRef.length > 0 && this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ?
+          '补充文字（可选）' : '作业文字')
+          .layoutWeight(1)
           .fontSize(AppTheme.LABEL_TITLE_SIZE)
           .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
-        TextArea({
-          placeholder: '例如：语文背诵第12课；数学完成口算练习',
-          text: this.textDraft
-        })
-          .width('100%')
-          .height(160)
-          .fontSize(AppTheme.FORM_TEXT_SIZE)
-          .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
-          .backgroundColor(AppTheme.SURFACE_SUBTLE)
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(!this.parseBusy)
-          .onChange((value: string) => {
-            this.textDraft = value;
-            this.parseMessage = '';
-            this.parseError = false;
-          });
+        if (this.textDraft.length > 0) {
+          Text('清空文字')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('清空作业文字，保留图片')
+            .enabled(!this.parseBusy)
+            .onClick(() => this.clearAssignmentText());
+        }
       }
-
-      if (this.sourceImageRef.length > 0) {
-        Text(this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ? '已添加作业图片' :
-          `图片来源：${this.sourceImageLabel.length > 0 ? this.sourceImageLabel : '作业图片'}`)
-          .width('100%')
-          .fontSize(AppTheme.CAPTION_SIZE)
-          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-        this.ImageModeSelector();
-      }
+      .width('100%');
+      TextArea({
+        placeholder: this.sourceImageRef.length > 0 ? '可补充作业要求，或修改识别出的文字' :
+          '例如：语文背诵第12课；数学完成口算练习',
+        text: this.textDraft
+      })
+        .width('100%')
+        .height(160)
+        .fontSize(AppTheme.FORM_TEXT_SIZE)
+        .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .enabled(!this.parseBusy)
+        .onChange((value: string) => {
+          this.textDraft = value;
+          this.parseMessage = '';
+          this.parseError = false;
+        });
     }
     .width('100%')
     .padding(AppTheme.CARD_PADDING_COMPACT)
@@ -530,7 +524,7 @@ export struct HomeworkImportPage {
     Column({ space: 8 }) {
       this.FeedbackBanner();
 
-      Button(this.parseBusy ? '正在处理…' : (this.needsImageOcr() ? '识别文字' : '整理并继续'), { type: ButtonType.Normal })
+      Button(this.parseBusy ? '正在处理…' : '整理并继续', { type: ButtonType.Normal })
         .width('100%')
         .constraintSize({ minHeight: AppTheme.BUTTON_HEIGHT })
         .padding({ top: 12, bottom: 12 })
