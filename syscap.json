@@ -8,11 +8,14 @@
   },
   "development": {
     "addedSysCaps": [
-      "SystemCapability.Multimedia.Media.AVPlayer"
+      "SystemCapability.Multimedia.Media.AVPlayer",
+      "SystemCapability.AI.TextToSpeech"
     ]
   },
   "production": {
-    "addedSysCaps": [],
+    "addedSysCaps": [
+      "SystemCapability.AI.TextToSpeech"
+    ],
     "removedSysCaps": []
   }
 }
