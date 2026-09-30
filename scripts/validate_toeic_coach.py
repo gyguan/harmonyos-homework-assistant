@@ -58,14 +58,21 @@ def main() -> None:
     preset = read("entry/src/main/ets/toeic/content/PresetToeicContent.ets")
     week_one = read("entry/src/main/ets/toeic/content/ToeicWeekOneContent.ets")
     week_two = read("entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets")
+    week_three = read("entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets")
     week_two_question_count = week_two.count("ToeicWeekTwoContent.q(")
-    question_count = preset.count("new ToeicQuestion(") + week_one.count("new ToeicQuestion(") + week_two_question_count
+    week_three_question_count = week_three.count("ToeicWeekThreeContent.q(")
+    question_count = (preset.count("new ToeicQuestion(") + week_one.count("new ToeicQuestion(") +
+                      week_two_question_count + week_three_question_count)
     vocabulary_count = preset.count("new ToeicVocabularyItem(") + week_one.count("new ToeicVocabularyItem(")
-    sentence_drill_count = week_one.count("new ToeicSentenceDrill(") + week_two.count("new ToeicSentenceDrill(")
-    study_day_count = week_one.count("new ToeicStudyDay(") + week_two.count("new ToeicStudyDay(")
-    require(question_count >= 190, f"expected >=190 reviewed Day 1-14 questions, found {question_count}")
+    sentence_drill_count = (week_one.count("new ToeicSentenceDrill(") +
+                            week_two.count("new ToeicSentenceDrill(") +
+                            week_three.count("new ToeicSentenceDrill("))
+    study_day_count = (week_one.count("new ToeicStudyDay(") +
+                       week_two.count("new ToeicStudyDay(") +
+                       week_three.count("new ToeicStudyDay("))
+    require(question_count >= 354, f"expected >=354 reviewed Day 1-21 questions, found {question_count}")
     require(vocabulary_count >= 90, f"expected >=90 reviewed vocabulary items, found {vocabulary_count}")
-    require(sentence_drill_count == 60, f"expected 60 sentence drills through Day 13, found {sentence_drill_count}")
+    require(sentence_drill_count == 70, f"expected 70 sentence drills through Day 21, found {sentence_drill_count}")
     translated_drills = re.findall(
         r"new ToeicSentenceDrill\('([^']+)','[^']+','([^']+)'",
         week_one,
@@ -74,13 +81,19 @@ def main() -> None:
         r'new ToeicSentenceDrill\("([^"]+)","[^"]+","([^"]+)"',
         week_two,
     )
+    translated_drills += re.findall(
+        r'new ToeicSentenceDrill\("([^"]+)","[^"]+","([^"]+)"',
+        week_three,
+    )
     require(len(translated_drills) == sentence_drill_count,
             "every TOEIC sentence drill must include a Chinese translation")
     for drill_id, translation in translated_drills:
         require(translation.strip(), f"{drill_id}: sentence drill translation is required")
-    require(study_day_count == 14, f"expected 14 implemented study days, found {study_day_count}")
+    require(study_day_count == 21, f"expected 21 implemented study days, found {study_day_count}")
     require(week_two_question_count == 136,
             f"expected 36 week-two drills + 100 mock questions, found {week_two_question_count}")
+    require(week_three_question_count == 164,
+            f"expected 64 week-three sprint questions + 100 second-mock questions, found {week_three_question_count}")
 
     diagnostic_match = re.search(
         r"let ids:string\[\]=\[(.*?)\];",
@@ -93,9 +106,11 @@ def main() -> None:
 
     question_ids = re.findall(r"new ToeicQuestion\('([^']+)'", preset + "\n" + week_one)
     question_ids += re.findall(r'ToeicWeekTwoContent\.q\("([^"]+)"', week_two)
+    question_ids += re.findall(r'ToeicWeekThreeContent\.q\("([^"]+)"', week_three)
     vocabulary_ids = re.findall(r"new ToeicVocabularyItem\('([^']+)'", preset + "\n" + week_one)
     sentence_ids = re.findall(r"new ToeicSentenceDrill\('([^']+)'", week_one)
     sentence_ids += re.findall(r'new ToeicSentenceDrill\("([^"]+)"', week_two)
+    sentence_ids += re.findall(r'new ToeicSentenceDrill\("([^"]+)"', week_three)
     require(len(question_ids) == len(set(question_ids)), "TOEIC question ids must be unique")
     require(len(vocabulary_ids) == len(set(vocabulary_ids)), "TOEIC vocabulary ids must be unique")
     require(len(sentence_ids) == len(set(sentence_ids)), "TOEIC sentence drill ids must be unique")
@@ -108,6 +123,38 @@ def main() -> None:
     require(len(mock_part7_ids) == 54, f"Day 14 Part 7 must contain 54 questions, found {len(mock_part7_ids)}")
     require("new ToeicStudyDay(14" in week_two and "ToeicWeekTwoContent.mockQuestionIds()" in week_two,
             "Day 14 must map to the complete mock question set")
+
+    day15_ids = re.findall(r'ToeicWeekThreeContent\.q\("(R-P5-SPRINT-[^"]+)"', week_three)
+    day16_ids = re.findall(r'ToeicWeekThreeContent\.q\("(R-P6-SPRINT-[^"]+)"', week_three)
+    day17_ids = re.findall(r'ToeicWeekThreeContent\.q\("(R-P7-TIMED-[^"]+)"', week_three)
+    require(len(day15_ids) == 30, f"Day 15 Part 5 sprint must contain 30 questions, found {len(day15_ids)}")
+    require(len(day16_ids) == 16, f"Day 16 Part 6 sprint must contain 16 questions, found {len(day16_ids)}")
+    require(len(day17_ids) == 18, f"Day 17 Part 7 timed set must contain 18 questions, found {len(day17_ids)}")
+
+    mock_two_part5_ids = re.findall(r'ToeicWeekThreeContent\.q\("(R-M2-P5-[^"]+)"', week_three)
+    mock_two_part6_ids = re.findall(r'ToeicWeekThreeContent\.q\("(R-M2-P6-[^"]+)"', week_three)
+    mock_two_part7_ids = re.findall(r'ToeicWeekThreeContent\.q\("(R-M2-P7-[^"]+)"', week_three)
+    require(len(mock_two_part5_ids) == 30, f"Day 19 Part 5 must contain 30 questions, found {len(mock_two_part5_ids)}")
+    require(len(mock_two_part6_ids) == 16, f"Day 19 Part 6 must contain 16 questions, found {len(mock_two_part6_ids)}")
+    require(len(mock_two_part7_ids) == 54, f"Day 19 Part 7 must contain 54 questions, found {len(mock_two_part7_ids)}")
+    require("new ToeicStudyDay(19" in week_three and "ToeicWeekThreeContent.mockQuestionIds()" in week_three,
+            "Day 19 must map to the independent second mock question set")
+    require("new ToeicStudyDay(18" in week_three and "new ToeicStudyDay(20" in week_three,
+            "Day 18 and Day 20 dynamic review plans must exist")
+    require("new ToeicStudyDay(21" in week_three and "ToeicWeekThreeContent.finalCheckQuestionIds()" in week_three,
+            "Day 21 final verification plan must exist")
+
+    mock_two_part7_positions = [
+        int(value) for value in re.findall(
+            r'ToeicWeekThreeContent\.q\("R-M2-P7-[^"]+".*?\],([0-3]),',
+            week_three,
+        )
+    ]
+    require(len(mock_two_part7_positions) == 54,
+            "Day 19 Part 7 answer positions could not be validated")
+    for position in range(4):
+        require(mock_two_part7_positions.count(position) >= 10,
+                f"Day 19 Part 7 answer position {position} is overly sparse")
 
 
     pronunciation = read("entry/src/main/ets/toeic/content/ToeicPronunciationCatalog.ets")
@@ -140,6 +187,9 @@ def main() -> None:
         "sentenceDrillsForDay(day:number)",
         "studyDay(day:number)",
         "isMockDay(day:number)",
+        "isWeaknessDay(day:number)",
+        "isHighErrorReviewDay(day:number)",
+        "questionsThroughDay(maxDay:number)",
     ]
     for token in preset_api:
         require(token in preset, f"week-one catalog API missing: {token}")
@@ -152,6 +202,15 @@ def main() -> None:
             "manual day entry must use a day-scoped queue")
     require("if (PresetToeicContent.isMockDay(studyDay)) return planned" in training,
             "full mock must preserve fixed question order and bypass remediation reordering")
+    require("PresetToeicContent.isWeaknessDay(studyDay)" in training and
+            "weaknessDayQuestions(snapshot,18)" in training,
+            "Day 18 must use a dynamic weakness queue")
+    require("PresetToeicContent.isHighErrorReviewDay(studyDay)" in training and
+            "highErrorReviewQuestions(snapshot,20)" in training,
+            "Day 20 must use a high-error review queue")
+    require("history.wrongCount<2" in training and
+            "histories.sort" in training,
+            "Day 20 must prioritize cumulative repeated errors")
     require("recoveryLimit=Math.min(4,limit)" in training,
             "daily queue must cap remediation so planned content still fits")
     require("containsQuestionId(selected,q.id)" in training and
@@ -161,8 +220,8 @@ def main() -> None:
     progress = read("entry/src/main/ets/toeic/data/ToeicProgressStore.ets")
     require("this.snapshot.currentDay=2" in progress,
             "diagnostic must count as Day 1 and advance to Day 2")
-    require("MAX_AVAILABLE_STUDY_DAY:number=14" in progress,
-            "progress must support the implemented Day 1-14 boundary")
+    require("MAX_AVAILABLE_STUDY_DAY:number=21" in progress,
+            "progress must support the implemented Day 1-21 boundary")
     require("advanceProgress:boolean=true" in progress and
             "if (advanceProgress)" in progress,
             "review or preview sessions must be recordable without advancing currentDay")
@@ -179,6 +238,7 @@ def main() -> None:
                   "DayButton", "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'",
                   "selectedStudyDay", "selectedDayTitle", "selectStudyDay(day:number)", "effectiveStudyDay()",
                   "this.DayButton(1);", "this.DayButton(7);", "this.DayButton(8);", "this.DayButton(14);",
+                  "this.DayButton(15);", "this.DayButton(19);", "this.DayButton(21);",
                   ".onClick(()=>this.selectStudyDay(day))", "dailyQuestionsForDay(day)",
                   "'进入 Day '+this.selectedStudyDay+' 训练'", "currentAttemptCount", "currentWrongCount",
                   "'已做 '+this.currentAttemptCount+' 次'", "'错 '+this.currentWrongCount+' 次'",
@@ -277,8 +337,22 @@ def main() -> None:
     require("this.selectedStudyDay=this.progressCurrentDay" in ui and
             "this.loadStudyDay(this.selectedStudyDay)" in ui,
             "after completing the real current day the UI must follow and load the new currentDay")
-    require("return this.activeSessionDay===14" in ui,
-            "Day 14 must have an explicit mock-session boundary")
+    require("return this.activeSessionDay===14 || this.activeSessionDay===19" in ui,
+            "Day 14 and Day 19 must share the explicit mock-session boundary")
+    require("if (day<1 || day>21) return;" in ui,
+            "TOEIC day selection must support Day 1-21")
+    for token in [
+        "private selectedDayGuidance():string",
+        "private trainingButtonLabel():string",
+        "Day 18 根据当前错题、慢题和薄弱能力动态组题",
+        "Day 20 优先复盘累计错 2 次及以上题目",
+        "开始 Day 19 第二次完整模考",
+        "开始 Day 21 最终验证",
+        "@State private mockResultDay:number=0",
+        "this.mockResultDay=this.activeSessionDay",
+        "this.mockResultDay===19?'第二次完整 Reading 模考':'第一次完整 Reading 模考'",
+    ]:
+        require(token in ui, f"week-three UI flow missing: {token}")
     require("完整模考过程中不显示对错与解析" in ui and
             "this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.HOME" in ui,
             "mock mode must hide immediate feedback and show a result screen after completion")
@@ -356,7 +430,7 @@ def main() -> None:
         f"[toeic-coach] PASS: questions={question_count}, "
         f"diagnostic={len(diagnostic_ids)}, vocabulary={vocabulary_count}, "
         f"sentences={sentence_drill_count}, days={study_day_count}, "
-        f"mock=100(30/16/54), pronunciations={pronunciation_entry_count}"
+        f"mock1=100(30/16/54), mock2=100(30/16/54), pronunciations={pronunciation_entry_count}"
     )
 
 

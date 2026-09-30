@@ -1,7 +1,7 @@
 import { ToeicTrainingService } from '../../main/ets/toeic/application/ToeicTrainingService';
 import { PresetToeicContent } from '../../main/ets/toeic/content/PresetToeicContent';
 import { ToeicContentValidator } from '../../main/ets/toeic/content/ToeicContentValidator';
-import { ToeicLearningSnapshot, ToeicPart, ToeicPerformance } from '../../main/ets/toeic/domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicPart, ToeicPerformance, ToeicQuestionHistory, ToeicSkill } from '../../main/ets/toeic/domain/ToeicModels';
 
 export class ToeicCoachFixtureResult {
   passed:boolean;
@@ -28,8 +28,8 @@ export class ToeicCoachFixture {
     let vocabularyValidation=ToeicContentValidator.validateVocabulary(vocabulary);
     let sentenceValidation=ToeicContentValidator.validateSentenceDrills(sentenceDrills);
     if (!validation.valid || !vocabularyValidation.valid || !sentenceValidation.valid ||
-      diagnostic.length!==12 || vocabulary.length<90 || questions.length<190 ||
-      sentenceDrills.length!==60 || studyDays.length!==14) {
+      diagnostic.length!==12 || vocabulary.length<90 || questions.length<354 ||
+      sentenceDrills.length!==70 || studyDays.length!==21) {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
         sentenceDrills.length,studyDays.length);
     }
@@ -89,6 +89,98 @@ export class ToeicCoachFixture {
     let orderedMock=ToeicTrainingService.instance.studyDayQuestions(mockSnapshot,14);
     if (orderedMock.length!==mockQuestions.length || orderedMock[0].id!==mockQuestions[0].id ||
       orderedMock[orderedMock.length-1].id!==mockQuestions[mockQuestions.length-1].id) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+
+    let day15=PresetToeicContent.questionsForDay(15);
+    let day16=PresetToeicContent.questionsForDay(16);
+    let day17=PresetToeicContent.questionsForDay(17);
+    if (day15.length!==30 || day16.length!==16 || day17.length!==18 ||
+      PresetToeicContent.sentenceDrillsForDay(16).length!==5 ||
+      PresetToeicContent.sentenceDrillsForDay(17).length!==5) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+    for (let item of day15) if (item.part!==ToeicPart.PART_5) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+    for (let item of day16) if (item.part!==ToeicPart.PART_6) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+    for (let item of day17) if (item.part!==ToeicPart.PART_7) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+
+    let weaknessSnapshot=new ToeicLearningSnapshot();
+    weaknessSnapshot.reviewQuestionIds=[day15[4].id];
+    weaknessSnapshot.slowQuestionIds=[day16[5].id];
+    weaknessSnapshot.weakSkill=ToeicSkill.CROSS_DOCUMENT;
+    let day18=ToeicTrainingService.instance.studyDayQuestions(weaknessSnapshot,18);
+    if (day18.length!==18 || day18[0].id!==day15[4].id) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+    let day18HasSlow:boolean=false;
+    let day18HasWeak:boolean=false;
+    for (let item of day18) {
+      if (item.id===day16[5].id) day18HasSlow=true;
+      if (item.skill===ToeicSkill.CROSS_DOCUMENT) day18HasWeak=true;
+    }
+    if (!day18HasSlow || !day18HasWeak) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+
+    let mockTwo=PresetToeicContent.questionsForDay(19);
+    let mockTwoPart5:number=0;
+    let mockTwoPart6:number=0;
+    let mockTwoPart7:number=0;
+    for (let item of mockTwo) {
+      if (item.part===ToeicPart.PART_5) mockTwoPart5++;
+      else if (item.part===ToeicPart.PART_6) mockTwoPart6++;
+      else if (item.part===ToeicPart.PART_7) mockTwoPart7++;
+    }
+    if (mockTwo.length!==100 || mockTwoPart5!==30 || mockTwoPart6!==16 || mockTwoPart7!==54) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+    let mockTwoSnapshot=new ToeicLearningSnapshot();
+    mockTwoSnapshot.reviewQuestionIds=[mockTwo[mockTwo.length-1].id];
+    let orderedMockTwo=ToeicTrainingService.instance.studyDayQuestions(mockTwoSnapshot,19);
+    if (orderedMockTwo.length!==mockTwo.length || orderedMockTwo[0].id!==mockTwo[0].id ||
+      orderedMockTwo[orderedMockTwo.length-1].id!==mockTwo[mockTwo.length-1].id) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+
+    let highErrorSnapshot=new ToeicLearningSnapshot();
+    highErrorSnapshot.questionHistories=[
+      new ToeicQuestionHistory(day15[1].id,3,2),
+      new ToeicQuestionHistory(day16[1].id,4,3),
+      new ToeicQuestionHistory(day17[1].id,5,1)
+    ];
+    highErrorSnapshot.reviewQuestionIds=[day17[1].id];
+    highErrorSnapshot.weakSkill=ToeicSkill.DETAIL;
+    let day20=ToeicTrainingService.instance.studyDayQuestions(highErrorSnapshot,20);
+    if (day20.length!==20 || day20[0].id!==day16[1].id || day20[1].id!==day15[1].id) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+
+    let finalCheck=PresetToeicContent.questionsForDay(21);
+    let finalPart5:number=0;
+    let finalPart6:number=0;
+    let finalPart7:number=0;
+    for (let item of finalCheck) {
+      if (item.part===ToeicPart.PART_5) finalPart5++;
+      else if (item.part===ToeicPart.PART_6) finalPart6++;
+      else if (item.part===ToeicPart.PART_7) finalPart7++;
+    }
+    if (finalCheck.length!==35 || finalPart5!==15 || finalPart6!==8 || finalPart7!==12) {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
         sentenceDrills.length,studyDays.length);
     }

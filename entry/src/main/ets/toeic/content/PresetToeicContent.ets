@@ -5,6 +5,7 @@ import {
 import { ToeicContentValidator } from './ToeicContentValidator';
 import { ToeicWeekOneContent } from './ToeicWeekOneContent';
 import { ToeicWeekTwoContent } from './ToeicWeekTwoContent';
+import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
 
 export class PresetToeicContent {
@@ -118,7 +119,7 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions());
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions());
   }
 
   static publishedQuestions():ToeicQuestion[] {
@@ -176,11 +177,11 @@ export class PresetToeicContent {
   }
 
   static studyDays():ToeicStudyDay[] {
-    return ToeicWeekOneContent.studyDays().concat(ToeicWeekTwoContent.studyDays());
+    return ToeicWeekOneContent.studyDays().concat(ToeicWeekTwoContent.studyDays()).concat(ToeicWeekThreeContent.studyDays());
   }
 
   static sentenceDrills():ToeicSentenceDrill[] {
-    return ToeicWeekOneContent.sentenceDrills().concat(ToeicWeekTwoContent.sentenceDrills());
+    return ToeicWeekOneContent.sentenceDrills().concat(ToeicWeekTwoContent.sentenceDrills()).concat(ToeicWeekThreeContent.sentenceDrills());
   }
 
   static studyDay(day:number):ToeicStudyDay {
@@ -190,7 +191,29 @@ export class PresetToeicContent {
   }
 
   static isMockDay(day:number):boolean {
-    return day===14;
+    return day===14 || day===19;
+  }
+
+  static isWeaknessDay(day:number):boolean { return day===18; }
+
+  static isHighErrorReviewDay(day:number):boolean { return day===20; }
+
+  static questionsThroughDay(maxDay:number):ToeicQuestion[] {
+    let all=PresetToeicContent.publishedQuestions();
+    let plans=PresetToeicContent.studyDays();
+    let result:ToeicQuestion[]=[];
+    for (let plan of plans) {
+      if (plan.day>maxDay) continue;
+      for (let id of plan.questionIds) {
+        for (let question of all) {
+          if (question.id===id && !PresetToeicContent.containsQuestionId(result,question.id)) {
+            result.push(question);
+            break;
+          }
+        }
+      }
+    }
+    return result;
   }
 
   static questionsForDay(day:number):ToeicQuestion[] {
@@ -222,4 +245,9 @@ export class PresetToeicContent {
     }
     return result;
   }
+  private static containsQuestionId(items:ToeicQuestion[],questionId:string):boolean {
+    for (let item of items) if (item.id===questionId) return true;
+    return false;
+  }
+
 }
