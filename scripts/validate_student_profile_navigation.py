@@ -25,7 +25,11 @@ require("PROFILE = 'PROFILE'" in shell, "student navigation must define a PROFIL
 require("StudentProfilePage" in shell, "AppShell must render StudentProfilePage")
 require("this.studentRoute === StudentRoute.PROFILE" in shell,
         "student profile route must have an active navigation state")
-require(shell.count("() => this.studentRoute = StudentRoute.PROFILE") >= 2,
+profile_open_count = (
+    shell.count("() => this.studentRoute = StudentRoute.PROFILE")
+    + shell.count("() => this.selectStudentRoute(StudentRoute.PROFILE)")
+)
+require(profile_open_count >= 2,
         "both phone bottom navigation and pad side navigation must open student profile")
 require("'我的', false, () => {}" not in shell,
         "student 我的 must never regress to an empty navigation action")
