@@ -35,6 +35,7 @@ export struct ToeicHomePage {
   @State private progressAccuracy:string='--';
   @State private activeSessionDay:number=0;
   @State private activeSessionAdvancesProgress:boolean=false;
+  @State private mockResultDay:number=0;
   @State private mockResultCorrect:number=0;
   @State private mockResultTotal:number=0;
   @State private mockPart5Correct:number=0;
@@ -164,7 +165,7 @@ export struct ToeicHomePage {
   }
 
   private selectStudyDay(day:number):void {
-    if (day<1 || day>14) return;
+    if (day<1 || day>21) return;
     this.selectedStudyDay=day;
     this.loadStudyDay(day);
     this.refreshRevision++;
@@ -177,11 +178,43 @@ export struct ToeicHomePage {
     return '预习';
   }
 
+  private selectedDayGuidance():string {
+    if (this.selectedStudyDay===14) {
+      return 'Day 14 为第一次完整 Reading 模考：75 分钟、100 题固定题序，作答过程中不显示答案，结束后统一查看结果。';
+    }
+    if (this.selectedStudyDay===18) {
+      return 'Day 18 根据当前错题、慢题和薄弱能力动态组题，优先修复最影响 350+ 目标的失分点。';
+    }
+    if (this.selectedStudyDay===19) {
+      return 'Day 19 为第二次完整 Reading 模考：75 分钟、100 题独立题集，用于验证第一轮补弱后的提升。';
+    }
+    if (this.selectedStudyDay===20) {
+      return 'Day 20 优先复盘累计错 2 次及以上题目，再处理当前错题、慢题和薄弱能力。';
+    }
+    if (this.selectedStudyDay===21) {
+      return 'Day 21 只做轻量最终验证：P5 15题 + P6 8题 + P7 12题，不再堆新难题。';
+    }
+    return '进入 Day '+this.selectedStudyDay+' 后只训练这一天的计划题；本日错题和慢题会优先出现。';
+  }
+
+  private trainingButtonLabel():string {
+    if (this.selectedStudyDay===1) {
+      return this.progressDiagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断';
+    }
+    if (this.selectedStudyDay===14) return '开始 Day 14 第一次完整模考';
+    if (this.selectedStudyDay===18) return '开始 Day 18 动态补弱';
+    if (this.selectedStudyDay===19) return '开始 Day 19 第二次完整模考';
+    if (this.selectedStudyDay===20) return '开始 Day 20 错题收口';
+    if (this.selectedStudyDay===21) return '开始 Day 21 最终验证';
+    return '进入 Day '+this.selectedStudyDay+' 训练';
+  }
+
   private isMockSession():boolean {
-    return this.activeSessionDay===14;
+    return this.activeSessionDay===14 || this.activeSessionDay===19;
   }
 
   private captureMockResult():void {
+    this.mockResultDay=this.activeSessionDay;
     this.mockResultCorrect=0;
     this.mockResultTotal=this.attempts.length;
     this.mockPart5Correct=0;
@@ -415,13 +448,10 @@ export struct ToeicHomePage {
       }
       .width('100%');
 
-      Text(this.selectedStudyDay===14?
-        'Day 14 为 75 分钟完整 Reading 模考：100 题固定题序，作答过程中不显示答案，结束后统一查看结果。':
-        '进入 Day '+this.selectedStudyDay+' 后只训练这一天的计划题；本日错题和慢题会优先出现。')
+      Text(this.selectedDayGuidance())
         .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
 
-      Button(this.selectedStudyDay===1?(this.progressDiagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断'):
-        (this.selectedStudyDay===14?'开始 Day 14 完整模考':'进入 Day '+this.selectedStudyDay+' 训练'),{type:ButtonType.Normal})
+      Button(this.trainingButtonLabel(),{type:ButtonType.Normal})
         .width('100%').height(AppTheme.BUTTON_HEIGHT)
         .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
         .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -487,6 +517,22 @@ export struct ToeicHomePage {
       Row({space:8}) {
         this.DayButton(13);
         this.DayButton(14);
+        this.DayButton(15);
+        this.DayButton(16);
+      }
+      .width('100%');
+
+      Row({space:8}) {
+        this.DayButton(17);
+        this.DayButton(18);
+        this.DayButton(19);
+        this.DayButton(20);
+      }
+      .width('100%');
+
+      Row({space:8}) {
+        this.DayButton(21);
+        Blank().layoutWeight(1);
         Blank().layoutWeight(1);
         Blank().layoutWeight(1);
       }
@@ -732,8 +778,8 @@ export struct ToeicHomePage {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         DeepPageHeader({
-          title:'Day 14 模考结果',
-          subtitle:'第一次完整 Reading 模考',
+          title:'Day '+this.mockResultDay+' 模考结果',
+          subtitle:this.mockResultDay===19?'第二次完整 Reading 模考':'第一次完整 Reading 模考',
           onBack:()=>this.leaveMockResult()
         });
 
