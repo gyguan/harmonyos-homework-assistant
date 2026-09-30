@@ -26,12 +26,17 @@ export class ToeicCoachFixture {
     let studyDays=PresetToeicContent.studyDays();
     let validation=ToeicContentValidator.validateAll(questions);
     if (!validation.valid || diagnostic.length!==12 || vocabulary.length<90 || questions.length<54 ||
-      sentenceDrills.length!==30 || studyDays.length!==7 ||
-      PresetToeicContent.questionsForDay(2).length!==6 ||
-      PresetToeicContent.vocabularyForDay(2).length!==15 ||
-      PresetToeicContent.sentenceDrillsForDay(2).length!==5) {
+      sentenceDrills.length!==30 || studyDays.length!==7) {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
         sentenceDrills.length,studyDays.length);
+    }
+    for (let day=2; day<=7; day++) {
+      if (PresetToeicContent.questionsForDay(day).length!==6 ||
+        PresetToeicContent.vocabularyForDay(day).length!==15 ||
+        PresetToeicContent.sentenceDrillsForDay(day).length!==5) {
+        return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+          sentenceDrills.length,studyDays.length);
+      }
     }
 
     let q=diagnostic[0];
