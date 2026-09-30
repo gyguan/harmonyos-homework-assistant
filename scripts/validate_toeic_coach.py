@@ -98,6 +98,14 @@ def main() -> None:
             f"expected 36 week-two drills + 100 mock questions, found {week_two_question_count}")
     require(week_three_question_count == 164,
             f"expected 64 week-three sprint questions + 100 second-mock questions, found {week_three_question_count}")
+    require(re.search(r"\[[^\]\n]*\bnull\b[^\]\n]*\]", week_three) is None,
+            "week-three question options must be concrete strings, never null placeholders")
+    require('["9:30","10:00","10:15","10:30"],1' in week_three,
+            "Day 17 sample answer mapping must keep 10:00 at option index 1")
+    require('["11:30 A.M.","12:20 P.M.","1:00 P.M.","4:00 P.M."],2' in week_three,
+            "Day 17 sample answer mapping must keep 1:00 P.M. at option index 2")
+    require('["$0.20","$1.15","$2.00","$0.95"],3' in week_three,
+            "Day 19 sample answer mapping must keep $0.95 at option index 3")
 
     translation_week_one = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekOneCatalog.ets")
     translation_week_two = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekTwoCatalog.ets")
