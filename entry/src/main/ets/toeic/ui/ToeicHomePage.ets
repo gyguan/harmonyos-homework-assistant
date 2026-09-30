@@ -108,11 +108,11 @@ export struct ToeicHomePage {
 
   private loadStudyDay(day:number):void {
     let plan=this.viewModel.planForDay(day);
-    this.selectedDayTitle=this.selectedDayTitle;
-    this.selectedDayFocus=this.selectedDayFocus;
-    this.selectedDayMinutes=this.selectedDayMinutes;
-    this.selectedDayVocabularyCount=this.selectedDayVocabularyCount;
-    this.selectedDaySentenceCount=this.selectedDaySentenceCount;
+    this.selectedDayTitle=plan.title;
+    this.selectedDayFocus=plan.focus;
+    this.selectedDayMinutes=plan.estimatedMinutes;
+    this.selectedDayVocabularyCount=plan.vocabularyIds.length;
+    this.selectedDaySentenceCount=plan.sentenceDrillIds.length;
   }
 
   private selectStudyDay(day:number):void {
@@ -320,7 +320,7 @@ export struct ToeicHomePage {
       }
       .width('100%');
 
-      Text('训练题会先插入错题和慢题，再进入今天的主题内容，避免机械重复。')
+      Text('进入 Day '+selectedDay+' 后只训练这一天的计划题；本日错题和慢题会优先出现。')
         .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
 
       Button(selectedDay===1?(snapshot.diagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断'):'进入 Day '+selectedDay+' 训练',{type:ButtonType.Normal})
