@@ -16,6 +16,7 @@ import { LocalHomeworkAssignmentParser } from '../infrastructure/ai/LocalHomewor
 import { PreferencesBackendSessionStorage } from '../infrastructure/persistence/PreferencesBackendSessionStorage';
 import { PreferencesHomeworkPersistence } from '../infrastructure/persistence/PreferencesHomeworkPersistence';
 import { PreferencesHomeworkImportInboxPersistence } from '../infrastructure/persistence/PreferencesHomeworkImportInboxPersistence';
+import { ToeicModuleBootstrap } from '../toeic/application/ToeicModuleBootstrap';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -77,6 +78,12 @@ export default class EntryAbility extends UIAbility {
         new PreferencesHomeworkImportInboxPersistence(this.context));
     } catch {
       console.error('Homework import inbox initialization failed; continuing with in-memory inbox');
+    }
+
+    try {
+      await ToeicModuleBootstrap.initialize(this.context);
+    } catch {
+      console.error('TOEIC progress initialization failed; continuing with in-memory state');
     }
 
     this.loadMainPage(windowStage);
