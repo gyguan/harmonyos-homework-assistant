@@ -37,7 +37,12 @@ export class HomeworkImageEncoder {
       pixelMap = await source.createPixelMap(options);
       packer = image.createImagePacker();
       let packing: image.PackingOption = { format: 'image/jpeg', quality: 90 };
-      let encoded = await packer.packToData(pixelMap, packing);
+      let encoded: ArrayBuffer;
+      try {
+        encoded = await packer.packToData(pixelMap, packing);
+      } catch {
+        throw new Error('图片编码失败，请重新选择后重试');
+      }
       if (encoded.byteLength === 0 || encoded.byteLength > 4 * 1024 * 1024) {
         throw new Error('图片处理后超过4MB，请裁剪后重试');
       }
