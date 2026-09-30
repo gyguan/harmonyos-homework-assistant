@@ -5,7 +5,7 @@ import { ToeicPart, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, Toeic
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 
-enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', SENTENCE='SENTENCE' }
+enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', SENTENCE='SENTENCE', MOCK_RESULT='MOCK_RESULT' }
 
 @Component
 export struct ToeicHomePage {
@@ -35,6 +35,15 @@ export struct ToeicHomePage {
   @State private progressAccuracy:string='--';
   @State private activeSessionDay:number=0;
   @State private activeSessionAdvancesProgress:boolean=false;
+  @State private mockResultCorrect:number=0;
+  @State private mockResultTotal:number=0;
+  @State private mockPart5Correct:number=0;
+  @State private mockPart5Total:number=0;
+  @State private mockPart6Correct:number=0;
+  @State private mockPart6Total:number=0;
+  @State private mockPart7Correct:number=0;
+  @State private mockPart7Total:number=0;
+  @State private mockElapsedSeconds:number=0;
   @State private currentQuestionId:string='';
   @State private currentPassage:string='';
   @State private currentStem:string='';
@@ -155,7 +164,7 @@ export struct ToeicHomePage {
   }
 
   private selectStudyDay(day:number):void {
-    if (day<1 || day>7) return;
+    if (day<1 || day>14) return;
     this.selectedStudyDay=day;
     this.loadStudyDay(day);
     this.refreshRevision++;
@@ -166,6 +175,42 @@ export struct ToeicHomePage {
     if (day===this.progressCurrentDay) return '当前进度';
     if (day<this.progressCurrentDay) return '复习';
     return '预习';
+  }
+
+  private isMockSession():boolean {
+    return this.activeSessionDay===14;
+  }
+
+  private captureMockResult():void {
+    this.mockResultCorrect=0;
+    this.mockResultTotal=this.attempts.length;
+    this.mockPart5Correct=0;
+    this.mockPart5Total=0;
+    this.mockPart6Correct=0;
+    this.mockPart6Total=0;
+    this.mockPart7Correct=0;
+    this.mockPart7Total=0;
+    this.mockElapsedSeconds=0;
+    for (let attempt of this.attempts) {
+      if (attempt.correct) this.mockResultCorrect++;
+      this.mockElapsedSeconds+=attempt.elapsedSeconds;
+      if (attempt.part===ToeicPart.PART_5) {
+        this.mockPart5Total++;
+        if (attempt.correct) this.mockPart5Correct++;
+      } else if (attempt.part===ToeicPart.PART_6) {
+        this.mockPart6Total++;
+        if (attempt.correct) this.mockPart6Correct++;
+      } else if (attempt.part===ToeicPart.PART_7) {
+        this.mockPart7Total++;
+        if (attempt.correct) this.mockPart7Correct++;
+      }
+    }
+  }
+
+  private leaveMockResult():void {
+    this.mode=ToeicPageMode.HOME;
+    this.activeSessionDay=0;
+    this.activeSessionAdvancesProgress=false;
   }
 
   private startDiagnostic():void {
@@ -252,6 +297,8 @@ export struct ToeicHomePage {
 
   private async finishSession():Promise<void> {
     let advanceProgress=this.activeSessionAdvancesProgress;
+    let mockSession=this.isMockSession();
+    if (mockSession) this.captureMockResult();
     await this.viewModel.completeSession(
       this.attempts,
       this.mode===ToeicPageMode.DIAGNOSTIC,
@@ -262,7 +309,9 @@ export struct ToeicHomePage {
       this.selectedStudyDay=this.progressCurrentDay;
       this.loadStudyDay(this.selectedStudyDay);
     }
-    this.refreshRevision++; this.mode=ToeicPageMode.HOME; this.questions=[]; this.attempts=[];
+    this.refreshRevision++;
+    this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.HOME;
+    this.questions=[]; this.attempts=[];
     this.answerLocked=false; this.selectedIndex=-1;
     this.clearQuestionSnapshot();
     this.activeSessionDay=0; this.activeSessionAdvancesProgress=false;
@@ -270,6 +319,7 @@ export struct ToeicHomePage {
 
   private optionBackground(index:number):string {
     if (!this.answerLocked) return AppTheme.SURFACE;
+    if (this.isMockSession()) return index===this.selectedIndex?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE;
     if (index===this.currentCorrectIndex) return AppTheme.SUCCESS_SOFT;
     if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER_SOFT;
     return AppTheme.SURFACE;
@@ -277,6 +327,7 @@ export struct ToeicHomePage {
 
   private optionBorder(index:number):string {
     if (!this.answerLocked) return AppTheme.BORDER;
+    if (this.isMockSession()) return index===this.selectedIndex?AppTheme.PRIMARY:AppTheme.BORDER;
     if (index===this.currentCorrectIndex) return AppTheme.SUCCESS;
     if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER;
     return AppTheme.BORDER;
@@ -284,6 +335,7 @@ export struct ToeicHomePage {
 
   private optionText(index:number):string {
     if (!this.answerLocked) return AppTheme.TEXT;
+    if (this.isMockSession()) return index===this.selectedIndex?AppTheme.PRIMARY:AppTheme.TEXT;
     if (index===this.currentCorrectIndex) return AppTheme.SUCCESS;
     if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER;
     return AppTheme.TEXT;
@@ -363,10 +415,13 @@ export struct ToeicHomePage {
       }
       .width('100%');
 
-      Text('进入 Day '+this.selectedStudyDay+' 后只训练这一天的计划题；本日错题和慢题会优先出现。')
+      Text(this.selectedStudyDay===14?
+        'Day 14 为 75 分钟完整 Reading 模考：100 题固定题序，作答过程中不显示答案，结束后统一查看结果。':
+        '进入 Day '+this.selectedStudyDay+' 后只训练这一天的计划题；本日错题和慢题会优先出现。')
         .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
 
-      Button(this.selectedStudyDay===1?(this.progressDiagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断'):'进入 Day '+this.selectedStudyDay+' 训练',{type:ButtonType.Normal})
+      Button(this.selectedStudyDay===1?(this.progressDiagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断'):
+        (this.selectedStudyDay===14?'开始 Day 14 完整模考':'进入 Day '+this.selectedStudyDay+' 训练'),{type:ButtonType.Normal})
         .width('100%').height(AppTheme.BUTTON_HEIGHT)
         .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
         .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -417,6 +472,22 @@ export struct ToeicHomePage {
         this.DayButton(5);
         this.DayButton(6);
         this.DayButton(7);
+        this.DayButton(8);
+      }
+      .width('100%');
+
+      Row({space:8}) {
+        this.DayButton(9);
+        this.DayButton(10);
+        this.DayButton(11);
+        this.DayButton(12);
+      }
+      .width('100%');
+
+      Row({space:8}) {
+        this.DayButton(13);
+        this.DayButton(14);
+        Blank().layoutWeight(1);
         Blank().layoutWeight(1);
       }
       .width('100%');
@@ -627,11 +698,65 @@ export struct ToeicHomePage {
   }
 
   @Builder
+  private MockResultContent() {
+    Scroll() {
+      Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
+        DeepPageHeader({
+          title:'Day 14 模考结果',
+          subtitle:'第一次完整 Reading 模考',
+          onBack:()=>this.leaveMockResult()
+        });
+
+        Column({space:10}) {
+          Text(this.mockResultCorrect+' / '+this.mockResultTotal)
+            .width('100%').fontSize(AppTheme.PAGE_TITLE_SIZE)
+            .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          Text('正确率 '+(this.mockResultTotal>0?
+            Math.round(this.mockResultCorrect*100/this.mockResultTotal)+'%':'--')+
+            ' · 实际作答约 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min')
+            .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%').padding(AppTheme.CARD_PADDING)
+        .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
+
+        Row({space:10}) {
+          this.Metric(this.mockPart5Correct+' / '+this.mockPart5Total,'Part 5');
+          this.Metric(this.mockPart6Correct+' / '+this.mockPart6Total,'Part 6');
+          this.Metric(this.mockPart7Correct+' / '+this.mockPart7Total,'Part 7');
+        }
+        .width('100%');
+
+        Column({space:8}) {
+          Text('复盘建议').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+            .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          Text('错题已经进入待复习队列；后续训练会继续按错题、慢题与薄弱技能做针对性巩固。')
+            .width('100%').fontSize(AppTheme.BODY_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%').padding(AppTheme.CARD_PADDING)
+        .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+
+        Button('返回训练首页',{type:ButtonType.Normal})
+          .width('100%').height(AppTheme.BUTTON_HEIGHT)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(()=>this.leaveMockResult());
+      }
+      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+        right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+        top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_BOTTOM_PADDING});
+    }
+    .width('100%').height('100%').scrollBar(BarState.Off).align(Alignment.TopStart);
+  }
+
+  @Builder
   private QuestionContent() {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         DeepPageHeader({
-          title:this.mode===ToeicPageMode.DIAGNOSTIC?'Reading 快速诊断':'今日训练',
+          title:this.mode===ToeicPageMode.DIAGNOSTIC?'Reading 快速诊断':
+            (this.isMockSession()?'Reading 完整模考':'今日训练'),
           subtitle:String(this.currentIndex+1)+' / '+this.questions.length+' · '+
             this.viewModel.partLabel(this.currentPart),
           trailingText:'建议 '+this.currentRecommendedSeconds+'s',
@@ -720,24 +845,36 @@ export struct ToeicHomePage {
           .width('100%');
 
           if (this.answerLocked) {
-            Column({space:7}) {
-              Text(this.answerCorrect?'✓ 判断正确':'× 这题需要再巩固')
-                .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold)
-                .fontColor(this.answerCorrect?AppTheme.SUCCESS:AppTheme.DANGER);
-              Text(this.currentExplanation)
-                .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-              if (this.currentEvidence.length>0) {
-                Text('证据：'+this.currentEvidence)
-                  .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+            if (this.isMockSession()) {
+              Column({space:7}) {
+                Text('已记录本题答案')
+                  .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.PRIMARY);
+                Text('完整模考过程中不显示对错与解析，结束后统一查看结果。')
+                  .width('100%').fontSize(AppTheme.BODY_SIZE)
+                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
               }
-              if (this.currentParaphrase.length>0) {
-                Text('替换关系：'+this.currentParaphrase)
-                  .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+              .width('100%').padding(AppTheme.CARD_PADDING)
+              .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+            } else {
+              Column({space:7}) {
+                Text(this.answerCorrect?'✓ 判断正确':'× 这题需要再巩固')
+                  .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold)
+                  .fontColor(this.answerCorrect?AppTheme.SUCCESS:AppTheme.DANGER);
+                Text(this.currentExplanation)
+                  .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                if (this.currentEvidence.length>0) {
+                  Text('证据：'+this.currentEvidence)
+                    .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                }
+                if (this.currentParaphrase.length>0) {
+                  Text('替换关系：'+this.currentParaphrase)
+                    .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+                }
               }
+              .width('100%').padding(AppTheme.CARD_PADDING)
+              .backgroundColor(this.answerCorrect?AppTheme.SUCCESS_SOFT:AppTheme.DANGER_SOFT)
+              .borderRadius(AppTheme.CONTROL_RADIUS);
             }
-            .width('100%').padding(AppTheme.CARD_PADDING)
-            .backgroundColor(this.answerCorrect?AppTheme.SUCCESS_SOFT:AppTheme.DANGER_SOFT)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
           }
 
           Row({space:10}) {
@@ -747,7 +884,7 @@ export struct ToeicHomePage {
               .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
               .enabled(this.currentIndex>0)
               .onClick(()=>this.previousQuestion());
-            Button(this.currentIndex+1>=this.questions.length?'完成本轮':'下一题',{type:ButtonType.Normal})
+            Button(this.currentIndex+1>=this.questions.length?(this.isMockSession()?'提交模考':'完成本轮'):'下一题',{type:ButtonType.Normal})
               .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
               .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
               .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -779,6 +916,8 @@ export struct ToeicHomePage {
         this.SentenceContent(
           this.viewModel.sentenceDrillsForDay(this.effectiveStudyDay())
         );
+      } else if (this.mode===ToeicPageMode.MOCK_RESULT) {
+        this.MockResultContent();
       } else if (this.currentQuestionId.length>0) {
         this.QuestionContent();
       }
