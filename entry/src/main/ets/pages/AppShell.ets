@@ -42,6 +42,7 @@ import { ParentPracticeGenerationResultPage } from '../features/parent/practice/
 import { ParentScheduledAssignmentPage } from '../features/parent/scheduled/ParentScheduledAssignmentPage';
 import { ParentReviewPage } from '../features/parent/review/ParentReviewPage';
 import { BackendConnectionPage } from '../features/parent/settings/BackendConnectionPage';
+import { ToeicHomePage } from '../toeic/ui/ToeicHomePage';
 import { StudentAssignmentDetailPage } from '../features/student/assignments/StudentAssignmentDetailPage';
 import { StudentAssignmentsPage } from '../features/student/assignments/StudentAssignmentsPage';
 import { StudentHomePage } from '../features/student/home/StudentHomePage';
@@ -69,6 +70,7 @@ enum StudentRoute {
 enum ParentRoute {
   DASHBOARD = 'DASHBOARD',
   PROGRESS = 'PROGRESS',
+  TOEIC = 'TOEIC',
   SETTINGS = 'SETTINGS'
 }
 
@@ -626,6 +628,8 @@ export struct AppShell {
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),
         onAttentionFilterCleared: () => this.parentAttentionKind = AssignmentAttentionKind.NONE
       });
+    } else if (this.parentRoute === ParentRoute.TOEIC) {
+      ToeicHomePage();
     } else if (this.parentRoute === ParentRoute.SETTINGS) {
       BackendConnectionPage({
         onStoreChanged: () => this.notifyUiChanged()
@@ -683,6 +687,10 @@ export struct AppShell {
           onSelect: () => this.selectParentRoute(ParentRoute.PROGRESS)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
+          symbol: $r('sys.symbol.checkmark_square'), label: '托业', selected: this.parentRoute === ParentRoute.TOEIC,
+          onSelect: () => this.selectParentRoute(ParentRoute.TOEIC)
+        }).layoutWeight(1).height('100%');
+        BottomPrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.parentRoute === ParentRoute.SETTINGS,
           onSelect: () => this.selectParentRoute(ParentRoute.SETTINGS)
         }).layoutWeight(1).height('100%');
@@ -735,6 +743,10 @@ export struct AppShell {
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.checkmark_circle'), label: '学生作业', selected: this.parentRoute === ParentRoute.PROGRESS,
           onSelect: () => this.selectParentRoute(ParentRoute.PROGRESS)
+        });
+        SidePrimaryNavItem({
+          symbol: $r('sys.symbol.checkmark_square'), label: '托业', selected: this.parentRoute === ParentRoute.TOEIC,
+          onSelect: () => this.selectParentRoute(ParentRoute.TOEIC)
         });
         SidePrimaryNavItem({
           symbol: $r('sys.symbol.gearshape'), label: '我的', selected: this.parentRoute === ParentRoute.SETTINGS,

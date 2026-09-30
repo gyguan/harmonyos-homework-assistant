@@ -137,6 +137,9 @@ jobs:
       - name: Validate ArkTS compile safety
         run: python scripts/validate_arkts_compile_safety.py
 
+      - name: Validate TOEIC coach boundaries and starter content
+        run: python scripts/validate_toeic_coach.py
+
       - name: Validate issue 370 invisible AI loop
         run: python scripts/validate_issue370_invisible_ai_loop.py
 
