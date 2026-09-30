@@ -38,6 +38,11 @@ require("ForEach(this.imageUris" in pane and "this.selectImage(index)" in pane,
         "voice media pane must provide direct thumbnail image switching")
 require("Swiper()" in pane and ".onChange((index: number) => { void this.showImage(index); })" in pane,
         "voice media pane must support direct touch swipe paging")
+image_viewer = pane.split("@Builder\n  private ImageViewer()", 1)[1].split(
+    "@Builder\n  private AudioControls()", 1)[0]
+require(image_viewer.index("Button('全屏查看'") <
+        image_viewer.index(".accessibilityText('上一张情景图片')"),
+        "voice image navigation arrows must be declared above the full-size control overlay in Stack z-order")
 require("let merged = this.imageUris.slice()" in parent and
         "existing: Set<string>" in parent and
         "＋ 继续添加图片" in parent,
