@@ -36,6 +36,8 @@ export struct ToeicHomePage {
   @State private currentOptionC:string='';
   @State private currentOptionD:string='';
   @State private currentCorrectIndex:number=-1;
+  @State private currentAttemptCount:number=0;
+  @State private currentWrongCount:number=0;
   @State private currentExplanation:string='';
   @State private currentEvidence:string='';
   @State private currentParaphrase:string='';
@@ -72,6 +74,8 @@ export struct ToeicHomePage {
     this.currentOptionC=question.options.length>2?question.options[2]:'';
     this.currentOptionD=question.options.length>3?question.options[3]:'';
     this.currentCorrectIndex=question.correctIndex;
+    this.currentAttemptCount=this.viewModel.attemptCount(question.id);
+    this.currentWrongCount=this.viewModel.wrongCount(question.id);
     this.currentExplanation=question.explanation;
     this.currentEvidence=question.evidence;
     this.currentParaphrase=question.paraphrase;
@@ -92,6 +96,8 @@ export struct ToeicHomePage {
     this.currentOptionC='';
     this.currentOptionD='';
     this.currentCorrectIndex=-1;
+    this.currentAttemptCount=0;
+    this.currentWrongCount=0;
     this.currentExplanation='';
     this.currentEvidence='';
     this.currentParaphrase='';
@@ -193,6 +199,8 @@ export struct ToeicHomePage {
     this.attempts.push(attempt);
     this.selectedIndex=index;
     this.answerCorrect=attempt.correct;
+    this.currentAttemptCount++;
+    if (!attempt.correct) this.currentWrongCount++;
     this.answerLocked=true;
   }
 
@@ -558,6 +566,9 @@ export struct ToeicHomePage {
             Text(item.sentence)
               .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
               .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+            Text('译：'+item.translation)
+              .width('100%').fontSize(AppTheme.BODY_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
             Text('主干：'+item.core)
               .width('100%').fontSize(AppTheme.BODY_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
             Text('重点：'+item.focus)
@@ -604,6 +615,26 @@ export struct ToeicHomePage {
               .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
           }
           .width('100%');
+
+          if (this.currentAttemptCount>0) {
+            Row({space:8}) {
+              Text('已做 '+this.currentAttemptCount+' 次')
+                .fontSize(AppTheme.META_SIZE)
+                .fontColor(AppTheme.SUBTEXT)
+                .padding({left:8,right:8,top:4,bottom:4})
+                .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                .borderRadius(AppTheme.CHIP_RADIUS);
+              if (this.currentWrongCount>0) {
+                Text('错 '+this.currentWrongCount+' 次')
+                  .fontSize(AppTheme.META_SIZE)
+                  .fontColor(AppTheme.DANGER)
+                  .padding({left:8,right:8,top:4,bottom:4})
+                  .backgroundColor(AppTheme.DANGER_SOFT)
+                  .borderRadius(AppTheme.CHIP_RADIUS);
+              }
+            }
+            .width('100%');
+          }
 
           if (this.currentPassage.length>0) {
             Text(this.currentPassage)
