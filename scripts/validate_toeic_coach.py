@@ -155,9 +155,9 @@ def main() -> None:
     for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "DaySelector",
                   "DayButton", "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'",
                   "selectedStudyDay", "selectedDayTitle", "selectStudyDay(day:number)", "effectiveStudyDay()",
-                  "this.DayButton(1,currentDay)", "this.DayButton(7,currentDay)",
+                  "this.DayButton(1);", "this.DayButton(7);",
                   ".onClick(()=>this.selectStudyDay(day))", "dailyQuestionsForDay(day)",
-                  "'进入 Day '+selectedDay+' 训练'", "currentAttemptCount", "currentWrongCount",
+                  "'进入 Day '+this.selectedStudyDay+' 训练'", "currentAttemptCount", "currentWrongCount",
                   "'已做 '+this.currentAttemptCount+' 次'", "'错 '+this.currentWrongCount+' 次'",
                   "'译：'+item.translation"]:
         require(token in ui, f"week-one free-day UI missing: {token}")
@@ -215,21 +215,52 @@ def main() -> None:
             "private optionBorder(index:number):string" in ui and
             "private optionText(index:number):string" in ui,
             "answer option styling must not depend on stale ToeicQuestion objects")
-    require("this.activeSessionAdvancesProgress=day===this.viewModel.snapshot().currentDay" in ui,
+    require("this.activeSessionAdvancesProgress=day===this.progressCurrentDay" in ui,
             "only the real current progress day may advance currentDay")
-    require("this.activeSessionAdvancesProgress=!this.viewModel.snapshot().diagnosticCompleted" in ui,
+    require("this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted" in ui,
             "Day 1 should advance only on the first diagnostic")
     require("else if (!snapshot.diagnosticCompleted)" not in ui,
             "diagnostic state must not hide the Day 1-7 selector or block free day entry")
-    require("this.DaySelector(snapshot.currentDay);" in ui and
-            "this.TodayCard(snapshot,selectedDay);" in ui,
-            "day selector and selected-day training card must always render when content is valid")
+    require("this.DaySelector();" in ui and
+            "this.TodayCard();" in ui,
+            "day selector and selected-day training card must always render from explicit state")
+    require("private TodayCard()" in ui and
+            "private HomeContent()" in ui and
+            "TodayCard(snapshot:" not in ui and
+            "HomeContent(snapshot:" not in ui,
+            "selected-day home card must not depend on Builder object or selectedDay parameters")
     require("this.selectedDayTitle=plan.title" in ui and
             "this.selectedDayFocus=plan.focus" in ui,
             "selected day must load explicit plan snapshot fields")
-    require("this.selectedStudyDay=this.viewModel.snapshot().currentDay" in ui and
+    require("this.selectedStudyDay=this.progressCurrentDay" in ui and
             "this.loadStudyDay(this.selectedStudyDay)" in ui,
             "after completing the real current day the UI must follow and load the new currentDay")
+    for token in [
+        "@State private progressCurrentDay:number=1",
+        "@State private progressDiagnosticCompleted:boolean=false",
+        "@State private progressWeakSkill:string=ToeicSkill.PARAPHRASE",
+        "@State private progressReviewCount:number=0",
+        "@State private progressSlowCount:number=0",
+        "@State private progressAnswered:number=0",
+        "@State private progressCorrect:number=0",
+        "@State private progressAccuracy:string='--'",
+        "private loadProgressSnapshot():void",
+        "this.progressCurrentDay=snapshot.currentDay",
+        "this.progressDiagnosticCompleted=snapshot.diagnosticCompleted",
+    ]:
+        require(token in ui, f"explicit home progress snapshot missing: {token}")
+    today_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private TodayCard\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    require(today_match is not None, "TodayCard builder could not be identified")
+    today_builder = today_match.group(0)
+    for token in [
+        "this.selectedStudyDay", "this.selectedDayTitle", "this.selectedDayFocus",
+        "this.selectedDayMinutes", "this.selectedDayVocabularyCount",
+        "this.selectedDaySentenceCount",
+    ]:
+        require(token in today_builder, f"TodayCard must bind selected-day reactive state directly: {token}")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
