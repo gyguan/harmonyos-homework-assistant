@@ -32,11 +32,20 @@ export class ToeicCoachFixture {
         sentenceDrills.length,studyDays.length);
     }
     for (let day=2; day<=7; day++) {
-      if (PresetToeicContent.questionsForDay(day).length!==6 ||
+      let dayQuestions=PresetToeicContent.questionsForDay(day);
+      if (dayQuestions.length!==6 ||
         PresetToeicContent.vocabularyForDay(day).length!==15 ||
         PresetToeicContent.sentenceDrillsForDay(day).length!==5) {
         return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
           sentenceDrills.length,studyDays.length);
+      }
+      let stems:string[]=[];
+      for (let dayQuestion of dayQuestions) {
+        if (stems.indexOf(dayQuestion.stem)>=0) {
+          return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+            sentenceDrills.length,studyDays.length);
+        }
+        stems.push(dayQuestion.stem);
       }
     }
 

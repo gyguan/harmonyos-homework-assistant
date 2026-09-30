@@ -143,11 +143,45 @@ def main() -> None:
     require(builder_sections, "TOEIC UI builders could not be identified")
     require(re.search(r"(?m)^\s+let\s+", "\n".join(builder_sections)) is None,
             "TOEIC @Builder bodies must not declare local let variables")
-    require("QuestionContent(question:ToeicQuestion)" not in ui,
-            "question renderer must not use ToeicQuestion class object as Builder state boundary")
-    require("QuestionContent(questionIndex:number,questionId:string)" in ui and
-            "this.QuestionContent(this.currentIndex,this.questions[this.currentIndex].id)" in ui,
-            "question renderer must refresh from primitive index/id state")
+    require("QuestionContent(question:ToeicQuestion)" not in ui and
+            "QuestionContent(questionIndex:number,questionId:string)" not in ui,
+            "question renderer must not use question objects or array indexes as Builder state boundary")
+    require("private QuestionContent()" in ui and
+            "this.QuestionContent();" in ui,
+            "question renderer must bind directly to explicit reactive snapshot state")
+    for token in [
+        "@State private currentQuestionId:string=''",
+        "@State private currentStem:string=''",
+        "@State private currentPassage:string=''",
+        "@State private currentCorrectIndex:number=-1",
+        "private loadQuestion(index:number):boolean",
+        "this.loadQuestion(0)",
+        "this.loadQuestion(nextIndex)",
+        "private currentQuestionForAttempt():ToeicQuestion|null",
+        "question.id===this.currentQuestionId",
+    ]:
+        require(token in ui, f"reactive question snapshot missing: {token}")
+
+    question_builder_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private QuestionContent\(\).*?(?=^\s*build\(\))",
+        ui,
+    )
+    require(question_builder_match is not None, "QuestionContent builder could not be identified")
+    question_builder = question_builder_match.group(0)
+    require("this.questions[" not in question_builder,
+            "QuestionContent must not render fields directly from class objects in the questions array")
+    for token in [
+        "this.currentStem", "this.currentPassage", "this.currentOptionA",
+        "this.currentOptionB", "this.currentOptionC",
+        "this.currentExplanation", "this.currentEvidence", "this.currentParaphrase",
+    ]:
+        require(token in question_builder, f"QuestionContent must render reactive snapshot field: {token}")
+    require("index===this.currentCorrectIndex" in ui,
+            "answer option styling must use reactive currentCorrectIndex snapshot")
+    require("private optionBackground(index:number):string" in ui and
+            "private optionBorder(index:number):string" in ui and
+            "private optionText(index:number):string" in ui,
+            "answer option styling must not depend on stale ToeicQuestion objects")
     require("this.activeSessionAdvancesProgress=day===this.viewModel.snapshot().currentDay" in ui,
             "only the real current progress day may advance currentDay")
     require("if (advanceProgress) this.selectedStudyDay=0" in ui,
