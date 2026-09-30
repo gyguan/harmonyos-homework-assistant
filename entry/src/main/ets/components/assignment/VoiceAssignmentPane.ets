@@ -139,8 +139,8 @@ export struct VoiceAssignmentPane {
       this.imageIndex = 0;
       this.notifyMediaState();
       this.loading = false;
-      this.startImagePrefetch(1, lifecycleVersion);
       void this.loadAudio(audio);
+      this.startImagePrefetch(1, lifecycleVersion);
     } catch {
       this.message = '作业资料加载失败，请检查网络后重试';
     } finally {
