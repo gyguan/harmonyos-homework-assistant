@@ -18,6 +18,7 @@ ASSIGNMENT_ATTENTION = ROOT / "entry/src/main/ets/domain/service/AssignmentAtten
 HVIGOR_CONFIG = ROOT / "hvigor/hvigor-config.json5"
 VERIFY_HARMONY = ROOT / "scripts/verify_harmony_client.ps1"
 ETS_ROOT = ROOT / "entry/src/main/ets"
+TOEIC_WEEK_THREE = ROOT / "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets"
 QUALIFIED_MODEL_SYMBOLS = [
     "AssignmentStatus",
     "AssignmentType",
@@ -229,6 +230,10 @@ def main() -> int:
     ]:
         require(not (ROOT / retired_capture_path).exists(),
                 f"retired screen-capture source must stay removed: {retired_capture_path}")
+
+    week_three = TOEIC_WEEK_THREE.read_text(encoding="utf-8")
+    require(re.search(r"\[[^\]\n]*\bnull\b[^\]\n]*\]", week_three) is None,
+            "week-three TOEIC options must not contain null placeholders")
 
     validate_qualified_model_imports()
 
