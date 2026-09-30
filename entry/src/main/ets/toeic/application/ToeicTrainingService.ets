@@ -45,6 +45,22 @@ export class ToeicTrainingService {
     return selected;
   }
 
+  studyDayQuestions(snapshot:ToeicLearningSnapshot, studyDay:number):ToeicQuestion[] {
+    let planned=PresetToeicContent.questionsForDay(studyDay);
+    let selected:ToeicQuestion[]=[];
+    this.appendByIds(selected,planned,snapshot.reviewQuestionIds,planned.length);
+    this.appendByIds(selected,planned,snapshot.slowQuestionIds,planned.length);
+
+    let weak=snapshot.weakSkill as ToeicSkill;
+    for (let question of planned) {
+      if (question.skill===weak && !this.containsQuestionId(selected,question.id)) selected.push(question);
+    }
+    for (let question of planned) {
+      if (!this.containsQuestionId(selected,question.id)) selected.push(question);
+    }
+    return selected;
+  }
+
   classify(question:ToeicQuestion, correct:boolean, elapsedSeconds:number):ToeicPerformance {
     let slow=elapsedSeconds>question.recommendedSeconds;
     if (correct) return slow ? ToeicPerformance.SLOW_CORRECT : ToeicPerformance.FAST_CORRECT;
