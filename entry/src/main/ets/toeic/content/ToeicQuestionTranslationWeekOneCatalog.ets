@@ -1,4 +1,4 @@
-import { ToeicQuestionTranslation } from './ToeicQuestionTranslationCatalog';
+import { ToeicQuestionTranslation } from './ToeicQuestionTranslationModels';
 
 export class ToeicQuestionTranslationWeekOneCatalog {
   static items():ToeicQuestionTranslation[] {
