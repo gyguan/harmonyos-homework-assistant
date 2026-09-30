@@ -6,7 +6,7 @@ import {
 export class ToeicWeekOneContent {
   static studyDays():ToeicStudyDay[] {
     return [
-      new ToeicStudyDay(1,'摸底诊断','先判断词汇、Part 5/6/7 与速度瓶颈',75,[],[],[
+      new ToeicStudyDay(1,'快速诊断','先判断词汇、Part 5/6/7 与速度瓶颈',15,[],[],[
         'R-P5-WF-0001','R-P5-VOICE-0002','R-P5-PREP-0003','R-P5-CONJ-0004','R-P5-COL-0005','R-P5-VOC-0006',
         'R-P6-CTX-0001','R-P6-WF-0002','R-P7-DETAIL-0001','R-P7-PURPOSE-0002','R-P7-PARA-0003','R-P7-DETAIL-0004'
       ]),
@@ -181,10 +181,10 @@ export class ToeicWeekOneContent {
         'visitors 是被登记，must be 后接过去分词 registered。',
         '','be registered = have one’s details recorded',14,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
       new ToeicQuestion('R-P5-VERB-0203',ToeicSection.READING,ToeicPart.PART_5,ToeicSkill.VERB,'',
-        'Ms. Ito _____ to the company’s Osaka branch next month.',
-        ['transfers','transferred','will transfer','has transferred'],2,
-        'next month 表示未来时间，will transfer 最直接符合。',
-        '','next month = future time signal',15,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
+        'Ms. Ito _____ to the company’s Osaka branch last month.',
+        ['transfers','transferred','will transfer','has transferred'],1,
+        'last month 是明确过去时间，使用一般过去时 transferred。',
+        '','last month = simple past signal',15,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
       new ToeicQuestion('R-P5-VOICE-0204',ToeicSection.READING,ToeicPart.PART_5,ToeicSkill.VOICE,'',
         'The travel expense reports have already been _____ by the finance team.',
         ['process','processed','processing','processes'],1,
