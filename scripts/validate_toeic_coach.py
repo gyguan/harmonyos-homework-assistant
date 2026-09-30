@@ -199,8 +199,9 @@ def main() -> None:
     require("this.selectedDayTitle=plan.title" in ui and
             "this.selectedDayFocus=plan.focus" in ui,
             "selected day must load explicit plan snapshot fields")
-    require("if (advanceProgress) this.selectedStudyDay=0" in ui,
-            "after completing the real current day the UI must follow the new currentDay")
+    require("this.selectedStudyDay=this.viewModel.snapshot().currentDay" in ui and
+            "this.loadStudyDay(this.selectedStudyDay)" in ui,
+            "after completing the real current day the UI must follow and load the new currentDay")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
