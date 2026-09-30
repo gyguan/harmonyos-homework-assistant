@@ -16,6 +16,7 @@ export struct HomeworkImportPage {
   @State private sourceImageRef: string = '';
   @State private sourceImageLabel: string = '';
   @State private selectedSubject: Subject | null = null;
+  @State private subjectOptionsOpen: boolean = false;
   @State private imageMode: HomeworkImageRecognitionMode = HomeworkImageRecognitionMode.AI_IMAGE;
   onOpenConfirmation: () => void = () => {};
   onOpenRecords: () => void = () => {};
@@ -191,52 +192,93 @@ export struct HomeworkImportPage {
 
   @Builder
   private SubjectSelector() {
-    Column({ space: 7 }) {
-      Text('作业科目')
-        .width('100%')
-        .fontSize(AppTheme.SECTION_TITLE_SIZE)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.TEXT);
-      Row({ space: 8 }) {
+    Flex({ wrap: FlexWrap.Wrap }) {
+      Row() {
         ChoiceSelectionChip({
           label: '自动识别',
           selected: this.selectedSubject === null,
           onSelect: () => this.selectSubject(null)
         });
       }
-      .width('100%');
-      Row({ space: 8 }) {
+      .margin({ right: 8, bottom: 8 });
+      Row() {
         ChoiceSelectionChip({
           label: Subject.CHINESE,
           selected: this.selectedSubject === Subject.CHINESE,
           onSelect: () => this.selectSubject(Subject.CHINESE)
         });
+      }
+      .margin({ right: 8, bottom: 8 });
+      Row() {
         ChoiceSelectionChip({
           label: Subject.MATH,
           selected: this.selectedSubject === Subject.MATH,
           onSelect: () => this.selectSubject(Subject.MATH)
         });
+      }
+      .margin({ right: 8, bottom: 8 });
+      Row() {
         ChoiceSelectionChip({
           label: Subject.ENGLISH,
           selected: this.selectedSubject === Subject.ENGLISH,
           onSelect: () => this.selectSubject(Subject.ENGLISH)
         });
+      }
+      .margin({ right: 8, bottom: 8 });
+      Row() {
         ChoiceSelectionChip({
           label: Subject.OTHER,
           selected: this.selectedSubject === Subject.OTHER,
           onSelect: () => this.selectSubject(Subject.OTHER)
         });
       }
-      .width('100%');
-      if (this.selectedSubject !== null) {
-        Text('本次所有作业将使用所选科目')
-          .width('100%')
-          .fontSize(AppTheme.CAPTION_SIZE)
-          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-          .fontColor(AppTheme.TERTIARY_TEXT);
-      }
+      .margin({ right: 8, bottom: 8 });
     }
-    .width('100%');
+    .width('100%')
+    .enabled(!this.parseBusy);
+  }
+
+  @Builder
+  private SubjectOptions() {
+    Column({ space: 8 }) {
+      Row({ space: 8 }) {
+        Text('科目（可选）')
+          .layoutWeight(1)
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.TEXT);
+        Text(this.selectedSubject === null ? '自动识别' : this.selectedSubject)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(this.selectedSubject === null ? AppTheme.SUBTEXT : AppTheme.PRIMARY);
+        SymbolGlyph($r('sys.symbol.chevron_right'))
+          .fontSize(AppTheme.META_SIZE)
+          .fontColor([AppTheme.TERTIARY_TEXT])
+          .rotate({ angle: this.subjectOptionsOpen ? 90 : 0 });
+      }
+      .width('100%')
+      .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+      .enabled(!this.parseBusy)
+      .accessibilityRole(AccessibilityRoleType.BUTTON)
+      .accessibilityText(`科目：${this.selectedSubject === null ? '自动识别' : this.selectedSubject}，${this.subjectOptionsOpen ? '收起' : '展开'}科目设置`)
+      .onClick(() => {
+        if (!this.parseBusy) this.subjectOptionsOpen = !this.subjectOptionsOpen;
+      });
+      if (this.subjectOptionsOpen) {
+        this.SubjectSelector();
+      }
+      Text(this.selectedSubject === null ? '按每项作业自动识别，支持一张图片包含多个科目' :
+        '本次所有作业将使用所选科目')
+        .width('100%')
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+        .fontColor(AppTheme.TERTIARY_TEXT);
+    }
+    .width('100%')
+    .padding(AppTheme.CARD_PADDING_COMPACT)
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .borderRadius(AppTheme.CARD_RADIUS_COMPACT);
   }
 
   @Builder
@@ -293,6 +335,7 @@ export struct HomeworkImportPage {
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
       .accessibilityText('继续核对待发布作业')
+      .enabled(!this.parseBusy)
       .onClick(() => this.onOpenConfirmation());
     }
   }
@@ -303,39 +346,47 @@ export struct HomeworkImportPage {
       Text('导入记录')
         .fontSize(AppTheme.ACTION_TEXT_SIZE)
         .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(AppTheme.PRIMARY);
+        .fontColor(AppTheme.SUBTEXT);
       SymbolGlyph($r('sys.symbol.chevron_right'))
         .fontSize(13)
-        .fontColor([AppTheme.PRIMARY]);
+        .fontColor([AppTheme.SUBTEXT]);
     }
     .width('100%')
     .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-    .justifyContent(FlexAlign.End)
+    .justifyContent(FlexAlign.Center)
     .alignItems(VerticalAlign.Center)
     .accessibilityRole(AccessibilityRoleType.BUTTON)
     .accessibilityText('查看历史导入记录')
+    .enabled(!this.parseBusy)
     .onClick(() => this.onOpenRecords());
   }
 
   @Builder
   private RecognitionActions() {
     Row({ space: 8 }) {
-      Button(this.parseBusy ? '识别中…' : '拍照识别', { type: ButtonType.Normal })
+      Button('拍照', { type: ButtonType.Normal })
         .layoutWeight(1)
-        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .constraintSize({ minHeight: AppTheme.SECONDARY_BUTTON_HEIGHT })
+        .padding({ top: 10, bottom: 10 })
         .borderRadius(AppTheme.CONTROL_RADIUS)
-        .backgroundColor(AppTheme.PRIMARY_SOFT)
-        .fontColor(AppTheme.PRIMARY)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .border({ width: 1, color: AppTheme.BORDER })
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .fontColor(AppTheme.TEXT)
+        .accessibilityText('拍照添加作业图片')
         .enabled(!this.parseBusy)
         .onClick(() => { void this.recognizePhoto(); });
 
-      Button(this.parseBusy ? '识别中…' : '相册识别', { type: ButtonType.Normal })
+      Button('选图片', { type: ButtonType.Normal })
         .layoutWeight(1)
-        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+        .constraintSize({ minHeight: AppTheme.SECONDARY_BUTTON_HEIGHT })
+        .padding({ top: 10, bottom: 10 })
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .fontColor(AppTheme.PRIMARY)
+        .border({ width: 1, color: AppTheme.BORDER })
+        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+        .fontColor(AppTheme.TEXT)
+        .accessibilityText('从相册添加作业图片')
         .enabled(!this.parseBusy)
         .onClick(() => { void this.recognizeGallery(); });
     }
@@ -344,23 +395,36 @@ export struct HomeworkImportPage {
 
   @Builder
   private ImageModeSelector() {
-    Column({ space: 7 }) {
-      Row({ space: 8 }) {
-        ChoiceSelectionChip({
-          label: 'AI图片解析',
-          selected: this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE,
-          onSelect: () => this.selectImageMode(HomeworkImageRecognitionMode.AI_IMAGE)
-        });
-        ChoiceSelectionChip({
-          label: '文字识别',
-          selected: this.imageMode === HomeworkImageRecognitionMode.OCR,
-          onSelect: () => this.selectImageMode(HomeworkImageRecognitionMode.OCR)
-        });
+    Column({ space: 8 }) {
+      Text('图片解析方式')
+        .width('100%')
+        .fontSize(AppTheme.LABEL_TITLE_SIZE)
+        .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.SUBTEXT);
+      Flex({ wrap: FlexWrap.Wrap }) {
+        Row() {
+          ChoiceSelectionChip({
+            label: 'AI图片解析',
+            selected: this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE,
+            onSelect: () => this.selectImageMode(HomeworkImageRecognitionMode.AI_IMAGE)
+          });
+        }
+        .margin({ right: 8, bottom: 8 });
+        Row() {
+          ChoiceSelectionChip({
+            label: '文字识别',
+            selected: this.imageMode === HomeworkImageRecognitionMode.OCR,
+            onSelect: () => this.selectImageMode(HomeworkImageRecognitionMode.OCR)
+          });
+        }
+        .margin({ right: 8, bottom: 8 });
       }
-      .width('100%');
+      .width('100%')
+      .enabled(!this.parseBusy);
       Text(this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ?
-        '点击整理并继续，将所选图片发送给AI解析；效果不佳可切换文字识别' :
-        '使用系统文字识别，可修改识别文字后继续')
+        '图片将发送给AI解析；效果不佳时可用同一图片切换文字识别' :
+        '先识别图片中的文字，修改后再整理作业')
         .width('100%')
         .fontSize(AppTheme.CAPTION_SIZE)
         .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
@@ -381,16 +445,16 @@ export struct HomeworkImportPage {
   @Builder
   private AssignmentInput() {
     Column({ space: 12 }) {
-      this.SubjectSelector();
-
       Row() {
         Text('作业内容')
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
         Blank();
         if (this.textDraft.length > 0 || this.sourceImageRef.length > 0) {
-          Text('清空')
+          Text(this.sourceImageRef.length > 0 && this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ?
+            '移除图片' : '清空内容')
             .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
             .padding({ left: 12, right: 4 })
             .fontSize(AppTheme.ACTION_TEXT_SIZE)
@@ -398,28 +462,46 @@ export struct HomeworkImportPage {
             .fontColor(AppTheme.PRIMARY)
             .accessibilityRole(AccessibilityRoleType.BUTTON)
             .accessibilityText('清空作业内容')
+            .enabled(!this.parseBusy)
             .onClick(() => this.clearAssignmentInput());
         }
       }
       .width('100%');
+
+      if (this.sourceImageRef.length === 0 && this.textDraft.length === 0) {
+        Text('拍照或选择老师通知，也可直接输入文字')
+          .width('100%')
+          .fontSize(AppTheme.BODY_SIZE)
+          .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+
+      this.RecognitionActions();
 
       if (this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE && this.sourceImageRef.length > 0) {
         Image(this.sourceImageRef)
           .width('100%')
           .height(200)
           .objectFit(ImageFit.Contain)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS);
       } else {
+        Text(this.sourceImageRef.length > 0 ? '识别文字，可修改' : '粘贴或输入文字')
+          .width('100%')
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
         TextArea({
-          placeholder: '例如：背诵第12课并完成课后练习',
+          placeholder: '例如：语文背诵第12课；数学完成口算练习',
           text: this.textDraft
         })
           .width('100%')
-          .height(200)
+          .height(160)
           .fontSize(AppTheme.FORM_TEXT_SIZE)
           .lineHeight(AppTheme.FORM_TEXT_LINE_HEIGHT)
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.parseBusy)
           .onChange((value: string) => {
             this.textDraft = value;
             this.parseMessage = '';
@@ -427,15 +509,14 @@ export struct HomeworkImportPage {
           });
       }
 
-      this.ImageModeSelector();
-      this.RecognitionActions();
-
-      if (this.sourceImageRef.length > 0 && this.imageMode === HomeworkImageRecognitionMode.OCR && this.textDraft.length > 0) {
-        Text(`已从${this.sourceImageLabel.length > 0 ? this.sourceImageLabel : '图片'}识别，可继续修改文字`)
+      if (this.sourceImageRef.length > 0) {
+        Text(this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE ? '已添加作业图片' :
+          `图片来源：${this.sourceImageLabel.length > 0 ? this.sourceImageLabel : '作业图片'}`)
           .width('100%')
           .fontSize(AppTheme.CAPTION_SIZE)
           .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
           .fontColor(AppTheme.TERTIARY_TEXT);
+        this.ImageModeSelector();
       }
     }
     .width('100%')
@@ -451,7 +532,8 @@ export struct HomeworkImportPage {
 
       Button(this.parseBusy ? '正在处理…' : (this.needsImageOcr() ? '识别文字' : '整理并继续'), { type: ButtonType.Normal })
         .width('100%')
-        .height(AppTheme.BUTTON_HEIGHT)
+        .constraintSize({ minHeight: AppTheme.BUTTON_HEIGHT })
+        .padding({ top: 12, bottom: 12 })
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .enabled(this.canOrganize())
         .fontSize(AppTheme.ACTION_TEXT_SIZE)
@@ -459,6 +541,12 @@ export struct HomeworkImportPage {
         .backgroundColor(this.canOrganize() ? AppTheme.PRIMARY : AppTheme.DISABLED)
         .fontColor(AppTheme.TEXT_ON_PRIMARY)
         .onClick(() => { void this.organize(); });
+      Text('下一步核对作业，确认后再发布')
+        .width('100%')
+        .textAlign(TextAlign.Center)
+        .fontSize(AppTheme.CAPTION_SIZE)
+        .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+        .fontColor(AppTheme.TERTIARY_TEXT);
     }
     .width('100%')
     .padding({ top: 8, bottom: 8 })
@@ -477,12 +565,14 @@ export struct HomeworkImportPage {
       }
 
       Scroll() {
-        Column({ space: 10 }) {
+        Column({ space: AppTheme.ITEM_GAP }) {
+          this.AssignmentInput();
+          this.SubjectOptions();
           this.PendingReview();
           this.ImportRecordsEntry();
-          this.AssignmentInput();
         }
         .width('100%')
+        .justifyContent(FlexAlign.Start)
         .padding({ bottom: 8 });
       }
       .width('100%')
@@ -501,6 +591,7 @@ export struct HomeworkImportPage {
       top: this.embeddedInDeepPage ? 0 : 14
     })
     .alignItems(HorizontalAlign.Center)
+    .justifyContent(FlexAlign.Start)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 }

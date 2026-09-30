@@ -42,14 +42,34 @@ require(".alignItems(HorizontalAlign.Center)" in import_route and
         "AppTheme.CONTENT_STANDARD_MAX_WIDTH" in import_page,
         "manual import route must center the embedded readable content column on Pad")
 
-require("Button(this.parseBusy ? '识别中…' : '拍照识别'" in import_page and
-        "Button(this.parseBusy ? '识别中…' : '相册识别'" in import_page,
-        "manual homework must expose compact camera and gallery OCR actions")
+require(".accessibilityText('拍照添加作业图片')" in import_page and
+        ".accessibilityText('从相册添加作业图片')" in import_page and
+        "void this.recognizePhoto();" in import_page and "void this.recognizeGallery();" in import_page,
+        "manual homework must expose accessible camera and gallery actions sharing the image/OCR flow")
 require("private ActionFooter()" in import_page and
         import_page.find("this.ActionFooter();") > import_page.find(".scrollBar(BarState.Off);"),
         "manual homework primary action must remain fixed outside scrolling content")
-require(".height(200)" in import_page and "整理并继续" in import_page,
-        "manual homework content editor must stay compact and preserve one primary continuation action")
+require(".height(160)" in import_page and "整理并继续" in import_page and
+        ".constraintSize({ minHeight: AppTheme.BUTTON_HEIGHT })" in import_page,
+        "manual homework content editor must stay compact and the primary action must allow large text")
+
+# The content is primary; subject override and old imports are secondary, contextual controls.
+composition = import_page[import_page.find("  build() {"):]
+require(composition.find("this.AssignmentInput();") < composition.find("this.SubjectOptions();") <
+        composition.find("this.PendingReview();") < composition.find("this.ImportRecordsEntry();"),
+        "manual homework must place content before optional subject, pending review and import records")
+require("@State private subjectOptionsOpen: boolean = false" in import_page and
+        "if (this.subjectOptionsOpen) {\n        this.SubjectSelector();" in import_page,
+        "manual subject overrides must default to collapsed optional settings")
+require("this.RecognitionActions();" in import_page and
+        import_page.find("this.RecognitionActions();") < import_page.find("TextArea({"),
+        "image actions must be discoverable before the editable text input")
+require("if (this.sourceImageRef.length > 0) {\n        Text(" in import_page and
+        "this.ImageModeSelector();" in import_page and
+        "Flex({ wrap: FlexWrap.Wrap })" in import_page,
+        "image parsing settings must be contextual and options must wrap in narrow/large-text layouts")
+require("下一步核对作业，确认后再发布" in import_page,
+        "manual homework primary action must clarify that publishing follows parent confirmation")
 require("private SubjectSelector()" in import_page and
         "label: Subject.CHINESE" in import_page and "label: Subject.MATH" in import_page and
         "label: Subject.ENGLISH" in import_page and "label: Subject.OTHER" in import_page,

@@ -435,12 +435,14 @@ for deep_page_name, deep_page_source in [
 require("left: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT" in homework_import and
         "right: this.embeddedInDeepPage ? 0 : AppTheme.PAGE_PADDING_COMPACT" in homework_import,
         "embedded HomeworkImportPage must not add a second horizontal page padding")
-require("Text('作业科目')" in homework_import and
-        "Text('作业内容')" in homework_import and
-        homework_import.count("AppTheme.SECTION_TITLE_SIZE") >= 2,
-        "Homework import subject and content headings must use the same section-title size")
+require("Text('作业内容')" in homework_import and
+        "AppTheme.SECTION_TITLE_SIZE" in between(homework_import, "private AssignmentInput()", "private ActionFooter()") and
+        "Text('科目（可选）')" in homework_import and
+        "AppTheme.LABEL_TITLE_SIZE" in between(homework_import, "private SubjectOptions()", "private FeedbackBanner()"),
+        "Homework import content must lead with a section heading and optional subject must use a subordinate form label")
 require("private clearAssignmentInput(): void" in homework_import and
-        "Text('清空')" in homework_import and
+        ".accessibilityText('清空作业内容')" in homework_import and
+        "this.clearAssignmentInput()" in homework_import and
         "this.textDraft = '';" in homework_import and
         "this.sourceImageRef = '';" in homework_import and
         "this.sourceImageLabel = '';" in homework_import,
