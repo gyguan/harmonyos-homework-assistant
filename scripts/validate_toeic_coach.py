@@ -91,6 +91,8 @@ def main() -> None:
             "transfer en-US pronunciation is required")
     require("V-051','/ˈɛstəmət/ n. · /ˈɛstəmeɪt/ v.'" in pronunciation,
             "estimate noun/verb pronunciation distinction is required")
+    require("V-082','/ʌpˈɡreɪd/ v. · /ˈʌpɡreɪd/ n.'" in pronunciation,
+            "upgrade noun/verb pronunciation distinction is required")
 
     pronunciation_service = read("entry/src/main/ets/toeic/application/ToeicPronunciationService.ets")
     for token in ["@kit.CoreSpeechKit", "SystemCapability.AI.TextToSpeech", "language: 'en-US'",
