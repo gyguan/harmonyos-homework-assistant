@@ -234,8 +234,9 @@ export struct ToeicHomePage {
           }
         }
         .width('100%')
-        .padding({top:8,bottom:8})
-        .border({width:{bottom:1},color:AppTheme.BORDER});
+        .padding({left:8,right:8,top:8,bottom:8})
+        .backgroundColor(plan.day===snapshot.currentDay?AppTheme.PRIMARY_SOFT:AppTheme.CARD_SURFACE)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       },(plan:ToeicStudyDay)=>String(plan.day));
     }
     .width('100%').padding(AppTheme.CARD_PADDING)
