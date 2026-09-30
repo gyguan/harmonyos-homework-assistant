@@ -53,9 +53,9 @@ public class OpenAiCompatibleTransport {
         .build();
 
     log.info(
-        "[AI] config provider={} protocol={} baseUrl={} responsesPath={} chatCompletionsPath={} tutorModel={} organizerModel={} practiceModel={} structuredOutput={} logPayloads={} keyConfigured={} allowUnauthenticated={}",
+        "[AI] config provider={} protocol={} baseUrl={} responsesPath={} chatCompletionsPath={} tutorModel={} organizerModel={} imageOrganizerModel={} practiceModel={} structuredOutput={} logPayloads={} keyConfigured={} allowUnauthenticated={}",
         properties.getProvider(), properties.getProtocol(), safeBaseUrl(properties.getBaseUrl()), properties.getResponsesPath(),
-        properties.getChatCompletionsPath(), properties.getTutorModel(), properties.getOrganizerModel(),
+        properties.getChatCompletionsPath(), properties.getTutorModel(), properties.getOrganizerModel(), properties.getImageOrganizerModel(),
         properties.getPracticeModel(), properties.isStructuredOutput(), properties.isLogPayloads(), keyConfigured(),
         properties.isAllowUnauthenticated());
   }
@@ -111,6 +111,19 @@ public class OpenAiCompatibleTransport {
       Map<String, Object> schema,
       ApiProtocol apiProtocol,
       StructuredOutputMode outputMode) {
+    return completeInput(model, instructions, input, null, maxTokens, schemaName, schema, apiProtocol, outputMode);
+  }
+
+  public Optional<String> completeWithImage(String model, String instructions, String input,
+      String imageDataUrl, int maxTokens, String schemaName, Map<String, Object> schema) {
+    AiProviderCapabilities capabilities = capabilities(model);
+    return completeInput(model, instructions, input, imageDataUrl, maxTokens, schemaName, schema,
+        capabilities.preferredProtocol(), capabilities.primaryMode());
+  }
+
+  private Optional<String> completeInput(String model, String instructions, String input,
+      String imageDataUrl, int maxTokens, String schemaName, Map<String, Object> schema,
+      ApiProtocol apiProtocol, StructuredOutputMode outputMode) {
     AiProviderCapabilities capabilities = capabilities(model);
     ApiProtocol resolvedProtocol =
         apiProtocol == null ? capabilities.preferredProtocol() : apiProtocol;
@@ -143,8 +156,8 @@ public class OpenAiCompatibleTransport {
         schema != null && properties.isStructuredOutput(), resolvedMode, maxTokens);
     try {
       Optional<String> result = resolvedProtocol == ApiProtocol.CHAT_COMPLETIONS
-          ? chatCompletion(model, instructions, input, maxTokens, schemaName, schema, resolvedMode)
-          : responses(model, instructions, input, maxTokens, schemaName, schema, resolvedMode);
+          ? chatCompletion(model, instructions, input, imageDataUrl, maxTokens, schemaName, schema, resolvedMode)
+          : responses(model, instructions, input, imageDataUrl, maxTokens, schemaName, schema, resolvedMode);
       long elapsedMs = elapsedMs(started);
       if (result.isPresent()) {
         log.info("[AI] response ok protocol={} model={} path={} elapsedMs={} outputChars={}",
@@ -156,7 +169,8 @@ public class OpenAiCompatibleTransport {
       return result;
     } catch (RestClientResponseException error) {
       String providerError = redactExact(
-          sanitizeProviderError(error.getResponseBodyAsString()), properties.getApiKey());
+          imageDataUrl == null ? sanitizeProviderError(error.getResponseBodyAsString()) : "<image-request-error>",
+          properties.getApiKey());
       log.warn(
           "[AI] response error protocol={} model={} path={} status={} elapsedMs={} exception={} providerError={}",
           protocol, model, path, error.getStatusCode().value(), elapsedMs(started),
@@ -166,7 +180,7 @@ public class OpenAiCompatibleTransport {
       log.warn(
           "[AI] request failed protocol={} model={} path={} elapsedMs={} exception={} message={}",
           protocol, model, path, elapsedMs(started), error.getClass().getSimpleName(),
-          safeMessage(error.getMessage()));
+          imageDataUrl == null ? safeMessage(error.getMessage()) : "<image-request-error>");
       return Optional.empty();
     }
   }
@@ -175,6 +189,7 @@ public class OpenAiCompatibleTransport {
       String model,
       String instructions,
       String input,
+      String imageDataUrl,
       int maxTokens,
       String schemaName,
       Map<String, Object> schema,
@@ -184,13 +199,13 @@ public class OpenAiCompatibleTransport {
     body.put("store", false);
     body.put("stream", false);
     body.put("instructions", instructions);
-    body.put("input", input);
+    body.put("input", responsesInput(input, imageDataUrl));
     body.put("max_output_tokens", maxTokens);
     if (schema != null && properties.isStructuredOutput()) {
       Map<String, Object> format = structuredFormat(outputMode, schemaName, schema);
       if (format != null) body.put("text", Map.of("format", format));
     }
-    ResponsesResponse response = post(properties.getResponsesPath(), body, ResponsesResponse.class);
+    ResponsesResponse response = post(properties.getResponsesPath(), body, ResponsesResponse.class, imageDataUrl != null);
     return extractResponsesText(response);
   }
 
@@ -198,6 +213,7 @@ public class OpenAiCompatibleTransport {
       String model,
       String instructions,
       String input,
+      String imageDataUrl,
       int maxTokens,
       String schemaName,
       Map<String, Object> schema,
@@ -207,29 +223,43 @@ public class OpenAiCompatibleTransport {
     body.put("stream", false);
     body.put("messages", List.of(
         Map.of("role", "system", "content", instructions),
-        Map.of("role", "user", "content", input)));
+        Map.of("role", "user", "content", chatInput(input, imageDataUrl))));
     body.put("max_tokens", maxTokens);
     if (schema != null && properties.isStructuredOutput()) {
       Map<String, Object> responseFormat =
           chatStructuredResponseFormat(outputMode, schemaName, schema);
       if (responseFormat != null) body.put("response_format", responseFormat);
     }
-    ChatResponse response = post(properties.getChatCompletionsPath(), body, ChatResponse.class);
+    ChatResponse response = post(properties.getChatCompletionsPath(), body, ChatResponse.class, imageDataUrl != null);
     return extractChatText(response);
   }
 
-  private <T> T post(String path, Map<String, Object> body, Class<T> responseType) throws Exception {
+  static Object responsesInput(String input, String imageDataUrl) {
+    if (imageDataUrl == null) return input;
+    return List.of(Map.of("role", "user", "content", List.of(
+        Map.of("type", "input_text", "text", input),
+        Map.of("type", "input_image", "image_url", imageDataUrl))));
+  }
+
+  static Object chatInput(String input, String imageDataUrl) {
+    if (imageDataUrl == null) return input;
+    return List.of(
+        Map.of("type", "text", "text", input),
+        Map.of("type", "image_url", "image_url", Map.of("url", imageDataUrl)));
+  }
+
+  private <T> T post(String path, Map<String, Object> body, Class<T> responseType, boolean imageRequest) throws Exception {
     RestClient.RequestBodySpec request = client.post().uri(path).accept(MediaType.APPLICATION_JSON);
     if (properties.getApiKey() != null && !properties.getApiKey().isBlank()) {
       request.header(HttpHeaders.AUTHORIZATION, "Bearer " + properties.getApiKey());
     }
 
-    if (properties.isLogPayloads()) {
+    if (properties.isLogPayloads() && !imageRequest) {
       log.info("[AI-PAYLOAD] request path={} body={}", path, payloadForLog(body));
     }
 
     String rawResponse = request.body(body).retrieve().body(String.class);
-    if (properties.isLogPayloads()) {
+    if (properties.isLogPayloads() && !imageRequest) {
       log.info("[AI-PAYLOAD] response path={} body={}", path,
           sanitizePayloadForLog(rawResponse, properties.getApiKey()));
     }

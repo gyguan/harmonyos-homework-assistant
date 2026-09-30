@@ -6,9 +6,30 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.xiaoban.homework.student.StudentEntity;
+import com.xiaoban.homework.ai.AiProviderProperties;
+import tools.jackson.databind.json.JsonMapper;
 import org.junit.jupiter.api.Test;
 
 class ConfigurableHomeworkOrganizerModelClientTest {
+  @Test
+  void imageResultKeepsMultipleSubjectsAndRejectsIncompleteOutput() {
+    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), null,
+        JsonMapper.builder().build());
+    String output = """
+        {"recognizedText":"语文背诵；数学口算", "assignments":[
+          {"subject":"语文","title":"背诵","instruction":"背诵课文","expectedMinutes":10,"confidence":0.9},
+          {"subject":"数学","title":"口算","instruction":"口算20题","expectedMinutes":15,"confidence":0.8}
+        ]}
+        """;
+    var result = client.parseImageOutput(output).orElseThrow();
+    assertEquals(java.util.List.of("语文", "数学"), result.assignments().stream()
+        .map(HomeworkOrganizerDtos.Candidate::subject).toList());
+    assertEquals("语文背诵；数学口算", result.recognizedText());
+    assertTrue(client.parseImageOutput(output.replace("\"recognizedText\"", "\"unused\"")).isEmpty());
+    assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
+    assertTrue(client.parseImageOutput("{\"recognizedText\":\"班级通知\",\"assignments\":[]}")
+        .orElseThrow().assignments().isEmpty());
+  }
   static class TestStudent extends StudentEntity {
     TestStudent() { super(); }
   }

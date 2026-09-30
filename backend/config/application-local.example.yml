@@ -41,6 +41,8 @@ app:
     # Tutor and homework organizer may use different models on the same provider.
     tutor-model: gpt-5.6-luna
     organizer-model: gpt-5.6-luna
+    # Must support image input. Blank reuses organizer-model; same provider/base URL/key.
+    image-organizer-model: ''
 
     # Set false if the provider does not support json_schema structured output.
     # The organizer will still ask for JSON and validate the returned structure locally.

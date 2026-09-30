@@ -13,7 +13,8 @@ export class HomeworkImportViewModel {
 
   rawImport(): RawHomeworkImport { return this.drafts.getRawImport(); }
   candidates(): CandidateAssignment[] { return this.drafts.getCandidates(); }
-  parseText(text: string, subject: Subject, imageRef: string = '',
+  activeStudentId(): string { return this.drafts.getActiveStudentId(); }
+  parseText(text: string, subject: Subject | null = null, imageRef: string = '',
     imageSourceLabel: string = ''): Promise<HomeworkTextImportResult> {
     return HomeworkImportService.instance.parseText(text, subject, imageRef, imageSourceLabel);
   }
@@ -22,4 +23,12 @@ export class HomeworkImportViewModel {
   }
   selectImageText(): Promise<HomeworkImageTextResult> { return HomeworkImportService.instance.selectImageText(); }
   selectImageAndParse(): Promise<HomeworkImageImportResult> { return HomeworkImportService.instance.selectImageAndParse(); }
+  selectImage(): Promise<string> { return HomeworkImportService.instance.selectImage(); }
+  captureImage(): Promise<string> { return HomeworkImportService.instance.captureImage(); }
+  recognizeSelectedImageText(imageRef: string, sourceLabel: string): Promise<HomeworkImageTextResult> {
+    return HomeworkImportService.instance.recognizeSelectedImageText(imageRef, sourceLabel);
+  }
+  parseImage(imageRef: string, subject: Subject | null, sourceLabel: string): Promise<HomeworkTextImportResult> {
+    return HomeworkImportService.instance.parseImage(imageRef, subject, sourceLabel);
+  }
 }

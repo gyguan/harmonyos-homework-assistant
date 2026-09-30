@@ -6,6 +6,17 @@ import org.junit.jupiter.api.Test;
 
 class AiProviderPropertiesTest {
   @Test
+  void imageModelCanBeChangedIndependentlyAndResetToOrganizer() {
+    var properties = new AiProviderProperties();
+    properties.setOrganizerModel("text-model");
+    assertEquals("text-model", properties.getImageOrganizerModel());
+    properties.setImageOrganizerModel("vision-model");
+    assertEquals("vision-model", properties.getImageOrganizerModel());
+    assertEquals("text-model", properties.getOrganizerModel());
+    properties.setImageOrganizerModel(" ");
+    assertEquals("text-model", properties.getImageOrganizerModel());
+  }
+  @Test
   void providerDefaultsToAutoAndCanBeOverridden() {
     AiProviderProperties properties = new AiProviderProperties();
 
