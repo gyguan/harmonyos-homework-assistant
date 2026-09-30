@@ -12,6 +12,9 @@ export class ToeicCoachViewModel {
   dailyQuestionsForDay(day:number):ToeicQuestion[] {
     return ToeicTrainingService.instance.studyDayQuestions(this.snapshot(),day);
   }
+  attemptCount(questionId:string):number { return ToeicProgressStore.instance.attemptCount(questionId); }
+  wrongCount(questionId:string):number { return ToeicProgressStore.instance.wrongCount(questionId); }
+
   createAttempt(question:ToeicQuestion,selectedIndex:number,elapsedSeconds:number):ToeicQuestionAttempt {
     return ToeicTrainingService.instance.createAttempt(question,selectedIndex,elapsedSeconds);
   }
