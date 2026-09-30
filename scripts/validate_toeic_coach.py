@@ -113,8 +113,8 @@ def main() -> None:
         require(token in preset, f"week-one catalog API missing: {token}")
 
     training = read("entry/src/main/ets/toeic/application/ToeicTrainingService.ets")
-    require("PresetToeicContent.questionsForDay(snapshot.currentDay)" in training,
-            "daily queue must include current-day planned questions")
+    require("PresetToeicContent.questionsForDay(studyDay)" in training,
+            "daily queue must include the explicitly selected study day")
     require("recoveryLimit=Math.min(4,limit)" in training,
             "daily queue must cap remediation so planned content still fits")
     require("containsQuestionId(selected,q.id)" in training and
@@ -126,10 +126,15 @@ def main() -> None:
             "diagnostic must count as Day 1 and advance to Day 2")
     require("MAX_AVAILABLE_STUDY_DAY:number=7" in progress,
             "week-one progress must stop at the currently implemented day boundary")
+    require("advanceProgress:boolean=true" in progress and
+            "if (advanceProgress)" in progress,
+            "review or preview sessions must be recordable without advancing currentDay")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
     for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "WeekPlanCard",
-                  "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'"]:
+                  "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'",
+                  "selectedStudyDay", "selectStudyDay(day:number)", "effectiveStudyDay()",
+                  ".onClick(()=>this.selectStudyDay(plan.day))", "dailyQuestionsForDay(day)"]:
         require(token in ui, f"week-one learning UI missing: {token}")
     builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
@@ -143,6 +148,10 @@ def main() -> None:
     require("QuestionContent(questionIndex:number,questionId:string)" in ui and
             "this.QuestionContent(this.currentIndex,this.questions[this.currentIndex].id)" in ui,
             "question renderer must refresh from primitive index/id state")
+    require("this.activeSessionAdvancesProgress=day===this.viewModel.snapshot().currentDay" in ui,
+            "only the real current progress day may advance currentDay")
+    require("if (advanceProgress) this.selectedStudyDay=0" in ui,
+            "after completing the real current day the UI must follow the new currentDay")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
