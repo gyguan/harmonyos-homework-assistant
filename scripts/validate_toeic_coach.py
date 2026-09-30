@@ -284,6 +284,28 @@ def main() -> None:
             "mock mode must hide immediate feedback and show a result screen after completion")
     require("this.mockPart5Correct" in ui and "this.mockPart6Correct" in ui and "this.mockPart7Correct" in ui,
             "mock result must expose Part 5/6/7 breakdown")
+    require("private QuestionOption(index:number,prefix:string,text:string)" in ui and
+            "Button({type:ButtonType.Normal})" in ui and
+            "Text(text)" in ui and
+            ".textAlign(TextAlign.Start)" in ui,
+            "TOEIC answer options must use a custom text child so long labels can wrap")
+    require("Button('A. '+this.currentOptionA" not in ui and
+            "Button('B. '+this.currentOptionB" not in ui and
+            "Button('C. '+this.currentOptionC" not in ui and
+            "Button('D. '+this.currentOptionD" not in ui,
+            "TOEIC answer options must not regress to single-label Button rendering")
+    option_builder_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private QuestionOption\(.*?(?=^\s*@Builder)",
+        ui,
+    )
+    require(option_builder_match is not None, "QuestionOption builder could not be identified")
+    option_builder = option_builder_match.group(0)
+    require(".constraintSize({minHeight:50})" in option_builder and
+            ".padding({left:14,right:14,top:12,bottom:12})" in option_builder,
+            "TOEIC answer options must keep a touch-safe minimum height and multiline padding")
+    require(".maxLines(" not in option_builder and ".textOverflow(" not in option_builder,
+            "TOEIC answer text must not be truncated by maxLines or ellipsis")
+
 
     for token in [
         "@State private progressCurrentDay:number=1",
