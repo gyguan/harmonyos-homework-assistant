@@ -59,7 +59,7 @@ export class HomeworkImportService {
     return await this.runSmart(input);
   }
 
-  async parseText(text: string, subject: Subject, imageRef: string = '',
+  async parseText(text: string, subject: Subject | null = null, imageRef: string = '',
     imageSourceLabel: string = ''): Promise<HomeworkTextImportResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let normalized = text.trim();
@@ -80,7 +80,7 @@ export class HomeworkImportService {
     let output: HomeworkImportPipelineResult = await this.runSmart(rawImport);
     let candidates = this.applySelectedSubject(output.candidates, subject);
     if (candidates.length === 0 && output.organizerMode === HomeworkOrganizerMode.LOCAL) {
-      candidates = [this.fallbackCandidate(studentId, normalized, rawImport.sourceLabel, subject)];
+      candidates = [this.fallbackCandidate(studentId, normalized, rawImport.sourceLabel, subject === null ? Subject.OTHER : subject)];
     }
     HomeworkImportInboxService.instance.commitParsedImport(
       rawImport,
@@ -88,10 +88,49 @@ export class HomeworkImportService {
       output.extracted.text,
       candidates,
       fromScreenshot ? imageRef : '');
+    this.ensureCurrentStudent(studentId);
     return { candidateCount: candidates.length, organizerMode: output.organizerMode };
   }
 
+  async parseImage(imageRef: string, subject: Subject | null = null,
+    sourceLabel: string = '相册作业图片'): Promise<HomeworkTextImportResult> {
+    let studentId = this.drafts.getActiveStudentId();
+    if (imageRef.length === 0) throw new Error('请先拍照或选择图片');
+    let rawImport: RawHomeworkImport = {
+      id: `ai-image-${Date.now()}`,
+      studentId: studentId,
+      sourceKind: HomeworkImportSourceKind.IMAGE,
+      sourceLabel: sourceLabel,
+      resourceUri: imageRef,
+      rawText: ''
+    };
+    let input: ExtractedHomeworkText = {
+      importId: rawImport.id, studentId: studentId, sourceLabel: sourceLabel, text: ''
+    };
+    let output = await HomeworkOrganizerRemoteApi.instance.organizeImage(input, imageRef);
+    let candidates = this.applySelectedSubject(this.normalizeCandidateDates(output.candidates), subject);
+    HomeworkImportInboxService.instance.commitParsedImport(
+      rawImport, HomeworkImportSourceType.SCREENSHOT, output.recognizedText, candidates, imageRef);
+    this.ensureCurrentStudent(studentId);
+    return { candidateCount: candidates.length, organizerMode: HomeworkOrganizerMode.AI };
+  }
+
+  private ensureCurrentStudent(studentId: string): void {
+    if (studentId !== this.drafts.getActiveStudentId()) {
+      throw new Error('孩子已切换，解析结果已保留在原孩子的导入记录中');
+    }
+  }
+
   async captureImageText(): Promise<HomeworkImageTextResult> {
+    let studentId = this.drafts.getActiveStudentId();
+    let imageRef = await this.captureImage();
+    if (imageRef.length === 0) return { selected: false, recognizedText: '', imageRef: '' };
+    let result = await this.recognizeImageText(imageRef, '现场拍照', studentId);
+    this.ensureCurrentStudent(studentId);
+    return result;
+  }
+
+  async captureImage(): Promise<string> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     if (this.context === null) throw new Error('拍照识别能力尚未初始化');
 
@@ -101,16 +140,22 @@ export class HomeworkImportService {
       };
       let result: cameraPicker.PickerResult = await cameraPicker.pick(
         this.context, [cameraPicker.PickerMediaType.PHOTO], profile);
-      if (result.resultUri.length === 0) {
-        return { selected: false, recognizedText: '', imageRef: '' };
-      }
-      return await this.recognizeImageText(result.resultUri, '现场拍照');
+      return result.resultUri;
     } catch {
-      throw new Error('无法打开相机或识别照片，请重试');
+      throw new Error('无法打开相机，请重试');
     }
   }
 
   async selectImageText(): Promise<HomeworkImageTextResult> {
+    let studentId = this.drafts.getActiveStudentId();
+    let imageRef = await this.selectImage();
+    if (imageRef.length === 0) return { selected: false, recognizedText: '', imageRef: '' };
+    let result = await this.recognizeImageText(imageRef, '相册作业截图', studentId);
+    this.ensureCurrentStudent(studentId);
+    return result;
+  }
+
+  async selectImage(): Promise<string> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
 
     let photoUris: string[] = [];
@@ -125,19 +170,22 @@ export class HomeworkImportService {
       throw new Error('无法打开相册或读取所选图片');
     }
 
-    if (photoUris.length === 0) {
-      return { selected: false, recognizedText: '', imageRef: '' };
-    }
-
-    return await this.recognizeImageText(photoUris[0], '相册作业截图');
+    return photoUris.length === 0 ? '' : photoUris[0];
   }
 
-  private async recognizeImageText(imageRef: string, sourceLabel: string):
+  async recognizeSelectedImageText(imageRef: string, sourceLabel: string): Promise<HomeworkImageTextResult> {
+    let studentId = this.drafts.getActiveStudentId();
+    let result = await this.recognizeImageText(imageRef, sourceLabel, studentId);
+    this.ensureCurrentStudent(studentId);
+    return result;
+  }
+
+  private async recognizeImageText(imageRef: string, sourceLabel: string, studentId: string):
     Promise<HomeworkImageTextResult> {
     if (this.pipeline === null) throw new Error('作业导入能力尚未初始化');
     let rawImport: RawHomeworkImport = {
       id: `image-preview-${Date.now()}`,
-      studentId: this.drafts.getActiveStudentId(),
+      studentId: studentId,
       sourceKind: HomeworkImportSourceKind.IMAGE,
       sourceLabel: sourceLabel,
       resourceUri: imageRef,
@@ -151,7 +199,8 @@ export class HomeworkImportService {
     };
   }
 
-  private applySelectedSubject(candidates: CandidateAssignment[], subject: Subject): CandidateAssignment[] {
+  private applySelectedSubject(candidates: CandidateAssignment[], subject: Subject | null): CandidateAssignment[] {
+    if (subject === null) return candidates;
     let result: CandidateAssignment[] = [];
     for (let candidate of candidates) {
       result.push({

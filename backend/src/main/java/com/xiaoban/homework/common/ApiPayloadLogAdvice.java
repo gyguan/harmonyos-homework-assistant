@@ -1,6 +1,7 @@
 package com.xiaoban.homework.common;
 
 import jakarta.servlet.http.HttpServletRequest;
+import com.xiaoban.homework.organizer.HomeworkOrganizerDtos;
 import java.lang.reflect.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +43,7 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
   public Object afterBodyRead(Object body, HttpInputMessage inputMessage, MethodParameter parameter,
       Type targetType, Class<? extends HttpMessageConverter<?>> converterType) {
     if (!properties.isLogPayloads()) return body;
+    if (body instanceof HomeworkOrganizerDtos.ImageRequest) return body;
     HttpServletRequest request = currentRequest(inputMessage);
     log.info("[HTTP-REQUEST-BODY] requestId={} scene={} body={}",
         requestAttribute(request, AccessLogFilter.ATTR_REQUEST_ID),
@@ -60,8 +62,11 @@ public class ApiPayloadLogAdvice extends RequestBodyAdviceAdapter implements Res
       Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request,
       ServerHttpResponse response) {
     if (!properties.isLogPayloads()) return body;
+    if (body instanceof HomeworkOrganizerDtos.ImageResponse) return body;
     HttpServletRequest servletRequest = request instanceof ServletServerHttpRequest servlet
         ? servlet.getServletRequest() : null;
+    // Image requests and their recognized text must never enter diagnostic payload logs.
+    if (servletRequest != null && servletRequest.getRequestURI().endsWith("/homework/organize-image")) return body;
     log.info("[HTTP-RESPONSE] requestId={} scene={} status={} body={}",
         requestAttribute(servletRequest, AccessLogFilter.ATTR_REQUEST_ID),
         requestAttribute(servletRequest, AccessLogFilter.ATTR_CLIENT_SCENE),

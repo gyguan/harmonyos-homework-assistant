@@ -14,6 +14,7 @@ public class AiProviderProperties {
   private String chatCompletionsPath = "/v1/chat/completions";
   private String tutorModel = "gpt-5.6-luna";
   private String organizerModel = "";
+  private String imageOrganizerModel = "";
   private String practiceModel = "";
   private boolean allowUnauthenticated = false;
   private boolean structuredOutput = true;
@@ -36,6 +37,10 @@ public class AiProviderProperties {
   public String getOrganizerModel() { return blank(organizerModel) ? tutorModel : organizerModel; }
   public void setOrganizerModel(String organizerModel) {
     this.organizerModel = organizerModel == null ? "" : organizerModel.trim();
+  }
+  public String getImageOrganizerModel() { return blank(imageOrganizerModel) ? getOrganizerModel() : imageOrganizerModel; }
+  public void setImageOrganizerModel(String imageOrganizerModel) {
+    this.imageOrganizerModel = imageOrganizerModel == null ? "" : imageOrganizerModel.trim();
   }
   public String getPracticeModel() { return blank(practiceModel) ? getOrganizerModel() : practiceModel; }
   public void setPracticeModel(String practiceModel) {

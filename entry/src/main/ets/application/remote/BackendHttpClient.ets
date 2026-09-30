@@ -12,8 +12,8 @@ export class BackendHttpClient {
   private constructor() {}
 
   async requestFor(scene: string, path: string, method: http.RequestMethod,
-    body: Object | null = null, authenticated: boolean = true): Promise<BackendResponse> {
-    return this.request(path, method, body, authenticated, scene);
+    body: Object | null = null, authenticated: boolean = true, readTimeoutMs: number = 60000): Promise<BackendResponse> {
+    return this.request(path, method, body, authenticated, scene, readTimeoutMs);
   }
 
   traceHeaders(path: string, method: http.RequestMethod, scene: string): Record<string, string> {
@@ -27,7 +27,7 @@ export class BackendHttpClient {
   }
 
   async request(path: string, method: http.RequestMethod, body: Object | null = null,
-    authenticated: boolean = true, scene: string = 'unclassified'): Promise<BackendResponse> {
+    authenticated: boolean = true, scene: string = 'unclassified', readTimeoutMs: number = 60000): Promise<BackendResponse> {
     let session = BackendSession.instance;
     if (session.getBaseUrl().length === 0) throw new Error('请先配置后端地址');
     let headers: Record<string, string> = this.traceHeaders(path, method, scene);
@@ -38,7 +38,9 @@ export class BackendHttpClient {
     }
     let client = http.createHttp();
     try {
-      let options: http.HttpRequestOptions = { method: method, header: headers };
+      let options: http.HttpRequestOptions = {
+        method: method, header: headers, connectTimeout: 15000, readTimeout: readTimeoutMs
+      };
       if (body !== null) options.extraData = JSON.stringify(body);
       let response = await client.request(session.getBaseUrl() + path, options);
       if (authenticated && response.responseCode === 401) session.disconnect();
