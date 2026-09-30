@@ -1,6 +1,7 @@
 import { ToeicTrainingService } from '../../main/ets/toeic/application/ToeicTrainingService';
 import { PresetToeicContent } from '../../main/ets/toeic/content/PresetToeicContent';
 import { ToeicContentValidator } from '../../main/ets/toeic/content/ToeicContentValidator';
+import { ToeicQuestionTranslationCatalog } from '../../main/ets/toeic/content/ToeicQuestionTranslationCatalog';
 import { ToeicLearningSnapshot, ToeicPart, ToeicPerformance, ToeicQuestionHistory, ToeicSkill } from '../../main/ets/toeic/domain/ToeicModels';
 
 export class ToeicCoachFixtureResult {
@@ -27,9 +28,13 @@ export class ToeicCoachFixture {
     let validation=ToeicContentValidator.validateAll(questions);
     let vocabularyValidation=ToeicContentValidator.validateVocabulary(vocabulary);
     let sentenceValidation=ToeicContentValidator.validateSentenceDrills(sentenceDrills);
-    if (!validation.valid || !vocabularyValidation.valid || !sentenceValidation.valid ||
+    let translationQuestions=PresetToeicContent.questionsRequiringTranslation();
+    let translations=ToeicQuestionTranslationCatalog.items();
+    let translationValidation=ToeicContentValidator.validateQuestionTranslations(translationQuestions,translations);
+    if (!validation.valid || !vocabularyValidation.valid || !sentenceValidation.valid || !translationValidation.valid ||
       diagnostic.length!==12 || vocabulary.length<90 || questions.length<354 ||
-      sentenceDrills.length!==70 || studyDays.length!==21) {
+      sentenceDrills.length!==70 || studyDays.length!==21 ||
+      translationQuestions.length!==84 || translations.length!==84) {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
         sentenceDrills.length,studyDays.length);
     }
@@ -68,6 +73,12 @@ export class ToeicCoachFixture {
     }
 
     let mockQuestions=PresetToeicContent.questionsForDay(14);
+    for (let mockQuestion of mockQuestions) {
+      if (ToeicQuestionTranslationCatalog.find(mockQuestion.id)!==null) {
+        return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+          sentenceDrills.length,studyDays.length);
+      }
+    }
     let mockPart5:number=0;
     let mockPart6:number=0;
     let mockPart7:number=0;
@@ -136,6 +147,12 @@ export class ToeicCoachFixture {
     }
 
     let mockTwo=PresetToeicContent.questionsForDay(19);
+    for (let mockTwoQuestion of mockTwo) {
+      if (ToeicQuestionTranslationCatalog.find(mockTwoQuestion.id)!==null) {
+        return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+          sentenceDrills.length,studyDays.length);
+      }
+    }
     let mockTwoPart5:number=0;
     let mockTwoPart6:number=0;
     let mockTwoPart7:number=0;
