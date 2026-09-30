@@ -1,7 +1,7 @@
 import { ToeicTrainingService } from '../../main/ets/toeic/application/ToeicTrainingService';
 import { PresetToeicContent } from '../../main/ets/toeic/content/PresetToeicContent';
 import { ToeicContentValidator } from '../../main/ets/toeic/content/ToeicContentValidator';
-import { ToeicLearningSnapshot, ToeicPerformance } from '../../main/ets/toeic/domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicPart, ToeicPerformance } from '../../main/ets/toeic/domain/ToeicModels';
 
 export class ToeicCoachFixtureResult {
   passed:boolean;
@@ -28,8 +28,8 @@ export class ToeicCoachFixture {
     let vocabularyValidation=ToeicContentValidator.validateVocabulary(vocabulary);
     let sentenceValidation=ToeicContentValidator.validateSentenceDrills(sentenceDrills);
     if (!validation.valid || !vocabularyValidation.valid || !sentenceValidation.valid ||
-      diagnostic.length!==12 || vocabulary.length<90 || questions.length<54 ||
-      sentenceDrills.length!==30 || studyDays.length!==7) {
+      diagnostic.length!==12 || vocabulary.length<90 || questions.length<190 ||
+      sentenceDrills.length!==60 || studyDays.length!==14) {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
         sentenceDrills.length,studyDays.length);
     }
@@ -49,6 +49,48 @@ export class ToeicCoachFixture {
         }
         stems.push(dayQuestion.stem);
       }
+    }
+
+    for (let day=8; day<=13; day++) {
+      let dayQuestions=PresetToeicContent.questionsForDay(day);
+      if (dayQuestions.length!==6 ||
+        PresetToeicContent.vocabularyForDay(day).length!==10 ||
+        PresetToeicContent.sentenceDrillsForDay(day).length!==5) {
+        return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+          sentenceDrills.length,studyDays.length);
+      }
+      for (let dayQuestion of dayQuestions) {
+        if (dayQuestion.part!==ToeicPart.PART_7) {
+          return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+            sentenceDrills.length,studyDays.length);
+        }
+      }
+    }
+
+    let mockQuestions=PresetToeicContent.questionsForDay(14);
+    let mockPart5:number=0;
+    let mockPart6:number=0;
+    let mockPart7:number=0;
+    for (let mockQuestion of mockQuestions) {
+      if (mockQuestion.part===ToeicPart.PART_5) mockPart5++;
+      else if (mockQuestion.part===ToeicPart.PART_6) mockPart6++;
+      else if (mockQuestion.part===ToeicPart.PART_7) mockPart7++;
+    }
+    if (mockQuestions.length!==100 || mockPart5!==30 || mockPart6!==16 || mockPart7!==54 ||
+      PresetToeicContent.vocabularyForDay(14).length!==0 ||
+      PresetToeicContent.sentenceDrillsForDay(14).length!==0) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
+    }
+
+    let mockSnapshot=new ToeicLearningSnapshot();
+    mockSnapshot.reviewQuestionIds=[mockQuestions[mockQuestions.length-1].id];
+    mockSnapshot.slowQuestionIds=[mockQuestions[20].id];
+    let orderedMock=ToeicTrainingService.instance.studyDayQuestions(mockSnapshot,14);
+    if (orderedMock.length!==mockQuestions.length || orderedMock[0].id!==mockQuestions[0].id ||
+      orderedMock[orderedMock.length-1].id!==mockQuestions[mockQuestions.length-1].id) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+        sentenceDrills.length,studyDays.length);
     }
 
     let selectedSnapshot=new ToeicLearningSnapshot();

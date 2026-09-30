@@ -47,6 +47,7 @@ export class ToeicTrainingService {
 
   studyDayQuestions(snapshot:ToeicLearningSnapshot, studyDay:number):ToeicQuestion[] {
     let planned=PresetToeicContent.questionsForDay(studyDay);
+    if (PresetToeicContent.isMockDay(studyDay)) return planned;
     let selected:ToeicQuestion[]=[];
     this.appendByIds(selected,planned,snapshot.reviewQuestionIds,planned.length);
     this.appendByIds(selected,planned,snapshot.slowQuestionIds,planned.length);
