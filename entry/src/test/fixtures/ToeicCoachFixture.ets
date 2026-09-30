@@ -49,19 +49,31 @@ export class ToeicCoachFixture {
       }
     }
 
-    let day2=ToeicTrainingService.instance.dailyQuestions(new ToeicLearningSnapshot(),10,2);
-    let day3=ToeicTrainingService.instance.dailyQuestions(new ToeicLearningSnapshot(),10,3);
+    let selectedSnapshot=new ToeicLearningSnapshot();
+    selectedSnapshot.reviewQuestionIds=[PresetToeicContent.questionsForDay(3)[0].id];
+    selectedSnapshot.slowQuestionIds=[PresetToeicContent.questionsForDay(4)[0].id];
+    let day2=ToeicTrainingService.instance.studyDayQuestions(selectedSnapshot,2);
+    let day3=ToeicTrainingService.instance.studyDayQuestions(selectedSnapshot,3);
     let day2Planned=PresetToeicContent.questionsForDay(2);
     let day3Planned=PresetToeicContent.questionsForDay(3);
-    let day2HasPlanned:boolean=false;
-    let day3HasPlanned:boolean=false;
+    if (day2.length!==day2Planned.length || day3.length!==day3Planned.length) {
+      return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,sentenceDrills.length,studyDays.length);
+    }
     for (let item of day2) {
-      for (let planned of day2Planned) if (item.id===planned.id) day2HasPlanned=true;
+      let found:boolean=false;
+      for (let planned of day2Planned) if (item.id===planned.id) found=true;
+      if (!found) {
+        return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,sentenceDrills.length,studyDays.length);
+      }
     }
     for (let item of day3) {
-      for (let planned of day3Planned) if (item.id===planned.id) day3HasPlanned=true;
+      let found:boolean=false;
+      for (let planned of day3Planned) if (item.id===planned.id) found=true;
+      if (!found) {
+        return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,sentenceDrills.length,studyDays.length);
+      }
     }
-    if (!day2HasPlanned || !day3HasPlanned) {
+    if (day2[0].id===day3[0].id) {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,sentenceDrills.length,studyDays.length);
     }
 
