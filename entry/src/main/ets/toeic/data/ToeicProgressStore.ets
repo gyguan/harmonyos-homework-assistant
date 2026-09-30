@@ -5,7 +5,7 @@ import { ToeicTrainingService } from '../application/ToeicTrainingService';
 
 const STORE_NAME:string='toeic_coach_progress';
 const SNAPSHOT_KEY:string='toeic_learning_snapshot_v1';
-const MAX_AVAILABLE_STUDY_DAY:number=14;
+const MAX_AVAILABLE_STUDY_DAY:number=21;
 
 export class ToeicProgressStore {
   static readonly instance:ToeicProgressStore=new ToeicProgressStore();
