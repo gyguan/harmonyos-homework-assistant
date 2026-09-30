@@ -24,7 +24,7 @@ class ApiPayloadLogAdviceTest {
     var logger = (Logger) LoggerFactory.getLogger(ApiPayloadLogAdvice.class);
     logger.addAppender(appender);
     try {
-      var request = new HomeworkOrganizerDtos.ImageRequest("PRIVATE_IMAGE", "image/jpeg", "source");
+      var request = new HomeworkOrganizerDtos.ImageRequest("PRIVATE_IMAGE", "image/jpeg", "source", "PRIVATE_SUPPLEMENT_TEXT");
       assertSame(request, advice.afterBodyRead(request, null, null, null, null));
       var response = new HomeworkOrganizerDtos.ImageResponse(List.of(), "AI_IMAGE", "PRIVATE_RECOGNIZED_TEXT");
       assertSame(response, advice.beforeBodyWrite(response, null, MediaType.APPLICATION_JSON, null, null, null));

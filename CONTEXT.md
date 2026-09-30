@@ -112,7 +112,7 @@ V1 文档用于历史背景；V2 实现与后续决策以上述文档为优先�
 ### AI
 
 - 导入：OCR / 任务拆分 / 学科识别 / due-time extraction / textbook matching / source evidence。
-- 布置作业默认允许自动识别科目，手工指定时作为本次所有候选作业的明确覆盖。图片支持家长主动选择的 AI 直接解析与原 Core Vision OCR 两种模式；AI 失败不静默改用 OCR，家长可用同一图片切换重试。图片仅经后端在内存中提交给配置的模型，不落盘且不记录 payload；候选作业仍需家长核对发布。
+- 布置作业默认允许自动识别科目，手工指定时作为本次所有候选作业的明确覆盖。图片与文字可同时输入：有图片时默认一并交给AI解析，无图片时整理文字。原Core Vision OCR以「识别图片文字」备用操作保留，识别后可编辑并走文字整理，也可用同图重新使用图片解析；AI失败不静默改用OCR。图片仅经后端在内存中提交给配置的模型，不落盘且不记录payload；图片原文与用户补充文字保留来源证据，候选作业仍需家长核对发布。
 - Tutor：assignment context / teacher resources / textbook context / graded hints / parent policy。
 - Practice Generation：student profile / subject-specific textbook context / parent requirement / strict structured output / deterministic validation / independent answer review / backend-owned audience compatibility / parent publish confirmation。
 - Practice Generation Provider Compatibility：Provider raw output 必须依次经过 `StructuredJsonNormalizer` 与 `PracticeGenerationProviderAdapter` 收敛为唯一 Canonical Practice Contract；后续 validator / answer review / publish 只消费 canonical 结构，禁止在业务层按模型或供应商增加兼容分支。

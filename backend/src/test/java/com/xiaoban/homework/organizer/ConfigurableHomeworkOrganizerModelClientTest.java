@@ -14,6 +14,26 @@ import org.junit.jupiter.api.Test;
 
 class ConfigurableHomeworkOrganizerModelClientTest {
   @Test
+  void submitsSupplementaryTextAlongsideImageAndKeepsItOutOfInstructions() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
+        anyString(), anyMap())).thenReturn(java.util.Optional.of(
+            "{\"recognizedText\":\"语文朗读\",\"assignments\":[]} "));
+    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
+        JsonMapper.builder().build());
+    client.organizeImage(new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE", " 数学口算20题 ");
+    var instructions = org.mockito.ArgumentCaptor.forClass(String.class);
+    var input = org.mockito.ArgumentCaptor.forClass(String.class);
+    verify(transport).completeWithImage(anyString(), instructions.capture(), input.capture(),
+        eq("data:image/jpeg;base64,PRIVATE"), eq(6000), anyString(), anyMap());
+    assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
+    assertTrue(instructions.getValue().contains("重复任务只保留一项"));
+    assertFalse(instructions.getValue().contains("数学口算20题"));
+    assertFalse(ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null)
+        .endsWith("null"));
+  }
+
+  @Test
   void imageUpstreamStatusReachesServiceUnavailableResponse() {
     var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
     when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
@@ -22,7 +42,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
         JsonMapper.builder().build());
     var error = assertThrows(com.xiaoban.homework.common.ApiExceptions.ServiceUnavailable.class,
-        () -> client.organizeImage(new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE"));
+        () -> client.organizeImage(new TestStudent(), "相册", "data:image/jpeg;base64,PRIVATE", null));
     assertTrue(error.getMessage().contains("HTTP 406"));
     assertTrue(error.getMessage().contains("data URL"));
     assertFalse(error.getMessage().contains("PRIVATE"));
