@@ -63,7 +63,7 @@ export class ToeicDiagnosticSummary {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=1; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=2; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string=ToeicSkill.PARAPHRASE;
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[];
 }
@@ -75,4 +75,42 @@ export class ToeicStudyPlan {
 export class ToeicTrainingSession {
   attempts:ToeicQuestionAttempt[];
   constructor(attempts:ToeicQuestionAttempt[]) { this.attempts=attempts; }
+}
+
+
+export class ToeicSentenceDrill {
+  id:string;
+  sentence:string;
+  core:string;
+  focus:string;
+  explanation:string;
+
+  constructor(id:string, sentence:string, core:string, focus:string, explanation:string) {
+    this.id=id;
+    this.sentence=sentence;
+    this.core=core;
+    this.focus=focus;
+    this.explanation=explanation;
+  }
+}
+
+export class ToeicStudyDay {
+  day:number;
+  title:string;
+  focus:string;
+  estimatedMinutes:number;
+  vocabularyIds:string[];
+  sentenceDrillIds:string[];
+  questionIds:string[];
+
+  constructor(day:number, title:string, focus:string, estimatedMinutes:number,
+    vocabularyIds:string[], sentenceDrillIds:string[], questionIds:string[]) {
+    this.day=day;
+    this.title=title;
+    this.focus=focus;
+    this.estimatedMinutes=estimatedMinutes;
+    this.vocabularyIds=vocabularyIds;
+    this.sentenceDrillIds=sentenceDrillIds;
+    this.questionIds=questionIds;
+  }
 }

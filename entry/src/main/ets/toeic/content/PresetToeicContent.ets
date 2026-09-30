@@ -1,12 +1,13 @@
 import {
   ToeicDifficulty, ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicScoreValue, ToeicSection,
-  ToeicSkill, ToeicVocabularyItem, ToeicVocabularyLevel
+  ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem, ToeicVocabularyLevel
 } from '../domain/ToeicModels';
 import { ToeicContentValidator } from './ToeicContentValidator';
+import { ToeicWeekOneContent } from './ToeicWeekOneContent';
 
 export class PresetToeicContent {
   static questions():ToeicQuestion[] {
-    return [
+    let base:ToeicQuestion[]=[
       new ToeicQuestion('R-P5-WF-0001',ToeicSection.READING,ToeicPart.PART_5,ToeicSkill.WORD_FORM,'',
         'The instructions in the training manual are _____ written.',
         ['clear','clearly','clarity','clearing'],1,
@@ -115,6 +116,7 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
+    return base.concat(ToeicWeekOneContent.questions());
   }
 
   static publishedQuestions():ToeicQuestion[] {
@@ -136,7 +138,7 @@ export class PresetToeicContent {
   }
 
   static vocabulary():ToeicVocabularyItem[] {
-    return [
+    let base:ToeicVocabularyItem[]=[
       new ToeicVocabularyItem('V-001','applicant','n.','申请人；求职者',ToeicVocabularyLevel.L1,'招聘',['job applicant'],['candidate']),
       new ToeicVocabularyItem('V-002','candidate','n.','候选人；应聘者',ToeicVocabularyLevel.L1,'招聘',['qualified candidate'],['applicant']),
       new ToeicVocabularyItem('V-003','qualification','n.','资格；资历',ToeicVocabularyLevel.L1,'招聘',['meet the qualifications'],['requirement']),
@@ -168,5 +170,50 @@ export class PresetToeicContent {
       new ToeicVocabularyItem('V-029','retain','v.','保留；保持',ToeicVocabularyLevel.L2,'办公/人事',['retain records'],['keep']),
       new ToeicVocabularyItem('V-030','supplier','n.','供应商',ToeicVocabularyLevel.L1,'采购',['contact a supplier'],['vendor'])
     ];
+    return base.concat(ToeicWeekOneContent.vocabulary());
+  }
+
+  static studyDays():ToeicStudyDay[] {
+    return ToeicWeekOneContent.studyDays();
+  }
+
+  static sentenceDrills():ToeicSentenceDrill[] {
+    return ToeicWeekOneContent.sentenceDrills();
+  }
+
+  static studyDay(day:number):ToeicStudyDay {
+    let plans=ToeicWeekOneContent.studyDays();
+    for (let plan of plans) if (plan.day===day) return plan;
+    return plans[plans.length-1];
+  }
+
+  static questionsForDay(day:number):ToeicQuestion[] {
+    let plan=PresetToeicContent.studyDay(day);
+    let all=PresetToeicContent.publishedQuestions();
+    let result:ToeicQuestion[]=[];
+    for (let id of plan.questionIds) {
+      for (let question of all) if (question.id===id) { result.push(question); break; }
+    }
+    return result;
+  }
+
+  static vocabularyForDay(day:number):ToeicVocabularyItem[] {
+    let plan=PresetToeicContent.studyDay(day);
+    let all=PresetToeicContent.vocabulary();
+    let result:ToeicVocabularyItem[]=[];
+    for (let id of plan.vocabularyIds) {
+      for (let item of all) if (item.id===id) { result.push(item); break; }
+    }
+    return result;
+  }
+
+  static sentenceDrillsForDay(day:number):ToeicSentenceDrill[] {
+    let plan=PresetToeicContent.studyDay(day);
+    let all=PresetToeicContent.sentenceDrills();
+    let result:ToeicSentenceDrill[]=[];
+    for (let id of plan.sentenceDrillIds) {
+      for (let item of all) if (item.id===id) { result.push(item); break; }
+    }
+    return result;
   }
 }

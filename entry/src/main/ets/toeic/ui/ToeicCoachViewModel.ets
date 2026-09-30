@@ -2,7 +2,7 @@ import { PresetToeicContent } from '../content/PresetToeicContent';
 import { ToeicContentValidator } from '../content/ToeicContentValidator';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { ToeicProgressStore } from '../data/ToeicProgressStore';
-import { ToeicLearningSnapshot, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSkill } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
 
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
@@ -16,6 +16,10 @@ export class ToeicCoachViewModel {
   }
   contentErrors():string[] { return ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors; }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
+  todayPlan():ToeicStudyDay { return PresetToeicContent.studyDay(this.snapshot().currentDay); }
+  weekOnePlans():ToeicStudyDay[] { return PresetToeicContent.studyDays(); }
+  todayVocabulary():ToeicVocabularyItem[] { return PresetToeicContent.vocabularyForDay(this.snapshot().currentDay); }
+  todaySentenceDrills():ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(this.snapshot().currentDay); }
 
   skillLabel(value:string):string {
     let skill=value as ToeicSkill;

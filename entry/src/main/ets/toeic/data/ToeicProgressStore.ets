@@ -5,6 +5,7 @@ import { ToeicTrainingService } from '../application/ToeicTrainingService';
 
 const STORE_NAME:string='toeic_coach_progress';
 const SNAPSHOT_KEY:string='toeic_learning_snapshot_v1';
+const MAX_AVAILABLE_STUDY_DAY:number=7;
 
 export class ToeicProgressStore {
   static readonly instance:ToeicProgressStore=new ToeicProgressStore();
@@ -32,10 +33,10 @@ export class ToeicProgressStore {
     this.snapshot.weakSkill=summary.weakSkill;
     if (diagnostic) {
       this.snapshot.diagnosticCompleted=true;
-      this.snapshot.currentDay=1;
+      this.snapshot.currentDay=2;
     } else {
       this.snapshot.completedTrainingSessions++;
-      this.snapshot.currentDay=Math.min(21,this.snapshot.completedTrainingSessions+1);
+      this.snapshot.currentDay=Math.min(MAX_AVAILABLE_STUDY_DAY,this.snapshot.completedTrainingSessions+2);
     }
     for (let attempt of attempts) this.applyAttempt(attempt);
     await this.save();
@@ -70,6 +71,13 @@ export class ToeicProgressStore {
       if (typeof parsed.weakSkill==='string') restored.weakSkill=parsed.weakSkill as string;
       if (Array.isArray(parsed.reviewQuestionIds)) restored.reviewQuestionIds=parsed.reviewQuestionIds as string[];
       if (Array.isArray(parsed.slowQuestionIds)) restored.slowQuestionIds=parsed.slowQuestionIds as string[];
+      if (restored.schemaVersion<2 && restored.diagnosticCompleted && restored.currentDay===1) {
+        restored.currentDay=2;
+      }
+      if (restored.currentDay>MAX_AVAILABLE_STUDY_DAY) {
+        restored.currentDay=MAX_AVAILABLE_STUDY_DAY;
+      }
+      restored.schemaVersion=2;
       this.snapshot=restored;
     } catch {
       this.snapshot=new ToeicLearningSnapshot();
