@@ -203,6 +203,15 @@ export class PresetToeicContent {
     return result;
   }
 
+  static questionsRequiringTranslation():ToeicQuestion[] {
+    let result:ToeicQuestion[]=[];
+    for (let day=1; day<=13; day++) {
+      let dayQuestions=PresetToeicContent.questionsForDay(day);
+      for (let question of dayQuestions) result.push(question);
+    }
+    return result;
+  }
+
   static vocabularyForDay(day:number):ToeicVocabularyItem[] {
     let plan=PresetToeicContent.studyDay(day);
     let all=PresetToeicContent.vocabulary();
