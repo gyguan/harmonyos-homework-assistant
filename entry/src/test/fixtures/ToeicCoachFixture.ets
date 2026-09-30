@@ -26,7 +26,9 @@ export class ToeicCoachFixture {
     let studyDays=PresetToeicContent.studyDays();
     let validation=ToeicContentValidator.validateAll(questions);
     let vocabularyValidation=ToeicContentValidator.validateVocabulary(vocabulary);
-    if (!validation.valid || !vocabularyValidation.valid || diagnostic.length!==12 || vocabulary.length<90 || questions.length<54 ||
+    let sentenceValidation=ToeicContentValidator.validateSentenceDrills(sentenceDrills);
+    if (!validation.valid || !vocabularyValidation.valid || !sentenceValidation.valid ||
+      diagnostic.length!==12 || vocabulary.length<90 || questions.length<54 ||
       sentenceDrills.length!==30 || studyDays.length!==7) {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
         sentenceDrills.length,studyDays.length);
