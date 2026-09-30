@@ -376,35 +376,31 @@ export struct VoiceAssignmentPane {
         .onChange((index: number) => { void this.showImage(index); })
         .borderRadius(AppTheme.CONTROL_RADIUS);
 
-        Column() {
-          Row({ space: 6 }) {
-            Blank();
-            Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
-              .padding({ left: 8, right: 8, top: 4, bottom: 4 })
-              .fontSize(AppTheme.CAPTION_SIZE)
-              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .backgroundColor('#66000000')
-              .borderRadius(12);
-            Button('全屏查看', { type: ButtonType.Normal })
-              .width(88)
-              .height(36)
-              .padding({ left: 10, right: 10 })
-              .fontSize(12)
-              .fontWeight(FontWeight.Medium)
-              .fontColor(AppTheme.TEXT_ON_PRIMARY)
-              .backgroundColor(AppTheme.PRIMARY)
-              .borderRadius(18)
-              .accessibilityText('全屏查看图片和语音')
-              .onClick(() => this.openFullscreen());
-          }
-          .width('100%')
-          .padding({ top: 10, right: 10 });
+        Row({ space: 6 }) {
           Blank();
+          Text(`${this.imageIndex + 1} / ${this.imageUris.length}`)
+            .padding({ left: 8, right: 8, top: 4, bottom: 4 })
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .backgroundColor('#66000000')
+            .borderRadius(12);
+          Button('全屏查看', { type: ButtonType.Normal })
+            .width(88)
+            .height(36)
+            .padding({ left: 10, right: 10 })
+            .fontSize(12)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .backgroundColor(AppTheme.PRIMARY)
+            .borderRadius(18)
+            .accessibilityText('全屏查看图片和语音')
+            .onClick(() => this.openFullscreen());
         }
         .width('100%')
-        .height(286);
+        .padding({ right: 10 })
+        .position({ x: 0, y: 10 });
         if (this.imageUris.length > 1) {
           Row() {
             Button('←', { type: ButtonType.Circle })

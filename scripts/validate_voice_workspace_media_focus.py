@@ -40,6 +40,9 @@ require("Swiper()" in pane and ".onChange((index: number) => { void this.showIma
         "voice media pane must support direct touch swipe paging")
 image_viewer = pane.split("@Builder\n  private ImageViewer()", 1)[1].split(
     "@Builder\n  private AudioControls()", 1)[0]
+require(".position({ x: 0, y: 10 })" in image_viewer and
+        "Blank();\n        }\n        .width('100%')\n        .height(286);" not in image_viewer,
+        "voice image top controls must leave the swiper gesture area uncovered")
 require(image_viewer.index("Button('全屏查看'") <
         image_viewer.index(".accessibilityText('上一张情景图片')"),
         "voice image navigation arrows must be declared above the full-size control overlay in Stack z-order")
