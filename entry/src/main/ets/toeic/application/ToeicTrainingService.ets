@@ -46,6 +46,8 @@ export class ToeicTrainingService {
   }
 
   studyDayQuestions(snapshot:ToeicLearningSnapshot, studyDay:number):ToeicQuestion[] {
+    if (PresetToeicContent.isWeaknessDay(studyDay)) return this.weaknessDayQuestions(snapshot,18);
+    if (PresetToeicContent.isHighErrorReviewDay(studyDay)) return this.highErrorReviewQuestions(snapshot,20);
     let planned=PresetToeicContent.questionsForDay(studyDay);
     if (PresetToeicContent.isMockDay(studyDay)) return planned;
     let selected:ToeicQuestion[]=[];
@@ -57,6 +59,53 @@ export class ToeicTrainingService {
       if (question.skill===weak && !this.containsQuestionId(selected,question.id)) selected.push(question);
     }
     for (let question of planned) {
+      if (!this.containsQuestionId(selected,question.id)) selected.push(question);
+    }
+    return selected;
+  }
+
+  private weaknessDayQuestions(snapshot:ToeicLearningSnapshot,limit:number):ToeicQuestion[] {
+    let source=PresetToeicContent.questionsThroughDay(17);
+    let selected:ToeicQuestion[]=[];
+    this.appendByIds(selected,source,snapshot.reviewQuestionIds,Math.min(6,limit));
+    this.appendByIds(selected,source,snapshot.slowQuestionIds,Math.min(10,limit));
+
+    let weak=snapshot.weakSkill as ToeicSkill;
+    for (let question of source) {
+      if (selected.length>=Math.min(14,limit)) break;
+      if (question.skill===weak && !this.containsQuestionId(selected,question.id)) selected.push(question);
+    }
+    for (let question of source) {
+      if (selected.length>=limit) break;
+      if (!this.containsQuestionId(selected,question.id)) selected.push(question);
+    }
+    return selected;
+  }
+
+  private highErrorReviewQuestions(snapshot:ToeicLearningSnapshot,limit:number):ToeicQuestion[] {
+    let source=PresetToeicContent.questionsThroughDay(19);
+    let selected:ToeicQuestion[]=[];
+    let histories=snapshot.questionHistories.slice();
+    histories.sort((a,b)=>{
+      if (a.wrongCount!==b.wrongCount) return b.wrongCount-a.wrongCount;
+      return b.attemptCount-a.attemptCount;
+    });
+    for (let history of histories) {
+      if (selected.length>=limit) break;
+      if (history.wrongCount<2) break;
+      this.appendByIds(selected,source,[history.questionId],limit);
+    }
+
+    this.appendByIds(selected,source,snapshot.reviewQuestionIds,Math.min(14,limit));
+    this.appendByIds(selected,source,snapshot.slowQuestionIds,Math.min(17,limit));
+
+    let weak=snapshot.weakSkill as ToeicSkill;
+    for (let question of source) {
+      if (selected.length>=limit) break;
+      if (question.skill===weak && !this.containsQuestionId(selected,question.id)) selected.push(question);
+    }
+    for (let question of source) {
+      if (selected.length>=limit) break;
       if (!this.containsQuestionId(selected,question.id)) selected.push(question);
     }
     return selected;
