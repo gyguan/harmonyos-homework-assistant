@@ -120,7 +120,7 @@ Daily Training Queue 优先：
 - [ ] 新增 Listening 时通过 transcript / audio / evidence 一致性检查。
 
 
-## 12. 词汇音标与发音
+## 11. 词汇音标与发音
 
 - 当前 Reading 词汇默认使用 **en-US 美式 IPA**；
 - 每个正式词汇必须维护 `ipa`、`pronunciationLocale` 与 `pronunciationText`；
