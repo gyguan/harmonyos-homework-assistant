@@ -7,15 +7,12 @@ import {
 } from '../model/practice/PracticeModels';
 
 export class PracticePassPolicy {
-  static readonly PASS_PERCENT: number = 60;
-
   static isPassedAttempt(item: PracticeAttemptSummary): boolean {
     if (item.status !== PracticeAttemptStatus.SUBMITTED) return false;
     if (item.mode !== PracticeAttemptMode.FULL) return false;
-    let denominator = item.maxScore > 0 ? item.maxScore : item.questionCount;
-    if (denominator <= 0) return false;
-    let numerator = item.maxScore > 0 ? item.score : item.correctCount;
-    return numerator * 100 >= denominator * PracticePassPolicy.PASS_PERCENT;
+    if (item.questionCount > 0) return item.correctCount === item.questionCount;
+    if (item.maxScore > 0) return item.score === item.maxScore;
+    return false;
   }
 
   static matchesAttemptPassFilter(item: PracticeAttemptSummary, filter: PracticePassFilter): boolean {
