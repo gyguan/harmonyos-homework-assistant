@@ -4,6 +4,7 @@ import {
 } from '../domain/ToeicModels';
 import { ToeicContentValidator } from './ToeicContentValidator';
 import { ToeicWeekOneContent } from './ToeicWeekOneContent';
+import { ToeicWeekTwoContent } from './ToeicWeekTwoContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
 
 export class PresetToeicContent {
@@ -117,7 +118,7 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions());
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions());
   }
 
   static publishedQuestions():ToeicQuestion[] {
@@ -175,17 +176,21 @@ export class PresetToeicContent {
   }
 
   static studyDays():ToeicStudyDay[] {
-    return ToeicWeekOneContent.studyDays();
+    return ToeicWeekOneContent.studyDays().concat(ToeicWeekTwoContent.studyDays());
   }
 
   static sentenceDrills():ToeicSentenceDrill[] {
-    return ToeicWeekOneContent.sentenceDrills();
+    return ToeicWeekOneContent.sentenceDrills().concat(ToeicWeekTwoContent.sentenceDrills());
   }
 
   static studyDay(day:number):ToeicStudyDay {
-    let plans=ToeicWeekOneContent.studyDays();
+    let plans=PresetToeicContent.studyDays();
     for (let plan of plans) if (plan.day===day) return plan;
     return plans[plans.length-1];
+  }
+
+  static isMockDay(day:number):boolean {
+    return day===14;
   }
 
   static questionsForDay(day:number):ToeicQuestion[] {
