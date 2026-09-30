@@ -118,3 +118,14 @@ Daily Training Queue 优先：
 - [ ] 推荐用时与 scoreValue 合理；
 - [ ] 新内容为原创或具备明确授权；
 - [ ] 新增 Listening 时通过 transcript / audio / evidence 一致性检查。
+
+
+## 12. 词汇音标与发音
+
+- 当前 Reading 词汇默认使用 **en-US 美式 IPA**；
+- 每个正式词汇必须维护 `ipa`、`pronunciationLocale` 与 `pronunciationText`；
+- IPA 属于内容资产，禁止在 UI 临时拼接或由模型运行时猜测；
+- 同形异音词必须按当前词性显式标注，例如 résumé、refund、estimate、upgrade；
+- 点击发音通过 HarmonyOS Core Speech Kit TextToSpeech 播放，当前使用 en-US 英语音色；
+- 发音能力不可用时必须降级为可学习的音标与文字内容，不得阻塞词汇页面；
+- 后续 Listening 增加英/加/澳口音时，复用 pronunciationLocale 扩展，不复制第二套词汇资产。
