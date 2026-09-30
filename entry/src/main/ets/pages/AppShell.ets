@@ -687,7 +687,7 @@ export struct AppShell {
           onSelect: () => this.selectParentRoute(ParentRoute.PROGRESS)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
-          symbol: $r('sys.symbol.book'), label: '托业', selected: this.parentRoute === ParentRoute.TOEIC,
+          symbol: $r('sys.symbol.checkmark_square'), label: '托业', selected: this.parentRoute === ParentRoute.TOEIC,
           onSelect: () => this.selectParentRoute(ParentRoute.TOEIC)
         }).layoutWeight(1).height('100%');
         BottomPrimaryNavItem({
@@ -745,7 +745,7 @@ export struct AppShell {
           onSelect: () => this.selectParentRoute(ParentRoute.PROGRESS)
         });
         SidePrimaryNavItem({
-          symbol: $r('sys.symbol.book'), label: '托业', selected: this.parentRoute === ParentRoute.TOEIC,
+          symbol: $r('sys.symbol.checkmark_square'), label: '托业', selected: this.parentRoute === ParentRoute.TOEIC,
           onSelect: () => this.selectParentRoute(ParentRoute.TOEIC)
         });
         SidePrimaryNavItem({
