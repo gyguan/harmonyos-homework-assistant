@@ -63,7 +63,7 @@ export class ToeicDiagnosticSummary {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=1; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=2; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string=ToeicSkill.PARAPHRASE;
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[];
 }
