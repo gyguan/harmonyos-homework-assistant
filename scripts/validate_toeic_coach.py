@@ -70,7 +70,7 @@ def main() -> None:
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
     require("ToeicHomePage" in shell, "TOEIC home is not connected to AppShell")
-    require("@State private toeic" not in shell.lower(), "AppShell must not own TOEIC business state")
+    require("@state private toeic" not in shell.lower(), "AppShell must not own TOEIC business state")
 
     ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
     require("ToeicModuleBootstrap.initialize" in ability, "TOEIC progress bootstrap is missing")
