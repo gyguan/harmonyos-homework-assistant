@@ -1,4 +1,4 @@
-import { ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicSection } from '../domain/ToeicModels';
+import { ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicSection, ToeicVocabularyItem } from '../domain/ToeicModels';
 
 export class ToeicContentValidationResult {
   valid:boolean; errors:string[];
@@ -34,6 +34,20 @@ export class ToeicContentValidator {
       for (let e of r.errors) errors.push(e);
     }
     return new ToeicContentValidationResult(errors.length===0, errors);
+  }
+
+  static validateVocabulary(items:ToeicVocabularyItem[]):ToeicContentValidationResult {
+    let errors:string[]=[];
+    let ids:string[]=[];
+    for (let item of items) {
+      if (ids.indexOf(item.id)>=0) errors.push(item.id + ': duplicate vocabulary id'); else ids.push(item.id);
+      if (item.word.trim().length===0) errors.push(item.id + ': word is required');
+      if (item.meaning.trim().length===0) errors.push(item.id + ': meaning is required');
+      if (item.ipa.trim().length===0) errors.push(item.id + ': IPA is required');
+      if (item.pronunciationLocale!=='en-US') errors.push(item.id + ': pronunciationLocale must be en-US in current content pack');
+      if (item.pronunciationText.trim().length===0) errors.push(item.id + ': pronunciationText is required');
+    }
+    return new ToeicContentValidationResult(errors.length===0,errors);
   }
 
   private static partMatchesSection(section:ToeicSection, part:ToeicPart):boolean {
