@@ -16,7 +16,7 @@ export class ToeicTrainingService {
 
   diagnosticQuestions():ToeicQuestion[] { return PresetToeicContent.diagnosticQuestions(); }
 
-  dailyQuestions(snapshot:ToeicLearningSnapshot, limit:number=10):ToeicQuestion[] {
+  dailyQuestions(snapshot:ToeicLearningSnapshot, limit:number=10, studyDay:number=snapshot.currentDay):ToeicQuestion[] {
     let all=PresetToeicContent.publishedQuestions();
     let selected:ToeicQuestion[]=[];
     let recoveryLimit=Math.min(4,limit);
@@ -31,7 +31,7 @@ export class ToeicTrainingService {
       if (q.skill===weak && !this.containsQuestionId(selected,q.id)) selected.push(q);
     }
 
-    let planned=PresetToeicContent.questionsForDay(snapshot.currentDay);
+    let planned=PresetToeicContent.questionsForDay(studyDay);
     for (let q of planned) {
       if (selected.length>=limit) break;
       if (!this.containsQuestionId(selected,q.id)) selected.push(q);
