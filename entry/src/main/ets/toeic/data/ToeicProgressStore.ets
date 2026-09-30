@@ -25,18 +25,20 @@ export class ToeicProgressStore {
 
   current():ToeicLearningSnapshot { return this.snapshot; }
 
-  async recordSession(attempts:ToeicQuestionAttempt[], diagnostic:boolean):Promise<void> {
+  async recordSession(attempts:ToeicQuestionAttempt[], diagnostic:boolean, advanceProgress:boolean=true):Promise<void> {
     if (attempts.length===0) return;
     let summary=ToeicTrainingService.instance.summarize(attempts);
     this.snapshot.totalAnswered+=attempts.length;
     this.snapshot.totalCorrect+=summary.correctCount;
     this.snapshot.weakSkill=summary.weakSkill;
-    if (diagnostic) {
-      this.snapshot.diagnosticCompleted=true;
-      this.snapshot.currentDay=2;
-    } else {
-      this.snapshot.completedTrainingSessions++;
-      this.snapshot.currentDay=Math.min(MAX_AVAILABLE_STUDY_DAY,this.snapshot.completedTrainingSessions+2);
+    if (advanceProgress) {
+      if (diagnostic) {
+        this.snapshot.diagnosticCompleted=true;
+        this.snapshot.currentDay=2;
+      } else {
+        this.snapshot.completedTrainingSessions++;
+        this.snapshot.currentDay=Math.min(MAX_AVAILABLE_STUDY_DAY,this.snapshot.completedTrainingSessions+2);
+      }
     }
     for (let attempt of attempts) this.applyAttempt(attempt);
     await this.save();
