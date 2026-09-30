@@ -152,8 +152,8 @@ require("AssignmentEditForm" in review_editor and "保存修改" in review_edito
 require("AssignmentEditForm" in confirmation_editor,
         "confirmation editing must reuse the same shared assignment form as published assignment editing")
 require("DeadlinePickerField" in shared_editor and "预计用时（分钟）" in shared_editor and
-        "教材 / 页码" in shared_editor and "作业标题" in shared_editor,
-        "shared assignment editor must own the common title/deadline/duration/textbook fields")
+        "教材 / 页码" not in shared_editor and "作业标题" in shared_editor,
+        "shared assignment editor must own title/deadline/duration and hide textbook/page editing")
 require("bindSheet($$this.showEditSheet" in review_pane and "AssignmentEditorSheet" in review_pane,
         "published assignment editing must open in a bottom sheet rather than inline")
 require("AssignmentStatus.SUBMITTED" in review_pane and "AssignmentStatus.COMPLETED" in review_pane and

@@ -11,14 +11,12 @@ export struct AssignmentEditForm {
   @Prop instruction: string = '';
   @Prop dueText: string = '';
   @Prop expectedMinutes: number = 20;
-  @Prop textbookRef: string = '';
 
   onSubjectChange: (subject: Subject) => void = (_subject: Subject) => {};
   onTitleChange: (value: string) => void = (_value: string) => {};
   onInstructionChange: (value: string) => void = (_value: string) => {};
   onDueTextChange: (value: string) => void = (_value: string) => {};
   onMinutesChange: (minutes: number) => void = (_minutes: number) => {};
-  onTextbookRefChange: (value: string) => void = (_value: string) => {};
 
   private applyCustomMinutes(value: string): void {
     if (value.trim().length === 0) return;
@@ -226,27 +224,6 @@ export struct AssignmentEditForm {
       });
 
       this.DurationSection();
-
-      Row() {
-        Text('教材 / 页码').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-        Blank();
-        if (this.textbookRef.length > 0) {
-          Text('清空')
-            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-            .padding({ left: 12, right: 4 })
-            .fontSize(AppTheme.ACTION_TEXT_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
-            .accessibilityRole(AccessibilityRoleType.BUTTON).accessibilityText('清空教材页码')
-            .onClick(() => this.onTextbookRefChange(''));
-        }
-      }
-      .width('100%');
-      TextInput({ text: this.textbookRef })
-        .width('100%')
-        .height(AppTheme.INPUT_HEIGHT)
-        .fontSize(AppTheme.FORM_TEXT_SIZE)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE)
-        .borderRadius(AppTheme.CONTROL_RADIUS)
-        .onChange((value: string) => this.onTextbookRefChange(value));
     }
     .width('100%');
   }
