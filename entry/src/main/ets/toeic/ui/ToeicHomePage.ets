@@ -443,49 +443,51 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private QuestionContent(question:ToeicQuestion) {
+  private QuestionContent(questionIndex:number,questionId:string) {
     Scroll() {
         Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
           DeepPageHeader({
             title:this.mode===ToeicPageMode.DIAGNOSTIC?'Reading 快速诊断':'今日训练',
-            subtitle:String(this.currentIndex+1)+' / '+this.questions.length+' · '+this.viewModel.partLabel(question.part),
-            trailingText:'建议 '+question.recommendedSeconds+'s',
+            subtitle:String(questionIndex+1)+' / '+this.questions.length+' · '+
+              this.viewModel.partLabel(this.questions[questionIndex].part),
+            trailingText:'建议 '+this.questions[questionIndex].recommendedSeconds+'s',
             onBack:()=>this.cancelSession()
           });
           Column({space:12}) {
             Row() {
-              Text(this.viewModel.skillLabel(question.skill))
+              Text(this.viewModel.skillLabel(this.questions[questionIndex].skill))
                 .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
                 .padding({left:9,right:9,top:5,bottom:5}).backgroundColor(AppTheme.PRIMARY_SOFT)
                 .borderRadius(AppTheme.CHIP_RADIUS);
               Blank();
-              Text(question.scoreValue===ToeicScoreValue.MUST_GET?'基础分优先':
-                (question.scoreValue===ToeicScoreValue.OPTIONAL?'难题可取舍':'正常作答'))
+              Text(this.questions[questionIndex].scoreValue===ToeicScoreValue.MUST_GET?'基础分优先':
+                (this.questions[questionIndex].scoreValue===ToeicScoreValue.OPTIONAL?'难题可取舍':'正常作答'))
                 .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
             }
             .width('100%');
 
-            if (question.passage.length>0) {
-              Text(question.passage)
+            if (this.questions[questionIndex].passage.length>0) {
+              Text(this.questions[questionIndex].passage)
                 .width('100%').fontSize(AppTheme.READING_BODY_SIZE).lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
                 .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
                 .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
             }
 
-            Text(question.stem)
+            Text(this.questions[questionIndex].stem)
               .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE).lineHeight(AppTheme.QUESTION_TEXT_LINE_HEIGHT)
               .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
 
             Column({space:9}) {
-              ForEach(question.options,(option:string,index:number)=>{
+              ForEach(this.questions[questionIndex].options,(option:string,index:number)=>{
                 Button(this.optionPrefix(index)+'. '+option,{type:ButtonType.Normal})
                   .width('100%').constraintSize({minHeight:50})
-                  .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(index,question))
-                  .backgroundColor(this.optionBackground(index,question))
-                  .border({width:1,color:this.optionBorder(index,question)})
+                  .fontSize(AppTheme.FORM_TEXT_SIZE)
+                  .fontColor(this.optionText(index,this.questions[questionIndex]))
+                  .backgroundColor(this.optionBackground(index,this.questions[questionIndex]))
+                  .border({width:1,color:this.optionBorder(index,this.questions[questionIndex])})
                   .borderRadius(AppTheme.CONTROL_RADIUS)
                   .onClick(()=>this.chooseAnswer(index));
-              },(option:string)=>question.id+':'+option);
+              },(option:string)=>questionId+':'+option);
             }
             .width('100%');
 
@@ -494,14 +496,14 @@ export struct ToeicHomePage {
                 Text(this.answerCorrect?'✓ 判断正确':'× 这题需要再巩固')
                   .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold)
                   .fontColor(this.answerCorrect?AppTheme.SUCCESS:AppTheme.DANGER);
-                Text(question.explanation)
+                Text(this.questions[questionIndex].explanation)
                   .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-                if (question.evidence.length>0) {
-                  Text('证据：'+question.evidence)
+                if (this.questions[questionIndex].evidence.length>0) {
+                  Text('证据：'+this.questions[questionIndex].evidence)
                     .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
                 }
-                if (question.paraphrase.length>0) {
-                  Text('替换关系：'+question.paraphrase)
+                if (this.questions[questionIndex].paraphrase.length>0) {
+                  Text('替换关系：'+this.questions[questionIndex].paraphrase)
                     .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
                 }
               }
@@ -509,7 +511,7 @@ export struct ToeicHomePage {
               .backgroundColor(this.answerCorrect?AppTheme.SUCCESS_SOFT:AppTheme.DANGER_SOFT)
               .borderRadius(AppTheme.CONTROL_RADIUS);
 
-              Button(this.currentIndex+1>=this.questions.length?'完成本轮':'下一题',{type:ButtonType.Normal})
+              Button(questionIndex+1>=this.questions.length?'完成本轮':'下一题',{type:ButtonType.Normal})
                 .width('100%').height(AppTheme.BUTTON_HEIGHT)
                 .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
                 .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -536,7 +538,7 @@ export struct ToeicHomePage {
       } else if (this.mode===ToeicPageMode.SENTENCE) {
         this.SentenceContent(this.viewModel.todayPlan(),this.viewModel.todaySentenceDrills());
       } else if (this.currentIndex>=0 && this.currentIndex<this.questions.length) {
-        this.QuestionContent(this.questions[this.currentIndex]);
+        this.QuestionContent(this.currentIndex,this.questions[this.currentIndex].id);
       }
     }
     .width('100%').height('100%').alignItems(HorizontalAlign.Center).backgroundColor(AppTheme.BACKGROUND)

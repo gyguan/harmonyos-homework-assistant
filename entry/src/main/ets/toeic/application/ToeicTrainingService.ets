@@ -28,19 +28,19 @@ export class ToeicTrainingService {
     let weak=snapshot.weakSkill as ToeicSkill;
     for (let q of all) {
       if (selected.length>=weakLimit) break;
-      if (q.skill===weak && selected.indexOf(q)<0) selected.push(q);
+      if (q.skill===weak && !this.containsQuestionId(selected,q.id)) selected.push(q);
     }
 
     let planned=PresetToeicContent.questionsForDay(snapshot.currentDay);
     for (let q of planned) {
       if (selected.length>=limit) break;
-      if (selected.indexOf(q)<0) selected.push(q);
+      if (!this.containsQuestionId(selected,q.id)) selected.push(q);
     }
 
     let diagnostic=PresetToeicContent.diagnosticQuestions();
     for (let q of all) {
       if (selected.length>=limit) break;
-      if (selected.indexOf(q)<0 && diagnostic.indexOf(q)<0) selected.push(q);
+      if (!this.containsQuestionId(selected,q.id) && diagnostic.indexOf(q)<0) selected.push(q);
     }
     return selected;
   }
@@ -83,8 +83,13 @@ export class ToeicTrainingService {
   private appendByIds(target:ToeicQuestion[], all:ToeicQuestion[], ids:string[], limit:number):void {
     for (let id of ids) {
       if (target.length>=limit) return;
-      for (let q of all) if (q.id===id && target.indexOf(q)<0) { target.push(q); break; }
+      for (let q of all) if (q.id===id && !this.containsQuestionId(target,q.id)) { target.push(q); break; }
     }
+  }
+
+  private containsQuestionId(items:ToeicQuestion[], questionId:string):boolean {
+    for (let item of items) if (item.id===questionId) return true;
+    return false;
   }
 
   private addPenalty(items:SkillPenalty[], skill:ToeicSkill, penalty:number):void {
