@@ -53,10 +53,15 @@ def main() -> None:
     require("listening transcript is required" in validator, "Listening transcript gate is missing")
 
     preset = read("entry/src/main/ets/toeic/content/PresetToeicContent.ets")
-    question_count = preset.count("new ToeicQuestion(")
-    vocabulary_count = preset.count("new ToeicVocabularyItem(")
-    require(question_count >= 18, f"expected >=18 reviewed starter questions, found {question_count}")
-    require(vocabulary_count >= 30, f"expected >=30 starter vocabulary items, found {vocabulary_count}")
+    week_one = read("entry/src/main/ets/toeic/content/ToeicWeekOneContent.ets")
+    question_count = preset.count("new ToeicQuestion(") + week_one.count("new ToeicQuestion(")
+    vocabulary_count = preset.count("new ToeicVocabularyItem(") + week_one.count("new ToeicVocabularyItem(")
+    sentence_drill_count = week_one.count("new ToeicSentenceDrill(")
+    study_day_count = week_one.count("new ToeicStudyDay(")
+    require(question_count >= 54, f"expected >=54 reviewed week-one questions, found {question_count}")
+    require(vocabulary_count >= 90, f"expected >=90 week-one vocabulary items, found {vocabulary_count}")
+    require(sentence_drill_count == 30, f"expected 30 sentence drills, found {sentence_drill_count}")
+    require(study_day_count == 7, f"expected 7 study days, found {study_day_count}")
 
     diagnostic_match = re.search(
         r"let ids:string\[\]=\[(.*?)\];",
@@ -66,6 +71,46 @@ def main() -> None:
     require(diagnostic_match is not None, "diagnostic question id list is missing")
     diagnostic_ids = re.findall(r"'R-[^']+'", diagnostic_match.group(1))
     require(len(diagnostic_ids) == 12, f"expected 12 diagnostic questions, found {len(diagnostic_ids)}")
+
+    question_ids = re.findall(r"new ToeicQuestion\('([^']+)'", preset + "\n" + week_one)
+    vocabulary_ids = re.findall(r"new ToeicVocabularyItem\('([^']+)'", preset + "\n" + week_one)
+    sentence_ids = re.findall(r"new ToeicSentenceDrill\('([^']+)'", week_one)
+    require(len(question_ids) == len(set(question_ids)), "TOEIC question ids must be unique")
+    require(len(vocabulary_ids) == len(set(vocabulary_ids)), "TOEIC vocabulary ids must be unique")
+    require(len(sentence_ids) == len(set(sentence_ids)), "TOEIC sentence drill ids must be unique")
+
+    preset_api = [
+        "questionsForDay(day:number)",
+        "vocabularyForDay(day:number)",
+        "sentenceDrillsForDay(day:number)",
+        "studyDay(day:number)",
+    ]
+    for token in preset_api:
+        require(token in preset, f"week-one catalog API missing: {token}")
+
+    training = read("entry/src/main/ets/toeic/application/ToeicTrainingService.ets")
+    require("PresetToeicContent.questionsForDay(snapshot.currentDay)" in training,
+            "daily queue must include current-day planned questions")
+    require("recoveryLimit=Math.min(4,limit)" in training,
+            "daily queue must cap remediation so planned content still fits")
+
+    progress = read("entry/src/main/ets/toeic/data/ToeicProgressStore.ets")
+    require("this.snapshot.currentDay=2" in progress,
+            "diagnostic must count as Day 1 and advance to Day 2")
+    require("MAX_AVAILABLE_STUDY_DAY:number=7" in progress,
+            "week-one progress must stop at the currently implemented day boundary")
+
+    ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
+    for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "WeekPlanCard",
+                  "VocabularyContent", "SentenceContent"]:
+        require(token in ui, f"week-one learning UI missing: {token}")
+    builder_sections = re.findall(
+        r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
+        ui,
+    )
+    require(builder_sections, "TOEIC UI builders could not be identified")
+    require(re.search(r"(?m)^\s+let\s+", "\n".join(builder_sections)) is None,
+            "TOEIC @Builder bodies must not declare local let variables")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
@@ -87,7 +132,8 @@ def main() -> None:
 
     print(
         f"[toeic-coach] PASS: questions={question_count}, "
-        f"diagnostic={len(diagnostic_ids)}, vocabulary={vocabulary_count}"
+        f"diagnostic={len(diagnostic_ids)}, vocabulary={vocabulary_count}, "
+        f"sentences={sentence_drill_count}, days={study_day_count}"
     )
 
 
