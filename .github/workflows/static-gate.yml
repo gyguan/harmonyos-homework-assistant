@@ -52,6 +52,14 @@ jobs:
           python scripts/validate_issue242_import_inbox.py
           python scripts/validate_parent_import_ui_conformance.py
 
+      - name: Set up Node for OCR adapter tests
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Test OCR input and resource lifecycle with SDK doubles
+        run: node scripts/test_core_vision_ocr.mjs
+
   validate-parent-home-progress:
     runs-on: ubuntu-latest
     steps:
