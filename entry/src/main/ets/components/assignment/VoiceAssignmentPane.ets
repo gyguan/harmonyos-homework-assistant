@@ -376,30 +376,6 @@ export struct VoiceAssignmentPane {
         .onChange((index: number) => { void this.showImage(index); })
         .borderRadius(AppTheme.CONTROL_RADIUS);
 
-        if (this.imageUris.length > 1) {
-          Row() {
-            Button('←', { type: ButtonType.Circle })
-              .width(42)
-              .height(42)
-              .fontSize(22)
-              .backgroundColor('#CCFFFFFF')
-              .fontColor(AppTheme.TEXT)
-              .accessibilityText('上一张情景图片')
-              .onClick(() => this.previousImage());
-            Blank();
-            Button('→', { type: ButtonType.Circle })
-              .width(42)
-              .height(42)
-              .fontSize(22)
-              .backgroundColor('#CCFFFFFF')
-              .fontColor(AppTheme.TEXT)
-              .accessibilityText('下一张情景图片')
-              .onClick(() => this.nextImage());
-          }
-          .width('100%')
-          .padding({ left: 10, right: 10 });
-        }
-
         Column() {
           Row({ space: 6 }) {
             Blank();
@@ -429,6 +405,30 @@ export struct VoiceAssignmentPane {
         }
         .width('100%')
         .height(286);
+        if (this.imageUris.length > 1) {
+          Row() {
+            Button('←', { type: ButtonType.Circle })
+              .width(42)
+              .height(42)
+              .fontSize(22)
+              .backgroundColor('#CCFFFFFF')
+              .fontColor(AppTheme.TEXT)
+              .accessibilityText('上一张情景图片')
+              .onClick(() => this.previousImage());
+            Blank();
+            Button('→', { type: ButtonType.Circle })
+              .width(42)
+              .height(42)
+              .fontSize(22)
+              .backgroundColor('#CCFFFFFF')
+              .fontColor(AppTheme.TEXT)
+              .accessibilityText('下一张情景图片')
+              .onClick(() => this.nextImage());
+          }
+          .width('100%')
+          .padding({ left: 10, right: 10 });
+        }
+
       }
       .width('100%');
 
