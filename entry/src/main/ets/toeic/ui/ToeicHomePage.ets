@@ -71,9 +71,17 @@ export struct ToeicHomePage {
     return null;
   }
 
+  private sessionAttempt(questionId:string):ToeicQuestionAttempt|null {
+    for (let attempt of this.attempts) {
+      if (attempt.questionId===questionId) return attempt;
+    }
+    return null;
+  }
+
   private loadQuestion(index:number):boolean {
     if (index<0 || index>=this.questions.length) return false;
     let question=this.questions[index];
+    let attempt=this.sessionAttempt(question.id);
     this.currentQuestionId=question.id;
     this.currentPassage=question.passage;
     this.currentStem=question.stem;
@@ -83,8 +91,8 @@ export struct ToeicHomePage {
     this.currentOptionC=question.options.length>2?question.options[2]:'';
     this.currentOptionD=question.options.length>3?question.options[3]:'';
     this.currentCorrectIndex=question.correctIndex;
-    this.currentAttemptCount=this.viewModel.attemptCount(question.id);
-    this.currentWrongCount=this.viewModel.wrongCount(question.id);
+    this.currentAttemptCount=this.viewModel.attemptCount(question.id)+(attempt===null?0:1);
+    this.currentWrongCount=this.viewModel.wrongCount(question.id)+(attempt!==null && !attempt.correct?1:0);
     this.currentExplanation=question.explanation;
     this.currentEvidence=question.evidence;
     this.currentParaphrase=question.paraphrase;
@@ -92,6 +100,10 @@ export struct ToeicHomePage {
     this.currentPart=question.part;
     this.currentSkill=question.skill;
     this.currentScoreValue=question.scoreValue;
+    this.selectedIndex=attempt===null?-1:attempt.selectedIndex;
+    this.answerCorrect=attempt===null?false:attempt.correct;
+    this.answerLocked=attempt!==null;
+    this.questionStartedAtMs=Date.now();
     return true;
   }
 
@@ -194,10 +206,6 @@ export struct ToeicHomePage {
     if (questions.length===0) return;
     this.questions=questions;
     this.currentIndex=0;
-    this.selectedIndex=-1;
-    this.answerLocked=false;
-    this.answerCorrect=false;
-    this.questionStartedAtMs=Date.now();
     this.attempts=[];
     this.loadQuestion(0);
     this.mode=mode;
@@ -215,7 +223,8 @@ export struct ToeicHomePage {
   private chooseAnswer(index:number):void {
     if (this.answerLocked) return;
     let question=this.currentQuestionForAttempt();
-    if (question===null || question.id!==this.currentQuestionId) return;
+    if (question===null || question.id!==this.currentQuestionId ||
+      this.sessionAttempt(this.currentQuestionId)!==null) return;
     let elapsed=Math.max(1,Math.round((Date.now()-this.questionStartedAtMs)/1000));
     let attempt=this.viewModel.createAttempt(question,index,elapsed);
     this.attempts.push(attempt);
@@ -226,15 +235,18 @@ export struct ToeicHomePage {
     this.answerLocked=true;
   }
 
+  private previousQuestion():void {
+    if (this.currentIndex<=0) return;
+    let previousIndex=this.currentIndex-1;
+    this.currentIndex=previousIndex;
+    this.loadQuestion(previousIndex);
+  }
+
   private nextQuestion():void {
     if (!this.answerLocked) return;
     let nextIndex=this.currentIndex+1;
     if (nextIndex>=this.questions.length) { void this.finishSession(); return; }
     this.currentIndex=nextIndex;
-    this.selectedIndex=-1;
-    this.answerLocked=false;
-    this.answerCorrect=false;
-    this.questionStartedAtMs=Date.now();
     this.loadQuestion(nextIndex);
   }
 
@@ -726,13 +738,23 @@ export struct ToeicHomePage {
             .width('100%').padding(AppTheme.CARD_PADDING)
             .backgroundColor(this.answerCorrect?AppTheme.SUCCESS_SOFT:AppTheme.DANGER_SOFT)
             .borderRadius(AppTheme.CONTROL_RADIUS);
+          }
 
+          Row({space:10}) {
+            Button('上一题',{type:ButtonType.Normal})
+              .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+              .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
+              .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(this.currentIndex>0)
+              .onClick(()=>this.previousQuestion());
             Button(this.currentIndex+1>=this.questions.length?'完成本轮':'下一题',{type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
               .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
               .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(this.answerLocked)
               .onClick(()=>this.nextQuestion());
           }
+          .width('100%');
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
