@@ -3,6 +3,7 @@ import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
 import { ToeicLearningSnapshot, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue, ToeicSentenceDrill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
+import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 
 enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', SENTENCE='SENTENCE' }
 
@@ -17,6 +18,7 @@ export struct ToeicHomePage {
   @State private answerCorrect:boolean=false;
   @State private questionStartedAtMs:number=0;
   @State private refreshRevision:number=0;
+  @State private pronunciationMessage:string='';
   private readonly viewModel:ToeicCoachViewModel=new ToeicCoachViewModel();
   private attempts:ToeicQuestionAttempt[]=[];
 
@@ -29,8 +31,20 @@ export struct ToeicHomePage {
 
   private startDiagnostic():void { this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions()); }
   private startTraining():void { this.startSession(ToeicPageMode.TRAINING,this.viewModel.dailyQuestions()); }
-  private openVocabulary():void { this.mode=ToeicPageMode.VOCABULARY; }
+  private openVocabulary():void { this.pronunciationMessage=''; this.mode=ToeicPageMode.VOCABULARY; }
   private openSentenceDrills():void { this.mode=ToeicPageMode.SENTENCE; }
+
+  private async pronounce(item:ToeicVocabularyItem):Promise<void> {
+    this.pronunciationMessage='';
+    let status=await this.viewModel.pronounce(item);
+    if (status===ToeicPronunciationStatus.DOWNLOAD_STARTED) {
+      this.pronunciationMessage='首次使用需要英语发音资源，请按系统提示完成下载后再次点击发音。';
+    } else if (status===ToeicPronunciationStatus.UNSUPPORTED) {
+      this.pronunciationMessage='当前设备暂不支持系统英语发音，音标和词汇内容仍可正常学习。';
+    } else if (status===ToeicPronunciationStatus.FAILED) {
+      this.pronunciationMessage='发音服务暂不可用，请稍后重试。';
+    }
+  }
 
   private startSession(mode:ToeicPageMode,questions:ToeicQuestion[]):void {
     if (questions.length===0) return;
@@ -313,6 +327,17 @@ export struct ToeicHomePage {
           subtitle:plan.title+' · '+items.length+' 个',
           onBack:()=>this.cancelSession()
         });
+
+        if (this.pronunciationMessage.length>0) {
+          Text(this.pronunciationMessage)
+            .width('100%')
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT)
+            .padding(AppTheme.CARD_PADDING_COMPACT)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .borderRadius(AppTheme.CONTROL_RADIUS);
+        }
         ForEach(items,(item:ToeicVocabularyItem)=>{
           Column({space:8}) {
             Row() {
@@ -327,6 +352,23 @@ export struct ToeicHomePage {
                 .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
             }
             .width('100%');
+
+            Row({space:10}) {
+              Text('美 '+item.ipa)
+                .layoutWeight(1)
+                .fontSize(AppTheme.BODY_SIZE)
+                .fontColor(AppTheme.SUBTEXT);
+              Button('发音',{type:ButtonType.Normal})
+                .height(34)
+                .fontSize(AppTheme.META_SIZE)
+                .fontColor(AppTheme.PRIMARY)
+                .backgroundColor(AppTheme.PRIMARY_SOFT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .onClick(()=>{ void this.pronounce(item); });
+            }
+            .width('100%')
+            .alignItems(VerticalAlign.Center);
+
             Text(item.meaning)
               .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
             Text('场景：'+item.scenario)
