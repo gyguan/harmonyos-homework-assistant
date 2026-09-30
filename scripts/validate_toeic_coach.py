@@ -172,10 +172,16 @@ def main() -> None:
             "QuestionContent must not render fields directly from class objects in the questions array")
     for token in [
         "this.currentStem", "this.currentPassage", "this.currentOptionA",
-        "this.currentOptionB", "this.currentOptionC", "this.currentCorrectIndex",
+        "this.currentOptionB", "this.currentOptionC",
         "this.currentExplanation", "this.currentEvidence", "this.currentParaphrase",
     ]:
         require(token in question_builder, f"QuestionContent must render reactive snapshot field: {token}")
+    require("index===this.currentCorrectIndex" in ui,
+            "answer option styling must use reactive currentCorrectIndex snapshot")
+    require("private optionBackground(index:number):string" in ui and
+            "private optionBorder(index:number):string" in ui and
+            "private optionText(index:number):string" in ui,
+            "answer option styling must not depend on stale ToeicQuestion objects")
     require("this.activeSessionAdvancesProgress=day===this.viewModel.snapshot().currentDay" in ui,
             "only the real current progress day may advance currentDay")
     require("if (advanceProgress) this.selectedStudyDay=0" in ui,
