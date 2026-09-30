@@ -698,6 +698,36 @@ export struct ToeicHomePage {
   }
 
   @Builder
+  private QuestionOption(index:number,prefix:string,text:string) {
+    Button({type:ButtonType.Normal}) {
+      Row({space:8}) {
+        Text(prefix+'.')
+          .width(22)
+          .fontSize(AppTheme.FORM_TEXT_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.optionText(index));
+        Text(text)
+          .layoutWeight(1)
+          .fontSize(AppTheme.FORM_TEXT_SIZE)
+          .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+          .fontColor(this.optionText(index))
+          .textAlign(TextAlign.Start);
+      }
+      .width('100%')
+      .constraintSize({minHeight:50})
+      .alignItems(VerticalAlign.Center)
+      .padding({left:14,right:14,top:12,bottom:12});
+    }
+    .width('100%')
+    .constraintSize({minHeight:50})
+    .padding(0)
+    .backgroundColor(this.optionBackground(index))
+    .border({width:1,color:this.optionBorder(index)})
+    .borderRadius(AppTheme.CONTROL_RADIUS)
+    .onClick(()=>this.chooseAnswer(index));
+  }
+
+  @Builder
   private MockResultContent() {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
@@ -808,38 +838,11 @@ export struct ToeicHomePage {
             .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
 
           Column({space:9}) {
-            Button('A. '+this.currentOptionA,{type:ButtonType.Normal})
-              .width('100%').constraintSize({minHeight:50})
-              .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(0))
-              .backgroundColor(this.optionBackground(0))
-              .border({width:1,color:this.optionBorder(0)})
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.chooseAnswer(0));
-
-            Button('B. '+this.currentOptionB,{type:ButtonType.Normal})
-              .width('100%').constraintSize({minHeight:50})
-              .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(1))
-              .backgroundColor(this.optionBackground(1))
-              .border({width:1,color:this.optionBorder(1)})
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.chooseAnswer(1));
-
-            Button('C. '+this.currentOptionC,{type:ButtonType.Normal})
-              .width('100%').constraintSize({minHeight:50})
-              .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(2))
-              .backgroundColor(this.optionBackground(2))
-              .border({width:1,color:this.optionBorder(2)})
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.chooseAnswer(2));
-
+            this.QuestionOption(0,'A',this.currentOptionA);
+            this.QuestionOption(1,'B',this.currentOptionB);
+            this.QuestionOption(2,'C',this.currentOptionC);
             if (this.currentOptionCount>3) {
-              Button('D. '+this.currentOptionD,{type:ButtonType.Normal})
-                .width('100%').constraintSize({minHeight:50})
-                .fontSize(AppTheme.FORM_TEXT_SIZE).fontColor(this.optionText(3))
-                .backgroundColor(this.optionBackground(3))
-                .border({width:1,color:this.optionBorder(3)})
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .onClick(()=>this.chooseAnswer(3));
+              this.QuestionOption(3,'D',this.currentOptionD);
             }
           }
           .width('100%');
