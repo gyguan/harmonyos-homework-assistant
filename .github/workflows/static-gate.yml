@@ -307,6 +307,10 @@ jobs:
       - name: Validate API observability invariants
         run: python scripts/validate_api_observability.py
 
+      - name: Validate backend logging standard
+        run: python scripts/validate_backend_logging.py
+
+
       - name: Validate repository quality hardening
         run: python scripts/validate_quality_hardening.py
 
