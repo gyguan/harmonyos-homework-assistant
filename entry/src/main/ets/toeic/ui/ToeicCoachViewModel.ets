@@ -9,11 +9,14 @@ export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
   diagnosticQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.diagnosticQuestions(); }
   dailyQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.dailyQuestions(this.snapshot()); }
+  dailyQuestionsForDay(day:number):ToeicQuestion[] {
+    return ToeicTrainingService.instance.dailyQuestions(this.snapshot(),10,day);
+  }
   createAttempt(question:ToeicQuestion,selectedIndex:number,elapsedSeconds:number):ToeicQuestionAttempt {
     return ToeicTrainingService.instance.createAttempt(question,selectedIndex,elapsedSeconds);
   }
-  async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean):Promise<void> {
-    await ToeicProgressStore.instance.recordSession(attempts,diagnostic);
+  async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean,advanceProgress:boolean=true):Promise<void> {
+    await ToeicProgressStore.instance.recordSession(attempts,diagnostic,advanceProgress);
   }
   contentErrors():string[] {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
@@ -22,9 +25,12 @@ export class ToeicCoachViewModel {
   }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
   todayPlan():ToeicStudyDay { return PresetToeicContent.studyDay(this.snapshot().currentDay); }
+  planForDay(day:number):ToeicStudyDay { return PresetToeicContent.studyDay(day); }
   weekOnePlans():ToeicStudyDay[] { return PresetToeicContent.studyDays(); }
   todayVocabulary():ToeicVocabularyItem[] { return PresetToeicContent.vocabularyForDay(this.snapshot().currentDay); }
+  vocabularyForDay(day:number):ToeicVocabularyItem[] { return PresetToeicContent.vocabularyForDay(day); }
   todaySentenceDrills():ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(this.snapshot().currentDay); }
+  sentenceDrillsForDay(day:number):ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(day); }
   async pronounce(item:ToeicVocabularyItem):Promise<ToeicPronunciationStatus> {
     return await ToeicPronunciationService.instance.speak(item);
   }

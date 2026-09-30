@@ -19,6 +19,9 @@ export struct ToeicHomePage {
   @State private questionStartedAtMs:number=0;
   @State private refreshRevision:number=0;
   @State private pronunciationMessage:string='';
+  @State private selectedStudyDay:number=0;
+  @State private activeSessionDay:number=0;
+  @State private activeSessionAdvancesProgress:boolean=false;
   private readonly viewModel:ToeicCoachViewModel=new ToeicCoachViewModel();
   private attempts:ToeicQuestionAttempt[]=[];
 
@@ -29,8 +32,42 @@ export struct ToeicHomePage {
     return this.questions[this.currentIndex];
   }
 
-  private startDiagnostic():void { this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions()); }
-  private startTraining():void { this.startSession(ToeicPageMode.TRAINING,this.viewModel.dailyQuestions()); }
+  private effectiveStudyDay():number {
+    if (this.selectedStudyDay>0) return this.selectedStudyDay;
+    return this.viewModel.snapshot().currentDay;
+  }
+
+  private selectStudyDay(day:number):void {
+    if (day<1 || day>7) return;
+    this.selectedStudyDay=day;
+    this.pronunciationMessage='';
+  }
+
+  private dayContextLabel(day:number,currentDay:number):string {
+    if (day===currentDay) return '当前进度';
+    if (day<currentDay) return '复习';
+    return '预习';
+  }
+
+  private startDiagnostic():void {
+    this.activeSessionDay=1;
+    this.activeSessionAdvancesProgress=true;
+    this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions());
+  }
+
+  private startTraining():void {
+    let day=this.effectiveStudyDay();
+    if (day===1) {
+      this.activeSessionDay=1;
+      this.activeSessionAdvancesProgress=false;
+      this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions());
+      return;
+    }
+    this.activeSessionDay=day;
+    this.activeSessionAdvancesProgress=day===this.viewModel.snapshot().currentDay;
+    this.startSession(ToeicPageMode.TRAINING,this.viewModel.dailyQuestionsForDay(day));
+  }
+
   private openVocabulary():void { this.pronunciationMessage=''; this.mode=ToeicPageMode.VOCABULARY; }
   private openSentenceDrills():void { this.mode=ToeicPageMode.SENTENCE; }
 
@@ -72,9 +109,16 @@ export struct ToeicHomePage {
   }
 
   private async finishSession():Promise<void> {
-    await this.viewModel.completeSession(this.attempts,this.mode===ToeicPageMode.DIAGNOSTIC);
+    let advanceProgress=this.activeSessionAdvancesProgress;
+    await this.viewModel.completeSession(
+      this.attempts,
+      this.mode===ToeicPageMode.DIAGNOSTIC,
+      advanceProgress
+    );
+    if (advanceProgress) this.selectedStudyDay=0;
     this.refreshRevision++; this.mode=ToeicPageMode.HOME; this.questions=[]; this.attempts=[];
     this.answerLocked=false; this.selectedIndex=-1;
+    this.activeSessionDay=0; this.activeSessionAdvancesProgress=false;
   }
 
   private optionBackground(index:number,question:ToeicQuestion):string {
@@ -168,7 +212,7 @@ export struct ToeicHomePage {
     Column({space:14}) {
       Row() {
         Column({space:4}) {
-          Text('Day '+plan.day+' / 21')
+          Text('Day '+plan.day+' / 21 · '+this.dayContextLabel(plan.day,snapshot.currentDay))
             .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
           Text(plan.title)
             .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
@@ -190,13 +234,17 @@ export struct ToeicHomePage {
       Row({space:10}) {
         Button('高频词 '+plan.vocabularyIds.length+' 个',{type:ButtonType.Normal})
           .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-          .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(plan.vocabularyIds.length>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
           .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(plan.vocabularyIds.length>0)
           .onClick(()=>this.openVocabulary());
         Button('阅读提速 '+plan.sentenceDrillIds.length+' 句',{type:ButtonType.Normal})
           .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-          .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(plan.sentenceDrillIds.length>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
           .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(plan.sentenceDrillIds.length>0)
           .onClick(()=>this.openSentenceDrills());
       }
       .width('100%');
@@ -204,7 +252,7 @@ export struct ToeicHomePage {
       Text('训练题会先插入错题和慢题，再进入今天的主题内容，避免机械重复。')
         .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
 
-      Button('开始题型训练',{type:ButtonType.Normal})
+      Button(plan.day===1?'重新进行快速诊断':'开始题型训练',{type:ButtonType.Normal})
         .width('100%').height(AppTheme.BUTTON_HEIGHT)
         .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
         .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -217,7 +265,7 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private WeekPlanCard(plans:ToeicStudyDay[],snapshot:ToeicLearningSnapshot) {
+  private WeekPlanCard(plans:ToeicStudyDay[],snapshot:ToeicLearningSnapshot,selectedDay:number) {
     Column({space:10}) {
       Text('第一周计划')
         .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
@@ -227,30 +275,35 @@ export struct ToeicHomePage {
           Text('Day '+plan.day)
             .fontSize(AppTheme.META_SIZE)
             .fontWeight(FontWeight.Medium)
-            .fontColor(plan.day===snapshot.currentDay?AppTheme.PRIMARY:AppTheme.SUBTEXT)
+            .fontColor(plan.day===selectedDay?AppTheme.PRIMARY:AppTheme.SUBTEXT)
             .constraintSize({minWidth:48});
           Column({space:2}) {
             Text(plan.title)
               .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .fontWeight(plan.day===snapshot.currentDay?FontWeight.Medium:FontWeight.Regular)
+              .fontWeight(plan.day===selectedDay?FontWeight.Medium:FontWeight.Regular)
               .fontColor(AppTheme.TEXT);
             Text(plan.focus)
               .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT)
               .fontColor(AppTheme.SUBTEXT).maxLines(2).textOverflow({overflow:TextOverflow.Ellipsis});
           }
           .layoutWeight(1).alignItems(HorizontalAlign.Start);
-          if (plan.day===1 && snapshot.diagnosticCompleted) {
+          if (plan.day===selectedDay && plan.day===snapshot.currentDay) {
+            Text('当前进度').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
+          } else if (plan.day===selectedDay) {
+            Text('已选择').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
+          } else if (plan.day===1 && snapshot.diagnosticCompleted) {
             Text('已完成').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUCCESS);
           } else if (plan.day<snapshot.currentDay) {
             Text('已完成').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUCCESS);
           } else if (plan.day===snapshot.currentDay) {
-            Text('今天').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
+            Text('当前进度').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
           }
         }
         .width('100%')
         .padding({left:8,right:8,top:8,bottom:8})
-        .backgroundColor(plan.day===snapshot.currentDay?AppTheme.PRIMARY_SOFT:AppTheme.CARD_SURFACE)
-        .borderRadius(AppTheme.CONTROL_RADIUS);
+        .backgroundColor(plan.day===selectedDay?AppTheme.PRIMARY_SOFT:AppTheme.CARD_SURFACE)
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .onClick(()=>this.selectStudyDay(plan.day));
       },(plan:ToeicStudyDay)=>String(plan.day));
     }
     .width('100%').padding(AppTheme.CARD_PADDING)
@@ -258,7 +311,7 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private HomeContent(snapshot:ToeicLearningSnapshot,plan:ToeicStudyDay,plans:ToeicStudyDay[]) {
+  private HomeContent(snapshot:ToeicLearningSnapshot,plan:ToeicStudyDay,plans:ToeicStudyDay[],selectedDay:number) {
     Scroll() {
       Column({space:AppTheme.SECTION_GAP_STANDARD}) {
         Row() {
@@ -298,7 +351,7 @@ export struct ToeicHomePage {
           .width('100%').padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
 
-          this.WeekPlanCard(plans,snapshot);
+          this.WeekPlanCard(plans,snapshot,selectedDay);
         }
 
         Column({space:6}) {
@@ -532,11 +585,22 @@ export struct ToeicHomePage {
   build() {
     Column() {
       if (this.mode===ToeicPageMode.HOME) {
-        this.HomeContent(this.viewModel.snapshot(),this.viewModel.todayPlan(),this.viewModel.weekOnePlans());
+        this.HomeContent(
+          this.viewModel.snapshot(),
+          this.viewModel.planForDay(this.effectiveStudyDay()),
+          this.viewModel.weekOnePlans(),
+          this.effectiveStudyDay()
+        );
       } else if (this.mode===ToeicPageMode.VOCABULARY) {
-        this.VocabularyContent(this.viewModel.todayPlan(),this.viewModel.todayVocabulary());
+        this.VocabularyContent(
+          this.viewModel.planForDay(this.effectiveStudyDay()),
+          this.viewModel.vocabularyForDay(this.effectiveStudyDay())
+        );
       } else if (this.mode===ToeicPageMode.SENTENCE) {
-        this.SentenceContent(this.viewModel.todayPlan(),this.viewModel.todaySentenceDrills());
+        this.SentenceContent(
+          this.viewModel.planForDay(this.effectiveStudyDay()),
+          this.viewModel.sentenceDrillsForDay(this.effectiveStudyDay())
+        );
       } else if (this.currentIndex>=0 && this.currentIndex<this.questions.length) {
         this.QuestionContent(this.currentIndex,this.questions[this.currentIndex].id);
       }
