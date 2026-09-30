@@ -52,6 +52,13 @@ export struct ToeicHomePage {
   @State private currentOptionB:string='';
   @State private currentOptionC:string='';
   @State private currentOptionD:string='';
+  @State private showQuestionTranslation:boolean=false;
+  @State private currentTranslationPassage:string='';
+  @State private currentTranslationStem:string='';
+  @State private currentTranslationOptionA:string='';
+  @State private currentTranslationOptionB:string='';
+  @State private currentTranslationOptionC:string='';
+  @State private currentTranslationOptionD:string='';
   @State private currentCorrectIndex:number=-1;
   @State private currentAttemptCount:number=0;
   @State private currentWrongCount:number=0;
@@ -99,6 +106,14 @@ export struct ToeicHomePage {
     this.currentOptionB=question.options.length>1?question.options[1]:'';
     this.currentOptionC=question.options.length>2?question.options[2]:'';
     this.currentOptionD=question.options.length>3?question.options[3]:'';
+    let translation=this.viewModel.questionTranslation(question.id);
+    this.showQuestionTranslation=false;
+    this.currentTranslationPassage=translation===null?'':translation.passage;
+    this.currentTranslationStem=translation===null?'':translation.stem;
+    this.currentTranslationOptionA=translation===null || translation.options.length<1?'':translation.options[0];
+    this.currentTranslationOptionB=translation===null || translation.options.length<2?'':translation.options[1];
+    this.currentTranslationOptionC=translation===null || translation.options.length<3?'':translation.options[2];
+    this.currentTranslationOptionD=translation===null || translation.options.length<4?'':translation.options[3];
     this.currentCorrectIndex=question.correctIndex;
     this.currentAttemptCount=this.viewModel.attemptCount(question.id)+(attempt===null?0:1);
     this.currentWrongCount=this.viewModel.wrongCount(question.id)+(attempt!==null && !attempt.correct?1:0);
@@ -125,6 +140,13 @@ export struct ToeicHomePage {
     this.currentOptionB='';
     this.currentOptionC='';
     this.currentOptionD='';
+    this.showQuestionTranslation=false;
+    this.currentTranslationPassage='';
+    this.currentTranslationStem='';
+    this.currentTranslationOptionA='';
+    this.currentTranslationOptionB='';
+    this.currentTranslationOptionC='';
+    this.currentTranslationOptionD='';
     this.currentCorrectIndex=-1;
     this.currentAttemptCount=0;
     this.currentWrongCount=0;
@@ -315,6 +337,11 @@ export struct ToeicHomePage {
     this.answerLocked=false; this.selectedIndex=-1;
     this.clearQuestionSnapshot();
     this.activeSessionDay=0; this.activeSessionAdvancesProgress=false;
+  }
+
+  private toggleQuestionTranslation():void {
+    if (this.isMockSession() || this.currentTranslationStem.length===0) return;
+    this.showQuestionTranslation=!this.showQuestionTranslation;
   }
 
   private optionBackground(index:number):string {
@@ -728,6 +755,24 @@ export struct ToeicHomePage {
   }
 
   @Builder
+  private QuestionTranslationOption(prefix:string,text:string) {
+    Row({space:8}) {
+      Text(prefix+'.')
+        .width(22)
+        .fontSize(AppTheme.BODY_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.SUBTEXT);
+      Text(text)
+        .layoutWeight(1)
+        .fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+        .fontColor(AppTheme.SUBTEXT);
+    }
+    .width('100%')
+    .alignItems(VerticalAlign.Top);
+  }
+
+  @Builder
   private MockResultContent() {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
@@ -846,6 +891,41 @@ export struct ToeicHomePage {
             }
           }
           .width('100%');
+
+          if (!this.isMockSession() && this.currentTranslationStem.length>0) {
+            Button(this.showQuestionTranslation?'收起中文翻译':'查看中文翻译',{type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
+              .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+              .onClick(()=>this.toggleQuestionTranslation());
+
+            if (this.showQuestionTranslation) {
+              Column({space:8}) {
+                Text('中文翻译 · 辅助理解')
+                  .width('100%').fontSize(AppTheme.META_SIZE)
+                  .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+                if (this.currentTranslationPassage.length>0) {
+                  Text(this.currentTranslationPassage)
+                    .width('100%').fontSize(AppTheme.BODY_SIZE)
+                    .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                }
+                Text(this.currentTranslationStem)
+                  .width('100%').fontSize(AppTheme.BODY_SIZE)
+                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium)
+                  .fontColor(AppTheme.TEXT);
+                this.QuestionTranslationOption('A',this.currentTranslationOptionA);
+                this.QuestionTranslationOption('B',this.currentTranslationOptionB);
+                this.QuestionTranslationOption('C',this.currentTranslationOptionC);
+                if (this.currentOptionCount>3) {
+                  this.QuestionTranslationOption('D',this.currentTranslationOptionD);
+                }
+              }
+              .width('100%').padding(AppTheme.CARD_PADDING)
+              .backgroundColor(AppTheme.SURFACE_SUBTLE)
+              .border({width:1,color:AppTheme.BORDER})
+              .borderRadius(AppTheme.CONTROL_RADIUS);
+            }
+          }
 
           if (this.answerLocked) {
             if (this.isMockSession()) {
