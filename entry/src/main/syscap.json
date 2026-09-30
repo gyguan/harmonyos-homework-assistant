@@ -1,0 +1,14 @@
+{
+  "devices": {
+    "general": [
+      "default",
+      "tablet"
+    ]
+  },
+  "development": {
+    "addedSysCaps": [
+      "SystemCapability.Multimedia.Media.AVPlayer",
+      "SystemCapability.Multimedia.Media.Core"
+    ]
+  }
+}
