@@ -117,6 +117,9 @@ def main() -> None:
             "daily queue must include current-day planned questions")
     require("recoveryLimit=Math.min(4,limit)" in training,
             "daily queue must cap remediation so planned content still fits")
+    require("containsQuestionId(selected,q.id)" in training and
+            "selected.indexOf(q)" not in training,
+            "daily queue must deduplicate by stable question id, not object identity")
 
     progress = read("entry/src/main/ets/toeic/data/ToeicProgressStore.ets")
     require("this.snapshot.currentDay=2" in progress,
@@ -135,6 +138,11 @@ def main() -> None:
     require(builder_sections, "TOEIC UI builders could not be identified")
     require(re.search(r"(?m)^\s+let\s+", "\n".join(builder_sections)) is None,
             "TOEIC @Builder bodies must not declare local let variables")
+    require("QuestionContent(question:ToeicQuestion)" not in ui,
+            "question renderer must not use ToeicQuestion class object as Builder state boundary")
+    require("QuestionContent(questionIndex:number,questionId:string)" in ui and
+            "this.QuestionContent(this.currentIndex,this.questions[this.currentIndex].id)" in ui,
+            "question renderer must refresh from primitive index/id state")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
