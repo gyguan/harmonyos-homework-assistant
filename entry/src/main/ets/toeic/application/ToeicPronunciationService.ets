@@ -89,14 +89,14 @@ export class ToeicPronunciationService {
             resolve(ToeicPronunciationStatus.FAILED);
             return;
           }
-          response.on('complete',()=>{
+          response.on('complete',(_voiceInfo:textToSpeech.VoiceInfo)=>{
             this.downloadInProgress=false;
             this.engine=null;
           });
-          response.on('cancel',()=>{
+          response.on('cancel',(_info:string)=>{
             this.downloadInProgress=false;
           });
-          response.on('error',()=>{
+          response.on('error',(_downloadError:BusinessError)=>{
             this.downloadInProgress=false;
           });
           resolve(ToeicPronunciationStatus.DOWNLOAD_STARTED);
