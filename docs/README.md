@@ -59,6 +59,12 @@
   - Action Command；
   - Progress Query；
   - Flyway V7+。
+- `architecture/backend-logging-standard.md`
+  - HTTP requestId / scene 与 MDC 贯通；
+  - 业务事件日志格式与 INFO / WARN / ERROR 分级；
+  - Assignment / Practice / Submission / Tutor / Voice / Scheduler 推荐事件；
+  - 儿童数据、认证凭据、作业/对话/AI payload 的日志隐私红线；
+  - `validate_backend_logging.py` 静态门禁。
 - `architecture/ai-provider-capabilities.md`
   - AI Provider Capability 分层；
   - OpenAI / DeepSeek / GLM-4.7+ / Generic OpenAI-compatible 能力矩阵；
