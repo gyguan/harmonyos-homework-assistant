@@ -74,7 +74,7 @@ export class ToeicPronunciationService {
   }
 
   private requestEnglishVoiceDownload():Promise<ToeicPronunciationStatus> {
-    return new Promise((resolve)=>{
+    return new Promise<ToeicPronunciationStatus>((resolve)=>{
       let params:textToSpeech.VoiceDownload={
         requestId: this.nextRequestId('voice'),
         language: 'en-US',
