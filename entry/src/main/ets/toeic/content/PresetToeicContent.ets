@@ -1,6 +1,6 @@
 import {
   ToeicDifficulty, ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicScoreValue, ToeicSection,
-  ToeicSkill, ToeicVocabularyItem, ToeicVocabularyLevel
+  ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem, ToeicVocabularyLevel
 } from '../domain/ToeicModels';
 import { ToeicContentValidator } from './ToeicContentValidator';
 import { ToeicWeekOneContent } from './ToeicWeekOneContent';
@@ -173,15 +173,15 @@ export class PresetToeicContent {
     return base.concat(ToeicWeekOneContent.vocabulary());
   }
 
-  static studyDays() {
+  static studyDays():ToeicStudyDay[] {
     return ToeicWeekOneContent.studyDays();
   }
 
-  static sentenceDrills() {
+  static sentenceDrills():ToeicSentenceDrill[] {
     return ToeicWeekOneContent.sentenceDrills();
   }
 
-  static studyDay(day:number) {
+  static studyDay(day:number):ToeicStudyDay {
     let plans=ToeicWeekOneContent.studyDays();
     for (let plan of plans) if (plan.day===day) return plan;
     return plans[plans.length-1];
@@ -207,10 +207,10 @@ export class PresetToeicContent {
     return result;
   }
 
-  static sentenceDrillsForDay(day:number) {
+  static sentenceDrillsForDay(day:number):ToeicSentenceDrill[] {
     let plan=PresetToeicContent.studyDay(day);
     let all=PresetToeicContent.sentenceDrills();
-    let result=[];
+    let result:ToeicSentenceDrill[]=[];
     for (let id of plan.sentenceDrillIds) {
       for (let item of all) if (item.id===id) { result.push(item); break; }
     }
