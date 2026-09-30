@@ -1,6 +1,10 @@
 server:
   port: ${SERVER_PORT:8080}
 
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [requestId=%X{requestId} scene=%X{scene}] %logger{36} - %msg%n"
+
 spring:
   config:
     import: optional:file:./config/application-local.yml
