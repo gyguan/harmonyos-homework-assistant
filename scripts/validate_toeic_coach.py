@@ -183,8 +183,10 @@ def main() -> None:
         "@State private currentWrongCount:number=0",
         "private loadQuestion(index:number):boolean",
         "this.loadQuestion(0)",
+        "this.loadQuestion(previousIndex)",
         "this.loadQuestion(nextIndex)",
         "private currentQuestionForAttempt():ToeicQuestion|null",
+        "private sessionAttempt(questionId:string):ToeicQuestionAttempt|null",
         "question.id===this.currentQuestionId",
     ]:
         require(token in ui, f"reactive question snapshot missing: {token}")
@@ -194,6 +196,23 @@ def main() -> None:
     require("this.currentAttemptCount++" in ui and
             "if (!attempt.correct) this.currentWrongCount++" in ui,
             "question history badges must update immediately after answering")
+    for token in [
+        "private previousQuestion():void",
+        "Button('上一题'",
+        ".enabled(this.currentIndex>0)",
+        ".onClick(()=>this.previousQuestion())",
+        ".enabled(this.answerLocked)",
+        ".onClick(()=>this.nextQuestion())",
+        "attempt===null?-1:attempt.selectedIndex",
+        "this.answerCorrect=attempt===null?false:attempt.correct",
+        "this.answerLocked=attempt!==null",
+        "this.sessionAttempt(this.currentQuestionId)!==null",
+    ]:
+        require(token in ui, f"question navigation state restoration missing: {token}")
+    require("if (!this.answerLocked) return;" in ui,
+            "next question navigation must not skip unanswered questions")
+    require("this.attempts.push(attempt)" in ui,
+            "session attempts must remain the source of answered-question state")
 
     question_builder_match = re.search(
         r"(?ms)^\s*@Builder\s*\n\s*private QuestionContent\(\).*?(?=^\s*build\(\))",
