@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import jakarta.persistence.criteria.Predicate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -30,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AssignmentService {
+  private static final Logger log = LoggerFactory.getLogger(AssignmentService.class);
   private static final String DEFAULT_ASSIGNMENT_TYPE = "SCHOOL";
   private static final String DEFAULT_SUBJECT_CODE = "OTHER";
   private static final String DEFAULT_CONTENT_TYPE = "NORMAL";
@@ -220,7 +223,10 @@ public class AssignmentService {
     }
     e.createdAt = now;
     e.updatedAt = now;
-    return AssignmentDtos.Response.from(repository.saveAndFlush(e));
+    AssignmentEntity saved = repository.saveAndFlush(e);
+    log.info("assignment created assignmentId={} studentId={} assignmentType={} contentType={} subjectCode={} status={}",
+        saved.id, saved.studentId, saved.assignmentType, saved.contentType, saved.subjectCode, saved.status);
+    return AssignmentDtos.Response.from(saved);
   }
 
   @Transactional
@@ -277,7 +283,12 @@ public class AssignmentService {
       }
     }
     e.updatedAt = Instant.now();
-    return AssignmentDtos.Response.from(repository.saveAndFlush(e));
+    AssignmentEntity saved = repository.saveAndFlush(e);
+    if (!previousStatus.equals(saved.status)) {
+      log.info("assignment state_changed assignmentId={} studentId={} action=UPDATE from={} to={}",
+          saved.id, saved.studentId, previousStatus, saved.status);
+    }
+    return AssignmentDtos.Response.from(saved);
   }
 
   @Transactional
@@ -324,6 +335,7 @@ public class AssignmentService {
     if (e.version != input.version()) throw new ApiExceptions.Conflict("作业已在其他设备更新，请刷新后重试");
 
     String action = input.action().trim().toUpperCase();
+    String previousStatus = e.status;
     long nowMs = System.currentTimeMillis();
     switch (action) {
       case "START" -> start(e, familyId, nowMs);
@@ -332,7 +344,12 @@ public class AssignmentService {
       default -> throw new ApiExceptions.BadRequest("不支持的作业动作: " + input.action());
     }
     e.updatedAt = Instant.now();
-    return AssignmentDtos.Response.from(repository.saveAndFlush(e));
+    AssignmentEntity saved = repository.saveAndFlush(e);
+    if (!previousStatus.equals(saved.status)) {
+      log.info("assignment state_changed assignmentId={} studentId={} action={} from={} to={}",
+          saved.id, saved.studentId, action, previousStatus, saved.status);
+    }
+    return AssignmentDtos.Response.from(saved);
   }
 
   @Transactional
@@ -354,6 +371,8 @@ public class AssignmentService {
     resources.deleteByFamilyIdAndAssignmentId(familyId, id);
     repository.delete(assignment);
     repository.flush();
+    log.info("assignment deleted assignmentId={} studentId={} status={} contentType={}",
+        assignment.id, assignment.studentId, assignment.status, assignment.contentType);
   }
 
   private void start(AssignmentEntity e, UUID familyId, long nowMs) {
@@ -479,6 +498,8 @@ public class AssignmentService {
       other.status = "PAUSED";
       other.updatedAt = Instant.now();
       repository.save(other);
+      log.info("assignment auto_paused assignmentId={} studentId={} triggeredBy={} reason=ANOTHER_ASSIGNMENT_STARTED",
+          other.id, studentId, activeId);
     }
   }
 
