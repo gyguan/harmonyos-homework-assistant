@@ -22,8 +22,7 @@ def read(path: str) -> str:
 
 def main() -> None:
     require(TOEIC.exists(), "TOEIC module directory is missing")
-    sources = "
-".join(
+    sources = "\\n".join(
         p.read_text(encoding="utf-8")
         for p in TOEIC.rglob("*.ets")
     )
