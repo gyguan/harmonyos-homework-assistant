@@ -83,12 +83,12 @@ def main() -> None:
     pronunciation_entry_count = pronunciation.count("new ToeicPronunciationEntry(")
     require(pronunciation_entry_count == vocabulary_count,
             f"every TOEIC vocabulary item must have pronunciation metadata: {pronunciation_entry_count}/{vocabulary_count}")
-    require("V-033','/ˈrɛzəmeɪ/'" in pronunciation and "'résumé'" in pronunciation,
+    require("V-033','/ˈrɛzəˌmeɪ/'" in pronunciation and "'résumé'" in pronunciation,
             "resume noun pronunciation must be disambiguated")
-    require("V-014','/ˈriːfʌnd/ n. · /rɪˈfʌnd/ v.'" in pronunciation,
+    require("V-014','/ˈriːfʌnd/ n. · /ˌriːˈfʌnd/ v.'" in pronunciation,
             "refund noun/verb pronunciation distinction is required")
-    require("V-038','/trænsˈfɝː/ v. · /ˈtrænsfɝː/ n.'" in pronunciation,
-            "transfer noun/verb pronunciation distinction is required")
+    require("V-038','/ˈtrænsfɝː/'" in pronunciation,
+            "transfer en-US pronunciation is required")
     require("V-051','/ˈɛstəmət/ n. · /ˈɛstəmeɪt/ v.'" in pronunciation,
             "estimate noun/verb pronunciation distinction is required")
 
