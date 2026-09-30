@@ -74,6 +74,9 @@ export class ToeicProgressStore {
       if (restored.schemaVersion<2 && restored.diagnosticCompleted && restored.currentDay===1) {
         restored.currentDay=2;
       }
+      if (restored.currentDay>MAX_AVAILABLE_STUDY_DAY) {
+        restored.currentDay=MAX_AVAILABLE_STUDY_DAY;
+      }
       restored.schemaVersion=2;
       this.snapshot=restored;
     } catch {
