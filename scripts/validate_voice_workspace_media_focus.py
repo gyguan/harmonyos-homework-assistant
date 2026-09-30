@@ -62,6 +62,11 @@ require("async preload(resource: AssignmentResource): Promise<void>" in remote_r
         "resource API must expose cache-only preloading without binding every image to UI state")
 require("pendingDownloads" in remote_resource,
         "resource downloads must deduplicate concurrent prefetch and foreground requests")
+show_image = pane.split("private async showImage(index: number)", 1)[1].split(
+    "private async toggleAudio()", 1)[0]
+require(show_image.index("let uri = await this.loadImage(index)") <
+        show_image.index("this.imageIndex = index"),
+        "voice image switching must load the target before committing imageIndex")
 require("invalidate(resourceId: string)" in remote_resource,
         "resource cache must support invalidation after media decode failures")
 require("RemoteAssignmentResourceApi.instance.invalidate(resource.id)" in pane,
