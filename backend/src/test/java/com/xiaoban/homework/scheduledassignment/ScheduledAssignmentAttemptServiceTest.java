@@ -98,6 +98,47 @@ class ScheduledAssignmentAttemptServiceTest {
   }
 
   @Test
+  void manualScheduledAssignmentAddsFireDateToInstanceTitle() {
+    UUID familyId = UUID.randomUUID();
+    UUID planId = UUID.randomUUID();
+    Instant fireAt = Instant.parse("2026-09-30T09:00:00Z");
+    Instant executionAt = Instant.parse("2026-09-30T09:00:05Z");
+
+    ScheduledAssignmentPlanEntity plan = manualPlan(familyId, planId, fireAt);
+    plan.scheduleType = "DAILY";
+    ScheduledAssignmentTemplateEntity template = template(planId);
+    template.duePolicy = "AFTER_MINUTES";
+    template.dueOffsetMinutes = 60;
+
+    when(plans.lockById(planId)).thenReturn(Optional.of(plan));
+    when(runs.findByPlanIdAndScheduledFireAt(planId, fireAt)).thenReturn(Optional.empty());
+    when(runs.saveAndFlush(any(ScheduledAssignmentRunEntity.class)))
+        .thenAnswer(invocation -> invocation.getArgument(0));
+    when(templates.findById(planId)).thenReturn(Optional.of(template));
+    when(assignments.create(any(UUID.class), any(String.class), any(AssignmentDtos.Create.class)))
+        .thenAnswer(invocation -> {
+          AssignmentDtos.Create create = invocation.getArgument(2);
+          return new AssignmentDtos.Response(
+              create.id(), "student-1", create.assignmentType(), create.subjectCode(),
+              create.contentType(), create.subject(), create.title(), create.instruction(),
+              create.textbookRef(), create.dueAtEpochMs() == null ? 0L : create.dueAtEpochMs(),
+              create.dueTimezone(), create.dueText(), create.status(), create.sourceLabel(),
+              create.sourceExcerpt(), create.expectedMinutes(), 0L, 0L, 0L, "", 0L);
+        });
+
+    service().executeScheduler(planId, fireAt, executionAt);
+
+    ArgumentCaptor<AssignmentDtos.Create> create =
+        ArgumentCaptor.forClass(AssignmentDtos.Create.class);
+    verify(assignments).create(
+        org.mockito.ArgumentMatchers.eq(familyId),
+        org.mockito.ArgumentMatchers.eq("student-1"),
+        create.capture());
+    assertEquals("阅读 20 分钟 · 09-30", create.getValue().title());
+    assertEquals("阅读 20 分钟", template.title);
+  }
+
+  @Test
   void failureRecordSurvivesAsIndependentRetryStateAndAdvancesAfterThirdFailure() {
     UUID familyId = UUID.randomUUID();
     UUID planId = UUID.randomUUID();

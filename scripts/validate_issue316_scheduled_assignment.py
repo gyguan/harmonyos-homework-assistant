@@ -30,6 +30,10 @@ require("unique (plan_id, scheduled_fire_at)" in migration,
         "scheduled run must be unique by plan and fire time")
 require('"a-scheduled-" + plan.id + "-" + fireAt.toEpochMilli()' in attempt,
         "manual scheduled Assignment id must be deterministic")
+require("instanceTitle(plan, template, fireAt)" in attempt and
+        'DateTimeFormatter.ofPattern("MM-dd")' in attempt and
+        'template.title + " · " + fireDate' in attempt,
+        "scheduled Assignment instance title must include the scheduled fire date")
 require("voiceAssignments.autoCreateNext" in attempt,
         "voice schedule must reuse VoiceMaterialAssignmentService.autoCreateNext")
 require("autoCreateOnStudentEntry" in service,
