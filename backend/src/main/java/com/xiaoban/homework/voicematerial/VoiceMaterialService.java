@@ -16,12 +16,15 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class VoiceMaterialService {
+  private static final Logger log = LoggerFactory.getLogger(VoiceMaterialService.class);
   private final VoiceMaterialBatchRepository batches;
   private final VoiceMaterialPackageRepository packages;
   private final VoiceMaterialFileRepository files;
@@ -65,7 +68,9 @@ public class VoiceMaterialService {
     batch.invalidCount = 0;
     batch.createdAt = now;
     batch.updatedAt = now;
-    return VoiceMaterialDtos.BatchResponse.from(batches.save(batch));
+    VoiceMaterialBatchEntity saved = batches.save(batch);
+    log.info("voice_material batch_created batchId={} studentId={}", saved.id, saved.studentId);
+    return VoiceMaterialDtos.BatchResponse.from(saved);
   }
 
   @Transactional
@@ -114,6 +119,8 @@ public class VoiceMaterialService {
     batch.directoryCount++;
     batch.updatedAt = now;
     batches.save(batch);
+    log.info("voice_material package_registered batchId={} packageId={} studentId={} subjectCode={} assignmentType={}",
+        batch.id, item.id, item.studentId, item.subjectCode, item.assignmentType);
     return response(item);
   }
 
@@ -192,6 +199,9 @@ public class VoiceMaterialService {
         item.updatedAt = Instant.now();
         packages.save(item);
         invalid++;
+        log.warn("voice_material package_invalid batchId={} packageId={} studentId={} reason={}",
+            batch.id, item.id, item.studentId,
+            audioCount == 0 ? "MISSING_AUDIO" : audioCount > 1 ? "MULTIPLE_AUDIO" : "MISSING_IMAGE");
         continue;
       }
 
@@ -209,6 +219,8 @@ public class VoiceMaterialService {
         item.updatedAt = Instant.now();
         packages.save(item);
         invalid++;
+        log.warn("voice_material package_invalid batchId={} packageId={} studentId={} reason=DUPLICATE_CONTENT",
+            batch.id, item.id, item.studentId);
         continue;
       }
 
@@ -223,6 +235,8 @@ public class VoiceMaterialService {
     batch.invalidCount = invalid;
     batch.updatedAt = Instant.now();
     batches.save(batch);
+    log.info("voice_material batch_completed batchId={} studentId={} packageCount={} readyCount={} invalidCount={}",
+        batch.id, batch.studentId, items.size(), ready, invalid);
 
     List<VoiceMaterialDtos.PackageResult> results = items.stream()
         .map(item -> {
