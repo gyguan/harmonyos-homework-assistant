@@ -1,7 +1,7 @@
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 
 enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING' }
@@ -148,8 +148,7 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private TodayCard() {
-    let snapshot=this.viewModel.snapshot();
+  private TodayCard(snapshot:ToeicLearningSnapshot) {
     Column({space:14}) {
       Row() {
         Column({space:4}) {
@@ -183,8 +182,7 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private HomeContent() {
-    let snapshot=this.viewModel.snapshot();
+  private HomeContent(snapshot:ToeicLearningSnapshot) {
     Scroll() {
       Column({space:AppTheme.SECTION_GAP_STANDARD}) {
         Row() {
@@ -209,7 +207,7 @@ export struct ToeicHomePage {
         } else if (!snapshot.diagnosticCompleted) {
           this.IntroCard();
         } else {
-          this.TodayCard();
+          this.TodayCard(snapshot);
           Column({space:10}) {
             Text('当前学习状态')
               .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
@@ -243,10 +241,8 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private QuestionContent() {
-    let question=this.currentQuestion();
-    if (question!==null) {
-      Scroll() {
+  private QuestionContent(question:ToeicQuestion) {
+    Scroll() {
         Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
           DeepPageHeader({
             title:this.mode===ToeicPageMode.DIAGNOSTIC?'Reading 快速诊断':'今日训练',
@@ -327,12 +323,15 @@ export struct ToeicHomePage {
           top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_BOTTOM_PADDING});
       }
       .width('100%').height('100%').scrollBar(BarState.Off).align(Alignment.TopStart);
-    }
   }
 
   build() {
     Column() {
-      if (this.mode===ToeicPageMode.HOME) this.HomeContent(); else this.QuestionContent();
+      if (this.mode===ToeicPageMode.HOME) {
+        this.HomeContent(this.viewModel.snapshot());
+      } else if (this.currentIndex>=0 && this.currentIndex<this.questions.length) {
+        this.QuestionContent(this.questions[this.currentIndex]);
+      }
     }
     .width('100%').height('100%').alignItems(HorizontalAlign.Center).backgroundColor(AppTheme.BACKGROUND)
     .onAreaChange((_oldValue,newValue)=>{
