@@ -34,6 +34,20 @@
 - 微信/钉钉首版采用用户主动分享、截图识别、文本粘贴；不得依赖后台读取聊天记录。
 - 后端保持 Spring Boot 模块化单体 + PostgreSQL；除非新的 ADR 明确批准，不引入 Redis、MQ、微服务、API Gateway 或工作流引擎。
 
+## Backend logging standard
+
+任何 Agent / 开发者只要修改 Spring Boot 后端的日志、异常处理、业务状态流转、AI / 外部调用、认证或媒体处理，**必须先阅读** `docs/architecture/backend-logging-standard.md`。
+
+后端日志必须遵守：
+
+1. HTTP 链路复用 `AccessLogFilter` 的 MDC `requestId / scene`，不得在 Service 自行生成追踪 ID；
+2. 业务日志采用 `domain event key=value`，只记录关键业务事实，不为普通查询或方法进入/退出刷 INFO；
+3. INFO 用于已发生的重要业务事件，WARN 用于可恢复异常/降级，ERROR 仅用于未预期且需要处理的异常；
+4. 禁止记录密码、token、Authorization、API key、儿童姓名、作业正文、Tutor 对话、Prompt/Response、题干/答案/笔记正文、图片/音频内容、原始文件名和存储路径；
+5. Controller 不重复打印 HTTP 入口/出口；业务状态变化在 Service 层记录；
+6. Payload 日志默认关闭；不得为了排障长期打开生产环境全量请求/响应日志；
+7. 涉及后端日志的变更必须运行 `python scripts/validate_backend_logging.py` 和 `mvn -f backend/pom.xml test`。
+
 ## Practice content standard
 
 任何 Agent / 开发者只要涉及以下内容之一，**必须先阅读** `docs/product/practice-question-content-standard.md`：
