@@ -129,3 +129,19 @@ Daily Training Queue 优先：
 - 点击发音通过 HarmonyOS Core Speech Kit TextToSpeech 播放，当前使用 en-US 英语音色；
 - 发音能力不可用时必须降级为可学习的音标与文字内容，不得阻塞词汇页面；
 - 后续 Listening 增加英/加/澳口音时，复用 pronunciationLocale 扩展，不复制第二套词汇资产。
+
+
+## 12. 训练历史与阅读提速翻译
+
+### 12.1 题目训练历史
+- 每道正式训练题必须使用稳定的 `questionId` 关联历史记录；
+- 历史记录至少包含累计作答次数 `attemptCount` 和累计错误次数 `wrongCount`；
+- `wrongCount` 是累计错误次数，后续做对不得清零；
+- `reviewQuestionIds` 只表达当前是否需要复习，不能替代累计错误次数；
+- UI 应让用户在进入/作答题目时看到“已做 X 次”，存在错误历史时同时显示“错 X 次”。
+
+### 12.2 阅读提速中文翻译
+- 每条正式 `ToeicSentenceDrill` 必须同时维护英文原句和中文 `translation`；
+- 中文翻译用于快速确认句意，不替代“先抓主干、再看修饰”的训练方法；
+- 翻译必须忠实表达原句，不额外加入原文不存在的信息；
+- 无中文翻译的阅读提速内容不得进入正式内容包。
