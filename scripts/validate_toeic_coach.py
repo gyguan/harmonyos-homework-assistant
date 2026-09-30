@@ -79,6 +79,28 @@ def main() -> None:
     require(len(vocabulary_ids) == len(set(vocabulary_ids)), "TOEIC vocabulary ids must be unique")
     require(len(sentence_ids) == len(set(sentence_ids)), "TOEIC sentence drill ids must be unique")
 
+    pronunciation = read("entry/src/main/ets/toeic/content/ToeicPronunciationCatalog.ets")
+    pronunciation_entry_count = pronunciation.count("new ToeicPronunciationEntry(")
+    require(pronunciation_entry_count == vocabulary_count,
+            f"every TOEIC vocabulary item must have pronunciation metadata: {pronunciation_entry_count}/{vocabulary_count}")
+    require("V-033','/ˈrɛzəmeɪ/'" in pronunciation and "'résumé'" in pronunciation,
+            "resume noun pronunciation must be disambiguated")
+    require("V-014','/ˈriːfʌnd/ n. · /rɪˈfʌnd/ v.'" in pronunciation,
+            "refund noun/verb pronunciation distinction is required")
+    require("V-038','/trænsˈfɝː/ v. · /ˈtrænsfɝː/ n.'" in pronunciation,
+            "transfer noun/verb pronunciation distinction is required")
+    require("V-051','/ˈɛstəmət/ n. · /ˈɛstəmeɪt/ v.'" in pronunciation,
+            "estimate noun/verb pronunciation distinction is required")
+
+    pronunciation_service = read("entry/src/main/ets/toeic/application/ToeicPronunciationService.ets")
+    for token in ["@kit.CoreSpeechKit", "SystemCapability.AI.TextToSpeech", "language: 'en-US'",
+                  "person: 8", "downloadVoice", "queueMode", "ToeicPronunciationStatus"]:
+        require(token in pronunciation_service, f"TOEIC pronunciation service missing: {token}")
+
+    syscap = read("syscap.json")
+    require(syscap.count("SystemCapability.AI.TextToSpeech") >= 2,
+            "TextToSpeech capability must be associated in development and production")
+
     preset_api = [
         "questionsForDay(day:number)",
         "vocabularyForDay(day:number)",
@@ -102,7 +124,7 @@ def main() -> None:
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
     for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "WeekPlanCard",
-                  "VocabularyContent", "SentenceContent"]:
+                  "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'"]:
         require(token in ui, f"week-one learning UI missing: {token}")
     builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
@@ -133,7 +155,8 @@ def main() -> None:
     print(
         f"[toeic-coach] PASS: questions={question_count}, "
         f"diagnostic={len(diagnostic_ids)}, vocabulary={vocabulary_count}, "
-        f"sentences={sentence_drill_count}, days={study_day_count}"
+        f"sentences={sentence_drill_count}, days={study_day_count}, "
+        f"pronunciations={pronunciation_entry_count}"
     )
 
 
