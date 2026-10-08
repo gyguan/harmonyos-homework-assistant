@@ -79,6 +79,17 @@ def validate() -> None:
     assert "不符" in zh_stem and "至少两年销售经验" in zh_options[0]
     assert len(zh_options) == len(job.choices)
 
+    # #478 D: absence of visible damage alone is not evidence of normal use.
+    warranty = by_id["R-P7-TRIPLE-1202"]
+    assert warranty.version == 2 and warranty.answer == 0
+    assert "if it fails under normal use" in warranty.passage
+    assert "during normal use, following the product instructions" in warranty.passage
+    assert "normal use" in warranty.evidence
+    assert "正常使用" in warranty.explanation
+    zh_warranty, zh_warranty_stem, zh_warranty_choices = translations[warranty.id]
+    assert "遵循产品说明" in zh_warranty and "正常使用" in zh_warranty
+    assert "免费更换" in zh_warranty_choices[0] and len(zh_warranty_choices) == 4
+
     # #478 B: invoice amount due is NOT a guarantee that a bank transfer
     # initiated on the due date will be received or posted by that date.
     invoice = by_id["R-M1-P7-077"]
