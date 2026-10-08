@@ -1,0 +1,863 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-08",
+  "issue": 478,
+  "reviewer": "AI-GPT6",
+  "reviewScope": "71 legacy Part7 items whose evidence was non-verbatim in source passage",
+  "limitations": "Single-model AI first-pass reasoning only; not ETS approval or independent expert certification. New v2 mock derivatives, all vocabulary, and other translated content remain out of scope.",
+  "notIndependentExpertCertification": true,
+  "items": [
+    {
+      "assetId": "R-P7-PARA-0003",
+      "sourceAnchor": "provides a complimentary shuttle",
+      "correctBasis": "免费接驳车等于免费交通",
+      "distractorReasons": [
+        "未说明免费早餐",
+        "未说明免费停车",
+        "未说明免费洗衣"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-CROSS-0007",
+      "sourceAnchor": "Train 84: Lakeside 8:10 A.M. → Central 9:05 A.M.",
+      "correctBasis": "9:30开会步行15分钟至少需9:15到站，只有84次9:05满足",
+      "distractorReasons": [
+        "92次9:35才到站",
+        "两班并非都满足",
+        "84次可行，非两班皆不可"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-DX-P7-03",
+      "sourceAnchor": "arrived on September 7",
+      "correctBasis": "9月7日交付到9月16日申请仅9天，未使用且包装完整",
+      "distractorReasons": [
+        "没有已修理记载",
+        "未载制造商免除费用",
+        "交付距今未超过一个月"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-PURPOSE-0703",
+      "sourceAnchor": "Harbor Street Café opens this Saturday",
+      "correctBasis": "开业公告附免费糕点促销，旨在推广新咖啡馆",
+      "distractorReasons": [
+        "没有员工会议通知",
+        "没有征集意见",
+        "没有延误配送信息"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-PURPOSE-0704",
+      "sourceAnchor": "water supply will be turned off",
+      "correctBasis": "明确通知住户周三9至11点停水",
+      "distractorReasons": [
+        "没有招租内容",
+        "没有缴费要求",
+        "没有消防演习"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-PURPOSE-0706",
+      "sourceAnchor": "exercise room will therefore be unavailable",
+      "correctBasis": "跑步机更换导致运动室周末不可用",
+      "distractorReasons": [
+        "不是出售旧设备",
+        "泳池和课程仍开放",
+        "无新会费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-PARA-0902",
+      "sourceAnchor": "provides complimentary lockers",
+      "correctBasis": "免费的为储物柜",
+      "distractorReasons": [
+        "未说免费门票",
+        "未说免费导览",
+        "未说免费停车"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-LONG-1002",
+      "sourceAnchor": "Employees who have completed the online security course",
+      "correctBasis": "完成课程的员工可申请新门禁卡",
+      "distractorReasons": [
+        "访客不属于限定员工",
+        "未说明未通过测验者合资格",
+        "不是仅限HR员工"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-LONG-1003",
+      "sourceAnchor": "replacement displays requested by the downtown store",
+      "correctBasis": "they被转移到门店，先行词是可转移的替换显示器",
+      "distractorReasons": [
+        "编号记录在转移前且不是货物",
+        "库存团队负责记录，不是被转移物",
+        "商店是目的地不是被转移物"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-LONG-1006",
+      "sourceAnchor": "orders submitted later will be processed the following business day",
+      "correctBasis": "午前订单当天发运，午后订单次工作日处理",
+      "distractorReasons": [
+        "没有全部延迟一周",
+        "未宣布不再收订单",
+        "未要求自取"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1101",
+      "sourceAnchor": "Train 18: Northport 8:10 → Central 8:55",
+      "correctBasis": "9:30前保留20分钟步行需9:10前到站，18次8:55满足",
+      "distractorReasons": [
+        "24次9:25到站太晚",
+        "两班不均满足",
+        "有一班可行"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1102",
+      "sourceAnchor": "Book a two-night stay by November 15",
+      "correctBasis": "Luis 11月10日预订20日至22日两晚，满足免费机场交通",
+      "distractorReasons": [
+        "没有免费第三晚",
+        "未提升级客房",
+        "未提免费早餐"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1103",
+      "sourceAnchor": "Date: October 2",
+      "correctBasis": "10月18日距购买16天，超过14天退货期限",
+      "distractorReasons": [
+        "原文说明包装未拆",
+        "没有折扣信息",
+        "材料包括购买收据"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1104",
+      "sourceAnchor": "11:30–11:50 Cloud Operations",
+      "correctBasis": "云运维全程在中午前且未学过",
+      "distractorReasons": [
+        "数据安全课已修完",
+        "产品战略是下午",
+        "存在云运维合适场次"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1105",
+      "sourceAnchor": "Free standard shipping on orders over $100.",
+      "correctBasis": "订单124美元高于100免标准运费且成本最低",
+      "distractorReasons": [
+        "八美元标准运费不适用",
+        "十五美元加急成本更高",
+        "没有只允许自取限制"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1106",
+      "sourceAnchor": "Valid: October 7",
+      "correctBasis": "访客证仅印刷日期有效，10月8日再来需新证",
+      "distractorReasons": [
+        "旧证在10月8日已失效",
+        "无员工停车要求",
+        "无领取楼宇钥匙规定"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1201",
+      "sourceAnchor": "Departures to Convention Center: 7:45, 8:30, 9:15.",
+      "correctBasis": "8:30发车25分钟后8:55到，最晚且早于9:15",
+      "distractorReasons": [
+        "7:45更早非最晚",
+        "9:15发车9:40到太晚",
+        "存在8:30可行"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1202",
+      "sourceAnchor": "during normal use, following the product instructions",
+      "correctBasis": "10月3日至20日少于30天，明确按说明正常使用发生故障可免费更换",
+      "distractorReasons": [
+        "条款没有付费会员",
+        "条款没有额外运费",
+        "正常使用故障且期限内，并非无帮助"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1203",
+      "sourceAnchor": "Sales associate, January 2026–present.",
+      "correctBasis": "2026年10月仅九个多月销售经验，不足两年，A陈述与资料冲突",
+      "distractorReasons": [
+        "10月28日可开始早于11月1日",
+        "邮件明确可全职",
+        "简历明确曾做销售"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1204",
+      "sourceAnchor": "Advanced Formulas requires completion of Excel Basics.",
+      "correctBasis": "从未上Excel课需先上周一的基础课再上高级课",
+      "distractorReasons": [
+        "高级课有先修条件",
+        "数据图表在周二且她无法出席",
+        "周一可上基础课，非无课程"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1205",
+      "sourceAnchor": "Garage C: $5/day after 5 P.M.",
+      "correctBasis": "招待会18至20点全落在17点后的5美元时段且比其他车库便宜",
+      "distractorReasons": [
+        "A为12美元",
+        "B为8美元",
+        "三车库费用并不相等"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1206",
+      "sourceAnchor": "Saturday 9 A.M.–5 P.M.",
+      "correctBasis": "周六17点闭馆而预约到18点，违反预约必须闭馆前结束",
+      "distractorReasons": [
+        "周六实际开放",
+        "规定最多两小时而非必须四小时",
+        "周六9点开馆非中午"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-050",
+      "sourceAnchor": "new inventory system will be introduced on November 2.",
+      "correctBasis": "新系统上线前需仓库员工培训，邮件旨在准备",
+      "distractorReasons": [
+        "没有停业安排",
+        "没有产品订货请求",
+        "不是推广软件厂商广告"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-051",
+      "sourceAnchor": "Supervisors will receive an additional live demonstration.",
+      "correctBasis": "只有主管额外参加现场演示",
+      "distractorReasons": [
+        "未指客户参加",
+        "未指司机参加",
+        "未指求职者参加"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-052",
+      "sourceAnchor": "must complete a 45-minute online tutorial before that date.",
+      "correctBasis": "that date指前一句11月2日，须于此前完成",
+      "distractorReasons": [
+        "10月28日是主管演示日",
+        "不得晚于11月2日",
+        "不是11月底"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-059",
+      "sourceAnchor": "Invoice 9047 for $1,280 is due October 20.",
+      "correctBasis": "付款提醒明确账单到期时间",
+      "distractorReasons": [
+        "未提供折扣",
+        "未取消发票",
+        "未修改账户"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-060",
+      "sourceAnchor": "Please include the invoice number with the payment",
+      "correctBasis": "转账需附发票编号供财务核销",
+      "distractorReasons": [
+        "无需护照号码",
+        "无需送货地址",
+        "无需员工编号"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-067",
+      "sourceAnchor": "10:15 Market Trends Panel",
+      "correctBasis": "12点午餐前安排的是10:15趋势论坛",
+      "distractorReasons": [
+        "报到在9点更早",
+        "产品展示在午餐之后",
+        "社交招待会更晚"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-071",
+      "sourceAnchor": "Train 52: Easton 7:50 → Central 8:35",
+      "correctBasis": "演示9:15，需步行20分钟，52次8:35及时",
+      "distractorReasons": [
+        "60次9:05仅余10分钟",
+        "两班不都可行",
+        "52次可行"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-073",
+      "sourceAnchor": "Train 60: Easton 8:20 → Central 9:05",
+      "correctBasis": "9:05距9:15演示只10分钟，不足步行20分钟",
+      "distractorReasons": [
+        "60次确实到中央站",
+        "60次8:20发车非7点前",
+        "没有票价信息"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-074",
+      "sourceAnchor": "Spend $80 or more online and receive free standard delivery.",
+      "correctBasis": "10月28日购物车92美元满足10月31日前80美元门槛",
+      "distractorReasons": [
+        "未承诺免费加急",
+        "无八折价格优惠",
+        "未赠礼品卡"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-077",
+      "sourceAnchor": "Amount due: $640",
+      "correctBasis": "发票列明640美元，不含逾期才可能加收的25美元",
+      "distractorReasons": [
+        "615不是发票金额",
+        "665含潜在罚金但非当前应付款",
+        "25仅为滞纳金"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-080",
+      "sourceAnchor": "Route 7 arrives Downtown at 8:40 and 9:10.",
+      "correctBasis": "8:40到站步行10分钟8:50到办公室，早于9点",
+      "distractorReasons": [
+        "9:10到站已迟",
+        "并非两班皆可",
+        "8:40可行非皆不可"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-082",
+      "sourceAnchor": "meeting begins at 9:00",
+      "correctBasis": "9:10已晚于9点会议开始，且还有10分钟步行",
+      "distractorReasons": [
+        "办公室是否关闭未提供",
+        "路线确实在市中心到站",
+        "无预约要求"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-083",
+      "sourceAnchor": "since June last year",
+      "correctBasis": "去年6月到今年11月已超一年办公室经验",
+      "distractorReasons": [
+        "职位要求12月1日而非12月15日",
+        "邮件日期11月8早于10日",
+        "确有工作经验"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-085",
+      "sourceAnchor": "can start November 25",
+      "correctBasis": "11月25日可入职早于要求12月1日",
+      "distractorReasons": [
+        "否认与原文明显矛盾",
+        "非12月15日之后",
+        "邮件明确提供可入职日期"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-086",
+      "sourceAnchor": "departs 8:00 and 9:45; travel time 30 minutes.",
+      "correctBasis": "9:45发车10:15到，距10:30恰好15分钟且是最晚可行班次",
+      "distractorReasons": [
+        "8点可行但不是最晚",
+        "两班都符合时间但问最晚班次",
+        "9:45符合条件非两班皆不可"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-087",
+      "sourceAnchor": "10:30 Workshop: Sales Analytics",
+      "correctBasis": "邮件指定10:30工作坊，日程对应销售分析",
+      "distractorReasons": [
+        "客户留存是13点",
+        "开场不是工作坊",
+        "无酒店运营课"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-088",
+      "sourceAnchor": "departs 8:00 and 9:45; travel time 30 minutes.",
+      "correctBasis": "9:45加30分钟即10:15",
+      "distractorReasons": [
+        "9:45只是发车时间",
+        "10:30是工作坊开始",
+        "11点晚了45分钟"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-091",
+      "sourceAnchor": "Our office closes at 4 P.M. tomorrow.",
+      "correctBasis": "客户要求司机次日16点关门前送达",
+      "distractorReasons": [
+        "没有晚于18点配送要求",
+        "没有周末配送请求",
+        "没有自取安排"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-092",
+      "sourceAnchor": "East entrance: Pine Avenue.",
+      "correctBasis": "访客停车位在Pine Avenue附近，东入口临该路",
+      "distractorReasons": [
+        "南入口施工关闭",
+        "北入口临Main Street",
+        "没有装卸入口路径"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-095",
+      "sourceAnchor": "Advanced Formulas: requires Excel Basics",
+      "correctBasis": "注册高级课前先修基础课程，她尚未参加Excel课",
+      "distractorReasons": [
+        "无需取消全部培训",
+        "营销研讨不相关",
+        "无需出差表格"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-097",
+      "sourceAnchor": "Lena has not taken any company Excel training before.",
+      "correctBasis": "高级课要求基础课，但员工尚未完成",
+      "distractorReasons": [
+        "课程满员未提及",
+        "报名逾期未提及",
+        "主管取消未提及"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M1-P7-098",
+      "sourceAnchor": "Building management handles plumbing and heating repairs.",
+      "correctBasis": "水槽漏水属于管道维修应由物业负责",
+      "distractorReasons": [
+        "租客只承担灯泡更换",
+        "家具供应商无关",
+        "供暖检查员无关"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TIMED-1701",
+      "sourceAnchor": "cafeteria on the second floor will close at 2 P.M.",
+      "correctBasis": "目的为通知二楼食堂周五设备清洁提前关闭",
+      "distractorReasons": [
+        "没有新菜单推广",
+        "没有餐卡涨价",
+        "没有招聘信息"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TIMED-1706",
+      "sourceAnchor": "I will meet the group in the lobby",
+      "correctBasis": "Marta明确先在大厅接访客再带上楼",
+      "distractorReasons": [
+        "会议室是样品摆放处",
+        "未提Delta公司见面",
+        "无酒店安排"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TIMED-1707",
+      "sourceAnchor": "The call usually lasts 35 minutes.",
+      "correctBasis": "11:30通话按通常35分钟12:05可结束，早于12:20班车",
+      "distractorReasons": [
+        "无需取消电话",
+        "工作坊13点开始非11:30",
+        "没有开班车角色"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TIMED-1710",
+      "sourceAnchor": "Purchase date: May 3",
+      "correctBasis": "邮件5月15日说次日5月16日退，相隔13天在14天内",
+      "distractorReasons": [
+        "退货期限并非5月10日",
+        "商品未拆封且条款非只允许已拆",
+        "政策明确14天期限"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TIMED-1713",
+      "sourceAnchor": "requires completion of Spreadsheet Basics or equivalent work experience.",
+      "correctBasis": "缺基础课程且等效经验是否足够未知，须核准先修资格",
+      "distractorReasons": [
+        "课期11月8在注册中已知",
+        "无停车付款条件",
+        "无自带电脑要求"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TIMED-1715",
+      "sourceAnchor": "has not taken the Basics course and has not worked with pivot tables.",
+      "correctBasis": "缺基础课且替代经验未证实，资格待审核",
+      "distractorReasons": [
+        "并非基础课授课教师",
+        "明确没有数据透视表经验",
+        "未取消课程"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TIMED-1716",
+      "sourceAnchor": "landlord is responsible for repairs to building plumbing.",
+      "correctBasis": "厨下管道漏水而洗碗机正常，房东负责建筑管道维修",
+      "distractorReasons": [
+        "房客仅负责私人电器损坏",
+        "电梯检查者无关",
+        "洗碗机制造商无关"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-P7-TIMED-1718",
+      "sourceAnchor": "Elevator inspection: September 6",
+      "correctBasis": "检查针对电梯，而报修是厨房管道，属于不同系统",
+      "distractorReasons": [
+        "未说明租期结束",
+        "不是仅涉及私人设备",
+        "不是房租付款"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-B-01",
+      "sourceAnchor": "our driver will arrive Friday",
+      "correctBasis": "原计划周四因装卸区关闭改周五，邮件通知更改送货时间",
+      "distractorReasons": [
+        "没有付款请求",
+        "没有取消订单",
+        "不是宣传快速配送"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-C-01",
+      "sourceAnchor": "Book a meeting room for six hours or more",
+      "correctBasis": "宣传预订会议室可获咖啡服务",
+      "distractorReasons": [
+        "无酒店装修内容",
+        "不是咖啡馆开业",
+        "无招聘事项"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-C-03",
+      "sourceAnchor": "Offer valid for weekday bookings made before November 30.",
+      "correctBasis": "工作日预订至少6小时且11月30日前的交易符合资格",
+      "distractorReasons": [
+        "周末两小时不符合",
+        "12月预订超过期限",
+        "仅有音响设备不构成资格"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-D-01",
+      "sourceAnchor": "north elevator will be unavailable",
+      "correctBasis": "北电梯安全检查期间临时停运",
+      "distractorReasons": [
+        "货梯运货未受影响",
+        "没有搬迁办公室",
+        "没有消防演练"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-G-01",
+      "sourceAnchor": "88: Bayview 7:40 → Central 8:35",
+      "correctBasis": "9:15会议至少提前20分钟到站最晚8:55，只有88次8:35",
+      "distractorReasons": [
+        "94次9点过晚",
+        "102次9:25过晚",
+        "88次可行非无车"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-H-01",
+      "sourceAnchor": "20% off one office chair.",
+      "correctBasis": "150美元椅子20%即30美元",
+      "distractorReasons": [
+        "20美元不是20%结果",
+        "25美元是收纳物售价",
+        "35美元不是20%结果"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-H-03",
+      "sourceAnchor": "Valid through August 31.",
+      "correctBasis": "8月28日购买仍在8月31日有效期内",
+      "distractorReasons": [
+        "并非8月27日过期",
+        "适用办公室椅子非仅办公桌",
+        "购买日期已给出"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-I-01",
+      "sourceAnchor": "Parking at the venue costs $12.",
+      "correctBasis": "她乘公司班车且不预留车位，因此避免停车费",
+      "distractorReasons": [
+        "注册费是否存在未交代",
+        "午餐已包含不能据此算额外省下费用",
+        "不承担班车维护费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-J-01",
+      "sourceAnchor": "Scanner purchased March 12.",
+      "correctBasis": "购买次年2月20仍未满一年，保修时长有效",
+      "distractorReasons": [
+        "条款明确一年非六个月",
+        "次年2月仍早于3月12",
+        "购买日期已给出"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-K-03",
+      "sourceAnchor": "three years in warehouse logistics",
+      "correctBasis": "三年物流经验、表格认证、9月8日可开工，满足列出的三项",
+      "distractorReasons": [
+        "有三年经验非欠缺",
+        "9月8早于9月15",
+        "已获高级表格认证"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-L-01",
+      "sourceAnchor": "I approve her participation",
+      "correctBasis": "允许基础课程或经理批准，经理明确批准",
+      "distractorReasons": [
+        "她并未完成基础课",
+        "条件仍然存在",
+        "未提她任教"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-M-01",
+      "sourceAnchor": "Tenants replace batteries in individual thermostats.",
+      "correctBasis": "室内温暖而温控器屏幕无显示且电池未换，先换电池",
+      "distractorReasons": [
+        "暖气仍正常无需更换中央锅炉",
+        "无搬家要求",
+        "检查无须取消"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-N-01",
+      "sourceAnchor": "Express delivery costs $18 regardless of order value.",
+      "correctBasis": "订单选加急，固定18美元不因金额减免",
+      "distractorReasons": [
+        "免费仅限标准配送",
+        "无8美元费率",
+        "96美元是商品小计"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-N-03",
+      "sourceAnchor": "Orders over $80 receive free standard delivery.",
+      "correctBasis": "免费仅适用标准服务；订单选加急且固定18美元",
+      "distractorReasons": [
+        "订单96高于80",
+        "订单并未取消",
+        "加急服务有明确报价可用"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-O-01",
+      "sourceAnchor": "Return shuttle leaves at 12:30 and takes 40 minutes",
+      "correctBasis": "12:30加40分钟13:10，早于最迟13:20",
+      "distractorReasons": [
+        "不会晚于14点",
+        "12:30发车在12点午餐后",
+        "行车时间40分钟已知"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-P-01",
+      "sourceAnchor": "from July 1 through August 15.",
+      "correctBasis": "7月1至8月15少于两个月，且当年没用过暂停额",
+      "distractorReasons": [
+        "最长两个月不是六个月限制",
+        "政策允许冻结",
+        "时间起止明确"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-Q-01",
+      "sourceAnchor": "targets next-business-day completion.",
+      "correctBasis": "快修目标下一工作日，周一收到对应周二",
+      "distractorReasons": [
+        "周三是客户演示日期",
+        "周四非下一工作日",
+        "周五非下一工作日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-R-01",
+      "sourceAnchor": "Soup + sandwich combo: $9.50",
+      "correctBasis": "餐食9.50美元10%折扣为0.95美元",
+      "distractorReasons": [
+        "0.20是咖啡价格的10%但饮料不打折",
+        "1.15对应错误地合计咖啡",
+        "2.00是咖啡原价"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-M2-P7-R-02",
+      "sourceAnchor": "beverages are excluded.",
+      "correctBasis": "咖啡是饮品不享员工餐食折扣",
+      "distractorReasons": [
+        "汤属于食物",
+        "三明治属于食物",
+        "不是所有食物均排除"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    }
+  ]
+}
