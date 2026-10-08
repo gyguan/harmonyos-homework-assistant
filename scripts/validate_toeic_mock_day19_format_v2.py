@@ -92,8 +92,39 @@ def validate() -> None:
         assert token in preset,f"Day19 runtime paper assembly missing {token}"
     assert "ToeicMockDay19V2Content.groups()" in service
     assert "let result:ToeicQuestion[]=[];" in SRC
+    # A separately versioned Part6 four-blank letter introduces one genuine
+    # complete-sentence option group, without overwriting the legacy 16 IDs.
+    revised=(CONTENT/"ToeicMockDay19Part6V2Content.ets").read_text(encoding="utf-8")
+    for token in (
+        "ToeicMockDay19Part6V2Content.questions()",
+        "ids[30+i]=revisedPart6[i].id",
+        "for (let i=0;i<revisedPart6.length;i++)",
+    ):
+        assert token in preset,f"Day19 new Part6 plan not wired: {token}"
+    for token in ("oldPaper[30+i]", "if (i===2)", "ToeicSkill.SENTENCE_INSERTION",
+                  "Which sentence best completes blank [3]",
+                  "Do not move products between shelves during the count.",
+                  "correctIndex=3", "ToeicReviewStatus.PUBLISHED,1"):
+        assert token in revised,f"missing complete-sentence Part6 contract: {token}"
+    assert "[3] _____" in revised and "R-FM2-P6-" in revised
+    # Require an explicit source constraint: topic-related alternatives cannot
+    # be "plausible" instructions without contradicting the notice.
+    assert "Each product's assigned shelf must match its location on the checklist." in revised
+    assert "Staff may change shelf location codes" in revised
+    assert "Employees who are not assigned to the count may enter" in revised
+    assert "All scheduled deliveries will be postponed" not in revised
+    active_part6_ids=[f"R-FM2-P6-{i:03d}" for i in range(1,5)]
+    assert all(not any(q.id==id for q in old_p6) for id in active_part6_ids)
+    # Preserve the other three original Part6 groups unchanged, and keep
+    # archived P6 records queryable by the Day20 high-error review queue.
+    assert len(old_p6[4:])==12
+    assert "maxDay>=19 && question.id.startsWith('R-M2-P6-')" in preset
+    assert "oldDay14 || oldDay19 || oldDay19Part6" in preset
     # Active v2 answer-position distribution, independent of archived R-M2 paper.
-    displayed=[(q.id,q.answer) for q in old_p5+old_p6]
+    displayed=[(q.id,q.answer) for q in old_p5]
+    displayed.extend((f"R-FM2-P6-{i+1:03d}",3 if i==2 else old_p6[i].answer)
+                     for i in range(4))
+    displayed.extend((q.id,q.answer) for q in old_p6[4:])
     displayed.extend((f"R-FM2-P7-S{i//3+1:02d}-{i%3+1:02d}",old_p7[i].answer)
                      for i in range(18))
     displayed.extend((f"R-FM2-P7-M{g+1}-{item+1:02d}",item)
