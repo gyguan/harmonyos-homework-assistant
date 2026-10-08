@@ -12,7 +12,7 @@ import re
 from collections import Counter
 from pathlib import Path
 
-from validate_toeic_question_quality import collect, fields, literals_after, wrapper_version_overrides
+from validate_toeic_question_quality import collect, fields, literals_after, wrapper_version_overrides, remove_arkts_comments
 from validate_toeic_translation_coverage import collect_translations
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,6 +47,13 @@ def validate() -> None:
               + "/* if (id==='R-OLD') question.version=2; */" + chr(10)
               + "if (id==='R-LIVE') question.version=3;")
     assert wrapper_version_overrides(sample) == {"R-LIVE": 3}
+    # A commented-out question constructor must NOT be counted as a live item.
+    fixture = (
+        "// ToeicWeekTwoContent.q('R-COMMENTED-LINE', 1);" + chr(10)
+        + "/* ToeicWeekTwoContent.q('R-COMMENTED-BLOCK', 2); */" + chr(10)
+        + "ToeicWeekTwoContent.q('R-LIVE-Q', 3);")
+    parsed = literals_after(remove_arkts_comments(fixture), "ToeicWeekTwoContent.q(")
+    assert len(parsed) == 1 and "'R-LIVE-Q'" in parsed[0]
     questions, _ = collect()
     by_id = {q.id: q for q in questions}
     assert len(questions) == len(by_id) == 431, "all legacy questions must stay addressable"
