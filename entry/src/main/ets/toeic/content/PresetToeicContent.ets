@@ -5,6 +5,7 @@ import {
 import { ToeicContentValidator } from './ToeicContentValidator';
 import { ToeicWeekOneContent } from './ToeicWeekOneContent';
 import { ToeicWeekTwoContent } from './ToeicWeekTwoContent';
+import { ToeicMockDay14V2Content } from './ToeicMockDay14V2Content';
 import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
 import { ToeicVocabularyExpansion } from './ToeicVocabularyExpansion';
@@ -135,12 +136,12 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions());
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions());
   }
 
   static publishedReadingGroups():ToeicReadingGroup[] {
-    let candidates=ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups());
-    let items=ToeicExtraReadingContent.questions().concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions());
+    let candidates=ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups());
+    let items=ToeicExtraReadingContent.questions().concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions());
     let groups:ToeicReadingGroup[]=[];
     for (let group of candidates) {
       let everyPublished=true;
@@ -281,7 +282,17 @@ export class PresetToeicContent {
   }
 
   static studyDays():ToeicStudyDay[] {
-    return ToeicWeekOneContent.studyDays().concat(ToeicWeekTwoContent.studyDays()).concat(ToeicWeekThreeContent.studyDays());
+    let plans=ToeicWeekOneContent.studyDays().concat(ToeicWeekTwoContent.studyDays()).concat(ToeicWeekThreeContent.studyDays());
+    // Keep the published v1 100-question bank unchanged for historical drafts.
+    // Only *new* Day14 sessions use the structurally corrected v2 Part7.
+    for (let plan of plans) {
+      if (plan.day===14) {
+        let ids=ToeicWeekTwoContent.mockQuestionIds().slice(0,46);
+        for (let question of ToeicMockDay14V2Content.questions()) ids.push(question.id);
+        plan.questionIds=ids;
+      }
+    }
+    return plans;
   }
 
   static sentenceDrills():ToeicSentenceDrill[] {
@@ -328,7 +339,7 @@ export class PresetToeicContent {
       for (let question of all) if (question.id===id) { result.push(question); break; }
     }
     // Daily extra passages are genuine planned exercises, not a separate bonus session.
-    // Day 14 and Day 19 mock question sets remain byte-for-byte unchanged.
+    // Historical Day14/19 items remain unchanged; new Day14 sessions use new v2 IDs.
     for (let question of PresetToeicContent.supplementaryReadingQuestionsForDay(day)) {
       if (!PresetToeicContent.containsQuestionId(result,question.id)) result.push(question);
     }
