@@ -335,8 +335,8 @@ export struct ToeicHomePage {
   private selectedDayGuidance():string {
     if (this.selectedStudyDay===1) {
       return this.progressDiagnosticCompleted?
-        '初始诊断已完成。可按需做标准水平复测；复测只记录答题表现，不影响当前学习进度。':
-        '先完成 12 题快速诊断，了解 Part 5/6/7 的薄弱点，完成后自动进入 Day 2。';
+        '综合诊断已完成，可按需重新练习 Day 1；历史答题记录会保留。':
+        '完成 20 题综合诊断，识别词汇语法、篇章理解及跨文档阅读的薄弱点；提交后进入 Day 2。';
     }
     if (this.selectedStudyDay===12 || this.selectedStudyDay===13) {
       return '今日训练已包含完整双篇 / 三篇文档组；每组连续完成 5 题，历史作答和错题次数正常保留。';
@@ -364,7 +364,7 @@ export struct ToeicHomePage {
 
   private trainingButtonLabel():string {
     if (this.selectedStudyDay===1) {
-      return this.progressDiagnosticCompleted?'重新进行 Day 1 快速诊断':'进入 Day 1 快速诊断';
+      return this.progressDiagnosticCompleted?'重新进行 Day 1 综合诊断':'开始 Day 1 综合诊断';
     }
     if (this.selectedStudyDay===14) return '开始 Day 14 第一次完整模考';
     if (this.selectedStudyDay===18) return '开始 Day 18 动态补弱';
@@ -425,20 +425,6 @@ export struct ToeicHomePage {
     this.mode=ToeicPageMode.HOME;
     this.activeSessionDay=0;
     this.activeSessionAdvancesProgress=false;
-  }
-
-  private startDiagnostic():void {
-    this.activeSessionDay=1;
-    this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted;
-    this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions());
-  }
-
-  private startStandardDiagnostic():void {
-    // Optional Day 1 reassessment: do not replace the quick diagnostic milestone or advance progress.
-    if (this.selectedStudyDay!==1 || !this.progressDiagnosticCompleted) return;
-    this.activeSessionDay=1;
-    this.activeSessionAdvancesProgress=false;
-    this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.standardDiagnosticQuestions());
   }
 
   private startTraining():void {
@@ -840,7 +826,7 @@ export struct ToeicHomePage {
         .width('100%').fontSize(AppTheme.BODY_SIZE)
         .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       if (this.selectedStudyDay===1) {
-        Text('预计 '+this.selectedDayMinutes+' 分钟 · 12 题快速诊断')
+        Text('预计 '+this.selectedDayMinutes+' 分钟 · 20 题综合诊断')
           .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
       } else {
         Text('预计 '+this.selectedDayMinutes+' 分钟 · 高频词 '+this.selectedDayVocabularyCount+
@@ -875,13 +861,6 @@ export struct ToeicHomePage {
           .padding(AppTheme.CARD_PADDING_COMPACT)
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS);
-      }
-      if (this.selectedStudyDay===1 && this.progressDiagnosticCompleted) {
-        Button('标准水平复测 · 12 题',{type:ButtonType.Normal})
-          .width('100%').height(AppTheme.BUTTON_HEIGHT)
-          .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
-          .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.startStandardDiagnostic());
       }
     }
     .width('100%').padding(AppTheme.CARD_PADDING)

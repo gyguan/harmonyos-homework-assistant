@@ -181,22 +181,9 @@ export class PresetToeicContent {
     return published;
   }
 
+  /** The Day 1 plan is the only source of truth for the comprehensive diagnostic. */
   static diagnosticQuestions():ToeicQuestion[] {
-    let all=PresetToeicContent.publishedQuestions();
-    let ids:string[]=['R-P5-WF-0001','R-P5-VOICE-0002','R-P5-PREP-0003','R-P5-CONJ-0004','R-P5-COL-0005','R-P5-VOC-0006',
-      'R-P6-CTX-0001','R-P6-WF-0002','R-P7-DETAIL-0001','R-P7-PURPOSE-0002','R-P7-PARA-0003','R-P7-DETAIL-0004'];
-    let result:ToeicQuestion[]=[];
-    for (let id of ids) for (let q of all) if (q.id===id) { result.push(q); break; }
-    return result;
-  }
-
-  static standardDiagnosticQuestions():ToeicQuestion[] {
-    let published=PresetToeicContent.publishedQuestions();
-    let result:ToeicQuestion[]=[];
-    for (let question of published) {
-      if (question.id.startsWith('R-DX-')) result.push(question);
-    }
-    return result;
+    return PresetToeicContent.questionsForDay(1);
   }
 
   // Every published extra reading group has exactly one assigned day. Keep all five
