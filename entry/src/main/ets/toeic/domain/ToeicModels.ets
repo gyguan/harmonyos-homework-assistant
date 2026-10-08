@@ -80,14 +80,12 @@ export class ToeicQuestionHistory {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=8; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=9; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string='';
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
   activeDraft:ToeicSessionDraft|null=null; mockReports:ToeicMockReport[]=[];
   vocabularyRecalls:ToeicVocabularyRecall[]=[];
-  // Separate user-selected key words from automatically flagged "not remembered" words.
-  // Both collections store stable vocabulary IDs and survive study-day changes.
-  importantVocabularyIds:string[]=[];
+  // Only "not remembered" words are flagged; this persists across study days.
   unrememberedVocabularyIds:string[]=[];
   dayTasks:ToeicDayTaskProgress[]=[]; sessionReports:ToeicSessionReport[]=[];
   skillStats:ToeicSkillStat[]=[];
