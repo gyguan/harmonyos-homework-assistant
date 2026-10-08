@@ -60,6 +60,8 @@ export struct ToeicHomePage {
   @State private draftLabel:string='';
   @State private navigatorVisible:boolean=false;
   @State private revealedWordIds:string[]=[];
+  @State private importantVocabularyIds:string[]=[];
+  @State private unrememberedVocabularyIds:string[]=[];
   @State private revealedSentenceIds:string[]=[];
   @State private lastReviewedWordId:string='';
   @State private vocabularyFeedback:string='';
@@ -266,6 +268,8 @@ export struct ToeicHomePage {
     this.progressAccuracy=this.viewModel.accuracyValue(snapshot);
     this.mockReports=snapshot.mockReports.slice();
     this.recentReports=snapshot.sessionReports.slice(-3).reverse();
+    this.importantVocabularyIds=snapshot.importantVocabularyIds.slice();
+    this.unrememberedVocabularyIds=snapshot.unrememberedVocabularyIds.slice();
     let draft=snapshot.activeDraft;
     this.draftLabel=draft===null?'':'Day '+draft.day+' · '+
       (draft.day===14 || draft.day===19?'完整模考':'专项训练')+
@@ -506,8 +510,18 @@ export struct ToeicHomePage {
   private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean):Promise<void> {
     await this.viewModel.recordVocabularyRecall(item.id,remembered);
     this.lastReviewedWordId=item.id;
-    this.vocabularyFeedback=remembered?'已记住，系统将按掌握度安排复习。':'还没记住，已安排短期复习。';
+    this.vocabularyFeedback=remembered?
+      '已记住，取消待加强标记；手动重点标记保持不变。':
+      '已加入待加强并优先排列，6 小时后安排短期复习。';
+    this.loadProgressSnapshot();
     this.loadStudyDay(this.selectedStudyDay);
+    this.refreshRevision++;
+  }
+
+  private async toggleVocabularyImportant(item:ToeicVocabularyItem):Promise<void> {
+    let important=!this.viewModel.isImportantVocabulary(item.id);
+    await this.viewModel.setVocabularyImportant(item.id,important);
+    this.loadProgressSnapshot();
     this.refreshRevision++;
   }
 
@@ -1245,7 +1259,7 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private VocabularyContent(items:ToeicVocabularyItem[]) {
+  private VocabularyContent(items:ToeicVocabularyItem[],importantIds:string[],unrememberedIds:string[]) {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Row({space:8}) {
@@ -1263,7 +1277,7 @@ export struct ToeicHomePage {
             .onClick(()=>this.startVocabularyQuiz(ToeicVocabularyQuizMode.PARAPHRASE));
         }
         .width('100%');
-        Text('选择一种检索测验，答题结果会自动安排到期复习。')
+        Text('没记住的单词优先，其次是手动标记的重点单词；标记会在切换日期和重启后保留。')
           .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         if (this.pronunciationMessage.length>0) {
           Text(this.pronunciationMessage)
@@ -1302,9 +1316,22 @@ export struct ToeicHomePage {
                 .backgroundColor(AppTheme.PRIMARY_SOFT)
                 .borderRadius(AppTheme.CONTROL_RADIUS)
                 .onClick(()=>{ void this.pronounce(item); });
+              Button(importantIds.indexOf(item.id)>=0?'★ 取消重点':'☆ 标记重点',
+                {type:ButtonType.Normal})
+                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontColor(AppTheme.PRIMARY)
+                .backgroundColor(importantIds.indexOf(item.id)>=0?
+                  AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .onClick(()=>{ void this.toggleVocabularyImportant(item); });
             }
             .width('100%')
             .alignItems(VerticalAlign.Center);
+            if (unrememberedIds.indexOf(item.id)>=0) {
+              Text('待加强 · 排在最前')
+                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.DANGER);
+            }
 
             Button(this.revealedWordIds.indexOf(item.id)>=0?'收起词义':'查看词义与搭配',
               {type:ButtonType.Normal})
@@ -1862,7 +1889,8 @@ export struct ToeicHomePage {
         this.HomeContent();
       } else if (this.mode===ToeicPageMode.VOCABULARY) {
         this.VocabularyContent(
-          this.viewModel.vocabularyForDay(this.effectiveStudyDay())
+          this.viewModel.vocabularyForDay(this.effectiveStudyDay()),
+          this.importantVocabularyIds,this.unrememberedVocabularyIds
         );
       } else if (this.mode===ToeicPageMode.VOCABULARY_QUIZ) {
         this.VocabularyQuizContent();

@@ -367,11 +367,42 @@ def main() -> None:
         "attemptCount(questionId:string)", "wrongCount(questionId:string)",
         "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
         "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
-        "restored.schemaVersion=7",
+        "restored.schemaVersion=8",
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
+    # Persisted user flags and automatic weak-word flags are distinct.
+    # They may change list order but must not override planned/due vocabulary selection.
+    models = read("entry/src/main/ets/toeic/domain/ToeicModels.ets")
+    require("schemaVersion:number=8" in models and
+            "importantVocabularyIds:string[]=[]" in models and
+            "unrememberedVocabularyIds:string[]=[]" in models,
+            "word priority flags must use additive v8 snapshot fields")
+    for token in [
+        "isImportantVocabulary(vocabularyId:string)", "isUnrememberedVocabulary(vocabularyId:string)",
+        "setVocabularyImportant(vocabularyId:string,important:boolean)",
+        "restored.importantVocabularyIds.push(value as string)",
+        "restored.unrememberedVocabularyIds.push(value as string)",
+        "if (!remembered && weakIndex<0) weakIds.push(vocabularyId)",
+        "if (remembered && weakIndex>=0) weakIds.splice(weakIndex,1)",
+        "await this.save()",
+    ]:
+        require(token in progress, f"TOEIC word flag persistence / recall integration missing: {token}")
+    # User's important flag must survive both successful and failed recalls.
+    recall_block = progress[progress.index("  async recordVocabularyRecall("):
+                            progress.index("  dayTasks(day:number)")]
+    require("importantVocabularyIds" not in recall_block and
+            "review.streak=remembered?Math.min(4,review.streak+1):0" in recall_block and
+            "review.nextDueAtMs=nowMs+delayMs" in recall_block,
+            "remembered / not-remembered must preserve manual marks and spaced repetition schedule")
     view_model = read("entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets")
+    require("let weak:ToeicVocabularyItem[]=[]" in view_model and
+            "let important:ToeicVocabularyItem[]=[]" in view_model and
+            "let regular:ToeicVocabularyItem[]=[]" in view_model and
+            "return weak.concat(important).concat(regular)" in view_model and
+            "let due=ToeicProgressStore.instance.vocabularyDueIds()" in view_model and
+            "let result:ToeicVocabularyItem[]=planned.slice()" in view_model,
+            "TOEIC vocabulary must prioritize weak then important without losing planned or due words")
     require("questionTranslation(questionId:string)" in view_model and
             "ToeicQuestionTranslationCatalog.find(questionId)" in view_model,
             "TOEIC view model must expose question translations by stable question id")
@@ -380,6 +411,15 @@ def main() -> None:
             "TOEIC contentErrors must include question translation validation")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
+    require("Button(importantIds.indexOf(item.id)>=0?'★ 取消重点':'☆ 标记重点'" in ui and
+            "this.toggleVocabularyImportant(item)" in ui and
+            "if (unrememberedIds.indexOf(item.id)>=0)" in ui and
+            "this.importantVocabularyIds=snapshot.importantVocabularyIds.slice()" in ui and
+            "this.unrememberedVocabularyIds=snapshot.unrememberedVocabularyIds.slice()" in ui and
+            "this.loadProgressSnapshot()" in ui[ui.index("  private async recordWordRecall("):
+                                                  ui.index("  private async pronounce(")] and
+            "this.importantVocabularyIds,this.unrememberedVocabularyIds" in ui,
+            "TOEIC word marks must update reactively and remain visible across day changes")
     # TOEIC page chrome must stay outside the independent scrolling content pane.
     require("private FixedHeader()" in ui and "private FixedFooter()" in ui and
             "private hasFixedFooter():boolean" in ui,
@@ -436,8 +476,8 @@ def main() -> None:
                 (".height(AppTheme.BUTTON_HEIGHT)" in body or
                  ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in body),
                 f"TOEIC action button inconsistent: {first_line}")
-    require(action_count == 27 and quiz_choice_count == 8,
-            "TOEIC all 27 action buttons and eight choice tiles must be inspected")
+    require(action_count == 28 and quiz_choice_count == 8,
+            "TOEIC all 28 action buttons and eight choice tiles must be inspected")
     require("Button('发音',{type:ButtonType.Normal})" in ui and
             ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in ui,
             "TOEIC pronunciation must preserve at least the standard secondary touch target")

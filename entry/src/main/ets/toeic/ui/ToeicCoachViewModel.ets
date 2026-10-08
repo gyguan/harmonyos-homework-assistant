@@ -89,8 +89,31 @@ export class ToeicCoachViewModel {
         break;
       }
     }
-    return result;
+    // Stable, three-tier ordering: weak words first, manually marked key words
+    // second, remaining planned/due words third. Do not mutate published catalog order.
+    let weak:ToeicVocabularyItem[]=[];
+    let important:ToeicVocabularyItem[]=[];
+    let regular:ToeicVocabularyItem[]=[];
+    for (let item of result) {
+      if (ToeicProgressStore.instance.isUnrememberedVocabulary(item.id)) weak.push(item);
+      else if (ToeicProgressStore.instance.isImportantVocabulary(item.id)) important.push(item);
+      else regular.push(item);
+    }
+    return weak.concat(important).concat(regular);
   }
+
+  isImportantVocabulary(id:string):boolean {
+    return ToeicProgressStore.instance.isImportantVocabulary(id);
+  }
+
+  isUnrememberedVocabulary(id:string):boolean {
+    return ToeicProgressStore.instance.isUnrememberedVocabulary(id);
+  }
+
+  async setVocabularyImportant(id:string,important:boolean):Promise<void> {
+    await ToeicProgressStore.instance.setVocabularyImportant(id,important);
+  }
+
   async recordVocabularyRecall(id:string,remembered:boolean):Promise<void> {
     await ToeicProgressStore.instance.recordVocabularyRecall(id,remembered);
   }
