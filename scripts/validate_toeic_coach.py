@@ -633,6 +633,11 @@ def main() -> None:
             "publishedReadingGroups():ToeicReadingGroup[]" in preset and
             "ToeicContentValidator.validateAll(published)" in preset,
             "unpublished candidate errors must not block an existing published question catalog")
+    require("let readyGroups=PresetToeicContent.publishedReadingGroups()" in preset and
+            "if (q.groupId.length>0)" in preset and
+            "if (!groupReady) continue;" in preset and
+            "validateReadingGroups(published,readyGroups)" in preset,
+            "incomplete P7 shared-passage group must not leak through publishedQuestions")
     require("static vocabularyForReview():ToeicVocabularyItem[]" in preset and
             "item.reviewStatus===ToeicReviewStatus.PUBLISHED" in preset and
             "reviewStatus:ToeicReviewStatus" in model,
