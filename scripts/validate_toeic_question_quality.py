@@ -280,8 +280,8 @@ def validate() -> dict[str, int]:
               "extra_groups": group_count, "extra_group_questions": grouped_count,
               "day1": len(DAY_ONE), "mock_sets": 2}
     print("TOEIC_QUESTION_QUALITY_PASS " + " ".join(f"{k}={v}" for k, v in result.items()))
-    print("TOEIC_QUESTION_FORMAT_P1_GAP: Day 14/19 Part 7 article group distribution "
-          "still differs from ETS 29 single / 25 multi questions; see issue #468")
+    print("TOEIC_LEGACY_MOCK_V1_PRESERVED: authored R-M1/R-M2 Part7 article groups "
+          "remain intact for historical drafts; active v2 papers are gated separately")
     return result
 
 if __name__ == "__main__":
