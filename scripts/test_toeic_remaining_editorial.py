@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Secondary AI editorial report regression: every remaining asset is covered.
+"""Secondary AI editorial regression: confirm formerly staged assets remain approved after release.
 
 This detects stale review decisions and inaccurate evidence bindings. It cannot
 certify TOEIC-equivalent difficulty or independently verify every pronunciation.
@@ -44,7 +44,7 @@ class RemainingEditorialTests(unittest.TestCase):
             row = word_rows[key]
             reviewed = self.report["vocabulary"][key]
             fingerprint = vocabulary_fingerprint(row, self.ipa[key])
-            self.assertEqual("REVIEWED", row["status"])
+            self.assertEqual("PUBLISHED", row["status"])
             self.assertEqual("PASS_AI_RECHECK", reviewed["decision"])
             self.assertEqual(row["word"], reviewed["headword"])
             self.assertEqual(row["pos"], reviewed["pos"])
@@ -91,7 +91,7 @@ class RemainingEditorialTests(unittest.TestCase):
             self.assertEqual(group["ids"], [q["id"] for q in checks])
             for row, check in zip(members, checks):
                 count += 1
-                self.assertEqual("REVIEWED", row["status"])
+                self.assertEqual("PUBLISHED", row["status"])
                 self.assertEqual("PASS_AI_RECHECK", check["result"])
                 self.assertEqual(row["stem"], check["question"])
                 self.assertEqual(row["answer"], check["answerIndex"])
