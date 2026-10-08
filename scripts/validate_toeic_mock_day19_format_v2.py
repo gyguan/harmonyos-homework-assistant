@@ -59,6 +59,7 @@ def validate() -> None:
     assert evidence and markers,"document splitting and evidence matrix missing"
     evidence=json.loads(evidence.group(1)); markers=json.loads(markers.group(1))
     assert len(evidence)==len(markers)==5
+    passage_sizes=[]
     for n in range(5):
         source_id=f"R-M2-P7-{chr(71+n)}-01"
         passage=existing[source_id].passage
@@ -66,6 +67,7 @@ def validate() -> None:
         docs=[passage[offsets[i]:(offsets[i+1] if i+1<len(offsets) else len(passage))].strip()
               for i in range(len(offsets))]
         assert len(docs) in (2,3),f"{source_id}: two or three real documents required"
+        passage_sizes.append(len(docs))
         for k,raw in enumerate(evidence[n]):
             fragments=raw.split(" || ")
             assert all(any(part in doc for doc in docs) for part in fragments),(
@@ -79,6 +81,8 @@ def validate() -> None:
                 assert all(any(part in doc for doc in docs)
                            for part in question.evidence.split(" || ")),(
                     f"{question.id}: orphan answer evidence")
+    assert passage_sizes.count(2)==2 and passage_sizes.count(3)==3, (
+        f"Day19 requires exactly two double and three triple passages: {passage_sizes}")
     assert sorted(Counter(q.group for q in multiples).values())==[2]*5
     preset=(CONTENT/"PresetToeicContent.ets").read_text(encoding="utf-8")
     service=(ROOT/"entry/src/main/ets/toeic/application/ToeicReadingGroupService.ets").read_text(encoding="utf-8")
@@ -102,7 +106,7 @@ def validate() -> None:
     assert all(8<=p7counts[i]<=19 for i in range(4)),f"Day19 v2 P7 bias: {p7counts}"
     print("TOEIC_MOCK_DAY19_V2_DISPLAY_PASS " + " ".join(f"{chr(i+65)}={counts[i]}" for i in range(4)))
     print("TOEIC_MOCK_DAY19_V2_FORMAT_PASS questions=100 P5=30 P6=16_4x4 "
-          "P7_single=29_10sets P7_multi=25_5x5 multi_docs=2or3 evidence=verbatim "
+          "P7_single=29_10sets P7_multi=25_5x5 multi_docs=2double_3triple evidence=verbatim "
           "legacy_v1=preserved")
 
 
