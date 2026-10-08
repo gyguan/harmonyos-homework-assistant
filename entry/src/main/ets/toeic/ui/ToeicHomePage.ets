@@ -370,13 +370,13 @@ export struct ToeicHomePage {
       return 'Part 7 限时训练已包含新增双篇 / 三篇题组；先读清各文档职责，再联动定位答案。';
     }
     if (this.selectedStudyDay===14) {
-      return 'Day 14 为第一次完整 Reading 模考：75 分钟、100 题固定题序，作答过程中不显示答案，结束后统一查看结果。';
+      return 'Day 14 为100题/75分钟限时模拟练习；当前Part 7单篇与多篇题组分布尚未按ETS正式卷面重编，不能据此推算官方成绩。交卷后可查看答案与解析。';
     }
     if (this.selectedStudyDay===18) {
       return 'Day 18 优先复习错题、慢题及薄弱能力，并完成新安排的双篇 / 三篇阅读整组训练。';
     }
     if (this.selectedStudyDay===19) {
-      return 'Day 19 为第二次完整 Reading 模考：75 分钟、100 题独立题集，用于验证第一轮补弱后的提升。';
+      return 'Day 19 为第二套100题/75分钟限时模拟练习；当前Part 7题组分布尚不符合ETS正式结构。结果仅用于内部补弱，不等同官方模拟成绩。';
     }
     if (this.selectedStudyDay===20) {
       return 'Day 20 优先复盘累计错 2 次及以上题目，随后完成两组新的三篇阅读，检验跨篇能力。';
@@ -1624,6 +1624,8 @@ export struct ToeicHomePage {
             ' · 用时 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min'+
             ' · 已答 '+this.mockResultAnswered+' · 未答 '+this.mockResultUnanswered)
             .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+          Text('本套题的Part 7单篇/多篇组卷比例尚未按ETS正式格式重编；成绩仅供训练诊断。')
+            .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
