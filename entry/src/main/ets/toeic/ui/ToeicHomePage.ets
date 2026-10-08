@@ -1,7 +1,7 @@
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { ToeicPart, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue, ToeicSentenceDrill, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 
@@ -38,6 +38,8 @@ export struct ToeicHomePage {
   @State private mockResultDay:number=0;
   @State private mockResultCorrect:number=0;
   @State private mockResultTotal:number=0;
+  @State private mockResultAnswered:number=0;
+  @State private mockResultUnanswered:number=0;
   @State private mockPart5Correct:number=0;
   @State private mockPart5Total:number=0;
   @State private mockPart6Correct:number=0;
@@ -45,6 +47,13 @@ export struct ToeicHomePage {
   @State private mockPart7Correct:number=0;
   @State private mockPart7Total:number=0;
   @State private mockElapsedSeconds:number=0;
+  @State private mockCountdownSeconds:number=4500;
+  @State private draftLabel:string='';
+  @State private mockReports:ToeicMockReport[]=[];
+  private sessionStartedAtMs:number=0;
+  private questionTimes:ToeicQuestionTime[]=[];
+  private mockClockId:number=-1;
+  private finishingSession:boolean=false;
   @State private currentQuestionId:string='';
   @State private currentPassage:string='';
   @State private currentStem:string='';
@@ -78,6 +87,44 @@ export struct ToeicHomePage {
     if (this.selectedStudyDay<=0) this.selectedStudyDay=this.progressCurrentDay;
     this.loadStudyDay(this.selectedStudyDay);
     this.refreshRevision++;
+    if (this.isMockSession() && this.mode===ToeicPageMode.TRAINING) this.startMockClock();
+  }
+
+  aboutToDisappear():void { this.stopMockClock(); }
+
+  private stopMockClock():void {
+    if (this.mockClockId>=0) {
+      clearInterval(this.mockClockId);
+      this.mockClockId=-1;
+    }
+  }
+
+  private mockExpired():boolean {
+    return this.isMockSession() && Date.now()>=this.sessionStartedAtMs+75*60*1000;
+  }
+
+  private updateMockClock():void {
+    if (!this.isMockSession() || this.mode!==ToeicPageMode.TRAINING) return;
+    this.mockCountdownSeconds=Math.max(0,
+      Math.ceil((this.sessionStartedAtMs+75*60*1000-Date.now())/1000));
+    if (this.mockCountdownSeconds===0) {
+      this.stopMockClock();
+      void this.finishSession();
+    }
+  }
+
+  private startMockClock():void {
+    this.stopMockClock();
+    this.updateMockClock();
+    if (this.mode===ToeicPageMode.TRAINING && this.isMockSession() && !this.finishingSession) {
+      this.mockClockId=setInterval(()=>this.updateMockClock(),1000);
+    }
+  }
+
+  private clockLabel():string {
+    let minutes=Math.floor(this.mockCountdownSeconds/60);
+    let seconds=this.mockCountdownSeconds%60;
+    return String(minutes).padStart(2,'0')+':'+String(seconds).padStart(2,'0');
   }
 
   private currentQuestionForAttempt():ToeicQuestion|null {
@@ -170,6 +217,11 @@ export struct ToeicHomePage {
     this.progressAnswered=snapshot.totalAnswered;
     this.progressCorrect=snapshot.totalCorrect;
     this.progressAccuracy=this.viewModel.accuracyValue(snapshot);
+    this.mockReports=snapshot.mockReports.slice();
+    let draft=snapshot.activeDraft;
+    this.draftLabel=draft===null?'':'Day '+draft.day+' · '+
+      (draft.day===14 || draft.day===19?'完整模考':'专项训练')+
+      '（已答 '+draft.attempts.length+'/'+draft.questionIds.length+'）';
   }
 
   private effectiveStudyDay():number {
@@ -238,17 +290,18 @@ export struct ToeicHomePage {
   private captureMockResult():void {
     this.mockResultDay=this.activeSessionDay;
     this.mockResultCorrect=0;
-    this.mockResultTotal=this.attempts.length;
+    this.mockResultTotal=this.questions.length;
+    this.mockResultAnswered=this.attempts.length;
+    this.mockResultUnanswered=this.questions.length-this.attempts.length;
     this.mockPart5Correct=0;
     this.mockPart5Total=0;
     this.mockPart6Correct=0;
     this.mockPart6Total=0;
     this.mockPart7Correct=0;
     this.mockPart7Total=0;
-    this.mockElapsedSeconds=0;
+    this.mockElapsedSeconds=Math.min(75*60,Math.max(1,Math.round((Date.now()-this.sessionStartedAtMs)/1000)));
     for (let attempt of this.attempts) {
       if (attempt.correct) this.mockResultCorrect++;
-      this.mockElapsedSeconds+=attempt.elapsedSeconds;
       if (attempt.part===ToeicPart.PART_5) {
         this.mockPart5Total++;
         if (attempt.correct) this.mockPart5Correct++;
@@ -302,63 +355,172 @@ export struct ToeicHomePage {
     }
   }
 
+  private spentForQuestion(questionId:string):number {
+    for (let entry of this.questionTimes) if (entry.questionId===questionId) return entry.spentSeconds;
+    return 0;
+  }
+
+  private noteCurrentQuestionTime():void {
+    if (this.currentQuestionId.length===0 || this.questionStartedAtMs<=0) return;
+    let elapsed=Math.max(0,Math.round((Date.now()-this.questionStartedAtMs)/1000));
+    let item:ToeicQuestionTime|null=null;
+    for (let entry of this.questionTimes) if (entry.questionId===this.currentQuestionId) { item=entry; break; }
+    if (item===null) {
+      item=new ToeicQuestionTime(this.currentQuestionId,elapsed);
+      this.questionTimes.push(item);
+    } else {
+      item.spentSeconds+=elapsed;
+    }
+    this.questionStartedAtMs=Date.now();
+    let attempt=this.sessionAttempt(this.currentQuestionId);
+    if (attempt!==null && this.isMockSession()) attempt.elapsedSeconds=Math.max(1,item.spentSeconds);
+  }
+
+  private persistDraft():void {
+    if (this.questions.length===0 || this.sessionStartedAtMs<=0) return;
+    let questionIds:string[]=[];
+    for (let question of this.questions) questionIds.push(question.id);
+    let draft=new ToeicSessionDraft(this.activeSessionDay,this.mode,
+      questionIds,this.currentIndex,this.attempts.slice(),this.questionTimes.slice(),
+      this.sessionStartedAtMs,this.activeSessionAdvancesProgress);
+    void this.viewModel.saveDraft(draft);
+    this.draftLabel='Day '+draft.day+' · '+
+      (this.isMockSession()?'完整模考':'专项训练')+
+      '（已答 '+draft.attempts.length+'/'+draft.questionIds.length+'）';
+  }
+
+  private resumeDraft():void {
+    let draft=this.viewModel.activeDraft();
+    if (draft===null) return;
+    let restored=this.viewModel.questionsForDraft(draft);
+    if (restored.length===0 || restored.length!==draft.questionIds.length) {
+      void this.viewModel.discardDraft();
+      this.draftLabel='';
+      return;
+    }
+    this.activeSessionDay=draft.day;
+    this.activeSessionAdvancesProgress=draft.advancesProgress;
+    this.mode=draft.mode===ToeicPageMode.DIAGNOSTIC?ToeicPageMode.DIAGNOSTIC:ToeicPageMode.TRAINING;
+    this.questions=restored;
+    this.attempts=draft.attempts.slice();
+    this.questionTimes=draft.questionTimes.slice();
+    this.sessionStartedAtMs=draft.startedAtMs;
+    this.currentIndex=Math.min(Math.max(0,draft.currentIndex),restored.length-1);
+    this.finishingSession=false;
+    this.loadQuestion(this.currentIndex);
+    if (this.isMockSession()) this.startMockClock();
+  }
+
+  private discardSavedDraft():void {
+    void this.viewModel.discardDraft();
+    this.draftLabel='';
+  }
+
   private startSession(mode:ToeicPageMode,questions:ToeicQuestion[]):void {
     if (questions.length===0) return;
+    this.stopMockClock();
     this.questions=questions;
     this.currentIndex=0;
     this.attempts=[];
+    this.questionTimes=[];
+    this.sessionStartedAtMs=Date.now();
+    this.finishingSession=false;
     this.loadQuestion(0);
     this.mode=mode;
+    this.persistDraft();
+    if (this.isMockSession()) this.startMockClock();
   }
 
   private cancelSession():void {
+    this.noteCurrentQuestionTime();
+    this.persistDraft(); // Return to home without losing unfinished answers.
+    this.stopMockClock();
     this.mode=ToeicPageMode.HOME;
     this.questions=[];
     this.attempts=[];
+    this.questionTimes=[];
     this.answerLocked=false;
     this.selectedIndex=-1;
     this.clearQuestionSnapshot();
+    this.activeSessionDay=0;
+    this.sessionStartedAtMs=0;
   }
 
   private chooseAnswer(index:number):void {
-    if (this.answerLocked) return;
+    if (this.finishingSession || (this.answerLocked && !this.isMockSession())) return;
+    if (this.mockExpired()) { void this.finishSession(); return; }
     let question=this.currentQuestionForAttempt();
-    if (question===null || question.id!==this.currentQuestionId ||
-      this.sessionAttempt(this.currentQuestionId)!==null) return;
-    let elapsed=Math.max(1,Math.round((Date.now()-this.questionStartedAtMs)/1000));
+    if (question===null || question.id!==this.currentQuestionId) return;
+    let existing=this.sessionAttempt(this.currentQuestionId);
+    if (existing!==null && !this.isMockSession()) return;
+    let elapsed=Math.max(1,Math.round((Date.now()-this.questionStartedAtMs)/1000)+
+      this.spentForQuestion(this.currentQuestionId));
     let attempt=this.viewModel.createAttempt(question,index,elapsed);
-    this.attempts.push(attempt);
+    if (existing!==null) {
+      for (let i=0;i<this.attempts.length;i++) {
+        if (this.attempts[i].questionId===question.id) { this.attempts[i]=attempt; break; }
+      }
+    } else {
+      this.attempts.push(attempt);
+      this.currentAttemptCount++;
+      if (!this.isMockSession() && !attempt.correct) this.currentWrongCount++;
+    }
     this.selectedIndex=index;
     this.answerCorrect=attempt.correct;
-    this.currentAttemptCount++;
-    if (!attempt.correct) this.currentWrongCount++;
     this.answerLocked=true;
+    this.persistDraft();
   }
 
   private previousQuestion():void {
-    if (this.currentIndex<=0) return;
-    let previousIndex=this.currentIndex-1;
-    this.currentIndex=previousIndex;
-    this.loadQuestion(previousIndex);
+    if (this.currentIndex<=0 || this.finishingSession) return;
+    if (this.mockExpired()) { void this.finishSession(); return; }
+    this.noteCurrentQuestionTime();
+    this.currentIndex--;
+    this.loadQuestion(this.currentIndex);
+    this.persistDraft();
   }
 
   private nextQuestion():void {
-    if (!this.answerLocked) return;
+    if (this.finishingSession || (!this.answerLocked && !this.isMockSession())) return;
+    if (this.mockExpired()) { void this.finishSession(); return; }
     let nextIndex=this.currentIndex+1;
-    if (nextIndex>=this.questions.length) { void this.finishSession(); return; }
+    if (nextIndex>=this.questions.length) {
+      if (this.isMockSession()) this.confirmMockSubmission();
+      else void this.finishSession();
+      return;
+    }
+    this.noteCurrentQuestionTime();
     this.currentIndex=nextIndex;
     this.loadQuestion(nextIndex);
+    this.persistDraft();
+  }
+
+  private confirmMockSubmission():void {
+    let remaining=this.questions.length-this.attempts.length;
+    AlertDialog.show({
+      title:'提交完整模考',
+      message:remaining>0?'还有 '+remaining+' 题未作答，确定现在提交吗？':'确定提交本次完整模考吗？',
+      primaryButton:{value:'继续作答',action:()=>{}},
+      secondaryButton:{value:'提交模考',action:()=>{ void this.finishSession(); }}
+    });
   }
 
   private async finishSession():Promise<void> {
+    if (this.finishingSession) return;
+    this.finishingSession=true;
+    this.stopMockClock();
+    this.noteCurrentQuestionTime();
     let advanceProgress=this.activeSessionAdvancesProgress;
     let mockSession=this.isMockSession();
-    if (mockSession) this.captureMockResult();
-    await this.viewModel.completeSession(
-      this.attempts,
-      this.mode===ToeicPageMode.DIAGNOSTIC,
-      advanceProgress
-    );
+    let report:ToeicMockReport|null=null;
+    if (mockSession) {
+      this.captureMockResult();
+      report=new ToeicMockReport(this.mockResultDay,Date.now(),this.mockResultCorrect,
+        this.mockResultAnswered,this.mockResultTotal,this.mockElapsedSeconds,
+        this.mockPart5Correct,this.mockPart6Correct,this.mockPart7Correct);
+    }
+    await this.viewModel.completeSession(this.attempts,this.mode===ToeicPageMode.DIAGNOSTIC,
+      advanceProgress,report);
     this.loadProgressSnapshot();
     if (advanceProgress) {
       this.selectedStudyDay=this.progressCurrentDay;
@@ -366,10 +528,13 @@ export struct ToeicHomePage {
     }
     this.refreshRevision++;
     this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.HOME;
-    this.questions=[]; this.attempts=[];
+    this.questions=[]; this.attempts=[]; this.questionTimes=[];
     this.answerLocked=false; this.selectedIndex=-1;
     this.clearQuestionSnapshot();
+    this.sessionStartedAtMs=0;
     this.activeSessionDay=0; this.activeSessionAdvancesProgress=false;
+    this.finishingSession=false;
+    this.draftLabel='';
   }
 
   private toggleQuestionTranslation():void {
