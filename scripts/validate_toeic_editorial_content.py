@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Static editorial quality gate for staged original TOEIC vocabulary and P7 bundles.
 
-These tests check structural and exact-evidence consistency; they do not replace
-independent human proofreading or authorize publishing a REVIEWED candidate.
+Checks structural and exact-evidence consistency, plus signed-off source snapshots.
+These checks cannot establish TOEIC-standard difficulty or guarantee English accuracy;
+AI editorial decisions are explicitly labeled and never represented as human review.
 """
 from __future__ import annotations
 
