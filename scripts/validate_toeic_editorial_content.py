@@ -69,7 +69,7 @@ def validate() -> None:
         rf'\s*(?P<explanation>{JSON_STRING}),(?P<evidence>{JSON_STRING}),'
         rf'(?P<paraphrase>{JSON_STRING}),(?P<seconds>\d+),'
         r'\s*ToeicDifficulty\.(?P<difficulty>\w+),ToeicScoreValue\.\w+,'
-        r'\s*ToeicReviewStatus\.(?P<status>\w+),1,\'\',\'\',0,0,"(?P<group>[^"]+)"\)'
+        r'\s*ToeicReviewStatus\.(?P<status>\w+),(?P<version>[1-9]\d*),\'\',\'\',0,0,"(?P<group>[^"]+)"\)'
     )
     questions = []
     for m in question_re.finditer(source):
@@ -77,6 +77,7 @@ def validate() -> None:
         for field in ("stem", "options", "explanation", "evidence", "paraphrase"):
             obj[field] = json.loads(obj[field])
         obj["answer"] = int(obj["answer"])
+        obj["version"] = int(obj["version"])
         obj["seconds"] = int(obj["seconds"])
         questions.append(obj)
     require(len(questions) == len(groups) * 5,
