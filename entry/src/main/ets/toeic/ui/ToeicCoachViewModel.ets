@@ -1,5 +1,6 @@
 import { PresetToeicContent } from '../content/PresetToeicContent';
 import { ToeicContentValidator } from '../content/ToeicContentValidator';
+import { ToeicExtraReadingContent } from '../content/ToeicExtraReadingContent';
 import { ToeicQuestionTranslationCatalog } from '../content/ToeicQuestionTranslationCatalog';
 import { ToeicQuestionTranslation } from '../content/ToeicQuestionTranslationModels';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
@@ -12,6 +13,7 @@ export class ToeicCoachViewModel {
   diagnosticQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.diagnosticQuestions(); }
   standardDiagnosticQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.standardDiagnosticQuestions(); }
   dailyQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.dailyQuestions(this.snapshot()); }
+  supplementaryReadingQuestions():ToeicQuestion[] { return PresetToeicContent.supplementaryReadingQuestions(); }
   dailyQuestionsForDay(day:number):ToeicQuestion[] {
     return ToeicTrainingService.instance.studyDayQuestions(this.snapshot(),day);
   }
@@ -52,13 +54,14 @@ export class ToeicCoachViewModel {
   recentSessionReports():ToeicSessionReport[] { return this.snapshot().sessionReports.slice(); }
   contentErrors():string[] {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
+    let groupErrors=ToeicContentValidator.validateReadingGroups(PresetToeicContent.questions(),ToeicExtraReadingContent.groups()).errors;
     let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
     let sentenceErrors=ToeicContentValidator.validateSentenceDrills(PresetToeicContent.sentenceDrills()).errors;
     let translationErrors=ToeicContentValidator.validateQuestionTranslations(
       PresetToeicContent.questionsRequiringTranslation(),
       ToeicQuestionTranslationCatalog.items()
     ).errors;
-    return questionErrors.concat(vocabularyErrors).concat(sentenceErrors).concat(translationErrors);
+    return questionErrors.concat(vocabularyErrors).concat(sentenceErrors).concat(translationErrors).concat(groupErrors);
   }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
   allVocabulary():ToeicVocabularyItem[] { return PresetToeicContent.vocabulary(); }
