@@ -3,7 +3,7 @@ import {
   ToeicReviewStatus, ToeicScoreValue, ToeicSection, ToeicSkill
 } from '../domain/ToeicModels';
 
-/** Review-only supplementary Part 7 travel and event expense cases; no learner publication. */
+/** AI-reviewed shared Part 7 PERDIEM/CATERING groups, published as complete bundles. */
 export class ToeicExtraReadingBatchSix {
   static groups():ToeicReadingGroup[] {
     return [
