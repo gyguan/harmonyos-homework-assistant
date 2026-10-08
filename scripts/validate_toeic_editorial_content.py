@@ -25,6 +25,12 @@ def validate() -> None:
     source = (CONTENT / "ToeicExtraReadingContent.ets").read_text(encoding="utf-8")
     word_source = (CONTENT / "ToeicVocabularyBatchTwo.ets").read_text(encoding="utf-8")
     pronunciation = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(encoding="utf-8")
+    approvals = json.loads((ROOT / "docs/product/toeic-editorial-approvals.json").read_text(encoding="utf-8"))
+
+    def approved(area: str, key: str) -> bool:
+        entry = approvals.get(area, {}).get(key, {})
+        return (isinstance(entry, dict) and bool(entry.get("reviewer", "").strip()) and
+                re.fullmatch(r"\d{4}-\d{2}-\d{2}", entry.get("approvedAt", "")) is not None)
 
     groups = {}
     group_pattern = r'new ToeicReadingGroup\("([^"]+)",(\[[^\n]*?\]),(\[[^\n]*?\])\)'
@@ -62,12 +68,19 @@ def validate() -> None:
     for group_id, group in groups.items():
         members = [q for q in questions if q["group"] == group_id]
         require({q["id"] for q in members} == set(group["ids"]), f"{group_id}: linked IDs mismatch")
+        statuses = {q["status"] for q in members}
+        require(statuses in ({"REVIEWED"}, {"PUBLISHED"}),
+                f"{group_id}: entire linked group must share a recognized review status")
+        if statuses == {"PUBLISHED"}:
+            require(approved("readingGroups", group_id),
+                    f"{group_id}: publication requires recorded human reviewer and approval date")
         for option in range(4):
             require(any(q["answer"] == option for q in members),
                     f"{group_id}: answer position {option} is absent")
         for q in members:
             key = q["id"]
-            require(q["status"] == "REVIEWED", f"{key}: must await external editorial signoff")
+            require(q["status"] in ("REVIEWED", "PUBLISHED"),
+                    f"{key}: invalid editorial state")
             require(30 <= q["seconds"] <= 180, f"{key}: implausible recommended time")
             require(len(q["options"]) == 4 and len(set(q["options"])) == 4,
                     f"{key}: four distinct options required")
@@ -84,13 +97,13 @@ def validate() -> None:
             if q["skill"] == "CROSS_DOCUMENT":
                 require(len(cited_docs) >= 2, f"{key}: requires proof from two documents")
 
-    # These entries are editorial candidates only: the active catalog must
-    # continue to exclude them until the full content checklist is approved.
+    # The active catalog excludes REVIEWED content. Publication requires explicit
+    # signoff in the approval ledger and a corresponding PUBLISHED state.
     word_re = re.compile(
         rf'new ToeicVocabularyItem\((?P<id>{JSON_STRING}),(?P<word>{JSON_STRING}),'
         rf'(?P<pos>{JSON_STRING}),(?P<meaning>{JSON_STRING}),ToeicVocabularyLevel\.(?P<level>L[123]),'
         rf'(?P<scene>{JSON_STRING}),(?P<collocations>{JSON_OPTIONS}),(?P<synonyms>{JSON_OPTIONS}),'
-        rf'"","en-US","",(?P<example>{JSON_STRING}),ToeicReviewStatus.REVIEWED\)'
+        rf'"","en-US","",(?P<example>{JSON_STRING}),ToeicReviewStatus\.(?P<status>REVIEWED|PUBLISHED)\)'
     )
     words = []
     for m in word_re.finditer(word_source):
@@ -109,13 +122,17 @@ def validate() -> None:
         for field in ("collocations", "synonyms"):
             require(len(word[field]) > 0 and all(x.strip() for x in word[field]),
                     f"{key}: missing {field}")
+        require(word["status"] in ("REVIEWED", "PUBLISHED"), f"{key}: invalid editorial state")
+        if word["status"] == "PUBLISHED":
+            require(approved("vocabulary", key),
+                    f"{key}: publication requires recorded human reviewer and approval date")
         ipa = pronunciations.get(key, "")
         require(ipa.startswith("/") and ipa.endswith("/") and len(ipa) >= 5,
                 f"{key}: missing en-US IPA")
     require(len({w["word"].casefold() for w in words}) == 30, "duplicated staged English word")
 
-    print(f"[toeic-editorial] PASS: {len(words)} staged words + "
-          f"{len(questions)} staged P7 questions / {len(groups)} distinct multi-document groups")
+    print(f"[toeic-editorial] PASS: {len(words)} authored words + "
+          f"{len(questions)} P7 questions / {len(groups)} groups; approval ledger enforced")
 
 
 if __name__ == "__main__":
