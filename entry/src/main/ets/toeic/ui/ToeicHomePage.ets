@@ -32,7 +32,6 @@ export struct ToeicHomePage {
   @State private selectedSentenceDone:boolean=false;
   @State private selectedTrainingDone:boolean=false;
   @State private showFullPlan:boolean=false;
-  @State private showPracticeTools:boolean=false;
   @State private showLearningDetails:boolean=false;
   @State private recentReports:ToeicSessionReport[]=[];
   @State private progressCurrentDay:number=1;
@@ -292,6 +291,8 @@ export struct ToeicHomePage {
   }
 
   private completedTasksCount():number {
+    // Day 1 has one actual milestone: finishing the quick baseline diagnostic.
+    if (this.selectedStudyDay===1) return this.progressDiagnosticCompleted?1:0;
     let count=0;
     if (this.selectedDayVocabularyCount===0 || this.selectedVocabDone) count++;
     if (this.selectedDaySentenceCount===0 || this.selectedSentenceDone) count++;
@@ -332,6 +333,11 @@ export struct ToeicHomePage {
   }
 
   private selectedDayGuidance():string {
+    if (this.selectedStudyDay===1) {
+      return this.progressDiagnosticCompleted?
+        '初始诊断已完成。可按需做标准水平复测；复测只记录答题表现，不影响当前学习进度。':
+        '先完成 12 题快速诊断，了解 Part 5/6/7 的薄弱点，完成后自动进入 Day 2。';
+    }
     if (this.selectedStudyDay===12 || this.selectedStudyDay===13) {
       return '今日训练已包含完整双篇 / 三篇文档组；每组连续完成 5 题，历史作答和错题次数正常保留。';
     }
@@ -428,7 +434,7 @@ export struct ToeicHomePage {
   }
 
   private startStandardDiagnostic():void {
-    // Extra 12 questions never substitute for the Day 1 quick diagnostic milestone.
+    // Optional Day 1 reassessment: do not replace the quick diagnostic milestone or advance progress.
     this.activeSessionDay=1;
     this.activeSessionAdvancesProgress=false;
     this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.standardDiagnosticQuestions());
@@ -820,7 +826,7 @@ export struct ToeicHomePage {
         Text('本日任务 · '+this.dayContextLabel(this.selectedStudyDay))
           .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
         Blank();
-        Text('已完成 '+this.completedTasksCount()+'/3')
+        Text('已完成 '+this.completedTasksCount()+(this.selectedStudyDay===1?'/1':'/3'))
           .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
       }
       .width('100%').alignItems(VerticalAlign.Center);
@@ -832,29 +838,33 @@ export struct ToeicHomePage {
       Text(this.selectedDayFocus)
         .width('100%').fontSize(AppTheme.BODY_SIZE)
         .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-      Text('预计 '+this.selectedDayMinutes+' 分钟 · 高频词 '+this.selectedDayVocabularyCount+
-        ' 个 · 阅读提速 '+this.selectedDaySentenceCount+' 句')
-        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-
-      Row({space:10}) {
-        Button((this.selectedVocabDone?'✓ ':'')+'高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
-          .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-          .fontSize(AppTheme.ACTION_TEXT_SIZE)
-          .fontColor(this.selectedDayVocabularyCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
-          .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(this.selectedDayVocabularyCount>0)
-          .onClick(()=>this.openVocabulary());
-        Button((this.selectedSentenceDone?'✓ ':'')+'阅读提速 '+this.selectedDaySentenceCount+' 句',{type:ButtonType.Normal})
-          .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-          .fontSize(AppTheme.ACTION_TEXT_SIZE)
-          .fontColor(this.selectedDaySentenceCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
-          .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-          .enabled(this.selectedDaySentenceCount>0)
-          .onClick(()=>this.openSentenceDrills());
+      if (this.selectedStudyDay===1) {
+        Text('预计 '+this.selectedDayMinutes+' 分钟 · 12 题快速诊断')
+          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+      } else {
+        Text('预计 '+this.selectedDayMinutes+' 分钟 · 高频词 '+this.selectedDayVocabularyCount+
+          ' 个 · 阅读提速 '+this.selectedDaySentenceCount+' 句')
+          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+        Row({space:10}) {
+          Button((this.selectedVocabDone?'✓ ':'')+'高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
+            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(this.selectedDayVocabularyCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
+            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(this.selectedDayVocabularyCount>0)
+            .onClick(()=>this.openVocabulary());
+          Button((this.selectedSentenceDone?'✓ ':'')+'阅读提速 '+this.selectedDaySentenceCount+' 句',{type:ButtonType.Normal})
+            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(this.selectedDaySentenceCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
+            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(this.selectedDaySentenceCount>0)
+            .onClick(()=>this.openSentenceDrills());
+        }
+        .width('100%');
       }
-      .width('100%');
 
-      if (this.selectedStudyDay===12 || this.selectedStudyDay===13 ||
+      if (this.selectedStudyDay===1 || this.selectedStudyDay===12 || this.selectedStudyDay===13 ||
         this.selectedStudyDay===17 || this.selectedStudyDay===18 ||
         this.selectedStudyDay===20 || this.selectedStudyDay===14 ||
         this.selectedStudyDay===19 || this.selectedStudyDay===21) {
@@ -864,6 +874,13 @@ export struct ToeicHomePage {
           .padding(AppTheme.CARD_PADDING_COMPACT)
           .backgroundColor(AppTheme.SURFACE_SUBTLE)
           .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+      if (this.selectedStudyDay===1 && this.progressDiagnosticCompleted) {
+        Button('标准水平复测 · 12 题',{type:ButtonType.Normal})
+          .width('100%').height(AppTheme.BUTTON_HEIGHT)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
+          .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(()=>this.startStandardDiagnostic());
       }
     }
     .width('100%').padding(AppTheme.CARD_PADDING)
@@ -1156,27 +1173,6 @@ export struct ToeicHomePage {
           }
 
           this.TodayCard();
-
-          Button(this.showPracticeTools?'收起水平诊断':'更多训练 · 水平诊断',
-            {type:ButtonType.Normal})
-            .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>{this.showPracticeTools=!this.showPracticeTools;});
-          if (this.showPracticeTools) {
-            Column({space:10}) {
-              Button('标准水平诊断 · 12 题',{type:ButtonType.Normal})
-                .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .onClick(()=>this.startStandardDiagnostic());
-              Text('标准诊断不影响当前 Day 进度，Day 1 快速诊断仍从每日训练进入。')
-                .width('100%').fontSize(AppTheme.META_SIZE)
-                .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            }
-            .width('100%').padding(AppTheme.CARD_PADDING)
-            .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-          }
 
           Button(this.showLearningDetails?'收起学习数据':'学习数据与训练记录',
             {type:ButtonType.Normal})
