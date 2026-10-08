@@ -337,7 +337,8 @@ export class PresetToeicContent {
 
   static questionsRequiringTranslation():ToeicQuestion[] {
     let result:ToeicQuestion[]=[];
-    for (let day=1; day<=13; day++) {
+    for (let day=1; day<=16; day++) {
+      if (PresetToeicContent.isMockDay(day)) continue;
       let dayQuestions=PresetToeicContent.questionsForDay(day);
       for (let question of dayQuestions) result.push(question);
     }
