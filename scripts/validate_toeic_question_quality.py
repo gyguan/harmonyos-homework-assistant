@@ -114,8 +114,10 @@ def parse_question(raw: list[str], source: str, wrapper: bool) -> Item | None:
         part = values[1 + shift].split(".")[-1]
         version = values[15] if not wrapper and len(values) > 15 else 1
         group = values[20] if not wrapper and len(values) > 20 else ""
-        if wrapper and id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1102"):
-            version = 2  # explicit wrapper-level version override
+        if wrapper and id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1104"):
+            version = 2
+        if wrapper and id == "R-P7-DOUBLE-1102":
+            version = 3  # verified evidence updated from old before to source by
         return Item(id, part, values[3 + shift], values[4 + shift],
                     values[5 + shift], int(values[6 + shift]),
                     values[7 + shift], values[8 + shift],
@@ -217,12 +219,14 @@ def validate() -> dict[str, int]:
         if id not in translated_question_ids:
             errors.append(f"{id}: Day 1 has no hidden Chinese translation")
     week_two_source = contents["ToeicWeekTwoContent"]
-    for id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1102"):
+    for id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1104"):
         if f"id==='{id}'" not in week_two_source or "question.version=2" not in week_two_source:
             errors.append(f"{id}: version override for corrected published item is missing")
+    if "if (id==='R-P7-DOUBLE-1102') question.version=3;" not in week_two_source:
+        errors.append("R-P7-DOUBLE-1102: corrected published evidence requires version 3")
     for id, version in (("R-P6-CTX-0001", 2), ("R-P6-WF-0002", 2),
                         ("R-M1-P5-003", 2), ("R-M1-P7-086", 2),
-                        ("R-P7-DOUBLE-1102", 2)):
+                        ("R-P7-DOUBLE-1102", 3), ("R-P7-DOUBLE-1104", 2)):
         if id_map.get(id) is None or id_map[id].version < version:
             errors.append(f"{id}: corrected published item must increment version")
     if id_map.get("R-M1-P5-003") and "_____ users automatically" not in id_map["R-M1-P5-003"].stem:
@@ -231,6 +235,12 @@ def validate() -> dict[str, int]:
         errors.append("R-M1-P7-086: two shuttles are feasible; question must ask for latest")
     if id_map.get("R-P7-DOUBLE-1102") and "by November 15" not in id_map["R-P7-DOUBLE-1102"].passage:
         errors.append("R-P7-DOUBLE-1102: booking deadline must be unambiguous")
+    if id_map.get("R-P7-DOUBLE-1102") and "Book a two-night stay by November 15" not in id_map["R-P7-DOUBLE-1102"].evidence:
+        errors.append("R-P7-DOUBLE-1102: evidence must quote the current source rather than stale wording")
+    if id_map.get("R-P7-DOUBLE-1104") and "11:30–11:50 Cloud Operations" not in id_map["R-P7-DOUBLE-1104"].passage:
+        errors.append("R-P7-DOUBLE-1104: seminar completion time must be stated")
+    if "入选面试的申请人最迟会在 10 月 18 日当天收到联系。" not in contents["ToeicWeekTwoContent"]:
+        errors.append("S-037: no later than October 18 must include the deadline date in Chinese")
     group_count = 0
     grouped_count = 0
     seen_members: set[str] = set()
