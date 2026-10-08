@@ -7,10 +7,9 @@ independent human proofreading or authorize publishing a REVIEWED candidate.
 from __future__ import annotations
 
 import json
-from datetime import date
 from pathlib import Path
 import re
-from toeic_review_integrity import reading_fingerprint, vocabulary_fingerprint
+from toeic_review_integrity import reading_fingerprint, vocabulary_fingerprint, is_valid_approval
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "entry/src/main/ets/toeic/content"
@@ -36,21 +35,7 @@ def validate() -> None:
     approvals = json.loads((ROOT / "docs/product/toeic-editorial-approvals.json").read_text(encoding="utf-8"))
 
     def approved(area: str, key: str, expected_sha: str) -> bool:
-        entry = approvals.get(area, {}).get(key, {})
-        if not isinstance(entry, dict):
-            return False
-        reviewer = entry.get("reviewer", "")
-        approved_at = entry.get("approvedAt", "")
-        if not isinstance(reviewer, str) or not reviewer.strip():
-            return False
-        if not isinstance(approved_at, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", approved_at):
-            return False
-        try:
-            # Reject fake calendar days, and never accept a future signoff.
-            signed_on = date.fromisoformat(approved_at)
-        except ValueError:
-            return False
-        return signed_on <= date.today() and entry.get("contentSha256") == expected_sha
+        return is_valid_approval(approvals.get(area, {}).get(key, {}), expected_sha)
 
     groups = {}
     group_pattern = r'new ToeicReadingGroup\("([^"]+)",(\[[^\n]*?\]),(\[[^\n]*?\])\)'
