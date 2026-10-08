@@ -69,11 +69,17 @@ def validate() -> None:
     match=re.search(r"let evidence:string\[\]\[\]=(\[\[.*?\]\]);",V2)
     assert match,"re-grounded legacy evidence matrix missing"
     evidence=json.loads(match.group(1))
+    third_match=re.search(r"let thirdDocuments:string\[\]=(\[.*?\]);",V2,re.S)
+    assert third_match, "Day14 triple-passage companion documents missing"
+    third=ast.literal_eval(third_match.group(1))
+    assert len(third)==5 and all(third[n] for n in (2,3,4))
     assert len(evidence)==5 and all(len(g)==3 for g in evidence)
     for block in range(5):
         source=legacy[f"R-M1-P7-{71+block*3:03d}"]
         docs=re.split(r"\n\n(?=DOCUMENT [23])",source.passage)
-        assert len(docs)==2,f"multi block {block+1}: requires two linked documents"
+        if block>=2: docs.append(third[block])
+        assert len(docs)==(2 if block<2 else 3),(
+            f"multi block {block+1}: requires proper double/triple document count")
         for q_index,raw in enumerate(evidence[block]):
             matching={i for fragment in raw.split(" || ") for i,doc in enumerate(docs)
                       if fragment in doc}
@@ -100,7 +106,7 @@ def validate() -> None:
     assert "ToeicMockDay14V2Content.groups()" in service
     print("TOEIC_MOCK_DAY14_V2_FORMAT_PASS questions=100 P5=30 "
           "P6=16_4x4 P7_single=29_10sets P7_multi=25_5x5 "
-          "group_docs=2 each evidence=verbatim legacy_v1=preserved")
+          "group_docs=2double_3triple evidence=verbatim legacy_v1=preserved")
 
 
 if __name__=="__main__":
