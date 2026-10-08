@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
-import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill, ToeicVocabularyRecall, ToeicDayTaskProgress, ToeicSessionReport, ToeicSkillStat } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicMockReport, ToeicMockAnswerRecord, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill, ToeicVocabularyRecall, ToeicDayTaskProgress, ToeicSessionReport, ToeicSkillStat } from '../domain/ToeicModels';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { PresetToeicContent } from '../content/PresetToeicContent';
 
@@ -245,11 +245,26 @@ export class ToeicProgressStore {
         for (let record of parsed.mockReports as Object[]) {
           let report=record as Record<string,Object>;
           if (typeof report.day!=='number' || typeof report.completedAtMs!=='number') continue;
+          let answers:ToeicMockAnswerRecord[]=[];
+          if (Array.isArray(report.answers)) {
+            for (let value of report.answers as Object[]) {
+              if (value===null || typeof value!=='object') continue;
+              let answer=value as Record<string,Object>;
+              if (typeof answer.questionId!=='string' || typeof answer.selectedIndex!=='number' ||
+                typeof answer.questionVersion!=='number') continue;
+              let selected=answer.selectedIndex as number;
+              if (selected< -1 || selected>3 || (answers.length>=100)) continue;
+              answers.push(new ToeicMockAnswerRecord(
+                answer.questionId as string,answer.questionVersion as number,
+                selected,answer.correct===true));
+            }
+          }
           restored.mockReports.push(new ToeicMockReport(
             report.day as number, report.completedAtMs as number,
             Number(report.correctCount), Number(report.answeredCount),
             Number(report.totalCount), Number(report.elapsedSeconds),
-            Number(report.part5Correct), Number(report.part6Correct), Number(report.part7Correct)));
+            Number(report.part5Correct), Number(report.part6Correct), Number(report.part7Correct),
+            answers));
         }
       }
       if (parsed.activeDraft!==null && typeof parsed.activeDraft==='object') {
@@ -341,7 +356,7 @@ export class ToeicProgressStore {
             Math.max(0,Number(item.slow)||0)));
         }
       }
-      restored.schemaVersion=9;
+      restored.schemaVersion=10;
       this.snapshot=restored;
     } catch {
       this.snapshot=new ToeicLearningSnapshot();
