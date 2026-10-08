@@ -566,8 +566,18 @@ def main() -> None:
             "supplementaryReadingQuestions()" in view_model and
             "ToeicExtraReadingContent.groups()" in group_service,
             "supplemental shared articles must be accessible only after publication")
-    require("validateReadingGroups(PresetToeicContent.questions(),ToeicExtraReadingContent.groups())" in view_model,
-            "all supplementary group evidence must pass pre-publication runtime validation")
+    require("PresetToeicContent.publishedReadingGroups()" in view_model and
+            "publishedReadingGroups():ToeicReadingGroup[]" in preset and
+            "ToeicContentValidator.validateAll(published)" in preset,
+            "unpublished candidate errors must not block an existing published question catalog")
+    require("static vocabularyForReview():ToeicVocabularyItem[]" in preset and
+            "item.reviewStatus===ToeicReviewStatus.PUBLISHED" in preset and
+            "ToeicReviewStatus.REVIEWED" in batch_two,
+            "word candidates must remain outside the live study vocabulary until reviewed")
+    require("undefined" not in extra_reading,
+            "supplemental questions contain an invalid undefined constructor argument")
+    require(extra_reading.count("ToeicReviewStatus.REVIEWED") == 15,
+            "supplemental grouped reading must stay review-only until editorial signoff")
     quiz_service = read("entry/src/main/ets/toeic/application/ToeicVocabularyQuizService.ets")
     for token in ["class ToeicDayTaskProgress", "class ToeicSessionReport",
                   "dayTasks:ToeicDayTaskProgress[]", "sessionReports:ToeicSessionReport[]",
