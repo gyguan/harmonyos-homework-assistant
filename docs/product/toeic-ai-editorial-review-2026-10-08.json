@@ -2061,7 +2061,7 @@
       ]
     },
     "P7-EX-DELIVERY": {
-      "contentSha256": "dac4560e25866750c712a5d9c364d27a7a8da3fb7e1d7afbef2ddef1338d341d",
+      "contentSha256": "1e193292b3b6a7b356d8cf411b219f63deb627bff43935cdc285841258eb4949",
       "decision": "PASS",
       "documents": 2,
       "questions": [
@@ -2095,7 +2095,8 @@
           "answerIndex": 1,
           "skill": "PURPOSE"
         }
-      ]
+      ],
+      "revisionNote": "2026-10-08 #478: AI semantic re-review corrected wording/evidence boundary; no human/ETS approval implied"
     },
     "P7-EX-TRAVEL": {
       "contentSha256": "426128b8163433b04e4fe30bbd94557730abe0c266827426531cb8784593c763",
@@ -2209,7 +2210,7 @@
       ]
     },
     "P7-EX-SUPPORT": {
-      "contentSha256": "30aee7b6155f6976b14220b4ae011c15b153da9323dcf27c1ec1411d54e4a216",
+      "contentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7",
       "decision": "PASS",
       "documents": 3,
       "questions": [
@@ -2243,7 +2244,8 @@
           "answerIndex": 2,
           "skill": "CROSS_DOCUMENT"
         }
-      ]
+      ],
+      "revisionNote": "2026-10-08 #478: AI semantic re-review corrected wording/evidence boundary; no human/ETS approval implied"
     },
     "P7-EX-RETAIL": {
       "contentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931",
