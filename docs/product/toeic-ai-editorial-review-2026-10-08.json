@@ -802,7 +802,7 @@
     },
     "V-190": {
       "word": "perishable",
-      "contentSha256": "726cc0d046e771c2aa174eaa43d7647e50000190da2781d28f54024dfa433270",
+      "contentSha256": "fac568e695c22c5ca4e721f590b9cfe2dc76a2e61e0c87e8ce5c3e6eef17752d",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -813,7 +813,7 @@
     },
     "V-191": {
       "word": "wholesale",
-      "contentSha256": "9b4ac51ccc5baa657bc5dfe131d20c5d9323f27ff5e4aab405b52b8a78b92903",
+      "contentSha256": "b3ddffcab231b376c18a117678c1417c4bc0636a4e1a1b030b5761cf9dea8d75",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -824,7 +824,7 @@
     },
     "V-192": {
       "word": "retail",
-      "contentSha256": "a52e224d4bb66f604556f0adbda18fd64726e4279da85a182fac9e44a14fcdcc",
+      "contentSha256": "485f2568ef6d5e54eae0ac2816c50231e81f07d4cfebf57d874a3484e9dfc98e",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -835,7 +835,7 @@
     },
     "V-193": {
       "word": "promotional",
-      "contentSha256": "e0e549d68a1b534c9fe35bf3038bf4bd69210ddc68eb7145d43942f62acce5ae",
+      "contentSha256": "8849f1525df79a5ee5267b982cb9ecac9051fcfaf604805ac7af6f99cac41f88",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -1110,7 +1110,7 @@
     },
     "V-218": {
       "word": "deposit",
-      "contentSha256": "3325af069b7d148264b44aa3ae3d5f75f16ffdec58922b620249b97d92891c55",
+      "contentSha256": "5b598a7c4e614e168cfd76de5b5503cf60e0fb50f9802324b628e0c63357a951",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -1506,7 +1506,7 @@
     },
     "V-254": {
       "word": "authenticate",
-      "contentSha256": "653aef55169d8cecc3ba8a74d7da790f5990997ddb1e5f1f9de51f7852ff2b2a",
+      "contentSha256": "a5c202690cc6204b9da9101d220fcaf94ace7ee5100b1d17c5c62e278d986caa",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -1770,7 +1770,7 @@
     },
     "V-278": {
       "word": "allowance",
-      "contentSha256": "6ec59a30a094cac8dc79f234d8ea4bae5c9bed43f962ca5d05d3e178328e7711",
+      "contentSha256": "f03a4e20ab49f9d81311d57a8d339697adf51734b4b5c720371d862ef5b03ca8",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -1825,7 +1825,7 @@
     },
     "V-283": {
       "word": "refreshment",
-      "contentSha256": "a597302342da2e454dcd31da1b661240c502dd4265a185604c3078d94f8c9eb4",
+      "contentSha256": "3cc0ca69f37fc4ac64636ec6d0f7ce5b88aa72f5d2f2dbac185abc5f606e9de6",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -2357,7 +2357,7 @@
       ]
     },
     "P7-EX-MIGRATION": {
-      "contentSha256": "6716f54bbe4ac990bc0c7ff14260dc658974ab1e585be72f2fcefbd5c0047312",
+      "contentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158",
       "decision": "PASS",
       "documents": 3,
       "questions": [
