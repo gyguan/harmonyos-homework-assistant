@@ -13,6 +13,7 @@ import re
 from collections import Counter
 from pathlib import Path
 from validate_toeic_question_quality import collect, fields, literals_after, parse_question
+from validate_toeic_answer_display import display_order
 
 ROOT=Path(__file__).resolve().parents[1]
 CONTENT=ROOT/"entry/src/main/ets/toeic/content"
@@ -104,6 +105,22 @@ def validate() -> None:
     assert "ToeicMockDay14V2Content.questions()" in preset
     assert "ToeicMockDay14V2Content.groups()" in preset
     assert "ToeicMockDay14V2Content.groups()" in service
+    # Stable display permutation must also make the *active* v2 mock resistant
+    # to guessing from answer-letter position; old R-M1 statistics are separate.
+    active=old_p5+old_p6
+    displayed=[(q.id,q.answer) for q in active]
+    displayed.extend((f"R-FM1-P7-S{i//3+1:02d}-{i%3+1:02d}",
+                      legacy[f"R-M1-P7-{47+i:03d}"].answer) for i in range(24))
+    displayed.extend((f"R-FM1-P7-M{g+1}-{item+1:02d}",
+                      (legacy[f"R-M1-P7-{71+g*3+item:03d}"].answer+item)%4)
+                     for g in range(5) for item in range(3))
+    displayed.extend((q.id,q.answer) for q in authored)
+    assert len(displayed)==100 and len({x[0] for x in displayed})==100
+    counts=Counter(display_order(id).index(index) for id,index in displayed)
+    p7counts=Counter(display_order(id).index(index) for id,index in displayed[46:])
+    assert all(18<=counts[i]<=32 for i in range(4)),f"Day14 v2 display bias: {counts}"
+    assert all(8<=p7counts[i]<=19 for i in range(4)),f"Day14 v2 P7 bias: {p7counts}"
+    print("TOEIC_MOCK_DAY14_V2_DISPLAY_PASS " + " ".join(f"{chr(i+65)}={counts[i]}" for i in range(4)))
     print("TOEIC_MOCK_DAY14_V2_FORMAT_PASS questions=100 P5=30 "
           "P6=16_4x4 P7_single=29_10sets P7_multi=25_5x5 "
           "group_docs=2double_3triple evidence=verbatim legacy_v1=preserved")
