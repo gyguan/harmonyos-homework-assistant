@@ -49,6 +49,18 @@ def is_valid_approval(entry: object, expected_hash: str, today: date | None = No
         return False
     if reviewer.lower() in {"unknown", "pending", "todo", "tbd"}:
         return False
+    # AI-led reviews are allowed only with explicit provenance. Never
+    # masquerade as a human approver or silently treat an AI label as human.
+    mode = entry.get("reviewMode", "HUMAN")
+    if mode == "AI_EDITORIAL":
+        if reviewer != "AI-GPT6" or entry.get("reviewEvidence") != (
+                "docs/product/toeic-ai-editorial-review-2026-10-08.json"):
+            return False
+    elif mode == "HUMAN":
+        if reviewer.startswith("AI-"):
+            return False
+    else:
+        return False
     if not isinstance(approved_at, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", approved_at):
         return False
     if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or digest != expected_hash:
