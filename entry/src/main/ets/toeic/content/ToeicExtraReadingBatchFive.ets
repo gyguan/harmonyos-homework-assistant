@@ -25,7 +25,7 @@ export class ToeicExtraReadingBatchFive {
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-MIGRATION"),
       new ToeicQuestion("R-P7-MIGRATION-03",ToeicSection.READING,ToeicPart.PART_7,
-        ToeicSkill.DETAIL,'',"When is the portal expected to become available after the migration?",["At 11 P.M. on October 17","At 9 P.M. on October 17","At 7 A.M. on October 18","At 8 A.M. on October 18"],0,
+        ToeicSkill.DETAIL,'',"When is the scheduled migration window due to end?",["At 11 P.M. on October 17","At 9 P.M. on October 17","At 7 A.M. on October 18","At 8 A.M. on October 18"],0,
         "通知给出的计划维护时段为10月17日21:00至23:00，因此计划在23:00结束。","on October 17 from 9 P.M. to 11 P.M.","planned availability = after the scheduled 11 P.M. end",50,
         ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-MIGRATION"),
