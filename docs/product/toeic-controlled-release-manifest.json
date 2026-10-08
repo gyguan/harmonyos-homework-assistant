@@ -33,6 +33,54 @@
         "P7-EX-FILTER"
       ],
       "context": "Follow-up gated publication for meeting/project/finance vocabulary and 2 shared Part7 groups"
+    },
+    {
+      "batchId": "ai-editorial-final-03",
+      "wordIdRange": {
+        "start": 181,
+        "end": 210
+      },
+      "readingGroupIds": [
+        "P7-EX-SUPPORT",
+        "P7-EX-RETAIL"
+      ],
+      "context": "Final single PR publication: technical support and retail reading"
+    },
+    {
+      "batchId": "ai-editorial-final-04",
+      "wordIdRange": {
+        "start": 211,
+        "end": 240
+      },
+      "readingGroupIds": [
+        "P7-EX-LEASE",
+        "P7-EX-TRAINING"
+      ],
+      "context": "Final single PR publication: property lease and training reimbursement"
+    },
+    {
+      "batchId": "ai-editorial-final-05",
+      "wordIdRange": {
+        "start": 241,
+        "end": 270
+      },
+      "readingGroupIds": [
+        "P7-EX-MIGRATION",
+        "P7-EX-LICENSE"
+      ],
+      "context": "Final single PR publication: portal migration and software licenses"
+    },
+    {
+      "batchId": "ai-editorial-final-06",
+      "wordIdRange": {
+        "start": 271,
+        "end": 300
+      },
+      "readingGroupIds": [
+        "P7-EX-PERDIEM",
+        "P7-EX-CATERING"
+      ],
+      "context": "Final single PR publication: business trip expenses and conference catering"
     }
   ]
 }
