@@ -3,7 +3,7 @@ import {
   ToeicReviewStatus, ToeicScoreValue, ToeicSection, ToeicSkill
 } from '../domain/ToeicModels';
 
-/** Original shared Part 7 articles. Draft content needs signed editorial review. */
+/** AI-reviewed shared Part 7 MIGRATION/LICENSE groups, published as complete bundles. */
 export class ToeicExtraReadingBatchFive {
   static groups():ToeicReadingGroup[] {
     return [
@@ -18,52 +18,52 @@ export class ToeicExtraReadingBatchFive {
         ToeicSkill.CROSS_DOCUMENT,'',"What should Melissa do before the system migration?",["Share her account password with a colleague","Export the September report by October 16","Request a new company laptop","Move her presentation to October 17"],1,
         "通知明确要求10月18日上午使用的报告最迟10月16日导出；Melissa 在10月18日8点展示9月客户报告。","Staff should export any reports needed for the morning of October 18 no later than October 16. || I have to present the September client report at 8 A.M. on October 18.","export by October 16 = prepare the October 18 report in advance",93,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-MIGRATION"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-MIGRATION"),
       new ToeicQuestion("R-P7-MIGRATION-02",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"How should Melissa access the updated portal on October 18?",["Reuse a colleague's credentials","Wait until the next weekly update","Open the intranet and sign in with her own account","Contact an external vendor to activate access"],2,
         "系统通知要求迁移后重新登录，帮助台指引使用内网入口与个人账号。","After the migration, users must sign in again using their individual company accounts. || To access the updated client-records portal, open the company intranet and select Client Records.","sign in again = reauthenticate using personal account",89,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-MIGRATION"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-MIGRATION"),
       new ToeicQuestion("R-P7-MIGRATION-03",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.DETAIL,'',"When is the scheduled migration window due to end?",["At 11 P.M. on October 17","At 9 P.M. on October 17","At 7 A.M. on October 18","At 8 A.M. on October 18"],0,
         "通知给出的计划维护时段为10月17日21:00至23:00，因此计划在23:00结束。","on October 17 from 9 P.M. to 11 P.M.","planned availability = after the scheduled 11 P.M. end",50,
         ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-MIGRATION"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-MIGRATION"),
       new ToeicQuestion("R-P7-MIGRATION-04",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"What should Melissa do if her original password is rejected?",["Wait for the database to be rebuilt","Use another employee's account","Export the report from the old portal","Use the password-reset link"],3,
         "帮助台明确指示如果旧密码不可用应使用重置链接；迁移通知明确使用个人账号。","users must sign in again using their individual company accounts. || If your existing password is rejected, use the password-reset link.","password-reset link = recover access without sharing credentials",84,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-MIGRATION"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-MIGRATION"),
       new ToeicQuestion("R-P7-MIGRATION-05",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"Will internal help desk support be available when Melissa plans to log in?",["No, it starts at 8 A.M.","Yes, it begins before 7:30 A.M.","No, it ends at 7 A.M.","Yes, but only by email"],1,
         "帮助台从上午7点开始服务，Melissa计划7:30登录，时间落在服务开始之后。","support begins at 7 A.M. || I also need to log in from my laptop at 7:30 A.M. that day.","support begins before the login attempt = available by that time",83,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-MIGRATION"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-MIGRATION"),
       new ToeicQuestion("R-P7-LICENSE-01",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"Why is the requested order eligible for the volume discount?",["It contains exactly ten active-user licenses","The account is being opened in November","The team plans to add two licenses later","A new setup charge applies to it"],0,
         "价格规则规定10个及以上用户许可证享有15%折扣，采购单初始申请恰好10个。","Orders for 10 or more licenses receive a 15 percent discount on license fees only. || We would like to open a new team account with 10 active-user licenses","10 or more = the 10 licenses requested qualify",91,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-LICENSE"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-LICENSE"),
       new ToeicQuestion("R-P7-LICENSE-02",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"What is the discounted monthly license charge for the initial order?",["$500","$440","$425","$485"],2,
         "10个许可证每个50美元共500美元，许可证费用享受15%即75美元折扣，因此月费425美元（不含设置费）。","A monthly team license costs $50 per active user. Orders for 10 or more licenses receive a 15 percent discount on license fees only. || 10 active-user licenses beginning December 1.","15 percent off $500 = $425 license fee",93,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-LICENSE"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-LICENSE"),
       new ToeicQuestion("R-P7-LICENSE-03",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"How much should the first invoice total before taxes?",["$560","$485","$425","$500"],1,
         "首月许可证425美元再加一次性设置费60美元，合计485美元。采购与财务均确认初始数量为10。","New customer accounts have a one-time setup charge of $60. || 10 active-user licenses beginning December 1. || The first invoice will reflect the volume discount and the one-time setup charge.","first invoice = discounted licenses $425 plus setup $60",98,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-LICENSE"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-LICENSE"),
       new ToeicQuestion("R-P7-LICENSE-04",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.DETAIL,'',"When is the new team account expected to become active?",["November 3","November 4","January 1","December 1"],3,
         "财务邮件明确可以12月1日激活新账号。","can activate the account on December 1.","activate = begin use of account",49,
         ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-LICENSE"),
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-LICENSE"),
       new ToeicQuestion("R-P7-LICENSE-05",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"Why should the two possible extra users be excluded from the first invoice?",["The manager said not to include them in the initial order","The software cannot support more than ten users","The team must wait for the yearly subscription to end","They have already been paid for by another department"],0,
         "采购明确额外两人可能在1月需要，但不加入初始订单；定价规则说增加许可证在后续账单计费。","Teams may add licenses during the month, but any increase will be billed on the next invoice. || We may need two additional users in January, but please do not add them to the first order.","possible future users ≠ licenses in the first purchase",89,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-LICENSE")
+        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-LICENSE")
     ];
   }
 }
