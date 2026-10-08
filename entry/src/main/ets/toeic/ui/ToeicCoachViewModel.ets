@@ -1,6 +1,5 @@
 import { PresetToeicContent } from '../content/PresetToeicContent';
 import { ToeicContentValidator } from '../content/ToeicContentValidator';
-import { ToeicExtraReadingContent } from '../content/ToeicExtraReadingContent';
 import { ToeicQuestionTranslationCatalog } from '../content/ToeicQuestionTranslationCatalog';
 import { ToeicQuestionTranslation } from '../content/ToeicQuestionTranslationModels';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
