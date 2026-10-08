@@ -78,7 +78,7 @@ class AiEditorialReleaseTests(unittest.TestCase):
             text = path.read_text(encoding="utf-8")
             for question_id, status, group_id in re.findall(
                 r'new ToeicQuestion\("(R-P7-[A-Z-]+-\d+)"[\s\S]*?'
-                r'ToeicReviewStatus\.(REVIEWED|PUBLISHED),1,\'\',\'\',0,0,"(P7-EX-[A-Z-]+)"\)',
+                r'ToeicReviewStatus\.(REVIEWED|PUBLISHED),[1-9]\d*,\'\',\'\',0,0,"(P7-EX-[A-Z-]+)"\)',
                 text,
             ):
                 self.assertNotIn(question_id, reading_statuses)
