@@ -50,6 +50,8 @@ export struct ToeicHomePage {
   @State private mockCountdownSeconds:number=4500;
   @State private draftLabel:string='';
   @State private navigatorVisible:boolean=false;
+  @State private revealedWordIds:string[]=[];
+  @State private revealedSentenceIds:string[]=[];
   @State private markedQuestionIds:string[]=[];
   @State private mockReports:ToeicMockReport[]=[];
   private sessionStartedAtMs:number=0;
@@ -342,8 +344,31 @@ export struct ToeicHomePage {
     this.startSession(ToeicPageMode.TRAINING,this.viewModel.dailyQuestionsForDay(day));
   }
 
-  private openVocabulary():void { this.pronunciationMessage=''; this.mode=ToeicPageMode.VOCABULARY; }
-  private openSentenceDrills():void { this.mode=ToeicPageMode.SENTENCE; }
+  private openVocabulary():void {
+    this.pronunciationMessage='';
+    this.revealedWordIds=[];
+    this.mode=ToeicPageMode.VOCABULARY;
+  }
+  private openSentenceDrills():void {
+    this.revealedSentenceIds=[];
+    this.mode=ToeicPageMode.SENTENCE;
+  }
+
+  private toggleWordReveal(id:string):void {
+    let next=this.revealedWordIds.slice();
+    let index=next.indexOf(id);
+    if (index>=0) next.splice(index,1);
+    else next.push(id);
+    this.revealedWordIds=next;
+  }
+
+  private toggleSentenceReveal(id:string):void {
+    let next=this.revealedSentenceIds.slice();
+    let index=next.indexOf(id);
+    if (index>=0) next.splice(index,1);
+    else next.push(id);
+    this.revealedSentenceIds=next;
+  }
 
   private async pronounce(item:ToeicVocabularyItem):Promise<void> {
     this.pronunciationMessage='';
@@ -938,17 +963,26 @@ export struct ToeicHomePage {
             .width('100%')
             .alignItems(VerticalAlign.Center);
 
-            Text(item.meaning)
-              .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
-            Text('场景：'+item.scenario)
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            if (item.collocations.length>0) {
-              Text('搭配：'+item.collocations.join(' · '))
-                .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
-            }
-            if (item.paraphrases.length>0) {
-              Text('同义：'+item.paraphrases.join(' · '))
-                .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+            Button(this.revealedWordIds.indexOf(item.id)>=0?'收起词义':'查看词义与搭配',
+              {type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .onClick(()=>this.toggleWordReveal(item.id));
+            if (this.revealedWordIds.indexOf(item.id)>=0) {
+              Text(item.meaning)
+                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
+              Text('场景：'+item.scenario)
+                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+              if (item.collocations.length>0) {
+                Text('搭配：'+item.collocations.join(' · '))
+                  .width('100%').fontSize(AppTheme.BODY_SIZE)
+                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+              }
+              if (item.paraphrases.length>0) {
+                Text('同义：'+item.paraphrases.join(' · '))
+                  .width('100%').fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              }
             }
           }
           .width('100%').padding(AppTheme.CARD_PADDING)
@@ -989,16 +1023,24 @@ export struct ToeicHomePage {
             Text(item.sentence)
               .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
               .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-            Text('译：'+item.translation)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            Text('主干：'+item.core)
-              .width('100%').fontSize(AppTheme.BODY_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-            Text('重点：'+item.focus)
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            Text(item.explanation)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+            Button(this.revealedSentenceIds.indexOf(item.id)>=0?'收起解析':'查看主干与译文',
+              {type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .onClick(()=>this.toggleSentenceReveal(item.id));
+            if (this.revealedSentenceIds.indexOf(item.id)>=0) {
+              Text('译：'+item.translation)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              Text('主干：'+item.core)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+              Text('重点：'+item.focus)
+                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+              Text(item.explanation)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+            }
           }
           .width('100%').padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.CARD_SURFACE)
