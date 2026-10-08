@@ -5,17 +5,18 @@ import { ToeicExtraReadingBatchThree } from '../content/ToeicExtraReadingBatchTh
 import { ToeicExtraReadingBatchFour } from '../content/ToeicExtraReadingBatchFour';
 import { ToeicExtraReadingBatchFive } from '../content/ToeicExtraReadingBatchFive';
 import { ToeicExtraReadingBatchSix } from '../content/ToeicExtraReadingBatchSix';
+import { ToeicMockDay14V2Content } from '../content/ToeicMockDay14V2Content';
 
 /**
  * Build a view of existing published shared passages without changing any
- * questionId, answer version or the two 100-question mock sets.
+ * questionId or answer version. New mock sessions use independent paper-v2 IDs.
  */
 export class ToeicReadingGroupService {
   static groupAt(questions:ToeicQuestion[],index:number):ToeicReadingGroup {
     if (index<0 || index>=questions.length) return new ToeicReadingGroup('',[],[]);
     let current=questions[index];
     if (current.groupId.length>0) {
-      for (let group of ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups())) {
+      for (let group of ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups())) {
         if (group.groupId!==current.groupId) continue;
         let presentIds:string[]=[];
         for (let id of group.questionIds) {
