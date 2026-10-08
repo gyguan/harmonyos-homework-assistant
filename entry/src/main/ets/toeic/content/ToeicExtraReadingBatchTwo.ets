@@ -3,7 +3,7 @@ import {
   ToeicReviewStatus, ToeicScoreValue, ToeicSection, ToeicSkill
 } from '../domain/ToeicModels';
 
-/** Original supplementary Part 7 candidates. Human editorial signoff required before publication. */
+/** ONBOARD/FILTER: AI-screened shared Part 7 reading, released as two complete groups. */
 export class ToeicExtraReadingBatchTwo {
   static groups():ToeicReadingGroup[] {
     return [
