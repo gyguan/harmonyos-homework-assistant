@@ -256,7 +256,7 @@ def main() -> None:
         "attemptCount(questionId:string)", "wrongCount(questionId:string)",
         "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
         "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
-        "restored.schemaVersion=3",
+        "restored.schemaVersion=4",
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
