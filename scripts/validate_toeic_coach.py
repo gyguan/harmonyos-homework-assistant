@@ -418,12 +418,13 @@ def main() -> None:
             "toggleVocabularyImportant" not in ui and
             "importantVocabularyIds" not in ui and
             "this.unrememberedVocabularyIds=snapshot.unrememberedVocabularyIds.slice()" in ui and
-            "if (unrememberedIds.indexOf(item.id)>=0)" in ui and
-            "this.viewModel.vocabularyForDay(this.effectiveStudyDay())," in ui and
-            "this.unrememberedVocabularyIds" in ui and
+            "this.vocabularyItems=this.viewModel.vocabularyForDay(this.effectiveStudyDay())" in ui and
+            "this.unrememberedVocabularyIds=this.viewModel.snapshot().unrememberedVocabularyIds.slice()" in ui and
+            "this.VocabularyContent(this.vocabularyItems);" in ui and
+            "this.refreshVocabularyItems();" in ui and
             "this.loadProgressSnapshot()" in ui[ui.index("  private async recordWordRecall("):
                                                   ui.index("  private async pronounce(")],
-            "vocabulary UI must keep automatic weak-word priority but remove redundant manual mark")
+            "vocabulary UI must use an observable display list and preserve automatic weak-word priority")
     # TOEIC page chrome must stay outside the independent scrolling content pane.
     require("private FixedHeader()" in ui and "private FixedFooter()" in ui and
             "private hasFixedFooter():boolean" in ui,
@@ -780,7 +781,7 @@ def main() -> None:
         require(token in ui, f"exam bookmark or question navigation missing: {token}")
     for token in ["this.toggleSentenceReveal(item.id)",
                   "this.revealedSentenceIds.indexOf(item.id)>=0",
-                  "private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean)"]:
+                  "private async recordWordRecall(item:ToeicVocabularyItem):Promise<void>"]:
         require(token in ui, f"active recall UI missing: {token}")
     vocabulary_section = ui[ui.index("  private VocabularyContent("):
                            ui.index("  private VocabularyQuizContent()")]
@@ -794,19 +795,26 @@ def main() -> None:
             "Text('搭配：'+item.collocations.join(' · '))" in vocabulary_section and
             "Text('同义：'+item.paraphrases.join(' · '))" in vocabulary_section,
             "vocabulary definition, context, example, collocations and paraphrases must be visible without disclosure")
-    require("Button(unrememberedIds.indexOf(item.id)>=0?'记住了':'没记住'" in vocabulary_section and
-            vocabulary_section.count("this.recordWordRecall(item,") == 1 and
-            "this.recordWordRecall(item,unrememberedIds.indexOf(item.id)>=0)" in vocabulary_section and
-            "this.updatingVocabularyId.length===0" in vocabulary_section and
-            "if (unrememberedIds.indexOf(item.id)>=0)" in vocabulary_section,
-            "one reversible recall button must toggle the automatic weak flag and show current state")
+    require("this.unrememberedVocabularyIds.indexOf(item.id)>=0?'记住了':'没记住'" in vocabulary_section and
+            vocabulary_section.count("this.recordWordRecall(item)") == 1 and
+            "this.updatingVocabularyId===item.id?'保存中…'" in vocabulary_section and
+            ".enabled(this.updatingVocabularyId.length===0)" in vocabulary_section and
+            "if (this.unrememberedVocabularyIds.indexOf(item.id)>=0)" in vocabulary_section and
+            "(this.unrememberedVocabularyIds.indexOf(item.id)>=0?'-weak':'-normal')" in vocabulary_section and
+            "unrememberedIds" not in vocabulary_section and
+            "ForEach(items,(item:ToeicVocabularyItem)=>" in vocabulary_section,
+            "single recall action must bind live @State and rebuild the keyed card on weak status changes")
     recall_handler = ui[ui.index("  private async recordWordRecall("):
                         ui.index("  private toggleSentenceReveal(")]
     require("if (this.updatingVocabularyId.length>0) return" in recall_handler and
-            "await this.viewModel.recordVocabularyRecall(item.id,remembered)" in recall_handler and
+            "this.viewModel.snapshot().unrememberedVocabularyIds.indexOf(item.id)>=0" in recall_handler and
+            "let saving=this.viewModel.recordVocabularyRecall(item.id,remembered)" in recall_handler and
+            "this.refreshVocabularyItems();" in recall_handler and
+            "await saving;" in recall_handler and
+            recall_handler.index("this.refreshVocabularyItems();") < recall_handler.index("await saving;") and
             "this.loadProgressSnapshot()" in recall_handler and
             "this.updatingVocabularyId=''" in recall_handler,
-            "single recall action must block double-taps and refresh persisted priority ordering")
+            "recall must update the visible state immediately, guard double taps and persist the same word status")
     require("this.questions.length===0 || this.sessionStartedAtMs===0" in ui,
             "subsequent submission callbacks must not double commit a closed session")
 
