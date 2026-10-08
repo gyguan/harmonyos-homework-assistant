@@ -9,8 +9,10 @@ import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
 import { ToeicVocabularyExpansion } from './ToeicVocabularyExpansion';
 import { ToeicVocabularyBatchTwo } from './ToeicVocabularyBatchTwo';
+import { ToeicVocabularyBatchThree } from './ToeicVocabularyBatchThree';
 import { ToeicStandardDiagnosticContent } from './ToeicStandardDiagnosticContent';
 import { ToeicExtraReadingContent } from './ToeicExtraReadingContent';
+import { ToeicExtraReadingBatchTwo } from './ToeicExtraReadingBatchTwo';
 
 export class PresetToeicContent {
   static questions():ToeicQuestion[] {
@@ -123,12 +125,12 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions());
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions());
   }
 
   static publishedReadingGroups():ToeicReadingGroup[] {
-    let candidates=ToeicExtraReadingContent.groups();
-    let items=ToeicExtraReadingContent.questions();
+    let candidates=ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups());
+    let items=ToeicExtraReadingContent.questions().concat(ToeicExtraReadingBatchTwo.questions());
     let groups:ToeicReadingGroup[]=[];
     for (let group of candidates) {
       let everyPublished=true;
@@ -224,7 +226,7 @@ export class PresetToeicContent {
       new ToeicVocabularyItem('V-029','retain','v.','保留；保持',ToeicVocabularyLevel.L2,'办公/人事',['retain records'],['keep']),
       new ToeicVocabularyItem('V-030','supplier','n.','供应商',ToeicVocabularyLevel.L1,'采购',['contact a supplier'],['vendor'])
     ];
-    return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()).concat(ToeicVocabularyExpansion.items()).concat(ToeicVocabularyBatchTwo.items()));
+    return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()).concat(ToeicVocabularyExpansion.items()).concat(ToeicVocabularyBatchTwo.items()).concat(ToeicVocabularyBatchThree.items()));
   }
 
   static vocabulary():ToeicVocabularyItem[] {
@@ -299,7 +301,7 @@ export class PresetToeicContent {
     let plan=PresetToeicContent.studyDay(day);
     let all=PresetToeicContent.vocabulary();
     let result:ToeicVocabularyItem[]=[];
-    let assigned=plan.vocabularyIds.concat(ToeicVocabularyExpansion.idsForDay(day)).concat(ToeicVocabularyBatchTwo.idsForDay(day));
+    let assigned=plan.vocabularyIds.concat(ToeicVocabularyExpansion.idsForDay(day)).concat(ToeicVocabularyBatchTwo.idsForDay(day)).concat(ToeicVocabularyBatchThree.idsForDay(day));
     for (let id of assigned) {
       for (let item of all) if (item.id===id) { result.push(item); break; }
     }
