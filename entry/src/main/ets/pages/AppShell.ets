@@ -818,18 +818,28 @@ export struct AppShell {
     .border({ width: { right: 1 }, color: AppTheme.DIVIDER });
   }
 
+  // Only the TOEIC parent's main surface hides the compact identity row.
+  // Other parent/student routes and blocking page states retain the shared shell chrome.
+  private hideIdentityBarForToeic(): boolean {
+    return this.role === AppRole.PARENT &&
+      this.parentRoute === ParentRoute.TOEIC &&
+      !this.isBlockingPageState();
+  }
+
   @Builder
   private BottomNavShell() {
     Column() {
-      IdentityContextBar({
-        isParent: this.role === AppRole.PARENT,
-        studentName: this.currentStudent().name,
-        studentGrade: this.currentStudent().grade,
-        studentClassName: this.currentStudent().className,
-        canSwitchStudent: this.familyStudents.length > 1,
-        onSwitchIdentity: () => this.openIdentitySwitcher(),
-        onSwitchStudent: () => this.openStudentSwitcher()
-      });
+      if (!this.hideIdentityBarForToeic()) {
+        IdentityContextBar({
+          isParent: this.role === AppRole.PARENT,
+          studentName: this.currentStudent().name,
+          studentGrade: this.currentStudent().grade,
+          studentClassName: this.currentStudent().className,
+          canSwitchStudent: this.familyStudents.length > 1,
+          onSwitchIdentity: () => this.openIdentitySwitcher(),
+          onSwitchStudent: () => this.openStudentSwitcher()
+        });
+      }
       Column() {
         this.PersonaContent();
       }
