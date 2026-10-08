@@ -9,6 +9,7 @@ import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
 import { ToeicVocabularyExpansion } from './ToeicVocabularyExpansion';
 import { ToeicStandardDiagnosticContent } from './ToeicStandardDiagnosticContent';
+import { ToeicExtraReadingContent } from './ToeicExtraReadingContent';
 
 export class PresetToeicContent {
   static questions():ToeicQuestion[] {
@@ -121,13 +122,14 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions());
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions());
   }
 
   static publishedQuestions():ToeicQuestion[] {
     let source=PresetToeicContent.questions();
     let validation=ToeicContentValidator.validateAll(source);
-    if (!validation.valid) return [];
+    let groupValidation=ToeicContentValidator.validateReadingGroups(source,ToeicExtraReadingContent.groups());
+    if (!validation.valid || !groupValidation.valid) return [];
     let result:ToeicQuestion[]=[];
     for (let q of source) if (q.reviewStatus===ToeicReviewStatus.PUBLISHED) result.push(q);
     return result;
@@ -147,6 +149,19 @@ export class PresetToeicContent {
     let result:ToeicQuestion[]=[];
     for (let question of published) {
       if (question.id.startsWith('R-DX-')) result.push(question);
+    }
+    return result;
+  }
+
+  static supplementaryReadingQuestions():ToeicQuestion[] {
+    let all=PresetToeicContent.publishedQuestions();
+    let ids:string[]=[];
+    for (let group of ToeicExtraReadingContent.groups()) {
+      for (let id of group.questionIds) ids.push(id);
+    }
+    let result:ToeicQuestion[]=[];
+    for (let id of ids) {
+      for (let question of all) if (question.id===id) { result.push(question); break; }
     }
     return result;
   }
