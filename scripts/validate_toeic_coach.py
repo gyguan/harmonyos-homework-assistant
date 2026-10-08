@@ -279,7 +279,7 @@ def main() -> None:
                   "'已做 '+this.currentAttemptCount+' 次'", "'错 '+this.currentWrongCount+' 次'",
                   "'译：'+item.translation", "showQuestionTranslation",
                   "currentTranslationStem", "toggleQuestionTranslation()",
-                  "'查看中文翻译'", "'收起中文翻译'", "QuestionTranslationOption"]:
+                  "'查看中文翻译'", "'收起中文翻译'"]:
         require(token in ui, f"week-one free-day UI missing: {token}")
     builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
@@ -294,6 +294,9 @@ def main() -> None:
     require("private QuestionContent()" in ui and
             "this.QuestionContent();" in ui,
             "question renderer must bind directly to explicit reactive snapshot state")
+    require("private QuestionOption(" not in ui and
+            "private QuestionTranslationOption(" not in ui,
+            "dynamic option text must not be passed through nested Builder parameters")
     for token in [
         "@State private currentQuestionId:string=''",
         "@State private currentStem:string=''",
@@ -354,6 +357,14 @@ def main() -> None:
     question_builder = question_builder_match.group(0)
     require("this.questions[" not in question_builder,
             "QuestionContent must not render fields directly from class objects in the questions array")
+    for token in [
+        "Text(this.currentOptionA)", "Text(this.currentOptionB)",
+        "Text(this.currentOptionC)", "Text(this.currentOptionD)",
+        "Text(this.currentTranslationOptionA)", "Text(this.currentTranslationOptionB)",
+        "Text(this.currentTranslationOptionC)", "Text(this.currentTranslationOptionD)",
+    ]:
+        require(token in question_builder,
+                f"QuestionContent must bind option text directly to reactive state: {token}")
     for token in [
         "this.currentStem", "this.currentPassage", "this.currentOptionA",
         "this.currentOptionB", "this.currentOptionC",
