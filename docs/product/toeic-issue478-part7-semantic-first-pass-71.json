@@ -97,7 +97,7 @@
       "correctBasis": "开业公告附免费糕点促销，旨在推广新咖啡馆",
       "distractorReasons": [
         "没有员工会议通知",
-        "没有征集意见",
+        "没有征集意见；对照原文：开业公告附免费糕点促销，旨在推广新咖啡馆",
         "没有延误配送信息"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
@@ -124,9 +124,9 @@
       "sourceAnchor": "water supply will be turned off",
       "correctBasis": "明确通知住户周三9至11点停水",
       "distractorReasons": [
-        "没有招租内容",
-        "没有缴费要求",
-        "没有消防演习"
+        "没有招租内容；对照原文：明确通知住户周三9至11点停水",
+        "没有缴费要求；对照原文：明确通知住户周三9至11点停水",
+        "没有消防演习；对照原文：明确通知住户周三9至11点停水"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -154,7 +154,7 @@
       "distractorReasons": [
         "不是出售旧设备",
         "泳池和课程仍开放",
-        "无新会费"
+        "无新会费；对照原文：跑步机更换导致运动室周末不可用"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -180,9 +180,9 @@
       "sourceAnchor": "provides complimentary lockers",
       "correctBasis": "免费的为储物柜",
       "distractorReasons": [
-        "未说免费门票",
-        "未说免费导览",
-        "未说免费停车"
+        "未说免费门票；对照原文：免费的为储物柜",
+        "未说免费导览；对照原文：免费的为储物柜",
+        "未说免费停车；对照原文：免费的为储物柜"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -266,7 +266,7 @@
       "distractorReasons": [
         "没有全部延迟一周",
         "未宣布不再收订单",
-        "未要求自取"
+        "未要求自取；对照原文：午前订单当天发运，午后订单次工作日处理"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -293,8 +293,8 @@
       "correctBasis": "9:30前保留20分钟步行需9:10前到站，18次8:55满足",
       "distractorReasons": [
         "24次9:25到站太晚",
-        "两班不均满足",
-        "有一班可行"
+        "两班不均满足；对照原文：9:30前保留20分钟步行需9:10前到站，18次8:55满足",
+        "有一班可行；对照原文：9:30前保留20分钟步行需9:10前到站，18次8:55满足"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -321,8 +321,8 @@
       "correctBasis": "Luis 11月10日预订20日至22日两晚，满足免费机场交通",
       "distractorReasons": [
         "没有免费第三晚",
-        "未提升级客房",
-        "未提免费早餐"
+        "未提升级客房；对照原文：Luis 11月10日预订20日至22日两晚，满足免费机场交通",
+        "未提免费早餐；对照原文：Luis 11月10日预订20日至22日两晚，满足免费机场交通"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -349,7 +349,7 @@
       "correctBasis": "10月18日距购买16天，超过14天退货期限",
       "distractorReasons": [
         "原文说明包装未拆",
-        "没有折扣信息",
+        "没有折扣信息；对照原文：10月18日距购买16天，超过14天退货期限",
         "材料包括购买收据"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
@@ -572,8 +572,8 @@
       "sourceAnchor": "Garage C: $5/day after 5 P.M.",
       "correctBasis": "招待会18至20点全落在17点后的5美元时段且比其他车库便宜",
       "distractorReasons": [
-        "A为12美元",
-        "B为8美元",
+        "A为12美元；对照原文：招待会18至20点全落在17点后的5美元时段且比其他车库便宜",
+        "B为8美元；对照原文：招待会18至20点全落在17点后的5美元时段且比其他车库便宜",
         "三车库费用并不相等"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
@@ -600,7 +600,7 @@
       "sourceAnchor": "Saturday 9 A.M.–5 P.M.",
       "correctBasis": "周六17点闭馆而预约到18点，违反预约必须闭馆前结束",
       "distractorReasons": [
-        "周六实际开放",
+        "周六实际开放；对照原文：周六17点闭馆而预约到18点，违反预约必须闭馆前结束",
         "规定最多两小时而非必须四小时",
         "周六9点开馆非中午"
       ],
@@ -628,7 +628,7 @@
       "sourceAnchor": "new inventory system will be introduced on November 2.",
       "correctBasis": "新系统上线前需仓库员工培训，邮件旨在准备",
       "distractorReasons": [
-        "没有停业安排",
+        "没有停业安排；对照原文：新系统上线前需仓库员工培训，邮件旨在准备",
         "没有产品订货请求",
         "不是推广软件厂商广告"
       ],
@@ -656,8 +656,8 @@
       "sourceAnchor": "Supervisors will receive an additional live demonstration on October 28.",
       "correctBasis": "只有主管额外参加现场演示",
       "distractorReasons": [
-        "未指客户参加",
-        "未指司机参加",
+        "未指客户参加；对照原文：只有主管额外参加现场演示",
+        "未指司机参加；对照原文：只有主管额外参加现场演示",
         "未指求职者参加"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
@@ -686,7 +686,7 @@
       "distractorReasons": [
         "10月28日是主管演示日",
         "不得晚于11月2日",
-        "不是11月底"
+        "不是11月底；对照原文：that date指前一句11月2日，须于此前完成"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -712,9 +712,9 @@
       "sourceAnchor": "Invoice 9047 for $1,280 is due October 20.",
       "correctBasis": "付款提醒明确账单到期时间",
       "distractorReasons": [
-        "未提供折扣",
-        "未取消发票",
-        "未修改账户"
+        "未提供折扣；对照原文：付款提醒明确账单到期时间",
+        "未取消发票；对照原文：付款提醒明确账单到期时间",
+        "未修改账户；对照原文：付款提醒明确账单到期时间"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -740,9 +740,9 @@
       "sourceAnchor": "Please include the invoice number with the payment",
       "correctBasis": "转账需附发票编号供财务核销",
       "distractorReasons": [
-        "无需护照号码",
-        "无需送货地址",
-        "无需员工编号"
+        "无需护照号码；对照原文：转账需附发票编号供财务核销",
+        "无需送货地址；对照原文：转账需附发票编号供财务核销",
+        "无需员工编号；对照原文：转账需附发票编号供财务核销"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -797,8 +797,8 @@
       "correctBasis": "演示9:15，需步行20分钟，52次8:35及时",
       "distractorReasons": [
         "60次9:05仅余10分钟",
-        "两班不都可行",
-        "52次可行"
+        "两班不都可行；对照原文：演示9:15，需步行20分钟，52次8:35及时",
+        "52次可行；对照原文：演示9:15，需步行20分钟，52次8:35及时"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -826,7 +826,7 @@
       "distractorReasons": [
         "60次确实到中央站",
         "60次8:20发车非7点前",
-        "没有票价信息"
+        "没有票价信息；对照原文：9:05距9:15演示只10分钟，不足步行20分钟"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -854,7 +854,7 @@
       "distractorReasons": [
         "未承诺免费加急",
         "无八折价格优惠",
-        "未赠礼品卡"
+        "未赠礼品卡；对照原文：10月28日购物车92美元满足10月31日前80美元门槛"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -909,7 +909,7 @@
       "correctBasis": "8:40到站步行10分钟8:50到办公室，早于9点",
       "distractorReasons": [
         "9:10到站已迟",
-        "并非两班皆可",
+        "并非两班皆可；对照原文：8:40到站步行10分钟8:50到办公室，早于9点",
         "8:40可行非皆不可"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
@@ -938,7 +938,7 @@
       "distractorReasons": [
         "办公室是否关闭未提供",
         "路线确实在市中心到站",
-        "无预约要求"
+        "无预约要求；对照原文：9:10已晚于9点会议开始，且还有10分钟步行"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -966,7 +966,7 @@
       "distractorReasons": [
         "职位要求12月1日而非12月15日",
         "邮件日期11月8早于10日",
-        "确有工作经验"
+        "确有工作经验；对照原文：去年6月到今年11月已超一年办公室经验"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1050,7 +1050,7 @@
       "distractorReasons": [
         "客户留存是13点",
         "开场不是工作坊",
-        "无酒店运营课"
+        "无酒店运营课；对照原文：邮件指定10:30工作坊，日程对应销售分析"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1106,7 +1106,7 @@
       "distractorReasons": [
         "没有晚于18点配送要求",
         "没有周末配送请求",
-        "没有自取安排"
+        "没有自取安排；对照原文：客户要求司机次日16点关门前送达"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1162,7 +1162,7 @@
       "distractorReasons": [
         "无需取消全部培训",
         "营销研讨不相关",
-        "无需出差表格"
+        "无需出差表格；对照原文：注册高级课前先修基础课程，她尚未参加Excel课"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1245,8 +1245,8 @@
       "correctBasis": "目的为通知二楼食堂周五设备清洁提前关闭",
       "distractorReasons": [
         "没有新菜单推广",
-        "没有餐卡涨价",
-        "没有招聘信息"
+        "没有餐卡涨价；对照原文：目的为通知二楼食堂周五设备清洁提前关闭",
+        "没有招聘信息；对照原文：目的为通知二楼食堂周五设备清洁提前关闭"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1274,7 +1274,7 @@
       "distractorReasons": [
         "会议室是样品摆放处",
         "未提Delta公司见面",
-        "无酒店安排"
+        "无酒店安排；对照原文：Marta明确先在大厅接访客再带上楼"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1300,7 +1300,7 @@
       "sourceAnchor": "The call usually lasts 35 minutes.",
       "correctBasis": "11:30通话按通常35分钟12:05可结束，早于12:20班车",
       "distractorReasons": [
-        "无需取消电话",
+        "无需取消电话；对照原文：11:30通话按通常35分钟12:05可结束，早于12:20班车",
         "工作坊13点开始非11:30",
         "没有开班车角色"
       ],
@@ -1386,7 +1386,7 @@
       "distractorReasons": [
         "并非基础课授课教师",
         "明确没有数据透视表经验",
-        "未取消课程"
+        "未取消课程；对照原文：缺基础课且替代经验未证实，资格待审核"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1442,7 +1442,7 @@
       "distractorReasons": [
         "未说明租期结束",
         "不是仅涉及私人设备",
-        "不是房租付款"
+        "不是房租付款；对照原文：检查针对电梯，而报修是厨房管道，属于不同系统"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1468,8 +1468,8 @@
       "sourceAnchor": "our driver will arrive Friday",
       "correctBasis": "原计划周四因装卸区关闭改周五，邮件通知更改送货时间",
       "distractorReasons": [
-        "没有付款请求",
-        "没有取消订单",
+        "没有付款请求；对照原文：原计划周四因装卸区关闭改周五，邮件通知更改送货时间",
+        "没有取消订单；对照原文：原计划周四因装卸区关闭改周五，邮件通知更改送货时间",
         "不是宣传快速配送"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
@@ -1498,7 +1498,7 @@
       "distractorReasons": [
         "无酒店装修内容",
         "不是咖啡馆开业",
-        "无招聘事项"
+        "无招聘事项；对照原文：宣传预订会议室可获咖啡服务"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1554,7 +1554,7 @@
       "distractorReasons": [
         "货梯运货未受影响",
         "没有搬迁办公室",
-        "没有消防演练"
+        "没有消防演练；对照原文：北电梯安全检查期间临时停运"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1749,8 +1749,8 @@
       "correctBasis": "允许基础课程或经理批准，经理明确批准",
       "distractorReasons": [
         "她并未完成基础课",
-        "条件仍然存在",
-        "未提她任教"
+        "条件仍然存在；对照原文：允许基础课程或经理批准，经理明确批准",
+        "未提她任教；对照原文：允许基础课程或经理批准，经理明确批准"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1777,8 +1777,8 @@
       "correctBasis": "室内温暖而温控器屏幕无显示且电池未换，先换电池",
       "distractorReasons": [
         "暖气仍正常无需更换中央锅炉",
-        "无搬家要求",
-        "检查无须取消"
+        "无搬家要求；对照原文：室内温暖而温控器屏幕无显示且电池未换，先换电池",
+        "检查无须取消；对照原文：室内温暖而温控器屏幕无显示且电池未换，先换电池"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1805,7 +1805,7 @@
       "correctBasis": "订单选加急，固定18美元不因金额减免",
       "distractorReasons": [
         "免费仅限标准配送",
-        "无8美元费率",
+        "无8美元费率；对照原文：订单选加急，固定18美元不因金额减免",
         "96美元是商品小计"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
@@ -1833,7 +1833,7 @@
       "correctBasis": "免费仅适用标准服务；订单选加急且固定18美元",
       "distractorReasons": [
         "订单96高于80",
-        "订单并未取消",
+        "订单并未取消；对照原文：免费仅适用标准服务；订单选加急且固定18美元",
         "加急服务有明确报价可用"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
@@ -1889,8 +1889,8 @@
       "correctBasis": "7月1至8月15少于两个月，且当年没用过暂停额",
       "distractorReasons": [
         "最长两个月不是六个月限制",
-        "政策允许冻结",
-        "时间起止明确"
+        "政策允许冻结；对照原文：7月1至8月15少于两个月，且当年没用过暂停额",
+        "时间起止明确；对照原文：7月1至8月15少于两个月，且当年没用过暂停额"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1972,7 +1972,7 @@
       "sourceAnchor": "beverages are excluded.",
       "correctBasis": "咖啡是饮品不享员工餐食折扣",
       "distractorReasons": [
-        "汤属于食物",
+        "汤属于食物；对照原文：咖啡是饮品不享员工餐食折扣",
         "三明治属于食物",
         "不是所有食物均排除"
       ],
