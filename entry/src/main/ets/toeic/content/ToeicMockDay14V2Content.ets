@@ -49,7 +49,8 @@ export class ToeicMockDay14V2Content {
           original.section,original.part,original.skill,'',original.stem,options,
           (original.correctIndex+item)%4,original.explanation,evidence[group][item],
           original.paraphrase,original.recommendedSeconds,original.difficulty,
-          original.scoreValue,ToeicReviewStatus.PUBLISHED,1,'','',0,0,'FM1-G'+String(group+1)));
+          original.scoreValue,ToeicReviewStatus.PUBLISHED,
+          original.id==='R-M1-P7-077'?2:1,'','',0,0,'FM1-G'+String(group+1)));
       }
     }
     result.push(new ToeicQuestion("R-FM1-P7-M1-04",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","What event is scheduled to begin at 9:15?",["A training seminar","A hotel check-in","A supplier call","A presentation"],3,"9:15开始的是演示汇报。","Our presentation at Central Tower starts at 9:15.",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G1"));
