@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
-import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill, ToeicVocabularyRecall } from '../domain/ToeicModels';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 
 const STORE_NAME:string='toeic_coach_progress';
@@ -34,6 +34,34 @@ export class ToeicProgressStore {
   wrongCount(questionId:string):number {
     let history=this.findHistory(questionId);
     return history===null?0:history.wrongCount;
+  }
+
+  vocabularyDueIds(nowMs:number=Date.now()):string[] {
+    let ids:string[]=[];
+    for (let review of this.snapshot.vocabularyRecalls) {
+      if (review.nextDueAtMs<=nowMs) ids.push(review.vocabularyId);
+    }
+    return ids;
+  }
+
+  async recordVocabularyRecall(vocabularyId:string,remembered:boolean):Promise<void> {
+    let review:ToeicVocabularyRecall|null=null;
+    for (let item of this.snapshot.vocabularyRecalls) {
+      if (item.vocabularyId===vocabularyId) { review=item; break; }
+    }
+    let nowMs=Date.now();
+    if (review===null) {
+      review=new ToeicVocabularyRecall(vocabularyId,0,0,nowMs,nowMs);
+      this.snapshot.vocabularyRecalls.push(review);
+    }
+    review.totalReviews++;
+    review.lastReviewedAtMs=nowMs;
+    review.streak=remembered?Math.min(4,review.streak+1):0;
+    // Remembered: 1/3/7/14 days. Not remembered: repeat after six hours.
+    let intervals:number[]=[0,1,3,7,14];
+    let delayMs=remembered?intervals[review.streak]*24*60*60*1000:6*60*60*1000;
+    review.nextDueAtMs=nowMs+delayMs;
+    await this.save();
   }
 
   activeDraft():ToeicSessionDraft|null { return this.snapshot.activeDraft; }
@@ -174,7 +202,18 @@ export class ToeicProgressStore {
             Array.isArray(raw.markedQuestionIds)?raw.markedQuestionIds as string[]:[]);
         }
       }
-      restored.schemaVersion=4;
+      if (Array.isArray(parsed.vocabularyRecalls)) {
+        for (let record of parsed.vocabularyRecalls as Object[]) {
+          let recall=record as Record<string,Object>;
+          if (typeof recall.vocabularyId!=='string' ||
+            typeof recall.nextDueAtMs!=='number') continue;
+          restored.vocabularyRecalls.push(new ToeicVocabularyRecall(
+            recall.vocabularyId as string,Math.max(0,Number(recall.streak)||0),
+            Math.max(0,Number(recall.totalReviews)||0),recall.nextDueAtMs as number,
+            Math.max(0,Number(recall.lastReviewedAtMs)||0)));
+        }
+      }
+      restored.schemaVersion=5;
       this.snapshot=restored;
     } catch {
       this.snapshot=new ToeicLearningSnapshot();
