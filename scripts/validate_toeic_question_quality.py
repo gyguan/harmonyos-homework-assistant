@@ -114,19 +114,37 @@ def parse_question(raw: list[str], source: str, wrapper: bool) -> Item | None:
         part = values[1 + shift].split(".")[-1]
         version = values[15] if not wrapper and len(values) > 15 else 1
         group = values[20] if not wrapper and len(values) > 20 else ""
-        if wrapper and id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1104",
-                                 "R-P7-TRIPLE-1203", "R-M1-P7-077"):
-            version = 2
-        if wrapper and id == "R-P7-DOUBLE-1102":
-            version = 3  # verified evidence updated from old before to source by
-        if wrapper and id == "R-P5-SPRINT-1528":
-            version = 2  # repaired reflexive expression
         return Item(id, part, values[3 + shift], values[4 + shift],
                     values[5 + shift], int(values[6 + shift]),
                     values[7 + shift], values[8 + shift],
                     group, int(version), source)
     except (ValueError, SyntaxError, TypeError, IndexError, AttributeError) as exc:
         raise ValueError(f"cannot parse question literal in {source}: {raw[:3]}") from exc
+
+def wrapper_version_overrides(source: str) -> dict[str, int]:
+    """Read the actual q() helper conditions, never fabricate known versions.
+
+    Unknown version-assignment syntax must fail rather than silently report v1.
+    """
+    expression = re.compile(
+        r"if\s*\((?P<condition>[^)]*)\)\s*\{?\s*"
+        r"question\.version\s*=\s*(?P<version>\d+)\s*;"
+    )
+    matches = list(expression.finditer(source))
+    if len(matches) != len(re.findall(r"question\.version\s*=", source)):
+        raise ValueError("unrecognized ArkTS question.version override syntax")
+    versions: dict[str, int] = {}
+    for match in matches:
+        ids = re.findall(r"id\s*===\s*'([^']+)'", match.group("condition"))
+        if not ids or any(not question_id.startswith("R-") for question_id in ids):
+            raise ValueError("unknown question.version override condition")
+        version = int(match.group("version"))
+        for question_id in ids:
+            if question_id in versions:
+                raise ValueError(f"duplicate version assignment for {question_id}")
+            versions[question_id] = version
+    return versions
+
 
 def collect() -> tuple[list[Item], dict[str, str]]:
     questions: list[Item] = []
@@ -137,13 +155,23 @@ def collect() -> tuple[list[Item], dict[str, str]]:
         if basename in ("ToeicWeekTwoContent", "ToeicWeekThreeContent"):
             signature = f"{basename}.q("
             wrapper = True
+            versions = wrapper_version_overrides(text)
         else:
             signature = "new ToeicQuestion("
             wrapper = False
+            versions = {}
+        seen: set[str] = set()
         for args in literals_after(text, signature):
             item = parse_question(fields(args), basename, wrapper)
             if item is not None:
+                if wrapper:
+                    item.version = versions.get(item.id, item.version)
+                    seen.add(item.id)
                 questions.append(item)
+        if wrapper:
+            missing = versions.keys() - seen
+            if missing:
+                raise ValueError(f"unmapped ArkTS version overrides: {sorted(missing)}")
     return questions, contents
 
 def validate() -> dict[str, int]:
