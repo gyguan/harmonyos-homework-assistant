@@ -481,8 +481,8 @@ def main() -> None:
                 (".height(AppTheme.BUTTON_HEIGHT)" in body or
                  ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in body),
                 f"TOEIC action button inconsistent: {first_line}")
-    require(action_count == 28 and quiz_choice_count == 8,
-            "TOEIC all 28 action buttons and eight choice tiles must be inspected")
+    require(action_count == 26 and quiz_choice_count == 8,
+            "TOEIC all 26 action buttons and eight choice tiles must be inspected")
     require("Button('发音',{type:ButtonType.Normal})" in ui and
             ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in ui,
             "TOEIC pronunciation must preserve at least the standard secondary touch target")
@@ -778,11 +778,35 @@ def main() -> None:
                   "Flex({wrap:FlexWrap.Wrap", "this.isQuestionMarked(question.id)",
                   "this.markedQuestionIds=draft.markedQuestionIds.slice()"]:
         require(token in ui, f"exam bookmark or question navigation missing: {token}")
-    for token in ["this.toggleWordReveal(item.id)", "this.toggleSentenceReveal(item.id)",
-                  "this.revealedWordIds.indexOf(item.id)>=0",
+    for token in ["this.toggleSentenceReveal(item.id)",
                   "this.revealedSentenceIds.indexOf(item.id)>=0",
-                  "this.recordWordRecall(item,true)", "this.recordWordRecall(item,false)"]:
+                  "private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean)"]:
         require(token in ui, f"active recall UI missing: {token}")
+    vocabulary_section = ui[ui.index("  private VocabularyContent("):
+                           ui.index("  private VocabularyQuizContent()")]
+    require("revealedWordIds" not in ui and
+            "toggleWordReveal" not in ui and
+            "查看词义与搭配" not in vocabulary_section and
+            "收起词义" not in vocabulary_section and
+            "Text(item.meaning)" in vocabulary_section and
+            "Text('场景：'+item.scenario)" in vocabulary_section and
+            "Text('例句：'+item.exampleSentence)" in vocabulary_section and
+            "Text('搭配：'+item.collocations.join(' · '))" in vocabulary_section and
+            "Text('同义：'+item.paraphrases.join(' · '))" in vocabulary_section,
+            "vocabulary definition, context, example, collocations and paraphrases must be visible without disclosure")
+    require("Button(unrememberedIds.indexOf(item.id)>=0?'记住了':'没记住'" in vocabulary_section and
+            vocabulary_section.count("this.recordWordRecall(item,") == 1 and
+            "this.recordWordRecall(item,unrememberedIds.indexOf(item.id)>=0)" in vocabulary_section and
+            "this.updatingVocabularyId.length===0" in vocabulary_section and
+            "if (unrememberedIds.indexOf(item.id)>=0)" in vocabulary_section,
+            "one reversible recall button must toggle the automatic weak flag and show current state")
+    recall_handler = ui[ui.index("  private async recordWordRecall("):
+                        ui.index("  private toggleSentenceReveal(")]
+    require("if (this.updatingVocabularyId.length>0) return" in recall_handler and
+            "await this.viewModel.recordVocabularyRecall(item.id,remembered)" in recall_handler and
+            "this.loadProgressSnapshot()" in recall_handler and
+            "this.updatingVocabularyId=''" in recall_handler,
+            "single recall action must block double-taps and refresh persisted priority ordering")
     require("this.questions.length===0 || this.sessionStartedAtMs===0" in ui,
             "subsequent submission callbacks must not double commit a closed session")
 
