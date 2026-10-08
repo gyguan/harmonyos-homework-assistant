@@ -368,6 +368,31 @@ def main() -> None:
             "TOEIC contentErrors must include question translation validation")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
+    # TOEIC page chrome must stay outside the independent scrolling content pane.
+    require("private FixedHeader()" in ui and "private FixedFooter()" in ui and
+            "private hasFixedFooter():boolean" in ui,
+            "TOEIC must centralize fixed page chrome")
+    root = ui[ui.index("  build() {"):]
+    require("this.FixedHeader();" in root and "this.FixedFooter();" in root and
+            "if (this.hasFixedFooter())" in root,
+            "TOEIC root must place fixed header/footer around the content pane")
+    for name in ["HomeContent", "VocabularyContent", "VocabularyQuizContent",
+                 "SentenceContent", "MockResultContent", "QuestionContent"]:
+        section = re.search(
+            rf"(?ms)^  @Builder\n  private {name}\([^\n]*\) \{{\n(.*?)(?=^  @Builder|^  build\(\))",
+            ui,
+        )
+        require(section is not None and "Scroll() {" in section.group(1) and
+                "DeepPageHeader({" not in section.group(1) and
+                ".layoutWeight(1).scrollBar(BarState.Off)" in section.group(1),
+                f"TOEIC {name} must be the scroll-only middle pane")
+    require(ui.count(".layoutWeight(1).scrollBar(BarState.Off)") == 6,
+            "TOEIC all six content panes must fill available space")
+    footer = ui[ui.index("  private FixedFooter()"):ui.index("  @Builder\n  private HomeContent()")]
+    for token in ["Button('上一题'", "this.nextQuestion()", "this.nextVocabularyQuiz()",
+                  "this.finishDayTask('vocabulary')", "this.finishDayTask('sentence')",
+                  "this.startTraining()", "this.leaveMockResult()"]:
+        require(token in footer, f"TOEIC fixed footer action missing: {token}")
     # Compile regression: FlexSpaceOptions requires LengthMetrics, not raw numbers.
     require("import { LengthMetrics } from '@kit.ArkUI';" in ui and
             "space:{main:LengthMetrics.vp(6),cross:LengthMetrics.vp(6)}" in ui and
