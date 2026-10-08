@@ -432,3 +432,35 @@ Day 14 与 Day 19 完整 Reading 模考均不提供中文翻译入口，也不�
 `PresetToeicContent.publishedQuestions()` 除了检查单题的 `PUBLISHED` 标记，还会先从 `publishedReadingGroups()` 判断完整共享阅读题组是否全部发布；只发布其中一题的错误操作不会将半个题组混入活跃题库。静态发布审核门禁、审核摘要及整组校验仍必须保留，客户端保护属于最后一道运行时保险。
 
 CI 的 `scripts/validate_toeic_coach.py` 同时运行审核交接负例测试，覆盖 30 词批次、缺失条目、重复记录、旧摘要、错误日期、无审核人、未说明的退修以及禁止覆盖审核员工作成果。所有审核信息仅保存在人工交接资料中，不能提前认定 180 词或 65 题已通过专业审核。
+
+## 27. AI 独立内容审校与首批受控发布（2026-10-08）
+
+**本节更新第 22–26 节的默认人工审校要求：用户授权由 AI 直接承担本轮候选内容审校，无需用户逐词、逐题确认。** AI 审校与人工审核是两类不同的 provenance，均不能伪装成对方，更不能声称内容绝对无误或 ETS 官方认证。
+
+### 27.1 审核范围和已发现问题
+
+- 逐项筛查 V-121–V-300 共 180 个候选词的英文词形、词性、商务语境中文释义、搭配、语境同义表达、例句及 en-US IPA 表达；保留已发布 V-001–V-120 的历史词 ID 不变。
+- 筛查全部 13 组、65 道原创 Part 7 双/三篇阅读题的材料、四个选项、正确答案、中文解析、证据文字、跨篇引用、金额和日期推理。每组 5 题，四种答案位置均需出现。外部格式依据：[ETS TOEIC Listening & Reading](https://www.ets.org/toeic/about/listening-reading.html)、[ETS Global test content](https://www.etsglobal.org/fx/en/help-center/test-content/format-questions-toeic-listening-reading)。这些标准只作为格式参照，不代表题目经 ETS 审定。
+- 发现并修改的内容：
+  - **V-135**：避免把 compensate 与 reimburse 当成无条件可互换，更新语境释义表达及补偿例句。
+  - **V-177**：避免免赔额和维修保险关系模糊，改为投保人承担车险免赔额的情境。
+  - **P7-EX-FILTER**：原题把“10月9日发货”当成“10月10日前已到货”的充分证据；补充保证次日到货的说明并修正对应引用、中文解析及选项。
+  - **P7-EX-SUPPORT**：补充工单优先级，令两小时优先响应标准适用；将“无通知”修改为材料实际支持的“意外中断”。
+  - **P7-EX-RETAIL**：区分“满足免费标准配送的购物门槛”与“客户实际选择额外收费的快递配送”。
+  - **P7-EX-MIGRATION**：不把维护窗口截止时间误写成系统实际恢复时间，题干明确询问预定维护结束时点。
+- 审核证据按 **180 个词的精确内容摘要、13 个文章组及其 65 道题的逐项审校结论** 保存在 `docs/product/toeic-ai-editorial-review-2026-10-08.json`，批准台账另在 `docs/product/toeic-editorial-approvals.json` 中保存 `reviewMode=AI_EDITORIAL`、`reviewer=AI-GPT6`、日期和 `contentSha256`。
+- 词汇语义/音标可存在发音变体。词汇抽样还参考了 Cambridge 的 [per diem 词义](https://dictionary.cambridge.org/dictionary/english/per-diem)；**不是对全部 180 条 IPA 逐一进行了独立词典权威认证**。任何有疑义的词条以后仍可按同一规则重新修正和重新签核。
+
+### 27.2 首批上线及日任务稳定性
+
+AI 筛查覆盖全部候选内容，但为了避免突然把全部 180 个单词塞入日任务，分批上线：
+- **新增上线**：V-121–V-150 共 30 词；P7-EX-VENUE、P7-EX-DELIVERY、P7-EX-TRAVEL 共 3 组、15 道题。
+- **继续保留在候选区**：V-151–V-300 共 150 词；剩余 10 组、50 道 Part 7 题，已记录 AI 筛查结论，后续通过受控批次上线，不需用户再做人工作业。
+- 完成本批后，**已发布词汇合计 150/300 个内容资产**，额外 Part 7 题组上线 3 组 / 15 题。学生可使用的学习内容不得把“已审校但尚未上线”误记为“已发布”。
+
+### 27.3 自动闸门与限制
+
+- `scripts/validate_toeic_editorial_content.py` 验证每个已上线的候选词或整组阅读的源码 SHA-256 与批准台账完全一致，且 `AI_EDITORIAL` 模式必须能在独立审校记录中找到相同资产的 `PASS` 结论与内容摘要；修改题目、例句、IPA 或选项会让旧审核失效。
+- `scripts/test_toeic_review_integrity.py` 检查 AI 标记不能冒充 `HUMAN`，伪造或过期审校记录应被拒绝；`scripts/test_toeic_ai_editorial_release.py` 独立复核上线范围、典型金额计算和已修复的证据链问题。
+- `is_valid_approval` 只能核实记录格式和内容绑定，**不证明审校模型的身份、不能从形式校验推导出所有英语题目绝对正确**；GitHub 审查和设备测试是工程发布质量控制，与用户是否亲自逐词审核无关。
+- 历史 Day 14 / Day 19 两套 100 题模考、题目 ID、题目版本和学习记录均不得因本轮内容审核更改；HarmonyOS SDK 编译和 Phone / Pad 实际体验仍需要单独验证。

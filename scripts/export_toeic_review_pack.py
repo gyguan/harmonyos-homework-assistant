@@ -160,16 +160,16 @@ def export_review_pack(destination: Path) -> dict[str, int]:
     queue = [
         "# TOEIC 内容审核队列",
         "",
-        "> 仅供审核排期，不等于专业审校通过或正式发布。",
+        "> 审核及上线进度概览：AI 内容筛查不代表保证绝对正确或 ETS 官方认证。",
         "> 词汇正式发布基线 V-001–V-120 不包含在本审核 CSV 中。",
         "",
-        f"**待审资产：{sum(w['review_status'] == 'REVIEWED' for w in words)} 词；"
-        f"已发布候选：{sum(w['review_status'] == 'PUBLISHED' for w in words)} 词；"
+        f"**已完成 AI 筛查、待上线：{sum(w['review_status'] == 'REVIEWED' for w in words)} 词；"
+        f"已上线扩展词：{sum(w['review_status'] == 'PUBLISHED' for w in words)} 词；"
         f"阅读题组：{len(groups)} 组 / {len(questions)} 题。**",
         "",
         "## 词汇批次（每批 30 个）",
         "",
-        "| 词条范围 | 待审 | 已发布 |",
+        "| 词条范围 | AI已筛查待上线 | 已上线 |",
         "|---|---:|---:|",
     ]
     for start in range(121, 121 + len(words), 30):
@@ -188,7 +188,7 @@ def export_review_pack(destination: Path) -> dict[str, int]:
     ])
     for group_id, question_ids, documents in groups:
         statuses = {questions[question_id]["status"] for question_id in question_ids}
-        state = "已发布" if statuses == {"PUBLISHED"} else "待审核"
+        state = "已上线" if statuses == {"PUBLISHED"} else "AI已筛查待上线"
         queue.append(f"| {group_id} | {len(documents)} | {len(question_ids)} | {state} |")
     queue.extend([
         "",
