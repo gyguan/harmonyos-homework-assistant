@@ -32,6 +32,8 @@ export struct ToeicHomePage {
   @State private selectedSentenceDone:boolean=false;
   @State private selectedTrainingDone:boolean=false;
   @State private showFullPlan:boolean=false;
+  @State private showPracticeTools:boolean=false;
+  @State private showLearningDetails:boolean=false;
   @State private recentReports:ToeicSessionReport[]=[];
   @State private progressCurrentDay:number=1;
   @State private progressDiagnosticCompleted:boolean=false;
@@ -816,29 +818,26 @@ export struct ToeicHomePage {
 
   @Builder
   private TodayCard() {
-    Column({space:14}) {
+    Column({space:12}) {
       Row() {
-        Column({space:4}) {
-          Text('Day '+this.selectedStudyDay+' / 21 · '+this.dayContextLabel(this.selectedStudyDay))
-            .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-          Text(this.selectedDayTitle)
-            .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text(this.selectedDayFocus)
-            .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-        }
-        .layoutWeight(1).alignItems(HorizontalAlign.Start);
-        Text('约 '+this.selectedDayMinutes+' min').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+        Text('本日任务 · '+this.dayContextLabel(this.selectedStudyDay))
+          .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+        Blank();
+        Text('已完成 '+this.completedTasksCount()+'/3')
+          .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
       }
-      .width('100%').alignItems(VerticalAlign.Top);
+      .width('100%').alignItems(VerticalAlign.Center);
 
-      Text('当日任务 '+this.completedTasksCount()+'/3 已完成 · 完成后推进学习进度')
-        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
-      Row({space:10}) {
-        this.Metric(this.viewModel.skillLabel(this.progressWeakSkill),'当前薄弱点');
-        this.Metric(String(this.progressReviewCount),'待复习错题');
-        this.Metric(String(this.progressSlowCount),'做对但偏慢');
-      }
-      .width('100%');
+      Text(this.selectedDayTitle)
+        .width('100%').fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+        .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+        .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+      Text(this.selectedDayFocus)
+        .width('100%').fontSize(AppTheme.BODY_SIZE)
+        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+      Text('预计 '+this.selectedDayMinutes+' 分钟 · 高频词 '+this.selectedDayVocabularyCount+
+        ' 个 · 阅读提速 '+this.selectedDaySentenceCount+' 句')
+        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
 
       Row({space:10}) {
         Button((this.selectedVocabDone?'✓ ':'')+'高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
@@ -858,9 +857,15 @@ export struct ToeicHomePage {
       }
       .width('100%');
 
-      Text(this.selectedDayGuidance())
-        .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-
+      if (this.selectedStudyDay===14 || this.selectedStudyDay===18 || this.selectedStudyDay===19 ||
+        this.selectedStudyDay===20 || this.selectedStudyDay===21) {
+        Text(this.selectedDayGuidance())
+          .width('100%').fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
+          .padding(AppTheme.CARD_PADDING_COMPACT)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
     }
     .width('100%').padding(AppTheme.CARD_PADDING)
     .backgroundColor(AppTheme.CARD_SURFACE)
@@ -969,19 +974,14 @@ export struct ToeicHomePage {
   private FixedHeader() {
     Column() {
       if (this.mode===ToeicPageMode.HOME) {
-          Row() {
-            Column({space:4}) {
-              Text('TOEIC')
-                .fontSize(AppTheme.PAGE_TITLE_SIZE).lineHeight(AppTheme.PAGE_TITLE_LINE_HEIGHT)
-                .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-              Text('Reading 350+ · 三周高效备考')
-                .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            }
-            .layoutWeight(1).alignItems(HorizontalAlign.Start);
-            Text('首批词库 '+this.viewModel.vocabularyCount())
-              .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%').alignItems(VerticalAlign.Center);
+        Column({space:4}) {
+          Text('TOEIC')
+            .fontSize(AppTheme.PAGE_TITLE_SIZE).lineHeight(AppTheme.PAGE_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          Text('Reading 350+ · 21 天备考')
+            .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%').alignItems(HorizontalAlign.Start);
       } else if (this.mode===ToeicPageMode.VOCABULARY) {
         DeepPageHeader({
           title:'Day '+this.selectedStudyDay+' 高频词',
@@ -1088,7 +1088,7 @@ export struct ToeicHomePage {
   @Builder
   private HomeContent() {
     Scroll() {
-      Column({space:AppTheme.SECTION_GAP_STANDARD}) {
+      Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         if (this.viewModel.contentErrors().length>0) {
           Text('内容校验未通过，正式训练内容已暂停。')
             .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.DANGER)
@@ -1096,137 +1096,178 @@ export struct ToeicHomePage {
             .borderRadius(AppTheme.CONTROL_RADIUS);
         } else {
           if (this.draftLabel.length>0) {
-            Column({space:10}) {
-              Text('继续未完成训练')
-                .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
-                .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+            Column({space:8}) {
+              Text('上次训练尚未完成')
+                .width('100%').fontSize(AppTheme.CARD_TITLE_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
               Text(this.draftLabel)
                 .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
               Row({space:10}) {
                 Button('继续作答',{type:ButtonType.Normal})
                   .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                  .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS).fontColor(AppTheme.TEXT_ON_PRIMARY)
+                  .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
+                  .fontColor(AppTheme.TEXT_ON_PRIMARY)
                   .onClick(()=>this.resumeDraft());
                 Button('放弃本轮',{type:ButtonType.Normal})
                   .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                  .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS).fontColor(AppTheme.PRIMARY)
+                  .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+                  .fontColor(AppTheme.PRIMARY)
                   .onClick(()=>this.discardSavedDraft());
               }
               .width('100%');
             }
             .width('100%').padding(AppTheme.CARD_PADDING)
-            .backgroundColor(AppTheme.CARD_SURFACE)
-            .border({width:1,color:AppTheme.BORDER})
+            .backgroundColor(AppTheme.SURFACE_SUBTLE)
             .borderRadius(AppTheme.CARD_RADIUS);
           }
-          this.TodayCard();
-          Button(this.showFullPlan?'收起 21 天计划':'展开 21 天计划（可复习或预习）',
-            {type:ButtonType.Normal})
-            .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>{this.showFullPlan=!this.showFullPlan;});
-          if (this.showFullPlan) { this.DaySelector(); }
-          if (this.viewModel.supplementaryReadingQuestions().length>0) {
-            Button('Part 7 双篇 / 三篇加练',{type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.startSupplementaryReading());
-          }
-          Button('标准水平诊断 · 12 题',{type:ButtonType.Normal})
-            .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>this.startStandardDiagnostic());
-          Text('标准诊断不影响当前 Day 进度；基础快速诊断仍是 Day 1 入口。')
-            .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-          if (!this.progressDiagnosticCompleted && this.selectedStudyDay!==1) {
-            Text('建议先完成 Day 1 快速诊断，但你也可以直接进入当前选择的训练日。')
-              .width('100%').fontSize(AppTheme.META_SIZE)
-              .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
-              .padding(AppTheme.CARD_PADDING_COMPACT)
-              .backgroundColor(AppTheme.PRIMARY_SOFT)
-              .borderRadius(AppTheme.CONTROL_RADIUS);
-          }
+
           Column({space:10}) {
-            Text('当前学习状态')
-              .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
-              .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-            Row({space:10}) {
-              this.Metric(String(this.progressAnswered),'累计答题');
-              this.Metric(String(this.progressCorrect),'累计正确');
-              this.Metric(this.progressAccuracy,'正确率');
+            Row() {
+              Text('Day '+this.selectedStudyDay+' / 21 · '+this.dayContextLabel(this.selectedStudyDay))
+                .fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Blank();
+              Text('当前进度 Day '+this.progressCurrentDay)
+                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%');
+            Row({space:8}) {
+              Button('上一天',{type:ButtonType.Normal})
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.SURFACE_SUBTLE)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .enabled(this.selectedStudyDay>1)
+                .onClick(()=>this.selectStudyDay(this.selectedStudyDay-1));
+              Button(this.showFullPlan?'收起选天':'选择任意 Day',{type:ButtonType.Normal})
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .onClick(()=>{this.showFullPlan=!this.showFullPlan;});
+              Button('下一天',{type:ButtonType.Normal})
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.SURFACE_SUBTLE)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .enabled(this.selectedStudyDay<21)
+                .onClick(()=>this.selectStudyDay(this.selectedStudyDay+1));
             }
             .width('100%');
           }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-
-        }
-
-        if (this.recentReports.length>0) {
-          Column({space:8}) {
-            Text('最近训练记录')
-              .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
-              .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-            ForEach(this.recentReports,(report:ToeicSessionReport)=>{
-              Column({space:4}) {
-                Text(this.lastSessionHeadline(report))
-                  .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
-                Text('P5 '+report.part5Correct+'/'+report.part5Answered+
-                  ' · P6 '+report.part6Correct+'/'+report.part6Answered+
-                  ' · P7 '+report.part7Correct+'/'+report.part7Answered)
-                  .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-                Text('平均用时：P5 '+(report.part5Answered>0?
-                  Math.round(report.part5Seconds/report.part5Answered)+'s':'--')+
-                  ' · P6 '+(report.part6Answered>0?
-                    Math.round(report.part6Seconds/report.part6Answered)+'s':'--')+
-                  ' · P7 '+(report.part7Answered>0?
-                    Math.round(report.part7Seconds/report.part7Answered)+'s':'--'))
-                  .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              }
-              .width('100%');
-            },(report:ToeicSessionReport)=>String(report.completedAtMs));
-            Text('正确率为练习原始得分，不代表官方换算分。')
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+          .width('100%');
+          if (this.showFullPlan) {
+            this.DaySelector();
           }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-        }
 
-        if (this.mockReports.length>0) {
-          Column({space:9}) {
-            Text('完整模考历史')
-              .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
-              .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-            if (this.mockComparisonLabel().length>0) {
-              Text(this.mockComparisonLabel())
-                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.PRIMARY);
+          this.TodayCard();
+
+          Button(this.showPracticeTools?'收起专项训练':'更多训练 · 诊断与 Part 7 加练',
+            {type:ButtonType.Normal})
+            .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>{this.showPracticeTools=!this.showPracticeTools;});
+          if (this.showPracticeTools) {
+            Column({space:10}) {
+              if (this.viewModel.supplementaryReadingQuestions().length>0) {
+                Button('Part 7 双篇 / 三篇加练',{type:ButtonType.Normal})
+                  .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                  .borderRadius(AppTheme.CONTROL_RADIUS)
+                  .onClick(()=>this.startSupplementaryReading());
+              }
+              Button('标准水平诊断 · 12 题',{type:ButtonType.Normal})
+                .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                .borderRadius(AppTheme.CONTROL_RADIUS)
+                .onClick(()=>this.startStandardDiagnostic());
+              Text('标准诊断不影响当前 Day 进度，Day 1 快速诊断仍从每日训练进入。')
+                .width('100%').fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
             }
-            ForEach(this.mockReports,(report:ToeicMockReport)=>{
-              Row({space:8}) {
-                Text('Day '+report.day)
-                  .fontSize(AppTheme.BODY_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-                Blank();
-                Text(report.correctCount+'/'+report.totalCount+' · 未答 '+
-                  (report.totalCount-report.answeredCount)+' · '+
-                  Math.round(report.elapsedSeconds/60)+' 分钟')
-                  .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+            .width('100%').padding(AppTheme.CARD_PADDING)
+            .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+          }
+
+          Button(this.showLearningDetails?'收起学习数据':'学习数据与训练记录',
+            {type:ButtonType.Normal})
+            .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>{this.showLearningDetails=!this.showLearningDetails;});
+          if (this.showLearningDetails) {
+            Column({space:12}) {
+              Text('累计学习情况')
+                .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Row({space:10}) {
+                this.Metric(String(this.progressAnswered),'累计答题');
+                this.Metric(String(this.progressCorrect),'累计正确');
+                this.Metric(this.progressAccuracy,'正确率');
               }
               .width('100%');
-            },(report:ToeicMockReport)=>String(report.completedAtMs));
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-        }
+              Row({space:10}) {
+                this.Metric(this.viewModel.skillLabel(this.progressWeakSkill),'当前薄弱点');
+                this.Metric(String(this.progressReviewCount),'待复习错题');
+                this.Metric(String(this.progressSlowCount),'做对但偏慢');
+              }
+              .width('100%');
 
-        Column({space:6}) {
-          Text('训练原则').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          Text('高频优先 · 速度优先 · 基础分优先 · 错因优先')
-            .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-          Text('首期开放 Reading；底层题目与进度模型已兼容后续 Listening Part 1–4。')
-            .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.TERTIARY_TEXT);
+              if (this.recentReports.length>0) {
+                Column({space:8}) {
+                  Text('最近训练记录')
+                    .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+                    .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+                  ForEach(this.recentReports,(report:ToeicSessionReport)=>{
+                    Column({space:4}) {
+                      Text(this.lastSessionHeadline(report))
+                        .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
+                      Text('P5 '+report.part5Correct+'/'+report.part5Answered+
+                        ' · P6 '+report.part6Correct+'/'+report.part6Answered+
+                        ' · P7 '+report.part7Correct+'/'+report.part7Answered)
+                        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Text('平均用时：P5 '+(report.part5Answered>0?
+                        Math.round(report.part5Seconds/report.part5Answered)+'s':'--')+
+                        ' · P6 '+(report.part6Answered>0?
+                          Math.round(report.part6Seconds/report.part6Answered)+'s':'--')+
+                        ' · P7 '+(report.part7Answered>0?
+                          Math.round(report.part7Seconds/report.part7Answered)+'s':'--'))
+                        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                    }
+                    .width('100%');
+                  },(report:ToeicSessionReport)=>String(report.completedAtMs));
+                  Text('正确率为练习原始得分，不代表官方换算分。')
+                    .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                }
+                .width('100%');
+              }
+
+              if (this.mockReports.length>0) {
+                Column({space:8}) {
+                  Text('完整模考历史')
+                    .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+                    .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+                  if (this.mockComparisonLabel().length>0) {
+                    Text(this.mockComparisonLabel())
+                      .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.PRIMARY);
+                  }
+                  ForEach(this.mockReports,(report:ToeicMockReport)=>{
+                    Row({space:8}) {
+                      Text('Day '+report.day)
+                        .fontSize(AppTheme.BODY_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+                      Blank();
+                      Text(report.correctCount+'/'+report.totalCount+' · 未答 '+
+                        (report.totalCount-report.answeredCount)+' · '+
+                        Math.round(report.elapsedSeconds/60)+' 分钟')
+                        .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+                    }
+                    .width('100%');
+                  },(report:ToeicMockReport)=>String(report.completedAtMs));
+                }
+                .width('100%');
+              }
+            }
+            .width('100%').padding(AppTheme.CARD_PADDING)
+            .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+          }
         }
-        .width('100%').alignItems(HorizontalAlign.Start).padding(AppTheme.CARD_PADDING)
-        .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CARD_RADIUS);
       }
       .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_STANDARD_MAX_WIDTH})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
