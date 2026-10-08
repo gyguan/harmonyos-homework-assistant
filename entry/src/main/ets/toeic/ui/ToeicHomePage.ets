@@ -836,9 +836,10 @@ export struct ToeicHomePage {
     this.mockElapsedSeconds=report.elapsedSeconds;
     this.mockReviewUnavailable=0;
     this.mockReviewLegacy=report.answers.length===0;
+    // Part 5/6 IDs are shared by v1 and v2. Only Part 7 identifies the paper.
     this.mockResultLegacyPaper=report.answers.length===0;
     for (let record of report.answers) {
-      if (record.questionId.startsWith('R-M1-') || record.questionId.startsWith('R-M2-')) {
+      if (record.questionId.startsWith('R-M1-P7-') || record.questionId.startsWith('R-M2-P7-')) {
         this.mockResultLegacyPaper=true;
         break;
       }
