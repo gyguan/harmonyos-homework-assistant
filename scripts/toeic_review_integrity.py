@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+from datetime import date
+import re
 
 
 def sha256_content(value: object) -> str:
@@ -31,3 +33,28 @@ def reading_fingerprint(group_id: str, group: dict, questions: list[dict]) -> st
         "groupId": group_id, "questionIds": group["ids"],
         "documents": group["docs"], "questions": ordered,
     })
+
+
+def is_valid_approval(entry: object, expected_hash: str, today: date | None = None) -> bool:
+    """Check only recorded evidence shape and content identity, not reviewer authenticity.
+
+    Human/organization approval authority must be enforced during PR review.
+    """
+    if not isinstance(entry, dict):
+        return False
+    reviewer = entry.get("reviewer", "")
+    approved_at = entry.get("approvedAt", "")
+    digest = entry.get("contentSha256", "")
+    if not isinstance(reviewer, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}", reviewer):
+        return False
+    if reviewer.lower() in {"unknown", "pending", "todo", "tbd"}:
+        return False
+    if not isinstance(approved_at, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", approved_at):
+        return False
+    if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest) or digest != expected_hash:
+        return False
+    try:
+        when = date.fromisoformat(approved_at)
+    except ValueError:
+        return False
+    return when <= (today if today is not None else date.today())
