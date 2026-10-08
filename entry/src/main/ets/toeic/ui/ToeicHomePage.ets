@@ -52,6 +52,8 @@ export struct ToeicHomePage {
   @State private navigatorVisible:boolean=false;
   @State private revealedWordIds:string[]=[];
   @State private revealedSentenceIds:string[]=[];
+  @State private lastReviewedWordId:string='';
+  @State private vocabularyFeedback:string='';
   @State private markedQuestionIds:string[]=[];
   @State private mockReports:ToeicMockReport[]=[];
   private sessionStartedAtMs:number=0;
@@ -245,7 +247,7 @@ export struct ToeicHomePage {
     this.selectedDayTitle=plan.title;
     this.selectedDayFocus=plan.focus;
     this.selectedDayMinutes=plan.estimatedMinutes;
-    this.selectedDayVocabularyCount=plan.vocabularyIds.length;
+    this.selectedDayVocabularyCount=this.viewModel.vocabularyForDay(day).length;
     this.selectedDaySentenceCount=plan.sentenceDrillIds.length;
   }
 
@@ -354,6 +356,8 @@ export struct ToeicHomePage {
   private openVocabulary():void {
     this.pronunciationMessage='';
     this.revealedWordIds=[];
+    this.lastReviewedWordId='';
+    this.vocabularyFeedback='';
     this.mode=ToeicPageMode.VOCABULARY;
   }
   private openSentenceDrills():void {
@@ -367,6 +371,14 @@ export struct ToeicHomePage {
     if (index>=0) next.splice(index,1);
     else next.push(id);
     this.revealedWordIds=next;
+  }
+
+  private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean):Promise<void> {
+    await this.viewModel.recordVocabularyRecall(item.id,remembered);
+    this.lastReviewedWordId=item.id;
+    this.vocabularyFeedback=remembered?'已记住，系统将按掌握度安排复习。':'还没记住，已安排短期复习。';
+    this.loadStudyDay(this.selectedStudyDay);
+    this.refreshRevision++;
   }
 
   private toggleSentenceReveal(id:string):void {
@@ -990,6 +1002,21 @@ export struct ToeicHomePage {
                 Text('同义：'+item.paraphrases.join(' · '))
                   .width('100%').fontSize(AppTheme.META_SIZE)
                   .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              }
+              Row({space:10}) {
+                Button('记住了',{type:ButtonType.Normal})
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                  .onClick(()=>{void this.recordWordRecall(item,true);});
+                Button('没记住',{type:ButtonType.Normal})
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.SURFACE_SUBTLE)
+                  .onClick(()=>{void this.recordWordRecall(item,false);});
+              }
+              .width('100%');
+              if (this.lastReviewedWordId===item.id) {
+                Text(this.vocabularyFeedback)
+                  .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
               }
             }
           }
