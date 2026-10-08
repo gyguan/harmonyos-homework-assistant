@@ -15,6 +15,7 @@ from validate_toeic_translation_coverage import main as validate_translation_cov
 from validate_toeic_semantic_issue478 import validate as validate_semantic_issue478
 from validate_toeic_evidence_provenance import validate as validate_evidence_provenance
 from validate_toeic_part7_semantic_first_pass import validate as validate_part7_semantic_first_pass
+from validate_toeic_shared_part7_first_pass import validate as validate_shared_part7_first_pass
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -41,6 +42,7 @@ def main() -> None:
     validate_semantic_issue478()
     validate_evidence_provenance()
     validate_part7_semantic_first_pass()
+    validate_shared_part7_first_pass()
     verify_answer_display()
     validate_mock_day14_v2()
     validate_mock_day19_v2()
