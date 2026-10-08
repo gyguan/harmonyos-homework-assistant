@@ -1250,7 +1250,7 @@ export struct ToeicHomePage {
           Button({type:ButtonType.Normal}) {
             Text('A. '+this.quizOptionA)
               .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontSize(AppTheme.FORM_TEXT_SIZE)
               .fontColor(AppTheme.TEXT)
               .padding({left:14,right:14,top:12,bottom:12});
           }
@@ -1261,7 +1261,7 @@ export struct ToeicHomePage {
           Button({type:ButtonType.Normal}) {
             Text('B. '+this.quizOptionB)
               .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontSize(AppTheme.FORM_TEXT_SIZE)
               .fontColor(AppTheme.TEXT)
               .padding({left:14,right:14,top:12,bottom:12});
           }
@@ -1272,7 +1272,7 @@ export struct ToeicHomePage {
           Button({type:ButtonType.Normal}) {
             Text('C. '+this.quizOptionC)
               .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontSize(AppTheme.FORM_TEXT_SIZE)
               .fontColor(AppTheme.TEXT)
               .padding({left:14,right:14,top:12,bottom:12});
           }
@@ -1283,7 +1283,7 @@ export struct ToeicHomePage {
           Button({type:ButtonType.Normal}) {
             Text('D. '+this.quizOptionD)
               .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontSize(AppTheme.FORM_TEXT_SIZE)
               .fontColor(AppTheme.TEXT)
               .padding({left:14,right:14,top:12,bottom:12});
           }
