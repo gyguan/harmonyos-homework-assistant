@@ -105,6 +105,16 @@ def validate() -> None:
     assert "ToeicMockDay14V2Content.questions()" in preset
     assert "ToeicMockDay14V2Content.groups()" in preset
     assert "ToeicMockDay14V2Content.groups()" in service
+    # Regression: archived P7 mistakes must remain eligible for Day18/20
+    # while new mock sessions only assign R-FM* IDs.
+    assert "maxDay>=14 && question.id.startsWith('R-M1-P7-')" in preset
+    assert "maxDay>=19 && question.id.startsWith('R-M2-P7-')" in preset
+    assert "!PresetToeicContent.containsQuestionId(result,question.id)" in preset
+    # Shared R-M* Part5/6 IDs cannot identify an old paper: only its P7 can.
+    ui=(ROOT/"entry/src/main/ets/toeic/ui/ToeicHomePage.ets").read_text(encoding="utf-8")
+    assert "record.questionId.startsWith('R-M1-P7-')" in ui
+    assert "record.questionId.startsWith('R-M2-P7-')" in ui
+    assert "record.questionId.startsWith('R-M1-') || record.questionId.startsWith('R-M2-')" not in ui
     # Stable display permutation must also make the *active* v2 mock resistant
     # to guessing from answer-letter position; old R-M1 statistics are separate.
     active=old_p5+old_p6
