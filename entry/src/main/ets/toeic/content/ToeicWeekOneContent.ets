@@ -6,9 +6,14 @@ import {
 export class ToeicWeekOneContent {
   static studyDays():ToeicStudyDay[] {
     return [
-      new ToeicStudyDay(1,'快速诊断','先判断词汇、Part 5/6/7 与速度瓶颈',15,[],[],[
+      // 20-question comprehensive baseline: P5 10 / P6 4 / P7 6.
+      // Reuse existing published IDs and keep shared P6 and P7 passages adjacent.
+      new ToeicStudyDay(1,'综合诊断','一次测出词汇语法、篇章理解与跨文档阅读的薄弱点',25,[],[],[
         'R-P5-WF-0001','R-P5-VOICE-0002','R-P5-PREP-0003','R-P5-CONJ-0004','R-P5-COL-0005','R-P5-VOC-0006',
-        'R-P6-CTX-0001','R-P6-WF-0002','R-P7-DETAIL-0001','R-P7-PURPOSE-0002','R-P7-PARA-0003','R-P7-DETAIL-0004'
+        'R-DX-P5-01','R-DX-P5-02','R-DX-P5-03','R-DX-P5-04',
+        'R-P6-CTX-0001','R-P6-WF-0002','R-DX-P6-01','R-DX-P6-02',
+        'R-P7-DETAIL-0001','R-P7-PURPOSE-0002','R-P7-PARA-0003','R-P7-DETAIL-0004',
+        'R-DX-P7-03','R-DX-P7-04'
       ]),
       new ToeicStudyDay(2,'词性秒杀','HR 高频词 + 主干识别 + Part 5 词性',75,
         ['V-001','V-002','V-003','V-004','V-031','V-032','V-033','V-034','V-035','V-036','V-037','V-038','V-039','V-040','V-041'],
