@@ -817,8 +817,8 @@ def main() -> None:
         require(sum(item.startswith(prefix) for item in translated_ids) == 5,
                 f"Day 12/13 complete reading group needs five translations: {gid}")
     require("Button('Part 7 双篇 / 三篇加练'" not in ui and
-            "更多训练 · 水平诊断" in ui,
-            "Standalone Part 7 bonus entry should be removed once integrated into daily training")
+            "更多训练 · 水平诊断" not in ui,
+            "Standalone Part 7 bonus and global diagnostic entries must remain removed")
     require("passageBlocks(passage:string):string[]" in group_service and
             "questions[first-1].passage===current.passage" in group_service and
             "questions[last+1].passage===current.passage" in group_service,
