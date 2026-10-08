@@ -276,3 +276,21 @@ Day 14 与 Day 19 完整 Reading 模考均不提供中文翻译入口，也不�
 - `scripts/validate_toeic_editorial_content.py` 为候选内容执行结构、字段、IPA 对齐、唯一 ID、选项分布和跨文档原文证据一致性检查，并由 `scripts/validate_toeic_coach.py` 自动执行。
 - `REVIEWED` 仅表示待编辑审核，不等同于人审完成。内容门禁通过不代表专业人工审校或真实 ArkTS 编译通过。人工签核结果必须记录在 #447 或其子 Issue 后再发布。
 - 后续 150→300–400 核心词仍按批次审核，不得一次性生成大量未经审核内容冒充正式词库。
+
+## 21. 第三批补充候选：会议、项目与财务（2026-10-08）
+
+在已有正式词条 `V-001–V-120`、待审核 `V-121–V-150` 基础上，新增 30 个原创待审核词条 `V-151–V-180`，按以下方向沉淀：会议培训（briefing、minutes、attendee 等）、项目管理（stakeholder、milestone、deliverable、feasibility 等）、财务经营（audit、discrepancy、reconcile、revenue 等）。每条包括美式 IPA、词性、中文释义、业务场景、搭配、同义替换和英文例句。
+
+新增 Part 7 原创跨文档候选两组，各 5 题：
+- `P7-EX-ONBOARD`：新员工培训规则 + 到场安排（双篇），重点核对报到时间、证件要求与报名截止；
+- `P7-EX-FILTER`：供应协议 + 仓库验收 + 供应商邮件（三篇），重点核对缺货数量、运费规则与开票条件。
+
+**累计内容资产：180 词（120 已发布、60 待审核），5 组 / 25 道额外 Part 7 阅读题（均待审核）。** “词条资产总数”不可直接当作学生可用词条数汇报。
+
+### 本批验收与发布纪律
+
+- `ToeicVocabularyBatchThree` 与 `ToeicExtraReadingBatchTwo` 保持独立内容模块，由 `PresetToeicContent` 统一聚合；新内容仍标识 `REVIEWED`，不进入当天任务、错题训练或标准诊断。
+- `scripts/validate_toeic_editorial_content.py` 同时检查两批审核候选，覆盖 180 词 ID / IPA 对齐、题目唯一 ID、文章分组、跨文档取证、每组答案位置与逐词人工签核。
+- 任何改成 `PUBLISHED` 的题组必须同组全部完成审核并登记 `docs/product/toeic-editorial-approvals.json`，只发布通过专业人审的整组题。
+- 下一批扩充应先清理单词重复与同义语境问题，再扩大词量；重点继续考虑业务邮件、采购合同和费用政策，不批量造“同模板题”凑数。
+- 合并 PR 不等于新增内容获准发布；两套原有 100 题模考及学习记录的 questionId 和版本不得变更。
