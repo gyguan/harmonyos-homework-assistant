@@ -55,6 +55,10 @@
     {
       "id": "P7-EX-MIGRATION",
       "note": "Replace ambiguous following morning with October 18 and align answer evidence"
+    },
+    {
+      "id": "R-P7-SUPPORT-05",
+      "note": "Remove unsupported ticket-open-time inference; answer tests interval from outage start and first response, with unchanged correct choice"
     }
   ],
   "vocabulary": {
@@ -1981,7 +1985,7 @@
   },
   "readingGroups": {
     "P7-EX-SUPPORT": {
-      "contentSha256": "30aee7b6155f6976b14220b4ae011c15b153da9323dcf27c1ec1411d54e4a216",
+      "contentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7",
       "documentCount": 3,
       "questionCount": 5,
       "decision": "PASS_AI_RECHECK",
@@ -2035,7 +2039,7 @@
         },
         {
           "id": "R-P7-SUPPORT-05",
-          "question": "Did the initial response meet the priority-ticket response target?",
+          "question": "Was the first engineer response within two hours after the service interruption began?",
           "answerIndex": 2,
           "answer": "Yes, it took forty minutes",
           "evidence": "priority support tickets receive an initial response within two hours || Service unavailable: 10:10 A.M.–12:05 P.M. || Initial engineer response: 10:50 A.M.",
@@ -2046,7 +2050,8 @@
           "result": "PASS_AI_RECHECK"
         }
       ],
-      "correction": null
+      "correction": null,
+      "revisionNote": "#478 2026-10-08: AI rechecked wording to avoid treating outage start as ticket creation for SLA"
     },
     "P7-EX-RETAIL": {
       "contentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931",
