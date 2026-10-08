@@ -138,10 +138,14 @@ export class ToeicTrainingService {
       if (slow) penalty++;
       this.addPenalty(penalties,a.skill,penalty);
     }
+    // Do not invent a weak skill when every answer was both correct and within time.
     if (penalties.length>0) {
       let weakest=penalties[0];
       for (let item of penalties) if (item.penalty>weakest.penalty) weakest=item;
-      summary.weakSkill=weakest.skill;
+      if (weakest.penalty>0) {
+        summary.weakSkill=weakest.skill;
+        summary.hasWeakSkill=true;
+      }
     }
     return summary;
   }

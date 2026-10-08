@@ -5,7 +5,7 @@ import { ToeicQuestionTranslation } from '../content/ToeicQuestionTranslationMod
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { ToeicProgressStore } from '../data/ToeicProgressStore';
 import { ToeicPronunciationService, ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
-import { ToeicLearningSnapshot, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
 
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
@@ -23,8 +23,23 @@ export class ToeicCoachViewModel {
   createAttempt(question:ToeicQuestion,selectedIndex:number,elapsedSeconds:number):ToeicQuestionAttempt {
     return ToeicTrainingService.instance.createAttempt(question,selectedIndex,elapsedSeconds);
   }
-  async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean,advanceProgress:boolean=true):Promise<void> {
-    await ToeicProgressStore.instance.recordSession(attempts,diagnostic,advanceProgress);
+  activeDraft():ToeicSessionDraft|null { return ToeicProgressStore.instance.activeDraft(); }
+  questionsForDraft(draft:ToeicSessionDraft):ToeicQuestion[] {
+    let source=PresetToeicContent.publishedQuestions();
+    let result:ToeicQuestion[]=[];
+    for (let id of draft.questionIds) {
+      let found:ToeicQuestion|null=null;
+      for (let q of source) if (q.id===id) { found=q; break; }
+      if (found===null) return [];
+      result.push(found);
+    }
+    return result;
+  }
+  async saveDraft(draft:ToeicSessionDraft):Promise<void> { await ToeicProgressStore.instance.saveDraft(draft); }
+  async discardDraft():Promise<void> { await ToeicProgressStore.instance.discardDraft(); }
+  async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean,
+    advanceProgress:boolean=true,mockReport:ToeicMockReport|null=null):Promise<void> {
+    await ToeicProgressStore.instance.recordSession(attempts,diagnostic,advanceProgress,mockReport);
   }
   contentErrors():string[] {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
@@ -41,7 +56,27 @@ export class ToeicCoachViewModel {
   planForDay(day:number):ToeicStudyDay { return PresetToeicContent.studyDay(day); }
   weekOnePlans():ToeicStudyDay[] { return PresetToeicContent.studyDays(); }
   todayVocabulary():ToeicVocabularyItem[] { return PresetToeicContent.vocabularyForDay(this.snapshot().currentDay); }
-  vocabularyForDay(day:number):ToeicVocabularyItem[] { return PresetToeicContent.vocabularyForDay(day); }
+  vocabularyForDay(day:number):ToeicVocabularyItem[] {
+    let planned=PresetToeicContent.vocabularyForDay(day);
+    let source=PresetToeicContent.vocabulary();
+    let result:ToeicVocabularyItem[]=planned.slice();
+    let due=ToeicProgressStore.instance.vocabularyDueIds();
+    let reviewCount:number=0;
+    for (let id of due) {
+      if (reviewCount>=10) break;
+      for (let item of source) {
+        if (item.id!==id) continue;
+        let already=false;
+        for (let existing of result) if (existing.id===item.id) { already=true; break; }
+        if (!already) { result.unshift(item); reviewCount++; }
+        break;
+      }
+    }
+    return result;
+  }
+  async recordVocabularyRecall(id:string,remembered:boolean):Promise<void> {
+    await ToeicProgressStore.instance.recordVocabularyRecall(id,remembered);
+  }
   todaySentenceDrills():ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(this.snapshot().currentDay); }
   sentenceDrillsForDay(day:number):ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(day); }
   async pronounce(item:ToeicVocabularyItem):Promise<ToeicPronunciationStatus> {
@@ -49,6 +84,7 @@ export class ToeicCoachViewModel {
   }
 
   skillLabel(value:string):string {
+    if (value.length===0) return '暂无明显弱项';
     let skill=value as ToeicSkill;
     if (skill===ToeicSkill.WORD_FORM) return '词性判断';
     if (skill===ToeicSkill.VERB) return '动词结构';

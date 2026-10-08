@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
-import { ToeicLearningSnapshot, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill, ToeicVocabularyRecall } from '../domain/ToeicModels';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 
 const STORE_NAME:string='toeic_coach_progress';
@@ -11,6 +11,7 @@ export class ToeicProgressStore {
   static readonly instance:ToeicProgressStore=new ToeicProgressStore();
   private store:preferences.Preferences|null=null;
   private snapshot:ToeicLearningSnapshot=new ToeicLearningSnapshot();
+  private pendingSave:Promise<void>=Promise.resolve();
   private constructor() {}
 
   async initialize(context:common.UIAbilityContext):Promise<void> {
@@ -35,12 +36,53 @@ export class ToeicProgressStore {
     return history===null?0:history.wrongCount;
   }
 
-  async recordSession(attempts:ToeicQuestionAttempt[], diagnostic:boolean, advanceProgress:boolean=true):Promise<void> {
-    if (attempts.length===0) return;
+  vocabularyDueIds(nowMs:number=Date.now()):string[] {
+    let ids:string[]=[];
+    for (let review of this.snapshot.vocabularyRecalls) {
+      if (review.nextDueAtMs<=nowMs) ids.push(review.vocabularyId);
+    }
+    return ids;
+  }
+
+  async recordVocabularyRecall(vocabularyId:string,remembered:boolean):Promise<void> {
+    let review:ToeicVocabularyRecall|null=null;
+    for (let item of this.snapshot.vocabularyRecalls) {
+      if (item.vocabularyId===vocabularyId) { review=item; break; }
+    }
+    let nowMs=Date.now();
+    if (review===null) {
+      review=new ToeicVocabularyRecall(vocabularyId,0,0,nowMs,nowMs);
+      this.snapshot.vocabularyRecalls.push(review);
+    }
+    review.totalReviews++;
+    review.lastReviewedAtMs=nowMs;
+    review.streak=remembered?Math.min(4,review.streak+1):0;
+    // Remembered: 1/3/7/14 days. Not remembered: repeat after six hours.
+    let intervals:number[]=[0,1,3,7,14];
+    let delayMs=remembered?intervals[review.streak]*24*60*60*1000:6*60*60*1000;
+    review.nextDueAtMs=nowMs+delayMs;
+    await this.save();
+  }
+
+  activeDraft():ToeicSessionDraft|null { return this.snapshot.activeDraft; }
+
+  async saveDraft(draft:ToeicSessionDraft):Promise<void> {
+    this.snapshot.activeDraft=draft;
+    await this.save();
+  }
+
+  async discardDraft():Promise<void> {
+    this.snapshot.activeDraft=null;
+    await this.save();
+  }
+
+  async recordSession(attempts:ToeicQuestionAttempt[], diagnostic:boolean, advanceProgress:boolean=true,
+    mockReport:ToeicMockReport|null=null):Promise<void> {
+    if (attempts.length===0 && mockReport===null) return;
     let summary=ToeicTrainingService.instance.summarize(attempts);
     this.snapshot.totalAnswered+=attempts.length;
     this.snapshot.totalCorrect+=summary.correctCount;
-    this.snapshot.weakSkill=summary.weakSkill;
+    this.snapshot.weakSkill=summary.hasWeakSkill?summary.weakSkill:'';
     if (advanceProgress) {
       if (diagnostic) {
         this.snapshot.diagnosticCompleted=true;
@@ -51,6 +93,11 @@ export class ToeicProgressStore {
       }
     }
     for (let attempt of attempts) this.applyAttempt(attempt);
+    if (mockReport!==null) {
+      this.snapshot.mockReports.push(mockReport);
+      if (this.snapshot.mockReports.length>10) this.snapshot.mockReports.shift();
+    }
+    this.snapshot.activeDraft=null;
     await this.save();
   }
 
@@ -114,7 +161,59 @@ export class ToeicProgressStore {
       if (restored.currentDay>MAX_AVAILABLE_STUDY_DAY) {
         restored.currentDay=MAX_AVAILABLE_STUDY_DAY;
       }
-      restored.schemaVersion=3;
+      if (Array.isArray(parsed.mockReports)) {
+        for (let record of parsed.mockReports as Object[]) {
+          let report=record as Record<string,Object>;
+          if (typeof report.day!=='number' || typeof report.completedAtMs!=='number') continue;
+          restored.mockReports.push(new ToeicMockReport(
+            report.day as number, report.completedAtMs as number,
+            Number(report.correctCount), Number(report.answeredCount),
+            Number(report.totalCount), Number(report.elapsedSeconds),
+            Number(report.part5Correct), Number(report.part6Correct), Number(report.part7Correct)));
+        }
+      }
+      if (parsed.activeDraft!==null && typeof parsed.activeDraft==='object') {
+        let raw=parsed.activeDraft as Record<string,Object>;
+        if (typeof raw.day==='number' && typeof raw.mode==='string' &&
+          Array.isArray(raw.questionIds) && typeof raw.startedAtMs==='number') {
+          let attempts:ToeicQuestionAttempt[]=[];
+          if (Array.isArray(raw.attempts)) {
+            for (let entry of raw.attempts as Object[]) {
+              let item=entry as Record<string,Object>;
+              if (typeof item.questionId!=='string' || typeof item.selectedIndex!=='number') continue;
+              attempts.push(new ToeicQuestionAttempt(
+                item.questionId as string,item.part as ToeicPart,item.skill as ToeicSkill,
+                item.selectedIndex as number,item.correct===true,
+                Number(item.elapsedSeconds),item.performance as ToeicPerformance));
+            }
+          }
+          let times:ToeicQuestionTime[]=[];
+          if (Array.isArray(raw.questionTimes)) {
+            for (let entry of raw.questionTimes as Object[]) {
+              let item=entry as Record<string,Object>;
+              if (typeof item.questionId==='string' && typeof item.spentSeconds==='number') {
+                times.push(new ToeicQuestionTime(item.questionId as string,item.spentSeconds as number));
+              }
+            }
+          }
+          restored.activeDraft=new ToeicSessionDraft(raw.day as number,raw.mode as string,
+            raw.questionIds as string[],Math.max(0,Number(raw.currentIndex)||0),attempts,times,
+            raw.startedAtMs as number,raw.advancesProgress===true,
+            Array.isArray(raw.markedQuestionIds)?raw.markedQuestionIds as string[]:[]);
+        }
+      }
+      if (Array.isArray(parsed.vocabularyRecalls)) {
+        for (let record of parsed.vocabularyRecalls as Object[]) {
+          let recall=record as Record<string,Object>;
+          if (typeof recall.vocabularyId!=='string' ||
+            typeof recall.nextDueAtMs!=='number') continue;
+          restored.vocabularyRecalls.push(new ToeicVocabularyRecall(
+            recall.vocabularyId as string,Math.max(0,Number(recall.streak)||0),
+            Math.max(0,Number(recall.totalReviews)||0),recall.nextDueAtMs as number,
+            Math.max(0,Number(recall.lastReviewedAtMs)||0)));
+        }
+      }
+      restored.schemaVersion=5;
       this.snapshot=restored;
     } catch {
       this.snapshot=new ToeicLearningSnapshot();
@@ -122,12 +221,15 @@ export class ToeicProgressStore {
   }
 
   private async save():Promise<void> {
-    if (this.store===null) return;
-    try {
-      await this.store.put(SNAPSHOT_KEY,JSON.stringify(this.snapshot));
+    // Serialize snapshots in call order: an older draft write must never overwrite a submitted report.
+    const serialized:string=JSON.stringify(this.snapshot);
+    this.pendingSave=this.pendingSave.then(async()=>{
+      if (this.store===null) return;
+      await this.store.put(SNAPSHOT_KEY,serialized);
       await this.store.flush();
-    } catch {
-      // Local persistence is best-effort; the active in-memory training session remains usable.
-    }
+    }).catch(()=>{
+      // Keep the in-memory session usable on a failed best-effort local write.
+    });
+    await this.pendingSave;
   }
 }

@@ -1,7 +1,7 @@
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { ToeicPart, ToeicPerformance, ToeicQuestion, ToeicQuestionAttempt, ToeicScoreValue, ToeicSentenceDrill, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 
@@ -27,7 +27,7 @@ export struct ToeicHomePage {
   @State private selectedDaySentenceCount:number=0;
   @State private progressCurrentDay:number=1;
   @State private progressDiagnosticCompleted:boolean=false;
-  @State private progressWeakSkill:string=ToeicSkill.PARAPHRASE;
+  @State private progressWeakSkill:string='';
   @State private progressReviewCount:number=0;
   @State private progressSlowCount:number=0;
   @State private progressAnswered:number=0;
@@ -38,6 +38,8 @@ export struct ToeicHomePage {
   @State private mockResultDay:number=0;
   @State private mockResultCorrect:number=0;
   @State private mockResultTotal:number=0;
+  @State private mockResultAnswered:number=0;
+  @State private mockResultUnanswered:number=0;
   @State private mockPart5Correct:number=0;
   @State private mockPart5Total:number=0;
   @State private mockPart6Correct:number=0;
@@ -45,6 +47,19 @@ export struct ToeicHomePage {
   @State private mockPart7Correct:number=0;
   @State private mockPart7Total:number=0;
   @State private mockElapsedSeconds:number=0;
+  @State private mockCountdownSeconds:number=4500;
+  @State private draftLabel:string='';
+  @State private navigatorVisible:boolean=false;
+  @State private revealedWordIds:string[]=[];
+  @State private revealedSentenceIds:string[]=[];
+  @State private lastReviewedWordId:string='';
+  @State private vocabularyFeedback:string='';
+  @State private markedQuestionIds:string[]=[];
+  @State private mockReports:ToeicMockReport[]=[];
+  private sessionStartedAtMs:number=0;
+  private questionTimes:ToeicQuestionTime[]=[];
+  private mockClockId:number=-1;
+  private finishingSession:boolean=false;
   @State private currentQuestionId:string='';
   @State private currentPassage:string='';
   @State private currentStem:string='';
@@ -78,6 +93,51 @@ export struct ToeicHomePage {
     if (this.selectedStudyDay<=0) this.selectedStudyDay=this.progressCurrentDay;
     this.loadStudyDay(this.selectedStudyDay);
     this.refreshRevision++;
+    if (this.isMockSession() && this.mode===ToeicPageMode.TRAINING) this.startMockClock();
+  }
+
+  aboutToDisappear():void {
+    this.stopMockClock();
+    if (!this.finishingSession && this.questions.length>0 &&
+      (this.mode===ToeicPageMode.TRAINING || this.mode===ToeicPageMode.DIAGNOSTIC)) {
+      this.noteCurrentQuestionTime();
+      this.persistDraft();
+    }
+  }
+
+  private stopMockClock():void {
+    if (this.mockClockId>=0) {
+      clearInterval(this.mockClockId);
+      this.mockClockId=-1;
+    }
+  }
+
+  private mockExpired():boolean {
+    return this.isMockSession() && Date.now()>=this.sessionStartedAtMs+75*60*1000;
+  }
+
+  private updateMockClock():void {
+    if (!this.isMockSession() || this.mode!==ToeicPageMode.TRAINING) return;
+    this.mockCountdownSeconds=Math.max(0,
+      Math.ceil((this.sessionStartedAtMs+75*60*1000-Date.now())/1000));
+    if (this.mockCountdownSeconds===0) {
+      this.stopMockClock();
+      void this.finishSession();
+    }
+  }
+
+  private startMockClock():void {
+    this.stopMockClock();
+    this.updateMockClock();
+    if (this.mode===ToeicPageMode.TRAINING && this.isMockSession() && !this.finishingSession) {
+      this.mockClockId=setInterval(()=>this.updateMockClock(),1000);
+    }
+  }
+
+  private clockLabel():string {
+    let minutes=Math.floor(this.mockCountdownSeconds/60);
+    let seconds=this.mockCountdownSeconds%60;
+    return String(minutes).padStart(2,'0')+':'+String(seconds).padStart(2,'0');
   }
 
   private currentQuestionForAttempt():ToeicQuestion|null {
@@ -170,6 +230,11 @@ export struct ToeicHomePage {
     this.progressAnswered=snapshot.totalAnswered;
     this.progressCorrect=snapshot.totalCorrect;
     this.progressAccuracy=this.viewModel.accuracyValue(snapshot);
+    this.mockReports=snapshot.mockReports.slice();
+    let draft=snapshot.activeDraft;
+    this.draftLabel=draft===null?'':'Day '+draft.day+' · '+
+      (draft.day===14 || draft.day===19?'完整模考':'专项训练')+
+      '（已答 '+draft.attempts.length+'/'+draft.questionIds.length+'）';
   }
 
   private effectiveStudyDay():number {
@@ -182,7 +247,7 @@ export struct ToeicHomePage {
     this.selectedDayTitle=plan.title;
     this.selectedDayFocus=plan.focus;
     this.selectedDayMinutes=plan.estimatedMinutes;
-    this.selectedDayVocabularyCount=plan.vocabularyIds.length;
+    this.selectedDayVocabularyCount=this.viewModel.vocabularyForDay(day).length;
     this.selectedDaySentenceCount=plan.sentenceDrillIds.length;
   }
 
@@ -238,17 +303,18 @@ export struct ToeicHomePage {
   private captureMockResult():void {
     this.mockResultDay=this.activeSessionDay;
     this.mockResultCorrect=0;
-    this.mockResultTotal=this.attempts.length;
+    this.mockResultTotal=this.questions.length;
+    this.mockResultAnswered=this.attempts.length;
+    this.mockResultUnanswered=this.questions.length-this.attempts.length;
     this.mockPart5Correct=0;
     this.mockPart5Total=0;
     this.mockPart6Correct=0;
     this.mockPart6Total=0;
     this.mockPart7Correct=0;
     this.mockPart7Total=0;
-    this.mockElapsedSeconds=0;
+    this.mockElapsedSeconds=Math.min(75*60,Math.max(1,Math.round((Date.now()-this.sessionStartedAtMs)/1000)));
     for (let attempt of this.attempts) {
       if (attempt.correct) this.mockResultCorrect++;
-      this.mockElapsedSeconds+=attempt.elapsedSeconds;
       if (attempt.part===ToeicPart.PART_5) {
         this.mockPart5Total++;
         if (attempt.correct) this.mockPart5Correct++;
@@ -260,6 +326,21 @@ export struct ToeicHomePage {
         if (attempt.correct) this.mockPart7Correct++;
       }
     }
+  }
+
+  private mockComparisonLabel():string {
+    let first:ToeicMockReport|null=null;
+    let second:ToeicMockReport|null=null;
+    for (let report of this.mockReports) {
+      if (report.day===14) first=report;
+      if (report.day===19) second=report;
+    }
+    if (first===null || second===null) return '';
+    let difference=second.correctCount-first.correctCount;
+    return '二模相较一模：'+(difference>0?'+':'')+difference+' 题；'+
+      'Part 5 '+(second.part5Correct-first.part5Correct)+
+      '，Part 6 '+(second.part6Correct-first.part6Correct)+
+      '，Part 7 '+(second.part7Correct-first.part7Correct);
   }
 
   private leaveMockResult():void {
@@ -287,8 +368,41 @@ export struct ToeicHomePage {
     this.startSession(ToeicPageMode.TRAINING,this.viewModel.dailyQuestionsForDay(day));
   }
 
-  private openVocabulary():void { this.pronunciationMessage=''; this.mode=ToeicPageMode.VOCABULARY; }
-  private openSentenceDrills():void { this.mode=ToeicPageMode.SENTENCE; }
+  private openVocabulary():void {
+    this.pronunciationMessage='';
+    this.revealedWordIds=[];
+    this.lastReviewedWordId='';
+    this.vocabularyFeedback='';
+    this.mode=ToeicPageMode.VOCABULARY;
+  }
+  private openSentenceDrills():void {
+    this.revealedSentenceIds=[];
+    this.mode=ToeicPageMode.SENTENCE;
+  }
+
+  private toggleWordReveal(id:string):void {
+    let next=this.revealedWordIds.slice();
+    let index=next.indexOf(id);
+    if (index>=0) next.splice(index,1);
+    else next.push(id);
+    this.revealedWordIds=next;
+  }
+
+  private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean):Promise<void> {
+    await this.viewModel.recordVocabularyRecall(item.id,remembered);
+    this.lastReviewedWordId=item.id;
+    this.vocabularyFeedback=remembered?'已记住，系统将按掌握度安排复习。':'还没记住，已安排短期复习。';
+    this.loadStudyDay(this.selectedStudyDay);
+    this.refreshRevision++;
+  }
+
+  private toggleSentenceReveal(id:string):void {
+    let next=this.revealedSentenceIds.slice();
+    let index=next.indexOf(id);
+    if (index>=0) next.splice(index,1);
+    else next.push(id);
+    this.revealedSentenceIds=next;
+  }
 
   private async pronounce(item:ToeicVocabularyItem):Promise<void> {
     this.pronunciationMessage='';
@@ -302,63 +416,203 @@ export struct ToeicHomePage {
     }
   }
 
+  private spentForQuestion(questionId:string):number {
+    for (let entry of this.questionTimes) if (entry.questionId===questionId) return entry.spentSeconds;
+    return 0;
+  }
+
+  private noteCurrentQuestionTime():void {
+    if (this.currentQuestionId.length===0 || this.questionStartedAtMs<=0) return;
+    let elapsed=Math.max(0,Math.round((Date.now()-this.questionStartedAtMs)/1000));
+    let item:ToeicQuestionTime|null=null;
+    for (let entry of this.questionTimes) if (entry.questionId===this.currentQuestionId) { item=entry; break; }
+    if (item===null) {
+      item=new ToeicQuestionTime(this.currentQuestionId,elapsed);
+      this.questionTimes.push(item);
+    } else {
+      item.spentSeconds+=elapsed;
+    }
+    this.questionStartedAtMs=Date.now();
+    let attempt=this.sessionAttempt(this.currentQuestionId);
+    if (attempt!==null && this.isMockSession()) attempt.elapsedSeconds=Math.max(1,item.spentSeconds);
+  }
+
+  private persistDraft():void {
+    if (this.questions.length===0 || this.sessionStartedAtMs<=0) return;
+    let questionIds:string[]=[];
+    for (let question of this.questions) questionIds.push(question.id);
+    let draft=new ToeicSessionDraft(this.activeSessionDay,this.mode,
+      questionIds,this.currentIndex,this.attempts.slice(),this.questionTimes.slice(),
+      this.sessionStartedAtMs,this.activeSessionAdvancesProgress,this.markedQuestionIds.slice());
+    void this.viewModel.saveDraft(draft);
+    this.draftLabel='Day '+draft.day+' · '+
+      (this.isMockSession()?'完整模考':'专项训练')+
+      '（已答 '+draft.attempts.length+'/'+draft.questionIds.length+'）';
+  }
+
+  private resumeDraft():void {
+    let draft=this.viewModel.activeDraft();
+    if (draft===null) return;
+    let restored=this.viewModel.questionsForDraft(draft);
+    if (restored.length===0 || restored.length!==draft.questionIds.length) {
+      void this.viewModel.discardDraft();
+      this.draftLabel='';
+      return;
+    }
+    this.activeSessionDay=draft.day;
+    this.activeSessionAdvancesProgress=draft.advancesProgress;
+    this.mode=draft.mode===ToeicPageMode.DIAGNOSTIC?ToeicPageMode.DIAGNOSTIC:ToeicPageMode.TRAINING;
+    this.questions=restored;
+    this.attempts=draft.attempts.slice();
+    this.questionTimes=draft.questionTimes.slice();
+    this.markedQuestionIds=draft.markedQuestionIds.slice();
+    this.navigatorVisible=false;
+    this.sessionStartedAtMs=draft.startedAtMs;
+    this.currentIndex=Math.min(Math.max(0,draft.currentIndex),restored.length-1);
+    this.finishingSession=false;
+    this.loadQuestion(this.currentIndex);
+    if (this.isMockSession()) this.startMockClock();
+  }
+
+  private discardSavedDraft():void {
+    void this.viewModel.discardDraft();
+    this.draftLabel='';
+  }
+
   private startSession(mode:ToeicPageMode,questions:ToeicQuestion[]):void {
     if (questions.length===0) return;
+    this.stopMockClock();
     this.questions=questions;
     this.currentIndex=0;
     this.attempts=[];
+    this.questionTimes=[];
+    this.markedQuestionIds=[];
+    this.navigatorVisible=false;
+    this.sessionStartedAtMs=Date.now();
+    this.finishingSession=false;
     this.loadQuestion(0);
     this.mode=mode;
+    this.persistDraft();
+    if (this.isMockSession()) this.startMockClock();
   }
 
   private cancelSession():void {
+    if (this.finishingSession) return;
+    this.noteCurrentQuestionTime();
+    this.persistDraft(); // Return to home without losing unfinished answers.
+    this.stopMockClock();
     this.mode=ToeicPageMode.HOME;
     this.questions=[];
     this.attempts=[];
+    this.questionTimes=[];
+    this.markedQuestionIds=[];
+    this.navigatorVisible=false;
     this.answerLocked=false;
     this.selectedIndex=-1;
     this.clearQuestionSnapshot();
+    this.activeSessionDay=0;
+    this.sessionStartedAtMs=0;
   }
 
   private chooseAnswer(index:number):void {
-    if (this.answerLocked) return;
+    if (this.finishingSession || (this.answerLocked && !this.isMockSession())) return;
+    if (this.mockExpired()) { void this.finishSession(); return; }
     let question=this.currentQuestionForAttempt();
-    if (question===null || question.id!==this.currentQuestionId ||
-      this.sessionAttempt(this.currentQuestionId)!==null) return;
-    let elapsed=Math.max(1,Math.round((Date.now()-this.questionStartedAtMs)/1000));
+    if (question===null || question.id!==this.currentQuestionId) return;
+    let existing=this.sessionAttempt(this.currentQuestionId);
+    if (existing!==null && !this.isMockSession()) return;
+    let elapsed=Math.max(1,Math.round((Date.now()-this.questionStartedAtMs)/1000)+
+      this.spentForQuestion(this.currentQuestionId));
     let attempt=this.viewModel.createAttempt(question,index,elapsed);
-    this.attempts.push(attempt);
+    if (existing!==null) {
+      for (let i=0;i<this.attempts.length;i++) {
+        if (this.attempts[i].questionId===question.id) { this.attempts[i]=attempt; break; }
+      }
+    } else {
+      this.attempts.push(attempt);
+      this.currentAttemptCount++;
+      if (!this.isMockSession() && !attempt.correct) this.currentWrongCount++;
+    }
     this.selectedIndex=index;
     this.answerCorrect=attempt.correct;
-    this.currentAttemptCount++;
-    if (!attempt.correct) this.currentWrongCount++;
     this.answerLocked=true;
+    this.persistDraft();
   }
 
   private previousQuestion():void {
-    if (this.currentIndex<=0) return;
-    let previousIndex=this.currentIndex-1;
-    this.currentIndex=previousIndex;
-    this.loadQuestion(previousIndex);
+    if (this.currentIndex<=0 || this.finishingSession) return;
+    if (this.mockExpired()) { void this.finishSession(); return; }
+    this.noteCurrentQuestionTime();
+    this.currentIndex--;
+    this.loadQuestion(this.currentIndex);
+    this.persistDraft();
   }
 
   private nextQuestion():void {
-    if (!this.answerLocked) return;
+    if (this.finishingSession || (!this.answerLocked && !this.isMockSession())) return;
+    if (this.mockExpired()) { void this.finishSession(); return; }
     let nextIndex=this.currentIndex+1;
-    if (nextIndex>=this.questions.length) { void this.finishSession(); return; }
+    if (nextIndex>=this.questions.length) {
+      if (this.isMockSession()) this.confirmMockSubmission();
+      else void this.finishSession();
+      return;
+    }
+    this.noteCurrentQuestionTime();
     this.currentIndex=nextIndex;
     this.loadQuestion(nextIndex);
+    this.persistDraft();
+  }
+
+  private isQuestionMarked(questionId:string):boolean {
+    return this.markedQuestionIds.indexOf(questionId)>=0;
+  }
+
+  private toggleQuestionMark():void {
+    if (!this.isMockSession() || this.currentQuestionId.length===0) return;
+    let next=this.markedQuestionIds.slice();
+    let index=next.indexOf(this.currentQuestionId);
+    if (index>=0) next.splice(index,1);
+    else next.push(this.currentQuestionId);
+    this.markedQuestionIds=next;
+    this.persistDraft();
+  }
+
+  private jumpToQuestion(index:number):void {
+    if (!this.isMockSession() || index<0 || index>=this.questions.length ||
+      this.finishingSession) return;
+    if (this.mockExpired()) { void this.finishSession(); return; }
+    this.noteCurrentQuestionTime();
+    this.currentIndex=index;
+    this.loadQuestion(index);
+    this.persistDraft();
+  }
+
+  private confirmMockSubmission():void {
+    let remaining=this.questions.length-this.attempts.length;
+    AlertDialog.show({
+      title:'提交完整模考',
+      message:remaining>0?'还有 '+remaining+' 题未作答，确定现在提交吗？':'确定提交本次完整模考吗？',
+      primaryButton:{value:'继续作答',action:()=>{}},
+      secondaryButton:{value:'提交模考',action:()=>{ void this.finishSession(); }}
+    });
   }
 
   private async finishSession():Promise<void> {
+    if (this.finishingSession || this.questions.length===0 || this.sessionStartedAtMs===0) return;
+    this.finishingSession=true;
+    this.stopMockClock();
+    this.noteCurrentQuestionTime();
     let advanceProgress=this.activeSessionAdvancesProgress;
     let mockSession=this.isMockSession();
-    if (mockSession) this.captureMockResult();
-    await this.viewModel.completeSession(
-      this.attempts,
-      this.mode===ToeicPageMode.DIAGNOSTIC,
-      advanceProgress
-    );
+    let report:ToeicMockReport|null=null;
+    if (mockSession) {
+      this.captureMockResult();
+      report=new ToeicMockReport(this.mockResultDay,Date.now(),this.mockResultCorrect,
+        this.mockResultAnswered,this.mockResultTotal,this.mockElapsedSeconds,
+        this.mockPart5Correct,this.mockPart6Correct,this.mockPart7Correct);
+    }
+    await this.viewModel.completeSession(this.attempts,this.mode===ToeicPageMode.DIAGNOSTIC,
+      advanceProgress,report);
     this.loadProgressSnapshot();
     if (advanceProgress) {
       this.selectedStudyDay=this.progressCurrentDay;
@@ -366,10 +620,14 @@ export struct ToeicHomePage {
     }
     this.refreshRevision++;
     this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.HOME;
-    this.questions=[]; this.attempts=[];
+    this.questions=[]; this.attempts=[]; this.questionTimes=[]; this.markedQuestionIds=[];
     this.answerLocked=false; this.selectedIndex=-1;
     this.clearQuestionSnapshot();
+    this.sessionStartedAtMs=0;
     this.activeSessionDay=0; this.activeSessionAdvancesProgress=false;
+    this.navigatorVisible=false;
+    this.finishingSession=false;
+    this.draftLabel='';
   }
 
   private toggleQuestionTranslation():void {
@@ -601,6 +859,30 @@ export struct ToeicHomePage {
             .borderRadius(AppTheme.CONTROL_RADIUS);
         } else {
           this.DaySelector();
+          if (this.draftLabel.length>0) {
+            Column({space:10}) {
+              Text('继续未完成训练')
+                .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Text(this.draftLabel)
+                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+              Row({space:10}) {
+                Button('继续作答',{type:ButtonType.Normal})
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                  .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
+                  .onClick(()=>this.resumeDraft());
+                Button('放弃本轮',{type:ButtonType.Normal})
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                  .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+                  .onClick(()=>this.discardSavedDraft());
+              }
+              .width('100%');
+            }
+            .width('100%').padding(AppTheme.CARD_PADDING)
+            .backgroundColor(AppTheme.CARD_SURFACE)
+            .border({width:1,color:AppTheme.BORDER})
+            .borderRadius(AppTheme.CARD_RADIUS);
+          }
           this.TodayCard();
           if (!this.progressDiagnosticCompleted && this.selectedStudyDay!==1) {
             Text('建议先完成 Day 1 快速诊断，但你也可以直接进入当前选择的训练日。')
@@ -624,6 +906,32 @@ export struct ToeicHomePage {
           .width('100%').padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
 
+        }
+
+        if (this.mockReports.length>0) {
+          Column({space:9}) {
+            Text('完整模考历史')
+              .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+              .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+            if (this.mockComparisonLabel().length>0) {
+              Text(this.mockComparisonLabel())
+                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.PRIMARY);
+            }
+            ForEach(this.mockReports,(report:ToeicMockReport)=>{
+              Row({space:8}) {
+                Text('Day '+report.day)
+                  .fontSize(AppTheme.BODY_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+                Blank();
+                Text(report.correctCount+'/'+report.totalCount+' · 未答 '+
+                  (report.totalCount-report.answeredCount)+' · '+
+                  Math.round(report.elapsedSeconds/60)+' 分钟')
+                  .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+              }
+              .width('100%');
+            },(report:ToeicMockReport)=>String(report.completedAtMs));
+          }
+          .width('100%').padding(AppTheme.CARD_PADDING)
+          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
         }
 
         Column({space:6}) {
@@ -694,17 +1002,41 @@ export struct ToeicHomePage {
             .width('100%')
             .alignItems(VerticalAlign.Center);
 
-            Text(item.meaning)
-              .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
-            Text('场景：'+item.scenario)
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            if (item.collocations.length>0) {
-              Text('搭配：'+item.collocations.join(' · '))
-                .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
-            }
-            if (item.paraphrases.length>0) {
-              Text('同义：'+item.paraphrases.join(' · '))
-                .width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+            Button(this.revealedWordIds.indexOf(item.id)>=0?'收起词义':'查看词义与搭配',
+              {type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .onClick(()=>this.toggleWordReveal(item.id));
+            if (this.revealedWordIds.indexOf(item.id)>=0) {
+              Text(item.meaning)
+                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
+              Text('场景：'+item.scenario)
+                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+              if (item.collocations.length>0) {
+                Text('搭配：'+item.collocations.join(' · '))
+                  .width('100%').fontSize(AppTheme.BODY_SIZE)
+                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+              }
+              if (item.paraphrases.length>0) {
+                Text('同义：'+item.paraphrases.join(' · '))
+                  .width('100%').fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              }
+              Row({space:10}) {
+                Button('记住了',{type:ButtonType.Normal})
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                  .onClick(()=>{void this.recordWordRecall(item,true);});
+                Button('没记住',{type:ButtonType.Normal})
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.SURFACE_SUBTLE)
+                  .onClick(()=>{void this.recordWordRecall(item,false);});
+              }
+              .width('100%');
+              if (this.lastReviewedWordId===item.id) {
+                Text(this.vocabularyFeedback)
+                  .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+              }
             }
           }
           .width('100%').padding(AppTheme.CARD_PADDING)
@@ -745,16 +1077,24 @@ export struct ToeicHomePage {
             Text(item.sentence)
               .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
               .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-            Text('译：'+item.translation)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            Text('主干：'+item.core)
-              .width('100%').fontSize(AppTheme.BODY_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-            Text('重点：'+item.focus)
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            Text(item.explanation)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+            Button(this.revealedSentenceIds.indexOf(item.id)>=0?'收起解析':'查看主干与译文',
+              {type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .onClick(()=>this.toggleSentenceReveal(item.id));
+            if (this.revealedSentenceIds.indexOf(item.id)>=0) {
+              Text('译：'+item.translation)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              Text('主干：'+item.core)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+              Text('重点：'+item.focus)
+                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+              Text(item.explanation)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+            }
           }
           .width('100%').padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.CARD_SURFACE)
@@ -786,7 +1126,8 @@ export struct ToeicHomePage {
             .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
           Text('正确率 '+(this.mockResultTotal>0?
             Math.round(this.mockResultCorrect*100/this.mockResultTotal)+'%':'--')+
-            ' · 实际作答约 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min')
+            ' · 用时 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min'+
+            ' · 已答 '+this.mockResultAnswered+' · 未答 '+this.mockResultUnanswered)
             .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
@@ -832,11 +1173,56 @@ export struct ToeicHomePage {
             (this.isMockSession()?'Reading 完整模考':'今日训练'),
           subtitle:String(this.currentIndex+1)+' / '+this.questions.length+' · '+
             this.viewModel.partLabel(this.currentPart),
-          trailingText:'建议 '+this.currentRecommendedSeconds+'s',
+          trailingText:this.isMockSession()?this.clockLabel():'建议 '+this.currentRecommendedSeconds+'s',
           onBack:()=>this.cancelSession()
         });
 
         Column({space:12}) {
+          if (this.isMockSession()) {
+            Row({space:10}) {
+              Text('剩余时间 '+this.clockLabel())
+                .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold)
+                .fontColor(this.mockCountdownSeconds<=300?AppTheme.DANGER:AppTheme.PRIMARY);
+              Blank();
+              Text('已答 '+this.attempts.length+' / '+this.questions.length)
+                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%').padding(AppTheme.CARD_PADDING_COMPACT)
+            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+            Row({space:10}) {
+              Button(this.isQuestionMarked(this.currentQuestionId)?'取消标记':'标记此题',
+                {type:ButtonType.Normal})
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                .onClick(()=>this.toggleQuestionMark());
+              Button(this.navigatorVisible?'收起题号导航':'展开题号导航',{type:ButtonType.Normal})
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                .onClick(()=>{this.navigatorVisible=!this.navigatorVisible;});
+            }
+            .width('100%');
+            if (this.navigatorVisible) {
+              Flex({wrap:FlexWrap.Wrap,space:{main:6,cross:6}}) {
+                ForEach(this.questions,(question:ToeicQuestion,index:number)=>{
+                  Button((this.isQuestionMarked(question.id)?'★':'')+String(index+1),
+                    {type:ButtonType.Normal})
+                    .width(48).height(42).fontSize(AppTheme.META_SIZE)
+                    .fontColor(index===this.currentIndex?AppTheme.TEXT_ON_PRIMARY:AppTheme.PRIMARY)
+                    .backgroundColor(index===this.currentIndex?AppTheme.PRIMARY:
+                      (this.sessionAttempt(question.id)!==null?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE))
+                    .borderRadius(AppTheme.CONTROL_RADIUS)
+                    .onClick(()=>this.jumpToQuestion(index));
+                },(question:ToeicQuestion)=>question.id);
+              }
+              .width('100%');
+            }
+            Text('可跳过、返回修改或标记题目；剩余时间结束时自动交卷。')
+              .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+            Button('提前提交整场模考',{type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .onClick(()=>this.confirmMockSubmission());
+          }
           Row() {
             Text(this.viewModel.skillLabel(this.currentSkill))
               .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
@@ -849,7 +1235,7 @@ export struct ToeicHomePage {
           }
           .width('100%');
 
-          if (this.currentAttemptCount>0) {
+          if (!this.isMockSession() && this.currentAttemptCount>0) {
             Row({space:8}) {
               Text('已做 '+this.currentAttemptCount+' 次')
                 .fontSize(AppTheme.META_SIZE)
@@ -1097,7 +1483,7 @@ export struct ToeicHomePage {
               .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
               .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
               .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(this.answerLocked)
+              .enabled(this.isMockSession() || this.answerLocked)
               .onClick(()=>this.nextQuestion());
           }
           .width('100%');
