@@ -100,6 +100,7 @@ export struct ToeicHomePage {
   @State private mockReports:ToeicMockReport[]=[];
   @State private mockReviewUnavailable:number=0;
   @State private mockReviewLegacy:boolean=false;
+  @State private mockResultLegacyPaper:boolean=false;
   private sessionStartedAtMs:number=0;
   private questionTimes:ToeicQuestionTime[]=[];
   private mockClockId:number=-1;
@@ -370,13 +371,13 @@ export struct ToeicHomePage {
       return 'Part 7 限时训练已包含新增双篇 / 三篇题组；先读清各文档职责，再联动定位答案。';
     }
     if (this.selectedStudyDay===14) {
-      return 'Day 14 为100题/75分钟限时模拟练习；当前Part 7单篇与多篇题组分布尚未按ETS正式卷面重编，不能据此推算官方成绩。交卷后可查看答案与解析。';
+      return 'Day 14 新版限时模考：100题/75分钟，Part 7按单篇29题、多篇25题组卷。题目为自编训练内容，原始正确率不等于TOEIC官方换算分。';
     }
     if (this.selectedStudyDay===18) {
       return 'Day 18 优先复习错题、慢题及薄弱能力，并完成新安排的双篇 / 三篇阅读整组训练。';
     }
     if (this.selectedStudyDay===19) {
-      return 'Day 19 为第二套100题/75分钟限时模拟练习；当前Part 7题组分布尚不符合ETS正式结构。结果仅用于内部补弱，不等同官方模拟成绩。';
+      return 'Day 19 新版限时模考：100题/75分钟，Part 7按单篇29题、多篇25题组卷；自编试题的原始成绩不等于官方TOEIC换算分。';
     }
     if (this.selectedStudyDay===20) {
       return 'Day 20 优先复盘累计错 2 次及以上题目，随后完成两组新的三篇阅读，检验跨篇能力。';
@@ -405,6 +406,9 @@ export struct ToeicHomePage {
 
   private captureMockResult():void {
     this.mockResultDay=this.activeSessionDay;
+    // Existing in-progress v1 drafts may still complete after v2 is released.
+    let paperP7Id=this.questions.length>46?this.questions[46].id:'';
+    this.mockResultLegacyPaper=paperP7Id.startsWith('R-M1-') || paperP7Id.startsWith('R-M2-');
     this.mockResultCorrect=0;
     this.mockResultTotal=this.questions.length;
     this.mockResultAnswered=this.attempts.length;
@@ -832,6 +836,14 @@ export struct ToeicHomePage {
     this.mockElapsedSeconds=report.elapsedSeconds;
     this.mockReviewUnavailable=0;
     this.mockReviewLegacy=report.answers.length===0;
+    // Part 5/6 IDs are shared by v1 and v2. Only Part 7 identifies the paper.
+    this.mockResultLegacyPaper=report.answers.length===0;
+    for (let record of report.answers) {
+      if (record.questionId.startsWith('R-M1-P7-') || record.questionId.startsWith('R-M2-P7-')) {
+        this.mockResultLegacyPaper=true;
+        break;
+      }
+    }
     let review:ToeicPracticeReviewItem[]=[];
     let ids:string[]=[];
     for (let record of report.answers) ids.push(record.questionId);
@@ -1624,7 +1636,9 @@ export struct ToeicHomePage {
             ' · 用时 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min'+
             ' · 已答 '+this.mockResultAnswered+' · 未答 '+this.mockResultUnanswered)
             .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
-          Text('本套题的Part 7单篇/多篇组卷比例尚未按ETS正式格式重编；成绩仅供训练诊断。')
+          Text(this.mockResultLegacyPaper?
+            '本次属于历史旧卷：Part7题组与当前正式结构不一致，保留原成绩供学习参考。':
+            '新版Part7按单篇29题、多篇25题（2组双篇、3组三篇）组织；自编题正确率不等于官方TOEIC换算分。')
             .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding(AppTheme.CARD_PADDING)

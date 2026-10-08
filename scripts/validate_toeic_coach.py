@@ -9,6 +9,8 @@ from test_toeic_ai_editorial_release import run_tests as test_ai_release
 from test_toeic_remaining_editorial import run_tests as test_remaining_editorial
 from validate_toeic_question_quality import validate as validate_question_quality
 from validate_toeic_answer_display import verify as verify_answer_display
+from validate_toeic_mock_format_v2 import validate as validate_mock_day14_v2
+from validate_toeic_mock_day19_format_v2 import validate as validate_mock_day19_v2
 from validate_toeic_translation_coverage import main as validate_translation_coverage
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +36,8 @@ def main() -> None:
     require(TOEIC.exists(), "TOEIC module directory is missing")
     validate_question_quality()
     verify_answer_display()
+    validate_mock_day14_v2()
+    validate_mock_day19_v2()
     validate_translation_coverage()
     sources = "\\n".join(
         p.read_text(encoding="utf-8")
