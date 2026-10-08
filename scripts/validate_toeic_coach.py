@@ -279,7 +279,7 @@ def main() -> None:
                   "'已做 '+this.currentAttemptCount+' 次'", "'错 '+this.currentWrongCount+' 次'",
                   "'译：'+item.translation", "showQuestionTranslation",
                   "currentTranslationStem", "toggleQuestionTranslation()",
-                  "'查看中文翻译'", "'收起中文翻译'", "QuestionTranslationOption"]:
+                  "'查看中文翻译'", "'收起中文翻译'"]:
         require(token in ui, f"week-one free-day UI missing: {token}")
     builder_sections = re.findall(
         r"(?ms)^\s*@Builder\s*\n\s*private .*?(?=^\s*@Builder|^\s*build\(\))",
@@ -294,6 +294,9 @@ def main() -> None:
     require("private QuestionContent()" in ui and
             "this.QuestionContent();" in ui,
             "question renderer must bind directly to explicit reactive snapshot state")
+    require("private QuestionOption(" not in ui and
+            "private QuestionTranslationOption(" not in ui,
+            "dynamic option text must not be passed through nested Builder parameters")
     for token in [
         "@State private currentQuestionId:string=''",
         "@State private currentStem:string=''",
@@ -355,6 +358,14 @@ def main() -> None:
     require("this.questions[" not in question_builder,
             "QuestionContent must not render fields directly from class objects in the questions array")
     for token in [
+        "Text(this.currentOptionA)", "Text(this.currentOptionB)",
+        "Text(this.currentOptionC)", "Text(this.currentOptionD)",
+        "Text(this.currentTranslationOptionA)", "Text(this.currentTranslationOptionB)",
+        "Text(this.currentTranslationOptionC)", "Text(this.currentTranslationOptionD)",
+    ]:
+        require(token in question_builder,
+                f"QuestionContent must bind option text directly to reactive state: {token}")
+    for token in [
         "this.currentStem", "this.currentPassage", "this.currentOptionA",
         "this.currentOptionB", "this.currentOptionC",
         "this.currentExplanation", "this.currentEvidence", "this.currentParaphrase",
@@ -407,26 +418,17 @@ def main() -> None:
             "mock mode must hide immediate feedback and show a result screen after completion")
     require("this.mockPart5Correct" in ui and "this.mockPart6Correct" in ui and "this.mockPart7Correct" in ui,
             "mock result must expose Part 5/6/7 breakdown")
-    require("private QuestionOption(index:number,prefix:string,text:string)" in ui and
-            "Button({type:ButtonType.Normal})" in ui and
-            "Text(text)" in ui and
-            ".textAlign(TextAlign.Start)" in ui,
-            "TOEIC answer options must use a custom text child so long labels can wrap")
     require("Button('A. '+this.currentOptionA" not in ui and
             "Button('B. '+this.currentOptionB" not in ui and
             "Button('C. '+this.currentOptionC" not in ui and
             "Button('D. '+this.currentOptionD" not in ui,
             "TOEIC answer options must not regress to single-label Button rendering")
-    option_builder_match = re.search(
-        r"(?ms)^\s*@Builder\s*\n\s*private QuestionOption\(.*?(?=^\s*@Builder)",
-        ui,
-    )
-    require(option_builder_match is not None, "QuestionOption builder could not be identified")
-    option_builder = option_builder_match.group(0)
-    require(".constraintSize({minHeight:50})" in option_builder and
-            ".padding({left:14,right:14,top:12,bottom:12})" in option_builder,
-            "TOEIC answer options must keep a touch-safe minimum height and multiline padding")
-    require(".maxLines(" not in option_builder and ".textOverflow(" not in option_builder,
+    require(question_builder.count("Button({type:ButtonType.Normal})") >= 4 and
+            ".constraintSize({minHeight:50})" in question_builder and
+            ".padding({left:14,right:14,top:12,bottom:12})" in question_builder and
+            ".textAlign(TextAlign.Start)" in question_builder,
+            "TOEIC answer options must keep custom multiline Button content and touch-safe layout")
+    require(".maxLines(" not in question_builder and ".textOverflow(" not in question_builder,
             "TOEIC answer text must not be truncated by maxLines or ellipsis")
 
 
