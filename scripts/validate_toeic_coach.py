@@ -256,7 +256,7 @@ def main() -> None:
         "attemptCount(questionId:string)", "wrongCount(questionId:string)",
         "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
         "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
-        "restored.schemaVersion=4",
+        "restored.schemaVersion=5",
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
@@ -489,10 +489,20 @@ def main() -> None:
         require(token in ui, f"exam bookmark or question navigation missing: {token}")
     for token in ["this.toggleWordReveal(item.id)", "this.toggleSentenceReveal(item.id)",
                   "this.revealedWordIds.indexOf(item.id)>=0",
-                  "this.revealedSentenceIds.indexOf(item.id)>=0"]:
+                  "this.revealedSentenceIds.indexOf(item.id)>=0",
+                  "this.recordWordRecall(item,true)", "this.recordWordRecall(item,false)"]:
         require(token in ui, f"active recall UI missing: {token}")
     require("this.questions.length===0 || this.sessionStartedAtMs===0" in ui,
             "subsequent submission callbacks must not double commit a closed session")
+
+    for token in ["class ToeicVocabularyRecall", "vocabularyRecalls:ToeicVocabularyRecall[]"]:
+        require(token in model, f"spaced-repetition model missing: {token}")
+    for token in ["async recordVocabularyRecall(", "vocabularyDueIds(", "let intervals:number[]=[0,1,3,7,14]",
+                  "Array.isArray(parsed.vocabularyRecalls)"]:
+        require(token in progress, f"spaced-repetition persistence missing: {token}")
+    require("vocabularyForDay(day:number)" in view_model and
+            "ToeicProgressStore.instance.vocabularyDueIds()" in view_model,
+            "due vocabulary must enter the selected-day study flow")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
