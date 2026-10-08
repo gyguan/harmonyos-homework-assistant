@@ -3,7 +3,7 @@ import {
   ToeicReviewStatus, ToeicScoreValue, ToeicSection, ToeicSkill
 } from '../domain/ToeicModels';
 
-/** Original Part 7 source sets; all questions are editorial candidates until recorded signoff. */
+/** AI-reviewed shared Part 7 SUPPORT/RETAIL groups, published as complete bundles. */
 export class ToeicExtraReadingBatchThree {
   static groups():ToeicReadingGroup[] {
     return [
