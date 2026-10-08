@@ -1,6 +1,6 @@
 import { ToeicReviewStatus, ToeicVocabularyItem, ToeicVocabularyLevel } from '../domain/ToeicModels';
 
-/** Original correspondence and workplace IT vocabulary, pending human editorial approval. */
+/** AI-reviewed V241–V270, released with content-bound editorial fingerprints. */
 export class ToeicVocabularyBatchSix {
   static items():ToeicVocabularyItem[] {
     return [
