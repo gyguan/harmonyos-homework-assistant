@@ -328,6 +328,21 @@ export struct ToeicHomePage {
     }
   }
 
+  private mockComparisonLabel():string {
+    let first:ToeicMockReport|null=null;
+    let second:ToeicMockReport|null=null;
+    for (let report of this.mockReports) {
+      if (report.day===14) first=report;
+      if (report.day===19) second=report;
+    }
+    if (first===null || second===null) return '';
+    let difference=second.correctCount-first.correctCount;
+    return '二模相较一模：'+(difference>0?'+':'')+difference+' 题；'+
+      'Part 5 '+(second.part5Correct-first.part5Correct)+
+      '，Part 6 '+(second.part6Correct-first.part6Correct)+
+      '，Part 7 '+(second.part7Correct-first.part7Correct);
+  }
+
   private leaveMockResult():void {
     this.mode=ToeicPageMode.HOME;
     this.activeSessionDay=0;
@@ -898,6 +913,10 @@ export struct ToeicHomePage {
             Text('完整模考历史')
               .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
               .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+            if (this.mockComparisonLabel().length>0) {
+              Text(this.mockComparisonLabel())
+                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.PRIMARY);
+            }
             ForEach(this.mockReports,(report:ToeicMockReport)=>{
               Row({space:8}) {
                 Text('Day '+report.day)
@@ -1199,6 +1218,10 @@ export struct ToeicHomePage {
             }
             Text('可跳过、返回修改或标记题目；剩余时间结束时自动交卷。')
               .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+            Button('提前提交整场模考',{type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .onClick(()=>this.confirmMockSubmission());
           }
           Row() {
             Text(this.viewModel.skillLabel(this.currentSkill))
