@@ -690,6 +690,7 @@ def main() -> None:
                 f"editorial export coverage mismatch: {exported}")
         require((Path(temp_dir) / "vocabulary-review.csv").exists() and
                 (Path(temp_dir) / "part7-review.md").exists() and
+                (Path(temp_dir) / "review-queue.md").exists() and
                 (Path(temp_dir) / "manifest.json").exists(),
                 "editorial review packet not written")
         import csv
@@ -704,6 +705,10 @@ def main() -> None:
         require(review_text.count("### 题 ") == exported["questions"] and
                 review_text.count("## P7-EX-") == exported["groups"],
                 "offline reading review pack omitted groups or questions")
+        queue = (Path(temp_dir) / "review-queue.md").read_text(encoding="utf-8")
+        require(queue.count("| V-") == exported["vocabulary"] // 30 and
+                queue.count("| P7-EX-") == exported["groups"],
+                "editorial review queue omitted vocabulary batches or reading groups")
 
 
     require("ToeicStandardDiagnosticContent.questions()" in preset and
