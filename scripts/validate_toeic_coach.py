@@ -151,8 +151,8 @@ def main() -> None:
     translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
     translation_ids = re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_one + "\n" + translation_week_two)
     translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two + "\n" + translation_extra)
-    require(len(translation_ids) == 104,
-            f"Day 1-13 must have exactly 104 question translations after Part 7 integration, found {len(translation_ids)}")
+    require(len(translation_ids) == 112,
+            f"Day 1-13 including the integrated diagnostic must have 112 unique question translations, found {len(translation_ids)}")
     require(len(translation_ids) == len(set(translation_ids)),
             "TOEIC question translation ids must be unique")
     require(not any(question_id.startswith("R-M1-") or question_id.startswith("R-M2-") for question_id in translation_ids),
@@ -163,13 +163,20 @@ def main() -> None:
             "question translation catalog must aggregate all Day 1-13 translations")
 
     diagnostic_match = re.search(
-        r"let ids:string\[\]=\[(.*?)\];",
-        preset,
-        flags=re.S,
+        r"new ToeicStudyDay\(1,.*?\[\],\[\],\[(.*?)\]\),",
+        week_one, flags=re.S,
     )
-    require(diagnostic_match is not None, "diagnostic question id list is missing")
-    diagnostic_ids = re.findall(r"'R-[^']+'", diagnostic_match.group(1))
-    require(len(diagnostic_ids) == 12, f"expected 12 diagnostic questions, found {len(diagnostic_ids)}")
+    require(diagnostic_match is not None, "Day 1 integrated diagnostic question list is missing")
+    diagnostic_ids = re.findall(r"'(R-[^']+)'", diagnostic_match.group(1))
+    require(len(diagnostic_ids) == 20 and len(set(diagnostic_ids)) == 20,
+            f"Day 1 must contain 20 distinct questions, found {len(diagnostic_ids)}")
+    require((sum('P5' in item for item in diagnostic_ids),
+             sum('P6' in item for item in diagnostic_ids),
+             sum('P7' in item for item in diagnostic_ids)) == (10,4,6),
+            "Day 1 combined diagnostic must cover P5=10 / P6=4 / P7=6")
+    require(diagnostic_ids[-2:] == ['R-DX-P7-03','R-DX-P7-04'] and
+            diagnostic_ids[12:14] == ['R-DX-P6-01','R-DX-P6-02'],
+            "Day 1 must retain intact Part 6 and cross-document passage pairs")
 
     question_ids = re.findall(r"new ToeicQuestion\('([^']+)'", preset + "\n" + week_one)
     question_ids += re.findall(r'ToeicWeekTwoContent\.q\("([^"]+)"', week_two)
@@ -198,11 +205,11 @@ def main() -> None:
             "ToeicExtraReadingBatchSix.groups()" in preset,
             "supplemental content must be registered for review validation")
     require(len(re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)) == 12,
-            "standard diagnostic must have 12 unique extra questions")
+            "legacy diagnostic bank must retain all twelve IDs for saved drafts")
     require(len(re.findall(r'new ToeicQuestion\("R-DX-P5-', extra_diagnostic)) == 6 and
             len(re.findall(r'new ToeicQuestion\("R-DX-P6-', extra_diagnostic)) == 2 and
             len(re.findall(r'new ToeicQuestion\("R-DX-P7-', extra_diagnostic)) == 4,
-            "standard diagnostic must cover P5=6, P6=2, P7=4")
+            "preserved diagnostic question bank must retain its original P5/P6/P7 assets")
     vocabulary_ids = re.findall(r"new ToeicVocabularyItem\('([^']+)'", preset + "\n" + week_one)
     vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)
     vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_two)
@@ -871,35 +878,38 @@ def main() -> None:
                 "editorial review queue omitted vocabulary batches or reading groups")
 
 
-    require("ToeicStandardDiagnosticContent.questions()" in preset and
-            "standardDiagnosticQuestions():ToeicQuestion[]" in preset,
-            "independent standard-level diagnostic must be reachable from PresetToeicContent")
-    require("this.startStandardDiagnostic()" in ui and
-            "this.activeSessionAdvancesProgress=false" in ui,
-            "supplemental diagnostic must not advance the 21-day plan")
-    # Day 1 is the only diagnostic destination: quick baseline first, optional
-    # standard reassessment after it completes. No separate homepage section.
+    # A single 20-item Day 1 baseline replaces the two former separate entry points.
+    # Preserve all original question IDs and the draft-based resume path.
     day_one = ui[ui.index("  private TodayCard()"):ui.index("  private DayButton(")]
-    standard_entry = ui[ui.index("  private startStandardDiagnostic()"):ui.index("  private startTraining()")]
-    require("this.selectedStudyDay===1 && this.progressDiagnosticCompleted" in day_one and
-            "Button('标准水平复测 · 12 题'" in day_one and
-            ".onClick(()=>this.startStandardDiagnostic())" in day_one,
-            "standard diagnosis entry must appear only on completed Day 1 card")
-    require("this.selectedStudyDay!==1 || !this.progressDiagnosticCompleted" in standard_entry and
-            "this.activeSessionAdvancesProgress=false" in standard_entry and
-            "this.viewModel.standardDiagnosticQuestions()" in standard_entry,
-            "standard reassessment must be guarded and must not change day progress")
-    require("this.viewModel.diagnosticQuestions()" in ui and
-            "this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted" in ui,
-            "Day 1 quick diagnosis must retain initial progression and question set")
-    require("if (this.selectedStudyDay===1) return this.progressDiagnosticCompleted?1:0;" in ui and
+    day_one_entry = ui[ui.index("  private startTraining()"):ui.index("  private openVocabulary()")]
+    view_model = read("entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets")
+    training_service = read("entry/src/main/ets/toeic/application/ToeicTrainingService.ets")
+    require("ToeicStandardDiagnosticContent.questions()" in preset and
+            "return PresetToeicContent.questionsForDay(1);" in preset,
+            "the single Day 1 diagnostic must reuse the published question bank and plan ordering")
+    require("static standardDiagnosticQuestions()" not in preset and
+            "standardDiagnosticQuestions()" not in ui and
+            "standardDiagnosticQuestions()" not in view_model and
+            "standardDiagnosticQuestions()" not in training_service and
+            "startStandardDiagnostic()" not in ui and
+            "标准水平复测" not in day_one,
+            "Day 1 must not expose a separate standard diagnosis or retest")
+    require("this.viewModel.diagnosticQuestions()" in day_one_entry and
+            "this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted" in day_one_entry and
+            "this.startSession(ToeicPageMode.DIAGNOSTIC" in day_one_entry,
+            "Day 1 must enter one 20-question diagnostic and advance only on first completion")
+    require("20 题综合诊断" in day_one and
             "this.selectedStudyDay===1?'/1':'/3'" in day_one and
-            "if (this.selectedStudyDay===1)" in day_one,
-            "Day 1 must show one real milestone rather than disabled word/sentence tasks")
+            "if (this.selectedStudyDay===1) return this.progressDiagnosticCompleted?1:0;" in ui,
+            "Day 1 must display the single completion milestone and updated question count")
+    require("questionsForDraft(draft:ToeicSessionDraft)" in view_model and
+            "for (let id of draft.questionIds)" in view_model and
+            "this.questions=restored" in ui and
+            "this.activeSessionAdvancesProgress=draft.advancesProgress" in ui,
+            "legacy saved 12-question Day 1 drafts must resume with their original stable IDs")
     require("this.TodayCard();" in home and
-            "startStandardDiagnostic()" not in home and
-            "标准水平诊断 · 12 题" not in home,
-            "standard diagnosis must not be duplicated as a global homepage shortcut")
+            "startStandardDiagnostic()" not in home,
+            "the standard retest must not remain in the home layout")
 
     standard = read("docs/product/toeic-coach-content-standard.md")
     for phrase in [
