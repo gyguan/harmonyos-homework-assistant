@@ -76,10 +76,11 @@ export class ToeicQuestionHistory {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=4; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=5; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string='';
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
   activeDraft:ToeicSessionDraft|null=null; mockReports:ToeicMockReport[]=[];
+  vocabularyRecalls:ToeicVocabularyRecall[]=[];
 }
 
 export class ToeicStudyPlan {
@@ -163,5 +164,14 @@ export class ToeicMockReport {
     this.answeredCount=answeredCount; this.totalCount=totalCount;
     this.elapsedSeconds=elapsedSeconds; this.part5Correct=part5Correct;
     this.part6Correct=part6Correct; this.part7Correct=part7Correct;
+  }
+}
+
+/** Lightweight scheduled repetition, independent of Homework / Practice. */
+export class ToeicVocabularyRecall {
+  vocabularyId:string; streak:number; totalReviews:number; nextDueAtMs:number; lastReviewedAtMs:number;
+  constructor(vocabularyId:string,streak:number,totalReviews:number,nextDueAtMs:number,lastReviewedAtMs:number) {
+    this.vocabularyId=vocabularyId; this.streak=streak; this.totalReviews=totalReviews;
+    this.nextDueAtMs=nextDueAtMs; this.lastReviewedAtMs=lastReviewedAtMs;
   }
 }
