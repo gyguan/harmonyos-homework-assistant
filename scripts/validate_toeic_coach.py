@@ -289,6 +289,14 @@ def main() -> None:
             "TOEIC contentErrors must include question translation validation")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
+    # Compile regression: FlexSpaceOptions requires LengthMetrics, not raw numbers.
+    require("import { LengthMetrics } from '@kit.ArkUI';" in ui and
+            "space:{main:LengthMetrics.vp(6),cross:LengthMetrics.vp(6)}" in ui and
+            re.search(r"space\s*:\s*\{\s*main\s*:\s*\d+\s*,\s*cross\s*:\s*\d+\s*\}", ui) is None,
+            "TOEIC Flex spacing must use LengthMetrics values, not number")
+    require("this.getUIContext().showAlertDialog({" in ui and
+            "AlertDialog.show(" not in ui,
+            "TOEIC mock confirmation must use non-deprecated UIContext alert dialog")
     for token in ["VOCABULARY='VOCABULARY'", "SENTENCE='SENTENCE'", "DaySelector",
                   "DayButton", "VocabularyContent", "SentenceContent", "item.ipa", "Button('发音'",
                   "selectedStudyDay", "selectedDayTitle", "selectStudyDay(day:number)", "effectiveStudyDay()",
