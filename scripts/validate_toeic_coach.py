@@ -1,5 +1,6 @@
 from pathlib import Path
 import re
+from validate_toeic_editorial_content import validate as validate_editorial_candidates
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -617,6 +618,8 @@ def main() -> None:
 
     ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
     require("ToeicModuleBootstrap.initialize" in ability, "TOEIC progress bootstrap is missing")
+
+    validate_editorial_candidates()
 
     require("ToeicStandardDiagnosticContent.questions()" in preset and
             "standardDiagnosticQuestions():ToeicQuestion[]" in preset,
