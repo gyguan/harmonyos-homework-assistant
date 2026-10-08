@@ -73,11 +73,13 @@ def main() -> None:
     batch_four = read("entry/src/main/ets/toeic/content/ToeicVocabularyBatchFour.ets")
     batch_five = read("entry/src/main/ets/toeic/content/ToeicVocabularyBatchFive.ets")
     batch_six = read("entry/src/main/ets/toeic/content/ToeicVocabularyBatchSix.ets")
+    batch_seven = read("entry/src/main/ets/toeic/content/ToeicVocabularyBatchSeven.ets")
     extra_reading = read("entry/src/main/ets/toeic/content/ToeicExtraReadingContent.ets")
     extra_reading_second = read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchTwo.ets")
     extra_reading_third = read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchThree.ets")
     extra_reading_fourth = read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFour.ets")
     extra_reading_fifth = read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFive.ets")
+    extra_reading_sixth = read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchSix.ets")
     extra_diagnostic = read("entry/src/main/ets/toeic/content/ToeicStandardDiagnosticContent.ets")
     week_two_question_count = week_two.count("ToeicWeekTwoContent.q(")
     week_three_question_count = week_three.count("ToeicWeekThreeContent.q(")
@@ -88,7 +90,8 @@ def main() -> None:
                       extra_reading_second.count("new ToeicQuestion(") +
                       extra_reading_third.count("new ToeicQuestion(") +
                       extra_reading_fourth.count("new ToeicQuestion(") +
-                      extra_reading_fifth.count("new ToeicQuestion("))
+                      extra_reading_fifth.count("new ToeicQuestion(") +
+                      extra_reading_sixth.count("new ToeicQuestion("))
     vocabulary_count = (preset.count("new ToeicVocabularyItem(") +
                         week_one.count("new ToeicVocabularyItem(") +
                         expansion.count("new ToeicVocabularyItem(") +
@@ -96,7 +99,8 @@ def main() -> None:
                          batch_three.count("new ToeicVocabularyItem(") +
                          batch_four.count("new ToeicVocabularyItem(") +
                          batch_five.count("new ToeicVocabularyItem(") +
-                         batch_six.count("new ToeicVocabularyItem("))
+                         batch_six.count("new ToeicVocabularyItem(") +
+                         batch_seven.count("new ToeicVocabularyItem("))
     sentence_drill_count = (week_one.count("new ToeicSentenceDrill(") +
                             week_two.count("new ToeicSentenceDrill(") +
                             week_three.count("new ToeicSentenceDrill("))
@@ -163,14 +167,14 @@ def main() -> None:
     question_ids += re.findall(r'ToeicWeekTwoContent\.q\("([^"]+)"', week_two)
     question_ids += re.findall(r'ToeicWeekThreeContent\.q\("([^"]+)"', week_three)
     question_ids += re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)
-    extra_ids = re.findall(r'new ToeicQuestion\("(R-P7-[A-Z-]+-[0-9]+)"', extra_reading + "\n" + extra_reading_second + "\n" + extra_reading_third + "\n" + extra_reading_fourth + "\n" + extra_reading_fifth)
+    extra_ids = re.findall(r'new ToeicQuestion\("(R-P7-[A-Z-]+-[0-9]+)"', extra_reading + "\n" + extra_reading_second + "\n" + extra_reading_third + "\n" + extra_reading_fourth + "\n" + extra_reading_fifth + "\n" + extra_reading_sixth)
     question_ids += extra_ids
-    require(len(extra_ids) == 55 and len(set(extra_ids)) == 55,
-            "supplemental multi-document reading must contain 45 stable unique questions")
-    combined_extra = extra_reading + "\n" + extra_reading_second + "\n" + extra_reading_third + "\n" + extra_reading_fourth + "\n" + extra_reading_fifth
-    require(combined_extra.count("new ToeicReadingGroup(") == 11 and
+    require(len(extra_ids) == 65 and len(set(extra_ids)) == 65,
+            "supplemental multi-document reading must contain 65 stable unique questions")
+    combined_extra = extra_reading + "\n" + extra_reading_second + "\n" + extra_reading_third + "\n" + extra_reading_fourth + "\n" + extra_reading_fifth + "\n" + extra_reading_sixth
+    require(combined_extra.count("new ToeicReadingGroup(") == 13 and
             (combined_extra.count("ToeicReviewStatus.REVIEWED") +
-             combined_extra.count("ToeicReviewStatus.PUBLISHED")) == 55,
+             combined_extra.count("ToeicReviewStatus.PUBLISHED")) == 65,
             "all supplementary passage questions must retain a valid review state")
     require("ToeicExtraReadingContent.questions()" in preset and
             "ToeicExtraReadingContent.groups()" in preset and
@@ -181,7 +185,9 @@ def main() -> None:
             "ToeicExtraReadingBatchFour.questions()" in preset and
             "ToeicExtraReadingBatchFour.groups()" in preset and
             "ToeicExtraReadingBatchFive.questions()" in preset and
-            "ToeicExtraReadingBatchFive.groups()" in preset,
+            "ToeicExtraReadingBatchFive.groups()" in preset and
+            "ToeicExtraReadingBatchSix.questions()" in preset and
+            "ToeicExtraReadingBatchSix.groups()" in preset,
             "supplemental content must be registered for review validation")
     require(len(re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)) == 12,
             "standard diagnostic must have 12 unique extra questions")
@@ -196,11 +202,13 @@ def main() -> None:
     vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_four)
     vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_five)
     vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_six)
+    vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_seven)
     require(len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_two)) == 30 and
             len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_three)) == 30 and
             len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_four)) == 30 and
             len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_five)) == 30 and
-            len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_six)) == 30,
+            len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_six)) == 30 and
+            len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_seven)) == 30,
             "both staged vocabulary batches must each contain 30 business word entries")
     require("ToeicVocabularyBatchTwo.idsForDay(day)" in preset and
             "ToeicVocabularyBatchTwo.items()" in preset and
@@ -211,7 +219,9 @@ def main() -> None:
             "ToeicVocabularyBatchFive.idsForDay(day)" in preset and
             "ToeicVocabularyBatchFive.items()" in preset and
             "ToeicVocabularyBatchSix.items()" in preset and
-            "ToeicVocabularyBatchSix.idsForDay(day)" in preset,
+            "ToeicVocabularyBatchSix.idsForDay(day)" in preset and
+            "ToeicVocabularyBatchSeven.items()" in preset and
+            "ToeicVocabularyBatchSeven.idsForDay(day)" in preset,
             "second vocabulary batch must be scheduled and surfaced from the catalog")
     require(len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)) == 30,
             "incremental vocabulary must contain exactly 30 curated entries")
@@ -615,6 +625,7 @@ def main() -> None:
             "ToeicExtraReadingBatchThree.groups()" in group_service and
             "ToeicExtraReadingBatchFour.groups()" in group_service and
             "ToeicExtraReadingBatchFive.groups()" in group_service and
+            "ToeicExtraReadingBatchSix.groups()" in group_service and
             "for (let group of PresetToeicContent.publishedReadingGroups())" in preset,
             "supplemental shared articles must be accessible only after publication")
     require("PresetToeicContent.publishedReadingGroups()" in view_model and
@@ -675,10 +686,11 @@ def main() -> None:
     # Review exports must remain complete as more batches are added.
     with TemporaryDirectory() as temp_dir:
         exported = export_review_pack(Path(temp_dir))
-        require(exported == {"vocabulary": 150, "questions": 55, "groups": 11},
+        require(exported == {"vocabulary": 180, "questions": 65, "groups": 13},
                 f"editorial export coverage mismatch: {exported}")
         require((Path(temp_dir) / "vocabulary-review.csv").exists() and
                 (Path(temp_dir) / "part7-review.md").exists() and
+                (Path(temp_dir) / "review-queue.md").exists() and
                 (Path(temp_dir) / "manifest.json").exists(),
                 "editorial review packet not written")
         import csv
@@ -687,12 +699,16 @@ def main() -> None:
             review_rows = list(csv.DictReader(handle))
         require(len(review_rows) == exported["vocabulary"] and
                 review_rows[0]["id"] == "V-121" and
-                review_rows[-1]["id"] == "V-270",
+                review_rows[-1]["id"] == "V-300",
                 "offline vocabulary review export lost items or stable ID ordering")
         review_text = (Path(temp_dir) / "part7-review.md").read_text(encoding="utf-8")
         require(review_text.count("### 题 ") == exported["questions"] and
                 review_text.count("## P7-EX-") == exported["groups"],
                 "offline reading review pack omitted groups or questions")
+        queue = (Path(temp_dir) / "review-queue.md").read_text(encoding="utf-8")
+        require(queue.count("| V-") == exported["vocabulary"] // 30 and
+                queue.count("| P7-EX-") == exported["groups"],
+                "editorial review queue omitted vocabulary batches or reading groups")
 
 
     require("ToeicStandardDiagnosticContent.questions()" in preset and
