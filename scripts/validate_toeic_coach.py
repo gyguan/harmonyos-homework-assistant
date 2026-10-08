@@ -309,8 +309,8 @@ def main() -> None:
         "@State private currentTranslationStem:string=''",
         "private loadQuestion(index:number):boolean",
         "this.loadQuestion(0)",
-        "this.loadQuestion(previousIndex)",
-        "this.loadQuestion(nextIndex)",
+        "this.loadQuestion(this.currentIndex)",
+        "this.noteCurrentQuestionTime()",
         "private currentQuestionForAttempt():ToeicQuestion|null",
         "private sessionAttempt(questionId:string):ToeicQuestionAttempt|null",
         "question.id===this.currentQuestionId",
@@ -320,23 +320,23 @@ def main() -> None:
             "this.currentWrongCount=this.viewModel.wrongCount(question.id)" in ui,
             "question history badges must load from persisted history")
     require("this.currentAttemptCount++" in ui and
-            "if (!attempt.correct) this.currentWrongCount++" in ui,
+            "if (!this.isMockSession() && !attempt.correct) this.currentWrongCount++" in ui,
             "question history badges must update immediately after answering")
     for token in [
         "private previousQuestion():void",
         "Button('上一题'",
         ".enabled(this.currentIndex>0)",
         ".onClick(()=>this.previousQuestion())",
-        ".enabled(this.answerLocked)",
+        ".enabled(this.isMockSession() || this.answerLocked)",
         ".onClick(()=>this.nextQuestion())",
         "attempt===null?-1:attempt.selectedIndex",
         "this.answerCorrect=attempt===null?false:attempt.correct",
         "this.answerLocked=attempt!==null",
-        "this.sessionAttempt(this.currentQuestionId)!==null",
+        "let existing=this.sessionAttempt(this.currentQuestionId)",
     ]:
         require(token in ui, f"question navigation state restoration missing: {token}")
-    require("if (!this.answerLocked) return;" in ui,
-            "next question navigation must not skip unanswered questions")
+    require("(!this.answerLocked && !this.isMockSession())" in ui,
+            "daily practice must not skip unanswered questions, while mocks may")
     require("this.attempts.push(attempt)" in ui,
             "session attempts must remain the source of answered-question state")
     require("this.showQuestionTranslation=false;" in ui,
@@ -435,7 +435,7 @@ def main() -> None:
     for token in [
         "@State private progressCurrentDay:number=1",
         "@State private progressDiagnosticCompleted:boolean=false",
-        "@State private progressWeakSkill:string=ToeicSkill.PARAPHRASE",
+        "@State private progressWeakSkill:string=''",
         "@State private progressReviewCount:number=0",
         "@State private progressSlowCount:number=0",
         "@State private progressAnswered:number=0",
@@ -458,6 +458,26 @@ def main() -> None:
         "this.selectedDaySentenceCount",
     ]:
         require(token in today_builder, f"TodayCard must bind selected-day reactive state directly: {token}")
+
+    # Persistent exam clock and draft/resume cannot be replaced with a label-only timer.
+    model = read("entry/src/main/ets/toeic/domain/ToeicModels.ets")
+    for token in ["class ToeicSessionDraft", "class ToeicMockReport", "class ToeicQuestionTime",
+                  "activeDraft:ToeicSessionDraft|null", "mockReports:ToeicMockReport[]"]:
+        require(token in model, f"missing persistent TOEIC exam model: {token}")
+    progress = read("entry/src/main/ets/toeic/data/ToeicProgressStore.ets")
+    for token in ["async saveDraft(", "async discardDraft(", "async recordSession(",
+                  "this.snapshot.activeDraft=null", "this.snapshot.mockReports.push(mockReport)",
+                  "private pendingSave:Promise<void>"]:
+        require(token in progress, f"draft or report persistence invariant missing: {token}")
+    for token in ["this.sessionStartedAtMs+75*60*1000", "this.mockCountdownSeconds",
+                  "this.mockExpired()", "setInterval(()=>this.updateMockClock(),1000)",
+                  "this.stopMockClock()", "this.resumeDraft()", "this.persistDraft()",
+                  "this.viewModel.completeSession(", "this.confirmMockSubmission()",
+                  "this.questions.length-this.attempts.length",
+                  "this.mockResultUnanswered", "this.mockReports.length>0"]:
+        require(token in ui, f"timed mock / resume / results invariant missing: {token}")
+    require("if (weakest.penalty>0)" in training and "summary.hasWeakSkill=true" in training,
+            "weak skill must not be fabricated for a perfect fast session")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
