@@ -424,8 +424,8 @@ def main() -> None:
                 (".height(AppTheme.BUTTON_HEIGHT)" in body or
                  ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in body),
                 f"TOEIC action button inconsistent: {first_line}")
-    require(action_count == 30 and quiz_choice_count == 8,
-            "TOEIC all 30 action buttons and eight choice tiles must be inspected")
+    require(action_count == 29 and quiz_choice_count == 8,
+            "TOEIC all 29 action buttons and eight choice tiles must be inspected")
     require("Button('发音',{type:ButtonType.Normal})" in ui and
             ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in ui,
             "TOEIC pronunciation must preserve at least the standard secondary touch target")
@@ -444,7 +444,7 @@ def main() -> None:
             "TOEIC home must offer bounded previous/next day and full Day 1-21 selection")
     require("if (this.showPracticeTools)" in home and
             "if (this.showLearningDetails)" in home and
-            "this.startSupplementaryReading()" in home and
+            "this.startStandardDiagnostic()" in home and
             "this.startStandardDiagnostic()" in home and
             "this.recentReports.length>0" in home and
             "this.mockReports.length>0" in home,
@@ -708,8 +708,9 @@ def main() -> None:
     for token in ["groupId:string", "this.groupId=groupId"]:
         require(token in model, f"explicit group question reference missing: {token}")
     require("this.currentPassage=readingGroup.passageBlocks.join(" in ui and
-            "this.startSupplementaryReading()" in ui and
-            "supplementaryReadingQuestions()" in view_model and
+            "startSupplementaryReading" not in ui and
+            "supplementaryReadingQuestionsForDay(day:number)" in preset and
+            "supplementaryReadingQuestionsForDay(studyDay)" in training and
             "ToeicExtraReadingContent.groups()" in group_service and
             "ToeicExtraReadingBatchTwo.groups()" in group_service and
             "ToeicExtraReadingBatchThree.groups()" in group_service and
@@ -759,6 +760,64 @@ def main() -> None:
                   "ToeicVocabularyQuizMode.PARAPHRASE",
                   "this.quizSelectedIndex>=0"]:
         require(token in ui, f"new TOEIC page capability missing: {token}")
+    # Supplemental Part 7 questions are now assigned exactly once within the 21-day plan.
+    # Only complete five-question published groups can be included, and both mock days stay fixed.
+    expected_groups = {
+        12: ["P7-EX-VENUE", "P7-EX-DELIVERY"],
+        13: ["P7-EX-TRAVEL", "P7-EX-FILTER"],
+        17: ["P7-EX-ONBOARD", "P7-EX-RETAIL", "P7-EX-SUPPORT", "P7-EX-LEASE"],
+        18: ["P7-EX-TRAINING", "P7-EX-MIGRATION", "P7-EX-LICENSE"],
+        20: ["P7-EX-PERDIEM", "P7-EX-CATERING"],
+    }
+    schedule = re.findall(
+        r"if \\(day===([0-9]+)\\) return \\[([^\\]]+)\\];",
+        preset[preset.index("static supplementaryGroupIdsForDay("):preset.index("static supplementaryReadingQuestionsForDay(")],
+    )
+    actual = {int(day): re.findall(r"'(P7-EX-[A-Z]+)'", ids) for day, ids in schedule}
+    require(actual == expected_groups, "Part 7 daily schedule must cover 13 groups on Day 12/13/17/18/20")
+    planned_groups = [item for day in actual.values() for item in day]
+    require(len(planned_groups) == 13 and len(set(planned_groups)) == 13,
+            "Part 7 supplementary group IDs must be scheduled once and only once")
+    reading_sources = "".join([
+        read("entry/src/main/ets/toeic/content/ToeicExtraReadingContent.ets"),
+        read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchTwo.ets"),
+        read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchThree.ets"),
+        read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFour.ets"),
+        read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFive.ets"),
+        read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchSix.ets"),
+    ])
+    authored_groups = re.findall(r'new ToeicReadingGroup\\("([^"]+)"', reading_sources)
+    require(set(authored_groups) == set(planned_groups) and len(authored_groups) == 13,
+            "Part 7 schedule must cover each authored reading group exactly once")
+    require("ordered.length===group.questionIds.length" in preset and
+            "for (let questionId of group.questionIds)" in preset and
+            "if (group.groupId!==id) continue;" in preset,
+            "Part 7 daily sessions must preserve original five-question published group integrity")
+    require("supplementaryReadingQuestionsForDay(day)" in preset and
+            "if (PresetToeicContent.supplementaryGroupIdsForDay(studyDay).length>0) return planned;" in training,
+            "Part 7 daily batches must be contiguous rather than re-sorted by weak skills")
+    require("this.weaknessDayQuestions(snapshot,18)" in training and
+            "this.highErrorReviewQuestions(snapshot,20)" in training and
+            training.count(".concat(PresetToeicContent.supplementaryReadingQuestionsForDay(studyDay))") == 2,
+            "Part 7 Day 18/20 must preserve their adaptive review and append complete new groups")
+    require("PresetToeicContent.isMockDay(studyDay)) return planned;" in training and
+            "if (day===14)" not in preset[preset.index("static supplementaryGroupIdsForDay("):preset.index("static supplementaryReadingQuestionsForDay(")] and
+            "if (day===19)" not in preset[preset.index("static supplementaryGroupIdsForDay("):preset.index("static supplementaryReadingQuestionsForDay(")],
+            "Part 7 supplemental schedule must not alter two complete mock exams")
+    require("ToeicQuestionTranslationSupplementaryCatalog.items()" in read(
+        "entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets"),
+        "Day 12/13 extra Part 7 groups need Chinese translations for learning mode")
+    translation_extra = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationSupplementaryCatalog.ets")
+    translated_ids = re.findall(r'new ToeicQuestionTranslation\\("([^"]+)"', translation_extra)
+    require(len(translated_ids) == 20 and len(set(translated_ids)) == 20,
+            "Day 12/13 extra Part 7 groups must have 20 independent translated questions")
+    for gid in expected_groups[12] + expected_groups[13]:
+        prefix = gid.replace("P7-EX-", "R-P7-") + "-"
+        require(sum(item.startswith(prefix) for item in translated_ids) == 5,
+                f"Day 12/13 complete reading group needs five translations: {gid}")
+    require("Button('Part 7 双篇 / 三篇加练'" not in ui and
+            "更多训练 · 水平诊断" in ui,
+            "Standalone Part 7 bonus entry should be removed once integrated into daily training")
     require("passageBlocks(passage:string):string[]" in group_service and
             "questions[first-1].passage===current.passage" in group_service and
             "questions[last+1].passage===current.passage" in group_service,
