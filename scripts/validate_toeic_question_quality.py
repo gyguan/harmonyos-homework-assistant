@@ -23,9 +23,11 @@ FILES = (
 DAY_ONE = (
     "R-P5-WF-0001", "R-P5-VOICE-0002", "R-P5-PREP-0003",
     "R-P5-CONJ-0004", "R-P5-COL-0005", "R-P5-VOC-0006",
-    "R-P6-CTX-0001", "R-P6-WF-0002",
+    "R-DX-P5-01", "R-DX-P5-02", "R-DX-P5-03", "R-DX-P5-04",
+    "R-P6-CTX-0001", "R-P6-WF-0002", "R-DX-P6-01", "R-DX-P6-02",
     "R-P7-DETAIL-0001", "R-P7-PURPOSE-0002",
     "R-P7-PARA-0003", "R-P7-DETAIL-0004",
+    "R-DX-P7-03", "R-DX-P7-04",
 )
 
 @dataclass
@@ -178,10 +180,22 @@ def validate() -> dict[str, int]:
         if id not in id_map:
             errors.append(f"Day 1 diagnostic missing {id}")
     preset = contents["PresetToeicContent"]
-    day_one_section = preset.split("static diagnosticQuestions():ToeicQuestion[] {", 1)[-1].split("static standardDiagnosticQuestions()", 1)[0]
-    selected_day_one = re.findall(r"'(R-(?:P5|P6|P7)-[^']+)'", day_one_section)
+    day_one_source = contents["ToeicWeekOneContent"]
+    day_one_match = re.search(
+        r"new ToeicStudyDay\(1,.*?\[\],\[\],\[(.*?)\]\),",
+        day_one_source, re.S,
+    )
+    selected_day_one = re.findall(r"'(R-[^']+)'", day_one_match.group(1)) if day_one_match else []
     if tuple(selected_day_one) != DAY_ONE:
-        errors.append(f"Day 1 question order/content changed: {selected_day_one}")
+        errors.append(f"Day 1 20-question plan content/order changed: {selected_day_one}")
+    if "return PresetToeicContent.questionsForDay(1);" not in preset:
+        errors.append("Day 1 diagnosis must use the study plan as its sole source of truth")
+    if len({q.id for q in questions if q.id in DAY_ONE}) != 20:
+        errors.append("Day 1 contains missing or duplicate question IDs")
+    for group in (("R-DX-P6-01", "R-DX-P6-02"), ("R-DX-P7-03", "R-DX-P7-04")):
+        indexes = [selected_day_one.index(id) for id in group if id in selected_day_one]
+        if len(indexes) != 2 or indexes[1] != indexes[0]+1:
+            errors.append(f"Day 1 shared reading pair not contiguous: {group}")
     if "Qualifyingly" in preset:
         errors.append("Day 1 contains a fabricated English distractor 'Qualifyingly'")
     for id in ("R-P6-CTX-0001", "R-P6-WF-0002"):
@@ -196,6 +210,12 @@ def validate() -> dict[str, int]:
         day_one_translation = day_one_translation[1].split("new ToeicQuestionTranslation(", 1)[0]
         if "为横线选择最合适的词" in day_one_translation or "合格地" in day_one_translation:
             errors.append("Day 1 Chinese translation still contains stale stem or deleted nonword distractor")
+    translated_question_ids = re.findall(
+        r"new ToeicQuestionTranslation\('([^']+)'", translations
+    )
+    for id in DAY_ONE:
+        if id not in translated_question_ids:
+            errors.append(f"{id}: Day 1 has no hidden Chinese translation")
     week_two_source = contents["ToeicWeekTwoContent"]
     for id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1102"):
         if f"id==='{id}'" not in week_two_source or "question.version=2" not in week_two_source:
