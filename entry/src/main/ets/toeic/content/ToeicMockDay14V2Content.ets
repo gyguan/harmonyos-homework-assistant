@@ -57,22 +57,29 @@ export class ToeicMockDay14V2Content {
     result.push(new ToeicQuestion("R-FM1-P7-M2-04",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","When does the free-delivery offer end?",["October 28","November 1","September 30","October 31"],3,"优惠截至10月31日。","Offer ends October 31.",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G2"));
     result.push(new ToeicQuestion("R-FM1-P7-M2-05",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","On what date was the customer email sent?",["October 31","October 28","October 20","November 28"],1,"邮件日期是10月28日。","CUSTOMER E-MAIL dated October 28",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G2"));
     result.push(new ToeicQuestion("R-FM1-P7-M3-04",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","When must invoice 3118 be paid?",["November 7","November 5","October 31","November 6"],3,"付款截止日为11月6日。","Due date: Nov. 6",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G3"));
-    result.push(new ToeicQuestion("R-FM1-P7-M3-05",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","What payment method may take two business days to post?",["Credit-card payment","Bank transfer","Cash at reception","Mobile wallet"],1,"银行转账可能需要两个工作日入账。","Bank transfers may take up to two business days to post.",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G3"));
+    result.push(new ToeicQuestion("R-FM1-P7-M3-05",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","What did Finance advise the customer to do?",["Cancel the invoice","Submit the bank transfer early","Pay an additional service charge","Request a new due date"],1,"财务建议提前汇款，以便最迟11月6日完成入账。","Finance has advised submitting the transfer early enough for it to post by November 6.",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G3"));
     result.push(new ToeicQuestion("R-FM1-P7-M4-04",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","Where will the team meeting be held?",["At the bus station","At Easton","At the training center","At the Downtown office"],3,"会议地点是Downtown办公室。","The team meeting begins at 9:00 in the Downtown office.",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G4"));
-    result.push(new ToeicQuestion("R-FM1-P7-M4-05",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.CROSS_DOCUMENT,"","At what time would someone taking the 8:40 bus arrival reach the office after the stated walk?",["8:40","8:50","9:00","9:10"],1,"8:40到站加10分钟步行即8:50。","Route 7 arrives Downtown at 8:40 and 9:10. || It takes about 10 minutes to walk from the bus stop.",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G4"));
+    result.push(new ToeicQuestion("R-FM1-P7-M4-05",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.CROSS_DOCUMENT,"","At what time would Harper reach the office after taking the bus mentioned in the message?",["8:40","8:50","9:00","9:10"],1,"Harper乘坐8:40到站的巴士，步行10分钟后8:50到办公室。","I will take the Route 7 bus that reaches Downtown at 8:40. || It takes about 10 minutes to walk from the bus stop.",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G4"));
     result.push(new ToeicQuestion("R-FM1-P7-M5-04",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","When is the marketing assistant position scheduled to begin?",["November 8","November 10","November 25","December 1"],3,"职位计划12月1日开始。","start date Dec. 1",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G5"));
-    result.push(new ToeicQuestion("R-FM1-P7-M5-05",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","When was the applicant's email written?",["November 10","November 8","November 25","December 1"],1,"申请邮件写于11月8日。","APPLICANT E-MAIL dated Nov. 8",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G5"));
+    result.push(new ToeicQuestion("R-FM1-P7-M5-05",ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,"","What will the recruiter do before the application deadline?",["Arrange office equipment","Review the candidate's résumé","Issue a travel voucher","Cancel the job posting"],1,"招聘人员表示将在11月10日截止前审阅简历。","We have received the résumé and will review it before the application deadline on November 10.",'',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,ToeicReviewStatus.PUBLISHED,1,'','',0,0,"FM1-G5"));
     return result;
   }
 
   static groups():ToeicReadingGroup[] {
     let legacy=ToeicWeekTwoContent.mockQuestions();
     let result:ToeicReadingGroup[]=[];
+    let thirdDocuments:string[]=[
+      '', '',
+      'DOCUMENT 3 — CUSTOMER ACCOUNT MESSAGE, NOVEMBER 1\nThe customer has requested payment by bank transfer. Finance has advised submitting the transfer early enough for it to post by November 6.',
+      'DOCUMENT 3 — EMPLOYEE MESSAGE\nI will take the Route 7 bus that reaches Downtown at 8:40. I will go directly to the office after getting off. —Harper',
+      'DOCUMENT 3 — RECRUITER FOLLOW-UP, NOVEMBER 9\nWe have received the résumé and will review it before the application deadline on November 10.'
+    ];
     for(let group=0;group<5;group++) {
       let ids:string[]=[];
       for(let q=1;q<=5;q++) ids.push('R-FM1-P7-M'+String(group+1)+'-'+String(q).padStart(2,'0'));
-      result.push(new ToeicReadingGroup('FM1-G'+String(group+1),ids,
-        ToeicMockDay14V2Content.splitDocuments(legacy[70+group*3].passage)));
+      let blocks=ToeicMockDay14V2Content.splitDocuments(legacy[70+group*3].passage);
+      if (group>=2) blocks.push(thirdDocuments[group]);
+      result.push(new ToeicReadingGroup('FM1-G'+String(group+1),ids,blocks));
     }
     return result;
   }
