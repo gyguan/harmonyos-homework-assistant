@@ -1,0 +1,2531 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-10-08",
+  "reviewer": "AI-GPT6",
+  "reviewMode": "AI_EDITORIAL",
+  "status": "AI_SECOND_PASS_COMPLETED",
+  "notReleaseAuthorization": true,
+  "limitations": "Full AI item screening and source quote checks do not guarantee 100-percent linguistic correctness, independent expert certification or ETS recognition; IPA verified structurally with selective dictionary spot checks.",
+  "scope": {
+    "words": 120,
+    "groups": 8,
+    "questions": 40
+  },
+  "referenceUrls": [
+    "https://dictionary.cambridge.org/dictionary/english/perishable",
+    "https://dictionary.cambridge.org/us/dictionary/english/wholesale",
+    "https://dictionary.cambridge.org/dictionary/english/refundable-deposit",
+    "https://dictionary.cambridge.org/dictionary/english/refreshment",
+    "https://dictionary.cambridge.org/dictionary/english/authenticate",
+    "https://dictionary.cambridge.org/us/dictionary/english/allowance"
+  ],
+  "corrected": [
+    {
+      "id": "V-190",
+      "note": "Adjective paraphrase required an adjective phrase rather than a plural noun"
+    },
+    {
+      "id": "V-191",
+      "note": "Wholesale adjective paraphrase was a noun phrase"
+    },
+    {
+      "id": "V-192",
+      "note": "Retail adjective paraphrase was a noun phrase"
+    },
+    {
+      "id": "V-193",
+      "note": "Promotional adjective paraphrase was a noun phrase"
+    },
+    {
+      "id": "V-218",
+      "note": "Refundable security deposit is not necessarily an advance payment against price"
+    },
+    {
+      "id": "V-254",
+      "note": "Authenticate yourself is the idiomatic IT usage"
+    },
+    {
+      "id": "V-278",
+      "note": "Travel allowance is a specified sum provided for expenses, not a limit alone"
+    },
+    {
+      "id": "V-283",
+      "note": "The standard meeting-food term is plural refreshments (headword/POS/IPA)"
+    },
+    {
+      "id": "P7-EX-MIGRATION",
+      "note": "Replace ambiguous following morning with October 18 and align answer evidence"
+    }
+  ],
+  "vocabulary": {
+    "V-181": {
+      "headword": "consignment",
+      "pos": "n.",
+      "meaning": "托运货物；寄售商品",
+      "example": "The carrier confirmed receipt of the consignment at the warehouse.",
+      "collocations": [
+        "consignment of goods"
+      ],
+      "synonyms": [
+        "shipment of goods"
+      ],
+      "ipa": "/kənˈsaɪnmənt/",
+      "contentSha256": "43ad678f560ea27d3a7d4d77c67b5c7925259f1d89f8b17cc2380787c21bb26b",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-182": {
+      "headword": "fulfillment",
+      "pos": "n.",
+      "meaning": "订单履行；履约",
+      "example": "The retailer outsourced order fulfillment during the holiday season.",
+      "collocations": [
+        "order fulfillment"
+      ],
+      "synonyms": [
+        "processing and delivery of orders"
+      ],
+      "ipa": "/fʊlˈfɪlmənt/",
+      "contentSha256": "713286cff9f3a73b3ce4706deb171e0001290c6a178a1b43a3792f8caf68a578",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-183": {
+      "headword": "backorder",
+      "pos": "n.",
+      "meaning": "延期交付订单；缺货待交订单",
+      "example": "The printer cartridges are on backorder until next week.",
+      "collocations": [
+        "place an item on backorder"
+      ],
+      "synonyms": [
+        "order awaiting stock"
+      ],
+      "ipa": "/ˈbækˌɔːrdər/",
+      "contentSha256": "da9641f9615e1807bf0d9d48ef83678970d6bdcf2dca6b8b9644e6b152a7fb15",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-184": {
+      "headword": "restock",
+      "pos": "v.",
+      "meaning": "补货；重新进货",
+      "example": "Staff will restock the shelves before the store opens.",
+      "collocations": [
+        "restock shelves"
+      ],
+      "synonyms": [
+        "replenish inventory"
+      ],
+      "ipa": "/riːˈstɑːk/",
+      "contentSha256": "cb2f2c45562fcb9fc2bf6958d79937244f32a7ecf9a546bef55a2cb7240f8357",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-185": {
+      "headword": "carrier",
+      "pos": "n.",
+      "meaning": "承运商；运输公司",
+      "example": "The carrier will collect the packages on Tuesday.",
+      "collocations": [
+        "freight carrier"
+      ],
+      "synonyms": [
+        "transport company"
+      ],
+      "ipa": "/ˈkæriər/",
+      "contentSha256": "59013cbd27098bf02ac4ee76dc3163d085deab4d8f70b5cb939f0f3b0c8e581a",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-186": {
+      "headword": "customs",
+      "pos": "n.",
+      "meaning": "海关",
+      "example": "The shipment was delayed while customs inspected the documents.",
+      "collocations": [
+        "clear customs"
+      ],
+      "synonyms": [
+        "border authorities"
+      ],
+      "ipa": "/ˈkʌstəmz/",
+      "contentSha256": "fec4b64704ea6048525da2f32a2e1bb902b433e4453ab7afbff512de24d8b37b",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-187": {
+      "headword": "tariff",
+      "pos": "n.",
+      "meaning": "关税；收费表",
+      "example": "The new tariff increased the cost of imported components.",
+      "collocations": [
+        "import tariff"
+      ],
+      "synonyms": [
+        "import duty"
+      ],
+      "ipa": "/ˈtærɪf/",
+      "contentSha256": "425db28b1a92b3d7426b33c417329f4aa83632a18d8ce9fe4d0e3f85d08970e2",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-188": {
+      "headword": "clearance",
+      "pos": "n.",
+      "meaning": "清关；许可",
+      "example": "Customs clearance usually takes two business days.",
+      "collocations": [
+        "customs clearance"
+      ],
+      "synonyms": [
+        "authorization to pass"
+      ],
+      "ipa": "/ˈklɪrəns/",
+      "contentSha256": "a41a58e010b4eeae4a69f4d6ff27a894d9ff6460a3cbba1f5b06877fefc9c612",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-189": {
+      "headword": "pallet",
+      "pos": "n.",
+      "meaning": "货物托盘",
+      "example": "Each pallet must be labeled before it leaves the warehouse.",
+      "collocations": [
+        "shipping pallet"
+      ],
+      "synonyms": [
+        "loading platform"
+      ],
+      "ipa": "/ˈpælɪt/",
+      "contentSha256": "1da6c279ec94a1dde77bb9fce9f367a94cefb4c7f5602de0f3c92fb3bc39b02f",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-190": {
+      "headword": "perishable",
+      "pos": "adj.",
+      "meaning": "易腐坏的；易变质的",
+      "example": "Perishable products must be kept refrigerated during transport.",
+      "collocations": [
+        "perishable goods"
+      ],
+      "synonyms": [
+        "likely to spoil quickly"
+      ],
+      "ipa": "/ˈpɛrɪʃəbəl/",
+      "contentSha256": "fac568e695c22c5ca4e721f590b9cfe2dc76a2e61e0c87e8ce5c3e6eef17752d",
+      "decision": "PASS_AI_RECHECK",
+      "correction": "Adjective paraphrase required an adjective phrase rather than a plural noun"
+    },
+    "V-191": {
+      "headword": "wholesale",
+      "pos": "adj.",
+      "meaning": "批发的",
+      "example": "The distributor offers a wholesale discount to business customers.",
+      "collocations": [
+        "wholesale price"
+      ],
+      "synonyms": [
+        "sold in large quantities to businesses"
+      ],
+      "ipa": "/ˈhoʊlˌseɪl/",
+      "contentSha256": "b3ddffcab231b376c18a117678c1417c4bc0636a4e1a1b030b5761cf9dea8d75",
+      "decision": "PASS_AI_RECHECK",
+      "correction": "Wholesale adjective paraphrase was a noun phrase"
+    },
+    "V-192": {
+      "headword": "retail",
+      "pos": "adj.",
+      "meaning": "零售的",
+      "example": "The retail price includes local sales tax.",
+      "collocations": [
+        "retail price"
+      ],
+      "synonyms": [
+        "sold directly to consumers"
+      ],
+      "ipa": "/ˈriːteɪl/",
+      "contentSha256": "485f2568ef6d5e54eae0ac2816c50231e81f07d4cfebf57d874a3484e9dfc98e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": "Retail adjective paraphrase was a noun phrase"
+    },
+    "V-193": {
+      "headword": "promotional",
+      "pos": "adj.",
+      "meaning": "促销的；宣传性的",
+      "example": "The promotional price applies only to online orders.",
+      "collocations": [
+        "promotional offer"
+      ],
+      "synonyms": [
+        "intended to increase sales"
+      ],
+      "ipa": "/prəˈmoʊʃənəl/",
+      "contentSha256": "8849f1525df79a5ee5267b982cb9ecac9051fcfaf604805ac7af6f99cac41f88",
+      "decision": "PASS_AI_RECHECK",
+      "correction": "Promotional adjective paraphrase was a noun phrase"
+    },
+    "V-194": {
+      "headword": "coupon",
+      "pos": "n.",
+      "meaning": "优惠券；折扣券",
+      "example": "Customers may use one coupon per purchase.",
+      "collocations": [
+        "discount coupon"
+      ],
+      "synonyms": [
+        "voucher"
+      ],
+      "ipa": "/ˈkuːpɑːn/",
+      "contentSha256": "842d56b244f4f5fa0fc77c4044a4d2fd12af4fdb11f2377178695f5cb2abe5ff",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-195": {
+      "headword": "redeem",
+      "pos": "v.",
+      "meaning": "兑换；使用优惠券",
+      "example": "Members can redeem points for a gift card.",
+      "collocations": [
+        "redeem a voucher"
+      ],
+      "synonyms": [
+        "exchange for a benefit"
+      ],
+      "ipa": "/rɪˈdiːm/",
+      "contentSha256": "915d47133374937965c6370c893d261aa7cb16b2e4a736746f63260497850db0",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-196": {
+      "headword": "exchange",
+      "pos": "n.",
+      "meaning": "换货；交换",
+      "example": "The customer requested an exchange for a different size.",
+      "collocations": [
+        "request an exchange"
+      ],
+      "synonyms": [
+        "replacement transaction"
+      ],
+      "ipa": "/ɪksˈtʃeɪndʒ/",
+      "contentSha256": "5655b20853b6e2ad914e1f9acef582b02358d89f17b2fc291fc5a9782a1aea43",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-197": {
+      "headword": "returnable",
+      "pos": "adj.",
+      "meaning": "可退还的；可退货的",
+      "example": "Opened software packages are not returnable under the store policy.",
+      "collocations": [
+        "returnable item"
+      ],
+      "synonyms": [
+        "eligible for return"
+      ],
+      "ipa": "/rɪˈtɝːnəbəl/",
+      "contentSha256": "e18f6681b44d7f2f5af6f49291b72c8da75b4f152786b3a9666085b2d0d90def",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-198": {
+      "headword": "defective",
+      "pos": "adj.",
+      "meaning": "有缺陷的；有故障的",
+      "example": "The supplier replaced the defective parts without charge.",
+      "collocations": [
+        "defective product"
+      ],
+      "synonyms": [
+        "faulty"
+      ],
+      "ipa": "/dɪˈfɛktɪv/",
+      "contentSha256": "b790a043fa81c35f220486f9bc1e9c974f63939ce61e42a7da9de68b22a39f75",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-199": {
+      "headword": "markdown",
+      "pos": "n.",
+      "meaning": "降价；减价金额",
+      "example": "The store announced a markdown on last season's jackets.",
+      "collocations": [
+        "price markdown"
+      ],
+      "synonyms": [
+        "price reduction"
+      ],
+      "ipa": "/ˈmɑːrkˌdaʊn/",
+      "contentSha256": "d1f142ca918f7510975ea2f7589e19ffc4f7c75bd86bc3a46d112ad58374045a",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-200": {
+      "headword": "merchandise",
+      "pos": "n.",
+      "meaning": "商品；货品",
+      "example": "The new merchandise will be displayed near the entrance.",
+      "collocations": [
+        "display merchandise"
+      ],
+      "synonyms": [
+        "goods for sale"
+      ],
+      "ipa": "/ˈmɝːtʃənˌdaɪs/",
+      "contentSha256": "ac0f2ec58b266dd4b658d5a53af15b2740bbd8f6d52d42c2d517250d58a5833e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-201": {
+      "headword": "malfunction",
+      "pos": "n.",
+      "meaning": "故障；失灵",
+      "example": "A malfunction interrupted the packing line for twenty minutes.",
+      "collocations": [
+        "equipment malfunction"
+      ],
+      "synonyms": [
+        "failure to operate correctly"
+      ],
+      "ipa": "/mælˈfʌŋkʃən/",
+      "contentSha256": "2c6adc1f62e8a0ab2701aeef6153bb17320a46d99af2c9f596b5def6d8245e38",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-202": {
+      "headword": "troubleshoot",
+      "pos": "v.",
+      "meaning": "排查并解决故障",
+      "example": "The support engineer will troubleshoot the network connection.",
+      "collocations": [
+        "troubleshoot a connection"
+      ],
+      "synonyms": [
+        "diagnose a problem"
+      ],
+      "ipa": "/ˈtrʌbəlˌʃuːt/",
+      "contentSha256": "204cffc18fcc7da4d455dded84f699f7efe04c373d270c23db6aa054f4c95fe2",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-203": {
+      "headword": "outage",
+      "pos": "n.",
+      "meaning": "中断；停电；断网",
+      "example": "The office could not access email during the network outage.",
+      "collocations": [
+        "network outage"
+      ],
+      "synonyms": [
+        "service interruption"
+      ],
+      "ipa": "/ˈaʊtɪdʒ/",
+      "contentSha256": "3b7a7d86a7b568b0cf8819d5c63f55f9541cb45f92e89640f54200ef6b2bef76",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-204": {
+      "headword": "downtime",
+      "pos": "n.",
+      "meaning": "停机时间；服务不可用时间",
+      "example": "Preventive maintenance helps minimize equipment downtime.",
+      "collocations": [
+        "minimize downtime"
+      ],
+      "synonyms": [
+        "period of unavailability"
+      ],
+      "ipa": "/ˈdaʊnˌtaɪm/",
+      "contentSha256": "9c8b48f61e919fbdfebb8871d4b1b15dfc9e89ba2a8baace2354426ba276ef15",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-205": {
+      "headword": "backup",
+      "pos": "n.",
+      "meaning": "备份；后备方案",
+      "example": "The technician restored the files from the latest backup.",
+      "collocations": [
+        "data backup"
+      ],
+      "synonyms": [
+        "reserve copy"
+      ],
+      "ipa": "/ˈbækˌʌp/",
+      "contentSha256": "298a7db888df3f83e6b9e448fd31566c58430ad73e365315c6914d91849618df",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-206": {
+      "headword": "deployment",
+      "pos": "n.",
+      "meaning": "部署；投入使用",
+      "example": "The software deployment is scheduled for Sunday morning.",
+      "collocations": [
+        "software deployment"
+      ],
+      "synonyms": [
+        "release into operation"
+      ],
+      "ipa": "/dɪˈplɔɪmənt/",
+      "contentSha256": "caa3ad42059fa187b2ecffab88afe7b7ce74c44e777e45d03d07ba06d10efda7",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-207": {
+      "headword": "cancellation",
+      "pos": "n.",
+      "meaning": "取消；撤销",
+      "example": "The hotel charges a cancellation fee for late changes.",
+      "collocations": [
+        "cancellation fee"
+      ],
+      "synonyms": [
+        "withdrawal of a booking"
+      ],
+      "ipa": "/ˌkænsəˈleɪʃən/",
+      "contentSha256": "10d8edbf165b898c72a44ebfe282c34e3de7b5e147326a0832502778df0b2d07",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-208": {
+      "headword": "expiration",
+      "pos": "n.",
+      "meaning": "到期；期满",
+      "example": "The insurance policy must be renewed before its expiration.",
+      "collocations": [
+        "expiration date"
+      ],
+      "synonyms": [
+        "end of validity"
+      ],
+      "ipa": "/ˌɛkspəˈreɪʃən/",
+      "contentSha256": "0614e7a421725a88d0f1d7a7d714d390185339a2bbda883edae90e719bb0a68f",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-209": {
+      "headword": "entitlement",
+      "pos": "n.",
+      "meaning": "权利；应得福利",
+      "example": "Employees can check their leave entitlement in the HR portal.",
+      "collocations": [
+        "benefit entitlement"
+      ],
+      "synonyms": [
+        "right to a benefit"
+      ],
+      "ipa": "/ɪnˈtaɪtəlmənt/",
+      "contentSha256": "ddee7b1641cf37fe3c53b1e6629034566e69d5202e3b497577d64e7cf5887a4f",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-210": {
+      "headword": "assistance",
+      "pos": "n.",
+      "meaning": "协助；援助",
+      "example": "Please contact our help desk if you need technical assistance.",
+      "collocations": [
+        "technical assistance"
+      ],
+      "synonyms": [
+        "help"
+      ],
+      "ipa": "/əˈsɪstəns/",
+      "contentSha256": "2190905774d9fcff3c0deea05feb81eec07f08bf12c97b6543cdccbbe15e5cb6",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-211": {
+      "headword": "tenant",
+      "pos": "n.",
+      "meaning": "租户；承租人",
+      "example": "The tenant asked the property manager to repair the heating system.",
+      "collocations": [
+        "commercial tenant"
+      ],
+      "synonyms": [
+        "renter"
+      ],
+      "ipa": "/ˈtɛnənt/",
+      "contentSha256": "d542d137e17b5747c88e0cda0471fe3920fec45e5eb878f50c41ae379ee971fa",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-212": {
+      "headword": "landlord",
+      "pos": "n.",
+      "meaning": "房东；出租人",
+      "example": "The landlord approved the request to repaint the office.",
+      "collocations": [
+        "commercial landlord"
+      ],
+      "synonyms": [
+        "property owner"
+      ],
+      "ipa": "/ˈlændˌlɔːrd/",
+      "contentSha256": "499c8eacb7b65ab7adf7b2606abe1cb84e321ce8b9701379aef717d953a1ec08",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-213": {
+      "headword": "premises",
+      "pos": "n. pl.",
+      "meaning": "房屋；经营场所",
+      "example": "Visitors must sign in before entering the premises.",
+      "collocations": [
+        "business premises"
+      ],
+      "synonyms": [
+        "building or site"
+      ],
+      "ipa": "/ˈprɛmɪsɪz/",
+      "contentSha256": "9e4f88e859a7119ed645d936bc5defce8dd6def6a9ab29791d269349e01e06dd",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-214": {
+      "headword": "occupancy",
+      "pos": "n.",
+      "meaning": "入住；使用率",
+      "example": "The hotel reported an occupancy rate of eighty percent.",
+      "collocations": [
+        "occupancy rate"
+      ],
+      "synonyms": [
+        "room utilization"
+      ],
+      "ipa": "/ˈɑːkjəpənsi/",
+      "contentSha256": "3564a54b5a1b691ac8275d736eba25526c197181bc7bdda3b41605a923e4b7e9",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-215": {
+      "headword": "utilities",
+      "pos": "n. pl.",
+      "meaning": "水电燃气等公共事业费用",
+      "example": "Utilities are billed separately from the office rent.",
+      "collocations": [
+        "monthly utilities"
+      ],
+      "synonyms": [
+        "water and electricity services"
+      ],
+      "ipa": "/juːˈtɪlətiz/",
+      "contentSha256": "55947d276141a5152b330752134f9acb1a4d14b216402fdc2cab12d21e7679b1",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-216": {
+      "headword": "fixture",
+      "pos": "n.",
+      "meaning": "固定装置；附属设备",
+      "example": "The contractor replaced a damaged lighting fixture.",
+      "collocations": [
+        "lighting fixture"
+      ],
+      "synonyms": [
+        "permanently attached fitting"
+      ],
+      "ipa": "/ˈfɪkstʃər/",
+      "contentSha256": "62218ceaf81ea33b1f189fb467a3264c9388afb113293d40228dd6aa78f5ac20",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-217": {
+      "headword": "permit",
+      "pos": "n.",
+      "meaning": "许可证；许可文件",
+      "example": "Construction cannot begin until the city issues a permit.",
+      "collocations": [
+        "building permit"
+      ],
+      "synonyms": [
+        "official authorization document"
+      ],
+      "ipa": "/ˈpɝːmɪt/",
+      "contentSha256": "b4ce409a4f9c7d9ade6d0ffa94bfc839ec8975c55e6a499ba0ecf5702568c60b",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-218": {
+      "headword": "deposit",
+      "pos": "n.",
+      "meaning": "押金；订金",
+      "example": "A refundable deposit is required to reserve the meeting space.",
+      "collocations": [
+        "refundable deposit"
+      ],
+      "synonyms": [
+        "refundable payment held as security"
+      ],
+      "ipa": "/dɪˈpɑːzɪt/",
+      "contentSha256": "5b598a7c4e614e168cfd76de5b5503cf60e0fb50f9802324b628e0c63357a951",
+      "decision": "PASS_AI_RECHECK",
+      "correction": "Refundable security deposit is not necessarily an advance payment against price"
+    },
+    "V-219": {
+      "headword": "amendment",
+      "pos": "n.",
+      "meaning": "修正案；合同修订",
+      "example": "Both parties signed an amendment to the rental agreement.",
+      "collocations": [
+        "contract amendment"
+      ],
+      "synonyms": [
+        "formal change"
+      ],
+      "ipa": "/əˈmɛndmənt/",
+      "contentSha256": "0b3d78ad32b8202922ffa386a94c63a7aac48220689c3b07be7d624fbea5ee56",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-220": {
+      "headword": "terminate",
+      "pos": "v.",
+      "meaning": "终止；结束合同",
+      "example": "Either party may terminate the agreement with thirty days' notice.",
+      "collocations": [
+        "terminate an agreement"
+      ],
+      "synonyms": [
+        "end formally"
+      ],
+      "ipa": "/ˈtɝːməˌneɪt/",
+      "contentSha256": "e421c3a3f47a5c35661c4cc1f37e5b9d2e40d5bed1b3765f51976715ca6393dc",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-221": {
+      "headword": "disclosure",
+      "pos": "n.",
+      "meaning": "披露；公开说明",
+      "example": "The application requires disclosure of potential conflicts of interest.",
+      "collocations": [
+        "financial disclosure"
+      ],
+      "synonyms": [
+        "release of information"
+      ],
+      "ipa": "/dɪˈskloʊʒər/",
+      "contentSha256": "5cf110b229f19c52390d516ab3e0adef9e8482a088c710da3f5fc39aef323f07",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-222": {
+      "headword": "liability",
+      "pos": "n.",
+      "meaning": "法律责任；负债",
+      "example": "The policy limits the supplier's liability for shipping delays.",
+      "collocations": [
+        "limited liability"
+      ],
+      "synonyms": [
+        "legal responsibility"
+      ],
+      "ipa": "/ˌlaɪəˈbɪləti/",
+      "contentSha256": "bdad4e8e37973d6219a1322851f6275063edc4b44a8a686f61db243591986f99",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-223": {
+      "headword": "coverage",
+      "pos": "n.",
+      "meaning": "保险保障范围；覆盖",
+      "example": "The basic insurance plan includes dental coverage.",
+      "collocations": [
+        "insurance coverage"
+      ],
+      "synonyms": [
+        "scope of protection"
+      ],
+      "ipa": "/ˈkʌvərɪdʒ/",
+      "contentSha256": "1178c3c81de6a0405fb7cfb93c61f7fddf6b7d04784c7251d5061ba145f995ee",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-224": {
+      "headword": "premium",
+      "pos": "n.",
+      "meaning": "保险费；保费",
+      "example": "The annual premium will increase when the policy is renewed.",
+      "collocations": [
+        "monthly premium"
+      ],
+      "synonyms": [
+        "insurance payment"
+      ],
+      "ipa": "/ˈpriːmiəm/",
+      "contentSha256": "cd356f04d6a16a1d942ece88cfc6161d5b7f20bbbbfda6acacfcf81aebb9d5f1",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-225": {
+      "headword": "beneficiary",
+      "pos": "n.",
+      "meaning": "受益人",
+      "example": "Employees must name a beneficiary on the enrollment form.",
+      "collocations": [
+        "designated beneficiary"
+      ],
+      "synonyms": [
+        "person receiving benefits"
+      ],
+      "ipa": "/ˌbɛnəˈfɪʃiˌɛri/",
+      "contentSha256": "73141088fbbb51018b5021c7d141f2bc502c9111e83a20024bc31c9c36046310",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-226": {
+      "headword": "broker",
+      "pos": "n.",
+      "meaning": "经纪人；中介",
+      "example": "The broker arranged three tours of commercial properties.",
+      "collocations": [
+        "real estate broker"
+      ],
+      "synonyms": [
+        "intermediary"
+      ],
+      "ipa": "/ˈbroʊkər/",
+      "contentSha256": "71823e749f7f732242ceca28b714eb07b900fb921424de1d128f80a3c520c525",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-227": {
+      "headword": "appraisal",
+      "pos": "n.",
+      "meaning": "评估；估价",
+      "example": "The bank requested a property appraisal before approving the loan.",
+      "collocations": [
+        "property appraisal"
+      ],
+      "synonyms": [
+        "professional valuation"
+      ],
+      "ipa": "/əˈpreɪzəl/",
+      "contentSha256": "41b38b0f051df7021b2ed9142f7e0773732cbe3a033242cc93aeebc86404fa20",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-228": {
+      "headword": "valuation",
+      "pos": "n.",
+      "meaning": "估值；价值评估",
+      "example": "The report includes an independent valuation of the equipment.",
+      "collocations": [
+        "asset valuation"
+      ],
+      "synonyms": [
+        "assessment of worth"
+      ],
+      "ipa": "/ˌvæljuˈeɪʃən/",
+      "contentSha256": "4ef9a6da20f217330f79398255b482fced017816ea49004327a884232fa2c9d0",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-229": {
+      "headword": "collateral",
+      "pos": "n.",
+      "meaning": "抵押品；担保物",
+      "example": "The lender required collateral for the business loan.",
+      "collocations": [
+        "provide collateral"
+      ],
+      "synonyms": [
+        "pledged security"
+      ],
+      "ipa": "/kəˈlætərəl/",
+      "contentSha256": "741c34715c011dab3d70c226ceb6a97cb99d25c842265d1e6b2f0c7ec2e564eb",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-230": {
+      "headword": "mortgage",
+      "pos": "n.",
+      "meaning": "抵押贷款",
+      "example": "The company refinanced the mortgage on its headquarters.",
+      "collocations": [
+        "mortgage payment"
+      ],
+      "synonyms": [
+        "property loan"
+      ],
+      "ipa": "/ˈmɔːrɡɪdʒ/",
+      "contentSha256": "2cb6cf3a9cc62fd07e7421554d395efdde864068d3a69b4b120bf3e9ccaf4a75",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-231": {
+      "headword": "provisional",
+      "pos": "adj.",
+      "meaning": "临时的；暂定的",
+      "example": "The committee granted provisional approval pending the final review.",
+      "collocations": [
+        "provisional approval"
+      ],
+      "synonyms": [
+        "temporary"
+      ],
+      "ipa": "/prəˈvɪʒənəl/",
+      "contentSha256": "c0505d3e344b7597a7b28164463be4a24ede9eb8bc872538b3a02d0f1d85bc37",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-232": {
+      "headword": "exemption",
+      "pos": "n.",
+      "meaning": "豁免；免除",
+      "example": "The nonprofit organization applied for a tax exemption.",
+      "collocations": [
+        "tax exemption"
+      ],
+      "synonyms": [
+        "exception from requirement"
+      ],
+      "ipa": "/ɪɡˈzɛmpʃən/",
+      "contentSha256": "1b71832562fb5b42b3c6f865570478d01ebe7c67bbb4faa6b1fc8ee17d08b1a3",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-233": {
+      "headword": "waiver",
+      "pos": "n.",
+      "meaning": "豁免；弃权声明",
+      "example": "Students may request a fee waiver under certain conditions.",
+      "collocations": [
+        "fee waiver"
+      ],
+      "synonyms": [
+        "formal exemption"
+      ],
+      "ipa": "/ˈweɪvər/",
+      "contentSha256": "40789ea7cd0ee5a70f466d66b32dde60ba252493d6ffb4734207e6f1e1e8e0c1",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-234": {
+      "headword": "stipulate",
+      "pos": "v.",
+      "meaning": "明确规定；约定",
+      "example": "The agreement stipulates that payment is due within fifteen days.",
+      "collocations": [
+        "contract stipulates"
+      ],
+      "synonyms": [
+        "specify"
+      ],
+      "ipa": "/ˈstɪpjəˌleɪt/",
+      "contentSha256": "d0f7387e484cc2e21d84138a313d51e1181ee4562072492fa4dbd7cb3175d2bf",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-235": {
+      "headword": "convey",
+      "pos": "v.",
+      "meaning": "传达；表达",
+      "example": "The manager asked the assistant to convey the schedule changes.",
+      "collocations": [
+        "convey information"
+      ],
+      "synonyms": [
+        "communicate"
+      ],
+      "ipa": "/kənˈveɪ/",
+      "contentSha256": "9bf017f8fba58d2351342b4946b29f58d4c5072696ad7342c4fff8012fedbd2e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-236": {
+      "headword": "endorsement",
+      "pos": "n.",
+      "meaning": "背书；认可",
+      "example": "The campaign received an endorsement from a professional association.",
+      "collocations": [
+        "product endorsement"
+      ],
+      "synonyms": [
+        "public support"
+      ],
+      "ipa": "/ɪnˈdɔːrsmənt/",
+      "contentSha256": "f4020b85d9b921c18f5b682eccebc4aed240fbacc1fb3e278aed3f75e9b4a68e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-237": {
+      "headword": "sublet",
+      "pos": "v.",
+      "meaning": "转租；分租",
+      "example": "The tenant needs written permission to sublet part of the office.",
+      "collocations": [
+        "sublet office space"
+      ],
+      "synonyms": [
+        "rent to another tenant"
+      ],
+      "ipa": "/ˌsʌbˈlɛt/",
+      "contentSha256": "d3a77f5870adfcdd10b4c1f1322ef19233b8dcdd18aea8e68939b53b8fd86902",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-238": {
+      "headword": "arrears",
+      "pos": "n. pl.",
+      "meaning": "欠款；逾期未付款项",
+      "example": "The notice stated that two months of rent were in arrears.",
+      "collocations": [
+        "rent in arrears"
+      ],
+      "synonyms": [
+        "overdue payments"
+      ],
+      "ipa": "/əˈrɪrz/",
+      "contentSha256": "87d0411f6c73272b6b19e2e24803388d20d9853b231a84569f78a4ec5dfd5a48",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-239": {
+      "headword": "disbursement",
+      "pos": "n.",
+      "meaning": "拨付；支出款项",
+      "example": "The finance team scheduled the loan disbursement for Monday.",
+      "collocations": [
+        "loan disbursement"
+      ],
+      "synonyms": [
+        "release of funds"
+      ],
+      "ipa": "/dɪsˈbɝːsmənt/",
+      "contentSha256": "dc00166bf29631f421238f4864fe056043e690ef3f8b28b84bcbea15c2caf174",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-240": {
+      "headword": "commission",
+      "pos": "n.",
+      "meaning": "佣金；提成",
+      "example": "The sales commission is paid at the end of each quarter.",
+      "collocations": [
+        "sales commission"
+      ],
+      "synonyms": [
+        "percentage paid for sales"
+      ],
+      "ipa": "/kəˈmɪʃən/",
+      "contentSha256": "9d7bcdcaf2f0be6678163161c3487d853dd2b65b3ca0c52c0ba3eee24a1bff49",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-241": {
+      "headword": "acknowledgment",
+      "pos": "n.",
+      "meaning": "确认收到；致谢",
+      "example": "We sent an acknowledgment after receiving the signed form.",
+      "collocations": [
+        "acknowledgment of receipt"
+      ],
+      "synonyms": [
+        "confirmation"
+      ],
+      "ipa": "/əkˈnɑːlɪdʒmənt/",
+      "contentSha256": "8e8f1ec9cb94fd377405b54e5ba38ce4c1e98b95b7e820061ada251150c42856",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-242": {
+      "headword": "memorandum",
+      "pos": "n.",
+      "meaning": "备忘录；内部通知",
+      "example": "The director circulated a memorandum about the new travel policy.",
+      "collocations": [
+        "internal memorandum"
+      ],
+      "synonyms": [
+        "internal note"
+      ],
+      "ipa": "/ˌmɛməˈrændəm/",
+      "contentSha256": "181ed34785f2c41e674db52059ab8ff2561f8be12595d252031d3f4fbfbdafe8",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-243": {
+      "headword": "correspondence",
+      "pos": "n.",
+      "meaning": "通信；往来函件",
+      "example": "Please keep copies of all correspondence with the supplier.",
+      "collocations": [
+        "business correspondence"
+      ],
+      "synonyms": [
+        "written communication"
+      ],
+      "ipa": "/ˌkɔːrəˈspɑːndəns/",
+      "contentSha256": "202620291cc18fef7fe4f1dc0b3297502c33af57c2e3663666220c3f55791555",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-244": {
+      "headword": "attachment",
+      "pos": "n.",
+      "meaning": "附件；随附文件",
+      "example": "The revised agenda is included as an attachment to this email.",
+      "collocations": [
+        "email attachment"
+      ],
+      "synonyms": [
+        "attached file"
+      ],
+      "ipa": "/əˈtætʃmənt/",
+      "contentSha256": "0d16d4787a8e2a276107d43f2d09f28c27bedd3f7ca9af5f275e26db13a22c60",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-245": {
+      "headword": "enclosure",
+      "pos": "n.",
+      "meaning": "随函附件；围栏",
+      "example": "The signed application is listed as an enclosure in the letter.",
+      "collocations": [
+        "letter enclosure"
+      ],
+      "synonyms": [
+        "document included with a letter"
+      ],
+      "ipa": "/ɪnˈkloʊʒər/",
+      "contentSha256": "53dbb717713ce25f5d635ce4d8e795ae0d4b11255d621350463e89c1033fbe79",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-246": {
+      "headword": "recipient",
+      "pos": "n.",
+      "meaning": "收件人；接收方",
+      "example": "Check the recipient's address before sending the confidential file.",
+      "collocations": [
+        "email recipient"
+      ],
+      "synonyms": [
+        "person receiving a message"
+      ],
+      "ipa": "/rɪˈsɪpiənt/",
+      "contentSha256": "e8d985cf637796b4af3b4182d3d3f17aca620273a2ae3472e56a27435fe3d513",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-247": {
+      "headword": "forward",
+      "pos": "v.",
+      "meaning": "转发；转交",
+      "example": "Please forward the invoice to the accounting department.",
+      "collocations": [
+        "forward an email"
+      ],
+      "synonyms": [
+        "send on"
+      ],
+      "ipa": "/ˈfɔːrwərd/",
+      "contentSha256": "2c0ba782e509e4d8112c3e3757b9d2684bfb9d0b3b12ce7e760dccc060924e75",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-248": {
+      "headword": "circulate",
+      "pos": "v.",
+      "meaning": "传阅；分发",
+      "example": "The secretary will circulate the meeting notes by noon.",
+      "collocations": [
+        "circulate a report"
+      ],
+      "synonyms": [
+        "share widely"
+      ],
+      "ipa": "/ˈsɝːkjəˌleɪt/",
+      "contentSha256": "d096703fe05ca5a11b84da15d755c406a5581785c7e7fa0aac5c84d2827fa753",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-249": {
+      "headword": "clarification",
+      "pos": "n.",
+      "meaning": "澄清；解释",
+      "example": "The vendor requested clarification of the delivery requirements.",
+      "collocations": [
+        "request clarification"
+      ],
+      "synonyms": [
+        "explanation"
+      ],
+      "ipa": "/ˌklærəfɪˈkeɪʃən/",
+      "contentSha256": "7444615537c31976ad704c878fe03326be2bb0c624f378bbb22bca913a90d50e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-250": {
+      "headword": "inquiry",
+      "pos": "n.",
+      "meaning": "询问；咨询",
+      "example": "Our support desk responds to most inquiries within one day.",
+      "collocations": [
+        "customer inquiry"
+      ],
+      "synonyms": [
+        "question"
+      ],
+      "ipa": "/ɪnˈkwaɪəri/",
+      "contentSha256": "1085f67884989214b55be3e5bc6ac8a554808d1a4bcc35fdfca6f69aeb42382a",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-251": {
+      "headword": "reference",
+      "pos": "n.",
+      "meaning": "参考资料；编号",
+      "example": "Quote the reference number when contacting our service center.",
+      "collocations": [
+        "reference number"
+      ],
+      "synonyms": [
+        "identifier"
+      ],
+      "ipa": "/ˈrɛfərəns/",
+      "contentSha256": "8a2f4dbfa025d13cd0eec2d69a1e35c60aba65138ee874877035a6ec3e6ae231",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-252": {
+      "headword": "optional",
+      "pos": "adj.",
+      "meaning": "可选的；非强制的",
+      "example": "Attendance at the afternoon workshop is optional.",
+      "collocations": [
+        "optional training"
+      ],
+      "synonyms": [
+        "not required"
+      ],
+      "ipa": "/ˈɑːpʃənəl/",
+      "contentSha256": "1c36f7d8fe1c65b034318f29753e36c5cac90ef4d21e71ff1b7f3c37ec41a05a",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-253": {
+      "headword": "prohibit",
+      "pos": "v.",
+      "meaning": "禁止；不允许",
+      "example": "Safety rules prohibit visitors from entering the storage area alone.",
+      "collocations": [
+        "strictly prohibit"
+      ],
+      "synonyms": [
+        "forbid"
+      ],
+      "ipa": "/proʊˈhɪbɪt/",
+      "contentSha256": "aedb7d336ee062685d3de4e01e767d441ca561046f6864694701004b7e9afae0",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-254": {
+      "headword": "authenticate",
+      "pos": "v.",
+      "meaning": "验证身份；鉴别",
+      "example": "Employees must authenticate themselves before accessing payroll records.",
+      "collocations": [
+        "authenticate a user"
+      ],
+      "synonyms": [
+        "verify identity"
+      ],
+      "ipa": "/ɔːˈθɛntəˌkeɪt/",
+      "contentSha256": "a5c202690cc6204b9da9101d220fcaf94ace7ee5100b1d17c5c62e278d986caa",
+      "decision": "PASS_AI_RECHECK",
+      "correction": "Authenticate yourself is the idiomatic IT usage"
+    },
+    "V-255": {
+      "headword": "credential",
+      "pos": "n.",
+      "meaning": "身份凭证；资格证书",
+      "example": "Do not share your login credentials with other users.",
+      "collocations": [
+        "login credentials"
+      ],
+      "synonyms": [
+        "proof of identity"
+      ],
+      "ipa": "/krɪˈdɛnʃəl/",
+      "contentSha256": "1ee861abbe35e38a53ac713c8393db7db762d9f637d325495d290b8aac5df664",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-256": {
+      "headword": "encryption",
+      "pos": "n.",
+      "meaning": "加密",
+      "example": "The new software uses encryption to protect customer details.",
+      "collocations": [
+        "data encryption"
+      ],
+      "synonyms": [
+        "data protection through encoding"
+      ],
+      "ipa": "/ɪnˈkrɪpʃən/",
+      "contentSha256": "fc9fc6ddfa04cdba06c536c416e8c41b8f54b538617286d102a4003a55bcd608",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-257": {
+      "headword": "database",
+      "pos": "n.",
+      "meaning": "数据库",
+      "example": "The customer database is backed up every evening.",
+      "collocations": [
+        "customer database"
+      ],
+      "synonyms": [
+        "organized data store"
+      ],
+      "ipa": "/ˈdeɪtəˌbeɪs/",
+      "contentSha256": "8c73a68aacb710cb295d33fdf26db37a9f35d33a07996ec5449eb0a660b5378e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-258": {
+      "headword": "interface",
+      "pos": "n.",
+      "meaning": "界面；交互接口",
+      "example": "The updated interface makes it easier to find account information.",
+      "collocations": [
+        "user interface"
+      ],
+      "synonyms": [
+        "point of interaction"
+      ],
+      "ipa": "/ˈɪntərˌfeɪs/",
+      "contentSha256": "c9f6207ba2ee1e297ad604cba4c56e18fd58bb153e80c8ce201705df5da61a78",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-259": {
+      "headword": "prototype",
+      "pos": "n.",
+      "meaning": "原型；样机",
+      "example": "The design team tested a prototype before approving production.",
+      "collocations": [
+        "product prototype"
+      ],
+      "synonyms": [
+        "early model"
+      ],
+      "ipa": "/ˈproʊtəˌtaɪp/",
+      "contentSha256": "bd78511c3d46c522d6f2666ba3e64b022ceb356a3479da88315a741636c8452c",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-260": {
+      "headword": "migration",
+      "pos": "n.",
+      "meaning": "迁移；转移",
+      "example": "The data migration is scheduled for the weekend.",
+      "collocations": [
+        "data migration"
+      ],
+      "synonyms": [
+        "transfer to a new system"
+      ],
+      "ipa": "/maɪˈɡreɪʃən/",
+      "contentSha256": "730f388305242f7fb47ba6b59a09f3344b40c6a54abcf66b534b697be07cc8a9",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-261": {
+      "headword": "integration",
+      "pos": "n.",
+      "meaning": "集成；整合",
+      "example": "The upgrade allows integration with the company's billing platform.",
+      "collocations": [
+        "system integration"
+      ],
+      "synonyms": [
+        "combination of systems"
+      ],
+      "ipa": "/ˌɪntəˈɡreɪʃən/",
+      "contentSha256": "4ec546eaa16d30f08ec8ec657bce00757e76c0fdc8b2ceb703d9b53ceec17e71",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-262": {
+      "headword": "configuration",
+      "pos": "n.",
+      "meaning": "配置；设置",
+      "example": "The technician reviewed the network configuration before installation.",
+      "collocations": [
+        "system configuration"
+      ],
+      "synonyms": [
+        "setup"
+      ],
+      "ipa": "/kənˌfɪɡjəˈreɪʃən/",
+      "contentSha256": "d015bc49e57a13d9f8a61e5b06d8d0735178fc4476a94aa6d069a7ecc0744ff1",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-263": {
+      "headword": "permission",
+      "pos": "n.",
+      "meaning": "许可；权限",
+      "example": "Users need permission to edit the shared budget.",
+      "collocations": [
+        "access permission"
+      ],
+      "synonyms": [
+        "authorization"
+      ],
+      "ipa": "/pərˈmɪʃən/",
+      "contentSha256": "ea7b8f2e4bed6e97fcac29fce103d5583b03cf69765b45e41b67e0006e90805a",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-264": {
+      "headword": "accessibility",
+      "pos": "n.",
+      "meaning": "无障碍可访问性；便利程度",
+      "example": "The redesign improved website accessibility for keyboard users.",
+      "collocations": [
+        "website accessibility"
+      ],
+      "synonyms": [
+        "ease of access"
+      ],
+      "ipa": "/əkˌsɛsəˈbɪləti/",
+      "contentSha256": "c97687d82b5e1b72337a1d0d5d8a335e5c3c179a5ccbedc456014b29c17c5dbd",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-265": {
+      "headword": "compatibility",
+      "pos": "n.",
+      "meaning": "兼容性；适配性",
+      "example": "Please check software compatibility before installing the update.",
+      "collocations": [
+        "software compatibility"
+      ],
+      "synonyms": [
+        "ability to work together"
+      ],
+      "ipa": "/kəmˌpætəˈbɪləti/",
+      "contentSha256": "9696ab7fc5a20701e0449e760cbd6f5f71e74b73e759bbd837536aeb19c664a6",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-266": {
+      "headword": "bandwidth",
+      "pos": "n.",
+      "meaning": "网络带宽；处理能力",
+      "example": "Video meetings require sufficient network bandwidth.",
+      "collocations": [
+        "network bandwidth"
+      ],
+      "synonyms": [
+        "data-transfer capacity"
+      ],
+      "ipa": "/ˈbændˌwɪdθ/",
+      "contentSha256": "d2db1cfee3dfde6f008dc464aca9aad9b85ba06aad9e851ac7e938594b248ca0",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-267": {
+      "headword": "notification",
+      "pos": "n.",
+      "meaning": "通知；提醒",
+      "example": "Employees will receive a notification when the new form is available.",
+      "collocations": [
+        "email notification"
+      ],
+      "synonyms": [
+        "alert"
+      ],
+      "ipa": "/ˌnoʊtəfɪˈkeɪʃən/",
+      "contentSha256": "f1cdd556ab88fa818e013df9f40bdccfe2c9b74ba47f3c78c1a8884cdd030b8a",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-268": {
+      "headword": "synchronize",
+      "pos": "v.",
+      "meaning": "同步；使一致",
+      "example": "The mobile app will synchronize records when the device reconnects.",
+      "collocations": [
+        "synchronize records"
+      ],
+      "synonyms": [
+        "update to match"
+      ],
+      "ipa": "/ˈsɪŋkrəˌnaɪz/",
+      "contentSha256": "03a9f0af435d3b933ff81b31b936f2e07ba6472a7bcd36802da2c10bfc5e6ad1",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-269": {
+      "headword": "archive",
+      "pos": "v.",
+      "meaning": "归档；存档",
+      "example": "The department must archive completed contracts for five years.",
+      "collocations": [
+        "archive documents"
+      ],
+      "synonyms": [
+        "store for future reference"
+      ],
+      "ipa": "/ˈɑːrˌkaɪv/",
+      "contentSha256": "4bfeee8ce131a5be8b9c71fe647a3079aa6fc65a909783ab981f9a2e0d024e6c",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-270": {
+      "headword": "obsolete",
+      "pos": "adj.",
+      "meaning": "过时的；淘汰的",
+      "example": "The company replaced several obsolete computers last month.",
+      "collocations": [
+        "obsolete equipment"
+      ],
+      "synonyms": [
+        "outdated"
+      ],
+      "ipa": "/ˌɑːbsəˈliːt/",
+      "contentSha256": "30ff610fbace627503f472b70772a77f4c28988972aa63b8ac21b5f21850779e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-271": {
+      "headword": "layover",
+      "pos": "n.",
+      "meaning": "转机候机时间",
+      "example": "The traveler has a two-hour layover before the connecting flight.",
+      "collocations": [
+        "two-hour layover"
+      ],
+      "synonyms": [
+        "waiting time between flights"
+      ],
+      "ipa": "/ˈleɪˌoʊvər/",
+      "contentSha256": "bd99772688c50d2432c1796a83da2bfa9c06320d0cd91db860cba0f83b411999",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-272": {
+      "headword": "confirmation",
+      "pos": "n.",
+      "meaning": "确认；确认函",
+      "example": "Please bring your booking confirmation to the hotel reception desk.",
+      "collocations": [
+        "booking confirmation"
+      ],
+      "synonyms": [
+        "verification"
+      ],
+      "ipa": "/ˌkɑːnfərˈmeɪʃən/",
+      "contentSha256": "27c46bc62b1bc8dcc6419ba58643c2a5a39744d95fcc35347fe366ecdf82caaa",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-273": {
+      "headword": "boarding",
+      "pos": "n.",
+      "meaning": "登机；上车",
+      "example": "Boarding begins thirty minutes before the scheduled departure.",
+      "collocations": [
+        "boarding time"
+      ],
+      "synonyms": [
+        "getting on a vehicle"
+      ],
+      "ipa": "/ˈbɔːrdɪŋ/",
+      "contentSha256": "e24a91c8a2b6ae59fc4902fc5f70838d5a14bd7b8858fe035732a20af28e1051",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-274": {
+      "headword": "baggage",
+      "pos": "n.",
+      "meaning": "行李",
+      "example": "The airline allows one piece of checked baggage on this ticket.",
+      "collocations": [
+        "checked baggage"
+      ],
+      "synonyms": [
+        "luggage"
+      ],
+      "ipa": "/ˈbæɡɪdʒ/",
+      "contentSha256": "17ab2d83f4df57b97c631617184aed014c9678d2f17748fb140f42d9c68246c8",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-275": {
+      "headword": "luggage",
+      "pos": "n.",
+      "meaning": "行李",
+      "example": "Guests can leave their luggage at the front desk after checkout.",
+      "collocations": [
+        "luggage storage"
+      ],
+      "synonyms": [
+        "baggage"
+      ],
+      "ipa": "/ˈlʌɡɪdʒ/",
+      "contentSha256": "6848064f050c5c4597fbe2c388aa61faa327a0bc9b15a795904bd5b95aae780a",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-276": {
+      "headword": "shuttle",
+      "pos": "n.",
+      "meaning": "班车；接驳车",
+      "example": "A complimentary shuttle runs between the airport and the hotel.",
+      "collocations": [
+        "airport shuttle"
+      ],
+      "synonyms": [
+        "transfer bus"
+      ],
+      "ipa": "/ˈʃʌtəl/",
+      "contentSha256": "40935b508acb8cea4fbaf595415919195101030882126d34f11d5fe91ad8842d",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-277": {
+      "headword": "commute",
+      "pos": "v.",
+      "meaning": "通勤；往返上班",
+      "example": "Several employees commute by train to avoid traffic.",
+      "collocations": [
+        "commute by train"
+      ],
+      "synonyms": [
+        "travel to work"
+      ],
+      "ipa": "/kəˈmjuːt/",
+      "contentSha256": "e356cd34337f0f79fa419042646a6634d729bb51a0bd98a564b474ac6954cddd",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-278": {
+      "headword": "allowance",
+      "pos": "n.",
+      "meaning": "津贴；补助额度",
+      "example": "The company provides a daily travel allowance for meals.",
+      "collocations": [
+        "travel allowance"
+      ],
+      "synonyms": [
+        "fixed sum provided for expenses"
+      ],
+      "ipa": "/əˈlaʊəns/",
+      "contentSha256": "f03a4e20ab49f9d81311d57a8d339697adf51734b4b5c720371d862ef5b03ca8",
+      "decision": "PASS_AI_RECHECK",
+      "correction": "Travel allowance is a specified sum provided for expenses, not a limit alone"
+    },
+    "V-279": {
+      "headword": "lodging",
+      "pos": "n.",
+      "meaning": "住宿；住处",
+      "example": "The conference fee does not include lodging expenses.",
+      "collocations": [
+        "lodging expenses"
+      ],
+      "synonyms": [
+        "accommodation"
+      ],
+      "ipa": "/ˈlɑːdʒɪŋ/",
+      "contentSha256": "0d1ab715dc58a44fb8550da34d536810e739a5c82ad831ecdb9667dfa33097c2",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-280": {
+      "headword": "catering",
+      "pos": "n.",
+      "meaning": "餐饮承办服务",
+      "example": "The event coordinator confirmed catering for eighty attendees.",
+      "collocations": [
+        "event catering"
+      ],
+      "synonyms": [
+        "food service for an event"
+      ],
+      "ipa": "/ˈkeɪtərɪŋ/",
+      "contentSha256": "98eefb997f8071d793a90776e5d5a2f765921b45ba7d44cd95ec94f11b04c503",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-281": {
+      "headword": "banquet",
+      "pos": "n.",
+      "meaning": "宴会",
+      "example": "The hotel will host the company's annual banquet in November.",
+      "collocations": [
+        "annual banquet"
+      ],
+      "synonyms": [
+        "formal dinner"
+      ],
+      "ipa": "/ˈbæŋkwɪt/",
+      "contentSha256": "fc5460eaad87121165bfa1aa307442183bf12ef8fdea72c5e41211daee7a390f",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-282": {
+      "headword": "buffet",
+      "pos": "n.",
+      "meaning": "自助餐",
+      "example": "The registration fee includes a buffet lunch for participants.",
+      "collocations": [
+        "breakfast buffet"
+      ],
+      "synonyms": [
+        "self-service meal"
+      ],
+      "ipa": "/bəˈfeɪ/",
+      "contentSha256": "f1ec92f2cde37ed56ecc044cab7356f2131f6bf25a0a4d3ec941cf88846406b2",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-283": {
+      "headword": "refreshments",
+      "pos": "n. pl.",
+      "meaning": "茶点；饮料",
+      "example": "Light refreshments will be served during the afternoon break.",
+      "collocations": [
+        "light refreshments"
+      ],
+      "synonyms": [
+        "snacks and drinks"
+      ],
+      "ipa": "/rɪˈfrɛʃmənts/",
+      "contentSha256": "3cc0ca69f37fc4ac64636ec6d0f7ce5b88aa72f5d2f2dbac185abc5f606e9de6",
+      "decision": "PASS_AI_RECHECK",
+      "correction": "The standard meeting-food term is plural refreshments (headword/POS/IPA)"
+    },
+    "V-284": {
+      "headword": "amenity",
+      "pos": "n.",
+      "meaning": "便利设施；配套服务",
+      "example": "Free wireless internet is one of the hotel's amenities.",
+      "collocations": [
+        "hotel amenity"
+      ],
+      "synonyms": [
+        "guest facility"
+      ],
+      "ipa": "/əˈmɛnɪti/",
+      "contentSha256": "5aac076aaf6c32c470ae5bebc171af9e3e821b977fed14de6471a2bf62877256",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-285": {
+      "headword": "contractor",
+      "pos": "n.",
+      "meaning": "承包商",
+      "example": "The contractor will repair the office windows next week.",
+      "collocations": [
+        "maintenance contractor"
+      ],
+      "synonyms": [
+        "external service provider"
+      ],
+      "ipa": "/ˈkɑːntræktər/",
+      "contentSha256": "90279d3c79983321777fda140038ed7511c9e9190304d086328297cf645326fb",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-286": {
+      "headword": "allocation",
+      "pos": "n.",
+      "meaning": "分配；拨款",
+      "example": "The department increased its budget allocation for staff training.",
+      "collocations": [
+        "budget allocation"
+      ],
+      "synonyms": [
+        "distribution of resources"
+      ],
+      "ipa": "/ˌæləˈkeɪʃən/",
+      "contentSha256": "4863fa3ba57c62d2e0f0c25b4b4371d7d8ab5e21c3225fad7ab3a0b263ad2f6c",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-287": {
+      "headword": "consumption",
+      "pos": "n.",
+      "meaning": "消耗；用量",
+      "example": "The new lighting system reduces electricity consumption.",
+      "collocations": [
+        "energy consumption"
+      ],
+      "synonyms": [
+        "amount used"
+      ],
+      "ipa": "/kənˈsʌmpʃən/",
+      "contentSha256": "5807d2719ed578869d0a146eaa5d6500cdca002936c83442c54c06b817f6db35",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-288": {
+      "headword": "surplus",
+      "pos": "n.",
+      "meaning": "盈余；过剩",
+      "example": "The team used the budget surplus to purchase new equipment.",
+      "collocations": [
+        "budget surplus"
+      ],
+      "synonyms": [
+        "excess"
+      ],
+      "ipa": "/ˈsɝːpləs/",
+      "contentSha256": "a139e3c418dfb414c97901a5701740abb842a2d74d58aea78de43b4c225651c7",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-289": {
+      "headword": "surcharge",
+      "pos": "n.",
+      "meaning": "附加费",
+      "example": "The airline added a small fuel surcharge to the ticket price.",
+      "collocations": [
+        "fuel surcharge"
+      ],
+      "synonyms": [
+        "additional fee"
+      ],
+      "ipa": "/ˈsɝːˌtʃɑːrdʒ/",
+      "contentSha256": "81615c5665416a09f277e28fdbb9edd7d25de90577534448021f0ea684fa1200",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-290": {
+      "headword": "concierge",
+      "pos": "n.",
+      "meaning": "酒店礼宾服务人员",
+      "example": "The concierge arranged transportation to the conference center.",
+      "collocations": [
+        "hotel concierge"
+      ],
+      "synonyms": [
+        "guest-service attendant"
+      ],
+      "ipa": "/ˌkɑːnsiˈɛrʒ/",
+      "contentSha256": "32cc9da288542cbde40b3c91e8570dc14ac5eb9aa7927108c795293e27700ab2",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-291": {
+      "headword": "receptionist",
+      "pos": "n.",
+      "meaning": "前台接待员",
+      "example": "The receptionist will print a visitor badge after registration.",
+      "collocations": [
+        "front-desk receptionist"
+      ],
+      "synonyms": [
+        "front-desk clerk"
+      ],
+      "ipa": "/rɪˈsɛpʃənɪst/",
+      "contentSha256": "a25633aa20d3d992fd4b0f01b8092835e067329a368d121e5174700fe6f1623c",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-292": {
+      "headword": "reception",
+      "pos": "n.",
+      "meaning": "接待处；招待会",
+      "example": "Guests should collect their name badges at reception.",
+      "collocations": [
+        "hotel reception"
+      ],
+      "synonyms": [
+        "front desk"
+      ],
+      "ipa": "/rɪˈsɛpʃən/",
+      "contentSha256": "fbd4962277527b568809e7203eeca86070fc10af7940894a63573d274dfc427e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-293": {
+      "headword": "checklist",
+      "pos": "n.",
+      "meaning": "检查清单",
+      "example": "The coordinator used a checklist to confirm the room setup.",
+      "collocations": [
+        "event checklist"
+      ],
+      "synonyms": [
+        "list of tasks to verify"
+      ],
+      "ipa": "/ˈtʃɛkˌlɪst/",
+      "contentSha256": "1b55d95ff1a1912ced0ef00e859ef1cc6982fb886f2f2917a5b0e54fd9da924d",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-294": {
+      "headword": "hospitality",
+      "pos": "n.",
+      "meaning": "待客服务；餐旅服务业",
+      "example": "The training focuses on hospitality and customer communication.",
+      "collocations": [
+        "hospitality industry"
+      ],
+      "synonyms": [
+        "guest services"
+      ],
+      "ipa": "/ˌhɑːspɪˈtæləti/",
+      "contentSha256": "34dddc79ccf5acb83c4e1b3409faa18b2a0cb805cf466c84045e942734ccd74e",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-295": {
+      "headword": "transit",
+      "pos": "n.",
+      "meaning": "运输；转运过程",
+      "example": "The replacement parts were damaged while in transit.",
+      "collocations": [
+        "goods in transit"
+      ],
+      "synonyms": [
+        "transportation"
+      ],
+      "ipa": "/ˈtrænzɪt/",
+      "contentSha256": "3c2ed7b92f012d2273c29c275d5ce6347b5adfde31fd7db46ef025ca7edec179",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-296": {
+      "headword": "requisition",
+      "pos": "n.",
+      "meaning": "采购申请单",
+      "example": "A manager must approve the purchase requisition before ordering.",
+      "collocations": [
+        "purchase requisition"
+      ],
+      "synonyms": [
+        "internal purchase request"
+      ],
+      "ipa": "/ˌrɛkwɪˈzɪʃən/",
+      "contentSha256": "379893011a5585a92e472e51a667ed35e91e7d3b41527f26c47d2066e1fda108",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-297": {
+      "headword": "attendance",
+      "pos": "n.",
+      "meaning": "出勤；出席人数",
+      "example": "The conference organizer reported higher attendance this year.",
+      "collocations": [
+        "attendance record"
+      ],
+      "synonyms": [
+        "presence"
+      ],
+      "ipa": "/əˈtɛndəns/",
+      "contentSha256": "e3eca55daf36daea7b8187b379f93163ec1e87cda26b260b10e1b18ca6da393f",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-298": {
+      "headword": "roster",
+      "pos": "n.",
+      "meaning": "人员名单；值班表",
+      "example": "The supervisor updated the staff roster before the weekend shift.",
+      "collocations": [
+        "staff roster"
+      ],
+      "synonyms": [
+        "list of assigned staff"
+      ],
+      "ipa": "/ˈrɑːstər/",
+      "contentSha256": "17d0e691b76184d62d71b0fbc349c806d013d7ab6c0c699b0d6195ac5fe4c1b8",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-299": {
+      "headword": "voucher",
+      "pos": "n.",
+      "meaning": "代金券；凭证",
+      "example": "Attendees received a meal voucher at the registration desk.",
+      "collocations": [
+        "meal voucher"
+      ],
+      "synonyms": [
+        "redeemable coupon"
+      ],
+      "ipa": "/ˈvaʊtʃər/",
+      "contentSha256": "0713ded432f1c77fb2a8c2e7323a6f4fccd72275107f79edca4cf68c866d6d27",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    },
+    "V-300": {
+      "headword": "per diem",
+      "pos": "n.",
+      "meaning": "每日津贴；出差日补助",
+      "example": "Employees receive a per diem for meals during approved overnight trips.",
+      "collocations": [
+        "meal per diem"
+      ],
+      "synonyms": [
+        "daily allowance"
+      ],
+      "ipa": "/pɚ ˈdiːəm/",
+      "contentSha256": "6d660ac75f04c6f53d30e2d9e9ca1017f51e9b7fba6765b2ce31aa9c5c9cc015",
+      "decision": "PASS_AI_RECHECK",
+      "correction": null
+    }
+  },
+  "readingGroups": {
+    "P7-EX-SUPPORT": {
+      "contentSha256": "30aee7b6155f6976b14220b4ae011c15b153da9323dcf27c1ec1411d54e4a216",
+      "documentCount": 3,
+      "questionCount": 5,
+      "decision": "PASS_AI_RECHECK",
+      "questions": [
+        {
+          "id": "R-P7-SUPPORT-01",
+          "question": "Why does incident NT-118 qualify for a service credit?",
+          "answerIndex": 0,
+          "answer": "It was an unplanned service interruption lasting more than 90 minutes",
+          "evidence": "An unplanned service interruption lasting longer than 90 consecutive minutes qualifies || (115 consecutive minutes)",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-SUPPORT-02",
+          "question": "How much credit should appear on the June invoice for NT-118?",
+          "answerIndex": 1,
+          "answer": "$40",
+          "evidence": "a one-time credit of 10 percent of the monthly fee || The June invoice is scheduled to show the normal $400 monthly fee before adjustments.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-SUPPORT-03",
+          "question": "When did the engineer first respond to NT-118?",
+          "answerIndex": 2,
+          "answer": "10:50 A.M.",
+          "evidence": "Initial engineer response: 10:50 A.M.",
+          "documents": [
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-SUPPORT-04",
+          "question": "Why would the May 15 maintenance window not qualify for an outage credit?",
+          "answerIndex": 3,
+          "answer": "It was announced at least 48 hours beforehand",
+          "evidence": "Scheduled maintenance announced at least 48 hours in advance does not qualify for a credit. || our planned maintenance window on May 15, 10–11 P.M., was announced to customers on May 11",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-SUPPORT-05",
+          "question": "Did the initial response meet the priority-ticket response target?",
+          "answerIndex": 2,
+          "answer": "Yes, it took forty minutes",
+          "evidence": "priority support tickets receive an initial response within two hours || Service unavailable: 10:10 A.M.–12:05 P.M. || Initial engineer response: 10:50 A.M.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        }
+      ],
+      "correction": null
+    },
+    "P7-EX-RETAIL": {
+      "contentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931",
+      "documentCount": 2,
+      "questionCount": 5,
+      "decision": "PASS_AI_RECHECK",
+      "questions": [
+        {
+          "id": "R-P7-RETAIL-01",
+          "question": "Does the clothing subtotal of order S-822 meet the promotion's minimum-purchase requirement?",
+          "answerIndex": 1,
+          "answer": "Yes, the clothing subtotal exceeds $100",
+          "evidence": "clothing purchases with a merchandise subtotal of at least $100 before tax qualify || The clothing subtotal is $112 before tax.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-RETAIL-02",
+          "question": "How much does express shipping add to the order?",
+          "answerIndex": 3,
+          "answer": "$18",
+          "evidence": "Customers who choose express shipping pay an additional $18.",
+          "documents": [
+            1
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-RETAIL-03",
+          "question": "What amount from order S-822 counts toward the promotion's clothing minimum?",
+          "answerIndex": 0,
+          "answer": "$112",
+          "evidence": "Gift cards do not count toward the minimum. || The clothing subtotal is $112 before tax.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-RETAIL-04",
+          "question": "What would Helen need in order to return the jacket under the stated policy?",
+          "answerIndex": 2,
+          "answer": "The original receipt and a return within 30 days",
+          "evidence": "Clothing purchased online may be returned within 30 days with the original receipt, except for personalized items. || Neither clothing item was personalized. Helen has kept the original electronic receipt.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-RETAIL-05",
+          "question": "Which item is specifically excluded from the minimum-purchase calculation?",
+          "answerIndex": 1,
+          "answer": "Digital gift card",
+          "evidence": "Gift cards do not count toward the minimum.",
+          "documents": [
+            1
+          ],
+          "result": "PASS_AI_RECHECK"
+        }
+      ],
+      "correction": null
+    },
+    "P7-EX-LEASE": {
+      "contentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d",
+      "documentCount": 3,
+      "questionCount": 5,
+      "decision": "PASS_AI_RECHECK",
+      "questions": [
+        {
+          "id": "R-P7-LEASE-01",
+          "question": "Why did Iris contact the property office?",
+          "answerIndex": 1,
+          "answer": "To request more time in Suite C",
+          "evidence": "We would like to keep Suite C for September",
+          "documents": [
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-LEASE-02",
+          "question": "What monthly rent should Meridian Consulting expect for September?",
+          "answerIndex": 2,
+          "answer": "$900",
+          "evidence": "leases Suite C for $900 per month || September rent will remain $900",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-LEASE-03",
+          "question": "What is the earliest time the movers can enter on the proposed Thursday?",
+          "answerIndex": 0,
+          "answer": "9 A.M.",
+          "evidence": "Furniture deliveries are permitted Monday through Friday between 9 A.M. and 5 P.M. || please schedule furniture delivery no earlier than 9 A.M.",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-LEASE-04",
+          "question": "By when must the extension agreement be signed?",
+          "answerIndex": 3,
+          "answer": "August 15",
+          "evidence": "if the agreement is signed by August 15",
+          "documents": [
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-LEASE-05",
+          "question": "Why will the property office not request a second deposit?",
+          "answerIndex": 1,
+          "answer": "The same tenant will continue using the suite",
+          "evidence": "the existing deposit carries forward if the same tenant remains in the suite || We would like to keep Suite C for September",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        }
+      ],
+      "correction": null
+    },
+    "P7-EX-TRAINING": {
+      "contentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d",
+      "documentCount": 2,
+      "questionCount": 5,
+      "decision": "PASS_AI_RECHECK",
+      "questions": [
+        {
+          "id": "R-P7-TRAINING-01",
+          "question": "How much may Daniel claim under the stated reimbursement policy?",
+          "answerIndex": 0,
+          "answer": "$260",
+          "evidence": "reimburses up to $300 for approved professional-course tuition || an itemized tuition receipt for $260",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-TRAINING-02",
+          "question": "Does Daniel meet the assessment-score requirement?",
+          "answerIndex": 2,
+          "answer": "Yes, because 88 percent exceeds the required 75 percent",
+          "evidence": "earns at least 75 percent on the final assessment || scored 88 percent on the final assessment",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-TRAINING-03",
+          "question": "Which supporting materials did Daniel attach?",
+          "answerIndex": 3,
+          "answer": "A completion result and an itemized tuition receipt",
+          "evidence": "Attached are the completion result and an itemized tuition receipt for $260.",
+          "documents": [
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-TRAINING-04",
+          "question": "Is Daniel submitting the request within the allowed period?",
+          "answerIndex": 1,
+          "answer": "Yes, June 2 is ten calendar days after May 23",
+          "evidence": "within 10 calendar days after course completion || I completed the approved project-management course on May 23 || EMPLOYEE CLAIM MESSAGE, JUNE 2",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-TRAINING-05",
+          "question": "Why should Daniel exclude the textbook from his claim?",
+          "answerIndex": 2,
+          "answer": "The policy specifically excludes textbooks",
+          "evidence": "Transportation and textbooks are not eligible expenses. || I also purchased a $45 textbook",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        }
+      ],
+      "correction": null
+    },
+    "P7-EX-MIGRATION": {
+      "contentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158",
+      "documentCount": 3,
+      "questionCount": 5,
+      "decision": "PASS_AI_RECHECK",
+      "questions": [
+        {
+          "id": "R-P7-MIGRATION-01",
+          "question": "What should Melissa do before the system migration?",
+          "answerIndex": 1,
+          "answer": "Export the September report by October 16",
+          "evidence": "Staff should export any reports needed for the morning of October 18 no later than October 16. || I have to present the September client report at 8 A.M. on October 18.",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-MIGRATION-02",
+          "question": "How should Melissa access the updated portal on October 18?",
+          "answerIndex": 2,
+          "answer": "Open the intranet and sign in with her own account",
+          "evidence": "After the migration, users must sign in again using their individual company accounts. || To access the updated client-records portal, open the company intranet and select Client Records.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-MIGRATION-03",
+          "question": "When is the scheduled migration window due to end?",
+          "answerIndex": 0,
+          "answer": "At 11 P.M. on October 17",
+          "evidence": "on October 17 from 9 P.M. to 11 P.M.",
+          "documents": [
+            1
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-MIGRATION-04",
+          "question": "What should Melissa do if her original password is rejected?",
+          "answerIndex": 3,
+          "answer": "Use the password-reset link",
+          "evidence": "users must sign in again using their individual company accounts. || If your existing password is rejected, use the password-reset link.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-MIGRATION-05",
+          "question": "Will internal help desk support be available when Melissa plans to log in?",
+          "answerIndex": 1,
+          "answer": "Yes, it begins before 7:30 A.M.",
+          "evidence": "support begins at 7 A.M. || I also need to log in from my laptop at 7:30 A.M. that day.",
+          "documents": [
+            2,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        }
+      ],
+      "correction": "Replace ambiguous following morning with October 18 and align answer evidence"
+    },
+    "P7-EX-LICENSE": {
+      "contentSha256": "3d2c8bf23e75762f08073f2ed21137e4c952438c9ce379b75da428e01f5d66db",
+      "documentCount": 3,
+      "questionCount": 5,
+      "decision": "PASS_AI_RECHECK",
+      "questions": [
+        {
+          "id": "R-P7-LICENSE-01",
+          "question": "Why is the requested order eligible for the volume discount?",
+          "answerIndex": 0,
+          "answer": "It contains exactly ten active-user licenses",
+          "evidence": "Orders for 10 or more licenses receive a 15 percent discount on license fees only. || We would like to open a new team account with 10 active-user licenses",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-LICENSE-02",
+          "question": "What is the discounted monthly license charge for the initial order?",
+          "answerIndex": 2,
+          "answer": "$425",
+          "evidence": "A monthly team license costs $50 per active user. Orders for 10 or more licenses receive a 15 percent discount on license fees only. || 10 active-user licenses beginning December 1.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-LICENSE-03",
+          "question": "How much should the first invoice total before taxes?",
+          "answerIndex": 1,
+          "answer": "$485",
+          "evidence": "New customer accounts have a one-time setup charge of $60. || 10 active-user licenses beginning December 1. || The first invoice will reflect the volume discount and the one-time setup charge.",
+          "documents": [
+            1,
+            2,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-LICENSE-04",
+          "question": "When is the new team account expected to become active?",
+          "answerIndex": 3,
+          "answer": "December 1",
+          "evidence": "can activate the account on December 1.",
+          "documents": [
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-LICENSE-05",
+          "question": "Why should the two possible extra users be excluded from the first invoice?",
+          "answerIndex": 0,
+          "answer": "The manager said not to include them in the initial order",
+          "evidence": "Teams may add licenses during the month, but any increase will be billed on the next invoice. || We may need two additional users in January, but please do not add them to the first order.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        }
+      ],
+      "correction": null
+    },
+    "P7-EX-PERDIEM": {
+      "contentSha256": "96dc7753845b8198fb10ab2873e21a7ed2a7e90626d4b7d35a15d0eb4ddbc61b",
+      "documentCount": 3,
+      "questionCount": 5,
+      "decision": "PASS_AI_RECHECK",
+      "questions": [
+        {
+          "id": "R-P7-PERDIEM-01",
+          "question": "How much of Jordan's hotel expense is eligible for reimbursement?",
+          "answerIndex": 1,
+          "answer": "$264",
+          "evidence": "Hotel accommodation is reimbursed up to $140 per room-night if an itemized receipt is supplied. || Standard room: two nights at $132 per night",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-PERDIEM-02",
+          "question": "How much meal per diem can Jordan claim for the trip?",
+          "answerIndex": 0,
+          "answer": "$135",
+          "evidence": "a meal per diem of $45 for each calendar day of travel, including the departure and return dates. || I traveled on an approved business trip from September 14 to September 16",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-PERDIEM-03",
+          "question": "Which expense must Jordan leave out of the claim?",
+          "answerIndex": 3,
+          "answer": "The museum admission",
+          "evidence": "personal entertainment is not covered. || I also paid $18 to visit a museum in my free time.",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-PERDIEM-04",
+          "question": "What is the deadline for Jordan's travel claim?",
+          "answerIndex": 2,
+          "answer": "September 23",
+          "evidence": "within seven calendar days after returning. || returned home on September 16.",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-PERDIEM-05",
+          "question": "What is Jordan's total eligible reimbursement, including meals?",
+          "answerIndex": 1,
+          "answer": "$425",
+          "evidence": "a meal per diem of $45 for each calendar day of travel, including the departure and return dates. || Total lodging paid: $264 || I traveled on an approved business trip from September 14 to September 16 and returned home on September 16. Along with the attached hotel receipt, I have a $26 airport shuttle receipt.",
+          "documents": [
+            1,
+            2,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        }
+      ],
+      "correction": null
+    },
+    "P7-EX-CATERING": {
+      "contentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b",
+      "documentCount": 3,
+      "questionCount": 5,
+      "decision": "PASS_AI_RECHECK",
+      "questions": [
+        {
+          "id": "R-P7-CATERING-01",
+          "question": "Which room can hold all 135 expected attendees?",
+          "answerIndex": 2,
+          "answer": "Hall A only",
+          "evidence": "Hall A accommodates up to 160 attendees; Hall B accommodates up to 80. || Our registration count has increased to 135.",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-CATERING-02",
+          "question": "How much more will the revised catering order cost?",
+          "answerIndex": 0,
+          "answer": "$260",
+          "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || Original catering cost: $1,360. || update catering to 135 coffee servings and 135 boxed lunches.",
+          "documents": [
+            1,
+            2,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-CATERING-03",
+          "question": "Will the scheduled maintenance prevent the event from starting at the reserved time?",
+          "answerIndex": 3,
+          "answer": "No, the event begins after Hall A reopens",
+          "evidence": "Hall A will be unavailable from 9 A.M. to noon for scheduled maintenance, but events beginning at or after 1 P.M. may proceed. || Date and start: October 12, 2 P.M.",
+          "documents": [
+            1,
+            2
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-CATERING-04",
+          "question": "Was the change to catering quantities accepted before the stated cutoff?",
+          "answerIndex": 2,
+          "answer": "Yes, the response came on October 7",
+          "evidence": "Catering orders may be changed through October 8 at 5 P.M. || EVENT SERVICES RESPONSE, OCTOBER 7, 4 P.M. || The revised quantities are accepted.",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        },
+        {
+          "id": "R-P7-CATERING-05",
+          "question": "What should the updated invoice show as the total catering charge?",
+          "answerIndex": 1,
+          "answer": "$1,620",
+          "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || update catering to 135 coffee servings and 135 boxed lunches.",
+          "documents": [
+            1,
+            3
+          ],
+          "result": "PASS_AI_RECHECK"
+        }
+      ],
+      "correction": null
+    }
+  }
+}

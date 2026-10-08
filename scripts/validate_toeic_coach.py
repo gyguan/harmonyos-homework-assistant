@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 from test_toeic_review_integrity import run_tests as test_review_integrity
 from test_toeic_editorial_handoff import run_tests as test_editorial_handoff
 from test_toeic_ai_editorial_release import run_tests as test_ai_release
+from test_toeic_remaining_editorial import run_tests as test_remaining_editorial
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -692,6 +693,7 @@ def main() -> None:
     test_review_integrity()
     test_editorial_handoff()
     test_ai_release()
+    test_remaining_editorial()
     # Review exports must remain complete as more batches are added.
     with TemporaryDirectory() as temp_dir:
         exported = export_review_pack(Path(temp_dir))

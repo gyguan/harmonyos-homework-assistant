@@ -90,10 +90,12 @@ def validate() -> None:
         statuses = {q["status"] for q in members}
         require(statuses in ({"REVIEWED"}, {"PUBLISHED"}),
                 f"{group_id}: entire linked group must share a recognized review status")
-        if statuses == {"PUBLISHED"}:
-            group_hash = reading_fingerprint(group_id, group, members)
+        group_hash = reading_fingerprint(group_id, group, members)
+        # Revalidate recorded AI screening even before PUBLISHED: otherwise
+        # an edited REVIEWED source could silently retain a stale PASS verdict.
+        if statuses == {"PUBLISHED"} or approvals.get("readingGroups", {}).get(group_id, {}).get("reviewMode") == "AI_EDITORIAL":
             require(approved("readingGroups", group_id, group_hash),
-                    f"{group_id}: publication requires dated signoff for the exact group contentSha256")
+                    f"{group_id}: editorial evidence stale or missing for the exact group contentSha256")
         for option in range(4):
             require(any(q["answer"] == option for q in members),
                     f"{group_id}: answer position {option} is absent")
@@ -149,10 +151,10 @@ def validate() -> None:
         ipa = pronunciations.get(key, "")
         require(ipa.startswith("/") and ipa.endswith("/") and len(ipa) >= 5,
                 f"{key}: missing en-US IPA")
-        if word["status"] == "PUBLISHED":
-            content_hash = vocabulary_fingerprint(word, ipa)
+        content_hash = vocabulary_fingerprint(word, ipa)
+        if word["status"] == "PUBLISHED" or approvals.get("vocabulary", {}).get(key, {}).get("reviewMode") == "AI_EDITORIAL":
             require(approved("vocabulary", key, content_hash),
-                    f"{key}: publication requires dated signoff for the exact word contentSha256")
+                    f"{key}: editorial evidence stale or missing for the exact word contentSha256")
     require(len({w["word"].casefold() for w in words}) == len(words), "duplicated staged English word")
 
     # Check the published inventory too; a new batch must teach genuinely new
