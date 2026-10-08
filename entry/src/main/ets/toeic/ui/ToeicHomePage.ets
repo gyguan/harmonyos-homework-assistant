@@ -49,6 +49,8 @@ export struct ToeicHomePage {
   @State private mockElapsedSeconds:number=0;
   @State private mockCountdownSeconds:number=4500;
   @State private draftLabel:string='';
+  @State private navigatorVisible:boolean=false;
+  @State private markedQuestionIds:string[]=[];
   @State private mockReports:ToeicMockReport[]=[];
   private sessionStartedAtMs:number=0;
   private questionTimes:ToeicQuestionTime[]=[];
@@ -382,7 +384,7 @@ export struct ToeicHomePage {
     for (let question of this.questions) questionIds.push(question.id);
     let draft=new ToeicSessionDraft(this.activeSessionDay,this.mode,
       questionIds,this.currentIndex,this.attempts.slice(),this.questionTimes.slice(),
-      this.sessionStartedAtMs,this.activeSessionAdvancesProgress);
+      this.sessionStartedAtMs,this.activeSessionAdvancesProgress,this.markedQuestionIds.slice());
     void this.viewModel.saveDraft(draft);
     this.draftLabel='Day '+draft.day+' · '+
       (this.isMockSession()?'完整模考':'专项训练')+
@@ -404,6 +406,8 @@ export struct ToeicHomePage {
     this.questions=restored;
     this.attempts=draft.attempts.slice();
     this.questionTimes=draft.questionTimes.slice();
+    this.markedQuestionIds=draft.markedQuestionIds.slice();
+    this.navigatorVisible=false;
     this.sessionStartedAtMs=draft.startedAtMs;
     this.currentIndex=Math.min(Math.max(0,draft.currentIndex),restored.length-1);
     this.finishingSession=false;
@@ -423,6 +427,8 @@ export struct ToeicHomePage {
     this.currentIndex=0;
     this.attempts=[];
     this.questionTimes=[];
+    this.markedQuestionIds=[];
+    this.navigatorVisible=false;
     this.sessionStartedAtMs=Date.now();
     this.finishingSession=false;
     this.loadQuestion(0);
@@ -439,6 +445,8 @@ export struct ToeicHomePage {
     this.questions=[];
     this.attempts=[];
     this.questionTimes=[];
+    this.markedQuestionIds=[];
+    this.navigatorVisible=false;
     this.answerLocked=false;
     this.selectedIndex=-1;
     this.clearQuestionSnapshot();
@@ -495,6 +503,30 @@ export struct ToeicHomePage {
     this.persistDraft();
   }
 
+  private isQuestionMarked(questionId:string):boolean {
+    return this.markedQuestionIds.indexOf(questionId)>=0;
+  }
+
+  private toggleQuestionMark():void {
+    if (!this.isMockSession() || this.currentQuestionId.length===0) return;
+    let next=this.markedQuestionIds.slice();
+    let index=next.indexOf(this.currentQuestionId);
+    if (index>=0) next.splice(index,1);
+    else next.push(this.currentQuestionId);
+    this.markedQuestionIds=next;
+    this.persistDraft();
+  }
+
+  private jumpToQuestion(index:number):void {
+    if (!this.isMockSession() || index<0 || index>=this.questions.length ||
+      this.finishingSession) return;
+    if (this.mockExpired()) { void this.finishSession(); return; }
+    this.noteCurrentQuestionTime();
+    this.currentIndex=index;
+    this.loadQuestion(index);
+    this.persistDraft();
+  }
+
   private confirmMockSubmission():void {
     let remaining=this.questions.length-this.attempts.length;
     AlertDialog.show({
@@ -506,7 +538,7 @@ export struct ToeicHomePage {
   }
 
   private async finishSession():Promise<void> {
-    if (this.finishingSession) return;
+    if (this.finishingSession || this.questions.length===0 || this.sessionStartedAtMs===0) return;
     this.finishingSession=true;
     this.stopMockClock();
     this.noteCurrentQuestionTime();
@@ -528,11 +560,12 @@ export struct ToeicHomePage {
     }
     this.refreshRevision++;
     this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.HOME;
-    this.questions=[]; this.attempts=[]; this.questionTimes=[];
+    this.questions=[]; this.attempts=[]; this.questionTimes=[]; this.markedQuestionIds=[];
     this.answerLocked=false; this.selectedIndex=-1;
     this.clearQuestionSnapshot();
     this.sessionStartedAtMs=0;
     this.activeSessionDay=0; this.activeSessionAdvancesProgress=false;
+    this.navigatorVisible=false;
     this.finishingSession=false;
     this.draftLabel='';
   }
@@ -1060,7 +1093,34 @@ export struct ToeicHomePage {
             }
             .width('100%').padding(AppTheme.CARD_PADDING_COMPACT)
             .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
-            Text('可跳过未答题、返回已答题修改答案；到时自动交卷。')
+            Row({space:10}) {
+              Button(this.isQuestionMarked(this.currentQuestionId)?'取消标记':'标记此题',
+                {type:ButtonType.Normal})
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                .onClick(()=>this.toggleQuestionMark());
+              Button(this.navigatorVisible?'收起题号导航':'展开题号导航',{type:ButtonType.Normal})
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                .onClick(()=>{this.navigatorVisible=!this.navigatorVisible;});
+            }
+            .width('100%');
+            if (this.navigatorVisible) {
+              Flex({wrap:FlexWrap.Wrap,space:{main:6,cross:6}}) {
+                ForEach(this.questions,(question:ToeicQuestion,index:number)=>{
+                  Button((this.isQuestionMarked(question.id)?'★':'')+String(index+1),
+                    {type:ButtonType.Normal})
+                    .width(48).height(42).fontSize(AppTheme.META_SIZE)
+                    .fontColor(index===this.currentIndex?AppTheme.TEXT_ON_PRIMARY:AppTheme.PRIMARY)
+                    .backgroundColor(index===this.currentIndex?AppTheme.PRIMARY:
+                      (this.sessionAttempt(question.id)!==null?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE))
+                    .borderRadius(AppTheme.CONTROL_RADIUS)
+                    .onClick(()=>this.jumpToQuestion(index));
+                },(question:ToeicQuestion)=>question.id);
+              }
+              .width('100%');
+            }
+            Text('可跳过、返回修改或标记题目；剩余时间结束时自动交卷。')
               .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
           }
           Row() {
