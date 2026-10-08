@@ -665,8 +665,21 @@ def main() -> None:
         require(exported == {"vocabulary": 120, "questions": 45, "groups": 9},
                 f"editorial export coverage mismatch: {exported}")
         require((Path(temp_dir) / "vocabulary-review.csv").exists() and
-                (Path(temp_dir) / "part7-review.md").exists(),
+                (Path(temp_dir) / "part7-review.md").exists() and
+                (Path(temp_dir) / "manifest.json").exists(),
                 "editorial review packet not written")
+        import csv
+        with (Path(temp_dir) / "vocabulary-review.csv").open(
+                "r", newline="", encoding="utf-8-sig") as handle:
+            review_rows = list(csv.DictReader(handle))
+        require(len(review_rows) == exported["vocabulary"] and
+                review_rows[0]["id"] == "V-121" and
+                review_rows[-1]["id"] == "V-240",
+                "offline vocabulary review export lost items or stable ID ordering")
+        review_text = (Path(temp_dir) / "part7-review.md").read_text(encoding="utf-8")
+        require(review_text.count("### 题 ") == exported["questions"] and
+                review_text.count("## P7-EX-") == exported["groups"],
+                "offline reading review pack omitted groups or questions")
 
 
     require("ToeicStandardDiagnosticContent.questions()" in preset and
