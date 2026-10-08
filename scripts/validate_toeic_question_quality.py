@@ -189,8 +189,13 @@ def validate() -> dict[str, int]:
         if item and item.stem.startswith(("Choose the best ", "Choose the correct ")):
             errors.append(f"{id}: Day 1 generic question wording must be replaced")
     translations = (CONTENT / "ToeicQuestionTranslationWeekOneCatalog.ets").read_text(encoding="utf-8")
-    if "为横线选择最合适的词" in translations or "合格地" in translations:
-        errors.append("Day 1 Chinese translation still contains stale stem or deleted nonword distractor")
+    day_one_translation = translations.split("new ToeicQuestionTranslation('R-P6-WF-0002'", 1)
+    if len(day_one_translation) != 2:
+        errors.append("Day 1 Chinese translation for R-P6-WF-0002 is missing")
+    else:
+        day_one_translation = day_one_translation[1].split("new ToeicQuestionTranslation(", 1)[0]
+        if "为横线选择最合适的词" in day_one_translation or "合格地" in day_one_translation:
+            errors.append("Day 1 Chinese translation still contains stale stem or deleted nonword distractor")
     week_two_source = contents["ToeicWeekTwoContent"]
     for id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1102"):
         if f"id==='{id}'" not in week_two_source or "question.version=2" not in week_two_source:
