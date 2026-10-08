@@ -1,6 +1,6 @@
 import { ToeicReviewStatus, ToeicVocabularyItem, ToeicVocabularyLevel } from '../domain/ToeicModels';
 
-/** Third original business-vocabulary batch. Candidate content pending human review. */
+/** V-151–V-180: AI-screened content, published only with a matching editorial snapshot. */
 export class ToeicVocabularyBatchThree {
   static items():ToeicVocabularyItem[] {
     return [
