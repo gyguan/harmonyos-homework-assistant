@@ -4,6 +4,7 @@ import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
 import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicSessionReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
+import { ToeicReadingGroupService } from '../application/ToeicReadingGroupService';
 
 enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', SENTENCE='SENTENCE', MOCK_RESULT='MOCK_RESULT' }
 
@@ -67,6 +68,9 @@ export struct ToeicHomePage {
   private finishingSession:boolean=false;
   @State private currentQuestionId:string='';
   @State private currentPassage:string='';
+  @State private currentPassageBlocks:string[]=[];
+  @State private currentGroupPosition:number=0;
+  @State private currentGroupCount:number=0;
   @State private currentStem:string='';
   @State private currentOptionCount:number=0;
   @State private currentOptionA:string='';
@@ -166,6 +170,10 @@ export struct ToeicHomePage {
     let attempt=this.sessionAttempt(question.id);
     this.currentQuestionId=question.id;
     this.currentPassage=question.passage;
+    let readingGroup=ToeicReadingGroupService.groupAt(this.questions,index);
+    this.currentPassageBlocks=readingGroup.passageBlocks;
+    this.currentGroupCount=readingGroup.questionIds.length;
+    this.currentGroupPosition=readingGroup.questionIds.indexOf(question.id)+1;
     this.currentStem=question.stem;
     this.currentOptionCount=question.options.length;
     this.currentOptionA=question.options.length>0?question.options[0]:'';
@@ -200,6 +208,9 @@ export struct ToeicHomePage {
   private clearQuestionSnapshot():void {
     this.currentQuestionId='';
     this.currentPassage='';
+    this.currentPassageBlocks=[];
+    this.currentGroupPosition=0;
+    this.currentGroupCount=0;
     this.currentStem='';
     this.currentOptionCount=0;
     this.currentOptionA='';
@@ -1334,10 +1345,18 @@ export struct ToeicHomePage {
           }
 
           if (this.currentPassage.length>0) {
-            Text(this.currentPassage)
-              .width('100%').fontSize(AppTheme.READING_BODY_SIZE).lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
-              .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
-              .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS);
+            if (this.currentGroupCount>1) {
+              Text('共用阅读材料 · 本组第 '+this.currentGroupPosition+'/'+this.currentGroupCount+' 题')
+                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
+            }
+            ForEach(this.currentPassageBlocks,(block:string,index:number)=>{
+              Text(block)
+                .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
+                .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
+                .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
+                .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                .borderRadius(AppTheme.CONTROL_RADIUS);
+            },(block:string,index:number)=>String(index));
           }
 
           Text(this.currentStem)
