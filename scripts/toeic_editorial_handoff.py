@@ -20,11 +20,13 @@ GROUP_TITLE = re.compile(r"(?m)^## (P7-EX-[A-Z-]+)\s*$")
 GROUP_SHA = re.compile(r"内容 SHA-256：\x60([0-9a-f]{64})\x60")
 
 
-def load_csv(path: Path) -> list[dict[str, str]]:
+def load_csv(path: Path, required_columns: list[str] | None = None) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
         if reader.fieldnames is None:
             raise ValueError(f"Missing CSV header: {path}")
+        if required_columns is not None and reader.fieldnames != required_columns:
+            raise ValueError(f"Invalid decision CSV headers: {path}")
         return list(reader)
 
 
@@ -87,8 +89,9 @@ def prepare(batch_start: int | None, group_id: str | None, output: Path) -> dict
         writer.writeheader()
         writer.writerows(rows)
     counts = {"words": len(selected), "groups": len(picked), "decisions": len(rows)}
+    manifest = {**counts, "selection": {"batchStart": batch_start, "groupId": group_id}}
     (output / "manifest.json").write_text(
-        json.dumps(counts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (output / "README.md").write_text(
         "# TOEIC 审核交接包\n\n"
         "1. 审校词汇 CSV 和阅读 Markdown 的语言、IPA、证据和答案。\n"
@@ -120,7 +123,7 @@ def evaluate(snapshot: dict[str, str], current: dict[str, str],
             errors.append(f"Changed review digest: {key}")
         if current.get(key) != snapshot[key]:
             errors.append(f"Stale source; prepare a new pack: {key}")
-        decision = row.get("decision", "").strip().upper()
+        decision = (row.get("decision") or "").strip().upper()
         if decision not in counts:
             errors.append(f"Invalid decision: {key}")
             continue
@@ -131,7 +134,7 @@ def evaluate(snapshot: dict[str, str], current: dict[str, str],
             "contentSha256": digest,
         }, snapshot[key], today):
             errors.append(f"APPROVE requires a named, dated, matching review: {key}")
-        if decision in ("REVISE", "REJECT") and not row.get("notes", "").strip():
+        if decision in ("REVISE", "REJECT") and not (row.get("notes") or "").strip():
             errors.append(f"{decision} requires review notes: {key}")
     errors += [f"Missing review row: {key}" for key in sorted(set(snapshot) - seen)]
     ready = bool(snapshot) and not errors and counts["APPROVE"] == len(snapshot)
@@ -142,12 +145,32 @@ def evaluate(snapshot: dict[str, str], current: dict[str, str],
 
 def verify(directory: Path) -> dict:
     snapshot = json.loads((directory / "review-source.json").read_text(encoding="utf-8"))
-    rows = load_csv(directory / "review-decisions.csv")
+    rows = load_csv(directory / "review-decisions.csv", COLUMNS)
+    manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
+    selection = manifest.get("selection", {})
     with TemporaryDirectory() as temp:
         export_review_pack(Path(temp))
         words, groups, _ = load_inventory(Path(temp))
     current = {f"vocabulary:{word['id']}": word["content_sha256"] for word in words}
     current.update({f"readingGroups:{key}": value[0] for key, value in groups.items()})
+    # Cross-check the declared batch against every expected row; this prevents
+    # losing part of a 30-word group by editing the snapshot or decision CSV.
+    batch = selection.get("batchStart")
+    group = selection.get("groupId")
+    if batch is None and group is None:
+        raise ValueError("Review manifest has no bounded scope")
+    if batch is not None and (not isinstance(batch, int) or batch < 121 or
+                              (batch - 121) % 30):
+        raise ValueError("Review manifest has an invalid word batch")
+    expected = set()
+    if batch is not None:
+        expected.update(f"vocabulary:V-{number:03d}" for number in range(batch, batch + 30))
+    if group is not None:
+        if not isinstance(group, str) or f"readingGroups:{group}" not in current:
+            raise ValueError("Review manifest specifies an unknown reading group")
+        expected.add(f"readingGroups:{group}")
+    if set(snapshot) != expected or len(snapshot) != manifest.get("decisions"):
+        raise ValueError("Review snapshot does not cover the complete selected batch")
     outcome = evaluate(snapshot, current, rows)
     (directory / "review-verification.json").write_text(
         json.dumps(outcome, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
