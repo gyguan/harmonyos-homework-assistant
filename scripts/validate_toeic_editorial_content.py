@@ -33,9 +33,21 @@ def validate() -> None:
     word_source = "\n".join((CONTENT / name).read_text(encoding="utf-8") for name in word_files)
     pronunciation = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(encoding="utf-8")
     approvals = json.loads((ROOT / "docs/product/toeic-editorial-approvals.json").read_text(encoding="utf-8"))
+    ai_audit = json.loads((ROOT / "docs/product/toeic-ai-editorial-review-2026-10-08.json").read_text(encoding="utf-8"))
 
     def approved(area: str, key: str, expected_sha: str) -> bool:
-        return is_valid_approval(approvals.get(area, {}).get(key, {}), expected_sha)
+        entry = approvals.get(area, {}).get(key, {})
+        if not is_valid_approval(entry, expected_sha):
+            return False
+        if entry.get("reviewMode", "HUMAN") == "AI_EDITORIAL":
+            item = ai_audit.get(area, {}).get(key, {})
+            if item.get("decision") != "PASS" or item.get("contentSha256") != expected_sha:
+                return False
+            if area == "readingGroups":
+                questions = item.get("questions", [])
+                if len(questions) != 5 or any(q.get("decision") != "PASS" for q in questions):
+                    return False
+        return True
 
     groups = {}
     group_pattern = r'new ToeicReadingGroup\("([^"]+)",(\[[^\n]*?\]),(\[[^\n]*?\])\)'
