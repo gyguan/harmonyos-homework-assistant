@@ -1,6 +1,6 @@
 import { ToeicReviewStatus, ToeicVocabularyItem, ToeicVocabularyLevel } from '../domain/ToeicModels';
 
-/** Seventh review-only batch, focused on corporate travel, events and operations. */
+/** AI-reviewed V271–V300, released travel, events, and operations vocabulary. */
 export class ToeicVocabularyBatchSeven {
   static items():ToeicVocabularyItem[] {
     return [
