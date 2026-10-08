@@ -133,6 +133,27 @@ def validate() -> None:
                 f"{key}: missing en-US IPA")
     require(len({w["word"].casefold() for w in words}) == 60, "duplicated staged English word")
 
+    # Check the published inventory too; a new batch must teach genuinely new
+    # headwords rather than silently creating a second ID for an existing term.
+    existing_sources = [
+        "PresetToeicContent.ets", "ToeicWeekOneContent.ets",
+        "ToeicVocabularyExpansion.ets",
+    ]
+    existing_words = []
+    for name in existing_sources:
+        content = (CONTENT / name).read_text(encoding="utf-8")
+        existing_words += re.findall(
+            r"""new ToeicVocabularyItem\(['"]V-\d+['"],['"]([^'"]+)['"]""", content)
+    known = {word.casefold() for word in existing_words}
+    for word in words:
+        require(word["word"].casefold() not in known,
+                f'{word["id"]}: headword already exists in the published inventory')
+    require(len(existing_words) == 120,
+            f"published baseline headword list unexpectedly changed: {len(existing_words)}")
+    require(len(pronunciations) == 180 and
+            {w["id"] for w in words}.issubset(set(pronunciations)),
+            "every drafted and published term must keep a unique pronunciation ID")
+
     print(f"[toeic-editorial] PASS: {len(words)} authored words + "
           f"{len(questions)} P7 questions / {len(groups)} groups; approval ledger enforced")
 
