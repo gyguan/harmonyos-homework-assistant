@@ -97,8 +97,8 @@ class AiEditorialReleaseTests(unittest.TestCase):
         self.assertTrue(all(
             len(set(statuses)) == 1 for statuses in by_group.values()
         ), "Shared Part 7 passages must release atomically")
-        self.assertEqual(120 + len(expected_words), 180)
-        self.assertEqual(sum(5 for _ in expected_groups), 25)
+        self.assertEqual(120 + len(expected_words), 300)
+        self.assertEqual(sum(5 for _ in expected_groups), 65)
 
     def test_corrected_evidence_cannot_regress(self) -> None:
         two = (CONTENT / "ToeicExtraReadingBatchTwo.ets").read_text(encoding="utf-8")
