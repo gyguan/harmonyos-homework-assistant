@@ -294,3 +294,22 @@ Day 14 与 Day 19 完整 Reading 模考均不提供中文翻译入口，也不�
 - 任何改成 `PUBLISHED` 的题组必须同组全部完成审核并登记 `docs/product/toeic-editorial-approvals.json`，只发布通过专业人审的整组题。
 - 下一批扩充应先清理单词重复与同义语境问题，再扩大词量；重点继续考虑业务邮件、采购合同和费用政策，不批量造“同模板题”凑数。
 - 合并 PR 不等于新增内容获准发布；两套原有 100 题模考及学习记录的 questionId 和版本不得变更。
+
+## 22. 第四批待审核资产：物流、零售与技术服务（2026-10-08）
+
+本批新增原创商务词 `V-181–V-210`（30 词），覆盖物流与进出口（backorder / customs / tariff / perishable 等）、零售政策（wholesale / coupon / redeem / merchandise 等）以及技术服务（malfunction / outage / backup / deployment 等）。每个词均包含 en-US IPA、词性、语义、搭配、商务场景与原创英文例句，仍须人工语言复核后才能由 `REVIEWED` 升级为 `PUBLISHED`。
+
+新增 Part 7 共享文章候选：`P7-EX-SUPPORT`（3 篇、5 题，合同 SLA / 服务故障 / 费用抵扣）及 `P7-EX-RETAIL`（2 篇、5 题，促销门槛 / 运费 / 退货条件）。跨文档题需引用两个及以上不同文档，并确认费用计算与截止时间无歧义。
+
+**累计内容资产：210 个词，其中已发布 120 个、待审核 90 个；7 组共 35 道新增 Part 7 候选题。** 本批不更改既有 Day 1–21 任务、已发布题目的 questionId / version 或 Day 14 / 19 独立模考题集。
+
+### 22.1 已修复的多批次内容访问问题
+
+`PresetToeicContent.supplementaryReadingQuestions()` 现在统一从 `publishedReadingGroups()` 聚合所有经审核的题组，而不是只读取最初一批；`ToeicReadingGroupService.groupAt()` 同样支持定位第三批新增的共享文章。不会因为只审批后来的一组文章而隐藏加练入口，也不能将尚未批准的文章带入学员界面。
+
+### 22.2 质量门禁与发布纪律
+
+- `scripts/validate_toeic_editorial_content.py` 统一覆盖三个阅读候选文件和三个词汇候选文件，检查词汇全库英文 headword 不重复、210 个 IPA 唯一且与 ID 对应、每组 4 选项各至少出现一次正确答案、每个跨文档证据片段确实来自指定文档。
+- 审核人通过 `docs/product/toeic-editorial-approvals.json` 留下每个词 / 每组阅读的审批账号与日期之后，才能将对应 `reviewStatus` 改为 `PUBLISHED`；未审批只可留为候选。
+- `ToeicVocabularyLevel.L1/L2/L3` 仅代表内容分级，不是 ETS 官方认可的 600 / 700 / 800 分数预测；分数段标注须后续用合理难度标定和真实训练数据校准。
+- 词义同义替换、英美发音、多义词词性、阅读选项唯一正确性仍需外部编辑审核；自动脚本合格不意味着可以跳过人工质量签核。
