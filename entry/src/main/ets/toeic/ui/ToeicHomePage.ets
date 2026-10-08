@@ -1,12 +1,13 @@
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicSessionReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicSessionReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem, ToeicVocabularyQuizMode, ToeicVocabularyQuizQuestion } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 import { ToeicReadingGroupService } from '../application/ToeicReadingGroupService';
+import { ToeicVocabularyQuizService } from '../application/ToeicVocabularyQuizService';
 
-enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', SENTENCE='SENTENCE', MOCK_RESULT='MOCK_RESULT' }
+enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', VOCABULARY_QUIZ='VOCABULARY_QUIZ', SENTENCE='SENTENCE', MOCK_RESULT='MOCK_RESULT' }
 
 @Component
 export struct ToeicHomePage {
@@ -60,6 +61,18 @@ export struct ToeicHomePage {
   @State private revealedSentenceIds:string[]=[];
   @State private lastReviewedWordId:string='';
   @State private vocabularyFeedback:string='';
+  @State private quizStem:string='';
+  @State private quizOptionA:string='';
+  @State private quizOptionB:string='';
+  @State private quizOptionC:string='';
+  @State private quizOptionD:string='';
+  @State private quizAnswerIndex:number=-1;
+  @State private quizSelectedIndex:number=-1;
+  @State private quizPosition:number=0;
+  @State private quizCorrectCount:number=0;
+  @State private quizModeLabel:string='';
+  @State private quizExplanation:string='';
+  private quizQuestions:ToeicVocabularyQuizQuestion[]=[];
   @State private markedQuestionIds:string[]=[];
   @State private mockReports:ToeicMockReport[]=[];
   private sessionStartedAtMs:number=0;
@@ -433,6 +446,49 @@ export struct ToeicHomePage {
     if (index>=0) next.splice(index,1);
     else next.push(id);
     this.revealedWordIds=next;
+  }
+
+  private startVocabularyQuiz(mode:ToeicVocabularyQuizMode):void {
+    let selected=this.viewModel.vocabularyForDay(this.effectiveStudyDay());
+    this.quizQuestions=ToeicVocabularyQuizService.generate(
+      selected,this.viewModel.allVocabulary(),mode);
+    if (this.quizQuestions.length===0) return;
+    this.quizCorrectCount=0;
+    this.quizModeLabel=mode===ToeicVocabularyQuizMode.MEANING?'词义':
+      (mode===ToeicVocabularyQuizMode.COLLOCATION?'商务搭配':'同义替换');
+    this.loadVocabularyQuiz(0);
+    this.mode=ToeicPageMode.VOCABULARY_QUIZ;
+  }
+
+  private loadVocabularyQuiz(index:number):void {
+    if (index<0 || index>=this.quizQuestions.length) return;
+    let quiz=this.quizQuestions[index];
+    this.quizPosition=index;
+    this.quizStem=quiz.stem;
+    this.quizOptionA=quiz.options[0];
+    this.quizOptionB=quiz.options[1];
+    this.quizOptionC=quiz.options[2];
+    this.quizOptionD=quiz.options[3];
+    this.quizAnswerIndex=quiz.correctIndex;
+    this.quizSelectedIndex=-1;
+    this.quizExplanation=quiz.explanation;
+  }
+
+  private answerVocabularyQuiz(index:number):void {
+    if (this.quizSelectedIndex>=0 || this.quizPosition>=this.quizQuestions.length) return;
+    this.quizSelectedIndex=index;
+    if (index===this.quizAnswerIndex) this.quizCorrectCount++;
+    let question=this.quizQuestions[this.quizPosition];
+    void this.viewModel.recordVocabularyRecall(question.vocabularyId,index===this.quizAnswerIndex);
+  }
+
+  private nextVocabularyQuiz():void {
+    if (this.quizSelectedIndex<0) return;
+    if (this.quizPosition+1>=this.quizQuestions.length) {
+      void this.finishDayTask('vocabulary');
+      return;
+    }
+    this.loadVocabularyQuiz(this.quizPosition+1);
   }
 
   private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean):Promise<void> {
@@ -1038,6 +1094,23 @@ export struct ToeicHomePage {
           onBack:()=>this.cancelSession()
         });
 
+        Row({space:8}) {
+          Button('词义测验',{type:ButtonType.Normal})
+            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .onClick(()=>this.startVocabularyQuiz(ToeicVocabularyQuizMode.MEANING));
+          Button('搭配测验',{type:ButtonType.Normal})
+            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .onClick(()=>this.startVocabularyQuiz(ToeicVocabularyQuizMode.COLLOCATION));
+          Button('同义测验',{type:ButtonType.Normal})
+            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .onClick(()=>this.startVocabularyQuiz(ToeicVocabularyQuizMode.PARAPHRASE));
+        }
+        .width('100%');
+        Text('选择一种检索测验，答题结果会自动安排到期复习。')
+          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         if (this.pronunciationMessage.length>0) {
           Text(this.pronunciationMessage)
             .width('100%')
@@ -1127,6 +1200,64 @@ export struct ToeicHomePage {
             .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY)
             .onClick(()=>{void this.finishDayTask('vocabulary');});
         }
+      }
+      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+        right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+        top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_BOTTOM_PADDING});
+    }
+    .width('100%').height('100%').scrollBar(BarState.Off).align(Alignment.TopStart);
+  }
+
+  @Builder
+  private VocabularyQuizContent() {
+    Scroll() {
+      Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
+        DeepPageHeader({
+          title:'词汇检索测验',
+          subtitle:this.quizModeLabel+' · '+(this.quizPosition+1)+' / '+this.quizQuestions.length,
+          onBack:()=>{this.mode=ToeicPageMode.VOCABULARY;}
+        });
+        Column({space:10}) {
+          Text(this.quizStem)
+            .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+          Button(this.quizOptionA,{type:ButtonType.Normal})
+            .width('100%').constraintSize({minHeight:50})
+            .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .onClick(()=>this.answerVocabularyQuiz(0));
+          Button(this.quizOptionB,{type:ButtonType.Normal})
+            .width('100%').constraintSize({minHeight:50})
+            .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .onClick(()=>this.answerVocabularyQuiz(1));
+          Button(this.quizOptionC,{type:ButtonType.Normal})
+            .width('100%').constraintSize({minHeight:50})
+            .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .onClick(()=>this.answerVocabularyQuiz(2));
+          Button(this.quizOptionD,{type:ButtonType.Normal})
+            .width('100%').constraintSize({minHeight:50})
+            .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .onClick(()=>this.answerVocabularyQuiz(3));
+          if (this.quizSelectedIndex>=0) {
+            Text(this.quizSelectedIndex===this.quizAnswerIndex?'回答正确':'需要巩固')
+              .width('100%').fontSize(AppTheme.CARD_TITLE_SIZE)
+              .fontColor(this.quizSelectedIndex===this.quizAnswerIndex?AppTheme.SUCCESS:AppTheme.DANGER);
+            Text(this.quizExplanation)
+              .width('100%').fontSize(AppTheme.BODY_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+          }
+          Button(this.quizPosition+1>=this.quizQuestions.length?'完成词汇测验':'下一题',
+            {type:ButtonType.Normal})
+            .width('100%').height(AppTheme.BUTTON_HEIGHT)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY)
+            .enabled(this.quizSelectedIndex>=0)
+            .onClick(()=>this.nextVocabularyQuiz());
+          Text('本轮已答对 '+this.quizCorrectCount+'/'+
+            (this.quizPosition+(this.quizSelectedIndex>=0?1:0))+'；错误词进入短期复习。')
+            .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+        }
+        .width('100%').padding(AppTheme.CARD_PADDING)
+        .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
       }
       .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1604,6 +1735,8 @@ export struct ToeicHomePage {
         this.VocabularyContent(
           this.viewModel.vocabularyForDay(this.effectiveStudyDay())
         );
+      } else if (this.mode===ToeicPageMode.VOCABULARY_QUIZ) {
+        this.VocabularyQuizContent();
       } else if (this.mode===ToeicPageMode.SENTENCE) {
         this.SentenceContent(
           this.viewModel.sentenceDrillsForDay(this.effectiveStudyDay())
