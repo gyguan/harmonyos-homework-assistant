@@ -22,7 +22,7 @@ export class ToeicQuestionTranslationWeekOneCatalog {
         ['出席（动词）','参会者（复数名词）','出席中的（分词）','出席；出勤（名词）']),
       new ToeicQuestionTranslation('R-DX-P5-02','','所有电子发票在付款前都必须由财务团队_____。',
         ['审核（原形）','审核（过去分词）','正在审核（分词）','审核员']),
-      new ToeicQuestionTranslation('R-DX-P5-03','','委员会一旦批准最终数据，修订后的报告就会发布_____。',
+      new ToeicQuestionTranslation('R-DX-P5-03','','委员会_____批准最终数据，修订后的报告就会发布。',
         ['一旦','尽管','在……期间','因为']),
       new ToeicQuestionTranslation('R-DX-P5-04','','员工最迟必须在星期五完成线上调查（no later _____ Friday）。',
         ['然后（then）','比；固定搭配 no later than','那个（that）','从（from）']),
