@@ -259,7 +259,7 @@ Day 14 与 Day 19 完整 Reading 模考均不提供中文翻译入口，也不�
 - `P7-EX-TRAVEL`：差旅报销规则、票据和财务补件，三篇/5题；考查限额计算及跨文档取证。
 
 **发布闸门**：这 30 个词和 15 道题均标识为 `REVIEWED`（候选，非已获人工批准），不可进入正式训练。原已发布的 120 词、两套 100 题模考和历史记录保持不变。人工审核后，按整组逐题签核，才允许将对应资产转为 `PUBLISHED`；同组题不能部分发布。 审核人需在 `docs/product/toeic-editorial-approvals.json` 中添加签核记录：
-`readingGroups[groupId]={ "reviewer": "GitHub用户名", "approvedAt": "YYYY-MM-DD" }`；
+`readingGroups[groupId]={ "reviewer": "GitHub用户名", "approvedAt": "YYYY-MM-DD", "contentSha256": "审核内容摘要" }`；
 `vocabulary[wordId]` 采用相同结构。添加签核记录并将对应 `reviewStatus` 变为 `PUBLISHED` 后，CI 才允许发布；无签核或同组题部分发布均会失败。
 
 ### 20.1 必须人工审核的项目
@@ -339,3 +339,33 @@ Day 14 与 Day 19 完整 Reading 模考均不提供中文翻译入口，也不�
 审核员在导出材料中独立核验英文、中文、IPA 和试题后，针对每个已通过词汇或完整阅读题组，在 `docs/product/toeic-editorial-approvals.json` 登记 `reviewer` / `approvedAt`；然后由独立变更更新对应 `reviewStatus=PUBLISHED`，运行 CI 并执行 Phone / Pad 编译与实测。不能依靠导出成功或自动证据匹配假装人工内容审核已完成。
 
 为避免静态测试每次扩容都需要维护文件名，`validate_toeic_editorial_content.py` 自动发现新增的词汇、阅读批次，检查从 `V-121` 开始的连续 ID、与既有 120 词不重复、全量 IPA 对齐、每组题证据归属与人工签核记录。扩容仍应坚持内容优先，不得为达到 300–400 词目标而直接批量发布。
+
+## 24. 第六批候选内容与审核快照一致性（2026-10-08）
+
+新增 `V-241–V-270` 共 30 个原创待审核词条，聚焦商务通信、企业 IT 和信息安全，包括 memorandum / correspondence / attachment、database / migration / integration、credential / encryption 等。每个词均含中文释义、英文场景例句、搭配、同义替换和美式 IPA。增量词条全部为 `REVIEWED`。
+
+新增 Part 7 多文档组：
+- `P7-EX-MIGRATION`：三篇 / 5 题，系统迁移通知、帮助台指引及员工工作邮件，涉及服务窗口、登录与事前准备。
+- `P7-EX-LICENSE`：三篇 / 5 题，软件价格政策、采购申请与财务确认，考查折扣、一次性费用、许可证数量及后续增购。
+
+当前**总资产 270 词**（既有 120 个已发布、150 个审核候选），**Part 7 新增候选共 11 组 / 55 题**。两套 100 题模考与原有题号、学习记录不变；不可把候选资产数当作学生实际可用词数。
+
+### 24.1 审核批准必须绑定内容版本
+
+审核资料导出：`python scripts/export_toeic_review_pack.py --out-dir build/toeic-review`。
+
+生成的 CSV 中新增 `content_sha256` 列；Part 7 审核 Markdown 每组列出对应的内容 SHA-256。**审核人必须审阅导出内容，并把对应摘要原样登记到批准记录**：
+
+`"vocabulary": { "V-241": { "reviewer": "真实GitHub账号", "approvedAt": "YYYY-MM-DD", "contentSha256": "64位小写十六进制摘要" } }`
+
+阅读题组在 `readingGroups` 下按 `groupId` 使用同一字段结构。审核批准与内容状态必须在同一 PR 中经人工 Code Review 后提交，不能使用占位账号或未来日期。状态 `REVIEWED` → `PUBLISHED` 本身不构成审核。
+
+审核摘要由规范化的题干、选项、答案、解析、证据、原文、IPA 等内容计算，**不包括状态字段**。因此，合法的状态切换不会导致摘要变化，但审核之后任何答案、解析、文档或单词释义、发音的改动都会使旧摘要失效；CI 拒绝发布直到重新经过人工校对和签核。
+
+这里的 SHA-256 是**内容一致性标识**，不是审核人员的密码学身份签名。真实审核人员权限及审校证据必须靠 GitHub 的 PR 审查与仓库权限管理落实。自动检测只能防止无意复用过期批准记录，不能替代真实的专业语言审核。
+
+### 24.2 发布前检查
+
+- `python scripts/validate_toeic_coach.py` 同时运行编辑资产验证、审核摘要负例回归，以及审核材料 CSV/Markdown 完整性检查。
+- 新批次遵循相同 `REVIEWED` 隔离，不改变历史题目 ID、版本或学生记录。
+- 合并含候选内容的 PR 不等于获准发布，必须另行完成经签核的 `PUBLISHED` 变更和 HarmonyOS Phone / Pad 编译、实测。
