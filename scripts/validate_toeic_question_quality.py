@@ -118,6 +118,8 @@ def parse_question(raw: list[str], source: str, wrapper: bool) -> Item | None:
             version = 2
         if wrapper and id == "R-P7-DOUBLE-1102":
             version = 3  # verified evidence updated from old before to source by
+        if wrapper and id == "R-P5-SPRINT-1528":
+            version = 2  # repaired reflexive expression
         return Item(id, part, values[3 + shift], values[4 + shift],
                     values[5 + shift], int(values[6 + shift]),
                     values[7 + shift], values[8 + shift],
@@ -226,7 +228,8 @@ def validate() -> dict[str, int]:
         errors.append("R-P7-DOUBLE-1102: corrected published evidence requires version 3")
     for id, version in (("R-P6-CTX-0001", 2), ("R-P6-WF-0002", 2),
                         ("R-M1-P5-003", 2), ("R-M1-P7-086", 2),
-                        ("R-P7-DOUBLE-1102", 3), ("R-P7-DOUBLE-1104", 2)):
+                        ("R-P7-DOUBLE-1102", 3), ("R-P7-DOUBLE-1104", 2),
+                        ("R-P5-SPRINT-1528", 2)):
         if id_map.get(id) is None or id_map[id].version < version:
             errors.append(f"{id}: corrected published item must increment version")
     if id_map.get("R-M1-P5-003") and "_____ users automatically" not in id_map["R-M1-P5-003"].stem:
@@ -239,6 +242,8 @@ def validate() -> dict[str, int]:
         errors.append("R-P7-DOUBLE-1102: evidence must quote the current source rather than stale wording")
     if id_map.get("R-P7-DOUBLE-1104") and "11:30–11:50 Cloud Operations" not in id_map["R-P7-DOUBLE-1104"].passage:
         errors.append("R-P7-DOUBLE-1104: seminar completion time must be stated")
+    if "Each applicant must identify _____ with a photo ID" not in id_map["R-P5-SPRINT-1528"].stem:
+        errors.append("R-P5-SPRINT-1528: use idiomatic identify oneself, not provide oneself with ID at reception")
     if "入选面试的申请人最迟会在 10 月 18 日当天收到联系。" not in contents["ToeicWeekTwoContent"]:
         errors.append("S-037: no later than October 18 must include the deadline date in Chinese")
     group_count = 0
