@@ -114,7 +114,8 @@ def parse_question(raw: list[str], source: str, wrapper: bool) -> Item | None:
         part = values[1 + shift].split(".")[-1]
         version = values[15] if not wrapper and len(values) > 15 else 1
         group = values[20] if not wrapper and len(values) > 20 else ""
-        if wrapper and id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1104"):
+        if wrapper and id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1104",
+                                 "R-P7-TRIPLE-1203", "R-M1-P7-077"):
             version = 2
         if wrapper and id == "R-P7-DOUBLE-1102":
             version = 3  # verified evidence updated from old before to source by
