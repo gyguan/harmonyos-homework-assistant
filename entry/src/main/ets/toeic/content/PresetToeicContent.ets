@@ -345,7 +345,10 @@ export class PresetToeicContent {
     for (let question of all) {
       let oldDay14=maxDay>=14 && question.id.startsWith('R-M1-P7-');
       let oldDay19=maxDay>=19 && question.id.startsWith('R-M2-P7-');
-      if ((oldDay14 || oldDay19) &&
+      // Day19 v2 also replaces the first archived Part6 passage with four
+      // independent sentence-completion IDs. Preserve historic P6 mistakes.
+      let oldDay19Part6=maxDay>=19 && question.id.startsWith('R-M2-P6-');
+      if ((oldDay14 || oldDay19 || oldDay19Part6) &&
           !PresetToeicContent.containsQuestionId(result,question.id)) result.push(question);
     }
     return result;
