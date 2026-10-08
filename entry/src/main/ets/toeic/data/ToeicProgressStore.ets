@@ -170,7 +170,8 @@ export class ToeicProgressStore {
           }
           restored.activeDraft=new ToeicSessionDraft(raw.day as number,raw.mode as string,
             raw.questionIds as string[],Math.max(0,Number(raw.currentIndex)||0),attempts,times,
-            raw.startedAtMs as number,raw.advancesProgress===true);
+            raw.startedAtMs as number,raw.advancesProgress===true,
+            Array.isArray(raw.markedQuestionIds)?raw.markedQuestionIds as string[]:[]);
         }
       }
       restored.schemaVersion=4;
