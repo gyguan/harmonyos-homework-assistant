@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Versioned release plan for AI-screened TOEIC content; publication flags must match this plan, but this manifest is not editorial approval.",
+  "baselinePublishedVocabulary": 120,
+  "authoredVocabularyRange": {
+    "start": 121,
+    "end": 300
+  },
+  "authoredSupplementaryReadingGroups": 13,
+  "editorialEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+  "releaseBatches": [
+    {
+      "batchId": "ai-editorial-pilot-01",
+      "wordIdRange": {
+        "start": 121,
+        "end": 150
+      },
+      "readingGroupIds": [
+        "P7-EX-VENUE",
+        "P7-EX-DELIVERY",
+        "P7-EX-TRAVEL"
+      ],
+      "context": "Initial gated publication: PR #458"
+    },
+    {
+      "batchId": "ai-editorial-pilot-02",
+      "wordIdRange": {
+        "start": 151,
+        "end": 180
+      },
+      "readingGroupIds": [
+        "P7-EX-ONBOARD",
+        "P7-EX-FILTER"
+      ],
+      "context": "Follow-up gated publication for meeting/project/finance vocabulary and 2 shared Part7 groups"
+    }
+  ]
+}
