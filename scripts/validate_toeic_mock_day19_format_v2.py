@@ -10,6 +10,7 @@ import re
 from collections import Counter
 from pathlib import Path
 from validate_toeic_question_quality import collect,fields,literals_after,parse_question
+from validate_toeic_answer_display import display_order
 
 ROOT=Path(__file__).resolve().parents[1]
 CONTENT=ROOT/"entry/src/main/ets/toeic/content"
@@ -87,6 +88,19 @@ def validate() -> None:
         assert token in preset,f"Day19 runtime paper assembly missing {token}"
     assert "ToeicMockDay19V2Content.groups()" in service
     assert "let result:ToeicQuestion[]=[];" in SRC
+    # Active v2 answer-position distribution, independent of archived R-M2 paper.
+    displayed=[(q.id,q.answer) for q in old_p5+old_p6]
+    displayed.extend((f"R-FM2-P7-S{i//3+1:02d}-{i%3+1:02d}",old_p7[i].answer)
+                     for i in range(18))
+    displayed.extend((f"R-FM2-P7-M{g+1}-{item+1:02d}",item)
+                     for g in range(5) for item in range(3))
+    displayed.extend((q.id,q.answer) for q in authored)
+    assert len(displayed)==100 and len({x[0] for x in displayed})==100
+    counts=Counter(display_order(id).index(index) for id,index in displayed)
+    p7counts=Counter(display_order(id).index(index) for id,index in displayed[46:])
+    assert all(18<=counts[i]<=32 for i in range(4)),f"Day19 v2 display bias: {counts}"
+    assert all(8<=p7counts[i]<=19 for i in range(4)),f"Day19 v2 P7 bias: {p7counts}"
+    print("TOEIC_MOCK_DAY19_V2_DISPLAY_PASS " + " ".join(f"{chr(i+65)}={counts[i]}" for i in range(4)))
     print("TOEIC_MOCK_DAY19_V2_FORMAT_PASS questions=100 P5=30 P6=16_4x4 "
           "P7_single=29_10sets P7_multi=25_5x5 multi_docs=2or3 evidence=verbatim "
           "legacy_v1=preserved")
