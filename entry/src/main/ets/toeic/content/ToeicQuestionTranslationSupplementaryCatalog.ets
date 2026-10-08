@@ -19,7 +19,7 @@ export class ToeicQuestionTranslationSupplementaryCatalog {
       new ToeicQuestionTranslation("R-P7-VENUE-05",venuePassage,
         "更换房间的请求是否在规定截止日期前发出？",["否，邮件发于9月12日之后","否，场馆不允许更换房间","是，邮件于9月10日发出","是，因为研讨会在11月举行"]),
       new ToeicQuestionTranslation("R-P7-DELIVERY-01",deliveryPassage,
-        "哪种配送方式能满足运营部门要求的期限？",["标准配送","加急配送","两种方式都可以","两种方式都不行"]),
+        "依据列出的配送承诺，哪种方式能保证显示器在10月15日布置培训室之前送达？",["标准配送","加急配送","两种方式都可以","两种方式都不行"]),
       new ToeicQuestionTranslation("R-P7-DELIVERY-02",deliveryPassage,
         "增加配送费用之前，采购部门必须取得什么？",["新的订单编号","安全检查","已签字的送货单","采购审批"]),
       new ToeicQuestionTranslation("R-P7-DELIVERY-03",deliveryPassage,

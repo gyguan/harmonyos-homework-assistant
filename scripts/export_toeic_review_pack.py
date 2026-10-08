@@ -31,7 +31,7 @@ QUESTION_RE = re.compile(
     rf'\s*(?P<explanation>{QSTR}),(?P<evidence>{QSTR}),'
     rf'(?P<paraphrase>{QSTR}),(?P<seconds>\d+),'
     r'\s*ToeicDifficulty\.(?P<difficulty>\w+),ToeicScoreValue\.\w+,'
-    r'\s*ToeicReviewStatus\.(?P<status>REVIEWED|PUBLISHED),1,\'\',\'\',0,0,"(?P<group>[^"]+)"\)'
+    r'\s*ToeicReviewStatus\.(?P<status>REVIEWED|PUBLISHED),(?P<version>[1-9]\d*),\'\',\'\',0,0,"(?P<group>[^"]+)"\)'
 )
 HEADERS = [
     "id", "word", "part_of_speech", "meaning_zh", "level", "scenario",

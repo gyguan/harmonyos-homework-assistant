@@ -10,7 +10,7 @@
     "P7-EX-DELIVERY": {
       "reviewer": "AI-GPT6",
       "approvedAt": "2026-10-08",
-      "contentSha256": "dac4560e25866750c712a5d9c364d27a7a8da3fb7e1d7afbef2ddef1338d341d",
+      "contentSha256": "1e193292b3b6a7b356d8cf411b219f63deb627bff43935cdc285841258eb4949",
       "reviewMode": "AI_EDITORIAL",
       "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
     },
@@ -38,7 +38,7 @@
     "P7-EX-SUPPORT": {
       "reviewer": "AI-GPT6",
       "approvedAt": "2026-10-08",
-      "contentSha256": "30aee7b6155f6976b14220b4ae011c15b153da9323dcf27c1ec1411d54e4a216",
+      "contentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7",
       "reviewMode": "AI_EDITORIAL",
       "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
     },

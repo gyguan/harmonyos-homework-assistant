@@ -1,0 +1,1837 @@
+{
+  "schemaVersion": 1,
+  "reviewDate": "2026-10-08",
+  "issue": 478,
+  "reviewer": "AI-GPT6",
+  "reviewStatus": "AI_FIRST_PASS",
+  "disclaimer": "Model-led source and distractor screening, not two independent editorial passes, not certified by ETS or a human expert. Documents/question contents stay protected by signed AI-only group fingerprint; re-review after any source change.",
+  "scope": {
+    "groups": 13,
+    "questions": 65,
+    "correctReasons": 65,
+    "excludedOptions": 195,
+    "newMockDerivedIncluded": false
+  },
+  "items": [
+    {
+      "assetId": "R-P7-VENUE-01",
+      "correctBasis": "邮件明确要求换成容量更大的Cedar Hall",
+      "distractorReasons": [
+        "并未取消研讨会",
+        "邮件要求活动日期不变",
+        "餐食数量另行确认并非减少"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-VENUE-01",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-VENUE",
+        "version": 1,
+        "stem": "Why did Min Seo write to the conference center?",
+        "options": [
+          "To cancel a workshop",
+          "To change the workshop date",
+          "To request a larger room",
+          "To reduce the catering order"
+        ],
+        "answerIndex": 2,
+        "explanation": "邮件要求将 Maple Room 改为 Cedar Hall，培训日期不变。",
+        "evidence": "we would like to move to Cedar Hall."
+      },
+      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+    },
+    {
+      "assetId": "R-P7-VENUE-02",
+      "correctBasis": "原房间55座而报名升至62人所以容纳不足",
+      "distractorReasons": [
+        "未说原房间停止供餐",
+        "10月7日场地没有关闭信息",
+        "加价仅是更换房间费用"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-VENUE-02",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-VENUE",
+        "version": 1,
+        "stem": "Why is the original room no longer suitable?",
+        "options": [
+          "Registration is higher than its capacity",
+          "Catering is unavailable there",
+          "The venue is closed on October 7",
+          "The coordinator raised its rental rate"
+        ],
+        "answerIndex": 0,
+        "explanation": "原房间最多55人，报名人数已增至62人；需要合并两份材料。",
+        "evidence": "The Maple Room accommodates up to 55 attendees || Registration has now increased to 62"
+      },
+      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+    },
+    {
+      "assetId": "R-P7-VENUE-03",
+      "correctBasis": "升级到Cedar Hall需要额外160美元",
+      "distractorReasons": [
+        "55是原房间座位数",
+        "90是新房间座位数",
+        "62是当前报名人数"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-VENUE-03",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-VENUE",
+        "version": 1,
+        "stem": "What additional rental charge applies to the requested change?",
+        "options": [
+          "$55",
+          "$90",
+          "$62",
+          "$160"
+        ],
+        "answerIndex": 3,
+        "explanation": "预订指南中 Cedar Hall 升级费用为160美元；不要把容量当作价格。",
+        "evidence": "Switching from Maple Room to Cedar Hall adds $160 to the rental fee."
+      },
+      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+    },
+    {
+      "assetId": "R-P7-VENUE-04",
+      "correctBasis": "邮件写明最终午餐人数稍后再确认",
+      "distractorReasons": [
+        "预订编号已在邮件标题提供",
+        "场地地点已明确且未要求补充",
+        "10月7日活动日期保持不变"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-VENUE-04",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-VENUE",
+        "version": 1,
+        "stem": "What information will the training team provide later?",
+        "options": [
+          "The booking reference",
+          "The final lunch count",
+          "The location of the venue",
+          "The workshop date"
+        ],
+        "answerIndex": 1,
+        "explanation": "邮件最后明确 final lunch count 会另行确认。",
+        "evidence": "We will confirm the final lunch count separately."
+      },
+      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+    },
+    {
+      "assetId": "R-P7-VENUE-05",
+      "correctBasis": "换房截止9月12日，邮件日期9月10日满足要求",
+      "distractorReasons": [
+        "9月10日早于9月12日而非更晚",
+        "政策允许申请变更房间",
+        "活动于10月7日举行不是11月"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-VENUE-05",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-VENUE",
+        "version": 1,
+        "stem": "Was the request for a different room sent by the stated deadline?",
+        "options": [
+          "No, it was sent after September 12",
+          "No, room changes were not permitted",
+          "Yes, it was emailed on September 10",
+          "Yes, because the workshop starts in November"
+        ],
+        "answerIndex": 2,
+        "explanation": "指南要求9月12日前提出调整，邮件日期为9月10日。",
+        "evidence": "Requests to change rooms must reach the venue coordinator by September 12 || DOCUMENT 2 — EMAIL, SEPTEMBER 10"
+      },
+      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+    },
+    {
+      "assetId": "R-P7-DELIVERY-01",
+      "correctBasis": "只有加急明确保证10月13日到货，早于10月15日布置培训室",
+      "distractorReasons": [
+        "普通配送仅承诺最迟10月16日，不能保证提前",
+        "普通配送无提前保证因此不是两种均可",
+        "加急已保证按时到货故不是两者均不可"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-DELIVERY-01",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-DELIVERY",
+        "version": 2,
+        "stem": "Based on the stated delivery commitments, which option guarantees the monitors will arrive before the October 15 room setup?",
+        "options": [
+          "Standard delivery",
+          "Express delivery",
+          "Either option",
+          "Neither option"
+        ],
+        "answerIndex": 1,
+        "explanation": "标准配送承诺最迟10月16日到货，无法保证10月15日布置培训室之前送达；加急明确保证10月13日送达，只有它提供按期到货保证。",
+        "evidence": "standard delivery by October 16 || guarantees delivery by October 13 || begin fitting out the training room on October 15"
+      },
+      "groupContentSha256": "1e193292b3b6a7b356d8cf411b219f63deb627bff43935cdc285841258eb4949"
+    },
+    {
+      "assetId": "R-P7-DELIVERY-02",
+      "correctBasis": "内部邮件明确要求加收配送费之前得到采购审批",
+      "distractorReasons": [
+        "没有要求申请新订单号",
+        "未提额外安全检查",
+        "签收单不能替代采购批准"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-DELIVERY-02",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-DELIVERY",
+        "version": 1,
+        "stem": "What must Purchasing obtain before accepting an extra delivery charge?",
+        "options": [
+          "A new order number",
+          "A safety inspection",
+          "A signed delivery note",
+          "Purchasing approval"
+        ],
+        "answerIndex": 3,
+        "explanation": "内部邮件明确加收运费前须获得采购审批。",
+        "evidence": "obtain purchasing approval before adding a delivery fee."
+      },
+      "groupContentSha256": "1e193292b3b6a7b356d8cf411b219f63deb627bff43935cdc285841258eb4949"
+    },
+    {
+      "assetId": "R-P7-DELIVERY-03",
+      "correctBasis": "加急配送明确额外收费80美元",
+      "distractorReasons": [
+        "24是显示器台数",
+        "13是加急送达日期中的数字",
+        "16是普通送达日期中的数字"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-DELIVERY-03",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-DELIVERY",
+        "version": 1,
+        "stem": "How much would the express option add to the order?",
+        "options": [
+          "$80",
+          "$24",
+          "$13",
+          "$16"
+        ],
+        "answerIndex": 0,
+        "explanation": "订单说明 express option 额外收取80美元；其他数字来自数量或日期。",
+        "evidence": "An express option costs an additional $80"
+      },
+      "groupContentSha256": "1e193292b3b6a7b356d8cf411b219f63deb627bff43935cdc285841258eb4949"
+    },
+    {
+      "assetId": "R-P7-DELIVERY-04",
+      "correctBasis": "加急申请截止为10月10日下午4点",
+      "distractorReasons": [
+        "10月9日是内部邮件日期而非截止日",
+        "10月15日是培训室装修开始日",
+        "10月16日是普通配送最迟日期"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-DELIVERY-04",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-DELIVERY",
+        "version": 1,
+        "stem": "By when must the express upgrade be requested?",
+        "options": [
+          "October 9 at 4 P.M.",
+          "October 15 at noon",
+          "October 10 at 4 P.M.",
+          "October 16 at 4 P.M."
+        ],
+        "answerIndex": 2,
+        "explanation": "定位 must be requested by，截止时间为10月10日下午4点。",
+        "evidence": "The express upgrade must be requested by 4 P.M. on October 10."
+      },
+      "groupContentSha256": "1e193292b3b6a7b356d8cf411b219f63deb627bff43935cdc285841258eb4949"
+    },
+    {
+      "assetId": "R-P7-DELIVERY-05",
+      "correctBasis": "运营部要求在10月15日开工前装齐24台显示器",
+      "distractorReasons": [
+        "没有因税率上涨而赶交付的证据",
+        "原订单并未取消",
+        "10月16日是普通送达日并无促销"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-DELIVERY-05",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-DELIVERY",
+        "version": 1,
+        "stem": "Why does Operations want the monitors delivered early?",
+        "options": [
+          "To avoid a tax increase",
+          "To prepare for fitting out a training room",
+          "To replace a cancelled order",
+          "To use an October 16 promotion"
+        ],
+        "answerIndex": 1,
+        "explanation": "内部消息说明10月15日起布置培训室，显示器须在开工前到货。",
+        "evidence": "Facilities will begin fitting out the training room on October 15. We need all 24 new monitors on site before that work begins."
+      },
+      "groupContentSha256": "1e193292b3b6a7b356d8cf411b219f63deb627bff43935cdc285841258eb4949"
+    },
+    {
+      "assetId": "R-P7-TRAVEL-01",
+      "correctBasis": "每晚上限145美元而实际138美元，低于上限7美元",
+      "distractorReasons": [
+        "每晚实际价格比上限低而不是高",
+        "政策明确允许符合条件的酒店报销",
+        "规则设有每晚145美元上限"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAVEL-01",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-TRAVEL",
+        "version": 1,
+        "stem": "Does the nightly hotel rate meet the company's reimbursement limit?",
+        "options": [
+          "Yes, the rate is $7 below the limit",
+          "No, the rate is $7 above the limit",
+          "No, hotels are not reimbursable",
+          "Yes, because there is no nightly limit"
+        ],
+        "answerIndex": 0,
+        "explanation": "政策每晚最高145美元（税前），发票每晚138美元，低于上限7美元。",
+        "evidence": "up to $145 per hotel night before taxes || two nights at $138 per night before taxes"
+      },
+      "groupContentSha256": "426128b8163433b04e4fe30bbd94557730abe0c266827426531cb8784593c763"
+    },
+    {
+      "assetId": "R-P7-TRAVEL-02",
+      "correctBasis": "酒店税前两晚每晚138美元，合计276美元",
+      "distractorReasons": [
+        "145美元是单晚上限并非消费",
+        "138美元仅是一晚费用",
+        "290美元来自145乘2非实际账单"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAVEL-02",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-TRAVEL",
+        "version": 1,
+        "stem": "What is the hotel charge for two nights before taxes?",
+        "options": [
+          "$145",
+          "$138",
+          "$276",
+          "$290"
+        ],
+        "answerIndex": 2,
+        "explanation": "住宿两晚、每晚138美元，税前金额为276美元；别把限额145当成实际价格。",
+        "evidence": "two nights at $138 per night before taxes || up to $145 per hotel night before taxes"
+      },
+      "groupContentSha256": "426128b8163433b04e4fe30bbd94557730abe0c266827426531cb8784593c763"
+    },
+    {
+      "assetId": "R-P7-TRAVEL-03",
+      "correctBasis": "财务邮件明确缺少出租车逐项收据",
+      "distractorReasons": [
+        "没有要求新行程计划",
+        "已收到完整酒店明细收据",
+        "并未要求供应商合同"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAVEL-03",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-TRAVEL",
+        "version": 1,
+        "stem": "Which supporting document must Adrian still provide?",
+        "options": [
+          "A new itinerary",
+          "An itemized taxi receipt",
+          "Another hotel receipt",
+          "A supplier contract"
+        ],
+        "answerIndex": 1,
+        "explanation": "旅行记录只有出租车刷卡对账单，财务明确要求补充出租车逐项收据。",
+        "evidence": "taxi expense summary shows $48 but includes only a card statement || Please upload the itemized taxi receipt"
+      },
+      "groupContentSha256": "426128b8163433b04e4fe30bbd94557730abe0c266827426531cb8784593c763"
+    },
+    {
+      "assetId": "R-P7-TRAVEL-04",
+      "correctBasis": "行程记录明确11月4日至11月6日，结束于6日",
+      "distractorReasons": [
+        "11月4日是出发日",
+        "11月11日是财务跟进日期",
+        "11月5日不是行程结束日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAVEL-04",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-TRAVEL",
+        "version": 1,
+        "stem": "When did Adrian's trip end?",
+        "options": [
+          "November 4",
+          "November 11",
+          "November 5",
+          "November 6"
+        ],
+        "answerIndex": 3,
+        "explanation": "行程记录写明出差从11月4日至11月6日。",
+        "evidence": "from November 4 to November 6"
+      },
+      "groupContentSha256": "426128b8163433b04e4fe30bbd94557730abe0c266827426531cb8784593c763"
+    },
+    {
+      "assetId": "R-P7-TRAVEL-05",
+      "correctBasis": "规则要求出租车逐项收据，刷卡对账单不能替代",
+      "distractorReasons": [
+        "政策允许出租车费用凭明细报销",
+        "没有声明48美元超过出租车上限",
+        "11月11日距离结束5天并未超过30天"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAVEL-05",
+        "sourceFile": "ToeicExtraReadingContent.ets",
+        "groupId": "P7-EX-TRAVEL",
+        "version": 1,
+        "stem": "Why is the card statement insufficient for the taxi claim?",
+        "options": [
+          "Taxi travel is excluded from company policy",
+          "The amount is above the taxi limit",
+          "The policy requires an itemized receipt",
+          "The claim was made more than 30 days late"
+        ],
+        "answerIndex": 2,
+        "explanation": "政策要求酒店和出租车均提供逐项收据，财务提醒刷卡对账单不能替代。",
+        "evidence": "Itemized receipts are required for hotel and taxi expenses || a card statement alone does not satisfy our documentation rule"
+      },
+      "groupContentSha256": "426128b8163433b04e4fe30bbd94557730abe0c266827426531cb8784593c763"
+    },
+    {
+      "assetId": "R-P7-ONBOARD-01",
+      "correctBasis": "Nora来信重点说明永久门禁卡未到并确认临时出入安排",
+      "distractorReasons": [
+        "邮件显示席位已确认不是取消",
+        "请求仍参加1月12日原安排",
+        "邮件没有索要课程表"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-ONBOARD-01",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-ONBOARD",
+        "version": 1,
+        "stem": "Why did Nora contact Human Resources?",
+        "options": [
+          "To cancel her registration",
+          "To explain her building-access situation",
+          "To request a different orientation date",
+          "To ask for a training schedule"
+        ],
+        "answerIndex": 1,
+        "explanation": "Nora 说明正式门禁卡要到周二才发放，并告知提前抵达及携带证件的计划。",
+        "evidence": "My permanent badge will not be ready until Tuesday, January 13."
+      },
+      "groupContentSha256": "daa99d58028af89fb1e37f1144f97cac66c85ecaf8d3af5730322786632ff5c6"
+    },
+    {
+      "assetId": "R-P7-ONBOARD-02",
+      "correctBasis": "尚无永久证者须8点45前向保安领取临时证",
+      "distractorReasons": [
+        "邮件已有课程报名确认",
+        "9点教室报到不是临时证办理",
+        "正式卡在1月13日才到无法当天领取"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-ONBOARD-02",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-ONBOARD",
+        "version": 1,
+        "stem": "What should Nora do before 8:45 A.M. on January 12?",
+        "options": [
+          "Obtain a day pass from Security",
+          "Register online for the session",
+          "Meet the trainer in Room B",
+          "Collect her permanent badge"
+        ],
+        "answerIndex": 0,
+        "explanation": "指南要求尚无正式门禁卡者在8:45前领取临时通行证，而邮件说明 Nora 的正式卡要到次日才有。",
+        "evidence": "Anyone without a permanent building badge should check in with Security for a day pass before 8:45 A.M. || My permanent badge will not be ready until Tuesday, January 13."
+      },
+      "groupContentSha256": "daa99d58028af89fb1e37f1144f97cac66c85ecaf8d3af5730322786632ff5c6"
+    },
+    {
+      "assetId": "R-P7-ONBOARD-03",
+      "correctBasis": "入职介绍明确1月12日在二楼Room B进行",
+      "distractorReasons": [
+        "安保室是申领日证地点",
+        "没有指定主礼堂",
+        "课程明确在楼内举行不是线上"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-ONBOARD-03",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-ONBOARD",
+        "version": 1,
+        "stem": "Where will the orientation take place?",
+        "options": [
+          "In the security office",
+          "In the main auditorium",
+          "In Room B on the second floor",
+          "In an online meeting room"
+        ],
+        "answerIndex": 2,
+        "explanation": "入职指南首句明确指出 Room B on the second floor。",
+        "evidence": "in Room B on the second floor"
+      },
+      "groupContentSha256": "daa99d58028af89fb1e37f1144f97cac66c85ecaf8d3af5730322786632ff5c6"
+    },
+    {
+      "assetId": "R-P7-ONBOARD-04",
+      "correctBasis": "申请日证需政府颁发的照片证件，护照满足",
+      "distractorReasons": [
+        "护照不用于确认职称",
+        "线上报名已经完成无需再凭护照",
+        "政策没有停车证办理要求"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-ONBOARD-04",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-ONBOARD",
+        "version": 1,
+        "stem": "Why should Nora bring her passport?",
+        "options": [
+          "To confirm her job title",
+          "To complete her registration",
+          "To receive a parking permit",
+          "To show the photo ID needed for a day pass"
+        ],
+        "answerIndex": 3,
+        "explanation": "指南要求办理临时通行证提供政府签发的带照片证件，邮件里 Nora 将携带护照。",
+        "evidence": "A government-issued photo ID is required to obtain the pass. || I plan to arrive at 8:20 A.M. on Monday and will bring my passport."
+      },
+      "groupContentSha256": "daa99d58028af89fb1e37f1144f97cac66c85ecaf8d3af5730322786632ff5c6"
+    },
+    {
+      "assetId": "R-P7-ONBOARD-05",
+      "correctBasis": "线上注册截止1月8日下午5点",
+      "distractorReasons": [
+        "1月7日是Nora邮件日期",
+        "1月12日8点45是临时通行证时限",
+        "1月13日是正式门禁卡预计时间"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-ONBOARD-05",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-ONBOARD",
+        "version": 1,
+        "stem": "By when must new employees complete online registration?",
+        "options": [
+          "January 7 at 9:00 A.M.",
+          "January 12 at 8:45 A.M.",
+          "January 8 at 5:00 P.M.",
+          "January 13 at 5:00 P.M."
+        ],
+        "answerIndex": 2,
+        "explanation": "指南明确规定报名截止在1月8日下午5点。",
+        "evidence": "complete online registration by 5:00 P.M. on January 8"
+      },
+      "groupContentSha256": "daa99d58028af89fb1e37f1144f97cac66c85ecaf8d3af5730322786632ff5c6"
+    },
+    {
+      "assetId": "R-P7-FILTER-01",
+      "correctBasis": "总订40个而10月3日只收38个，尚欠2个",
+      "distractorReasons": [
+        "未全部到货因为记录只有38个",
+        "缺口为两件不是一件",
+        "40减38为两件而不是四件"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-FILTER-01",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-FILTER",
+        "version": 1,
+        "stem": "How many filters had not arrived as of October 3?",
+        "options": [
+          "None",
+          "One",
+          "Two",
+          "Four"
+        ],
+        "answerIndex": 2,
+        "explanation": "订单共40件，而10月3日验收入库38件，尚欠2件。",
+        "evidence": "ordered 40 replacement air filters || 38 filters received and counted"
+      },
+      "groupContentSha256": "2f6f4c9185277dbb8ede45d47b727ba83997e4eb6764eb1efaf221704423a288"
+    },
+    {
+      "assetId": "R-P7-FILTER-02",
+      "correctBasis": "协议只收一次30美元运费，邮件承诺补发不另收费",
+      "distractorReasons": [
+        "12美元是单件滤芯售价",
+        "24美元是两件货值非新增运费",
+        "30美元为原订单一次运费不是补发费用"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-FILTER-02",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-FILTER",
+        "version": 1,
+        "stem": "How much extra will the second delivery cost in shipping fees?",
+        "options": [
+          "$12",
+          "$24",
+          "$30",
+          "$0"
+        ],
+        "answerIndex": 3,
+        "explanation": "合同约定整单只收一次30美元运费，供应商邮件也确认补发不另外收运费。",
+        "evidence": "A single $30 shipping charge applies to the full order, including split deliveries. || We will not add any shipping charge."
+      },
+      "groupContentSha256": "2f6f4c9185277dbb8ede45d47b727ba83997e4eb6764eb1efaf221704423a288"
+    },
+    {
+      "assetId": "R-P7-FILTER-03",
+      "correctBasis": "供应商计划10月9日寄出余下两件滤芯",
+      "distractorReasons": [
+        "10月3日是第一批收货日期",
+        "10月5日为供应商来信日期",
+        "10月10日是承诺到货日并非发货日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-FILTER-03",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-FILTER",
+        "version": 1,
+        "stem": "When is the supplier planning to send the remaining filters?",
+        "options": [
+          "October 9",
+          "October 3",
+          "October 5",
+          "October 10"
+        ],
+        "answerIndex": 0,
+        "explanation": "供应商邮件直接说明剩余两件计划10月9日发出。",
+        "evidence": "The remaining two filters are scheduled to ship on October 9 by guaranteed next-day delivery"
+      },
+      "groupContentSha256": "2f6f4c9185277dbb8ede45d47b727ba83997e4eb6764eb1efaf221704423a288"
+    },
+    {
+      "assetId": "R-P7-FILTER-04",
+      "correctBasis": "补货保证10月10日到，未超合同需贷项通知的期限",
+      "distractorReasons": [
+        "单价仍为每件12美元没有调低",
+        "原单30美元运费并未被取消",
+        "10月3日只收到38个而不是40个"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-FILTER-04",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-FILTER",
+        "version": 1,
+        "stem": "Why does the supplier expect the original invoice to remain valid?",
+        "options": [
+          "The unit price was reduced",
+          "The remaining units are guaranteed to arrive by the deadline",
+          "The shipping fee was removed from the first invoice",
+          "The warehouse already received all 40 filters"
+        ],
+        "answerIndex": 1,
+        "explanation": "合同规定10月10日后仍未到货的商品可获得贷项通知；供应商承诺10月9日发货、10月10日送达，因此预计无需修改原账单。",
+        "evidence": "Items that remain undelivered after October 10 qualify for a credit note || The remaining two filters are scheduled to ship on October 9 by guaranteed next-day delivery, arriving on October 10."
+      },
+      "groupContentSha256": "2f6f4c9185277dbb8ede45d47b727ba83997e4eb6764eb1efaf221704423a288"
+    },
+    {
+      "assetId": "R-P7-FILTER-05",
+      "correctBasis": "40件每件12美元合计480，加一次运费30，总计510",
+      "distractorReasons": [
+        "480只含商品货值不含运费",
+        "500与40乘12加30的结果不同",
+        "530多算了不存在的附加收费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-FILTER-05",
+        "sourceFile": "ToeicExtraReadingBatchTwo.ets",
+        "groupId": "P7-EX-FILTER",
+        "version": 1,
+        "stem": "What is the total amount on the original invoice, including shipping?",
+        "options": [
+          "$480",
+          "$500",
+          "$510",
+          "$530"
+        ],
+        "answerIndex": 2,
+        "explanation": "40件每件12美元共480美元，再加一次30美元运费，总额510美元；验收数量不改变原发票数量。",
+        "evidence": "ordered 40 replacement air filters at $12 each. A single $30 shipping charge applies || The accompanying invoice lists all 40 filters at the agreed unit price, plus the single shipping fee."
+      },
+      "groupContentSha256": "2f6f4c9185277dbb8ede45d47b727ba83997e4eb6764eb1efaf221704423a288"
+    },
+    {
+      "assetId": "R-P7-SUPPORT-01",
+      "correctBasis": "意外断网持续115分钟超过90分钟触发抵扣",
+      "distractorReasons": [
+        "本次为突发设备故障非计划维护",
+        "不足两小时并非协议抵扣判定条件",
+        "记录只有一个优先工单没有两张"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-SUPPORT-01",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-SUPPORT",
+        "version": 1,
+        "stem": "Why does incident NT-118 qualify for a service credit?",
+        "options": [
+          "It was an unplanned service interruption lasting more than 90 minutes",
+          "It occurred during a scheduled maintenance window",
+          "It lasted fewer than two hours",
+          "It generated two separate service tickets"
+        ],
+        "answerIndex": 0,
+        "explanation": "服务协议规定意外中断超过连续90分钟可获抵扣，而事件记录为意外停机115分钟。",
+        "evidence": "An unplanned service interruption lasting longer than 90 consecutive minutes qualifies || (115 consecutive minutes)"
+      },
+      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+    },
+    {
+      "assetId": "R-P7-SUPPORT-02",
+      "correctBasis": "月费400美元的10%即40美元抵扣",
+      "distractorReasons": [
+        "10是百分比数值而非美元金额",
+        "90是最短中断分钟门槛",
+        "115是故障持续分钟不是美元"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-SUPPORT-02",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-SUPPORT",
+        "version": 1,
+        "stem": "How much credit should appear on the June invoice for NT-118?",
+        "options": [
+          "$10",
+          "$40",
+          "$90",
+          "$115"
+        ],
+        "answerIndex": 1,
+        "explanation": "协议按月费的10%抵扣，月费400美元，因此抵扣40美元。",
+        "evidence": "a one-time credit of 10 percent of the monthly fee || The June invoice is scheduled to show the normal $400 monthly fee before adjustments."
+      },
+      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+    },
+    {
+      "assetId": "R-P7-SUPPORT-03",
+      "correctBasis": "事件记录明确首次工程师响应时间10点50分",
+      "distractorReasons": [
+        "10点10分是中断开始时间",
+        "12点05分是恢复服务时间",
+        "下午6点是服务时段终点"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-SUPPORT-03",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-SUPPORT",
+        "version": 1,
+        "stem": "When did the engineer first respond to NT-118?",
+        "options": [
+          "10:10 A.M.",
+          "12:05 P.M.",
+          "10:50 A.M.",
+          "6:00 P.M."
+        ],
+        "answerIndex": 2,
+        "explanation": "事件日志的 Initial engineer response 明确为上午10:50。",
+        "evidence": "Initial engineer response: 10:50 A.M."
+      },
+      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+    },
+    {
+      "assetId": "R-P7-SUPPORT-04",
+      "correctBasis": "5月15日计划维护早在5月11日通知，满足48小时提前通知",
+      "distractorReasons": [
+        "周二上午属于另一个突发事故",
+        "没有证据说明两次使用同一设备",
+        "计划维护为1小时而非115分钟"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-SUPPORT-04",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-SUPPORT",
+        "version": 1,
+        "stem": "Why would the May 15 maintenance window not qualify for an outage credit?",
+        "options": [
+          "It happened on a Tuesday morning",
+          "It involved the same network device",
+          "It lasted exactly 115 minutes",
+          "It was announced at least 48 hours beforehand"
+        ],
+        "answerIndex": 3,
+        "explanation": "协议排除提前48小时宣布的计划维护，邮件指出5月11日已告知5月15日的维护。",
+        "evidence": "Scheduled maintenance announced at least 48 hours in advance does not qualify for a credit. || our planned maintenance window on May 15, 10–11 P.M., was announced to customers on May 11"
+      },
+      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+    },
+    {
+      "assetId": "R-P7-SUPPORT-05",
+      "correctBasis": "10点10分中断至10点50分首次响应相差40分钟，小于2小时",
+      "distractorReasons": [
+        "40分钟并没有超过两小时",
+        "当天属于正常工作时段且题目不考工单创建时刻",
+        "服务12点05分才恢复不是中午之前"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-SUPPORT-05",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-SUPPORT",
+        "version": 2,
+        "stem": "Was the first engineer response within two hours after the service interruption began?",
+        "options": [
+          "No, it took longer than two hours",
+          "No, the ticket began outside service hours",
+          "Yes, it took forty minutes",
+          "Yes, because the problem was resolved before noon"
+        ],
+        "answerIndex": 2,
+        "explanation": "中断记录开始于10:10，工程师首次响应于10:50，相差40分钟，确实在中断发生后两小时内。原文未明确工单创建时刻，因此不据此宣称SLA合规。",
+        "evidence": "priority support tickets receive an initial response within two hours || Service unavailable: 10:10 A.M.–12:05 P.M. || Initial engineer response: 10:50 A.M."
+      },
+      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+    },
+    {
+      "assetId": "R-P7-RETAIL-01",
+      "correctBasis": "4月5日服装税前小计112美元，高于促销100美元门槛",
+      "distractorReasons": [
+        "礼品卡不计入但服装金额仍达标",
+        "下单4月5日早于4月7日结束",
+        "礼品卡被规则明文排除"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-RETAIL-01",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-RETAIL",
+        "version": 1,
+        "stem": "Does the clothing subtotal of order S-822 meet the promotion's minimum-purchase requirement?",
+        "options": [
+          "No, gift cards are excluded from the offer",
+          "Yes, the clothing subtotal exceeds $100",
+          "No, the order was placed after April 7",
+          "Yes, all gift cards qualify as clothing"
+        ],
+        "answerIndex": 1,
+        "explanation": "订单中的服装小计为112美元，超过活动要求的税前100美元门槛；礼品卡不参与计算。",
+        "evidence": "clothing purchases with a merchandise subtotal of at least $100 before tax qualify || The clothing subtotal is $112 before tax."
+      },
+      "groupContentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931"
+    },
+    {
+      "assetId": "R-P7-RETAIL-02",
+      "correctBasis": "促销条款指明加急运费额外18美元",
+      "distractorReasons": [
+        "30美元是数字礼品卡金额",
+        "12美元是服装总额与100的差数",
+        "100美元是满额门槛非运费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-RETAIL-02",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-RETAIL",
+        "version": 1,
+        "stem": "How much does express shipping add to the order?",
+        "options": [
+          "$30",
+          "$12",
+          "$100",
+          "$18"
+        ],
+        "answerIndex": 3,
+        "explanation": "活动规定选择快递配送额外支付18美元。",
+        "evidence": "Customers who choose express shipping pay an additional $18."
+      },
+      "groupContentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931"
+    },
+    {
+      "assetId": "R-P7-RETAIL-03",
+      "correctBasis": "服装税前小计112美元是合资格金额",
+      "distractorReasons": [
+        "142包括应排除的30美元礼品卡",
+        "64仅是其中一件衬衫价格",
+        "30美元礼品卡不能算服装消费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-RETAIL-03",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-RETAIL",
+        "version": 1,
+        "stem": "What amount from order S-822 counts toward the promotion's clothing minimum?",
+        "options": [
+          "$112",
+          "$142",
+          "$64",
+          "$30"
+        ],
+        "answerIndex": 0,
+        "explanation": "订单明确服装小计112美元，礼品卡30美元不计入；无需将所有商品相加。",
+        "evidence": "Gift cards do not count toward the minimum. || The clothing subtotal is $112 before tax."
+      },
+      "groupContentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931"
+    },
+    {
+      "assetId": "R-P7-RETAIL-04",
+      "correctBasis": "非定制夹克可在30天内凭原始收据退货",
+      "distractorReasons": [
+        "退货无需在4月二次购买",
+        "规则未要求制造商手写证明",
+        "更换礼品卡与服装退款无关"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-RETAIL-04",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-RETAIL",
+        "version": 1,
+        "stem": "What would Helen need in order to return the jacket under the stated policy?",
+        "options": [
+          "A second purchase during April",
+          "A handwritten note from the manufacturer",
+          "The original receipt and a return within 30 days",
+          "A replacement gift card"
+        ],
+        "answerIndex": 2,
+        "explanation": "政策要求30天内持原始收据且非定制商品，确认单显示夹克不是定制且已保存电子收据。",
+        "evidence": "Clothing purchased online may be returned within 30 days with the original receipt, except for personalized items. || Neither clothing item was personalized. Helen has kept the original electronic receipt."
+      },
+      "groupContentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931"
+    },
+    {
+      "assetId": "R-P7-RETAIL-05",
+      "correctBasis": "政策明确礼品卡不计入促销最低购买额",
+      "distractorReasons": [
+        "棉衬衫属于可计入的服装",
+        "春季夹克属于可计入的服装",
+        "规则并非排除所有服装"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-RETAIL-05",
+        "sourceFile": "ToeicExtraReadingBatchThree.ets",
+        "groupId": "P7-EX-RETAIL",
+        "version": 1,
+        "stem": "Which item is specifically excluded from the minimum-purchase calculation?",
+        "options": [
+          "Cotton shirt",
+          "Digital gift card",
+          "Spring jacket",
+          "All apparel"
+        ],
+        "answerIndex": 1,
+        "explanation": "活动规则明确 Gift cards do not count toward the minimum。",
+        "evidence": "Gift cards do not count toward the minimum."
+      },
+      "groupContentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931"
+    },
+    {
+      "assetId": "R-P7-LEASE-01",
+      "correctBasis": "Iris希望9月继续使用Suite C并询问延租手续",
+      "distractorReasons": [
+        "押金继续沿用而非要求退还",
+        "月租仍为900美元不是投诉涨价",
+        "未反映家具有任何损坏"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LEASE-01",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-LEASE",
+        "version": 1,
+        "stem": "Why did Iris contact the property office?",
+        "options": [
+          "To ask for a deposit refund",
+          "To request more time in Suite C",
+          "To complain about the rental price",
+          "To report furniture damage"
+        ],
+        "answerIndex": 1,
+        "explanation": "邮件说明客户展示调整至9月，租户希望续租Suite C并询问手续。",
+        "evidence": "We would like to keep Suite C for September"
+      },
+      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+    },
+    {
+      "assetId": "R-P7-LEASE-02",
+      "correctBasis": "物业回复9月月租仍为900美元",
+      "distractorReasons": [
+        "300美元是可退押金",
+        "600美元在租约和回复中都未出现",
+        "1200是租金加押金并非月租"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LEASE-02",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-LEASE",
+        "version": 1,
+        "stem": "What monthly rent should Meridian Consulting expect for September?",
+        "options": [
+          "$300",
+          "$600",
+          "$900",
+          "$1,200"
+        ],
+        "answerIndex": 2,
+        "explanation": "原租约月租900美元，物业回复明确9月继续按900美元收费。",
+        "evidence": "leases Suite C for $900 per month || September rent will remain $900"
+      },
+      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+    },
+    {
+      "assetId": "R-P7-LEASE-03",
+      "correctBasis": "工作日家具送货最早9点，物业明确否决8点",
+      "distractorReasons": [
+        "8点早于允许窗口",
+        "下午5点是窗口结束而非最早",
+        "早上7点同样早于9点限制"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LEASE-03",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-LEASE",
+        "version": 1,
+        "stem": "What is the earliest time the movers can enter on the proposed Thursday?",
+        "options": [
+          "9 A.M.",
+          "8 A.M.",
+          "5 P.M.",
+          "7 A.M."
+        ],
+        "answerIndex": 0,
+        "explanation": "租约允许工作日9点起收货，物业明确否定8点并要求不早于9点。",
+        "evidence": "Furniture deliveries are permitted Monday through Friday between 9 A.M. and 5 P.M. || please schedule furniture delivery no earlier than 9 A.M."
+      },
+      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+    },
+    {
+      "assetId": "R-P7-LEASE-04",
+      "correctBasis": "续租协议须在8月15日或之前签署",
+      "distractorReasons": [
+        "8月3日是租户发邮件时间",
+        "8月4日是物业回复时间",
+        "9月18日是客户演示日期"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LEASE-04",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-LEASE",
+        "version": 1,
+        "stem": "By when must the extension agreement be signed?",
+        "options": [
+          "August 3",
+          "August 4",
+          "September 18",
+          "August 15"
+        ],
+        "answerIndex": 3,
+        "explanation": "物业回复写明8月15日前签署续租协议。",
+        "evidence": "if the agreement is signed by August 15"
+      },
+      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+    },
+    {
+      "assetId": "R-P7-LEASE-05",
+      "correctBasis": "相同租户续用房间时押金结转，因此不再收第二笔",
+      "distractorReasons": [
+        "押金没有遭没收",
+        "9月月租仍需支付没有免租",
+        "新增家具送货并未取消"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LEASE-05",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-LEASE",
+        "version": 1,
+        "stem": "Why will the property office not request a second deposit?",
+        "options": [
+          "The initial deposit was forfeited",
+          "The same tenant will continue using the suite",
+          "The September rent was waived",
+          "The furniture delivery was canceled"
+        ],
+        "answerIndex": 1,
+        "explanation": "租约规定同一租户续租则原押金结转，而邮件说明 Meridian 继续使用相同办公室。",
+        "evidence": "the existing deposit carries forward if the same tenant remains in the suite || We would like to keep Suite C for September"
+      },
+      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+    },
+    {
+      "assetId": "R-P7-TRAINING-01",
+      "correctBasis": "可报销只有合资格学费260美元，未超300上限",
+      "distractorReasons": [
+        "300是封顶金额不是实际学费",
+        "327包括不报销的教材和交通",
+        "305含了不合资格的45美元教材"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAINING-01",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-TRAINING",
+        "version": 1,
+        "stem": "How much may Daniel claim under the stated reimbursement policy?",
+        "options": [
+          "$260",
+          "$300",
+          "$327",
+          "$305"
+        ],
+        "answerIndex": 0,
+        "explanation": "政策仅报销符合条件的课程学费且最高300美元，Daniel 的学费为260美元。",
+        "evidence": "reimburses up to $300 for approved professional-course tuition || an itemized tuition receipt for $260"
+      },
+      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+    },
+    {
+      "assetId": "R-P7-TRAINING-02",
+      "correctBasis": "期末考核88分超过政策最低75分",
+      "distractorReasons": [
+        "原文并未要求最低90分",
+        "邮件称课程已获批准",
+        "成绩要求适用于课程而非教材"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAINING-02",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-TRAINING",
+        "version": 1,
+        "stem": "Does Daniel meet the assessment-score requirement?",
+        "options": [
+          "No, because he scored under 90 percent",
+          "No, because the course was not approved",
+          "Yes, because 88 percent exceeds the required 75 percent",
+          "Yes, because the score requirement applies only to textbooks"
+        ],
+        "answerIndex": 2,
+        "explanation": "政策规定最低75%，邮件中 Daniel 的考核成绩是88%。",
+        "evidence": "earns at least 75 percent on the final assessment || scored 88 percent on the final assessment"
+      },
+      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+    },
+    {
+      "assetId": "R-P7-TRAINING-03",
+      "correctBasis": "邮件明确附结业成绩和260美元逐项学费收据",
+      "distractorReasons": [
+        "交通和教材款未说明附相应票据",
+        "没有提供课程宣传册和出差单",
+        "没有提供报名表或经理许可信"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAINING-03",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-TRAINING",
+        "version": 1,
+        "stem": "Which supporting materials did Daniel attach?",
+        "options": [
+          "A transit ticket and a textbook receipt",
+          "The course brochure and a travel invoice",
+          "A registration form and a manager's letter",
+          "A completion result and an itemized tuition receipt"
+        ],
+        "answerIndex": 3,
+        "explanation": "邮件明确附上结业成绩和逐项学费收据。",
+        "evidence": "Attached are the completion result and an itemized tuition receipt for $260."
+      },
+      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+    },
+    {
+      "assetId": "R-P7-TRAINING-04",
+      "correctBasis": "课程5月23日结束，6月2日为随后第10个自然日，仍在允许期内",
+      "distractorReasons": [
+        "规则期限10日而不是7日",
+        "并非仅完课当天可以提交",
+        "课程学费260美元不是免费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAINING-04",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-TRAINING",
+        "version": 1,
+        "stem": "Is Daniel submitting the request within the allowed period?",
+        "options": [
+          "No, the limit is seven days",
+          "Yes, June 2 is ten calendar days after May 23",
+          "No, only same-day applications are accepted",
+          "Yes, but only because the course was free"
+        ],
+        "answerIndex": 1,
+        "explanation": "课程结束时间是5月23日，政策期限为结束后10个自然日，6月2日处于截止日。",
+        "evidence": "within 10 calendar days after course completion || I completed the approved project-management course on May 23 || EMPLOYEE CLAIM MESSAGE, JUNE 2"
+      },
+      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+    },
+    {
+      "assetId": "R-P7-TRAINING-05",
+      "correctBasis": "报销条款明确排除教材，45美元书费不可申领",
+      "distractorReasons": [
+        "排除与教材售价高低无关",
+        "未说因为缺小票而排除教材",
+        "政策最低考试成绩75而非90"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-TRAINING-05",
+        "sourceFile": "ToeicExtraReadingBatchFour.ets",
+        "groupId": "P7-EX-TRAINING",
+        "version": 1,
+        "stem": "Why should Daniel exclude the textbook from his claim?",
+        "options": [
+          "It cost less than the tuition fee",
+          "The retailer did not issue a receipt",
+          "The policy specifically excludes textbooks",
+          "Textbooks require a score of 90 percent"
+        ],
+        "answerIndex": 2,
+        "explanation": "政策明确不报销教材费用，而邮件显示购买了45美元教材。",
+        "evidence": "Transportation and textbooks are not eligible expenses. || I also purchased a $45 textbook"
+      },
+      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+    },
+    {
+      "assetId": "R-P7-MIGRATION-01",
+      "correctBasis": "10月18日早上要用报告，通知要求最迟10月16日先导出",
+      "distractorReasons": [
+        "共享凭证被帮助台明文禁止",
+        "没有更换笔记本要求",
+        "原演示日期不能据此改到17日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-MIGRATION-01",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-MIGRATION",
+        "version": 1,
+        "stem": "What should Melissa do before the system migration?",
+        "options": [
+          "Share her account password with a colleague",
+          "Export the September report by October 16",
+          "Request a new company laptop",
+          "Move her presentation to October 17"
+        ],
+        "answerIndex": 1,
+        "explanation": "通知明确要求10月18日上午使用的报告最迟10月16日导出；Melissa 在10月18日8点展示9月客户报告。",
+        "evidence": "Staff should export any reports needed for the morning of October 18 no later than October 16. || I have to present the September client report at 8 A.M. on October 18."
+      },
+      "groupContentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158"
+    },
+    {
+      "assetId": "R-P7-MIGRATION-02",
+      "correctBasis": "迁移后须在内网以个人账户重新登录",
+      "distractorReasons": [
+        "帮助台禁止借用同事账号",
+        "迁移于17日晚结束无需等待下一周",
+        "没有联系外部供应商激活的要求"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-MIGRATION-02",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-MIGRATION",
+        "version": 1,
+        "stem": "How should Melissa access the updated portal on October 18?",
+        "options": [
+          "Reuse a colleague's credentials",
+          "Wait until the next weekly update",
+          "Open the intranet and sign in with her own account",
+          "Contact an external vendor to activate access"
+        ],
+        "answerIndex": 2,
+        "explanation": "系统通知要求迁移后重新登录，帮助台指引使用内网入口与个人账号。",
+        "evidence": "After the migration, users must sign in again using their individual company accounts. || To access the updated client-records portal, open the company intranet and select Client Records."
+      },
+      "groupContentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158"
+    },
+    {
+      "assetId": "R-P7-MIGRATION-03",
+      "correctBasis": "迁移计划10月17日晚9至11点，结束时刻是11点",
+      "distractorReasons": [
+        "9点是维护开始时刻",
+        "7点是第二天帮助台开工时间",
+        "8点是演示安排时间"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-MIGRATION-03",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-MIGRATION",
+        "version": 1,
+        "stem": "When is the scheduled migration window due to end?",
+        "options": [
+          "At 11 P.M. on October 17",
+          "At 9 P.M. on October 17",
+          "At 7 A.M. on October 18",
+          "At 8 A.M. on October 18"
+        ],
+        "answerIndex": 0,
+        "explanation": "通知给出的计划维护时段为10月17日21:00至23:00，因此计划在23:00结束。",
+        "evidence": "on October 17 from 9 P.M. to 11 P.M."
+      },
+      "groupContentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158"
+    },
+    {
+      "assetId": "R-P7-MIGRATION-04",
+      "correctBasis": "旧密码被拒绝时应使用密码重置链接",
+      "distractorReasons": [
+        "通知承诺数据不变无重建数据库要求",
+        "帮助台严禁使用他人账号",
+        "旧站点下载并非重置登录步骤"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-MIGRATION-04",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-MIGRATION",
+        "version": 1,
+        "stem": "What should Melissa do if her original password is rejected?",
+        "options": [
+          "Wait for the database to be rebuilt",
+          "Use another employee's account",
+          "Export the report from the old portal",
+          "Use the password-reset link"
+        ],
+        "answerIndex": 3,
+        "explanation": "帮助台明确指示如果旧密码不可用应使用重置链接；迁移通知明确使用个人账号。",
+        "evidence": "users must sign in again using their individual company accounts. || If your existing password is rejected, use the password-reset link."
+      },
+      "groupContentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158"
+    },
+    {
+      "assetId": "R-P7-MIGRATION-05",
+      "correctBasis": "内部帮助台7点开始服务，计划7点30登录时已开放",
+      "distractorReasons": [
+        "帮助台开始时间不是8点",
+        "7点是服务开始而非结束",
+        "帮助台联系方式未限定为电子邮件"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-MIGRATION-05",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-MIGRATION",
+        "version": 1,
+        "stem": "Will internal help desk support be available when Melissa plans to log in?",
+        "options": [
+          "No, it starts at 8 A.M.",
+          "Yes, it begins before 7:30 A.M.",
+          "No, it ends at 7 A.M.",
+          "Yes, but only by email"
+        ],
+        "answerIndex": 1,
+        "explanation": "帮助台从上午7点开始服务，Melissa计划7:30登录，时间落在服务开始之后。",
+        "evidence": "support begins at 7 A.M. || I also need to log in from my laptop at 7:30 A.M. that day."
+      },
+      "groupContentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158"
+    },
+    {
+      "assetId": "R-P7-LICENSE-01",
+      "correctBasis": "初始订单恰好10个账号满足至少10个的15%优惠门槛",
+      "distractorReasons": [
+        "11月开通申请与人数优惠无关",
+        "额外2人可能1月加购不计首单",
+        "新户设置费不决定人数折扣"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LICENSE-01",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-LICENSE",
+        "version": 1,
+        "stem": "Why is the requested order eligible for the volume discount?",
+        "options": [
+          "It contains exactly ten active-user licenses",
+          "The account is being opened in November",
+          "The team plans to add two licenses later",
+          "A new setup charge applies to it"
+        ],
+        "answerIndex": 0,
+        "explanation": "价格规则规定10个及以上用户许可证享有15%折扣，采购单初始申请恰好10个。",
+        "evidence": "Orders for 10 or more licenses receive a 15 percent discount on license fees only. || We would like to open a new team account with 10 active-user licenses"
+      },
+      "groupContentSha256": "3d2c8bf23e75762f08073f2ed21137e4c952438c9ce379b75da428e01f5d66db"
+    },
+    {
+      "assetId": "R-P7-LICENSE-02",
+      "correctBasis": "10份每份50美元共500美元，打85折为425美元",
+      "distractorReasons": [
+        "500美元为折扣前月费",
+        "440美元与15%折扣计算不符",
+        "485美元包括60元设置费不是月许可费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LICENSE-02",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-LICENSE",
+        "version": 1,
+        "stem": "What is the discounted monthly license charge for the initial order?",
+        "options": [
+          "$500",
+          "$440",
+          "$425",
+          "$485"
+        ],
+        "answerIndex": 2,
+        "explanation": "10个许可证每个50美元共500美元，许可证费用享受15%即75美元折扣，因此月费425美元（不含设置费）。",
+        "evidence": "A monthly team license costs $50 per active user. Orders for 10 or more licenses receive a 15 percent discount on license fees only. || 10 active-user licenses beginning December 1."
+      },
+      "groupContentSha256": "3d2c8bf23e75762f08073f2ed21137e4c952438c9ce379b75da428e01f5d66db"
+    },
+    {
+      "assetId": "R-P7-LICENSE-03",
+      "correctBasis": "初月折扣许可费425加不打折设置费60，税前总计485美元",
+      "distractorReasons": [
+        "560美元错误地用未折扣费用加设置费",
+        "425美元漏计一次性设置费",
+        "500美元既未正确计折扣也未加设置费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LICENSE-03",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-LICENSE",
+        "version": 1,
+        "stem": "How much should the first invoice total before taxes?",
+        "options": [
+          "$560",
+          "$485",
+          "$425",
+          "$500"
+        ],
+        "answerIndex": 1,
+        "explanation": "首月许可证425美元再加一次性设置费60美元，合计485美元。采购与财务均确认初始数量为10。",
+        "evidence": "New customer accounts have a one-time setup charge of $60. || 10 active-user licenses beginning December 1. || The first invoice will reflect the volume discount and the one-time setup charge."
+      },
+      "groupContentSha256": "3d2c8bf23e75762f08073f2ed21137e4c952438c9ce379b75da428e01f5d66db"
+    },
+    {
+      "assetId": "R-P7-LICENSE-04",
+      "correctBasis": "采购与财务明确账号12月1日起生效",
+      "distractorReasons": [
+        "11月3日是采购申请时间",
+        "11月4日是财务邮件时间",
+        "1月可能增加人数但不是账号初始生效日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LICENSE-04",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-LICENSE",
+        "version": 1,
+        "stem": "When is the new team account expected to become active?",
+        "options": [
+          "November 3",
+          "November 4",
+          "January 1",
+          "December 1"
+        ],
+        "answerIndex": 3,
+        "explanation": "财务邮件明确可以12月1日激活新账号。",
+        "evidence": "can activate the account on December 1."
+      },
+      "groupContentSha256": "3d2c8bf23e75762f08073f2ed21137e4c952438c9ce379b75da428e01f5d66db"
+    },
+    {
+      "assetId": "R-P7-LICENSE-05",
+      "correctBasis": "经理明示可能1月再加2人且不要列首单",
+      "distractorReasons": [
+        "平台规则并未限制最多10个用户",
+        "无需等年度订阅期结束才能加购",
+        "原文没有其他部门代付的事实"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-LICENSE-05",
+        "sourceFile": "ToeicExtraReadingBatchFive.ets",
+        "groupId": "P7-EX-LICENSE",
+        "version": 1,
+        "stem": "Why should the two possible extra users be excluded from the first invoice?",
+        "options": [
+          "The manager said not to include them in the initial order",
+          "The software cannot support more than ten users",
+          "The team must wait for the yearly subscription to end",
+          "They have already been paid for by another department"
+        ],
+        "answerIndex": 0,
+        "explanation": "采购明确额外两人可能在1月需要，但不加入初始订单；定价规则说增加许可证在后续账单计费。",
+        "evidence": "Teams may add licenses during the month, but any increase will be billed on the next invoice. || We may need two additional users in January, but please do not add them to the first order."
+      },
+      "groupContentSha256": "3d2c8bf23e75762f08073f2ed21137e4c952438c9ce379b75da428e01f5d66db"
+    },
+    {
+      "assetId": "R-P7-PERDIEM-01",
+      "correctBasis": "两晚132美元低于每晚140上限，附明细票据可报264美元",
+      "distractorReasons": [
+        "280是两晚上限而非实际支出",
+        "132仅为一晚实际费用",
+        "140是每晚上限不是总报销"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-PERDIEM-01",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-PERDIEM",
+        "version": 1,
+        "stem": "How much of Jordan's hotel expense is eligible for reimbursement?",
+        "options": [
+          "$280",
+          "$264",
+          "$132",
+          "$140"
+        ],
+        "answerIndex": 1,
+        "explanation": "住宿上限每晚140美元；收据显示两晚每晚132美元，总额264美元均在限额内。",
+        "evidence": "Hotel accommodation is reimbursed up to $140 per room-night if an itemized receipt is supplied. || Standard room: two nights at $132 per night"
+      },
+      "groupContentSha256": "96dc7753845b8198fb10ab2873e21a7ed2a7e90626d4b7d35a15d0eb4ddbc61b"
+    },
+    {
+      "assetId": "R-P7-PERDIEM-02",
+      "correctBasis": "9月14日至16日含出发返程3天，各45共135美元",
+      "distractorReasons": [
+        "90只计算两天遗漏一天",
+        "45只计算一天",
+        "180计算了不存在的第四天"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-PERDIEM-02",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-PERDIEM",
+        "version": 1,
+        "stem": "How much meal per diem can Jordan claim for the trip?",
+        "options": [
+          "$135",
+          "$90",
+          "$45",
+          "$180"
+        ],
+        "answerIndex": 0,
+        "explanation": "规则包括出发和返程日，9月14日至16日共3个日历日，3乘以45美元为135美元。",
+        "evidence": "a meal per diem of $45 for each calendar day of travel, including the departure and return dates. || I traveled on an approved business trip from September 14 to September 16"
+      },
+      "groupContentSha256": "96dc7753845b8198fb10ab2873e21a7ed2a7e90626d4b7d35a15d0eb4ddbc61b"
+    },
+    {
+      "assetId": "R-P7-PERDIEM-03",
+      "correctBasis": "个人空闲时的18美元博物馆门票属于不报销的娱乐",
+      "distractorReasons": [
+        "机场接驳费持收据可报销",
+        "酒店住宿有明细且未超过上限",
+        "餐补由出差天数决定可申领"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-PERDIEM-03",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-PERDIEM",
+        "version": 1,
+        "stem": "Which expense must Jordan leave out of the claim?",
+        "options": [
+          "The airport shuttle fare",
+          "The hotel accommodation",
+          "The meal per diem",
+          "The museum admission"
+        ],
+        "answerIndex": 3,
+        "explanation": "政策不报销个人娱乐；邮件说明18美元博物馆门票是个人闲暇开支。",
+        "evidence": "personal entertainment is not covered. || I also paid $18 to visit a museum in my free time."
+      },
+      "groupContentSha256": "96dc7753845b8198fb10ab2873e21a7ed2a7e90626d4b7d35a15d0eb4ddbc61b"
+    },
+    {
+      "assetId": "R-P7-PERDIEM-04",
+      "correctBasis": "9月16日返程，随后7个自然日截止9月23日",
+      "distractorReasons": [
+        "20日只是发送报销询问邮件的日期",
+        "16日是返程日不是7日之后",
+        "30日超过了七天截止"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-PERDIEM-04",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-PERDIEM",
+        "version": 1,
+        "stem": "What is the deadline for Jordan's travel claim?",
+        "options": [
+          "September 20",
+          "September 16",
+          "September 23",
+          "September 30"
+        ],
+        "answerIndex": 2,
+        "explanation": "规则规定返程后七个自然日内提交，Jordan 于9月16日返回，因此9月23日为截止日。",
+        "evidence": "within seven calendar days after returning. || returned home on September 16."
+      },
+      "groupContentSha256": "96dc7753845b8198fb10ab2873e21a7ed2a7e90626d4b7d35a15d0eb4ddbc61b"
+    },
+    {
+      "assetId": "R-P7-PERDIEM-05",
+      "correctBasis": "住宿264加餐补135加机场接驳26共425美元",
+      "distractorReasons": [
+        "443美元错误计入18美元娱乐费",
+        "399美元漏计26美元机场接驳",
+        "407美元不是三项可报金额之和"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-PERDIEM-05",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-PERDIEM",
+        "version": 1,
+        "stem": "What is Jordan's total eligible reimbursement, including meals?",
+        "options": [
+          "$443",
+          "$425",
+          "$399",
+          "$407"
+        ],
+        "answerIndex": 1,
+        "explanation": "两晚住宿264美元、三天餐补135美元和机场班车26美元可报销，合计425美元；博物馆18美元不计入。",
+        "evidence": "a meal per diem of $45 for each calendar day of travel, including the departure and return dates. || Total lodging paid: $264 || I traveled on an approved business trip from September 14 to September 16 and returned home on September 16. Along with the attached hotel receipt, I have a $26 airport shuttle receipt."
+      },
+      "groupContentSha256": "96dc7753845b8198fb10ab2873e21a7ed2a7e90626d4b7d35a15d0eb4ddbc61b"
+    },
+    {
+      "assetId": "R-P7-CATERING-01",
+      "correctBasis": "Hall A容量160大于135，Hall B只有80，因此仅Hall A可容纳",
+      "distractorReasons": [
+        "Hall B的80位不足容纳135人",
+        "Hall A160位足够故非都不行",
+        "Hall B不足故不是两个大厅都可以"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-CATERING-01",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-CATERING",
+        "version": 1,
+        "stem": "Which room can hold all 135 expected attendees?",
+        "options": [
+          "Hall B only",
+          "Neither Hall A nor Hall B",
+          "Hall A only",
+          "Both rooms"
+        ],
+        "answerIndex": 2,
+        "explanation": "会务条款显示 Hall A 容量160、Hall B 容量80；报名人数增至135，因此仅 Hall A 合适。",
+        "evidence": "Hall A accommodates up to 160 attendees; Hall B accommodates up to 80. || Our registration count has increased to 135."
+      },
+      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+    },
+    {
+      "assetId": "R-P7-CATERING-02",
+      "correctBasis": "新餐饮135乘4加135乘8等于1620，减旧账1360新增260美元",
+      "distractorReasons": [
+        "140只是多35份咖啡的费用",
+        "360美元不是两种餐品差额之和",
+        "240美元漏算一部分新增数量"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-CATERING-02",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-CATERING",
+        "version": 1,
+        "stem": "How much more will the revised catering order cost?",
+        "options": [
+          "$260",
+          "$140",
+          "$360",
+          "$240"
+        ],
+        "answerIndex": 0,
+        "explanation": "新订单135杯咖啡乘4美元加135份午餐乘8美元等于1620美元，原订1360美元，新增260美元。",
+        "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || Original catering cost: $1,360. || update catering to 135 coffee servings and 135 boxed lunches."
+      },
+      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+    },
+    {
+      "assetId": "R-P7-CATERING-03",
+      "correctBasis": "Hall A维修至中午，下午1点起可办活动，2点开场不受影响",
+      "distractorReasons": [
+        "Hall A并非全天不可用",
+        "维修中午已结束而非下午3点",
+        "无需转移到容量不足的Hall B"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-CATERING-03",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-CATERING",
+        "version": 1,
+        "stem": "Will the scheduled maintenance prevent the event from starting at the reserved time?",
+        "options": [
+          "Yes, Hall A will be unavailable all day",
+          "Yes, maintenance continues until 3 P.M.",
+          "Yes, the forum must move to Hall B",
+          "No, the event begins after Hall A reopens"
+        ],
+        "answerIndex": 3,
+        "explanation": "维修仅安排上午9点到中午，下午1点及以后可举办活动；预订开场时间为下午2点。",
+        "evidence": "Hall A will be unavailable from 9 A.M. to noon for scheduled maintenance, but events beginning at or after 1 P.M. may proceed. || Date and start: October 12, 2 P.M."
+      },
+      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+    },
+    {
+      "assetId": "R-P7-CATERING-04",
+      "correctBasis": "更改期限10月8日17点，服务方10月7日16点已确认接受",
+      "distractorReasons": [
+        "10月12日是活动日期不是确认时间",
+        "10月5日仅为原预订确认时间",
+        "截止是10月8日不是活动当天"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-CATERING-04",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-CATERING",
+        "version": 1,
+        "stem": "Was the change to catering quantities accepted before the stated cutoff?",
+        "options": [
+          "No, it was accepted on October 12",
+          "No, all changes needed approval by October 5",
+          "Yes, the response came on October 7",
+          "Yes, the deadline was October 12"
+        ],
+        "answerIndex": 2,
+        "explanation": "会务条款规定10月8日17点前可更改，服务方10月7日16点确认收到并接受。",
+        "evidence": "Catering orders may be changed through October 8 at 5 P.M. || EVENT SERVICES RESPONSE, OCTOBER 7, 4 P.M. || The revised quantities are accepted."
+      },
+      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+    },
+    {
+      "assetId": "R-P7-CATERING-05",
+      "correctBasis": "修订135杯咖啡每杯4元加135份盒饭每份8元，共1620美元",
+      "distractorReasons": [
+        "1360美元是原餐食订单金额",
+        "1500美元与更新数量单价不符",
+        "1800美元并非135乘12的结果"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "questionSnapshot": {
+        "id": "R-P7-CATERING-05",
+        "sourceFile": "ToeicExtraReadingBatchSix.ets",
+        "groupId": "P7-EX-CATERING",
+        "version": 1,
+        "stem": "What should the updated invoice show as the total catering charge?",
+        "options": [
+          "$1,360",
+          "$1,620",
+          "$1,500",
+          "$1,800"
+        ],
+        "answerIndex": 1,
+        "explanation": "更新后为135杯咖啡和135份午餐，单价4美元与8美元，合计1620美元。",
+        "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || update catering to 135 coffee servings and 135 boxed lunches."
+      },
+      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+    }
+  ]
+}
