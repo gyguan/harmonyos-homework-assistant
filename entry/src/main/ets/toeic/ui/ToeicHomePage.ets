@@ -766,6 +766,30 @@ export struct ToeicHomePage {
             .borderRadius(AppTheme.CONTROL_RADIUS);
         } else {
           this.DaySelector();
+          if (this.draftLabel.length>0) {
+            Column({space:10}) {
+              Text('继续未完成训练')
+                .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+                .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+              Text(this.draftLabel)
+                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+              Row({space:10}) {
+                Button('继续作答',{type:ButtonType.Normal})
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                  .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
+                  .onClick(()=>this.resumeDraft());
+                Button('放弃本轮',{type:ButtonType.Normal})
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+                  .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+                  .onClick(()=>this.discardSavedDraft());
+              }
+              .width('100%');
+            }
+            .width('100%').padding(AppTheme.CARD_PADDING)
+            .backgroundColor(AppTheme.CARD_SURFACE)
+            .border({width:1,color:AppTheme.BORDER})
+            .borderRadius(AppTheme.CARD_RADIUS);
+          }
           this.TodayCard();
           if (!this.progressDiagnosticCompleted && this.selectedStudyDay!==1) {
             Text('建议先完成 Day 1 快速诊断，但你也可以直接进入当前选择的训练日。')
@@ -789,6 +813,28 @@ export struct ToeicHomePage {
           .width('100%').padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
 
+        }
+
+        if (this.mockReports.length>0) {
+          Column({space:9}) {
+            Text('完整模考历史')
+              .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+              .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+            ForEach(this.mockReports,(report:ToeicMockReport)=>{
+              Row({space:8}) {
+                Text('Day '+report.day)
+                  .fontSize(AppTheme.BODY_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+                Blank();
+                Text(report.correctCount+'/'+report.totalCount+' · 未答 '+
+                  (report.totalCount-report.answeredCount)+' · '+
+                  Math.round(report.elapsedSeconds/60)+' 分钟')
+                  .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+              }
+              .width('100%');
+            },(report:ToeicMockReport)=>String(report.completedAtMs));
+          }
+          .width('100%').padding(AppTheme.CARD_PADDING)
+          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
         }
 
         Column({space:6}) {
@@ -951,7 +997,8 @@ export struct ToeicHomePage {
             .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
           Text('正确率 '+(this.mockResultTotal>0?
             Math.round(this.mockResultCorrect*100/this.mockResultTotal)+'%':'--')+
-            ' · 实际作答约 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min')
+            ' · 用时 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min'+
+            ' · 已答 '+this.mockResultAnswered+' · 未答 '+this.mockResultUnanswered)
             .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
@@ -997,11 +1044,25 @@ export struct ToeicHomePage {
             (this.isMockSession()?'Reading 完整模考':'今日训练'),
           subtitle:String(this.currentIndex+1)+' / '+this.questions.length+' · '+
             this.viewModel.partLabel(this.currentPart),
-          trailingText:'建议 '+this.currentRecommendedSeconds+'s',
+          trailingText:this.isMockSession()?this.clockLabel():'建议 '+this.currentRecommendedSeconds+'s',
           onBack:()=>this.cancelSession()
         });
 
         Column({space:12}) {
+          if (this.isMockSession()) {
+            Row({space:10}) {
+              Text('剩余时间 '+this.clockLabel())
+                .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold)
+                .fontColor(this.mockCountdownSeconds<=300?AppTheme.DANGER:AppTheme.PRIMARY);
+              Blank();
+              Text('已答 '+this.attempts.length+' / '+this.questions.length)
+                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%').padding(AppTheme.CARD_PADDING_COMPACT)
+            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS);
+            Text('可跳过未答题、返回已答题修改答案；到时自动交卷。')
+              .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+          }
           Row() {
             Text(this.viewModel.skillLabel(this.currentSkill))
               .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY)
@@ -1014,7 +1075,7 @@ export struct ToeicHomePage {
           }
           .width('100%');
 
-          if (this.currentAttemptCount>0) {
+          if (!this.isMockSession() && this.currentAttemptCount>0) {
             Row({space:8}) {
               Text('已做 '+this.currentAttemptCount+' 次')
                 .fontSize(AppTheme.META_SIZE)
@@ -1262,7 +1323,7 @@ export struct ToeicHomePage {
               .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
               .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
               .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(this.answerLocked)
+              .enabled(this.isMockSession() || this.answerLocked)
               .onClick(()=>this.nextQuestion());
           }
           .width('100%');
