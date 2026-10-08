@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Content QA regression suite for the first AI-attributed TOEIC rollout.
+"""Content QA regression suite for staged AI-attributed TOEIC releases.
 
 This is deterministic evidence checking, not proof of TOEIC-equivalent difficulty.
 """
@@ -30,26 +30,75 @@ class AiEditorialReleaseTests(unittest.TestCase):
                 self.assertEqual("PASS", evidence[section][key]["decision"])
                 self.assertEqual(value["contentSha256"], evidence[section][key]["contentSha256"])
 
-    def test_pilot_publication_is_atomic_and_bounded(self) -> None:
-        first_words = (CONTENT / "ToeicVocabularyBatchTwo.ets").read_text(encoding="utf-8")
-        self.assertEqual(30, first_words.count("ToeicReviewStatus.PUBLISHED"))
-        self.assertEqual(0, first_words.count("ToeicReviewStatus.REVIEWED"))
-        later_words = "".join(
-            source.read_text(encoding="utf-8")
-            for source in CONTENT.glob("ToeicVocabularyBatch*.ets")
-            if source.name != "ToeicVocabularyBatchTwo.ets"
+    def test_release_manifest_enforces_exactly_declared_batches(self) -> None:
+        """Release audit checks actual per-ID states, not only aggregate totals."""
+        manifest = json.loads(
+            (ROOT / "docs/product/toeic-controlled-release-manifest.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(150, later_words.count("ToeicReviewStatus.REVIEWED"))
-        self.assertEqual(0, later_words.count("ToeicReviewStatus.PUBLISHED"))
+        self.assertEqual(1, manifest["schemaVersion"])
+        self.assertEqual(120, manifest["baselinePublishedVocabulary"])
+        self.assertEqual(13, manifest["authoredSupplementaryReadingGroups"])
+        self.assertEqual(
+            "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+            manifest["editorialEvidence"],
+        )
+        expected_words = set()
+        expected_groups = set()
+        for batch in manifest["releaseBatches"]:
+            start, end = batch["wordIdRange"]["start"], batch["wordIdRange"]["end"]
+            self.assertEqual(30, end - start + 1, "Release only one 30-word tranche at once")
+            self.assertEqual(0, (start - 121) % 30, "Vocabulary tranche must align to day plan")
+            for number in range(start, end + 1):
+                key = f"V-{number:03d}"
+                self.assertNotIn(key, expected_words, "A word may belong to only one release batch")
+                expected_words.add(key)
+            self.assertTrue(batch["readingGroupIds"], "Each tranche records its complete P7 groups")
+            for group in batch["readingGroupIds"]:
+                self.assertNotIn(group, expected_groups, "No reading group can be released twice")
+                expected_groups.add(group)
 
-        early_groups = (CONTENT / "ToeicExtraReadingContent.ets").read_text(encoding="utf-8")
-        self.assertEqual(15, early_groups.count("ToeicReviewStatus.PUBLISHED"))
-        later_groups = "".join(
-            file.read_text(encoding="utf-8")
-            for file in CONTENT.glob("ToeicExtraReadingBatch*.ets")
+        word_statuses = {}
+        for path in CONTENT.glob("ToeicVocabularyBatch*.ets"):
+            text = path.read_text(encoding="utf-8")
+            for word_id, status in re.findall(
+                r'new ToeicVocabularyItem\("(V-\d+)",.+?ToeicReviewStatus\.(REVIEWED|PUBLISHED)\)',
+                text,
+            ):
+                self.assertNotIn(word_id, word_statuses)
+                word_statuses[word_id] = status
+        self.assertEqual(180, len(word_statuses))
+        self.assertEqual(set(f"V-{number:03d}" for number in range(121, 301)), set(word_statuses))
+        self.assertEqual(
+            expected_words,
+            {word_id for word_id, status in word_statuses.items() if status == "PUBLISHED"},
         )
-        self.assertEqual(50, later_groups.count("ToeicReviewStatus.REVIEWED"))
-        self.assertEqual(0, later_groups.count("ToeicReviewStatus.PUBLISHED"))
+
+        reading_statuses = {}
+        for path in [CONTENT / "ToeicExtraReadingContent.ets", *CONTENT.glob("ToeicExtraReadingBatch*.ets")]:
+            text = path.read_text(encoding="utf-8")
+            for question_id, status, group_id in re.findall(
+                r'new ToeicQuestion\("(R-P7-[A-Z-]+-\d+)"[\s\S]*?'
+                r'ToeicReviewStatus\.(REVIEWED|PUBLISHED),1,\'\',\'\',0,0,"(P7-EX-[A-Z-]+)"\)',
+                text,
+            ):
+                self.assertNotIn(question_id, reading_statuses)
+                reading_statuses[question_id] = (group_id, status)
+        self.assertEqual(65, len(reading_statuses))
+        by_group = {}
+        for group_id, status in reading_statuses.values():
+            by_group.setdefault(group_id, []).append(status)
+        self.assertEqual(13, len(by_group))
+        self.assertEqual({5}, {len(statuses) for statuses in by_group.values()})
+        self.assertEqual(
+            expected_groups,
+            {group_id for group_id, statuses in by_group.items()
+             if all(status == "PUBLISHED" for status in statuses)},
+        )
+        self.assertTrue(all(
+            len(set(statuses)) == 1 for statuses in by_group.values()
+        ), "Shared Part 7 passages must release atomically")
+        self.assertEqual(120 + len(expected_words), 180)
+        self.assertEqual(sum(5 for _ in expected_groups), 25)
 
     def test_corrected_evidence_cannot_regress(self) -> None:
         two = (CONTENT / "ToeicExtraReadingBatchTwo.ets").read_text(encoding="utf-8")
