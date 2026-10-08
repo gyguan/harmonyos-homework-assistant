@@ -12,6 +12,7 @@ from pathlib import Path
 
 from validate_toeic_question_quality import collect
 from validate_toeic_evidence_provenance import triage, parse_group_sources
+from validate_toeic_translation_coverage import collect_translations
 
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "docs/product/toeic-issue478-shared-part7-first-pass-65.json"
@@ -99,6 +100,12 @@ def validate() -> None:
     assert delivery.version == 2 and "guarantees" in delivery.stem
     assert support.version == 2 and "after the service interruption began" in support.stem
     assert "SLA" not in support.stem
+    translations = collect_translations()
+    delivery_zh = translations[delivery.id][1]
+    support_zh = translations[support.id][1]
+    assert "保证" in delivery_zh and "10月15日" in delivery_zh
+    assert "服务中断" in support_zh and "两小时内" in support_zh
+    assert "响应时间目标" not in support_zh
     print("TOEIC_ISSUE478_SHARED_P7_FIRST_PASS_PASS groups=13 questions=65 "
           "correct_reasons=65 wrong_option_reasons=195 "
           "version2_delivery=OK version2_support=OK "
