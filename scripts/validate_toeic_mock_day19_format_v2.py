@@ -109,8 +109,11 @@ def validate() -> None:
     assert "[3] _____" in revised and "R-FM2-P6-" in revised
     active_part6_ids=[f"R-FM2-P6-{i:03d}" for i in range(1,5)]
     assert all(not any(q.id==id for q in old_p6) for id in active_part6_ids)
-    # Preserve the other three original Part6 groups unchanged.
+    # Preserve the other three original Part6 groups unchanged, and keep
+    # archived P6 records queryable by the Day20 high-error review queue.
     assert len(old_p6[4:])==12
+    assert "maxDay>=19 && question.id.startsWith('R-M2-P6-')" in preset
+    assert "oldDay14 || oldDay19 || oldDay19Part6" in preset
     # Active v2 answer-position distribution, independent of archived R-M2 paper.
     displayed=[(q.id,q.answer) for q in old_p5]
     displayed.extend((f"R-FM2-P6-{i+1:03d}",3 if i==2 else old_p6[i].answer)
