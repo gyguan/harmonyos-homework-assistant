@@ -394,3 +394,41 @@ Day 14 与 Day 19 完整 Reading 模考均不提供中文翻译入口，也不�
 2. 由具有审批权限的审核人员通过独立 PR 登记已核准资产对应的 `reviewer`、`approvedAt`、`contentSha256`，并审核该 PR；`contentSha256` 仅保证被审批正文与当前正文一致，**不能自动证明审核人身份或专业质量**。
 3. 把通过的词或整组阅读切换 `PUBLISHED`，运行内容门禁、单元测试和实机编译；不得发布尚未核准的其他候选内容，不影响已有 21 天计划、Day 14/19 两套 100 题模考和历史记录。
 4. 当已发布高频词实际达到阶段目标后，再决定是否从 300 资产扩充到 400；不要堆积没有实际使用价值的审核债务。
+
+## 26. 按批次推进人工审核与整组发布防护（2026-10-08）
+
+目前词汇有 300 个内容资产，其中 V-001–V-120 已发布、V-121–V-300 共 180 个处于待审核状态；Part 7 共享文章候选 13 组/65 题尚待专业核对。本阶段**暂停单纯扩充题量，优先完成可追踪的审核交接**。
+
+### 26.1 生成第一批定向审核资料
+
+在代码仓根目录执行以下单行命令（支持 PowerShell 或 CMD）：
+
+`python scripts/toeic_editorial_handoff.py prepare --batch-start 121 --group P7-EX-VENUE --out-dir build/toeic-review/first`
+
+- `--batch-start 121`：仅导出 V-121–V-150 的完整 30 词；还可选 151/181/211/241/271。支持只指定词汇批次。
+- `--group P7-EX-VENUE`：仅导出该 Part 7 题组的完整原文和 5 题；可只指定题组，不能指向不存在的题组。
+- 两个选项可同时指定，用于一次交接 30 词及 1 个阅读题组；不允许既不指定批次也不指定题组。
+- 输出包括 `vocabulary-review.csv`、`part7-review.md`、`review-decisions.csv`、`review-source.json`、`manifest.json`、`README.md`。**重复执行不允许覆盖已有的 review-decisions.csv**，避免抹掉人工审核结果。
+
+审核人员先阅读文案、IPA、题干、选项、中文解析及证据，然后在 `review-decisions.csv` 按行填写：
+- `asset_type / asset_id / content_sha256`：不应修改，绑定原始资产与内容快照。
+- `decision`：初始 `PENDING`；人工核查后逐项改为 `APPROVE`、`REVISE` 或 `REJECT`。
+- `reviewer`：审核人的真实 GitHub 用户名；`reviewed_at`：实际审核日期（YYYY-MM-DD）；`notes`：修改要求与审核证据摘要。退修或驳回必须写出原因。**Part 7 必须按完整题组审批，不允许只批准其中单题。**
+
+### 26.2 校验交接结果，不自动发布
+
+审核完成后执行：
+
+`python scripts/toeic_editorial_handoff.py verify --pack-dir build/toeic-review/first`
+
+该命令重新读取当前源码与 SHA-256 摘要，检查 30 词和整组文章是否完整、是否有漏项/重复项、审核日期及审核人格式、是否复用了内容已变化的旧审核结果，并生成 `review-verification.json`。
+
+- `BLOCKED`：存在待审、退修、驳回、缺少记录、日期无效或内容变更。命令返回非零退出码。
+- `READY_FOR_HUMAN_PR`：本地审核表完整且内容快照一致，**仅表示可以进入下一步人工发布评审**，不证明审核人拥有仓库权限，也不等于已发布。
+- 工具**不修改** `docs/product/toeic-editorial-approvals.json`、任何 ArkTS 源码状态或学生历史记录。后续仍需独立 GitHub PR 审查，由有权限的真实审核人核验内容、录入已批准资产的台账信息与 `contentSha256`，再将对应资产改为 `PUBLISHED` 并执行构建/设备验证。
+
+### 26.3 客户端整组发布保护
+
+`PresetToeicContent.publishedQuestions()` 除了检查单题的 `PUBLISHED` 标记，还会先从 `publishedReadingGroups()` 判断完整共享阅读题组是否全部发布；只发布其中一题的错误操作不会将半个题组混入活跃题库。静态发布审核门禁、审核摘要及整组校验仍必须保留，客户端保护属于最后一道运行时保险。
+
+CI 的 `scripts/validate_toeic_coach.py` 同时运行审核交接负例测试，覆盖 30 词批次、缺失条目、重复记录、旧摘要、错误日期、无审核人、未说明的退修以及禁止覆盖审核员工作成果。所有审核信息仅保存在人工交接资料中，不能提前认定 180 词或 65 题已通过专业审核。
