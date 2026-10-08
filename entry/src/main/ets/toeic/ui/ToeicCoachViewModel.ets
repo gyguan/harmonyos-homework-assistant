@@ -5,7 +5,7 @@ import { ToeicQuestionTranslation } from '../content/ToeicQuestionTranslationMod
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { ToeicProgressStore } from '../data/ToeicProgressStore';
 import { ToeicPronunciationService, ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
-import { ToeicLearningSnapshot, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
 
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
@@ -23,8 +23,12 @@ export class ToeicCoachViewModel {
   createAttempt(question:ToeicQuestion,selectedIndex:number,elapsedSeconds:number):ToeicQuestionAttempt {
     return ToeicTrainingService.instance.createAttempt(question,selectedIndex,elapsedSeconds);
   }
-  async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean,advanceProgress:boolean=true):Promise<void> {
-    await ToeicProgressStore.instance.recordSession(attempts,diagnostic,advanceProgress);
+  activeDraft():ToeicSessionDraft|null { return ToeicProgressStore.instance.activeDraft(); }
+  async saveDraft(draft:ToeicSessionDraft):Promise<void> { await ToeicProgressStore.instance.saveDraft(draft); }
+  async discardDraft():Promise<void> { await ToeicProgressStore.instance.discardDraft(); }
+  async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean,
+    advanceProgress:boolean=true,mockReport:ToeicMockReport|null=null):Promise<void> {
+    await ToeicProgressStore.instance.recordSession(attempts,diagnostic,advanceProgress,mockReport);
   }
   contentErrors():string[] {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
@@ -49,6 +53,7 @@ export class ToeicCoachViewModel {
   }
 
   skillLabel(value:string):string {
+    if (value.length===0) return '暂无明显弱项';
     let skill=value as ToeicSkill;
     if (skill===ToeicSkill.WORD_FORM) return '词性判断';
     if (skill===ToeicSkill.VERB) return '动词结构';
