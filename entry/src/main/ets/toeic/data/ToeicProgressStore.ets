@@ -37,21 +37,8 @@ export class ToeicProgressStore {
     return history===null?0:history.wrongCount;
   }
 
-  isImportantVocabulary(vocabularyId:string):boolean {
-    return this.snapshot.importantVocabularyIds.indexOf(vocabularyId)>=0;
-  }
-
   isUnrememberedVocabulary(vocabularyId:string):boolean {
     return this.snapshot.unrememberedVocabularyIds.indexOf(vocabularyId)>=0;
-  }
-
-  async setVocabularyImportant(vocabularyId:string,important:boolean):Promise<void> {
-    let ids=this.snapshot.importantVocabularyIds;
-    let index=ids.indexOf(vocabularyId);
-    if (important && index<0) ids.push(vocabularyId);
-    else if (!important && index>=0) ids.splice(index,1);
-    else return;
-    await this.save();
   }
 
   vocabularyDueIds(nowMs:number=Date.now()):string[] {
@@ -75,8 +62,8 @@ export class ToeicProgressStore {
     review.totalReviews++;
     review.lastReviewedAtMs=nowMs;
     review.streak=remembered?Math.min(4,review.streak+1):0;
-    // A failed recall puts the word at the front of future study lists.
-    // A successful recall clears only the automatic weak-word flag, never the user's key-word mark.
+    // A failed recall prioritizes the word in the study list.
+    // Remembering it removes this automatic flag without affecting the review schedule.
     let weakIds=this.snapshot.unrememberedVocabularyIds;
     let weakIndex=weakIds.indexOf(vocabularyId);
     if (!remembered && weakIndex<0) weakIds.push(vocabularyId);
@@ -295,15 +282,9 @@ export class ToeicProgressStore {
             Array.isArray(raw.markedQuestionIds)?raw.markedQuestionIds as string[]:[]);
         }
       }
-      // Old v7 snapshots have neither flag array; keep their progress and recall schedule intact.
-      // Ignore malformed IDs and duplicates rather than letting old or corrupt data poison ordering.
-      if (Array.isArray(parsed.importantVocabularyIds)) {
-        for (let value of parsed.importantVocabularyIds as Object[]) {
-          if (typeof value!=='string' || value.length===0 ||
-            restored.importantVocabularyIds.indexOf(value as string)>=0) continue;
-          restored.importantVocabularyIds.push(value as string);
-        }
-      }
+      // Legacy v8 manual importantVocabularyIds are deliberately ignored.
+      // Preserve all existing progress, recall schedules, and automatic weak-word flags.
+      // Ignore malformed or duplicated automatic flag IDs.
       if (Array.isArray(parsed.unrememberedVocabularyIds)) {
         for (let value of parsed.unrememberedVocabularyIds as Object[]) {
           if (typeof value!=='string' || value.length===0 ||
@@ -360,7 +341,7 @@ export class ToeicProgressStore {
             Math.max(0,Number(item.slow)||0)));
         }
       }
-      restored.schemaVersion=8;
+      restored.schemaVersion=9;
       this.snapshot=restored;
     } catch {
       this.snapshot=new ToeicLearningSnapshot();
