@@ -3,6 +3,7 @@ import re
 from validate_toeic_editorial_content import validate as validate_editorial_candidates
 from export_toeic_review_pack import export_review_pack
 from tempfile import TemporaryDirectory
+from test_toeic_review_integrity import run_tests as test_review_integrity
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -670,6 +671,7 @@ def main() -> None:
     require("ToeicModuleBootstrap.initialize" in ability, "TOEIC progress bootstrap is missing")
 
     validate_editorial_candidates()
+    test_review_integrity()
     # Review exports must remain complete as more batches are added.
     with TemporaryDirectory() as temp_dir:
         exported = export_review_pack(Path(temp_dir))
