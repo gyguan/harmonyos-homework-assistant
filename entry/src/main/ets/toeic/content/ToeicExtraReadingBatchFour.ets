@@ -3,7 +3,7 @@ import {
   ToeicReviewStatus, ToeicScoreValue, ToeicSection, ToeicSkill
 } from '../domain/ToeicModels';
 
-/** Original extra cross-document practice. Each item requires independent editorial signoff. */
+/** AI-reviewed shared Part 7 LEASE/TRAINING groups, published as complete bundles. */
 export class ToeicExtraReadingBatchFour {
   static groups():ToeicReadingGroup[] {
     return [
