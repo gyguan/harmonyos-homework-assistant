@@ -79,7 +79,7 @@ export class ToeicWeekThreeContent {
       ToeicWeekThreeContent.q("R-P5-SPRINT-1525",ToeicPart.PART_5,ToeicSkill.WORD_FORM,"","Customers responded very _____ to the extended service hours.",["positive","positively","position","positivity"],1,"responded 为动词，使用副词 positively 修饰。","","respond positively = react favorably",12,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
       ToeicWeekThreeContent.q("R-P5-SPRINT-1526",ToeicPart.PART_5,ToeicSkill.VERB,"","The accounting team _____ the invoice before issuing payment yesterday.",["verifies","verified","has verified","will verify"],1,"yesterday 指明确过去时间，用一般过去时 verified。","","verified yesterday",10,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
       ToeicWeekThreeContent.q("R-P5-SPRINT-1527",ToeicPart.PART_5,ToeicSkill.CONJUNCTION,"","The meeting room is small; _____, it is equipped with a high-quality video system.",["however","therefore","because","otherwise"],0,"前后是转折关系，选 however。","","however = nevertheless",15,ToeicDifficulty.MEDIUM,ToeicScoreValue.MUST_GET),
-      ToeicWeekThreeContent.q("R-P5-SPRINT-1528",ToeicPart.PART_5,ToeicSkill.PRONOUN,"","Each applicant must provide _____ with a photo ID at reception.",["itself","himself","themselves","ourselves"],2,"现代英语中 each applicant 可用单数 they，对应反身代词 themselves。","","provide themselves with ID",15,ToeicDifficulty.MEDIUM,ToeicScoreValue.MUST_GET),
+      ToeicWeekThreeContent.q("R-P5-SPRINT-1528",ToeicPart.PART_5,ToeicSkill.PRONOUN,"","Each applicant must identify _____ with a photo ID at reception.",["itself","himself","themselves","ourselves"],2,"现代英语中 each applicant 可用单数 they，对应反身代词 themselves。","","provide themselves with ID",15,ToeicDifficulty.MEDIUM,ToeicScoreValue.MUST_GET),
       ToeicWeekThreeContent.q("R-P5-SPRINT-1529",ToeicPart.PART_5,ToeicSkill.PREPOSITION,"","The maintenance work will take place _____ regular business hours.",["outside","among","onto","besides"],0,"outside regular business hours 表示营业时间之外。","","outside business hours",12,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
       ToeicWeekThreeContent.q("R-P5-SPRINT-1530",ToeicPart.PART_5,ToeicSkill.VOCABULARY,"","Please _____ the confirmation e-mail until your reservation is complete.",["retain","dispatch","estimate","notify"],0,"retain 表示保留。","","retain = keep",10,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET)
     ];
@@ -237,7 +237,9 @@ export class ToeicWeekThreeContent {
   private static q(id:string,part:ToeicPart,skill:ToeicSkill,passage:string,stem:string,options:string[],
     correctIndex:number,explanation:string,evidence:string,paraphrase:string,recommendedSeconds:number,
     difficulty:ToeicDifficulty,scoreValue:ToeicScoreValue):ToeicQuestion {
-    return new ToeicQuestion(id,ToeicSection.READING,part,skill,passage,stem,options,correctIndex,
+    let question=new ToeicQuestion(id,ToeicSection.READING,part,skill,passage,stem,options,correctIndex,
       explanation,evidence,paraphrase,recommendedSeconds,difficulty,scoreValue);
+    if (id==='R-P5-SPRINT-1528') question.version=2;
+    return question;
   }
 }

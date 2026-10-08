@@ -8,6 +8,7 @@ from test_toeic_editorial_handoff import run_tests as test_editorial_handoff
 from test_toeic_ai_editorial_release import run_tests as test_ai_release
 from test_toeic_remaining_editorial import run_tests as test_remaining_editorial
 from validate_toeic_question_quality import validate as validate_question_quality
+from validate_toeic_answer_display import verify as verify_answer_display
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -31,6 +32,7 @@ def read(path: str) -> str:
 def main() -> None:
     require(TOEIC.exists(), "TOEIC module directory is missing")
     validate_question_quality()
+    verify_answer_display()
     sources = "\\n".join(
         p.read_text(encoding="utf-8")
         for p in TOEIC.rglob("*.ets")
@@ -64,7 +66,7 @@ def main() -> None:
     require("validateSentenceDrills" in validator and "translation is required" in validator,
             "sentence drill translation gate is missing")
     require("validateQuestionTranslations" in validator and
-            "Chinese translation is required for Day 1-13 training" in validator and
+            "Chinese translation is required for assigned non-mock training" in validator and
             "translated option count must match question options" in validator,
             "question translation content gate is missing")
 
@@ -147,20 +149,23 @@ def main() -> None:
 
     translation_week_one = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekOneCatalog.ets")
     translation_week_two = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekTwoCatalog.ets")
+    translation_week_three = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekThreeCatalog.ets")
     translation_extra = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationSupplementaryCatalog.ets")
     translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
     translation_ids = re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_one + "\n" + translation_week_two)
     translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two + "\n" + translation_extra)
-    require(len(translation_ids) == 112,
-            f"Day 1-13 including the integrated diagnostic must have 112 unique question translations, found {len(translation_ids)}")
+    translation_ids += re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_three)
+    require(len(translation_ids) == 158,
+            f"Day1-13 and Day15-16 must have 158 question translations, found {len(translation_ids)}")
     require(len(translation_ids) == len(set(translation_ids)),
             "TOEIC question translation ids must be unique")
     require(not any(question_id.startswith("R-M1-") or question_id.startswith("R-M2-") for question_id in translation_ids),
             "full mock questions must not have Chinese translations")
     require("ToeicQuestionTranslationWeekOneCatalog.items()" in translation_catalog and
             "ToeicQuestionTranslationWeekTwoCatalog.items()" in translation_catalog and
+            "ToeicQuestionTranslationWeekThreeCatalog.items()" in translation_catalog and
             "ToeicQuestionTranslationSupplementaryCatalog.items()" in translation_catalog,
-            "question translation catalog must aggregate all Day 1-13 translations")
+            "question translation catalog must aggregate all Day1-16 non-mock translations")
 
     diagnostic_match = re.search(
         r"new ToeicStudyDay\(1,.*?\[\],\[\],\[(.*?)\]\),",
@@ -367,14 +372,14 @@ def main() -> None:
         "attemptCount(questionId:string)", "wrongCount(questionId:string)",
         "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
         "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
-        "restored.schemaVersion=9",
+        "restored.schemaVersion=10",
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
     # Manual important-word marks were removed in v9. Only automatic forgotten
     # words remain persisted; legacy v8 progress and reviews must not be reset.
     models = read("entry/src/main/ets/toeic/domain/ToeicModels.ets")
-    require("schemaVersion:number=9" in models and
+    require("schemaVersion:number=10" in models and
             "unrememberedVocabularyIds:string[]=[]" in models and
             "importantVocabularyIds" not in models,
             "v9 snapshot must retain only the automatic weak-word flag")
@@ -705,6 +710,31 @@ def main() -> None:
             "this.PracticeResultContent();" in ui and
             "this.leavePracticeResult()" in ui,
             "both vocabulary and practice sessions must have complete deferred result screens")
+    # Published answer options are displayed through a stable permutation only.
+    # Canonical selectedIndex stays intact in drafts, reports and scores.
+    require("class ToeicMockAnswerRecord" in models and
+            "answers:ToeicMockAnswerRecord[]" in models and
+            "answers:ToeicMockAnswerRecord[]=[]" in models and
+            "new ToeicMockAnswerRecord(" in progress and
+            "Array.isArray(report.answers)" in progress and
+            "selected< -1 || selected>3" in progress,
+            "mock question-level canonical answer records must persist and migrate safely")
+    mock_review=ui[ui.index("  private openMockHistoryReport("):
+                   ui.index("  private leavePracticeResult()")]
+    require("this.viewModel.questionsForIds(ids)" in mock_review and
+            "question.version!==answer.questionVersion" in mock_review and
+            "this.mockReviewUnavailable++" in mock_review and
+            "this.mode=ToeicPageMode.MOCK_RESULT" in mock_review,
+            "historical mock review must not regrade a changed published item version")
+    require("report.answers.push(new ToeicMockAnswerRecord(" in ui and
+            "this.preparePracticeResult();" in ui and
+            "this.openMockHistoryReport(report)" in ui and
+            "ForEach(this.practiceReviewItems" in ui[ui.index("  private MockResultContent()"):
+                                                  ui.index("  private PracticeResultContent()")],
+            "fresh and archived mock reports must support post-submission item-by-item review")
+    require("questionsForIds(ids:string[]):ToeicQuestion[]" in view_model and
+            "return this.questionsForIds(draft.questionIds)" in view_model,
+            "question IDs must resolve consistently for drafts and saved report reviews")
     require("this.mockPart5Correct" in ui and "this.mockPart6Correct" in ui and "this.mockPart7Correct" in ui,
             "mock result must expose Part 5/6/7 breakdown")
     require("Button('A. '+this.currentOptionA" not in ui and
@@ -1019,7 +1049,8 @@ def main() -> None:
             "if (this.selectedStudyDay===1) return this.progressDiagnosticCompleted?1:0;" in ui,
             "Day 1 must display the single completion milestone and updated question count")
     require("questionsForDraft(draft:ToeicSessionDraft)" in view_model and
-            "for (let id of draft.questionIds)" in view_model and
+            "return this.questionsForIds(draft.questionIds)" in view_model and
+            "for (let id of ids)" in view_model and
             "this.questions=restored" in ui and
             "this.activeSessionAdvancesProgress=draft.advancesProgress" in ui,
             "legacy saved 12-question Day 1 drafts must resume with their original stable IDs")

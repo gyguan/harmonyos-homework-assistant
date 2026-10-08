@@ -2,10 +2,11 @@ import { LengthMetrics } from '@kit.ArkUI';
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicSessionReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem, ToeicVocabularyQuizMode, ToeicVocabularyQuizQuestion } from '../domain/ToeicModels';
+import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicMockAnswerRecord, ToeicSessionReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem, ToeicVocabularyQuizMode, ToeicVocabularyQuizQuestion } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 import { ToeicReadingGroupService } from '../application/ToeicReadingGroupService';
+import { ToeicAnswerDisplayOrder } from '../application/ToeicAnswerDisplayOrder';
 import { ToeicVocabularyQuizService } from '../application/ToeicVocabularyQuizService';
 
 enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', VOCABULARY_QUIZ='VOCABULARY_QUIZ', VOCABULARY_RESULT='VOCABULARY_RESULT', SENTENCE='SENTENCE', MOCK_RESULT='MOCK_RESULT', PRACTICE_RESULT='PRACTICE_RESULT' }
@@ -97,6 +98,8 @@ export struct ToeicHomePage {
   @State private practiceReviewItems:ToeicPracticeReviewItem[]=[];
   @State private markedQuestionIds:string[]=[];
   @State private mockReports:ToeicMockReport[]=[];
+  @State private mockReviewUnavailable:number=0;
+  @State private mockReviewLegacy:boolean=false;
   private sessionStartedAtMs:number=0;
   private questionTimes:ToeicQuestionTime[]=[];
   private mockClockId:number=-1;
@@ -129,6 +132,9 @@ export struct ToeicHomePage {
   @State private currentScoreValue:ToeicScoreValue=ToeicScoreValue.MUST_GET;
   private readonly viewModel:ToeicCoachViewModel=new ToeicCoachViewModel();
   private attempts:ToeicQuestionAttempt[]=[];
+  // Maps displayed A/B/C/D back to the canonical source option index.
+  // Stored draft attempts always use canonical indices.
+  private currentOptionOrder:number[]=[0,1,2,3];
 
   aboutToAppear():void {
     this.loadProgressSnapshot();
@@ -211,20 +217,22 @@ export struct ToeicHomePage {
     this.currentGroupCount=readingGroup.questionIds.length;
     this.currentGroupPosition=readingGroup.questionIds.indexOf(question.id)+1;
     this.currentStem=question.stem;
+    this.currentOptionOrder=ToeicAnswerDisplayOrder.order(question.id);
     this.currentOptionCount=question.options.length;
-    this.currentOptionA=question.options.length>0?question.options[0]:'';
-    this.currentOptionB=question.options.length>1?question.options[1]:'';
-    this.currentOptionC=question.options.length>2?question.options[2]:'';
-    this.currentOptionD=question.options.length>3?question.options[3]:'';
+    this.currentOptionA=question.options[this.currentOptionOrder[0]];
+    this.currentOptionB=question.options[this.currentOptionOrder[1]];
+    this.currentOptionC=question.options[this.currentOptionOrder[2]];
+    this.currentOptionD=question.options[this.currentOptionOrder[3]];
     let translation=this.viewModel.questionTranslation(question.id);
     this.showQuestionTranslation=false;
     this.currentTranslationPassage=translation===null?'':translation.passage;
     this.currentTranslationStem=translation===null?'':translation.stem;
-    this.currentTranslationOptionA=translation===null || translation.options.length<1?'':translation.options[0];
-    this.currentTranslationOptionB=translation===null || translation.options.length<2?'':translation.options[1];
-    this.currentTranslationOptionC=translation===null || translation.options.length<3?'':translation.options[2];
-    this.currentTranslationOptionD=translation===null || translation.options.length<4?'':translation.options[3];
-    this.currentCorrectIndex=question.correctIndex;
+    // Translation choices use precisely the same display permutation.
+    this.currentTranslationOptionA=translation===null?'':translation.options[this.currentOptionOrder[0]];
+    this.currentTranslationOptionB=translation===null?'':translation.options[this.currentOptionOrder[1]];
+    this.currentTranslationOptionC=translation===null?'':translation.options[this.currentOptionOrder[2]];
+    this.currentTranslationOptionD=translation===null?'':translation.options[this.currentOptionOrder[3]];
+    this.currentCorrectIndex=ToeicAnswerDisplayOrder.displayIndex(this.currentOptionOrder,question.correctIndex);
     this.currentExplanation=question.explanation;
     this.currentEvidence=question.evidence;
     this.currentParaphrase=question.paraphrase;
@@ -232,7 +240,8 @@ export struct ToeicHomePage {
     this.currentPart=question.part;
     this.currentSkill=question.skill;
     this.currentScoreValue=question.scoreValue;
-    this.selectedIndex=attempt===null?-1:attempt.selectedIndex;
+    this.selectedIndex=attempt===null?-1:
+      ToeicAnswerDisplayOrder.displayIndex(this.currentOptionOrder,attempt.selectedIndex);
     this.answerCorrect=attempt===null?false:attempt.correct;
     this.answerLocked=attempt!==null;
     this.questionStartedAtMs=Date.now();
@@ -240,6 +249,7 @@ export struct ToeicHomePage {
   }
 
   private clearQuestionSnapshot():void {
+    this.currentOptionOrder=[0,1,2,3];
     this.currentQuestionId='';
     this.currentPassage='';
     this.currentPassageBlocks=[];
@@ -360,13 +370,13 @@ export struct ToeicHomePage {
       return 'Part 7 限时训练已包含新增双篇 / 三篇题组；先读清各文档职责，再联动定位答案。';
     }
     if (this.selectedStudyDay===14) {
-      return 'Day 14 为第一次完整 Reading 模考：75 分钟、100 题固定题序，作答过程中不显示答案，结束后统一查看结果。';
+      return 'Day 14 为100题/75分钟限时模拟练习；当前Part 7单篇与多篇题组分布尚未按ETS正式卷面重编，不能据此推算官方成绩。交卷后可查看答案与解析。';
     }
     if (this.selectedStudyDay===18) {
       return 'Day 18 优先复习错题、慢题及薄弱能力，并完成新安排的双篇 / 三篇阅读整组训练。';
     }
     if (this.selectedStudyDay===19) {
-      return 'Day 19 为第二次完整 Reading 模考：75 分钟、100 题独立题集，用于验证第一轮补弱后的提升。';
+      return 'Day 19 为第二套100题/75分钟限时模拟练习；当前Part 7题组分布尚不符合ETS正式结构。结果仅用于内部补弱，不等同官方模拟成绩。';
     }
     if (this.selectedStudyDay===20) {
       return 'Day 20 优先复盘累计错 2 次及以上题目，随后完成两组新的三篇阅读，检验跨篇能力。';
@@ -667,7 +677,10 @@ export struct ToeicHomePage {
     if (existing!==null && !this.isMockSession()) return;
     let elapsed=Math.max(1,Math.round((Date.now()-this.questionStartedAtMs)/1000)+
       this.spentForQuestion(this.currentQuestionId));
-    let attempt=this.viewModel.createAttempt(question,index,elapsed);
+    // Only convert the displayed index here; every persisted attempt, score and
+    // result review continues to use the unchanged canonical content index.
+    let canonicalIndex=this.currentOptionOrder[index];
+    let attempt=this.viewModel.createAttempt(question,canonicalIndex,elapsed);
     if (existing!==null) {
       for (let i=0;i<this.attempts.length;i++) {
         if (this.attempts[i].questionId===question.id) { this.attempts[i]=attempt; break; }
@@ -755,6 +768,11 @@ export struct ToeicHomePage {
       report=new ToeicMockReport(this.mockResultDay,Date.now(),this.mockResultCorrect,
         this.mockResultAnswered,this.mockResultTotal,this.mockElapsedSeconds,
         this.mockPart5Correct,this.mockPart6Correct,this.mockPart7Correct);
+      for (let question of this.questions) {
+        let attempt=this.sessionAttempt(question.id);
+        report.answers.push(new ToeicMockAnswerRecord(question.id,question.version,
+          attempt===null?-1:attempt.selectedIndex,attempt===null?false:attempt.correct));
+      }
     }
     await this.viewModel.completeSession(this.attempts,this.mode===ToeicPageMode.DIAGNOSTIC,
       advanceProgress,report,this.activeSessionDay);
@@ -764,9 +782,9 @@ export struct ToeicHomePage {
       this.loadStudyDay(this.selectedStudyDay);
     }
     this.refreshRevision++;
-    if (!mockSession) {
-      this.preparePracticeResult();
-    }
+    this.preparePracticeResult();
+    this.mockReviewUnavailable=0;
+    this.mockReviewLegacy=false;
     this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.PRACTICE_RESULT;
     this.questions=[]; this.attempts=[]; this.questionTimes=[]; this.markedQuestionIds=[];
     this.answerLocked=false; this.selectedIndex=-1;
@@ -800,6 +818,48 @@ export struct ToeicHomePage {
         this.viewModel.attemptCount(question.id),this.viewModel.wrongCount(question.id)));
     }
     this.practiceReviewItems=review;
+  }
+
+  private openMockHistoryReport(report:ToeicMockReport):void {
+    this.mockResultDay=report.day;
+    this.mockResultCorrect=report.correctCount;
+    this.mockResultAnswered=report.answeredCount;
+    this.mockResultTotal=report.totalCount;
+    this.mockResultUnanswered=report.totalCount-report.answeredCount;
+    this.mockPart5Correct=report.part5Correct; this.mockPart5Total=30;
+    this.mockPart6Correct=report.part6Correct; this.mockPart6Total=16;
+    this.mockPart7Correct=report.part7Correct; this.mockPart7Total=54;
+    this.mockElapsedSeconds=report.elapsedSeconds;
+    this.mockReviewUnavailable=0;
+    this.mockReviewLegacy=report.answers.length===0;
+    let review:ToeicPracticeReviewItem[]=[];
+    let ids:string[]=[];
+    for (let record of report.answers) ids.push(record.questionId);
+    let source=this.viewModel.questionsForIds(ids);
+    if (source.length!==report.answers.length) {
+      this.mockReviewUnavailable=report.answers.length;
+    } else {
+      for (let i=0;i<source.length;i++) {
+        let question=source[i];
+        let answer=report.answers[i];
+        // Never regrade an old attempt against a changed published question.
+        if (question.version!==answer.questionVersion) {
+          this.mockReviewUnavailable++;
+          continue;
+        }
+        let passage=question.passage;
+        if (question.groupId.length>0) {
+          let group=ToeicReadingGroupService.groupAt(source,i);
+          if (group.passageBlocks.length>0) passage=group.passageBlocks.join('\n\n');
+        }
+        let chosen=answer.selectedIndex<0?'未作答':question.options[answer.selectedIndex];
+        review.push(new ToeicPracticeReviewItem(question.id,this.viewModel.partLabel(question.part),
+          question.stem,passage,chosen,question.options[question.correctIndex],answer.correct,
+          question.explanation,question.evidence,0,0));
+      }
+    }
+    this.practiceReviewItems=review;
+    this.mode=ToeicPageMode.MOCK_RESULT;
   }
 
   private leavePracticeResult():void {
@@ -1293,8 +1353,11 @@ export struct ToeicHomePage {
                         Math.round(report.elapsedSeconds/60)+' 分钟')
                         .fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
                     }
-                    .width('100%');
+                    .width('100%')
+                    .onClick(()=>this.openMockHistoryReport(report));
                   },(report:ToeicMockReport)=>String(report.completedAtMs));
+                  Text('点击历史记录可查看已保存的逐题复盘；旧版报告仅保留成绩汇总。')
+                    .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
                 }
                 .width('100%');
               }
@@ -1561,6 +1624,8 @@ export struct ToeicHomePage {
             ' · 用时 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min'+
             ' · 已答 '+this.mockResultAnswered+' · 未答 '+this.mockResultUnanswered)
             .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+          Text('本套题的Part 7单篇/多篇组卷比例尚未按ETS正式格式重编；成绩仅供训练诊断。')
+            .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
@@ -1581,6 +1646,55 @@ export struct ToeicHomePage {
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+
+        if (this.mockReviewLegacy) {
+          Text('该历史模考在逐题记录上线前完成，仅保留原成绩，不推断旧版作答内容。')
+            .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+        }
+        if (this.mockReviewUnavailable>0) {
+          Text('有 '+this.mockReviewUnavailable+' 道题的历史版本已变更或不可用；为避免错误重判，暂不显示对应旧题解析。')
+            .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.DANGER);
+        }
+        if (this.practiceReviewItems.length>0) {
+          Text('逐题复盘 · '+this.practiceReviewItems.length+' 道')
+            .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+            .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+          ForEach(this.practiceReviewItems,(item:ToeicPracticeReviewItem,index:number)=>{
+            Column({space:7}) {
+              Row() {
+                Text('题 '+(index+1)+' · '+item.part)
+                  .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                Blank();
+                Text(item.correct?'✓ 正确':'× 错误 / 未作答')
+                  .fontSize(AppTheme.META_SIZE)
+                  .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
+              }
+              .width('100%');
+              if (!item.correct && item.passage.length>0) {
+                Text(item.passage)
+                  .width('100%').fontSize(AppTheme.BODY_SIZE)
+                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              }
+              Text(item.stem)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+              Text('所选：'+item.chosen)
+                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+              Text('正确：'+item.correctAnswer)
+                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
+              Text('解析：'+item.explanation)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+              if (item.evidence.length>0) {
+                Text('证据：'+item.evidence)
+                  .width('100%').fontSize(AppTheme.META_SIZE)
+                  .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              }
+            }
+            .width('100%').padding(AppTheme.CARD_PADDING)
+            .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+          },(item:ToeicPracticeReviewItem)=>item.id);
+        }
 
       }
       .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})

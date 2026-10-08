@@ -80,7 +80,7 @@ export class ToeicQuestionHistory {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=9; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=10; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string='';
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
   activeDraft:ToeicSessionDraft|null=null; mockReports:ToeicMockReport[]=[];
@@ -162,16 +162,28 @@ export class ToeicSessionDraft {
   }
 }
 
+/** Canonical option index for one mock item. Old reports may have no records. */
+export class ToeicMockAnswerRecord {
+  questionId:string; questionVersion:number; selectedIndex:number; correct:boolean;
+  constructor(questionId:string,questionVersion:number,selectedIndex:number,correct:boolean) {
+    this.questionId=questionId; this.questionVersion=questionVersion;
+    this.selectedIndex=selectedIndex; this.correct=correct;
+  }
+}
+
 /** A full mock report is kept separately from mutable daily progress statistics. */
 export class ToeicMockReport {
   day:number; completedAtMs:number; correctCount:number; answeredCount:number;
   totalCount:number; elapsedSeconds:number; part5Correct:number; part6Correct:number; part7Correct:number;
+  answers:ToeicMockAnswerRecord[];
   constructor(day:number,completedAtMs:number,correctCount:number,answeredCount:number,
-    totalCount:number,elapsedSeconds:number,part5Correct:number,part6Correct:number,part7Correct:number) {
+    totalCount:number,elapsedSeconds:number,part5Correct:number,part6Correct:number,part7Correct:number,
+    answers:ToeicMockAnswerRecord[]=[]) {
     this.day=day; this.completedAtMs=completedAtMs; this.correctCount=correctCount;
     this.answeredCount=answeredCount; this.totalCount=totalCount;
     this.elapsedSeconds=elapsedSeconds; this.part5Correct=part5Correct;
     this.part6Correct=part6Correct; this.part7Correct=part7Correct;
+    this.answers=answers;
   }
 }
 
