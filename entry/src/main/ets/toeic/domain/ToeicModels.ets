@@ -60,7 +60,7 @@ export class ToeicQuestionAttempt {
 export class ToeicDiagnosticSummary {
   correctCount:number=0; totalCount:number=0; slowCount:number=0; weakSkill:ToeicSkill=ToeicSkill.PARAPHRASE;
   part5Correct:number=0; part5Total:number=0; part6Correct:number=0; part6Total:number=0;
-  part7Correct:number=0; part7Total:number=0;
+  part7Correct:number=0; part7Total:number=0; hasWeakSkill:boolean=false;
 }
 
 export class ToeicQuestionHistory {
@@ -76,9 +76,10 @@ export class ToeicQuestionHistory {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=3; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
-  totalAnswered:number=0; totalCorrect:number=0; weakSkill:string=ToeicSkill.PARAPHRASE;
+  schemaVersion:number=4; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  totalAnswered:number=0; totalCorrect:number=0; weakSkill:string='';
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
+  activeDraft:ToeicSessionDraft|null=null; mockReports:ToeicMockReport[]=[];
 }
 
 export class ToeicStudyPlan {
@@ -127,5 +128,39 @@ export class ToeicStudyDay {
     this.vocabularyIds=vocabularyIds;
     this.sentenceDrillIds=sentenceDrillIds;
     this.questionIds=questionIds;
+  }
+}
+
+/** A local snapshot of the active training session. Persisted without scoring until submission. */
+export class ToeicQuestionTime {
+  questionId:string; spentSeconds:number;
+  constructor(questionId:string,spentSeconds:number) {
+    this.questionId=questionId; this.spentSeconds=spentSeconds;
+  }
+}
+
+export class ToeicSessionDraft {
+  day:number; mode:string; questionIds:string[]; currentIndex:number;
+  attempts:ToeicQuestionAttempt[]; questionTimes:ToeicQuestionTime[];
+  startedAtMs:number; advancesProgress:boolean;
+  constructor(day:number,mode:string,questionIds:string[],currentIndex:number,
+    attempts:ToeicQuestionAttempt[],questionTimes:ToeicQuestionTime[],
+    startedAtMs:number,advancesProgress:boolean) {
+    this.day=day; this.mode=mode; this.questionIds=questionIds;
+    this.currentIndex=currentIndex; this.attempts=attempts; this.questionTimes=questionTimes;
+    this.startedAtMs=startedAtMs; this.advancesProgress=advancesProgress;
+  }
+}
+
+/** A full mock report is kept separately from mutable daily progress statistics. */
+export class ToeicMockReport {
+  day:number; completedAtMs:number; correctCount:number; answeredCount:number;
+  totalCount:number; elapsedSeconds:number; part5Correct:number; part6Correct:number; part7Correct:number;
+  constructor(day:number,completedAtMs:number,correctCount:number,answeredCount:number,
+    totalCount:number,elapsedSeconds:number,part5Correct:number,part6Correct:number,part7Correct:number) {
+    this.day=day; this.completedAtMs=completedAtMs; this.correctCount=correctCount;
+    this.answeredCount=answeredCount; this.totalCount=totalCount;
+    this.elapsedSeconds=elapsedSeconds; this.part5Correct=part5Correct;
+    this.part6Correct=part6Correct; this.part7Correct=part7Correct;
   }
 }
