@@ -51,7 +51,7 @@ export class ToeicExtraReadingBatchTwo {
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-FILTER"),
       new ToeicQuestion("R-P7-FILTER-03",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.DETAIL,'',"When is the supplier planning to send the remaining filters?",["October 9","October 3","October 5","October 10"],0,
-        "供应商邮件直接说明剩余两件计划10月9日发出。","The remaining two filters are scheduled to ship on October 9.","scheduled to ship = planned dispatch date",58,
+        "供应商邮件直接说明剩余两件计划10月9日发出。","The remaining two filters are scheduled to ship on October 9 by guaranteed next-day delivery","scheduled to ship = planned dispatch date",58,
         ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-FILTER"),
       new ToeicQuestion("R-P7-FILTER-04",ToeicSection.READING,ToeicPart.PART_7,
