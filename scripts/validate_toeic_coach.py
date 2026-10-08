@@ -63,11 +63,14 @@ def main() -> None:
     week_one = read("entry/src/main/ets/toeic/content/ToeicWeekOneContent.ets")
     week_two = read("entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets")
     week_three = read("entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets")
+    expansion = read("entry/src/main/ets/toeic/content/ToeicVocabularyExpansion.ets")
     week_two_question_count = week_two.count("ToeicWeekTwoContent.q(")
     week_three_question_count = week_three.count("ToeicWeekThreeContent.q(")
     question_count = (preset.count("new ToeicQuestion(") + week_one.count("new ToeicQuestion(") +
                       week_two_question_count + week_three_question_count)
-    vocabulary_count = preset.count("new ToeicVocabularyItem(") + week_one.count("new ToeicVocabularyItem(")
+    vocabulary_count = (preset.count("new ToeicVocabularyItem(") +
+                        week_one.count("new ToeicVocabularyItem(") +
+                        expansion.count("new ToeicVocabularyItem("))
     sentence_drill_count = (week_one.count("new ToeicSentenceDrill(") +
                             week_two.count("new ToeicSentenceDrill(") +
                             week_three.count("new ToeicSentenceDrill("))
@@ -134,6 +137,14 @@ def main() -> None:
     question_ids += re.findall(r'ToeicWeekTwoContent\.q\("([^"]+)"', week_two)
     question_ids += re.findall(r'ToeicWeekThreeContent\.q\("([^"]+)"', week_three)
     vocabulary_ids = re.findall(r"new ToeicVocabularyItem\('([^']+)'", preset + "\n" + week_one)
+    vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)
+    require(len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)) == 30,
+            "incremental vocabulary must contain exactly 30 curated entries")
+    require("V-091" in expansion and "V-120" in expansion and
+            "ToeicVocabularyExpansion.idsForDay(day)" in preset,
+            "business word expansion must reach the selected daily vocabulary plan")
+    require("exampleSentence:string" in models and "item.exampleSentence" in validator,
+            "new TOEIC business words must carry reviewed examples")
     sentence_ids = re.findall(r"new ToeicSentenceDrill\('([^']+)'", week_one)
     sentence_ids += re.findall(r'new ToeicSentenceDrill\("([^"]+)"', week_two)
     sentence_ids += re.findall(r'new ToeicSentenceDrill\("([^"]+)"', week_three)
