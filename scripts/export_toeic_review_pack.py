@@ -72,6 +72,7 @@ def export_review_pack(destination: Path) -> dict[str, int]:
             "approved_at": review.get("approvedAt", ""),
             "human_review_notes": "",
         })
+    words.sort(key=lambda row: int(row["id"].split("-")[1]))
     source = (CONTENT / "ToeicExtraReadingContent.ets").read_text(encoding="utf-8")
     source += "\n" + concatenated_sources("ToeicExtraReadingBatch*.ets")
     groups = [
