@@ -94,5 +94,15 @@ class HandoffTests(unittest.TestCase):
                 prepare(None, "P7-EX-DOES-NOT-EXIST", target)
 
 
+def run_tests() -> None:
+    import io
+    output = io.StringIO()
+    suite = unittest.defaultTestLoader.loadTestsFromTestCase(HandoffTests)
+    result = unittest.TextTestRunner(stream=output).run(suite)
+    if not result.wasSuccessful():
+        raise SystemExit("[toeic-handoff-tests] FAIL\n" + output.getvalue())
+    print(f"[toeic-handoff-tests] PASS: {result.testsRun} tests")
+
+
 if __name__ == "__main__":
-    unittest.main()
+    run_tests()
