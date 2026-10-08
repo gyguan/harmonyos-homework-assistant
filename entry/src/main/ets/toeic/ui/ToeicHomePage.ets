@@ -72,7 +72,10 @@ export struct ToeicHomePage {
   @State private draftLabel:string='';
   @State private navigatorVisible:boolean=false;
   @State private unrememberedVocabularyIds:string[]=[];
+  // Drive ForEach from reactive state rather than a non-observable ViewModel getter.
+  @State private vocabularyItems:ToeicVocabularyItem[]=[];
   @State private updatingVocabularyId:string='';
+  @State private vocabularyActionMessage:string='';
   @State private revealedSentenceIds:string[]=[];
   @State private quizStem:string='';
   @State private quizOptionA:string='';
@@ -452,8 +455,16 @@ export struct ToeicHomePage {
     this.startSession(ToeicPageMode.TRAINING,this.viewModel.dailyQuestionsForDay(day));
   }
 
+  private refreshVocabularyItems():void {
+    // Rebuild both the visual flag snapshot and the stable-priority queue together.
+    this.unrememberedVocabularyIds=this.viewModel.snapshot().unrememberedVocabularyIds.slice();
+    this.vocabularyItems=this.viewModel.vocabularyForDay(this.effectiveStudyDay());
+  }
+
   private openVocabulary():void {
     this.pronunciationMessage='';
+    this.vocabularyActionMessage='';
+    this.refreshVocabularyItems();
     this.mode=ToeicPageMode.VOCABULARY;
   }
   private openSentenceDrills():void {
@@ -504,16 +515,26 @@ export struct ToeicHomePage {
     }
   }
 
-  private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean):Promise<void> {
-    // One reversible action per card: "没记住" flags it, "记住了" clears the flag.
-    // Ignore rapid double-taps while a local review write is pending.
+  private async recordWordRecall(item:ToeicVocabularyItem):Promise<void> {
+    // Use the live store value, not the captured @Builder array argument.
     if (this.updatingVocabularyId.length>0) return;
+    let remembered=this.viewModel.snapshot().unrememberedVocabularyIds.indexOf(item.id)>=0;
     this.updatingVocabularyId=item.id;
+    this.vocabularyActionMessage='';
     try {
-      await this.viewModel.recordVocabularyRecall(item.id,remembered);
+      // recordVocabularyRecall mutates the local snapshot before its awaited save.
+      // Publish that state immediately so the user sees the toggle and reordering.
+      let saving=this.viewModel.recordVocabularyRecall(item.id,remembered);
+      this.refreshVocabularyItems();
+      await saving;
       this.loadProgressSnapshot();
+      this.refreshVocabularyItems();
       this.loadStudyDay(this.selectedStudyDay);
       this.refreshRevision++;
+    } catch {
+      this.vocabularyActionMessage='单词状态更新失败，请重试。';
+      this.loadProgressSnapshot();
+      this.refreshVocabularyItems();
     } finally {
       this.updatingVocabularyId='';
     }
@@ -1019,7 +1040,7 @@ export struct ToeicHomePage {
         DeepPageHeader({
           title:'词汇检索测验',
           subtitle:this.quizModeLabel+' · '+(this.quizPosition+1)+' / '+this.quizQuestions.length,
-          onBack:()=>{this.mode=ToeicPageMode.VOCABULARY;}
+          onBack:()=>{this.refreshVocabularyItems();this.mode=ToeicPageMode.VOCABULARY;}
         });
       } else if (this.mode===ToeicPageMode.VOCABULARY_RESULT) {
         DeepPageHeader({
@@ -1291,7 +1312,7 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private VocabularyContent(items:ToeicVocabularyItem[],unrememberedIds:string[]) {
+  private VocabularyContent(items:ToeicVocabularyItem[]) {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Row({space:8}) {
@@ -1311,6 +1332,10 @@ export struct ToeicHomePage {
         .width('100%');
         Text('没记住的词会排在前面；点击同一按钮的“记住了”即可取消待加强。')
           .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+        if (this.vocabularyActionMessage.length>0) {
+          Text(this.vocabularyActionMessage)
+            .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.DANGER);
+        }
         if (this.pronunciationMessage.length>0) {
           Text(this.pronunciationMessage)
             .width('100%')
@@ -1351,7 +1376,7 @@ export struct ToeicHomePage {
             }
             .width('100%')
             .alignItems(VerticalAlign.Center);
-            if (unrememberedIds.indexOf(item.id)>=0) {
+            if (this.unrememberedVocabularyIds.indexOf(item.id)>=0) {
               Text('待加强 · 排在最前')
                 .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.DANGER);
             }
@@ -1375,20 +1400,23 @@ export struct ToeicHomePage {
                 .width('100%').fontSize(AppTheme.META_SIZE)
                 .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
             }
-            Button(unrememberedIds.indexOf(item.id)>=0?'记住了':'没记住',{type:ButtonType.Normal})
+            Button(this.updatingVocabularyId===item.id?'保存中…':
+              (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'记住了':'没记住'),
+              {type:ButtonType.Normal})
               .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
               .fontColor(AppTheme.PRIMARY)
-              .backgroundColor(unrememberedIds.indexOf(item.id)>=0?
+              .backgroundColor(this.unrememberedVocabularyIds.indexOf(item.id)>=0?
                 AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
               .borderRadius(AppTheme.CONTROL_RADIUS)
               .enabled(this.updatingVocabularyId.length===0)
-              .onClick(()=>{void this.recordWordRecall(item,unrememberedIds.indexOf(item.id)>=0);});
+              .onClick(()=>{void this.recordWordRecall(item);});
           }
           .width('100%').padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.CARD_SURFACE)
           .border({width:1,color:AppTheme.BORDER})
           .borderRadius(AppTheme.CARD_RADIUS);
-        },(item:ToeicVocabularyItem)=>item.id);
+        },(item:ToeicVocabularyItem)=>item.id+
+          (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'-weak':'-normal'));
       }
       .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1945,10 +1973,7 @@ export struct ToeicHomePage {
       if (this.mode===ToeicPageMode.HOME) {
         this.HomeContent();
       } else if (this.mode===ToeicPageMode.VOCABULARY) {
-        this.VocabularyContent(
-          this.viewModel.vocabularyForDay(this.effectiveStudyDay()),
-          this.unrememberedVocabularyIds
-        );
+        this.VocabularyContent(this.vocabularyItems);
       } else if (this.mode===ToeicPageMode.VOCABULARY_QUIZ) {
         this.VocabularyQuizContent();
       } else if (this.mode===ToeicPageMode.VOCABULARY_RESULT) {
