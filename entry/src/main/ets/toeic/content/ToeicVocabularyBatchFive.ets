@@ -1,6 +1,6 @@
 import { ToeicReviewStatus, ToeicVocabularyItem, ToeicVocabularyLevel } from '../domain/ToeicModels';
 
-/** Original property, policy and finance vocabulary; remains REVIEWED pending human signoff. */
+/** AI-reviewed V211–V240, released with content-bound editorial fingerprints. */
 export class ToeicVocabularyBatchFive {
   static items():ToeicVocabularyItem[] {
     return [
