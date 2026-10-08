@@ -1,12 +1,14 @@
 import { ToeicQuestionTranslation } from './ToeicQuestionTranslationModels';
 import { ToeicQuestionTranslationWeekOneCatalog } from './ToeicQuestionTranslationWeekOneCatalog';
 import { ToeicQuestionTranslationWeekTwoCatalog } from './ToeicQuestionTranslationWeekTwoCatalog';
+import { ToeicQuestionTranslationWeekThreeCatalog } from './ToeicQuestionTranslationWeekThreeCatalog';
 import { ToeicQuestionTranslationSupplementaryCatalog } from './ToeicQuestionTranslationSupplementaryCatalog';
 
 export class ToeicQuestionTranslationCatalog {
   static items():ToeicQuestionTranslation[] {
     return ToeicQuestionTranslationWeekOneCatalog.items()
       .concat(ToeicQuestionTranslationWeekTwoCatalog.items())
+      .concat(ToeicQuestionTranslationWeekThreeCatalog.items())
       .concat(ToeicQuestionTranslationSupplementaryCatalog.items());
   }
 
