@@ -60,6 +60,24 @@ class ReviewIntegrityTests(unittest.TestCase):
         self.assertFalse(is_valid_approval({}, digest, today))
 
 
+
+    def test_ai_review_must_be_openly_attributed(self) -> None:
+        digest = "b" * 64
+        ai = {
+            "reviewer": "AI-GPT6",
+            "approvedAt": "2026-10-08",
+            "contentSha256": digest,
+            "reviewMode": "AI_EDITORIAL",
+            "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+        }
+        today = date(2026, 10, 8)
+        self.assertTrue(is_valid_approval(ai, digest, today))
+        self.assertFalse(is_valid_approval({**ai, "reviewMode": "HUMAN"}, digest, today))
+        self.assertFalse(is_valid_approval({**ai, "reviewer": "unknown"}, digest, today))
+        self.assertFalse(is_valid_approval({**ai, "reviewEvidence": "none"}, digest, today))
+        self.assertFalse(is_valid_approval({**ai, "reviewMode": "AUTOMATED"}, digest, today))
+        self.assertFalse(is_valid_approval(ai, "c" * 64, today))
+
 def run_tests() -> None:
     stream = io.StringIO()
     suite = unittest.defaultTestLoader.loadTestsFromTestCase(ReviewIntegrityTests)
