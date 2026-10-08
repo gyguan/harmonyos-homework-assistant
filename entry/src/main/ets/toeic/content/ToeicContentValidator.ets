@@ -11,7 +11,14 @@ export class ToeicContentValidator {
     let errors:string[]=[];
     if (question.id.trim().length===0) errors.push('question id is required');
     if (question.stem.trim().length===0) errors.push(question.id + ': stem is required');
-    if (question.options.length<3 || question.options.length>4) errors.push(question.id + ': options must contain 3 or 4 items');
+    if (question.options.length!==4) errors.push(question.id + ': TOEIC item requires exactly four choices');
+    let uniqueOptions:string[]=[];
+    for (let option of question.options) {
+      let normalized=option.trim().toLowerCase();
+      if (normalized.length===0) errors.push(question.id + ': empty option');
+      if (uniqueOptions.indexOf(normalized)>=0) errors.push(question.id + ': duplicate option');
+      uniqueOptions.push(normalized);
+    }
     if (question.correctIndex<0 || question.correctIndex>=question.options.length) errors.push(question.id + ': invalid correctIndex');
     if (question.recommendedSeconds<=0) errors.push(question.id + ': recommendedSeconds must be positive');
     if (question.version<=0) errors.push(question.id + ': version must be positive');
@@ -19,6 +26,20 @@ export class ToeicContentValidator {
     if (question.reviewStatus===ToeicReviewStatus.PUBLISHED) {
       if (question.explanation.trim().length===0) errors.push(question.id + ': explanation is required');
       if (question.part===ToeicPart.PART_7 && question.evidence.trim().length===0) errors.push(question.id + ': Part 7 evidence is required');
+      if (question.part===ToeicPart.PART_5 &&
+          question.stem.split('_____').length!==2) {
+        errors.push(question.id + ': Part 5 must contain exactly one visible blank');
+      }
+      if (question.part===ToeicPart.PART_6 && question.passage.indexOf('_____')<0) {
+        errors.push(question.id + ': Part 6 passage is missing the completion blank');
+      }
+      if (question.part===ToeicPart.PART_7 &&
+          question.passage.trim().length===0 && question.groupId.trim().length===0) {
+        errors.push(question.id + ': Part 7 question must link to reading text');
+      }
+      if (question.stem.indexOf('题干待')>=0 || question.stem.indexOf('TBD')>=0) {
+        errors.push(question.id + ': placeholder question stem is not publishable');
+      }
       if (question.section===ToeicSection.LISTENING) {
         if (question.audioAssetId.trim().length===0) errors.push(question.id + ': listening audioAssetId is required');
         if (question.transcript.trim().length===0) errors.push(question.id + ': listening transcript is required');

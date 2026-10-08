@@ -7,6 +7,7 @@ from test_toeic_review_integrity import run_tests as test_review_integrity
 from test_toeic_editorial_handoff import run_tests as test_editorial_handoff
 from test_toeic_ai_editorial_release import run_tests as test_ai_release
 from test_toeic_remaining_editorial import run_tests as test_remaining_editorial
+from validate_toeic_question_quality import validate as validate_question_quality
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -29,6 +30,7 @@ def read(path: str) -> str:
 
 def main() -> None:
     require(TOEIC.exists(), "TOEIC module directory is missing")
+    validate_question_quality()
     sources = "\\n".join(
         p.read_text(encoding="utf-8")
         for p in TOEIC.rglob("*.ets")
