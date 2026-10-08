@@ -1,7 +1,7 @@
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
-import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicSessionReport, ToeicQuestion, ToeicQuestionAttempt, ToeicQuestionTime, ToeicScoreValue, ToeicSentenceDrill, ToeicSessionDraft, ToeicSkill, ToeicVocabularyItem } from '../domain/ToeicModels';
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 
@@ -25,6 +25,11 @@ export struct ToeicHomePage {
   @State private selectedDayMinutes:number=0;
   @State private selectedDayVocabularyCount:number=0;
   @State private selectedDaySentenceCount:number=0;
+  @State private selectedVocabDone:boolean=false;
+  @State private selectedSentenceDone:boolean=false;
+  @State private selectedTrainingDone:boolean=false;
+  @State private showFullPlan:boolean=false;
+  @State private recentReports:ToeicSessionReport[]=[];
   @State private progressCurrentDay:number=1;
   @State private progressDiagnosticCompleted:boolean=false;
   @State private progressWeakSkill:string='';
@@ -231,6 +236,7 @@ export struct ToeicHomePage {
     this.progressCorrect=snapshot.totalCorrect;
     this.progressAccuracy=this.viewModel.accuracyValue(snapshot);
     this.mockReports=snapshot.mockReports.slice();
+    this.recentReports=snapshot.sessionReports.slice(-3).reverse();
     let draft=snapshot.activeDraft;
     this.draftLabel=draft===null?'':'Day '+draft.day+' · '+
       (draft.day===14 || draft.day===19?'完整模考':'专项训练')+
@@ -249,6 +255,36 @@ export struct ToeicHomePage {
     this.selectedDayMinutes=plan.estimatedMinutes;
     this.selectedDayVocabularyCount=this.viewModel.vocabularyForDay(day).length;
     this.selectedDaySentenceCount=plan.sentenceDrillIds.length;
+    let progress=this.viewModel.dayTaskProgress(day);
+    this.selectedVocabDone=progress.vocabularyCompleted;
+    this.selectedSentenceDone=progress.sentenceCompleted;
+    this.selectedTrainingDone=progress.trainingCompleted;
+  }
+
+  private completedTasksCount():number {
+    let count=0;
+    if (this.selectedDayVocabularyCount===0 || this.selectedVocabDone) count++;
+    if (this.selectedDaySentenceCount===0 || this.selectedSentenceDone) count++;
+    if (this.selectedTrainingDone) count++;
+    return count;
+  }
+
+  private async finishDayTask(task:string):Promise<void> {
+    await this.viewModel.completeDayTask(this.selectedStudyDay,task);
+    this.loadProgressSnapshot();
+    if (this.selectedStudyDay!==this.progressCurrentDay &&
+      this.selectedStudyDay+1===this.progressCurrentDay) {
+      this.selectedStudyDay=this.progressCurrentDay;
+    }
+    this.loadStudyDay(this.selectedStudyDay);
+    this.mode=ToeicPageMode.HOME;
+    this.refreshRevision++;
+  }
+
+  private lastSessionHeadline(report:ToeicSessionReport):string {
+    let accuracy=report.answered>0?Math.round(report.correct*100/report.answered):0;
+    return 'Day '+report.day+' · '+report.correct+'/'+report.answered+
+      '（'+accuracy+'%）· 慢题 '+report.slow;
   }
 
   private selectStudyDay(day:number):void {
@@ -612,7 +648,7 @@ export struct ToeicHomePage {
         this.mockPart5Correct,this.mockPart6Correct,this.mockPart7Correct);
     }
     await this.viewModel.completeSession(this.attempts,this.mode===ToeicPageMode.DIAGNOSTIC,
-      advanceProgress,report);
+      advanceProgress,report,this.activeSessionDay);
     this.loadProgressSnapshot();
     if (advanceProgress) {
       this.selectedStudyDay=this.progressCurrentDay;
@@ -708,6 +744,8 @@ export struct ToeicHomePage {
       }
       .width('100%').alignItems(VerticalAlign.Top);
 
+      Text('当日任务 '+this.completedTasksCount()+'/3 已完成 · 完成后推进学习进度')
+        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
       Row({space:10}) {
         this.Metric(this.viewModel.skillLabel(this.progressWeakSkill),'当前薄弱点');
         this.Metric(String(this.progressReviewCount),'待复习错题');
@@ -716,14 +754,14 @@ export struct ToeicHomePage {
       .width('100%');
 
       Row({space:10}) {
-        Button('高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
+        Button((this.selectedVocabDone?'✓ ':'')+'高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
           .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
           .fontSize(AppTheme.ACTION_TEXT_SIZE)
           .fontColor(this.selectedDayVocabularyCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
           .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
           .enabled(this.selectedDayVocabularyCount>0)
           .onClick(()=>this.openVocabulary());
-        Button('阅读提速 '+this.selectedDaySentenceCount+' 句',{type:ButtonType.Normal})
+        Button((this.selectedSentenceDone?'✓ ':'')+'阅读提速 '+this.selectedDaySentenceCount+' 句',{type:ButtonType.Normal})
           .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
           .fontSize(AppTheme.ACTION_TEXT_SIZE)
           .fontColor(this.selectedDaySentenceCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
@@ -736,7 +774,7 @@ export struct ToeicHomePage {
       Text(this.selectedDayGuidance())
         .width('100%').fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
 
-      Button(this.trainingButtonLabel(),{type:ButtonType.Normal})
+      Button((this.selectedTrainingDone?'✓ ':'')+this.trainingButtonLabel(),{type:ButtonType.Normal})
         .width('100%').height(AppTheme.BUTTON_HEIGHT)
         .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
         .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
@@ -858,7 +896,6 @@ export struct ToeicHomePage {
             .padding(AppTheme.CARD_PADDING_COMPACT).backgroundColor(AppTheme.DANGER_SOFT)
             .borderRadius(AppTheme.CONTROL_RADIUS);
         } else {
-          this.DaySelector();
           if (this.draftLabel.length>0) {
             Column({space:10}) {
               Text('继续未完成训练')
@@ -884,6 +921,12 @@ export struct ToeicHomePage {
             .borderRadius(AppTheme.CARD_RADIUS);
           }
           this.TodayCard();
+          Button(this.showFullPlan?'收起 21 天计划':'展开 21 天计划（可复习或预习）',
+            {type:ButtonType.Normal})
+            .width('100%').height(AppTheme.BUTTON_HEIGHT)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .onClick(()=>{this.showFullPlan=!this.showFullPlan;});
+          if (this.showFullPlan) { this.DaySelector(); }
           if (!this.progressDiagnosticCompleted && this.selectedStudyDay!==1) {
             Text('建议先完成 Day 1 快速诊断，但你也可以直接进入当前选择的训练日。')
               .width('100%').fontSize(AppTheme.META_SIZE)
@@ -906,6 +949,29 @@ export struct ToeicHomePage {
           .width('100%').padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
 
+        }
+
+        if (this.recentReports.length>0) {
+          Column({space:8}) {
+            Text('最近训练记录')
+              .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
+              .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+            ForEach(this.recentReports,(report:ToeicSessionReport)=>{
+              Column({space:4}) {
+                Text(this.lastSessionHeadline(report))
+                  .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
+                Text('P5 '+report.part5Correct+'/'+report.part5Answered+
+                  ' · P6 '+report.part6Correct+'/'+report.part6Answered+
+                  ' · P7 '+report.part7Correct+'/'+report.part7Answered)
+                  .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+              }
+              .width('100%');
+            },(report:ToeicSessionReport)=>String(report.completedAtMs));
+            Text('正确率为练习原始得分，不代表官方换算分。')
+              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%').padding(AppTheme.CARD_PADDING)
+          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
         }
 
         if (this.mockReports.length>0) {
@@ -1044,6 +1110,12 @@ export struct ToeicHomePage {
           .border({width:1,color:AppTheme.BORDER})
           .borderRadius(AppTheme.CARD_RADIUS);
         },(item:ToeicVocabularyItem)=>item.id);
+        if (items.length>0 && !this.selectedVocabDone) {
+          Button('完成今日词汇学习',{type:ButtonType.Normal})
+            .width('100%').height(AppTheme.BUTTON_HEIGHT)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY)
+            .onClick(()=>{void this.finishDayTask('vocabulary');});
+        }
       }
       .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1101,6 +1173,12 @@ export struct ToeicHomePage {
           .border({width:1,color:AppTheme.BORDER})
           .borderRadius(AppTheme.CARD_RADIUS);
         },(item:ToeicSentenceDrill)=>item.id);
+        if (items.length>0 && !this.selectedSentenceDone) {
+          Button('完成今日拆句训练',{type:ButtonType.Normal})
+            .width('100%').height(AppTheme.BUTTON_HEIGHT)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY)
+            .onClick(()=>{void this.finishDayTask('sentence');});
+        }
       }
       .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
