@@ -6,7 +6,7 @@ import { ToeicQuestionTranslation } from '../content/ToeicQuestionTranslationMod
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { ToeicProgressStore } from '../data/ToeicProgressStore';
 import { ToeicPronunciationService, ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
-import { ToeicDayTaskProgress, ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSessionReport, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicDayTaskProgress, ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicReviewStatus, ToeicSessionReport, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
 
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
@@ -53,9 +53,15 @@ export class ToeicCoachViewModel {
   }
   recentSessionReports():ToeicSessionReport[] { return this.snapshot().sessionReports.slice(); }
   contentErrors():string[] {
-    let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
-    let groupErrors=ToeicContentValidator.validateReadingGroups(PresetToeicContent.questions(),ToeicExtraReadingContent.groups()).errors;
-    let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabularyForReview()).errors;
+    let all=PresetToeicContent.questions();
+    let live:ToeicQuestion[]=[];
+    for (let question of all) {
+      if (question.reviewStatus===ToeicReviewStatus.PUBLISHED) live.push(question);
+    }
+    let questionErrors=ToeicContentValidator.validateAll(live).errors;
+    let groupErrors=ToeicContentValidator.validateReadingGroups(
+      live,PresetToeicContent.publishedReadingGroups()).errors;
+    let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
     let sentenceErrors=ToeicContentValidator.validateSentenceDrills(PresetToeicContent.sentenceDrills()).errors;
     let translationErrors=ToeicContentValidator.validateQuestionTranslations(
       PresetToeicContent.questionsRequiringTranslation(),
