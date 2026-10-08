@@ -1,4 +1,1357 @@
 {
-  "readingGroups": {},
-  "vocabulary": {}
+  "readingGroups": {
+    "P7-EX-VENUE": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-DELIVERY": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "dac4560e25866750c712a5d9c364d27a7a8da3fb7e1d7afbef2ddef1338d341d",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-TRAVEL": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "426128b8163433b04e4fe30bbd94557730abe0c266827426531cb8784593c763",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-ONBOARD": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "daa99d58028af89fb1e37f1144f97cac66c85ecaf8d3af5730322786632ff5c6",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-FILTER": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "2f6f4c9185277dbb8ede45d47b727ba83997e4eb6764eb1efaf221704423a288",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-SUPPORT": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "30aee7b6155f6976b14220b4ae011c15b153da9323dcf27c1ec1411d54e4a216",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-RETAIL": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-LEASE": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-TRAINING": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-MIGRATION": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "6716f54bbe4ac990bc0c7ff14260dc658974ab1e585be72f2fcefbd5c0047312",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-LICENSE": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "3d2c8bf23e75762f08073f2ed21137e4c952438c9ce379b75da428e01f5d66db",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-PERDIEM": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "96dc7753845b8198fb10ab2873e21a7ed2a7e90626d4b7d35a15d0eb4ddbc61b",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "P7-EX-CATERING": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    }
+  },
+  "vocabulary": {
+    "V-121": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9e59f9ab8cc72e390602bea73294dc5f75fc9d0040a7b58767810c07ec95568c",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-122": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "ce0218e118168cff11c3d1d3557aa7e92f36d0bfa698e07ce054e733901d5222",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-123": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "4de364d876c81f8d82508115e38b4f7f126c5fd3c9a10a87edf6bdacc89e039f",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-124": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "c7003721d5f506290ea6d377c187ce2ab3a35cbef95c09b9a7e7e3de00f7d681",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-125": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "34d0b5f7859d30205d179f3dbba64cb1ffd79678302ea4a887cc738f771f2e08",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-126": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "05d2063bd7b8aa9b5367709deaadf14eb205f4a92052965771c3d8431f1d25f7",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-127": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "a45662a378db234f6c64a32b5fd0d8bffbb947a3a1e411988f3c852850a117ca",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-128": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "6925fca0460c71d92f5c992f0ac41a534d2d1453cfec2c1897bdc7ae5575b83c",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-129": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "ce5c4a301904d905f12461ad75025fa79476033f3ab085948de3097640135223",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-130": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "43086913170c69f674145ca3730fbf4c77acd820979006309ca24870d62cb3c6",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-131": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1fddf1d3c394ae16ab7d401753600cea5e4eed45d8a96df0e4b7ff76b410ea19",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-132": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "6b02981bed0b4022ebf4c0be3d2838cf901408c7f72a02a28ae997452ba1d608",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-133": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "43e0c48cb0d10996d4f4a8ee13087d6254e5e167b3e4783e2b710fc58268c5a7",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-134": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "25c207457bfb70b09abe16f6bd0bfc14578941b0daec6c4530a7f3f6dcff20d4",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-135": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "7b17349d12310219f8f80f2966c3b7048e423e8468960181e7166044dd0808a9",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-136": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "c5412120065cead1020630e69d4a122052945980be35cb1bb88b60d333e859a7",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-137": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "c13e44e05a1e3cee28d2c67ba682eaba8c18e3c8f59ce16b39c56e301c437a4a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-138": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "a0bb93d0bf79ce3c7e64fab5c9b2ec7a5e4696f1ac3dcf22c24d1cba30b166bc",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-139": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "67438167177a9511bcbff872c3299bea4db6fc1ecf25cd772971db3853ed07e1",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-140": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "01defc6fe46d231eedef70013bf8fb0246f1443e4d5ed9dcbfab2eeff167629a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-141": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "043b526db11705ecb67d997e8edb5b6f4224ce0d2bf4c9c851346e968c850cf4",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-142": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "3248d276ba4886ac9145878307378a8ce53e8c0633434909ed5a7ab2bf60fb95",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-143": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0288063eb39095b2d901118fddfc089608877ff273fd35a5c2ba98cd098b0498",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-144": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "fb44b6fbc744a916979af1980fb4e5b109ac2b3e988a517420874c07b7dfa754",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-145": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9e3c1e9eb45d46a036f977b73309cc4a4ec9b372054f793f69008111d191e6a3",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-146": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "dcbc776af3ecad02130931544c45557557e90f7ebac948070e48eb2485447db3",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-147": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "696cd04e65fb2b9e16d0e54e66fdbd760d79808a5a0f4f36a1a4e9546cf383f4",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-148": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "21d1d6dbef32ce351bb87bd504ed0ae2111b2bd07621ccb51039ab17d108b447",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-149": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0171d8dbfaa0ffd9f5efac741e21ffada007515221e829be9e58e6326b795a51",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-150": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "3d2617f92a00f870ee897fff3395267c78b5561b3b294f6d076ffe7b86424171",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-151": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9681b6f26c1b74245ccb76b0c842a595fab7d553552c3358f81346d40ce3018b",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-152": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "39459977a2772673dadd7c0af7a20ce139c320b5a84b0fa7de6b9b3695c006c0",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-153": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "8a4a9988000a7472207da9bc0997b394277f1e890734e88c7cda8f8ea1c27b45",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-154": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "6ffea7908dafe6e05868658e7f145c4e20edbcc8e9d558ff2d760fa2289cc1ca",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-155": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0809affa928d4ec4fb27469adb2acba64e13725112511a89643105e45b2d7ffb",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-156": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "048e6f24dec0b87c42b8f7afac5125d7fe9f510191fcdf63722879f6cf3b3bcb",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-157": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "948a460c8e9ff7298f4e31360e3c7131cbb8d2bb922ba6814f16ea8218066f77",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-158": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9dc216a7889d38aa51166d90f476a24de809a16cfc57d40b13e1351d23da7a83",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-159": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "45e3668802b8db437aa42779a7689a65800f01347e9ffa775171e6d62f802473",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-160": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "7b17f88dd5648661bad7fbdef8b7ffd0f441b00bde369f9ae16adb3143b4a0d0",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-161": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9b390f9e21caf72f4a8870af62866171a2b54a7810cf2c7fac5377d1eb5872fc",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-162": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "f566ba7ebabda8fca1aa49d8abc9b9200abe49e89c2fbc78088cfe6e95c4d9b0",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-163": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "7b96404d65348a43b6b2e21af0de1e3cc2069dfb8802f60a7f25119a076470de",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-164": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "c80bf4ceaf0d57a44f1ed16b5fb6c21647c91ea0745c9eea201c2f70af03d458",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-165": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1ac1ba7dd64e6f2d7ee73842352f050107a4025f3db96e4107b6e694af1d4cbb",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-166": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "5911ad834feb63ae909675ea2021c8dbfc0e5d7e5b8c6274cefa3e48ce88d364",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-167": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "f46b7ee586545e546f3a19c2e0ba5cc5a8be0059bc61ce3463de01307a0314a7",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-168": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "7ca2caaeda14a48eca31d1ac4b6cffc564be6eebf90d0f26fba0fa97bfb724db",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-169": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "64a91a1212266a438132213d8cc2084e8f4e3bbc06efcd7f544beb45fcce664f",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-170": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "ab5a9988f268a96b141cfc3b2f2a3df5dc1d5fbbaa673ebb6d432b5be9c0b670",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-171": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0bb3aa3826315822754f6fabf81d7904f54062cb783076d7513b411d349e85c9",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-172": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "8ae830f126cc1e31cf52b6bed7b23ce53d10ec72a691cc415cb52a7b940d099a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-173": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "dfdaf77808a122e6b8a77434028d52b6daf9d3e896232e826edaef1bf255eff0",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-174": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "3c0941e374775b294955e6ff89f9c70d3893f1737c59b98622fc0c2b9589ae0f",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-175": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "c11ad61cd528605506a45ecc5454338ee1967559128fb5d1230d8646ff08c5b8",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-176": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "4253ba068ea774c47bfcba1670bc7d38e8d9bacdcf83a5b570b97721d0af26fc",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-177": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "d4295cb7107fe9be35fe2a1d10bdbeda5f31adb486fc35b27930f111bd348562",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-178": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "4c1b90f483c3f889b9faf8a4e0698e73de0e6281cf88b88911c0e42550561670",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-179": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "266d72ed8fba7edefda7927cee74963c37a2c39d8a0926461c1a33ebe64693b5",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-180": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "fcda16b85bb5af7af6f50d65631a7d4661965f663732817019b1a355e86db334",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-181": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "43ad678f560ea27d3a7d4d77c67b5c7925259f1d89f8b17cc2380787c21bb26b",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-182": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "713286cff9f3a73b3ce4706deb171e0001290c6a178a1b43a3792f8caf68a578",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-183": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "da9641f9615e1807bf0d9d48ef83678970d6bdcf2dca6b8b9644e6b152a7fb15",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-184": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "cb2f2c45562fcb9fc2bf6958d79937244f32a7ecf9a546bef55a2cb7240f8357",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-185": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "59013cbd27098bf02ac4ee76dc3163d085deab4d8f70b5cb939f0f3b0c8e581a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-186": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "fec4b64704ea6048525da2f32a2e1bb902b433e4453ab7afbff512de24d8b37b",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-187": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "425db28b1a92b3d7426b33c417329f4aa83632a18d8ce9fe4d0e3f85d08970e2",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-188": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "a41a58e010b4eeae4a69f4d6ff27a894d9ff6460a3cbba1f5b06877fefc9c612",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-189": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1da6c279ec94a1dde77bb9fce9f367a94cefb4c7f5602de0f3c92fb3bc39b02f",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-190": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "726cc0d046e771c2aa174eaa43d7647e50000190da2781d28f54024dfa433270",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-191": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9b4ac51ccc5baa657bc5dfe131d20c5d9323f27ff5e4aab405b52b8a78b92903",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-192": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "a52e224d4bb66f604556f0adbda18fd64726e4279da85a182fac9e44a14fcdcc",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-193": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "e0e549d68a1b534c9fe35bf3038bf4bd69210ddc68eb7145d43942f62acce5ae",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-194": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "842d56b244f4f5fa0fc77c4044a4d2fd12af4fdb11f2377178695f5cb2abe5ff",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-195": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "915d47133374937965c6370c893d261aa7cb16b2e4a736746f63260497850db0",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-196": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "5655b20853b6e2ad914e1f9acef582b02358d89f17b2fc291fc5a9782a1aea43",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-197": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "e18f6681b44d7f2f5af6f49291b72c8da75b4f152786b3a9666085b2d0d90def",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-198": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "b790a043fa81c35f220486f9bc1e9c974f63939ce61e42a7da9de68b22a39f75",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-199": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "d1f142ca918f7510975ea2f7589e19ffc4f7c75bd86bc3a46d112ad58374045a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-200": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "ac0f2ec58b266dd4b658d5a53af15b2740bbd8f6d52d42c2d517250d58a5833e",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-201": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "2c6adc1f62e8a0ab2701aeef6153bb17320a46d99af2c9f596b5def6d8245e38",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-202": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "204cffc18fcc7da4d455dded84f699f7efe04c373d270c23db6aa054f4c95fe2",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-203": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "3b7a7d86a7b568b0cf8819d5c63f55f9541cb45f92e89640f54200ef6b2bef76",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-204": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9c8b48f61e919fbdfebb8871d4b1b15dfc9e89ba2a8baace2354426ba276ef15",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-205": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "298a7db888df3f83e6b9e448fd31566c58430ad73e365315c6914d91849618df",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-206": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "caa3ad42059fa187b2ecffab88afe7b7ce74c44e777e45d03d07ba06d10efda7",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-207": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "10d8edbf165b898c72a44ebfe282c34e3de7b5e147326a0832502778df0b2d07",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-208": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0614e7a421725a88d0f1d7a7d714d390185339a2bbda883edae90e719bb0a68f",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-209": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "ddee7b1641cf37fe3c53b1e6629034566e69d5202e3b497577d64e7cf5887a4f",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-210": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "2190905774d9fcff3c0deea05feb81eec07f08bf12c97b6543cdccbbe15e5cb6",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-211": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "d542d137e17b5747c88e0cda0471fe3920fec45e5eb878f50c41ae379ee971fa",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-212": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "499c8eacb7b65ab7adf7b2606abe1cb84e321ce8b9701379aef717d953a1ec08",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-213": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9e4f88e859a7119ed645d936bc5defce8dd6def6a9ab29791d269349e01e06dd",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-214": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "3564a54b5a1b691ac8275d736eba25526c197181bc7bdda3b41605a923e4b7e9",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-215": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "55947d276141a5152b330752134f9acb1a4d14b216402fdc2cab12d21e7679b1",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-216": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "62218ceaf81ea33b1f189fb467a3264c9388afb113293d40228dd6aa78f5ac20",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-217": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "b4ce409a4f9c7d9ade6d0ffa94bfc839ec8975c55e6a499ba0ecf5702568c60b",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-218": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "3325af069b7d148264b44aa3ae3d5f75f16ffdec58922b620249b97d92891c55",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-219": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0b3d78ad32b8202922ffa386a94c63a7aac48220689c3b07be7d624fbea5ee56",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-220": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "e421c3a3f47a5c35661c4cc1f37e5b9d2e40d5bed1b3765f51976715ca6393dc",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-221": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "5cf110b229f19c52390d516ab3e0adef9e8482a088c710da3f5fc39aef323f07",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-222": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "bdad4e8e37973d6219a1322851f6275063edc4b44a8a686f61db243591986f99",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-223": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1178c3c81de6a0405fb7cfb93c61f7fddf6b7d04784c7251d5061ba145f995ee",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-224": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "cd356f04d6a16a1d942ece88cfc6161d5b7f20bbbbfda6acacfcf81aebb9d5f1",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-225": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "73141088fbbb51018b5021c7d141f2bc502c9111e83a20024bc31c9c36046310",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-226": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "71823e749f7f732242ceca28b714eb07b900fb921424de1d128f80a3c520c525",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-227": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "41b38b0f051df7021b2ed9142f7e0773732cbe3a033242cc93aeebc86404fa20",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-228": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "4ef9a6da20f217330f79398255b482fced017816ea49004327a884232fa2c9d0",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-229": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "741c34715c011dab3d70c226ceb6a97cb99d25c842265d1e6b2f0c7ec2e564eb",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-230": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "2cb6cf3a9cc62fd07e7421554d395efdde864068d3a69b4b120bf3e9ccaf4a75",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-231": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "c0505d3e344b7597a7b28164463be4a24ede9eb8bc872538b3a02d0f1d85bc37",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-232": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1b71832562fb5b42b3c6f865570478d01ebe7c67bbb4faa6b1fc8ee17d08b1a3",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-233": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "40789ea7cd0ee5a70f466d66b32dde60ba252493d6ffb4734207e6f1e1e8e0c1",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-234": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "d0f7387e484cc2e21d84138a313d51e1181ee4562072492fa4dbd7cb3175d2bf",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-235": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9bf017f8fba58d2351342b4946b29f58d4c5072696ad7342c4fff8012fedbd2e",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-236": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "f4020b85d9b921c18f5b682eccebc4aed240fbacc1fb3e278aed3f75e9b4a68e",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-237": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "d3a77f5870adfcdd10b4c1f1322ef19233b8dcdd18aea8e68939b53b8fd86902",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-238": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "87d0411f6c73272b6b19e2e24803388d20d9853b231a84569f78a4ec5dfd5a48",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-239": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "dc00166bf29631f421238f4864fe056043e690ef3f8b28b84bcbea15c2caf174",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-240": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9d7bcdcaf2f0be6678163161c3487d853dd2b65b3ca0c52c0ba3eee24a1bff49",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-241": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "8e8f1ec9cb94fd377405b54e5ba38ce4c1e98b95b7e820061ada251150c42856",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-242": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "181ed34785f2c41e674db52059ab8ff2561f8be12595d252031d3f4fbfbdafe8",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-243": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "202620291cc18fef7fe4f1dc0b3297502c33af57c2e3663666220c3f55791555",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-244": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0d16d4787a8e2a276107d43f2d09f28c27bedd3f7ca9af5f275e26db13a22c60",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-245": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "53dbb717713ce25f5d635ce4d8e795ae0d4b11255d621350463e89c1033fbe79",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-246": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "e8d985cf637796b4af3b4182d3d3f17aca620273a2ae3472e56a27435fe3d513",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-247": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "2c0ba782e509e4d8112c3e3757b9d2684bfb9d0b3b12ce7e760dccc060924e75",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-248": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "d096703fe05ca5a11b84da15d755c406a5581785c7e7fa0aac5c84d2827fa753",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-249": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "7444615537c31976ad704c878fe03326be2bb0c624f378bbb22bca913a90d50e",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-250": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1085f67884989214b55be3e5bc6ac8a554808d1a4bcc35fdfca6f69aeb42382a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-251": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "8a2f4dbfa025d13cd0eec2d69a1e35c60aba65138ee874877035a6ec3e6ae231",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-252": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1c36f7d8fe1c65b034318f29753e36c5cac90ef4d21e71ff1b7f3c37ec41a05a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-253": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "aedb7d336ee062685d3de4e01e767d441ca561046f6864694701004b7e9afae0",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-254": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "653aef55169d8cecc3ba8a74d7da790f5990997ddb1e5f1f9de51f7852ff2b2a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-255": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1ee861abbe35e38a53ac713c8393db7db762d9f637d325495d290b8aac5df664",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-256": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "fc9fc6ddfa04cdba06c536c416e8c41b8f54b538617286d102a4003a55bcd608",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-257": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "8c73a68aacb710cb295d33fdf26db37a9f35d33a07996ec5449eb0a660b5378e",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-258": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "c9f6207ba2ee1e297ad604cba4c56e18fd58bb153e80c8ce201705df5da61a78",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-259": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "bd78511c3d46c522d6f2666ba3e64b022ceb356a3479da88315a741636c8452c",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-260": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "730f388305242f7fb47ba6b59a09f3344b40c6a54abcf66b534b697be07cc8a9",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-261": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "4ec546eaa16d30f08ec8ec657bce00757e76c0fdc8b2ceb703d9b53ceec17e71",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-262": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "d015bc49e57a13d9f8a61e5b06d8d0735178fc4476a94aa6d069a7ecc0744ff1",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-263": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "ea7b8f2e4bed6e97fcac29fce103d5583b03cf69765b45e41b67e0006e90805a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-264": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "c97687d82b5e1b72337a1d0d5d8a335e5c3c179a5ccbedc456014b29c17c5dbd",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-265": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "9696ab7fc5a20701e0449e760cbd6f5f71e74b73e759bbd837536aeb19c664a6",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-266": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "d2db1cfee3dfde6f008dc464aca9aad9b85ba06aad9e851ac7e938594b248ca0",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-267": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "f1cdd556ab88fa818e013df9f40bdccfe2c9b74ba47f3c78c1a8884cdd030b8a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-268": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "03a9f0af435d3b933ff81b31b936f2e07ba6472a7bcd36802da2c10bfc5e6ad1",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-269": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "4bfeee8ce131a5be8b9c71fe647a3079aa6fc65a909783ab981f9a2e0d024e6c",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-270": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "30ff610fbace627503f472b70772a77f4c28988972aa63b8ac21b5f21850779e",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-271": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "bd99772688c50d2432c1796a83da2bfa9c06320d0cd91db860cba0f83b411999",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-272": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "27c46bc62b1bc8dcc6419ba58643c2a5a39744d95fcc35347fe366ecdf82caaa",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-273": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "e24a91c8a2b6ae59fc4902fc5f70838d5a14bd7b8858fe035732a20af28e1051",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-274": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "17ab2d83f4df57b97c631617184aed014c9678d2f17748fb140f42d9c68246c8",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-275": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "6848064f050c5c4597fbe2c388aa61faa327a0bc9b15a795904bd5b95aae780a",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-276": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "40935b508acb8cea4fbaf595415919195101030882126d34f11d5fe91ad8842d",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-277": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "e356cd34337f0f79fa419042646a6634d729bb51a0bd98a564b474ac6954cddd",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-278": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "6ec59a30a094cac8dc79f234d8ea4bae5c9bed43f962ca5d05d3e178328e7711",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-279": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0d1ab715dc58a44fb8550da34d536810e739a5c82ad831ecdb9667dfa33097c2",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-280": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "98eefb997f8071d793a90776e5d5a2f765921b45ba7d44cd95ec94f11b04c503",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-281": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "fc5460eaad87121165bfa1aa307442183bf12ef8fdea72c5e41211daee7a390f",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-282": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "f1ec92f2cde37ed56ecc044cab7356f2131f6bf25a0a4d3ec941cf88846406b2",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-283": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "a597302342da2e454dcd31da1b661240c502dd4265a185604c3078d94f8c9eb4",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-284": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "5aac076aaf6c32c470ae5bebc171af9e3e821b977fed14de6471a2bf62877256",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-285": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "90279d3c79983321777fda140038ed7511c9e9190304d086328297cf645326fb",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-286": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "4863fa3ba57c62d2e0f0c25b4b4371d7d8ab5e21c3225fad7ab3a0b263ad2f6c",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-287": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "5807d2719ed578869d0a146eaa5d6500cdca002936c83442c54c06b817f6db35",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-288": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "a139e3c418dfb414c97901a5701740abb842a2d74d58aea78de43b4c225651c7",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-289": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "81615c5665416a09f277e28fdbb9edd7d25de90577534448021f0ea684fa1200",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-290": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "32cc9da288542cbde40b3c91e8570dc14ac5eb9aa7927108c795293e27700ab2",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-291": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "a25633aa20d3d992fd4b0f01b8092835e067329a368d121e5174700fe6f1623c",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-292": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "fbd4962277527b568809e7203eeca86070fc10af7940894a63573d274dfc427e",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-293": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "1b55d95ff1a1912ced0ef00e859ef1cc6982fb886f2f2917a5b0e54fd9da924d",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-294": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "34dddc79ccf5acb83c4e1b3409faa18b2a0cb805cf466c84045e942734ccd74e",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-295": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "3c2ed7b92f012d2273c29c275d5ce6347b5adfde31fd7db46ef025ca7edec179",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-296": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "379893011a5585a92e472e51a667ed35e91e7d3b41527f26c47d2066e1fda108",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-297": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "e3eca55daf36daea7b8187b379f93163ec1e87cda26b260b10e1b18ca6da393f",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-298": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "17d0e691b76184d62d71b0fbc349c806d013d7ab6c0c699b0d6195ac5fe4c1b8",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-299": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "0713ded432f1c77fb2a8c2e7323a6f4fccd72275107f79edca4cf68c866d6d27",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    },
+    "V-300": {
+      "reviewer": "AI-GPT6",
+      "approvedAt": "2026-10-08",
+      "contentSha256": "6d660ac75f04c6f53d30e2d9e9ca1017f51e9b7fba6765b2ce31aa9c5c9cc015",
+      "reviewMode": "AI_EDITORIAL",
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+    }
+  }
 }
