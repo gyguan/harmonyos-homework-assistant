@@ -464,3 +464,31 @@ AI 筛查覆盖全部候选内容，但为了避免突然把全部 180 个单词
 - `scripts/test_toeic_review_integrity.py` 检查 AI 标记不能冒充 `HUMAN`，伪造或过期审校记录应被拒绝；`scripts/test_toeic_ai_editorial_release.py` 独立复核上线范围、典型金额计算和已修复的证据链问题。
 - `is_valid_approval` 只能核实记录格式和内容绑定，**不证明审校模型的身份、不能从形式校验推导出所有英语题目绝对正确**；GitHub 审查和设备测试是工程发布质量控制，与用户是否亲自逐词审核无关。
 - 历史 Day 14 / Day 19 两套 100 题模考、题目 ID、题目版本和学习记录均不得因本轮内容审核更改；HarmonyOS SDK 编译和 Phone / Pad 实际体验仍需要单独验证。
+
+## 28. 第二批经 AI 审校内容的受控发布（2026-10-08）
+
+本轮不继续增加词库或新增试题，使用上一轮已有的 AI 内容审校记录和逐项 SHA-256 摘要，将原本保留的 `V-151–V-180` 共 30 个商务词汇、`P7-EX-ONBOARD` 和 `P7-EX-FILTER` 两组共 10 道 Part 7 题切换为 `PUBLISHED`。
+
+**合并该 PR 后的发布状态**：
+
+| 资产 | 已发布 | 继续候选 |
+|---|---:|---:|
+| 300 个词汇 | 180 个（原有 120 + 第一批 30 + 第二批 30） | 120 个（V-181–V-300） |
+| Part 7 原创额外阅读 | 5 组、25 道题 | 8 组、40 道题 |
+
+第二批阅读内容分别对应新员工报到指引和货品分批配送/发票。V-151–V-180 聚焦会议、项目管理、审计、财务词汇。两组阅读题保留各自完整的 double/triple-document blocks 和五题组结构；不得只发布单题。
+
+### 28.1 版本化发布清单
+
+新增 `docs/product/toeic-controlled-release-manifest.json`，按批次显式记录词汇 ID 连续区间、完整 Part 7 题组 ID、AI 审校证据位置。**发布清单不是审批记录**：只有审核台账里匹配源码的 `contentSha256`、审校报告中逐项 `PASS`，以及 `PUBLISHED` 源码状态同时成立，才允许进入学生端。
+
+`scripts/test_toeic_ai_editorial_release.py` 不再仅按 30 词/15 题累计数量判断是否误发布，而是逐个 ID 比对这个 manifest 与 ArkTS 源码状态、检查所有 65 道候选阅读题的整组一致性。下次发布第三批时，仅更新 manifest、对应源码发布状态及新阶段文档，不需要重写先前批次的验收规则。
+
+### 28.2 与已有训练的兼容和安全性
+
+- `PresetToeicContent.vocabulary()` 仍只返回 `PUBLISHED` 词汇，`vocabularyForDay(day)` 继续按原日计划 ID 分配方法查询，新增批次不会修改已做词汇的历史 ID。
+- `publishedReadingGroups()` 和 `publishedQuestions()` 要求完整五题组均已发布，单个题误发布不得进入训练。历史两个 100 题模考仍使用原先的题目 ID 与版本，不受此次扩展影响。
+- `scripts/validate_toeic_editorial_content.py` 按源码内容重算词义、例句、音标、题干、材料和答案等的哈希：任何改动都要求重新取得相同内容版本的审校记录，不能复用过期结论。
+- 所谓“AI 已审校”代表有明确溯源及自动化检查，并不等于被 ETS 官方认可，也不能承诺 100% 准确。当前鸿蒙 SDK 构建和 Phone/Pad 设备使用仍需单独验证。
+
+下一步优先处理 `V-181–V-210` 与 `P7-EX-SUPPORT`、`P7-EX-RETAIL` 的第三批发布；仍遵循单次小批量、检查清单与 CI，并根据使用反馈修正问题。
