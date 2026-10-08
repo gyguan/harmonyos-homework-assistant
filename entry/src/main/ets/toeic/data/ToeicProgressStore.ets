@@ -1,6 +1,6 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
-import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill, ToeicVocabularyRecall, ToeicDayTaskProgress, ToeicSessionReport } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill, ToeicVocabularyRecall, ToeicDayTaskProgress, ToeicSessionReport, ToeicSkillStat } from '../domain/ToeicModels';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { PresetToeicContent } from '../content/PresetToeicContent';
 
@@ -116,7 +116,7 @@ export class ToeicProgressStore {
     let summary=ToeicTrainingService.instance.summarize(attempts);
     this.snapshot.totalAnswered+=attempts.length;
     this.snapshot.totalCorrect+=summary.correctCount;
-    this.snapshot.weakSkill=summary.hasWeakSkill?summary.weakSkill:'';
+    // The weak skill is recomputed after persisted cumulative statistics are updated.
     if (advanceProgress) {
       if (diagnostic) {
         this.snapshot.diagnosticCompleted=true;
@@ -144,6 +144,8 @@ export class ToeicProgressStore {
         if (attempt.correct) report.part7Correct++;
       }
     }
+    let ranked=ToeicTrainingService.instance.topWeakSkills(this.snapshot,1);
+    this.snapshot.weakSkill=ranked.length>0?ranked[0]:'';
     if (report.answered>0) {
       this.snapshot.sessionReports.push(report);
       if (this.snapshot.sessionReports.length>40) this.snapshot.sessionReports.shift();
@@ -164,6 +166,19 @@ export class ToeicProgressStore {
     }
     history.attemptCount++;
     if (!attempt.correct) history.wrongCount++;
+
+    let skillStat:ToeicSkillStat|null=null;
+    for (let item of this.snapshot.skillStats) {
+      if (item.skill===attempt.skill) { skillStat=item; break; }
+    }
+    if (skillStat===null) {
+      skillStat=new ToeicSkillStat(attempt.skill);
+      this.snapshot.skillStats.push(skillStat);
+    }
+    skillStat.answered++;
+    if (attempt.correct) skillStat.correct++;
+    if (attempt.performance===ToeicPerformance.SLOW_CORRECT ||
+      attempt.performance===ToeicPerformance.SLOW_WRONG) skillStat.slow++;
 
     if (attempt.correct) this.removeId(this.snapshot.reviewQuestionIds,attempt.questionId);
     else this.addId(this.snapshot.reviewQuestionIds,attempt.questionId);
@@ -296,7 +311,17 @@ export class ToeicProgressStore {
           restored.sessionReports.push(report);
         }
       }
-      restored.schemaVersion=6;
+      if (Array.isArray(parsed.skillStats)) {
+        for (let value of parsed.skillStats as Object[]) {
+          let item=value as Record<string,Object>;
+          if (typeof item.skill!=='string') continue;
+          restored.skillStats.push(new ToeicSkillStat(item.skill as ToeicSkill,
+            Math.max(0,Number(item.answered)||0),
+            Math.max(0,Number(item.correct)||0),
+            Math.max(0,Number(item.slow)||0)));
+        }
+      }
+      restored.schemaVersion=7;
       this.snapshot=restored;
     } catch {
       this.snapshot=new ToeicLearningSnapshot();
