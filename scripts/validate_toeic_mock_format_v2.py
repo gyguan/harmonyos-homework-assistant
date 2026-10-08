@@ -51,7 +51,8 @@ def validate() -> None:
     counts=Counter(q.id.split("-")[3] for q in singles)
     assert sorted(counts.values())==[2,3]
     assert any(q.id=="R-FM1-P7-S09-03" and q.answer==3 and
-               "[4]" in q.stem for q in singles), "Day14 needs real sentence placement"
+               "[4]" in q.passage and "[4]" in q.choices for q in singles), (
+        "Day14 needs a real sentence-placement question with four marked positions")
     # Full active Day14 paper: 8*3 inherited single items + 3+2 new,
     # then five two-document passages with 3 legacy-derived + 2 new.
     active_ids=[f"R-FM1-P7-S{block:02d}-{q:02d}" for block in range(1,9) for q in range(1,4)]
