@@ -186,6 +186,9 @@ export struct ToeicHomePage {
     this.currentPassage=question.passage;
     let readingGroup=ToeicReadingGroupService.groupAt(this.questions,index);
     this.currentPassageBlocks=readingGroup.passageBlocks;
+    if (question.groupId.length>0 && readingGroup.passageBlocks.length>0) {
+      this.currentPassage=readingGroup.passageBlocks.join('\n\n');
+    }
     this.currentGroupCount=readingGroup.questionIds.length;
     this.currentGroupPosition=readingGroup.questionIds.indexOf(question.id)+1;
     this.currentStem=question.stem;
@@ -414,6 +417,15 @@ export struct ToeicHomePage {
     this.activeSessionDay=1;
     this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted;
     this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions());
+  }
+
+  private startSupplementaryReading():void {
+    let questions=this.viewModel.supplementaryReadingQuestions();
+    if (questions.length===0) return;
+    // Extra reading is optional and must not advance the current study day.
+    this.activeSessionDay=17;
+    this.activeSessionAdvancesProgress=false;
+    this.startSession(ToeicPageMode.TRAINING,questions);
   }
 
   private startStandardDiagnostic():void {
@@ -1002,6 +1014,12 @@ export struct ToeicHomePage {
             .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
             .onClick(()=>{this.showFullPlan=!this.showFullPlan;});
           if (this.showFullPlan) { this.DaySelector(); }
+          if (this.viewModel.supplementaryReadingQuestions().length>0) {
+            Button('Part 7 双篇 / 三篇加练',{type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .onClick(()=>this.startSupplementaryReading());
+          }
           Button('标准水平诊断 · 12 题',{type:ButtonType.Normal})
             .width('100%').height(AppTheme.BUTTON_HEIGHT)
             .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)

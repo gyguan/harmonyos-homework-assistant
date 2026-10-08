@@ -1,4 +1,4 @@
-import { ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicSection, ToeicSentenceDrill, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicPart, ToeicQuestion, ToeicReadingGroup, ToeicReviewStatus, ToeicSection, ToeicSkill, ToeicSentenceDrill, ToeicVocabularyItem } from '../domain/ToeicModels';
 import { ToeicQuestionTranslation } from './ToeicQuestionTranslationModels';
 
 export class ToeicContentValidationResult {
@@ -35,6 +35,69 @@ export class ToeicContentValidator {
       for (let e of r.errors) errors.push(e);
     }
     return new ToeicContentValidationResult(errors.length===0, errors);
+  }
+
+  static validateReadingGroups(questions:ToeicQuestion[],
+    groups:ToeicReadingGroup[]):ToeicContentValidationResult {
+    let errors:string[]=[];
+    let groupIds:string[]=[];
+    let mappedQuestionIds:string[]=[];
+    for (let group of groups) {
+      if (group.groupId.trim().length===0 || groupIds.indexOf(group.groupId)>=0) {
+        errors.push(group.groupId + ': missing or duplicated group id');
+      }
+      groupIds.push(group.groupId);
+      if (group.passageBlocks.length<2 || group.passageBlocks.length>3) {
+        errors.push(group.groupId + ': group requires two or three documents');
+      }
+      if (group.questionIds.length<2) errors.push(group.groupId + ': insufficient linked questions');
+      let answerPositions:number[]=[];
+      for (let id of group.questionIds) {
+        if (mappedQuestionIds.indexOf(id)>=0) errors.push(id + ': duplicate group membership');
+        mappedQuestionIds.push(id);
+        let item:ToeicQuestion|null=null;
+        for (let question of questions) if (question.id===id) { item=question; break; }
+        if (item===null) { errors.push(id + ': missing group question'); continue; }
+        if (item.groupId!==group.groupId || item.part!==ToeicPart.PART_7) {
+          errors.push(id + ': group id or part mismatch');
+        }
+        if (item.passage.trim().length>0) errors.push(id + ': group question must not duplicate passage');
+        if (item.options.length!==4) errors.push(id + ': Part 7 group item requires four options');
+        for (let i=0;i<item.options.length;i++) {
+          if (item.options[i].trim().length===0) errors.push(id + ': empty option');
+          for (let j=0;j<i;j++) {
+            if (item.options[i]===item.options[j]) errors.push(id + ': duplicate option');
+          }
+        }
+        answerPositions.push(item.correctIndex);
+        let seenDocuments:number[]=[];
+        let evidenceFragments=item.evidence.split(' || ');
+        for (let fragment of evidenceFragments) {
+          let found=false;
+          for (let index=0;index<group.passageBlocks.length;index++) {
+            if (group.passageBlocks[index].indexOf(fragment)>=0) {
+              found=true;
+              if (seenDocuments.indexOf(index)<0) seenDocuments.push(index);
+              break;
+            }
+          }
+          if (!found || fragment.trim().length===0) errors.push(id + ': evidence missing in linked documents');
+        }
+        if (item.skill===ToeicSkill.CROSS_DOCUMENT && seenDocuments.length<2) {
+          errors.push(id + ': cross-document question must cite at least two documents');
+        }
+      }
+      // Prevent a group from accidentally testing the same answer position every time.
+      for (let index=0;index<4;index++) {
+        if (answerPositions.indexOf(index)<0) errors.push(group.groupId + ': answer position not represented ' + index);
+      }
+    }
+    for (let question of questions) {
+      if (question.groupId.length>0 && mappedQuestionIds.indexOf(question.id)<0) {
+        errors.push(question.id + ': question references an unknown reading group');
+      }
+    }
+    return new ToeicContentValidationResult(errors.length===0,errors);
   }
 
   static validateVocabulary(items:ToeicVocabularyItem[]):ToeicContentValidationResult {

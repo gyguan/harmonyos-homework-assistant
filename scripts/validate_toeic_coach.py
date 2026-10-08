@@ -1,5 +1,6 @@
 from pathlib import Path
 import re
+from validate_toeic_editorial_content import validate as validate_editorial_candidates
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -64,15 +65,19 @@ def main() -> None:
     week_two = read("entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets")
     week_three = read("entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets")
     expansion = read("entry/src/main/ets/toeic/content/ToeicVocabularyExpansion.ets")
+    batch_two = read("entry/src/main/ets/toeic/content/ToeicVocabularyBatchTwo.ets")
+    extra_reading = read("entry/src/main/ets/toeic/content/ToeicExtraReadingContent.ets")
     extra_diagnostic = read("entry/src/main/ets/toeic/content/ToeicStandardDiagnosticContent.ets")
     week_two_question_count = week_two.count("ToeicWeekTwoContent.q(")
     week_three_question_count = week_three.count("ToeicWeekThreeContent.q(")
     question_count = (preset.count("new ToeicQuestion(") + week_one.count("new ToeicQuestion(") +
                       week_two_question_count + week_three_question_count +
-                      extra_diagnostic.count("new ToeicQuestion("))
+                      extra_diagnostic.count("new ToeicQuestion(") +
+                      extra_reading.count("new ToeicQuestion("))
     vocabulary_count = (preset.count("new ToeicVocabularyItem(") +
                         week_one.count("new ToeicVocabularyItem(") +
-                        expansion.count("new ToeicVocabularyItem("))
+                        expansion.count("new ToeicVocabularyItem(") +
+                         batch_two.count("new ToeicVocabularyItem("))
     sentence_drill_count = (week_one.count("new ToeicSentenceDrill(") +
                             week_two.count("new ToeicSentenceDrill(") +
                             week_three.count("new ToeicSentenceDrill("))
@@ -139,6 +144,17 @@ def main() -> None:
     question_ids += re.findall(r'ToeicWeekTwoContent\.q\("([^"]+)"', week_two)
     question_ids += re.findall(r'ToeicWeekThreeContent\.q\("([^"]+)"', week_three)
     question_ids += re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)
+    extra_ids = re.findall(r'new ToeicQuestion\("(R-P7-[A-Z-]+-[0-9]+)"', extra_reading)
+    question_ids += extra_ids
+    require(len(extra_ids) == 15 and len(set(extra_ids)) == 15,
+            "supplemental multi-document reading must contain 15 stable unique questions")
+    require(extra_reading.count("new ToeicReadingGroup(") == 3 and
+            (extra_reading.count("ToeicReviewStatus.REVIEWED") +
+             extra_reading.count("ToeicReviewStatus.PUBLISHED")) == 15,
+            "all supplementary passage questions must retain a valid review state")
+    require("ToeicExtraReadingContent.questions()" in preset and
+            "ToeicExtraReadingContent.groups()" in preset,
+            "supplemental content must be registered for review validation")
     require(len(re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)) == 12,
             "standard diagnostic must have 12 unique extra questions")
     require(len(re.findall(r'new ToeicQuestion\("R-DX-P5-', extra_diagnostic)) == 6 and
@@ -147,6 +163,12 @@ def main() -> None:
             "standard diagnostic must cover P5=6, P6=2, P7=4")
     vocabulary_ids = re.findall(r"new ToeicVocabularyItem\('([^']+)'", preset + "\n" + week_one)
     vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)
+    vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_two)
+    require(len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', batch_two)) == 30,
+            "second vocabulary batch must have exactly 30 complete business word entries")
+    require("ToeicVocabularyBatchTwo.idsForDay(day)" in preset and
+            "ToeicVocabularyBatchTwo.items()" in preset,
+            "second vocabulary batch must be scheduled and surfaced from the catalog")
     require(len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)) == 30,
             "incremental vocabulary must contain exactly 30 curated entries")
     require("V-091" in expansion and "V-120" in expansion and
@@ -536,6 +558,29 @@ def main() -> None:
             "due vocabulary must enter the selected-day study flow")
 
     group_service = read("entry/src/main/ets/toeic/application/ToeicReadingGroupService.ets")
+    for token in ["static validateReadingGroups(", "cross-document question must cite at least two documents",
+                  "group question must not duplicate passage", "evidence missing in linked documents"]:
+        require(token in validator, f"multi-document editorial gate missing: {token}")
+    for token in ["groupId:string", "this.groupId=groupId"]:
+        require(token in model, f"explicit group question reference missing: {token}")
+    require("this.currentPassage=readingGroup.passageBlocks.join(" in ui and
+            "this.startSupplementaryReading()" in ui and
+            "supplementaryReadingQuestions()" in view_model and
+            "ToeicExtraReadingContent.groups()" in group_service,
+            "supplemental shared articles must be accessible only after publication")
+    require("PresetToeicContent.publishedReadingGroups()" in view_model and
+            "publishedReadingGroups():ToeicReadingGroup[]" in preset and
+            "ToeicContentValidator.validateAll(published)" in preset,
+            "unpublished candidate errors must not block an existing published question catalog")
+    require("static vocabularyForReview():ToeicVocabularyItem[]" in preset and
+            "item.reviewStatus===ToeicReviewStatus.PUBLISHED" in preset and
+            "reviewStatus:ToeicReviewStatus" in model,
+            "vocabulary publication must respect explicit review state")
+    require("undefined" not in extra_reading,
+            "supplemental questions contain an invalid undefined constructor argument")
+    require("ToeicReviewStatus" in extra_reading and
+            "static publishedReadingGroups()" not in extra_reading,
+            "supplemental reading publication must be controlled centrally")
     quiz_service = read("entry/src/main/ets/toeic/application/ToeicVocabularyQuizService.ets")
     for token in ["class ToeicDayTaskProgress", "class ToeicSessionReport",
                   "dayTasks:ToeicDayTaskProgress[]", "sessionReports:ToeicSessionReport[]",
@@ -575,6 +620,8 @@ def main() -> None:
 
     ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
     require("ToeicModuleBootstrap.initialize" in ability, "TOEIC progress bootstrap is missing")
+
+    validate_editorial_candidates()
 
     require("ToeicStandardDiagnosticContent.questions()" in preset and
             "standardDiagnosticQuestions():ToeicQuestion[]" in preset,
