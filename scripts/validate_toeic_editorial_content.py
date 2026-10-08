@@ -7,8 +7,10 @@ independent human proofreading or authorize publishing a REVIEWED candidate.
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 import re
+from toeic_review_integrity import reading_fingerprint, vocabulary_fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTENT = ROOT / "entry/src/main/ets/toeic/content"
@@ -33,10 +35,22 @@ def validate() -> None:
     pronunciation = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(encoding="utf-8")
     approvals = json.loads((ROOT / "docs/product/toeic-editorial-approvals.json").read_text(encoding="utf-8"))
 
-    def approved(area: str, key: str) -> bool:
+    def approved(area: str, key: str, expected_sha: str) -> bool:
         entry = approvals.get(area, {}).get(key, {})
-        return (isinstance(entry, dict) and bool(entry.get("reviewer", "").strip()) and
-                re.fullmatch(r"\d{4}-\d{2}-\d{2}", entry.get("approvedAt", "")) is not None)
+        if not isinstance(entry, dict):
+            return False
+        reviewer = entry.get("reviewer", "")
+        approved_at = entry.get("approvedAt", "")
+        if not isinstance(reviewer, str) or not reviewer.strip():
+            return False
+        if not isinstance(approved_at, str) or not re.fullmatch(r"\d{4}-\d{2}-\d{2}", approved_at):
+            return False
+        try:
+            # Reject fake calendar days, and never accept a future signoff.
+            signed_on = date.fromisoformat(approved_at)
+        except ValueError:
+            return False
+        return signed_on <= date.today() and entry.get("contentSha256") == expected_sha
 
     groups = {}
     group_pattern = r'new ToeicReadingGroup\("([^"]+)",(\[[^\n]*?\]),(\[[^\n]*?\])\)'
@@ -48,7 +62,7 @@ def validate() -> None:
         for number, doc in enumerate(docs, 1):
             require(doc.startswith(f"DOCUMENT {number}"), f"{name}: document headings out of sequence")
         groups[name] = {"ids": ids, "docs": docs}
-    require(len(groups) >= 9, f"expected at least 9 authored reading groups, found {len(groups)}")
+    require(len(groups) >= 11, f"expected at least 11 authored reading groups, found {len(groups)}")
 
     question_re = re.compile(
         r'new ToeicQuestion\("(?P<id>[^"]+)",ToeicSection.READING,ToeicPart.PART_7,'
@@ -79,8 +93,9 @@ def validate() -> None:
         require(statuses in ({"REVIEWED"}, {"PUBLISHED"}),
                 f"{group_id}: entire linked group must share a recognized review status")
         if statuses == {"PUBLISHED"}:
-            require(approved("readingGroups", group_id),
-                    f"{group_id}: publication requires recorded human reviewer and approval date")
+            group_hash = reading_fingerprint(group_id, group, members)
+            require(approved("readingGroups", group_id, group_hash),
+                    f"{group_id}: publication requires dated signoff for the exact group contentSha256")
         for option in range(4):
             require(any(q["answer"] == option for q in members),
                     f"{group_id}: answer position {option} is absent")
@@ -120,7 +135,7 @@ def validate() -> None:
         words.append(item)
     # Files are alphabetic (BatchFive, BatchFour, ...), not in ID order.
     words.sort(key=lambda w: int(w["id"].split("-")[1]))
-    require(len(words) >= 120, f"expected at least 120 structured staged words, found {len(words)}")
+    require(len(words) >= 150, f"expected at least 150 structured staged words, found {len(words)}")
     require([int(w["id"].removeprefix("V-")) for w in words] ==
             list(range(121, 121 + len(words))),
             "vocabulary IDs must remain consecutive from V-121")
@@ -133,12 +148,13 @@ def validate() -> None:
             require(len(word[field]) > 0 and all(x.strip() for x in word[field]),
                     f"{key}: missing {field}")
         require(word["status"] in ("REVIEWED", "PUBLISHED"), f"{key}: invalid editorial state")
-        if word["status"] == "PUBLISHED":
-            require(approved("vocabulary", key),
-                    f"{key}: publication requires recorded human reviewer and approval date")
         ipa = pronunciations.get(key, "")
         require(ipa.startswith("/") and ipa.endswith("/") and len(ipa) >= 5,
                 f"{key}: missing en-US IPA")
+        if word["status"] == "PUBLISHED":
+            content_hash = vocabulary_fingerprint(word, ipa)
+            require(approved("vocabulary", key, content_hash),
+                    f"{key}: publication requires dated signoff for the exact word contentSha256")
     require(len({w["word"].casefold() for w in words}) == len(words), "duplicated staged English word")
 
     # Check the published inventory too; a new batch must teach genuinely new
