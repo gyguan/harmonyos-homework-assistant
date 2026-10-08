@@ -1162,6 +1162,11 @@ export struct ToeicHomePage {
                 .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
               Text('场景：'+item.scenario)
                 .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+              if (item.exampleSentence.length>0) {
+                Text('例句：'+item.exampleSentence)
+                  .width('100%').fontSize(AppTheme.BODY_SIZE)
+                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+              }
               if (item.collocations.length>0) {
                 Text('搭配：'+item.collocations.join(' · '))
                   .width('100%').fontSize(AppTheme.BODY_SIZE)
