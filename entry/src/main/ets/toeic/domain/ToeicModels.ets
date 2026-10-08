@@ -209,3 +209,18 @@ export class ToeicReadingGroup {
     this.groupId=groupId; this.questionIds=questionIds; this.passageBlocks=passageBlocks;
   }
 }
+
+export enum ToeicVocabularyQuizMode {
+  MEANING='MEANING', COLLOCATION='COLLOCATION', PARAPHRASE='PARAPHRASE'
+}
+
+/** Built from reviewed source vocabulary; not a generated exam question. */
+export class ToeicVocabularyQuizQuestion {
+  vocabularyId:string; mode:ToeicVocabularyQuizMode; stem:string;
+  options:string[]; correctIndex:number; explanation:string;
+  constructor(vocabularyId:string,mode:ToeicVocabularyQuizMode,stem:string,
+    options:string[],correctIndex:number,explanation:string) {
+    this.vocabularyId=vocabularyId; this.mode=mode; this.stem=stem;
+    this.options=options; this.correctIndex=correctIndex; this.explanation=explanation;
+  }
+}
