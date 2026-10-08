@@ -107,6 +107,12 @@ def validate() -> None:
                   "correctIndex=3", "ToeicReviewStatus.PUBLISHED,1"):
         assert token in revised,f"missing complete-sentence Part6 contract: {token}"
     assert "[3] _____" in revised and "R-FM2-P6-" in revised
+    # Require an explicit source constraint: topic-related alternatives cannot
+    # be "plausible" instructions without contradicting the notice.
+    assert "Each product's assigned shelf must match its location on the checklist." in revised
+    assert "Staff may change shelf location codes" in revised
+    assert "Employees who are not assigned to the count may enter" in revised
+    assert "All scheduled deliveries will be postponed" not in revised
     active_part6_ids=[f"R-FM2-P6-{i:03d}" for i in range(1,5)]
     assert all(not any(q.id==id for q in old_p6) for id in active_part6_ids)
     # Preserve the other three original Part6 groups unchanged, and keep
