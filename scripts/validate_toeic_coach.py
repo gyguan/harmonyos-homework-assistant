@@ -66,7 +66,7 @@ def main() -> None:
     require("validateSentenceDrills" in validator and "translation is required" in validator,
             "sentence drill translation gate is missing")
     require("validateQuestionTranslations" in validator and
-            "Chinese translation is required for Day 1-13 training" in validator and
+            "Chinese translation is required for assigned non-mock training" in validator and
             "translated option count must match question options" in validator,
             "question translation content gate is missing")
 
@@ -149,20 +149,23 @@ def main() -> None:
 
     translation_week_one = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekOneCatalog.ets")
     translation_week_two = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekTwoCatalog.ets")
+    translation_week_three = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekThreeCatalog.ets")
     translation_extra = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationSupplementaryCatalog.ets")
     translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
-    translation_ids = re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_one + "\n" + translation_week_two)
-    translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two + "\n" + translation_extra)
-    require(len(translation_ids) == 112,
-            f"Day 1-13 including the integrated diagnostic must have 112 unique question translations, found {len(translation_ids)}")
+    translation_ids = re.findall(r"new ToeicQuestionTranslation\\('([^']+)'", translation_week_one + "\\n" + translation_week_two)
+    translation_ids += re.findall(r'new ToeicQuestionTranslation\\("([^"]+)"', translation_week_two + "\\n" + translation_extra)
+    translation_ids += re.findall(r"new ToeicQuestionTranslation\\('([^']+)'", translation_week_three)
+    require(len(translation_ids) == 158,
+            f"Day1-13 and Day15-16 must have 158 question translations, found {len(translation_ids)}")
     require(len(translation_ids) == len(set(translation_ids)),
             "TOEIC question translation ids must be unique")
     require(not any(question_id.startswith("R-M1-") or question_id.startswith("R-M2-") for question_id in translation_ids),
             "full mock questions must not have Chinese translations")
     require("ToeicQuestionTranslationWeekOneCatalog.items()" in translation_catalog and
             "ToeicQuestionTranslationWeekTwoCatalog.items()" in translation_catalog and
+            "ToeicQuestionTranslationWeekThreeCatalog.items()" in translation_catalog and
             "ToeicQuestionTranslationSupplementaryCatalog.items()" in translation_catalog,
-            "question translation catalog must aggregate all Day 1-13 translations")
+            "question translation catalog must aggregate all Day1-16 non-mock translations")
 
     diagnostic_match = re.search(
         r"new ToeicStudyDay\(1,.*?\[\],\[\],\[(.*?)\]\),",
