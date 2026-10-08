@@ -1,5 +1,5 @@
 import {
-  ToeicDifficulty, ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicScoreValue, ToeicSection,
+  ToeicDifficulty, ToeicPart, ToeicQuestion, ToeicReadingGroup, ToeicReviewStatus, ToeicScoreValue, ToeicSection,
   ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem, ToeicVocabularyLevel
 } from '../domain/ToeicModels';
 import { ToeicContentValidator } from './ToeicContentValidator';
@@ -126,14 +126,37 @@ export class PresetToeicContent {
     return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions());
   }
 
+  static publishedReadingGroups():ToeicReadingGroup[] {
+    let candidates=ToeicExtraReadingContent.groups();
+    let items=ToeicExtraReadingContent.questions();
+    let groups:ToeicReadingGroup[]=[];
+    for (let group of candidates) {
+      let everyPublished=true;
+      for (let id of group.questionIds) {
+        let published=false;
+        for (let q of items) {
+          if (q.id===id && q.reviewStatus===ToeicReviewStatus.PUBLISHED) {
+            published=true; break;
+          }
+        }
+        if (!published) { everyPublished=false; break; }
+      }
+      if (everyPublished) groups.push(group);
+    }
+    return groups;
+  }
+
   static publishedQuestions():ToeicQuestion[] {
     let source=PresetToeicContent.questions();
-    let validation=ToeicContentValidator.validateAll(source);
-    let groupValidation=ToeicContentValidator.validateReadingGroups(source,ToeicExtraReadingContent.groups());
+    let published:ToeicQuestion[]=[];
+    for (let q of source) {
+      if (q.reviewStatus===ToeicReviewStatus.PUBLISHED) published.push(q);
+    }
+    let validation=ToeicContentValidator.validateAll(published);
+    let groupValidation=ToeicContentValidator.validateReadingGroups(
+      published,PresetToeicContent.publishedReadingGroups());
     if (!validation.valid || !groupValidation.valid) return [];
-    let result:ToeicQuestion[]=[];
-    for (let q of source) if (q.reviewStatus===ToeicReviewStatus.PUBLISHED) result.push(q);
-    return result;
+    return published;
   }
 
   static diagnosticQuestions():ToeicQuestion[] {
