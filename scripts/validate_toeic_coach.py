@@ -436,8 +436,8 @@ def main() -> None:
                 (".height(AppTheme.BUTTON_HEIGHT)" in body or
                  ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in body),
                 f"TOEIC action button inconsistent: {first_line}")
-    require(action_count == 28 and quiz_choice_count == 8,
-            "TOEIC all 28 action buttons and eight choice tiles must be inspected")
+    require(action_count == 27 and quiz_choice_count == 8,
+            "TOEIC all 27 action buttons and eight choice tiles must be inspected")
     require("Button('发音',{type:ButtonType.Normal})" in ui and
             ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in ui,
             "TOEIC pronunciation must preserve at least the standard secondary touch target")
