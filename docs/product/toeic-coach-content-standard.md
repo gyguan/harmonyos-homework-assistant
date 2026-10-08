@@ -525,3 +525,30 @@ AI 筛查覆盖全部候选内容，但为了避免突然把全部 180 个单词
 在本次审核分支中，**120 个词和 40 道题仍为 REVIEWED**；正式可用数量仍是**180/300 词、5 组/25 道额外 Part 7 题**。后续若选择全部上线，可以创建独立受控发布 PR，更新 `toeic-controlled-release-manifest.json` 并将已审核候选完整切换为 `PUBLISHED`；无需用户重复做人工作业。
 
 AI 的集中复核与逐项证据校验可显著减少结构性错误，但**不能承诺语言绝对准确、ETS 官方难度等效或 100% 唯一正确答案**。鸿蒙 SDK 实际编译、Phone/Pad 训练体验和后续用户错题反馈仍属于独立质量检查。
+
+## 30. 全部已审校候选内容一次性受控发布（2026-10-08）
+
+Issue #447 的第六个发布批次计划与第 3–5 批**同时纳入单个独立 PR**。本次**不新增内容、不再次生成词汇、不改动任一题目原文或答案**，只将前述 AI 二次审核已通过的剩余 120 词与 8 组/40 题解锁给学生训练。
+
+### 30.1 最终发布清单与学习范围
+
+| 发布批次 | 词汇 ID | 完整阅读题组 |
+|---|---|---|
+| 已有 #458 / #459 | V-121–V-180 | VENUE、DELIVERY、TRAVEL、ONBOARD、FILTER |
+| 最终批次 03 | V-181–V-210 | SUPPORT、RETAIL |
+| 最终批次 04 | V-211–V-240 | LEASE、TRAINING |
+| 最终批次 05 | V-241–V-270 | MIGRATION、LICENSE |
+| 最终批次 06 | V-271–V-300 | PERDIEM、CATERING |
+
+以上四个最终批次登记在 `docs/product/toeic-controlled-release-manifest.json`。合并该 PR 后，词汇正式可见总量为 **V-001–V-300 共 300 个**；额外 Part 7 完整共享文章正式可见 **13 组、65 道题**。之前已发布的 180 词/25 题未重做内容，也没有新旧 ID 映射或历史学习记录迁移。
+
+### 30.2 上线前自动验证
+
+- `scripts/test_toeic_ai_editorial_release.py` 依据版本化 manifest **逐个词汇 ID 与阅读 groupId** 对照源码 `PUBLISHED` 标记，确认 6 批 180 个扩展词、13 组/65 道题均已完整上线，且不存在重复、漏发布或混合发布状态。
+- `scripts/test_toeic_remaining_editorial.py` 仍逐项核对 **120 个新增解锁词、40 道阅读题**与二次审核材料 `docs/product/toeic-remaining-content-review-2026-10-08.json`，检查例句、词义、IPA、内容摘要、正确选项及逐文档引用；仅将发布状态断言由 `REVIEWED` 调整为 `PUBLISHED`，没有缩减校验。
+- `scripts/validate_toeic_editorial_content.py` 验证 180 个扩展词的 AI_EDITORIAL 记录与全部 13 组阅读题的 SHA-256、答案/原文证据绑定；任何试题、释义或 IPA 改动都会使既有批准摘要失效。
+- `PresetToeicContent.vocabulary()` 只向客户端开放标记为 `PUBLISHED` 的词汇，`publishedReadingGroups()` 和 `publishedQuestions()` 仍要求完整题组发布。现有 21 天学习安排、Day 14/19 两套 100 题模考，以及历史 `questionId` 和学习记录格式保持原样。
+
+### 30.3 发布限制与后续验收
+
+所有新发布内容此前均有 **AI 全量审核 + 第二轮检查报告**，但这不能保证每个英语语义/音标或每道题目的难度绝对等效官方 TOEIC。GitHub 静态门禁的通过不代表 ArkTS 已在 DevEco Studio、Phone 和 Pad 上实际编译运行。上线后的建议重点从“继续大量扩词”调整为：**在实机上验证 21 天单词列表、点按发音与整组阅读行为；再依据真实错题反馈、内容缺陷与评分分布持续迭代**。不得将未验证的设备体验写成 PASS。
