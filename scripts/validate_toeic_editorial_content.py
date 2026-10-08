@@ -22,8 +22,12 @@ def require(value: bool, message: str) -> None:
 
 
 def validate() -> None:
-    source_files = ["ToeicExtraReadingContent.ets", "ToeicExtraReadingBatchTwo.ets", "ToeicExtraReadingBatchThree.ets"]
-    word_files = ["ToeicVocabularyBatchTwo.ets", "ToeicVocabularyBatchThree.ets", "ToeicVocabularyBatchFour.ets"]
+    # Discover additional batches automatically; adding new content need not
+    # weaken evidence or approval gates by patching hardcoded file lists.
+    source_files = ["ToeicExtraReadingContent.ets"] + [
+        p.name for p in sorted(CONTENT.glob("ToeicExtraReadingBatch*.ets"))
+    ]
+    word_files = [p.name for p in sorted(CONTENT.glob("ToeicVocabularyBatch*.ets"))]
     source = "\n".join((CONTENT / name).read_text(encoding="utf-8") for name in source_files)
     word_source = "\n".join((CONTENT / name).read_text(encoding="utf-8") for name in word_files)
     pronunciation = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(encoding="utf-8")
@@ -44,7 +48,7 @@ def validate() -> None:
         for number, doc in enumerate(docs, 1):
             require(doc.startswith(f"DOCUMENT {number}"), f"{name}: document headings out of sequence")
         groups[name] = {"ids": ids, "docs": docs}
-    require(len(groups) == 7, f"expected 7 group candidates, found {len(groups)}")
+    require(len(groups) >= 9, f"expected at least 9 authored reading groups, found {len(groups)}")
 
     question_re = re.compile(
         r'new ToeicQuestion\("(?P<id>[^"]+)",ToeicSection.READING,ToeicPart.PART_7,'
@@ -63,8 +67,9 @@ def validate() -> None:
         obj["answer"] = int(obj["answer"])
         obj["seconds"] = int(obj["seconds"])
         questions.append(obj)
-    require(len(questions) == 35, f"expected 35 valid P7 candidates, parsed {len(questions)}")
-    require(len({q["id"] for q in questions}) == 35, "duplicate P7 question IDs")
+    require(len(questions) == len(groups) * 5,
+            f"each group requires five fully parsed question constructors: {len(questions)} / {len(groups)}")
+    require(len({q["id"] for q in questions}) == len(questions), "duplicate P7 question IDs")
     require("undefined" not in source, "undefined appears in P7 authored question source")
 
     for group_id, group in groups.items():
@@ -113,9 +118,12 @@ def validate() -> None:
         for field in ("id", "word", "pos", "meaning", "scene", "collocations", "synonyms", "example"):
             item[field] = json.loads(item[field])
         words.append(item)
-    require(len(words) == 90, f"expected 90 structured word candidates, found {len(words)}")
-    require([w["id"] for w in words] == [f"V-{i:03d}" for i in range(121, 211)],
-            "vocabulary IDs must remain consecutive V-121...V-210")
+    # Files are alphabetic (BatchFive, BatchFour, ...), not in ID order.
+    words.sort(key=lambda w: int(w["id"].split("-")[1]))
+    require(len(words) >= 120, f"expected at least 120 structured staged words, found {len(words)}")
+    require([int(w["id"].removeprefix("V-")) for w in words] ==
+            list(range(121, 121 + len(words))),
+            "vocabulary IDs must remain consecutive from V-121")
     pronunciations = dict(re.findall(r"new ToeicPronunciationEntry\('(V-\d+)','([^']+)'", pronunciation))
     for word in words:
         key = word["id"]
@@ -131,7 +139,7 @@ def validate() -> None:
         ipa = pronunciations.get(key, "")
         require(ipa.startswith("/") and ipa.endswith("/") and len(ipa) >= 5,
                 f"{key}: missing en-US IPA")
-    require(len({w["word"].casefold() for w in words}) == 90, "duplicated staged English word")
+    require(len({w["word"].casefold() for w in words}) == len(words), "duplicated staged English word")
 
     # Check the published inventory too; a new batch must teach genuinely new
     # headwords rather than silently creating a second ID for an existing term.
@@ -150,7 +158,7 @@ def validate() -> None:
                 f'{word["id"]}: headword already exists in the published inventory')
     require(len(existing_words) == 120,
             f"published baseline headword list unexpectedly changed: {len(existing_words)}")
-    require(len(pronunciations) == 210 and
+    require(len(pronunciations) == len(existing_words) + len(words) and
             {w["id"] for w in words}.issubset(set(pronunciations)),
             "every drafted and published term must keep a unique pronunciation ID")
 
