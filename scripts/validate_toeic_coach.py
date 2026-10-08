@@ -145,17 +145,20 @@ def main() -> None:
 
     translation_week_one = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekOneCatalog.ets")
     translation_week_two = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekTwoCatalog.ets")
+    translation_extra = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationSupplementaryCatalog.ets")
     translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
     translation_ids = re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_one + "\n" + translation_week_two)
-    translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two)
-    require(len(translation_ids) == 84,
-            f"Day 1-13 must have exactly 84 question translations, found {len(translation_ids)}")
+    translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two + "\\n" + translation_extra)
+    require(len(translation_ids) == 104,
+            f"Day 1-13 must have exactly 104 question translations after Part 7 integration, found {len(translation_ids)}")
     require(len(translation_ids) == len(set(translation_ids)),
             "TOEIC question translation ids must be unique")
     require(not any(question_id.startswith("R-M1-") or question_id.startswith("R-M2-") for question_id in translation_ids),
             "full mock questions must not have Chinese translations")
-    require("ToeicQuestionTranslationWeekOneCatalog.items().concat(ToeicQuestionTranslationWeekTwoCatalog.items())" in translation_catalog,
-            "question translation catalog must aggregate week-one and week-two translations")
+    require("ToeicQuestionTranslationWeekOneCatalog.items()" in translation_catalog and
+            "ToeicQuestionTranslationWeekTwoCatalog.items()" in translation_catalog and
+            "ToeicQuestionTranslationSupplementaryCatalog.items()" in translation_catalog,
+            "question translation catalog must aggregate all Day 1-13 translations")
 
     diagnostic_match = re.search(
         r"let ids:string\[\]=\[(.*?)\];",
@@ -598,7 +601,7 @@ def main() -> None:
     for token in [
         "private selectedDayGuidance():string",
         "private trainingButtonLabel():string",
-        "Day 18 根据当前错题、慢题和薄弱能力动态组题",
+        "Day 18 优先复习错题、慢题及薄弱能力",
         "Day 20 优先复盘累计错 2 次及以上题目",
         "开始 Day 19 第二次完整模考",
         "开始 Day 21 最终验证",
