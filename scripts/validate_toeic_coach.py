@@ -770,7 +770,7 @@ def main() -> None:
         20: ["P7-EX-PERDIEM", "P7-EX-CATERING"],
     }
     schedule = re.findall(
-        r"if \\(day===([0-9]+)\\) return \\[([^\\]]+)\\];",
+        r"if \(day===([0-9]+)\) return \[([^\]]+)\];",
         preset[preset.index("static supplementaryGroupIdsForDay("):preset.index("static supplementaryReadingQuestionsForDay(")],
     )
     actual = {int(day): re.findall(r"'(P7-EX-[A-Z]+)'", ids) for day, ids in schedule}
@@ -786,7 +786,7 @@ def main() -> None:
         read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFive.ets"),
         read("entry/src/main/ets/toeic/content/ToeicExtraReadingBatchSix.ets"),
     ])
-    authored_groups = re.findall(r'new ToeicReadingGroup\\("([^"]+)"', reading_sources)
+    authored_groups = re.findall(r'new ToeicReadingGroup\("([^"]+)"', reading_sources)
     require(set(authored_groups) == set(planned_groups) and len(authored_groups) == 13,
             "Part 7 schedule must cover each authored reading group exactly once")
     require("ordered.length===group.questionIds.length" in preset and
@@ -808,7 +808,7 @@ def main() -> None:
         "entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets"),
         "Day 12/13 extra Part 7 groups need Chinese translations for learning mode")
     translation_extra = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationSupplementaryCatalog.ets")
-    translated_ids = re.findall(r'new ToeicQuestionTranslation\\("([^"]+)"', translation_extra)
+    translated_ids = re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_extra)
     require(len(translated_ids) == 20 and len(set(translated_ids)) == 20,
             "Day 12/13 extra Part 7 groups must have 20 independent translated questions")
     for gid in expected_groups[12] + expected_groups[13]:
