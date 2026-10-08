@@ -22,17 +22,19 @@ export class ToeicQuestion {
   id:string; section:ToeicSection; part:ToeicPart; skill:ToeicSkill; passage:string; stem:string; options:string[];
   correctIndex:number; explanation:string; evidence:string; paraphrase:string; recommendedSeconds:number;
   difficulty:ToeicDifficulty; scoreValue:ToeicScoreValue; reviewStatus:ToeicReviewStatus; version:number;
-  audioAssetId:string; transcript:string; evidenceStartMs:number; evidenceEndMs:number;
+  audioAssetId:string; transcript:string; evidenceStartMs:number; evidenceEndMs:number; groupId:string;
   constructor(id:string, section:ToeicSection, part:ToeicPart, skill:ToeicSkill, passage:string, stem:string,
     options:string[], correctIndex:number, explanation:string, evidence:string, paraphrase:string,
     recommendedSeconds:number, difficulty:ToeicDifficulty, scoreValue:ToeicScoreValue,
     reviewStatus:ToeicReviewStatus=ToeicReviewStatus.PUBLISHED, version:number=1,
-    audioAssetId:string='', transcript:string='', evidenceStartMs:number=0, evidenceEndMs:number=0) {
+    audioAssetId:string='', transcript:string='', evidenceStartMs:number=0, evidenceEndMs:number=0,
+    groupId:string='') {
     this.id=id; this.section=section; this.part=part; this.skill=skill; this.passage=passage; this.stem=stem;
     this.options=options; this.correctIndex=correctIndex; this.explanation=explanation; this.evidence=evidence;
     this.paraphrase=paraphrase; this.recommendedSeconds=recommendedSeconds; this.difficulty=difficulty;
     this.scoreValue=scoreValue; this.reviewStatus=reviewStatus; this.version=version; this.audioAssetId=audioAssetId;
     this.transcript=transcript; this.evidenceStartMs=evidenceStartMs; this.evidenceEndMs=evidenceEndMs;
+    this.groupId=groupId;
   }
 }
 
