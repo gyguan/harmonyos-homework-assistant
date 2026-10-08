@@ -1,0 +1,2000 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-08",
+  "issue": 478,
+  "reviewer": "AI-GPT6",
+  "reviewScope": "71 legacy Part7 items whose evidence was non-verbatim in source passage",
+  "limitations": "Single-model AI first-pass reasoning only; not ETS approval or independent expert certification. New v2 mock derivatives, all vocabulary, and other translated content remain out of scope. All 71 records are exact-content snapshots; future passage/stem/options/evidence/explanation changes must be re-reviewed.",
+  "notIndependentExpertCertification": true,
+  "items": [
+    {
+      "assetId": "R-P7-PARA-0003",
+      "sourceAnchor": "provides a complimentary shuttle",
+      "correctBasis": "免费接驳车等于免费交通",
+      "distractorReasons": [
+        "未说明免费早餐",
+        "未说明免费停车",
+        "未说明免费洗衣"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "PresetToeicContent.ets",
+      "questionSnapshot": {
+        "passage": "Harbor View Hotel provides a complimentary shuttle between the hotel and Central Station every 30 minutes from 6 A.M. to 10 P.M.",
+        "stem": "What does the hotel offer at no charge?",
+        "choices": [
+          "Breakfast",
+          "Parking",
+          "Transportation",
+          "Laundry service"
+        ],
+        "answer": 2,
+        "explanation": "complimentary 表示免费；shuttle 是接驳交通。因此 at no charge 对应 complimentary，答案是 Transportation。",
+        "evidence": "Harbor View Hotel provides a complimentary shuttle between the hotel and Central Station."
+      },
+      "snapshotSha256": "e222bdecb64262a26f81f69f42345a629cff1b578c92e0bc0ff9af67722799c3"
+    },
+    {
+      "assetId": "R-P7-CROSS-0007",
+      "sourceAnchor": "Train 84: Lakeside 8:10 A.M. → Central 9:05 A.M.",
+      "correctBasis": "9:30开会步行15分钟至少需9:15到站，只有84次9:05满足",
+      "distractorReasons": [
+        "92次9:35才到站",
+        "两班并非都满足",
+        "84次可行，非两班皆不可"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "PresetToeicContent.ets",
+      "questionSnapshot": {
+        "passage": "TRAIN SCHEDULE\nTrain 84: Lakeside 8:10 A.M. → Central 9:05 A.M.\nTrain 92: Lakeside 8:40 A.M. → Central 9:35 A.M.\n\nMESSAGE\nPriya, our presentation at Central Tower starts at 9:30. Please choose a train that gives us at least 15 minutes to walk from Central Station to the building. —Owen",
+        "stem": "Which train should Priya take?",
+        "choices": [
+          "Train 84",
+          "Train 92",
+          "Either train",
+          "Neither train"
+        ],
+        "answer": 0,
+        "explanation": "会议 9:30 开始且至少需要 15 分钟步行，因此必须在 9:15 前到站。Train 84 在 9:05 到达，满足要求。",
+        "evidence": "Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation."
+      },
+      "snapshotSha256": "2f1f523aac8a1b82337e1023d7ae18560bce0795ce4e5ead61fff3d0673e0d04"
+    },
+    {
+      "assetId": "R-DX-P7-03",
+      "sourceAnchor": "arrived on September 7",
+      "correctBasis": "9月7日交付到9月16日申请仅9天，未使用且包装完整",
+      "distractorReasons": [
+        "没有已修理记载",
+        "未载制造商免除费用",
+        "交付距今未超过一个月"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicStandardDiagnosticContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — RETURN POLICY\nFurniture may be returned within 14 days of delivery if the item is unused and in its original packaging. Customers must contact Support before shipping any return.\n\nDOCUMENT 2 — CUSTOMER MESSAGE\nTo: Support\nMy office chair arrived on September 7. I noticed a scratch when I opened the shipping carton, but I have not used the chair and the original packaging is intact. Today is September 16. Please advise me on the return procedure.",
+        "stem": "Why does the customer's chair appear to meet the stated return conditions?",
+        "choices": [
+          "The item is unused, packaged, and the request is within fourteen days",
+          "The chair has already been repaired",
+          "The manufacturer waived the return fee",
+          "The item was delivered more than one month ago"
+        ],
+        "answer": 0,
+        "explanation": "Policy要求14天内、未使用、保留原包装；邮件在收货9天后发出，且顾客明确说明未使用、包装完好。",
+        "evidence": "within 14 days of delivery if the item is unused and in its original packaging; arrived on September 7; Today is September 16; have not used the chair"
+      },
+      "snapshotSha256": "b9b3c3364fb3871f4b820c154812a8e45d91f14961f595bfefdb26613a2f51ad"
+    },
+    {
+      "assetId": "R-P7-PURPOSE-0703",
+      "sourceAnchor": "Harbor Street Café opens this Saturday",
+      "correctBasis": "开业公告附免费糕点促销，旨在推广新咖啡馆",
+      "distractorReasons": [
+        "没有员工会议通知",
+        "没有征集意见；对照原文：开业公告附免费糕点促销，旨在推广新咖啡馆",
+        "没有延误配送信息"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "GRAND OPENING\nHarbor Street Café opens this Saturday at 8 A.M. Show this advertisement before noon and receive a complimentary pastry with any beverage purchase.",
+        "stem": "Why was the advertisement published?",
+        "choices": [
+          "To promote a new café",
+          "To announce a staff meeting",
+          "To request customer feedback",
+          "To explain a delivery delay"
+        ],
+        "answer": 0,
+        "explanation": "广告给出开业时间和促销优惠，目的是推广新店。",
+        "evidence": "Harbor Street Café opens this Saturday at 8 A.M. Show this advertisement before noon and receive a complimentary pastry."
+      },
+      "snapshotSha256": "c70e9c199c16486666b5fe5acf4521ee3b7517051f9766bdbf03271778defe52"
+    },
+    {
+      "assetId": "R-P7-PURPOSE-0704",
+      "sourceAnchor": "water supply will be turned off",
+      "correctBasis": "明确通知住户周三9至11点停水",
+      "distractorReasons": [
+        "没有招租内容；对照原文：明确通知住户周三9至11点停水",
+        "没有缴费要求；对照原文：明确通知住户周三9至11点停水",
+        "没有消防演习；对照原文：明确通知住户周三9至11点停水"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "To: Building Tenants\nThe water supply will be turned off from 9 A.M. to 11 A.M. on Wednesday so that a damaged pipe on the fourth floor can be replaced. We apologize for the inconvenience.",
+        "stem": "Why did the building manager send this message?",
+        "choices": [
+          "To warn tenants about a service interruption",
+          "To advertise office space",
+          "To collect a maintenance fee",
+          "To schedule a fire drill"
+        ],
+        "answer": 0,
+        "explanation": "正文说明停水时段和维修原因，是服务中断提醒。",
+        "evidence": "The water supply will be turned off from 9 A.M. to 11 A.M. on Wednesday."
+      },
+      "snapshotSha256": "42b9a59101f18210c162fec302db5e29feacfb6e491ed4354c1f6903f9826f0d"
+    },
+    {
+      "assetId": "R-P7-PURPOSE-0706",
+      "sourceAnchor": "exercise room will therefore be unavailable",
+      "correctBasis": "跑步机更换导致运动室周末不可用",
+      "distractorReasons": [
+        "不是出售旧设备",
+        "泳池和课程仍开放",
+        "无新会费；对照原文：跑步机更换导致运动室周末不可用"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "Dear Members,\nOur fitness center will replace all treadmills this weekend. The exercise room will therefore be unavailable Saturday and Sunday, but the pool and studio classes will operate normally.",
+        "stem": "What is the main purpose of the message?",
+        "choices": [
+          "To explain a weekend room closure",
+          "To sell used exercise equipment",
+          "To cancel all weekend activities",
+          "To announce new membership fees"
+        ],
+        "answer": 0,
+        "explanation": "邮件围绕更换跑步机导致运动室周末关闭展开。",
+        "evidence": "The exercise room will therefore be unavailable Saturday and Sunday."
+      },
+      "snapshotSha256": "5f9842d55d7912409d9b2fd9ddae97e9a27ca7ced1d165219bac88f010e4ab3d"
+    },
+    {
+      "assetId": "R-P7-PARA-0902",
+      "sourceAnchor": "provides complimentary lockers",
+      "correctBasis": "原文明示 complimentary lockers，意思是入口附近的小包寄存柜免费使用；未承诺其他服务免费",
+      "distractorReasons": [
+        "未说免费门票；对照原文：免费的为储物柜",
+        "未说免费导览；对照原文：免费的为储物柜",
+        "未说免费停车；对照原文：免费的为储物柜"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "The museum provides complimentary lockers near the main entrance for visitors carrying small bags.",
+        "stem": "What is available at no charge?",
+        "choices": [
+          "Lockers",
+          "Admission tickets",
+          "Guided tours",
+          "Parking"
+        ],
+        "answer": 0,
+        "explanation": "complimentary 与 at no charge 同义。",
+        "evidence": "The museum provides complimentary lockers near the main entrance."
+      },
+      "snapshotSha256": "f74d772f6ff928cf6151880d9e0c466f22684e01d970c7fd2fca5fea9c390966"
+    },
+    {
+      "assetId": "R-P7-LONG-1002",
+      "sourceAnchor": "Employees who have completed the online security course",
+      "correctBasis": "完成课程的员工可申请新门禁卡",
+      "distractorReasons": [
+        "访客不属于限定员工",
+        "未说明未通过测验者合资格",
+        "不是仅限HR员工"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "Employees who have completed the online security course, which includes a short quiz at the end, may request a new building access card from Human Resources beginning Monday.",
+        "stem": "Who may request a new access card?",
+        "choices": [
+          "Employees who completed the security course",
+          "All visitors to the building",
+          "Employees who failed the quiz",
+          "Only Human Resources staff"
+        ],
+        "answer": 0,
+        "explanation": "主语核心是 Employees who have completed the online security course。",
+        "evidence": "Employees who have completed the online security course ... may request a new building access card."
+      },
+      "snapshotSha256": "93d7e59f77896362590c18201a90f7a06c140dfcce80ad0cd3a276e379717712"
+    },
+    {
+      "assetId": "R-P7-LONG-1003",
+      "sourceAnchor": "replacement displays requested by the downtown store",
+      "correctBasis": "they被转移到门店，先行词是可转移的替换显示器",
+      "distractorReasons": [
+        "编号记录在转移前且不是货物",
+        "库存团队负责记录，不是被转移物",
+        "商店是目的地不是被转移物"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "The shipment that arrived yesterday contains the replacement displays requested by the downtown store, and they will be transferred there after the inventory team records the serial numbers.",
+        "stem": "What does 'they' refer to?",
+        "choices": [
+          "The replacement displays",
+          "The serial numbers",
+          "The inventory team",
+          "The downtown store"
+        ],
+        "answer": 0,
+        "explanation": "并列句中的 they 指向最近且语义匹配的复数名词 replacement displays。",
+        "evidence": "contains the replacement displays ... and they will be transferred there"
+      },
+      "snapshotSha256": "6aeebd35ea6fb0d3a07fc9b2ca44a8be4fc19a32b6235fc79268e4e5c2e90c7f"
+    },
+    {
+      "assetId": "R-P7-LONG-1006",
+      "sourceAnchor": "orders submitted later will be processed the following business day",
+      "correctBasis": "午前订单当天发运，午后订单次工作日处理",
+      "distractorReasons": [
+        "没有全部延迟一周",
+        "未宣布不再收订单",
+        "未要求自取；对照原文：午前订单当天发运，午后订单次工作日处理"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "While customers whose orders were placed before noon will still receive same-day dispatch, orders submitted later will be processed the following business day because the warehouse now closes earlier.",
+        "stem": "What is the main contrast in the sentence?",
+        "choices": [
+          "Orders before noon and later orders follow different schedules",
+          "All orders are delayed one week",
+          "The warehouse will stop accepting orders",
+          "Customers must collect packages themselves"
+        ],
+        "answer": 0,
+        "explanation": "while 引出对比：中午前订单当天发，之后订单次工作日处理。",
+        "evidence": "orders placed before noon ... same-day dispatch; orders submitted later ... following business day"
+      },
+      "snapshotSha256": "23f7a00b8f7ae74ad1edc027e181fa0fb5b5ee819a01ea21b5f91836f4911ac0"
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1101",
+      "sourceAnchor": "Train 18: Northport 8:10 → Central 8:55",
+      "correctBasis": "9:30前保留20分钟步行需9:10前到站，18次8:55满足",
+      "distractorReasons": [
+        "24次9:25到站太晚",
+        "两班不均满足；对照原文：9:30前保留20分钟步行需9:10前到站，18次8:55满足",
+        "有一班可行；对照原文：9:30前保留20分钟步行需9:10前到站，18次8:55满足"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 18: Northport 8:10 → Central 8:55\nTrain 24: Northport 8:40 → Central 9:25\n\nDOCUMENT 2 — MESSAGE\nMina, our client meeting at Central Plaza begins at 9:30. Please choose a train that leaves at least 20 minutes to walk from Central Station. —Eric",
+        "stem": "Which train should Mina take?",
+        "choices": [
+          "Train 18",
+          "Train 24",
+          "Either train",
+          "Neither train"
+        ],
+        "answer": 0,
+        "explanation": "会议 9:30，步行至少20分钟，需要 9:10 前到站；只有 Train 18 在 8:55 到。",
+        "evidence": "Train 18 arrives at 8:55; the message requires at least 20 minutes before 9:30."
+      },
+      "snapshotSha256": "2524f6bb1ed5a45a3eacd6ef5f39c2c882cd8287b4acccd4e5aeb641f7f28f66"
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1102",
+      "sourceAnchor": "Book a two-night stay by November 15",
+      "correctBasis": "Luis 11月10日预订20日至22日两晚，满足免费机场交通",
+      "distractorReasons": [
+        "没有免费第三晚",
+        "未提升级客房；对照原文：Luis 11月10日预订20日至22日两晚，满足免费机场交通",
+        "未提免费早餐；对照原文：Luis 11月10日预订20日至22日两晚，满足免费机场交通"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 3,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — HOTEL OFFER\nBook a two-night stay by November 15 and receive complimentary airport transportation.\n\nDOCUMENT 2 — E-MAIL\nI will stay at the Harbor Hotel from November 20 to November 22. I made the reservation on November 10. Please confirm whether I need to arrange a taxi. —Luis",
+        "stem": "What benefit should Luis receive?",
+        "choices": [
+          "Free airport transportation",
+          "A third hotel night",
+          "A room upgrade",
+          "Free breakfast"
+        ],
+        "answer": 0,
+        "explanation": "预订日期 11/10 早于 11/15 且住两晚，满足免费机场交通条件。",
+        "evidence": "Book a two-night stay by November 15 and receive complimentary airport transportation; I made the reservation on November 10."
+      },
+      "snapshotSha256": "3feee4f638853e955e23a1fd4d8313354ba283e285e94260f96acecca3e0dd4c"
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1103",
+      "sourceAnchor": "Date: October 2",
+      "correctBasis": "10月18日距购买16天，超过14天退货期限",
+      "distractorReasons": [
+        "原文说明包装未拆",
+        "没有折扣信息；对照原文：10月18日距购买16天，超过14天退货期限",
+        "材料包括购买收据"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — RETURN POLICY\nElectronics may be returned within 14 days if unopened.\n\nDOCUMENT 2 — RECEIPT\nPurchase: Wireless keyboard\nDate: October 2\n\nCustomer note dated October 18: The box is still sealed.",
+        "stem": "Why is the return likely to be refused?",
+        "choices": [
+          "The 14-day period has passed",
+          "The box was opened",
+          "The item was discounted",
+          "A receipt is missing"
+        ],
+        "answer": 0,
+        "explanation": "10月2日至10月18超过14天，即使未开封也超出期限。",
+        "evidence": "Electronics may be returned within 14 days; purchase October 2; note October 18."
+      },
+      "snapshotSha256": "1e54f97dad8fd386f9c8d7fe753570073ed7bf8f79efaff2165e8f5182c76aca"
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1104",
+      "sourceAnchor": "11:30–11:50 Cloud Operations",
+      "correctBasis": "云运维全程在中午前且未学过",
+      "distractorReasons": [
+        "数据安全课已修完",
+        "产品战略是下午",
+        "存在云运维合适场次"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 2,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — SEMINAR PROGRAM\n10:00–11:00 Data Security\n11:30–11:50 Cloud Operations\n2:00–3:00 Product Strategy\n\nDOCUMENT 2 — NOTE\nI can attend only before noon, and I already completed the Data Security course last month. —Naomi",
+        "stem": "Which session is most appropriate for Naomi?",
+        "choices": [
+          "Cloud Operations",
+          "Data Security",
+          "Product Strategy",
+          "None of the sessions"
+        ],
+        "answer": 0,
+        "explanation": "她只能中午前参加且已学过 Data Security，因此选择 11:30 Cloud Operations。",
+        "evidence": "11:30–11:50 Cloud Operations; I can attend only before noon; I already completed the Data Security course last month."
+      },
+      "snapshotSha256": "a679c259f1f498e1da9da673d4cf6e201b4edf2f1612286aadb652c06563d532"
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1105",
+      "sourceAnchor": "Free standard shipping on orders over $100.",
+      "correctBasis": "订单124美元高于100免标准运费且成本最低",
+      "distractorReasons": [
+        "八美元标准运费不适用",
+        "十五美元加急成本更高",
+        "没有只允许自取限制"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — SHIPPING RATES\nStandard: $8, 3–5 business days\nExpress: $15, next business day\nFree standard shipping on orders over $100.\n\nDOCUMENT 2 — ORDER\nSubtotal: $124\nCustomer request: Lowest possible delivery cost.",
+        "stem": "Which shipping option best matches the request?",
+        "choices": [
+          "Free standard shipping",
+          "$8 standard shipping",
+          "$15 express shipping",
+          "Store pickup only"
+        ],
+        "answer": 0,
+        "explanation": "订单超过100美元，可享免费标准配送，且成本最低。",
+        "evidence": "Free standard shipping on orders over $100; subtotal $124."
+      },
+      "snapshotSha256": "aabdf1589429ac176a563a37a6338a0c3acd7f35715dd25a41ceb1ae77aa4647"
+    },
+    {
+      "assetId": "R-P7-DOUBLE-1106",
+      "sourceAnchor": "Valid: October 7",
+      "correctBasis": "访客证仅印刷日期有效，10月8日再来需新证",
+      "distractorReasons": [
+        "旧证在10月8日已失效",
+        "无员工停车要求",
+        "无领取楼宇钥匙规定"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — OFFICE ACCESS\nTemporary badges are valid only on the date printed on them.\n\nDOCUMENT 2 — BADGE\nVisitor: A. Singh\nValid: October 7\n\nE-mail dated October 8: I plan to return this afternoon for a second meeting.",
+        "stem": "What will A. Singh most likely need?",
+        "choices": [
+          "A new temporary badge",
+          "The same badge from October 7",
+          "An employee parking permit",
+          "A building key"
+        ],
+        "answer": 0,
+        "explanation": "临时证只在印刷日期有效，10月8日再次进入需要新证。",
+        "evidence": "Temporary badges are valid only on the date printed on them; badge valid October 7; return October 8."
+      },
+      "snapshotSha256": "4c857a6a11ad48944ea364f6ded1031ae2513b18553cc9383d31699bdcc01df6"
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1201",
+      "sourceAnchor": "Departures to Convention Center: 7:45, 8:30, 9:15.",
+      "correctBasis": "8:30发车25分钟后8:55到，最晚且早于9:15",
+      "distractorReasons": [
+        "7:45更早非最晚",
+        "9:15发车9:40到太晚",
+        "存在8:30可行"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — CONFERENCE AGENDA\n8:30 Registration\n9:30 Opening Talk\n11:00 Workshop A\n\nDOCUMENT 2 — HOTEL SHUTTLE\nDepartures to Convention Center: 7:45, 8:30, 9:15. Travel time: 25 minutes.\n\nDOCUMENT 3 — MESSAGE\nKai, please arrive before registration closes at 9:15. Use the latest shuttle that still gets you there on time. —Nora",
+        "stem": "Which shuttle should Kai take?",
+        "choices": [
+          "7:45",
+          "8:30",
+          "9:15",
+          "None"
+        ],
+        "answer": 1,
+        "explanation": "8:30 加25分钟=8:55，能在9:15前到；9:15班次太晚。",
+        "evidence": "8:30 shuttle + 25 minutes = 8:55; arrive before 9:15."
+      },
+      "snapshotSha256": "4cbe19fd9f9cb23497b81e2afc9f1c120a5e5b150bf1f8cdc705ec75a7b99a3b"
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1202",
+      "sourceAnchor": "during normal use, following the product instructions",
+      "correctBasis": "10月3日至20日少于30天，明确按说明正常使用发生故障可免费更换",
+      "distractorReasons": [
+        "条款没有付费会员",
+        "条款没有额外运费",
+        "正常使用故障且期限内，并非无帮助"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 2,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — ORDER RECEIPT\nItem: Model Q Scanner\nOrder date: Oct. 3\n\nDOCUMENT 2 — WARRANTY\nModel Q may be replaced free of charge within 30 days if it fails under normal use.\n\nDOCUMENT 3 — SUPPORT NOTE dated Oct. 20\nCustomer reports that the scanner stopped powering on during normal use, following the product instructions, and shows no physical damage.",
+        "stem": "What is the customer most likely eligible for?",
+        "choices": [
+          "A free replacement",
+          "A paid annual membership",
+          "A shipping surcharge",
+          "No assistance"
+        ],
+        "answer": 0,
+        "explanation": "10月3日下单、10月20日报修，尚在30天内；客服记录明确说明按说明正常使用时发生故障，且无物理损坏，因此最可能符合免费更换条件。",
+        "evidence": "Model Q may be replaced free of charge within 30 days if it fails under normal use; order Oct. 3; Oct. 20 support note confirms failure during normal use."
+      },
+      "snapshotSha256": "a186224d19e8a339d42054246b2893b506c2f7c4ff16aa65ad16659e6babcb85"
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1203",
+      "sourceAnchor": "Sales associate, January 2026–present.",
+      "correctBasis": "2026年10月仅九个多月销售经验，不足两年，A陈述与资料冲突",
+      "distractorReasons": [
+        "10月28日可开始早于11月1日",
+        "邮件明确可全职",
+        "简历明确曾做销售"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 2,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — JOB POSTING (OCTOBER 2026)\nApplicants must have two years of sales experience and be available to start November 1, 2026.\n\nDOCUMENT 2 — RÉSUMÉ\nJordan Lee — Sales associate, January 2026–present.\n\nDOCUMENT 3 — E-MAIL (OCTOBER 22, 2026)\nI can begin work on October 28, 2026, and am available full-time. —Jordan",
+        "stem": "Which statement is inconsistent with Jordan's application?",
+        "choices": [
+          "Jordan has at least two years of sales experience",
+          "Jordan can begin by November 1",
+          "Jordan is available full-time",
+          "Jordan has worked in sales"
+        ],
+        "answer": 0,
+        "explanation": "招聘信息发布于2026年10月，要求至少两年销售经验；简历只显示从2026年1月至今，不足一年。其他三项均与简历或邮件相符。",
+        "evidence": "Applicants must have two years of sales experience || Jordan Lee — Sales associate, January 2026–present."
+      },
+      "snapshotSha256": "41060192a8329815d36881a979a5dc2b30365a735b047f60d58c1749a3fd44c6"
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1204",
+      "sourceAnchor": "Advanced Formulas requires completion of Excel Basics.",
+      "correctBasis": "从未上Excel课需先上周一的基础课再上高级课",
+      "distractorReasons": [
+        "高级课有先修条件",
+        "数据图表在周二且她无法出席",
+        "周一可上基础课，非无课程"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — COURSE LIST\nExcel Basics — Monday 9:00\nData Charts — Tuesday 14:00\nAdvanced Formulas — Thursday 10:00\n\nDOCUMENT 2 — PREREQUISITE\nAdvanced Formulas requires completion of Excel Basics.\n\nDOCUMENT 3 — NOTE\nPriya has never taken an Excel course and can attend only Monday or Thursday.",
+        "stem": "What should Priya take first?",
+        "choices": [
+          "Excel Basics",
+          "Advanced Formulas",
+          "Data Charts",
+          "No course"
+        ],
+        "answer": 0,
+        "explanation": "Advanced Formulas 有前置要求；她周一可参加 Basics，应先完成基础课。",
+        "evidence": "Advanced Formulas requires completion of Excel Basics; Priya can attend Monday or Thursday."
+      },
+      "snapshotSha256": "4f9ed9fc72aabb8db736c0edd371576fb2cf6d82dae669acbee6928d80ce2a07"
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1205",
+      "sourceAnchor": "Garage C: $5/day after 5 P.M.",
+      "correctBasis": "招待会18至20点全落在17点后的5美元时段且比其他车库便宜",
+      "distractorReasons": [
+        "A为12美元；对照原文：招待会18至20点全落在17点后的5美元时段且比其他车库便宜",
+        "B为8美元；对照原文：招待会18至20点全落在17点后的5美元时段且比其他车库便宜",
+        "三车库费用并不相等"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — PARKING RATES\nGarage A: $12/day\nGarage B: $8/day\nGarage C: $5/day after 5 P.M.\n\nDOCUMENT 2 — EVENT\nReception: Friday, 6 P.M.–8 P.M.\n\nDOCUMENT 3 — MESSAGE\nPlease choose the least expensive garage available for the whole reception. —Mark",
+        "stem": "Which garage best meets Mark's request?",
+        "choices": [
+          "Garage A",
+          "Garage B",
+          "Garage C",
+          "All cost the same"
+        ],
+        "answer": 2,
+        "explanation": "活动6点开始，Garage C 5点后5美元，且最便宜。",
+        "evidence": "Garage C: $5/day after 5 P.M.; reception begins at 6 P.M."
+      },
+      "snapshotSha256": "0e96e588a3630c889803296623521932b776368882fa5db6328de2e9fdea17ea"
+    },
+    {
+      "assetId": "R-P7-TRIPLE-1206",
+      "sourceAnchor": "Saturday 9 A.M.–5 P.M.",
+      "correctBasis": "周六17点闭馆而预约到18点，违反预约必须闭馆前结束",
+      "distractorReasons": [
+        "周六实际开放；对照原文：周六17点闭馆而预约到18点，违反预约必须闭馆前结束",
+        "规定最多两小时而非必须四小时",
+        "周六9点开馆非中午"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — LIBRARY HOURS\nWeekdays 8 A.M.–8 P.M.; Saturday 9 A.M.–5 P.M.\n\nDOCUMENT 2 — ROOM POLICY\nStudy rooms may be reserved for up to two hours and must end before closing.\n\nDOCUMENT 3 — REQUEST\nSaturday reservation requested from 4 P.M. to 6 P.M.",
+        "stem": "Why must the request be changed?",
+        "choices": [
+          "The library closes at 5 P.M.",
+          "Rooms cannot be used Saturday",
+          "Reservations must be four hours",
+          "The library opens at noon"
+        ],
+        "answer": 0,
+        "explanation": "周六5点闭馆，申请到6点违反必须在闭馆前结束的规则。",
+        "evidence": "Saturday 9 A.M.–5 P.M.; study rooms must end before closing; request 4 P.M.–6 P.M."
+      },
+      "snapshotSha256": "061ecf392df238d74b8d019a5b8d1a5398c9e2809d38f389edf4831150aec611"
+    },
+    {
+      "assetId": "R-M1-P7-050",
+      "sourceAnchor": "new inventory system will be introduced on November 2.",
+      "correctBasis": "新系统上线前需仓库员工培训，邮件旨在准备",
+      "distractorReasons": [
+        "没有停业安排；对照原文：新系统上线前需仓库员工培训，邮件旨在准备",
+        "没有产品订货请求",
+        "不是推广软件厂商广告"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+        "stem": "What is the purpose of the e-mail?",
+        "choices": [
+          "To prepare staff for a new system",
+          "To announce a warehouse closure",
+          "To request product orders",
+          "To advertise a software company"
+        ],
+        "answer": 0,
+        "explanation": "邮件说明新系统上线前的培训要求。",
+        "evidence": "new inventory system ... all warehouse employees must complete ... tutorial"
+      },
+      "snapshotSha256": "8bf0c59fe9c8afd3ada7f1ac80ebec1b8b8a8d5aad19791b497c05c480771f79"
+    },
+    {
+      "assetId": "R-M1-P7-051",
+      "sourceAnchor": "Supervisors will receive an additional live demonstration on October 28.",
+      "correctBasis": "只有主管额外参加现场演示",
+      "distractorReasons": [
+        "未指客户参加；对照原文：只有主管额外参加现场演示",
+        "未指司机参加；对照原文：只有主管额外参加现场演示",
+        "未指求职者参加"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+        "stem": "Who will attend a live demonstration?",
+        "choices": [
+          "Supervisors",
+          "All customers",
+          "Delivery drivers",
+          "New applicants"
+        ],
+        "answer": 0,
+        "explanation": "原文明确 supervisors。",
+        "evidence": "Supervisors will receive an additional live demonstration."
+      },
+      "snapshotSha256": "004f36abdb1272cec698b5270ca6121268b16c06510dac39741cc788435d26c6"
+    },
+    {
+      "assetId": "R-M1-P7-052",
+      "sourceAnchor": "must complete a 45-minute online tutorial before that date.",
+      "correctBasis": "that date指前一句11月2日，须于此前完成",
+      "distractorReasons": [
+        "10月28日是主管演示日",
+        "不得晚于11月2日",
+        "不是11月底；对照原文：that date指前一句11月2日，须于此前完成"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+        "stem": "When must warehouse employees finish the tutorial?",
+        "choices": [
+          "Before November 2",
+          "On October 28 only",
+          "After November 2",
+          "At the end of November"
+        ],
+        "answer": 0,
+        "explanation": "before that date 指 November 2。",
+        "evidence": "must complete ... before that date"
+      },
+      "snapshotSha256": "1cc34246a11aae4bc2f1f3d861a252399596978ddca0c30699623189ac304c1a"
+    },
+    {
+      "assetId": "R-M1-P7-059",
+      "sourceAnchor": "Invoice 9047 for $1,280 is due October 20.",
+      "correctBasis": "付款提醒明确账单到期时间",
+      "distractorReasons": [
+        "未提供折扣；对照原文：付款提醒明确账单到期时间",
+        "未取消发票；对照原文：付款提醒明确账单到期时间",
+        "未修改账户；对照原文：付款提醒明确账单到期时间"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "PAYMENT REMINDER\nInvoice 9047 for $1,280 is due October 20. Payments may be made by bank transfer or company credit card. Please include the invoice number with the payment so that it can be applied to the correct account.",
+        "stem": "Why was this message sent?",
+        "choices": [
+          "To remind a customer about a payment",
+          "To offer a discount",
+          "To cancel an invoice",
+          "To change a bank account"
+        ],
+        "answer": 0,
+        "explanation": "标题和到期日表明这是付款提醒。",
+        "evidence": "Invoice 9047 ... is due October 20."
+      },
+      "snapshotSha256": "b9a48bb5d624e00e61c2892c925b4dde8b67ac5ac89536633b8b485f908664bc"
+    },
+    {
+      "assetId": "R-M1-P7-060",
+      "sourceAnchor": "Please include the invoice number with the payment",
+      "correctBasis": "转账需附发票编号供财务核销",
+      "distractorReasons": [
+        "无需护照号码；对照原文：转账需附发票编号供财务核销",
+        "无需送货地址；对照原文：转账需附发票编号供财务核销",
+        "无需员工编号；对照原文：转账需附发票编号供财务核销"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "PAYMENT REMINDER\nInvoice 9047 for $1,280 is due October 20. Payments may be made by bank transfer or company credit card. Please include the invoice number with the payment so that it can be applied to the correct account.",
+        "stem": "What information should accompany the payment?",
+        "choices": [
+          "The invoice number",
+          "A passport number",
+          "A shipping address",
+          "An employee ID"
+        ],
+        "answer": 0,
+        "explanation": "原文明确要求 include the invoice number。",
+        "evidence": "Please include the invoice number with the payment."
+      },
+      "snapshotSha256": "497af432f5084472361ec403bcbe82ccaee24446493cb8bf6e8b40e215c4eb74"
+    },
+    {
+      "assetId": "R-M1-P7-067",
+      "sourceAnchor": "10:15 Market Trends Panel",
+      "correctBasis": "12点午餐前安排的是10:15趋势论坛",
+      "distractorReasons": [
+        "报到在9点更早",
+        "产品展示在午餐之后",
+        "社交招待会更晚"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "EVENT SCHEDULE\n9:00 Registration\n9:45 Opening Remarks\n10:15 Market Trends Panel\n12:00 Lunch\n1:30 Product Demonstrations\n3:30 Networking Reception\nAll sessions except lunch will be held in Hall B.",
+        "stem": "What happens immediately before lunch?",
+        "choices": [
+          "The Market Trends Panel",
+          "Registration",
+          "Product demonstrations",
+          "The reception"
+        ],
+        "answer": 0,
+        "explanation": "时间顺序中 lunch 12:00 前是 10:15 panel。",
+        "evidence": "10:15 Market Trends Panel; 12:00 Lunch"
+      },
+      "snapshotSha256": "347731db0601db4012551676520117592af3d7e317b0824ba1bd103c15cba25a"
+    },
+    {
+      "assetId": "R-M1-P7-071",
+      "sourceAnchor": "Train 52: Easton 7:50 → Central 8:35",
+      "correctBasis": "演示9:15，需步行20分钟，52次8:35及时",
+      "distractorReasons": [
+        "60次9:05仅余10分钟",
+        "两班不都可行；对照原文：演示9:15，需步行20分钟，52次8:35及时",
+        "52次可行；对照原文：演示9:15，需步行20分钟，52次8:35及时"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 52: Easton 7:50 → Central 8:35\nTrain 60: Easton 8:20 → Central 9:05\n\nDOCUMENT 2 — E-MAIL\nOur presentation at Central Tower starts at 9:15. Please allow 20 minutes to walk from the station. —Dana",
+        "stem": "Which train should the recipient take?",
+        "choices": [
+          "Train 52",
+          "Train 60",
+          "Either train",
+          "Neither train"
+        ],
+        "answer": 0,
+        "explanation": "需要8:55前到站，Train52 8:35满足。",
+        "evidence": "Train 52 arrives 8:35; presentation 9:15 with 20-minute walk."
+      },
+      "snapshotSha256": "c5ce9082f6fd414c4c0bddd95c37d98199786bcdff41db41c769ee546291da34"
+    },
+    {
+      "assetId": "R-M1-P7-073",
+      "sourceAnchor": "Train 60: Easton 8:20 → Central 9:05",
+      "correctBasis": "9:05距9:15演示只10分钟，不足步行20分钟",
+      "distractorReasons": [
+        "60次确实到中央站",
+        "60次8:20发车非7点前",
+        "没有票价信息；对照原文：9:05距9:15演示只10分钟，不足步行20分钟"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 52: Easton 7:50 → Central 8:35\nTrain 60: Easton 8:20 → Central 9:05\n\nDOCUMENT 2 — E-MAIL\nOur presentation at Central Tower starts at 9:15. Please allow 20 minutes to walk from the station. —Dana",
+        "stem": "Why is Train 60 unsuitable?",
+        "choices": [
+          "It arrives too late to allow the requested walk time",
+          "It does not go to Central",
+          "It leaves before 7 A.M.",
+          "It costs more"
+        ],
+        "answer": 0,
+        "explanation": "9:05到站到9:15只有10分钟，不满足20分钟步行。",
+        "evidence": "Train 60 arrives 9:05; presentation starts 9:15; allow 20 minutes."
+      },
+      "snapshotSha256": "0fe69b133ae7fc76f7858ccc36f0a232c03cc60e825bf0008a1537f3f183780b"
+    },
+    {
+      "assetId": "R-M1-P7-074",
+      "sourceAnchor": "Spend $80 or more online and receive free standard delivery.",
+      "correctBasis": "10月28日购物车92美元满足10月31日前80美元门槛",
+      "distractorReasons": [
+        "未承诺免费加急",
+        "无八折价格优惠",
+        "未赠礼品卡；对照原文：10月28日购物车92美元满足10月31日前80美元门槛"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — STORE OFFER\nSpend $80 or more online and receive free standard delivery. Offer ends October 31.\n\nDOCUMENT 2 — CUSTOMER E-MAIL dated October 28\nMy cart total is $92. I do not need express shipping. Will there be a delivery charge?",
+        "stem": "What should the customer receive?",
+        "choices": [
+          "Free standard delivery",
+          "Free express delivery",
+          "A 20 percent discount",
+          "A gift card"
+        ],
+        "answer": 0,
+        "explanation": "金额92超过80且日期在10/31前，符合免费标准配送。",
+        "evidence": "Spend $80 or more online and receive free standard delivery; cart total is $92 on Oct. 28."
+      },
+      "snapshotSha256": "d9e26cd40fed395688647ab9507f8d8d45867ebdcbc645f5c0c46c7e1fdcb3a0"
+    },
+    {
+      "assetId": "R-M1-P7-077",
+      "sourceAnchor": "Amount due: $640",
+      "correctBasis": "发票列明640美元，不含逾期才可能加收的25美元",
+      "distractorReasons": [
+        "615不是发票金额",
+        "665含潜在罚金但非当前应付款",
+        "25仅为滞纳金"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 2,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — INVOICE\nInvoice 3118\nAmount due: $640\nDue date: Nov. 6\n\nDOCUMENT 2 — FINANCE MEMO\nPayments received after the due date are subject to a $25 late fee. Bank transfers may take up to two business days to post.",
+        "stem": "What amount is listed as due on Invoice 3118, excluding any late fee?",
+        "choices": [
+          "$640",
+          "$615",
+          "$665",
+          "$25"
+        ],
+        "answer": 0,
+        "explanation": "发票标明应付640美元；25美元是逾期收款后才可能产生的额外费用，且银行转账可能延迟入账，因此不应将汇款发起时间等同于到账时间。",
+        "evidence": "Amount due: $640; after due date subject to $25 late fee."
+      },
+      "snapshotSha256": "75e7dda905ff4ef8fcae195b5ac271bc9322bd2970337678870e2facfb087374"
+    },
+    {
+      "assetId": "R-M1-P7-080",
+      "sourceAnchor": "Route 7 arrives Downtown at 8:40 and 9:10.",
+      "correctBasis": "8:40到站步行10分钟8:50到办公室，早于9点",
+      "distractorReasons": [
+        "9:10到站已迟",
+        "并非两班皆可；对照原文：8:40到站步行10分钟8:50到办公室，早于9点",
+        "8:40可行非皆不可"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — BUS SCHEDULE\nRoute 7 arrives Downtown at 8:40 and 9:10.\n\nDOCUMENT 2 — MEETING NOTE\nThe team meeting begins at 9:00 in the Downtown office. It takes about 10 minutes to walk from the bus stop.",
+        "stem": "Which arrival should an employee choose?",
+        "choices": [
+          "8:40",
+          "9:10",
+          "Either",
+          "Neither"
+        ],
+        "answer": 0,
+        "explanation": "8:40到站后步行10分钟，8:50到办公室，可赶上9点会议。",
+        "evidence": "Route 7 arrives 8:40; meeting 9:00; walk 10 minutes."
+      },
+      "snapshotSha256": "1858bfdb295c041afeef0ef3457d71c3ad487f1a39490df7a751504e0774de4b"
+    },
+    {
+      "assetId": "R-M1-P7-082",
+      "sourceAnchor": "meeting begins at 9:00",
+      "correctBasis": "9:10已晚于9点会议开始，且还有10分钟步行",
+      "distractorReasons": [
+        "办公室是否关闭未提供",
+        "路线确实在市中心到站",
+        "无预约要求；对照原文：9:10已晚于9点会议开始，且还有10分钟步行"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — BUS SCHEDULE\nRoute 7 arrives Downtown at 8:40 and 9:10.\n\nDOCUMENT 2 — MEETING NOTE\nThe team meeting begins at 9:00 in the Downtown office. It takes about 10 minutes to walk from the bus stop.",
+        "stem": "Why is the 9:10 arrival not appropriate?",
+        "choices": [
+          "The meeting will already have started",
+          "The office will be closed",
+          "The route does not stop downtown",
+          "The bus requires a reservation"
+        ],
+        "answer": 0,
+        "explanation": "9:10已晚于9:00会议开始。",
+        "evidence": "meeting begins at 9:00; arrival 9:10"
+      },
+      "snapshotSha256": "36fc2150ba5a1a6fd0bc871ed192692feecaefbf7efcda3f3b8986ca628f99f0"
+    },
+    {
+      "assetId": "R-M1-P7-083",
+      "sourceAnchor": "since June last year",
+      "correctBasis": "去年6月到今年11月已超一年办公室经验",
+      "distractorReasons": [
+        "职位要求12月1日而非12月15日",
+        "邮件日期11月8早于10日",
+        "确有工作经验；对照原文：去年6月到今年11月已超一年办公室经验"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — JOB POSTING\nMarketing Assistant: start date Dec. 1; one year of office experience required; applications due Nov. 10.\n\nDOCUMENT 2 — APPLICANT E-MAIL dated Nov. 8\nI have worked as an office coordinator since June last year and can start November 25.",
+        "stem": "Which requirement does the applicant appear to meet?",
+        "choices": [
+          "Office experience",
+          "A December 15 start date",
+          "An application after November 10",
+          "No work experience"
+        ],
+        "answer": 0,
+        "explanation": "从去年6月起的办公室工作已超过一年。",
+        "evidence": "one year of office experience required; worked as an office coordinator since June last year"
+      },
+      "snapshotSha256": "7038d057aca1cfd0f036e8bd6de13862be7b298cd70b212f501215cc528cc661"
+    },
+    {
+      "assetId": "R-M1-P7-085",
+      "sourceAnchor": "can start November 25",
+      "correctBasis": "11月25日可入职早于要求12月1日",
+      "distractorReasons": [
+        "否认与原文明显矛盾",
+        "非12月15日之后",
+        "邮件明确提供可入职日期"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — JOB POSTING\nMarketing Assistant: start date Dec. 1; one year of office experience required; applications due Nov. 10.\n\nDOCUMENT 2 — APPLICANT E-MAIL dated Nov. 8\nI have worked as an office coordinator since June last year and can start November 25.",
+        "stem": "Can the applicant start by the required date?",
+        "choices": [
+          "Yes",
+          "No",
+          "Only after December 15",
+          "The e-mail does not mention availability"
+        ],
+        "answer": 0,
+        "explanation": "可11/25开始，早于12/1。",
+        "evidence": "start date Dec. 1; can start November 25"
+      },
+      "snapshotSha256": "ca8071a1fe7aa1a22834ab19d5c0eeeec2283c3d8199b68fdd9d9b7a05c3f9c3"
+    },
+    {
+      "assetId": "R-M1-P7-086",
+      "sourceAnchor": "departs 8:00 and 9:45; travel time 30 minutes.",
+      "correctBasis": "9:45发车10:15到，距10:30恰好15分钟且是最晚可行班次",
+      "distractorReasons": [
+        "8点可行但不是最晚",
+        "两班都符合时间但问最晚班次",
+        "9:45符合条件非两班皆不可"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 2,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — CONFERENCE AGENDA\n9:00 Opening\n10:30 Workshop: Sales Analytics\n1:00 Workshop: Customer Retention\n\nDOCUMENT 2 — HOTEL NOTICE\nShuttle to convention center departs 8:00 and 9:45; travel time 30 minutes.\n\nDOCUMENT 3 — E-MAIL\nI need to attend the 10:30 workshop and would like at least 15 minutes to find the room after arriving. —Maya",
+        "stem": "Which is the latest shuttle Maya can take and still allow at least 15 minutes before the workshop?",
+        "choices": [
+          "8:00",
+          "9:45",
+          "Either",
+          "Neither"
+        ],
+        "answer": 1,
+        "explanation": "8:00 和 9:45 两班车都能赶上，但题目问最晚的可行班次；9:45 发车，10:15 到达，距 10:30 恰好 15 分钟。",
+        "evidence": "9:45 shuttle arrives about 10:15; workshop 10:30; needs 15 minutes."
+      },
+      "snapshotSha256": "9bb843e01bc91db40c080a8fe7001d78eeb94021dbb8ea4273e063a74312412e"
+    },
+    {
+      "assetId": "R-M1-P7-087",
+      "sourceAnchor": "10:30 Workshop: Sales Analytics",
+      "correctBasis": "邮件指定10:30工作坊，日程对应销售分析",
+      "distractorReasons": [
+        "客户留存是13点",
+        "开场不是工作坊",
+        "无酒店运营课；对照原文：邮件指定10:30工作坊，日程对应销售分析"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — CONFERENCE AGENDA\n9:00 Opening\n10:30 Workshop: Sales Analytics\n1:00 Workshop: Customer Retention\n\nDOCUMENT 2 — HOTEL NOTICE\nShuttle to convention center departs 8:00 and 9:45; travel time 30 minutes.\n\nDOCUMENT 3 — E-MAIL\nI need to attend the 10:30 workshop and would like at least 15 minutes to find the room after arriving. —Maya",
+        "stem": "Which workshop does Maya want to attend?",
+        "choices": [
+          "Sales Analytics",
+          "Customer Retention",
+          "Opening",
+          "Hotel Operations"
+        ],
+        "answer": 0,
+        "explanation": "邮件明确 10:30 workshop，对应 Sales Analytics。",
+        "evidence": "10:30 Workshop: Sales Analytics; need to attend the 10:30 workshop"
+      },
+      "snapshotSha256": "02948acb09afe65aac26d9fc8ef4ecf29259002e0966990de9b5c5d153268438"
+    },
+    {
+      "assetId": "R-M1-P7-088",
+      "sourceAnchor": "departs 8:00 and 9:45; travel time 30 minutes.",
+      "correctBasis": "9:45加30分钟即10:15",
+      "distractorReasons": [
+        "9:45只是发车时间",
+        "10:30是工作坊开始",
+        "11点晚了45分钟"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — CONFERENCE AGENDA\n9:00 Opening\n10:30 Workshop: Sales Analytics\n1:00 Workshop: Customer Retention\n\nDOCUMENT 2 — HOTEL NOTICE\nShuttle to convention center departs 8:00 and 9:45; travel time 30 minutes.\n\nDOCUMENT 3 — E-MAIL\nI need to attend the 10:30 workshop and would like at least 15 minutes to find the room after arriving. —Maya",
+        "stem": "About what time will the 9:45 shuttle arrive?",
+        "choices": [
+          "10:15",
+          "9:45",
+          "10:30",
+          "11:00"
+        ],
+        "answer": 0,
+        "explanation": "行程30分钟，9:45出发约10:15到。",
+        "evidence": "9:45 departure; travel time 30 minutes"
+      },
+      "snapshotSha256": "7e209e1aaebf9f0108aa5b23ec2e7216b8a3e6c6930d1badca7dc4a7c4e500e7"
+    },
+    {
+      "assetId": "R-M1-P7-091",
+      "sourceAnchor": "Our office closes at 4 P.M. tomorrow.",
+      "correctBasis": "客户要求司机次日16点关门前送达",
+      "distractorReasons": [
+        "没有晚于18点配送要求",
+        "没有周末配送请求",
+        "没有自取安排；对照原文：客户要求司机次日16点关门前送达"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — ORDER RECEIPT\nOrder 4412: Office chairs, $860, placed Sept. 14.\n\nDOCUMENT 2 — SHIPPING UPDATE\nOrder 4412 departed Sept. 16 and is scheduled for delivery Sept. 19.\n\nDOCUMENT 3 — CUSTOMER MESSAGE dated Sept. 18\nOur office closes at 4 P.M. tomorrow. Please make sure the driver arrives before then.",
+        "stem": "What special delivery condition is requested?",
+        "choices": [
+          "Arrival before 4 P.M.",
+          "Delivery after 6 P.M.",
+          "Weekend delivery",
+          "Pickup by the customer"
+        ],
+        "answer": 0,
+        "explanation": "客户说明办公室4点关闭，要求司机此前到。",
+        "evidence": "office closes at 4 P.M. tomorrow; driver arrives before then"
+      },
+      "snapshotSha256": "abbdd9855ada32c5c05db1572d5bfde1befc7f7e977df54684daed3ad970a1fc"
+    },
+    {
+      "assetId": "R-M1-P7-092",
+      "sourceAnchor": "East entrance: Pine Avenue.",
+      "correctBasis": "访客停车位在Pine Avenue附近，东入口临该路",
+      "distractorReasons": [
+        "南入口施工关闭",
+        "北入口临Main Street",
+        "没有装卸入口路径"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — RENOVATION NOTICE\nThe south entrance will be closed Oct. 4–8.\n\nDOCUMENT 2 — VISITOR MAP\nNorth entrance: Main Street; East entrance: Pine Avenue.\n\nDOCUMENT 3 — MANAGER E-MAIL\nClients arriving next week should use the entrance closest to the visitor parking lot on Pine Avenue.",
+        "stem": "Which entrance should clients use?",
+        "choices": [
+          "East entrance",
+          "South entrance",
+          "North entrance",
+          "Loading entrance"
+        ],
+        "answer": 0,
+        "explanation": "Pine Avenue 对应 East entrance。",
+        "evidence": "East entrance: Pine Avenue; use entrance closest to visitor parking lot on Pine Avenue."
+      },
+      "snapshotSha256": "e24e91f3e3f3dc03e727ac034903b19de65b8dc26a7378e83e4201a3cc1d7efc"
+    },
+    {
+      "assetId": "R-M1-P7-095",
+      "sourceAnchor": "Advanced Formulas: requires Excel Basics",
+      "correctBasis": "注册高级课前先修基础课程，她尚未参加Excel课",
+      "distractorReasons": [
+        "无需取消全部培训",
+        "营销研讨不相关",
+        "无需出差表格；对照原文：注册高级课前先修基础课程，她尚未参加Excel课"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — COURSE BROCHURE\nExcel Basics: no prerequisite\nAdvanced Formulas: requires Excel Basics\n\nDOCUMENT 2 — REGISTRATION\nLena registered for Advanced Formulas on Nov. 12.\n\nDOCUMENT 3 — SUPERVISOR NOTE\nLena has not taken any company Excel training before.",
+        "stem": "What should Lena do before taking Advanced Formulas?",
+        "choices": [
+          "Complete Excel Basics",
+          "Cancel all training",
+          "Take a marketing seminar",
+          "Submit a travel form"
+        ],
+        "answer": 0,
+        "explanation": "高级课要求先完成 Excel Basics，而主管说明她未学过。",
+        "evidence": "Advanced Formulas requires Excel Basics; Lena has not taken any company Excel training."
+      },
+      "snapshotSha256": "418026f34045c7a3c7ae4f0cccbc4c59732f0ae35ad534e39801e723c3237a9f"
+    },
+    {
+      "assetId": "R-M1-P7-097",
+      "sourceAnchor": "Lena has not taken any company Excel training before.",
+      "correctBasis": "高级课要求基础课，但员工尚未完成",
+      "distractorReasons": [
+        "课程满员未提及",
+        "报名逾期未提及",
+        "主管取消未提及"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — COURSE BROCHURE\nExcel Basics: no prerequisite\nAdvanced Formulas: requires Excel Basics\n\nDOCUMENT 2 — REGISTRATION\nLena registered for Advanced Formulas on Nov. 12.\n\nDOCUMENT 3 — SUPERVISOR NOTE\nLena has not taken any company Excel training before.",
+        "stem": "What problem is indicated?",
+        "choices": [
+          "A prerequisite has not been completed",
+          "The course is full",
+          "The registration date is late",
+          "The supervisor canceled the course"
+        ],
+        "answer": 0,
+        "explanation": "未完成基础课却报名高级课。",
+        "evidence": "requires Excel Basics; has not taken any company Excel training"
+      },
+      "snapshotSha256": "95ac1619bc9c9359c307367ee60eff88578f2ecc31b5449028b0ff14e81d8ff2"
+    },
+    {
+      "assetId": "R-M1-P7-098",
+      "sourceAnchor": "Building management handles plumbing and heating repairs.",
+      "correctBasis": "水槽漏水属于管道维修应由物业负责",
+      "distractorReasons": [
+        "租客只承担灯泡更换",
+        "家具供应商无关",
+        "供暖检查员无关"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekTwoContent.ets",
+      "questionSnapshot": {
+        "passage": "DOCUMENT 1 — RENTAL AGREEMENT\nTenant is responsible for replacing ordinary light bulbs. Building management handles plumbing and heating repairs.\n\nDOCUMENT 2 — MAINTENANCE NOTICE\nHeating inspection scheduled for Oct. 22.\n\nDOCUMENT 3 — TENANT E-MAIL\nThe kitchen sink has been leaking since yesterday. Please advise who should arrange the repair.",
+        "stem": "Who should arrange the sink repair?",
+        "choices": [
+          "Building management",
+          "The tenant personally",
+          "A furniture supplier",
+          "The heating inspector"
+        ],
+        "answer": 0,
+        "explanation": "plumbing repairs 由 building management 负责，漏水水槽属于 plumbing。",
+        "evidence": "Building management handles plumbing ... repairs; kitchen sink has been leaking."
+      },
+      "snapshotSha256": "17461fbff5dfef882401d93c056f1af2ff232a91f5893c4d59ff579966e49749"
+    },
+    {
+      "assetId": "R-P7-TIMED-1701",
+      "sourceAnchor": "cafeteria on the second floor will close at 2 P.M.",
+      "correctBasis": "目的为通知二楼食堂周五设备清洁提前关闭",
+      "distractorReasons": [
+        "没有新菜单推广",
+        "没有餐卡涨价；对照原文：目的为通知二楼食堂周五设备清洁提前关闭",
+        "没有招聘信息；对照原文：目的为通知二楼食堂周五设备清洁提前关闭"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "NOTICE\nThe cafeteria on the second floor will close at 2 P.M. Friday for equipment cleaning. The lobby café will remain open until 5 P.M., and employees may use their meal cards there.",
+        "stem": "Why was the notice posted?",
+        "choices": [
+          "To advertise new menu items",
+          "To announce a temporary cafeteria closure",
+          "To change meal-card prices",
+          "To recruit café staff"
+        ],
+        "answer": 1,
+        "explanation": "通知核心是二楼食堂周五提前关闭。",
+        "evidence": "The cafeteria on the second floor will close at 2 P.M. Friday."
+      },
+      "snapshotSha256": "106ebb4b02cff1c9a924d8c51739b6ff17a1d66e28a7bf36d45339fa34d4fb22"
+    },
+    {
+      "assetId": "R-P7-TIMED-1706",
+      "sourceAnchor": "I will meet the group in the lobby",
+      "correctBasis": "Marta明确先在大厅接访客再带上楼",
+      "distractorReasons": [
+        "会议室是样品摆放处",
+        "未提Delta公司见面",
+        "无酒店安排；对照原文：Marta明确先在大厅接访客再带上楼"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "Subject: Client Visit\nOur visitors from Delta Systems will arrive at 10:15 on Tuesday. Please have the product samples ready in Conference Room B by 10:00. I will meet the group in the lobby and bring them upstairs. —Marta",
+        "stem": "Where will Marta first meet the visitors?",
+        "choices": [
+          "In Conference Room B",
+          "At Delta Systems",
+          "At the hotel",
+          "In the lobby"
+        ],
+        "answer": 3,
+        "explanation": "原文 I will meet the group in the lobby。",
+        "evidence": "I will meet the group in the lobby."
+      },
+      "snapshotSha256": "c0b4d74d60763e1968aa551f199e66ee800c90c7b579c787cf4f3651695cdf36"
+    },
+    {
+      "assetId": "R-P7-TIMED-1707",
+      "sourceAnchor": "The call usually lasts 35 minutes.",
+      "correctBasis": "11:30通话按通常35分钟12:05可结束，早于12:20班车",
+      "distractorReasons": [
+        "无需取消电话；对照原文：11:30通话按通常35分钟12:05可结束，早于12:20班车",
+        "工作坊13点开始非11:30",
+        "没有开班车角色"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "EVENT NOTICE\nCustomer Service Workshop — October 12, 1:00–4:00 P.M., North Training Center. Shuttle departs headquarters at 12:20 P.M.\n\nMESSAGE\nLeo, please finish the 11:30 client call before joining the workshop. The call usually lasts 35 minutes. —Nina",
+        "stem": "What can be concluded about Leo?",
+        "choices": [
+          "He can finish the call before the shuttle leaves",
+          "He must cancel the client call",
+          "He should arrive at the workshop at 11:30",
+          "He will drive the shuttle"
+        ],
+        "answer": 0,
+        "explanation": "11:30 + 35 分钟约 12:05，早于 12:20 班车。",
+        "evidence": "The call starts at 11:30 and usually lasts 35 minutes; the shuttle departs at 12:20."
+      },
+      "snapshotSha256": "795e8c2fbb21ee5ea74c96e92ebc99fae97befef8ded5df3c9d0c104f5c54f7b"
+    },
+    {
+      "assetId": "R-P7-TIMED-1710",
+      "sourceAnchor": "Purchase date: May 3",
+      "correctBasis": "邮件5月15日说次日5月16日退，相隔13天在14天内",
+      "distractorReasons": [
+        "退货期限并非5月10日",
+        "商品未拆封且条款非只允许已拆",
+        "政策明确14天期限"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "RETURN POLICY\nUnused merchandise may be returned within 14 days of purchase with a receipt.\n\nRECEIPT\nPurchase date: May 3 — Desk lamp — $48\n\nE-MAIL\nMay 15\nThe lamp is still unopened. May I bring it back tomorrow?",
+        "stem": "Is the planned return within the stated return period?",
+        "choices": [
+          "No, the period ended May 10",
+          "No, opened items only may be returned",
+          "The policy gives no time limit",
+          "Yes, it is within 14 days"
+        ],
+        "answer": 3,
+        "explanation": "购买 5月3日，邮件 5月15日说明天退，即 5月16日，仍在14天内。",
+        "evidence": "Purchase date: May 3; e-mail dated May 15 says tomorrow."
+      },
+      "snapshotSha256": "58b93d62b5051b77001c3ac59006b56b0406fccb95d25b28c32da97e38e682eb"
+    },
+    {
+      "assetId": "R-P7-TIMED-1713",
+      "sourceAnchor": "requires completion of Spreadsheet Basics or equivalent work experience.",
+      "correctBasis": "缺基础课程且等效经验是否足够未知，须核准先修资格",
+      "distractorReasons": [
+        "课期11月8在注册中已知",
+        "无停车付款条件",
+        "无自带电脑要求"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "COURSE GUIDE\nAdvanced Spreadsheet Analysis requires completion of Spreadsheet Basics or equivalent work experience.\n\nREGISTRATION\nMina Cho — Advanced Spreadsheet Analysis — November 8\n\nSUPERVISOR NOTE\nMina uses spreadsheets occasionally but has not taken the Basics course and has not worked with pivot tables.",
+        "stem": "What issue should be checked before Mina attends the course?",
+        "choices": [
+          "Whether the course is on November 8",
+          "Whether she meets the prerequisite",
+          "Whether she has paid for parking",
+          "Whether she owns a laptop"
+        ],
+        "answer": 1,
+        "explanation": "指南要求基础课程或等效经验，而主管备注显示她可能不满足。",
+        "evidence": "Advanced Spreadsheet Analysis requires completion of Spreadsheet Basics or equivalent work experience; Mina has not taken the Basics course."
+      },
+      "snapshotSha256": "c0ead13917fd88682b6fb24885e754b86a121aef2fac077856a3a71494632ca4"
+    },
+    {
+      "assetId": "R-P7-TIMED-1715",
+      "sourceAnchor": "has not taken the Basics course and has not worked with pivot tables.",
+      "correctBasis": "缺基础课且替代经验未证实，资格待审核",
+      "distractorReasons": [
+        "并非基础课授课教师",
+        "明确没有数据透视表经验",
+        "未取消课程；对照原文：缺基础课且替代经验未证实，资格待审核"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "COURSE GUIDE\nAdvanced Spreadsheet Analysis requires completion of Spreadsheet Basics or equivalent work experience.\n\nREGISTRATION\nMina Cho — Advanced Spreadsheet Analysis — November 8\n\nSUPERVISOR NOTE\nMina uses spreadsheets occasionally but has not taken the Basics course and has not worked with pivot tables.",
+        "stem": "What is most likely true about Mina?",
+        "choices": [
+          "Her eligibility needs review",
+          "She teaches Spreadsheet Basics",
+          "She has extensive pivot-table experience",
+          "She canceled the course"
+        ],
+        "answer": 0,
+        "explanation": "现有信息无法证明满足先修条件，因此资格需要复核。",
+        "evidence": "Mina has not taken the Basics course and has not worked with pivot tables."
+      },
+      "snapshotSha256": "e264fb644884ce10f6e5da4d11c4ee738e0d46abb6df296f7d27d77d7d83782c"
+    },
+    {
+      "assetId": "R-P7-TIMED-1716",
+      "sourceAnchor": "landlord is responsible for repairs to building plumbing.",
+      "correctBasis": "厨下管道漏水而洗碗机正常，房东负责建筑管道维修",
+      "distractorReasons": [
+        "房客仅负责私人电器损坏",
+        "电梯检查者无关",
+        "洗碗机制造商无关"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "LEASE EXCERPT\nThe landlord is responsible for repairs to building plumbing. Tenants are responsible for damage to personal appliances.\n\nMAINTENANCE NOTICE\nElevator inspection: September 6, 8–10 A.M.\n\nTENANT E-MAIL\nWater is leaking from the pipe under my kitchen sink. My dishwasher is working normally.",
+        "stem": "Who is responsible for the reported repair?",
+        "choices": [
+          "The tenant",
+          "The elevator inspector",
+          "The landlord",
+          "The dishwasher manufacturer"
+        ],
+        "answer": 2,
+        "explanation": "漏水来自建筑管道且洗碗机正常，按租约由房东负责。",
+        "evidence": "The landlord is responsible for repairs to building plumbing; water is leaking from the pipe under the sink."
+      },
+      "snapshotSha256": "a1379961065f8d0d2aaeb82f86820019ab22b5816b607a8b0d84a81ba3750bdc"
+    },
+    {
+      "assetId": "R-P7-TIMED-1718",
+      "sourceAnchor": "Elevator inspection: September 6",
+      "correctBasis": "检查针对电梯，而报修是厨房管道，属于不同系统",
+      "distractorReasons": [
+        "未说明租期结束",
+        "不是仅涉及私人设备",
+        "不是房租付款；对照原文：检查针对电梯，而报修是厨房管道，属于不同系统"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "LEASE EXCERPT\nThe landlord is responsible for repairs to building plumbing. Tenants are responsible for damage to personal appliances.\n\nMAINTENANCE NOTICE\nElevator inspection: September 6, 8–10 A.M.\n\nTENANT E-MAIL\nWater is leaking from the pipe under my kitchen sink. My dishwasher is working normally.",
+        "stem": "Why is the elevator notice not relevant to the tenant's problem?",
+        "choices": [
+          "It occurs after the lease ends",
+          "It applies only to personal appliances",
+          "It is about rent payment",
+          "It concerns a different building system"
+        ],
+        "answer": 3,
+        "explanation": "漏水是厨房管道问题，电梯检查涉及另一系统。",
+        "evidence": "Elevator inspection ...; Water is leaking from the pipe under my kitchen sink."
+      },
+      "snapshotSha256": "78a1e2eb696f8aae141a121f14cf971d2c39e68911b15c52d2a1fafc0f044a78"
+    },
+    {
+      "assetId": "R-M2-P7-B-01",
+      "sourceAnchor": "our driver will arrive Friday",
+      "correctBasis": "原计划周四因装卸区关闭改周五，邮件通知更改送货时间",
+      "distractorReasons": [
+        "没有付款请求；对照原文：原计划周四因装卸区关闭改周五，邮件通知更改送货时间",
+        "没有取消订单；对照原文：原计划周四因装卸区关闭改周五，邮件通知更改送货时间",
+        "不是宣传快速配送"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "Subject: Delivery Change\nYour order #4482 was scheduled for delivery on Thursday. Because the loading dock at your building will be closed that morning, our driver will arrive Friday between 9 A.M. and noon instead. No action is required unless this new time is inconvenient.",
+        "stem": "Why was the e-mail sent?",
+        "choices": [
+          "To request payment",
+          "To cancel an order",
+          "To advertise faster shipping",
+          "To announce a changed delivery time"
+        ],
+        "answer": 3,
+        "explanation": "核心是送货由周四改到周五。",
+        "evidence": "our driver will arrive Friday ... instead"
+      },
+      "snapshotSha256": "7968a700242a5e61cbb9f1aaba934a18b70a6e273daa3795e621ef6b4276b5ab"
+    },
+    {
+      "assetId": "R-M2-P7-C-01",
+      "sourceAnchor": "Book a meeting room for six hours or more",
+      "correctBasis": "宣传预订会议室可获咖啡服务",
+      "distractorReasons": [
+        "无酒店装修内容",
+        "不是咖啡馆开业",
+        "无招聘事项；对照原文：宣传预订会议室可获咖啡服务"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "ADVERTISEMENT\nLakeshore Business Hotel\nBook a meeting room for six hours or more and receive complimentary coffee service for up to 20 participants. Offer valid for weekday bookings made before November 30. Audio equipment is available for an additional charge.",
+        "stem": "What is being promoted?",
+        "choices": [
+          "A hotel renovation",
+          "A meeting-room offer",
+          "A coffee shop opening",
+          "A hiring event"
+        ],
+        "answer": 1,
+        "explanation": "广告推广会议室预订优惠。",
+        "evidence": "Book a meeting room ... and receive complimentary coffee service"
+      },
+      "snapshotSha256": "a3f314d3df7dc8aff868ed915f2a086590432665ecd1f47e85ac6d2023043ede"
+    },
+    {
+      "assetId": "R-M2-P7-C-03",
+      "sourceAnchor": "Offer valid for weekday bookings made before November 30.",
+      "correctBasis": "工作日预订至少6小时且11月30日前的交易符合资格",
+      "distractorReasons": [
+        "周末两小时不符合",
+        "12月预订超过期限",
+        "仅有音响设备不构成资格"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "ADVERTISEMENT\nLakeshore Business Hotel\nBook a meeting room for six hours or more and receive complimentary coffee service for up to 20 participants. Offer valid for weekday bookings made before November 30. Audio equipment is available for an additional charge.",
+        "stem": "Which booking qualifies for the offer?",
+        "choices": [
+          "A weekday six-hour booking made before November 30",
+          "A weekend two-hour booking",
+          "A December weekday booking",
+          "Any booking with audio equipment"
+        ],
+        "answer": 0,
+        "explanation": "需同时满足 weekday、至少六小时、11月30日前预订。",
+        "evidence": "Offer valid for weekday bookings made before November 30; six hours or more"
+      },
+      "snapshotSha256": "64627d7e8bc6f65d6094e263b7c4c6695b6e74890911564373b0a9f5cf603969"
+    },
+    {
+      "assetId": "R-M2-P7-D-01",
+      "sourceAnchor": "north elevator will be unavailable",
+      "correctBasis": "北电梯安全检查期间临时停运",
+      "distractorReasons": [
+        "货梯运货未受影响",
+        "没有搬迁办公室",
+        "没有消防演练；对照原文：北电梯安全检查期间临时停运"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "NOTICE\nThe north elevator will be unavailable from 8 A.M. to 1 P.M. Tuesday for a safety inspection. During that time, please use the south elevator. Deliveries requiring the freight elevator are not affected.",
+        "stem": "Why was the notice posted?",
+        "choices": [
+          "To cancel all deliveries",
+          "To move office departments",
+          "To announce a temporary elevator outage",
+          "To report a fire drill"
+        ],
+        "answer": 2,
+        "explanation": "通知告知北侧电梯临时停用。",
+        "evidence": "north elevator will be unavailable ... for a safety inspection"
+      },
+      "snapshotSha256": "ac51a356c79cbdf823bb64b636ebb306bfd7af05ab547a8f672a3141bd4ab48f"
+    },
+    {
+      "assetId": "R-M2-P7-G-01",
+      "sourceAnchor": "88: Bayview 7:40 → Central 8:35",
+      "correctBasis": "9:15会议至少提前20分钟到站最晚8:55，只有88次8:35",
+      "distractorReasons": [
+        "94次9点过晚",
+        "102次9:25过晚",
+        "88次可行非无车"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "TRAIN SCHEDULE\n88: Bayview 7:40 → Central 8:35\n94: Bayview 8:05 → Central 9:00\n102: Bayview 8:30 → Central 9:25\n\nMESSAGE\nOur client briefing at Central Plaza starts at 9:15. Please arrive at Central Station at least 20 minutes before the meeting so we can walk together.",
+        "stem": "Which train is the latest one that meets the request?",
+        "choices": [
+          "Train 94",
+          "Train 88",
+          "Train 102",
+          "None"
+        ],
+        "answer": 1,
+        "explanation": "需最迟8:55到站，只有88次8:35满足；94次9:00太晚。",
+        "evidence": "meeting at 9:15; arrive at least 20 minutes before; Train 88 arrives 8:35"
+      },
+      "snapshotSha256": "49f95508bbda5bf3347778e4d0e5a507628e162815716d185e76833bad22169f"
+    },
+    {
+      "assetId": "R-M2-P7-H-01",
+      "sourceAnchor": "20% off one office chair.",
+      "correctBasis": "150美元椅子20%即30美元",
+      "distractorReasons": [
+        "20美元不是20%结果",
+        "25美元是收纳物售价",
+        "35美元不是20%结果"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "COUPON\n20% off one office chair. Valid through August 31. Cannot be combined with other discounts.\n\nRECEIPT\nAugust 28 — Office chair $150 — Desk organizer $25\n\nNOTE\nPlease apply the chair coupon to my purchase if it is still valid. —Jordan",
+        "stem": "How much discount applies to the chair before tax?",
+        "choices": [
+          "$20",
+          "$25",
+          "$30",
+          "$35"
+        ],
+        "answer": 2,
+        "explanation": "150美元的20%为30美元。",
+        "evidence": "20% off one office chair; chair $150"
+      },
+      "snapshotSha256": "76ec833b09a88226323fc7932f1c44277935b00b0fc3f0ea61b36edf17491a2a"
+    },
+    {
+      "assetId": "R-M2-P7-H-03",
+      "sourceAnchor": "Valid through August 31.",
+      "correctBasis": "8月28日购买仍在8月31日有效期内",
+      "distractorReasons": [
+        "并非8月27日过期",
+        "适用办公室椅子非仅办公桌",
+        "购买日期已给出"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "COUPON\n20% off one office chair. Valid through August 31. Cannot be combined with other discounts.\n\nRECEIPT\nAugust 28 — Office chair $150 — Desk organizer $25\n\nNOTE\nPlease apply the chair coupon to my purchase if it is still valid. —Jordan",
+        "stem": "Is the coupon valid on the purchase date?",
+        "choices": [
+          "No, it expired August 27",
+          "No, it applies only to desks",
+          "The date is not given",
+          "Yes"
+        ],
+        "answer": 3,
+        "explanation": "优惠券到8月31有效，购买在8月28。",
+        "evidence": "Valid through August 31; receipt August 28"
+      },
+      "snapshotSha256": "866cc09b6c092065327e26dfa38faaaec6dc4c7b2bbafb3f45dea723d0d7e50f"
+    },
+    {
+      "assetId": "R-M2-P7-I-01",
+      "sourceAnchor": "Parking at the venue costs $12.",
+      "correctBasis": "她乘公司班车且不预留车位，因此避免停车费",
+      "distractorReasons": [
+        "注册费是否存在未交代",
+        "午餐已包含不能据此算额外省下费用",
+        "不承担班车维护费"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "EVENT PAGE\nLeadership Forum — November 5, 9 A.M.–3 P.M. Lunch is included. Parking at the venue costs $12.\n\nE-MAIL\nI will take the company shuttle, so please do not reserve parking for me. I selected the vegetarian lunch option when I registered. —Asha",
+        "stem": "What expense will Asha most likely avoid?",
+        "choices": [
+          "Parking",
+          "Registration",
+          "Lunch",
+          "Shuttle maintenance"
+        ],
+        "answer": 0,
+        "explanation": "她乘公司班车并明确不要预留停车，因此避免停车费。",
+        "evidence": "Parking at the venue costs $12; I will take the company shuttle"
+      },
+      "snapshotSha256": "16d5f0155063c5ca709bd03993781fe302914fc3f40cf70368d096343e8af81f"
+    },
+    {
+      "assetId": "R-M2-P7-J-01",
+      "sourceAnchor": "Scanner purchased March 12.",
+      "correctBasis": "购买次年2月20仍未满一年，保修时长有效",
+      "distractorReasons": [
+        "条款明确一年非六个月",
+        "次年2月仍早于3月12",
+        "购买日期已给出"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "WARRANTY\nPortable scanners are covered for one year from purchase against manufacturing defects. Damage caused by dropping or water is excluded.\n\nRECEIPT\nScanner purchased March 12.\n\nSUPPORT NOTE\nFebruary 20 of the following year: Unit no longer powers on. No visible impact or water damage.",
+        "stem": "Is the scanner still within the stated warranty period?",
+        "choices": [
+          "No, only six months are covered",
+          "No, the warranty ended in December",
+          "The purchase date is missing",
+          "Yes"
+        ],
+        "answer": 3,
+        "explanation": "次年2月20仍未满一年。",
+        "evidence": "covered for one year from purchase; purchased March 12; support note February 20 of following year"
+      },
+      "snapshotSha256": "72647d7fcbcd993aa40f3846d2803d0c292fc107eb82401664b663ba363162a0"
+    },
+    {
+      "assetId": "R-M2-P7-K-03",
+      "sourceAnchor": "three years in warehouse logistics",
+      "correctBasis": "三年物流经验、表格认证、9月8日可开工，满足列出的三项",
+      "distractorReasons": [
+        "有三年经验非欠缺",
+        "9月8早于9月15",
+        "已获高级表格认证"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "JOB POSTING\nOperations Coordinator: minimum two years of logistics experience; proficiency with spreadsheet software; available to start by September 15.\n\nRÉSUMÉ\nDario Kim — three years in warehouse logistics; advanced spreadsheet certification.\n\nE-MAIL\nI can begin on September 8 if selected. —Dario",
+        "stem": "What is most likely true about Dario?",
+        "choices": [
+          "He appears to meet all listed requirements",
+          "He lacks logistics experience",
+          "He cannot start by September 15",
+          "He has no spreadsheet experience"
+        ],
+        "answer": 0,
+        "explanation": "招聘三项要求均有对应证据。",
+        "evidence": "two years logistics; spreadsheet proficiency; start by Sep 15, with matching résumé/e-mail evidence"
+      },
+      "snapshotSha256": "0d1054488ed45ce2bf072adecfbeaa52f0766871a7013da40d0bc11940505f17"
+    },
+    {
+      "assetId": "R-M2-P7-L-01",
+      "sourceAnchor": "I approve her participation",
+      "correctBasis": "允许基础课程或经理批准，经理明确批准",
+      "distractorReasons": [
+        "她并未完成基础课",
+        "条件仍然存在；对照原文：允许基础课程或经理批准，经理明确批准",
+        "未提她任教；对照原文：允许基础课程或经理批准，经理明确批准"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "COURSE CATALOG\nProject Budgeting II requires Project Budgeting I or manager approval.\n\nREGISTRATION\nElena Ruiz — Project Budgeting II — October 22\n\nMANAGER MESSAGE\nElena has not taken Budgeting I, but I approve her participation based on her current project responsibilities.",
+        "stem": "Why can Elena attend Budgeting II?",
+        "choices": [
+          "She completed Budgeting I",
+          "The prerequisite was removed",
+          "Her manager approved participation",
+          "She teaches the course"
+        ],
+        "answer": 2,
+        "explanation": "目录允许“Budgeting I 或 manager approval”，经理明确批准。",
+        "evidence": "requires Project Budgeting I or manager approval; I approve her participation"
+      },
+      "snapshotSha256": "93f954c17fe83e3d5a1ead1a998f5b0789187b00841db750025403deb6b712ec"
+    },
+    {
+      "assetId": "R-M2-P7-M-01",
+      "sourceAnchor": "Tenants replace batteries in individual thermostats.",
+      "correctBasis": "室内温暖而温控器屏幕无显示且电池未换，先换电池",
+      "distractorReasons": [
+        "暖气仍正常无需更换中央锅炉",
+        "无搬家要求；对照原文：室内温暖而温控器屏幕无显示且电池未换，先换电池",
+        "检查无须取消；对照原文：室内温暖而温控器屏幕无显示且电池未换，先换电池"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "LEASE RULE\nBuilding management repairs central heating equipment. Tenants replace batteries in individual thermostats.\n\nSERVICE NOTICE\nHeating-system inspection — January 12.\n\nTENANT MESSAGE\nMy apartment is warm, but the thermostat screen is blank. I have not replaced its batteries this year.",
+        "stem": "What should the tenant most likely do first?",
+        "choices": [
+          "Replace the thermostat batteries",
+          "Request a central boiler replacement",
+          "Move out of the building",
+          "Cancel the inspection"
+        ],
+        "answer": 0,
+        "explanation": "房间仍温暖而屏幕空白，租约说明电池由租户更换。",
+        "evidence": "Tenants replace batteries in individual thermostats; screen is blank; batteries not replaced"
+      },
+      "snapshotSha256": "2f43a1cffa6a7012c24880c8498b8d12b80627fc19ec4230480a3af247d4251d"
+    },
+    {
+      "assetId": "R-M2-P7-N-01",
+      "sourceAnchor": "Express delivery costs $18 regardless of order value.",
+      "correctBasis": "订单选加急，固定18美元不因金额减免",
+      "distractorReasons": [
+        "免费仅限标准配送",
+        "无8美元费率；对照原文：订单选加急，固定18美元不因金额减免",
+        "96美元是商品小计"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "SHIPPING TERMS\nOrders over $80 receive free standard delivery. Express delivery costs $18 regardless of order value.\n\nORDER\nSubtotal: $96\nDelivery selected: Express\n\nMESSAGE\nPlease keep the fastest shipping option even if there is a fee. —Customer",
+        "stem": "What delivery charge applies?",
+        "choices": [
+          "$0",
+          "$8",
+          "$96",
+          "$18"
+        ],
+        "answer": 3,
+        "explanation": "虽订单超过80美元，但客户选择 Express，条款规定固定18美元。",
+        "evidence": "Express delivery costs $18 regardless of order value; Delivery selected: Express"
+      },
+      "snapshotSha256": "a9646d6c03e33454ddc148b577cc7b09adb60d9e7e33428975e5aa043626a9f9"
+    },
+    {
+      "assetId": "R-M2-P7-N-03",
+      "sourceAnchor": "Orders over $80 receive free standard delivery.",
+      "correctBasis": "免费仅适用标准服务；订单选加急且固定18美元",
+      "distractorReasons": [
+        "订单96高于80",
+        "订单并未取消；对照原文：免费仅适用标准服务；订单选加急且固定18美元",
+        "加急服务有明确报价可用"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "SHIPPING TERMS\nOrders over $80 receive free standard delivery. Express delivery costs $18 regardless of order value.\n\nORDER\nSubtotal: $96\nDelivery selected: Express\n\nMESSAGE\nPlease keep the fastest shipping option even if there is a fee. —Customer",
+        "stem": "Why does the customer not receive free delivery?",
+        "choices": [
+          "The order is below $80",
+          "The customer canceled the order",
+          "Free delivery applies only to standard service",
+          "Express delivery is unavailable"
+        ],
+        "answer": 2,
+        "explanation": "免费规则只适用于 standard，客户选 express。",
+        "evidence": "Orders over $80 receive free standard delivery; Express delivery costs $18"
+      },
+      "snapshotSha256": "82901762a5e88e14fc7ee41c533f547a68e8b8daeacf0021ce98241c4982bdd7"
+    },
+    {
+      "assetId": "R-M2-P7-O-01",
+      "sourceAnchor": "Return shuttle leaves at 12:30 and takes 40 minutes",
+      "correctBasis": "12:30加40分钟13:10，早于最迟13:20",
+      "distractorReasons": [
+        "不会晚于14点",
+        "12:30发车在12点午餐后",
+        "行车时间40分钟已知"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "AGENDA\n10:00 Product demo\n11:15 Q&A\n12:00 Lunch\n\nSHUTTLE NOTICE\nReturn shuttle leaves at 12:30 and takes 40 minutes to reach headquarters.\n\nMESSAGE\nI must be back at headquarters by 1:20 for a budget meeting. —Rina",
+        "stem": "Can Rina take the return shuttle and arrive by 1:20?",
+        "choices": [
+          "No, it arrives after 2:00",
+          "Yes",
+          "No, it leaves before lunch",
+          "The travel time is unknown"
+        ],
+        "answer": 1,
+        "explanation": "12:30 +40分钟=1:10，早于1:20。",
+        "evidence": "Return shuttle leaves at 12:30 and takes 40 minutes; back by 1:20"
+      },
+      "snapshotSha256": "76f466da42a92ee9b1bfea3078fbf4653c70ad67597e25e2bfc2bffb05436b1c"
+    },
+    {
+      "assetId": "R-M2-P7-P-01",
+      "sourceAnchor": "from July 1 through August 15.",
+      "correctBasis": "7月1至8月15少于两个月，且当年没用过暂停额",
+      "distractorReasons": [
+        "最长两个月不是六个月限制",
+        "政策允许冻结；对照原文：7月1至8月15少于两个月，且当年没用过暂停额",
+        "时间起止明确；对照原文：7月1至8月15少于两个月，且当年没用过暂停额"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "MEMBERSHIP TERMS\nMembers may freeze an account for up to two months per calendar year. Requests must be submitted before the freeze begins.\n\nACCOUNT\nNo freezes used this year.\n\nMESSAGE\nI will be overseas from July 1 through August 15. Can you pause my membership for that period? —Ken",
+        "stem": "Does Ken's requested freeze fit the stated maximum?",
+        "choices": [
+          "No, it exceeds six months",
+          "No, freezes are not allowed",
+          "Yes",
+          "The length cannot be determined"
+        ],
+        "answer": 2,
+        "explanation": "7月1日至8月15少于两个月，且今年未使用冻结。",
+        "evidence": "up to two months; no freezes used; July 1 through August 15"
+      },
+      "snapshotSha256": "214fbfcb447afa6e6396eed55571a6ee61e438ae1151cbf7a065b3e6affead9f"
+    },
+    {
+      "assetId": "R-M2-P7-Q-01",
+      "sourceAnchor": "targets next-business-day completion.",
+      "correctBasis": "快修目标下一工作日，周一收到对应周二",
+      "distractorReasons": [
+        "周三是客户演示日期",
+        "周四非下一工作日",
+        "周五非下一工作日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "REPAIR POLICY\nStandard repairs are completed within three business days after the device is received. Rush service is available for a $25 fee and targets next-business-day completion.\n\nSERVICE TICKET\nDevice received: Monday\nService: Rush\n\nNOTE\nThe customer needs the device for a presentation Wednesday morning.",
+        "stem": "When is the repair targeted for completion?",
+        "choices": [
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
+        "answer": 0,
+        "explanation": "Rush 服务目标下一工作日，周一收到则周二完成。",
+        "evidence": "Rush service ... next-business-day completion; Device received Monday"
+      },
+      "snapshotSha256": "a855e10295c7830ee6b47811911274a7193a78307638d4c40cb261d9fc0b4eaa"
+    },
+    {
+      "assetId": "R-M2-P7-R-01",
+      "sourceAnchor": "Soup + sandwich combo: $9.50",
+      "correctBasis": "餐食9.50美元10%折扣为0.95美元",
+      "distractorReasons": [
+        "0.20是咖啡价格的10%但饮料不打折",
+        "1.15对应错误地合计咖啡",
+        "2.00是咖啡原价"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "CAFETERIA MENU\nSoup + sandwich combo: $9.50\nSalad: $7.00\nCoffee: $2.00\nEmployees receive 10% off food items, but beverages are excluded.\n\nORDER\nSoup + sandwich combo; Coffee\n\nMESSAGE\nUse my employee discount. —Tara",
+        "stem": "How much is the food discount on the combo?",
+        "choices": [
+          "$0.20",
+          "$1.15",
+          "$2.00",
+          "$0.95"
+        ],
+        "answer": 3,
+        "explanation": "9.50 的10%为0.95，咖啡不参与。",
+        "evidence": "Employees receive 10% off food items; combo $9.50"
+      },
+      "snapshotSha256": "1d93e545cff30de60ea358024a3c11a83a50efc93a74c244e9f3f62574cc2659"
+    },
+    {
+      "assetId": "R-M2-P7-R-02",
+      "sourceAnchor": "beverages are excluded.",
+      "correctBasis": "咖啡是饮品不享员工餐食折扣",
+      "distractorReasons": [
+        "汤属于食物；对照原文：咖啡是饮品不享员工餐食折扣",
+        "三明治属于食物",
+        "不是所有食物均排除"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false,
+      "reviewedVersion": 1,
+      "sourceFile": "ToeicWeekThreeContent.ets",
+      "questionSnapshot": {
+        "passage": "CAFETERIA MENU\nSoup + sandwich combo: $9.50\nSalad: $7.00\nCoffee: $2.00\nEmployees receive 10% off food items, but beverages are excluded.\n\nORDER\nSoup + sandwich combo; Coffee\n\nMESSAGE\nUse my employee discount. —Tara",
+        "stem": "Which item is excluded from the employee discount?",
+        "choices": [
+          "Coffee",
+          "Soup",
+          "Sandwich",
+          "All food"
+        ],
+        "answer": 0,
+        "explanation": "beverages excluded，订单中的 coffee 是饮料。",
+        "evidence": "beverages are excluded; Coffee: $2.00"
+      },
+      "snapshotSha256": "15517abc049eba46da8c2c63c867d7b47d2bf305ae667a1b8a7474014795ad4a"
+    }
+  ],
+  "hashAlgorithm": "SHA-256 of JSON {answer,choices,evidence,explanation,passage,stem} with sorted keys, UTF-8, compact separators"
+}
