@@ -1,4 +1,5 @@
 import { ToeicPart, ToeicQuestion, ToeicReadingGroup } from '../domain/ToeicModels';
+import { ToeicExtraReadingContent } from '../content/ToeicExtraReadingContent';
 
 /**
  * Build a view of existing published shared passages without changing any
@@ -8,6 +9,19 @@ export class ToeicReadingGroupService {
   static groupAt(questions:ToeicQuestion[],index:number):ToeicReadingGroup {
     if (index<0 || index>=questions.length) return new ToeicReadingGroup('',[],[]);
     let current=questions[index];
+    if (current.groupId.length>0) {
+      for (let group of ToeicExtraReadingContent.groups()) {
+        if (group.groupId!==current.groupId) continue;
+        let presentIds:string[]=[];
+        for (let id of group.questionIds) {
+          for (let question of questions) {
+            if (question.id===id) { presentIds.push(id); break; }
+          }
+        }
+        return new ToeicReadingGroup(group.groupId,presentIds,group.passageBlocks);
+      }
+      return new ToeicReadingGroup('',[],[]);
+    }
     if (current.passage.length===0 || current.part===ToeicPart.PART_5) {
       return new ToeicReadingGroup(current.id,[current.id],[]);
     }
