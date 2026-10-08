@@ -43,9 +43,9 @@ def validate() -> None:
         "// if (id==='R-DISABLED') question.version=2;") == {}
     assert wrapper_version_overrides(
         "/* if (id==='R-DISABLED') question.version=2; */") == {}
-    sample = ("const helpUrl='https://example.org/v2'; // fake override below\\n"
-              "/* if (id==='R-OLD') question.version=2; */\\n"
-              "if (id==='R-LIVE') question.version=3;")
+    sample = ("const helpUrl='https://example.org/v2'; // comment" + chr(10)
+              + "/* if (id==='R-OLD') question.version=2; */" + chr(10)
+              + "if (id==='R-LIVE') question.version=3;")
     assert wrapper_version_overrides(sample) == {"R-LIVE": 3}
     questions, _ = collect()
     by_id = {q.id: q for q in questions}
