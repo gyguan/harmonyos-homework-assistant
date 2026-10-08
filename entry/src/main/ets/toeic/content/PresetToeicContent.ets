@@ -7,6 +7,7 @@ import { ToeicWeekOneContent } from './ToeicWeekOneContent';
 import { ToeicWeekTwoContent } from './ToeicWeekTwoContent';
 import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
+import { ToeicVocabularyExpansion } from './ToeicVocabularyExpansion';
 
 export class PresetToeicContent {
   static questions():ToeicQuestion[] {
@@ -173,7 +174,7 @@ export class PresetToeicContent {
       new ToeicVocabularyItem('V-029','retain','v.','保留；保持',ToeicVocabularyLevel.L2,'办公/人事',['retain records'],['keep']),
       new ToeicVocabularyItem('V-030','supplier','n.','供应商',ToeicVocabularyLevel.L1,'采购',['contact a supplier'],['vendor'])
     ];
-    return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()));
+    return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()).concat(ToeicVocabularyExpansion.items()));
   }
 
   static studyDays():ToeicStudyDay[] {
@@ -239,7 +240,8 @@ export class PresetToeicContent {
     let plan=PresetToeicContent.studyDay(day);
     let all=PresetToeicContent.vocabulary();
     let result:ToeicVocabularyItem[]=[];
-    for (let id of plan.vocabularyIds) {
+    let assigned=plan.vocabularyIds.concat(ToeicVocabularyExpansion.idsForDay(day));
+    for (let id of assigned) {
       for (let item of all) if (item.id===id) { result.push(item); break; }
     }
     return result;
