@@ -8,7 +8,19 @@ import { ToeicPronunciationStatus } from '../application/ToeicPronunciationServi
 import { ToeicReadingGroupService } from '../application/ToeicReadingGroupService';
 import { ToeicVocabularyQuizService } from '../application/ToeicVocabularyQuizService';
 
-enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', VOCABULARY_QUIZ='VOCABULARY_QUIZ', SENTENCE='SENTENCE', MOCK_RESULT='MOCK_RESULT' }
+enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', VOCABULARY_QUIZ='VOCABULARY_QUIZ', VOCABULARY_RESULT='VOCABULARY_RESULT', SENTENCE='SENTENCE', MOCK_RESULT='MOCK_RESULT', PRACTICE_RESULT='PRACTICE_RESULT' }
+
+/** Immutable answer review built after the completed session is saved. */
+class ToeicPracticeReviewItem {
+  id:string; part:string; stem:string; passage:string; chosen:string; correctAnswer:string;
+  correct:boolean; explanation:string; evidence:string; attemptCount:number; wrongCount:number;
+  constructor(id:string,part:string,stem:string,passage:string,chosen:string,correctAnswer:string,
+    correct:boolean,explanation:string,evidence:string,attemptCount:number,wrongCount:number) {
+    this.id=id; this.part=part; this.stem=stem; this.passage=passage; this.chosen=chosen;
+    this.correctAnswer=correctAnswer; this.correct=correct; this.explanation=explanation;
+    this.evidence=evidence; this.attemptCount=attemptCount; this.wrongCount=wrongCount;
+  }
+}
 
 @Component
 export struct ToeicHomePage {
@@ -76,7 +88,13 @@ export struct ToeicHomePage {
   @State private quizCorrectCount:number=0;
   @State private quizModeLabel:string='';
   @State private quizExplanation:string='';
+  @State private quizAnswers:number[]=[];
   private quizQuestions:ToeicVocabularyQuizQuestion[]=[];
+  @State private practiceResultDay:number=0;
+  @State private practiceResultCorrect:number=0;
+  @State private practiceResultTotal:number=0;
+  @State private practiceResultAnswered:number=0;
+  @State private practiceReviewItems:ToeicPracticeReviewItem[]=[];
   @State private markedQuestionIds:string[]=[];
   @State private mockReports:ToeicMockReport[]=[];
   private sessionStartedAtMs:number=0;
@@ -209,8 +227,9 @@ export struct ToeicHomePage {
     this.currentTranslationOptionC=translation===null || translation.options.length<3?'':translation.options[2];
     this.currentTranslationOptionD=translation===null || translation.options.length<4?'':translation.options[3];
     this.currentCorrectIndex=question.correctIndex;
-    this.currentAttemptCount=this.viewModel.attemptCount(question.id)+(attempt===null?0:1);
-    this.currentWrongCount=this.viewModel.wrongCount(question.id)+(attempt!==null && !attempt.correct?1:0);
+    // Persisted counts only: an answer still in a draft is not another completed attempt.
+    this.currentAttemptCount=this.viewModel.attemptCount(question.id);
+    this.currentWrongCount=this.viewModel.wrongCount(question.id);
     this.currentExplanation=question.explanation;
     this.currentEvidence=question.evidence;
     this.currentParaphrase=question.paraphrase;
@@ -470,6 +489,7 @@ export struct ToeicHomePage {
       selected,this.viewModel.allVocabulary(),mode);
     if (this.quizQuestions.length===0) return;
     this.quizCorrectCount=0;
+    this.quizAnswers=[];
     this.quizModeLabel=mode===ToeicVocabularyQuizMode.MEANING?'词义':
       (mode===ToeicVocabularyQuizMode.COLLOCATION?'商务搭配':'同义替换');
     this.loadVocabularyQuiz(0);
@@ -491,19 +511,25 @@ export struct ToeicHomePage {
   }
 
   private answerVocabularyQuiz(index:number):void {
-    if (this.quizSelectedIndex>=0 || this.quizPosition>=this.quizQuestions.length) return;
+    if (this.mode!==ToeicPageMode.VOCABULARY_QUIZ ||
+      this.quizSelectedIndex>=0 || this.quizPosition>=this.quizQuestions.length) return;
     this.quizSelectedIndex=index;
+    this.quizAnswers=this.quizAnswers.concat([index]);
     if (index===this.quizAnswerIndex) this.quizCorrectCount++;
     let question=this.quizQuestions[this.quizPosition];
     void this.viewModel.recordVocabularyRecall(question.vocabularyId,index===this.quizAnswerIndex);
+    // Don't reveal correctness or explanation until the full vocabulary quiz is done.
+    if (this.quizPosition+1>=this.quizQuestions.length) {
+      this.mode=ToeicPageMode.VOCABULARY_RESULT;
+    } else {
+      this.loadVocabularyQuiz(this.quizPosition+1);
+    }
   }
 
   private nextVocabularyQuiz():void {
+    // Compatibility for the shared footer: selecting a choice now advances automatically.
+    if (this.quizPosition+1>=this.quizQuestions.length) return;
     if (this.quizSelectedIndex<0) return;
-    if (this.quizPosition+1>=this.quizQuestions.length) {
-      void this.finishDayTask('vocabulary');
-      return;
-    }
     this.loadVocabularyQuiz(this.quizPosition+1);
   }
 
@@ -659,13 +685,14 @@ export struct ToeicHomePage {
       }
     } else {
       this.attempts.push(attempt);
-      this.currentAttemptCount++;
-      if (!this.isMockSession() && !attempt.correct) this.currentWrongCount++;
     }
     this.selectedIndex=index;
     this.answerCorrect=attempt.correct;
     this.answerLocked=true;
+    // One selection = one recorded answer; the navigation method saves the next draft
+    // or submits on the last question. Never reveal the answer on this page.
     this.persistDraft();
+    this.nextQuestion();
   }
 
   private previousQuestion():void {
@@ -748,7 +775,10 @@ export struct ToeicHomePage {
       this.loadStudyDay(this.selectedStudyDay);
     }
     this.refreshRevision++;
-    this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.HOME;
+    if (!mockSession) {
+      this.preparePracticeResult();
+    }
+    this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.PRACTICE_RESULT;
     this.questions=[]; this.attempts=[]; this.questionTimes=[]; this.markedQuestionIds=[];
     this.answerLocked=false; this.selectedIndex=-1;
     this.clearQuestionSnapshot();
@@ -759,33 +789,51 @@ export struct ToeicHomePage {
     this.draftLabel='';
   }
 
+  private preparePracticeResult():void {
+    this.practiceResultDay=this.activeSessionDay;
+    this.practiceResultTotal=this.questions.length;
+    this.practiceResultAnswered=this.attempts.length;
+    this.practiceResultCorrect=0;
+    let review:ToeicPracticeReviewItem[]=[];
+    for (let i=0;i<this.questions.length;i++) {
+      let question=this.questions[i];
+      let attempt=this.sessionAttempt(question.id);
+      if (attempt!==null && attempt.correct) this.practiceResultCorrect++;
+      let chosen=attempt===null?'未作答':question.options[attempt.selectedIndex];
+      let passage=question.passage;
+      if (question.groupId.length>0) {
+        let group=ToeicReadingGroupService.groupAt(this.questions,i);
+        if (group.passageBlocks.length>0) passage=group.passageBlocks.join('\n\n');
+      }
+      review.push(new ToeicPracticeReviewItem(question.id,this.viewModel.partLabel(question.part),
+        question.stem,passage,chosen,question.options[question.correctIndex],
+        attempt!==null && attempt.correct,question.explanation,question.evidence,
+        this.viewModel.attemptCount(question.id),this.viewModel.wrongCount(question.id)));
+    }
+    this.practiceReviewItems=review;
+  }
+
+  private leavePracticeResult():void {
+    this.practiceReviewItems=[];
+    this.mode=ToeicPageMode.HOME;
+  }
+
   private toggleQuestionTranslation():void {
     if (this.isMockSession() || this.currentTranslationStem.length===0) return;
     this.showQuestionTranslation=!this.showQuestionTranslation;
   }
 
   private optionBackground(index:number):string {
-    if (!this.answerLocked) return AppTheme.SURFACE;
-    if (this.isMockSession()) return index===this.selectedIndex?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE;
-    if (index===this.currentCorrectIndex) return AppTheme.SUCCESS_SOFT;
-    if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER_SOFT;
-    return AppTheme.SURFACE;
+    // During all question sessions, selection is neutral: correctness is result-only.
+    return this.answerLocked && index===this.selectedIndex?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE;
   }
 
   private optionBorder(index:number):string {
-    if (!this.answerLocked) return AppTheme.BORDER;
-    if (this.isMockSession()) return index===this.selectedIndex?AppTheme.PRIMARY:AppTheme.BORDER;
-    if (index===this.currentCorrectIndex) return AppTheme.SUCCESS;
-    if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER;
-    return AppTheme.BORDER;
+    return this.answerLocked && index===this.selectedIndex?AppTheme.PRIMARY:AppTheme.BORDER;
   }
 
   private optionText(index:number):string {
-    if (!this.answerLocked) return AppTheme.TEXT;
-    if (this.isMockSession()) return index===this.selectedIndex?AppTheme.PRIMARY:AppTheme.TEXT;
-    if (index===this.currentCorrectIndex) return AppTheme.SUCCESS;
-    if (index===this.selectedIndex && !this.answerCorrect) return AppTheme.DANGER;
-    return AppTheme.TEXT;
+    return this.answerLocked && index===this.selectedIndex?AppTheme.PRIMARY:AppTheme.TEXT;
   }
 
   private optionPrefix(index:number):string {
