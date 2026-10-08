@@ -109,7 +109,7 @@ export class ToeicWeekOneContent {
 
   static sentenceDrills():ToeicSentenceDrill[] {
     return [
-      new ToeicSentenceDrill('S-001','Applicants for the sales position must submit a resume by Friday.','销售岗位的申请人必须在周五前提交简历。','Applicants must submit a resume.','先找主语 + 谓语 + 宾语','for the sales position 和 by Friday 都是补充信息，先抓主干再补职位和时间。'),
+      new ToeicSentenceDrill('S-001','Applicants for the sales position must submit a resume by Friday.','销售岗位的申请人最迟须在周五当天提交简历。','Applicants must submit a resume.','先找主语 + 谓语 + 宾语','for the sales position 和 by Friday 都是补充信息；by Friday 指最迟周五（含当天），先抓主干再补条件。'),
       new ToeicSentenceDrill('S-002','The candidates selected for interviews will receive an email this afternoon.','入选面试的候选人将在今天下午收到一封电子邮件。','The candidates will receive an email.','过去分词作后置修饰','selected for interviews 修饰 candidates，不要误当成句子的谓语。'),
       new ToeicSentenceDrill('S-003','Employees in the accounting department attend training every quarter.','会计部门的员工每个季度都参加培训。','Employees attend training.','介词短语修饰主语','in the accounting department 只是限定哪些员工。'),
       new ToeicSentenceDrill('S-004','The manager responsible for recruitment will review all applications.','负责招聘的经理将审核所有申请。','The manager will review all applications.','形容词短语修饰主语','responsible for recruitment 修饰 manager，真正谓语是 will review。'),
