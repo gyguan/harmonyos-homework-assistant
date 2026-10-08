@@ -397,7 +397,7 @@ def main() -> None:
     # Day chips, question navigation chips and multiline answer tiles are distinct control roles.
     action_count = 0
     quiz_choice_count = 0
-    for button_match in re.finditer(r"(?m)^\\s*Button\\(", ui):
+    for button_match in re.finditer(r"(?m)^\s*Button\(", ui):
         start = button_match.start()
         end = ui.find(".onClick(", start)
         require(end >= 0, "TOEIC button must have an onClick handler")
