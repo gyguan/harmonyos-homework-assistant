@@ -415,6 +415,13 @@ export struct ToeicHomePage {
     this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions());
   }
 
+  private startStandardDiagnostic():void {
+    // Extra 12 questions never substitute for the Day 1 quick diagnostic milestone.
+    this.activeSessionDay=1;
+    this.activeSessionAdvancesProgress=false;
+    this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.standardDiagnosticQuestions());
+  }
+
   private startTraining():void {
     let day=this.effectiveStudyDay();
     if (day===1) {
@@ -994,6 +1001,10 @@ export struct ToeicHomePage {
             .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
             .onClick(()=>{this.showFullPlan=!this.showFullPlan;});
           if (this.showFullPlan) { this.DaySelector(); }
+          Button('标准难度补充诊断（12 题，不影响当前学习日）',{type:ButtonType.Normal})
+            .width('100%').height(AppTheme.BUTTON_HEIGHT)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .onClick(()=>this.startStandardDiagnostic());
           if (!this.progressDiagnosticCompleted && this.selectedStudyDay!==1) {
             Text('建议先完成 Day 1 快速诊断，但你也可以直接进入当前选择的训练日。')
               .width('100%').fontSize(AppTheme.META_SIZE)
@@ -1394,7 +1405,7 @@ export struct ToeicHomePage {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         DeepPageHeader({
-          title:this.mode===ToeicPageMode.DIAGNOSTIC?'Reading 快速诊断':
+          title:this.mode===ToeicPageMode.DIAGNOSTIC?'Reading 水平诊断':
             (this.isMockSession()?'Reading 完整模考':'今日训练'),
           subtitle:String(this.currentIndex+1)+' / '+this.questions.length+' · '+
             this.viewModel.partLabel(this.currentPart),
