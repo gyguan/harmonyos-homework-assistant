@@ -299,7 +299,7 @@ export class ToeicPronunciationCatalog {
       new ToeicPronunciationEntry('V-280','/ˈkeɪtərɪŋ/'),
       new ToeicPronunciationEntry('V-281','/ˈbæŋkwɪt/'),
       new ToeicPronunciationEntry('V-282','/bəˈfeɪ/'),
-      new ToeicPronunciationEntry('V-283','/rɪˈfrɛʃmənt/'),
+      new ToeicPronunciationEntry('V-283','/rɪˈfrɛʃmənts/'),
       new ToeicPronunciationEntry('V-284','/əˈmɛnɪti/'),
       new ToeicPronunciationEntry('V-285','/ˈkɑːntræktər/'),
       new ToeicPronunciationEntry('V-286','/ˌæləˈkeɪʃən/'),
