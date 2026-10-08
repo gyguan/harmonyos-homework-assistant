@@ -1037,19 +1037,19 @@ export struct ToeicHomePage {
           .onClick(()=>this.startTraining());
       } else if (this.mode===ToeicPageMode.VOCABULARY) {
         Button('完成今日词汇学习',{type:ButtonType.Normal})
-          .width('100%').height(AppTheme.BUTTON_HEIGHT)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY)
+          .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
           .onClick(()=>{void this.finishDayTask('vocabulary');});
       } else if (this.mode===ToeicPageMode.SENTENCE) {
         Button('完成今日拆句训练',{type:ButtonType.Normal})
-          .width('100%').height(AppTheme.BUTTON_HEIGHT)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY)
+          .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
           .onClick(()=>{void this.finishDayTask('sentence');});
       } else if (this.mode===ToeicPageMode.VOCABULARY_QUIZ) {
         Button(this.quizPosition+1>=this.quizQuestions.length?'完成词汇测验':'下一题',
           {type:ButtonType.Normal})
-          .width('100%').height(AppTheme.BUTTON_HEIGHT)
-          .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY)
+          .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY).backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
           .enabled(this.quizSelectedIndex>=0)
           .onClick(()=>this.nextVocabularyQuiz());
       } else if (this.mode===ToeicPageMode.MOCK_RESULT) {
@@ -1104,12 +1104,12 @@ export struct ToeicHomePage {
                 .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
               Row({space:10}) {
                 Button('继续作答',{type:ButtonType.Normal})
-                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-                  .backgroundColor(AppTheme.PRIMARY).fontColor(AppTheme.TEXT_ON_PRIMARY)
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                  .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS).fontColor(AppTheme.TEXT_ON_PRIMARY)
                   .onClick(()=>this.resumeDraft());
                 Button('放弃本轮',{type:ButtonType.Normal})
-                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-                  .backgroundColor(AppTheme.PRIMARY_SOFT).fontColor(AppTheme.PRIMARY)
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                  .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS).fontColor(AppTheme.PRIMARY)
                   .onClick(()=>this.discardSavedDraft());
               }
               .width('100%');
@@ -1122,19 +1122,19 @@ export struct ToeicHomePage {
           this.TodayCard();
           Button(this.showFullPlan?'收起 21 天计划':'展开 21 天计划（可复习或预习）',
             {type:ButtonType.Normal})
-            .width('100%').height(AppTheme.BUTTON_HEIGHT)
-            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
             .onClick(()=>{this.showFullPlan=!this.showFullPlan;});
           if (this.showFullPlan) { this.DaySelector(); }
           if (this.viewModel.supplementaryReadingQuestions().length>0) {
             Button('Part 7 双篇 / 三篇加练',{type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT)
-              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
               .onClick(()=>this.startSupplementaryReading());
           }
           Button('标准水平诊断 · 12 题',{type:ButtonType.Normal})
-            .width('100%').height(AppTheme.BUTTON_HEIGHT)
-            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
             .onClick(()=>this.startStandardDiagnostic());
           Text('标准诊断不影响当前 Day 进度；基础快速诊断仍是 Day 1 入口。')
             .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
@@ -1241,16 +1241,16 @@ export struct ToeicHomePage {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Row({space:8}) {
           Button('词义测验',{type:ButtonType.Normal})
-            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
             .onClick(()=>this.startVocabularyQuiz(ToeicVocabularyQuizMode.MEANING));
           Button('搭配测验',{type:ButtonType.Normal})
-            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
             .onClick(()=>this.startVocabularyQuiz(ToeicVocabularyQuizMode.COLLOCATION));
           Button('同义测验',{type:ButtonType.Normal})
-            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
             .onClick(()=>this.startVocabularyQuiz(ToeicVocabularyQuizMode.PARAPHRASE));
         }
         .width('100%');
@@ -1287,8 +1287,8 @@ export struct ToeicHomePage {
                 .fontSize(AppTheme.BODY_SIZE)
                 .fontColor(AppTheme.SUBTEXT);
               Button('发音',{type:ButtonType.Normal})
-                .height(34)
-                .fontSize(AppTheme.META_SIZE)
+                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                .fontSize(AppTheme.ACTION_TEXT_SIZE)
                 .fontColor(AppTheme.PRIMARY)
                 .backgroundColor(AppTheme.PRIMARY_SOFT)
                 .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -1299,8 +1299,8 @@ export struct ToeicHomePage {
 
             Button(this.revealedWordIds.indexOf(item.id)>=0?'收起词义':'查看词义与搭配',
               {type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT)
-              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
               .onClick(()=>this.toggleWordReveal(item.id));
             if (this.revealedWordIds.indexOf(item.id)>=0) {
               Text(item.meaning)
@@ -1324,12 +1324,12 @@ export struct ToeicHomePage {
               }
               Row({space:10}) {
                 Button('记住了',{type:ButtonType.Normal})
-                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
                   .onClick(()=>{void this.recordWordRecall(item,true);});
                 Button('没记住',{type:ButtonType.Normal})
-                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.SURFACE_SUBTLE)
+                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
                   .onClick(()=>{void this.recordWordRecall(item,false);});
               }
               .width('100%');
@@ -1369,7 +1369,8 @@ export struct ToeicHomePage {
               .padding({left:14,right:14,top:12,bottom:12});
           }
           .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===0?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+          .backgroundColor(this.quizSelectedIndex===0?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+          .border({width:1,color:this.quizSelectedIndex===0?AppTheme.PRIMARY:AppTheme.BORDER})
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onClick(()=>this.answerVocabularyQuiz(0));
           Button({type:ButtonType.Normal}) {
@@ -1380,7 +1381,8 @@ export struct ToeicHomePage {
               .padding({left:14,right:14,top:12,bottom:12});
           }
           .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===1?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+          .backgroundColor(this.quizSelectedIndex===1?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+          .border({width:1,color:this.quizSelectedIndex===1?AppTheme.PRIMARY:AppTheme.BORDER})
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onClick(()=>this.answerVocabularyQuiz(1));
           Button({type:ButtonType.Normal}) {
@@ -1391,7 +1393,8 @@ export struct ToeicHomePage {
               .padding({left:14,right:14,top:12,bottom:12});
           }
           .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===2?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+          .backgroundColor(this.quizSelectedIndex===2?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+          .border({width:1,color:this.quizSelectedIndex===2?AppTheme.PRIMARY:AppTheme.BORDER})
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onClick(()=>this.answerVocabularyQuiz(2));
           Button({type:ButtonType.Normal}) {
@@ -1402,7 +1405,8 @@ export struct ToeicHomePage {
               .padding({left:14,right:14,top:12,bottom:12});
           }
           .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===3?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+          .backgroundColor(this.quizSelectedIndex===3?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+          .border({width:1,color:this.quizSelectedIndex===3?AppTheme.PRIMARY:AppTheme.BORDER})
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .onClick(()=>this.answerVocabularyQuiz(3));
           if (this.quizSelectedIndex>=0) {
@@ -1449,8 +1453,8 @@ export struct ToeicHomePage {
               .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
             Button(this.revealedSentenceIds.indexOf(item.id)>=0?'收起解析':'查看主干与译文',
               {type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT)
-              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
               .onClick(()=>this.toggleSentenceReveal(item.id));
             if (this.revealedSentenceIds.indexOf(item.id)>=0) {
               Text('译：'+item.translation)
@@ -1542,12 +1546,12 @@ export struct ToeicHomePage {
             Row({space:10}) {
               Button(this.isQuestionMarked(this.currentQuestionId)?'取消标记':'标记此题',
                 {type:ButtonType.Normal})
-                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
                 .onClick(()=>this.toggleQuestionMark());
               Button(this.navigatorVisible?'收起题号导航':'展开题号导航',{type:ButtonType.Normal})
-                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+                .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
                 .onClick(()=>{this.navigatorVisible=!this.navigatorVisible;});
             }
             .width('100%');
@@ -1569,8 +1573,8 @@ export struct ToeicHomePage {
             Text('可跳过、返回修改或标记题目；剩余时间结束时自动交卷。')
               .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
             Button('提前提交整场模考',{type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT)
-              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
+              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
               .onClick(()=>this.confirmMockSubmission());
           }
           Row() {
