@@ -118,6 +118,8 @@ def validate() -> None:
         for field in ("id", "word", "pos", "meaning", "scene", "collocations", "synonyms", "example"):
             item[field] = json.loads(item[field])
         words.append(item)
+    # Files are alphabetic (BatchFive, BatchFour, ...), not in ID order.
+    words.sort(key=lambda w: int(w["id"].split("-")[1]))
     require(len(words) >= 120, f"expected at least 120 structured staged words, found {len(words)}")
     require([int(w["id"].removeprefix("V-")) for w in words] ==
             list(range(121, 121 + len(words))),
