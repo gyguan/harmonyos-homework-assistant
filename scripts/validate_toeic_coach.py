@@ -64,10 +64,12 @@ def main() -> None:
     week_two = read("entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets")
     week_three = read("entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets")
     expansion = read("entry/src/main/ets/toeic/content/ToeicVocabularyExpansion.ets")
+    extra_diagnostic = read("entry/src/main/ets/toeic/content/ToeicStandardDiagnosticContent.ets")
     week_two_question_count = week_two.count("ToeicWeekTwoContent.q(")
     week_three_question_count = week_three.count("ToeicWeekThreeContent.q(")
     question_count = (preset.count("new ToeicQuestion(") + week_one.count("new ToeicQuestion(") +
-                      week_two_question_count + week_three_question_count)
+                      week_two_question_count + week_three_question_count +
+                      extra_diagnostic.count("new ToeicQuestion("))
     vocabulary_count = (preset.count("new ToeicVocabularyItem(") +
                         week_one.count("new ToeicVocabularyItem(") +
                         expansion.count("new ToeicVocabularyItem("))
@@ -136,6 +138,13 @@ def main() -> None:
     question_ids = re.findall(r"new ToeicQuestion\('([^']+)'", preset + "\n" + week_one)
     question_ids += re.findall(r'ToeicWeekTwoContent\.q\("([^"]+)"', week_two)
     question_ids += re.findall(r'ToeicWeekThreeContent\.q\("([^"]+)"', week_three)
+    question_ids += re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)
+    require(len(re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)) == 12,
+            "standard diagnostic must have 12 unique extra questions")
+    require(len(re.findall(r'new ToeicQuestion\("R-DX-P5-', extra_diagnostic)) == 6 and
+            len(re.findall(r'new ToeicQuestion\("R-DX-P6-', extra_diagnostic)) == 2 and
+            len(re.findall(r'new ToeicQuestion\("R-DX-P7-', extra_diagnostic)) == 4,
+            "standard diagnostic must cover P5=6, P6=2, P7=4")
     vocabulary_ids = re.findall(r"new ToeicVocabularyItem\('([^']+)'", preset + "\n" + week_one)
     vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)
     require(len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)) == 30,
@@ -554,6 +563,13 @@ def main() -> None:
 
     ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
     require("ToeicModuleBootstrap.initialize" in ability, "TOEIC progress bootstrap is missing")
+
+    require("ToeicStandardDiagnosticContent.questions()" in preset and
+            "standardDiagnosticQuestions():ToeicQuestion[]" in preset,
+            "independent standard-level diagnostic must be reachable from PresetToeicContent")
+    require("this.startStandardDiagnostic()" in ui and
+            "this.activeSessionAdvancesProgress=false" in ui,
+            "supplemental diagnostic must not advance the 21-day plan")
 
     standard = read("docs/product/toeic-coach-content-standard.md")
     for phrase in [
