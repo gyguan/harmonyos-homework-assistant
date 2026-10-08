@@ -76,11 +76,12 @@ export class ToeicQuestionHistory {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=5; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=6; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string='';
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
   activeDraft:ToeicSessionDraft|null=null; mockReports:ToeicMockReport[]=[];
   vocabularyRecalls:ToeicVocabularyRecall[]=[];
+  dayTasks:ToeicDayTaskProgress[]=[]; sessionReports:ToeicSessionReport[]=[];
 }
 
 export class ToeicStudyPlan {
@@ -173,5 +174,30 @@ export class ToeicVocabularyRecall {
   constructor(vocabularyId:string,streak:number,totalReviews:number,nextDueAtMs:number,lastReviewedAtMs:number) {
     this.vocabularyId=vocabularyId; this.streak=streak; this.totalReviews=totalReviews;
     this.nextDueAtMs=nextDueAtMs; this.lastReviewedAtMs=lastReviewedAtMs;
+  }
+}
+
+/** Task completion is independent from a single question session. */
+export class ToeicDayTaskProgress {
+  day:number; vocabularyCompleted:boolean; sentenceCompleted:boolean; trainingCompleted:boolean;
+  constructor(day:number,vocabularyCompleted:boolean=false,
+    sentenceCompleted:boolean=false,trainingCompleted:boolean=false) {
+    this.day=day; this.vocabularyCompleted=vocabularyCompleted;
+    this.sentenceCompleted=sentenceCompleted; this.trainingCompleted=trainingCompleted;
+  }
+}
+
+/** Diagnostic and daily session breakdown, not a TOEIC scaled score. */
+export class ToeicSessionReport {
+  day:number; completedAtMs:number; answered:number; correct:number; slow:number;
+  part5Answered:number; part5Correct:number; part5Seconds:number;
+  part6Answered:number; part6Correct:number; part6Seconds:number;
+  part7Answered:number; part7Correct:number; part7Seconds:number;
+  constructor(day:number,completedAtMs:number=0) {
+    this.day=day; this.completedAtMs=completedAtMs;
+    this.answered=0; this.correct=0; this.slow=0;
+    this.part5Answered=0; this.part5Correct=0; this.part5Seconds=0;
+    this.part6Answered=0; this.part6Correct=0; this.part6Seconds=0;
+    this.part7Answered=0; this.part7Correct=0; this.part7Seconds=0;
   }
 }
