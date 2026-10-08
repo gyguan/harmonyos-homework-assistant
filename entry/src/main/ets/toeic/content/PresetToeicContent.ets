@@ -197,6 +197,41 @@ export class PresetToeicContent {
     return result;
   }
 
+  // Every published extra reading group has exactly one assigned day. Keep all five
+  // sibling questions adjacent; changing the plan does not change their stable IDs.
+  static supplementaryGroupIdsForDay(day:number):string[] {
+    if (day===12) return ['P7-EX-VENUE','P7-EX-DELIVERY'];
+    if (day===13) return ['P7-EX-TRAVEL','P7-EX-FILTER'];
+    if (day===17) return ['P7-EX-ONBOARD','P7-EX-RETAIL','P7-EX-SUPPORT','P7-EX-LEASE'];
+    if (day===18) return ['P7-EX-TRAINING','P7-EX-MIGRATION','P7-EX-LICENSE'];
+    if (day===20) return ['P7-EX-PERDIEM','P7-EX-CATERING'];
+    return [];
+  }
+
+  static supplementaryReadingQuestionsForDay(day:number):ToeicQuestion[] {
+    let ids=PresetToeicContent.supplementaryGroupIdsForDay(day);
+    let groups=PresetToeicContent.publishedReadingGroups();
+    let all=PresetToeicContent.publishedQuestions();
+    let result:ToeicQuestion[]=[];
+    for (let id of ids) {
+      for (let group of groups) {
+        if (group.groupId!==id) continue;
+        // Fail closed: never expose an incomplete five-question passage as a daily exercise.
+        let ordered:ToeicQuestion[]=[];
+        for (let questionId of group.questionIds) {
+          for (let question of all) {
+            if (question.id===questionId) { ordered.push(question); break; }
+          }
+        }
+        if (ordered.length===group.questionIds.length) {
+          for (let question of ordered) result.push(question);
+        }
+        break;
+      }
+    }
+    return result;
+  }
+
   static supplementaryReadingQuestions():ToeicQuestion[] {
     let all=PresetToeicContent.publishedQuestions();
     let ids:string[]=[];
@@ -302,6 +337,11 @@ export class PresetToeicContent {
     let result:ToeicQuestion[]=[];
     for (let id of plan.questionIds) {
       for (let question of all) if (question.id===id) { result.push(question); break; }
+    }
+    // Daily extra passages are genuine planned exercises, not a separate bonus session.
+    // Day 14 and Day 19 mock question sets remain byte-for-byte unchanged.
+    for (let question of PresetToeicContent.supplementaryReadingQuestionsForDay(day)) {
+      if (!PresetToeicContent.containsQuestionId(result,question.id)) result.push(question);
     }
     return result;
   }

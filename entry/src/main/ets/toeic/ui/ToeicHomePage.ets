@@ -332,17 +332,23 @@ export struct ToeicHomePage {
   }
 
   private selectedDayGuidance():string {
+    if (this.selectedStudyDay===12 || this.selectedStudyDay===13) {
+      return '今日训练已包含完整双篇 / 三篇文档组；每组连续完成 5 题，历史作答和错题次数正常保留。';
+    }
+    if (this.selectedStudyDay===17) {
+      return 'Part 7 限时训练已包含新增双篇 / 三篇题组；先读清各文档职责，再联动定位答案。';
+    }
     if (this.selectedStudyDay===14) {
       return 'Day 14 为第一次完整 Reading 模考：75 分钟、100 题固定题序，作答过程中不显示答案，结束后统一查看结果。';
     }
     if (this.selectedStudyDay===18) {
-      return 'Day 18 根据当前错题、慢题和薄弱能力动态组题，优先修复最影响 350+ 目标的失分点。';
+      return 'Day 18 优先复习错题、慢题及薄弱能力，并完成新安排的双篇 / 三篇阅读整组训练。';
     }
     if (this.selectedStudyDay===19) {
       return 'Day 19 为第二次完整 Reading 模考：75 分钟、100 题独立题集，用于验证第一轮补弱后的提升。';
     }
     if (this.selectedStudyDay===20) {
-      return 'Day 20 优先复盘累计错 2 次及以上题目，再处理当前错题、慢题和薄弱能力。';
+      return 'Day 20 优先复盘累计错 2 次及以上题目，随后完成两组新的三篇阅读，检验跨篇能力。';
     }
     if (this.selectedStudyDay===21) {
       return 'Day 21 只做轻量最终验证：P5 15题 + P6 8题 + P7 12题，不再堆新难题。';
@@ -419,15 +425,6 @@ export struct ToeicHomePage {
     this.activeSessionDay=1;
     this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted;
     this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.diagnosticQuestions());
-  }
-
-  private startSupplementaryReading():void {
-    let questions=this.viewModel.supplementaryReadingQuestions();
-    if (questions.length===0) return;
-    // Extra reading is optional and must not advance the current study day.
-    this.activeSessionDay=17;
-    this.activeSessionAdvancesProgress=false;
-    this.startSession(ToeicPageMode.TRAINING,questions);
   }
 
   private startStandardDiagnostic():void {
@@ -857,8 +854,10 @@ export struct ToeicHomePage {
       }
       .width('100%');
 
-      if (this.selectedStudyDay===14 || this.selectedStudyDay===18 || this.selectedStudyDay===19 ||
-        this.selectedStudyDay===20 || this.selectedStudyDay===21) {
+      if (this.selectedStudyDay===12 || this.selectedStudyDay===13 ||
+        this.selectedStudyDay===17 || this.selectedStudyDay===18 ||
+        this.selectedStudyDay===20 || this.selectedStudyDay===14 ||
+        this.selectedStudyDay===19 || this.selectedStudyDay===21) {
         Text(this.selectedDayGuidance())
           .width('100%').fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
@@ -1158,7 +1157,7 @@ export struct ToeicHomePage {
 
           this.TodayCard();
 
-          Button(this.showPracticeTools?'收起专项训练':'更多训练 · 诊断与 Part 7 加练',
+          Button(this.showPracticeTools?'收起水平诊断':'更多训练 · 水平诊断',
             {type:ButtonType.Normal})
             .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
             .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
@@ -1166,13 +1165,6 @@ export struct ToeicHomePage {
             .onClick(()=>{this.showPracticeTools=!this.showPracticeTools;});
           if (this.showPracticeTools) {
             Column({space:10}) {
-              if (this.viewModel.supplementaryReadingQuestions().length>0) {
-                Button('Part 7 双篇 / 三篇加练',{type:ButtonType.Normal})
-                  .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
-                  .borderRadius(AppTheme.CONTROL_RADIUS)
-                  .onClick(()=>this.startSupplementaryReading());
-              }
               Button('标准水平诊断 · 12 题',{type:ButtonType.Normal})
                 .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
                 .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)

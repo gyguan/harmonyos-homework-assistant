@@ -8,10 +8,10 @@ export class ToeicWeekThreeContent {
     return [
       new ToeicStudyDay(15,"Part 5 极速","30 题目标 ≤10 分钟：词性、动词、介词、连词与高频搭配快速决策",45,["V-001","V-004","V-007","V-009","V-010","V-013","V-014","V-023","V-027","V-028","V-029","V-030","V-051","V-058","V-082"],[],ToeicWeekThreeContent.p5SprintQuestionIds()),
       new ToeicStudyDay(16,"Part 6 + 长句","16 题目标 ≤10 分钟：先做局部语法，再用上下文确认连接与指代",60,["V-011","V-012","V-015","V-016","V-025","V-026","V-044","V-049","V-061","V-071"],["S-061","S-062","S-063","S-064","S-065"],ToeicWeekThreeContent.p6SprintQuestionIds()),
-      new ToeicStudyDay(17,"Part 7 限时","单篇快速取证；双/三篇先分工再联动，控制回读次数",70,["V-019","V-020","V-021","V-022","V-027","V-044","V-059","V-065","V-073","V-078"],["S-066","S-067","S-068","S-069","S-070"],ToeicWeekThreeContent.p7TimedQuestionIds()),
-      new ToeicStudyDay(18,"动态补弱","按当前薄弱能力、错题与慢题动态组题；优先修复高价值失分",60,[],[],[]),
+      new ToeicStudyDay(17,"Part 7 限时","单篇限时 + 4 组双篇 / 三篇，控制回读次数",95,["V-019","V-020","V-021","V-022","V-027","V-044","V-059","V-065","V-073","V-078"],["S-066","S-067","S-068","S-069","S-070"],ToeicWeekThreeContent.p7TimedQuestionIds()),
+      new ToeicStudyDay(18,"动态补弱","薄弱题回练 + 3 组完整多篇阅读，检验跨文档能力",90,[],[],[]),
       new ToeicStudyDay(19,"第二次完整 Reading 模考","75 分钟完成 100 题：Part 5 30题 + Part 6 16题 + Part 7 54题；固定题序，结束后统一复盘",75,[],[],ToeicWeekThreeContent.mockQuestionIds()),
-      new ToeicStudyDay(20,"错题收口","优先复盘累计错 2 次及以上题目，再补当前错题、慢题与薄弱能力",55,[],[],[]),
+      new ToeicStudyDay(20,"错题收口","高频错题收口 + 2 组三篇新题作最终强化",80,[],[],[]),
       new ToeicStudyDay(21,"轻量训练 + 最终验证","P5 15题 + P6 2篇(8题) + P7 4组(12题)，只做高价值复验，不再堆新难题",50,[],[],ToeicWeekThreeContent.finalCheckQuestionIds())
     ];
   }
