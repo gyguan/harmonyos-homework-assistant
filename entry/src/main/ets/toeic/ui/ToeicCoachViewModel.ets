@@ -26,9 +26,12 @@ export class ToeicCoachViewModel {
   }
   activeDraft():ToeicSessionDraft|null { return ToeicProgressStore.instance.activeDraft(); }
   questionsForDraft(draft:ToeicSessionDraft):ToeicQuestion[] {
+    return this.questionsForIds(draft.questionIds);
+  }
+  questionsForIds(ids:string[]):ToeicQuestion[] {
     let source=PresetToeicContent.publishedQuestions();
     let result:ToeicQuestion[]=[];
-    for (let id of draft.questionIds) {
+    for (let id of ids) {
       let found:ToeicQuestion|null=null;
       for (let q of source) if (q.id===id) { found=q; break; }
       if (found===null) return [];
