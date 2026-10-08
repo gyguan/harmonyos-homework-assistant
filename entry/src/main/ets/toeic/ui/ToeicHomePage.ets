@@ -1001,10 +1001,12 @@ export struct ToeicHomePage {
             .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
             .onClick(()=>{this.showFullPlan=!this.showFullPlan;});
           if (this.showFullPlan) { this.DaySelector(); }
-          Button('标准难度补充诊断（12 题，不影响当前学习日）',{type:ButtonType.Normal})
+          Button('标准水平诊断 · 12 题',{type:ButtonType.Normal})
             .width('100%').height(AppTheme.BUTTON_HEIGHT)
             .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT)
             .onClick(()=>this.startStandardDiagnostic());
+          Text('标准诊断不影响当前 Day 进度；基础快速诊断仍是 Day 1 入口。')
+            .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
           if (!this.progressDiagnosticCompleted && this.selectedStudyDay!==1) {
             Text('建议先完成 Day 1 快速诊断，但你也可以直接进入当前选择的训练日。')
               .width('100%').fontSize(AppTheme.META_SIZE)
@@ -1238,22 +1240,50 @@ export struct ToeicHomePage {
           Text(this.quizStem)
             .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE)
             .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Button(this.quizOptionA,{type:ButtonType.Normal})
-            .width('100%').constraintSize({minHeight:50})
-            .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.SURFACE_SUBTLE)
-            .onClick(()=>this.answerVocabularyQuiz(0));
-          Button(this.quizOptionB,{type:ButtonType.Normal})
-            .width('100%').constraintSize({minHeight:50})
-            .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.SURFACE_SUBTLE)
-            .onClick(()=>this.answerVocabularyQuiz(1));
-          Button(this.quizOptionC,{type:ButtonType.Normal})
-            .width('100%').constraintSize({minHeight:50})
-            .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.SURFACE_SUBTLE)
-            .onClick(()=>this.answerVocabularyQuiz(2));
-          Button(this.quizOptionD,{type:ButtonType.Normal})
-            .width('100%').constraintSize({minHeight:50})
-            .fontColor(AppTheme.TEXT).backgroundColor(AppTheme.SURFACE_SUBTLE)
-            .onClick(()=>this.answerVocabularyQuiz(3));
+          Button({type:ButtonType.Normal}) {
+            Text('A. '+this.quizOptionA)
+              .width('100%').textAlign(TextAlign.Start)
+              .fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.TEXT)
+              .padding({left:14,right:14,top:12,bottom:12});
+          }
+          .width('100%').constraintSize({minHeight:50}).padding(0)
+          .backgroundColor(this.quizSelectedIndex===0?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(()=>this.answerVocabularyQuiz(0));
+          Button({type:ButtonType.Normal}) {
+            Text('B. '+this.quizOptionB)
+              .width('100%').textAlign(TextAlign.Start)
+              .fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.TEXT)
+              .padding({left:14,right:14,top:12,bottom:12});
+          }
+          .width('100%').constraintSize({minHeight:50}).padding(0)
+          .backgroundColor(this.quizSelectedIndex===1?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(()=>this.answerVocabularyQuiz(1));
+          Button({type:ButtonType.Normal}) {
+            Text('C. '+this.quizOptionC)
+              .width('100%').textAlign(TextAlign.Start)
+              .fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.TEXT)
+              .padding({left:14,right:14,top:12,bottom:12});
+          }
+          .width('100%').constraintSize({minHeight:50}).padding(0)
+          .backgroundColor(this.quizSelectedIndex===2?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(()=>this.answerVocabularyQuiz(2));
+          Button({type:ButtonType.Normal}) {
+            Text('D. '+this.quizOptionD)
+              .width('100%').textAlign(TextAlign.Start)
+              .fontSize(AppTheme.FORM_TEXT_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.TEXT)
+              .padding({left:14,right:14,top:12,bottom:12});
+          }
+          .width('100%').constraintSize({minHeight:50}).padding(0)
+          .backgroundColor(this.quizSelectedIndex===3?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onClick(()=>this.answerVocabularyQuiz(3));
           if (this.quizSelectedIndex>=0) {
             Text(this.quizSelectedIndex===this.quizAnswerIndex?'回答正确':'需要巩固')
               .width('100%').fontSize(AppTheme.CARD_TITLE_SIZE)
