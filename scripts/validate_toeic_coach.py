@@ -424,11 +424,37 @@ def main() -> None:
                 (".height(AppTheme.BUTTON_HEIGHT)" in body or
                  ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in body),
                 f"TOEIC action button inconsistent: {first_line}")
-    require(action_count == 26 and quiz_choice_count == 8,
-            "TOEIC all 26 action buttons and eight choice tiles must be inspected")
+    require(action_count == 30 and quiz_choice_count == 8,
+            "TOEIC all 30 action buttons and eight choice tiles must be inspected")
     require("Button('发音',{type:ButtonType.Normal})" in ui and
             ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in ui,
             "TOEIC pronunciation must preserve at least the standard secondary touch target")
+    # The home page must put the current day's work ahead of optional analysis and drills.
+    home_start = ui.index("  private HomeContent()")
+    home_end = ui.index("  private VocabularyContent(", home_start)
+    home = ui[home_start:home_end]
+    require(home.index("this.TodayCard();") < home.index("this.showPracticeTools") and
+            home.index("this.TodayCard();") < home.index("this.showLearningDetails"),
+            "TOEIC home must lead with the selected-day card before optional tools and history")
+    require("this.selectStudyDay(this.selectedStudyDay-1)" in home and
+            "this.selectStudyDay(this.selectedStudyDay+1)" in home and
+            ".enabled(this.selectedStudyDay>1)" in home and
+            ".enabled(this.selectedStudyDay<21)" in home and
+            "this.DaySelector();" in home,
+            "TOEIC home must offer bounded previous/next day and full Day 1-21 selection")
+    require("if (this.showPracticeTools)" in home and
+            "if (this.showLearningDetails)" in home and
+            "this.startSupplementaryReading()" in home and
+            "this.startStandardDiagnostic()" in home and
+            "this.recentReports.length>0" in home and
+            "this.mockReports.length>0" in home,
+            "TOEIC optional training, learning history and mocks must remain accessible")
+    require("Text('训练原则')" not in home and "首批词库 " not in ui,
+            "TOEIC home must not restore redundant guidance and inventory chrome")
+    require("this.draftLabel.length>0" in home and
+            "this.resumeDraft()" in home and
+            "this.discardSavedDraft()" in home,
+            "TOEIC unfinished session must remain recoverable from the home page")
     # Compile regression: FlexSpaceOptions requires LengthMetrics, not raw numbers.
     require("import { LengthMetrics } from '@kit.ArkUI';" in ui and
             "space:{main:LengthMetrics.vp(6),cross:LengthMetrics.vp(6)}" in ui and
