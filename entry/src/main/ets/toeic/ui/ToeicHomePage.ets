@@ -1044,6 +1044,13 @@ export struct ToeicHomePage {
                   ' · P6 '+report.part6Correct+'/'+report.part6Answered+
                   ' · P7 '+report.part7Correct+'/'+report.part7Answered)
                   .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                Text('平均用时：P5 '+(report.part5Answered>0?
+                  Math.round(report.part5Seconds/report.part5Answered)+'s':'--')+
+                  ' · P6 '+(report.part6Answered>0?
+                    Math.round(report.part6Seconds/report.part6Answered)+'s':'--')+
+                  ' · P7 '+(report.part7Answered>0?
+                    Math.round(report.part7Seconds/report.part7Answered)+'s':'--'))
+                  .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
               }
               .width('100%');
             },(report:ToeicSessionReport)=>String(report.completedAtMs));
