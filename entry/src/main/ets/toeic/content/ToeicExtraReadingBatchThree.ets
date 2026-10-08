@@ -21,7 +21,7 @@ export class ToeicExtraReadingBatchThree {
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-SUPPORT"),
       new ToeicQuestion("R-P7-SUPPORT-02",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"How much credit should appear on the June invoice for NT-118?",["$10","$40","$90","$115"],1,
-        "协议按月费的10%抵扣，月费400美元，因此抵扣40美元。","The standard support plan costs $400 per month. || a one-time credit of 10 percent of the monthly fee","10 percent of $400 = $40",91,
+        "协议按月费的10%抵扣，月费400美元，因此抵扣40美元。","a one-time credit of 10 percent of the monthly fee || The June invoice is scheduled to show the normal $400 monthly fee before adjustments.","10 percent of $400 = $40",91,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-SUPPORT"),
       new ToeicQuestion("R-P7-SUPPORT-03",ToeicSection.READING,ToeicPart.PART_7,
