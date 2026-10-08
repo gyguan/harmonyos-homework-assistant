@@ -429,6 +429,7 @@ def main() -> None:
             "if (this.hasFixedFooter())" in root,
             "TOEIC root must place fixed header/footer around the content pane")
     for name in ["HomeContent", "VocabularyContent", "VocabularyQuizContent",
+                 "VocabularyResultContent", "PracticeResultContent",
                  "SentenceContent", "MockResultContent", "QuestionContent"]:
         section = re.search(
             rf"(?ms)^  @Builder\n  private {name}\([^\n]*\) \{{\n(.*?)(?=^  @Builder|^  build\(\))",
@@ -438,10 +439,10 @@ def main() -> None:
                 "DeepPageHeader({" not in section.group(1) and
                 ".layoutWeight(1).scrollBar(BarState.Off)" in section.group(1),
                 f"TOEIC {name} must be the scroll-only middle pane")
-    require(ui.count(".layoutWeight(1).scrollBar(BarState.Off)") == 6,
-            "TOEIC all six content panes must fill available space")
+    require(ui.count(".layoutWeight(1).scrollBar(BarState.Off)") == 8,
+            "TOEIC all eight content panes including deferred result screens must fill available space")
     footer = ui[ui.index("  private FixedFooter()"):ui.index("  @Builder\n  private HomeContent()")]
-    for token in ["Button('上一题'", "this.nextQuestion()", "this.nextVocabularyQuiz()",
+    for token in ["Button('上一题'", "this.nextQuestion()", "this.leavePracticeResult()",
                   "this.finishDayTask('vocabulary')", "this.finishDayTask('sentence')",
                   "this.startTraining()", "this.leaveMockResult()"]:
         require(token in footer, f"TOEIC fixed footer action missing: {token}")
@@ -476,8 +477,8 @@ def main() -> None:
                 (".height(AppTheme.BUTTON_HEIGHT)" in body or
                  ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in body),
                 f"TOEIC action button inconsistent: {first_line}")
-    require(action_count == 28 and quiz_choice_count == 8,
-            "TOEIC all 28 action buttons and eight choice tiles must be inspected")
+    require(action_count == 29 and quiz_choice_count == 8,
+            "TOEIC all 29 action buttons and eight choice tiles must be inspected")
     require("Button('发音',{type:ButtonType.Normal})" in ui and
             ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in ui,
             "TOEIC pronunciation must preserve at least the standard secondary touch target")
@@ -519,8 +520,8 @@ def main() -> None:
                   "this.DayButton(1);", "this.DayButton(7);", "this.DayButton(8);", "this.DayButton(14);",
                   "this.DayButton(15);", "this.DayButton(19);", "this.DayButton(21);",
                   ".onClick(()=>this.selectStudyDay(day))", "dailyQuestionsForDay(day)",
-                  "'进入 Day '+this.selectedStudyDay+' 训练'", "currentAttemptCount", "currentWrongCount",
-                  "'已做 '+this.currentAttemptCount+' 次'", "'错 '+this.currentWrongCount+' 次'",
+                  "'进入 Day '+this.selectedStudyDay+' 训练'", "practiceReviewItems",
+                  "'累计已做 '+item.attemptCount+' 次 · 累计错误 '+item.wrongCount+' 次'",
                   "'译：'+item.translation", "showQuestionTranslation",
                   "currentTranslationStem", "toggleQuestionTranslation()",
                   "'查看中文翻译'", "'收起中文翻译'"]:
@@ -546,8 +547,7 @@ def main() -> None:
         "@State private currentStem:string=''",
         "@State private currentPassage:string=''",
         "@State private currentCorrectIndex:number=-1",
-        "@State private currentAttemptCount:number=0",
-        "@State private currentWrongCount:number=0",
+        "@State private practiceReviewItems:ToeicPracticeReviewItem[]=[]",
         "@State private showQuestionTranslation:boolean=false",
         "@State private currentTranslationPassage:string=''",
         "@State private currentTranslationStem:string=''",
@@ -560,12 +560,10 @@ def main() -> None:
         "question.id===this.currentQuestionId",
     ]:
         require(token in ui, f"reactive question snapshot missing: {token}")
-    require("this.currentAttemptCount=this.viewModel.attemptCount(question.id)" in ui and
-            "this.currentWrongCount=this.viewModel.wrongCount(question.id)" in ui,
-            "question history badges must load from persisted history")
-    require("this.currentAttemptCount++" in ui and
-            "if (!this.isMockSession() && !attempt.correct) this.currentWrongCount++" in ui,
-            "question history badges must update immediately after answering")
+    require("this.currentAttemptCount" not in ui and
+            "this.currentWrongCount" not in ui and
+            "this.viewModel.attemptCount(question.id),this.viewModel.wrongCount(question.id)" in ui,
+            "historical attempt/wrong counts must only be displayed from persisted data after submission")
     for token in [
         "private previousQuestion():void",
         "Button('上一题'",
@@ -612,11 +610,11 @@ def main() -> None:
     for token in [
         "this.currentStem", "this.currentPassage", "this.currentOptionA",
         "this.currentOptionB", "this.currentOptionC",
-        "this.currentExplanation", "this.currentEvidence", "this.currentParaphrase",
     ]:
         require(token in question_builder, f"QuestionContent must render reactive snapshot field: {token}")
-    require("index===this.currentCorrectIndex" in ui,
-            "answer option styling must use reactive currentCorrectIndex snapshot")
+    require("index===this.currentCorrectIndex" not in ui and
+            "return this.answerLocked && index===this.selectedIndex?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE;" in ui,
+            "question options must not reveal the correct answer during training")
     require("private optionBackground(index:number):string" in ui and
             "private optionBorder(index:number):string" in ui and
             "private optionText(index:number):string" in ui,
@@ -657,9 +655,51 @@ def main() -> None:
         "this.mockResultDay===19?'第二次完整 Reading 模考':'第一次完整 Reading 模考'",
     ]:
         require(token in ui, f"week-three UI flow missing: {token}")
-    require("完整模考过程中不显示对错与解析" in ui and
-            "this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.HOME" in ui,
-            "mock mode must hide immediate feedback and show a result screen after completion")
+    require("this.mode=mockSession?ToeicPageMode.MOCK_RESULT:ToeicPageMode.PRACTICE_RESULT" in ui and
+            "this.preparePracticeResult()" in ui and
+            "this.mode===ToeicPageMode.PRACTICE_RESULT" in ui,
+            "daily practice must show a complete result page after saving without changing mock result behavior")
+    # Every answered choice is captured before moving to the next question.
+    # The review is constructed only AFTER the session has been saved.
+    choose_block = ui[ui.index("  private chooseAnswer(index:number):void"):ui.index("  private previousQuestion():void")]
+    finish_block = ui[ui.index("  private async finishSession():Promise<void>"):
+                      ui.index("  private toggleQuestionTranslation():void")]
+    result_block = ui[ui.index("  private PracticeResultContent()"):
+                      ui.index("  private QuestionContent()")]
+    question_view = ui[ui.index("  private QuestionContent()"):ui.index("  build() {")]
+    quiz_view = ui[ui.index("  private VocabularyQuizContent()"):ui.index("  private SentenceContent(")]
+    require("this.attempts.push(attempt)" in choose_block and
+            "this.persistDraft();" in choose_block and
+            "this.nextQuestion();" in choose_block and
+            choose_block.index("this.persistDraft();") < choose_block.index("this.nextQuestion();"),
+            "single choice must persist before automatic next-question navigation")
+    require("await this.viewModel.completeSession(" in finish_block and
+            finish_block.index("await this.viewModel.completeSession(") <
+            finish_block.index("this.preparePracticeResult()") and
+            "this.viewModel.attemptCount(question.id)" in finish_block and
+            "this.viewModel.wrongCount(question.id)" in finish_block,
+            "practice review history must be calculated after the completed session is persisted")
+    require("if (this.answerLocked)" not in question_view and
+            "this.currentExplanation" not in question_view and
+            "this.currentCorrectIndex" not in question_view and
+            "已做 '+this.currentAttemptCount" not in question_view,
+            "practice must never reveal per-question feedback or in-progress historical totals")
+    require("quizSelectedIndex===this.quizAnswerIndex?" not in quiz_view and
+            "this.quizExplanation" not in quiz_view and
+            "this.mode=ToeicPageMode.VOCABULARY_RESULT" in ui and
+            "this.quizAnswers=this.quizAnswers.concat([index]);" in ui and
+            "this.loadVocabularyQuiz(this.quizPosition+1)" in ui,
+            "vocabulary choice quiz must auto-advance and reveal answers only at completion")
+    require("ForEach(this.practiceReviewItems" in result_block and
+            "累计已做 '+item.attemptCount+" in result_block and
+            "累计错误 '+item.wrongCount+" in result_block and
+            "Text('解析：'+item.explanation)" in result_block,
+            "final result must show per-question explanations and persisted attempt/wrong totals")
+    require("private VocabularyResultContent()" in ui and
+            "this.VocabularyResultContent();" in ui and
+            "this.PracticeResultContent();" in ui and
+            "this.leavePracticeResult()" in ui,
+            "both vocabulary and practice sessions must have complete deferred result screens")
     require("this.mockPart5Correct" in ui and "this.mockPart6Correct" in ui and "this.mockPart7Correct" in ui,
             "mock result must expose Part 5/6/7 breakdown")
     require("Button('A. '+this.currentOptionA" not in ui and
