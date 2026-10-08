@@ -152,9 +152,9 @@ def main() -> None:
     translation_week_three = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationWeekThreeCatalog.ets")
     translation_extra = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationSupplementaryCatalog.ets")
     translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
-    translation_ids = re.findall(r"new ToeicQuestionTranslation\\('([^']+)'", translation_week_one + "\\n" + translation_week_two)
-    translation_ids += re.findall(r'new ToeicQuestionTranslation\\("([^"]+)"', translation_week_two + "\\n" + translation_extra)
-    translation_ids += re.findall(r"new ToeicQuestionTranslation\\('([^']+)'", translation_week_three)
+    translation_ids = re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_one + "\n" + translation_week_two)
+    translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two + "\n" + translation_extra)
+    translation_ids += re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_three)
     require(len(translation_ids) == 158,
             f"Day1-13 and Day15-16 must have 158 question translations, found {len(translation_ids)}")
     require(len(translation_ids) == len(set(translation_ids)),
