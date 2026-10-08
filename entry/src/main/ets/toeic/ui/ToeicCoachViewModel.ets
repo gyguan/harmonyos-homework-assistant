@@ -5,7 +5,7 @@ import { ToeicQuestionTranslation } from '../content/ToeicQuestionTranslationMod
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { ToeicProgressStore } from '../data/ToeicProgressStore';
 import { ToeicPronunciationService, ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
-import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicDayTaskProgress, ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicSessionReport, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
 
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
@@ -38,9 +38,17 @@ export class ToeicCoachViewModel {
   async saveDraft(draft:ToeicSessionDraft):Promise<void> { await ToeicProgressStore.instance.saveDraft(draft); }
   async discardDraft():Promise<void> { await ToeicProgressStore.instance.discardDraft(); }
   async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean,
-    advanceProgress:boolean=true,mockReport:ToeicMockReport|null=null):Promise<void> {
-    await ToeicProgressStore.instance.recordSession(attempts,diagnostic,advanceProgress,mockReport);
+    advanceProgress:boolean=true,mockReport:ToeicMockReport|null=null,
+    studyDay:number=0):Promise<void> {
+    await ToeicProgressStore.instance.recordSession(attempts,diagnostic,advanceProgress,mockReport,studyDay);
   }
+  dayTaskProgress(day:number):ToeicDayTaskProgress {
+    return ToeicProgressStore.instance.dayTasks(day);
+  }
+  async completeDayTask(day:number,task:string):Promise<void> {
+    await ToeicProgressStore.instance.completeDayTask(day,task);
+  }
+  recentSessionReports():ToeicSessionReport[] { return this.snapshot().sessionReports.slice(); }
   contentErrors():string[] {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
     let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
