@@ -8,7 +8,7 @@ export class ToeicQuestionTranslationWeekThreeCatalog {
   static items():ToeicQuestionTranslation[] {
     return [
       new ToeicQuestionTranslation('R-P5-SPRINT-1501',"","修改后的日程已通过_____方式分发给所有分支机构经理。",["电子的","以电子方式","电子产品","电子；电子器件"]),
-      new ToeicQuestionTranslation('R-P5-SPRINT-1502',"","所有费用报表必须在周五下午前被_____。",["提交（原形）","提交（过去分词）","提交（现在分词）","提交（名词）"]),
+      new ToeicQuestionTranslation('R-P5-SPRINT-1502',"","所有费用报表最迟须在周五下午被_____。",["提交（原形）","提交（过去分词）","提交（现在分词）","提交（名词）"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1503',"","Park 女士负责_____协调年度安全检查。",["在……处","负责（固定搭配用介词）","到……","与……一起"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1504',"","海关文件获得批准_____，这批货物今天就会发出。",["除非","一旦","尽管","在……期间"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1505',"","今天上午，经理和助理都_____不在岗。",["是（单数过去式）","是（复数过去式）","是（动词原形）","正在是（非标准表达）"]),
@@ -17,7 +17,7 @@ export class ToeicQuestionTranslationWeekThreeCatalog {
       new ToeicQuestionTranslation('R-P5-SPRINT-1508',"","技术人员以令人印象深刻的_____完成了维修。",["高效的","效率","高效地","各种效率"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1509',"","请在五个工作日_____退回签署好的协议。",["以内","在……之间","朝向","在……旁边"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1510',"","员工应保存一份表格副本，以供_____自行存档。",["他们（主格）","他们（宾格）","他们的（形容词性物主代词）","他们的（名词性物主代词）"]),
-      new ToeicQuestionTranslation('R-P5-SPRINT-1511',"","准备了报告的顾问将参加会议。请为“顾问_____准备报告”选择关系代词。",["指人的主格关系代词","指物的关系代词","表示地点的关系副词","表示所属的关系代词"]),
+      new ToeicQuestionTranslation('R-P5-SPRINT-1511',"","那位_____准备了报告的顾问将参加会议。",["指人的主格关系代词","指物的关系代词","表示地点的关系副词","表示所属的关系代词"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1512',"","_____天气不好，户外产品演示仍按计划进行。",["尽管","由于（后接名词）","在……期间","除非"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1513',"","酒店将为额外的交通费用向客人_____。",["报销","替换","预订","检查"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1514',"","签订合同前，请_____注意取消政策。",["做","给予／注意（固定搭配）","给","拿"]),
@@ -30,7 +30,7 @@ export class ToeicQuestionTranslationWeekThreeCatalog {
       new ToeicQuestionTranslation('R-P5-SPRINT-1521',"","主管将在审阅提案后_____决定。",["做（一般动词）","作出（make a decision）","拥有","带来"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1522',"","供应商同意_____交货，直到替换零件到货。",["推迟","保留","使合格","退款"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1523',"","最终价格如有调整恕不另行通知。请补足固定搭配 subject _____ change。",["为","受到／可能发生（subject to）","与","由"]),
-      new ToeicQuestionTranslation('R-P5-SPRINT-1524',"","去年开业的那家仓库，_____现在能处理两倍数量的订单。",["指人的关系代词","指物的关系代词","关系副词：地点","疑问代词／关系代词：什么"]),
+      new ToeicQuestionTranslation('R-P5-SPRINT-1524',"","那座仓库，_____去年开业，现在能处理两倍数量的订单。",["指人的关系代词","指物的关系代词","关系副词：地点","疑问代词／关系代词：什么"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1525',"","顾客对延长服务时间的举措反应非常_____。",["积极的","积极地","位置／职位","积极性"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1526',"","会计团队昨天付款前_____了发票。",["核验（现在时）","核验（过去时）","已经核验（现在完成时）","将核验"]),
       new ToeicQuestionTranslation('R-P5-SPRINT-1527',"","会议室虽小；_____，却配备了高品质的视频系统。",["然而","因此","因为","否则"]),
