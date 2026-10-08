@@ -519,13 +519,6 @@ export struct ToeicHomePage {
     }
   }
 
-  private nextVocabularyQuiz():void {
-    // Compatibility for the shared footer: selecting a choice now advances automatically.
-    if (this.quizPosition+1>=this.quizQuestions.length) return;
-    if (this.quizSelectedIndex<0) return;
-    this.loadVocabularyQuiz(this.quizPosition+1);
-  }
-
   private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean):Promise<void> {
     await this.viewModel.recordVocabularyRecall(item.id,remembered);
     this.lastReviewedWordId=item.id;
