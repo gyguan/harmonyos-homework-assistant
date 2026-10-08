@@ -435,6 +435,7 @@ export struct ToeicHomePage {
 
   private startStandardDiagnostic():void {
     // Optional Day 1 reassessment: do not replace the quick diagnostic milestone or advance progress.
+    if (this.selectedStudyDay!==1 || !this.progressDiagnosticCompleted) return;
     this.activeSessionDay=1;
     this.activeSessionAdvancesProgress=false;
     this.startSession(ToeicPageMode.DIAGNOSTIC,this.viewModel.standardDiagnosticQuestions());
