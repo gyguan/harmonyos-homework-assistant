@@ -174,7 +174,7 @@ export class ToeicContentValidator {
         if (item.questionId===question.id) { translation=item; break; }
       }
       if (translation===null) {
-        errors.push(question.id + ': Chinese translation is required for Day 1-13 training');
+        errors.push(question.id + ': Chinese translation is required for assigned non-mock training');
         continue;
       }
       if (question.passage.trim().length>0 && translation.passage.trim().length===0) {
