@@ -12,6 +12,7 @@ from validate_toeic_answer_display import verify as verify_answer_display
 from validate_toeic_mock_format_v2 import validate as validate_mock_day14_v2
 from validate_toeic_mock_day19_format_v2 import validate as validate_mock_day19_v2
 from validate_toeic_translation_coverage import main as validate_translation_coverage
+from validate_toeic_semantic_issue478 import validate as validate_semantic_issue478
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -35,6 +36,7 @@ def read(path: str) -> str:
 def main() -> None:
     require(TOEIC.exists(), "TOEIC module directory is missing")
     validate_question_quality()
+    validate_semantic_issue478()
     verify_answer_display()
     validate_mock_day14_v2()
     validate_mock_day19_v2()
