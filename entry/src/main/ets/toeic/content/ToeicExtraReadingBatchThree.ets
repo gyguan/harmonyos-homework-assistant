@@ -15,7 +15,7 @@ export class ToeicExtraReadingBatchThree {
   static questions():ToeicQuestion[] {
     return [
       new ToeicQuestion("R-P7-SUPPORT-01",ToeicSection.READING,ToeicPart.PART_7,
-        ToeicSkill.CROSS_DOCUMENT,'',"Why does incident NT-118 qualify for a service credit?",["It interrupted service for more than 90 minutes without notice","It occurred during a scheduled maintenance window","It lasted fewer than two hours","It generated two separate service tickets"],0,
+        ToeicSkill.CROSS_DOCUMENT,'',"Why does incident NT-118 qualify for a service credit?",["It was an unplanned service interruption lasting more than 90 minutes","It occurred during a scheduled maintenance window","It lasted fewer than two hours","It generated two separate service tickets"],0,
         "服务协议规定意外中断超过连续90分钟可获抵扣，而事件记录为意外停机115分钟。","An unplanned service interruption lasting longer than 90 consecutive minutes qualifies || (115 consecutive minutes)","unplanned interruption over 90 minutes = credit-eligible outage",90,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-SUPPORT"),
