@@ -1259,8 +1259,7 @@ export struct ToeicHomePage {
   }
 
   @Builder
-  private VocabularyContent(items:ToeicVocabularyItem[],
-    importantIds:string[],unrememberedIds:string[]) {
+  private VocabularyContent(items:ToeicVocabularyItem[],importantIds:string[],unrememberedIds:string[]) {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Row({space:8}) {
