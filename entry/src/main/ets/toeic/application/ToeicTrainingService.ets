@@ -49,10 +49,19 @@ export class ToeicTrainingService {
   }
 
   studyDayQuestions(snapshot:ToeicLearningSnapshot, studyDay:number):ToeicQuestion[] {
-    if (PresetToeicContent.isWeaknessDay(studyDay)) return this.weaknessDayQuestions(snapshot,18);
-    if (PresetToeicContent.isHighErrorReviewDay(studyDay)) return this.highErrorReviewQuestions(snapshot,20);
+    if (PresetToeicContent.isWeaknessDay(studyDay)) {
+      return this.weaknessDayQuestions(snapshot,18)
+        .concat(PresetToeicContent.supplementaryReadingQuestionsForDay(studyDay));
+    }
+    if (PresetToeicContent.isHighErrorReviewDay(studyDay)) {
+      return this.highErrorReviewQuestions(snapshot,20)
+        .concat(PresetToeicContent.supplementaryReadingQuestionsForDay(studyDay));
+    }
     let planned=PresetToeicContent.questionsForDay(studyDay);
     if (PresetToeicContent.isMockDay(studyDay)) return planned;
+    // Preserve both the existing multi-document passages and newly published extra groups
+    // as contiguous sets; question-wise weak-skill sorting would fragment the shared text.
+    if (PresetToeicContent.supplementaryGroupIdsForDay(studyDay).length>0) return planned;
     let selected:ToeicQuestion[]=[];
     this.appendByIds(selected,planned,snapshot.reviewQuestionIds,planned.length);
     this.appendByIds(selected,planned,snapshot.slowQuestionIds,planned.length);
