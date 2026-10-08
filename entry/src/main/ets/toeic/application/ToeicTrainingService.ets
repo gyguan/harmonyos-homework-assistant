@@ -15,7 +15,6 @@ export class ToeicTrainingService {
   private constructor() {}
 
   diagnosticQuestions():ToeicQuestion[] { return PresetToeicContent.diagnosticQuestions(); }
-  standardDiagnosticQuestions():ToeicQuestion[] { return PresetToeicContent.standardDiagnosticQuestions(); }
 
   dailyQuestions(snapshot:ToeicLearningSnapshot, limit:number=10, studyDay:number=snapshot.currentDay):ToeicQuestion[] {
     let all=PresetToeicContent.publishedQuestions();
