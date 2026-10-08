@@ -167,7 +167,8 @@ export class PresetToeicContent {
     return result;
   }
 
-  static vocabulary():ToeicVocabularyItem[] {
+  /** Includes unpublished candidates strictly for validation and editorial review. */
+  static vocabularyForReview():ToeicVocabularyItem[] {
     let base:ToeicVocabularyItem[]=[
       new ToeicVocabularyItem('V-001','applicant','n.','申请人；求职者',ToeicVocabularyLevel.L1,'招聘',['job applicant'],['candidate']),
       new ToeicVocabularyItem('V-002','candidate','n.','候选人；应聘者',ToeicVocabularyLevel.L1,'招聘',['qualified candidate'],['applicant']),
@@ -201,6 +202,15 @@ export class PresetToeicContent {
       new ToeicVocabularyItem('V-030','supplier','n.','供应商',ToeicVocabularyLevel.L1,'采购',['contact a supplier'],['vendor'])
     ];
     return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()).concat(ToeicVocabularyExpansion.items()).concat(ToeicVocabularyBatchTwo.items()));
+  }
+
+  static vocabulary():ToeicVocabularyItem[] {
+    let all=PresetToeicContent.vocabularyForReview();
+    let published:ToeicVocabularyItem[]=[];
+    for (let item of all) {
+      if (item.reviewStatus===ToeicReviewStatus.PUBLISHED) published.push(item);
+    }
+    return published;
   }
 
   static studyDays():ToeicStudyDay[] {
