@@ -492,3 +492,36 @@ AI 筛查覆盖全部候选内容，但为了避免突然把全部 180 个单词
 - 所谓“AI 已审校”代表有明确溯源及自动化检查，并不等于被 ETS 官方认可，也不能承诺 100% 准确。当前鸿蒙 SDK 构建和 Phone/Pad 设备使用仍需单独验证。
 
 下一步优先处理 `V-181–V-210` 与 `P7-EX-SUPPORT`、`P7-EX-RETAIL` 的第三批发布；仍遵循单次小批量、检查清单与 CI，并根据使用反馈修正问题。
+
+## 29. 剩余 120 词及 40 道 Part 7 题一次性完成 AI 二次审校（2026-10-08）
+
+本次按用户授权，对尚未发布的**全部**内容完成一次集中 AI 内容复核，**不再要求用户逐项人工审批**。范围是 `V-181–V-300` 共 120 词，以及 `P7-EX-SUPPORT`、`RETAIL`、`LEASE`、`TRAINING`、`MIGRATION`、`LICENSE`、`PERDIEM`、`CATERING` 共 8 组、40 道共享文章阅读题。
+
+### 29.1 修正清单
+
+| 资产 | 修正原因 |
+|---|---|
+| V-190 perishable | 形容词释义对应的英文同义表达误用了名词短语，改为形容词表达 |
+| V-191 wholesale | 用于批发的形容词不能等同于“批发价格”这一名词 |
+| V-192 retail | 用于零售的形容词不能等同于“零售价格”这一名词 |
+| V-193 promotional | 促销性质改为表达营销目的，避免名词/形容词混用 |
+| V-218 deposit | **可退押金**与预付款并非无条件等价 |
+| V-254 authenticate | 登录场景示例调整为 authenticate themselves，表达自然 |
+| V-278 allowance | 差旅津贴是用于支出的既定金额，不一定只是额度上限 |
+| V-283 refreshments | 会议茶点惯用复数，连带修正词头、词性 `n. pl.` 及 en-US IPA |
+| P7-EX-MIGRATION | 原“次日上午”指代含糊，改为明确 **10 月 18 日上午**，同步英文证据及中文解析 |
+
+词典抽核依据参考 Cambridge Dictionary 的 [perishable](https://dictionary.cambridge.org/dictionary/english/perishable)、[wholesale](https://dictionary.cambridge.org/us/dictionary/english/wholesale)、[refundable deposit](https://dictionary.cambridge.org/dictionary/english/refundable-deposit)、[refreshment](https://dictionary.cambridge.org/dictionary/english/refreshment)、[authenticate](https://dictionary.cambridge.org/dictionary/english/authenticate) 和 [allowance](https://dictionary.cambridge.org/us/dictionary/english/allowance) 释义和用法。**以上是针对疑义词条的抽核，不声称已以外部词典逐条认证全部 120 个 IPA。**
+
+### 29.2 审核结论和可追溯证据
+
+- 逐项复核报告：`docs/product/toeic-remaining-content-review-2026-10-08.json`。覆盖 120 个词，含词形、词性、中文词义、搭配、同义表达、例句、IPA 及对应的 SHA-256 内容摘要；覆盖 40 道题，记录每题题干、正确选项、对应文档及原文引用。
+- 同步更正 `docs/product/toeic-ai-editorial-review-2026-10-08.json` 与 `docs/product/toeic-editorial-approvals.json` 中受影响的**9 个资产**的内容摘要。不伪造新的人工签核、也不更改历史 `questionId`、答案版本或模考内容。
+- `scripts/validate_toeic_editorial_content.py` 现在对已记录 AI 审核结果的 **REVIEWED 与 PUBLISHED** 内容都进行内容摘要匹配。任何已经审核、尚未发布的词义、IPA、答案、原文或解析被改动，静态门禁即可阻止带着旧审核记录继续提交。
+- 新增 `scripts/test_toeic_remaining_editorial.py`，由 `scripts/validate_toeic_coach.py` 执行，对 120 个词和 8 组、40 道题逐个 ID 核对完整复核结果；再次检查全部阅读证据与原文的一致性，及典型报销、折扣、维护时间计算。
+
+### 29.3 审核完成不等于自动发布
+
+在本次审核分支中，**120 个词和 40 道题仍为 REVIEWED**；正式可用数量仍是**180/300 词、5 组/25 道额外 Part 7 题**。后续若选择全部上线，可以创建独立受控发布 PR，更新 `toeic-controlled-release-manifest.json` 并将已审核候选完整切换为 `PUBLISHED`；无需用户重复做人工作业。
+
+AI 的集中复核与逐项证据校验可显著减少结构性错误，但**不能承诺语言绝对准确、ETS 官方难度等效或 100% 唯一正确答案**。鸿蒙 SDK 实际编译、Phone/Pad 训练体验和后续用户错题反馈仍属于独立质量检查。
