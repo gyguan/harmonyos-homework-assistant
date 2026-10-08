@@ -55,7 +55,7 @@ export class ToeicCoachViewModel {
   contentErrors():string[] {
     let questionErrors=ToeicContentValidator.validateAll(PresetToeicContent.questions()).errors;
     let groupErrors=ToeicContentValidator.validateReadingGroups(PresetToeicContent.questions(),ToeicExtraReadingContent.groups()).errors;
-    let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
+    let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabularyForReview()).errors;
     let sentenceErrors=ToeicContentValidator.validateSentenceDrills(PresetToeicContent.sentenceDrills()).errors;
     let translationErrors=ToeicContentValidator.validateQuestionTranslations(
       PresetToeicContent.questionsRequiringTranslation(),
