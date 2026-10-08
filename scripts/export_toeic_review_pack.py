@@ -155,6 +155,54 @@ def export_review_pack(destination: Path) -> dict[str, int]:
                 "",
             ])
     (destination / "part7-review.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # One-page queue: reviewers need to see what is unpublished without
+    # scanning 180 CSV rows or 65 answer explanations.
+    queue = [
+        "# TOEIC 内容审核队列",
+        "",
+        "> 仅供审核排期，不等于专业审校通过或正式发布。",
+        "> 词汇正式发布基线 V-001–V-120 不包含在本审核 CSV 中。",
+        "",
+        f"**待审资产：{sum(w['review_status'] == 'REVIEWED' for w in words)} 词；"
+        f"已发布候选：{sum(w['review_status'] == 'PUBLISHED' for w in words)} 词；"
+        f"阅读题组：{len(groups)} 组 / {len(questions)} 题。**",
+        "",
+        "## 词汇批次（每批 30 个）",
+        "",
+        "| 词条范围 | 待审 | 已发布 |",
+        "|---|---:|---:|",
+    ]
+    for start in range(121, 121 + len(words), 30):
+        batch = [w for w in words if start <= int(w["id"][2:]) < start + 30]
+        queue.append(
+            f"| V-{start:03d}–V-{min(start + 29, 120 + len(words)):03d} | "
+            f"{sum(w['review_status'] == 'REVIEWED' for w in batch)} | "
+            f"{sum(w['review_status'] == 'PUBLISHED' for w in batch)} |"
+        )
+    queue.extend([
+        "",
+        "## Part 7 题组审核状态",
+        "",
+        "| 题组 | 材料数 | 题目数 | 状态 |",
+        "|---|---:|---:|---|",
+    ])
+    for group_id, question_ids, documents in groups:
+        statuses = {questions[question_id]["status"] for question_id in question_ids}
+        state = "已发布" if statuses == {"PUBLISHED"} else "待审核"
+        queue.append(f"| {group_id} | {len(documents)} | {len(question_ids)} | {state} |")
+    queue.extend([
+        "",
+        "## 审核工作顺序",
+        "",
+        "1. 先阅读 vocabulary-review.csv 和 part7-review.md，逐条核验语义、"
+        "IPA、正确答案、金额/日期推理和版权来源。",
+        "2. 经有权限的真实审核人完成代码审查，再登记 SHA-256 内容摘要、"
+        "真实 GitHub 审核账号和审核日期。",
+        "3. 在独立发布变更中将对应内容标识为 PUBLISHED，"
+        "验证 CI、ArkTS 构建以及 Phone/Pad 交互。",
+        "",
+    ])
+    (destination / "review-queue.md").write_text("\n".join(queue) + "\n", encoding="utf-8")
     counts = {"vocabulary": len(words), "questions": len(questions), "groups": len(groups)}
     (destination / "manifest.json").write_text(
         json.dumps(counts, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
