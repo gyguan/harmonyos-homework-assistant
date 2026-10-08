@@ -24,6 +24,17 @@ export class ToeicCoachViewModel {
     return ToeicTrainingService.instance.createAttempt(question,selectedIndex,elapsedSeconds);
   }
   activeDraft():ToeicSessionDraft|null { return ToeicProgressStore.instance.activeDraft(); }
+  questionsForDraft(draft:ToeicSessionDraft):ToeicQuestion[] {
+    let source=PresetToeicContent.publishedQuestions();
+    let result:ToeicQuestion[]=[];
+    for (let id of draft.questionIds) {
+      let found:ToeicQuestion|null=null;
+      for (let q of source) if (q.id===id) { found=q; break; }
+      if (found===null) return [];
+      result.push(found);
+    }
+    return result;
+  }
   async saveDraft(draft:ToeicSessionDraft):Promise<void> { await ToeicProgressStore.instance.saveDraft(draft); }
   async discardDraft():Promise<void> { await ToeicProgressStore.instance.discardDraft(); }
   async completeSession(attempts:ToeicQuestionAttempt[],diagnostic:boolean,
