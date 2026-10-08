@@ -6,6 +6,7 @@ import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicSessionReport, Toeic
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 import { ToeicReadingGroupService } from '../application/ToeicReadingGroupService';
+import { ToeicAnswerDisplayOrder } from '../application/ToeicAnswerDisplayOrder';
 import { ToeicVocabularyQuizService } from '../application/ToeicVocabularyQuizService';
 
 enum ToeicPageMode { HOME='HOME', DIAGNOSTIC='DIAGNOSTIC', TRAINING='TRAINING', VOCABULARY='VOCABULARY', VOCABULARY_QUIZ='VOCABULARY_QUIZ', VOCABULARY_RESULT='VOCABULARY_RESULT', SENTENCE='SENTENCE', MOCK_RESULT='MOCK_RESULT', PRACTICE_RESULT='PRACTICE_RESULT' }
@@ -129,6 +130,9 @@ export struct ToeicHomePage {
   @State private currentScoreValue:ToeicScoreValue=ToeicScoreValue.MUST_GET;
   private readonly viewModel:ToeicCoachViewModel=new ToeicCoachViewModel();
   private attempts:ToeicQuestionAttempt[]=[];
+  // Maps displayed A/B/C/D back to the canonical source option index.
+  // Stored draft attempts always use canonical indices.
+  private currentOptionOrder:number[]=[0,1,2,3];
 
   aboutToAppear():void {
     this.loadProgressSnapshot();
@@ -211,20 +215,22 @@ export struct ToeicHomePage {
     this.currentGroupCount=readingGroup.questionIds.length;
     this.currentGroupPosition=readingGroup.questionIds.indexOf(question.id)+1;
     this.currentStem=question.stem;
+    this.currentOptionOrder=ToeicAnswerDisplayOrder.order(question.id);
     this.currentOptionCount=question.options.length;
-    this.currentOptionA=question.options.length>0?question.options[0]:'';
-    this.currentOptionB=question.options.length>1?question.options[1]:'';
-    this.currentOptionC=question.options.length>2?question.options[2]:'';
-    this.currentOptionD=question.options.length>3?question.options[3]:'';
+    this.currentOptionA=question.options[this.currentOptionOrder[0]];
+    this.currentOptionB=question.options[this.currentOptionOrder[1]];
+    this.currentOptionC=question.options[this.currentOptionOrder[2]];
+    this.currentOptionD=question.options[this.currentOptionOrder[3]];
     let translation=this.viewModel.questionTranslation(question.id);
     this.showQuestionTranslation=false;
     this.currentTranslationPassage=translation===null?'':translation.passage;
     this.currentTranslationStem=translation===null?'':translation.stem;
-    this.currentTranslationOptionA=translation===null || translation.options.length<1?'':translation.options[0];
-    this.currentTranslationOptionB=translation===null || translation.options.length<2?'':translation.options[1];
-    this.currentTranslationOptionC=translation===null || translation.options.length<3?'':translation.options[2];
-    this.currentTranslationOptionD=translation===null || translation.options.length<4?'':translation.options[3];
-    this.currentCorrectIndex=question.correctIndex;
+    // Translation choices use precisely the same display permutation.
+    this.currentTranslationOptionA=translation===null?'':translation.options[this.currentOptionOrder[0]];
+    this.currentTranslationOptionB=translation===null?'':translation.options[this.currentOptionOrder[1]];
+    this.currentTranslationOptionC=translation===null?'':translation.options[this.currentOptionOrder[2]];
+    this.currentTranslationOptionD=translation===null?'':translation.options[this.currentOptionOrder[3]];
+    this.currentCorrectIndex=ToeicAnswerDisplayOrder.displayIndex(this.currentOptionOrder,question.correctIndex);
     this.currentExplanation=question.explanation;
     this.currentEvidence=question.evidence;
     this.currentParaphrase=question.paraphrase;
@@ -232,7 +238,8 @@ export struct ToeicHomePage {
     this.currentPart=question.part;
     this.currentSkill=question.skill;
     this.currentScoreValue=question.scoreValue;
-    this.selectedIndex=attempt===null?-1:attempt.selectedIndex;
+    this.selectedIndex=attempt===null?-1:
+      ToeicAnswerDisplayOrder.displayIndex(this.currentOptionOrder,attempt.selectedIndex);
     this.answerCorrect=attempt===null?false:attempt.correct;
     this.answerLocked=attempt!==null;
     this.questionStartedAtMs=Date.now();
@@ -240,6 +247,7 @@ export struct ToeicHomePage {
   }
 
   private clearQuestionSnapshot():void {
+    this.currentOptionOrder=[0,1,2,3];
     this.currentQuestionId='';
     this.currentPassage='';
     this.currentPassageBlocks=[];
@@ -667,7 +675,10 @@ export struct ToeicHomePage {
     if (existing!==null && !this.isMockSession()) return;
     let elapsed=Math.max(1,Math.round((Date.now()-this.questionStartedAtMs)/1000)+
       this.spentForQuestion(this.currentQuestionId));
-    let attempt=this.viewModel.createAttempt(question,index,elapsed);
+    // Only convert the displayed index here; every persisted attempt, score and
+    // result review continues to use the unchanged canonical content index.
+    let canonicalIndex=this.currentOptionOrder[index];
+    let attempt=this.viewModel.createAttempt(question,canonicalIndex,elapsed);
     if (existing!==null) {
       for (let i=0;i<this.attempts.length;i++) {
         if (this.attempts[i].questionId===question.id) { this.attempts[i]=attempt; break; }
