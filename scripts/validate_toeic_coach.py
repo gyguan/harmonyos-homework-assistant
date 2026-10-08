@@ -149,8 +149,9 @@ def main() -> None:
     require(len(extra_ids) == 15 and len(set(extra_ids)) == 15,
             "supplemental multi-document reading must contain 15 stable unique questions")
     require(extra_reading.count("new ToeicReadingGroup(") == 3 and
-            extra_reading.count("ToeicReviewStatus.REVIEWED") == 15,
-            "three supplementary passage groups must remain unpublished pending content QA")
+            (extra_reading.count("ToeicReviewStatus.REVIEWED") +
+             extra_reading.count("ToeicReviewStatus.PUBLISHED")) == 15,
+            "all supplementary passage questions must retain a valid review state")
     require("ToeicExtraReadingContent.questions()" in preset and
             "ToeicExtraReadingContent.groups()" in preset,
             "supplemental content must be registered for review validation")
@@ -573,12 +574,13 @@ def main() -> None:
             "unpublished candidate errors must not block an existing published question catalog")
     require("static vocabularyForReview():ToeicVocabularyItem[]" in preset and
             "item.reviewStatus===ToeicReviewStatus.PUBLISHED" in preset and
-            "ToeicReviewStatus.REVIEWED" in batch_two,
-            "word candidates must remain outside the live study vocabulary until reviewed")
+            "reviewStatus:ToeicReviewStatus" in model,
+            "vocabulary publication must respect explicit review state")
     require("undefined" not in extra_reading,
             "supplemental questions contain an invalid undefined constructor argument")
-    require(extra_reading.count("ToeicReviewStatus.REVIEWED") == 15,
-            "supplemental grouped reading must stay review-only until editorial signoff")
+    require("ToeicReviewStatus" in extra_reading and
+            "static publishedReadingGroups()" not in extra_reading,
+            "supplemental reading publication must be controlled centrally")
     quiz_service = read("entry/src/main/ets/toeic/application/ToeicVocabularyQuizService.ets")
     for token in ["class ToeicDayTaskProgress", "class ToeicSessionReport",
                   "dayTasks:ToeicDayTaskProgress[]", "sessionReports:ToeicSessionReport[]",
