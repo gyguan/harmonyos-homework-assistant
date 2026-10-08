@@ -27,7 +27,7 @@ export struct ToeicHomePage {
   @State private selectedDaySentenceCount:number=0;
   @State private progressCurrentDay:number=1;
   @State private progressDiagnosticCompleted:boolean=false;
-  @State private progressWeakSkill:string=ToeicSkill.PARAPHRASE;
+  @State private progressWeakSkill:string='';
   @State private progressReviewCount:number=0;
   @State private progressSlowCount:number=0;
   @State private progressAnswered:number=0;
