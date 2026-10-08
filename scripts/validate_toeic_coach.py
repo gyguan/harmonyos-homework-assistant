@@ -478,6 +478,21 @@ def main() -> None:
         require(token in ui, f"timed mock / resume / results invariant missing: {token}")
     require("if (weakest.penalty>0)" in training and "summary.hasWeakSkill=true" in training,
             "weak skill must not be fabricated for a perfect fast session")
+    for token in ["markedQuestionIds:string[]", "this.markedQuestionIds=markedQuestionIds"]:
+        require(token in model, f"exam bookmark field missing: {token}")
+    require("Array.isArray(raw.markedQuestionIds)" in progress,
+            "exam bookmark ids must be restored after relaunch")
+    for token in ["private toggleQuestionMark():void", "private jumpToQuestion(index:number):void",
+                  "this.noteCurrentQuestionTime()", "this.persistDraft()",
+                  "Flex({wrap:FlexWrap.Wrap", "this.isQuestionMarked(question.id)",
+                  "this.markedQuestionIds=draft.markedQuestionIds.slice()"]:
+        require(token in ui, f"exam bookmark or question navigation missing: {token}")
+    for token in ["this.toggleWordReveal(item.id)", "this.toggleSentenceReveal(item.id)",
+                  "this.revealedWordIds.indexOf(item.id)>=0",
+                  "this.revealedSentenceIds.indexOf(item.id)>=0"]:
+        require(token in ui, f"active recall UI missing: {token}")
+    require("this.questions.length===0 || this.sessionStartedAtMs===0" in ui,
+            "subsequent submission callbacks must not double commit a closed session")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
