@@ -56,7 +56,27 @@ export class ToeicCoachViewModel {
   planForDay(day:number):ToeicStudyDay { return PresetToeicContent.studyDay(day); }
   weekOnePlans():ToeicStudyDay[] { return PresetToeicContent.studyDays(); }
   todayVocabulary():ToeicVocabularyItem[] { return PresetToeicContent.vocabularyForDay(this.snapshot().currentDay); }
-  vocabularyForDay(day:number):ToeicVocabularyItem[] { return PresetToeicContent.vocabularyForDay(day); }
+  vocabularyForDay(day:number):ToeicVocabularyItem[] {
+    let planned=PresetToeicContent.vocabularyForDay(day);
+    let source=PresetToeicContent.vocabulary();
+    let result:ToeicVocabularyItem[]=planned.slice();
+    let due=ToeicProgressStore.instance.vocabularyDueIds();
+    let reviewCount:number=0;
+    for (let id of due) {
+      if (reviewCount>=10) break;
+      for (let item of source) {
+        if (item.id!==id) continue;
+        let already=false;
+        for (let existing of result) if (existing.id===item.id) { already=true; break; }
+        if (!already) { result.unshift(item); reviewCount++; }
+        break;
+      }
+    }
+    return result;
+  }
+  async recordVocabularyRecall(id:string,remembered:boolean):Promise<void> {
+    await ToeicProgressStore.instance.recordVocabularyRecall(id,remembered);
+  }
   todaySentenceDrills():ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(this.snapshot().currentDay); }
   sentenceDrillsForDay(day:number):ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(day); }
   async pronounce(item:ToeicVocabularyItem):Promise<ToeicPronunciationStatus> {
