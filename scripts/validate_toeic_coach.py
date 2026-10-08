@@ -1049,7 +1049,8 @@ def main() -> None:
             "if (this.selectedStudyDay===1) return this.progressDiagnosticCompleted?1:0;" in ui,
             "Day 1 must display the single completion milestone and updated question count")
     require("questionsForDraft(draft:ToeicSessionDraft)" in view_model and
-            "for (let id of draft.questionIds)" in view_model and
+            "return this.questionsForIds(draft.questionIds)" in view_model and
+            "for (let id of ids)" in view_model and
             "this.questions=restored" in ui and
             "this.activeSessionAdvancesProgress=draft.advancesProgress" in ui,
             "legacy saved 12-question Day 1 drafts must resume with their original stable IDs")
