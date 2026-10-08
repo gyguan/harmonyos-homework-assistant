@@ -142,13 +142,14 @@ export class ToeicQuestionTime {
 export class ToeicSessionDraft {
   day:number; mode:string; questionIds:string[]; currentIndex:number;
   attempts:ToeicQuestionAttempt[]; questionTimes:ToeicQuestionTime[];
-  startedAtMs:number; advancesProgress:boolean;
+  startedAtMs:number; advancesProgress:boolean; markedQuestionIds:string[];
   constructor(day:number,mode:string,questionIds:string[],currentIndex:number,
     attempts:ToeicQuestionAttempt[],questionTimes:ToeicQuestionTime[],
-    startedAtMs:number,advancesProgress:boolean) {
+    startedAtMs:number,advancesProgress:boolean,markedQuestionIds:string[]=[]) {
     this.day=day; this.mode=mode; this.questionIds=questionIds;
     this.currentIndex=currentIndex; this.attempts=attempts; this.questionTimes=questionTimes;
     this.startedAtMs=startedAtMs; this.advancesProgress=advancesProgress;
+    this.markedQuestionIds=markedQuestionIds;
   }
 }
 
