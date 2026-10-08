@@ -13,6 +13,7 @@ from pathlib import Path
 import re
 
 from validate_toeic_editorial_content import CONTENT, ROOT, validate
+from toeic_review_integrity import reading_fingerprint, vocabulary_fingerprint
 
 QSTR = r'"(?:[^"\\]|\\.)*"'
 ARRAY = r'\[[^\n]*?\]'
@@ -35,7 +36,7 @@ QUESTION_RE = re.compile(
 HEADERS = [
     "id", "word", "part_of_speech", "meaning_zh", "level", "scenario",
     "collocations", "paraphrases", "example", "ipa_en_us",
-    "review_status", "reviewer", "approved_at", "human_review_notes",
+    "review_status", "content_sha256", "reviewer", "approved_at", "human_review_notes",
 ]
 
 
@@ -68,7 +69,9 @@ def export_review_pack(destination: Path) -> dict[str, int]:
             "collocations": " | ".join(decoded["collocations"]),
             "paraphrases": " | ".join(decoded["synonyms"]),
             "example": decoded["example"], "ipa_en_us": ipas[decoded["id"]],
-            "review_status": item["status"], "reviewer": review.get("reviewer", ""),
+            "review_status": item["status"],
+            "content_sha256": vocabulary_fingerprint({**decoded, "level": item["level"]}, ipas[decoded["id"]]),
+            "reviewer": review.get("reviewer", ""),
             "approved_at": review.get("approvedAt", ""),
             "human_review_notes": "",
         })
@@ -84,6 +87,8 @@ def export_review_pack(destination: Path) -> dict[str, int]:
         question = match.groupdict()
         for name in ("stem", "options", "explanation", "evidence", "paraphrase"):
             question[name] = json.loads(question[name])
+        question["answer"] = int(question["answer"])
+        question["seconds"] = int(question["seconds"])
         questions[question["id"]] = question
 
     destination.mkdir(parents=True, exist_ok=True)
@@ -96,17 +101,22 @@ def export_review_pack(destination: Path) -> dict[str, int]:
         "# TOEIC Part 7 候选内容人工审校单",
         "",
         "> 仅用于内容审校，不是已发布题库，也不是审核批准记录。",
-        "> 发布须在 docs/product/toeic-editorial-approvals.json 独立登记审核人与日期。",
+        "> 发布须在 docs/product/toeic-editorial-approvals.json 独立登记审核人、日期和内容 SHA-256。",
         "",
     ]
     for group_id, ids, documents in groups:
         approval = ledger.get("readingGroups", {}).get(group_id, {})
+        content_sha = reading_fingerprint(
+            group_id, {"ids": ids, "docs": documents},
+            [questions[qid] for qid in ids],
+        )
         lines.extend([
             f"## {group_id}",
             "",
             f"文档：{len(documents)} 篇；题目：{len(ids)} 道；"
             f"审核人：{approval.get('reviewer', '待审核')}；"
             f"审核时间：{approval.get('approvedAt', '待审核')}",
+            f"内容 SHA-256：`{content_sha}`（审核通过时原样录入 contentSha256）",
             "",
             "- [ ] 原创性、文章自然度与版权边界已复核",
             "- [ ] 所有题目唯一正确性、选项干扰质量已复核",
