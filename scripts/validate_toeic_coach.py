@@ -256,7 +256,7 @@ def main() -> None:
         "attemptCount(questionId:string)", "wrongCount(questionId:string)",
         "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
         "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
-        "restored.schemaVersion=5",
+        "restored.schemaVersion=6",
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
@@ -503,6 +503,38 @@ def main() -> None:
     require("vocabularyForDay(day:number)" in view_model and
             "ToeicProgressStore.instance.vocabularyDueIds()" in view_model,
             "due vocabulary must enter the selected-day study flow")
+
+    group_service = read("entry/src/main/ets/toeic/application/ToeicReadingGroupService.ets")
+    quiz_service = read("entry/src/main/ets/toeic/application/ToeicVocabularyQuizService.ets")
+    for token in ["class ToeicDayTaskProgress", "class ToeicSessionReport",
+                  "dayTasks:ToeicDayTaskProgress[]", "sessionReports:ToeicSessionReport[]",
+                  "class ToeicReadingGroup", "class ToeicVocabularyQuizQuestion"]:
+        require(token in model, f"second-stage TOEIC model missing: {token}")
+    for token in ["private advanceDayIfReady(day:number)", "private writableDayTasks(day:number)",
+                  "async completeDayTask(", "this.advanceDayIfReady(studyDay)",
+                  "new ToeicSessionReport(studyDay,Date.now())",
+                  "Array.isArray(parsed.dayTasks)", "Array.isArray(parsed.sessionReports)"]:
+        require(token in progress, f"day task completion or session analytics missing: {token}")
+    for token in ["ToeicReadingGroupService.groupAt(this.questions,index)",
+                  "this.currentPassageBlocks=readingGroup.passageBlocks",
+                  "this.currentGroupCount=readingGroup.questionIds.length",
+                  "this.currentGroupPosition=readingGroup.questionIds.indexOf(question.id)+1",
+                  "this.DaySelector();", "this.showFullPlan",
+                  "this.completedTasksCount()", "this.finishDayTask('sentence')",
+                  "this.finishDayTask('vocabulary')",
+                  "this.quizOptionA", "this.quizOptionB", "this.quizOptionC", "this.quizOptionD",
+                  "ToeicVocabularyQuizMode.MEANING", "ToeicVocabularyQuizMode.COLLOCATION",
+                  "ToeicVocabularyQuizMode.PARAPHRASE",
+                  "this.quizSelectedIndex>=0"]:
+        require(token in ui, f"new TOEIC page capability missing: {token}")
+    require("passageBlocks(passage:string):string[]" in group_service and
+            "questions[first-1].passage===current.passage" in group_service and
+            "questions[last+1].passage===current.passage" in group_service,
+            "shared reading passage grouping must preserve article identity")
+    require("if (candidate.id===item.id || candidate.scenario===item.scenario) continue;" in quiz_service
+            and "distractors.length!==3" in quiz_service
+            and "answerFor(item:ToeicVocabularyItem,mode:ToeicVocabularyQuizMode)" in quiz_service,
+            "TOEIC vocabulary retrieval quiz must generate unique four-way options")
 
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
