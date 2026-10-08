@@ -16,7 +16,8 @@ export class ToeicMockDay19Part6V2Content {
       '[1] _____ the warehouse is normally closed on weekends, only employees assigned '+
       'to the count should enter the building. Team leaders will receive printed checklists '+
       'when they [2] _____. Please record damaged items separately so they can be reviewed '+
-      'later. [3] _____\nWe expect the work to be [4] _____ by noon.';
+      "later. Each product's assigned shelf must match its location on the checklist. "+
+      '[3] _____\nWe expect the work to be [4] _____ by noon.';
     let items:ToeicQuestion[]=[];
     for (let i=0;i<4;i++) {
       let original=oldPaper[30+i];
@@ -34,14 +35,14 @@ export class ToeicMockDay19Part6V2Content {
         skill=ToeicSkill.SENTENCE_INSERTION;
         stem='Which sentence best completes blank [3] in the inventory notice?';
         options=[
-          'All scheduled deliveries will be postponed until the following Tuesday.',
-          'All staff members should submit their vacation requests by noon.',
-          'Customers may browse the showroom while the count is in progress.',
+          'Staff may change shelf location codes whenever they find a better layout.',
+          'Team leaders should replace the inventory checklists with sales brochures.',
+          'Employees who are not assigned to the count may enter the warehouse to help.',
           'Do not move products between shelves during the count.'
         ];
         correctIndex=3;
-        explanation='盘点通知要求单独登记损坏物品，接着禁止在盘点中移动货物，避免库存记录与实物位置不符。其余选项引入送货、请假或顾客参观，与仓库盘点操作无关。';
-        evidence='Please record damaged items separately so they can be reviewed later.';
+        explanation='原文要求每件商品的货架位置与清单上的位置一致，因此盘点期间不得随意移动货物。A允许变更货架编码，与固定位置要求冲突；B以销售手册取代盘点清单，违背已安排发放盘点清单的要求；C允许未获指派的人员入仓，违背仅限盘点人员进入的明确限制。D是唯一符合操作要求的完整句子。';
+        evidence="Each product's assigned shelf must match its location on the checklist.";
         difficulty=ToeicDifficulty.MEDIUM;
       }
       items.push(new ToeicQuestion(id,original.section,original.part,skill,passage,
