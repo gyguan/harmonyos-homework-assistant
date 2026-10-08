@@ -89,29 +89,15 @@ export class ToeicCoachViewModel {
         break;
       }
     }
-    // Stable, three-tier ordering: weak words first, manually marked key words
-    // second, remaining planned/due words third. Do not mutate published catalog order.
+    // Put automatically flagged "not remembered" items first without changing
+    // the planned vocabulary or the due-review selection. Preserve order within each tier.
     let weak:ToeicVocabularyItem[]=[];
-    let important:ToeicVocabularyItem[]=[];
     let regular:ToeicVocabularyItem[]=[];
     for (let item of result) {
       if (ToeicProgressStore.instance.isUnrememberedVocabulary(item.id)) weak.push(item);
-      else if (ToeicProgressStore.instance.isImportantVocabulary(item.id)) important.push(item);
       else regular.push(item);
     }
-    return weak.concat(important).concat(regular);
-  }
-
-  isImportantVocabulary(id:string):boolean {
-    return ToeicProgressStore.instance.isImportantVocabulary(id);
-  }
-
-  isUnrememberedVocabulary(id:string):boolean {
-    return ToeicProgressStore.instance.isUnrememberedVocabulary(id);
-  }
-
-  async setVocabularyImportant(id:string,important:boolean):Promise<void> {
-    await ToeicProgressStore.instance.setVocabularyImportant(id,important);
+    return weak.concat(regular);
   }
 
   async recordVocabularyRecall(id:string,remembered:boolean):Promise<void> {
