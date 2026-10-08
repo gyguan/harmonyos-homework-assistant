@@ -184,6 +184,17 @@ def validate() -> dict[str, int]:
         errors.append(f"Day 1 question order/content changed: {selected_day_one}")
     if "Qualifyingly" in preset:
         errors.append("Day 1 contains a fabricated English distractor 'Qualifyingly'")
+    for id in ("R-P6-CTX-0001", "R-P6-WF-0002"):
+        item = id_map.get(id)
+        if item and item.stem.startswith(("Choose the best ", "Choose the correct ")):
+            errors.append(f"{id}: Day 1 generic question wording must be replaced")
+    translations = (CONTENT / "ToeicQuestionTranslationWeekOneCatalog.ets").read_text(encoding="utf-8")
+    if "为横线选择最合适的词" in translations or "合格地" in translations:
+        errors.append("Day 1 Chinese translation still contains stale stem or deleted nonword distractor")
+    week_two_source = contents["ToeicWeekTwoContent"]
+    for id in ("R-M1-P5-003", "R-M1-P7-086", "R-P7-DOUBLE-1102"):
+        if f"id==='{id}'" not in week_two_source or "question.version=2" not in week_two_source:
+            errors.append(f"{id}: version override for corrected published item is missing")
     for id, version in (("R-P6-CTX-0001", 2), ("R-P6-WF-0002", 2),
                         ("R-M1-P5-003", 2), ("R-M1-P7-086", 2),
                         ("R-P7-DOUBLE-1102", 2)):
@@ -229,6 +240,8 @@ def validate() -> dict[str, int]:
               "extra_groups": group_count, "extra_group_questions": grouped_count,
               "day1": len(DAY_ONE), "mock_sets": 2}
     print("TOEIC_QUESTION_QUALITY_PASS " + " ".join(f"{k}={v}" for k, v in result.items()))
+    print("TOEIC_QUESTION_FORMAT_P1_GAP: Day 14/19 Part 7 article group distribution "
+          "still differs from ETS 29 single / 25 multi questions; see issue #468")
     return result
 
 if __name__ == "__main__":
