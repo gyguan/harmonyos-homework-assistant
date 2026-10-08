@@ -1,6 +1,6 @@
 import { ToeicReviewStatus, ToeicVocabularyItem, ToeicVocabularyLevel } from '../domain/ToeicModels';
 
-/** Fourth original business-language candidate batch; all entries require human editorial signoff. */
+/** AI-reviewed V181–V210, released with content-bound editorial fingerprints. */
 export class ToeicVocabularyBatchFour {
   static items():ToeicVocabularyItem[] {
     return [
