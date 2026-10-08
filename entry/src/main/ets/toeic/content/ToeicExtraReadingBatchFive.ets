@@ -16,7 +16,7 @@ export class ToeicExtraReadingBatchFive {
     return [
       new ToeicQuestion("R-P7-MIGRATION-01",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"What should Melissa do before the system migration?",["Share her account password with a colleague","Export the September report by October 16","Request a new company laptop","Move her presentation to October 17"],1,
-        "通知要求次日上午需要的报告须在10月16日前导出，而 Melissa 将在10月18日上午8点展示报告。","Staff should export any reports needed for the morning of October 18 no later than October 16. || I have to present the September client report at 8 A.M. on October 18.","export by October 16 = prepare the October 18 report in advance",93,
+        "通知明确要求10月18日上午使用的报告最迟10月16日导出；Melissa 在10月18日8点展示9月客户报告。","Staff should export any reports needed for the morning of October 18 no later than October 16. || I have to present the September client report at 8 A.M. on October 18.","export by October 16 = prepare the October 18 report in advance",93,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-MIGRATION"),
       new ToeicQuestion("R-P7-MIGRATION-02",ToeicSection.READING,ToeicPart.PART_7,
