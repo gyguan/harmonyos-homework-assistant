@@ -10,6 +10,7 @@ import { ToeicDayTaskProgress, ToeicLearningSnapshot, ToeicMockReport, ToeicPart
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
   diagnosticQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.diagnosticQuestions(); }
+  standardDiagnosticQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.standardDiagnosticQuestions(); }
   dailyQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.dailyQuestions(this.snapshot()); }
   dailyQuestionsForDay(day:number):ToeicQuestion[] {
     return ToeicTrainingService.instance.studyDayQuestions(this.snapshot(),day);
