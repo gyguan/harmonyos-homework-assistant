@@ -393,6 +393,42 @@ def main() -> None:
                   "this.finishDayTask('vocabulary')", "this.finishDayTask('sentence')",
                   "this.startTraining()", "this.leaveMockResult()"]:
         require(token in footer, f"TOEIC fixed footer action missing: {token}")
+    # Action buttons share typography, height, radius and touch dimensions.
+    # Day chips, question navigation chips and multiline answer tiles are distinct control roles.
+    action_count = 0
+    quiz_choice_count = 0
+    for button_match in re.finditer(r"(?m)^\\s*Button\\(", ui):
+        start = button_match.start()
+        end = ui.find(".onClick(", start)
+        require(end >= 0, "TOEIC button must have an onClick handler")
+        body = ui[start:end]
+        first_line = body.lstrip().splitlines()[0]
+        if first_line.startswith("Button('Day '"):
+            require(".height(40)" in body and "AppTheme.CONTROL_RADIUS" in body,
+                    "TOEIC day selection chips must preserve the compact navigation style")
+            continue
+        if first_line.startswith("Button((this.isQuestionMarked(question.id)"):
+            require(".width(48).height(42)" in body and "AppTheme.CONTROL_RADIUS" in body,
+                    "TOEIC mock navigator chips must preserve their accessible size")
+            continue
+        if first_line.startswith("Button({type:ButtonType.Normal}) {"):
+            quiz_choice_count += 1
+            require(".constraintSize({minHeight:50})" in body and
+                    ".borderRadius(AppTheme.CONTROL_RADIUS)" in body and
+                    ".border({width:1,color:" in body,
+                    "TOEIC answer options must have the shared tile border and radius")
+            continue
+        action_count += 1
+        require(".fontSize(AppTheme.ACTION_TEXT_SIZE)" in body and
+                ".borderRadius(AppTheme.CONTROL_RADIUS)" in body and
+                (".height(AppTheme.BUTTON_HEIGHT)" in body or
+                 ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in body),
+                f"TOEIC action button inconsistent: {first_line}")
+    require(action_count == 26 and quiz_choice_count == 8,
+            "TOEIC all 26 action buttons and eight choice tiles must be inspected")
+    require("Button('发音',{type:ButtonType.Normal})" in ui and
+            ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in ui,
+            "TOEIC pronunciation must preserve at least the standard secondary touch target")
     # Compile regression: FlexSpaceOptions requires LengthMetrics, not raw numbers.
     require("import { LengthMetrics } from '@kit.ArkUI';" in ui and
             "space:{main:LengthMetrics.vp(6),cross:LengthMetrics.vp(6)}" in ui and
