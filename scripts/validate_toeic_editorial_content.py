@@ -47,7 +47,7 @@ def validate() -> None:
         for number, doc in enumerate(docs, 1):
             require(doc.startswith(f"DOCUMENT {number}"), f"{name}: document headings out of sequence")
         groups[name] = {"ids": ids, "docs": docs}
-    require(len(groups) >= 11, f"expected at least 11 authored reading groups, found {len(groups)}")
+    require(len(groups) >= 13, f"expected at least 13 authored reading groups, found {len(groups)}")
 
     question_re = re.compile(
         r'new ToeicQuestion\("(?P<id>[^"]+)",ToeicSection.READING,ToeicPart.PART_7,'
@@ -120,7 +120,7 @@ def validate() -> None:
         words.append(item)
     # Files are alphabetic (BatchFive, BatchFour, ...), not in ID order.
     words.sort(key=lambda w: int(w["id"].split("-")[1]))
-    require(len(words) >= 150, f"expected at least 150 structured staged words, found {len(words)}")
+    require(len(words) >= 180, f"expected at least 180 structured staged words, found {len(words)}")
     require([int(w["id"].removeprefix("V-")) for w in words] ==
             list(range(121, 121 + len(words))),
             "vocabulary IDs must remain consecutive from V-121")
