@@ -116,7 +116,7 @@ def validate() -> None:
     require(len(words) == 60, f"expected 60 structured word candidates, found {len(words)}")
     require([w["id"] for w in words] == [f"V-{i:03d}" for i in range(121, 181)],
             "vocabulary IDs must remain consecutive V-121...V-180")
-    pronunciations = dict(re.findall(r"new ToeicPronunciationEntry\('(V-\d+)','([^']+)'\)", pronunciation))
+    pronunciations = dict(re.findall(r"new ToeicPronunciationEntry\('(V-\d+)','([^']+)'", pronunciation))
     for word in words:
         key = word["id"]
         for field in ("word", "pos", "meaning", "scene", "example"):
