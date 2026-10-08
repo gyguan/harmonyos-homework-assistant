@@ -71,11 +71,9 @@ export struct ToeicHomePage {
   @State private mockCountdownSeconds:number=4500;
   @State private draftLabel:string='';
   @State private navigatorVisible:boolean=false;
-  @State private revealedWordIds:string[]=[];
   @State private unrememberedVocabularyIds:string[]=[];
+  @State private updatingVocabularyId:string='';
   @State private revealedSentenceIds:string[]=[];
-  @State private lastReviewedWordId:string='';
-  @State private vocabularyFeedback:string='';
   @State private quizStem:string='';
   @State private quizOptionA:string='';
   @State private quizOptionB:string='';
@@ -456,22 +454,11 @@ export struct ToeicHomePage {
 
   private openVocabulary():void {
     this.pronunciationMessage='';
-    this.revealedWordIds=[];
-    this.lastReviewedWordId='';
-    this.vocabularyFeedback='';
     this.mode=ToeicPageMode.VOCABULARY;
   }
   private openSentenceDrills():void {
     this.revealedSentenceIds=[];
     this.mode=ToeicPageMode.SENTENCE;
-  }
-
-  private toggleWordReveal(id:string):void {
-    let next=this.revealedWordIds.slice();
-    let index=next.indexOf(id);
-    if (index>=0) next.splice(index,1);
-    else next.push(id);
-    this.revealedWordIds=next;
   }
 
   private startVocabularyQuiz(mode:ToeicVocabularyQuizMode):void {
@@ -518,14 +505,18 @@ export struct ToeicHomePage {
   }
 
   private async recordWordRecall(item:ToeicVocabularyItem,remembered:boolean):Promise<void> {
-    await this.viewModel.recordVocabularyRecall(item.id,remembered);
-    this.lastReviewedWordId=item.id;
-    this.vocabularyFeedback=remembered?
-      '已记住，取消待加强标记并继续安排间隔复习。':
-      '已加入待加强并优先排列，6 小时后安排短期复习。';
-    this.loadProgressSnapshot();
-    this.loadStudyDay(this.selectedStudyDay);
-    this.refreshRevision++;
+    // One reversible action per card: "没记住" flags it, "记住了" clears the flag.
+    // Ignore rapid double-taps while a local review write is pending.
+    if (this.updatingVocabularyId.length>0) return;
+    this.updatingVocabularyId=item.id;
+    try {
+      await this.viewModel.recordVocabularyRecall(item.id,remembered);
+      this.loadProgressSnapshot();
+      this.loadStudyDay(this.selectedStudyDay);
+      this.refreshRevision++;
+    } finally {
+      this.updatingVocabularyId='';
+    }
   }
 
   private toggleSentenceReveal(id:string):void {
@@ -1318,7 +1309,7 @@ export struct ToeicHomePage {
             .onClick(()=>this.startVocabularyQuiz(ToeicVocabularyQuizMode.PARAPHRASE));
         }
         .width('100%');
-        Text('点击“没记住”自动加入待加强并排在前面；点击“记住了”取消待加强。学习记录跨日期和重启保留。')
+        Text('没记住的词会排在前面；点击同一按钮的“记住了”即可取消待加强。')
           .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         if (this.pronunciationMessage.length>0) {
           Text(this.pronunciationMessage)
@@ -1365,47 +1356,33 @@ export struct ToeicHomePage {
                 .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.DANGER);
             }
 
-            Button(this.revealedWordIds.indexOf(item.id)>=0?'收起词义':'查看词义与搭配',
-              {type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.toggleWordReveal(item.id));
-            if (this.revealedWordIds.indexOf(item.id)>=0) {
-              Text(item.meaning)
-                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
-              Text('场景：'+item.scenario)
-                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              if (item.exampleSentence.length>0) {
-                Text('例句：'+item.exampleSentence)
-                  .width('100%').fontSize(AppTheme.BODY_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-              }
-              if (item.collocations.length>0) {
-                Text('搭配：'+item.collocations.join(' · '))
-                  .width('100%').fontSize(AppTheme.BODY_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
-              }
-              if (item.paraphrases.length>0) {
-                Text('同义：'+item.paraphrases.join(' · '))
-                  .width('100%').fontSize(AppTheme.META_SIZE)
-                  .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-              }
-              Row({space:10}) {
-                Button('记住了',{type:ButtonType.Normal})
-                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-                  .onClick(()=>{void this.recordWordRecall(item,true);});
-                Button('没记住',{type:ButtonType.Normal})
-                  .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-                  .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-                  .onClick(()=>{void this.recordWordRecall(item,false);});
-              }
-              .width('100%');
-              if (this.lastReviewedWordId===item.id) {
-                Text(this.vocabularyFeedback)
-                  .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              }
+            Text(item.meaning)
+              .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
+            Text('场景：'+item.scenario)
+              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+            if (item.exampleSentence.length>0) {
+              Text('例句：'+item.exampleSentence)
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
             }
+            if (item.collocations.length>0) {
+              Text('搭配：'+item.collocations.join(' · '))
+                .width('100%').fontSize(AppTheme.BODY_SIZE)
+                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+            }
+            if (item.paraphrases.length>0) {
+              Text('同义：'+item.paraphrases.join(' · '))
+                .width('100%').fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+            }
+            Button(unrememberedIds.indexOf(item.id)>=0?'记住了':'没记住',{type:ButtonType.Normal})
+              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+              .fontColor(AppTheme.PRIMARY)
+              .backgroundColor(unrememberedIds.indexOf(item.id)>=0?
+                AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+              .borderRadius(AppTheme.CONTROL_RADIUS)
+              .enabled(this.updatingVocabularyId.length===0)
+              .onClick(()=>{void this.recordWordRecall(item,unrememberedIds.indexOf(item.id)>=0);});
           }
           .width('100%').padding(AppTheme.CARD_PADDING)
           .backgroundColor(AppTheme.CARD_SURFACE)
