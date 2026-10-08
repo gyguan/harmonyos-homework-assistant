@@ -369,14 +369,14 @@ def main() -> None:
         "attemptCount(questionId:string)", "wrongCount(questionId:string)",
         "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
         "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
-        "restored.schemaVersion=9",
+        "restored.schemaVersion=10",
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
     # Manual important-word marks were removed in v9. Only automatic forgotten
     # words remain persisted; legacy v8 progress and reviews must not be reset.
     models = read("entry/src/main/ets/toeic/domain/ToeicModels.ets")
-    require("schemaVersion:number=9" in models and
+    require("schemaVersion:number=10" in models and
             "unrememberedVocabularyIds:string[]=[]" in models and
             "importantVocabularyIds" not in models,
             "v9 snapshot must retain only the automatic weak-word flag")
@@ -707,6 +707,31 @@ def main() -> None:
             "this.PracticeResultContent();" in ui and
             "this.leavePracticeResult()" in ui,
             "both vocabulary and practice sessions must have complete deferred result screens")
+    # Published answer options are displayed through a stable permutation only.
+    # Canonical selectedIndex stays intact in drafts, reports and scores.
+    require("class ToeicMockAnswerRecord" in models and
+            "answers:ToeicMockAnswerRecord[]" in models and
+            "answers:ToeicMockAnswerRecord[]=[]" in models and
+            "new ToeicMockAnswerRecord(" in progress and
+            "Array.isArray(report.answers)" in progress and
+            "selected< -1 || selected>3" in progress,
+            "mock question-level canonical answer records must persist and migrate safely")
+    mock_review=ui[ui.index("  private openMockHistoryReport("):
+                   ui.index("  private leavePracticeResult()")]
+    require("this.viewModel.questionsForIds(ids)" in mock_review and
+            "question.version!==answer.questionVersion" in mock_review and
+            "this.mockReviewUnavailable++" in mock_review and
+            "this.mode=ToeicPageMode.MOCK_RESULT" in mock_review,
+            "historical mock review must not regrade a changed published item version")
+    require("report.answers.push(new ToeicMockAnswerRecord(" in ui and
+            "this.preparePracticeResult();" in ui and
+            "this.openMockHistoryReport(report)" in ui and
+            "ForEach(this.practiceReviewItems" in ui[ui.index("  private MockResultContent()"):
+                                                  ui.index("  private PracticeResultContent()")],
+            "fresh and archived mock reports must support post-submission item-by-item review")
+    require("questionsForIds(ids:string[]):ToeicQuestion[]" in view_model and
+            "return this.questionsForIds(draft.questionIds)" in view_model,
+            "question IDs must resolve consistently for drafts and saved report reviews")
     require("this.mockPart5Correct" in ui and "this.mockPart6Correct" in ui and "this.mockPart7Correct" in ui,
             "mock result must expose Part 5/6/7 breakdown")
     require("Button('A. '+this.currentOptionA" not in ui and
