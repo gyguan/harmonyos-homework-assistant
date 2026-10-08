@@ -201,3 +201,11 @@ export class ToeicSessionReport {
     this.part7Answered=0; this.part7Correct=0; this.part7Seconds=0;
   }
 }
+
+/** Stable runtime grouping of consecutive questions that share the same article. */
+export class ToeicReadingGroup {
+  groupId:string; questionIds:string[]; passageBlocks:string[];
+  constructor(groupId:string,questionIds:string[],passageBlocks:string[]) {
+    this.groupId=groupId; this.questionIds=questionIds; this.passageBlocks=passageBlocks;
+  }
+}
