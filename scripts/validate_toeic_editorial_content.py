@@ -22,8 +22,10 @@ def require(value: bool, message: str) -> None:
 
 
 def validate() -> None:
-    source = (CONTENT / "ToeicExtraReadingContent.ets").read_text(encoding="utf-8")
-    word_source = (CONTENT / "ToeicVocabularyBatchTwo.ets").read_text(encoding="utf-8")
+    source_files = ["ToeicExtraReadingContent.ets", "ToeicExtraReadingBatchTwo.ets"]
+    word_files = ["ToeicVocabularyBatchTwo.ets", "ToeicVocabularyBatchThree.ets"]
+    source = "\n".join((CONTENT / name).read_text(encoding="utf-8") for name in source_files)
+    word_source = "\n".join((CONTENT / name).read_text(encoding="utf-8") for name in word_files)
     pronunciation = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(encoding="utf-8")
     approvals = json.loads((ROOT / "docs/product/toeic-editorial-approvals.json").read_text(encoding="utf-8"))
 
@@ -42,7 +44,7 @@ def validate() -> None:
         for number, doc in enumerate(docs, 1):
             require(doc.startswith(f"DOCUMENT {number}"), f"{name}: document headings out of sequence")
         groups[name] = {"ids": ids, "docs": docs}
-    require(len(groups) == 3, f"expected 3 group candidates, found {len(groups)}")
+    require(len(groups) == 5, f"expected 5 group candidates, found {len(groups)}")
 
     question_re = re.compile(
         r'new ToeicQuestion\("(?P<id>[^"]+)",ToeicSection.READING,ToeicPart.PART_7,'
@@ -61,8 +63,8 @@ def validate() -> None:
         obj["answer"] = int(obj["answer"])
         obj["seconds"] = int(obj["seconds"])
         questions.append(obj)
-    require(len(questions) == 15, f"expected 15 valid P7 candidates, parsed {len(questions)}")
-    require(len({q["id"] for q in questions}) == 15, "duplicate P7 question IDs")
+    require(len(questions) == 25, f"expected 25 valid P7 candidates, parsed {len(questions)}")
+    require(len({q["id"] for q in questions}) == 25, "duplicate P7 question IDs")
     require("undefined" not in source, "undefined appears in P7 authored question source")
 
     for group_id, group in groups.items():
@@ -111,9 +113,9 @@ def validate() -> None:
         for field in ("id", "word", "pos", "meaning", "scene", "collocations", "synonyms", "example"):
             item[field] = json.loads(item[field])
         words.append(item)
-    require(len(words) == 30, f"expected 30 structured word candidates, found {len(words)}")
-    require([w["id"] for w in words] == [f"V-{i:03d}" for i in range(121, 151)],
-            "vocabulary IDs must be stable V-121...V-150")
+    require(len(words) == 60, f"expected 60 structured word candidates, found {len(words)}")
+    require([w["id"] for w in words] == [f"V-{i:03d}" for i in range(121, 181)],
+            "vocabulary IDs must remain consecutive V-121...V-180")
     pronunciations = dict(re.findall(r"new ToeicPronunciationEntry\('(V-\d+)','([^']+)'\)", pronunciation))
     for word in words:
         key = word["id"]
@@ -129,7 +131,7 @@ def validate() -> None:
         ipa = pronunciations.get(key, "")
         require(ipa.startswith("/") and ipa.endswith("/") and len(ipa) >= 5,
                 f"{key}: missing en-US IPA")
-    require(len({w["word"].casefold() for w in words}) == 30, "duplicated staged English word")
+    require(len({w["word"].casefold() for w in words}) == 60, "duplicated staged English word")
 
     print(f"[toeic-editorial] PASS: {len(words)} authored words + "
           f"{len(questions)} P7 questions / {len(groups)} groups; approval ledger enforced")
