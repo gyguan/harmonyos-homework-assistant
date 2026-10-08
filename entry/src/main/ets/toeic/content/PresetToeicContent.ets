@@ -333,6 +333,16 @@ export class PresetToeicContent {
         }
       }
     }
+    // A v2 paper replaces only new Day14/19 sessions, never the archived
+    // Part 7 answers stored in existing learners' error and slow-item queues.
+    // Include published v1 P7 IDs as review candidates only after their day.
+    // Do NOT re-add them to studyDays()/questionsForDay() for fresh mock runs.
+    for (let question of all) {
+      let oldDay14=maxDay>=14 && question.id.startsWith('R-M1-P7-');
+      let oldDay19=maxDay>=19 && question.id.startsWith('R-M2-P7-');
+      if ((oldDay14 || oldDay19) &&
+          !PresetToeicContent.containsQuestionId(result,question.id)) result.push(question);
+    }
     return result;
   }
 
