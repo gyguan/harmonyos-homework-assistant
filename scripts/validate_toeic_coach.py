@@ -1,6 +1,8 @@
 from pathlib import Path
 import re
 from validate_toeic_editorial_content import validate as validate_editorial_candidates
+from export_toeic_review_pack import export_review_pack
+from tempfile import TemporaryDirectory
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -657,6 +659,15 @@ def main() -> None:
     require("ToeicModuleBootstrap.initialize" in ability, "TOEIC progress bootstrap is missing")
 
     validate_editorial_candidates()
+    # Review exports must remain complete as more batches are added.
+    with TemporaryDirectory() as temp_dir:
+        exported = export_review_pack(Path(temp_dir))
+        require(exported == {"vocabulary": 120, "questions": 45, "groups": 9},
+                f"editorial export coverage mismatch: {exported}")
+        require((Path(temp_dir) / "vocabulary-review.csv").exists() and
+                (Path(temp_dir) / "part7-review.md").exists(),
+                "editorial review packet not written")
+
 
     require("ToeicStandardDiagnosticContent.questions()" in preset and
             "standardDiagnosticQuestions():ToeicQuestion[]" in preset,
