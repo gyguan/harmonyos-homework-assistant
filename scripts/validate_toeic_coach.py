@@ -427,8 +427,8 @@ def main() -> None:
                 (".height(AppTheme.BUTTON_HEIGHT)" in body or
                  ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in body),
                 f"TOEIC action button inconsistent: {first_line}")
-    require(action_count == 29 and quiz_choice_count == 8,
-            "TOEIC all 29 action buttons and eight choice tiles must be inspected")
+    require(action_count == 28 and quiz_choice_count == 8,
+            "TOEIC all 28 action buttons and eight choice tiles must be inspected")
     require("Button('发音',{type:ButtonType.Normal})" in ui and
             ".height(AppTheme.SECONDARY_BUTTON_HEIGHT)" in ui,
             "TOEIC pronunciation must preserve at least the standard secondary touch target")
@@ -436,8 +436,7 @@ def main() -> None:
     home_start = ui.index("  private HomeContent()")
     home_end = ui.index("  private VocabularyContent(", home_start)
     home = ui[home_start:home_end]
-    require(home.index("this.TodayCard();") < home.index("this.showPracticeTools") and
-            home.index("this.TodayCard();") < home.index("this.showLearningDetails"),
+    require(home.index("this.TodayCard();") < home.index("this.showLearningDetails"),
             "TOEIC home must lead with the selected-day card before optional tools and history")
     require("this.selectStudyDay(this.selectedStudyDay-1)" in home and
             "this.selectStudyDay(this.selectedStudyDay+1)" in home and
@@ -445,10 +444,9 @@ def main() -> None:
             ".enabled(this.selectedStudyDay<21)" in home and
             "this.DaySelector();" in home,
             "TOEIC home must offer bounded previous/next day and full Day 1-21 selection")
-    require("if (this.showPracticeTools)" in home and
-            "if (this.showLearningDetails)" in home and
-            "this.startStandardDiagnostic()" in home and
-            "this.startStandardDiagnostic()" in home and
+    require("if (this.showLearningDetails)" in home and
+            "showPracticeTools" not in ui and
+            "更多训练 · 水平诊断" not in home and
             "this.recentReports.length>0" in home and
             "this.mockReports.length>0" in home,
             "TOEIC optional training, learning history and mocks must remain accessible")
@@ -819,8 +817,8 @@ def main() -> None:
         require(sum(item.startswith(prefix) for item in translated_ids) == 5,
                 f"Day 12/13 complete reading group needs five translations: {gid}")
     require("Button('Part 7 双篇 / 三篇加练'" not in ui and
-            "更多训练 · 水平诊断" in ui,
-            "Standalone Part 7 bonus entry should be removed once integrated into daily training")
+            "更多训练 · 水平诊断" not in ui,
+            "Standalone Part 7 bonus and global diagnostic entries must remain removed")
     require("passageBlocks(passage:string):string[]" in group_service and
             "questions[first-1].passage===current.passage" in group_service and
             "questions[last+1].passage===current.passage" in group_service,
@@ -877,6 +875,29 @@ def main() -> None:
     require("this.startStandardDiagnostic()" in ui and
             "this.activeSessionAdvancesProgress=false" in ui,
             "supplemental diagnostic must not advance the 21-day plan")
+    # Day 1 is the only diagnostic destination: quick baseline first, optional
+    # standard reassessment after it completes. No separate homepage section.
+    day_one = ui[ui.index("  private TodayCard()"):ui.index("  private DayButton(")]
+    standard_entry = ui[ui.index("  private startStandardDiagnostic()"):ui.index("  private startTraining()")]
+    require("this.selectedStudyDay===1 && this.progressDiagnosticCompleted" in day_one and
+            "Button('标准水平复测 · 12 题'" in day_one and
+            ".onClick(()=>this.startStandardDiagnostic())" in day_one,
+            "standard diagnosis entry must appear only on completed Day 1 card")
+    require("this.selectedStudyDay!==1 || !this.progressDiagnosticCompleted" in standard_entry and
+            "this.activeSessionAdvancesProgress=false" in standard_entry and
+            "this.viewModel.standardDiagnosticQuestions()" in standard_entry,
+            "standard reassessment must be guarded and must not change day progress")
+    require("this.viewModel.diagnosticQuestions()" in ui and
+            "this.activeSessionAdvancesProgress=!this.progressDiagnosticCompleted" in ui,
+            "Day 1 quick diagnosis must retain initial progression and question set")
+    require("if (this.selectedStudyDay===1) return this.progressDiagnosticCompleted?1:0;" in ui and
+            "this.selectedStudyDay===1?'/1':'/3'" in day_one and
+            "if (this.selectedStudyDay===1)" in day_one,
+            "Day 1 must show one real milestone rather than disabled word/sentence tasks")
+    require("this.TodayCard();" in home and
+            "startStandardDiagnostic()" not in home and
+            "标准水平诊断 · 12 题" not in home,
+            "standard diagnosis must not be duplicated as a global homepage shortcut")
 
     standard = read("docs/product/toeic-coach-content-standard.md")
     for phrase in [
