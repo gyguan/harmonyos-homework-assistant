@@ -41,13 +41,13 @@ export class ToeicQuestion {
 export class ToeicVocabularyItem {
   id:string; word:string; partOfSpeech:string; meaning:string; level:ToeicVocabularyLevel; scenario:string;
   collocations:string[]; paraphrases:string[]; ipa:string; pronunciationLocale:string; pronunciationText:string;
-  exampleSentence:string;
+  exampleSentence:string; reviewStatus:ToeicReviewStatus;
   constructor(id:string, word:string, partOfSpeech:string, meaning:string, level:ToeicVocabularyLevel,
-    scenario:string, collocations:string[], paraphrases:string[], ipa:string='', pronunciationLocale:string='en-US', pronunciationText:string='', exampleSentence:string='') {
+    scenario:string, collocations:string[], paraphrases:string[], ipa:string='', pronunciationLocale:string='en-US', pronunciationText:string='', exampleSentence:string='', reviewStatus:ToeicReviewStatus=ToeicReviewStatus.PUBLISHED) {
     this.id=id; this.word=word; this.partOfSpeech=partOfSpeech; this.meaning=meaning; this.level=level;
     this.scenario=scenario; this.collocations=collocations; this.paraphrases=paraphrases;
     this.ipa=ipa; this.pronunciationLocale=pronunciationLocale; this.pronunciationText=pronunciationText.length>0?pronunciationText:word;
-    this.exampleSentence=exampleSentence;
+    this.exampleSentence=exampleSentence; this.reviewStatus=reviewStatus;
   }
 }
 
