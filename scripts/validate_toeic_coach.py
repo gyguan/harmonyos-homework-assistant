@@ -276,7 +276,7 @@ def main() -> None:
         "attemptCount(questionId:string)", "wrongCount(questionId:string)",
         "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
         "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
-        "restored.schemaVersion=6",
+        "restored.schemaVersion=7",
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
@@ -496,6 +496,9 @@ def main() -> None:
                   "this.questions.length-this.attempts.length",
                   "this.mockResultUnanswered", "this.mockReports.length>0"]:
         require(token in ui, f"timed mock / resume / results invariant missing: {token}")
+    require("topWeakSkills(snapshot:ToeicLearningSnapshot,limit:number=3):ToeicSkill[]" in training
+            and "let ranked=this.topWeakSkills(snapshot,3)" in training,
+            "adaptive training must rank multiple skills from cumulative proficiency")
     require("if (weakest.penalty>0)" in training and "summary.hasWeakSkill=true" in training,
             "weak skill must not be fabricated for a perfect fast session")
     for token in ["markedQuestionIds:string[]", "this.markedQuestionIds=markedQuestionIds"]:
@@ -533,7 +536,8 @@ def main() -> None:
     for token in ["private advanceDayIfReady(day:number)", "private writableDayTasks(day:number)",
                   "async completeDayTask(", "this.advanceDayIfReady(studyDay)",
                   "new ToeicSessionReport(studyDay,Date.now())",
-                  "Array.isArray(parsed.dayTasks)", "Array.isArray(parsed.sessionReports)"]:
+                  "Array.isArray(parsed.dayTasks)", "Array.isArray(parsed.sessionReports)",
+                  "Array.isArray(parsed.skillStats)", "new ToeicSkillStat(attempt.skill)"]:
         require(token in progress, f"day task completion or session analytics missing: {token}")
     for token in ["ToeicReadingGroupService.groupAt(this.questions,index)",
                   "this.currentPassageBlocks=readingGroup.passageBlocks",
