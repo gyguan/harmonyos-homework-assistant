@@ -94,7 +94,14 @@ export struct ToeicHomePage {
     if (this.isMockSession() && this.mode===ToeicPageMode.TRAINING) this.startMockClock();
   }
 
-  aboutToDisappear():void { this.stopMockClock(); }
+  aboutToDisappear():void {
+    this.stopMockClock();
+    if (!this.finishingSession && this.questions.length>0 &&
+      (this.mode===ToeicPageMode.TRAINING || this.mode===ToeicPageMode.DIAGNOSTIC)) {
+      this.noteCurrentQuestionTime();
+      this.persistDraft();
+    }
+  }
 
   private stopMockClock():void {
     if (this.mockClockId>=0) {
@@ -463,6 +470,7 @@ export struct ToeicHomePage {
   }
 
   private cancelSession():void {
+    if (this.finishingSession) return;
     this.noteCurrentQuestionTime();
     this.persistDraft(); // Return to home without losing unfinished answers.
     this.stopMockClock();
