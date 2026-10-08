@@ -8,6 +8,7 @@ import { ToeicWeekTwoContent } from './ToeicWeekTwoContent';
 import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
 import { ToeicVocabularyExpansion } from './ToeicVocabularyExpansion';
+import { ToeicStandardDiagnosticContent } from './ToeicStandardDiagnosticContent';
 
 export class PresetToeicContent {
   static questions():ToeicQuestion[] {
@@ -120,7 +121,7 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions());
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions());
   }
 
   static publishedQuestions():ToeicQuestion[] {
@@ -138,6 +139,15 @@ export class PresetToeicContent {
       'R-P6-CTX-0001','R-P6-WF-0002','R-P7-DETAIL-0001','R-P7-PURPOSE-0002','R-P7-PARA-0003','R-P7-DETAIL-0004'];
     let result:ToeicQuestion[]=[];
     for (let id of ids) for (let q of all) if (q.id===id) { result.push(q); break; }
+    return result;
+  }
+
+  static standardDiagnosticQuestions():ToeicQuestion[] {
+    let published=PresetToeicContent.publishedQuestions();
+    let result:ToeicQuestion[]=[];
+    for (let question of published) {
+      if (question.id.startsWith('R-DX-')) result.push(question);
+    }
     return result;
   }
 
