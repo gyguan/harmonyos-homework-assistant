@@ -1,3 +1,4 @@
+import { LengthMetrics } from '@kit.ArkUI';
 import { LayoutPolicy } from '../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { DeepPageHeader } from '../../components/navigation/DeepPageHeader';
@@ -699,7 +700,7 @@ export struct ToeicHomePage {
 
   private confirmMockSubmission():void {
     let remaining=this.questions.length-this.attempts.length;
-    AlertDialog.show({
+    this.getUIContext().showAlertDialog({
       title:'提交完整模考',
       message:remaining>0?'还有 '+remaining+' 题未作答，确定现在提交吗？':'确定提交本次完整模考吗？',
       primaryButton:{value:'继续作答',action:()=>{}},
@@ -1475,7 +1476,7 @@ export struct ToeicHomePage {
             }
             .width('100%');
             if (this.navigatorVisible) {
-              Flex({wrap:FlexWrap.Wrap,space:{main:6,cross:6}}) {
+              Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(6),cross:LengthMetrics.vp(6)}}) {
                 ForEach(this.questions,(question:ToeicQuestion,index:number)=>{
                   Button((this.isQuestionMarked(question.id)?'★':'')+String(index+1),
                     {type:ButtonType.Normal})

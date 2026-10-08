@@ -9,6 +9,13 @@ export interface AssignmentAudioPlayerCallbacks {
   onError: (message: string) => void;
 }
 
+/**
+ * AVPlayer and Media.Core are optional device capabilities.
+ * Keep canIUse checks and the unsupported-device fallback: the SDK can emit
+ * cross-device SysCap warnings for static MediaKit APIs despite these guards.
+ * Do not force these SysCaps into production.addedSysCaps just to hide warnings:
+ * doing so changes deployment compatibility for unsupported devices.
+ */
 export class AssignmentAudioPlayerService {
   private player: media.AVPlayer | null = null;
   private sourceFile: fileIo.File | null = null;
