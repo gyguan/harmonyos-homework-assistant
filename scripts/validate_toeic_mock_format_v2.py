@@ -40,7 +40,7 @@ def validate() -> None:
     authored=[]
     for call in literals_after(V2,"new ToeicQuestion("):
         parts=fields(call)
-        if parts and parts[0].startswith(("'",'"')):
+        if parts and re.fullmatch(r"""(?:'[^']+'|"[^"]+")""",parts[0]):
             item=parse_question(parts,"ToeicMockDay14V2Content",False)
             assert item is not None
             authored.append(item)
