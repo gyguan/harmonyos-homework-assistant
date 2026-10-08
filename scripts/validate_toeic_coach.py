@@ -4,6 +4,7 @@ from validate_toeic_editorial_content import validate as validate_editorial_cand
 from export_toeic_review_pack import export_review_pack
 from tempfile import TemporaryDirectory
 from test_toeic_review_integrity import run_tests as test_review_integrity
+from test_toeic_editorial_handoff import run_tests as test_editorial_handoff
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -632,6 +633,11 @@ def main() -> None:
             "publishedReadingGroups():ToeicReadingGroup[]" in preset and
             "ToeicContentValidator.validateAll(published)" in preset,
             "unpublished candidate errors must not block an existing published question catalog")
+    require("let readyGroups=PresetToeicContent.publishedReadingGroups()" in preset and
+            "if (q.groupId.length>0)" in preset and
+            "if (!groupReady) continue;" in preset and
+            "validateReadingGroups(published,readyGroups)" in preset,
+            "incomplete P7 shared-passage group must not leak through publishedQuestions")
     require("static vocabularyForReview():ToeicVocabularyItem[]" in preset and
             "item.reviewStatus===ToeicReviewStatus.PUBLISHED" in preset and
             "reviewStatus:ToeicReviewStatus" in model,
@@ -683,6 +689,7 @@ def main() -> None:
 
     validate_editorial_candidates()
     test_review_integrity()
+    test_editorial_handoff()
     # Review exports must remain complete as more batches are added.
     with TemporaryDirectory() as temp_dir:
         exported = export_review_pack(Path(temp_dir))

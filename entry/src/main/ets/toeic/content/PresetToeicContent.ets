@@ -158,13 +158,23 @@ export class PresetToeicContent {
 
   static publishedQuestions():ToeicQuestion[] {
     let source=PresetToeicContent.questions();
+    let readyGroups=PresetToeicContent.publishedReadingGroups();
     let published:ToeicQuestion[]=[];
     for (let q of source) {
-      if (q.reviewStatus===ToeicReviewStatus.PUBLISHED) published.push(q);
+      if (q.reviewStatus!==ToeicReviewStatus.PUBLISHED) continue;
+      // A published individual question cannot expose an incomplete shared
+      // passage. Every sibling of its group must first be PUBLISHED too.
+      if (q.groupId.length>0) {
+        let groupReady=false;
+        for (let group of readyGroups) {
+          if (group.groupId===q.groupId) { groupReady=true; break; }
+        }
+        if (!groupReady) continue;
+      }
+      published.push(q);
     }
     let validation=ToeicContentValidator.validateAll(published);
-    let groupValidation=ToeicContentValidator.validateReadingGroups(
-      published,PresetToeicContent.publishedReadingGroups());
+    let groupValidation=ToeicContentValidator.validateReadingGroups(published,readyGroups);
     if (!validation.valid || !groupValidation.valid) return [];
     return published;
   }
