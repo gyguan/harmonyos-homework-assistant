@@ -521,7 +521,7 @@ def main() -> None:
                   "this.DayButton(15);", "this.DayButton(19);", "this.DayButton(21);",
                   ".onClick(()=>this.selectStudyDay(day))", "dailyQuestionsForDay(day)",
                   "'进入 Day '+this.selectedStudyDay+' 训练'", "practiceReviewItems",
-                  "'累计已做 '+item.attemptCount+' 次'", "'累计错误 '+item.wrongCount+' 次'",
+                  "'累计已做 '+item.attemptCount+' 次 · 累计错误 '+item.wrongCount+' 次'",
                   "'译：'+item.translation", "showQuestionTranslation",
                   "currentTranslationStem", "toggleQuestionTranslation()",
                   "'查看中文翻译'", "'收起中文翻译'"]:
