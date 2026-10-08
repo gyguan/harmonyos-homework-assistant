@@ -78,12 +78,13 @@ export class ToeicQuestionHistory {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=6; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=7; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string='';
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
   activeDraft:ToeicSessionDraft|null=null; mockReports:ToeicMockReport[]=[];
   vocabularyRecalls:ToeicVocabularyRecall[]=[];
   dayTasks:ToeicDayTaskProgress[]=[]; sessionReports:ToeicSessionReport[]=[];
+  skillStats:ToeicSkillStat[]=[];
 }
 
 export class ToeicStudyPlan {
@@ -224,5 +225,13 @@ export class ToeicVocabularyQuizQuestion {
     options:string[],correctIndex:number,explanation:string) {
     this.vocabularyId=vocabularyId; this.mode=mode; this.stem=stem;
     this.options=options; this.correctIndex=correctIndex; this.explanation=explanation;
+  }
+}
+
+/** Aggregated, count-normalized skill statistics across submitted sessions. */
+export class ToeicSkillStat {
+  skill:ToeicSkill; answered:number; correct:number; slow:number;
+  constructor(skill:ToeicSkill,answered:number=0,correct:number=0,slow:number=0) {
+    this.skill=skill; this.answered=answered; this.correct=correct; this.slow=slow;
   }
 }
