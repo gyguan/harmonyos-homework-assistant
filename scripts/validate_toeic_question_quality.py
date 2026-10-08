@@ -121,6 +121,45 @@ def parse_question(raw: list[str], source: str, wrapper: bool) -> Item | None:
     except (ValueError, SyntaxError, TypeError, IndexError, AttributeError) as exc:
         raise ValueError(f"cannot parse question literal in {source}: {raw[:3]}") from exc
 
+def remove_arkts_comments(source: str) -> str:
+    """Remove disabled // and /* */ code without altering quoted URL strings."""
+    output: list[str] = []
+    i = 0
+    quote = ""
+    escaped = False
+    while i < len(source):
+        char = source[i]
+        if quote:
+            output.append(char)
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == quote:
+                quote = ""
+            i += 1
+            continue
+        if char in ("'", '"', '`'):
+            quote = char
+            output.append(char)
+            i += 1
+        elif source.startswith("//", i):
+            end = source.find("\n", i)
+            if end < 0:
+                break
+            output.append("\n")
+            i = end + 1
+        elif source.startswith("/*", i):
+            end = source.find("*/", i + 2)
+            if end < 0:
+                raise ValueError("unterminated ArkTS block comment")
+            output.extend("\n" for ch in source[i:end + 2] if ch == "\n")
+            i = end + 2
+        else:
+            output.append(char)
+            i += 1
+    return "".join(output)
+
 def wrapper_version_overrides(source: str) -> dict[str, int]:
     """Read the actual q() helper conditions, never fabricate known versions.
 
@@ -130,8 +169,9 @@ def wrapper_version_overrides(source: str) -> dict[str, int]:
         r"if\s*\((?P<condition>[^)]*)\)\s*\{?\s*"
         r"question\.version\s*=\s*(?P<version>\d+)\s*;"
     )
-    matches = list(expression.finditer(source))
-    if len(matches) != len(re.findall(r"question\.version\s*=", source)):
+    code = remove_arkts_comments(source)
+    matches = list(expression.finditer(code))
+    if len(matches) != len(re.findall(r"question\.version\s*=", code)):
         raise ValueError("unrecognized ArkTS question.version override syntax")
     versions: dict[str, int] = {}
     for match in matches:
