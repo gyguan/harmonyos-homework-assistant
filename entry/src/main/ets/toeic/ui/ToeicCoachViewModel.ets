@@ -60,6 +60,7 @@ export class ToeicCoachViewModel {
     return questionErrors.concat(vocabularyErrors).concat(sentenceErrors).concat(translationErrors);
   }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
+  allVocabulary():ToeicVocabularyItem[] { return PresetToeicContent.vocabulary(); }
   todayPlan():ToeicStudyDay { return PresetToeicContent.studyDay(this.snapshot().currentDay); }
   planForDay(day:number):ToeicStudyDay { return PresetToeicContent.studyDay(day); }
   weekOnePlans():ToeicStudyDay[] { return PresetToeicContent.studyDays(); }
