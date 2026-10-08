@@ -370,7 +370,7 @@ export struct ToeicHomePage {
       return 'Part 7 限时训练已包含新增双篇 / 三篇题组；先读清各文档职责，再联动定位答案。';
     }
     if (this.selectedStudyDay===14) {
-      return 'Day 14 为100题/75分钟限时模拟练习；当前Part 7单篇与多篇题组分布尚未按ETS正式卷面重编，不能据此推算官方成绩。交卷后可查看答案与解析。';
+      return 'Day 14 新版限时模考：100题/75分钟，Part 7按单篇29题、多篇25题组卷。题目为自编训练内容，原始正确率不等于TOEIC官方换算分。';
     }
     if (this.selectedStudyDay===18) {
       return 'Day 18 优先复习错题、慢题及薄弱能力，并完成新安排的双篇 / 三篇阅读整组训练。';
@@ -1624,7 +1624,9 @@ export struct ToeicHomePage {
             ' · 用时 '+Math.max(1,Math.round(this.mockElapsedSeconds/60))+' min'+
             ' · 已答 '+this.mockResultAnswered+' · 未答 '+this.mockResultUnanswered)
             .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
-          Text('本套题的Part 7单篇/多篇组卷比例尚未按ETS正式格式重编；成绩仅供训练诊断。')
+          Text(this.mockResultDay===14?
+            'Day14新版Part7按单篇29题、多篇25题组卷；自编试题成绩仍只供训练参考。':
+            'Day19当前Part7题组尚未按正式格式重编；成绩仅供训练诊断。')
             .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
