@@ -148,7 +148,7 @@ def main() -> None:
     translation_extra = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationSupplementaryCatalog.ets")
     translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
     translation_ids = re.findall(r"new ToeicQuestionTranslation\('([^']+)'", translation_week_one + "\n" + translation_week_two)
-    translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two + "\\n" + translation_extra)
+    translation_ids += re.findall(r'new ToeicQuestionTranslation\("([^"]+)"', translation_week_two + "\n" + translation_extra)
     require(len(translation_ids) == 104,
             f"Day 1-13 must have exactly 104 question translations after Part 7 integration, found {len(translation_ids)}")
     require(len(translation_ids) == len(set(translation_ids)),
