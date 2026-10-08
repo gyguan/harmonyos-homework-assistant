@@ -3,7 +3,7 @@ import {
   ToeicReviewStatus, ToeicScoreValue, ToeicSection, ToeicSkill
 } from '../domain/ToeicModels';
 
-/** Original shared Part 7 articles. Draft content needs signed editorial review. */
+/** AI-reviewed shared Part 7 MIGRATION/LICENSE groups, published as complete bundles. */
 export class ToeicExtraReadingBatchFive {
   static groups():ToeicReadingGroup[] {
     return [
