@@ -201,7 +201,9 @@ def collect() -> tuple[list[Item], dict[str, str]]:
             wrapper = False
             versions = {}
         seen: set[str] = set()
-        for args in literals_after(text, signature):
+        # Exclude disabled ArkTS question constructors as well as disabled overrides.
+        # Otherwise a commented-out corrected question could falsely satisfy the audit.
+        for args in literals_after(remove_arkts_comments(text), signature):
             item = parse_question(fields(args), basename, wrapper)
             if item is not None:
                 if wrapper:
