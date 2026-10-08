@@ -47,7 +47,7 @@ export class ToeicExtraReadingContent {
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-VENUE"),
       new ToeicQuestion("R-P7-DELIVERY-01",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"Which delivery option would meet Operations' required schedule?",["Standard delivery","Express delivery","Either option","Neither option"],1,
-        "标准送达日10月16日晚于10月15日的施工开始；快递10月13日送达，能满足要求。","standard delivery by October 16 || guarantees delivery by October 13 || begin fitting out the training room on October 15",88,undefined,
+        "标准送达日10月16日晚于10月15日的施工开始；快递10月13日送达，能满足要求。","standard delivery by October 16 || guarantees delivery by October 13 || begin fitting out the training room on October 15","meet the required schedule = arrive before fitting-out begins",88,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.REVIEWED,1,'','',0,0,"P7-EX-DELIVERY"),
       new ToeicQuestion("R-P7-DELIVERY-02",ToeicSection.READING,ToeicPart.PART_7,
