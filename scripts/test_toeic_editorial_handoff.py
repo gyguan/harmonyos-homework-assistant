@@ -81,6 +81,27 @@ class HandoffTests(unittest.TestCase):
             source = json.loads((pack / "review-source.json").read_text(encoding="utf-8"))
             self.assertEqual(31, len(source))
             self.assertTrue(all(len(value) == 64 for value in source.values()))
+            # Exercise the complete offline handoff: a fully populated verdict
+            # sheet can be verified, but must never mutate the source approval ledger.
+            decision_file = pack / "review-decisions.csv"
+            with decision_file.open("r", newline="", encoding="utf-8-sig") as handle:
+                decisions = list(csv.DictReader(handle))
+            for decision in decisions:
+                decision["decision"] = "APPROVE"
+                decision["reviewer"] = "professional-reviewer"
+                decision["reviewed_at"] = self.today.isoformat()
+                decision["notes"] = "Original checked independently"
+            with decision_file.open("w", newline="", encoding="utf-8-sig") as handle:
+                writer = csv.DictWriter(handle, fieldnames=COLUMNS)
+                writer.writeheader()
+                writer.writerows(decisions)
+            self.assertEqual("READY_FOR_HUMAN_PR", verify(pack)["status"])
+            # Removing 29 items from the snapshot must not falsely pass.
+            (pack / "review-source.json").write_text(
+                json.dumps({"vocabulary:V-121": source["vocabulary:V-121"]}),
+                encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "complete selected batch"):
+                verify(pack)
         self.assertEqual(before, approval_file.read_bytes())
 
     def test_pack_requires_valid_selection(self):
