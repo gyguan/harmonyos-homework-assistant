@@ -63,11 +63,16 @@ def main() -> None:
     week_one = read("entry/src/main/ets/toeic/content/ToeicWeekOneContent.ets")
     week_two = read("entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets")
     week_three = read("entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets")
+    expansion = read("entry/src/main/ets/toeic/content/ToeicVocabularyExpansion.ets")
+    extra_diagnostic = read("entry/src/main/ets/toeic/content/ToeicStandardDiagnosticContent.ets")
     week_two_question_count = week_two.count("ToeicWeekTwoContent.q(")
     week_three_question_count = week_three.count("ToeicWeekThreeContent.q(")
     question_count = (preset.count("new ToeicQuestion(") + week_one.count("new ToeicQuestion(") +
-                      week_two_question_count + week_three_question_count)
-    vocabulary_count = preset.count("new ToeicVocabularyItem(") + week_one.count("new ToeicVocabularyItem(")
+                      week_two_question_count + week_three_question_count +
+                      extra_diagnostic.count("new ToeicQuestion("))
+    vocabulary_count = (preset.count("new ToeicVocabularyItem(") +
+                        week_one.count("new ToeicVocabularyItem(") +
+                        expansion.count("new ToeicVocabularyItem("))
     sentence_drill_count = (week_one.count("new ToeicSentenceDrill(") +
                             week_two.count("new ToeicSentenceDrill(") +
                             week_three.count("new ToeicSentenceDrill("))
@@ -133,7 +138,22 @@ def main() -> None:
     question_ids = re.findall(r"new ToeicQuestion\('([^']+)'", preset + "\n" + week_one)
     question_ids += re.findall(r'ToeicWeekTwoContent\.q\("([^"]+)"', week_two)
     question_ids += re.findall(r'ToeicWeekThreeContent\.q\("([^"]+)"', week_three)
+    question_ids += re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)
+    require(len(re.findall(r'new ToeicQuestion\("(R-DX-[^"]+)"', extra_diagnostic)) == 12,
+            "standard diagnostic must have 12 unique extra questions")
+    require(len(re.findall(r'new ToeicQuestion\("R-DX-P5-', extra_diagnostic)) == 6 and
+            len(re.findall(r'new ToeicQuestion\("R-DX-P6-', extra_diagnostic)) == 2 and
+            len(re.findall(r'new ToeicQuestion\("R-DX-P7-', extra_diagnostic)) == 4,
+            "standard diagnostic must cover P5=6, P6=2, P7=4")
     vocabulary_ids = re.findall(r"new ToeicVocabularyItem\('([^']+)'", preset + "\n" + week_one)
+    vocabulary_ids += re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)
+    require(len(re.findall(r'new ToeicVocabularyItem\("(V-[0-9]+)"', expansion)) == 30,
+            "incremental vocabulary must contain exactly 30 curated entries")
+    require("V-091" in expansion and "V-120" in expansion and
+            "ToeicVocabularyExpansion.idsForDay(day)" in preset,
+            "business word expansion must reach the selected daily vocabulary plan")
+    require("exampleSentence:string" in models and "item.exampleSentence" in validator,
+            "new TOEIC business words must carry reviewed examples")
     sentence_ids = re.findall(r"new ToeicSentenceDrill\('([^']+)'", week_one)
     sentence_ids += re.findall(r'new ToeicSentenceDrill\("([^"]+)"', week_two)
     sentence_ids += re.findall(r'new ToeicSentenceDrill\("([^"]+)"', week_three)
@@ -256,7 +276,7 @@ def main() -> None:
         "attemptCount(questionId:string)", "wrongCount(questionId:string)",
         "history.attemptCount++", "if (!attempt.correct) history.wrongCount++",
         "Array.isArray(parsed.questionHistories)", "new ToeicQuestionHistory",
-        "restored.schemaVersion=5",
+        "restored.schemaVersion=7",
     ]:
         require(token in progress, f"question history persistence missing: {token}")
 
@@ -476,6 +496,9 @@ def main() -> None:
                   "this.questions.length-this.attempts.length",
                   "this.mockResultUnanswered", "this.mockReports.length>0"]:
         require(token in ui, f"timed mock / resume / results invariant missing: {token}")
+    require("topWeakSkills(snapshot:ToeicLearningSnapshot,limit:number=3):ToeicSkill[]" in training
+            and "let ranked=this.topWeakSkills(snapshot,3)" in training,
+            "adaptive training must rank multiple skills from cumulative proficiency")
     require("if (weakest.penalty>0)" in training and "summary.hasWeakSkill=true" in training,
             "weak skill must not be fabricated for a perfect fast session")
     for token in ["markedQuestionIds:string[]", "this.markedQuestionIds=markedQuestionIds"]:
@@ -504,6 +527,39 @@ def main() -> None:
             "ToeicProgressStore.instance.vocabularyDueIds()" in view_model,
             "due vocabulary must enter the selected-day study flow")
 
+    group_service = read("entry/src/main/ets/toeic/application/ToeicReadingGroupService.ets")
+    quiz_service = read("entry/src/main/ets/toeic/application/ToeicVocabularyQuizService.ets")
+    for token in ["class ToeicDayTaskProgress", "class ToeicSessionReport",
+                  "dayTasks:ToeicDayTaskProgress[]", "sessionReports:ToeicSessionReport[]",
+                  "class ToeicReadingGroup", "class ToeicVocabularyQuizQuestion"]:
+        require(token in model, f"second-stage TOEIC model missing: {token}")
+    for token in ["private advanceDayIfReady(day:number)", "private writableDayTasks(day:number)",
+                  "async completeDayTask(", "this.advanceDayIfReady(studyDay)",
+                  "new ToeicSessionReport(studyDay,Date.now())",
+                  "Array.isArray(parsed.dayTasks)", "Array.isArray(parsed.sessionReports)",
+                  "Array.isArray(parsed.skillStats)", "new ToeicSkillStat(attempt.skill)"]:
+        require(token in progress, f"day task completion or session analytics missing: {token}")
+    for token in ["ToeicReadingGroupService.groupAt(this.questions,index)",
+                  "this.currentPassageBlocks=readingGroup.passageBlocks",
+                  "this.currentGroupCount=readingGroup.questionIds.length",
+                  "this.currentGroupPosition=readingGroup.questionIds.indexOf(question.id)+1",
+                  "this.DaySelector();", "this.showFullPlan",
+                  "this.completedTasksCount()", "this.finishDayTask('sentence')",
+                  "this.finishDayTask('vocabulary')",
+                  "this.quizOptionA", "this.quizOptionB", "this.quizOptionC", "this.quizOptionD",
+                  "ToeicVocabularyQuizMode.MEANING", "ToeicVocabularyQuizMode.COLLOCATION",
+                  "ToeicVocabularyQuizMode.PARAPHRASE",
+                  "this.quizSelectedIndex>=0"]:
+        require(token in ui, f"new TOEIC page capability missing: {token}")
+    require("passageBlocks(passage:string):string[]" in group_service and
+            "questions[first-1].passage===current.passage" in group_service and
+            "questions[last+1].passage===current.passage" in group_service,
+            "shared reading passage grouping must preserve article identity")
+    require("if (candidate.id===item.id || candidate.scenario===item.scenario) continue;" in quiz_service
+            and "distractors.length!==3" in quiz_service
+            and "answerFor(item:ToeicVocabularyItem,mode:ToeicVocabularyQuizMode)" in quiz_service,
+            "TOEIC vocabulary retrieval quiz must generate unique four-way options")
+
     shell = read("entry/src/main/ets/pages/AppShell.ets")
     require("TOEIC = 'TOEIC'" in shell, "parent primary TOEIC route is missing")
     require("ToeicHomePage" in shell, "TOEIC home is not connected to AppShell")
@@ -511,6 +567,13 @@ def main() -> None:
 
     ability = read("entry/src/main/ets/entryability/EntryAbility.ets")
     require("ToeicModuleBootstrap.initialize" in ability, "TOEIC progress bootstrap is missing")
+
+    require("ToeicStandardDiagnosticContent.questions()" in preset and
+            "standardDiagnosticQuestions():ToeicQuestion[]" in preset,
+            "independent standard-level diagnostic must be reachable from PresetToeicContent")
+    require("this.startStandardDiagnostic()" in ui and
+            "this.activeSessionAdvancesProgress=false" in ui,
+            "supplemental diagnostic must not advance the 21-day plan")
 
     standard = read("docs/product/toeic-coach-content-standard.md")
     for phrase in [

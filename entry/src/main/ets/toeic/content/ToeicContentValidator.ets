@@ -47,6 +47,13 @@ export class ToeicContentValidator {
       if (item.ipa.trim().length===0) errors.push(item.id + ': IPA is required');
       if (item.pronunciationLocale!=='en-US') errors.push(item.id + ': pronunciationLocale must be en-US in current content pack');
       if (item.pronunciationText.trim().length===0) errors.push(item.id + ': pronunciationText is required');
+      if (item.id.startsWith('V-') && item.id>='V-091') {
+        if (item.exampleSentence.trim().length===0) errors.push(item.id + ': example sentence is required');
+        if (item.scenario.trim().length===0) errors.push(item.id + ': scenario is required');
+        if (item.collocations.length===0 || item.paraphrases.length===0) {
+          errors.push(item.id + ': collocations and paraphrases are required');
+        }
+      }
     }
     return new ToeicContentValidationResult(errors.length===0,errors);
   }

@@ -15,6 +15,7 @@ export class ToeicTrainingService {
   private constructor() {}
 
   diagnosticQuestions():ToeicQuestion[] { return PresetToeicContent.diagnosticQuestions(); }
+  standardDiagnosticQuestions():ToeicQuestion[] { return PresetToeicContent.standardDiagnosticQuestions(); }
 
   dailyQuestions(snapshot:ToeicLearningSnapshot, limit:number=10, studyDay:number=snapshot.currentDay):ToeicQuestion[] {
     let all=PresetToeicContent.publishedQuestions();
@@ -25,10 +26,12 @@ export class ToeicTrainingService {
     this.appendByIds(selected,all,snapshot.slowQuestionIds,recoveryLimit);
 
     let weakLimit=Math.min(6,limit);
-    let weak=snapshot.weakSkill as ToeicSkill;
-    for (let q of all) {
-      if (selected.length>=weakLimit) break;
-      if (q.skill===weak && !this.containsQuestionId(selected,q.id)) selected.push(q);
+    let weakSkills=this.topWeakSkills(snapshot,3);
+    for (let skill of weakSkills) {
+      for (let q of all) {
+        if (selected.length>=weakLimit) break;
+        if (q.skill===skill && !this.containsQuestionId(selected,q.id)) selected.push(q);
+      }
     }
 
     let planned=PresetToeicContent.questionsForDay(studyDay);
@@ -54,9 +57,11 @@ export class ToeicTrainingService {
     this.appendByIds(selected,planned,snapshot.reviewQuestionIds,planned.length);
     this.appendByIds(selected,planned,snapshot.slowQuestionIds,planned.length);
 
-    let weak=snapshot.weakSkill as ToeicSkill;
-    for (let question of planned) {
-      if (question.skill===weak && !this.containsQuestionId(selected,question.id)) selected.push(question);
+    let ranked=this.topWeakSkills(snapshot,3);
+    for (let skill of ranked) {
+      for (let question of planned) {
+        if (question.skill===skill && !this.containsQuestionId(selected,question.id)) selected.push(question);
+      }
     }
     for (let question of planned) {
       if (!this.containsQuestionId(selected,question.id)) selected.push(question);
@@ -70,10 +75,12 @@ export class ToeicTrainingService {
     this.appendByIds(selected,source,snapshot.reviewQuestionIds,Math.min(6,limit));
     this.appendByIds(selected,source,snapshot.slowQuestionIds,Math.min(10,limit));
 
-    let weak=snapshot.weakSkill as ToeicSkill;
-    for (let question of source) {
-      if (selected.length>=Math.min(14,limit)) break;
-      if (question.skill===weak && !this.containsQuestionId(selected,question.id)) selected.push(question);
+    let ranked=this.topWeakSkills(snapshot,3);
+    for (let skill of ranked) {
+      for (let question of source) {
+        if (selected.length>=Math.min(14,limit)) break;
+        if (question.skill===skill && !this.containsQuestionId(selected,question.id)) selected.push(question);
+      }
     }
     for (let question of source) {
       if (selected.length>=limit) break;
@@ -99,16 +106,38 @@ export class ToeicTrainingService {
     this.appendByIds(selected,source,snapshot.reviewQuestionIds,Math.min(14,limit));
     this.appendByIds(selected,source,snapshot.slowQuestionIds,Math.min(17,limit));
 
-    let weak=snapshot.weakSkill as ToeicSkill;
-    for (let question of source) {
-      if (selected.length>=limit) break;
-      if (question.skill===weak && !this.containsQuestionId(selected,question.id)) selected.push(question);
+    let ranked=this.topWeakSkills(snapshot,3);
+    for (let skill of ranked) {
+      for (let question of source) {
+        if (selected.length>=limit) break;
+        if (question.skill===skill && !this.containsQuestionId(selected,question.id)) selected.push(question);
+      }
     }
     for (let question of source) {
       if (selected.length>=limit) break;
       if (!this.containsQuestionId(selected,question.id)) selected.push(question);
     }
     return selected;
+  }
+
+  topWeakSkills(snapshot:ToeicLearningSnapshot,limit:number=3):ToeicSkill[] {
+    let stats=snapshot.skillStats.slice();
+    stats.sort((a,b)=>{
+      let penaltyA=a.answered>0?(2*(a.answered-a.correct)+a.slow)/a.answered:0;
+      let penaltyB=b.answered>0?(2*(b.answered-b.correct)+b.slow)/b.answered:0;
+      if (penaltyA!==penaltyB) return penaltyB-penaltyA;
+      return b.answered-a.answered;
+    });
+    let skills:ToeicSkill[]=[];
+    for (let item of stats) {
+      if (skills.length>=limit) break;
+      if (item.answered<=0 || (item.answered===item.correct && item.slow===0)) continue;
+      skills.push(item.skill);
+    }
+    if (skills.length===0 && snapshot.skillStats.length===0 && snapshot.weakSkill.length>0) {
+      skills.push(snapshot.weakSkill as ToeicSkill);
+    }
+    return skills;
   }
 
   classify(question:ToeicQuestion, correct:boolean, elapsedSeconds:number):ToeicPerformance {

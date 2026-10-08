@@ -39,11 +39,13 @@ export class ToeicQuestion {
 export class ToeicVocabularyItem {
   id:string; word:string; partOfSpeech:string; meaning:string; level:ToeicVocabularyLevel; scenario:string;
   collocations:string[]; paraphrases:string[]; ipa:string; pronunciationLocale:string; pronunciationText:string;
+  exampleSentence:string;
   constructor(id:string, word:string, partOfSpeech:string, meaning:string, level:ToeicVocabularyLevel,
-    scenario:string, collocations:string[], paraphrases:string[], ipa:string='', pronunciationLocale:string='en-US', pronunciationText:string='') {
+    scenario:string, collocations:string[], paraphrases:string[], ipa:string='', pronunciationLocale:string='en-US', pronunciationText:string='', exampleSentence:string='') {
     this.id=id; this.word=word; this.partOfSpeech=partOfSpeech; this.meaning=meaning; this.level=level;
     this.scenario=scenario; this.collocations=collocations; this.paraphrases=paraphrases;
     this.ipa=ipa; this.pronunciationLocale=pronunciationLocale; this.pronunciationText=pronunciationText.length>0?pronunciationText:word;
+    this.exampleSentence=exampleSentence;
   }
 }
 
@@ -76,11 +78,13 @@ export class ToeicQuestionHistory {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=5; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  schemaVersion:number=7; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
   totalAnswered:number=0; totalCorrect:number=0; weakSkill:string='';
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
   activeDraft:ToeicSessionDraft|null=null; mockReports:ToeicMockReport[]=[];
   vocabularyRecalls:ToeicVocabularyRecall[]=[];
+  dayTasks:ToeicDayTaskProgress[]=[]; sessionReports:ToeicSessionReport[]=[];
+  skillStats:ToeicSkillStat[]=[];
 }
 
 export class ToeicStudyPlan {
@@ -173,5 +177,61 @@ export class ToeicVocabularyRecall {
   constructor(vocabularyId:string,streak:number,totalReviews:number,nextDueAtMs:number,lastReviewedAtMs:number) {
     this.vocabularyId=vocabularyId; this.streak=streak; this.totalReviews=totalReviews;
     this.nextDueAtMs=nextDueAtMs; this.lastReviewedAtMs=lastReviewedAtMs;
+  }
+}
+
+/** Task completion is independent from a single question session. */
+export class ToeicDayTaskProgress {
+  day:number; vocabularyCompleted:boolean; sentenceCompleted:boolean; trainingCompleted:boolean;
+  constructor(day:number,vocabularyCompleted:boolean=false,
+    sentenceCompleted:boolean=false,trainingCompleted:boolean=false) {
+    this.day=day; this.vocabularyCompleted=vocabularyCompleted;
+    this.sentenceCompleted=sentenceCompleted; this.trainingCompleted=trainingCompleted;
+  }
+}
+
+/** Diagnostic and daily session breakdown, not a TOEIC scaled score. */
+export class ToeicSessionReport {
+  day:number; completedAtMs:number; answered:number; correct:number; slow:number;
+  part5Answered:number; part5Correct:number; part5Seconds:number;
+  part6Answered:number; part6Correct:number; part6Seconds:number;
+  part7Answered:number; part7Correct:number; part7Seconds:number;
+  constructor(day:number,completedAtMs:number=0) {
+    this.day=day; this.completedAtMs=completedAtMs;
+    this.answered=0; this.correct=0; this.slow=0;
+    this.part5Answered=0; this.part5Correct=0; this.part5Seconds=0;
+    this.part6Answered=0; this.part6Correct=0; this.part6Seconds=0;
+    this.part7Answered=0; this.part7Correct=0; this.part7Seconds=0;
+  }
+}
+
+/** Stable runtime grouping of consecutive questions that share the same article. */
+export class ToeicReadingGroup {
+  groupId:string; questionIds:string[]; passageBlocks:string[];
+  constructor(groupId:string,questionIds:string[],passageBlocks:string[]) {
+    this.groupId=groupId; this.questionIds=questionIds; this.passageBlocks=passageBlocks;
+  }
+}
+
+export enum ToeicVocabularyQuizMode {
+  MEANING='MEANING', COLLOCATION='COLLOCATION', PARAPHRASE='PARAPHRASE'
+}
+
+/** Built from reviewed source vocabulary; not a generated exam question. */
+export class ToeicVocabularyQuizQuestion {
+  vocabularyId:string; mode:ToeicVocabularyQuizMode; stem:string;
+  options:string[]; correctIndex:number; explanation:string;
+  constructor(vocabularyId:string,mode:ToeicVocabularyQuizMode,stem:string,
+    options:string[],correctIndex:number,explanation:string) {
+    this.vocabularyId=vocabularyId; this.mode=mode; this.stem=stem;
+    this.options=options; this.correctIndex=correctIndex; this.explanation=explanation;
+  }
+}
+
+/** Aggregated, count-normalized skill statistics across submitted sessions. */
+export class ToeicSkillStat {
+  skill:ToeicSkill; answered:number; correct:number; slow:number;
+  constructor(skill:ToeicSkill,answered:number=0,correct:number=0,slow:number=0) {
+    this.skill=skill; this.answered=answered; this.correct=correct; this.slow=slow;
   }
 }

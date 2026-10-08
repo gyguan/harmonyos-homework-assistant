@@ -1,7 +1,8 @@
 import { common } from '@kit.AbilityKit';
 import { preferences } from '@kit.ArkData';
-import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill, ToeicVocabularyRecall } from '../domain/ToeicModels';
+import { ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicPerformance, ToeicQuestionAttempt, ToeicQuestionHistory, ToeicQuestionTime, ToeicSessionDraft, ToeicSkill, ToeicVocabularyRecall, ToeicDayTaskProgress, ToeicSessionReport, ToeicSkillStat } from '../domain/ToeicModels';
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
+import { PresetToeicContent } from '../content/PresetToeicContent';
 
 const STORE_NAME:string='toeic_coach_progress';
 const SNAPSHOT_KEY:string='toeic_learning_snapshot_v1';
@@ -64,6 +65,39 @@ export class ToeicProgressStore {
     await this.save();
   }
 
+  dayTasks(day:number):ToeicDayTaskProgress {
+    for (let item of this.snapshot.dayTasks) if (item.day===day) return item;
+    return new ToeicDayTaskProgress(day);
+  }
+
+  private writableDayTasks(day:number):ToeicDayTaskProgress {
+    for (let item of this.snapshot.dayTasks) if (item.day===day) return item;
+    let result=new ToeicDayTaskProgress(day);
+    this.snapshot.dayTasks.push(result);
+    return result;
+  }
+
+  private advanceDayIfReady(day:number):void {
+    if (!this.snapshot.diagnosticCompleted || day!==this.snapshot.currentDay) return;
+    let plan=PresetToeicContent.studyDay(day);
+    let progress=this.dayTasks(day);
+    if (!progress.trainingCompleted) return;
+    if (plan.vocabularyIds.length>0 && !progress.vocabularyCompleted) return;
+    if (plan.sentenceDrillIds.length>0 && !progress.sentenceCompleted) return;
+    this.snapshot.completedTrainingSessions++;
+    this.snapshot.currentDay=Math.min(MAX_AVAILABLE_STUDY_DAY,day+1);
+  }
+
+  async completeDayTask(day:number,task:string):Promise<void> {
+    if (day<2 || day>MAX_AVAILABLE_STUDY_DAY) return;
+    let progress=this.writableDayTasks(day);
+    if (task==='vocabulary') progress.vocabularyCompleted=true;
+    else if (task==='sentence') progress.sentenceCompleted=true;
+    else return;
+    this.advanceDayIfReady(day);
+    await this.save();
+  }
+
   activeDraft():ToeicSessionDraft|null { return this.snapshot.activeDraft; }
 
   async saveDraft(draft:ToeicSessionDraft):Promise<void> {
@@ -77,22 +111,45 @@ export class ToeicProgressStore {
   }
 
   async recordSession(attempts:ToeicQuestionAttempt[], diagnostic:boolean, advanceProgress:boolean=true,
-    mockReport:ToeicMockReport|null=null):Promise<void> {
+    mockReport:ToeicMockReport|null=null,studyDay:number=0):Promise<void> {
     if (attempts.length===0 && mockReport===null) return;
     let summary=ToeicTrainingService.instance.summarize(attempts);
     this.snapshot.totalAnswered+=attempts.length;
     this.snapshot.totalCorrect+=summary.correctCount;
-    this.snapshot.weakSkill=summary.hasWeakSkill?summary.weakSkill:'';
+    // The weak skill is recomputed after persisted cumulative statistics are updated.
     if (advanceProgress) {
       if (diagnostic) {
         this.snapshot.diagnosticCompleted=true;
         this.snapshot.currentDay=2;
-      } else {
-        this.snapshot.completedTrainingSessions++;
-        this.snapshot.currentDay=Math.min(MAX_AVAILABLE_STUDY_DAY,this.snapshot.completedTrainingSessions+2);
+      } else if (studyDay>=2 && studyDay<=MAX_AVAILABLE_STUDY_DAY) {
+        this.writableDayTasks(studyDay).trainingCompleted=true;
+        this.advanceDayIfReady(studyDay);
       }
     }
-    for (let attempt of attempts) this.applyAttempt(attempt);
+    let report=new ToeicSessionReport(studyDay,Date.now());
+    for (let attempt of attempts) {
+      this.applyAttempt(attempt);
+      report.answered++;
+      if (attempt.correct) report.correct++;
+      if (attempt.performance===ToeicPerformance.SLOW_CORRECT ||
+        attempt.performance===ToeicPerformance.SLOW_WRONG) report.slow++;
+      if (attempt.part===ToeicPart.PART_5) {
+        report.part5Answered++; report.part5Seconds+=attempt.elapsedSeconds;
+        if (attempt.correct) report.part5Correct++;
+      } else if (attempt.part===ToeicPart.PART_6) {
+        report.part6Answered++; report.part6Seconds+=attempt.elapsedSeconds;
+        if (attempt.correct) report.part6Correct++;
+      } else if (attempt.part===ToeicPart.PART_7) {
+        report.part7Answered++; report.part7Seconds+=attempt.elapsedSeconds;
+        if (attempt.correct) report.part7Correct++;
+      }
+    }
+    let ranked=ToeicTrainingService.instance.topWeakSkills(this.snapshot,1);
+    this.snapshot.weakSkill=ranked.length>0?ranked[0]:'';
+    if (report.answered>0) {
+      this.snapshot.sessionReports.push(report);
+      if (this.snapshot.sessionReports.length>40) this.snapshot.sessionReports.shift();
+    }
     if (mockReport!==null) {
       this.snapshot.mockReports.push(mockReport);
       if (this.snapshot.mockReports.length>10) this.snapshot.mockReports.shift();
@@ -109,6 +166,19 @@ export class ToeicProgressStore {
     }
     history.attemptCount++;
     if (!attempt.correct) history.wrongCount++;
+
+    let skillStat:ToeicSkillStat|null=null;
+    for (let item of this.snapshot.skillStats) {
+      if (item.skill===attempt.skill) { skillStat=item; break; }
+    }
+    if (skillStat===null) {
+      skillStat=new ToeicSkillStat(attempt.skill);
+      this.snapshot.skillStats.push(skillStat);
+    }
+    skillStat.answered++;
+    if (attempt.correct) skillStat.correct++;
+    if (attempt.performance===ToeicPerformance.SLOW_CORRECT ||
+      attempt.performance===ToeicPerformance.SLOW_WRONG) skillStat.slow++;
 
     if (attempt.correct) this.removeId(this.snapshot.reviewQuestionIds,attempt.questionId);
     else this.addId(this.snapshot.reviewQuestionIds,attempt.questionId);
@@ -213,7 +283,45 @@ export class ToeicProgressStore {
             Math.max(0,Number(recall.lastReviewedAtMs)||0)));
         }
       }
-      restored.schemaVersion=5;
+      if (Array.isArray(parsed.dayTasks)) {
+        for (let value of parsed.dayTasks as Object[]) {
+          let item=value as Record<string,Object>;
+          if (typeof item.day!=='number' || item.day<2 || item.day>MAX_AVAILABLE_STUDY_DAY) continue;
+          restored.dayTasks.push(new ToeicDayTaskProgress(item.day as number,
+            item.vocabularyCompleted===true,item.sentenceCompleted===true,
+            item.trainingCompleted===true));
+        }
+      }
+      if (Array.isArray(parsed.sessionReports)) {
+        for (let value of parsed.sessionReports as Object[]) {
+          let item=value as Record<string,Object>;
+          if (typeof item.day!=='number' || typeof item.completedAtMs!=='number') continue;
+          let report=new ToeicSessionReport(item.day as number,item.completedAtMs as number);
+          report.answered=Number(item.answered)||0; report.correct=Number(item.correct)||0;
+          report.slow=Number(item.slow)||0;
+          report.part5Answered=Number(item.part5Answered)||0;
+          report.part5Correct=Number(item.part5Correct)||0;
+          report.part5Seconds=Number(item.part5Seconds)||0;
+          report.part6Answered=Number(item.part6Answered)||0;
+          report.part6Correct=Number(item.part6Correct)||0;
+          report.part6Seconds=Number(item.part6Seconds)||0;
+          report.part7Answered=Number(item.part7Answered)||0;
+          report.part7Correct=Number(item.part7Correct)||0;
+          report.part7Seconds=Number(item.part7Seconds)||0;
+          restored.sessionReports.push(report);
+        }
+      }
+      if (Array.isArray(parsed.skillStats)) {
+        for (let value of parsed.skillStats as Object[]) {
+          let item=value as Record<string,Object>;
+          if (typeof item.skill!=='string') continue;
+          restored.skillStats.push(new ToeicSkillStat(item.skill as ToeicSkill,
+            Math.max(0,Number(item.answered)||0),
+            Math.max(0,Number(item.correct)||0),
+            Math.max(0,Number(item.slow)||0)));
+        }
+      }
+      restored.schemaVersion=7;
       this.snapshot=restored;
     } catch {
       this.snapshot=new ToeicLearningSnapshot();
