@@ -60,7 +60,8 @@
         "efficiencies 是复数名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 0
     },
     {
       "id": "R-M1-P5-002",
@@ -92,7 +93,8 @@
         "toward 表朝向"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 1
     },
     {
       "id": "R-M1-P5-003",
@@ -124,7 +126,8 @@
         "notification 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 2
     },
     {
       "id": "R-M1-P5-004",
@@ -156,7 +159,8 @@
         "hold a reservation 是保留已有预订不是创建"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 3
     },
     {
       "id": "R-M1-P5-005",
@@ -188,7 +192,8 @@
         "prompting 是分词不适合作方式状语"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 4
     },
     {
       "id": "R-M1-P5-006",
@@ -220,7 +225,8 @@
         "during 后接名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 5
     },
     {
       "id": "R-M1-P5-007",
@@ -252,7 +258,8 @@
         "inspect 不是搬迁"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 6
     },
     {
       "id": "R-M1-P5-008",
@@ -284,7 +291,8 @@
         "reviews 是第三人称单数"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 7
     },
     {
       "id": "R-M1-P5-009",
@@ -316,7 +324,8 @@
         "particulars 为复数名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 8
     },
     {
       "id": "R-M1-P5-010",
@@ -348,7 +357,8 @@
         "except 表除外"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 9
     },
     {
       "id": "R-M1-P5-011",
@@ -380,7 +390,8 @@
         "working 缺助动词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 10
     },
     {
       "id": "R-M1-P5-012",
@@ -412,7 +423,8 @@
         "spread deadline 含义不对"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 11
     },
     {
       "id": "R-M1-P5-013",
@@ -444,7 +456,8 @@
         "closure 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 12
     },
     {
       "id": "R-M1-P5-014",
@@ -476,7 +489,8 @@
         "Unless 表条件例外而非已发生事实的让步"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 13
     },
     {
       "id": "R-M1-P5-015",
@@ -508,7 +522,8 @@
         "promote 与交卡无关"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 14
     },
     {
       "id": "R-M1-P5-016",
@@ -540,7 +555,8 @@
         "by purchases 不成立"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 15
     },
     {
       "id": "R-M1-P5-017",
@@ -572,7 +588,8 @@
         "approving 非谓语"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 16
     },
     {
       "id": "R-M1-P5-018",
@@ -604,7 +621,8 @@
         "details 为复数名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 17
     },
     {
       "id": "R-M1-P5-019",
@@ -636,7 +654,8 @@
         "arrive 为不及物不能直接接 invoice"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 18
     },
     {
       "id": "R-M1-P5-020",
@@ -668,7 +687,8 @@
         "because of 要接名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 19
     },
     {
       "id": "R-M1-P5-021",
@@ -700,7 +720,8 @@
         "salary 是薪资"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 20
     },
     {
       "id": "R-M1-P5-022",
@@ -732,7 +753,8 @@
         "unanimouslyness 非标准词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 21
     },
     {
       "id": "R-M1-P5-023",
@@ -764,7 +786,8 @@
         "beside 表位置"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 22
     },
     {
       "id": "R-M1-P5-024",
@@ -796,7 +819,8 @@
         "preparing 缺谓语"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 23
     },
     {
       "id": "R-M1-P5-025",
@@ -828,7 +852,8 @@
         "carry a survey 缺 out"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 24
     },
     {
       "id": "R-M1-P5-026",
@@ -860,7 +885,8 @@
         "visualize 是动词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 25
     },
     {
       "id": "R-M1-P5-027",
@@ -892,7 +918,8 @@
         "because of 接名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 26
     },
     {
       "id": "R-M1-P5-028",
@@ -924,7 +951,8 @@
         "refund 时间不合义"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 27
     },
     {
       "id": "R-M1-P5-029",
@@ -956,7 +984,8 @@
         "through 表穿过或截至含义不符"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 28
     },
     {
       "id": "R-M1-P5-030",
@@ -988,7 +1017,8 @@
         "professionalism 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 29
     },
     {
       "id": "R-M2-P5-001",
@@ -1020,7 +1050,8 @@
         "carefulness 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 30
     },
     {
       "id": "R-M2-P5-002",
@@ -1052,7 +1083,8 @@
         "issuance 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 31
     },
     {
       "id": "R-M2-P5-003",
@@ -1084,7 +1116,8 @@
         "by customers 表施事者"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 32
     },
     {
       "id": "R-M2-P5-004",
@@ -1116,7 +1149,8 @@
         "because of 后要名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 33
     },
     {
       "id": "R-M2-P5-005",
@@ -1148,7 +1182,8 @@
         "has 与复数不一致"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 34
     },
     {
       "id": "R-M2-P5-006",
@@ -1180,7 +1215,8 @@
         "set a reservation 不为标准预订用法"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 35
     },
     {
       "id": "R-FM2-P5-007",
@@ -1212,7 +1248,8 @@
         "has visited 不能和未来具体日期搭配"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 36
     },
     {
       "id": "R-M2-P5-008",
@@ -1244,7 +1281,8 @@
         "clearing 不符合所需形容词语义"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 37
     },
     {
       "id": "R-M2-P5-009",
@@ -1276,7 +1314,8 @@
         "beside 为在旁边"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 38
     },
     {
       "id": "R-M2-P5-010",
@@ -1308,7 +1347,8 @@
         "its' 不是正确所有格写法"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 39
     },
     {
       "id": "R-M2-P5-011",
@@ -1340,7 +1380,8 @@
         "whose 后须接其所有的名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 40
     },
     {
       "id": "R-M2-P5-012",
@@ -1372,7 +1413,8 @@
         "Whereas 表对比而非因果"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 41
     },
     {
       "id": "R-M2-P5-013",
@@ -1404,7 +1446,8 @@
         "retain 表保留"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 42
     },
     {
       "id": "R-M2-P5-014",
@@ -1436,7 +1479,8 @@
         "reach a meeting 不合搭配"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 43
     },
     {
       "id": "R-M2-P5-015",
@@ -1468,7 +1512,8 @@
         "returns 第三人称单数"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 44
     },
     {
       "id": "R-M2-P5-016",
@@ -1500,7 +1545,8 @@
         "to accordance 非固定表达"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 45
     },
     {
       "id": "R-M2-P5-017",
@@ -1532,7 +1578,8 @@
         "will complete 是将来"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 0
     },
     {
       "id": "R-M2-P5-018",
@@ -1564,7 +1611,8 @@
         "efficiencies 是复数名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 1
     },
     {
       "id": "R-M2-P5-019",
@@ -1596,7 +1644,8 @@
         "whereas 表对比而非许可条件"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 2
     },
     {
       "id": "R-M2-P5-020",
@@ -1628,7 +1677,8 @@
         "have received 与单数主语不一致"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 3
     },
     {
       "id": "R-M2-P5-021",
@@ -1660,7 +1710,8 @@
         "dispatch employees 指派员工并非告知"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 4
     },
     {
       "id": "R-M2-P5-022",
@@ -1692,7 +1743,8 @@
         "among 表分布于人群中不符"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 5
     },
     {
       "id": "R-M2-P5-023",
@@ -1724,7 +1776,8 @@
         "whose 需要所有对象"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 6
     },
     {
       "id": "R-M2-P5-024",
@@ -1756,7 +1809,8 @@
         "position 为名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 7
     },
     {
       "id": "R-M2-P5-025",
@@ -1788,7 +1842,8 @@
         "therefore 是副词不能作逗号后连接词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 8
     },
     {
       "id": "R-M2-P5-026",
@@ -1820,7 +1875,8 @@
         "drop off 通常不直接带成本宾语"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 9
     },
     {
       "id": "R-M2-P5-027",
@@ -1852,7 +1908,8 @@
         "will occupy 尚未开始与 since 冲突"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 10
     },
     {
       "id": "R-M2-P5-028",
@@ -1884,7 +1941,8 @@
         "with 表伴随"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 11
     },
     {
       "id": "R-M2-P5-029",
@@ -1916,7 +1974,8 @@
         "out of charge 非此处缺货表达"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 12
     },
     {
       "id": "R-M2-P5-030",
@@ -1948,7 +2007,8 @@
         "helpfulness 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 13
     },
     {
       "id": "R-M1-P6-031",
@@ -1980,7 +2040,8 @@
         "停车证十二月到期与搬迁无关"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 14
     },
     {
       "id": "R-M1-P6-032",
@@ -2012,7 +2073,8 @@
         "clearing 是动词分词不表示清晰标注"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 15
     },
     {
       "id": "R-FM1-P6-033",
@@ -2044,7 +2106,8 @@
         "themselves 不能单独代替主语"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 16
     },
     {
       "id": "R-M1-P6-034",
@@ -2076,7 +2139,8 @@
         "大堂盆栽不相关"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 17
     },
     {
       "id": "R-M1-P6-035",
@@ -2108,7 +2172,8 @@
         "accessibility 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 18
     },
     {
       "id": "R-M1-P6-036",
@@ -2140,7 +2205,8 @@
         "印刷产品目录不属于延时客服"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 19
     },
     {
       "id": "R-M1-P6-037",
@@ -2172,7 +2238,8 @@
         "answers 第三人称词形无法紧跟 are"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 20
     },
     {
       "id": "R-M1-P6-038",
@@ -2204,7 +2271,8 @@
         "implementation 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 21
     },
     {
       "id": "R-M1-P6-039",
@@ -2236,7 +2304,8 @@
         "advice 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 22
     },
     {
       "id": "R-M1-P6-040",
@@ -2268,7 +2337,8 @@
         "车站午夜关门无关"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 23
     },
     {
       "id": "R-M1-P6-041",
@@ -2300,7 +2370,8 @@
         "through 是经过过程不表示最迟截止"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 24
     },
     {
       "id": "R-M1-P6-042",
@@ -2332,7 +2403,8 @@
         "welcomed 为过去分词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 25
     },
     {
       "id": "R-M1-P6-043",
@@ -2364,7 +2436,8 @@
         "revising 为主动分词非被修改的预估"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 26
     },
     {
       "id": "R-M1-P6-044",
@@ -2396,7 +2469,8 @@
         "食堂菜单无关天气配送"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 27
     },
     {
       "id": "R-M1-P6-045",
@@ -2428,7 +2502,8 @@
         "until five business days 不构成规范期限表达"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 28
     },
     {
       "id": "R-M1-P6-046",
@@ -2460,7 +2535,8 @@
         "causing 为现在分词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 29
     },
     {
       "id": "R-FM2-P6-001",
@@ -2473,7 +2549,7 @@
       "question": {
         "part": "PART_6",
         "skill": "CONJUNCTION",
-        "article": "Dear Team,\nThe annual inventory count will begin at 7 A.M. Saturday. [1] _____ the warehouse is normally closed on weekends, only employees assigned to the count should enter the building. Team leaders will receive printed checklists when they [2] _____. Please record damaged items separately so they can be reviewed later. [3] _____, do not move products between shelves during the count. We expect the work to be [4] _____ by noon.",
+        "article": "Dear Team,\nThe annual inventory count will begin at 7 A.M. Saturday. [1] _____ the warehouse is normally closed on weekends, only employees assigned to the count should enter the building. Team leaders will receive printed checklists when they [2] _____. Please record damaged items separately so they can be reviewed later. Each product's assigned shelf must match its location on the checklist. [3] _____\nWe expect the work to be [4] _____ by noon.",
         "stem": "Choose the best word for [1].",
         "options": [
           "Because",
@@ -2492,7 +2568,8 @@
         "During 为介词不能接完整从句"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 30
     },
     {
       "id": "R-FM2-P6-002",
@@ -2505,7 +2582,7 @@
       "question": {
         "part": "PART_6",
         "skill": "VERB",
-        "article": "Dear Team,\nThe annual inventory count will begin at 7 A.M. Saturday. [1] _____ the warehouse is normally closed on weekends, only employees assigned to the count should enter the building. Team leaders will receive printed checklists when they [2] _____. Please record damaged items separately so they can be reviewed later. [3] _____, do not move products between shelves during the count. We expect the work to be [4] _____ by noon.",
+        "article": "Dear Team,\nThe annual inventory count will begin at 7 A.M. Saturday. [1] _____ the warehouse is normally closed on weekends, only employees assigned to the count should enter the building. Team leaders will receive printed checklists when they [2] _____. Please record damaged items separately so they can be reviewed later. Each product's assigned shelf must match its location on the checklist. [3] _____\nWe expect the work to be [4] _____ by noon.",
         "stem": "Choose the best word for [2].",
         "options": [
           "arrive",
@@ -2524,7 +2601,8 @@
         "arrival 为名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 31
     },
     {
       "id": "R-FM2-P6-003",
@@ -2537,7 +2615,7 @@
       "question": {
         "part": "PART_6",
         "skill": "SENTENCE_INSERTION",
-        "article": "Dear Team,\nThe annual inventory count will begin at 7 A.M. Saturday. [1] _____ the warehouse is normally closed on weekends, only employees assigned to the count should enter the building. Team leaders will receive printed checklists when they [2] _____. Please record damaged items separately so they can be reviewed later. [3] _____, do not move products between shelves during the count. We expect the work to be [4] _____ by noon.",
+        "article": "Dear Team,\nThe annual inventory count will begin at 7 A.M. Saturday. [1] _____ the warehouse is normally closed on weekends, only employees assigned to the count should enter the building. Team leaders will receive printed checklists when they [2] _____. Please record damaged items separately so they can be reviewed later. Each product's assigned shelf must match its location on the checklist. [3] _____\nWe expect the work to be [4] _____ by noon.",
         "stem": "Which sentence best completes blank [3] in the inventory notice?",
         "options": [
           "Staff may change shelf location codes whenever they find a better layout.",
@@ -2546,7 +2624,7 @@
           "Do not move products between shelves during the count."
         ],
         "answerIndex": 3,
-        "explanation": "前后都是盘点操作要求，In addition 表补充。",
+        "explanation": "原文要求每件商品的货架位置与清单上的位置一致，因此盘点期间不得随意移动货物。A允许变更货架编码，与固定位置要求冲突；B以销售手册取代盘点清单，违背已安排发放盘点清单的要求；C允许未获指派的人员入仓，违背仅限盘点人员进入的明确限制。D是唯一符合操作要求的完整句子。",
         "version": 1
       },
       "correctBasis": "文档要求各产品货架与盘点清单一致，因此不能在盘点时跨货架移动产品，应选择完整句D",
@@ -2556,7 +2634,8 @@
         "C允许未获指派者入库违背仅限指派人员"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 32
     },
     {
       "id": "R-FM2-P6-017",
@@ -2569,7 +2648,7 @@
       "question": {
         "part": "PART_6",
         "skill": "VOICE",
-        "article": "Dear Team,\nThe annual inventory count will begin at 7 A.M. Saturday. [1] _____ the warehouse is normally closed on weekends, only employees assigned to the count should enter the building. Team leaders will receive printed checklists when they [2] _____. Please record damaged items separately so they can be reviewed later. [3] _____, do not move products between shelves during the count. We expect the work to be [4] _____ by noon.",
+        "article": "Dear Team,\nThe annual inventory count will begin at 7 A.M. Saturday. [1] _____ the warehouse is normally closed on weekends, only employees assigned to the count should enter the building. Team leaders will receive printed checklists when they [2] _____. Please record damaged items separately so they can be reviewed later. Each product's assigned shelf must match its location on the checklist. [3] _____\nWe expect the work to be [4] _____ by noon.",
         "stem": "Choose the best word for [4].",
         "options": [
           "completes",
@@ -2588,7 +2667,8 @@
         "completion 名词不能在此与 be 构成所需完成结构"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 33
     },
     {
       "id": "R-M2-P6-005",
@@ -2620,7 +2700,8 @@
         "Therefore 是副词不能在此直接引导从句"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 34
     },
     {
       "id": "R-M2-P6-006",
@@ -2652,7 +2733,8 @@
         "still 表仍继续却未解释替代关系"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 35
     },
     {
       "id": "R-M2-P6-007",
@@ -2684,7 +2766,8 @@
         "publish 发表人员不合"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 36
     },
     {
       "id": "R-FM2-P6-018",
@@ -2716,7 +2799,8 @@
         "completeness 名词不能作被动谓语"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 37
     },
     {
       "id": "R-FM2-P6-009",
@@ -2748,7 +2832,8 @@
         "have been required 与单数主语不一致"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 38
     },
     {
       "id": "R-M2-P6-010",
@@ -2780,7 +2865,8 @@
         "automate 为动词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 39
     },
     {
       "id": "R-M2-P6-011",
@@ -2812,7 +2898,8 @@
         "Canceling 为分词，取消申请通常名词定语"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 40
     },
     {
       "id": "R-M2-P6-012",
@@ -2844,7 +2931,8 @@
         "causes 为单数谓语"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 41
     },
     {
       "id": "R-M2-P6-013",
@@ -2876,7 +2964,8 @@
         "matched 为过去时与新规定现在一般描述不符"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 42
     },
     {
       "id": "R-M2-P6-014",
@@ -2908,7 +2997,8 @@
         "whose 是所有格需接名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 43
     },
     {
       "id": "R-M2-P6-015",
@@ -2940,7 +3030,8 @@
         "Meanwhile 表同时而非因此"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 44
     },
     {
       "id": "R-M2-P6-016",
@@ -2972,7 +3063,8 @@
         "certify 是动词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false
+      "expertCertified": false,
+      "slot": 45
     }
   ]
 }
