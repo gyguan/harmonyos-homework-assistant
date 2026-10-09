@@ -17,8 +17,8 @@
   },
   "limitations": "AI first pass with exact active-pool slot mapping, three source-specific distractor notes per item, and Git source blob snapshot. Original archived ambiguous items remain untouched; ledger is not an ETS/second independent human assessment. Dynamic Part6 inherits historical stems/articles as described by assembly source; source SHA guards all dynamic code.",
   "sourceBlobs": {
-    "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "4be4a4f1c762362220fb2a0ebe8a31d62ebb9e8f",
-    "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "e954bef30ef8b570bde6d6c312c0e5eba6d33638",
+    "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "e8e80bff17620d563250ccfebe9a44271e198d33",
+    "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "8cd746ea9c71c5fa2f1211c99b74cfd88d4c2d18",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part5V2Content.ets": "6c23443627988a138a0a820e3cb6e16a574f7089",
     "entry/src/main/ets/toeic/content/ToeicMockPart6V2RepairContent.ets": "a7b037e937153bbe7aa3f499d4c6586753612f01",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6V2Content.ets": "4fdc74a07b2cdb0a9881a9280047003149b0f2f6",
@@ -3066,5 +3066,13 @@
       "expertCertified": false,
       "slot": 45
     }
-  ]
+  ],
+  "sourceChangeAttestation": {
+    "date": "2026-10-09",
+    "issue": 478,
+    "scope": "sentence-drill-only",
+    "questionAndStudyPlanContentUnchanged": true,
+    "method": "Balanced-constructor masking comparison against main@274b158b: remove each complete new ToeicSentenceDrill(...) constructor; remaining WeekOne, WeekTwo, WeekThree sources are byte-for-byte unchanged. Existing dynamic semantic validators recheck all original P5/P6 and Part7 question IDs, text and correct answers against ledger.",
+    "note": "Refresh source Git blobs only for WeekTwo/WeekThree translation guidance corrections; do not revise any question answer, version, original option, evidence, study day, or source item semantics. Does not count as a new independent editorial pass."
+  }
 }
