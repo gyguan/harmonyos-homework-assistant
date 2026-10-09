@@ -107,7 +107,7 @@ export class ToeicVocabularyExampleCatalog {
       new ToeicVocabularyExample('V-087',"The cafeteria will reopen when the repairs are complete."),
       new ToeicVocabularyExample('V-088',"Passengers should arrive at the station before the departure time."),
       new ToeicVocabularyExample('V-089',"The flight's arrival was delayed by heavy rain."),
-      new ToeicVocabularyExample('V-090',"The train fare includes one checked bag.")
+      new ToeicVocabularyExample('V-090',"The train fare is lower if you book one week in advance.")
     ];
   }
 
