@@ -144,7 +144,7 @@ def check(trans: dict, questions: dict, group: dict, source_rows: list[dict],
                 "answerIndex": 1,
                 "explanation": EXPLANATION,
                 "evidence": EVIDENCE,
-            } and "尚未" not in note["correctBasis"] or False,
+            },
             "conditional-first-pass snapshot differs")
     # The factual question and explanation must be explicitly conditional:
     require("不能认定已经提交" in note["correctBasis"],
