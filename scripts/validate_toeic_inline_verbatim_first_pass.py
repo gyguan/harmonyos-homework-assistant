@@ -45,7 +45,7 @@ def verify_item(entry: dict, q) -> None:
                 len(entry.get("correctBasis", "").strip()) < 15):
             raise AssertionError(f"{key}: archived ambiguity must remain explicitly flagged")
     elif entry["reviewOutcome"] != "AI_FIRST_PASS" or entry.get("correctBasis") != q.explanation:
-        raise AssertionError(f"{key}: unreviewed or changed explanation)
+        raise AssertionError(f"{key}: unreviewed or changed explanation")
     reasons = entry.get("distractorReasons")
     if not isinstance(reasons, list) or len(reasons) != 3:
         raise AssertionError(f"{key}: each wrong choice must have an exclusion")
