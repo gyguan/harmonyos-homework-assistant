@@ -2538,7 +2538,7 @@
       "correction": null
     },
     "P7-EX-CATERING": {
-      "contentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5",
+      "contentSha256": "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f",
       "documentCount": 3,
       "questionCount": 5,
       "decision": "PASS_AI_RECHECK",
@@ -2557,7 +2557,7 @@
         },
         {
           "id": "R-P7-CATERING-02",
-          "question": "How much more will the revised catering order cost?",
+          "question": "Based on the accepted quantities, how much higher is the estimated revised catering cost?",
           "answerIndex": 0,
           "answer": "$260",
           "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || Original catering cost: $1,360. || update catering to 135 coffee servings and 135 boxed lunches.",
@@ -2594,7 +2594,7 @@
         },
         {
           "id": "R-P7-CATERING-05",
-          "question": "What should the updated invoice show as the total catering charge?",
+          "question": "Assuming all 135 ordered coffee servings are served, what is the estimated total catering charge?",
           "answerIndex": 1,
           "answer": "$1,620",
           "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || update catering to 135 coffee servings and 135 boxed lunches.",
@@ -2605,7 +2605,7 @@
           "result": "PASS_AI_RECHECK"
         }
       ],
-      "correction": "2026-10-09 Issue #478: R-P7-CATERING-04 Chinese explanation must include through Oct8 5PM deadline; answer and evidence unchanged"
+      "correction": "2026-10-09 Issue #478: R-P7-CATERING-04 Chinese explanation must include through Oct8 5PM deadline; answer and evidence unchanged; 2026-10-09: CATERING-02 and -05 v2 distinguish accepted order estimate from actual coffee served."
     }
   }
 }
