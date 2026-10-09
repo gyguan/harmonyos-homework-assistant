@@ -15,6 +15,7 @@ import re
 from export_toeic_review_pack import CONTENT, ROOT
 from toeic_review_integrity import vocabulary_fingerprint
 from validate_toeic_vocabulary_dictionary_issue478 import parse_batches
+from validate_toeic_vocabulary_examples_issue478 import get_rows, get_supplement
 
 APPROVALS = ROOT / "docs/product/toeic-editorial-approvals.json"
 FIRST = ROOT / "docs/product/toeic-ai-editorial-review-2026-10-08.json"
@@ -101,6 +102,26 @@ def check(rows: dict, ipa: dict, approvals: dict, first: dict, second: dict) -> 
             "V-207: late-change wording falsely implies cancellations")
 
 
+
+def check_effective_examples(extras: dict[str, str]) -> None:
+    """Inspect the exact learning-card example catalog, not synthetic test data."""
+    originals = get_rows()
+    require(len(originals) == 300, "expected 300 real original words")
+    require(len(extras) == 90, "expected 90 real supplemental examples")
+    corrected = (
+        "The hotel will charge a cancellation fee if guests cancel "
+        "after the cancellation deadline."
+    )
+    require(extras.get("V-056") == corrected,
+            "V-056: still teaches cancellation fees for arbitrary late changes")
+    for item_id, (_, _, original_sentence) in originals.items():
+        effective = original_sentence or extras.get(item_id, "")
+        if "cancellation fee" in effective.lower():
+            require("late changes" not in effective.lower(),
+                    f"{item_id}: late changes incorrectly equated to cancellation")
+
+
+
 def validate() -> None:
     rows = parse_batches()
     pronunciation = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(
@@ -113,6 +134,8 @@ def validate() -> None:
     first = json.loads(FIRST.read_text(encoding="utf-8"))
     second = json.loads(SECOND.read_text(encoding="utf-8"))
     check(rows, ipa, approvals, first, second)
+    examples = get_supplement()
+    check_effective_examples(examples)
     for key, column, obsolete in (
         ("V-180", "synonyms", ["difference between revenue and cost"]),
         ("V-207", "example", "The hotel charges a cancellation fee for late changes."),
@@ -129,6 +152,18 @@ def validate() -> None:
             raise AssertionError(
                 f"TOEIC_ISSUE478_BUSINESS_CONTEXT_FAIL: obsolete {key} accepted")
 
+    corrupted_examples = dict(examples)
+    corrupted_examples["V-056"] = (
+        "The hotel will charge a cancellation fee for late changes.")
+    try:
+        check_effective_examples(corrupted_examples)
+    except AssertionError as ex:
+        require("V-056" in str(ex),
+                "real learner example negative check failed unexpectedly")
+    else:
+        raise AssertionError(
+            "TOEIC_ISSUE478_BUSINESS_CONTEXT_FAIL: old V-056 example accepted")
+
     corrupted_review = deepcopy(approvals)
     corrupted_review["vocabulary"]["V-202"]["contentSha256"] = "0" * 64
     try:
@@ -140,7 +175,7 @@ def validate() -> None:
             "TOEIC_ISSUE478_BUSINESS_CONTEXT_FAIL: forged hash accepted")
 
     print("TOEIC_ISSUE478_BUSINESS_CONTEXT_PASS source_batch_words=180 "
-          "corrected_word_ids=5 corrected_examples=1 negative_checks=5 "
+          "corrected_word_ids=6 corrected_examples=2 negative_checks=6 "
           "human_ETS_certification=NO")
 
 
