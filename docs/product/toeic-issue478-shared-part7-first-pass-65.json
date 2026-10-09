@@ -1791,7 +1791,7 @@
         "id": "R-P7-CATERING-04",
         "sourceFile": "ToeicExtraReadingBatchSix.ets",
         "groupId": "P7-EX-CATERING",
-        "version": 1,
+        "version": 2,
         "stem": "Was the change to catering quantities accepted before the stated cutoff?",
         "options": [
           "No, it was accepted on October 12",
@@ -1838,7 +1838,7 @@
     {
       "date": "2026-10-09",
       "issue": "#478",
-      "reason": "R-P7-CATERING-04 Chinese explanation corrected for inclusive through; original answer/options/evidence unchanged, all five question group hashes rebound after source verified",
+      "reason": "R-P7-CATERING-04 Chinese explanation corrected for inclusive through; original answer/options/evidence unchanged, all five question group hashes rebound after source verified; published question R-P7-CATERING-04 version 1 -> 2 per content standard, original answers/choices/history retained",
       "evidence": "docs/product/toeic-issue478-reading-deadlines-review-2026-10-09.md",
       "reviewStatus": "AI_FIRST_PASS",
       "isExpertCertified": false
