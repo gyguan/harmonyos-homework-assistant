@@ -169,7 +169,8 @@ def current_items() -> list[dict]:
 def check_one(record: dict, original: dict, reasons: dict) -> None:
     qid = original["id"]
     if {k: record[k] for k in ("id", "day", "slot", "source", "question")} != original:
-        raise AssertionError(f"{qid}: source/slot/answer/option snapshot changed")
+        changes = {key: {"actual": record.get(key), "expected": original.get(key)} for key in ("id", "day", "slot", "source", "question") if record.get(key) != original.get(key)}
+        raise AssertionError(f"{qid}: active snapshot drift {changes}")
     if record.get("reviewOutcome") != "AI_FIRST_PASS" or record.get("expertCertified") is not False:
         raise AssertionError(f"{qid}: invalid editorial status")
     if record["question"]["answerIndex"] not in range(4):
