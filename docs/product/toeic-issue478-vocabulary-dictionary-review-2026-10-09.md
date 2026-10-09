@@ -18,13 +18,13 @@
 - V-164：<https://dictionary.cambridge.org/dictionary/english/contingency>
 - V-245：<https://dictionary.cambridge.org/dictionary/english/enclosure>
 - V-014 refund 名词、动词重音不同：<https://dictionary.cambridge.org/pronunciation/american-english/refund>
-- V-038 transfer 美音动词与名词可同为首音节重音，不要误用英音规则批量修正：<https://dictionary.cambridge.org/pronunciation/english/transfer>
+- V-038 transfer 美音动词既有首音节重音 /ˈtrænsfɝː/，也见第二音节重音 /trænsˈfɝː/；名词首音节重音。不能将第二种美音变体错误当作唯一美音，也不能省略该变体：<https://dictionary.cambridge.org/pronunciation/english/transfer>
 - V-082 upgrade 名词、动词重音不同：<https://dictionary.cambridge.org/pronunciation/english/upgrade>
 - V-051 estimate 名词、动词读法不同：<https://dictionary.cambridge.org/pronunciation/english/estimate>
 - V-033 résumé 要使用重音语义避免 TTS 念成 resume（继续）：<https://dictionary.cambridge.org/pronunciation/english/resume>
 - V-238 arrears 为复数名词、V-283 refreshments 为复数名词，V-300 per diem 为名词津贴：<https://dictionary.cambridge.org/dictionary/english/arrears>、<https://dictionary.cambridge.org/dictionary/english/refreshment>、<https://dictionary.cambridge.org/dictionary/english/per-diem>
 
-其中仅 V-164、V-245 改动内容；对正确的音标和已有 TTS 语义消歧策略保持原样。辞典中的异体读音可能并存，不应以单一音标字符串宣称所有方言发音唯一正确。
+本批 V-164、V-245 修改词义；V-038 补充已有美音动词的另一重音变体。TTS 仍由系统 en-US 引擎负责，显示双变体不保证真实语音一定按指定变体发声。其余已核对的音标和现有 TTS 消歧规则保持原样。辞典中的异体读音可能并存，不应以单一音标字符串宣称所有方言发音唯一正确。
 
 ## 审核快照与可重复的回归门禁
 
