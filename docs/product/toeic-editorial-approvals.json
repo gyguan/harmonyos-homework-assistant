@@ -675,10 +675,10 @@
     "V-202": {
       "reviewer": "AI-GPT6",
       "approvedAt": "2026-10-09",
-      "contentSha256": "e85922722ac0c3a0f65b66c7153c2ff1bfac3a38eb97935999808c7d7650f74a",
+      "contentSha256": "3ee38e384a78d609916dd78fde1bc79fb236c45982cc4f6dc7d3af08bac86b9e",
       "reviewMode": "AI_EDITORIAL",
       "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
-      "revisionNote": "Issue #478 (2026-10-09) exact-content business context recheck; see docs/product/toeic-issue478-business-context-review-2026-10-09.md. AI_EDITORIAL, not human/ETS certification"
+      "revisionNote": "Cambridge Business English: troubleshooting attempts to find causes and solutions, not guaranteed repair; AI_EDITORIAL only."
     },
     "V-203": {
       "reviewer": "AI-GPT6",
