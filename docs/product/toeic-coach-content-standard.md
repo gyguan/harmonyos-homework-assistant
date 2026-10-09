@@ -648,5 +648,5 @@ Issue #447 的第六个发布批次计划与第 3–5 批**同时纳入单个独
 
 - 商务指标词的语义说明需要符合其行业口径：`profit margin` 可以用绝对利润差额或利润率说明，但表达“常以百分比表示”时不要错写为永远等于利润额；酒店 `occupancy rate` 对应已占用客房/可售客房而不是全部设施利用率。
 - 工程动作词必须保留完成条件：`troubleshoot` 是诊断并尝试解决故障，不能宣称已经修好，也不能在学习释义中只留下“诊断”。
-- 例句必须与限定词的一般业务用法一致：`cancellation fee` 必须明确发生取消预订，不能把任意 `late changes` 当作 `cancellation`；活动 `higher attendance` 表示参加人数更多而非只有“在场”。
+- 例句必须与限定词的一般业务用法一致：`cancellation fee` 必须明确发生取消预订，不能把任意 `late changes` 当作 `cancellation`；活动 `higher attendance` 表示参加人数更多而非只有“在场”。核验要穿透 `ToeicVocabularyExampleCatalog` 补充目录和 `ToeicPronunciationCatalog.apply` 的最终展示文本，例如 V-056；不能只校验批次词 V-207。
 - 每个语义订正都必须记录外部词典或业界指标来源、精确资产 ID、修订后的 SHA256 和真实审校模式（AI/HUMAN）；`scripts/validate_toeic_business_context_issue478.py` 维护正向与负向回归，统一 TOEIC 门禁不能关闭。只证明修订范围内的断言，不能假称第三方对完整 300 词审核。
