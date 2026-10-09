@@ -199,32 +199,67 @@ def validate() -> None:
     for row, actual in zip(published, expected, strict=True):
         check_item(row, actual)
 
-    # Evidence snippets in four current grouped questions are incomplete:
-    # full multi-document articles still support the answers, but students
-    # should not be led to believe the highlighted excerpt is the full proof.
+    # The four catalog v1 evidence fields are intentionally frozen for saved
+    # attempt/version replay. The actual result/history learner view must now
+    # supplement every omitted source fragment before this gate can pass.
     known_gaps = {
         "R-FM1-P7-M1-01", "R-FM1-P7-M4-01",
         "R-FM2-P7-M1-01", "R-FM2-P7-M5-03",
     }
     findings = data.get("editorialFindings", [])
     if len(findings) != 4 or {f["id"] for f in findings} != known_gaps:
-        raise AssertionError("four known learner-evidence coverage gaps must stay visible")
+        raise AssertionError("must retain four historic evidence-gap provenance records")
+    ui = (CONTENT.parent / "ui/ToeicHomePage.ets").read_text(encoding="utf-8")
+    service = (CONTENT.parent / "application/ToeicEvidenceDisplayService.ets").read_text(encoding="utf-8")
+    # One shared presentation path for active question, practice result and
+    # saved mock report: do not certify a fix only visible on one screen.
+    if ui.count("ToeicEvidenceDisplayService.forQuestion(question)") != 3:
+        raise AssertionError("all three learner-facing evidence paths must use the reviewed presenter")
+    if "return parts.join(' || ');" not in service or "for (let fragment of supplement.fragments)" not in service:
+        raise AssertionError("reviewed evidence supplements are not actually rendered")
+    supplemental = {}
+    for item in re.finditer(
+        r"new ToeicEvidenceSupplement\\(\\s*'([^']+)'\\s*,\\s*(\\[[\\s\\S]*?\\])\\s*\\)",
+        service,
+    ):
+        key, raw_fragments = item.group(1), item.group(2)
+        if key in supplemental:
+            raise AssertionError(f"{key}: duplicate evidence display supplement")
+        supplemental[key] = ast.literal_eval(raw_fragments)
+    if set(supplemental) != known_gaps:
+        raise AssertionError("all four reviewed evidence supplements must be present, no stale overrides")
     by_id = {r["id"]: r for r in published}
     for finding in findings:
         q = by_id[finding["id"]]
         if finding["type"] != "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE":
-            raise AssertionError(f'{finding["id"]}: invalid evidence-gap classification')
+            raise AssertionError(f'{finding["id"]}: wrong historical finding kind')
         if finding["answerValidity"] != "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER":
-            raise AssertionError(f'{finding["id"]}: evidence gap must not masquerade as unsupported answer')
-        excerpt = q["evidence"]
-        doc_text = "\\n\\n".join(q["documents"])
+            raise AssertionError(f'{finding["id"]}: claim about source support changed')
+        if finding.get("presentationStatus") != "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT":
+            raise AssertionError(f'{finding["id"]}: cannot mark unremediated learner evidence as PASS')
+        if finding.get("archivedEvidenceUnchanged") is not True:
+            raise AssertionError(f'{finding["id"]}: original v1 source must be preserved')
+        original_excerpt = q["evidence"]
+        document_text = "\\n\\n".join(q["documents"])
         missing = finding.get("missingEvidenceFragments")
-        if not isinstance(missing, list) or not missing:
-            raise AssertionError("must list exactly which evidence the highlight omitted")
+        additions = supplemental[finding["id"]]
+        if not isinstance(missing, list) or not missing or not isinstance(additions, list):
+            raise AssertionError(f'{finding["id"]}: missing reviewed evidence detail')
+        display_excerpt = original_excerpt + " || " + " || ".join(additions)
         for fragment in missing:
-            if fragment not in doc_text or fragment in excerpt:
-                raise AssertionError(f'{finding["id"]}: stale or fabricated missing evidence fragment')
-    # Do not call the data independent teacher/ETS certification.
+            if fragment not in document_text or fragment in original_excerpt:
+                raise AssertionError(f'{finding["id"]}: invalid historical missing-evidence finding')
+            if fragment not in additions or fragment not in display_excerpt:
+                raise AssertionError(f'{finding["id"]}: published learner-visible evidence remains incomplete')
+        for fragment in additions:
+            if fragment not in document_text:
+                raise AssertionError(f'{finding["id"]}: display evidence not traceable to group document')
+        # Negative check: ignoring supplements must fail the same proof test.
+        if all(fragment in original_excerpt for fragment in missing):
+            raise AssertionError(f'{finding["id"]}: negative control did not expose original gap')
+    if data["scope"].get("learnerPresentationUnresolvedGaps") != 0:
+        raise AssertionError("cannot close issue while display evidence is incomplete")
+    # This remains an AI editorial audit, not teacher or ETS certification.
 
     # Negative controls: changing one answer, one distractor or one underlying
     # source requires a genuine re-review rather than trusting the stale ledger.
@@ -252,7 +287,7 @@ def validate() -> None:
     print("TOEIC_ISSUE478_V2_DERIVED_PART7_SEMANTIC_PASS items=72 "
           "day14=39 day19=33 grouped=30 singles=42 "
           "distractor_exclusions=216 source_git_blobs=4 "
-          "rotated_correct_answer_text=verified evidence_highlight_gaps=4 "
+           "rotated_correct_answer_text=verified archival_evidence_excerpt_gaps=4 learner_display_gaps=0 "
           "human_expert_ETS_certification=NO")
 
 
