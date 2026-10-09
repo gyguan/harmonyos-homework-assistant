@@ -6,8 +6,6 @@ import json
 from pathlib import Path
 from validate_toeic_question_quality import collect
 from validate_toeic_translation_coverage import collect_translations
-from validate_toeic_evidence_provenance import parse_group_sources
-from toeic_review_integrity import reading_fingerprint
 
 ROOT = Path(__file__).resolve().parents[1]
 HASH = "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f"
@@ -28,7 +26,6 @@ def check(qs, translations, approvals, ai, first, second):
         q = source[qid]
         require(q.stem == stem and q.explanation == explanation and q.version == version and q.answer == answer,
                 qid + " actual published question drifted")
-        require(translations[qid][2] == stem if False else True, "unused")
     require(approvals["readingGroups"]["P7-EX-CATERING"]["contentSha256"] == HASH, "approval fingerprint")
     require(ai["readingGroups"]["P7-EX-CATERING"]["contentSha256"] == HASH, "AI fingerprint")
     require(second["readingGroups"]["P7-EX-CATERING"]["contentSha256"] == HASH, "second pass fingerprint")
