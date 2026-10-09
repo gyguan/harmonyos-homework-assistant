@@ -315,8 +315,11 @@ def validate() -> dict[str, int]:
         errors.append("R-P7-DOUBLE-1104: seminar completion time must be stated")
     if "Each applicant must identify _____ with a photo ID" not in id_map["R-P5-SPRINT-1528"].stem:
         errors.append("R-P5-SPRINT-1528: use idiomatic identify oneself, not provide oneself with ID at reception")
-    if "入选面试的申请人最迟会在 10 月 18 日当天收到联系。" not in contents["ToeicWeekTwoContent"]:
-        errors.append("S-037: no later than October 18 must include the deadline date in Chinese")
+    week_two_text = contents["ToeicWeekTwoContent"]
+    if "最迟将于 10 月 18 日收到联系（含当天，也可能更早）" not in week_two_text:
+        errors.append("S-037: no later than October 18 must preserve an inclusive deadline and allow earlier contact")
+    if "10 月 18 日前收到联系" in week_two_text or "10月18日前收到联系" in week_two_text:
+        errors.append("S-037: Chinese must not exclude October 18 from the no-later-than deadline")
     group_count = 0
     grouped_count = 0
     seen_members: set[str] = set()
