@@ -17,6 +17,11 @@ export class ToeicQuestionTranslationCatalog {
   }
 
   static find(questionId:string):ToeicQuestionTranslation|null {
+    if (questionId==='R-FP6-SPRINT-1610') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '如果椅子无法现场修复，我们_____提供临时替换椅。',
+        ['提供（单数谓语）','曾提供（过去式）','将提供（将来时）','提供（非谓语）']);
+    }
     // Revised active questions keep translated feedback without altering the
     // fixed 221-row historical translation catalog or old mock reports.
     if (questionId==='R-FP5-VERB-0206') {
