@@ -160,7 +160,7 @@ def current_items() -> list[dict]:
                     "part": old.part, "skill": skill, "article": article,
                     "stem": stem, "options": options,
                     "answerIndex": answer, "explanation": explanation,
-                    "version": 1,
+                    "version": 1 if qid != original_id else old.version,
                 },
             })
     return result
