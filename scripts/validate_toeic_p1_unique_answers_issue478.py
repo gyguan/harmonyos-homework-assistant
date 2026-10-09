@@ -29,7 +29,9 @@ def validate() -> None:
     source = PRESET.read_text(encoding="utf-8")
     assert ".concat(ToeicP5UniqueAnswerIssue478.questions())" in source
     assert "plan.day===3" in source and "id==='R-P5-VERB-0206' ? 'R-FP5-VERB-0206'" in source
-    assert "plan.day===15" in source and "id==='R-P5-SPRINT-1517' ? 'R-FP5-SPRINT-1517'" in source
+    assert "plan.day===15" in source
+    assert "if (id==='R-P5-SPRINT-1517') return 'R-FP5-SPRINT-1517';" in source
+    assert "if (id==='R-P5-SPRINT-1528') return 'R-FP1-P5-1528';" in source
     for id in ("R-P5-VERB-0206", "R-P5-SPRINT-1517"):
         assert f"question.id==='{id}'" in source, f"old question still eligible for new live sessions: {id}"
     chinese = TRANSLATIONS.read_text(encoding="utf-8")
