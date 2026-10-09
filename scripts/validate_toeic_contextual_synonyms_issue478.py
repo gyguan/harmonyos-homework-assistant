@@ -107,7 +107,7 @@ def validate() -> None:
     rows = parse_batches()
     source = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(encoding="utf-8")
     ipa_rows = re.findall(
-        r"new ToeicPronunciationEntry\\('(V-\\d+)','([^']+)'", source)
+        r"new ToeicPronunciationEntry\('(V-\d+)','([^']+)'", source)
     ipa = dict(ipa_rows)
     require(len(ipa_rows) == len(ipa) == 300, "duplicate or missing pronunciation")
     approvals = json.loads(APPROVALS.read_text(encoding="utf-8"))
