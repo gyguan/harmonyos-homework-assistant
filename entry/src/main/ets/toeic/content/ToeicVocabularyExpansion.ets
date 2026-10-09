@@ -36,7 +36,7 @@ export class ToeicVocabularyExpansion {
       new ToeicVocabularyItem("V-116","installment","n.","分期付款额",ToeicVocabularyLevel.L2,"财务",["monthly installment"],["scheduled payment"],"","en-US","","The first monthly installment is due in June."),
       new ToeicVocabularyItem("V-117","forecast","n./v.","预测；预报",ToeicVocabularyLevel.L2,"经营",["sales forecast"],["projection"],"","en-US","","The latest sales forecast suggests steady growth."),
       new ToeicVocabularyItem("V-118","subsidy","n.","补贴；津贴",ToeicVocabularyLevel.L3,"财务",["government subsidy"],["financial support"],"","en-US","","The company applied for a training subsidy."),
-      new ToeicVocabularyItem("V-119","productivity","n.","生产效率；生产率",ToeicVocabularyLevel.L2,"运营",["improve productivity"],["output efficiency"],"","en-US","","The new software is expected to improve productivity."),
+      new ToeicVocabularyItem("V-119","productivity","n.","生产率；单位投入所产生的产出效率",ToeicVocabularyLevel.L2,"运营",["improve productivity"],["output per unit of input"],"","en-US","","The new software is expected to improve productivity."),
       new ToeicVocabularyItem("V-120","promptly","adv.","及时地；迅速地",ToeicVocabularyLevel.L1,"服务",["respond promptly"],["quickly"],"","en-US","","Please respond promptly to customer requests.")
     ];
   }
