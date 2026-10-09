@@ -6,6 +6,7 @@ import { ToeicPart, ToeicPerformance, ToeicMockReport, ToeicMockAnswerRecord, To
 import { ToeicCoachViewModel } from './ToeicCoachViewModel';
 import { ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
 import { ToeicReadingGroupService } from '../application/ToeicReadingGroupService';
+import { ToeicEvidencePresentationService } from '../application/ToeicEvidencePresentationService';
 import { ToeicAnswerDisplayOrder } from '../application/ToeicAnswerDisplayOrder';
 import { ToeicVocabularyQuizService } from '../application/ToeicVocabularyQuizService';
 
@@ -235,7 +236,7 @@ export struct ToeicHomePage {
     this.currentTranslationOptionD=translation===null?'':translation.options[this.currentOptionOrder[3]];
     this.currentCorrectIndex=ToeicAnswerDisplayOrder.displayIndex(this.currentOptionOrder,question.correctIndex);
     this.currentExplanation=question.explanation;
-    this.currentEvidence=question.evidence;
+    this.currentEvidence=ToeicEvidencePresentationService.fullEvidence(question.id,question.evidence);
     this.currentParaphrase=question.paraphrase;
     this.currentRecommendedSeconds=question.recommendedSeconds;
     this.currentPart=question.part;
@@ -818,7 +819,7 @@ export struct ToeicHomePage {
       }
       review.push(new ToeicPracticeReviewItem(question.id,this.viewModel.partLabel(question.part),
         question.stem,passage,chosen,question.options[question.correctIndex],
-        attempt!==null && attempt.correct,question.explanation,question.evidence,
+        attempt!==null && attempt.correct,question.explanation,ToeicEvidencePresentationService.fullEvidence(question.id,question.evidence),
         this.viewModel.attemptCount(question.id),this.viewModel.wrongCount(question.id)));
     }
     this.practiceReviewItems=review;
@@ -867,7 +868,7 @@ export struct ToeicHomePage {
         let chosen=answer.selectedIndex<0?'未作答':question.options[answer.selectedIndex];
         review.push(new ToeicPracticeReviewItem(question.id,this.viewModel.partLabel(question.part),
           question.stem,passage,chosen,question.options[question.correctIndex],answer.correct,
-          question.explanation,question.evidence,0,0));
+          question.explanation,ToeicEvidencePresentationService.fullEvidence(question.id,question.evidence),0,0));
       }
     }
     this.practiceReviewItems=review;
