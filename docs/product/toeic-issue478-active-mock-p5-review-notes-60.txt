@@ -1,0 +1,60 @@
+R-M1-P5-001|completing 是动名词，修饰动作必须选副词 efficiently|efficient 是形容词不修饰动作|efficiency 是名词|efficiencies 是复数名词
+R-M1-P5-002|within five business days 表示五个工作日内|among 用于集合内部|beside 表位置|toward 表朝向
+R-M1-P5-003|不可数 software 作第三人称单数主语，使用 notifies users|notify 是原形且缺助动词|notifying 缺谓语结构|notification 是名词
+R-M1-P5-004|make a reservation 是正式预订的固定搭配|do 不是标准预订动词|take a reservation 通常是接单方用法|hold a reservation 是保留已有预订不是创建
+R-M1-P5-005|distributed promptly 使用副词修饰分发动作|prompt 是形容词|promptness 是名词|prompting 是分词不适合作方式状语
+R-M1-P5-006|as long as 引导完整条件句并表达条件|despite 后接名词或动名词|because of 后接名词|during 后接名词
+R-M1-P5-007|relocate its office 表示将办公地点迁往新楼|refund 办公室不合义|dispatch office 不合这里搬迁语境|inspect 不是搬迁
+R-M1-P5-008|must be reviewed 使用被动过去分词|review 是原形|reviewing 是现在分词|reviews 是第三人称单数
+R-M1-P5-009|particularly 修饰 valuable 形容词|particular 为形容词|particularity 为名词|particulars 为复数名词
+R-M1-P5-010|between A and B 表示两个位置之间|through 表穿过|until 用时间界限|except 表除外
+R-M1-P5-011|since 2021 延续到当前，用 has worked|works 与持续起点 since 2021 不搭配|worked 通常需过去终点语境|working 缺助动词
+R-M1-P5-012|extend the deadline by three days 表示延长三天|rise 通常不及物|grow deadline 不是常见搭配|spread deadline 含义不对
+R-M1-P5-013|remain closed 表示维持关闭状态|close 原形动词|closely 是副词|closure 是名词
+R-M1-P5-014|Although 引导事实转折：第一批迟到但第二批准时|Because of 不能直接接完整从句|During 不能接从句|Unless 表条件例外而非已发生事实的让步
+R-M1-P5-015|永久离职应 return 门禁卡|estimate 不是交还|reserve 表保留|promote 与交卡无关
+R-M1-P5-016|discount available for online purchases 是优惠适用范围|at purchases 不成立|from purchases 不成立|by purchases 不成立
+R-M1-P5-017|if 从句用现在时且 client 为第三人称单数 approves|approve 缺单数词尾|approved 为过去时不对应实际未来条件|approving 非谓语
+R-M1-P5-018|detailed 作为形容词修饰 explanation|detail 是名词或动词|detailing 是分词但此处不表具体解释质量|details 为复数名词
+R-M1-P5-019|issue an invoice 表示开具发票|attend invoice 语义不通|occupy invoice 不通|arrive 为不及物不能直接接 invoice
+R-M1-P5-020|if 引导需要访客证时才联系前台的条件句|despite 不能直接接从句|during 是介词|because of 要接名词
+R-M1-P5-021|in stock 是库存充足的固定搭配|agenda 是议程|venue 是地点|salary 是薪资
+R-M1-P5-022|unanimous decision 为一致决定，形容词修饰名词|unanimously 是副词|unanimity 是名词|unanimouslyness 非标准词
+R-M1-P5-023|closed for renovations 是因装修关闭|among 不表示关闭原因|under renovations 不如 under renovation 且此句不合搭配|beside 表位置
+R-M1-P5-024|by the time starts 指将来节点之前已完成，will have prepared|prepared 仅过去无将来完成意义|prepares 不能突出在将来节点前完成|preparing 缺谓语
+R-M1-P5-025|conduct a survey 是开展调查的固定搭配|build a survey 不表示实施调查|catch survey 语义不通|carry a survey 缺 out
+R-M1-P5-026|visually appealing 中副词修饰 appealing|visual 是形容词|vision 是名词|visualize 是动词
+R-M1-P5-027|if package cannot be delivered 表达配送失败的条件|while 表同时期间非指定条件|despite 不能直接接从句|because of 接名词
+R-M1-P5-028|confirm their arrival times 是确认到达时间|repair 时间搭配不通|lease 表租赁|refund 时间不合义
+R-M1-P5-029|具体日期 November 1 前用 on|for 一段时间非日期发生日|among 用集合内部|through 表穿过或截至含义不符
+R-M1-P5-030|responded professionally 修饰过去动作需副词|professional 是形容词|profession 是名词|professionalism 是名词
+R-M2-P5-001|reviewed carefully 中副词修饰 reviewed|careful 是形容词|care 是名词或动词|carefulness 是名词
+R-M2-P5-002|will be issued 构成一般将来时被动|issue 是动词原形|issuing 是进行式分词|issuance 是名词
+R-M2-P5-003|available to customers 表示提供给这些顾客|at customers 不符合搭配|from customers 表来源不是受益者|by customers 表施事者
+R-M2-P5-004|until 表持续营业至装修完工的时间界限|during 后不能接完整从句|despite 后要名词|because of 后要名词
+R-M2-P5-005|复数 results 作主语用 are posted|is 与复数不一致|was 与复数不一致|has 与复数不一致
+R-M2-P5-006|make a reservation 是预订固定搭配|do a reservation 不自然|build a reservation 不通|set a reservation 不为标准预订用法
+R-FM2-P5-007|Mr. Singh 为第三人称单数，next Monday 将来行程可用 will visit|visit 缺第三人称单数形式|visited 是过去时|has visited 不能和未来具体日期搭配
+R-M2-P5-008|clear guidance 使用形容词修饰 guidance|clearly 是副词|clarity 是名词|clearing 不符合所需形容词语义
+R-M2-P5-009|arrive by Tuesday afternoon 表示不晚于星期二下午|among 为在集合内|through 为经过期间|beside 为在旁边
+R-M2-P5-010|its policy 需要所有格限定词|it 是人称代词|itself 是反身代词|its' 不是正确所有格写法
+R-M2-P5-011|who delivered 从句主语指人的代表|which 通常指物|where 表地点|whose 后须接其所有的名词
+R-M2-P5-012|Because demand increased 对增开班次给出原因|Despite 不能直接接完整从句|Unless 是条件与已陈述的事实因果不符|Whereas 表对比而非因果
+R-M2-P5-013|reimburse the passenger for expense 表示为酒店花费报销|inspect 表检查|reserve 表预留|retain 表保留
+R-M2-P5-014|hold a meeting 是召开会议常见表达|catch a meeting 不符合举行语义|take a meeting 是参与会议非组织召开|reach a meeting 不合搭配
+R-M2-P5-015|must be returned 是访客证必须归还的被动|return 是原形|returning 是现在分词|returns 第三人称单数
+R-M2-P5-016|in accordance with 是按照政策的固定表达|on accordance 非固定表达|at accordance 非固定表达|to accordance 非固定表达
+R-M2-P5-017|yesterday 是过去具体时间，使用 completed|completes 现在时|has completed 不能与 yesterday 合用|will complete 是将来
+R-M2-P5-018|operates more efficiently 中比较副词修饰动词|efficient 是形容词|efficiency 是名词|efficiencies 是复数名词
+R-M2-P5-019|if manager approves 表条件允许在家办公|despite 接名词不接从句|until manager approves 不符合批准后才可居家办公的政策语义|whereas 表对比而非许可条件
+R-M2-P5-020|Every department manager 单数，谓语 receives|receive 原形缺单数变化|receiving 缺谓语结构|have received 与单数主语不一致
+R-M2-P5-021|notify employees of changes 是通知员工变动|estimate 表估计|retain 表保留|dispatch employees 指派员工并非告知
+R-M2-P5-022|intended for new supervisors 是面向新主管|with 不表示培训对象|by 表施事者|among 表分布于人群中不符
+R-M2-P5-023|office where we held workshop 从句需地点状语|who 不指代办公室|which person 不匹配先行词|whose 需要所有对象
+R-M2-P5-024|has been extremely positive 要形容词作表语|positively 为副词|positivity 为名词|position 为名词
+R-M2-P5-025|although several roads were closed 表让步但仍准时送达|because 表因道路封闭才准时不合文意|unless 表例外条件与确定事实不符|therefore 是副词不能作逗号后连接词
+R-M2-P5-026|reduce costs 表降低成本的及物动词搭配|fall 不及物|lowering 是分词非原形|drop off 通常不直接带成本宾语
+R-M2-P5-027|since 2018 表延续到现在，has occupied|occupies 不能单独和 since 起点搭配|occupied 过去式通常需要过去截止语境|will occupy 尚未开始与 since 冲突
+R-M2-P5-028|send questions to coordinator，收件者用 to|for 表目的不是收件方向|by 表方式|with 表伴随
+R-M2-P5-029|out of stock 是商品缺货固定表达|out of office 指不在办公室|out of service 指设备停运|out of charge 非此处缺货表达
+R-M2-P5-030|helpful explanation 用形容词修饰说明|helpfully 是副词|help 是动词或名词|helpfulness 是名词
