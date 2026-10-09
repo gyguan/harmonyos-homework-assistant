@@ -40,12 +40,17 @@ class RemainingEditorialTests(unittest.TestCase):
         expected = {f"V-{number}" for number in range(181, 301)}
         self.assertEqual(expected, set(self.report["vocabulary"]))
         self.assertEqual(expected, {k for k in word_rows if k in expected})
+        corrected_in_final_p1 = {"V-189", "V-285"}
         for key in sorted(expected):
             row = word_rows[key]
             reviewed = self.report["vocabulary"][key]
             fingerprint = vocabulary_fingerprint(row, self.ipa[key])
             self.assertEqual("PUBLISHED", row["status"])
-            self.assertEqual("PASS_AI_RECHECK", reviewed["decision"])
+            if key in corrected_in_final_p1:
+                self.assertEqual("PASS_AFTER_CORRECTION", reviewed["decision"])
+                self.assertTrue(reviewed.get("correction"))
+            else:
+                self.assertEqual("PASS_AI_RECHECK", reviewed["decision"])
             self.assertEqual(row["word"], reviewed["headword"])
             self.assertEqual(row["pos"], reviewed["pos"])
             self.assertEqual(row["meaning"], reviewed["meaning"])
