@@ -2210,7 +2210,7 @@
       ]
     },
     "P7-EX-SUPPORT": {
-      "contentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7",
+      "contentSha256": "96f785b5c54506d69a0ed66250179b3bedd7e95dbd6e933c18f8b0fd47ccc2c2",
       "decision": "PASS",
       "documents": 3,
       "questions": [
@@ -2245,7 +2245,7 @@
           "skill": "CROSS_DOCUMENT"
         }
       ],
-      "revisionNote": "2026-10-08 #478: AI semantic re-review corrected wording/evidence boundary; no human/ETS approval implied"
+      "revisionNote": "2026-10-09 AI re-review: hypothetical clock now makes priority-support target genuinely cross-document; does not assert actual SLA compliance."
     },
     "P7-EX-RETAIL": {
       "contentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931",
