@@ -14,7 +14,6 @@ import { ToeicMockPart6V2RepairContent } from './ToeicMockPart6V2RepairContent';
 import { ToeicMockDay19Part6CompletionContent } from './ToeicMockDay19Part6CompletionContent';
 import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
-import { ToeicVocabularyExampleCatalog } from './ToeicVocabularyExampleCatalog';
 import { ToeicVocabularyExpansion } from './ToeicVocabularyExpansion';
 import { ToeicVocabularyBatchTwo } from './ToeicVocabularyBatchTwo';
 import { ToeicVocabularyBatchThree } from './ToeicVocabularyBatchThree';
@@ -290,7 +289,7 @@ export class PresetToeicContent {
       new ToeicVocabularyItem('V-029','retain','v.','保留；保持',ToeicVocabularyLevel.L2,'办公/人事',['retain records'],['keep']),
       new ToeicVocabularyItem('V-030','supplier','n.','供应商',ToeicVocabularyLevel.L1,'采购',['contact a supplier'],['vendor'])
     ];
-    return ToeicPronunciationCatalog.apply(ToeicVocabularyExampleCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()).concat(ToeicVocabularyExpansion.items()).concat(ToeicVocabularyBatchTwo.items()).concat(ToeicVocabularyBatchThree.items()).concat(ToeicVocabularyBatchFour.items()).concat(ToeicVocabularyBatchFive.items()).concat(ToeicVocabularyBatchSix.items()).concat(ToeicVocabularyBatchSeven.items())));
+    return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()).concat(ToeicVocabularyExpansion.items()).concat(ToeicVocabularyBatchTwo.items()).concat(ToeicVocabularyBatchThree.items()).concat(ToeicVocabularyBatchFour.items()).concat(ToeicVocabularyBatchFive.items()).concat(ToeicVocabularyBatchSix.items()).concat(ToeicVocabularyBatchSeven.items()));
   }
 
   static vocabulary():ToeicVocabularyItem[] {
