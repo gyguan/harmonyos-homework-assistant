@@ -1021,996 +1021,6 @@
       "slot": 29
     },
     {
-      "id": "R-M2-P5-001",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-001",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "WORD_FORM",
-        "article": "",
-        "stem": "The finance team reviewed the proposal _____ before approving the budget.",
-        "options": [
-          "careful",
-          "carefully",
-          "care",
-          "carefulness"
-        ],
-        "answerIndex": 1,
-        "explanation": "修饰 reviewed 使用副词 carefully。",
-        "version": 1
-      },
-      "correctBasis": "reviewed carefully 中副词修饰 reviewed",
-      "distractorReasons": [
-        "careful 是形容词",
-        "care 是名词或动词",
-        "carefulness 是名词"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 30
-    },
-    {
-      "id": "R-M2-P5-002",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-002",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "VOICE",
-        "article": "",
-        "stem": "The conference badges will be _____ at the registration desk.",
-        "options": [
-          "issue",
-          "issued",
-          "issuing",
-          "issuance"
-        ],
-        "answerIndex": 1,
-        "explanation": "will be + 过去分词构成被动。",
-        "version": 1
-      },
-      "correctBasis": "will be issued 构成一般将来时被动",
-      "distractorReasons": [
-        "issue 是动词原形",
-        "issuing 是进行式分词",
-        "issuance 是名词"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 31
-    },
-    {
-      "id": "R-M2-P5-003",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-003",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "PREPOSITION",
-        "article": "",
-        "stem": "The discount is available _____ customers who order online.",
-        "options": [
-          "to",
-          "at",
-          "from",
-          "by"
-        ],
-        "answerIndex": 0,
-        "explanation": "available to customers 为常见搭配。",
-        "version": 1
-      },
-      "correctBasis": "available to customers 表示提供给这些顾客",
-      "distractorReasons": [
-        "at customers 不符合搭配",
-        "from customers 表来源不是受益者",
-        "by customers 表施事者"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 32
-    },
-    {
-      "id": "R-M2-P5-004",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-004",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "CONJUNCTION",
-        "article": "",
-        "stem": "The store will remain open _____ the renovation work is completed.",
-        "options": [
-          "until",
-          "during",
-          "despite",
-          "because of"
-        ],
-        "answerIndex": 0,
-        "explanation": "until 引导时间从句。",
-        "version": 1
-      },
-      "correctBasis": "until 表持续营业至装修完工的时间界限",
-      "distractorReasons": [
-        "during 后不能接完整从句",
-        "despite 后要名词",
-        "because of 后要名词"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 33
-    },
-    {
-      "id": "R-M2-P5-005",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-005",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "AGREEMENT",
-        "article": "",
-        "stem": "The results of the customer survey _____ posted on the internal site.",
-        "options": [
-          "is",
-          "are",
-          "was",
-          "has"
-        ],
-        "answerIndex": 1,
-        "explanation": "主语 results 为复数。",
-        "version": 1
-      },
-      "correctBasis": "复数 results 作主语用 are posted",
-      "distractorReasons": [
-        "is 与复数不一致",
-        "was 与复数不一致",
-        "has 与复数不一致"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 34
-    },
-    {
-      "id": "R-M2-P5-006",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-006",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "COLLOCATION",
-        "article": "",
-        "stem": "Please _____ a reservation at least two days in advance.",
-        "options": [
-          "make",
-          "do",
-          "build",
-          "set"
-        ],
-        "answerIndex": 0,
-        "explanation": "固定搭配 make a reservation。",
-        "version": 1
-      },
-      "correctBasis": "make a reservation 是预订固定搭配",
-      "distractorReasons": [
-        "do a reservation 不自然",
-        "build a reservation 不通",
-        "set a reservation 不为标准预订用法"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 35
-    },
-    {
-      "id": "R-FM2-P5-007",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-007",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicMockDay19Part5V2Content.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "VERB",
-        "article": "",
-        "stem": "Mr. Singh _____ the regional office next Monday.",
-        "options": [
-          "visit",
-          "visited",
-          "will visit",
-          "has visited"
-        ],
-        "answerIndex": 2,
-        "explanation": "next Monday 表示尚未发生的下周行程。will visit 是语法与时态均适合的唯一选项：A visit 缺少第三人称单数 -s；B visited 表示过去；D has visited 表示完成时，不能用 next Monday 指未来到访。旧题 visits 可表达已安排的将来行程，故在新版题中改为 visit 排除双答案。",
-        "version": 1
-      },
-      "correctBasis": "Mr. Singh 为第三人称单数，next Monday 将来行程可用 will visit",
-      "distractorReasons": [
-        "visit 缺第三人称单数形式",
-        "visited 是过去时",
-        "has visited 不能和未来具体日期搭配"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 36
-    },
-    {
-      "id": "R-M2-P5-008",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-008",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "WORD_FORM",
-        "article": "",
-        "stem": "The new policy provides _____ guidance for remote employees.",
-        "options": [
-          "clear",
-          "clearly",
-          "clarity",
-          "clearing"
-        ],
-        "answerIndex": 0,
-        "explanation": "guidance 前使用形容词 clear。",
-        "version": 1
-      },
-      "correctBasis": "clear guidance 使用形容词修饰 guidance",
-      "distractorReasons": [
-        "clearly 是副词",
-        "clarity 是名词",
-        "clearing 不符合所需形容词语义"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 37
-    },
-    {
-      "id": "R-M2-P5-009",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-009",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "PREPOSITION",
-        "article": "",
-        "stem": "The replacement unit should arrive _____ Tuesday afternoon.",
-        "options": [
-          "by",
-          "among",
-          "through",
-          "beside"
-        ],
-        "answerIndex": 0,
-        "explanation": "by 表示不晚于某时间。",
-        "version": 1
-      },
-      "correctBasis": "arrive by Tuesday afternoon 表示不晚于星期二下午",
-      "distractorReasons": [
-        "among 为在集合内",
-        "through 为经过期间",
-        "beside 为在旁边"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 38
-    },
-    {
-      "id": "R-M2-P5-010",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-010",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "PRONOUN",
-        "article": "",
-        "stem": "The company updated _____ privacy policy last month.",
-        "options": [
-          "it",
-          "its",
-          "itself",
-          "its'"
-        ],
-        "answerIndex": 1,
-        "explanation": "名词 policy 前使用 its。",
-        "version": 1
-      },
-      "correctBasis": "its policy 需要所有格限定词",
-      "distractorReasons": [
-        "it 是人称代词",
-        "itself 是反身代词",
-        "its' 不是正确所有格写法"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 39
-    },
-    {
-      "id": "R-M2-P5-011",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-011",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "RELATIVE",
-        "article": "",
-        "stem": "The representative _____ delivered the chairs also provides repair service.",
-        "options": [
-          "who",
-          "which",
-          "where",
-          "whose"
-        ],
-        "answerIndex": 0,
-        "explanation": "先行词 representative 指人且从句缺主语，使用 who。",
-        "version": 1
-      },
-      "correctBasis": "who delivered 从句主语指人的代表",
-      "distractorReasons": [
-        "which 通常指物",
-        "where 表地点",
-        "whose 后须接其所有的名词"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 40
-    },
-    {
-      "id": "R-M2-P5-012",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-012",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "CONJUNCTION",
-        "article": "",
-        "stem": "_____ demand increased unexpectedly, the factory added a second shift.",
-        "options": [
-          "Because",
-          "Despite",
-          "Unless",
-          "Whereas"
-        ],
-        "answerIndex": 0,
-        "explanation": "前因后果，Because。",
-        "version": 1
-      },
-      "correctBasis": "Because demand increased 对增开班次给出原因",
-      "distractorReasons": [
-        "Despite 不能直接接完整从句",
-        "Unless 是条件与已陈述的事实因果不符",
-        "Whereas 表对比而非因果"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 41
-    },
-    {
-      "id": "R-M2-P5-013",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-013",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "VOCABULARY",
-        "article": "",
-        "stem": "The airline agreed to _____ the passenger for the hotel expense.",
-        "options": [
-          "reimburse",
-          "inspect",
-          "reserve",
-          "retain"
-        ],
-        "answerIndex": 0,
-        "explanation": "reimburse 表示报销。",
-        "version": 1
-      },
-      "correctBasis": "reimburse the passenger for expense 表示为酒店花费报销",
-      "distractorReasons": [
-        "inspect 表检查",
-        "reserve 表预留",
-        "retain 表保留"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 42
-    },
-    {
-      "id": "R-M2-P5-014",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-014",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "COLLOCATION",
-        "article": "",
-        "stem": "The committee will _____ a meeting to discuss the revised plan.",
-        "options": [
-          "hold",
-          "catch",
-          "take",
-          "reach"
-        ],
-        "answerIndex": 0,
-        "explanation": "固定搭配 hold a meeting。",
-        "version": 1
-      },
-      "correctBasis": "hold a meeting 是召开会议常见表达",
-      "distractorReasons": [
-        "catch a meeting 不符合举行语义",
-        "take a meeting 是参与会议非组织召开",
-        "reach a meeting 不合搭配"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 43
-    },
-    {
-      "id": "R-M2-P5-015",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-015",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "VOICE",
-        "article": "",
-        "stem": "All visitor passes must be _____ before leaving the building.",
-        "options": [
-          "return",
-          "returned",
-          "returning",
-          "returns"
-        ],
-        "answerIndex": 1,
-        "explanation": "must be + 过去分词。",
-        "version": 1
-      },
-      "correctBasis": "must be returned 是访客证必须归还的被动",
-      "distractorReasons": [
-        "return 是原形",
-        "returning 是现在分词",
-        "returns 第三人称单数"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 44
-    },
-    {
-      "id": "R-M2-P5-016",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-016",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "PREPOSITION",
-        "article": "",
-        "stem": "The report was prepared _____ accordance with company policy.",
-        "options": [
-          "in",
-          "on",
-          "at",
-          "to"
-        ],
-        "answerIndex": 0,
-        "explanation": "固定表达 in accordance with。",
-        "version": 1
-      },
-      "correctBasis": "in accordance with 是按照政策的固定表达",
-      "distractorReasons": [
-        "on accordance 非固定表达",
-        "at accordance 非固定表达",
-        "to accordance 非固定表达"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 45
-    },
-    {
-      "id": "R-M2-P5-017",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-017",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "VERB",
-        "article": "",
-        "stem": "The maintenance crew _____ the inspection before noon yesterday.",
-        "options": [
-          "completes",
-          "completed",
-          "has completed",
-          "will complete"
-        ],
-        "answerIndex": 1,
-        "explanation": "yesterday 指明确过去时间。",
-        "version": 1
-      },
-      "correctBasis": "yesterday 是过去具体时间，使用 completed",
-      "distractorReasons": [
-        "completes 现在时",
-        "has completed 不能与 yesterday 合用",
-        "will complete 是将来"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 0
-    },
-    {
-      "id": "R-M2-P5-018",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-018",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "WORD_FORM",
-        "article": "",
-        "stem": "The updated system operates more _____ than the previous version.",
-        "options": [
-          "efficient",
-          "efficiently",
-          "efficiency",
-          "efficiencies"
-        ],
-        "answerIndex": 1,
-        "explanation": "operates 为动词，使用副词 efficiently。",
-        "version": 1
-      },
-      "correctBasis": "operates more efficiently 中比较副词修饰动词",
-      "distractorReasons": [
-        "efficient 是形容词",
-        "efficiency 是名词",
-        "efficiencies 是复数名词"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 1
-    },
-    {
-      "id": "R-M2-P5-019",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-019",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "CONJUNCTION",
-        "article": "",
-        "stem": "Employees may work from home _____ their manager approves the request.",
-        "options": [
-          "if",
-          "despite",
-          "until",
-          "whereas"
-        ],
-        "answerIndex": 0,
-        "explanation": "if 表条件。",
-        "version": 1
-      },
-      "correctBasis": "if manager approves 表条件允许在家办公",
-      "distractorReasons": [
-        "despite 接名词不接从句",
-        "until manager approves 不符合批准后才可居家办公的政策语义",
-        "whereas 表对比而非许可条件"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 2
-    },
-    {
-      "id": "R-M2-P5-020",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-020",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "AGREEMENT",
-        "article": "",
-        "stem": "Every department manager _____ a copy of the emergency plan.",
-        "options": [
-          "receive",
-          "receives",
-          "receiving",
-          "have received"
-        ],
-        "answerIndex": 1,
-        "explanation": "Every + 单数名词，谓语单数 receives。",
-        "version": 1
-      },
-      "correctBasis": "Every department manager 单数，谓语 receives",
-      "distractorReasons": [
-        "receive 原形缺单数变化",
-        "receiving 缺谓语结构",
-        "have received 与单数主语不一致"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 3
-    },
-    {
-      "id": "R-M2-P5-021",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-021",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "VOCABULARY",
-        "article": "",
-        "stem": "The company will _____ employees of any schedule changes by e-mail.",
-        "options": [
-          "notify",
-          "estimate",
-          "retain",
-          "dispatch"
-        ],
-        "answerIndex": 0,
-        "explanation": "notify someone of something。",
-        "version": 1
-      },
-      "correctBasis": "notify employees of changes 是通知员工变动",
-      "distractorReasons": [
-        "estimate 表估计",
-        "retain 表保留",
-        "dispatch employees 指派员工并非告知"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 4
-    },
-    {
-      "id": "R-M2-P5-022",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-022",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "PREPOSITION",
-        "article": "",
-        "stem": "The training session is intended _____ new supervisors.",
-        "options": [
-          "for",
-          "with",
-          "by",
-          "among"
-        ],
-        "answerIndex": 0,
-        "explanation": "intended for 表示面向。",
-        "version": 1
-      },
-      "correctBasis": "intended for new supervisors 是面向新主管",
-      "distractorReasons": [
-        "with 不表示培训对象",
-        "by 表施事者",
-        "among 表分布于人群中不符"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 5
-    },
-    {
-      "id": "R-M2-P5-023",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-023",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "RELATIVE",
-        "article": "",
-        "stem": "The office _____ we held last year's workshop has been renovated.",
-        "options": [
-          "where",
-          "who",
-          "which person",
-          "whose"
-        ],
-        "answerIndex": 0,
-        "explanation": "先行词 office 表地点，从句结构完整，用 where。",
-        "version": 1
-      },
-      "correctBasis": "office where we held workshop 从句需地点状语",
-      "distractorReasons": [
-        "who 不指代办公室",
-        "which person 不匹配先行词",
-        "whose 需要所有对象"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 6
-    },
-    {
-      "id": "R-M2-P5-024",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-024",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "WORD_FORM",
-        "article": "",
-        "stem": "Customer feedback has been extremely _____ this quarter.",
-        "options": [
-          "positive",
-          "positively",
-          "positivity",
-          "position"
-        ],
-        "answerIndex": 0,
-        "explanation": "be 后作表语使用形容词 positive。",
-        "version": 1
-      },
-      "correctBasis": "has been extremely positive 要形容词作表语",
-      "distractorReasons": [
-        "positively 为副词",
-        "positivity 为名词",
-        "position 为名词"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 7
-    },
-    {
-      "id": "R-M2-P5-025",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-025",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "CONJUNCTION",
-        "article": "",
-        "stem": "The package arrived on time, _____ several roads were closed by snow.",
-        "options": [
-          "although",
-          "because",
-          "unless",
-          "therefore"
-        ],
-        "answerIndex": 0,
-        "explanation": "尽管道路关闭仍准时到达，although。",
-        "version": 1
-      },
-      "correctBasis": "although several roads were closed 表让步但仍准时送达",
-      "distractorReasons": [
-        "because 表因道路封闭才准时不合文意",
-        "unless 表例外条件与确定事实不符",
-        "therefore 是副词不能作逗号后连接词"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 8
-    },
-    {
-      "id": "R-M2-P5-026",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-026",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "COLLOCATION",
-        "article": "",
-        "stem": "The new process is expected to _____ costs by ten percent.",
-        "options": [
-          "reduce",
-          "fall",
-          "lowering",
-          "drop off"
-        ],
-        "answerIndex": 0,
-        "explanation": "reduce costs 是自然搭配。",
-        "version": 1
-      },
-      "correctBasis": "reduce costs 表降低成本的及物动词搭配",
-      "distractorReasons": [
-        "fall 不及物",
-        "lowering 是分词非原形",
-        "drop off 通常不直接带成本宾语"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 9
-    },
-    {
-      "id": "R-M2-P5-027",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-027",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "VERB",
-        "article": "",
-        "stem": "The company _____ its current office since 2018.",
-        "options": [
-          "occupies",
-          "occupied",
-          "has occupied",
-          "will occupy"
-        ],
-        "answerIndex": 2,
-        "explanation": "since 2018 搭配现在完成时。",
-        "version": 1
-      },
-      "correctBasis": "since 2018 表延续到现在，has occupied",
-      "distractorReasons": [
-        "occupies 不能单独和 since 起点搭配",
-        "occupied 过去式通常需要过去截止语境",
-        "will occupy 尚未开始与 since 冲突"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 10
-    },
-    {
-      "id": "R-M2-P5-028",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-028",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "PREPOSITION",
-        "article": "",
-        "stem": "Please send all questions directly _____ the project coordinator.",
-        "options": [
-          "to",
-          "for",
-          "by",
-          "with"
-        ],
-        "answerIndex": 0,
-        "explanation": "send something to someone。",
-        "version": 1
-      },
-      "correctBasis": "send questions to coordinator，收件者用 to",
-      "distractorReasons": [
-        "for 表目的不是收件方向",
-        "by 表方式",
-        "with 表伴随"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 11
-    },
-    {
-      "id": "R-M2-P5-029",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-029",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "VOCABULARY",
-        "article": "",
-        "stem": "The shipment was delayed because one item was temporarily out of _____.",
-        "options": [
-          "stock",
-          "office",
-          "service",
-          "charge"
-        ],
-        "answerIndex": 0,
-        "explanation": "out of stock 表示缺货。",
-        "version": 1
-      },
-      "correctBasis": "out of stock 是商品缺货固定表达",
-      "distractorReasons": [
-        "out of office 指不在办公室",
-        "out of service 指设备停运",
-        "out of charge 非此处缺货表达"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 12
-    },
-    {
-      "id": "R-M2-P5-030",
-      "day": 19,
-      "source": {
-        "originId": "R-M2-P5-030",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
-        "originVersion": 1
-      },
-      "question": {
-        "part": "PART_5",
-        "skill": "WORD_FORM",
-        "article": "",
-        "stem": "The consultant gave a very _____ explanation of the new procedure.",
-        "options": [
-          "helpful",
-          "helpfully",
-          "help",
-          "helpfulness"
-        ],
-        "answerIndex": 0,
-        "explanation": "explanation 前使用形容词 helpful。",
-        "version": 1
-      },
-      "correctBasis": "helpful explanation 用形容词修饰说明",
-      "distractorReasons": [
-        "helpfully 是副词",
-        "help 是动词或名词",
-        "helpfulness 是名词"
-      ],
-      "reviewOutcome": "AI_FIRST_PASS",
-      "expertCertified": false,
-      "slot": 13
-    },
-    {
       "id": "R-M1-P6-031",
       "day": 14,
       "source": {
@@ -2041,7 +1051,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 14
+      "slot": 30
     },
     {
       "id": "R-M1-P6-032",
@@ -2074,7 +1084,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 15
+      "slot": 31
     },
     {
       "id": "R-FM1-P6-033",
@@ -2107,7 +1117,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 16
+      "slot": 32
     },
     {
       "id": "R-M1-P6-034",
@@ -2140,7 +1150,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 17
+      "slot": 33
     },
     {
       "id": "R-M1-P6-035",
@@ -2173,7 +1183,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 18
+      "slot": 34
     },
     {
       "id": "R-M1-P6-036",
@@ -2206,7 +1216,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 19
+      "slot": 35
     },
     {
       "id": "R-M1-P6-037",
@@ -2239,7 +1249,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 20
+      "slot": 36
     },
     {
       "id": "R-M1-P6-038",
@@ -2272,7 +1282,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 21
+      "slot": 37
     },
     {
       "id": "R-M1-P6-039",
@@ -2305,7 +1315,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 22
+      "slot": 38
     },
     {
       "id": "R-M1-P6-040",
@@ -2338,7 +1348,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 23
+      "slot": 39
     },
     {
       "id": "R-M1-P6-041",
@@ -2371,7 +1381,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 24
+      "slot": 40
     },
     {
       "id": "R-M1-P6-042",
@@ -2404,7 +1414,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 25
+      "slot": 41
     },
     {
       "id": "R-M1-P6-043",
@@ -2437,7 +1447,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 26
+      "slot": 42
     },
     {
       "id": "R-M1-P6-044",
@@ -2470,7 +1480,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 27
+      "slot": 43
     },
     {
       "id": "R-M1-P6-045",
@@ -2503,7 +1513,7 @@
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
-      "slot": 28
+      "slot": 44
     },
     {
       "id": "R-M1-P6-046",
@@ -2533,6 +1543,996 @@
         "causes 为第三人称单数",
         "caused 是过去时",
         "causing 为现在分词"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 45
+    },
+    {
+      "id": "R-M2-P5-001",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-001",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "WORD_FORM",
+        "article": "",
+        "stem": "The finance team reviewed the proposal _____ before approving the budget.",
+        "options": [
+          "careful",
+          "carefully",
+          "care",
+          "carefulness"
+        ],
+        "answerIndex": 1,
+        "explanation": "修饰 reviewed 使用副词 carefully。",
+        "version": 1
+      },
+      "correctBasis": "reviewed carefully 中副词修饰 reviewed",
+      "distractorReasons": [
+        "careful 是形容词",
+        "care 是名词或动词",
+        "carefulness 是名词"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 0
+    },
+    {
+      "id": "R-M2-P5-002",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-002",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "VOICE",
+        "article": "",
+        "stem": "The conference badges will be _____ at the registration desk.",
+        "options": [
+          "issue",
+          "issued",
+          "issuing",
+          "issuance"
+        ],
+        "answerIndex": 1,
+        "explanation": "will be + 过去分词构成被动。",
+        "version": 1
+      },
+      "correctBasis": "will be issued 构成一般将来时被动",
+      "distractorReasons": [
+        "issue 是动词原形",
+        "issuing 是进行式分词",
+        "issuance 是名词"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 1
+    },
+    {
+      "id": "R-M2-P5-003",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-003",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "PREPOSITION",
+        "article": "",
+        "stem": "The discount is available _____ customers who order online.",
+        "options": [
+          "to",
+          "at",
+          "from",
+          "by"
+        ],
+        "answerIndex": 0,
+        "explanation": "available to customers 为常见搭配。",
+        "version": 1
+      },
+      "correctBasis": "available to customers 表示提供给这些顾客",
+      "distractorReasons": [
+        "at customers 不符合搭配",
+        "from customers 表来源不是受益者",
+        "by customers 表施事者"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 2
+    },
+    {
+      "id": "R-M2-P5-004",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-004",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "CONJUNCTION",
+        "article": "",
+        "stem": "The store will remain open _____ the renovation work is completed.",
+        "options": [
+          "until",
+          "during",
+          "despite",
+          "because of"
+        ],
+        "answerIndex": 0,
+        "explanation": "until 引导时间从句。",
+        "version": 1
+      },
+      "correctBasis": "until 表持续营业至装修完工的时间界限",
+      "distractorReasons": [
+        "during 后不能接完整从句",
+        "despite 后要名词",
+        "because of 后要名词"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 3
+    },
+    {
+      "id": "R-M2-P5-005",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-005",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "AGREEMENT",
+        "article": "",
+        "stem": "The results of the customer survey _____ posted on the internal site.",
+        "options": [
+          "is",
+          "are",
+          "was",
+          "has"
+        ],
+        "answerIndex": 1,
+        "explanation": "主语 results 为复数。",
+        "version": 1
+      },
+      "correctBasis": "复数 results 作主语用 are posted",
+      "distractorReasons": [
+        "is 与复数不一致",
+        "was 与复数不一致",
+        "has 与复数不一致"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 4
+    },
+    {
+      "id": "R-M2-P5-006",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-006",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "COLLOCATION",
+        "article": "",
+        "stem": "Please _____ a reservation at least two days in advance.",
+        "options": [
+          "make",
+          "do",
+          "build",
+          "set"
+        ],
+        "answerIndex": 0,
+        "explanation": "固定搭配 make a reservation。",
+        "version": 1
+      },
+      "correctBasis": "make a reservation 是预订固定搭配",
+      "distractorReasons": [
+        "do a reservation 不自然",
+        "build a reservation 不通",
+        "set a reservation 不为标准预订用法"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 5
+    },
+    {
+      "id": "R-FM2-P5-007",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-007",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicMockDay19Part5V2Content.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "VERB",
+        "article": "",
+        "stem": "Mr. Singh _____ the regional office next Monday.",
+        "options": [
+          "visit",
+          "visited",
+          "will visit",
+          "has visited"
+        ],
+        "answerIndex": 2,
+        "explanation": "next Monday 表示尚未发生的下周行程。will visit 是语法与时态均适合的唯一选项：A visit 缺少第三人称单数 -s；B visited 表示过去；D has visited 表示完成时，不能用 next Monday 指未来到访。旧题 visits 可表达已安排的将来行程，故在新版题中改为 visit 排除双答案。",
+        "version": 1
+      },
+      "correctBasis": "Mr. Singh 为第三人称单数，next Monday 将来行程可用 will visit",
+      "distractorReasons": [
+        "visit 缺第三人称单数形式",
+        "visited 是过去时",
+        "has visited 不能和未来具体日期搭配"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 6
+    },
+    {
+      "id": "R-M2-P5-008",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-008",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "WORD_FORM",
+        "article": "",
+        "stem": "The new policy provides _____ guidance for remote employees.",
+        "options": [
+          "clear",
+          "clearly",
+          "clarity",
+          "clearing"
+        ],
+        "answerIndex": 0,
+        "explanation": "guidance 前使用形容词 clear。",
+        "version": 1
+      },
+      "correctBasis": "clear guidance 使用形容词修饰 guidance",
+      "distractorReasons": [
+        "clearly 是副词",
+        "clarity 是名词",
+        "clearing 不符合所需形容词语义"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 7
+    },
+    {
+      "id": "R-M2-P5-009",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-009",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "PREPOSITION",
+        "article": "",
+        "stem": "The replacement unit should arrive _____ Tuesday afternoon.",
+        "options": [
+          "by",
+          "among",
+          "through",
+          "beside"
+        ],
+        "answerIndex": 0,
+        "explanation": "by 表示不晚于某时间。",
+        "version": 1
+      },
+      "correctBasis": "arrive by Tuesday afternoon 表示不晚于星期二下午",
+      "distractorReasons": [
+        "among 为在集合内",
+        "through 为经过期间",
+        "beside 为在旁边"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 8
+    },
+    {
+      "id": "R-M2-P5-010",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-010",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "PRONOUN",
+        "article": "",
+        "stem": "The company updated _____ privacy policy last month.",
+        "options": [
+          "it",
+          "its",
+          "itself",
+          "its'"
+        ],
+        "answerIndex": 1,
+        "explanation": "名词 policy 前使用 its。",
+        "version": 1
+      },
+      "correctBasis": "its policy 需要所有格限定词",
+      "distractorReasons": [
+        "it 是人称代词",
+        "itself 是反身代词",
+        "its' 不是正确所有格写法"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 9
+    },
+    {
+      "id": "R-M2-P5-011",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-011",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "RELATIVE",
+        "article": "",
+        "stem": "The representative _____ delivered the chairs also provides repair service.",
+        "options": [
+          "who",
+          "which",
+          "where",
+          "whose"
+        ],
+        "answerIndex": 0,
+        "explanation": "先行词 representative 指人且从句缺主语，使用 who。",
+        "version": 1
+      },
+      "correctBasis": "who delivered 从句主语指人的代表",
+      "distractorReasons": [
+        "which 通常指物",
+        "where 表地点",
+        "whose 后须接其所有的名词"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 10
+    },
+    {
+      "id": "R-M2-P5-012",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-012",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "CONJUNCTION",
+        "article": "",
+        "stem": "_____ demand increased unexpectedly, the factory added a second shift.",
+        "options": [
+          "Because",
+          "Despite",
+          "Unless",
+          "Whereas"
+        ],
+        "answerIndex": 0,
+        "explanation": "前因后果，Because。",
+        "version": 1
+      },
+      "correctBasis": "Because demand increased 对增开班次给出原因",
+      "distractorReasons": [
+        "Despite 不能直接接完整从句",
+        "Unless 是条件与已陈述的事实因果不符",
+        "Whereas 表对比而非因果"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 11
+    },
+    {
+      "id": "R-M2-P5-013",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-013",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "VOCABULARY",
+        "article": "",
+        "stem": "The airline agreed to _____ the passenger for the hotel expense.",
+        "options": [
+          "reimburse",
+          "inspect",
+          "reserve",
+          "retain"
+        ],
+        "answerIndex": 0,
+        "explanation": "reimburse 表示报销。",
+        "version": 1
+      },
+      "correctBasis": "reimburse the passenger for expense 表示为酒店花费报销",
+      "distractorReasons": [
+        "inspect 表检查",
+        "reserve 表预留",
+        "retain 表保留"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 12
+    },
+    {
+      "id": "R-M2-P5-014",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-014",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "COLLOCATION",
+        "article": "",
+        "stem": "The committee will _____ a meeting to discuss the revised plan.",
+        "options": [
+          "hold",
+          "catch",
+          "take",
+          "reach"
+        ],
+        "answerIndex": 0,
+        "explanation": "固定搭配 hold a meeting。",
+        "version": 1
+      },
+      "correctBasis": "hold a meeting 是召开会议常见表达",
+      "distractorReasons": [
+        "catch a meeting 不符合举行语义",
+        "take a meeting 是参与会议非组织召开",
+        "reach a meeting 不合搭配"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 13
+    },
+    {
+      "id": "R-M2-P5-015",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-015",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "VOICE",
+        "article": "",
+        "stem": "All visitor passes must be _____ before leaving the building.",
+        "options": [
+          "return",
+          "returned",
+          "returning",
+          "returns"
+        ],
+        "answerIndex": 1,
+        "explanation": "must be + 过去分词。",
+        "version": 1
+      },
+      "correctBasis": "must be returned 是访客证必须归还的被动",
+      "distractorReasons": [
+        "return 是原形",
+        "returning 是现在分词",
+        "returns 第三人称单数"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 14
+    },
+    {
+      "id": "R-M2-P5-016",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-016",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "PREPOSITION",
+        "article": "",
+        "stem": "The report was prepared _____ accordance with company policy.",
+        "options": [
+          "in",
+          "on",
+          "at",
+          "to"
+        ],
+        "answerIndex": 0,
+        "explanation": "固定表达 in accordance with。",
+        "version": 1
+      },
+      "correctBasis": "in accordance with 是按照政策的固定表达",
+      "distractorReasons": [
+        "on accordance 非固定表达",
+        "at accordance 非固定表达",
+        "to accordance 非固定表达"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 15
+    },
+    {
+      "id": "R-M2-P5-017",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-017",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "VERB",
+        "article": "",
+        "stem": "The maintenance crew _____ the inspection before noon yesterday.",
+        "options": [
+          "completes",
+          "completed",
+          "has completed",
+          "will complete"
+        ],
+        "answerIndex": 1,
+        "explanation": "yesterday 指明确过去时间。",
+        "version": 1
+      },
+      "correctBasis": "yesterday 是过去具体时间，使用 completed",
+      "distractorReasons": [
+        "completes 现在时",
+        "has completed 不能与 yesterday 合用",
+        "will complete 是将来"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 16
+    },
+    {
+      "id": "R-M2-P5-018",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-018",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "WORD_FORM",
+        "article": "",
+        "stem": "The updated system operates more _____ than the previous version.",
+        "options": [
+          "efficient",
+          "efficiently",
+          "efficiency",
+          "efficiencies"
+        ],
+        "answerIndex": 1,
+        "explanation": "operates 为动词，使用副词 efficiently。",
+        "version": 1
+      },
+      "correctBasis": "operates more efficiently 中比较副词修饰动词",
+      "distractorReasons": [
+        "efficient 是形容词",
+        "efficiency 是名词",
+        "efficiencies 是复数名词"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 17
+    },
+    {
+      "id": "R-M2-P5-019",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-019",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "CONJUNCTION",
+        "article": "",
+        "stem": "Employees may work from home _____ their manager approves the request.",
+        "options": [
+          "if",
+          "despite",
+          "until",
+          "whereas"
+        ],
+        "answerIndex": 0,
+        "explanation": "if 表条件。",
+        "version": 1
+      },
+      "correctBasis": "if manager approves 表条件允许在家办公",
+      "distractorReasons": [
+        "despite 接名词不接从句",
+        "until manager approves 不符合批准后才可居家办公的政策语义",
+        "whereas 表对比而非许可条件"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 18
+    },
+    {
+      "id": "R-M2-P5-020",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-020",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "AGREEMENT",
+        "article": "",
+        "stem": "Every department manager _____ a copy of the emergency plan.",
+        "options": [
+          "receive",
+          "receives",
+          "receiving",
+          "have received"
+        ],
+        "answerIndex": 1,
+        "explanation": "Every + 单数名词，谓语单数 receives。",
+        "version": 1
+      },
+      "correctBasis": "Every department manager 单数，谓语 receives",
+      "distractorReasons": [
+        "receive 原形缺单数变化",
+        "receiving 缺谓语结构",
+        "have received 与单数主语不一致"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 19
+    },
+    {
+      "id": "R-M2-P5-021",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-021",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "VOCABULARY",
+        "article": "",
+        "stem": "The company will _____ employees of any schedule changes by e-mail.",
+        "options": [
+          "notify",
+          "estimate",
+          "retain",
+          "dispatch"
+        ],
+        "answerIndex": 0,
+        "explanation": "notify someone of something。",
+        "version": 1
+      },
+      "correctBasis": "notify employees of changes 是通知员工变动",
+      "distractorReasons": [
+        "estimate 表估计",
+        "retain 表保留",
+        "dispatch employees 指派员工并非告知"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 20
+    },
+    {
+      "id": "R-M2-P5-022",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-022",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "PREPOSITION",
+        "article": "",
+        "stem": "The training session is intended _____ new supervisors.",
+        "options": [
+          "for",
+          "with",
+          "by",
+          "among"
+        ],
+        "answerIndex": 0,
+        "explanation": "intended for 表示面向。",
+        "version": 1
+      },
+      "correctBasis": "intended for new supervisors 是面向新主管",
+      "distractorReasons": [
+        "with 不表示培训对象",
+        "by 表施事者",
+        "among 表分布于人群中不符"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 21
+    },
+    {
+      "id": "R-M2-P5-023",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-023",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "RELATIVE",
+        "article": "",
+        "stem": "The office _____ we held last year's workshop has been renovated.",
+        "options": [
+          "where",
+          "who",
+          "which person",
+          "whose"
+        ],
+        "answerIndex": 0,
+        "explanation": "先行词 office 表地点，从句结构完整，用 where。",
+        "version": 1
+      },
+      "correctBasis": "office where we held workshop 从句需地点状语",
+      "distractorReasons": [
+        "who 不指代办公室",
+        "which person 不匹配先行词",
+        "whose 需要所有对象"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 22
+    },
+    {
+      "id": "R-M2-P5-024",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-024",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "WORD_FORM",
+        "article": "",
+        "stem": "Customer feedback has been extremely _____ this quarter.",
+        "options": [
+          "positive",
+          "positively",
+          "positivity",
+          "position"
+        ],
+        "answerIndex": 0,
+        "explanation": "be 后作表语使用形容词 positive。",
+        "version": 1
+      },
+      "correctBasis": "has been extremely positive 要形容词作表语",
+      "distractorReasons": [
+        "positively 为副词",
+        "positivity 为名词",
+        "position 为名词"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 23
+    },
+    {
+      "id": "R-M2-P5-025",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-025",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "CONJUNCTION",
+        "article": "",
+        "stem": "The package arrived on time, _____ several roads were closed by snow.",
+        "options": [
+          "although",
+          "because",
+          "unless",
+          "therefore"
+        ],
+        "answerIndex": 0,
+        "explanation": "尽管道路关闭仍准时到达，although。",
+        "version": 1
+      },
+      "correctBasis": "although several roads were closed 表让步但仍准时送达",
+      "distractorReasons": [
+        "because 表因道路封闭才准时不合文意",
+        "unless 表例外条件与确定事实不符",
+        "therefore 是副词不能作逗号后连接词"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 24
+    },
+    {
+      "id": "R-M2-P5-026",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-026",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "COLLOCATION",
+        "article": "",
+        "stem": "The new process is expected to _____ costs by ten percent.",
+        "options": [
+          "reduce",
+          "fall",
+          "lowering",
+          "drop off"
+        ],
+        "answerIndex": 0,
+        "explanation": "reduce costs 是自然搭配。",
+        "version": 1
+      },
+      "correctBasis": "reduce costs 表降低成本的及物动词搭配",
+      "distractorReasons": [
+        "fall 不及物",
+        "lowering 是分词非原形",
+        "drop off 通常不直接带成本宾语"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 25
+    },
+    {
+      "id": "R-M2-P5-027",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-027",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "VERB",
+        "article": "",
+        "stem": "The company _____ its current office since 2018.",
+        "options": [
+          "occupies",
+          "occupied",
+          "has occupied",
+          "will occupy"
+        ],
+        "answerIndex": 2,
+        "explanation": "since 2018 搭配现在完成时。",
+        "version": 1
+      },
+      "correctBasis": "since 2018 表延续到现在，has occupied",
+      "distractorReasons": [
+        "occupies 不能单独和 since 起点搭配",
+        "occupied 过去式通常需要过去截止语境",
+        "will occupy 尚未开始与 since 冲突"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 26
+    },
+    {
+      "id": "R-M2-P5-028",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-028",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "PREPOSITION",
+        "article": "",
+        "stem": "Please send all questions directly _____ the project coordinator.",
+        "options": [
+          "to",
+          "for",
+          "by",
+          "with"
+        ],
+        "answerIndex": 0,
+        "explanation": "send something to someone。",
+        "version": 1
+      },
+      "correctBasis": "send questions to coordinator，收件者用 to",
+      "distractorReasons": [
+        "for 表目的不是收件方向",
+        "by 表方式",
+        "with 表伴随"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 27
+    },
+    {
+      "id": "R-M2-P5-029",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-029",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "VOCABULARY",
+        "article": "",
+        "stem": "The shipment was delayed because one item was temporarily out of _____.",
+        "options": [
+          "stock",
+          "office",
+          "service",
+          "charge"
+        ],
+        "answerIndex": 0,
+        "explanation": "out of stock 表示缺货。",
+        "version": 1
+      },
+      "correctBasis": "out of stock 是商品缺货固定表达",
+      "distractorReasons": [
+        "out of office 指不在办公室",
+        "out of service 指设备停运",
+        "out of charge 非此处缺货表达"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "expertCertified": false,
+      "slot": 28
+    },
+    {
+      "id": "R-M2-P5-030",
+      "day": 19,
+      "source": {
+        "originId": "R-M2-P5-030",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets",
+        "originVersion": 1
+      },
+      "question": {
+        "part": "PART_5",
+        "skill": "WORD_FORM",
+        "article": "",
+        "stem": "The consultant gave a very _____ explanation of the new procedure.",
+        "options": [
+          "helpful",
+          "helpfully",
+          "help",
+          "helpfulness"
+        ],
+        "answerIndex": 0,
+        "explanation": "explanation 前使用形容词 helpful。",
+        "version": 1
+      },
+      "correctBasis": "helpful explanation 用形容词修饰说明",
+      "distractorReasons": [
+        "helpfully 是副词",
+        "help 是动词或名词",
+        "helpfulness 是名词"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
