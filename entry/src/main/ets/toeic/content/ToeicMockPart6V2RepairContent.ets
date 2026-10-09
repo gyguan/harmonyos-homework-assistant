@@ -24,7 +24,7 @@ export class ToeicMockPart6V2RepairContent {
       ToeicSkill.VOICE,archived.passage,archived.stem,
       ['were required','was required','is requiring','have been required'],1,
       '改期的原因是讲师当时被要求出席行业会议，使用单数主语的被动结构 was required to attend。were required 与单数 instructor 不一致；is requiring 后不应直接接 to attend；have been required 与单数主语不一致。旧版 needed 与 will need 在缺失通知日期时都可能符合上下文，所以新题采用更明确的被动形式。',
-      '',archived.paraphrase,archived.recommendedSeconds,
+      'was required to attend = had to attend',archived.recommendedSeconds,
       ToeicDifficulty.MEDIUM,archived.scoreValue,ToeicReviewStatus.PUBLISHED,1);
   }
 }
