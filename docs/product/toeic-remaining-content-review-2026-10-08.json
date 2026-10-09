@@ -1985,7 +1985,7 @@
   },
   "readingGroups": {
     "P7-EX-SUPPORT": {
-      "contentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7",
+      "contentSha256": "96f785b5c54506d69a0ed66250179b3bedd7e95dbd6e933c18f8b0fd47ccc2c2",
       "documentCount": 3,
       "questionCount": 5,
       "decision": "PASS_AI_RECHECK",
@@ -2039,7 +2039,7 @@
         },
         {
           "id": "R-P7-SUPPORT-05",
-          "question": "Was the first engineer response within two hours after the service interruption began?",
+          "question": "If the priority-response clock started when the interruption began, would the engineer's first response meet the support plan's target?",
           "answerIndex": 2,
           "answer": "Yes, it took forty minutes",
           "evidence": "priority support tickets receive an initial response within two hours || Service unavailable: 10:10 A.M.–12:05 P.M. || Initial engineer response: 10:50 A.M.",
@@ -2051,7 +2051,7 @@
         }
       ],
       "correction": null,
-      "revisionNote": "#478 2026-10-08: AI rechecked wording to avoid treating outage start as ticket creation for SLA"
+      "revisionNote": "2026-10-09 AI re-review: conditional question uses actual policy plus incident clock instead of implying actual ticket timestamp."
     },
     "P7-EX-RETAIL": {
       "contentSha256": "bf88f4ca920a58c08443b183ba2cd046e1723db036de0509e300db8af036f931",
