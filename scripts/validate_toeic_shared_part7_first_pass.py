@@ -98,17 +98,17 @@ def validate() -> None:
     delivery = by_id["R-P7-DELIVERY-01"]
     support = by_id["R-P7-SUPPORT-05"]
     assert delivery.version == 2 and "guarantees" in delivery.stem
-    assert support.version == 2 and "after the service interruption began" in support.stem
+    assert support.version == 3 and "If the priority-response clock started" in support.stem
     assert "SLA" not in support.stem
     translations = collect_translations()
     delivery_zh = translations[delivery.id][1]
     support_zh = translations[support.id][1]
     assert "保证" in delivery_zh and "10月15日" in delivery_zh
-    assert "服务中断" in support_zh and "两小时内" in support_zh
+    assert "假设" in support_zh and "服务协议" in support_zh
     assert "响应时间目标" not in support_zh
     print("TOEIC_ISSUE478_SHARED_P7_FIRST_PASS_PASS groups=13 questions=65 "
           "correct_reasons=65 wrong_option_reasons=195 "
-          "version2_delivery=OK version2_support=OK "
+          "version2_delivery=OK version3_support=OK "
           "independent_expert_certification=NO")
 
 
