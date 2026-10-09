@@ -663,3 +663,9 @@ Issue #447 的第六个发布批次计划与第 3–5 批**同时纳入单个独
 - 原文 `by [date/time]`、`no later than` 和 `through [date/time]` 表示截止日或截止时刻**含当天/当时刻**；与 `before [date/time]` 严格早于区分。多文档共享的 `deliveryPassage` / `filterPassage`、同一题组的五条重复文章、正确选项与答题解释要作为**同一个语义变更单元**整体复核。
 - `R-P7-FILTER-04` 的“余货最迟10月10日到达”不仅检查文章，必须核对正确答案选项；`R-P7-CATERING-04` 的“through Oct8 5PM”除了译文必须检查真实学习者可见的中文答案解释。
 - 对已存在 AI_EDITORIAL 账本的题组若修改任何问答解析，严格执行**旧源内容哈希验真 → 重新计算 reading_fingerprint → 同步主审核、初轮和二次复核**。不得只改中文材料就默认英文题目质量全部通过；`validate_toeic_reading_deadlines_issue478.py` 的实际源码锚点与负向测试必须持续运行。
+
+## #478 租约截止日与按实际服务人数收费的对齐原则（第十七批 2026-10-09）
+
+- `signed by August 15` 表示最迟于8月15日（**含当天**）签署，不得简写成可能排除当日的“8月15日前”；核对该类多篇阅读材料时同步检查**全文译文、真实答题解析、版本以及已提交的 AI 审校账本**。
+- `$4 per attendee served` 表示为实际提供咖啡服务的每位参会者计费，不代表所有预计参会人都消费。多文档金额题必须核对**单位（per person served / per item）、真实订购份数、最终算式和数字**，如 `100 × $4 + 120 × $8 = $1,360`。
+- 正式发布题的解析变更属于学习内容更改，必须提高题目 `version`，不能仅更换文字使旧版和新版共享版本。修改答题解析需要真实 `reading_fingerprint`、`AI_EDITORIAL` 带日期复核记录、65题共享来源账本同步；不修改的单独翻译目录不得反过来伪造原英语题组新哈希。新增 `validate_toeic_lease_catering_bilingual_issue478.py` 及其防回退控制必须持续运行。
