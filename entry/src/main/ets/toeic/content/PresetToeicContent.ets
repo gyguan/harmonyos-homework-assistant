@@ -10,6 +10,7 @@ import { ToeicMockDay19V2Content } from './ToeicMockDay19V2Content';
 import { ToeicMockDay19Part6V2Content } from './ToeicMockDay19Part6V2Content';
 import { ToeicMockDay19Part5V2Content } from './ToeicMockDay19Part5V2Content';
 import { ToeicMockPart6V2RepairContent } from './ToeicMockPart6V2RepairContent';
+import { ToeicMockDay19Part6CompletionContent } from './ToeicMockDay19Part6CompletionContent';
 import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
 import { ToeicVocabularyExpansion } from './ToeicVocabularyExpansion';
@@ -140,7 +141,7 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19()]);
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19(),ToeicMockDay19Part6CompletionContent.inventory(),ToeicMockDay19Part6CompletionContent.library()]);
   }
 
   static publishedReadingGroups():ToeicReadingGroup[] {
@@ -194,7 +195,7 @@ export class PresetToeicContent {
     let published=PresetToeicContent.publishedQuestions();
     let live:ToeicQuestion[]=[];
     for (let question of published) {
-      if (question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009') continue;
+      if (question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008') continue;
       live.push(question);
     }
     return live;
@@ -314,6 +315,8 @@ export class PresetToeicContent {
         // Archive old mock question R-M2-P5-007; v2 paper uses a distinct ID.
         ids[6]=ToeicMockDay19Part5V2Content.questions()[0].id;
         ids[38]=ToeicMockPart6V2RepairContent.day19().id;
+        ids[33]=ToeicMockDay19Part6CompletionContent.inventory().id;
+        ids[37]=ToeicMockDay19Part6CompletionContent.library().id;
         // Keep the old four published questions for historic drafts and reports;
         // only new Day19 sessions use the independent sentence-completion IDs.
         let revisedPart6=ToeicMockDay19Part6V2Content.questions();
