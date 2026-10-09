@@ -226,6 +226,20 @@ def validate() -> None:
     ):
         if expected not in preset:
             raise AssertionError(f"new active mock or live exclusion missing: {expected}")
+    # The first four Day19 P6 slots are replaced as a block. The editorial
+    # replacement of slot 33 MUST run later, or the active exam loses one item.
+    day19 = preset.split("} else if (plan.day===19) {", 1)[1].split("plan.questionIds=ids;", 1)[0]
+    group_loop = day19.index("for (let i=0;i<revisedPart6.length;i++) ids[30+i]=revisedPart6[i].id;")
+    assert group_loop < day19.index("ids[33]=ToeicMockDay19Part6CompletionContent.inventory().id;")
+    assert group_loop < day19.index("ids[37]=ToeicMockDay19Part6CompletionContent.library().id;")
+    for day in (14, 19):
+        live_ids = [item["id"] for item in expected_items if item["day"] == day]
+        assert len(live_ids) == 46 and len(set(live_ids)) == 46
+        assert not set(live_ids) & {
+            "R-M2-P5-007", "R-M1-P6-033", "R-M2-P6-009",
+            "R-FM2-P6-004", "R-M2-P6-008",
+        }, "active mock assembled with excluded historic ambiguous content"
+        assert len(live_ids) + 54 == 100, "complete 100-question mock contract"
     old, _ = collect()
     originals = {q.id: q for q in old}
     assert originals["R-M2-P6-008"].choices == ["complete", "completed", "completing", "completion"]
