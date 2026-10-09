@@ -53,8 +53,11 @@ def is_valid_approval(entry: object, expected_hash: str, today: date | None = No
     # masquerade as a human approver or silently treat an AI label as human.
     mode = entry.get("reviewMode", "HUMAN")
     if mode == "AI_EDITORIAL":
-        if reviewer != "AI-GPT6" or entry.get("reviewEvidence") != (
-                "docs/product/toeic-ai-editorial-review-2026-10-08.json"):
+        allowed_ai = {
+            "AI-GPT6": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+            "AI-GPT5.6-SOL": "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json",
+        }
+        if reviewer not in allowed_ai or entry.get("reviewEvidence") != allowed_ai[reviewer]:
             return False
     elif mode == "HUMAN":
         if reviewer.startswith("AI-"):
