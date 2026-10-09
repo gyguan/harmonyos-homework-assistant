@@ -1,4 +1,5 @@
 import { ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicVocabularyExampleCatalog } from './ToeicVocabularyExampleCatalog';
 
 export class ToeicPronunciationEntry {
   id:string;
@@ -332,6 +333,6 @@ export class ToeicPronunciationCatalog {
         }
       }
     }
-    return items;
+    return ToeicVocabularyExampleCatalog.apply(items);
   }
 }
