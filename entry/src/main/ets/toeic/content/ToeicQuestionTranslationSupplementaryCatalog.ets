@@ -17,7 +17,7 @@ export class ToeicQuestionTranslationSupplementaryCatalog {
       new ToeicQuestionTranslation("R-P7-VENUE-04",venuePassage,
         "培训团队稍后会提供什么信息？",["预订编号","最终午餐人数","场馆位置","研讨会日期"]),
       new ToeicQuestionTranslation("R-P7-VENUE-05",venuePassage,
-        "更换房间的请求是否在规定截止日期前发出？",["否，邮件发于9月12日之后","否，场馆不允许更换房间","是，邮件于9月10日发出","是，因为研讨会在11月举行"]),
+        "综合预订指南和邮件，关于换厅申请，哪项说法有资料支持？",["协调员在9月10日批准使用雪松厅","协调员在9月12日之后才收到申请","邮件标注日期为9月10日，但材料未注明协调员的收件日期","换厅不会增加租金"]),
       new ToeicQuestionTranslation("R-P7-DELIVERY-01",deliveryPassage,
         "依据列出的配送承诺，哪种方式能保证显示器在10月15日布置培训室之前送达？",["标准配送","加急配送","两种方式都可以","两种方式都不行"]),
       new ToeicQuestionTranslation("R-P7-DELIVERY-02",deliveryPassage,
