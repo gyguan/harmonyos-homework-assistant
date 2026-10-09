@@ -45,10 +45,10 @@ export class ToeicExtraReadingBatchSix {
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-CATERING"),
       new ToeicQuestion("R-P7-CATERING-02",ToeicSection.READING,ToeicPart.PART_7,
-        ToeicSkill.CROSS_DOCUMENT,'',"How much more will the revised catering order cost?",["$260","$140","$360","$240"],0,
-        "新订单135杯咖啡乘4美元加135份午餐乘8美元等于1620美元，原订1360美元，新增260美元。","Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || Original catering cost: $1,360. || update catering to 135 coffee servings and 135 boxed lunches.","revised $1,620 minus original $1,360 = $260 increase",104,
+        ToeicSkill.CROSS_DOCUMENT,'',"Based on the accepted quantities, how much higher is the estimated revised catering cost?",["$260","$140","$360","$240"],0,
+        "按已接受的135份咖啡及135份盒饭计算，预计订单额为1620美元，比原先1360美元高260美元。咖啡最终实际计费仍取决于接受服务的人数。","Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || Original catering cost: $1,360. || update catering to 135 coffee servings and 135 boxed lunches.","revised $1,620 minus original $1,360 = $260 increase",104,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-CATERING"),
+        ToeicReviewStatus.PUBLISHED,2,'','',0,0,"P7-EX-CATERING"),
       new ToeicQuestion("R-P7-CATERING-03",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"Will the scheduled maintenance prevent the event from starting at the reserved time?",["Yes, Hall A will be unavailable all day","Yes, maintenance continues until 3 P.M.","Yes, the forum must move to Hall B","No, the event begins after Hall A reopens"],3,
         "维修仅安排上午9点到中午，下午1点及以后可举办活动；预订开场时间为下午2点。","Hall A will be unavailable from 9 A.M. to noon for scheduled maintenance, but events beginning at or after 1 P.M. may proceed. || Date and start: October 12, 2 P.M.","after 1 P.M. = allowed despite earlier maintenance",88,
@@ -60,10 +60,10 @@ export class ToeicExtraReadingBatchSix {
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.PUBLISHED,2,'','',0,0,"P7-EX-CATERING"),
       new ToeicQuestion("R-P7-CATERING-05",ToeicSection.READING,ToeicPart.PART_7,
-        ToeicSkill.CROSS_DOCUMENT,'',"What should the updated invoice show as the total catering charge?",["$1,360","$1,620","$1,500","$1,800"],1,
-        "更新后为135杯咖啡和135份午餐，单价4美元与8美元，合计1620美元。","Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || update catering to 135 coffee servings and 135 boxed lunches.","135 × ($4 + $8) = $1,620",89,
+        ToeicSkill.CROSS_DOCUMENT,'',"Assuming all 135 ordered coffee servings are served, what is the estimated total catering charge?",["$1,360","$1,620","$1,500","$1,800"],1,
+        "假设135份预订咖啡均已实际提供，则咖啡费为540美元；135份盒饭为1080美元，预计合计1620美元。实际咖啡收费仍取决于接受服务人数。","Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || update catering to 135 coffee servings and 135 boxed lunches.","135 × ($4 + $8) = $1,620",89,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
-        ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-CATERING")
+        ToeicReviewStatus.PUBLISHED,2,'','',0,0,"P7-EX-CATERING")
     ];
   }
 }
