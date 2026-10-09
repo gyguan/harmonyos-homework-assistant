@@ -199,32 +199,71 @@ def validate() -> None:
     for row, actual in zip(published, expected, strict=True):
         check_item(row, actual)
 
-    # Evidence snippets in four current grouped questions are incomplete:
-    # full multi-document articles still support the answers, but students
-    # should not be led to believe the highlighted excerpt is the full proof.
+    # A green release is allowed ONLY once the learner-facing evidence really
+    # includes all four previously omitted pieces. Saved question assets and
+    # their versions remain unchanged for historical mock-report replay.
     known_gaps = {
         "R-FM1-P7-M1-01", "R-FM1-P7-M4-01",
         "R-FM2-P7-M1-01", "R-FM2-P7-M5-03",
     }
     findings = data.get("editorialFindings", [])
     if len(findings) != 4 or {f["id"] for f in findings} != known_gaps:
-        raise AssertionError("four known learner-evidence coverage gaps must stay visible")
+        raise AssertionError("all four previously incomplete learner evidence excerpts must be addressed")
+    evidence_service = (
+        ROOT / "entry/src/main/ets/toeic/application/ToeicEvidencePresentationService.ets"
+    ).read_text(encoding="utf-8")
+    evidence_ui = (ROOT / "entry/src/main/ets/toeic/ui/ToeicHomePage.ets").read_text(encoding="utf-8")
+    # Parse the actual text returned by the presentation service, rather than
+    # merely checking that a class, ID or extension string appears somewhere.
+    pattern = re.compile(
+        r"if \(questionId==='([^']+)'\) \{\s*return savedEvidence\+('(?:\\.|[^'])*');\s*\}"
+    )
+    supplements = {}
+    for qid, literal in pattern.findall(evidence_service):
+        if qid in supplements:
+            raise AssertionError(f"{qid}: duplicate evidence-presentation rule")
+        supplements[qid] = ast.literal_eval(literal)
+    if set(supplements) != known_gaps:
+        raise AssertionError("four complete evidence presentation rules required")
+    if "return savedEvidence;" not in evidence_service:
+        raise AssertionError("ordinary learner evidence must stay unchanged")
+    if evidence_ui.count(
+        "ToeicEvidencePresentationService.fullEvidence(question.id,question.evidence)"
+    ) != 3:
+        raise AssertionError(
+            "learner evidence must be complete in current-question state, "
+            "practice result and historical mock report"
+        )
+    if "import { ToeicEvidencePresentationService }" not in evidence_ui:
+        raise AssertionError("learner-facing evidence service was not imported")
     by_id = {r["id"]: r for r in published}
     for finding in findings:
-        q = by_id[finding["id"]]
+        qid = finding["id"]
+        q = by_id[qid]
         if finding["type"] != "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE":
-            raise AssertionError(f'{finding["id"]}: invalid evidence-gap classification')
+            raise AssertionError(f"{qid}: incorrect evidence-gap classification")
         if finding["answerValidity"] != "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER":
-            raise AssertionError(f'{finding["id"]}: evidence gap must not masquerade as unsupported answer')
-        excerpt = q["evidence"]
-        doc_text = "\\n\\n".join(q["documents"])
+            raise AssertionError(f"{qid}: existing answer must remain source-grounded")
+        if finding.get("remediationStatus") != "RESOLVED_IN_PRESENTATION":
+            raise AssertionError(f"{qid}: known evidence gap cannot be release-green if unresolved")
         missing = finding.get("missingEvidenceFragments")
         if not isinstance(missing, list) or not missing:
-            raise AssertionError("must list exactly which evidence the highlight omitted")
+            raise AssertionError(f"{qid}: incomplete evidence specification")
+        displayed = q["evidence"] + supplements[qid]
+        full_docs = "\n\n".join(q["documents"])
         for fragment in missing:
-            if fragment not in doc_text or fragment in excerpt:
-                raise AssertionError(f'{finding["id"]}: stale or fabricated missing evidence fragment')
-    # Do not call the data independent teacher/ETS certification.
+            if fragment not in full_docs or fragment in q["evidence"]:
+                raise AssertionError(f"{qid}: saved omission no longer correctly identified")
+            if fragment not in displayed:
+                raise AssertionError(
+                    f"{qid}: required evidence still missing from learner-facing display: {fragment}"
+                )
+        if displayed == q["evidence"]:
+            raise AssertionError(f"{qid}: incomplete evidence still shown to learner")
+    # An absent/shortened extension MUST fail this same release rule.
+    first = findings[0]
+    if all(fragment in by_id[first["id"]]["evidence"] for fragment in first["missingEvidenceFragments"]):
+        raise AssertionError("negative control did not detect missing saved evidence")
 
     # Negative controls: changing one answer, one distractor or one underlying
     # source requires a genuine re-review rather than trusting the stale ledger.
@@ -252,7 +291,7 @@ def validate() -> None:
     print("TOEIC_ISSUE478_V2_DERIVED_PART7_SEMANTIC_PASS items=72 "
           "day14=39 day19=33 grouped=30 singles=42 "
           "distractor_exclusions=216 source_git_blobs=4 "
-          "rotated_correct_answer_text=verified evidence_highlight_gaps=4 "
+          "rotated_correct_answer_text=verified learner_evidence_completed=4 "
           "human_expert_ETS_certification=NO")
 
 
