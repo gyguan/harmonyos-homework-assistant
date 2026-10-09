@@ -7,6 +7,7 @@ import { ToeicWeekOneContent } from './ToeicWeekOneContent';
 import { ToeicWeekTwoContent } from './ToeicWeekTwoContent';
 import { ToeicMockDay14V2Content } from './ToeicMockDay14V2Content';
 import { ToeicMockDay19V2Content } from './ToeicMockDay19V2Content';
+import { ToeicMockPart7EvidenceRevisionContent } from './ToeicMockPart7EvidenceRevisionContent';
 import { ToeicMockDay19Part6V2Content } from './ToeicMockDay19Part6V2Content';
 import { ToeicMockDay19Part5V2Content } from './ToeicMockDay19Part5V2Content';
 import { ToeicMockPart6V2RepairContent } from './ToeicMockPart6V2RepairContent';
@@ -146,7 +147,7 @@ export class PresetToeicContent {
 
   static publishedReadingGroups():ToeicReadingGroup[] {
     let candidates=ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups()).concat(ToeicMockDay19V2Content.groups());
-    let items=ToeicExtraReadingContent.questions().concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockDay19Part6V2Content.questions());
+    let items=ToeicExtraReadingContent.questions().concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicMockDay19Part6V2Content.questions());
     let groups:ToeicReadingGroup[]=[];
     for (let group of candidates) {
       let everyPublished=true;
@@ -195,7 +196,7 @@ export class PresetToeicContent {
     let published=PresetToeicContent.publishedQuestions();
     let live:ToeicQuestion[]=[];
     for (let question of published) {
-      if (question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008') continue;
+      if (question.id==='R-FM1-P7-M1-01' || question.id==='R-FM1-P7-M4-01' || question.id==='R-FM2-P7-M1-01' || question.id==='R-FM2-P7-M5-03' || question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008') continue;
       live.push(question);
     }
     return live;
@@ -308,7 +309,7 @@ export class PresetToeicContent {
       if (plan.day===14) {
         let ids=ToeicWeekTwoContent.mockQuestionIds().slice(0,46);
         ids[32]=ToeicMockPart6V2RepairContent.day14().id;
-        for (let question of ToeicMockDay14V2Content.questions()) ids.push(question.id);
+        for (let question of ToeicMockDay14V2Content.questions()) ids.push(ToeicMockPart7EvidenceRevisionContent.activeId(question.id));
         plan.questionIds=ids;
       } else if (plan.day===19) {
         let ids=ToeicWeekThreeContent.mockQuestionIds().slice(0,46);
@@ -322,7 +323,7 @@ export class PresetToeicContent {
         // Reapply editorial replacements AFTER the initial P6 group override.
         ids[33]=ToeicMockDay19Part6CompletionContent.inventory().id;
         ids[37]=ToeicMockDay19Part6CompletionContent.library().id;
-        for (let question of ToeicMockDay19V2Content.questions()) ids.push(question.id);
+        for (let question of ToeicMockDay19V2Content.questions()) ids.push(ToeicMockPart7EvidenceRevisionContent.activeId(question.id));
         plan.questionIds=ids;
       }
     }
