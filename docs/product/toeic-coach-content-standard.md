@@ -675,3 +675,9 @@ Issue #447 的第六个发布批次计划与第 3–5 批**同时纳入单个独
 - 英文证据出现 `before I submit the form today`、`plan to`、`may need` 或 `will` 时，题目与译文必须明确其**未来、计划或条件性质**。若源文不能证明申请已提交，不能通过提问 `Is X submitting...` 或答案说明暗示提交已完成；应用 `If X submits ... will it ...?` 这类条件题干，正确选项同时保留时限计算。
 - 涉及 `within N calendar days after completion` 需要基于实际日期计数并核查界限包含性。本次原始邮件 5月23日结业、6月2日准备提交，恰好第10个自然日，结论仅为**当天提交才合规**，不能推断已经提交。
 - 已发布问题变更题干、证据、正确选项表述或答题解析，须按真实 `version` 提升、保留原有 ID 及答案语义并同步精确内容指纹、初次/二次 AI 审校记录和共享 Part7 审校快照；专项回归 `validate_toeic_planned_submission_issue478.py` 不可绕过。
+
+## #478 邮件标注日、实际送达日和批准日必须区分（2026-10-09 第十九批）
+
+- 当英语政策使用 `must reach the venue coordinator by [date]` 时，必须确认接收方**实际在截止日或之前收件**；`EMAIL, September 10` 仅表示邮件的标注日期，不能自动推断对方已经收件，更不能推断已**批准**申请。禁止把 `send`、`reach`、`receive`、`approve` 彼此偷换。
+- 跨文档题若无法证明收件事实，应修成原文可确定的陈述，如 `The email is dated September 10, but no receipt date is stated`；对应错误选项要与原文真正矛盾或缺乏证据；翻译中的日期主体和否定/不确定性同步保持。
+- 已发布题的题干、干扰项、证据逻辑或解释发生修正必须递增 `version`，同步原已审批的完整阅读题组SHA、AI初审与共享65题首次审校记录；若二次台账未覆盖该题组，不得伪造批准记录。专项 `validate_toeic_venue_receipt_issue478.py` 的7项实际负向测试必须持续运行。
