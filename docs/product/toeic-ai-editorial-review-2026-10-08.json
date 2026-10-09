@@ -2682,7 +2682,7 @@
       ]
     },
     "P7-EX-CATERING": {
-      "contentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5",
+      "contentSha256": "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f",
       "decision": "PASS",
       "documents": 3,
       "questions": [
@@ -2718,7 +2718,7 @@
         }
       ],
       "updatedAt": "2026-10-09",
-      "reviewCorrection": "R-P7-CATERING-04: through October 8 at 5 P.M. includes the cutoff instant, as opposed to before"
+      "reviewCorrection": "R-P7-CATERING-04: through October 8 at 5 P.M. includes the cutoff instant, as opposed to before; R-P7-CATERING-02/-05: ordered coffee quantities support estimated charges only, not actual attendees served. Both questions v2."
     }
   }
 }

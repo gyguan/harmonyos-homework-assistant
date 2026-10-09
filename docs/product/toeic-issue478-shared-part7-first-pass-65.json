@@ -1719,11 +1719,11 @@
         "explanation": "会务条款显示 Hall A 容量160、Hall B 容量80；报名人数增至135，因此仅 Hall A 合适。",
         "evidence": "Hall A accommodates up to 160 attendees; Hall B accommodates up to 80. || Our registration count has increased to 135."
       },
-      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
+      "groupContentSha256": "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f"
     },
     {
       "assetId": "R-P7-CATERING-02",
-      "correctBasis": "新餐饮135乘4加135乘8等于1620，减旧账1360新增260美元",
+      "correctBasis": "按已接受订单数量估算，135份咖啡和135份盒饭合计1620美元；原订单1360美元，估算差额260美元，非实际服务人数最终结算",
       "distractorReasons": [
         "140只是多35份咖啡的费用",
         "360美元不是两种餐品差额之和",
@@ -1735,8 +1735,8 @@
         "id": "R-P7-CATERING-02",
         "sourceFile": "ToeicExtraReadingBatchSix.ets",
         "groupId": "P7-EX-CATERING",
-        "version": 1,
-        "stem": "How much more will the revised catering order cost?",
+        "version": 2,
+        "stem": "Based on the accepted quantities, how much higher is the estimated revised catering cost?",
         "options": [
           "$260",
           "$140",
@@ -1744,10 +1744,10 @@
           "$240"
         ],
         "answerIndex": 0,
-        "explanation": "新订单135杯咖啡乘4美元加135份午餐乘8美元等于1620美元，原订1360美元，新增260美元。",
+        "explanation": "按已接受的135份咖啡及135份盒饭计算，预计订单额为1620美元，比原先1360美元高260美元。咖啡最终实际计费仍取决于接受服务的人数。",
         "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || Original catering cost: $1,360. || update catering to 135 coffee servings and 135 boxed lunches."
       },
-      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
+      "groupContentSha256": "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f"
     },
     {
       "assetId": "R-P7-CATERING-03",
@@ -1775,7 +1775,7 @@
         "explanation": "维修仅安排上午9点到中午，下午1点及以后可举办活动；预订开场时间为下午2点。",
         "evidence": "Hall A will be unavailable from 9 A.M. to noon for scheduled maintenance, but events beginning at or after 1 P.M. may proceed. || Date and start: October 12, 2 P.M."
       },
-      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
+      "groupContentSha256": "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f"
     },
     {
       "assetId": "R-P7-CATERING-04",
@@ -1803,11 +1803,11 @@
         "explanation": "会务条款允许最迟在10月8日17点（含该时刻）修改订单，服务方已于10月7日16点确认并接受修改。",
         "evidence": "Catering orders may be changed through October 8 at 5 P.M. || EVENT SERVICES RESPONSE, OCTOBER 7, 4 P.M. || The revised quantities are accepted."
       },
-      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
+      "groupContentSha256": "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f"
     },
     {
       "assetId": "R-P7-CATERING-05",
-      "correctBasis": "修订135杯咖啡每杯4元加135份盒饭每份8元，共1620美元",
+      "correctBasis": "题干明示假设135份咖啡全部实际提供，135乘4加135乘8等于1620美元；不能把预订数直接证明为最终真实用量",
       "distractorReasons": [
         "1360美元是原餐食订单金额",
         "1500美元与更新数量单价不符",
@@ -1819,8 +1819,8 @@
         "id": "R-P7-CATERING-05",
         "sourceFile": "ToeicExtraReadingBatchSix.ets",
         "groupId": "P7-EX-CATERING",
-        "version": 1,
-        "stem": "What should the updated invoice show as the total catering charge?",
+        "version": 2,
+        "stem": "Assuming all 135 ordered coffee servings are served, what is the estimated total catering charge?",
         "options": [
           "$1,360",
           "$1,620",
@@ -1828,10 +1828,10 @@
           "$1,800"
         ],
         "answerIndex": 1,
-        "explanation": "更新后为135杯咖啡和135份午餐，单价4美元与8美元，合计1620美元。",
+        "explanation": "假设135份预订咖啡均已实际提供，则咖啡费为540美元；135份盒饭为1080美元，预计合计1620美元。实际咖啡收费仍取决于接受服务人数。",
         "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || update catering to 135 coffee servings and 135 boxed lunches."
       },
-      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
+      "groupContentSha256": "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f"
     }
   ],
   "revisionNotes": [
@@ -1866,6 +1866,7 @@
       "evidence": "docs/product/toeic-issue478-venue-receipt-review-2026-10-09.md",
       "reviewStatus": "AI_FIRST_PASS",
       "isExpertCertified": false
-    }
+    },
+    "2026-10-09 PR #506: CATERING-02/05 estimated-vs-served semantic review; v2 snapshots and full-group approved SHA rebound after exact prior hash verification (AI_FIRST_PASS only)."
   ]
 }

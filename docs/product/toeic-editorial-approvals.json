@@ -90,10 +90,10 @@
     "P7-EX-CATERING": {
       "reviewer": "AI-GPT6",
       "approvedAt": "2026-10-09",
-      "contentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5",
+      "contentSha256": "f64086ae61837653d0f72323766a1aefc920ccc7a543443e0ad8186a1125836f",
       "reviewMode": "AI_EDITORIAL",
       "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
-      "revisionNote": "Issue #478 2026-10-09: one Chinese explanation corrected for inclusive through cutoff; AI_EDITORIAL only; docs/product/toeic-issue478-reading-deadlines-review-2026-10-09.md"
+      "revisionNote": "Issue #478 2026-10-09: CATERING-02 and -05 clarify estimated ordered versus actual served coffee quantities, both v2; AI_EDITORIAL only; PR #506."
     }
   },
   "vocabulary": {
