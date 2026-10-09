@@ -128,6 +128,20 @@ def validate() -> None:
                 vocabulary_fingerprint(item, ipa[key]),
                 f"{key}: approved exact fingerprint stale")
     check_target(batch, ipa, approvals, ai, second)
+    # Cambridge Business English: troubleshooting is an attempt to identify
+    # the cause and find a remedy, not a guarantee of successful repair.
+    trouble = batch["V-202"]
+    require(trouble["meaning"] == "排查故障并尝试解决" and
+            trouble["pos"] == "v." and
+            trouble["synonyms"] == ["identify a fault and seek a solution"] and
+            trouble["collocations"] == ["troubleshoot a connection"],
+            "V-202 diagnosis/attempt must not become guaranteed repair")
+    d202 = vocabulary_fingerprint(trouble, ipa["V-202"])
+    require(approvals["vocabulary"]["V-202"]["contentSha256"] == d202 and
+            ai["vocabulary"]["V-202"]["contentSha256"] == d202 and
+            second["vocabulary"]["V-202"]["contentSha256"] == d202 and
+            second["vocabulary"]["V-202"]["meaning"] == trouble["meaning"],
+            "V-202 source-bound approval/second pass drift")
     # Cambridge US utility public services and billed utility costs are related
     # but different senses; neither should be lost in Chinese learning material.
     util = batch["V-215"]
