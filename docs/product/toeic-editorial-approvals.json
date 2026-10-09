@@ -59,10 +59,11 @@
     },
     "P7-EX-TRAINING": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "7c86e1d0b1b9dadf48b4ff1d72cce555ea62853bbf275283781c4b6ecbebc0be",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Issue #478 2026-10-09: TRAINING-04 pending submission changed to conditional; v1->v2, reviewed AI_EDITORIAL only; see docs/product/toeic-issue478-training-submission-review-2026-10-09.md"
     },
     "P7-EX-MIGRATION": {
       "reviewer": "AI-GPT6",
