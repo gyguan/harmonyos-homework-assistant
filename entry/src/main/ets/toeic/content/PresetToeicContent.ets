@@ -315,12 +315,13 @@ export class PresetToeicContent {
         // Archive old mock question R-M2-P5-007; v2 paper uses a distinct ID.
         ids[6]=ToeicMockDay19Part5V2Content.questions()[0].id;
         ids[38]=ToeicMockPart6V2RepairContent.day19().id;
-        ids[33]=ToeicMockDay19Part6CompletionContent.inventory().id;
-        ids[37]=ToeicMockDay19Part6CompletionContent.library().id;
         // Keep the old four published questions for historic drafts and reports;
         // only new Day19 sessions use the independent sentence-completion IDs.
         let revisedPart6=ToeicMockDay19Part6V2Content.questions();
         for (let i=0;i<revisedPart6.length;i++) ids[30+i]=revisedPart6[i].id;
+        // Reapply editorial replacements AFTER the initial P6 group override.
+        ids[33]=ToeicMockDay19Part6CompletionContent.inventory().id;
+        ids[37]=ToeicMockDay19Part6CompletionContent.library().id;
         for (let question of ToeicMockDay19V2Content.questions()) ids.push(question.id);
         plan.questionIds=ids;
       }
