@@ -102,7 +102,7 @@
       "source": {
         "originId": "R-M1-P5-003",
         "originFile": "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets",
-        "originVersion": 1
+        "originVersion": 2
       },
       "question": {
         "part": "PART_5",
@@ -117,7 +117,7 @@
         ],
         "answerIndex": 1,
         "explanation": "software 是不可数单数名词，谓语用 notifies；notify 是及物动词，后面必须有宾语 users。",
-        "version": 1
+        "version": 2
       },
       "correctBasis": "不可数 software 作第三人称单数主语，使用 notifies users",
       "distractorReasons": [
