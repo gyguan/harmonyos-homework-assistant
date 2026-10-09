@@ -15,12 +15,12 @@
     "highlightCoverageGaps": 4,
     "learnerPresentationUnresolvedGaps": 0
   },
-  "limitations": "AI second-context look at actually rotated options and new reading groups, not independent human/ETS certification; requires re-review after source changes. Four published question evidence fields retain historically incomplete excerpt strings, but learner-facing presentation now includes verified supplementary fragments via shared service; the source gaps remain recorded transparently for editorial provenance.",
+  "limitations": "AI second-context look at actually rotated options and new reading groups, not independent human/ETS certification; requires re-review after source changes. Four published question evidence fields retain historically incomplete excerpt strings, but newly issued question IDs carry complete verified evidence in their published content; the source gaps remain recorded transparently for editorial provenance.",
   "sourceBlobs": {
     "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "4be4a4f1c762362220fb2a0ebe8a31d62ebb9e8f",
     "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "e954bef30ef8b570bde6d6c312c0e5eba6d33638",
-    "entry/src/main/ets/toeic/content/ToeicMockDay14V2Content.ets": "6b195f6dd8d8e924c6b7d9538666a23f0f2bbe06",
-    "entry/src/main/ets/toeic/content/ToeicMockDay19V2Content.ets": "4c3b17ab557b1742fe419d10c1a7a39f6c6386d1"
+    "entry/src/main/ets/toeic/content/ToeicMockDay14V2Content.ets": "c6dce0479e5c5181caeb0846cce0e81c04088945",
+    "entry/src/main/ets/toeic/content/ToeicMockDay19V2Content.ets": "4909b1a7a514bf5316a1f9f30051a16a394b622f"
   },
   "notesFiles": [
     "docs/product/toeic-issue478-v2-derived-part7-day14-editorial-notes-39.txt",
@@ -3169,9 +3169,10 @@
       ],
       "reviewerNote": "Train arrival plus presentation time alone omits walking buffer necessary for the final answer.",
       "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
-      "resolution": "The shared ToeicEvidenceDisplayService supplements this question's learner-facing evidence in active practice, result and history views; the stored published question evidence/version remains unchanged. CI must verify all omitted excerpts in current source documents and displayed presentation.",
-      "presentationStatus": "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT",
-      "archivedEvidenceUnchanged": true
+      "resolution": "New mock sessions and live learning use the separately published R-FM1-P7-M1-06 with a complete evidence field. Original R-FM1-P7-M1-01 v1 and its evidence remain unchanged for saved historical attempts/reports.",
+      "presentationStatus": "REMEDIATED_BY_NEW_PUBLISHED_ID",
+      "archivedEvidenceUnchanged": true,
+      "activeRevisionId": "R-FM1-P7-M1-06"
     },
     {
       "id": "R-FM1-P7-M4-01",
@@ -3181,9 +3182,10 @@
       ],
       "reviewerNote": "Bus arrival and meeting start require explicit walking time to justify selection.",
       "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
-      "resolution": "The shared ToeicEvidenceDisplayService supplements this question's learner-facing evidence in active practice, result and history views; the stored published question evidence/version remains unchanged. CI must verify all omitted excerpts in current source documents and displayed presentation.",
-      "presentationStatus": "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT",
-      "archivedEvidenceUnchanged": true
+      "resolution": "New mock sessions and live learning use the separately published R-FM1-P7-M4-06 with a complete evidence field. Original R-FM1-P7-M4-01 v1 and its evidence remain unchanged for saved historical attempts/reports.",
+      "presentationStatus": "REMEDIATED_BY_NEW_PUBLISHED_ID",
+      "archivedEvidenceUnchanged": true,
+      "activeRevisionId": "R-FM1-P7-M4-06"
     },
     {
       "id": "R-FM2-P7-M1-01",
@@ -3193,9 +3195,10 @@
       ],
       "reviewerNote": "Train 88 selection requires the twenty-minute advance-arrival threshold.",
       "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
-      "resolution": "The shared ToeicEvidenceDisplayService supplements this question's learner-facing evidence in active practice, result and history views; the stored published question evidence/version remains unchanged. CI must verify all omitted excerpts in current source documents and displayed presentation.",
-      "presentationStatus": "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT",
-      "archivedEvidenceUnchanged": true
+      "resolution": "New mock sessions and live learning use the separately published R-FM2-P7-M1-06 with a complete evidence field. Original R-FM2-P7-M1-01 v1 and its evidence remain unchanged for saved historical attempts/reports.",
+      "presentationStatus": "REMEDIATED_BY_NEW_PUBLISHED_ID",
+      "archivedEvidenceUnchanged": true,
+      "activeRevisionId": "R-FM2-P7-M1-06"
     },
     {
       "id": "R-FM2-P7-M5-03",
@@ -3208,9 +3211,10 @@
       ],
       "reviewerNote": "The evidence highlight only quotes logistics experience while answering all three hiring requirements requires résumé and email evidence.",
       "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
-      "resolution": "The shared ToeicEvidenceDisplayService supplements this question's learner-facing evidence in active practice, result and history views; the stored published question evidence/version remains unchanged. CI must verify all omitted excerpts in current source documents and displayed presentation.",
-      "presentationStatus": "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT",
-      "archivedEvidenceUnchanged": true
+      "resolution": "New mock sessions and live learning use the separately published R-FM2-P7-M5-06 with a complete evidence field. Original R-FM2-P7-M5-03 v1 and its evidence remain unchanged for saved historical attempts/reports.",
+      "presentationStatus": "REMEDIATED_BY_NEW_PUBLISHED_ID",
+      "archivedEvidenceUnchanged": true,
+      "activeRevisionId": "R-FM2-P7-M5-06"
     }
   ]
 }
