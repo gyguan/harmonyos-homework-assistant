@@ -199,6 +199,33 @@ def validate() -> None:
     for row, actual in zip(published, expected, strict=True):
         check_item(row, actual)
 
+    # Evidence snippets in four current grouped questions are incomplete:
+    # full multi-document articles still support the answers, but students
+    # should not be led to believe the highlighted excerpt is the full proof.
+    known_gaps = {
+        "R-FM1-P7-M1-01", "R-FM1-P7-M4-01",
+        "R-FM2-P7-M1-01", "R-FM2-P7-M5-03",
+    }
+    findings = data.get("editorialFindings", [])
+    if len(findings) != 4 or {f["id"] for f in findings} != known_gaps:
+        raise AssertionError("four known learner-evidence coverage gaps must stay visible")
+    by_id = {r["id"]: r for r in published}
+    for finding in findings:
+        q = by_id[finding["id"]]
+        if finding["type"] != "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE":
+            raise AssertionError(f'{finding["id"]}: invalid evidence-gap classification')
+        if finding["answerValidity"] != "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER":
+            raise AssertionError(f'{finding["id"]}: evidence gap must not masquerade as unsupported answer')
+        excerpt = q["evidence"]
+        doc_text = "\\n\\n".join(q["documents"])
+        missing = finding.get("missingEvidenceFragments")
+        if not isinstance(missing, list) or not missing:
+            raise AssertionError("must list exactly which evidence the highlight omitted")
+        for fragment in missing:
+            if fragment not in doc_text or fragment in excerpt:
+                raise AssertionError(f'{finding["id"]}: stale or fabricated missing evidence fragment')
+    # Do not call the data independent teacher/ETS certification.
+
     # Negative controls: changing one answer, one distractor or one underlying
     # source requires a genuine re-review rather than trusting the stale ledger.
     tampered = deepcopy(published[0])
@@ -225,7 +252,7 @@ def validate() -> None:
     print("TOEIC_ISSUE478_V2_DERIVED_PART7_SEMANTIC_PASS items=72 "
           "day14=39 day19=33 grouped=30 singles=42 "
           "distractor_exclusions=216 source_git_blobs=4 "
-          "rotated_correct_answer_text=verified "
+          "rotated_correct_answer_text=verified evidence_highlight_gaps=4 "
           "human_expert_ETS_certification=NO")
 
 
