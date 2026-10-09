@@ -45,7 +45,7 @@ def is_valid_approval(entry: object, expected_hash: str, today: date | None = No
     reviewer = entry.get("reviewer", "")
     approved_at = entry.get("approvedAt", "")
     digest = entry.get("contentSha256", "")
-    if not isinstance(reviewer, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9-]{0,38}", reviewer):
+    if not isinstance(reviewer, str) or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9.-]{0,38}", reviewer):
         return False
     if reviewer.lower() in {"unknown", "pending", "todo", "tbd"}:
         return False
