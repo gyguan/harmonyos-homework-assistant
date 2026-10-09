@@ -119,6 +119,11 @@
       "id": "V-298",
       "reviewDate": "2026-10-09",
       "note": "roster can include duties or work shifts, which the weekend-shift example requires"
+    },
+    {
+      "id": "P7-EX-CATERING",
+      "reviewDate": "2026-10-09",
+      "note": "2026-10-09 Issue #478: R-P7-CATERING-04 Chinese explanation must include through Oct8 5PM deadline; answer and evidence unchanged"
     }
   ],
   "vocabulary": {
@@ -2523,7 +2528,7 @@
       "correction": null
     },
     "P7-EX-CATERING": {
-      "contentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b",
+      "contentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5",
       "documentCount": 3,
       "questionCount": 5,
       "decision": "PASS_AI_RECHECK",
@@ -2590,7 +2595,7 @@
           "result": "PASS_AI_RECHECK"
         }
       ],
-      "correction": null
+      "correction": "2026-10-09 Issue #478: R-P7-CATERING-04 Chinese explanation must include through Oct8 5PM deadline; answer and evidence unchanged"
     }
   }
 }
