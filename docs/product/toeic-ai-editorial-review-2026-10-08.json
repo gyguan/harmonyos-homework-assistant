@@ -120,6 +120,62 @@
       "reason": "higher conference attendance refers to the number of attendees, not just fact of presence",
       "source": "https://dictionary.cambridge.org/dictionary/english/attendance",
       "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "V-124",
+      "reviewDate": "2026-10-09",
+      "reason": "a bid for work names a contractual price offer, not an unrestricted offer",
+      "source": "https://dictionary.cambridge.org/dictionary/english/bid",
+      "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "V-125",
+      "reviewDate": "2026-10-09",
+      "reason": "subcontractor carries out part of another party's original obligation; outside contractor alone is overbroad",
+      "source": "https://dictionary.cambridge.org/dictionary/english/subcontractor",
+      "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "V-215",
+      "reviewDate": "2026-10-09",
+      "reason": "utility services include gas and water, not just electricity and water",
+      "source": "https://dictionary.cambridge.org/dictionary/english/utility",
+      "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "V-264",
+      "reviewDate": "2026-10-09",
+      "reason": "keyboard-accessibility example concerns disability-inclusive website use rather than mere ease of access",
+      "source": "https://www.w3.org/WAI/fundamentals/accessibility-principles/",
+      "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "V-276",
+      "reviewDate": "2026-10-09",
+      "reason": "airport shuttle makes recurring trips; a generic transfer bus need not do so",
+      "source": "https://dictionary.cambridge.org/dictionary/english/shuttle",
+      "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "V-277",
+      "reviewDate": "2026-10-09",
+      "reason": "commute is a repeated home-work journey, not simply any trip to work",
+      "source": "https://dictionary.cambridge.org/dictionary/english/commute",
+      "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "V-284",
+      "reviewDate": "2026-10-09",
+      "reason": "hotel amenity can be a service such as Wi-Fi, not just a physical guest facility",
+      "source": "https://dictionary.cambridge.org/us/dictionary/learner-english/amenity",
+      "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "V-298",
+      "reviewDate": "2026-10-09",
+      "reason": "roster can include duties or work shifts, which the weekend-shift example requires",
+      "source": "https://dictionary.cambridge.org/dictionary/english/roster",
+      "reviewMode": "AI_EDITORIAL"
     }
   ],
   "vocabulary": {
@@ -160,25 +216,29 @@
     },
     "V-124": {
       "word": "bid",
-      "contentSha256": "c7003721d5f506290ea6d377c187ce2ab3a35cbef95c09b9a7e7e3de00f7d681",
+      "contentSha256": "4ff88692b94bb65c6dbfcbb6aeef7349a0dde12bde828fe0fddd57533311f093",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "a bid for work names a contractual price offer, not an unrestricted offer"
     },
     "V-125": {
       "word": "subcontractor",
-      "contentSha256": "34d0b5f7859d30205d179f3dbba64cb1ffd79678302ea4a887cc738f771f2e08",
+      "contentSha256": "7bc8bfa1ee156028770eb4679c4d6a8579945eecf408b42e6af872b3950da678",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "subcontractor carries out part of another party's original obligation; outside contractor alone is overbroad"
     },
     "V-126": {
       "word": "specification",
@@ -1177,14 +1237,16 @@
     },
     "V-215": {
       "word": "utilities",
-      "contentSha256": "55947d276141a5152b330752134f9acb1a4d14b216402fdc2cab12d21e7679b1",
+      "contentSha256": "4e44a769b149b2d63d27c8ab01bbd770f2304245213c91fdae26055e6c55a0d2",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "utility services include gas and water, not just electricity and water"
     },
     "V-216": {
       "word": "fixture",
@@ -1720,14 +1782,16 @@
     },
     "V-264": {
       "word": "accessibility",
-      "contentSha256": "c97687d82b5e1b72337a1d0d5d8a335e5c3c179a5ccbedc456014b29c17c5dbd",
+      "contentSha256": "f4143caebab04058203238d93442e94baf0c96d847fce57413e4e8a7c88f3db0",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "keyboard-accessibility example concerns disability-inclusive website use rather than mere ease of access"
     },
     "V-265": {
       "word": "compatibility",
@@ -1852,25 +1916,29 @@
     },
     "V-276": {
       "word": "shuttle",
-      "contentSha256": "40935b508acb8cea4fbaf595415919195101030882126d34f11d5fe91ad8842d",
+      "contentSha256": "65124965d3bd47c966cdb9b4db60e075ed74a0c8fccf6ddf0c9d9abbcfec4b6f",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "airport shuttle makes recurring trips; a generic transfer bus need not do so"
     },
     "V-277": {
       "word": "commute",
-      "contentSha256": "e356cd34337f0f79fa419042646a6634d729bb51a0bd98a564b474ac6954cddd",
+      "contentSha256": "3e5e95cdec1a2dbbc7c87a4cb82b14986b21c8036a16007ff6f0eba280cdc72e",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "commute is a repeated home-work journey, not simply any trip to work"
     },
     "V-278": {
       "word": "allowance",
@@ -1940,14 +2008,16 @@
     },
     "V-284": {
       "word": "amenity",
-      "contentSha256": "5aac076aaf6c32c470ae5bebc171af9e3e821b977fed14de6471a2bf62877256",
+      "contentSha256": "e17844980e0260da1b660392de2317cbf64359906a1b666f6a85ce20af6d469f",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "hotel amenity can be a service such as Wi-Fi, not just a physical guest facility"
     },
     "V-285": {
       "word": "contractor",
@@ -2096,14 +2166,16 @@
     },
     "V-298": {
       "word": "roster",
-      "contentSha256": "17d0e691b76184d62d71b0fbc349c806d013d7ab6c0c699b0d6195ac5fe4c1b8",
+      "contentSha256": "cfb727eb9033ec3c988912aa7d6c15f526a028685543895cdb06176160db135e",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "roster can include duties or work shifts, which the weekend-shift example requires"
     },
     "V-299": {
       "word": "voucher",
