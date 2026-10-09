@@ -23,6 +23,7 @@ from validate_toeic_active_mock_p5p6_issue478 import validate as validate_active
 from validate_toeic_v2_derived_part7_editorial_issue478 import validate as validate_v2_derived_p7_semantics
 from validate_toeic_vocabulary_examples_issue478 import validate as validate_vocabulary_examples_issue478
 from validate_toeic_bilingual_semantics_issue478 import validate as validate_bilingual_semantics_issue478
+from validate_toeic_reading_deadlines_issue478 import validate as validate_reading_deadlines_issue478
 from validate_toeic_vocabulary_dictionary_issue478 import validate as validate_vocabulary_dictionary_issue478
 from validate_toeic_contextual_synonyms_issue478 import validate as validate_contextual_synonyms_issue478
 from validate_toeic_business_context_issue478 import validate as validate_business_context_issue478
@@ -61,6 +62,7 @@ def main() -> None:
     validate_v2_derived_p7_semantics()
     validate_vocabulary_examples_issue478()
     validate_bilingual_semantics_issue478()
+    validate_reading_deadlines_issue478()
     validate_vocabulary_dictionary_issue478()
     validate_contextual_synonyms_issue478()
     validate_business_context_issue478()
