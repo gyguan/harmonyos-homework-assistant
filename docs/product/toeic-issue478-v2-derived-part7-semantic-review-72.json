@@ -11,9 +11,10 @@
     "day19Grouped": 15,
     "derivedItems": 72,
     "correctBasis": 72,
-    "wrongOptionReasons": 216
+    "wrongOptionReasons": 216,
+    "highlightCoverageGaps": 4
   },
-  "limitations": "AI second-context look at actually rotated options and new reading groups, not independent human/ETS certification; requires re-review after source changes.",
+  "limitations": "AI second-context look at actually rotated options and new reading groups, not independent human/ETS certification; requires re-review after source changes. Four identified learner-facing evidence excerpts omit relevant clauses, although full group documents support the answers; they remain explicitly flagged and require history-safe future publication.",
   "sourceBlobs": {
     "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "4be4a4f1c762362220fb2a0ebe8a31d62ebb9e8f",
     "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "e954bef30ef8b570bde6d6c312c0e5eba6d33638",
@@ -3156,6 +3157,51 @@
       ],
       "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
       "expertCertified": false
+    }
+  ],
+  "editorialFindings": [
+    {
+      "id": "R-FM1-P7-M1-01",
+      "type": "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE",
+      "missingEvidenceFragments": [
+        "Please allow 20 minutes to walk from the station."
+      ],
+      "reviewerNote": "Train arrival plus presentation time alone omits walking buffer necessary for the final answer.",
+      "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
+      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+    },
+    {
+      "id": "R-FM1-P7-M4-01",
+      "type": "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE",
+      "missingEvidenceFragments": [
+        "It takes about 10 minutes to walk from the bus stop."
+      ],
+      "reviewerNote": "Bus arrival and meeting start require explicit walking time to justify selection.",
+      "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
+      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+    },
+    {
+      "id": "R-FM2-P7-M1-01",
+      "type": "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE",
+      "missingEvidenceFragments": [
+        "Please arrive at Central Station at least 20 minutes before the meeting"
+      ],
+      "reviewerNote": "Train 88 selection requires the twenty-minute advance-arrival threshold.",
+      "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
+      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+    },
+    {
+      "id": "R-FM2-P7-M5-03",
+      "type": "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE",
+      "missingEvidenceFragments": [
+        "proficiency with spreadsheet software",
+        "advanced spreadsheet certification.",
+        "available to start by September 15.",
+        "I can begin on September 8 if selected."
+      ],
+      "reviewerNote": "The evidence highlight only quotes logistics experience while answering all three hiring requirements requires résumé and email evidence.",
+      "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
+      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
     }
   ]
 }
