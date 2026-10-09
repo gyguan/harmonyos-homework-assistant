@@ -8,7 +8,9 @@ certify all TOEIC content or simulate HarmonyOS device compilation.
 from __future__ import annotations
 
 from copy import deepcopy
+import ast
 import json
+import re
 from pathlib import Path
 
 from export_toeic_review_pack import GROUP_RE, QUESTION_RE
@@ -75,6 +77,15 @@ def read_source() -> tuple[dict, list[dict]]:
     return group, source_rows
 
 
+def resolved_venue_passage() -> str:
+    """Resolve the actual runtime article, not the coverage parser's variable name."""
+    source = (CONTENT / "ToeicQuestionTranslationSupplementaryCatalog.ets").read_text(
+        encoding="utf-8")
+    m = re.search(r'let venuePassage:string=("(?:[^"\\\\]|\\\\.)*");', source)
+    require(m is not None, "venuePassage shared runtime variable not found")
+    return ast.literal_eval(m[1])
+
+
 def check(trans: dict, questions: dict, group: dict, source_rows: list[dict],
           approved: dict, ai: dict, shared: dict) -> None:
     require(len(trans) == 221, "221 unique translated questions required")
@@ -104,7 +115,10 @@ def check(trans: dict, questions: dict, group: dict, source_rows: list[dict],
     require(q.evidence == source["evidence"] == EVIDENCE,
             "published evidence must distinguish deadline and email date")
 
-    passage, zh_stem, zh_options = trans[QID]
+    passage_ref, zh_stem, zh_options = trans[QID]
+    require(passage_ref == "venuePassage",
+            "published VENUE-05 must reference the actual shared Chinese article")
+    passage = resolved_venue_passage()
     require("最迟应于9月12日送达场地协调员" in passage and
             "9月10日的邮件" in passage,
             "real Chinese article must preserve delivery condition and email date")
@@ -112,8 +126,8 @@ def check(trans: dict, questions: dict, group: dict, source_rows: list[dict],
             "Chinese stem/options must not infer venue receipt")
     for index in range(1, 6):
         ident = f"R-P7-VENUE-{index:02d}"
-        require(ident in trans and trans[ident][0] == passage,
-                f"{ident}: shared venue Chinese article mismatch")
+        require(ident in trans and trans[ident][0] == passage_ref,
+                f"{ident}: shared VENUE translated article reference mismatch")
 
     digest = reading_fingerprint(GROUP, group, source_rows)
     approval = approved["readingGroups"][GROUP]
