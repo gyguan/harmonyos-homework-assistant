@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 import json
+import re
 from pathlib import Path
 
 from validate_toeic_question_quality import (
@@ -26,7 +27,9 @@ def authored_questions(path: Path) -> dict[str, dict]:
     result = {}
     for call in literals_after(source, "new ToeicQuestion("):
         args = fields(call)
-        if not args or not args[0].startswith(('"R-FM', "'R-FM")):
+        # Computed strings such as 'R-FM1-'+String(group) are derived
+        # constructors, not 36 literal authored questions.
+        if not args or not re.fullmatch(r"""(?:'R-FM[^']+'|"R-FM[^"]+")""", args[0]):
             continue
         question = parse_question(args, path.stem, False)
         if question is None or question.part != "PART_7":
