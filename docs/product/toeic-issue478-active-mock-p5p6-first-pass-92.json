@@ -15,7 +15,7 @@
     "correctRationales": 92,
     "excludedWrongOptions": 276
   },
-  "limitations": "AI first pass with exact active-pool slot mapping, three source-specific distractor notes per item, and Git source blob snapshot. Original archived ambiguous items remain untouched; ledger is not an ETS/second independent human assessment. Dynamic Part6 inherits historical stems/articles as described by assembly source; source SHA guards all dynamic code.; PR #508: Day14 slot22 new ID replaces nonstandard legacy distractor while archived old answer remains unaltered.; #478 Day3/Day15 additional P5 revisions change routing only; the 92 active mock P5/P6 content remains unchanged, source blob updated after explicit diff review.; Day16 Part6 revised elsewhere, Day14/19 mock questions untouched; refreshed source blob after review of routing-only changes.",
+  "limitations": "AI first pass with exact active-pool slot mapping, three source-specific distractor notes per item, and Git source blob snapshot. Original archived ambiguous items remain untouched; ledger is not an ETS/second independent human assessment. Dynamic Part6 inherits historical stems/articles as described by assembly source; source SHA guards all dynamic code.; PR #508: Day14 slot22 new ID replaces nonstandard legacy distractor while archived old answer remains unaltered.; #478 Day3/Day15 additional P5 revisions change routing only; the 92 active mock P5/P6 content remains unchanged, source blob updated after explicit diff review.; Day16 Part6 revised elsewhere, Day14/19 mock questions untouched; refreshed source blob after review of routing-only changes.; P1 final closeout added non-mock replacements/live quarantines and Day15/16 routing; Day14/Day19 active 92 P5/P6 item content was rechecked as unchanged before rebinding this Preset source blob.",
   "sourceBlobs": {
     "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "e8e80bff17620d563250ccfebe9a44271e198d33",
     "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "8cd746ea9c71c5fa2f1211c99b74cfd88d4c2d18",
@@ -23,7 +23,7 @@
     "entry/src/main/ets/toeic/content/ToeicMockPart6V2RepairContent.ets": "a7b037e937153bbe7aa3f499d4c6586753612f01",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6V2Content.ets": "4fdc74a07b2cdb0a9881a9280047003149b0f2f6",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6CompletionContent.ets": "f041c04a6c9ade0d30b90bd3f7c569c56b032f07",
-    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "2aad5f83482b1148080b3a0d90a199d2fbad11b8",
+    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "5c2e3639735fbb84bf5b2761c92bb47062e6b0c0",
     "entry/src/main/ets/toeic/content/ToeicMockDay14Part5V2Content.ets": "a20a3d1e547ee4678a5590022f0cb984a337ea97"
   },
   "sourceNotesFiles": [
