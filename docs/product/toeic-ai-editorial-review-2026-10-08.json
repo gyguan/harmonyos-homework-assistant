@@ -190,6 +190,13 @@
       "reason": "R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged",
       "source": "entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFour.ets",
       "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "P7-EX-TRAINING",
+      "reviewDate": "2026-10-09",
+      "reason": "R-P7-TRAINING-04 source states 'before I submit the form today': proposal to submit June 2 is not an already completed filing; conditional stem, option and explanation updated; published version v2",
+      "source": "entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFour.ets",
+      "reviewMode": "AI_EDITORIAL"
     }
   ],
   "vocabulary": {
@@ -2516,7 +2523,7 @@
       "reviewCorrection": "R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged"
     },
     "P7-EX-TRAINING": {
-      "contentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d",
+      "contentSha256": "7c86e1d0b1b9dadf48b4ff1d72cce555ea62853bbf275283781c4b6ecbebc0be",
       "decision": "PASS",
       "documents": 2,
       "questions": [
@@ -2550,7 +2557,9 @@
           "answerIndex": 2,
           "skill": "CROSS_DOCUMENT"
         }
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "R-P7-TRAINING-04 source states 'before I submit the form today': proposal to submit June 2 is not an already completed filing; conditional stem, option and explanation updated; published version v2"
     },
     "P7-EX-MIGRATION": {
       "contentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158",
