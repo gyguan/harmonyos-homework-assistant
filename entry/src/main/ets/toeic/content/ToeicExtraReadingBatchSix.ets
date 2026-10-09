@@ -56,7 +56,7 @@ export class ToeicExtraReadingBatchSix {
         ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-CATERING"),
       new ToeicQuestion("R-P7-CATERING-04",ToeicSection.READING,ToeicPart.PART_7,
         ToeicSkill.CROSS_DOCUMENT,'',"Was the change to catering quantities accepted before the stated cutoff?",["No, it was accepted on October 12","No, all changes needed approval by October 5","Yes, the response came on October 7","Yes, the deadline was October 12"],2,
-        "会务条款规定10月8日17点前可更改，服务方10月7日16点确认收到并接受。","Catering orders may be changed through October 8 at 5 P.M. || EVENT SERVICES RESPONSE, OCTOBER 7, 4 P.M. || The revised quantities are accepted.","accepted on October 7 = before October 8 deadline",94,
+        "会务条款允许最迟在10月8日17点（含该时刻）修改订单，服务方已于10月7日16点确认并接受修改。","Catering orders may be changed through October 8 at 5 P.M. || EVENT SERVICES RESPONSE, OCTOBER 7, 4 P.M. || The revised quantities are accepted.","accepted on October 7 = before October 8 deadline",94,
         ToeicDifficulty.HARD,ToeicScoreValue.NORMAL,
         ToeicReviewStatus.PUBLISHED,1,'','',0,0,"P7-EX-CATERING"),
       new ToeicQuestion("R-P7-CATERING-05",ToeicSection.READING,ToeicPart.PART_7,
