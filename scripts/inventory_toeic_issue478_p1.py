@@ -10,7 +10,7 @@ import argparse
 import json
 from pathlib import Path
 from validate_toeic_question_quality import collect
-from validate_toeic_vocabulary_examples_issue478 import get_rows
+from validate_toeic_vocabulary_examples_issue478 import get_rows, get_supplement
 from validate_toeic_vocabulary_dictionary_issue478 import parse_batches
 from validate_toeic_translation_coverage import collect_translations
 
@@ -28,6 +28,7 @@ def main() -> None:
     assert len(set(q.id for q in questions)) == 185, "Duplicate original Part5/6 IDs"
     words = get_rows()
     assert len(words) == 300 and set(words) == {f"V-{i:03d}" for i in range(1, 301)}
+    supplements = get_supplement()
     batches = parse_batches()
     assert len(batches) == 180
     items = []
@@ -49,7 +50,7 @@ def main() -> None:
     for id, (word, meaning, example) in sorted(words.items()):
         word_items.append({
             "assetId": id, "headword": word, "meaning": meaning,
-            "example": example, "isBatchWordWithAIEditorialHash": id in batches,
+            "example": example or supplements.get(id, ""), "isBatchWordWithAIEditorialHash": id in batches,
             "contentReviewStatus": "NEED_DICTIONARY_BOUND_SECOND_PASS",
             "reviewRequired": ["part of speech and sense", "business usage",
                 "collocation", "contextual paraphrase", "US IPA and pronunciation variants", "example grammar"],
