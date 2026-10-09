@@ -197,6 +197,13 @@
       "reason": "R-P7-TRAINING-04 source states 'before I submit the form today': proposal to submit June 2 is not an already completed filing; conditional stem, option and explanation updated; published version v2",
       "source": "entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFour.ets",
       "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "P7-EX-VENUE",
+      "reviewDate": "2026-10-09",
+      "reason": "R-P7-VENUE-05 original room-change deadline requires venue-coordinator receipt by September 12; EMAIL dated September 10 does not prove delivery/receipt. Correct question preserves uncertainty and v2 content.",
+      "source": "entry/src/main/ets/toeic/content/ToeicExtraReadingContent.ets",
+      "reviewMode": "AI_EDITORIAL"
     }
   ],
   "vocabulary": {
@@ -2223,7 +2230,7 @@
   },
   "readingGroups": {
     "P7-EX-VENUE": {
-      "contentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522",
+      "contentSha256": "1e1385c53112eb62795e89938961f04ef0cc8f403b136f1dc466c6873e49f78d",
       "decision": "PASS",
       "documents": 2,
       "questions": [
@@ -2257,7 +2264,9 @@
           "answerIndex": 2,
           "skill": "CROSS_DOCUMENT"
         }
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "R-P7-VENUE-05 original room-change deadline requires venue-coordinator receipt by September 12; EMAIL dated September 10 does not prove delivery/receipt. Correct question preserves uncertainty and v2 content."
     },
     "P7-EX-DELIVERY": {
       "contentSha256": "1e193292b3b6a7b356d8cf411b219f63deb627bff43935cdc285841258eb4949",
