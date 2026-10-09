@@ -64,6 +64,11 @@
       "id": "V-245",
       "reviewDate": "2026-10-09",
       "note": "Replace inaccurate '围栏' with '围起来的区域'; keep the letter-enclosure sense and existing example."
+    },
+    {
+      "id": "V-255",
+      "reviewDate": "2026-10-09",
+      "note": "Clarify login credential is authentication information, not limited to a physical identity document"
     }
   ],
   "vocabulary": {
@@ -1254,18 +1259,18 @@
     "V-255": {
       "headword": "credential",
       "pos": "n.",
-      "meaning": "身份凭证；资格证书",
+      "meaning": "登录凭据；身份或资格证明",
       "example": "Do not share your login credentials with other users.",
       "collocations": [
         "login credentials"
       ],
       "synonyms": [
-        "proof of identity"
+        "authentication information"
       ],
       "ipa": "/krɪˈdɛnʃəl/",
-      "contentSha256": "1ee861abbe35e38a53ac713c8393db7db762d9f637d325495d290b8aac5df664",
+      "contentSha256": "c8df166d3ce1e5e592500089831fb1dc4b162e2be609c62aca6ad81cd2e4fa0c",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 #478: login credentials represent authentication information; preserving additional identity and qualification senses"
     },
     "V-256": {
       "headword": "encryption",

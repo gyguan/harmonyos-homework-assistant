@@ -109,10 +109,11 @@
     },
     "V-123": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "4de364d876c81f8d82508115e38b4f7f126c5fd3c9a10a87edf6bdacc89e039f",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "6fe5c01607fd891bfc255d51bc876d952c6c38f43cabb8fa904305d729a68766",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Issue #478 2026-10-09 dictionary-grounded context paraphrase check; evidence: docs/product/toeic-issue478-contextual-paraphrase-review-2026-10-09.md. AI_EDITORIAL only."
     },
     "V-124": {
       "reviewer": "AI-GPT6",
@@ -158,10 +159,11 @@
     },
     "V-130": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "43086913170c69f674145ca3730fbf4c77acd820979006309ca24870d62cb3c6",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "35ae0ac106eba6bcc680b28d75d85f54d234235d808a38eaaba40cb22d375ff4",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Issue #478 2026-10-09 dictionary-grounded context paraphrase check; evidence: docs/product/toeic-issue478-contextual-paraphrase-review-2026-10-09.md. AI_EDITORIAL only."
     },
     "V-131": {
       "reviewer": "AI-GPT6",
@@ -256,10 +258,11 @@
     },
     "V-144": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "fb44b6fbc744a916979af1980fb4e5b109ac2b3e988a517420874c07b7dfa754",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "71b35d29e18c0770f96de4dd722c5d783c8f192885e467aacf69c4218ea7f64e",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Issue #478 2026-10-09 dictionary-grounded context paraphrase check; evidence: docs/product/toeic-issue478-contextual-paraphrase-review-2026-10-09.md. AI_EDITORIAL only."
     },
     "V-145": {
       "reviewer": "AI-GPT6",
@@ -270,10 +273,11 @@
     },
     "V-146": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "dcbc776af3ecad02130931544c45557557e90f7ebac948070e48eb2485447db3",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "9acbd639c6b538a0b741466bad5d600ab97d571b5b56ab69a6c4f0492c377208",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Issue #478 2026-10-09 dictionary-grounded context paraphrase check; evidence: docs/product/toeic-issue478-contextual-paraphrase-review-2026-10-09.md. AI_EDITORIAL only."
     },
     "V-147": {
       "reviewer": "AI-GPT6",
@@ -1035,10 +1039,11 @@
     },
     "V-255": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "1ee861abbe35e38a53ac713c8393db7db762d9f637d325495d290b8aac5df664",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "c8df166d3ce1e5e592500089831fb1dc4b162e2be609c62aca6ad81cd2e4fa0c",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Issue #478 2026-10-09 dictionary-grounded context paraphrase check; evidence: docs/product/toeic-issue478-contextual-paraphrase-review-2026-10-09.md. AI_EDITORIAL only."
     },
     "V-256": {
       "reviewer": "AI-GPT6",
