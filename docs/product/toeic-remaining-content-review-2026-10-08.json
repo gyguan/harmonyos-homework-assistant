@@ -89,6 +89,36 @@
       "id": "V-297",
       "reviewDate": "2026-10-09",
       "note": "higher conference attendance refers to the number of attendees, not just fact of presence"
+    },
+    {
+      "id": "V-215",
+      "reviewDate": "2026-10-09",
+      "note": "utility services include gas and water, not just electricity and water"
+    },
+    {
+      "id": "V-264",
+      "reviewDate": "2026-10-09",
+      "note": "keyboard-accessibility example concerns disability-inclusive website use rather than mere ease of access"
+    },
+    {
+      "id": "V-276",
+      "reviewDate": "2026-10-09",
+      "note": "airport shuttle makes recurring trips; a generic transfer bus need not do so"
+    },
+    {
+      "id": "V-277",
+      "reviewDate": "2026-10-09",
+      "note": "commute is a repeated home-work journey, not simply any trip to work"
+    },
+    {
+      "id": "V-284",
+      "reviewDate": "2026-10-09",
+      "note": "hotel amenity can be a service such as Wi-Fi, not just a physical guest facility"
+    },
+    {
+      "id": "V-298",
+      "reviewDate": "2026-10-09",
+      "note": "roster can include duties or work shifts, which the weekend-shift example requires"
     }
   ],
   "vocabulary": {
@@ -645,12 +675,12 @@
         "monthly utilities"
       ],
       "synonyms": [
-        "water and electricity services"
+        "essential services such as electricity, gas, and water"
       ],
       "ipa": "/juːˈtɪlətiz/",
-      "contentSha256": "55947d276141a5152b330752134f9acb1a4d14b216402fdc2cab12d21e7679b1",
+      "contentSha256": "4e44a769b149b2d63d27c8ab01bbd770f2304245213c91fdae26055e6c55a0d2",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: utility services include gas and water, not just electricity and water"
     },
     "V-216": {
       "headword": "fixture",
@@ -1429,12 +1459,12 @@
         "website accessibility"
       ],
       "synonyms": [
-        "ease of access"
+        "ability of people with disabilities to use a website"
       ],
       "ipa": "/əkˌsɛsəˈbɪləti/",
-      "contentSha256": "c97687d82b5e1b72337a1d0d5d8a335e5c3c179a5ccbedc456014b29c17c5dbd",
+      "contentSha256": "f4143caebab04058203238d93442e94baf0c96d847fce57413e4e8a7c88f3db0",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: keyboard-accessibility example concerns disability-inclusive website use rather than mere ease of access"
     },
     "V-265": {
       "headword": "compatibility",
@@ -1621,12 +1651,12 @@
         "airport shuttle"
       ],
       "synonyms": [
-        "transfer bus"
+        "vehicle making regular trips between two places"
       ],
       "ipa": "/ˈʃʌtəl/",
-      "contentSha256": "40935b508acb8cea4fbaf595415919195101030882126d34f11d5fe91ad8842d",
+      "contentSha256": "65124965d3bd47c966cdb9b4db60e075ed74a0c8fccf6ddf0c9d9abbcfec4b6f",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: airport shuttle makes recurring trips; a generic transfer bus need not do so"
     },
     "V-277": {
       "headword": "commute",
@@ -1637,12 +1667,12 @@
         "commute by train"
       ],
       "synonyms": [
-        "travel to work"
+        "travel regularly between home and work"
       ],
       "ipa": "/kəˈmjuːt/",
-      "contentSha256": "e356cd34337f0f79fa419042646a6634d729bb51a0bd98a564b474ac6954cddd",
+      "contentSha256": "3e5e95cdec1a2dbbc7c87a4cb82b14986b21c8036a16007ff6f0eba280cdc72e",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: commute is a repeated home-work journey, not simply any trip to work"
     },
     "V-278": {
       "headword": "allowance",
@@ -1749,12 +1779,12 @@
         "hotel amenity"
       ],
       "synonyms": [
-        "guest facility"
+        "hotel facility or service that improves comfort"
       ],
       "ipa": "/əˈmɛnɪti/",
-      "contentSha256": "5aac076aaf6c32c470ae5bebc171af9e3e821b977fed14de6471a2bf62877256",
+      "contentSha256": "e17844980e0260da1b660392de2317cbf64359906a1b666f6a85ce20af6d469f",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: hotel amenity can be a service such as Wi-Fi, not just a physical guest facility"
     },
     "V-285": {
       "headword": "contractor",
@@ -1973,12 +2003,12 @@
         "staff roster"
       ],
       "synonyms": [
-        "list of assigned staff"
+        "staff list with assigned duties or shifts"
       ],
       "ipa": "/ˈrɑːstər/",
-      "contentSha256": "17d0e691b76184d62d71b0fbc349c806d013d7ab6c0c699b0d6195ac5fe4c1b8",
+      "contentSha256": "cfb727eb9033ec3c988912aa7d6c15f526a028685543895cdb06176160db135e",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: roster can include duties or work shifts, which the weekend-shift example requires"
     },
     "V-299": {
       "headword": "voucher",
