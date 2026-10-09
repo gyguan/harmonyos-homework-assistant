@@ -2465,7 +2465,7 @@
       "correctBasis": "send questions to coordinator，收件者用 to",
       "distractorReasons": [
         "for 表目的不是收件方向",
-        "by 表方式",
+        "by 表动作执行方式，不能标明收件人",
         "with 表伴随"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
