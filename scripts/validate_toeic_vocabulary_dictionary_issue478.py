@@ -128,6 +128,17 @@ def validate() -> None:
                 vocabulary_fingerprint(item, ipa[key]),
                 f"{key}: approved exact fingerprint stale")
     check_target(batch, ipa, approvals, ai, second)
+    # V-119: productivity is output relative to inputs, not a synonym for generic efficiency.
+    expansion = (CONTENT / "ToeicVocabularyExpansion.ets").read_text(encoding="utf-8")
+    productivity = get_rows()["V-119"]
+    require(productivity[0] == "productivity" and
+            productivity[1] == "生产率；单位投入所产生的产出效率",
+            "V-119 productivity definition drift")
+    require('["output per unit of input"]' in expansion and
+            '"V-119","productivity","n."' in expansion,
+            "V-119 contextual paraphrase drift")
+    require('["output efficiency"]' not in expansion,
+            "V-119 old approximate synonym regression")
     # A deliberately wrong interpretation or stress must always fail the gate.
     corrupted = deepcopy(batch)
     corrupted["V-164"]["synonyms"] = ["backup arrangement"]
