@@ -51,10 +51,11 @@
     },
     "P7-EX-LEASE": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "f392ccd0df36893de38fb59111f3b2c9bb06ca695976f844cd435197269b354c",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Issue #478 2026-10-09: R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged; AI_EDITORIAL, not human/ETS certification"
     },
     "P7-EX-TRAINING": {
       "reviewer": "AI-GPT6",

@@ -124,6 +124,11 @@
       "id": "P7-EX-CATERING",
       "reviewDate": "2026-10-09",
       "note": "2026-10-09 Issue #478: R-P7-CATERING-04 Chinese explanation must include through Oct8 5PM deadline; answer and evidence unchanged"
+    },
+    {
+      "id": "P7-EX-LEASE",
+      "reviewDate": "2026-10-09",
+      "note": "R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged"
     }
   ],
   "vocabulary": {
@@ -2186,7 +2191,7 @@
       "correction": null
     },
     "P7-EX-LEASE": {
-      "contentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d",
+      "contentSha256": "f392ccd0df36893de38fb59111f3b2c9bb06ca695976f844cd435197269b354c",
       "documentCount": 3,
       "questionCount": 5,
       "decision": "PASS_AI_RECHECK",
@@ -2250,7 +2255,7 @@
           "result": "PASS_AI_RECHECK"
         }
       ],
-      "correction": null
+      "correction": "2026-10-09 Issue #478: R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged"
     },
     "P7-EX-TRAINING": {
       "contentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d",

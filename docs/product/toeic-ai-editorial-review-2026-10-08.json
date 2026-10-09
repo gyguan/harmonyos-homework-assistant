@@ -183,6 +183,13 @@
       "reason": "R-P7-CATERING-04: through October 8 at 5 P.M. includes the cutoff instant, as opposed to before",
       "source": "entry/src/main/ets/toeic/content/ToeicExtraReadingBatchSix.ets",
       "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "P7-EX-LEASE",
+      "reviewDate": "2026-10-09",
+      "reason": "R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged",
+      "source": "entry/src/main/ets/toeic/content/ToeicExtraReadingBatchFour.ets",
+      "reviewMode": "AI_EDITORIAL"
     }
   ],
   "vocabulary": {
@@ -2470,7 +2477,7 @@
       ]
     },
     "P7-EX-LEASE": {
-      "contentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d",
+      "contentSha256": "f392ccd0df36893de38fb59111f3b2c9bb06ca695976f844cd435197269b354c",
       "decision": "PASS",
       "documents": 3,
       "questions": [
@@ -2504,7 +2511,9 @@
           "answerIndex": 1,
           "skill": "CROSS_DOCUMENT"
         }
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged"
     },
     "P7-EX-TRAINING": {
       "contentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d",
