@@ -1159,7 +1159,7 @@
         "explanation": "政策仅报销符合条件的课程学费且最高300美元，Daniel 的学费为260美元。",
         "evidence": "reimburses up to $300 for approved professional-course tuition || an itemized tuition receipt for $260"
       },
-      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+      "groupContentSha256": "7c86e1d0b1b9dadf48b4ff1d72cce555ea62853bbf275283781c4b6ecbebc0be"
     },
     {
       "assetId": "R-P7-TRAINING-02",
@@ -1187,7 +1187,7 @@
         "explanation": "政策规定最低75%，邮件中 Daniel 的考核成绩是88%。",
         "evidence": "earns at least 75 percent on the final assessment || scored 88 percent on the final assessment"
       },
-      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+      "groupContentSha256": "7c86e1d0b1b9dadf48b4ff1d72cce555ea62853bbf275283781c4b6ecbebc0be"
     },
     {
       "assetId": "R-P7-TRAINING-03",
@@ -1215,15 +1215,15 @@
         "explanation": "邮件明确附上结业成绩和逐项学费收据。",
         "evidence": "Attached are the completion result and an itemized tuition receipt for $260."
       },
-      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+      "groupContentSha256": "7c86e1d0b1b9dadf48b4ff1d72cce555ea62853bbf275283781c4b6ecbebc0be"
     },
     {
       "assetId": "R-P7-TRAINING-04",
-      "correctBasis": "课程5月23日结束，6月2日为随后第10个自然日，仍在允许期内",
+      "correctBasis": "5月23日完课后的第10个自然日是6月2日；Daniel 邮件说会在当天提交之前先咨询金额，故只能判断如果当天提交则符合期限，不能认定已经提交。",
       "distractorReasons": [
-        "规则期限10日而不是7日",
-        "并非仅完课当天可以提交",
-        "课程学费260美元不是免费"
+        "期限是10个自然日而不是7天",
+        "不是只有完课当天可提交",
+        "获批课程收取260美元学费并非免费"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -1231,19 +1231,19 @@
         "id": "R-P7-TRAINING-04",
         "sourceFile": "ToeicExtraReadingBatchFour.ets",
         "groupId": "P7-EX-TRAINING",
-        "version": 1,
-        "stem": "Is Daniel submitting the request within the allowed period?",
+        "version": 2,
+        "stem": "If Daniel submits his reimbursement request on June 2, will it meet the deadline?",
         "options": [
           "No, the limit is seven days",
-          "Yes, June 2 is ten calendar days after May 23",
+          "Yes, June 2 is the tenth calendar day after May 23",
           "No, only same-day applications are accepted",
           "Yes, but only because the course was free"
         ],
         "answerIndex": 1,
-        "explanation": "课程结束时间是5月23日，政策期限为结束后10个自然日，6月2日处于截止日。",
-        "evidence": "within 10 calendar days after course completion || I completed the approved project-management course on May 23 || EMPLOYEE CLAIM MESSAGE, JUNE 2"
+        "explanation": "Daniel于5月23日完成课程，6月2日是此后第10个自然日。邮件表示他当日尚未提交申请，因此只有在6月2日当天提交才符合期限，不能当作已经提交。",
+        "evidence": "within 10 calendar days after course completion || I completed the approved project-management course on May 23 || EMPLOYEE CLAIM MESSAGE, JUNE 2 || before I submit the form today"
       },
-      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+      "groupContentSha256": "7c86e1d0b1b9dadf48b4ff1d72cce555ea62853bbf275283781c4b6ecbebc0be"
     },
     {
       "assetId": "R-P7-TRAINING-05",
@@ -1271,7 +1271,7 @@
         "explanation": "政策明确不报销教材费用，而邮件显示购买了45美元教材。",
         "evidence": "Transportation and textbooks are not eligible expenses. || I also purchased a $45 textbook"
       },
-      "groupContentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d"
+      "groupContentSha256": "7c86e1d0b1b9dadf48b4ff1d72cce555ea62853bbf275283781c4b6ecbebc0be"
     },
     {
       "assetId": "R-P7-MIGRATION-01",
@@ -1848,6 +1848,14 @@
       "issue": "#478",
       "reason": "P7-EX-LEASE group original fingerprint independently verified before rebind; five group SHA updated and only R-P7-LEASE-04's published version (1->2), Chinese explanation and correctBasis changed",
       "evidence": "docs/product/toeic-issue478-lease-catering-semantics-2026-10-09.md",
+      "reviewStatus": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "date": "2026-10-09",
+      "issue": "#478",
+      "reason": "Actual source says 'before I submit the form today'; R-P7-TRAINING-04 corrected to conditional filing, v1 to v2; source-verified old group SHA rebound for all five TRAINING rows; only TRAINING-04 snapshot and its semantic basis modified",
+      "evidence": "docs/product/toeic-issue478-training-submission-review-2026-10-09.md",
       "reviewStatus": "AI_FIRST_PASS",
       "isExpertCertified": false
     }
