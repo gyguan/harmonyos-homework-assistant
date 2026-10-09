@@ -13,7 +13,7 @@ import re
 from collections import Counter
 from pathlib import Path
 from validate_toeic_question_quality import collect, fields, literals_after, parse_question
-from validate_toeic_answer_display import display_order
+from validate_toeic_answer_display import display_order, longest_same_run
 
 ROOT=Path(__file__).resolve().parents[1]
 CONTENT=ROOT/"entry/src/main/ets/toeic/content"
@@ -138,11 +138,18 @@ def validate() -> None:
                      for g in range(5) for item in range(3))
     displayed.extend((q.id,q.answer) for q in authored)
     assert len(displayed)==100 and len({x[0] for x in displayed})==100
-    counts=Counter(display_order(id).index(index) for id,index in displayed)
-    p7counts=Counter(display_order(id).index(index) for id,index in displayed[46:])
+    positions=[display_order(id).index(index) for id,index in displayed]
+    p7positions=positions[46:]
+    counts=Counter(positions)
+    p7counts=Counter(p7positions)
+    full_run=longest_same_run(positions)
+    p7_run=longest_same_run(p7positions)
     assert all(18<=counts[i]<=32 for i in range(4)),f"Day14 v2 display bias: {counts}"
     assert all(8<=p7counts[i]<=19 for i in range(4)),f"Day14 v2 P7 bias: {p7counts}"
-    print("TOEIC_MOCK_DAY14_V2_DISPLAY_PASS " + " ".join(f"{chr(i+65)}={counts[i]}" for i in range(4)))
+    assert full_run<=6,f"Day14 v2 excessive identical displayed-answer run: {full_run}"
+    assert p7_run<=6,f"Day14 v2 Part7 excessive identical displayed-answer run: {p7_run}"
+    print("TOEIC_MOCK_DAY14_V2_DISPLAY_PASS " + " ".join(f"{chr(i+65)}={counts[i]}" for i in range(4))
+          + f" max_run={full_run} p7_max_run={p7_run}")
     print("TOEIC_MOCK_DAY14_V2_FORMAT_PASS questions=100 P5=30 "
           "P6=16_4x4 P7_single=29_10sets P7_multi=25_5x5 "
           "group_docs=2double_3triple evidence=verbatim legacy_v1=preserved")
