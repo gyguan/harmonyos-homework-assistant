@@ -10,7 +10,6 @@ from __future__ import annotations
 from copy import deepcopy
 import ast
 import json
-import re
 from pathlib import Path
 
 from export_toeic_review_pack import GROUP_RE, QUESTION_RE
@@ -81,9 +80,12 @@ def resolved_venue_passage() -> str:
     """Resolve the actual runtime article, not the coverage parser's variable name."""
     source = (CONTENT / "ToeicQuestionTranslationSupplementaryCatalog.ets").read_text(
         encoding="utf-8")
-    m = re.search(r'let venuePassage:string=("(?:[^"\\\\]|\\\\.)*");', source)
-    require(m is not None, "venuePassage shared runtime variable not found")
-    return ast.literal_eval(m[1])
+    lines = [line.strip() for line in source.splitlines()
+             if line.strip().startswith("let venuePassage:string=")]
+    require(len(lines) == 1 and lines[0].endswith('";'),
+            "expected exactly one literal runtime VENUE article")
+    literal = lines[0].split("=", 1)[1][:-1]
+    return ast.literal_eval(literal)
 
 
 def check(trans: dict, questions: dict, group: dict, source_rows: list[dict],
