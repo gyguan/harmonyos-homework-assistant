@@ -1580,18 +1580,19 @@
     "V-271": {
       "headword": "layover",
       "pos": "n.",
-      "meaning": "转机候机时间",
+      "meaning": "旅途中途短暂停留；转机等候",
       "example": "The traveler has a two-hour layover before the connecting flight.",
       "collocations": [
         "two-hour layover"
       ],
       "synonyms": [
-        "waiting time between flights"
+        "short stop during a longer journey"
       ],
       "ipa": "/ˈleɪˌoʊvər/",
-      "contentSha256": "bd99772688c50d2432c1796a83da2bfa9c06320d0cd91db860cba0f83b411999",
+      "contentSha256": "bf4b925a0ab923bc839afc197ecf0c087345c3d975ea31b95865f87549207dc1",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": null,
+      "revisionNote": "2026-10-09 Cambridge dictionary broadened short journey stop definition; AI editorial second review, not human certification"
     },
     "V-272": {
       "headword": "confirmation",

@@ -1889,14 +1889,16 @@
     },
     "V-271": {
       "word": "layover",
-      "contentSha256": "bd99772688c50d2432c1796a83da2bfa9c06320d0cd91db860cba0f83b411999",
+      "contentSha256": "bf4b925a0ab923bc839afc197ecf0c087345c3d975ea31b95865f87549207dc1",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "Meaning and paraphrase broadened to include short mid-journey stays; existing example still uses air connection. Cambridge layover (US/Business English)."
     },
     "V-272": {
       "word": "confirmation",

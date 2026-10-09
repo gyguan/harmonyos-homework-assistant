@@ -128,6 +128,18 @@ def validate() -> None:
                 vocabulary_fingerprint(item, ipa[key]),
                 f"{key}: approved exact fingerprint stale")
     check_target(batch, ipa, approvals, ai, second)
+    # V-271 layover: a short intermediate stay on any longer journey,
+    # especially (but not limited to) air travel.
+    layover = batch["V-271"]
+    require(layover["meaning"] == "旅途中途短暂停留；转机等候" and
+            layover["synonyms"] == ["short stop during a longer journey"] and
+            layover["pos"] == "n." and ipa["V-271"] == "/ˈleɪˌoʊvər/",
+            "V-271 dictionary-grounded layover semantic regression")
+    require(approvals["vocabulary"]["V-271"]["contentSha256"] ==
+            vocabulary_fingerprint(layover, ipa["V-271"]) and
+            ai["vocabulary"]["V-271"]["contentSha256"] ==
+            vocabulary_fingerprint(layover, ipa["V-271"]),
+            "V-271 editorial hash not bound to corrected meaning")
     # V-119: productivity is output relative to inputs, not a synonym for generic efficiency.
     expansion = (CONTENT / "ToeicVocabularyExpansion.ets").read_text(encoding="utf-8")
     productivity = get_rows()["V-119"]
