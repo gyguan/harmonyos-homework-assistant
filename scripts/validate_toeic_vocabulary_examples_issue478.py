@@ -76,9 +76,11 @@ def check(rows: dict[str, tuple[str, str, str]], extras: dict[str, str]) -> None
         else:
             require(item_id not in extras, f"{item_id}: do not override already published example")
     preset = (CONTENT / "PresetToeicContent.ets").read_text(encoding="utf-8")
+    pronunciation = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(encoding="utf-8")
     require(
-        "ToeicPronunciationCatalog.apply(ToeicVocabularyExampleCatalog.apply(base.concat(" in preset
-        and "ToeicVocabularyBatchSeven.items())));" in preset,
+        "return ToeicPronunciationCatalog.apply(base.concat(" in preset
+        and "return ToeicVocabularyExampleCatalog.apply(items);" in pronunciation
+        and "import { ToeicVocabularyExampleCatalog }" in pronunciation,
         "legacy enrichment is not hooked into the runtime vocabulary",
     )
     ui = (ROOT / "entry/src/main/ets/toeic/ui/ToeicHomePage.ets").read_text(encoding="utf-8")
