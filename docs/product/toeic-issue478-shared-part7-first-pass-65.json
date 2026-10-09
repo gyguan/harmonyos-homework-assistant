@@ -1019,7 +1019,7 @@
         "explanation": "邮件说明客户展示调整至9月，租户希望续租Suite C并询问手续。",
         "evidence": "We would like to keep Suite C for September"
       },
-      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+      "groupContentSha256": "f392ccd0df36893de38fb59111f3b2c9bb06ca695976f844cd435197269b354c"
     },
     {
       "assetId": "R-P7-LEASE-02",
@@ -1047,7 +1047,7 @@
         "explanation": "原租约月租900美元，物业回复明确9月继续按900美元收费。",
         "evidence": "leases Suite C for $900 per month || September rent will remain $900"
       },
-      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+      "groupContentSha256": "f392ccd0df36893de38fb59111f3b2c9bb06ca695976f844cd435197269b354c"
     },
     {
       "assetId": "R-P7-LEASE-03",
@@ -1075,11 +1075,11 @@
         "explanation": "租约允许工作日9点起收货，物业明确否定8点并要求不早于9点。",
         "evidence": "Furniture deliveries are permitted Monday through Friday between 9 A.M. and 5 P.M. || please schedule furniture delivery no earlier than 9 A.M."
       },
-      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+      "groupContentSha256": "f392ccd0df36893de38fb59111f3b2c9bb06ca695976f844cd435197269b354c"
     },
     {
       "assetId": "R-P7-LEASE-04",
-      "correctBasis": "续租协议须在8月15日或之前签署",
+      "correctBasis": "物业回复要求在8月15日或之前签署协议；英文 by August 15 包含15日当天，正确日期是8月15日",
       "distractorReasons": [
         "8月3日是租户发邮件时间",
         "8月4日是物业回复时间",
@@ -1091,7 +1091,7 @@
         "id": "R-P7-LEASE-04",
         "sourceFile": "ToeicExtraReadingBatchFour.ets",
         "groupId": "P7-EX-LEASE",
-        "version": 1,
+        "version": 2,
         "stem": "By when must the extension agreement be signed?",
         "options": [
           "August 3",
@@ -1100,10 +1100,10 @@
           "August 15"
         ],
         "answerIndex": 3,
-        "explanation": "物业回复写明8月15日前签署续租协议。",
+        "explanation": "物业回复写明续租协议最迟应于8月15日（含当天）签署。",
         "evidence": "if the agreement is signed by August 15"
       },
-      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+      "groupContentSha256": "f392ccd0df36893de38fb59111f3b2c9bb06ca695976f844cd435197269b354c"
     },
     {
       "assetId": "R-P7-LEASE-05",
@@ -1131,7 +1131,7 @@
         "explanation": "租约规定同一租户续租则原押金结转，而邮件说明 Meridian 继续使用相同办公室。",
         "evidence": "the existing deposit carries forward if the same tenant remains in the suite || We would like to keep Suite C for September"
       },
-      "groupContentSha256": "93fc10863a1f04b6f51c894a338df91de2d9994310464db342382b835d67744d"
+      "groupContentSha256": "f392ccd0df36893de38fb59111f3b2c9bb06ca695976f844cd435197269b354c"
     },
     {
       "assetId": "R-P7-TRAINING-01",
@@ -1840,6 +1840,14 @@
       "issue": "#478",
       "reason": "R-P7-CATERING-04 Chinese explanation corrected for inclusive through; original answer/options/evidence unchanged, all five question group hashes rebound after source verified; published question R-P7-CATERING-04 version 1 -> 2 per content standard, original answers/choices/history retained",
       "evidence": "docs/product/toeic-issue478-reading-deadlines-review-2026-10-09.md",
+      "reviewStatus": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "date": "2026-10-09",
+      "issue": "#478",
+      "reason": "P7-EX-LEASE group original fingerprint independently verified before rebind; five group SHA updated and only R-P7-LEASE-04's published version (1->2), Chinese explanation and correctBasis changed",
+      "evidence": "docs/product/toeic-issue478-lease-catering-semantics-2026-10-09.md",
       "reviewStatus": "AI_FIRST_PASS",
       "isExpertCertified": false
     }
