@@ -35,19 +35,33 @@ def validate() -> None:
     pronunciation = (CONTENT / "ToeicPronunciationCatalog.ets").read_text(encoding="utf-8")
     approvals = json.loads((ROOT / "docs/product/toeic-editorial-approvals.json").read_text(encoding="utf-8"))
     ai_audit = json.loads((ROOT / "docs/product/toeic-ai-editorial-review-2026-10-08.json").read_text(encoding="utf-8"))
+    p1_final_vocab = json.loads((ROOT / "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json").read_text(encoding="utf-8"))
+    p1_final_vocab_by_id = {item["id"]: item for item in p1_final_vocab["items"]}
 
     def approved(area: str, key: str, expected_sha: str) -> bool:
         entry = approvals.get(area, {}).get(key, {})
         if not is_valid_approval(entry, expected_sha):
             return False
         if entry.get("reviewMode", "HUMAN") == "AI_EDITORIAL":
-            item = ai_audit.get(area, {}).get(key, {})
-            if item.get("decision") != "PASS" or item.get("contentSha256") != expected_sha:
-                return False
-            if area == "readingGroups":
-                questions = item.get("questions", [])
-                if len(questions) != 5 or any(q.get("decision") != "PASS" for q in questions):
+            evidence_path = entry.get("reviewEvidence")
+            if evidence_path == "docs/product/toeic-ai-editorial-review-2026-10-08.json":
+                item = ai_audit.get(area, {}).get(key, {})
+                if item.get("decision") != "PASS" or item.get("contentSha256") != expected_sha:
                     return False
+                if area == "readingGroups":
+                    questions = item.get("questions", [])
+                    if len(questions) != 5 or any(q.get("decision") != "PASS" for q in questions):
+                        return False
+            elif evidence_path == "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json":
+                if area != "vocabulary":
+                    return False
+                item = p1_final_vocab_by_id.get(key, {})
+                if item.get("decision") != "PASS_AFTER_CORRECTION" or item.get("contentSha256") != expected_sha:
+                    return False
+                if item.get("reviewer") != "AI-GPT5.6-SOL" or item.get("reviewedAt") != "2026-10-09":
+                    return False
+            else:
+                return False
         return True
 
     groups = {}
