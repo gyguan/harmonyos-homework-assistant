@@ -23,7 +23,7 @@
     "entry/src/main/ets/toeic/content/ToeicMockPart6V2RepairContent.ets": "a7b037e937153bbe7aa3f499d4c6586753612f01",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6V2Content.ets": "4fdc74a07b2cdb0a9881a9280047003149b0f2f6",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6CompletionContent.ets": "f041c04a6c9ade0d30b90bd3f7c569c56b032f07",
-    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "f939a640baf6f6f8d546b739940e157f362edba7"
+    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "8ef540576d29def45414e41e49845e645b5d56fd"
   },
   "sourceNotesFiles": [
     "docs/product/toeic-issue478-active-mock-p5-review-notes-60.txt",
