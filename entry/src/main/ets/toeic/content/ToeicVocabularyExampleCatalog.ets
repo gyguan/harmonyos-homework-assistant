@@ -1,7 +1,7 @@
 import { ToeicVocabularyItem } from '../domain/ToeicModels';
 
 /**
- * Issue #478: manually authored, business-context example sentences for the
+ * Issue #478: AI-authored, business-context example sentences for the
  * original V-001..V-090 vocabulary. Keep the published word IDs, meanings,
  * pronunciation, and existing learning records unchanged.
  */
