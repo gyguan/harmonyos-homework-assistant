@@ -684,7 +684,7 @@
     "V-215": {
       "headword": "utilities",
       "pos": "n. pl.",
-      "meaning": "水电燃气等公共事业费用",
+      "meaning": "水电燃气等公用事业服务；水电燃气费用",
       "example": "Utilities are billed separately from the office rent.",
       "collocations": [
         "monthly utilities"
@@ -693,9 +693,9 @@
         "essential services such as electricity, gas, and water"
       ],
       "ipa": "/juːˈtɪlətiz/",
-      "contentSha256": "4e44a769b149b2d63d27c8ab01bbd770f2304245213c91fdae26055e6c55a0d2",
+      "contentSha256": "10ed5fad8a32af2ffbc28772bcf451e36b10dfd9bf3517a905b1f7a471a4284c",
       "decision": "PASS_AI_RECHECK",
-      "correction": "2026-10-09 Issue #478: utility services include gas and water, not just electricity and water"
+      "correction": "2026-10-09 source-linked English-Chinese second pass, service sense and expense sense; Cambridge dictionary."
     },
     "V-216": {
       "headword": "fixture",
