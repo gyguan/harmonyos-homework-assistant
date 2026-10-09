@@ -1237,10 +1237,11 @@
     },
     "V-281": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "fc5460eaad87121165bfa1aa307442183bf12ef8fdea72c5e41211daee7a390f",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "205c425da146a7c8fcf3db808667fd30dac116e97579af0cd48cbcb93a5537c7",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Cambridge & Oxford: banquet is a large formal meal, not necessarily dinner; AI_EDITORIAL only."
     },
     "V-282": {
       "reviewer": "AI-GPT6",

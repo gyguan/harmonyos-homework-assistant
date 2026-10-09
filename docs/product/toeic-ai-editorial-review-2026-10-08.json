@@ -2005,14 +2005,16 @@
     },
     "V-281": {
       "word": "banquet",
-      "contentSha256": "fc5460eaad87121165bfa1aa307442183bf12ef8fdea72c5e41211daee7a390f",
+      "contentSha256": "205c425da146a7c8fcf3db808667fd30dac116e97579af0cd48cbcb93a5537c7",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "Banquet can be any large formal meal; old paraphrase formal dinner was too narrow."
     },
     "V-282": {
       "word": "buffet",

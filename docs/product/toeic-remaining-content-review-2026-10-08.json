@@ -1747,12 +1747,12 @@
         "annual banquet"
       ],
       "synonyms": [
-        "formal dinner"
+        "large formal meal for many people"
       ],
       "ipa": "/ˈbæŋkwɪt/",
-      "contentSha256": "fc5460eaad87121165bfa1aa307442183bf12ef8fdea72c5e41211daee7a390f",
+      "contentSha256": "205c425da146a7c8fcf3db808667fd30dac116e97579af0cd48cbcb93a5537c7",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "Cambridge and Oxford dictionary-bound AI second pass 2026-10-09: not strictly dinner"
     },
     "V-282": {
       "headword": "buffet",
