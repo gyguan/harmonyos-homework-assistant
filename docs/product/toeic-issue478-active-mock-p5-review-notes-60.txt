@@ -19,7 +19,7 @@ R-M1-P5-018|detailed 作为形容词修饰 explanation|detail 是名词或动词
 R-M1-P5-019|issue an invoice 表示开具发票|attend invoice 语义不通|occupy invoice 不通|arrive 为不及物不能直接接 invoice
 R-M1-P5-020|if 引导需要访客证时才联系前台的条件句|despite 不能直接接从句|during 是介词|because of 要接名词
 R-M1-P5-021|in stock 是库存充足的固定搭配|agenda 是议程|venue 是地点|salary 是薪资
-R-M1-P5-022|unanimous decision 为一致决定，形容词修饰名词|unanimously 是副词|unanimity 是名词|unanimouslyness 非标准词
+R-FM1-P5-022|a unanimous decision 为全体一致通过的决定；decision 是名词，需要形容词 unanimous 直接修饰|unanimously 是副词，不能直接放在 decision 前修饰名词|unanimity 是名词，不能直接作此处的形容词定语|unanimousness 虽是可查证的名词，但此处需要形容词 unanimous
 R-M1-P5-023|closed for renovations 是因装修关闭|among 不表示关闭原因|under renovations 不如 under renovation 且此句不合搭配|beside 表位置
 R-M1-P5-024|by the time starts 指将来节点之前已完成，will have prepared|prepared 仅过去无将来完成意义|prepares 不能突出在将来节点前完成|preparing 缺谓语
 R-M1-P5-025|conduct a survey 是开展调查的固定搭配|build a survey 不表示实施调查|catch survey 语义不通|carry a survey 缺 out
