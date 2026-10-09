@@ -46,7 +46,7 @@ TARGETS = {
 IPA_PROBES = {
     "V-014": "/ˈriːfʌnd/ n. · /ˌriːˈfʌnd/ v.",
     "V-033": "/ˈrɛzəˌmeɪ/",
-    "V-038": "/ˈtrænsfɝː/",  # US noun and verb commonly share stress
+    "V-038": "/ˈtrænsfɝː/ n./v. · /trænsˈfɝː/ v. variant",  # both attested US verb stress patterns
     "V-051": "/ˈɛstəmət/ n. · /ˈɛstəmeɪt/ v.",
     "V-082": "/ʌpˈɡreɪd/ v. · /ˈʌpɡreɪd/ n.",
     "V-238": "/əˈrɪrz/",
