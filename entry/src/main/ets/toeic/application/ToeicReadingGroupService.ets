@@ -19,6 +19,9 @@ export class ToeicReadingGroupService {
     if (current.groupId.length>0) {
       for (let group of ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups()).concat(ToeicMockDay19V2Content.groups())) {
         if (group.groupId!==current.groupId) continue;
+        if (group.groupId==='FM1-G2' && group.questionIds.indexOf('R-FP3-FM1-P7-M2-03')<0) {
+          group.questionIds.push('R-FP3-FM1-P7-M2-03');
+        }
         // The group catalog contains both archived v1 question IDs and
         // new evidence-complete editions. Preserve the current exam order:
         // each draft/report may carry a different published edition.
