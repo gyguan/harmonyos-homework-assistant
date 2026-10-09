@@ -4,7 +4,7 @@ import { ToeicReviewStatus, ToeicVocabularyItem, ToeicVocabularyLevel } from '..
 export class ToeicVocabularyBatchSeven {
   static items():ToeicVocabularyItem[] {
     return [
-      new ToeicVocabularyItem("V-271","layover","n.","转机候机时间",ToeicVocabularyLevel.L2,"差旅",["two-hour layover"],["waiting time between flights"],"","en-US","","The traveler has a two-hour layover before the connecting flight.",ToeicReviewStatus.PUBLISHED),
+      new ToeicVocabularyItem("V-271","layover","n.","旅途中途短暂停留；转机等候",ToeicVocabularyLevel.L2,"差旅",["two-hour layover"],["short stop during a longer journey"],"","en-US","","The traveler has a two-hour layover before the connecting flight.",ToeicReviewStatus.PUBLISHED),
       new ToeicVocabularyItem("V-272","confirmation","n.","确认；确认函",ToeicVocabularyLevel.L1,"差旅",["booking confirmation"],["verification"],"","en-US","","Please bring your booking confirmation to the hotel reception desk.",ToeicReviewStatus.PUBLISHED),
       new ToeicVocabularyItem("V-273","boarding","n.","登机；上车",ToeicVocabularyLevel.L1,"差旅",["boarding time"],["getting on a vehicle"],"","en-US","","Boarding begins thirty minutes before the scheduled departure.",ToeicReviewStatus.PUBLISHED),
       new ToeicVocabularyItem("V-274","baggage","n.","行李",ToeicVocabularyLevel.L1,"差旅",["checked baggage"],["luggage"],"","en-US","","The airline allows one piece of checked baggage on this ticket.",ToeicReviewStatus.PUBLISHED),
