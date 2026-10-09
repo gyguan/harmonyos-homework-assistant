@@ -39,7 +39,7 @@
         "explanation": "邮件要求将 Maple Room 改为 Cedar Hall，培训日期不变。",
         "evidence": "we would like to move to Cedar Hall."
       },
-      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+      "groupContentSha256": "1e1385c53112eb62795e89938961f04ef0cc8f403b136f1dc466c6873e49f78d"
     },
     {
       "assetId": "R-P7-VENUE-02",
@@ -67,7 +67,7 @@
         "explanation": "原房间最多55人，报名人数已增至62人；需要合并两份材料。",
         "evidence": "The Maple Room accommodates up to 55 attendees || Registration has now increased to 62"
       },
-      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+      "groupContentSha256": "1e1385c53112eb62795e89938961f04ef0cc8f403b136f1dc466c6873e49f78d"
     },
     {
       "assetId": "R-P7-VENUE-03",
@@ -95,7 +95,7 @@
         "explanation": "预订指南中 Cedar Hall 升级费用为160美元；不要把容量当作价格。",
         "evidence": "Switching from Maple Room to Cedar Hall adds $160 to the rental fee."
       },
-      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+      "groupContentSha256": "1e1385c53112eb62795e89938961f04ef0cc8f403b136f1dc466c6873e49f78d"
     },
     {
       "assetId": "R-P7-VENUE-04",
@@ -123,15 +123,15 @@
         "explanation": "邮件最后明确 final lunch count 会另行确认。",
         "evidence": "We will confirm the final lunch count separately."
       },
-      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+      "groupContentSha256": "1e1385c53112eb62795e89938961f04ef0cc8f403b136f1dc466c6873e49f78d"
     },
     {
       "assetId": "R-P7-VENUE-05",
-      "correctBasis": "换房截止9月12日，邮件日期9月10日满足要求",
+      "correctBasis": "预订指南要求申请须在9月12日或之前送达协调员，邮件仅标注9月10日日期；缺少协调员收件日期，不足以判断是否已按期送达。",
       "distractorReasons": [
-        "9月10日早于9月12日而非更晚",
-        "政策允许申请变更房间",
-        "活动于10月7日举行不是11月"
+        "场馆未在材料中确认9月10日批准换厅",
+        "材料没有证据证明协调员在9月12日之后才收到申请",
+        "预订指南明确换厅需增加160美元租金"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -139,19 +139,19 @@
         "id": "R-P7-VENUE-05",
         "sourceFile": "ToeicExtraReadingContent.ets",
         "groupId": "P7-EX-VENUE",
-        "version": 1,
-        "stem": "Was the request for a different room sent by the stated deadline?",
+        "version": 2,
+        "stem": "What is supported about the room-change request by the two documents?",
         "options": [
-          "No, it was sent after September 12",
-          "No, room changes were not permitted",
-          "Yes, it was emailed on September 10",
-          "Yes, because the workshop starts in November"
+          "The coordinator approved Cedar Hall on September 10",
+          "The request was received after September 12",
+          "The email is dated September 10, but no receipt date is stated",
+          "The room change adds no rental charge"
         ],
         "answerIndex": 2,
-        "explanation": "指南要求9月12日前提出调整，邮件日期为9月10日。",
+        "explanation": "指南要求换厅请求最迟于9月12日送达协调员，但9月10日只是邮件标注日期，材料未给出实际送达或协调员确认收到的时间，不能断言已满足送达截止日。",
         "evidence": "Requests to change rooms must reach the venue coordinator by September 12 || DOCUMENT 2 — EMAIL, SEPTEMBER 10"
       },
-      "groupContentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522"
+      "groupContentSha256": "1e1385c53112eb62795e89938961f04ef0cc8f403b136f1dc466c6873e49f78d"
     },
     {
       "assetId": "R-P7-DELIVERY-01",
@@ -1856,6 +1856,14 @@
       "issue": "#478",
       "reason": "Actual source says 'before I submit the form today'; R-P7-TRAINING-04 corrected to conditional filing, v1 to v2; source-verified old group SHA rebound for all five TRAINING rows; only TRAINING-04 snapshot and its semantic basis modified",
       "evidence": "docs/product/toeic-issue478-training-submission-review-2026-10-09.md",
+      "reviewStatus": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "date": "2026-10-09",
+      "issue": "#478",
+      "reason": "Distinguish email dated September 10 from proof venue coordinator received request by September 12; VENUE-05 v1 to v2 and change snapshot/evidence-bound reasoning; all five group hashes rebound after old-source integrity confirmed",
+      "evidence": "docs/product/toeic-issue478-venue-receipt-review-2026-10-09.md",
       "reviewStatus": "AI_FIRST_PASS",
       "isExpertCertified": false
     }
