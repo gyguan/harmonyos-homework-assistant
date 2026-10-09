@@ -128,6 +128,18 @@ def validate() -> None:
                 vocabulary_fingerprint(item, ipa[key]),
                 f"{key}: approved exact fingerprint stale")
     check_target(batch, ipa, approvals, ai, second)
+    # Oxford/Cambridge: a banquet is a formal group meal, not necessarily dinner.
+    banquet = batch["V-281"]
+    require(banquet["word"] == "banquet" and banquet["pos"] == "n." and
+            banquet["synonyms"] == ["large formal meal for many people"] and
+            banquet["collocations"] == ["annual banquet"] and
+            "annual banquet" in banquet["example"], "V-281 formal-meal semantic drift")
+    b281_hash = vocabulary_fingerprint(banquet, ipa["V-281"])
+    require(approvals["vocabulary"]["V-281"]["contentSha256"] == b281_hash and
+            ai["vocabulary"]["V-281"]["contentSha256"] == b281_hash and
+            second["vocabulary"]["V-281"]["contentSha256"] == b281_hash and
+            second["vocabulary"]["V-281"]["synonyms"] == banquet["synonyms"],
+            "V-281 second-pass evidence/hash drift")
     # Cambridge Business English: troubleshooting is an attempt to identify
     # the cause and find a remedy, not a guarantee of successful repair.
     trouble = batch["V-202"]
