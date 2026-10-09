@@ -73,7 +73,7 @@ export class ToeicVocabularyExampleCatalog {
       new ToeicVocabularyExample('V-053',"Keep a receipt for every business travel expense."),
       new ToeicVocabularyExample('V-054',"The customer requested a receipt after making the payment."),
       new ToeicVocabularyExample('V-055',"The payment is due within thirty days of the invoice date."),
-      new ToeicVocabularyExample('V-056',"The hotel will charge a cancellation fee for late changes."),
+      new ToeicVocabularyExample('V-056',"The hotel will charge a cancellation fee if guests cancel after the cancellation deadline."),
       new ToeicVocabularyExample('V-057',"The membership fee includes access to all training sessions."),
       new ToeicVocabularyExample('V-058',"Customers receive a discount when they order ten or more units."),
       new ToeicVocabularyExample('V-059',"Both parties signed the service contract on Friday."),
