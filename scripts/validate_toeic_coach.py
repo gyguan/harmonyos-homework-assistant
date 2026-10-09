@@ -28,6 +28,7 @@ from validate_toeic_lease_catering_bilingual_issue478 import validate as validat
 from validate_toeic_planned_submission_issue478 import validate as validate_planned_submission_issue478
 from validate_toeic_venue_receipt_issue478 import validate as validate_venue_receipt_issue478
 from validate_toeic_catering_estimate_issue478 import validate as validate_catering_estimate_issue478
+from inventory_toeic_issue478_p1 import main as validate_p1_inventory
 from validate_toeic_vocabulary_dictionary_issue478 import validate as validate_vocabulary_dictionary_issue478
 from validate_toeic_contextual_synonyms_issue478 import validate as validate_contextual_synonyms_issue478
 from validate_toeic_business_context_issue478 import validate as validate_business_context_issue478
@@ -71,6 +72,7 @@ def main() -> None:
     validate_planned_submission_issue478()
     validate_venue_receipt_issue478()
     validate_catering_estimate_issue478()
+    validate_p1_inventory()
     validate_vocabulary_dictionary_issue478()
     validate_contextual_synonyms_issue478()
     validate_business_context_issue478()
