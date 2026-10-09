@@ -17,6 +17,18 @@ export class ToeicQuestionTranslationCatalog {
   }
 
   static find(questionId:string):ToeicQuestionTranslation|null {
+    // Revised active questions keep translated feedback without altering the
+    // fixed 221-row historical translation catalog or old mock reports.
+    if (questionId==='R-FP5-VERB-0206') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '在周五前_____培训的员工将获得证书。',
+        ['完成（复数主语谓语）','完成（第三人称单数）','完成（名词）','正在完成（非谓语）']);
+    }
+    if (questionId==='R-FP5-SPRINT-1517') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '到明天客户到达时，演示文稿_____准备就绪。',
+        ['过去已经是','正在是（非谓语）','将会是（将来时）','已经是（复数完成时）']);
+    }
     let items=ToeicQuestionTranslationCatalog.items();
     for (let item of items) if (item.questionId===questionId) return item;
     return null;
