@@ -739,7 +739,7 @@
         "explanation": "服务协议规定意外中断超过连续90分钟可获抵扣，而事件记录为意外停机115分钟。",
         "evidence": "An unplanned service interruption lasting longer than 90 consecutive minutes qualifies || (115 consecutive minutes)"
       },
-      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+      "groupContentSha256": "96f785b5c54506d69a0ed66250179b3bedd7e95dbd6e933c18f8b0fd47ccc2c2"
     },
     {
       "assetId": "R-P7-SUPPORT-02",
@@ -767,7 +767,7 @@
         "explanation": "协议按月费的10%抵扣，月费400美元，因此抵扣40美元。",
         "evidence": "a one-time credit of 10 percent of the monthly fee || The June invoice is scheduled to show the normal $400 monthly fee before adjustments."
       },
-      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+      "groupContentSha256": "96f785b5c54506d69a0ed66250179b3bedd7e95dbd6e933c18f8b0fd47ccc2c2"
     },
     {
       "assetId": "R-P7-SUPPORT-03",
@@ -795,7 +795,7 @@
         "explanation": "事件日志的 Initial engineer response 明确为上午10:50。",
         "evidence": "Initial engineer response: 10:50 A.M."
       },
-      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+      "groupContentSha256": "96f785b5c54506d69a0ed66250179b3bedd7e95dbd6e933c18f8b0fd47ccc2c2"
     },
     {
       "assetId": "R-P7-SUPPORT-04",
@@ -823,15 +823,15 @@
         "explanation": "协议排除提前48小时宣布的计划维护，邮件指出5月11日已告知5月15日的维护。",
         "evidence": "Scheduled maintenance announced at least 48 hours in advance does not qualify for a credit. || our planned maintenance window on May 15, 10–11 P.M., was announced to customers on May 11"
       },
-      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+      "groupContentSha256": "96f785b5c54506d69a0ed66250179b3bedd7e95dbd6e933c18f8b0fd47ccc2c2"
     },
     {
       "assetId": "R-P7-SUPPORT-05",
-      "correctBasis": "10点10分中断至10点50分首次响应相差40分钟，小于2小时",
+      "correctBasis": "在假定工单计时从10:10故障开始的条件下，10:50首次响应相隔40分钟，小于文档1的两小时优先响应目标；不证明实际SLA",
       "distractorReasons": [
-        "40分钟并没有超过两小时",
-        "当天属于正常工作时段且题目不考工单创建时刻",
-        "服务12点05分才恢复不是中午之前"
+        "间隔为40分钟，远未超过两小时",
+        "10:10至10:50均在工作日08:00至18:00的服务时段",
+        "故障在12:05才恢复，而且修复时间不是首次响应是否达到目标的依据"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "isExpertCertified": false,
@@ -839,8 +839,8 @@
         "id": "R-P7-SUPPORT-05",
         "sourceFile": "ToeicExtraReadingBatchThree.ets",
         "groupId": "P7-EX-SUPPORT",
-        "version": 2,
-        "stem": "Was the first engineer response within two hours after the service interruption began?",
+        "version": 3,
+        "stem": "If the priority-response clock started when the interruption began, would the engineer's first response meet the support plan's target?",
         "options": [
           "No, it took longer than two hours",
           "No, the ticket began outside service hours",
@@ -848,10 +848,10 @@
           "Yes, because the problem was resolved before noon"
         ],
         "answerIndex": 2,
-        "explanation": "中断记录开始于10:10，工程师首次响应于10:50，相差40分钟，确实在中断发生后两小时内。原文未明确工单创建时刻，因此不据此宣称SLA合规。",
+        "explanation": "根据假设，从10:10中断开始到10:50首次响应共40分钟；服务协议规定优先工单两小时内首次响应，故在假设的计时起点下满足目标。原文没有实际工单创建时刻，不能据此认定真实SLA已达标。",
         "evidence": "priority support tickets receive an initial response within two hours || Service unavailable: 10:10 A.M.–12:05 P.M. || Initial engineer response: 10:50 A.M."
       },
-      "groupContentSha256": "3fbb94a90fe71e543044230b0e0063c7ee60297d50b8a6be4cb7dc8d37e0d8b7"
+      "groupContentSha256": "96f785b5c54506d69a0ed66250179b3bedd7e95dbd6e933c18f8b0fd47ccc2c2"
     },
     {
       "assetId": "R-P7-RETAIL-01",
