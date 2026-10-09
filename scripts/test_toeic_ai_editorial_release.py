@@ -12,12 +12,15 @@ import re
 import unittest
 
 from validate_toeic_editorial_content import CONTENT, ROOT, validate
+from toeic_review_integrity import is_valid_approval
 
 
 class AiEditorialReleaseTests(unittest.TestCase):
     def test_approval_snapshots_cover_every_candidate(self) -> None:
         ledger = json.loads((ROOT / "docs/product/toeic-editorial-approvals.json").read_text(encoding="utf-8"))
         evidence = json.loads((ROOT / "docs/product/toeic-ai-editorial-review-2026-10-08.json").read_text(encoding="utf-8"))
+        final = json.loads((ROOT / "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json").read_text(encoding="utf-8"))
+        final_by_id = {item["id"]: item for item in final["items"]}
         self.assertEqual(180, len(ledger["vocabulary"]))
         self.assertEqual(13, len(ledger["readingGroups"]))
         self.assertEqual(180, len(evidence["vocabulary"]))
@@ -26,9 +29,17 @@ class AiEditorialReleaseTests(unittest.TestCase):
         for section in ("vocabulary", "readingGroups"):
             for key, value in ledger[section].items():
                 self.assertEqual("AI_EDITORIAL", value["reviewMode"])
-                self.assertEqual("AI-GPT6", value["reviewer"])
-                self.assertEqual("PASS", evidence[section][key]["decision"])
-                self.assertEqual(value["contentSha256"], evidence[section][key]["contentSha256"])
+                self.assertTrue(is_valid_approval(value, value["contentSha256"]))
+                if value["reviewEvidence"] == "docs/product/toeic-ai-editorial-review-2026-10-08.json":
+                    self.assertEqual("AI-GPT6", value["reviewer"])
+                    self.assertEqual("PASS", evidence[section][key]["decision"])
+                    self.assertEqual(value["contentSha256"], evidence[section][key]["contentSha256"])
+                else:
+                    self.assertEqual("vocabulary", section)
+                    self.assertEqual("AI-GPT5.6-SOL", value["reviewer"])
+                    self.assertEqual("docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json", value["reviewEvidence"])
+                    self.assertEqual("PASS_AFTER_CORRECTION", final_by_id[key]["decision"])
+                    self.assertEqual(value["contentSha256"], final_by_id[key]["contentSha256"])
 
     def test_release_manifest_enforces_exactly_declared_batches(self) -> None:
         """Release audit checks actual per-ID states, not only aggregate totals."""

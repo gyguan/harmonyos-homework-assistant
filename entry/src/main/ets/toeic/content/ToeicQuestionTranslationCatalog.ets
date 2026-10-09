@@ -17,6 +17,31 @@ export class ToeicQuestionTranslationCatalog {
   }
 
   static find(questionId:string):ToeicQuestionTranslation|null {
+    if (questionId==='R-FP1-P5-1528') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '每位申请人都必须在前台用带照片的证件证明_____身份。',
+        ['它自己','他自己','他们自己（单数 they）','我们自己']);
+    }
+    if (questionId==='R-FP1-P6-1606') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '付款_____后，将发送确认邮件。',
+        ['接收（主动单数）','被收到','已经收到（主动）','正在接收']);
+    }
+    if (questionId==='R-FP1-DX-P5-05') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '更新后的政策上周_____到所有区域办公室。',
+        ['发送（原形）','被发送','曾经发送（主动）','正在发送']);
+    }
+    if (questionId==='R-FP1-M2-P5-010') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '公司上个月更新了_____隐私政策。',
+        ['它','它的','它自己',"it's（it is/has）"]);
+    }
+    if (questionId==='R-FP1-M2-P6-002') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '团队负责人在他们_____时会收到打印的检查清单。',
+        ['到达（一般现在时）','到达了（过去时）','将到达','到达（名词）']);
+    }
     if (questionId==='R-FP6-SPRINT-1610') {
       return new ToeicQuestionTranslation(questionId,'',
         '如果椅子无法现场修复，我们_____提供临时替换椅。',

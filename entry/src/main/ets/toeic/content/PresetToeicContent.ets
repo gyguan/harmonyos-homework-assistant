@@ -13,6 +13,7 @@ import { ToeicMockDay19Part5V2Content } from './ToeicMockDay19Part5V2Content';
 import { ToeicMockDay14Part5V2Content } from './ToeicMockDay14Part5V2Content';
 import { ToeicP5UniqueAnswerIssue478 } from './ToeicP5UniqueAnswerIssue478';
 import { ToeicP6ConditionalIssue478 } from './ToeicP6ConditionalIssue478';
+import { ToeicP1FinalQuestionCorrections } from './ToeicP1FinalQuestionCorrections';
 import { ToeicMockPart6V2RepairContent } from './ToeicMockPart6V2RepairContent';
 import { ToeicMockDay19Part6CompletionContent } from './ToeicMockDay19Part6CompletionContent';
 import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
@@ -145,7 +146,7 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat(ToeicMockDay14Part5V2Content.questions()).concat(ToeicP5UniqueAnswerIssue478.questions()).concat(ToeicP6ConditionalIssue478.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19(),ToeicMockDay19Part6CompletionContent.inventory(),ToeicMockDay19Part6CompletionContent.library()]);
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat(ToeicMockDay14Part5V2Content.questions()).concat(ToeicP5UniqueAnswerIssue478.questions()).concat(ToeicP6ConditionalIssue478.questions()).concat(ToeicP1FinalQuestionCorrections.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19(),ToeicMockDay19Part6CompletionContent.inventory(),ToeicMockDay19Part6CompletionContent.library()]);
   }
 
   static publishedReadingGroups():ToeicReadingGroup[] {
@@ -199,7 +200,7 @@ export class PresetToeicContent {
     let published=PresetToeicContent.publishedQuestions();
     let live:ToeicQuestion[]=[];
     for (let question of published) {
-      if (question.id==='R-FM1-P7-M1-01' || question.id==='R-FM1-P7-M4-01' || question.id==='R-FM2-P7-M1-01' || question.id==='R-FM2-P7-M5-03' || question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P5-022' || question.id==='R-P5-VERB-0206' || question.id==='R-P5-SPRINT-1517' || question.id==='R-P6-SPRINT-1610' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008') continue;
+      if (question.id==='R-FM1-P7-M1-01' || question.id==='R-FM1-P7-M4-01' || question.id==='R-FM2-P7-M1-01' || question.id==='R-FM2-P7-M5-03' || question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P5-022' || question.id==='R-P5-VERB-0206' || question.id==='R-P5-SPRINT-1517' || question.id==='R-P6-SPRINT-1610' || question.id==='R-P5-SPRINT-1528' || question.id==='R-P6-SPRINT-1606' || question.id==='R-DX-P5-05' || question.id==='R-M2-P5-010' || question.id==='R-M2-P6-002' || question.id==='R-M2-P6-004' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008') continue;
       live.push(question);
     }
     return live;
@@ -312,9 +313,17 @@ export class PresetToeicContent {
       if (plan.day===3) {
         plan.questionIds=plan.questionIds.map((id:string):string => id==='R-P5-VERB-0206' ? 'R-FP5-VERB-0206' : id);
       } else if (plan.day===15) {
-        plan.questionIds=plan.questionIds.map((id:string):string => id==='R-P5-SPRINT-1517' ? 'R-FP5-SPRINT-1517' : id);
+        plan.questionIds=plan.questionIds.map((id:string):string => {
+          if (id==='R-P5-SPRINT-1517') return 'R-FP5-SPRINT-1517';
+          if (id==='R-P5-SPRINT-1528') return 'R-FP1-P5-1528';
+          return id;
+        });
       } else if (plan.day===16) {
-        plan.questionIds=plan.questionIds.map((id:string):string => id==='R-P6-SPRINT-1610' ? 'R-FP6-SPRINT-1610' : id);
+        plan.questionIds=plan.questionIds.map((id:string):string => {
+          if (id==='R-P6-SPRINT-1606') return 'R-FP1-P6-1606';
+          if (id==='R-P6-SPRINT-1610') return 'R-FP6-SPRINT-1610';
+          return id;
+        });
       } else if (plan.day===14) {
         let ids=ToeicWeekTwoContent.mockQuestionIds().slice(0,46);
         ids[21]=ToeicMockDay14Part5V2Content.questions()[0].id;

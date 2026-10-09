@@ -349,18 +349,20 @@
       "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
     },
     "V-156": {
-      "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "048e6f24dec0b87c42b8f7afac5125d7fe9f510191fcdf63722879f6cf3b3bcb",
+      "reviewer": "AI-GPT5.6-SOL",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "e9274afee3d0ec9fa3b8d189d96bbaca51348b0d528d1221401cf8b358acb56b",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json",
+      "revisionNote": "Cambridge seminar: meeting for study/discussion; removed workshop as a false direct synonym. Final P1 AI second pass; no human/ETS certification."
     },
     "V-157": {
-      "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "948a460c8e9ff7298f4e31360e3c7131cbb8d2bb922ba6814f16ea8218066f77",
+      "reviewer": "AI-GPT5.6-SOL",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "8b1d63182f05973a0cbe3afcea924df5414e3f5bccb23b7394f420d1e875a96f",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json",
+      "revisionNote": "Cambridge onboarding: broader employee integration process, not only orientation or paperwork. Final P1 AI second pass; no human/ETS certification."
     },
     "V-158": {
       "reviewer": "AI-GPT6",
@@ -511,11 +513,12 @@
       "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
     },
     "V-179": {
-      "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "266d72ed8fba7edefda7927cee74963c37a2c39d8a0926461c1a33ebe64693b5",
+      "reviewer": "AI-GPT5.6-SOL",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "eb93efdcd19775670a6b2dfb3d5e717363336244d207bcbd9bf9717633f3ea18",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json",
+      "revisionNote": "Cambridge revenue: business/government income, especially but not only sales; removed sales-only paraphrase. Final P1 AI second pass; no human/ETS certification."
     },
     "V-180": {
       "reviewer": "AI-GPT6",
@@ -582,11 +585,12 @@
       "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
     },
     "V-189": {
-      "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "1da6c279ec94a1dde77bb9fce9f367a94cefb4c7f5602de0f3c92fb3bc39b02f",
+      "reviewer": "AI-GPT5.6-SOL",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "fa5f5887ee71f61bc1c42599496806cb7a43d4c274d87a9ee8aa71960ac7a990",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json",
+      "revisionNote": "Cambridge pallet: flat platform for stacking/moving goods; removed generic loading-platform paraphrase. Final P1 AI second pass; no human/ETS certification."
     },
     "V-190": {
       "reviewer": "AI-GPT6",
@@ -1266,11 +1270,12 @@
       "revisionNote": "Issue #478 2026-10-09 contextual paraphrase review: docs/product/toeic-issue478-domain-paraphrase-review-2026-10-09.md; AI_EDITORIAL only, no human/ETS certification"
     },
     "V-285": {
-      "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "90279d3c79983321777fda140038ed7511c9e9190304d086328297cf645326fb",
+      "reviewer": "AI-GPT5.6-SOL",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "3b18d8833cc1ca532e89661e0cfcd6738fa5db0cbabd0f815161ee1b80d7124a",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json",
+      "revisionNote": "Cambridge contractor: person/company hired under contract for work; removed overbroad external-service-provider paraphrase. Final P1 AI second pass; no human/ETS certification."
     },
     "V-286": {
       "reviewer": "AI-GPT6",

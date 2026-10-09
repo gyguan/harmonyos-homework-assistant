@@ -14,7 +14,9 @@ def validate():
     assert q.version==1 and "If the chair cannot be repaired on site" in q.passage
     preset=(CONT/"PresetToeicContent.ets").read_text(encoding="utf-8")
     assert ".concat(ToeicP6ConditionalIssue478.questions())" in preset
-    assert "plan.day===16" in preset and "id==='R-P6-SPRINT-1610' ? 'R-FP6-SPRINT-1610'" in preset
+    assert "plan.day===16" in preset
+    assert "if (id==='R-P6-SPRINT-1606') return 'R-FP1-P6-1606';" in preset
+    assert "if (id==='R-P6-SPRINT-1610') return 'R-FP6-SPRINT-1610';" in preset
     assert "question.id==='R-P6-SPRINT-1610'" in preset
     old=(CONT/"ToeicWeekThreeContent.ets").read_text(encoding="utf-8")
     assert '["provide","provided","will provide","providing"],2' in old

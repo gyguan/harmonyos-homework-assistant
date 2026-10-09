@@ -274,12 +274,12 @@
         "shipping pallet"
       ],
       "synonyms": [
-        "loading platform"
+        "flat platform for stacking and moving goods"
       ],
       "ipa": "/ˈpælɪt/",
-      "contentSha256": "1da6c279ec94a1dde77bb9fce9f367a94cefb4c7f5602de0f3c92fb3bc39b02f",
-      "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "contentSha256": "fa5f5887ee71f61bc1c42599496806cb7a43d4c274d87a9ee8aa71960ac7a990",
+      "decision": "PASS_AFTER_CORRECTION",
+      "correction": "Cambridge pallet: flat platform for stacking/moving goods; removed generic loading-platform paraphrase."
     },
     "V-190": {
       "headword": "perishable",
@@ -1811,12 +1811,12 @@
         "maintenance contractor"
       ],
       "synonyms": [
-        "external service provider"
+        "person or company hired under a contract to do work"
       ],
       "ipa": "/ˈkɑːntræktər/",
-      "contentSha256": "90279d3c79983321777fda140038ed7511c9e9190304d086328297cf645326fb",
-      "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "contentSha256": "3b18d8833cc1ca532e89661e0cfcd6738fa5db0cbabd0f815161ee1b80d7124a",
+      "decision": "PASS_AFTER_CORRECTION",
+      "correction": "Cambridge contractor: person/company hired under contract for work; removed overbroad external-service-provider paraphrase."
     },
     "V-286": {
       "headword": "allocation",
