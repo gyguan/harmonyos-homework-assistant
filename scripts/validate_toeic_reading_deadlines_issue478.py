@@ -114,6 +114,8 @@ def check(source_passages: dict, trans: dict, questions: dict,
             "R-P7-FILTER-04: correct option still incorrectly excludes Oct 10")
     require("余货保证在期限前送达" not in trans["R-P7-FILTER-04"][2][1],
             "R-P7-FILTER-04: old option persisted")
+    require(questions["R-P7-CATERING-04"].version == 2,
+            "R-P7-CATERING-04: changed published explanation must bump version to 2")
     expl = explanations["R-P7-CATERING-04"]
     require("最迟在10月8日17点（含该时刻）" in expl,
             "R-P7-CATERING-04: visible answer explanation still excludes cutoff")
