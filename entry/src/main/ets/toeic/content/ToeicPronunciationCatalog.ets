@@ -55,7 +55,7 @@ export class ToeicPronunciationCatalog {
       new ToeicPronunciationEntry('V-035','/ɪmˈplɔɪər/'),
       new ToeicPronunciationEntry('V-036','/ˈsuːpərˌvaɪzər/'),
       new ToeicPronunciationEntry('V-037','/prəˈmoʊʃən/'),
-      new ToeicPronunciationEntry('V-038','/ˈtrænsfɝː/'),
+      new ToeicPronunciationEntry('V-038','/ˈtrænsfɝː/ n./v. · /trænsˈfɝː/ v. variant'),
       new ToeicPronunciationEntry('V-039','/ˈsæləri/'),
       new ToeicPronunciationEntry('V-040','/ˈbɛnəfɪt/'),
       new ToeicPronunciationEntry('V-041','/ˌpɝːsəˈnɛl/'),

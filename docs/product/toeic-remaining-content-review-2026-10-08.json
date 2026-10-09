@@ -59,6 +59,11 @@
     {
       "id": "R-P7-SUPPORT-05",
       "note": "Remove unsupported ticket-open-time inference; answer tests interval from outage start and first response, with unchanged correct choice"
+    },
+    {
+      "id": "V-245",
+      "reviewDate": "2026-10-09",
+      "note": "Replace inaccurate '围栏' with '围起来的区域'; keep the letter-enclosure sense and existing example."
     }
   ],
   "vocabulary": {
@@ -1089,7 +1094,7 @@
     "V-245": {
       "headword": "enclosure",
       "pos": "n.",
-      "meaning": "随函附件；围栏",
+      "meaning": "随函附件；围起来的区域",
       "example": "The signed application is listed as an enclosure in the letter.",
       "collocations": [
         "letter enclosure"
@@ -1098,9 +1103,9 @@
         "document included with a letter"
       ],
       "ipa": "/ɪnˈkloʊʒər/",
-      "contentSha256": "53dbb717713ce25f5d635ce4d8e795ae0d4b11255d621350463e89c1033fbe79",
+      "contentSha256": "8266c7702fb37dbb6ac047d2b520f349a086b1bc0f2ec61a5e4b81db8ee4d9fc",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 #478: enclosure is an enclosed area, not the fence; business usage means an item included with a letter"
     },
     "V-246": {
       "headword": "recipient",
