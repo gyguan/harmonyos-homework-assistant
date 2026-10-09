@@ -650,3 +650,10 @@ Issue #447 的第六个发布批次计划与第 3–5 批**同时纳入单个独
 - 工程动作词必须保留完成条件：`troubleshoot` 是诊断并尝试解决故障，不能宣称已经修好，也不能在学习释义中只留下“诊断”。
 - 例句必须与限定词的一般业务用法一致：`cancellation fee` 必须明确发生取消预订，不能把任意 `late changes` 当作 `cancellation`；活动 `higher attendance` 表示参加人数更多而非只有“在场”。核验要穿透 `ToeicVocabularyExampleCatalog` 补充目录和 `ToeicPronunciationCatalog.apply` 的最终展示文本，例如 V-056；不能只校验批次词 V-207。
 - 每个语义订正都必须记录外部词典或业界指标来源、精确资产 ID、修订后的 SHA256 和真实审校模式（AI/HUMAN）；`scripts/validate_toeic_business_context_issue478.py` 维护正向与负向回归，统一 TOEIC 门禁不能关闭。只证明修订范围内的断言，不能假称第三方对完整 300 词审核。
+
+## #478 具体业务语境中的同义表达边界（2026-10-09 第十五批）
+
+- 固定搭配必须保留所在领域的限定条件：`submit a bid` 不可仅解释为 `offer`，承接别人合同部分工作的 `subcontractor` 不能无差别换为外部承包商；`staff roster` 应保留人员、岗位/轮班关系。
+- 例句出现业务类型、周期或主要对象，英义不能省略这些特征：`monthly utilities` 可覆盖水、电、燃气；`airport shuttle` 是两地之间规律运营的接驳服务；`commute` 是家/工作地规律往返而非任意去上班。
+- 例句体现专门用途时应以它为准限定宽义词：`website accessibility` 配合键盘用户属于无障碍访问能力（含残障人士），不是单纯“易到达”；`hotel amenity` 可为设施或 Wi-Fi 一类服务，不限实物设备。
+- 任意已发布高频词的 `synonyms` 内容变化均须更新词库指纹、真实 AI/HUMAN 审核出处及二次审校记录。新增定向门禁 `validate_toeic_domain_paraphrases_issue478.py` 和负向回退检查不得删除或绕过。

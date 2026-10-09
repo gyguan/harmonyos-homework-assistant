@@ -26,6 +26,7 @@ from validate_toeic_bilingual_semantics_issue478 import validate as validate_bil
 from validate_toeic_vocabulary_dictionary_issue478 import validate as validate_vocabulary_dictionary_issue478
 from validate_toeic_contextual_synonyms_issue478 import validate as validate_contextual_synonyms_issue478
 from validate_toeic_business_context_issue478 import validate as validate_business_context_issue478
+from validate_toeic_domain_paraphrases_issue478 import validate as validate_domain_paraphrases_issue478
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -63,6 +64,7 @@ def main() -> None:
     validate_vocabulary_dictionary_issue478()
     validate_contextual_synonyms_issue478()
     validate_business_context_issue478()
+    validate_domain_paraphrases_issue478()
     verify_answer_display()
     validate_mock_day14_v2()
     validate_mock_day19_v2()
