@@ -1164,10 +1164,11 @@
     },
     "V-271": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "bd99772688c50d2432c1796a83da2bfa9c06320d0cd91db860cba0f83b411999",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "bf4b925a0ab923bc839afc197ecf0c087345c3d975ea31b95865f87549207dc1",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Cambridge dictionary 2026-10-09: layover can be a short stop on a longer journey, not solely flight waiting; AI_EDITORIAL only."
     },
     "V-272": {
       "reviewer": "AI-GPT6",
