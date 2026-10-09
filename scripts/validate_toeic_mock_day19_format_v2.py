@@ -87,7 +87,7 @@ def validate() -> None:
     preset=(CONTENT/"PresetToeicContent.ets").read_text(encoding="utf-8")
     service=(ROOT/"entry/src/main/ets/toeic/application/ToeicReadingGroupService.ets").read_text(encoding="utf-8")
     for token in ("ToeicWeekThreeContent.mockQuestionIds().slice(0,46)",
-                  "for (let question of ToeicMockDay19V2Content.questions()) ids.push(question.id)",
+                  "for (let question of ToeicMockDay19V2Content.questions()) ids.push(ToeicMockPart7EvidenceRevisionContent.activeId(question.id))",
                   "ToeicMockDay19V2Content.questions()","ToeicMockDay19V2Content.groups()"):
         assert token in preset,f"Day19 runtime paper assembly missing {token}"
     assert "ToeicMockDay19V2Content.groups()" in service
