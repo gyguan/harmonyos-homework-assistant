@@ -49,7 +49,7 @@ export class ToeicQuestionTranslationWeekOneCatalog {
       new ToeicQuestionTranslation('R-P5-VERB-0203','','Ito 女士上个月_____到公司的大阪分公司。',['调动（现在时）','调动了','将调动','已经调动']),
       new ToeicQuestionTranslation('R-P5-VOICE-0204','','差旅费用报告已经由财务团队_____。',['处理','已处理','正在处理','处理（第三人称）']),
       new ToeicQuestionTranslation('R-P5-VERB-0205','','如果货物今天_____，仓库明天就可以发出订单。',['到达','到达（第三人称）','到达了','正在到达']),
-      new ToeicQuestionTranslation('R-P5-VERB-0206','','在周五前_____培训的员工将获得证书。',['完成','完成（第三人称）','完成了','完成']),
+      new ToeicQuestionTranslation('R-P5-VERB-0206','','最迟于周五（含当天）_____培训的员工将获得证书。',['完成','完成（第三人称）','完成了','完成']),
 
       new ToeicQuestionTranslation('R-P5-PREP-0301','','Rivera 女士负责_____年度会议的安排。',['在','……的','对于','与']),
       new ToeicQuestionTranslation('R-P5-COL-0302','','请保留收据，以便在需要时_____退款。',['申请','参加','安装','搬迁']),

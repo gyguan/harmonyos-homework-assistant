@@ -17,8 +17,8 @@
   },
   "limitations": "AI second-context look at actually rotated options and new reading groups, not independent human/ETS certification; requires re-review after source changes. Four published question evidence fields retain historically incomplete excerpt strings, but newly issued question IDs carry complete verified evidence in their published content; the source gaps remain recorded transparently for editorial provenance.",
   "sourceBlobs": {
-    "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "e8e80bff17620d563250ccfebe9a44271e198d33",
-    "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "8cd746ea9c71c5fa2f1211c99b74cfd88d4c2d18",
+    "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "29c0e65587325e11e41df26d43100295d4c43528",
+    "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "c407cd0a6b72d329a81c08ca13de4e0961c29106",
     "entry/src/main/ets/toeic/content/ToeicMockDay14V2Content.ets": "c6dce0479e5c5181caeb0846cce0e81c04088945",
     "entry/src/main/ets/toeic/content/ToeicMockDay19V2Content.ets": "4909b1a7a514bf5316a1f9f30051a16a394b622f"
   },
@@ -3220,9 +3220,9 @@
   "sourceChangeAttestation": {
     "date": "2026-10-09",
     "issue": 478,
-    "scope": "sentence-drill-only",
+    "scope": "P2-final-sentence-drill-only",
     "questionAndStudyPlanContentUnchanged": true,
-    "method": "Balanced-constructor masking comparison against main@274b158b: remove each complete new ToeicSentenceDrill(...) constructor; remaining WeekOne, WeekTwo, WeekThree sources are byte-for-byte unchanged. Existing dynamic semantic validators recheck all original P5/P6 and Part7 question IDs, text and correct answers against ledger.",
-    "note": "Refresh source Git blobs only for WeekTwo/WeekThree translation guidance corrections; do not revise any question answer, version, original option, evidence, study day, or source item semantics. Does not count as a new independent editorial pass."
+    "method": "P2 final review changed only S-037 Chinese deadline wording and S-062 Chinese receive-payment wording inside ToeicSentenceDrill constructors. Part5/6/7 question constructors and study-plan IDs were not modified; existing dynamic semantic validators still compare current question text/answers against these ledgers.",
+    "note": "Refresh whole-file Git blobs only because the source files contain both questions and drills. This does not reclassify or weaken any active mock question review."
   }
 }

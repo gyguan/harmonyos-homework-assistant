@@ -17,8 +17,8 @@
   },
   "limitations": "AI first pass with exact active-pool slot mapping, three source-specific distractor notes per item, and Git source blob snapshot. Original archived ambiguous items remain untouched; ledger is not an ETS/second independent human assessment. Dynamic Part6 inherits historical stems/articles as described by assembly source; source SHA guards all dynamic code.; PR #508: Day14 slot22 new ID replaces nonstandard legacy distractor while archived old answer remains unaltered.; #478 Day3/Day15 additional P5 revisions change routing only; the 92 active mock P5/P6 content remains unchanged, source blob updated after explicit diff review.; Day16 Part6 revised elsewhere, Day14/19 mock questions untouched; refreshed source blob after review of routing-only changes.; P1 final closeout added non-mock replacements/live quarantines and Day15/16 routing; Day14/Day19 active 92 P5/P6 item content was rechecked as unchanged before rebinding this Preset source blob.",
   "sourceBlobs": {
-    "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "e8e80bff17620d563250ccfebe9a44271e198d33",
-    "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "8cd746ea9c71c5fa2f1211c99b74cfd88d4c2d18",
+    "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "29c0e65587325e11e41df26d43100295d4c43528",
+    "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "c407cd0a6b72d329a81c08ca13de4e0961c29106",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part5V2Content.ets": "6c23443627988a138a0a820e3cb6e16a574f7089",
     "entry/src/main/ets/toeic/content/ToeicMockPart6V2RepairContent.ets": "a7b037e937153bbe7aa3f499d4c6586753612f01",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6V2Content.ets": "4fdc74a07b2cdb0a9881a9280047003149b0f2f6",
@@ -3071,9 +3071,9 @@
   "sourceChangeAttestation": {
     "date": "2026-10-09",
     "issue": 478,
-    "scope": "sentence-drill-only",
+    "scope": "P2-final-sentence-drill-only",
     "questionAndStudyPlanContentUnchanged": true,
-    "method": "Balanced-constructor masking comparison against main@274b158b: remove each complete new ToeicSentenceDrill(...) constructor; remaining WeekOne, WeekTwo, WeekThree sources are byte-for-byte unchanged. Existing dynamic semantic validators recheck all original P5/P6 and Part7 question IDs, text and correct answers against ledger.",
-    "note": "Refresh source Git blobs only for WeekTwo/WeekThree translation guidance corrections; do not revise any question answer, version, original option, evidence, study day, or source item semantics. Does not count as a new independent editorial pass."
+    "method": "P2 final review changed only S-037 Chinese deadline wording and S-062 Chinese receive-payment wording inside ToeicSentenceDrill constructors. Part5/6/7 question constructors and study-plan IDs were not modified; existing dynamic semantic validators still compare current question text/answers against these ledgers.",
+    "note": "Refresh whole-file Git blobs only because the source files contain both questions and drills. This does not reclassify or weaken any active mock question review."
   }
 }

@@ -107,7 +107,7 @@ def validate() -> None:
     # 'before' excludes it. Chinese 'XX前' is too ambiguous at these deadlines.
     for id, en_keyword, cn_anchor in (
         ("S-001", "by Friday", "最迟须在周五当天"),
-        ("S-037", "no later than October 18", "10 月 18 日当天"),
+        ("S-037", "no later than October 18", "最迟将于 10 月 18 日收到联系（含当天，也可能更早）"),
         ("S-051", "by 9:20", "最迟在 9:20"),
         ("S-054", "by 11:30", "最迟必须在 11:30"),
     ):

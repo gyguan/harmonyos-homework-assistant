@@ -1,0 +1,1542 @@
+{
+  "schemaVersion": 1,
+  "issue": 478,
+  "scope": "P2 full bilingual final independent AI second pass",
+  "reviewMode": "AI_EDITORIAL_SECOND_PASS",
+  "expertCertification": "NO",
+  "reviewer": "AI-GPT5.6-SOL",
+  "reviewedAt": "2026-10-09",
+  "sourceBlobs": {
+    "ToeicQuestionTranslationWeekOneCatalog.ets": "75e40d734c807baf3cc177baa969a1d1240201ce",
+    "ToeicQuestionTranslationWeekTwoCatalog.ets": "00e6f1a66f1bca30b7e9c39c19187d7a9a2aeef2",
+    "ToeicQuestionTranslationWeekThreeCatalog.ets": "1b3aba7e4edb9c5e6a0ec91ebe053190c290554a",
+    "ToeicQuestionTranslationSupplementaryCatalog.ets": "8e9e3a7add9710b84b2cd63f2cde1fbb010e754f",
+    "ToeicQuestionTranslationDay17Catalog.ets": "3f5a7306f50de7a476132d0617916a63d67c60c2",
+    "ToeicQuestionTranslationDay18And20Catalog.ets": "57ed85361ea50743d1314ec116831352686124eb",
+    "ToeicWeekOneContent.ets": "8132ab377c81064927886e60c5c5dd2b3f42a709",
+    "ToeicWeekTwoContent.ets": "29c0e65587325e11e41df26d43100295d4c43528",
+    "ToeicWeekThreeContent.ets": "c407cd0a6b72d329a81c08ca13de4e0961c29106"
+  },
+  "translations": {
+    "count": 221,
+    "passCount": 218,
+    "correctedCount": 3,
+    "checks": [
+      "English-Chinese semantic alignment",
+      "option index alignment",
+      "time boundary: before/by/within/through/no later than",
+      "quantity threshold: over/at least/up to",
+      "negation/modality/condition scope",
+      "names/dates/amounts"
+    ],
+    "items": [
+      {
+        "id": "R-DX-P5-01",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-DX-P5-02",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-DX-P5-03",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-DX-P5-04",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-DX-P6-01",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-DX-P6-02",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-DX-P7-03",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-DX-P7-04",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-COL-0005",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-COL-0302",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-COL-0305",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-CONJ-0004",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-CONJ-0303",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-CONJ-0306",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-MIX-0601",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-MIX-0602",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-PREP-0003",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-PREP-0301",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-PREP-0304",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1501",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1502",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1503",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1504",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1505",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1506",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1507",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1508",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1509",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1510",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1511",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1512",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1513",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1514",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1515",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1516",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1517",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1518",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1519",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1520",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1521",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1522",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1523",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1524",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1525",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1526",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1527",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1528",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1529",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-SPRINT-1530",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-VERB-0201",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-VERB-0203",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-VERB-0205",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-VERB-0206",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AFTER_CORRECTION"
+      },
+      {
+        "id": "R-P5-VOC-0006",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-VOICE-0002",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-VOICE-0202",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-VOICE-0204",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-WF-0001",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-WF-0101",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-WF-0102",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-WF-0103",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-WF-0104",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-WF-0105",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P5-WF-0106",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-CONJ-0403",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-CTX-0001",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-CTX-0401",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-CTX-0405",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-MIX-0603",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-MIX-0604",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-REF-0404",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1601",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1602",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1603",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1604",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1605",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1606",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1607",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1608",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1609",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1610",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1611",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1612",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1613",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1614",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1615",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-SPRINT-1616",
+        "sourceFile": "ToeicQuestionTranslationWeekThreeCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-WF-0002",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-WF-0402",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P6-WF-0406",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-CATERING-01",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-CATERING-02",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-CATERING-03",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-CATERING-04",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-CATERING-05",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DELIVERY-01",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DELIVERY-02",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DELIVERY-03",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DELIVERY-04",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DELIVERY-05",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0001",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0004",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0501",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0502",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0505",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0801",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0802",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0803",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0804",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0805",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DETAIL-0806",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DOUBLE-1101",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DOUBLE-1102",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DOUBLE-1103",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DOUBLE-1104",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-DOUBLE-1105",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AFTER_CORRECTION"
+      },
+      {
+        "id": "R-P7-DOUBLE-1106",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-FILTER-01",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-FILTER-02",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-FILTER-03",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-FILTER-04",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-FILTER-05",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LEASE-01",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LEASE-02",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LEASE-03",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LEASE-04",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LEASE-05",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LICENSE-01",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LICENSE-02",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LICENSE-03",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LICENSE-04",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LICENSE-05",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LONG-1001",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LONG-1002",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LONG-1003",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LONG-1004",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LONG-1005",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-LONG-1006",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-MIGRATION-01",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-MIGRATION-02",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-MIGRATION-03",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-MIGRATION-04",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-MIGRATION-05",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-MIX-0605",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-MIX-0606",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-ONBOARD-01",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-ONBOARD-02",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-ONBOARD-03",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-ONBOARD-04",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-ONBOARD-05",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0003",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0503",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0506",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0901",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0902",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0903",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0904",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0905",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PARA-0906",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PERDIEM-01",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PERDIEM-02",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PERDIEM-03",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PERDIEM-04",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PERDIEM-05",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PURPOSE-0002",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PURPOSE-0504",
+        "sourceFile": "ToeicQuestionTranslationWeekOneCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PURPOSE-0701",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PURPOSE-0702",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PURPOSE-0703",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PURPOSE-0704",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PURPOSE-0705",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-PURPOSE-0706",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-RETAIL-01",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-RETAIL-02",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-RETAIL-03",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-RETAIL-04",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-RETAIL-05",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-SUPPORT-01",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-SUPPORT-02",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-SUPPORT-03",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-SUPPORT-04",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-SUPPORT-05",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1701",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1702",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1703",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1704",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1705",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1706",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1707",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1708",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1709",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1710",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1711",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1712",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1713",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1714",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1715",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1716",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1717",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TIMED-1718",
+        "sourceFile": "ToeicQuestionTranslationDay17Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAINING-01",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAINING-02",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAINING-03",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAINING-04",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAINING-05",
+        "sourceFile": "ToeicQuestionTranslationDay18And20Catalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAVEL-01",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAVEL-02",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAVEL-03",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAVEL-04",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRAVEL-05",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRIPLE-1201",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRIPLE-1202",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRIPLE-1203",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AFTER_CORRECTION"
+      },
+      {
+        "id": "R-P7-TRIPLE-1204",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRIPLE-1205",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-TRIPLE-1206",
+        "sourceFile": "ToeicQuestionTranslationWeekTwoCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-VENUE-01",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-VENUE-02",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-VENUE-03",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-VENUE-04",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "R-P7-VENUE-05",
+        "sourceFile": "ToeicQuestionTranslationSupplementaryCatalog.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      }
+    ]
+  },
+  "sentenceDrills": {
+    "count": 70,
+    "passCount": 68,
+    "correctedCount": 2,
+    "checks": [
+      "main-clause extraction",
+      "modifier scope",
+      "English-Chinese semantic alignment",
+      "time/quantity/negation boundaries",
+      "grammar naturalness",
+      "learning-note consistency"
+    ],
+    "items": [
+      {
+        "id": "S-001",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-002",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-003",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-004",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-005",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-006",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-007",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-008",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-009",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-010",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-011",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-012",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-013",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-014",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-015",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-016",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-017",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-018",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-019",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-020",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-021",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-022",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-023",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-024",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-025",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-026",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-027",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-028",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-029",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-030",
+        "sourceFile": "ToeicWeekOneContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-031",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-032",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-033",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-034",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-035",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-036",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-037",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AFTER_CORRECTION"
+      },
+      {
+        "id": "S-038",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-039",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-040",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-041",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-042",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-043",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-044",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-045",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-046",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-047",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-048",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-049",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-050",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-051",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-052",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-053",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-054",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-055",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-056",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-057",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-058",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-059",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-060",
+        "sourceFile": "ToeicWeekTwoContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-061",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-062",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AFTER_CORRECTION"
+      },
+      {
+        "id": "S-063",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-064",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-065",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-066",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-067",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-068",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-069",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      },
+      {
+        "id": "S-070",
+        "sourceFile": "ToeicWeekThreeContent.ets",
+        "decision": "PASS_AI_SECOND_PASS"
+      }
+    ]
+  },
+  "corrections": [
+    {
+      "id": "R-P5-VERB-0206",
+      "type": "translation",
+      "before": "在周五前_____培训的员工将获得证书。",
+      "after": "最迟于周五（含当天）_____培训的员工将获得证书。",
+      "reason": "by Friday includes Friday"
+    },
+    {
+      "id": "R-P7-DOUBLE-1105",
+      "type": "translation",
+      "before": "订单满100美元免标准运费。",
+      "after": "订单金额超过100美元可免标准运费。",
+      "reason": "over $100 is strictly greater than $100"
+    },
+    {
+      "id": "R-P7-TRIPLE-1203",
+      "type": "translation",
+      "before": "Jordan 能在11月1日前开始工作",
+      "after": "Jordan 最迟能于11月1日开始工作（含当天）",
+      "reason": "by November 1 includes November 1"
+    },
+    {
+      "id": "S-037",
+      "type": "sentenceDrill",
+      "before": "最迟会在10月18日当天收到联系",
+      "after": "最迟将于10月18日收到联系（含当天，也可能更早）",
+      "reason": "no later than is a deadline, not an exact-date-only statement"
+    },
+    {
+      "id": "S-062",
+      "type": "sentenceDrill",
+      "before": "付款收到后自动发送",
+      "after": "收到付款后自动发送",
+      "reason": "restore natural recipient/action relation for payment is received"
+    }
+  ]
+}
