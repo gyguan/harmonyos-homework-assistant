@@ -22,6 +22,7 @@ from validate_toeic_mock_p5p6_unique_issue478 import validate as validate_mock_p
 from validate_toeic_active_mock_p5p6_issue478 import validate as validate_active_mock_p5p6
 from validate_toeic_v2_derived_part7_editorial_issue478 import validate as validate_v2_derived_p7_semantics
 from validate_toeic_vocabulary_examples_issue478 import validate as validate_vocabulary_examples_issue478
+from validate_toeic_bilingual_semantics_issue478 import validate as validate_bilingual_semantics_issue478
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -55,6 +56,7 @@ def main() -> None:
     validate_active_mock_p5p6()
     validate_v2_derived_p7_semantics()
     validate_vocabulary_examples_issue478()
+    validate_bilingual_semantics_issue478()
     verify_answer_display()
     validate_mock_day14_v2()
     validate_mock_day19_v2()
