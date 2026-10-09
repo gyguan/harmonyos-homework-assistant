@@ -3,14 +3,15 @@
   "createdAt": "2026-10-09",
   "issue": 478,
   "reviewer": "AI-GPT6",
-  "reviewStatus": "AI_FIRST_PASS",
+  "reviewStatus": "AI_FIRST_PASS_WITH_ONE_FLAGGED",
   "notExpertCertified": true,
   "scope": {
     "legacyPart7InlineVerbatim": 110,
     "correctReasons": 110,
-    "threeDistractorReasons": 330
+    "threeDistractorReasons": 330,
+    "ambiguousLegacyQuestionCount": 1
   },
-  "limitations": "Model-led first-pass review of original questions only, not an independent expert or ETS certification. Correct-choice reasons are the source explanations checked against original passages; all wrong-choice exclusions were reviewed and recorded. New mock derivatives, vocabulary, listening and broader translation corpus excluded.",
+  "limitations": "Model-led first-pass review of original questions only, not an independent expert or ETS certification. Correct-choice reasons are the source explanations checked against original passages; all wrong-choice exclusions were reviewed and recorded. New mock derivatives, vocabulary, listening and broader translation corpus excluded. Archived R-M1-P7-094 is expressly flagged for unresolved time-context ambiguity and left unchanged to preserve v1 history.",
   "items": [
     {
       "assetId": "R-P7-DETAIL-0001",
@@ -1581,17 +1582,17 @@
     {
       "assetId": "R-M1-P7-094",
       "sourceFile": "ToeicWeekTwoContent.ets",
-      "reviewedVersion": 2,
+      "reviewedVersion": 1,
       "sourceAnchor": "The south entrance will be closed Oct. 4–8.",
-      "correctBasis": "10月6日落在公告规定的10月4日至8日南门关闭期内，因此访客当天不能从该入口进入。",
+      "correctBasis": "原文只说明南门10月4至8日关闭，但“下周”没有邮件绝对日期，无法证明客户抵达时间落在关闭期内。此题保留旧版以支持历史报告，不能视为语义审查通过。",
       "distractorReasons": [
-        "公告未说距主街远",
-        "没有门禁卡要求",
-        "不只限员工使用"
+        "没有比较南门与Main Street的距离",
+        "原文没有要求南门使用门禁卡",
+        "原文未说明南门仅供员工使用"
       ],
       "questionSnapshot": {
         "passage": "DOCUMENT 1 — RENOVATION NOTICE\nThe south entrance will be closed Oct. 4–8.\n\nDOCUMENT 2 — VISITOR MAP\nNorth entrance: Main Street; East entrance: Pine Avenue.\n\nDOCUMENT 3 — MANAGER E-MAIL\nClients arriving next week should use the entrance closest to the visitor parking lot on Pine Avenue.",
-        "stem": "According to the renovation notice, why should visitors avoid the south entrance on October 6?",
+        "stem": "Why is the south entrance not recommended?",
         "choices": [
           "It will be closed",
           "It is farther from Main Street",
@@ -1599,11 +1600,12 @@
           "It is for employees only"
         ],
         "answer": 0,
-        "explanation": "10月6日落在公告规定的10月4日至8日南门关闭期内，因此访客当天不能从该入口进入。",
+        "explanation": "notice 明确关闭。",
         "evidence": "The south entrance will be closed Oct. 4–8."
       },
-      "reviewOutcome": "AI_FIRST_PASS",
-      "isExpertCertified": false
+      "reviewOutcome": "AI_FLAGGED_AMBIGUITY",
+      "isExpertCertified": false,
+      "editorialFinding": "Unanchored 'next week' relative to October 4–8 closure; do not republish unchanged as a newly validated question."
     },
     {
       "assetId": "R-M1-P7-096",

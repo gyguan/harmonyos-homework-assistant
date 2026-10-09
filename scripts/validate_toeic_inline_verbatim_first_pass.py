@@ -36,10 +36,16 @@ def verify_item(entry: dict, q) -> None:
         raise AssertionError(f"{key}: reading article, stem, choices, answer or evidence changed")
     if entry["sourceAnchor"] != q.evidence or entry["sourceAnchor"] not in q.passage:
         raise AssertionError(f"{key}: source quotation no longer matches")
-    if entry["reviewOutcome"] != "AI_FIRST_PASS" or entry["isExpertCertified"] is not False:
+    if entry["isExpertCertified"] is not False:
         raise AssertionError(f"{key}: may not claim expert certification")
-    if entry.get("correctBasis") != q.explanation or len(entry["correctBasis"].strip()) < 4:
-        raise AssertionError(f"{key}: answer rationale changed or missing")
+    if key == "R-M1-P7-094":
+        if (entry["reviewOutcome"] != "AI_FLAGGED_AMBIGUITY" or
+                entry.get("editorialFinding") !=
+                "Unanchored 'next week' relative to October 4–8 closure; do not republish unchanged as a newly validated question." or
+                len(entry.get("correctBasis", "").strip()) < 15):
+            raise AssertionError(f"{key}: archived ambiguity must remain explicitly flagged")
+    elif entry["reviewOutcome"] != "AI_FIRST_PASS" or entry.get("correctBasis") != q.explanation:
+        raise AssertionError(f"{key}: unreviewed or changed explanation")
     reasons = entry.get("distractorReasons")
     if not isinstance(reasons, list) or len(reasons) != 3:
         raise AssertionError(f"{key}: each wrong choice must have an exclusion")
@@ -51,7 +57,7 @@ def verify_item(entry: dict, q) -> None:
 
 def validate() -> None:
     data = json.loads(LEDGER.read_text(encoding="utf-8"))
-    if data.get("reviewStatus") != "AI_FIRST_PASS" or data.get("notExpertCertified") is not True:
+    if data.get("reviewStatus") != "AI_FIRST_PASS_WITH_ONE_FLAGGED" or data.get("notExpertCertified") is not True:
         raise AssertionError("invalid or misleading editorial status")
     original, _ = collect()
     by_id = {q.id: q for q in original}
@@ -85,14 +91,33 @@ def validate() -> None:
     else:
         raise AssertionError("negative control accepted an unreviewed version")
     changed = by_id["R-M1-P7-094"]
-    assert changed.version == 2 and changed.answer == 0
-    assert "October 6" in changed.stem and "Oct. 4–8" in changed.passage
-    assert "ToeicSkill.DETAIL" in (
-        ROOT / "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets"
-    ).read_text(encoding="utf-8").split('ToeicWeekTwoContent.q("R-M1-P7-094"', 1)[1].split(",", 3)[2]
+    assert changed.version == 1 and changed.answer == 0
+    assert changed.stem == "Why is the south entrance not recommended?"
+    assert "Clients arriving next week" in changed.passage
+    assert "Oct. 4–8" in changed.passage
+    # Historical reports use publishedQuestions() for exact v1 lookup.
+    # New sessions must instead use the filtered live training source.
+    content = (ROOT / "entry/src/main/ets/toeic/content/PresetToeicContent.ets").read_text(encoding="utf-8")
+    service = (ROOT / "entry/src/main/ets/toeic/application/ToeicTrainingService.ets").read_text(encoding="utf-8")
+    viewmodel = (ROOT / "entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets").read_text(encoding="utf-8")
+    assert "static liveTrainingQuestions():ToeicQuestion[]" in content
+    live_block = content.split("static liveTrainingQuestions():ToeicQuestion[]", 1)[1].split("\n  }", 1)[0]
+    assert "question.id==='R-M1-P7-094'" in live_block
+    assert "PresetToeicContent.publishedQuestions()" in live_block
+    through_day = content.split("static questionsThroughDay(maxDay:number):ToeicQuestion[]", 1)[1].split("\n  }", 1)[0]
+    for_day = content.split("static questionsForDay(day:number):ToeicQuestion[]", 1)[1].split("\n  }", 1)[0]
+    assert "PresetToeicContent.liveTrainingQuestions()" in through_day
+    assert "PresetToeicContent.liveTrainingQuestions()" in for_day
+    assert "let all=PresetToeicContent.liveTrainingQuestions();" in service
+    # Do not break archived report/draft recovery by filtering the lookup.
+    lookup = viewmodel.split("questionsForIds(ids:string[]):ToeicQuestion[]", 1)[1].split("\n  }", 1)[0]
+    assert "PresetToeicContent.publishedQuestions()" in lookup
+    flagged = [e for e in data["items"] if e["reviewOutcome"] == "AI_FLAGGED_AMBIGUITY"]
+    assert len(flagged) == 1 and flagged[0]["assetId"] == changed.id
     print("TOEIC_ISSUE478_INLINE_VERBATIM_FIRST_PASS_PASS originalP7=110 "
           "exclusion_notes=330 content_snapshot_bound=110 "
-          "south_entrance_date_version2=OK expert_certification=NO")
+          "ai_first_pass_no_issue=109 flagged_archival_ambiguity=1 "
+          "archived_question_version1_preserved=YES live_training_excluded=YES expert_certification=NO")
 
 
 if __name__ == "__main__":

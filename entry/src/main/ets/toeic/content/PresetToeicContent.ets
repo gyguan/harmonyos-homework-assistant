@@ -184,6 +184,20 @@ export class PresetToeicContent {
     return published;
   }
 
+  /** Exclude editorially flagged archived items from new learning queues only.
+   * Keep publishedQuestions() intact for saved mock v1 reports/drafts.
+   * Issue #478: the old R-M1-P7-094 date inference is not independently supported.
+   */
+  static liveTrainingQuestions():ToeicQuestion[] {
+    let published=PresetToeicContent.publishedQuestions();
+    let live:ToeicQuestion[]=[];
+    for (let question of published) {
+      if (question.id==='R-M1-P7-094') continue;
+      live.push(question);
+    }
+    return live;
+  }
+
   /** The Day 1 plan is the only source of truth for the comprehensive diagnostic. */
   static diagnosticQuestions():ToeicQuestion[] {
     return PresetToeicContent.questionsForDay(1);
@@ -324,7 +338,7 @@ export class PresetToeicContent {
   static isHighErrorReviewDay(day:number):boolean { return day===20; }
 
   static questionsThroughDay(maxDay:number):ToeicQuestion[] {
-    let all=PresetToeicContent.publishedQuestions();
+    let all=PresetToeicContent.liveTrainingQuestions();
     let plans=PresetToeicContent.studyDays();
     let result:ToeicQuestion[]=[];
     for (let plan of plans) {
@@ -356,7 +370,7 @@ export class PresetToeicContent {
 
   static questionsForDay(day:number):ToeicQuestion[] {
     let plan=PresetToeicContent.studyDay(day);
-    let all=PresetToeicContent.publishedQuestions();
+    let all=PresetToeicContent.liveTrainingQuestions();
     let result:ToeicQuestion[]=[];
     for (let id of plan.questionIds) {
       for (let question of all) if (question.id===id) { result.push(question); break; }

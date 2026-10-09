@@ -17,7 +17,7 @@ export class ToeicTrainingService {
   diagnosticQuestions():ToeicQuestion[] { return PresetToeicContent.diagnosticQuestions(); }
 
   dailyQuestions(snapshot:ToeicLearningSnapshot, limit:number=10, studyDay:number=snapshot.currentDay):ToeicQuestion[] {
-    let all=PresetToeicContent.publishedQuestions();
+    let all=PresetToeicContent.liveTrainingQuestions();
     let selected:ToeicQuestion[]=[];
     let recoveryLimit=Math.min(4,limit);
 
