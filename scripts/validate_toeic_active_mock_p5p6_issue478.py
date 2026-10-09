@@ -22,6 +22,7 @@ LEDGER = ROOT / "docs/product/toeic-issue478-active-mock-p5p6-first-pass-92.json
 NOTE_P5 = ROOT / "docs/product/toeic-issue478-active-mock-p5-review-notes-60.txt"
 NOTE_P6 = ROOT / "docs/product/toeic-issue478-active-mock-p6-review-notes-32.txt"
 NEW_P5 = "entry/src/main/ets/toeic/content/ToeicMockDay19Part5V2Content.ets"
+NEW_DAY14_P5 = "entry/src/main/ets/toeic/content/ToeicMockDay14Part5V2Content.ets"
 NEW_P6 = "entry/src/main/ets/toeic/content/ToeicMockPart6V2RepairContent.ets"
 DAY19_P6 = "entry/src/main/ets/toeic/content/ToeicMockDay19Part6V2Content.ets"
 NEW_FINISH = "entry/src/main/ets/toeic/content/ToeicMockDay19Part6CompletionContent.ets"
@@ -98,9 +99,9 @@ def current_items() -> list[dict]:
     skills = legacy_skills()
     source_two = "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets"
     source_three = "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets"
-    files = {**literal_calls(NEW_P5), **literal_calls(NEW_P6),
+    files = {**literal_calls(NEW_DAY14_P5), **literal_calls(NEW_P5), **literal_calls(NEW_P6),
              **literal_calls(NEW_FINISH)}
-    required = {"R-FM2-P5-007", "R-FM1-P6-033", "R-FM2-P6-009",
+    required = {"R-FM1-P5-022", "R-FM2-P5-007", "R-FM1-P6-033", "R-FM2-P6-009",
                 "R-FM2-P6-017", "R-FM2-P6-018"}
     if set(files) != required:
         raise AssertionError(f"unexpected new P5/6 constructors {set(files)}")
@@ -126,7 +127,9 @@ def current_items() -> list[dict]:
             options = old.choices
             answer = old.answer
             explanation = old.explanation
-            if day == 14 and slot == 32:
+            if day == 14 and slot == 21:
+                qid, origin_file = "R-FM1-P5-022", NEW_DAY14_P5
+            elif day == 14 and slot == 32:
                 qid, origin_file = "R-FM1-P6-033", NEW_P6
             elif day == 19:
                 special = {6: ("R-FM2-P5-007", NEW_P5),
@@ -144,7 +147,7 @@ def current_items() -> list[dict]:
                 options = ast.literal_eval(args[6])
                 answer = int(args[7])
                 explanation = ast.literal_eval(args[8])
-                if qid == "R-FM2-P5-007":
+                if qid in ("R-FM2-P5-007", "R-FM1-P5-022"):
                     stem = ast.literal_eval(args[5])
             if qid in ("R-FM2-P6-001", "R-FM2-P6-002",
                        "R-FM2-P6-003", "R-FM2-P6-017"):
@@ -193,6 +196,7 @@ def validate() -> None:
     if set(doc["sourceBlobs"]) != {
         "entry/src/main/ets/toeic/content/" + name + ".ets" for name in (
             "ToeicWeekTwoContent", "ToeicWeekThreeContent", "ToeicMockDay19Part5V2Content",
+            "ToeicMockDay14Part5V2Content",
             "ToeicMockPart6V2RepairContent", "ToeicMockDay19Part6V2Content",
             "ToeicMockDay19Part6CompletionContent", "PresetToeicContent")
     }:
@@ -221,7 +225,7 @@ def validate() -> None:
     for expected in (
         "ids[33]=ToeicMockDay19Part6CompletionContent.inventory().id;",
         "ids[37]=ToeicMockDay19Part6CompletionContent.library().id;",
-        "question.id==='R-M1-P7-094'",
+        "question.id==='R-M1-P7-094'", "question.id==='R-M1-P5-022'",
         "question.id==='R-FM2-P6-004'", "question.id==='R-M2-P6-008'",
     ):
         if expected not in preset:
@@ -236,7 +240,7 @@ def validate() -> None:
         live_ids = [item["id"] for item in expected_items if item["day"] == day]
         assert len(live_ids) == 46 and len(set(live_ids)) == 46
         assert not set(live_ids) & {
-            "R-M2-P5-007", "R-M1-P6-033", "R-M2-P6-009",
+            "R-M2-P5-007", "R-M1-P5-022", "R-M1-P6-033", "R-M2-P6-009",
             "R-FM2-P6-004", "R-M2-P6-008",
         }, "active mock assembled with excluded historic ambiguous content"
         assert len(live_ids) + 54 == 100, "complete 100-question mock contract"
@@ -246,7 +250,7 @@ def validate() -> None:
     assert originals["R-M2-P6-008"].version == 1
     assert records[79]["id"] == "R-FM2-P6-017" and records[83]["id"] == "R-FM2-P6-018"
     print("TOEIC_ISSUE478_ACTIVE_P5_P6_FIRST_PASS_PASS active=92 day14=46 day19=46 "
-          "correct_notes=92 distractor_exclusions=276 source_blobs=7 "
+          "correct_notes=92 distractor_exclusions=276 source_blobs=8 "
           "historical_double_answer_items_excluded=2 expert_certification=NO")
 
 

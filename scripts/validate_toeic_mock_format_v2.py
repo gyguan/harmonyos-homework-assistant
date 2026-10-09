@@ -118,6 +118,18 @@ def validate() -> None:
     # Stable display permutation must also make the *active* v2 mock resistant
     # to guessing from answer-letter position; old R-M1 statistics are separate.
     active=old_p5+old_p6
+    # An independently published active ID replaces the historical nonword
+    # distractor without changing archived R-M1-P5-022 or saved drafts.
+    replacement_source=(CONTENT/"ToeicMockDay14Part5V2Content.ets").read_text(encoding="utf-8")
+    replacement_calls=literals_after(replacement_source,"new ToeicQuestion(")
+    assert len(replacement_calls)==1, "Day14 P5 correction must publish one new question"
+    new_p5=parse_question(fields(replacement_calls[0]),"ToeicMockDay14Part5V2Content",False)
+    assert new_p5.id=="R-FM1-P5-022" and new_p5.answer==0
+    assert new_p5.choices==["unanimous","unanimously","unanimity","unanimousness"]
+    assert old_p5[21].id=="R-M1-P5-022" and old_p5[21].choices[3]=="unanimouslyness"
+    active[21]=new_p5
+    assert "ids[21]=ToeicMockDay14Part5V2Content.questions()[0].id;" in preset
+
     displayed=[(q.id,q.answer) for q in active]
     displayed.extend((f"R-FM1-P7-S{i//3+1:02d}-{i%3+1:02d}",
                       legacy[f"R-M1-P7-{47+i:03d}"].answer) for i in range(24))

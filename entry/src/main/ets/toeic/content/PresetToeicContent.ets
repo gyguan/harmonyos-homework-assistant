@@ -10,6 +10,7 @@ import { ToeicMockDay19V2Content } from './ToeicMockDay19V2Content';
 import { ToeicMockPart7EvidenceRevisionContent } from './ToeicMockPart7EvidenceRevisionContent';
 import { ToeicMockDay19Part6V2Content } from './ToeicMockDay19Part6V2Content';
 import { ToeicMockDay19Part5V2Content } from './ToeicMockDay19Part5V2Content';
+import { ToeicMockDay14Part5V2Content } from './ToeicMockDay14Part5V2Content';
 import { ToeicMockPart6V2RepairContent } from './ToeicMockPart6V2RepairContent';
 import { ToeicMockDay19Part6CompletionContent } from './ToeicMockDay19Part6CompletionContent';
 import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
@@ -142,7 +143,7 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19(),ToeicMockDay19Part6CompletionContent.inventory(),ToeicMockDay19Part6CompletionContent.library()]);
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat(ToeicMockDay14Part5V2Content.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19(),ToeicMockDay19Part6CompletionContent.inventory(),ToeicMockDay19Part6CompletionContent.library()]);
   }
 
   static publishedReadingGroups():ToeicReadingGroup[] {
@@ -196,7 +197,7 @@ export class PresetToeicContent {
     let published=PresetToeicContent.publishedQuestions();
     let live:ToeicQuestion[]=[];
     for (let question of published) {
-      if (question.id==='R-FM1-P7-M1-01' || question.id==='R-FM1-P7-M4-01' || question.id==='R-FM2-P7-M1-01' || question.id==='R-FM2-P7-M5-03' || question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008') continue;
+      if (question.id==='R-FM1-P7-M1-01' || question.id==='R-FM1-P7-M4-01' || question.id==='R-FM2-P7-M1-01' || question.id==='R-FM2-P7-M5-03' || question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P5-022' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008') continue;
       live.push(question);
     }
     return live;
@@ -308,6 +309,7 @@ export class PresetToeicContent {
     for (let plan of plans) {
       if (plan.day===14) {
         let ids=ToeicWeekTwoContent.mockQuestionIds().slice(0,46);
+        ids[21]=ToeicMockDay14Part5V2Content.questions()[0].id;
         ids[32]=ToeicMockPart6V2RepairContent.day14().id;
         for (let question of ToeicMockDay14V2Content.questions()) ids.push(ToeicMockPart7EvidenceRevisionContent.activeId(question.id));
         plan.questionIds=ids;
