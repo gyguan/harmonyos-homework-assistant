@@ -55,6 +55,6 @@ R-M2-P5-024|has been extremely positive 要形容词作表语|positively 为副�
 R-M2-P5-025|although several roads were closed 表让步但仍准时送达|because 表因道路封闭才准时不合文意|unless 表例外条件与确定事实不符|therefore 是副词不能作逗号后连接词
 R-M2-P5-026|reduce costs 表降低成本的及物动词搭配|fall 不及物|lowering 是分词非原形|drop off 通常不直接带成本宾语
 R-M2-P5-027|since 2018 表延续到现在，has occupied|occupies 不能单独和 since 起点搭配|occupied 过去式通常需要过去截止语境|will occupy 尚未开始与 since 冲突
-R-M2-P5-028|send questions to coordinator，收件者用 to|for 表目的不是收件方向|by 表方式|with 表伴随
+R-M2-P5-028|send questions to coordinator，收件者用 to|for 表目的不是收件方向|by 表动作执行方式，不能标明收件人|with 表伴随
 R-M2-P5-029|out of stock 是商品缺货固定表达|out of office 指不在办公室|out of service 指设备停运|out of charge 非此处缺货表达
 R-M2-P5-030|helpful explanation 用形容词修饰说明|helpfully 是副词|help 是动词或名词|helpfulness 是名词
