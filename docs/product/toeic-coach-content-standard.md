@@ -657,3 +657,9 @@ Issue #447 的第六个发布批次计划与第 3–5 批**同时纳入单个独
 - 例句出现业务类型、周期或主要对象，英义不能省略这些特征：`monthly utilities` 可覆盖水、电、燃气；`airport shuttle` 是两地之间规律运营的接驳服务；`commute` 是家/工作地规律往返而非任意去上班。
 - 例句体现专门用途时应以它为准限定宽义词：`website accessibility` 配合键盘用户属于无障碍访问能力（含残障人士），不是单纯“易到达”；`hotel amenity` 可为设施或 Wi-Fi 一类服务，不限实物设备。
 - 任意已发布高频词的 `synonyms` 内容变化均须更新词库指纹、真实 AI/HUMAN 审核出处及二次审校记录。新增定向门禁 `validate_toeic_domain_paraphrases_issue478.py` 和负向回退检查不得删除或绕过。
+
+## #478 跨多文档题组的中文时间边界、正确选项与解析必须同步（2026-10-09）
+
+- 原文 `by [date/time]`、`no later than` 和 `through [date/time]` 表示截止日或截止时刻**含当天/当时刻**；与 `before [date/time]` 严格早于区分。多文档共享的 `deliveryPassage` / `filterPassage`、同一题组的五条重复文章、正确选项与答题解释要作为**同一个语义变更单元**整体复核。
+- `R-P7-FILTER-04` 的“余货最迟10月10日到达”不仅检查文章，必须核对正确答案选项；`R-P7-CATERING-04` 的“through Oct8 5PM”除了译文必须检查真实学习者可见的中文答案解释。
+- 对已存在 AI_EDITORIAL 账本的题组若修改任何问答解析，严格执行**旧源内容哈希验真 → 重新计算 reading_fingerprint → 同步主审核、初轮和二次复核**。不得只改中文材料就默认英文题目质量全部通过；`validate_toeic_reading_deadlines_issue478.py` 的实际源码锚点与负向测试必须持续运行。

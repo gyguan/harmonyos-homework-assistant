@@ -1719,7 +1719,7 @@
         "explanation": "会务条款显示 Hall A 容量160、Hall B 容量80；报名人数增至135，因此仅 Hall A 合适。",
         "evidence": "Hall A accommodates up to 160 attendees; Hall B accommodates up to 80. || Our registration count has increased to 135."
       },
-      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
     },
     {
       "assetId": "R-P7-CATERING-02",
@@ -1747,7 +1747,7 @@
         "explanation": "新订单135杯咖啡乘4美元加135份午餐乘8美元等于1620美元，原订1360美元，新增260美元。",
         "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || Original catering cost: $1,360. || update catering to 135 coffee servings and 135 boxed lunches."
       },
-      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
     },
     {
       "assetId": "R-P7-CATERING-03",
@@ -1775,11 +1775,11 @@
         "explanation": "维修仅安排上午9点到中午，下午1点及以后可举办活动；预订开场时间为下午2点。",
         "evidence": "Hall A will be unavailable from 9 A.M. to noon for scheduled maintenance, but events beginning at or after 1 P.M. may proceed. || Date and start: October 12, 2 P.M."
       },
-      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
     },
     {
       "assetId": "R-P7-CATERING-04",
-      "correctBasis": "更改期限10月8日17点，服务方10月7日16点已确认接受",
+      "correctBasis": "餐饮变更期限包含10月8日17点，服务方已于10月7日16点确认接受，因此在截止时间之内",
       "distractorReasons": [
         "10月12日是活动日期不是确认时间",
         "10月5日仅为原预订确认时间",
@@ -1791,7 +1791,7 @@
         "id": "R-P7-CATERING-04",
         "sourceFile": "ToeicExtraReadingBatchSix.ets",
         "groupId": "P7-EX-CATERING",
-        "version": 1,
+        "version": 2,
         "stem": "Was the change to catering quantities accepted before the stated cutoff?",
         "options": [
           "No, it was accepted on October 12",
@@ -1800,10 +1800,10 @@
           "Yes, the deadline was October 12"
         ],
         "answerIndex": 2,
-        "explanation": "会务条款规定10月8日17点前可更改，服务方10月7日16点确认收到并接受。",
+        "explanation": "会务条款允许最迟在10月8日17点（含该时刻）修改订单，服务方已于10月7日16点确认并接受修改。",
         "evidence": "Catering orders may be changed through October 8 at 5 P.M. || EVENT SERVICES RESPONSE, OCTOBER 7, 4 P.M. || The revised quantities are accepted."
       },
-      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
     },
     {
       "assetId": "R-P7-CATERING-05",
@@ -1831,7 +1831,17 @@
         "explanation": "更新后为135杯咖啡和135份午餐，单价4美元与8美元，合计1620美元。",
         "evidence": "Coffee service costs $4 per attendee served and boxed lunches cost $8 each. || update catering to 135 coffee servings and 135 boxed lunches."
       },
-      "groupContentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b"
+      "groupContentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5"
+    }
+  ],
+  "revisionNotes": [
+    {
+      "date": "2026-10-09",
+      "issue": "#478",
+      "reason": "R-P7-CATERING-04 Chinese explanation corrected for inclusive through; original answer/options/evidence unchanged, all five question group hashes rebound after source verified; published question R-P7-CATERING-04 version 1 -> 2 per content standard, original answers/choices/history retained",
+      "evidence": "docs/product/toeic-issue478-reading-deadlines-review-2026-10-09.md",
+      "reviewStatus": "AI_FIRST_PASS",
+      "isExpertCertified": false
     }
   ]
 }
