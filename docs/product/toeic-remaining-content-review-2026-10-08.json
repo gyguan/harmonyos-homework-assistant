@@ -69,6 +69,26 @@
       "id": "V-255",
       "reviewDate": "2026-10-09",
       "note": "Clarify login credential is authentication information, not limited to a physical identity document"
+    },
+    {
+      "id": "V-202",
+      "reviewDate": "2026-10-09",
+      "note": "troubleshoot includes seeking ways to resolve a malfunction, beyond diagnosis alone"
+    },
+    {
+      "id": "V-207",
+      "reviewDate": "2026-10-09",
+      "note": "make cancellation fee example explicitly conditional on cancellation after deadline; avoid confusing late changes with cancellation"
+    },
+    {
+      "id": "V-214",
+      "reviewDate": "2026-10-09",
+      "note": "hotel occupancy rate uses occupied/sold rooms divided by available room inventory, not vague utilization"
+    },
+    {
+      "id": "V-297",
+      "reviewDate": "2026-10-09",
+      "note": "higher conference attendance refers to the number of attendees, not just fact of presence"
     }
   ],
   "vocabulary": {
@@ -417,12 +437,12 @@
         "troubleshoot a connection"
       ],
       "synonyms": [
-        "diagnose a problem"
+        "identify a fault and seek a solution"
       ],
       "ipa": "/ˈtrʌbəlˌʃuːt/",
-      "contentSha256": "204cffc18fcc7da4d455dded84f699f7efe04c373d270c23db6aa054f4c95fe2",
+      "contentSha256": "e85922722ac0c3a0f65b66c7153c2ff1bfac3a38eb97935999808c7d7650f74a",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: troubleshoot includes seeking ways to resolve a malfunction, beyond diagnosis alone"
     },
     "V-203": {
       "headword": "outage",
@@ -492,7 +512,7 @@
       "headword": "cancellation",
       "pos": "n.",
       "meaning": "取消；撤销",
-      "example": "The hotel charges a cancellation fee for late changes.",
+      "example": "The hotel charges a cancellation fee when guests cancel after the deadline.",
       "collocations": [
         "cancellation fee"
       ],
@@ -500,9 +520,9 @@
         "withdrawal of a booking"
       ],
       "ipa": "/ˌkænsəˈleɪʃən/",
-      "contentSha256": "10d8edbf165b898c72a44ebfe282c34e3de7b5e147326a0832502778df0b2d07",
+      "contentSha256": "93f89b5d5c2529efa9164ff3e23f7f1cf2f01b403d61619ac68987c75682506b",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: make cancellation fee example explicitly conditional on cancellation after deadline; avoid confusing late changes with cancellation"
     },
     "V-208": {
       "headword": "expiration",
@@ -609,12 +629,12 @@
         "occupancy rate"
       ],
       "synonyms": [
-        "room utilization"
+        "percentage of available hotel rooms occupied"
       ],
       "ipa": "/ˈɑːkjəpənsi/",
-      "contentSha256": "3564a54b5a1b691ac8275d736eba25526c197181bc7bdda3b41605a923e4b7e9",
+      "contentSha256": "daf4cfdde27fa1fad78976a851b3ed69479ab6e56c6832499f99750c3f311060",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: hotel occupancy rate uses occupied/sold rooms divided by available room inventory, not vague utilization"
     },
     "V-215": {
       "headword": "utilities",
@@ -1937,12 +1957,12 @@
         "attendance record"
       ],
       "synonyms": [
-        "presence"
+        "number of people attending an event"
       ],
       "ipa": "/əˈtɛndəns/",
-      "contentSha256": "e3eca55daf36daea7b8187b379f93163ec1e87cda26b260b10e1b18ca6da393f",
+      "contentSha256": "2d8fcfa5ad5bd2582d951b417493ef9123e237560d8d5a8e94ba26036f744889",
       "decision": "PASS_AI_RECHECK",
-      "correction": null
+      "correction": "2026-10-09 Issue #478: higher conference attendance refers to the number of attendees, not just fact of presence"
     },
     "V-298": {
       "headword": "roster",
