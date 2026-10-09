@@ -1265,7 +1265,7 @@
     },
     "V-215": {
       "word": "utilities",
-      "contentSha256": "4e44a769b149b2d63d27c8ab01bbd770f2304245213c91fdae26055e6c55a0d2",
+      "contentSha256": "10ed5fad8a32af2ffbc28772bcf451e36b10dfd9bf3517a905b1f7a471a4284c",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -1274,7 +1274,7 @@
         "IPA-screening"
       ],
       "updatedAt": "2026-10-09",
-      "reviewCorrection": "utility services include gas and water, not just electricity and water"
+      "reviewCorrection": "Expanded utilities Chinese translation from bills only to public utility services and bills, Cambridge dictionary evidence."
     },
     "V-216": {
       "word": "fixture",

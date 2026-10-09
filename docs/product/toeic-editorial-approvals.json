@@ -769,10 +769,10 @@
     "V-215": {
       "reviewer": "AI-GPT6",
       "approvedAt": "2026-10-09",
-      "contentSha256": "4e44a769b149b2d63d27c8ab01bbd770f2304245213c91fdae26055e6c55a0d2",
+      "contentSha256": "10ed5fad8a32af2ffbc28772bcf451e36b10dfd9bf3517a905b1f7a471a4284c",
       "reviewMode": "AI_EDITORIAL",
       "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
-      "revisionNote": "Issue #478 2026-10-09 contextual paraphrase review: docs/product/toeic-issue478-domain-paraphrase-review-2026-10-09.md; AI_EDITORIAL only, no human/ETS certification"
+      "revisionNote": "Issue #478 utilities sense: Cambridge defines gas/water/electric supply services; billed usage also costs. AI editorial only."
     },
     "V-216": {
       "reviewer": "AI-GPT6",

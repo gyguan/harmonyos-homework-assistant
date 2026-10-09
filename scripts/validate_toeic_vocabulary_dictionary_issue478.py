@@ -128,6 +128,20 @@ def validate() -> None:
                 vocabulary_fingerprint(item, ipa[key]),
                 f"{key}: approved exact fingerprint stale")
     check_target(batch, ipa, approvals, ai, second)
+    # Cambridge US utility public services and billed utility costs are related
+    # but different senses; neither should be lost in Chinese learning material.
+    util = batch["V-215"]
+    require(util["pos"] == "n. pl." and
+            util["meaning"] == "水电燃气等公用事业服务；水电燃气费用" and
+            util["synonyms"] == ["essential services such as electricity, gas, and water"] and
+            "billed separately" in util["example"],
+            "V-215 utility services / billed costs meaning drift")
+    digest215 = vocabulary_fingerprint(util, ipa["V-215"])
+    require(approvals["vocabulary"]["V-215"]["contentSha256"] == digest215 and
+            ai["vocabulary"]["V-215"]["contentSha256"] == digest215 and
+            second["vocabulary"]["V-215"]["contentSha256"] == digest215 and
+            second["vocabulary"]["V-215"]["meaning"] == util["meaning"],
+            "V-215 second-pass source-bound semantic snapshot drift")
     # V-271 layover: a short intermediate stay on any longer journey,
     # especially (but not limited to) air travel.
     layover = batch["V-271"]
