@@ -129,6 +129,11 @@
       "id": "P7-EX-LEASE",
       "reviewDate": "2026-10-09",
       "note": "R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged"
+    },
+    {
+      "id": "P7-EX-TRAINING",
+      "reviewDate": "2026-10-09",
+      "note": "2026-10-09 Issue #478: R-P7-TRAINING-04 plan to file on June 2 is conditional, not a completed action; published v2; source-backed approved contents SHA updated"
     }
   ],
   "vocabulary": {
@@ -2258,7 +2263,7 @@
       "correction": "2026-10-09 Issue #478: R-P7-LEASE-04: 'by August 15' includes Aug 15; visible Chinese answer explanation updated and published question version 1->2, other questions unchanged"
     },
     "P7-EX-TRAINING": {
-      "contentSha256": "4df33dfb2437a286966908568ac9e985184176afb84eb8525b91baea2923ae4d",
+      "contentSha256": "7c86e1d0b1b9dadf48b4ff1d72cce555ea62853bbf275283781c4b6ecbebc0be",
       "documentCount": 2,
       "questionCount": 5,
       "decision": "PASS_AI_RECHECK",
@@ -2300,10 +2305,10 @@
         },
         {
           "id": "R-P7-TRAINING-04",
-          "question": "Is Daniel submitting the request within the allowed period?",
+          "question": "If Daniel submits his reimbursement request on June 2, will it meet the deadline?",
           "answerIndex": 1,
-          "answer": "Yes, June 2 is ten calendar days after May 23",
-          "evidence": "within 10 calendar days after course completion || I completed the approved project-management course on May 23 || EMPLOYEE CLAIM MESSAGE, JUNE 2",
+          "answer": "Yes, June 2 is the tenth calendar day after May 23",
+          "evidence": "within 10 calendar days after course completion || I completed the approved project-management course on May 23 || EMPLOYEE CLAIM MESSAGE, JUNE 2 || before I submit the form today",
           "documents": [
             1,
             2
@@ -2323,7 +2328,7 @@
           "result": "PASS_AI_RECHECK"
         }
       ],
-      "correction": null
+      "correction": "2026-10-09 Issue #478: R-P7-TRAINING-04 plan to file on June 2 is conditional, not a completed action; published v2; source-backed approved contents SHA updated"
     },
     "P7-EX-MIGRATION": {
       "contentSha256": "fa89e7618b2666173dc9e461e0ebc684d232ff51b4fe706334098bfffc089158",
