@@ -476,7 +476,7 @@
     "V-202": {
       "headword": "troubleshoot",
       "pos": "v.",
-      "meaning": "排查并解决故障",
+      "meaning": "排查故障并尝试解决",
       "example": "The support engineer will troubleshoot the network connection.",
       "collocations": [
         "troubleshoot a connection"
@@ -485,9 +485,9 @@
         "identify a fault and seek a solution"
       ],
       "ipa": "/ˈtrʌbəlˌʃuːt/",
-      "contentSha256": "e85922722ac0c3a0f65b66c7153c2ff1bfac3a38eb97935999808c7d7650f74a",
+      "contentSha256": "3ee38e384a78d609916dd78fde1bc79fb236c45982cc4f6dc7d3af08bac86b9e",
       "decision": "PASS_AI_RECHECK",
-      "correction": "2026-10-09 Issue #478: troubleshoot includes seeking ways to resolve a malfunction, beyond diagnosis alone"
+      "correction": "2026-10-09 Cambridge Business English source-bound second-pass: attempt to identify fault and remedy, no guaranteed completion."
     },
     "V-203": {
       "headword": "outage",
