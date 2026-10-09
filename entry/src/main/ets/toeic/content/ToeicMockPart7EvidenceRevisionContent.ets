@@ -46,13 +46,10 @@ export class ToeicMockPart7EvidenceRevisionContent {
   }
 
   static activeId(originalId:string):string {
-    for (let revised of ToeicMockPart7EvidenceRevisionContent.questions()) {
-      // Names follow R-FM*-P7-Mx-06, linked to their immutable source below.
-      if (revised.id==='R-FM1-P7-M1-06' && originalId==='R-FM1-P7-M1-01') return revised.id;
-      if (revised.id==='R-FM1-P7-M4-06' && originalId==='R-FM1-P7-M4-01') return revised.id;
-      if (revised.id==='R-FM2-P7-M1-06' && originalId==='R-FM2-P7-M1-01') return revised.id;
-      if (revised.id==='R-FM2-P7-M5-06' && originalId==='R-FM2-P7-M5-03') return revised.id;
-    }
+    if (originalId==='R-FM1-P7-M1-01') return 'R-FM1-P7-M1-06';
+    if (originalId==='R-FM1-P7-M4-01') return 'R-FM1-P7-M4-06';
+    if (originalId==='R-FM2-P7-M1-01') return 'R-FM2-P7-M1-06';
+    if (originalId==='R-FM2-P7-M5-03') return 'R-FM2-P7-M5-06';
     return originalId;
   }
 }
