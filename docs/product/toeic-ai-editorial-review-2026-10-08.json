@@ -1116,7 +1116,7 @@
     },
     "V-202": {
       "word": "troubleshoot",
-      "contentSha256": "e85922722ac0c3a0f65b66c7153c2ff1bfac3a38eb97935999808c7d7650f74a",
+      "contentSha256": "3ee38e384a78d609916dd78fde1bc79fb236c45982cc4f6dc7d3af08bac86b9e",
       "decision": "PASS",
       "reviewChecks": [
         "meaning-part-of-speech-context",
@@ -1125,7 +1125,7 @@
         "IPA-screening"
       ],
       "updatedAt": "2026-10-09",
-      "reviewCorrection": "troubleshoot includes seeking ways to resolve a malfunction, beyond diagnosis alone"
+      "reviewCorrection": "Clarified troubleshoot involves diagnosis and attempted remedy, not a guarantee of successful fix; Cambridge Business English."
     },
     "V-203": {
       "word": "outage",
