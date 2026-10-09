@@ -61,6 +61,20 @@ class ReviewIntegrityTests(unittest.TestCase):
 
 
 
+    def test_current_p1_ai_review_must_bind_to_final_evidence(self) -> None:
+        digest = "d" * 64
+        ai = {
+            "reviewer": "AI-GPT5.6-SOL",
+            "approvedAt": "2026-10-09",
+            "contentSha256": digest,
+            "reviewMode": "AI_EDITORIAL",
+            "reviewEvidence": "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json",
+        }
+        today = date(2026, 10, 9)
+        self.assertTrue(is_valid_approval(ai, digest, today))
+        self.assertFalse(is_valid_approval({**ai, "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"}, digest, today))
+        self.assertFalse(is_valid_approval({**ai, "reviewer": "AI-GPT6"}, digest, today))
+
     def test_ai_review_must_be_openly_attributed(self) -> None:
         digest = "b" * 64
         ai = {
