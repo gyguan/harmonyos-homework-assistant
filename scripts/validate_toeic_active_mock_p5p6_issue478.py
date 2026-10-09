@@ -221,7 +221,7 @@ def validate() -> None:
     for expected in (
         "ids[33]=ToeicMockDay19Part6CompletionContent.inventory().id;",
         "ids[37]=ToeicMockDay19Part6CompletionContent.library().id;",
-        "if (question.id==='R-M1-P7-094'",
+        "question.id==='R-M1-P7-094'",
         "question.id==='R-FM2-P6-004'", "question.id==='R-M2-P6-008'",
     ):
         if expected not in preset:

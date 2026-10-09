@@ -19,11 +19,13 @@ export class ToeicReadingGroupService {
     if (current.groupId.length>0) {
       for (let group of ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups()).concat(ToeicMockDay19V2Content.groups())) {
         if (group.groupId!==current.groupId) continue;
+        // The group catalog contains both archived v1 question IDs and
+        // new evidence-complete editions. Preserve the current exam order:
+        // each draft/report may carry a different published edition.
         let presentIds:string[]=[];
-        for (let id of group.questionIds) {
-          for (let question of questions) {
-            if (question.id===id) { presentIds.push(id); break; }
-          }
+        for (let question of questions) {
+          if (question.groupId===group.groupId &&
+              group.questionIds.indexOf(question.id)>=0) presentIds.push(question.id);
         }
         return new ToeicReadingGroup(group.groupId,presentIds,group.passageBlocks);
       }

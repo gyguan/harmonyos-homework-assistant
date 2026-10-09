@@ -76,6 +76,8 @@ export class ToeicMockDay19V2Content {
     for(let group=0;group<5;group++) {
       let ids:string[]=[];
       for(let q=1;q<=5;q++) ids.push('R-FM2-P7-M'+String(group+1)+'-'+String(q).padStart(2,'0'));
+      // Preserve historical v1 ID while publishing fully evidenced active revision.
+      if (group===0 || group===4) ids.push('R-FM2-P7-M'+String(group+1)+'-06');
       result.push(new ToeicReadingGroup('FM2-G'+String(group+1),ids,
         ToeicMockDay19V2Content.splitDocuments(legacy[64+group*3].passage,group)));
     }

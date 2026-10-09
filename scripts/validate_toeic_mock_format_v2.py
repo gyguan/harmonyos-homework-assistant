@@ -101,7 +101,7 @@ def validate() -> None:
     preset=(CONTENT/"PresetToeicContent.ets").read_text(encoding="utf-8")
     service=(ROOT/"entry/src/main/ets/toeic/application/ToeicReadingGroupService.ets").read_text(encoding="utf-8")
     assert "ToeicWeekTwoContent.mockQuestionIds().slice(0,46)" in preset
-    assert "for (let question of ToeicMockDay14V2Content.questions()) ids.push(question.id)" in preset
+    assert "for (let question of ToeicMockDay14V2Content.questions()) ids.push(ToeicMockPart7EvidenceRevisionContent.activeId(question.id))" in preset
     assert "ToeicMockDay14V2Content.questions()" in preset
     assert "ToeicMockDay14V2Content.groups()" in preset
     assert "ToeicMockDay14V2Content.groups()" in service

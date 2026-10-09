@@ -78,6 +78,8 @@ export class ToeicMockDay14V2Content {
     for(let group=0;group<5;group++) {
       let ids:string[]=[];
       for(let q=1;q<=5;q++) ids.push('R-FM1-P7-M'+String(group+1)+'-'+String(q).padStart(2,'0'));
+      // Keep original five IDs for historical reports, plus a new published evidence edition.
+      if (group===0 || group===3) ids.push('R-FM1-P7-M'+String(group+1)+'-06');
       let blocks=ToeicMockDay14V2Content.splitDocuments(legacy[70+group*3].passage);
       if (group>=2) blocks.push(thirdDocuments[group]);
       result.push(new ToeicReadingGroup('FM1-G'+String(group+1),ids,blocks));
