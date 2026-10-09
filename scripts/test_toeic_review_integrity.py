@@ -71,8 +71,7 @@ class ReviewIntegrityTests(unittest.TestCase):
             "reviewEvidence": "docs/product/toeic-issue478-p1-final-vocabulary-review-2026-10-09.json",
         }
         today = date(2026, 10, 9)
-        self.assertTrue(is_valid_approval(ai, digest, today))
-        self.assertFalse(is_valid_approval({**ai, "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"}, digest, today))
+        self.assertTrue(is_valid_approval(ai, digest, today))\n        self.assertIn(".", ai["reviewer"])  # model-version provenance may contain a dot\n        self.assertFalse(is_valid_approval({**ai, "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"}, digest, today))
         self.assertFalse(is_valid_approval({**ai, "reviewer": "AI-GPT6"}, digest, today))
 
     def test_ai_review_must_be_openly_attributed(self) -> None:
