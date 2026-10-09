@@ -347,8 +347,8 @@ def main() -> None:
             "resume noun pronunciation must be disambiguated")
     require("V-014','/ˈriːfʌnd/ n. · /ˌriːˈfʌnd/ v.'" in pronunciation,
             "refund noun/verb pronunciation distinction is required")
-    require("V-038','/ˈtrænsfɝː/'" in pronunciation,
-            "transfer en-US pronunciation is required")
+    require("V-038','/ˈtrænsfɝː/ n./v. · /trænsˈfɝː/ v. variant'" in pronunciation,
+            "transfer must retain both attested en-US verb stress variants")
     require("V-051','/ˈɛstəmət/ n. · /ˈɛstəmeɪt/ v.'" in pronunciation,
             "estimate noun/verb pronunciation distinction is required")
     require("V-082','/ʌpˈɡreɪd/ v. · /ˈʌpɡreɪd/ n.'" in pronunciation,
