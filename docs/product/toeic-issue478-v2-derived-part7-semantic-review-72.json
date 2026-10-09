@@ -1,0 +1,3207 @@
+{
+  "schemaVersion": 1,
+  "issueNumber": 478,
+  "reviewDate": "2026-10-09",
+  "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+  "notExpertCertified": true,
+  "scope": {
+    "day14Singles": 24,
+    "day14Grouped": 15,
+    "day19Singles": 18,
+    "day19Grouped": 15,
+    "derivedItems": 72,
+    "correctBasis": 72,
+    "wrongOptionReasons": 216,
+    "highlightCoverageGaps": 4
+  },
+  "limitations": "AI second-context look at actually rotated options and new reading groups, not independent human/ETS certification; requires re-review after source changes. Four identified learner-facing evidence excerpts omit relevant clauses, although full group documents support the answers; they remain explicitly flagged and require history-safe future publication.",
+  "sourceBlobs": {
+    "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "4be4a4f1c762362220fb2a0ebe8a31d62ebb9e8f",
+    "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "e954bef30ef8b570bde6d6c312c0e5eba6d33638",
+    "entry/src/main/ets/toeic/content/ToeicMockDay14V2Content.ets": "6b195f6dd8d8e924c6b7d9538666a23f0f2bbe06",
+    "entry/src/main/ets/toeic/content/ToeicMockDay19V2Content.ets": "4c3b17ab557b1742fe419d10c1a7a39f6c6386d1"
+  },
+  "notesFiles": [
+    "docs/product/toeic-issue478-v2-derived-part7-day14-editorial-notes-39.txt",
+    "docs/product/toeic-issue478-v2-derived-part7-day19-editorial-notes-33.txt"
+  ],
+  "items": [
+    {
+      "id": "R-FM1-P7-S01-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-047",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "NOTICE\nBeginning October 6, the employee cafeteria will serve breakfast from 7:30 to 10 A.M. Lunch hours will remain unchanged. During the first week, customers who buy any breakfast entrée will receive a complimentary coffee.",
+      "referenceArticle": "NOTICE\nBeginning October 6, the employee cafeteria will serve breakfast from 7:30 to 10 A.M. Lunch hours will remain unchanged. During the first week, customers who buy any breakfast entrée will receive a complimentary coffee.",
+      "documents": [],
+      "stem": "Why was the notice written?",
+      "options": [
+        "To announce a new breakfast service",
+        "To explain a lunch price increase",
+        "To recruit cafeteria workers",
+        "To cancel coffee sales"
+      ],
+      "answerIndex": 0,
+      "answerText": "To announce a new breakfast service",
+      "explanation": "通知新增早餐时段及开业优惠。",
+      "evidence": "the employee cafeteria will serve breakfast from 7:30 to 10 A.M.",
+      "correctBasis": "公告新增10月6日起07:30—10:00早餐服务，写作目的为告知此服务",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "To explain a lunch price increase",
+          "reason": "午餐时段明确不变，未涨价"
+        },
+        {
+          "index": 2,
+          "option": "To recruit cafeteria workers",
+          "reason": "未招食堂员工"
+        },
+        {
+          "index": 3,
+          "option": "To cancel coffee sales",
+          "reason": "首周反而赠送咖啡"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S01-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-048",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "NOTICE\nBeginning October 6, the employee cafeteria will serve breakfast from 7:30 to 10 A.M. Lunch hours will remain unchanged. During the first week, customers who buy any breakfast entrée will receive a complimentary coffee.",
+      "referenceArticle": "NOTICE\nBeginning October 6, the employee cafeteria will serve breakfast from 7:30 to 10 A.M. Lunch hours will remain unchanged. During the first week, customers who buy any breakfast entrée will receive a complimentary coffee.",
+      "documents": [],
+      "stem": "What will remain unchanged?",
+      "options": [
+        "Lunch hours",
+        "Breakfast prices",
+        "The cafeteria location",
+        "Coffee sizes"
+      ],
+      "answerIndex": 0,
+      "answerText": "Lunch hours",
+      "explanation": "原文直接说明 Lunch hours will remain unchanged。",
+      "evidence": "Lunch hours will remain unchanged.",
+      "correctBasis": "原文明确午餐营业时间保持不变",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Breakfast prices",
+          "reason": "没有宣布早餐价格维持旧价"
+        },
+        {
+          "index": 2,
+          "option": "The cafeteria location",
+          "reason": "没有比较新旧食堂地址"
+        },
+        {
+          "index": 3,
+          "option": "Coffee sizes",
+          "reason": "没有涉及咖啡容量"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S01-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-049",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "NOTICE\nBeginning October 6, the employee cafeteria will serve breakfast from 7:30 to 10 A.M. Lunch hours will remain unchanged. During the first week, customers who buy any breakfast entrée will receive a complimentary coffee.",
+      "referenceArticle": "NOTICE\nBeginning October 6, the employee cafeteria will serve breakfast from 7:30 to 10 A.M. Lunch hours will remain unchanged. During the first week, customers who buy any breakfast entrée will receive a complimentary coffee.",
+      "documents": [],
+      "stem": "What can customers receive at no charge during the first week?",
+      "options": [
+        "Coffee",
+        "Lunch",
+        "A parking permit",
+        "A dessert"
+      ],
+      "answerIndex": 0,
+      "answerText": "Coffee",
+      "explanation": "complimentary coffee 即免费咖啡。",
+      "evidence": "will receive a complimentary coffee",
+      "correctBasis": "首周购买任一早餐主食即可获免费咖啡",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Lunch",
+          "reason": "没有赠送午餐"
+        },
+        {
+          "index": 2,
+          "option": "A parking permit",
+          "reason": "不赠停车证"
+        },
+        {
+          "index": 3,
+          "option": "A dessert",
+          "reason": "不赠甜点"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S02-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-050",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+      "referenceArticle": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+      "documents": [],
+      "stem": "What is the purpose of the e-mail?",
+      "options": [
+        "To prepare staff for a new system",
+        "To announce a warehouse closure",
+        "To request product orders",
+        "To advertise a software company"
+      ],
+      "answerIndex": 0,
+      "answerText": "To prepare staff for a new system",
+      "explanation": "邮件说明新系统上线前的培训要求。",
+      "evidence": "new inventory system ... all warehouse employees must complete ... tutorial",
+      "correctBasis": "新库存系统11月2日上线，员工须提前完成教程，因此邮件是部署培训通知",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "To announce a warehouse closure",
+          "reason": "没有关闭仓库安排"
+        },
+        {
+          "index": 2,
+          "option": "To request product orders",
+          "reason": "未征求商品订单"
+        },
+        {
+          "index": 3,
+          "option": "To advertise a software company",
+          "reason": "不是售卖软件广告"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S02-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-051",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+      "referenceArticle": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+      "documents": [],
+      "stem": "Who will attend a live demonstration?",
+      "options": [
+        "Supervisors",
+        "All customers",
+        "Delivery drivers",
+        "New applicants"
+      ],
+      "answerIndex": 0,
+      "answerText": "Supervisors",
+      "explanation": "原文明确 supervisors。",
+      "evidence": "Supervisors will receive an additional live demonstration.",
+      "correctBasis": "主管另于10月28日参加现场演示，只有该岗位被明确指出",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "All customers",
+          "reason": "客户非培训对象"
+        },
+        {
+          "index": 2,
+          "option": "Delivery drivers",
+          "reason": "送货司机并未被指定参加"
+        },
+        {
+          "index": 3,
+          "option": "New applicants",
+          "reason": "申请者与仓库内部培训无关"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S02-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-052",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+      "referenceArticle": "Subject: Software Training\nThe new inventory system will be introduced on November 2. All warehouse employees must complete a 45-minute online tutorial before that date. Supervisors will receive an additional live demonstration on October 28.",
+      "documents": [],
+      "stem": "When must warehouse employees finish the tutorial?",
+      "options": [
+        "Before November 2",
+        "On October 28 only",
+        "After November 2",
+        "At the end of November"
+      ],
+      "answerIndex": 0,
+      "answerText": "Before November 2",
+      "explanation": "before that date 指 November 2。",
+      "evidence": "must complete ... before that date",
+      "correctBasis": "教程须在新系统11月2日引入前完成，before 是严格提前",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "On October 28 only",
+          "reason": "10月28日只安排主管演示"
+        },
+        {
+          "index": 2,
+          "option": "After November 2",
+          "reason": "不允许上线后才做教程"
+        },
+        {
+          "index": 3,
+          "option": "At the end of November",
+          "reason": "11月底已晚于上线时间"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S03-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-053",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "RIVER HOTEL WEEKEND PACKAGE\nStay two nights Friday through Sunday and receive breakfast for two each morning, late checkout at 2 P.M., and free parking. Reservations must be made directly through the hotel website.",
+      "referenceArticle": "RIVER HOTEL WEEKEND PACKAGE\nStay two nights Friday through Sunday and receive breakfast for two each morning, late checkout at 2 P.M., and free parking. Reservations must be made directly through the hotel website.",
+      "documents": [],
+      "stem": "What is being advertised?",
+      "options": [
+        "A weekend hotel package",
+        "A restaurant job",
+        "A parking garage",
+        "A weekday conference"
+      ],
+      "answerIndex": 0,
+      "answerText": "A weekend hotel package",
+      "explanation": "整段在推广酒店周末套餐。",
+      "evidence": "RIVER HOTEL WEEKEND PACKAGE",
+      "correctBasis": "酒店广告标题及周五至周日两晚套餐指周末住宿优惠",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "A restaurant job",
+          "reason": "不是招聘广告"
+        },
+        {
+          "index": 2,
+          "option": "A parking garage",
+          "reason": "免费停车只是套餐附加"
+        },
+        {
+          "index": 3,
+          "option": "A weekday conference",
+          "reason": "没有工作日会议安排"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S03-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-054",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "RIVER HOTEL WEEKEND PACKAGE\nStay two nights Friday through Sunday and receive breakfast for two each morning, late checkout at 2 P.M., and free parking. Reservations must be made directly through the hotel website.",
+      "referenceArticle": "RIVER HOTEL WEEKEND PACKAGE\nStay two nights Friday through Sunday and receive breakfast for two each morning, late checkout at 2 P.M., and free parking. Reservations must be made directly through the hotel website.",
+      "documents": [],
+      "stem": "What time is late checkout?",
+      "options": [
+        "2 P.M.",
+        "Noon",
+        "10 A.M.",
+        "4 P.M."
+      ],
+      "answerIndex": 0,
+      "answerText": "2 P.M.",
+      "explanation": "原文直接给出 2 P.M.。",
+      "evidence": "late checkout at 2 P.M.",
+      "correctBasis": "套餐明确延迟退房时刻14:00",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Noon",
+          "reason": "中午12点不是通知时间"
+        },
+        {
+          "index": 2,
+          "option": "10 A.M.",
+          "reason": "上午10点过早"
+        },
+        {
+          "index": 3,
+          "option": "4 P.M.",
+          "reason": "16点未被承诺"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S03-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-055",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "RIVER HOTEL WEEKEND PACKAGE\nStay two nights Friday through Sunday and receive breakfast for two each morning, late checkout at 2 P.M., and free parking. Reservations must be made directly through the hotel website.",
+      "referenceArticle": "RIVER HOTEL WEEKEND PACKAGE\nStay two nights Friday through Sunday and receive breakfast for two each morning, late checkout at 2 P.M., and free parking. Reservations must be made directly through the hotel website.",
+      "documents": [],
+      "stem": "How must reservations be made?",
+      "options": [
+        "Through the hotel website",
+        "By mail",
+        "At the airport",
+        "Through any travel agency"
+      ],
+      "answerIndex": 0,
+      "answerText": "Through the hotel website",
+      "explanation": "预订必须直接通过酒店网站。",
+      "evidence": "Reservations must be made directly through the hotel website.",
+      "correctBasis": "酒店注明预订须直接通过本店官网完成",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "By mail",
+          "reason": "未提供邮件预订方式"
+        },
+        {
+          "index": 2,
+          "option": "At the airport",
+          "reason": "机场不是预订地点"
+        },
+        {
+          "index": 3,
+          "option": "Through any travel agency",
+          "reason": "第三方代理不是官网直订"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S04-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-056",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "MEMO\nThe design department will move from Floor 3 to Floor 6 on Friday. Staff should pack personal items by Thursday at 5 P.M. The facilities team will move shared furniture overnight, and normal work will resume Monday morning.",
+      "referenceArticle": "MEMO\nThe design department will move from Floor 3 to Floor 6 on Friday. Staff should pack personal items by Thursday at 5 P.M. The facilities team will move shared furniture overnight, and normal work will resume Monday morning.",
+      "documents": [],
+      "stem": "Why was the memo sent?",
+      "options": [
+        "To provide office relocation instructions",
+        "To announce new furniture prices",
+        "To schedule interviews",
+        "To change employee salaries"
+      ],
+      "answerIndex": 0,
+      "answerText": "To provide office relocation instructions",
+      "explanation": "核心是部门搬楼层及打包安排。",
+      "evidence": "design department will move from Floor 3 to Floor 6",
+      "correctBasis": "设计部由三楼搬至六楼，并要求员工打包，这是搬迁指引",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "To announce new furniture prices",
+          "reason": "未提家具调价"
+        },
+        {
+          "index": 2,
+          "option": "To schedule interviews",
+          "reason": "没有招聘面试"
+        },
+        {
+          "index": 3,
+          "option": "To change employee salaries",
+          "reason": "没有薪资变化"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S04-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-057",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "MEMO\nThe design department will move from Floor 3 to Floor 6 on Friday. Staff should pack personal items by Thursday at 5 P.M. The facilities team will move shared furniture overnight, and normal work will resume Monday morning.",
+      "referenceArticle": "MEMO\nThe design department will move from Floor 3 to Floor 6 on Friday. Staff should pack personal items by Thursday at 5 P.M. The facilities team will move shared furniture overnight, and normal work will resume Monday morning.",
+      "documents": [],
+      "stem": "By when should personal items be packed?",
+      "options": [
+        "Thursday at 5 P.M.",
+        "Friday morning",
+        "Monday morning",
+        "Wednesday at noon"
+      ],
+      "answerIndex": 0,
+      "answerText": "Thursday at 5 P.M.",
+      "explanation": "原文直接给出 Thursday at 5 P.M.。",
+      "evidence": "pack personal items by Thursday at 5 P.M.",
+      "correctBasis": "个人物品需周四17点前完成打包",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Friday morning",
+          "reason": "周五已进入搬迁日"
+        },
+        {
+          "index": 2,
+          "option": "Monday morning",
+          "reason": "周一恢复办公而非打包期限"
+        },
+        {
+          "index": 3,
+          "option": "Wednesday at noon",
+          "reason": "周三中午不是通知期限"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S04-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-058",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "MEMO\nThe design department will move from Floor 3 to Floor 6 on Friday. Staff should pack personal items by Thursday at 5 P.M. The facilities team will move shared furniture overnight, and normal work will resume Monday morning.",
+      "referenceArticle": "MEMO\nThe design department will move from Floor 3 to Floor 6 on Friday. Staff should pack personal items by Thursday at 5 P.M. The facilities team will move shared furniture overnight, and normal work will resume Monday morning.",
+      "documents": [],
+      "stem": "When will normal work resume?",
+      "options": [
+        "Monday morning",
+        "Friday evening",
+        "Saturday morning",
+        "Thursday afternoon"
+      ],
+      "answerIndex": 0,
+      "answerText": "Monday morning",
+      "explanation": "原文最后一句说明 Monday morning。",
+      "evidence": "normal work will resume Monday morning",
+      "correctBasis": "搬迁后正常办公周一上午恢复，时间明确",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Friday evening",
+          "reason": "周五是搬迁夜"
+        },
+        {
+          "index": 2,
+          "option": "Saturday morning",
+          "reason": "周六没有恢复安排"
+        },
+        {
+          "index": 3,
+          "option": "Thursday afternoon",
+          "reason": "周四尚未搬迁"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S05-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-059",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "PAYMENT REMINDER\nInvoice 9047 for $1,280 is due October 20. Payments may be made by bank transfer or company credit card. Please include the invoice number with the payment so that it can be applied to the correct account.",
+      "referenceArticle": "PAYMENT REMINDER\nInvoice 9047 for $1,280 is due October 20. Payments may be made by bank transfer or company credit card. Please include the invoice number with the payment so that it can be applied to the correct account.",
+      "documents": [],
+      "stem": "Why was this message sent?",
+      "options": [
+        "To remind a customer about a payment",
+        "To offer a discount",
+        "To cancel an invoice",
+        "To change a bank account"
+      ],
+      "answerIndex": 0,
+      "answerText": "To remind a customer about a payment",
+      "explanation": "标题和到期日表明这是付款提醒。",
+      "evidence": "Invoice 9047 ... is due October 20.",
+      "correctBasis": "标有PAYMENT REMINDER、9047发票及10月20日到期，目的是催缴",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "To offer a discount",
+          "reason": "未承诺折扣"
+        },
+        {
+          "index": 2,
+          "option": "To cancel an invoice",
+          "reason": "没有取消发票"
+        },
+        {
+          "index": 3,
+          "option": "To change a bank account",
+          "reason": "银行账号未更新"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S05-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-060",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "PAYMENT REMINDER\nInvoice 9047 for $1,280 is due October 20. Payments may be made by bank transfer or company credit card. Please include the invoice number with the payment so that it can be applied to the correct account.",
+      "referenceArticle": "PAYMENT REMINDER\nInvoice 9047 for $1,280 is due October 20. Payments may be made by bank transfer or company credit card. Please include the invoice number with the payment so that it can be applied to the correct account.",
+      "documents": [],
+      "stem": "What information should accompany the payment?",
+      "options": [
+        "The invoice number",
+        "A passport number",
+        "A shipping address",
+        "An employee ID"
+      ],
+      "answerIndex": 0,
+      "answerText": "The invoice number",
+      "explanation": "原文明确要求 include the invoice number。",
+      "evidence": "Please include the invoice number with the payment.",
+      "correctBasis": "汇款时应注明9047发票编号以便财务入账",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "A passport number",
+          "reason": "不需护照号码"
+        },
+        {
+          "index": 2,
+          "option": "A shipping address",
+          "reason": "不是要求运输地址"
+        },
+        {
+          "index": 3,
+          "option": "An employee ID",
+          "reason": "未要求员工编号"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S05-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-061",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "PAYMENT REMINDER\nInvoice 9047 for $1,280 is due October 20. Payments may be made by bank transfer or company credit card. Please include the invoice number with the payment so that it can be applied to the correct account.",
+      "referenceArticle": "PAYMENT REMINDER\nInvoice 9047 for $1,280 is due October 20. Payments may be made by bank transfer or company credit card. Please include the invoice number with the payment so that it can be applied to the correct account.",
+      "documents": [],
+      "stem": "How may the invoice be paid?",
+      "options": [
+        "By bank transfer or company credit card",
+        "Only in cash",
+        "Only by personal check",
+        "At a retail store"
+      ],
+      "answerIndex": 0,
+      "answerText": "By bank transfer or company credit card",
+      "explanation": "支付方式直接列出两种。",
+      "evidence": "Payments may be made by bank transfer or company credit card.",
+      "correctBasis": "原文允许银行转账或企业信用卡两种付款渠道",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Only in cash",
+          "reason": "现金唯一渠道与事实不符"
+        },
+        {
+          "index": 2,
+          "option": "Only by personal check",
+          "reason": "个人支票唯一渠道与事实不符"
+        },
+        {
+          "index": 3,
+          "option": "At a retail store",
+          "reason": "没有线下零售店缴费安排"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S06-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-062",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "SALES COORDINATOR\nWe are seeking a candidate with at least two years of customer service experience and strong spreadsheet skills. The position begins November 15. Applications, including a résumé and two references, must be received by October 25.",
+      "referenceArticle": "SALES COORDINATOR\nWe are seeking a candidate with at least two years of customer service experience and strong spreadsheet skills. The position begins November 15. Applications, including a résumé and two references, must be received by October 25.",
+      "documents": [],
+      "stem": "What is the text mainly about?",
+      "options": [
+        "A job opening",
+        "A training course",
+        "A customer complaint",
+        "A product launch"
+      ],
+      "answerIndex": 0,
+      "answerText": "A job opening",
+      "explanation": "职位名称、资格和申请材料表明是招聘信息。",
+      "evidence": "We are seeking a candidate",
+      "correctBasis": "Sales Coordinator招聘要求年限、能力与申请材料，主要是岗位招聘",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "A training course",
+          "reason": "不是培训课程"
+        },
+        {
+          "index": 2,
+          "option": "A customer complaint",
+          "reason": "不是投诉处理"
+        },
+        {
+          "index": 3,
+          "option": "A product launch",
+          "reason": "未发布商品"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S06-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-063",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "SALES COORDINATOR\nWe are seeking a candidate with at least two years of customer service experience and strong spreadsheet skills. The position begins November 15. Applications, including a résumé and two references, must be received by October 25.",
+      "referenceArticle": "SALES COORDINATOR\nWe are seeking a candidate with at least two years of customer service experience and strong spreadsheet skills. The position begins November 15. Applications, including a résumé and two references, must be received by October 25.",
+      "documents": [],
+      "stem": "What experience is required?",
+      "options": [
+        "At least two years of customer service",
+        "Warehouse management",
+        "Software development",
+        "Hotel operations"
+      ],
+      "answerIndex": 0,
+      "answerText": "At least two years of customer service",
+      "explanation": "原文明确 two years of customer service experience。",
+      "evidence": "at least two years of customer service experience",
+      "correctBasis": "至少两年客服经验是硬性门槛",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Warehouse management",
+          "reason": "未要求仓储管理"
+        },
+        {
+          "index": 2,
+          "option": "Software development",
+          "reason": "不要求软件开发"
+        },
+        {
+          "index": 3,
+          "option": "Hotel operations",
+          "reason": "没有酒店运营要求"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S06-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-064",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "SALES COORDINATOR\nWe are seeking a candidate with at least two years of customer service experience and strong spreadsheet skills. The position begins November 15. Applications, including a résumé and two references, must be received by October 25.",
+      "referenceArticle": "SALES COORDINATOR\nWe are seeking a candidate with at least two years of customer service experience and strong spreadsheet skills. The position begins November 15. Applications, including a résumé and two references, must be received by October 25.",
+      "documents": [],
+      "stem": "What must applicants provide?",
+      "options": [
+        "A résumé and two references",
+        "A product sample",
+        "A travel itinerary",
+        "A medical certificate"
+      ],
+      "answerIndex": 0,
+      "answerText": "A résumé and two references",
+      "explanation": "申请材料直接列出 résumé and two references。",
+      "evidence": "Applications, including a résumé and two references",
+      "correctBasis": "提交简历和两名推荐人，申请材料明列",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "A product sample",
+          "reason": "未要求商品样品"
+        },
+        {
+          "index": 2,
+          "option": "A travel itinerary",
+          "reason": "不需出差行程"
+        },
+        {
+          "index": 3,
+          "option": "A medical certificate",
+          "reason": "没有体检证明"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S07-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-065",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "EVENT SCHEDULE\n9:00 Registration\n9:45 Opening Remarks\n10:15 Market Trends Panel\n12:00 Lunch\n1:30 Product Demonstrations\n3:30 Networking Reception\nAll sessions except lunch will be held in Hall B.",
+      "referenceArticle": "EVENT SCHEDULE\n9:00 Registration\n9:45 Opening Remarks\n10:15 Market Trends Panel\n12:00 Lunch\n1:30 Product Demonstrations\n3:30 Networking Reception\nAll sessions except lunch will be held in Hall B.",
+      "documents": [],
+      "stem": "When does the panel begin?",
+      "options": [
+        "10:15",
+        "9:45",
+        "12:00",
+        "1:30"
+      ],
+      "answerIndex": 0,
+      "answerText": "10:15",
+      "explanation": "定位 Market Trends Panel。",
+      "evidence": "10:15 Market Trends Panel",
+      "correctBasis": "市场趋势论坛10:15开始，日程时间原文明确",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "9:45",
+          "reason": "9:45是开幕致辞"
+        },
+        {
+          "index": 2,
+          "option": "12:00",
+          "reason": "12点是午餐"
+        },
+        {
+          "index": 3,
+          "option": "1:30",
+          "reason": "13:30是产品演示"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S07-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-066",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "EVENT SCHEDULE\n9:00 Registration\n9:45 Opening Remarks\n10:15 Market Trends Panel\n12:00 Lunch\n1:30 Product Demonstrations\n3:30 Networking Reception\nAll sessions except lunch will be held in Hall B.",
+      "referenceArticle": "EVENT SCHEDULE\n9:00 Registration\n9:45 Opening Remarks\n10:15 Market Trends Panel\n12:00 Lunch\n1:30 Product Demonstrations\n3:30 Networking Reception\nAll sessions except lunch will be held in Hall B.",
+      "documents": [],
+      "stem": "Where will product demonstrations take place?",
+      "options": [
+        "Hall B",
+        "The cafeteria",
+        "Hall A",
+        "The lobby"
+      ],
+      "answerIndex": 0,
+      "answerText": "Hall B",
+      "explanation": "除午餐外所有环节都在 Hall B。",
+      "evidence": "All sessions except lunch will be held in Hall B.",
+      "correctBasis": "原文指出除午餐外活动都在B厅，产品演示属于活动环节",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "The cafeteria",
+          "reason": "食堂是午餐地点而非演示地点"
+        },
+        {
+          "index": 2,
+          "option": "Hall A",
+          "reason": "没有A厅安排"
+        },
+        {
+          "index": 3,
+          "option": "The lobby",
+          "reason": "没有大堂演示安排"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S07-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-067",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "EVENT SCHEDULE\n9:00 Registration\n9:45 Opening Remarks\n10:15 Market Trends Panel\n12:00 Lunch\n1:30 Product Demonstrations\n3:30 Networking Reception\nAll sessions except lunch will be held in Hall B.",
+      "referenceArticle": "EVENT SCHEDULE\n9:00 Registration\n9:45 Opening Remarks\n10:15 Market Trends Panel\n12:00 Lunch\n1:30 Product Demonstrations\n3:30 Networking Reception\nAll sessions except lunch will be held in Hall B.",
+      "documents": [],
+      "stem": "What happens immediately before lunch?",
+      "options": [
+        "The Market Trends Panel",
+        "Registration",
+        "Product demonstrations",
+        "The reception"
+      ],
+      "answerIndex": 0,
+      "answerText": "The Market Trends Panel",
+      "explanation": "时间顺序中 lunch 12:00 前是 10:15 panel。",
+      "evidence": "10:15 Market Trends Panel; 12:00 Lunch",
+      "correctBasis": "午餐12点前直接安排的是10:15 Market Trends Panel，中间无其他活动",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Registration",
+          "reason": "9点注册早于致辞和论坛"
+        },
+        {
+          "index": 2,
+          "option": "Product demonstrations",
+          "reason": "13:30产品演示在午餐后"
+        },
+        {
+          "index": 3,
+          "option": "The reception",
+          "reason": "15:30酒会更晚"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S08-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-068",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "SHIPPING UPDATE\nPackage 7732 arrived at the city distribution center at 6:40 A.M. and was assigned to a local courier at 9:10 A.M. Delivery is expected before 5 P.M. today. If no one is available to sign, a second attempt will be made tomorrow.",
+      "referenceArticle": "SHIPPING UPDATE\nPackage 7732 arrived at the city distribution center at 6:40 A.M. and was assigned to a local courier at 9:10 A.M. Delivery is expected before 5 P.M. today. If no one is available to sign, a second attempt will be made tomorrow.",
+      "documents": [],
+      "stem": "When was the package assigned to a courier?",
+      "options": [
+        "9:10 A.M.",
+        "6:40 A.M.",
+        "5 P.M.",
+        "Tomorrow"
+      ],
+      "answerIndex": 0,
+      "answerText": "9:10 A.M.",
+      "explanation": "原文给出 9:10 A.M.。",
+      "evidence": "was assigned to a local courier at 9:10 A.M.",
+      "correctBasis": "包裹于09:10分配给本地快递员，原文明确",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "6:40 A.M.",
+          "reason": "06:40是进入城市分拨中心"
+        },
+        {
+          "index": 2,
+          "option": "5 P.M.",
+          "reason": "17:00为当天预计送达截止"
+        },
+        {
+          "index": 3,
+          "option": "Tomorrow",
+          "reason": "次日仅条件性二次派送"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S08-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-069",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "SHIPPING UPDATE\nPackage 7732 arrived at the city distribution center at 6:40 A.M. and was assigned to a local courier at 9:10 A.M. Delivery is expected before 5 P.M. today. If no one is available to sign, a second attempt will be made tomorrow.",
+      "referenceArticle": "SHIPPING UPDATE\nPackage 7732 arrived at the city distribution center at 6:40 A.M. and was assigned to a local courier at 9:10 A.M. Delivery is expected before 5 P.M. today. If no one is available to sign, a second attempt will be made tomorrow.",
+      "documents": [],
+      "stem": "When is delivery expected?",
+      "options": [
+        "Before 5 P.M. today",
+        "Tomorrow morning only",
+        "After 6 P.M.",
+        "Next week"
+      ],
+      "answerIndex": 0,
+      "answerText": "Before 5 P.M. today",
+      "explanation": "原文明确 before 5 P.M. today。",
+      "evidence": "Delivery is expected before 5 P.M. today.",
+      "correctBasis": "预计今日17点之前送达，区别于签收失败后的次日重试",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Tomorrow morning only",
+          "reason": "次日上午只在今天无法签收时才重投"
+        },
+        {
+          "index": 2,
+          "option": "After 6 P.M.",
+          "reason": "不是18点后"
+        },
+        {
+          "index": 3,
+          "option": "Next week",
+          "reason": "未推迟至下一周"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-S08-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-070",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "SHIPPING UPDATE\nPackage 7732 arrived at the city distribution center at 6:40 A.M. and was assigned to a local courier at 9:10 A.M. Delivery is expected before 5 P.M. today. If no one is available to sign, a second attempt will be made tomorrow.",
+      "referenceArticle": "SHIPPING UPDATE\nPackage 7732 arrived at the city distribution center at 6:40 A.M. and was assigned to a local courier at 9:10 A.M. Delivery is expected before 5 P.M. today. If no one is available to sign, a second attempt will be made tomorrow.",
+      "documents": [],
+      "stem": "What will happen if nobody can sign today?",
+      "options": [
+        "Another delivery attempt will be made tomorrow",
+        "The package will be discarded",
+        "A refund will be issued immediately",
+        "The order will be canceled"
+      ],
+      "answerIndex": 0,
+      "answerText": "Another delivery attempt will be made tomorrow",
+      "explanation": "条件句直接给出第二天再次投递。",
+      "evidence": "If no one is available to sign, a second attempt will be made tomorrow.",
+      "correctBasis": "当天无人签收将于次日再尝试配送，明确条件动作",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "The package will be discarded",
+          "reason": "不直接弃置包裹"
+        },
+        {
+          "index": 2,
+          "option": "A refund will be issued immediately",
+          "reason": "没有立即退款"
+        },
+        {
+          "index": 3,
+          "option": "The order will be canceled",
+          "reason": "没有取消订单要求"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M1-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-071",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G1",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 52: Easton 7:50 → Central 8:35\nTrain 60: Easton 8:20 → Central 9:05\n\nDOCUMENT 2 — E-MAIL\nOur presentation at Central Tower starts at 9:15. Please allow 20 minutes to walk from the station. —Dana",
+      "documents": [
+        "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 52: Easton 7:50 → Central 8:35\nTrain 60: Easton 8:20 → Central 9:05",
+        "DOCUMENT 2 — E-MAIL\nOur presentation at Central Tower starts at 9:15. Please allow 20 minutes to walk from the station. —Dana"
+      ],
+      "stem": "Which train should the recipient take?",
+      "options": [
+        "Train 52",
+        "Train 60",
+        "Either train",
+        "Neither train"
+      ],
+      "answerIndex": 0,
+      "answerText": "Train 52",
+      "explanation": "需要8:55前到站，Train52 8:35满足。",
+      "evidence": "Train 52: Easton 7:50 → Central 8:35 || Our presentation at Central Tower starts at 9:15.",
+      "correctBasis": "52次列车08:35到Central，步行20分钟约08:55，不晚于09:15演示；60次09:05到约09:25",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Train 60",
+          "reason": "60次到站09:05加20分钟会迟到"
+        },
+        {
+          "index": 2,
+          "option": "Either train",
+          "reason": "两班车并非都符合步行时间"
+        },
+        {
+          "index": 3,
+          "option": "Neither train",
+          "reason": "52次已满足要求不可能两班均不适用"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M1-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-072",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G1",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 52: Easton 7:50 → Central 8:35\nTrain 60: Easton 8:20 → Central 9:05\n\nDOCUMENT 2 — E-MAIL\nOur presentation at Central Tower starts at 9:15. Please allow 20 minutes to walk from the station. —Dana",
+      "documents": [
+        "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 52: Easton 7:50 → Central 8:35\nTrain 60: Easton 8:20 → Central 9:05",
+        "DOCUMENT 2 — E-MAIL\nOur presentation at Central Tower starts at 9:15. Please allow 20 minutes to walk from the station. —Dana"
+      ],
+      "stem": "How long should be allowed for walking?",
+      "options": [
+        "One hour",
+        "20 minutes",
+        "10 minutes",
+        "35 minutes"
+      ],
+      "answerIndex": 1,
+      "answerText": "20 minutes",
+      "explanation": "邮件直接说明 allow 20 minutes。",
+      "evidence": "Please allow 20 minutes to walk from the station.",
+      "correctBasis": "邮件明确从中央车站至会议地点预留20分钟步行时间",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "One hour",
+          "reason": "一小时没有要求"
+        },
+        {
+          "index": 2,
+          "option": "10 minutes",
+          "reason": "10分钟不足邮件指示"
+        },
+        {
+          "index": 3,
+          "option": "35 minutes",
+          "reason": "35分钟不是指定预留量"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M1-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-073",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G1",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 52: Easton 7:50 → Central 8:35\nTrain 60: Easton 8:20 → Central 9:05\n\nDOCUMENT 2 — E-MAIL\nOur presentation at Central Tower starts at 9:15. Please allow 20 minutes to walk from the station. —Dana",
+      "documents": [
+        "DOCUMENT 1 — TRAIN SCHEDULE\nTrain 52: Easton 7:50 → Central 8:35\nTrain 60: Easton 8:20 → Central 9:05",
+        "DOCUMENT 2 — E-MAIL\nOur presentation at Central Tower starts at 9:15. Please allow 20 minutes to walk from the station. —Dana"
+      ],
+      "stem": "Why is Train 60 unsuitable?",
+      "options": [
+        "It leaves before 7 A.M.",
+        "It costs more",
+        "It arrives too late to allow the requested walk time",
+        "It does not go to Central"
+      ],
+      "answerIndex": 2,
+      "answerText": "It arrives too late to allow the requested walk time",
+      "explanation": "9:05到站到9:15只有10分钟，不满足20分钟步行。",
+      "evidence": "Train 60: Easton 8:20 → Central 9:05 || Our presentation at Central Tower starts at 9:15.",
+      "correctBasis": "60次列车09:05抵站，加邮件要求20分钟步行到09:25，晚于09:15演示",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "It leaves before 7 A.M.",
+          "reason": "60次从Easton08:20发车，不早于7点"
+        },
+        {
+          "index": 1,
+          "option": "It costs more",
+          "reason": "未提两列车票价区别"
+        },
+        {
+          "index": 3,
+          "option": "It does not go to Central",
+          "reason": "时刻表明示60次抵达Central"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M2-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-074",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G2",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — STORE OFFER\nSpend $80 or more online and receive free standard delivery. Offer ends October 31.\n\nDOCUMENT 2 — CUSTOMER E-MAIL dated October 28\nMy cart total is $92. I do not need express shipping. Will there be a delivery charge?",
+      "documents": [
+        "DOCUMENT 1 — STORE OFFER\nSpend $80 or more online and receive free standard delivery. Offer ends October 31.",
+        "DOCUMENT 2 — CUSTOMER E-MAIL dated October 28\nMy cart total is $92. I do not need express shipping. Will there be a delivery charge?"
+      ],
+      "stem": "What should the customer receive?",
+      "options": [
+        "Free standard delivery",
+        "Free express delivery",
+        "A 20 percent discount",
+        "A gift card"
+      ],
+      "answerIndex": 0,
+      "answerText": "Free standard delivery",
+      "explanation": "金额92超过80且日期在10/31前，符合免费标准配送。",
+      "evidence": "Spend $80 or more online and receive free standard delivery. || My cart total is $92.",
+      "correctBasis": "网店消费92美元达80美元免标准运费门槛，邮件日期10月28仍在10月31优惠期内",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Free express delivery",
+          "reason": "只承诺标准而非加急免邮"
+        },
+        {
+          "index": 2,
+          "option": "A 20 percent discount",
+          "reason": "优惠不是商品八折"
+        },
+        {
+          "index": 3,
+          "option": "A gift card",
+          "reason": "没有赠送礼品卡"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M2-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-075",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G2",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — STORE OFFER\nSpend $80 or more online and receive free standard delivery. Offer ends October 31.\n\nDOCUMENT 2 — CUSTOMER E-MAIL dated October 28\nMy cart total is $92. I do not need express shipping. Will there be a delivery charge?",
+      "documents": [
+        "DOCUMENT 1 — STORE OFFER\nSpend $80 or more online and receive free standard delivery. Offer ends October 31.",
+        "DOCUMENT 2 — CUSTOMER E-MAIL dated October 28\nMy cart total is $92. I do not need express shipping. Will there be a delivery charge?"
+      ],
+      "stem": "How much is in the customer's cart?",
+      "options": [
+        "$28",
+        "$92",
+        "$80",
+        "$31"
+      ],
+      "answerIndex": 1,
+      "answerText": "$92",
+      "explanation": "邮件直接说明 $92。",
+      "evidence": "My cart total is $92.",
+      "correctBasis": "顾客邮件直接给购物车总额92美元",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "$28",
+          "reason": "28是邮件发出日期"
+        },
+        {
+          "index": 2,
+          "option": "$80",
+          "reason": "80美元是免运费门槛"
+        },
+        {
+          "index": 3,
+          "option": "$31",
+          "reason": "31是优惠截止日而非金额"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M2-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-076",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G2",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — STORE OFFER\nSpend $80 or more online and receive free standard delivery. Offer ends October 31.\n\nDOCUMENT 2 — CUSTOMER E-MAIL dated October 28\nMy cart total is $92. I do not need express shipping. Will there be a delivery charge?",
+      "documents": [
+        "DOCUMENT 1 — STORE OFFER\nSpend $80 or more online and receive free standard delivery. Offer ends October 31.",
+        "DOCUMENT 2 — CUSTOMER E-MAIL dated October 28\nMy cart total is $92. I do not need express shipping. Will there be a delivery charge?"
+      ],
+      "stem": "Which delivery type does the customer prefer?",
+      "options": [
+        "Store pickup",
+        "International freight",
+        "Standard delivery",
+        "Express delivery"
+      ],
+      "answerIndex": 2,
+      "answerText": "Standard delivery",
+      "explanation": "客户明确不需要 express，结合询问配送费可推断标准配送。",
+      "evidence": "I do not need express shipping.",
+      "correctBasis": "客户说不需要加急；优惠承诺免费标准配送，偏好标准配送是唯一符合选项",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "Store pickup",
+          "reason": "没有门店取货要求"
+        },
+        {
+          "index": 1,
+          "option": "International freight",
+          "reason": "没有国际运送安排"
+        },
+        {
+          "index": 3,
+          "option": "Express delivery",
+          "reason": "明确否定加急配送"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M3-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-077",
+      "sourceVersion": 2,
+      "currentVersion": 2,
+      "groupId": "FM1-G3",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — INVOICE\nInvoice 3118\nAmount due: $640\nDue date: Nov. 6\n\nDOCUMENT 2 — FINANCE MEMO\nPayments received after the due date are subject to a $25 late fee. Bank transfers may take up to two business days to post.",
+      "documents": [
+        "DOCUMENT 1 — INVOICE\nInvoice 3118\nAmount due: $640\nDue date: Nov. 6",
+        "DOCUMENT 2 — FINANCE MEMO\nPayments received after the due date are subject to a $25 late fee. Bank transfers may take up to two business days to post.",
+        "DOCUMENT 3 — CUSTOMER ACCOUNT MESSAGE, NOVEMBER 1\nThe customer has requested payment by bank transfer. Finance has advised submitting the transfer early enough for it to post by November 6."
+      ],
+      "stem": "What amount is listed as due on Invoice 3118, excluding any late fee?",
+      "options": [
+        "$640",
+        "$615",
+        "$665",
+        "$25"
+      ],
+      "answerIndex": 0,
+      "answerText": "$640",
+      "explanation": "发票标明应付640美元；25美元是逾期收款后才可能产生的额外费用，且银行转账可能延迟入账，因此不应将汇款发起时间等同于到账时间。",
+      "evidence": "Amount due: $640 || Payments received after the due date are subject to a $25 late fee.",
+      "correctBasis": "原发票应付640美元，晚缴25美元手续费另计，问题限定不含滞纳金",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "$615",
+          "reason": "615是640减25，不是票面金额"
+        },
+        {
+          "index": 2,
+          "option": "$665",
+          "reason": "665含滞纳金，问题明确排除"
+        },
+        {
+          "index": 3,
+          "option": "$25",
+          "reason": "25只有滞纳金而非账单本金"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M3-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-078",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G3",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — INVOICE\nInvoice 3118\nAmount due: $640\nDue date: Nov. 6\n\nDOCUMENT 2 — FINANCE MEMO\nPayments received after the due date are subject to a $25 late fee. Bank transfers may take up to two business days to post.",
+      "documents": [
+        "DOCUMENT 1 — INVOICE\nInvoice 3118\nAmount due: $640\nDue date: Nov. 6",
+        "DOCUMENT 2 — FINANCE MEMO\nPayments received after the due date are subject to a $25 late fee. Bank transfers may take up to two business days to post.",
+        "DOCUMENT 3 — CUSTOMER ACCOUNT MESSAGE, NOVEMBER 1\nThe customer has requested payment by bank transfer. Finance has advised submitting the transfer early enough for it to post by November 6."
+      ],
+      "stem": "How large is the late fee?",
+      "options": [
+        "$2",
+        "$25",
+        "$640",
+        "$6"
+      ],
+      "answerIndex": 1,
+      "answerText": "$25",
+      "explanation": "memo 直接给出 $25。",
+      "evidence": "subject to a $25 late fee.",
+      "correctBasis": "财务备忘录规定逾期费25美元",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "$2",
+          "reason": "2是银行转账工作日数"
+        },
+        {
+          "index": 2,
+          "option": "$640",
+          "reason": "640美元是发票应付本金"
+        },
+        {
+          "index": 3,
+          "option": "$6",
+          "reason": "6是付款截止日期中的日"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M3-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-079",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G3",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — INVOICE\nInvoice 3118\nAmount due: $640\nDue date: Nov. 6\n\nDOCUMENT 2 — FINANCE MEMO\nPayments received after the due date are subject to a $25 late fee. Bank transfers may take up to two business days to post.",
+      "documents": [
+        "DOCUMENT 1 — INVOICE\nInvoice 3118\nAmount due: $640\nDue date: Nov. 6",
+        "DOCUMENT 2 — FINANCE MEMO\nPayments received after the due date are subject to a $25 late fee. Bank transfers may take up to two business days to post.",
+        "DOCUMENT 3 — CUSTOMER ACCOUNT MESSAGE, NOVEMBER 1\nThe customer has requested payment by bank transfer. Finance has advised submitting the transfer early enough for it to post by November 6."
+      ],
+      "stem": "Why might a customer send a bank transfer early?",
+      "options": [
+        "The invoice cannot be paid on time",
+        "Transfers are accepted only on Fridays",
+        "It may take two business days to post",
+        "It receives a discount"
+      ],
+      "answerIndex": 2,
+      "answerText": "It may take two business days to post",
+      "explanation": "转账可能两工作日到账，因此应预留时间。",
+      "evidence": "Bank transfers may take up to two business days to post.",
+      "correctBasis": "转账入账最多两工作日，早转账可避免截止日晚到账及逾期费用",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "The invoice cannot be paid on time",
+          "reason": "并非必然无法准时付款"
+        },
+        {
+          "index": 1,
+          "option": "Transfers are accepted only on Fridays",
+          "reason": "银行没有仅周五受理规则"
+        },
+        {
+          "index": 3,
+          "option": "It receives a discount",
+          "reason": "没有提前汇款优惠"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M4-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-080",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G4",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — BUS SCHEDULE\nRoute 7 arrives Downtown at 8:40 and 9:10.\n\nDOCUMENT 2 — MEETING NOTE\nThe team meeting begins at 9:00 in the Downtown office. It takes about 10 minutes to walk from the bus stop.",
+      "documents": [
+        "DOCUMENT 1 — BUS SCHEDULE\nRoute 7 arrives Downtown at 8:40 and 9:10.",
+        "DOCUMENT 2 — MEETING NOTE\nThe team meeting begins at 9:00 in the Downtown office. It takes about 10 minutes to walk from the bus stop.",
+        "DOCUMENT 3 — EMPLOYEE MESSAGE\nI will take the Route 7 bus that reaches Downtown at 8:40. I will go directly to the office after getting off. —Harper"
+      ],
+      "stem": "Which arrival should an employee choose?",
+      "options": [
+        "8:40",
+        "9:10",
+        "Either",
+        "Neither"
+      ],
+      "answerIndex": 0,
+      "answerText": "8:40",
+      "explanation": "8:40到站后步行10分钟，8:50到办公室，可赶上9点会议。",
+      "evidence": "Route 7 arrives Downtown at 8:40 and 9:10. || The team meeting begins at 9:00 in the Downtown office.",
+      "correctBasis": "8:40抵公交站加10分钟步行约8:50，满足9点会议；9:10到站已晚",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "9:10",
+          "reason": "9:10抵达后尚需10分钟必迟到"
+        },
+        {
+          "index": 2,
+          "option": "Either",
+          "reason": "两班车无法都满足会议开始时间"
+        },
+        {
+          "index": 3,
+          "option": "Neither",
+          "reason": "8:40班次可以准时到并非都不行"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M4-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-081",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G4",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — BUS SCHEDULE\nRoute 7 arrives Downtown at 8:40 and 9:10.\n\nDOCUMENT 2 — MEETING NOTE\nThe team meeting begins at 9:00 in the Downtown office. It takes about 10 minutes to walk from the bus stop.",
+      "documents": [
+        "DOCUMENT 1 — BUS SCHEDULE\nRoute 7 arrives Downtown at 8:40 and 9:10.",
+        "DOCUMENT 2 — MEETING NOTE\nThe team meeting begins at 9:00 in the Downtown office. It takes about 10 minutes to walk from the bus stop.",
+        "DOCUMENT 3 — EMPLOYEE MESSAGE\nI will take the Route 7 bus that reaches Downtown at 8:40. I will go directly to the office after getting off. —Harper"
+      ],
+      "stem": "How long is the walk?",
+      "options": [
+        "40 minutes",
+        "About 10 minutes",
+        "20 minutes",
+        "30 minutes"
+      ],
+      "answerIndex": 1,
+      "answerText": "About 10 minutes",
+      "explanation": "meeting note 直接给出10分钟。",
+      "evidence": "It takes about 10 minutes to walk from the bus stop.",
+      "correctBasis": "步行从站到Downtown办公室约十分钟，是会议通知原句",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "40 minutes",
+          "reason": "40分钟也不是通知值"
+        },
+        {
+          "index": 2,
+          "option": "20 minutes",
+          "reason": "20分钟未被明确给出"
+        },
+        {
+          "index": 3,
+          "option": "30 minutes",
+          "reason": "30分钟不是原文路程"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M4-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-082",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G4",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — BUS SCHEDULE\nRoute 7 arrives Downtown at 8:40 and 9:10.\n\nDOCUMENT 2 — MEETING NOTE\nThe team meeting begins at 9:00 in the Downtown office. It takes about 10 minutes to walk from the bus stop.",
+      "documents": [
+        "DOCUMENT 1 — BUS SCHEDULE\nRoute 7 arrives Downtown at 8:40 and 9:10.",
+        "DOCUMENT 2 — MEETING NOTE\nThe team meeting begins at 9:00 in the Downtown office. It takes about 10 minutes to walk from the bus stop.",
+        "DOCUMENT 3 — EMPLOYEE MESSAGE\nI will take the Route 7 bus that reaches Downtown at 8:40. I will go directly to the office after getting off. —Harper"
+      ],
+      "stem": "Why is the 9:10 arrival not appropriate?",
+      "options": [
+        "The route does not stop downtown",
+        "The bus requires a reservation",
+        "The meeting will already have started",
+        "The office will be closed"
+      ],
+      "answerIndex": 2,
+      "answerText": "The meeting will already have started",
+      "explanation": "9:10已晚于9:00会议开始。",
+      "evidence": "The team meeting begins at 9:00 in the Downtown office.",
+      "correctBasis": "会议09:00开始，而9:10车到站时会议已开始且还要步行",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "The route does not stop downtown",
+          "reason": "Route7时刻表明确抵Downtown"
+        },
+        {
+          "index": 1,
+          "option": "The bus requires a reservation",
+          "reason": "没有订座要求"
+        },
+        {
+          "index": 3,
+          "option": "The office will be closed",
+          "reason": "会议地点无关闭说明"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M5-01",
+      "day": 14,
+      "sourceId": "R-M1-P7-083",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G5",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — JOB POSTING\nMarketing Assistant: start date Dec. 1; one year of office experience required; applications due Nov. 10.\n\nDOCUMENT 2 — APPLICANT E-MAIL dated Nov. 8\nI have worked as an office coordinator since June last year and can start November 25.",
+      "documents": [
+        "DOCUMENT 1 — JOB POSTING\nMarketing Assistant: start date Dec. 1; one year of office experience required; applications due Nov. 10.",
+        "DOCUMENT 2 — APPLICANT E-MAIL dated Nov. 8\nI have worked as an office coordinator since June last year and can start November 25.",
+        "DOCUMENT 3 — RECRUITER FOLLOW-UP, NOVEMBER 9\nWe have received the résumé and will review it before the application deadline on November 10."
+      ],
+      "stem": "Which requirement does the applicant appear to meet?",
+      "options": [
+        "Office experience",
+        "A December 15 start date",
+        "An application after November 10",
+        "No work experience"
+      ],
+      "answerIndex": 0,
+      "answerText": "Office experience",
+      "explanation": "从去年6月起的办公室工作已超过一年。",
+      "evidence": "one year of office experience required || I have worked as an office coordinator since June last year",
+      "correctBasis": "申请人自去年六月至本年十一月从事办公室协调工作，至少17个月，符合一年工作经验要求",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "A December 15 start date",
+          "reason": "广告要求12月1日到岗而非12月15日"
+        },
+        {
+          "index": 2,
+          "option": "An application after November 10",
+          "reason": "报名截止11月10，申请邮件11月8早于截止"
+        },
+        {
+          "index": 3,
+          "option": "No work experience",
+          "reason": "已有办公室经验与无经验矛盾"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M5-02",
+      "day": 14,
+      "sourceId": "R-M1-P7-084",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G5",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — JOB POSTING\nMarketing Assistant: start date Dec. 1; one year of office experience required; applications due Nov. 10.\n\nDOCUMENT 2 — APPLICANT E-MAIL dated Nov. 8\nI have worked as an office coordinator since June last year and can start November 25.",
+      "documents": [
+        "DOCUMENT 1 — JOB POSTING\nMarketing Assistant: start date Dec. 1; one year of office experience required; applications due Nov. 10.",
+        "DOCUMENT 2 — APPLICANT E-MAIL dated Nov. 8\nI have worked as an office coordinator since June last year and can start November 25.",
+        "DOCUMENT 3 — RECRUITER FOLLOW-UP, NOVEMBER 9\nWe have received the résumé and will review it before the application deadline on November 10."
+      ],
+      "stem": "When are applications due?",
+      "options": [
+        "December 1",
+        "November 10",
+        "November 8",
+        "November 25"
+      ],
+      "answerIndex": 1,
+      "answerText": "November 10",
+      "explanation": "posting 直接给出 Nov.10。",
+      "evidence": "applications due Nov. 10.",
+      "correctBasis": "招聘要求11月10日前收到申请，职位开始日期不同",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "December 1",
+          "reason": "12月1是岗位开始日"
+        },
+        {
+          "index": 2,
+          "option": "November 8",
+          "reason": "11月8是邮件发出日"
+        },
+        {
+          "index": 3,
+          "option": "November 25",
+          "reason": "11月25是应聘者可上岗日期"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM1-P7-M5-03",
+      "day": 14,
+      "sourceId": "R-M1-P7-085",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM1-G5",
+      "passage": "",
+      "referenceArticle": "DOCUMENT 1 — JOB POSTING\nMarketing Assistant: start date Dec. 1; one year of office experience required; applications due Nov. 10.\n\nDOCUMENT 2 — APPLICANT E-MAIL dated Nov. 8\nI have worked as an office coordinator since June last year and can start November 25.",
+      "documents": [
+        "DOCUMENT 1 — JOB POSTING\nMarketing Assistant: start date Dec. 1; one year of office experience required; applications due Nov. 10.",
+        "DOCUMENT 2 — APPLICANT E-MAIL dated Nov. 8\nI have worked as an office coordinator since June last year and can start November 25.",
+        "DOCUMENT 3 — RECRUITER FOLLOW-UP, NOVEMBER 9\nWe have received the résumé and will review it before the application deadline on November 10."
+      ],
+      "stem": "Can the applicant start by the required date?",
+      "options": [
+        "Only after December 15",
+        "The e-mail does not mention availability",
+        "Yes",
+        "No"
+      ],
+      "answerIndex": 2,
+      "answerText": "Yes",
+      "explanation": "可11/25开始，早于12/1。",
+      "evidence": "start date Dec. 1 || can start November 25.",
+      "correctBasis": "应聘者11月25日可入职，早于招聘岗位12月1日要求，因此可按期开始",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "Only after December 15",
+          "reason": "招聘未要求12月15日以后"
+        },
+        {
+          "index": 1,
+          "option": "The e-mail does not mention availability",
+          "reason": "邮件明确说明availability"
+        },
+        {
+          "index": 3,
+          "option": "No",
+          "reason": "11月25早于岗位开始不能判不符合"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S01-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-A-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "MEMO\nBeginning October 1, employees who cycle to work may use the new secured bicycle room in the west garage. Access requires a staff badge. Lockers are available on a first-come basis, but users must provide their own locks.",
+      "referenceArticle": "MEMO\nBeginning October 1, employees who cycle to work may use the new secured bicycle room in the west garage. Access requires a staff badge. Lockers are available on a first-come basis, but users must provide their own locks.",
+      "documents": [],
+      "stem": "Why was the memo written?",
+      "options": [
+        "To explain access to a new bicycle room",
+        "To announce free bicycles",
+        "To close the west garage",
+        "To replace staff badges"
+      ],
+      "answerIndex": 0,
+      "answerText": "To explain access to a new bicycle room",
+      "explanation": "备忘录介绍新自行车房的使用规则。",
+      "evidence": "employees who cycle to work may use the new secured bicycle room",
+      "correctBasis": "备忘录解释员工如何使用西车库新自行车室，包括工牌和储物柜规定",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "To announce free bicycles",
+          "reason": "并未提供免费自行车"
+        },
+        {
+          "index": 2,
+          "option": "To close the west garage",
+          "reason": "西车库内新增房间而非关闭车库"
+        },
+        {
+          "index": 3,
+          "option": "To replace staff badges",
+          "reason": "员工证作为准入凭据未被替换"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S01-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-A-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "MEMO\nBeginning October 1, employees who cycle to work may use the new secured bicycle room in the west garage. Access requires a staff badge. Lockers are available on a first-come basis, but users must provide their own locks.",
+      "referenceArticle": "MEMO\nBeginning October 1, employees who cycle to work may use the new secured bicycle room in the west garage. Access requires a staff badge. Lockers are available on a first-come basis, but users must provide their own locks.",
+      "documents": [],
+      "stem": "What is required to enter the bicycle room?",
+      "options": [
+        "A parking receipt",
+        "A locker key",
+        "A staff badge",
+        "A visitor pass"
+      ],
+      "answerIndex": 2,
+      "answerText": "A staff badge",
+      "explanation": "原文直接说明 Access requires a staff badge。",
+      "evidence": "Access requires a staff badge.",
+      "correctBasis": "进入自行车房需持员工工牌，原文写Access requires a staff badge",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "A parking receipt",
+          "reason": "没有停车收据规定"
+        },
+        {
+          "index": 1,
+          "option": "A locker key",
+          "reason": "储物柜是先到先得，钥匙不是准入凭据"
+        },
+        {
+          "index": 3,
+          "option": "A visitor pass",
+          "reason": "访客证不是员工专用自行车室准入证"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S01-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-A-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "MEMO\nBeginning October 1, employees who cycle to work may use the new secured bicycle room in the west garage. Access requires a staff badge. Lockers are available on a first-come basis, but users must provide their own locks.",
+      "referenceArticle": "MEMO\nBeginning October 1, employees who cycle to work may use the new secured bicycle room in the west garage. Access requires a staff badge. Lockers are available on a first-come basis, but users must provide their own locks.",
+      "documents": [],
+      "stem": "What must users provide themselves?",
+      "options": [
+        "A bicycle rack",
+        "A lock",
+        "A staff badge printer",
+        "A locker"
+      ],
+      "answerIndex": 1,
+      "answerText": "A lock",
+      "explanation": "原文说 users must provide their own locks。",
+      "evidence": "users must provide their own locks.",
+      "correctBasis": "储物柜可用，但使用者必须自备锁具",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "A bicycle rack",
+          "reason": "自行车架无自备说明"
+        },
+        {
+          "index": 2,
+          "option": "A staff badge printer",
+          "reason": "不要求员工证打印机"
+        },
+        {
+          "index": 3,
+          "option": "A locker",
+          "reason": "储物柜已由设施提供"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S02-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-B-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Delivery Change\nYour order #4482 was scheduled for delivery on Thursday. Because the loading dock at your building will be closed that morning, our driver will arrive Friday between 9 A.M. and noon instead. No action is required unless this new time is inconvenient.",
+      "referenceArticle": "Subject: Delivery Change\nYour order #4482 was scheduled for delivery on Thursday. Because the loading dock at your building will be closed that morning, our driver will arrive Friday between 9 A.M. and noon instead. No action is required unless this new time is inconvenient.",
+      "documents": [],
+      "stem": "Why was the e-mail sent?",
+      "options": [
+        "To request payment",
+        "To cancel an order",
+        "To advertise faster shipping",
+        "To announce a changed delivery time"
+      ],
+      "answerIndex": 3,
+      "answerText": "To announce a changed delivery time",
+      "explanation": "核心是送货由周四改到周五。",
+      "evidence": "our driver will arrive Friday ... instead",
+      "correctBasis": "通知将原定周四送货改为周五09:00到12:00，写作目的为更改送货安排",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "To request payment",
+          "reason": "没有催付款"
+        },
+        {
+          "index": 1,
+          "option": "To cancel an order",
+          "reason": "没有取消订单"
+        },
+        {
+          "index": 2,
+          "option": "To advertise faster shipping",
+          "reason": "没有广告加急服务"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S02-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-B-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Delivery Change\nYour order #4482 was scheduled for delivery on Thursday. Because the loading dock at your building will be closed that morning, our driver will arrive Friday between 9 A.M. and noon instead. No action is required unless this new time is inconvenient.",
+      "referenceArticle": "Subject: Delivery Change\nYour order #4482 was scheduled for delivery on Thursday. Because the loading dock at your building will be closed that morning, our driver will arrive Friday between 9 A.M. and noon instead. No action is required unless this new time is inconvenient.",
+      "documents": [],
+      "stem": "Why was the delivery changed?",
+      "options": [
+        "The loading dock will be closed",
+        "The order was unpaid",
+        "The driver is on vacation",
+        "The item is out of stock"
+      ],
+      "answerIndex": 0,
+      "answerText": "The loading dock will be closed",
+      "explanation": "原因是 loading dock 周四上午关闭。",
+      "evidence": "Because the loading dock at your building will be closed that morning",
+      "correctBasis": "周四上午装卸平台关闭，才使货车改在周五到达",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "The order was unpaid",
+          "reason": "没有订单欠款记录"
+        },
+        {
+          "index": 2,
+          "option": "The driver is on vacation",
+          "reason": "未说司机休假"
+        },
+        {
+          "index": 3,
+          "option": "The item is out of stock",
+          "reason": "没说库存不足"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S02-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-B-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Delivery Change\nYour order #4482 was scheduled for delivery on Thursday. Because the loading dock at your building will be closed that morning, our driver will arrive Friday between 9 A.M. and noon instead. No action is required unless this new time is inconvenient.",
+      "referenceArticle": "Subject: Delivery Change\nYour order #4482 was scheduled for delivery on Thursday. Because the loading dock at your building will be closed that morning, our driver will arrive Friday between 9 A.M. and noon instead. No action is required unless this new time is inconvenient.",
+      "documents": [],
+      "stem": "When should the customer contact the sender?",
+      "options": [
+        "After every delivery",
+        "Before placing any order",
+        "If Friday morning is inconvenient",
+        "Only if the dock is open"
+      ],
+      "answerIndex": 2,
+      "answerText": "If Friday morning is inconvenient",
+      "explanation": "邮件说明新时间不方便时才需行动。",
+      "evidence": "No action is required unless this new time is inconvenient.",
+      "correctBasis": "新周五上午时段若不方便需联系发件人，其他情形不用行动",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "After every delivery",
+          "reason": "不是每次交付后联系"
+        },
+        {
+          "index": 1,
+          "option": "Before placing any order",
+          "reason": "不是下单前联系"
+        },
+        {
+          "index": 3,
+          "option": "Only if the dock is open",
+          "reason": "码头周五可用与是否需要沟通无直接关系"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S03-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-C-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "ADVERTISEMENT\nLakeshore Business Hotel\nBook a meeting room for six hours or more and receive complimentary coffee service for up to 20 participants. Offer valid for weekday bookings made before November 30. Audio equipment is available for an additional charge.",
+      "referenceArticle": "ADVERTISEMENT\nLakeshore Business Hotel\nBook a meeting room for six hours or more and receive complimentary coffee service for up to 20 participants. Offer valid for weekday bookings made before November 30. Audio equipment is available for an additional charge.",
+      "documents": [],
+      "stem": "What is being promoted?",
+      "options": [
+        "A hotel renovation",
+        "A meeting-room offer",
+        "A coffee shop opening",
+        "A hiring event"
+      ],
+      "answerIndex": 1,
+      "answerText": "A meeting-room offer",
+      "explanation": "广告推广会议室预订优惠。",
+      "evidence": "Book a meeting room ... and receive complimentary coffee service",
+      "correctBasis": "商业酒店广告为预订六小时以上会议室赠咖啡的会议室促销",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "A hotel renovation",
+          "reason": "未宣传装修"
+        },
+        {
+          "index": 2,
+          "option": "A coffee shop opening",
+          "reason": "免费咖啡不是新咖啡店开业"
+        },
+        {
+          "index": 3,
+          "option": "A hiring event",
+          "reason": "并非招聘会"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S03-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-C-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "ADVERTISEMENT\nLakeshore Business Hotel\nBook a meeting room for six hours or more and receive complimentary coffee service for up to 20 participants. Offer valid for weekday bookings made before November 30. Audio equipment is available for an additional charge.",
+      "referenceArticle": "ADVERTISEMENT\nLakeshore Business Hotel\nBook a meeting room for six hours or more and receive complimentary coffee service for up to 20 participants. Offer valid for weekday bookings made before November 30. Audio equipment is available for an additional charge.",
+      "documents": [],
+      "stem": "What is included at no charge for qualifying bookings?",
+      "options": [
+        "Audio equipment",
+        "Parking for all guests",
+        "An extra meeting hour",
+        "Coffee service"
+      ],
+      "answerIndex": 3,
+      "answerText": "Coffee service",
+      "explanation": "complimentary coffee service 表示免费咖啡服务。",
+      "evidence": "receive complimentary coffee service",
+      "correctBasis": "符合工作日且预订至少六小时等条件时提供免费咖啡服务至多20人",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "Audio equipment",
+          "reason": "音响设备另收费"
+        },
+        {
+          "index": 1,
+          "option": "Parking for all guests",
+          "reason": "没有免费停车承诺"
+        },
+        {
+          "index": 2,
+          "option": "An extra meeting hour",
+          "reason": "没有加赠一小时会议室"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S03-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-C-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "ADVERTISEMENT\nLakeshore Business Hotel\nBook a meeting room for six hours or more and receive complimentary coffee service for up to 20 participants. Offer valid for weekday bookings made before November 30. Audio equipment is available for an additional charge.",
+      "referenceArticle": "ADVERTISEMENT\nLakeshore Business Hotel\nBook a meeting room for six hours or more and receive complimentary coffee service for up to 20 participants. Offer valid for weekday bookings made before November 30. Audio equipment is available for an additional charge.",
+      "documents": [],
+      "stem": "Which booking qualifies for the offer?",
+      "options": [
+        "A weekday six-hour booking made before November 30",
+        "A weekend two-hour booking",
+        "A December weekday booking",
+        "Any booking with audio equipment"
+      ],
+      "answerIndex": 0,
+      "answerText": "A weekday six-hour booking made before November 30",
+      "explanation": "需同时满足 weekday、至少六小时、11月30日前预订。",
+      "evidence": "Offer valid for weekday bookings made before November 30; six hours or more",
+      "correctBasis": "工作日会议室订六小时、于11月30日前下单，满足所有明确优惠条件",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "A weekend two-hour booking",
+          "reason": "周末且只订两小时不符合"
+        },
+        {
+          "index": 2,
+          "option": "A December weekday booking",
+          "reason": "12月预订若在11月30前下单未必不合，但选项缺关键下单时点，不能确认为必定符合"
+        },
+        {
+          "index": 3,
+          "option": "Any booking with audio equipment",
+          "reason": "带音响不免除工作日和六小时门槛"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S04-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-D-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "NOTICE\nThe north elevator will be unavailable from 8 A.M. to 1 P.M. Tuesday for a safety inspection. During that time, please use the south elevator. Deliveries requiring the freight elevator are not affected.",
+      "referenceArticle": "NOTICE\nThe north elevator will be unavailable from 8 A.M. to 1 P.M. Tuesday for a safety inspection. During that time, please use the south elevator. Deliveries requiring the freight elevator are not affected.",
+      "documents": [],
+      "stem": "Why was the notice posted?",
+      "options": [
+        "To cancel all deliveries",
+        "To move office departments",
+        "To announce a temporary elevator outage",
+        "To report a fire drill"
+      ],
+      "answerIndex": 2,
+      "answerText": "To announce a temporary elevator outage",
+      "explanation": "通知告知北侧电梯临时停用。",
+      "evidence": "north elevator will be unavailable ... for a safety inspection",
+      "correctBasis": "安全检查使北侧电梯周二08:00至13:00暂时停用，因此公告告知电梯检修",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "To cancel all deliveries",
+          "reason": "货梯送货明确不受影响"
+        },
+        {
+          "index": 1,
+          "option": "To move office departments",
+          "reason": "不是部门迁移"
+        },
+        {
+          "index": 3,
+          "option": "To report a fire drill",
+          "reason": "没有消防演练"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S04-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-D-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "NOTICE\nThe north elevator will be unavailable from 8 A.M. to 1 P.M. Tuesday for a safety inspection. During that time, please use the south elevator. Deliveries requiring the freight elevator are not affected.",
+      "referenceArticle": "NOTICE\nThe north elevator will be unavailable from 8 A.M. to 1 P.M. Tuesday for a safety inspection. During that time, please use the south elevator. Deliveries requiring the freight elevator are not affected.",
+      "documents": [],
+      "stem": "Which elevator should employees use during the inspection?",
+      "options": [
+        "The freight elevator only",
+        "The south elevator",
+        "The north elevator",
+        "No elevator"
+      ],
+      "answerIndex": 1,
+      "answerText": "The south elevator",
+      "explanation": "原文明确 please use the south elevator。",
+      "evidence": "please use the south elevator",
+      "correctBasis": "安全检修期间请改用南侧电梯，是明确指示",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "The freight elevator only",
+          "reason": "货梯仍供配送但没有要求人员只乘货梯"
+        },
+        {
+          "index": 2,
+          "option": "The north elevator",
+          "reason": "北侧电梯此时停用"
+        },
+        {
+          "index": 3,
+          "option": "No elevator",
+          "reason": "南电梯可用，不是全部停运"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S04-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-D-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "NOTICE\nThe north elevator will be unavailable from 8 A.M. to 1 P.M. Tuesday for a safety inspection. During that time, please use the south elevator. Deliveries requiring the freight elevator are not affected.",
+      "referenceArticle": "NOTICE\nThe north elevator will be unavailable from 8 A.M. to 1 P.M. Tuesday for a safety inspection. During that time, please use the south elevator. Deliveries requiring the freight elevator are not affected.",
+      "documents": [],
+      "stem": "What can be inferred about freight deliveries?",
+      "options": [
+        "They must wait until Wednesday",
+        "They use the north elevator",
+        "They are canceled",
+        "They can continue during the inspection"
+      ],
+      "answerIndex": 3,
+      "answerText": "They can continue during the inspection",
+      "explanation": "货运电梯不受影响，因此货运可继续。",
+      "evidence": "Deliveries requiring the freight elevator are not affected.",
+      "correctBasis": "通知说明货梯配送不受北梯检修影响，因此仍可继续",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "They must wait until Wednesday",
+          "reason": "不必等周三"
+        },
+        {
+          "index": 1,
+          "option": "They use the north elevator",
+          "reason": "送货用货梯不必使用北梯"
+        },
+        {
+          "index": 2,
+          "option": "They are canceled",
+          "reason": "没有取消所有送货"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S05-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-E-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Interview Schedule\nThank you for applying for the accounting assistant position. We would like to meet with you on Monday, October 19 at 2:30 P.M. The interview will take approximately 45 minutes. Please check in at reception ten minutes before your appointment.",
+      "referenceArticle": "Subject: Interview Schedule\nThank you for applying for the accounting assistant position. We would like to meet with you on Monday, October 19 at 2:30 P.M. The interview will take approximately 45 minutes. Please check in at reception ten minutes before your appointment.",
+      "documents": [],
+      "stem": "When should the applicant check in?",
+      "options": [
+        "2:20 P.M.",
+        "2:30 P.M.",
+        "3:15 P.M.",
+        "1:45 P.M."
+      ],
+      "answerIndex": 0,
+      "answerText": "2:20 P.M.",
+      "explanation": "面试 2:30，需提前10分钟签到，即2:20。",
+      "evidence": "check in at reception ten minutes before your appointment",
+      "correctBasis": "面试14:30开始且需提前十分钟到接待处，签到时间14:20",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "2:30 P.M.",
+          "reason": "14:30是正式约见时刻"
+        },
+        {
+          "index": 2,
+          "option": "3:15 P.M.",
+          "reason": "15:15是预计面试结束"
+        },
+        {
+          "index": 3,
+          "option": "1:45 P.M.",
+          "reason": "13:45比要求早45分钟"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S05-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-E-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Interview Schedule\nThank you for applying for the accounting assistant position. We would like to meet with you on Monday, October 19 at 2:30 P.M. The interview will take approximately 45 minutes. Please check in at reception ten minutes before your appointment.",
+      "referenceArticle": "Subject: Interview Schedule\nThank you for applying for the accounting assistant position. We would like to meet with you on Monday, October 19 at 2:30 P.M. The interview will take approximately 45 minutes. Please check in at reception ten minutes before your appointment.",
+      "documents": [],
+      "stem": "Why was the e-mail sent?",
+      "options": [
+        "To offer the job immediately",
+        "To request a résumé rewrite",
+        "To invite an applicant to an interview",
+        "To cancel recruitment"
+      ],
+      "answerIndex": 2,
+      "answerText": "To invite an applicant to an interview",
+      "explanation": "邮件明确安排面试。",
+      "evidence": "We would like to meet with you on Monday, October 19 at 2:30 P.M.",
+      "correctBasis": "邮件邀请会计助理应聘者在10月19日参加面试",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "To offer the job immediately",
+          "reason": "并非当场录用通知"
+        },
+        {
+          "index": 1,
+          "option": "To request a résumé rewrite",
+          "reason": "没有重写简历请求"
+        },
+        {
+          "index": 3,
+          "option": "To cancel recruitment",
+          "reason": "招聘没有取消"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S05-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-E-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "Subject: Interview Schedule\nThank you for applying for the accounting assistant position. We would like to meet with you on Monday, October 19 at 2:30 P.M. The interview will take approximately 45 minutes. Please check in at reception ten minutes before your appointment.",
+      "referenceArticle": "Subject: Interview Schedule\nThank you for applying for the accounting assistant position. We would like to meet with you on Monday, October 19 at 2:30 P.M. The interview will take approximately 45 minutes. Please check in at reception ten minutes before your appointment.",
+      "documents": [],
+      "stem": "How long is the interview expected to take?",
+      "options": [
+        "About 10 minutes",
+        "About 45 minutes",
+        "Two hours",
+        "All afternoon"
+      ],
+      "answerIndex": 1,
+      "answerText": "About 45 minutes",
+      "explanation": "原文 approximately 45 minutes。",
+      "evidence": "The interview will take approximately 45 minutes.",
+      "correctBasis": "面试预计用时45分钟直接明示",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "About 10 minutes",
+          "reason": "十分钟是提前签到"
+        },
+        {
+          "index": 2,
+          "option": "Two hours",
+          "reason": "不是两小时"
+        },
+        {
+          "index": 3,
+          "option": "All afternoon",
+          "reason": "没有全天面试安排"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S06-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-F-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "STORE POLICY\nOnline orders may be picked up at no charge. Orders are held for five calendar days after the customer receives a pickup notice. After five days, uncollected orders are canceled and payment is refunded automatically.",
+      "referenceArticle": "STORE POLICY\nOnline orders may be picked up at no charge. Orders are held for five calendar days after the customer receives a pickup notice. After five days, uncollected orders are canceled and payment is refunded automatically.",
+      "documents": [],
+      "stem": "How long will an order be held?",
+      "options": [
+        "One business day",
+        "Ten calendar days",
+        "Until the end of the month",
+        "Five calendar days"
+      ],
+      "answerIndex": 3,
+      "answerText": "Five calendar days",
+      "explanation": "政策明确 five calendar days。",
+      "evidence": "Orders are held for five calendar days",
+      "correctBasis": "取货通知发出后保留五个自然日，这是明确的订单保留期",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "One business day",
+          "reason": "非一个工作日"
+        },
+        {
+          "index": 1,
+          "option": "Ten calendar days",
+          "reason": "非十个自然日"
+        },
+        {
+          "index": 2,
+          "option": "Until the end of the month",
+          "reason": "不是保留至月底"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S06-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-F-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "STORE POLICY\nOnline orders may be picked up at no charge. Orders are held for five calendar days after the customer receives a pickup notice. After five days, uncollected orders are canceled and payment is refunded automatically.",
+      "referenceArticle": "STORE POLICY\nOnline orders may be picked up at no charge. Orders are held for five calendar days after the customer receives a pickup notice. After five days, uncollected orders are canceled and payment is refunded automatically.",
+      "documents": [],
+      "stem": "What happens if a customer never picks up the order?",
+      "options": [
+        "The order is canceled and refunded",
+        "A storage fee is charged",
+        "The order is mailed automatically",
+        "The payment is kept"
+      ],
+      "answerIndex": 0,
+      "answerText": "The order is canceled and refunded",
+      "explanation": "超过五天未领取会取消并自动退款。",
+      "evidence": "uncollected orders are canceled and payment is refunded automatically",
+      "correctBasis": "五自然日未提货订单取消，付款自动退款",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "A storage fee is charged",
+          "reason": "未设仓储费"
+        },
+        {
+          "index": 2,
+          "option": "The order is mailed automatically",
+          "reason": "未自动寄送"
+        },
+        {
+          "index": 3,
+          "option": "The payment is kept",
+          "reason": "商家不保留顾客付款"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-S06-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-F-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "",
+      "passage": "STORE POLICY\nOnline orders may be picked up at no charge. Orders are held for five calendar days after the customer receives a pickup notice. After five days, uncollected orders are canceled and payment is refunded automatically.",
+      "referenceArticle": "STORE POLICY\nOnline orders may be picked up at no charge. Orders are held for five calendar days after the customer receives a pickup notice. After five days, uncollected orders are canceled and payment is refunded automatically.",
+      "documents": [],
+      "stem": "The word \"held\" is closest in meaning to",
+      "options": [
+        "sold",
+        "opened",
+        "kept",
+        "weighed"
+      ],
+      "answerIndex": 2,
+      "answerText": "kept",
+      "explanation": "在订单自提语境中 held 表示保留、保存。",
+      "evidence": "Orders are held for five calendar days",
+      "correctBasis": "Orders are held for five calendar days 的 held 表保存待领取",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "sold",
+          "reason": "不是卖给其他人"
+        },
+        {
+          "index": 1,
+          "option": "opened",
+          "reason": "不是拆封商品"
+        },
+        {
+          "index": 3,
+          "option": "weighed",
+          "reason": "与商品重量无关"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M1-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-G-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G1",
+      "passage": "",
+      "referenceArticle": "TRAIN SCHEDULE\n88: Bayview 7:40 → Central 8:35\n94: Bayview 8:05 → Central 9:00\n102: Bayview 8:30 → Central 9:25\n\nMESSAGE\nOur client briefing at Central Plaza starts at 9:15. Please arrive at Central Station at least 20 minutes before the meeting so we can walk together.",
+      "documents": [
+        "TRAIN SCHEDULE\n88: Bayview 7:40 → Central 8:35\n94: Bayview 8:05 → Central 9:00\n102: Bayview 8:30 → Central 9:25",
+        "MESSAGE\nOur client briefing at Central Plaza starts at 9:15. Please arrive at Central Station at least 20 minutes before the meeting so we can walk together."
+      ],
+      "stem": "Which train is the latest one that meets the request?",
+      "options": [
+        "Train 88",
+        "Train 102",
+        "None",
+        "Train 94"
+      ],
+      "answerIndex": 0,
+      "answerText": "Train 88",
+      "explanation": "需最迟8:55到站，只有88次8:35满足；94次9:00太晚。",
+      "evidence": "88: Bayview 7:40 → Central 8:35 || Our client briefing at Central Plaza starts at 9:15.",
+      "correctBasis": "会议09:15开始且要求至少提前20分钟到Central站，最迟应08:55到；88次08:35达，94次09:00已晚",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Train 102",
+          "reason": "102次09:25更晚"
+        },
+        {
+          "index": 2,
+          "option": "None",
+          "reason": "88次存在并符合要求，不可能都不合格"
+        },
+        {
+          "index": 3,
+          "option": "Train 94",
+          "reason": "94次09:00抵达晚于08:55要求"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M1-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-G-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G1",
+      "passage": "",
+      "referenceArticle": "TRAIN SCHEDULE\n88: Bayview 7:40 → Central 8:35\n94: Bayview 8:05 → Central 9:00\n102: Bayview 8:30 → Central 9:25\n\nMESSAGE\nOur client briefing at Central Plaza starts at 9:15. Please arrive at Central Station at least 20 minutes before the meeting so we can walk together.",
+      "documents": [
+        "TRAIN SCHEDULE\n88: Bayview 7:40 → Central 8:35\n94: Bayview 8:05 → Central 9:00\n102: Bayview 8:30 → Central 9:25",
+        "MESSAGE\nOur client briefing at Central Plaza starts at 9:15. Please arrive at Central Station at least 20 minutes before the meeting so we can walk together."
+      ],
+      "stem": "When does Train 94 arrive at Central?",
+      "options": [
+        "9:25",
+        "9:00",
+        "8:35",
+        "9:15"
+      ],
+      "answerIndex": 1,
+      "answerText": "9:00",
+      "explanation": "时刻表直接给出 9:00。",
+      "evidence": "94: Bayview 8:05 → Central 9:00",
+      "correctBasis": "时刻表94次到达Central为09:00",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "9:25",
+          "reason": "09:25是102次到站"
+        },
+        {
+          "index": 2,
+          "option": "8:35",
+          "reason": "08:35是88次到站"
+        },
+        {
+          "index": 3,
+          "option": "9:15",
+          "reason": "09:15是简报开始时间"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M1-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-G-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G1",
+      "passage": "",
+      "referenceArticle": "TRAIN SCHEDULE\n88: Bayview 7:40 → Central 8:35\n94: Bayview 8:05 → Central 9:00\n102: Bayview 8:30 → Central 9:25\n\nMESSAGE\nOur client briefing at Central Plaza starts at 9:15. Please arrive at Central Station at least 20 minutes before the meeting so we can walk together.",
+      "documents": [
+        "TRAIN SCHEDULE\n88: Bayview 7:40 → Central 8:35\n94: Bayview 8:05 → Central 9:00\n102: Bayview 8:30 → Central 9:25",
+        "MESSAGE\nOur client briefing at Central Plaza starts at 9:15. Please arrive at Central Station at least 20 minutes before the meeting so we can walk together."
+      ],
+      "stem": "Why was the message written?",
+      "options": [
+        "To cancel the client briefing",
+        "To reserve train seats",
+        "To coordinate arrival before a client briefing",
+        "To change the train schedule"
+      ],
+      "answerIndex": 2,
+      "answerText": "To coordinate arrival before a client briefing",
+      "explanation": "消息要求提前到站以一起步行去会议。",
+      "evidence": "Our client briefing at Central Plaza starts at 9:15.",
+      "correctBasis": "消息提醒09:15简报前到中央站并一起步行，意图为协调到达时间",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "To cancel the client briefing",
+          "reason": "没有取消简报"
+        },
+        {
+          "index": 1,
+          "option": "To reserve train seats",
+          "reason": "不要求订火车座位"
+        },
+        {
+          "index": 3,
+          "option": "To change the train schedule",
+          "reason": "不改变车次表"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M2-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-H-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G2",
+      "passage": "",
+      "referenceArticle": "COUPON\n20% off one office chair. Valid through August 31. Cannot be combined with other discounts.\n\nRECEIPT\nAugust 28 — Office chair $150 — Desk organizer $25\n\nNOTE\nPlease apply the chair coupon to my purchase if it is still valid. —Jordan",
+      "documents": [
+        "COUPON\n20% off one office chair. Valid through August 31. Cannot be combined with other discounts.",
+        "RECEIPT\nAugust 28 — Office chair $150 — Desk organizer $25",
+        "NOTE\nPlease apply the chair coupon to my purchase if it is still valid. —Jordan"
+      ],
+      "stem": "How much discount applies to the chair before tax?",
+      "options": [
+        "$30",
+        "$35",
+        "$20",
+        "$25"
+      ],
+      "answerIndex": 0,
+      "answerText": "$30",
+      "explanation": "150美元的20%为30美元。",
+      "evidence": "20% off one office chair. || Office chair $150",
+      "correctBasis": "办公椅150美元优惠券八折，150乘20%=30美元，是税前折扣额度",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "$35",
+          "reason": "35美元不是两成折扣"
+        },
+        {
+          "index": 2,
+          "option": "$20",
+          "reason": "20美元不是150的20%"
+        },
+        {
+          "index": 3,
+          "option": "$25",
+          "reason": "25美元为收纳器价而非折扣"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M2-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-H-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G2",
+      "passage": "",
+      "referenceArticle": "COUPON\n20% off one office chair. Valid through August 31. Cannot be combined with other discounts.\n\nRECEIPT\nAugust 28 — Office chair $150 — Desk organizer $25\n\nNOTE\nPlease apply the chair coupon to my purchase if it is still valid. —Jordan",
+      "documents": [
+        "COUPON\n20% off one office chair. Valid through August 31. Cannot be combined with other discounts.",
+        "RECEIPT\nAugust 28 — Office chair $150 — Desk organizer $25",
+        "NOTE\nPlease apply the chair coupon to my purchase if it is still valid. —Jordan"
+      ],
+      "stem": "When was the purchase made?",
+      "options": [
+        "August 31",
+        "August 28",
+        "September 1",
+        "July 28"
+      ],
+      "answerIndex": 1,
+      "answerText": "August 28",
+      "explanation": "收据日期 August 28。",
+      "evidence": "August 28 — Office chair $150",
+      "correctBasis": "收据表明8月28日购买办公椅与整理器",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "August 31",
+          "reason": "8月31是优惠券截止日期"
+        },
+        {
+          "index": 2,
+          "option": "September 1",
+          "reason": "9月1日没有收据"
+        },
+        {
+          "index": 3,
+          "option": "July 28",
+          "reason": "7月28日不是购买日"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M2-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-H-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G2",
+      "passage": "",
+      "referenceArticle": "COUPON\n20% off one office chair. Valid through August 31. Cannot be combined with other discounts.\n\nRECEIPT\nAugust 28 — Office chair $150 — Desk organizer $25\n\nNOTE\nPlease apply the chair coupon to my purchase if it is still valid. —Jordan",
+      "documents": [
+        "COUPON\n20% off one office chair. Valid through August 31. Cannot be combined with other discounts.",
+        "RECEIPT\nAugust 28 — Office chair $150 — Desk organizer $25",
+        "NOTE\nPlease apply the chair coupon to my purchase if it is still valid. —Jordan"
+      ],
+      "stem": "Is the coupon valid on the purchase date?",
+      "options": [
+        "No, it applies only to desks",
+        "The date is not given",
+        "Yes",
+        "No, it expired August 27"
+      ],
+      "answerIndex": 2,
+      "answerText": "Yes",
+      "explanation": "优惠券到8月31有效，购买在8月28。",
+      "evidence": "Valid through August 31. || August 28 — Office chair $150",
+      "correctBasis": "优惠券有效至8月31且8月28日购买，日期上仍有效",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "No, it applies only to desks",
+          "reason": "优惠适用于办公椅而非仅桌子"
+        },
+        {
+          "index": 1,
+          "option": "The date is not given",
+          "reason": "收据上有日期"
+        },
+        {
+          "index": 3,
+          "option": "No, it expired August 27",
+          "reason": "不是8月27到期"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M3-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-I-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G3",
+      "passage": "",
+      "referenceArticle": "EVENT PAGE\nLeadership Forum — November 5, 9 A.M.–3 P.M. Lunch is included. Parking at the venue costs $12.\n\nE-MAIL\nI will take the company shuttle, so please do not reserve parking for me. I selected the vegetarian lunch option when I registered. —Asha",
+      "documents": [
+        "EVENT PAGE\nLeadership Forum — November 5, 9 A.M.–3 P.M. Lunch is included. Parking at the venue costs $12.",
+        "E-MAIL\nI will take the company shuttle, so please do not reserve parking for me. I selected the vegetarian lunch option when I registered. —Asha"
+      ],
+      "stem": "What expense will Asha most likely avoid?",
+      "options": [
+        "Parking",
+        "Registration",
+        "Lunch",
+        "Shuttle maintenance"
+      ],
+      "answerIndex": 0,
+      "answerText": "Parking",
+      "explanation": "她乘公司班车并明确不要预留停车，因此避免停车费。",
+      "evidence": "Parking at the venue costs $12. || I will take the company shuttle",
+      "correctBasis": "Asha乘公司班车不预订停车，故最可能免付场地停车12美元",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Registration",
+          "reason": "论坛报名费没有写需要付或免"
+        },
+        {
+          "index": 2,
+          "option": "Lunch",
+          "reason": "午餐已包含且她选择素食，没有因坐班车免付午餐"
+        },
+        {
+          "index": 3,
+          "option": "Shuttle maintenance",
+          "reason": "班车保养不是她的会场开支"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M3-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-I-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G3",
+      "passage": "",
+      "referenceArticle": "EVENT PAGE\nLeadership Forum — November 5, 9 A.M.–3 P.M. Lunch is included. Parking at the venue costs $12.\n\nE-MAIL\nI will take the company shuttle, so please do not reserve parking for me. I selected the vegetarian lunch option when I registered. —Asha",
+      "documents": [
+        "EVENT PAGE\nLeadership Forum — November 5, 9 A.M.–3 P.M. Lunch is included. Parking at the venue costs $12.",
+        "E-MAIL\nI will take the company shuttle, so please do not reserve parking for me. I selected the vegetarian lunch option when I registered. —Asha"
+      ],
+      "stem": "What lunch option did Asha select?",
+      "options": [
+        "No lunch",
+        "Vegetarian",
+        "Standard only",
+        "Seafood"
+      ],
+      "answerIndex": 1,
+      "answerText": "Vegetarian",
+      "explanation": "邮件明确 vegetarian lunch option。",
+      "evidence": "I selected the vegetarian lunch option when I registered.",
+      "correctBasis": "她在邮件中明确已选素食午餐",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "No lunch",
+          "reason": "活动包含午餐且她实际选餐"
+        },
+        {
+          "index": 2,
+          "option": "Standard only",
+          "reason": "不是仅可选择标准午餐"
+        },
+        {
+          "index": 3,
+          "option": "Seafood",
+          "reason": "未订海鲜"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M3-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-I-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G3",
+      "passage": "",
+      "referenceArticle": "EVENT PAGE\nLeadership Forum — November 5, 9 A.M.–3 P.M. Lunch is included. Parking at the venue costs $12.\n\nE-MAIL\nI will take the company shuttle, so please do not reserve parking for me. I selected the vegetarian lunch option when I registered. —Asha",
+      "documents": [
+        "EVENT PAGE\nLeadership Forum — November 5, 9 A.M.–3 P.M. Lunch is included. Parking at the venue costs $12.",
+        "E-MAIL\nI will take the company shuttle, so please do not reserve parking for me. I selected the vegetarian lunch option when I registered. —Asha"
+      ],
+      "stem": "How long does the forum run?",
+      "options": [
+        "Twelve hours",
+        "Three hours",
+        "Six hours",
+        "Nine hours"
+      ],
+      "answerIndex": 2,
+      "answerText": "Six hours",
+      "explanation": "9 A.M.–3 P.M. 为6小时。",
+      "evidence": "Leadership Forum — November 5, 9 A.M.–3 P.M.",
+      "correctBasis": "论坛从上午09:00持续到下午15:00，共6小时",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "Twelve hours",
+          "reason": "12小时是实际两倍"
+        },
+        {
+          "index": 1,
+          "option": "Three hours",
+          "reason": "3小时仅半程"
+        },
+        {
+          "index": 3,
+          "option": "Nine hours",
+          "reason": "9小时超出实际时段"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M4-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-J-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G4",
+      "passage": "",
+      "referenceArticle": "WARRANTY\nPortable scanners are covered for one year from purchase against manufacturing defects. Damage caused by dropping or water is excluded.\n\nRECEIPT\nScanner purchased March 12.\n\nSUPPORT NOTE\nFebruary 20 of the following year: Unit no longer powers on. No visible impact or water damage.",
+      "documents": [
+        "WARRANTY\nPortable scanners are covered for one year from purchase against manufacturing defects. Damage caused by dropping or water is excluded.",
+        "RECEIPT\nScanner purchased March 12.",
+        "SUPPORT NOTE\nFebruary 20 of the following year: Unit no longer powers on. No visible impact or water damage."
+      ],
+      "stem": "Is the scanner still within the stated warranty period?",
+      "options": [
+        "Yes",
+        "No, only six months are covered",
+        "No, the warranty ended in December",
+        "The purchase date is missing"
+      ],
+      "answerIndex": 0,
+      "answerText": "Yes",
+      "explanation": "次年2月20仍未满一年。",
+      "evidence": "covered for one year from purchase || Scanner purchased March 12.",
+      "correctBasis": "保修一年：3月12日买，次年2月20日报修，尚不足一年，在保修期限内",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "No, only six months are covered",
+          "reason": "不止六个月质保而是一年"
+        },
+        {
+          "index": 2,
+          "option": "No, the warranty ended in December",
+          "reason": "保修不会在购买当年12月结束"
+        },
+        {
+          "index": 3,
+          "option": "The purchase date is missing",
+          "reason": "收据明确有3月12日"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M4-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-J-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G4",
+      "passage": "",
+      "referenceArticle": "WARRANTY\nPortable scanners are covered for one year from purchase against manufacturing defects. Damage caused by dropping or water is excluded.\n\nRECEIPT\nScanner purchased March 12.\n\nSUPPORT NOTE\nFebruary 20 of the following year: Unit no longer powers on. No visible impact or water damage.",
+      "documents": [
+        "WARRANTY\nPortable scanners are covered for one year from purchase against manufacturing defects. Damage caused by dropping or water is excluded.",
+        "RECEIPT\nScanner purchased March 12.",
+        "SUPPORT NOTE\nFebruary 20 of the following year: Unit no longer powers on. No visible impact or water damage."
+      ],
+      "stem": "Why might the issue qualify for warranty service?",
+      "options": [
+        "The receipt is for another product",
+        "No excluded damage is reported",
+        "The scanner is more than two years old",
+        "Water damage is visible"
+      ],
+      "answerIndex": 1,
+      "answerText": "No excluded damage is reported",
+      "explanation": "故障在保修期内且未报告摔落/进水。",
+      "evidence": "Damage caused by dropping or water is excluded. || No visible impact or water damage.",
+      "correctBasis": "购买期未满一年、记录无可见撞击或进水，不能确认制造缺陷但有可能适用保修",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "The receipt is for another product",
+          "reason": "凭证是本扫码器不是其他商品"
+        },
+        {
+          "index": 2,
+          "option": "The scanner is more than two years old",
+          "reason": "机器并非已购两年以上"
+        },
+        {
+          "index": 3,
+          "option": "Water damage is visible",
+          "reason": "注明未见水损而非可见水损"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M4-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-J-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G4",
+      "passage": "",
+      "referenceArticle": "WARRANTY\nPortable scanners are covered for one year from purchase against manufacturing defects. Damage caused by dropping or water is excluded.\n\nRECEIPT\nScanner purchased March 12.\n\nSUPPORT NOTE\nFebruary 20 of the following year: Unit no longer powers on. No visible impact or water damage.",
+      "documents": [
+        "WARRANTY\nPortable scanners are covered for one year from purchase against manufacturing defects. Damage caused by dropping or water is excluded.",
+        "RECEIPT\nScanner purchased March 12.",
+        "SUPPORT NOTE\nFebruary 20 of the following year: Unit no longer powers on. No visible impact or water damage."
+      ],
+      "stem": "What problem is reported?",
+      "options": [
+        "The screen is scratched",
+        "The battery was lost",
+        "The unit will not power on",
+        "The scanner was dropped"
+      ],
+      "answerIndex": 2,
+      "answerText": "The unit will not power on",
+      "explanation": "support note 明确 no longer powers on。",
+      "evidence": "Unit no longer powers on.",
+      "correctBasis": "售后登记设备无法开机，原文明示Unit no longer powers on",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "The screen is scratched",
+          "reason": "不是屏幕刮伤"
+        },
+        {
+          "index": 1,
+          "option": "The battery was lost",
+          "reason": "无电池丢失记载"
+        },
+        {
+          "index": 3,
+          "option": "The scanner was dropped",
+          "reason": "明确没有可见跌落损伤而非报告摔落"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M5-01",
+      "day": 19,
+      "sourceId": "R-M2-P7-K-01",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G5",
+      "passage": "",
+      "referenceArticle": "JOB POSTING\nOperations Coordinator: minimum two years of logistics experience; proficiency with spreadsheet software; available to start by September 15.\n\nRÉSUMÉ\nDario Kim — three years in warehouse logistics; advanced spreadsheet certification.\n\nE-MAIL\nI can begin on September 8 if selected. —Dario",
+      "documents": [
+        "JOB POSTING\nOperations Coordinator: minimum two years of logistics experience; proficiency with spreadsheet software; available to start by September 15.",
+        "RÉSUMÉ\nDario Kim — three years in warehouse logistics; advanced spreadsheet certification.",
+        "E-MAIL\nI can begin on September 8 if selected. —Dario"
+      ],
+      "stem": "Which requirement is supported by the e-mail?",
+      "options": [
+        "Start-date availability",
+        "Spreadsheet proficiency",
+        "University degree",
+        "Years of logistics experience"
+      ],
+      "answerIndex": 0,
+      "answerText": "Start-date availability",
+      "explanation": "邮件证明9月8日可开始，满足9月15日前到岗。",
+      "evidence": "available to start by September 15. || I can begin on September 8 if selected.",
+      "correctBasis": "邮件只写9月8日可上岗，早于职位9月15日最迟开工要求，证明入职时间条件",
+      "wrongOptions": [
+        {
+          "index": 1,
+          "option": "Spreadsheet proficiency",
+          "reason": "表格证书也在简历"
+        },
+        {
+          "index": 2,
+          "option": "University degree",
+          "reason": "没有大学学位相关要求"
+        },
+        {
+          "index": 3,
+          "option": "Years of logistics experience",
+          "reason": "工作年限在简历非邮件"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M5-02",
+      "day": 19,
+      "sourceId": "R-M2-P7-K-02",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G5",
+      "passage": "",
+      "referenceArticle": "JOB POSTING\nOperations Coordinator: minimum two years of logistics experience; proficiency with spreadsheet software; available to start by September 15.\n\nRÉSUMÉ\nDario Kim — three years in warehouse logistics; advanced spreadsheet certification.\n\nE-MAIL\nI can begin on September 8 if selected. —Dario",
+      "documents": [
+        "JOB POSTING\nOperations Coordinator: minimum two years of logistics experience; proficiency with spreadsheet software; available to start by September 15.",
+        "RÉSUMÉ\nDario Kim — three years in warehouse logistics; advanced spreadsheet certification.",
+        "E-MAIL\nI can begin on September 8 if selected. —Dario"
+      ],
+      "stem": "Which requirement is supported by the résumé?",
+      "options": [
+        "Language certification",
+        "Logistics experience and spreadsheet skill",
+        "Only start date",
+        "Parking availability"
+      ],
+      "answerIndex": 1,
+      "answerText": "Logistics experience and spreadsheet skill",
+      "explanation": "简历提供三年物流经验和高级表格证书。",
+      "evidence": "minimum two years of logistics experience || three years in warehouse logistics",
+      "correctBasis": "简历写仓储物流工作三年及高级表格证书，符合经验和软件能力条件",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "Language certification",
+          "reason": "没有语言资格说明"
+        },
+        {
+          "index": 2,
+          "option": "Only start date",
+          "reason": "开始日期写在邮件不在简历"
+        },
+        {
+          "index": 3,
+          "option": "Parking availability",
+          "reason": "停车情况非职位要求"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    },
+    {
+      "id": "R-FM2-P7-M5-03",
+      "day": 19,
+      "sourceId": "R-M2-P7-K-03",
+      "sourceVersion": 1,
+      "currentVersion": 1,
+      "groupId": "FM2-G5",
+      "passage": "",
+      "referenceArticle": "JOB POSTING\nOperations Coordinator: minimum two years of logistics experience; proficiency with spreadsheet software; available to start by September 15.\n\nRÉSUMÉ\nDario Kim — three years in warehouse logistics; advanced spreadsheet certification.\n\nE-MAIL\nI can begin on September 8 if selected. —Dario",
+      "documents": [
+        "JOB POSTING\nOperations Coordinator: minimum two years of logistics experience; proficiency with spreadsheet software; available to start by September 15.",
+        "RÉSUMÉ\nDario Kim — three years in warehouse logistics; advanced spreadsheet certification.",
+        "E-MAIL\nI can begin on September 8 if selected. —Dario"
+      ],
+      "stem": "What is most likely true about Dario?",
+      "options": [
+        "He cannot start by September 15",
+        "He has no spreadsheet experience",
+        "He appears to meet all listed requirements",
+        "He lacks logistics experience"
+      ],
+      "answerIndex": 2,
+      "answerText": "He appears to meet all listed requirements",
+      "explanation": "招聘三项要求均有对应证据。",
+      "evidence": "minimum two years of logistics experience || three years in warehouse logistics",
+      "correctBasis": "岗位要求两年物流、表格能力、9月15日前到岗；简历三年加证书，邮件9月8可入职，三项均满足",
+      "wrongOptions": [
+        {
+          "index": 0,
+          "option": "He cannot start by September 15",
+          "reason": "9月8可上岗早于15日"
+        },
+        {
+          "index": 1,
+          "option": "He has no spreadsheet experience",
+          "reason": "高级表格证书证明有表格能力"
+        },
+        {
+          "index": 3,
+          "option": "He lacks logistics experience",
+          "reason": "不是缺物流经验，简历写三年"
+        }
+      ],
+      "reviewStatus": "AI_DERIVED_CONTEXT_PASS",
+      "expertCertified": false
+    }
+  ],
+  "editorialFindings": [
+    {
+      "id": "R-FM1-P7-M1-01",
+      "type": "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE",
+      "missingEvidenceFragments": [
+        "Please allow 20 minutes to walk from the station."
+      ],
+      "reviewerNote": "Train arrival plus presentation time alone omits walking buffer necessary for the final answer.",
+      "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
+      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+    },
+    {
+      "id": "R-FM1-P7-M4-01",
+      "type": "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE",
+      "missingEvidenceFragments": [
+        "It takes about 10 minutes to walk from the bus stop."
+      ],
+      "reviewerNote": "Bus arrival and meeting start require explicit walking time to justify selection.",
+      "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
+      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+    },
+    {
+      "id": "R-FM2-P7-M1-01",
+      "type": "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE",
+      "missingEvidenceFragments": [
+        "Please arrive at Central Station at least 20 minutes before the meeting"
+      ],
+      "reviewerNote": "Train 88 selection requires the twenty-minute advance-arrival threshold.",
+      "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
+      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+    },
+    {
+      "id": "R-FM2-P7-M5-03",
+      "type": "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE",
+      "missingEvidenceFragments": [
+        "proficiency with spreadsheet software",
+        "advanced spreadsheet certification.",
+        "available to start by September 15.",
+        "I can begin on September 8 if selected."
+      ],
+      "reviewerNote": "The evidence highlight only quotes logistics experience while answering all three hiring requirements requires résumé and email evidence.",
+      "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
+      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+    }
+  ]
+}
