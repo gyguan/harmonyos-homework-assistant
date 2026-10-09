@@ -176,6 +176,13 @@
       "reason": "roster can include duties or work shifts, which the weekend-shift example requires",
       "source": "https://dictionary.cambridge.org/dictionary/english/roster",
       "reviewMode": "AI_EDITORIAL"
+    },
+    {
+      "asset": "P7-EX-CATERING",
+      "reviewDate": "2026-10-09",
+      "reason": "R-P7-CATERING-04: through October 8 at 5 P.M. includes the cutoff instant, as opposed to before",
+      "source": "entry/src/main/ets/toeic/content/ToeicExtraReadingBatchSix.ets",
+      "reviewMode": "AI_EDITORIAL"
     }
   ],
   "vocabulary": {
@@ -2648,7 +2655,7 @@
       ]
     },
     "P7-EX-CATERING": {
-      "contentSha256": "a99bf569b6d2ec708d35f21929c4294b12f36851830f9a4e3fe2a89a55fe323b",
+      "contentSha256": "e1c48565c2c4ec5a9d46f02ff12afb1f3bfc9d3335b54d7f076929e1eae5d4b5",
       "decision": "PASS",
       "documents": 3,
       "questions": [
@@ -2682,7 +2689,9 @@
           "answerIndex": 1,
           "skill": "CROSS_DOCUMENT"
         }
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "R-P7-CATERING-04: through October 8 at 5 P.M. includes the cutoff instant, as opposed to before"
     }
   }
 }
