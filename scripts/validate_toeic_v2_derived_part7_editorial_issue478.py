@@ -199,67 +199,89 @@ def validate() -> None:
     for row, actual in zip(published, expected, strict=True):
         check_item(row, actual)
 
-    # The four catalog v1 evidence fields are intentionally frozen for saved
-    # attempt/version replay. The actual result/history learner view must now
-    # supplement every omitted source fragment before this gate can pass.
-    known_gaps = {
-        "R-FM1-P7-M1-01", "R-FM1-P7-M4-01",
-        "R-FM2-P7-M1-01", "R-FM2-P7-M5-03",
-    }
+    # The four incomplete originals remain byte-for-byte addressable for
+    # historical v1 replay. Only new separately published question IDs can
+    # provide corrected learner-facing evidence in newly assembled mock exams.
     findings = data.get("editorialFindings", [])
-    if len(findings) != 4 or {f["id"] for f in findings} != known_gaps:
-        raise AssertionError("must retain four historic evidence-gap provenance records")
-    ui = (CONTENT.parent / "ui/ToeicHomePage.ets").read_text(encoding="utf-8")
-    service = (CONTENT.parent / "application/ToeicEvidenceDisplayService.ets").read_text(encoding="utf-8")
-    # One shared presentation path for active question, practice result and
-    # saved mock report: do not certify a fix only visible on one screen.
-    if ui.count("ToeicEvidenceDisplayService.forQuestion(question)") != 3:
-        raise AssertionError("all three learner-facing evidence paths must use the reviewed presenter")
-    if "return parts.join(' || ');" not in service or "for (let fragment of supplement.fragments)" not in service:
-        raise AssertionError("reviewed evidence supplements are not actually rendered")
-    supplemental = {}
-    for item in re.finditer(
-        r"new ToeicEvidenceSupplement\(\s*'([^']+)'\s*,\s*(\[[\s\S]*?\])\s*\)",
-        service,
+    revisions = {
+        "R-FM1-P7-M1-01": "R-FM1-P7-M1-06",
+        "R-FM1-P7-M4-01": "R-FM1-P7-M4-06",
+        "R-FM2-P7-M1-01": "R-FM2-P7-M1-06",
+        "R-FM2-P7-M5-03": "R-FM2-P7-M5-06",
+    }
+    if len(findings) != 4 or {f["id"] for f in findings} != set(revisions):
+        raise AssertionError("all four archived evidence issues must remain visible")
+    revised_source = (CONTENT / "ToeicMockPart7EvidenceRevisionContent.ets").read_text(encoding="utf-8")
+    expected_revisions = {}
+    for match in re.finditer(
+        r"revised\(day(14|19),'([^']+)','([^']+)',\[(.*?)\]\)",
+        revised_source, flags=re.S,
     ):
-        key, raw_fragments = item.group(1), item.group(2)
-        if key in supplemental:
-            raise AssertionError(f"{key}: duplicate evidence display supplement")
-        supplemental[key] = ast.literal_eval(raw_fragments)
-    if set(supplemental) != known_gaps:
-        raise AssertionError("all four reviewed evidence supplements must be present, no stale overrides")
+        old_day, old_id, new_id = match.group(1), match.group(2), match.group(3)
+        extras = ast.literal_eval("[" + match.group(4) + "]")
+        if old_id in expected_revisions:
+            raise AssertionError("duplicate source evidence revision " + old_id)
+        expected_revisions[old_id] = (new_id, int(old_day), extras)
+    if set(expected_revisions) != set(revisions):
+        raise AssertionError("new evidence revisions are absent or unreviewed")
+
+    preset = (CONTENT / "PresetToeicContent.ets").read_text(encoding="utf-8")
+    groups14 = (CONTENT / "ToeicMockDay14V2Content.ets").read_text(encoding="utf-8")
+    groups19 = (CONTENT / "ToeicMockDay19V2Content.ets").read_text(encoding="utf-8")
+    reading = (CONTENT.parent / "application/ToeicReadingGroupService.ets").read_text(encoding="utf-8")
+    # Both new and old IDs must coexist in publishedQuestions for drafts;
+    # only newly assembled day14/day19 mock question IDs are replaced.
+    if preset.count(".concat(ToeicMockPart7EvidenceRevisionContent.questions())") != 2:
+        raise AssertionError("complete evidence editions must be in both published and group catalogs")
+    if preset.count("ToeicMockPart7EvidenceRevisionContent.activeId(question.id)") != 2:
+        raise AssertionError("Day14 and Day19 must both pick the revised IDs")
+    if "group.questionIds.indexOf(question.id)>=0" not in reading:
+        raise AssertionError("group navigation must support both historical and revised question editions")
+    if "if (group===0 || group===3) ids.push('R-FM1-P7-M'" not in groups14:
+        raise AssertionError("revised Day14 group IDs not available to linked passage validator")
+    if "if (group===0 || group===4) ids.push('R-FM2-P7-M'" not in groups19:
+        raise AssertionError("revised Day19 group IDs not available to linked passage validator")
     by_id = {r["id"]: r for r in published}
     for finding in findings:
-        q = by_id[finding["id"]]
-        if finding["type"] != "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE":
-            raise AssertionError(f'{finding["id"]}: wrong historical finding kind')
-        if finding["answerValidity"] != "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER":
-            raise AssertionError(f'{finding["id"]}: claim about source support changed')
-        if finding.get("presentationStatus") != "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT":
-            raise AssertionError(f'{finding["id"]}: cannot mark unremediated learner evidence as PASS')
+        old_id = finding["id"]
+        original = by_id[old_id]
+        revised_id, day, additions = expected_revisions[old_id]
+        if finding.get("activeRevisionId") != revised_id or revisions[old_id] != revised_id:
+            raise AssertionError(f"{old_id}: active revised question ID not recorded")
+        if finding.get("presentationStatus") != "REMEDIATED_BY_NEW_PUBLISHED_ID":
+            raise AssertionError(f"{old_id}: unresolved evidence cannot be marked releasable")
         if finding.get("archivedEvidenceUnchanged") is not True:
-            raise AssertionError(f'{finding["id"]}: original v1 source must be preserved')
-        original_excerpt = q["evidence"]
-        document_text = "\n\n".join(q["documents"])
-        missing = finding.get("missingEvidenceFragments")
-        additions = supplemental[finding["id"]]
-        if not isinstance(missing, list) or not missing or not isinstance(additions, list):
-            raise AssertionError(f'{finding["id"]}: missing reviewed evidence detail')
-        display_excerpt = original_excerpt + " || " + " || ".join(additions)
+            raise AssertionError(f"{old_id}: historical question evidence must stay immutable")
+        if finding["type"] != "LEARNER_EVIDENCE_HIGHLIGHT_INCOMPLETE":
+            raise AssertionError(f"{old_id}: lost historical reason for revision")
+        if original["currentVersion"] != 1 or original["day"] != day:
+            raise AssertionError(f"{old_id}: historical version/day drift")
+        if f"question.id==='{old_id}'" not in preset:
+            raise AssertionError(f"{old_id}: original evidence question could leak back into live learning")
+        document_text = "\n\n".join(original["documents"])
+        missing = finding["missingEvidenceFragments"]
+        if not missing or not additions:
+            raise AssertionError(f"{old_id}: missing source evidence revision")
+        published_revision_evidence = original["evidence"] + " || " + " || ".join(additions)
         for fragment in missing:
-            if fragment not in document_text or fragment in original_excerpt:
-                raise AssertionError(f'{finding["id"]}: invalid historical missing-evidence finding')
-            if fragment not in additions or fragment not in display_excerpt:
-                raise AssertionError(f'{finding["id"]}: published learner-visible evidence remains incomplete')
+            if fragment not in document_text or fragment in original["evidence"]:
+                raise AssertionError(f"{old_id}: edited or fabricated historical evidence gap")
+            if fragment not in published_revision_evidence or fragment not in additions:
+                raise AssertionError(f"{old_id}: revised learner question still omits required proof")
         for fragment in additions:
             if fragment not in document_text:
-                raise AssertionError(f'{finding["id"]}: display evidence not traceable to group document')
-        # Negative check: ignoring supplements must fail the same proof test.
-        if all(fragment in original_excerpt for fragment in missing):
-            raise AssertionError(f'{finding["id"]}: negative control did not expose original gap')
+                raise AssertionError(f"{old_id}: revised evidence not present in grouped source documents")
+        # Verify the actual new question constructor copies original answer,
+        # stem, options and group, but publishes an independent version=1.
+    required_copy = (
+        "q.options.slice(),q.correctIndex,q.explanation,evidence,q.paraphrase",
+        "q.recommendedSeconds,q.difficulty,q.scoreValue,ToeicReviewStatus.PUBLISHED",
+        "1,q.audioAssetId,q.transcript,q.evidenceStartMs,q.evidenceEndMs,q.groupId",
+    )
+    if any(token not in revised_source for token in required_copy):
+        raise AssertionError("new evidence edition must preserve correct option/reading group")
     if data["scope"].get("learnerPresentationUnresolvedGaps") != 0:
-        raise AssertionError("cannot close issue while display evidence is incomplete")
-    # This remains an AI editorial audit, not teacher or ETS certification.
+        raise AssertionError("unresolved released evidence still exists")
 
     # Negative controls: changing one answer, one distractor or one underlying
     # source requires a genuine re-review rather than trusting the stale ledger.
@@ -287,7 +309,7 @@ def validate() -> None:
     print("TOEIC_ISSUE478_V2_DERIVED_PART7_SEMANTIC_PASS items=72 "
           "day14=39 day19=33 grouped=30 singles=42 "
           "distractor_exclusions=216 source_git_blobs=4 "
-          "rotated_correct_answer_text=verified archival_evidence_excerpt_gaps=4 learner_display_gaps=0 "
+          "rotated_correct_answer_text=verified archival_evidence_excerpt_gaps=4 active_revised_evidence_questions=4 "
           "human_expert_ETS_certification=NO")
 
 
