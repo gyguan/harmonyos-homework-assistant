@@ -12,9 +12,10 @@
     "derivedItems": 72,
     "correctBasis": 72,
     "wrongOptionReasons": 216,
-    "highlightCoverageGaps": 4
+    "highlightCoverageGaps": 4,
+    "learnerPresentationUnresolvedGaps": 0
   },
-  "limitations": "AI second-context look at actually rotated options and new reading groups, not independent human/ETS certification; requires re-review after source changes. Four identified learner-facing evidence excerpts omit relevant clauses, although full group documents support the answers; they remain explicitly flagged and require history-safe future publication.",
+  "limitations": "AI second-context look at actually rotated options and new reading groups, not independent human/ETS certification; requires re-review after source changes. Four published question evidence fields retain historically incomplete excerpt strings, but learner-facing presentation now includes verified supplementary fragments via shared service; the source gaps remain recorded transparently for editorial provenance.",
   "sourceBlobs": {
     "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "4be4a4f1c762362220fb2a0ebe8a31d62ebb9e8f",
     "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "e954bef30ef8b570bde6d6c312c0e5eba6d33638",
@@ -3168,7 +3169,9 @@
       ],
       "reviewerNote": "Train arrival plus presentation time alone omits walking buffer necessary for the final answer.",
       "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
-      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+      "resolution": "The shared ToeicEvidenceDisplayService supplements this question's learner-facing evidence in active practice, result and history views; the stored published question evidence/version remains unchanged. CI must verify all omitted excerpts in current source documents and displayed presentation.",
+      "presentationStatus": "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT",
+      "archivedEvidenceUnchanged": true
     },
     {
       "id": "R-FM1-P7-M4-01",
@@ -3178,7 +3181,9 @@
       ],
       "reviewerNote": "Bus arrival and meeting start require explicit walking time to justify selection.",
       "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
-      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+      "resolution": "The shared ToeicEvidenceDisplayService supplements this question's learner-facing evidence in active practice, result and history views; the stored published question evidence/version remains unchanged. CI must verify all omitted excerpts in current source documents and displayed presentation.",
+      "presentationStatus": "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT",
+      "archivedEvidenceUnchanged": true
     },
     {
       "id": "R-FM2-P7-M1-01",
@@ -3188,7 +3193,9 @@
       ],
       "reviewerNote": "Train 88 selection requires the twenty-minute advance-arrival threshold.",
       "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
-      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+      "resolution": "The shared ToeicEvidenceDisplayService supplements this question's learner-facing evidence in active practice, result and history views; the stored published question evidence/version remains unchanged. CI must verify all omitted excerpts in current source documents and displayed presentation.",
+      "presentationStatus": "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT",
+      "archivedEvidenceUnchanged": true
     },
     {
       "id": "R-FM2-P7-M5-03",
@@ -3201,7 +3208,9 @@
       ],
       "reviewerNote": "The evidence highlight only quotes logistics experience while answering all three hiring requirements requires résumé and email evidence.",
       "answerValidity": "SOURCE_DOCUMENTS_SUPPORT_THE_STATED_ANSWER",
-      "resolution": "Do not overwrite an already-published ID/version in place; issue a revised new-ID question with complete evidence if learner-facing evidence is corrected."
+      "resolution": "The shared ToeicEvidenceDisplayService supplements this question's learner-facing evidence in active practice, result and history views; the stored published question evidence/version remains unchanged. CI must verify all omitted excerpts in current source documents and displayed presentation.",
+      "presentationStatus": "REMEDIATED_BY_NONDESTRUCTIVE_DISPLAY_SUPPLEMENT",
+      "archivedEvidenceUnchanged": true
     }
   ]
 }
