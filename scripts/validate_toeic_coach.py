@@ -19,6 +19,7 @@ from validate_toeic_shared_part7_first_pass import validate as validate_shared_p
 from validate_toeic_inline_verbatim_first_pass import validate as validate_inline_verbatim_first_pass
 from validate_toeic_v2_mock_semantics_issue478 import validate as validate_v2_mock_semantics
 from validate_toeic_mock_p5p6_unique_issue478 import validate as validate_mock_p5p6_unique
+from validate_toeic_active_mock_p5p6_issue478 import validate as validate_active_mock_p5p6
 
 ROOT = Path(__file__).resolve().parents[1]
 TOEIC = ROOT / "entry/src/main/ets/toeic"
@@ -49,6 +50,7 @@ def main() -> None:
     validate_inline_verbatim_first_pass()
     validate_v2_mock_semantics()
     validate_mock_p5p6_unique()
+    validate_active_mock_p5p6()
     verify_answer_display()
     validate_mock_day14_v2()
     validate_mock_day19_v2()
