@@ -2,10 +2,11 @@
   "readingGroups": {
     "P7-EX-VENUE": {
       "reviewer": "AI-GPT6",
-      "approvedAt": "2026-10-08",
-      "contentSha256": "5f17c7567e2a09dd390e8ca75d9066abd4b55c7fae4c595ce77e8ace7f4ad522",
+      "approvedAt": "2026-10-09",
+      "contentSha256": "1e1385c53112eb62795e89938961f04ef0cc8f403b136f1dc466c6873e49f78d",
       "reviewMode": "AI_EDITORIAL",
-      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json"
+      "reviewEvidence": "docs/product/toeic-ai-editorial-review-2026-10-08.json",
+      "revisionNote": "Issue #478 2026-10-09: VENUE-05 replaces sent-on-time inference with supported distinction between email date and confirmed venue receipt; published v1->v2; AI_EDITORIAL only; docs/product/toeic-issue478-venue-receipt-review-2026-10-09.md"
     },
     "P7-EX-DELIVERY": {
       "reviewer": "AI-GPT6",
