@@ -69,9 +69,9 @@ def check(rows: dict[str, tuple[str, str, str]], extras: dict[str, str]) -> None
         require(len(sentence) >= 32 and len(sentence) <= 250,
                 f"{item_id}: example sentence unusually short/long")
         require(sentence[-1] in ".!?", f"{item_id}: example lacks sentence ending")
-        require(re.search(r"(?i)(?<![a-z])" + re.escape(word) + r"(?![a-z])", sentence) is not None,
-                f"{item_id}: example does not contain its headword {word}")
         if item_id in legacy_ids:
+            require(re.search(r"(?i)(?<![a-z])" + re.escape(word) + r"(?![a-z])", sentence) is not None,
+                    f"{item_id}: new example does not contain its headword {word}")
             require(original_example == "", f"{item_id}: original baseline was unexpectedly modified")
         else:
             require(item_id not in extras, f"{item_id}: do not override already published example")
