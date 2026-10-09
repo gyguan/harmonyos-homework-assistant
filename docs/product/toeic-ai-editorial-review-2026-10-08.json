@@ -606,25 +606,29 @@
     },
     "V-156": {
       "word": "seminar",
-      "contentSha256": "048e6f24dec0b87c42b8f7afac5125d7fe9f510191fcdf63722879f6cf3b3bcb",
-      "decision": "PASS",
+      "contentSha256": "e9274afee3d0ec9fa3b8d189d96bbaca51348b0d528d1221401cf8b358acb56b",
+      "decision": "PASS_AFTER_CORRECTION",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "Cambridge seminar: meeting for study/discussion; removed workshop as a false direct synonym."
     },
     "V-157": {
       "word": "onboarding",
-      "contentSha256": "948a460c8e9ff7298f4e31360e3c7131cbb8d2bb922ba6814f16ea8218066f77",
-      "decision": "PASS",
+      "contentSha256": "8b1d63182f05973a0cbe3afcea924df5414e3f5bccb23b7394f420d1e875a96f",
+      "decision": "PASS_AFTER_CORRECTION",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "Cambridge onboarding: broader employee integration process, not only orientation or paperwork."
     },
     "V-158": {
       "word": "facilitator",
@@ -861,14 +865,16 @@
     },
     "V-179": {
       "word": "revenue",
-      "contentSha256": "266d72ed8fba7edefda7927cee74963c37a2c39d8a0926461c1a33ebe64693b5",
-      "decision": "PASS",
+      "contentSha256": "eb93efdcd19775670a6b2dfb3d5e717363336244d207bcbd9bf9717633f3ea18",
+      "decision": "PASS_AFTER_CORRECTION",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "Cambridge revenue: business/government income, especially but not only sales; removed sales-only paraphrase."
     },
     "V-180": {
       "word": "margin",
@@ -973,14 +979,16 @@
     },
     "V-189": {
       "word": "pallet",
-      "contentSha256": "1da6c279ec94a1dde77bb9fce9f367a94cefb4c7f5602de0f3c92fb3bc39b02f",
-      "decision": "PASS",
+      "contentSha256": "fa5f5887ee71f61bc1c42599496806cb7a43d4c274d87a9ee8aa71960ac7a990",
+      "decision": "PASS_AFTER_CORRECTION",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "Cambridge pallet: flat platform for stacking/moving goods; removed generic loading-platform paraphrase."
     },
     "V-190": {
       "word": "perishable",
@@ -2053,14 +2061,16 @@
     },
     "V-285": {
       "word": "contractor",
-      "contentSha256": "90279d3c79983321777fda140038ed7511c9e9190304d086328297cf645326fb",
-      "decision": "PASS",
+      "contentSha256": "3b18d8833cc1ca532e89661e0cfcd6738fa5db0cbabd0f815161ee1b80d7124a",
+      "decision": "PASS_AFTER_CORRECTION",
       "reviewChecks": [
         "meaning-part-of-speech-context",
         "example-collocation",
         "paraphrase-context",
         "IPA-screening"
-      ]
+      ],
+      "updatedAt": "2026-10-09",
+      "reviewCorrection": "Cambridge contractor: person/company hired under contract for work; removed overbroad external-service-provider paraphrase."
     },
     "V-286": {
       "word": "allocation",
