@@ -23,7 +23,7 @@
     "entry/src/main/ets/toeic/content/ToeicMockPart6V2RepairContent.ets": "a7b037e937153bbe7aa3f499d4c6586753612f01",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6V2Content.ets": "4fdc74a07b2cdb0a9881a9280047003149b0f2f6",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6CompletionContent.ets": "f041c04a6c9ade0d30b90bd3f7c569c56b032f07",
-    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "5c2e3639735fbb84bf5b2761c92bb47062e6b0c0",
+    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "c181ae6774eb5f3d6530f8a44938cc5a6d541feb",
     "entry/src/main/ets/toeic/content/ToeicMockDay14Part5V2Content.ets": "a20a3d1e547ee4678a5590022f0cb984a337ea97"
   },
   "sourceNotesFiles": [
@@ -3075,5 +3075,12 @@
     "questionAndStudyPlanContentUnchanged": true,
     "method": "P2 final review changed only S-037 Chinese deadline wording and S-062 Chinese receive-payment wording inside ToeicSentenceDrill constructors. Part5/6/7 question constructors and study-plan IDs were not modified; existing dynamic semantic validators still compare current question text/answers against these ledgers.",
     "note": "Refresh whole-file Git blobs only because the source files contain both questions and drills. This does not reclassify or weaken any active mock question review."
+  },
+  "sourceChangeAttestationIssue519": {
+    "previousBlob": "5c2e3639735fbb84bf5b2761c92bb47062e6b0c0",
+    "currentBlob": "c181ae6774eb5f3d6530f8a44938cc5a6d541feb",
+    "scope": "P3 routing overlay only; active Day14/Day19 Part5/6 question snapshots, options, answers and passages remain unchanged",
+    "reviewedBy": "AI-GPT5.6-SOL",
+    "date": "2026-10-09"
   }
 }
