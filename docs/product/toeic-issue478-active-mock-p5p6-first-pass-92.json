@@ -15,7 +15,7 @@
     "correctRationales": 92,
     "excludedWrongOptions": 276
   },
-  "limitations": "AI first pass with exact active-pool slot mapping, three source-specific distractor notes per item, and Git source blob snapshot. Original archived ambiguous items remain untouched; ledger is not an ETS/second independent human assessment. Dynamic Part6 inherits historical stems/articles as described by assembly source; source SHA guards all dynamic code.",
+  "limitations": "AI first pass with exact active-pool slot mapping, three source-specific distractor notes per item, and Git source blob snapshot. Original archived ambiguous items remain untouched; ledger is not an ETS/second independent human assessment. Dynamic Part6 inherits historical stems/articles as described by assembly source; source SHA guards all dynamic code.; PR #508: Day14 slot22 new ID replaces nonstandard legacy distractor while archived old answer remains unaltered.",
   "sourceBlobs": {
     "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets": "e8e80bff17620d563250ccfebe9a44271e198d33",
     "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets": "8cd746ea9c71c5fa2f1211c99b74cfd88d4c2d18",
@@ -23,7 +23,8 @@
     "entry/src/main/ets/toeic/content/ToeicMockPart6V2RepairContent.ets": "a7b037e937153bbe7aa3f499d4c6586753612f01",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6V2Content.ets": "4fdc74a07b2cdb0a9881a9280047003149b0f2f6",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6CompletionContent.ets": "f041c04a6c9ade0d30b90bd3f7c569c56b032f07",
-    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "7a1a4e5c1c1ac89e83fd27ba92631b108d79cbbe"
+    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "890bccd77b3100005e307d77c439c87ee3fe2956",
+    "entry/src/main/ets/toeic/content/ToeicMockDay14Part5V2Content.ets": "a20a3d1e547ee4678a5590022f0cb984a337ea97"
   },
   "sourceNotesFiles": [
     "docs/product/toeic-issue478-active-mock-p5-review-notes-60.txt",
@@ -724,11 +725,11 @@
       "slot": 20
     },
     {
-      "id": "R-M1-P5-022",
+      "id": "R-FM1-P5-022",
       "day": 14,
       "source": {
         "originId": "R-M1-P5-022",
-        "originFile": "entry/src/main/ets/toeic/content/ToeicWeekTwoContent.ets",
+        "originFile": "entry/src/main/ets/toeic/content/ToeicMockDay14Part5V2Content.ets",
         "originVersion": 1
       },
       "question": {
@@ -740,17 +741,17 @@
           "unanimous",
           "unanimously",
           "unanimity",
-          "unanimouslyness"
+          "unanimousness"
         ],
         "answerIndex": 0,
-        "explanation": "修饰 decision 用形容词 unanimous。",
+        "explanation": "decision 是名词，空格须用形容词 unanimous。B unanimously 是副词；C unanimity 和 D unanimousness 均是名词，不能作此处定语形容词。新版删除原题中非标准构词 unanimouslyness。",
         "version": 1
       },
-      "correctBasis": "unanimous decision 为一致决定，形容词修饰名词",
+      "correctBasis": "a unanimous decision 为全体一致通过的决定；decision 是名词，需要形容词 unanimous 直接修饰",
       "distractorReasons": [
-        "unanimously 是副词",
-        "unanimity 是名词",
-        "unanimouslyness 非标准词"
+        "unanimously 是副词，不能直接放在 decision 前修饰名词",
+        "unanimity 是名词，不能直接作此处的形容词定语",
+        "unanimousness 虽是可查证的名词，但此处需要形容词 unanimous"
       ],
       "reviewOutcome": "AI_FIRST_PASS",
       "expertCertified": false,
