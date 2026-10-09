@@ -219,7 +219,7 @@ def validate() -> None:
         raise AssertionError("reviewed evidence supplements are not actually rendered")
     supplemental = {}
     for item in re.finditer(
-        r"new ToeicEvidenceSupplement\\(\\s*'([^']+)'\\s*,\\s*(\\[[\\s\\S]*?\\])\\s*\\)",
+        r"new ToeicEvidenceSupplement\(\s*'([^']+)'\s*,\s*(\[[\s\S]*?\])\s*\)",
         service,
     ):
         key, raw_fragments = item.group(1), item.group(2)
@@ -240,7 +240,7 @@ def validate() -> None:
         if finding.get("archivedEvidenceUnchanged") is not True:
             raise AssertionError(f'{finding["id"]}: original v1 source must be preserved')
         original_excerpt = q["evidence"]
-        document_text = "\\n\\n".join(q["documents"])
+        document_text = "\n\n".join(q["documents"])
         missing = finding.get("missingEvidenceFragments")
         additions = supplemental[finding["id"]]
         if not isinstance(missing, list) or not missing or not isinstance(additions, list):
@@ -287,7 +287,7 @@ def validate() -> None:
     print("TOEIC_ISSUE478_V2_DERIVED_PART7_SEMANTIC_PASS items=72 "
           "day14=39 day19=33 grouped=30 singles=42 "
           "distractor_exclusions=216 source_git_blobs=4 "
-           "rotated_correct_answer_text=verified archival_evidence_excerpt_gaps=4 learner_display_gaps=0 "
+          "rotated_correct_answer_text=verified archival_evidence_excerpt_gaps=4 learner_display_gaps=0 "
           "human_expert_ETS_certification=NO")
 
 
