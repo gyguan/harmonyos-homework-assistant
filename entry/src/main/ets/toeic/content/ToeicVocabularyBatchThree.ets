@@ -33,7 +33,7 @@ export class ToeicVocabularyBatchThree {
       new ToeicVocabularyItem("V-177","deductible","n.","保险免赔额",ToeicVocabularyLevel.L3,"保险",["insurance deductible"],["amount paid before insurance coverage applies"],"","en-US","","The policyholder must pay the deductible before the insurer covers eligible vehicle repairs.",ToeicReviewStatus.PUBLISHED),
       new ToeicVocabularyItem("V-178","depreciation","n.","折旧",ToeicVocabularyLevel.L3,"财务",["annual depreciation"],["reduction in recorded asset value"],"","en-US","","The finance report includes depreciation of factory equipment.",ToeicReviewStatus.PUBLISHED),
       new ToeicVocabularyItem("V-179","revenue","n.","营收；收入",ToeicVocabularyLevel.L2,"财务",["annual revenue"],["sales income"],"","en-US","","The retailer reported higher revenue in the second quarter.",ToeicReviewStatus.PUBLISHED),
-      new ToeicVocabularyItem("V-180","margin","n.","利润率；差额",ToeicVocabularyLevel.L3,"经营",["profit margin"],["difference between revenue and cost"],"","en-US","","Higher shipping costs reduced the company's profit margin.",ToeicReviewStatus.PUBLISHED)
+      new ToeicVocabularyItem("V-180","margin","n.","利润率；差额",ToeicVocabularyLevel.L3,"经营",["profit margin"],["difference between revenue and cost, often expressed as a percentage"],"","en-US","","Higher shipping costs reduced the company's profit margin.",ToeicReviewStatus.PUBLISHED)
     ];
   }
 
