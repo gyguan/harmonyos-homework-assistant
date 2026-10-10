@@ -951,7 +951,7 @@ def main() -> None:
     require("ToeicVocabularyRemoteApi.instance.save" in view_model and
             "ToeicVocabularyRemoteApi.instance.list" in view_model and
             "async syncVocabularyRecalls():Promise<boolean>" in view_model and
-            "DefaultFamilyContextRepository.instance.getActiveStudentId()" in view_model,
+            "ActiveStudentContext.instance.get()" in view_model,
             "TOEIC view model must synchronize recalls for the active student")
     require("vocabularyRecall(vocabularyId:string):ToeicVocabularyRecall|null" in progress and
             "async mergeVocabularyRecalls(" in progress and
