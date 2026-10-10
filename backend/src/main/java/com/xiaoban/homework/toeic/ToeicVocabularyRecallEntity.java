@@ -10,8 +10,7 @@ import java.util.UUID;
 @Table(name = "toeic_vocabulary_recall")
 public class ToeicVocabularyRecallEntity {
   @Id public UUID id;
-  public UUID familyId;
-  public String studentId;
+  public UUID accountId;
   public String vocabularyId;
   public boolean remembered;
   public int streak;
