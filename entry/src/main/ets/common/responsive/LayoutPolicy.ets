@@ -30,6 +30,14 @@ export class LayoutPolicy {
     return AppTheme.PAGE_PADDING_EXPANDED;
   }
 
+  static contentMaxWidthForWidth(availableWidthVp: number): number {
+    if (!Number.isFinite(availableWidthVp) || availableWidthVp <= 600) {
+      return AppTheme.CONTENT_NARROW_MAX_WIDTH;
+    }
+    if (availableWidthVp <= 840) return AppTheme.CONTENT_STANDARD_MAX_WIDTH;
+    return AppTheme.CONTENT_WIDE_MAX_WIDTH;
+  }
+
   static homeFocusSummaryRequirement(): LayoutRequirement {
     return new LayoutRequirement(AppTheme.HOME_PRIMARY_MIN_WIDTH, AppTheme.HOME_SECONDARY_MIN_WIDTH,
       AppTheme.SPLIT_PANE_GAP, AppTheme.PAGE_PADDING_WIDE);
