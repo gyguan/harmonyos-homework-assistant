@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/students/{studentId}/toeic/vocabulary-recalls")
+@RequestMapping("/api/v1/toeic/vocabulary-recalls")
 public class ToeicVocabularyRecallController {
   private final ToeicVocabularyRecallService service;
 
@@ -23,17 +23,15 @@ public class ToeicVocabularyRecallController {
 
   @GetMapping
   public List<ToeicVocabularyRecallDtos.Response> list(
-      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String studentId) {
-    return service.list(familyId, studentId);
+      @RequestAttribute(AuthInterceptor.ACCOUNT_ID) UUID accountId) {
+    return service.list(accountId);
   }
 
   @PutMapping("/{vocabularyId}")
   public ToeicVocabularyRecallDtos.Response upsert(
-      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String studentId,
+      @RequestAttribute(AuthInterceptor.ACCOUNT_ID) UUID accountId,
       @PathVariable String vocabularyId,
       @Valid @RequestBody ToeicVocabularyRecallDtos.UpsertRequest input) {
-    return service.upsert(familyId, studentId, vocabularyId, input);
+    return service.upsert(accountId, vocabularyId, input);
   }
 }
