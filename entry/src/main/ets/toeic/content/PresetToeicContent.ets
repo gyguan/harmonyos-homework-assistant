@@ -152,12 +152,17 @@ export class PresetToeicContent {
 
   static publishedReadingGroups():ToeicReadingGroup[] {
     let candidates=ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups()).concat(ToeicMockDay19V2Content.groups());
-    // P3 keeps the previous v2 ID for historic reports while publishing a
-    // stricter wording under a new ID in the same shared passage group.
+    // The group catalog represents the CURRENT release only. Historic question
+    // IDs remain published/addressable for saved drafts and reports, but they
+    // must not be counted as extra members of an active five-question group.
     for (let group of candidates) {
-      if (group.groupId==='FM1-G2' && group.questionIds.indexOf('R-FP3-FM1-P7-M2-03')<0) {
-        group.questionIds.push('R-FP3-FM1-P7-M2-03');
+      let activeIds:string[]=[];
+      for (let id of group.questionIds) {
+        let active=ToeicMockPart7EvidenceRevisionContent.activeId(id);
+        active=ToeicP3FinalCorrections.activePart7Id(active);
+        activeIds.push(active);
       }
+      group.questionIds=activeIds;
     }
     let items=ToeicExtraReadingContent.questions().concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicP3FinalCorrections.questions()).concat(ToeicMockDay19Part6V2Content.questions());
     let groups:ToeicReadingGroup[]=[];
@@ -175,6 +180,26 @@ export class PresetToeicContent {
       if (everyPublished) groups.push(group);
     }
     return groups;
+  }
+
+  /** Return only the CURRENT members of published reading groups for group
+   * integrity validation. Historic published revisions intentionally remain
+   * outside this set so they can still restore old drafts/reports without
+   * being mistaken for extra members of today's paper.
+   */
+  static readingGroupValidationQuestions(questions:ToeicQuestion[],
+    groups:ToeicReadingGroup[]):ToeicQuestion[] {
+    let activeIds:string[]=[];
+    for (let group of groups) {
+      for (let id of group.questionIds) {
+        if (activeIds.indexOf(id)<0) activeIds.push(id);
+      }
+    }
+    let result:ToeicQuestion[]=[];
+    for (let question of questions) {
+      if (activeIds.indexOf(question.id)>=0) result.push(question);
+    }
+    return result;
   }
 
   static publishedQuestions():ToeicQuestion[] {
@@ -195,7 +220,8 @@ export class PresetToeicContent {
       published.push(q);
     }
     let validation=ToeicContentValidator.validateAll(published);
-    let groupValidation=ToeicContentValidator.validateReadingGroups(published,readyGroups);
+    let groupValidation=ToeicContentValidator.validateReadingGroups(
+      PresetToeicContent.readingGroupValidationQuestions(published,readyGroups),readyGroups);
     if (!validation.valid || !groupValidation.valid) return [];
     return published;
   }
