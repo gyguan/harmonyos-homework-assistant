@@ -951,8 +951,8 @@ def main() -> None:
     require("ToeicVocabularyRemoteApi.instance.save" in view_model and
             "ToeicVocabularyRemoteApi.instance.list" in view_model and
             "async syncVocabularyRecalls():Promise<boolean>" in view_model and
-            "ActiveStudentContext.instance.get()" in view_model,
-            "TOEIC view model must synchronize recalls for the active student")
+            "BackendSession.instance.isConnected()" in view_model,
+            "TOEIC view model must synchronize recalls for the authenticated account")
     require("vocabularyRecall(vocabularyId:string):ToeicVocabularyRecall|null" in progress and
             "async mergeVocabularyRecalls(" in progress and
             "local.lastReviewedAtMs>incoming.lastReviewedAtMs" in progress,
@@ -961,17 +961,17 @@ def main() -> None:
     backend_toeic = read("backend/src/main/java/com/xiaoban/homework/toeic/ToeicVocabularyRecallService.java")
     backend_controller = read("backend/src/main/java/com/xiaoban/homework/toeic/ToeicVocabularyRecallController.java")
     migration = read("backend/src/main/resources/db/migration/V24__toeic_vocabulary_recall.sql")
-    require("findByFamilyIdAndStudentIdAndVocabularyId" in backend_toeic and
+    require("findByAccountIdAndVocabularyId" in backend_toeic and
             "!incomingReviewedAt.isAfter(entity.lastReviewedAt)" in backend_toeic and
-            "students.requireOwnedForUpdate" in backend_toeic,
-            "TOEIC backend recall upsert must be student-scoped and stale-write safe")
+            "entity.accountId = accountId" in backend_toeic,
+            "TOEIC backend recall upsert must be account-scoped and stale-write safe")
     require('@PutMapping("/{vocabularyId}")' in backend_controller and
             "@GetMapping" in backend_controller,
             "TOEIC backend recall API must expose list and idempotent upsert")
     require("create table toeic_vocabulary_recall" in migration and
-            "unique (family_id, student_id, vocabulary_id)" in migration and
-            "references student(id) on delete cascade" in migration,
-            "TOEIC vocabulary recall schema must persist one state per student and word")
+            "unique (account_id, vocabulary_id)" in migration and
+            "references account(id) on delete cascade" in migration,
+            "TOEIC vocabulary recall schema must persist one state per account and word")
     require("this.questions.length===0 || this.sessionStartedAtMs===0" in ui,
             "subsequent submission callbacks must not double commit a closed session")
 
