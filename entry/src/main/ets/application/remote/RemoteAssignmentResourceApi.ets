@@ -139,7 +139,7 @@ export class RemoteAssignmentResourceApi {
       size += await this.writeFilePart(writer.fd, boundary, 'file', sourceUri, name, mime);
       size += await this.writeText(writer.fd, '--' + boundary + '--\\r\\n', '附件上传封装失败');
     } finally {
-      await fileIo.close(writer);
+      try { await fileIo.close(writer); } catch {}
     }
     let maxSize = resourceType === AssignmentResourceType.VIDEO ? 200 * 1024 * 1024 :
       (resourceType === AssignmentResourceType.AUDIO ? 30 * 1024 * 1024 : 10 * 1024 * 1024);
@@ -159,7 +159,7 @@ export class RemoteAssignmentResourceApi {
         position += count;
       }
     } finally {
-      await fileIo.close(reader);
+      try { await fileIo.close(reader); } catch {}
       try { await fileIo.unlink(temp); } catch {}
     }
     if (position !== size) throw new Error('附件读取不完整');
@@ -169,17 +169,22 @@ export class RemoteAssignmentResourceApi {
       let headers = BackendHttpClient.instance.traceHeaders(route, http.RequestMethod.POST, 'assignment.resource.upload');
       headers['Authorization'] = 'Bearer ' + BackendSession.instance.getToken();
       headers['Content-Type'] = 'multipart/form-data; boundary=' + boundary;
-      let response = await client.request(BackendSession.instance.getBaseUrl() + route, {
+      let response;
+      try {
+        response = await client.request(BackendSession.instance.getBaseUrl() + route, {
         method: http.RequestMethod.POST, header: headers, extraData: bytes,
-        connectTimeout: 15000, readTimeout: 120000
-      });
+          connectTimeout: 15000, readTimeout: 120000
+        });
+      } catch {
+        throw new Error('附件上传请求失败，请检查网络后重试');
+      }
       if (response.responseCode < 200 || response.responseCode >= 300) {
         throw new Error('附件上传失败：HTTP ' + response.responseCode);
       }
       let result = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
       return this.toDomain(JSON.parse(result) as RemoteAssignmentResource);
     } finally {
-      client.destroy();
+      try { client.destroy(); } catch {}
     }
   }
 
