@@ -233,7 +233,7 @@ export class RemoteAssignmentResourceApi {
           header: headers,
           connectTimeout: 10000,
           readTimeout: 60000,
-          maxLimit: 25 * 1024 * 1024,
+          maxLimit: 205 * 1024 * 1024,
           expectDataType: http.HttpDataType.ARRAY_BUFFER
         });
       if (response.responseCode === 401) {
