@@ -1,4 +1,7 @@
-import { AssignmentAudioPlayerService } from '../../application/assignment/AssignmentAudioPlayerService';
+import {
+  AssignmentAudioPlayerCallbacks,
+  AssignmentAudioPlayerService
+} from '../../application/assignment/AssignmentAudioPlayerService';
 import { RemoteAssignmentResourceApi } from '../../application/remote/RemoteAssignmentResourceApi';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { AssignmentResource, AssignmentResourceType } from '../../domain/model/HomeworkModels';
@@ -40,12 +43,13 @@ export struct AssignmentAttachmentViewer {
     this.selectedType = item.resourceType;
     this.selectedName = item.originalName;
     if (item.resourceType === AssignmentResourceType.AUDIO) {
-      await this.player.prepare(uri, {
+      let callbacks: AssignmentAudioPlayerCallbacks = {
         onPrepared: (_duration: number) => { this.audioReady = true; },
-        onState: (state: string) => { this.audioPlaying = state === 'playing'; },
+        onState: (state) => { this.audioPlaying = state === 'playing'; },
         onTime: (_time: number) => {},
         onError: (error: string) => { this.message = error; }
-      });
+      };
+      await this.player.prepare(uri, callbacks);
     }
   }
 
