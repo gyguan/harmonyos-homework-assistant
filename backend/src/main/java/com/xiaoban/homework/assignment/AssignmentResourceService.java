@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,6 +78,68 @@ public class AssignmentResourceService {
       }
       throw error;
     }
+  }
+
+  /**
+   * Ordinary assignments can attach independent images, audio and videos after creation.
+   * No voice-assignment-specific audio/image pairing rule applies here.
+   */
+  @Transactional
+  public AssignmentResourceDtos.Response addResource(UUID familyId, String assignmentId, MultipartFile file) {
+    assignments.requireOwned(familyId, assignmentId);
+    String resourceType = classifyAttachment(file);
+    List<AssignmentResourceEntity> existing =
+        resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, assignmentId);
+    if (existing.size() >= 10) throw new ApiExceptions.BadRequest("每项作业最多添加 10 个附件");
+    int nextOrder = existing.stream().mapToInt(item -> item.sortOrder).max().orElse(-1) + 1;
+    MediaAssetEntity asset = mediaAssets.store(familyId, file);
+    AssignmentResourceEntity entity = new AssignmentResourceEntity();
+    entity.id = UUID.randomUUID();
+    entity.familyId = familyId;
+    entity.assignmentId = assignmentId;
+    entity.resourceType = resourceType;
+    entity.assetId = asset.id;
+    entity.originalName = asset.originalName;
+    entity.contentType = asset.contentType;
+    entity.sizeBytes = asset.sizeBytes;
+    entity.sortOrder = nextOrder;
+    entity.durationMs = 0;
+    entity.createdAt = Instant.now();
+    return AssignmentResourceDtos.Response.from(resources.saveAndFlush(entity));
+  }
+
+  @Transactional
+  public void removeResource(UUID familyId, String assignmentId, UUID resourceId) {
+    assignments.requireOwned(familyId, assignmentId);
+    AssignmentResourceEntity resource = resources.findById(resourceId)
+        .orElseThrow(() -> new ApiExceptions.NotFound("作业附件不存在"));
+    if (!familyId.equals(resource.familyId) || !assignmentId.equals(resource.assignmentId)) {
+      throw new ApiExceptions.NotFound("作业附件不存在");
+    }
+    // Asset content is deduplicated and may be referenced by other assignments.
+    resources.delete(resource);
+  }
+
+  private String classifyAttachment(MultipartFile file) {
+    if (file == null || file.isEmpty()) throw new ApiExceptions.BadRequest("请选择附件");
+    String name = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase(Locale.ROOT);
+    String mime = file.getContentType() == null ? "" : file.getContentType().toLowerCase(Locale.ROOT);
+    final String type;
+    final long maxBytes;
+    if ((name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") || name.endsWith(".webp"))
+        && (mime.equals("image/jpeg") || mime.equals("image/png") || mime.equals("image/webp"))) {
+      type = "IMAGE"; maxBytes = 10L * 1024 * 1024;
+    } else if ((name.endsWith(".mp3") || name.endsWith(".m4a") || name.endsWith(".wav"))
+        && (mime.equals("audio/mpeg") || mime.equals("audio/mp4") || mime.equals("audio/wav")
+        || mime.equals("audio/x-wav"))) {
+      type = "AUDIO"; maxBytes = 30L * 1024 * 1024;
+    } else if (name.endsWith(".mp4") && mime.equals("video/mp4")) {
+      type = "VIDEO"; maxBytes = 200L * 1024 * 1024;
+    } else {
+      throw new ApiExceptions.BadRequest("附件仅支持 JPG/PNG/WebP、MP3/M4A/WAV 或 MP4");
+    }
+    if (file.getSize() > maxBytes) throw new ApiExceptions.BadRequest("附件超过该类型大小限制");
+    return type;
   }
 
   @Transactional

@@ -26,7 +26,8 @@ export enum AssignmentBacking {
 
 export enum AssignmentResourceType {
   AUDIO = 'AUDIO',
-  IMAGE = 'IMAGE'
+  IMAGE = 'IMAGE',
+  VIDEO = 'VIDEO'
 }
 
 export enum Subject {

@@ -120,6 +120,78 @@ export class RemoteAssignmentResourceApi {
     }
   }
 
+  /** Upload an optional mixed-media resource to an existing ordinary assignment. */
+  async uploadAttachment(assignmentId: string, sourceUri: string, resourceType: AssignmentResourceType): Promise<AssignmentResource> {
+    if (this.context === null || !BackendSession.instance.isConnected()) {
+      throw new Error('上传附件需要连接家庭云端');
+    }
+    let name = this.fileName(sourceUri, resourceType === AssignmentResourceType.VIDEO ? 'video.mp4' :
+      (resourceType === AssignmentResourceType.AUDIO ? 'audio.mp3' : 'image.jpg'));
+    let mime = resourceType === AssignmentResourceType.VIDEO ? 'video/mp4' :
+      (resourceType === AssignmentResourceType.AUDIO ? this.audioContentType(sourceUri) : this.imageContentType(sourceUri));
+    let boundary = '----xiaoban-resource-' + Date.now();
+    let temp = this.context.cacheDir + '/upload-resource-' + Date.now() + '.bin';
+    let writer = await this.openFile(temp,
+      fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC,
+      '无法创建上传缓存');
+    let size = 0;
+    try {
+      size += await this.writeFilePart(writer.fd, boundary, 'file', sourceUri, name, mime);
+      size += await this.writeText(writer.fd, '--' + boundary + '--\\r\\n', '附件上传封装失败');
+    } finally {
+      await fileIo.close(writer);
+    }
+    let maxSize = resourceType === AssignmentResourceType.VIDEO ? 200 * 1024 * 1024 :
+      (resourceType === AssignmentResourceType.AUDIO ? 30 * 1024 * 1024 : 10 * 1024 * 1024);
+    if (size > maxSize + 1024) {
+      try { await fileIo.unlink(temp); } catch {}
+      throw new Error('附件超过大小限制');
+    }
+    let bytes = new ArrayBuffer(size);
+    let reader = await this.openFile(temp, fileIo.OpenMode.READ_ONLY, '无法读取上传缓存');
+    let position = 0;
+    try {
+      let chunk = new ArrayBuffer(64 * 1024);
+      while (position < size) {
+        let count = await this.readBuffer(reader.fd, chunk, '读取附件失败');
+        if (count <= 0) break;
+        new Uint8Array(bytes).set(new Uint8Array(chunk, 0, count), position);
+        position += count;
+      }
+    } finally {
+      await fileIo.close(reader);
+      try { await fileIo.unlink(temp); } catch {}
+    }
+    if (position !== size) throw new Error('附件读取不完整');
+    let route = '/api/v1/assignments/' + encodeURIComponent(assignmentId) + '/resources';
+    let client = http.createHttp();
+    try {
+      let headers = BackendHttpClient.instance.traceHeaders(route, http.RequestMethod.POST, 'assignment.resource.upload');
+      headers['Authorization'] = 'Bearer ' + BackendSession.instance.getToken();
+      headers['Content-Type'] = 'multipart/form-data; boundary=' + boundary;
+      let response = await client.request(BackendSession.instance.getBaseUrl() + route, {
+        method: http.RequestMethod.POST, header: headers, extraData: bytes,
+        connectTimeout: 15000, readTimeout: 120000
+      });
+      if (response.responseCode < 200 || response.responseCode >= 300) {
+        throw new Error('附件上传失败：HTTP ' + response.responseCode);
+      }
+      let result = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
+      return this.toDomain(JSON.parse(result) as RemoteAssignmentResource);
+    } finally {
+      client.destroy();
+    }
+  }
+
+  async removeAttachment(assignmentId: string, resourceId: string): Promise<void> {
+    let path = '/api/v1/assignments/' + encodeURIComponent(assignmentId) +
+      '/resources/' + encodeURIComponent(resourceId);
+    let response = await BackendHttpClient.instance.requestFor(
+      'assignment.resource.delete', path, http.RequestMethod.DELETE);
+    if (response.statusCode < 200 || response.statusCode >= 300) throw new Error('删除附件失败');
+    this.invalidate(resourceId);
+  }
+
   invalidate(resourceId: string): void {
     this.cache.delete(resourceId);
   }
@@ -161,7 +233,7 @@ export class RemoteAssignmentResourceApi {
           header: headers,
           connectTimeout: 10000,
           readTimeout: 60000,
-          maxLimit: 25 * 1024 * 1024,
+          maxLimit: 205 * 1024 * 1024,
           expectDataType: http.HttpDataType.ARRAY_BUFFER
         });
       if (response.responseCode === 401) {
@@ -193,8 +265,8 @@ export class RemoteAssignmentResourceApi {
   private toDomain(item: RemoteAssignmentResource): AssignmentResource {
     return {
       id: item.id,
-      resourceType: item.resourceType === AssignmentResourceType.AUDIO ?
-        AssignmentResourceType.AUDIO : AssignmentResourceType.IMAGE,
+      resourceType: item.resourceType === AssignmentResourceType.AUDIO ? AssignmentResourceType.AUDIO :
+        (item.resourceType === AssignmentResourceType.VIDEO ? AssignmentResourceType.VIDEO : AssignmentResourceType.IMAGE),
       originalName: item.originalName,
       contentType: item.contentType,
       sizeBytes: item.sizeBytes,
@@ -383,6 +455,7 @@ export class RemoteAssignmentResourceApi {
     if (type.indexOf('webp') >= 0) return 'webp';
     if (type.indexOf('heic') >= 0) return 'heic';
     if (type.indexOf('mpeg') >= 0) return 'mp3';
+    if (resource.resourceType === AssignmentResourceType.VIDEO) return 'mp4';
     if (type.indexOf('mp4') >= 0 || type.indexOf('m4a') >= 0) return 'm4a';
     if (type.indexOf('wav') >= 0) return 'wav';
     return resource.resourceType === AssignmentResourceType.AUDIO ? 'mp3' : 'jpg';

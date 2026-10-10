@@ -1,3 +1,4 @@
+import { AssignmentAttachmentEditor } from '../../../components/assignment/AssignmentAttachmentEditor';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
@@ -14,6 +15,7 @@ export struct ParentExtraAssignmentPage {
   @State private dueText: string = '今天';
   @State private expectedMinutesText: string = '20';
   @State private busy: boolean = false;
+  @State private createdAssignmentId: string = '';
   @State private message: string = '';
   @State private messageError: boolean = false;
   onBack: () => void = () => {};
@@ -71,9 +73,10 @@ export struct ParentExtraAssignmentPage {
         dueText: dueText,
         expectedMinutes: expectedMinutes
       };
-      await this.viewModel.create(draft);
+      let created = await this.viewModel.create(draft);
+      this.createdAssignmentId = created.id;
       this.message = `已布置给 ${this.viewModel.student().name}`;
-      this.onCreated();
+      // Keep this page open after publishing so parents may add optional attachments.
     } catch (error) {
       this.message = error instanceof Error ? error.message : '任务布置失败，请稍后重试';
       this.messageError = true;
@@ -202,7 +205,7 @@ export struct ParentExtraAssignmentPage {
   private ActionFooter() {
     Column({ space: 8 }) {
       this.Feedback();
-      Button(this.busy ? '正在布置…' : '布置任务', { type: ButtonType.Normal })
+      Button(this.busy ? '正在布置…' : (this.createdAssignmentId.length > 0 ? '完成并返回' : '布置任务'), { type: ButtonType.Normal })
         .width('100%')
         .height(AppTheme.BUTTON_HEIGHT)
         .borderRadius(AppTheme.CONTROL_RADIUS)
@@ -211,7 +214,10 @@ export struct ParentExtraAssignmentPage {
         .fontWeight(FontWeight.Medium)
         .backgroundColor(AppTheme.PRIMARY)
         .fontColor(AppTheme.TEXT_ON_PRIMARY)
-        .onClick(() => { void this.createTask(); });
+        .onClick(() => {
+          if (this.createdAssignmentId.length > 0) this.onCreated();
+          else void this.createTask();
+        });
     }
     .width('100%')
     .padding({ top: 8, bottom: 10 })
@@ -232,6 +238,12 @@ export struct ParentExtraAssignmentPage {
               this.CategorySection();
               this.BasicSection();
               this.TimingSection();
+              if (this.createdAssignmentId.length > 0) {
+                AssignmentAttachmentEditor({ assignmentId: this.createdAssignmentId });
+              } else {
+                Text('发布任务后，可继续添加图片、语音和视频附件')
+                  .fontSize(12).fontColor(AppTheme.SUBTEXT);
+              }
             }
             .width('100%')
             .padding(AppTheme.CARD_PADDING_COMPACT)
