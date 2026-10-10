@@ -492,6 +492,12 @@ def main() -> None:
             "let resolved=ToeicQuestionTranslationCatalog.find(questionId);" in translation_catalog and
             "if (resolved!==null) result.push(resolved);" in translation_catalog,
             "current versioned question translations must participate in runtime validation")
+    for active_translation_id in [
+        "R-FP1-DX-P5-05","R-FP5-VERB-0206","R-FP5-SPRINT-1517",
+        "R-FP3-P5-1528","R-FP1-P6-1606","R-FP6-SPRINT-1610",
+    ]:
+        require(f"questionId==='{active_translation_id}'" in translation_catalog,
+                f"active non-mock replacement translation missing: {active_translation_id}")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
     require("校验详情：" in ui and
@@ -1118,8 +1124,9 @@ def main() -> None:
     view_model = read("entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets")
     training_service = read("entry/src/main/ets/toeic/application/ToeicTrainingService.ets")
     require("ToeicStandardDiagnosticContent.questions()" in preset and
-            "return PresetToeicContent.questionsForDay(1);" in preset,
-            "the single Day 1 diagnostic must reuse the published question bank and plan ordering")
+            "return PresetToeicContent.questionsForDay(1);" in preset and
+            "id==='R-DX-P5-05' ? 'R-FP1-DX-P5-05' : id" in preset,
+            "the single Day 1 diagnostic must reuse the current reviewed question bank and plan ordering")
     require("static standardDiagnosticQuestions()" not in preset and
             "standardDiagnosticQuestions()" not in ui and
             "standardDiagnosticQuestions()" not in view_model and
