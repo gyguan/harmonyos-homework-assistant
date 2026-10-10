@@ -23,7 +23,7 @@
     "entry/src/main/ets/toeic/content/ToeicMockPart6V2RepairContent.ets": "a7b037e937153bbe7aa3f499d4c6586753612f01",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6V2Content.ets": "4fdc74a07b2cdb0a9881a9280047003149b0f2f6",
     "entry/src/main/ets/toeic/content/ToeicMockDay19Part6CompletionContent.ets": "f041c04a6c9ade0d30b90bd3f7c569c56b032f07",
-    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "04370378550e24b4d66f91638580f7bb5520dd3a",
+    "entry/src/main/ets/toeic/content/PresetToeicContent.ets": "1bb814de271cfbaed03aa48296f4769d0b4e2c6b",
     "entry/src/main/ets/toeic/content/ToeicMockDay14Part5V2Content.ets": "a20a3d1e547ee4678a5590022f0cb984a337ea97"
   },
   "sourceNotesFiles": [
@@ -3087,6 +3087,13 @@
     "previousBlob": "c181ae6774eb5f3d6530f8a44938cc5a6d541feb",
     "currentBlob": "04370378550e24b4d66f91638580f7bb5520dd3a",
     "scope": "Runtime publication/group-validation fix only; active Day14/Day19 Part5/6 question snapshots, options, answers and passages remain unchanged",
+    "reviewedBy": "AI-GPT5.6-SOL",
+    "date": "2026-10-10"
+  },
+  "sourceChangeAttestationIssue522": {
+    "previousBlob": "04370378550e24b4d66f91638580f7bb5520dd3a",
+    "currentBlob": "1bb814de271cfbaed03aa48296f4769d0b4e2c6b",
+    "scope": "Runtime reading-group active-ID deduplication only; Day14/Day19 Part5/6 question snapshots, options, answers and passages remain unchanged",
     "reviewedBy": "AI-GPT5.6-SOL",
     "date": "2026-10-10"
   }

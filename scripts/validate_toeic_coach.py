@@ -34,6 +34,7 @@ from validate_toeic_p6_conditional_issue478 import validate as validate_p6_condi
 from validate_toeic_p1_final_review_issue478 import validate as validate_p1_final_review_issue478
 from validate_toeic_p2_final_review_issue478 import validate as validate_p2_final_review_issue478
 from validate_toeic_p3_final_review_issue519 import validate as validate_p3_final_review_issue519
+from validate_toeic_runtime_group_release import validate as validate_runtime_group_release
 from validate_toeic_vocabulary_dictionary_issue478 import validate as validate_vocabulary_dictionary_issue478
 from validate_toeic_contextual_synonyms_issue478 import validate as validate_contextual_synonyms_issue478
 from validate_toeic_business_context_issue478 import validate as validate_business_context_issue478
@@ -83,6 +84,7 @@ def main() -> None:
     validate_p1_final_review_issue478()
     validate_p2_final_review_issue478()
     validate_p3_final_review_issue519()
+    validate_runtime_group_release()
     validate_vocabulary_dictionary_issue478()
     validate_contextual_synonyms_issue478()
     validate_business_context_issue478()
@@ -954,11 +956,12 @@ def main() -> None:
             "incomplete P7 shared-passage group must not leak through publishedQuestions")
     require("ToeicMockPart7EvidenceRevisionContent.activeId(id)" in preset and
             "ToeicP3FinalCorrections.activePart7Id(active)" in preset and
+            "if (activeIds.indexOf(active)<0) activeIds.push(active);" in preset and
             "static readingGroupValidationQuestions(" in preset and
             "PresetToeicContent.readingGroupValidationQuestions(live,readyGroups)" in view_model and
             "ToeicMockPart7EvidenceRevisionContent.activeId(id)" in group_service and
             "ToeicP3FinalCorrections.activePart7Id(active)" in group_service,
-            "runtime reading-group validation must use current release IDs while preserving historic draft compatibility")
+            "runtime reading-group validation must use unique current release IDs while preserving historic draft compatibility")
     require("static vocabularyForReview():ToeicVocabularyItem[]" in preset and
             "item.reviewStatus===ToeicReviewStatus.PUBLISHED" in preset and
             "reviewStatus:ToeicReviewStatus" in model,
