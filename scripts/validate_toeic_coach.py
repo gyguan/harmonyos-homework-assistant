@@ -902,14 +902,27 @@ def main() -> None:
         r"(?ms)^\s*@Builder\s*\n\s*private TodayCard\(\).*?(?=^\s*@Builder)",
         ui,
     )
-    require(today_match is not None, "TodayCard builder could not be identified")
+    today_summary_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private TodaySummary\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    today_actions_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private TodayActions\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    require(today_match is not None and today_summary_match is not None and
+            today_actions_match is not None,
+            "responsive TodayCard / TodaySummary / TodayActions builders could not be identified")
     today_builder = today_match.group(0)
+    today_state = today_summary_match.group(0) + today_actions_match.group(0) + today_builder
+    require("this.TodaySummary();" in today_builder and "this.TodayActions();" in today_builder,
+            "TodayCard must compose reactive summary/actions builders directly")
     for token in [
         "this.selectedStudyDay", "this.selectedDayTitle", "this.selectedDayFocus",
         "this.selectedDayMinutes", "this.selectedDayVocabularyCount",
         "this.selectedDaySentenceCount",
     ]:
-        require(token in today_builder, f"TodayCard must bind selected-day reactive state directly: {token}")
+        require(token in today_state, f"TodayCard composition must bind selected-day reactive state directly: {token}")
 
     # Persistent exam clock and draft/resume cannot be replaced with a label-only timer.
     model = read("entry/src/main/ets/toeic/domain/ToeicModels.ets")
