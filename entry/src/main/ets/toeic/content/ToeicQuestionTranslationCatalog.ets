@@ -16,6 +16,24 @@ export class ToeicQuestionTranslationCatalog {
       .concat(ToeicQuestionTranslationDay18And20Catalog.items());
   }
 
+  /** Historical 221-row catalog plus current release-only translation overlays.
+   * Keep items() stable for historical audits; runtime publication validation
+   * must include versioned replacement IDs that are resolved by find().
+   */
+  static validationItems(questionIds:string[]):ToeicQuestionTranslation[] {
+    let result=ToeicQuestionTranslationCatalog.items().slice();
+    for (let questionId of questionIds) {
+      let exists=false;
+      for (let item of result) {
+        if (item.questionId===questionId) { exists=true; break; }
+      }
+      if (exists) continue;
+      let resolved=ToeicQuestionTranslationCatalog.find(questionId);
+      if (resolved!==null) result.push(resolved);
+    }
+    return result;
+  }
+
   static find(questionId:string):ToeicQuestionTranslation|null {
     if (questionId==='R-FP3-P5-1528') {
       return new ToeicQuestionTranslation(questionId,'',
