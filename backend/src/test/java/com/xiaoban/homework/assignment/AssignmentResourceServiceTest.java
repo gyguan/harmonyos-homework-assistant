@@ -50,7 +50,7 @@ class AssignmentResourceServiceTest {
         mock(FileTransactionCoordinator.class), media, new VoiceMediaPolicy());
     when(resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(
         eq(familyId), eq("assignment-1"))).thenReturn(List.of());
-    MediaAssetEntity asset = new MediaAssetEntity();
+    MediaAssetEntity asset = new MediaAssetEntity() {};
     asset.id = UUID.randomUUID();
     asset.originalName = "lesson.mp4";
     asset.contentType = "video/mp4";
