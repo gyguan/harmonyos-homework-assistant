@@ -5,20 +5,15 @@ import argparse
 import sys
 import time
 
-from e2e_smoke import DEFAULT_BASE_URL, SmokeFailure, expect, http, require
+from e2e_smoke import DEFAULT_BASE_URL, DEFAULT_TOKEN_FILE, SmokeFailure, expect, http, load_token, require
 
 STUDENT_ID = "student-xiaoyu-001"
 VOCABULARY_ID = "V-001"
 
 
-def login(base_url: str) -> str:
-    payload = expect(
-        http(base_url, "POST", "/api/v1/auth/login",
-             payload={"loginName": "parent", "password": "parent123"}),
-        (200,),
-        "toeic vocabulary recall login",
-    ).json()
-    return payload["token"]
+def session_token() -> str:
+    saved = load_token(DEFAULT_TOKEN_FILE)
+    return str(saved["token"])
 
 
 def find_recall(items: list[dict], vocabulary_id: str) -> dict | None:
@@ -49,7 +44,7 @@ def main() -> int:
     args = parser.parse_args()
     base_url = DEFAULT_BASE_URL
     try:
-        token = login(base_url)
+        token = session_token()
         if args.verify_only:
             verify_persisted(base_url, token)
             print("TOEIC_VOCABULARY_RECALL_E2E_PASS mode=verify-only")
