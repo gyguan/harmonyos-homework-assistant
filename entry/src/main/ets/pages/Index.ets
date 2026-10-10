@@ -2,7 +2,6 @@ import { VoiceMaterialAutoCreateService } from '../application/assignment/VoiceM
 import { BackendAuthService } from '../application/remote/BackendAuthService';
 import { BackendSession } from '../application/remote/BackendSession';
 import { FamilyCloudService } from '../application/remote/FamilyCloudService';
-import { ActiveStudentContext } from '../application/session/ActiveStudentContext';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { ParentAccessDialog } from '../components/family/ParentAccessDialog';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
@@ -83,14 +82,12 @@ struct Index {
   }
 
   private enterParent(): void {
-    ActiveStudentContext.instance.clear();
     this.selectedRole = AppRole.PARENT;
     DefaultAssignmentRepository.instance.requestSync();
   }
 
   private enterStudent(studentId: string): void {
     if (this.familyContext.setActiveStudent(studentId)) {
-      ActiveStudentContext.instance.set(studentId);
       this.selectedRole = AppRole.STUDENT;
       void this.prepareStudentAssignments(studentId);
     }
