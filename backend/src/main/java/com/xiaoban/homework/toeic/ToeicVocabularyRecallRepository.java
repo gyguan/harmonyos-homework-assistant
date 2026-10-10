@@ -6,8 +6,7 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ToeicVocabularyRecallRepository extends JpaRepository<ToeicVocabularyRecallEntity, UUID> {
-  Optional<ToeicVocabularyRecallEntity> findByFamilyIdAndStudentIdAndVocabularyId(
-      UUID familyId, String studentId, String vocabularyId);
-  List<ToeicVocabularyRecallEntity> findByFamilyIdAndStudentIdOrderByUpdatedAtDesc(
-      UUID familyId, String studentId);
+  Optional<ToeicVocabularyRecallEntity> findByAccountIdAndVocabularyId(
+      UUID accountId, String vocabularyId);
+  List<ToeicVocabularyRecallEntity> findByAccountIdOrderByUpdatedAtDesc(UUID accountId);
 }
