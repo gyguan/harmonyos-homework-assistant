@@ -1,4 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { AssignmentAttachmentViewer } from '../../../components/assignment/AssignmentAttachmentViewer';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Assignment, AssignmentStatus, AssignmentType } from '../../../domain/model/HomeworkModels';
 import { AssignmentStateMachine } from '../../../domain/service/AssignmentStateMachine';
@@ -154,6 +155,8 @@ export struct AssignmentDetailPane {
       .backgroundColor(AppTheme.SURFACE)
       .border({ width: 1, color: AppTheme.BORDER })
       .borderRadius(AppTheme.CONTROL_RADIUS);
+
+      AssignmentAttachmentViewer({ assignmentId: this.assignment()!.id });
 
       if (this.assignment()!.textbookRef.length > 0) {
         Row({ space: 12 }) {
