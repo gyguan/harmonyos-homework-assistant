@@ -915,6 +915,24 @@ export struct ToeicHomePage {
     return 'D';
   }
 
+  private canUseWideComposition():boolean {
+    return LayoutPolicy.canSplit(this.availableWidthVp,LayoutPolicy.toeicStudyRequirement());
+  }
+
+  private contentMaxWidth():number {
+    if (this.canUseWideComposition()) return AppTheme.CONTENT_WIDE_MAX_WIDTH;
+    if (this.availableWidthVp>600) return AppTheme.CONTENT_STANDARD_MAX_WIDTH;
+    return AppTheme.CONTENT_NARROW_MAX_WIDTH;
+  }
+
+  private actionMaxWidth():number {
+    return this.canUseWideComposition()?AppTheme.CONTENT_NARROW_MAX_WIDTH:this.contentMaxWidth();
+  }
+
+  private responsiveCardWidth():string {
+    return this.canUseWideComposition()?'49%':'100%';
+  }
+
   @Builder
   private Metric(value:string,label:string) {
     Column({space:4}) {
@@ -1161,8 +1179,7 @@ export struct ToeicHomePage {
       }
     }
     .width('100%')
-    .constraintSize({maxWidth:this.mode===ToeicPageMode.HOME?
-      AppTheme.CONTENT_STANDARD_MAX_WIDTH:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+    .constraintSize({maxWidth:this.contentMaxWidth()})
     .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       top:this.mode===ToeicPageMode.HOME?20:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:8})
@@ -1223,8 +1240,7 @@ export struct ToeicHomePage {
       }
     }
     .width('100%')
-    .constraintSize({maxWidth:this.mode===ToeicPageMode.HOME?
-      AppTheme.CONTENT_STANDARD_MAX_WIDTH:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+    .constraintSize({maxWidth:this.actionMaxWidth()})
     .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),top:8,
       bottom:AppTheme.DEEP_PAGE_BOTTOM_PADDING})
@@ -1401,7 +1417,7 @@ export struct ToeicHomePage {
           }
         }
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_STANDARD_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),top:8,bottom:8});
     }
@@ -1515,7 +1531,7 @@ export struct ToeicHomePage {
         },(item:ToeicVocabularyItem)=>item.id+
           (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'-weak':'-normal'));
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1585,7 +1601,7 @@ export struct ToeicHomePage {
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1637,7 +1653,7 @@ export struct ToeicHomePage {
           .borderRadius(AppTheme.CARD_RADIUS);
         },(item:ToeicSentenceDrill)=>item.id);
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1733,7 +1749,7 @@ export struct ToeicHomePage {
         }
 
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1804,7 +1820,7 @@ export struct ToeicHomePage {
           .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
         },(item:ToeicPracticeReviewItem)=>item.id);
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1843,7 +1859,7 @@ export struct ToeicHomePage {
           .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
         },(question:ToeicVocabularyQuizQuestion)=>question.vocabularyId);
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -2109,7 +2125,7 @@ export struct ToeicHomePage {
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
