@@ -102,6 +102,8 @@ export class AppTheme {
   static readonly IMPORT_SOURCE_MIN_WIDTH: number = 400;
   static readonly IMPORT_CANDIDATE_MIN_WIDTH: number = 420;
   static readonly SETTINGS_INLINE_FIELD_MIN_WIDTH: number = 220;
+  static readonly TOEIC_PRIMARY_MIN_WIDTH: number = 500;
+  static readonly TOEIC_SECONDARY_MIN_WIDTH: number = 380;
   static readonly SPLIT_PANE_GAP: number = 18;
 
   // Compatibility aliases. New code should prefer the semantic COMPACT/STANDARD tokens above.

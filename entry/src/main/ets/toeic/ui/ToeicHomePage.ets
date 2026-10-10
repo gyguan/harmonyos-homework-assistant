@@ -915,6 +915,22 @@ export struct ToeicHomePage {
     return 'D';
   }
 
+  private canUseWideComposition():boolean {
+    return LayoutPolicy.canSplit(this.availableWidthVp,LayoutPolicy.toeicStudyRequirement());
+  }
+
+  private contentMaxWidth():number {
+    return LayoutPolicy.contentMaxWidthForWidth(this.availableWidthVp);
+  }
+
+  private actionMaxWidth():number {
+    return this.canUseWideComposition()?AppTheme.CONTENT_NARROW_MAX_WIDTH:this.contentMaxWidth();
+  }
+
+  private responsiveCardWidth():string {
+    return this.canUseWideComposition()?'49%':'100%';
+  }
+
   @Builder
   private Metric(value:string,label:string) {
     Column({space:4}) {
@@ -941,48 +957,74 @@ export struct ToeicHomePage {
 
 
   @Builder
+  private TodaySummary() {
+    Row() {
+      Text('本日任务 · '+this.dayContextLabel(this.selectedStudyDay))
+        .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+      Blank();
+      Text('已完成 '+this.completedTasksCount()+(this.selectedStudyDay===1?'/1':'/3'))
+        .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+    }
+    .width('100%').alignItems(VerticalAlign.Center);
+
+    Text(this.selectedDayTitle)
+      .width('100%').fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+      .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+      .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+    Text(this.selectedDayFocus)
+      .width('100%').fontSize(AppTheme.BODY_SIZE)
+      .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+  }
+
+  @Builder
+  private TodayActions() {
+    if (this.selectedStudyDay===1) {
+      Text('预计 '+this.selectedDayMinutes+' 分钟 · 20 题综合诊断')
+        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+    } else {
+      Text('预计 '+this.selectedDayMinutes+' 分钟 · 高频词 '+this.selectedDayVocabularyCount+
+        ' 个 · 阅读提速 '+this.selectedDaySentenceCount+' 句')
+        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+      Row({space:10}) {
+        Button((this.selectedVocabDone?'✓ ':'')+'高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
+          .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(this.selectedDayVocabularyCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
+          .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(this.selectedDayVocabularyCount>0)
+          .onClick(()=>this.openVocabulary());
+        Button((this.selectedSentenceDone?'✓ ':'')+'阅读提速 '+this.selectedDaySentenceCount+' 句',{type:ButtonType.Normal})
+          .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(this.selectedDaySentenceCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
+          .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(this.selectedDaySentenceCount>0)
+          .onClick(()=>this.openSentenceDrills());
+      }
+      .width('100%');
+    }
+  }
+
+  @Builder
   private TodayCard() {
     Column({space:12}) {
-      Row() {
-        Text('本日任务 · '+this.dayContextLabel(this.selectedStudyDay))
-          .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-        Blank();
-        Text('已完成 '+this.completedTasksCount()+(this.selectedStudyDay===1?'/1':'/3'))
-          .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%').alignItems(VerticalAlign.Center);
+      if (this.canUseWideComposition()) {
+        Row({space:AppTheme.SPLIT_PANE_GAP}) {
+          Column({space:10}) {
+            this.TodaySummary();
+          }
+          .layoutWeight(1);
 
-      Text(this.selectedDayTitle)
-        .width('100%').fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
-        .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
-        .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-      Text(this.selectedDayFocus)
-        .width('100%').fontSize(AppTheme.BODY_SIZE)
-        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-      if (this.selectedStudyDay===1) {
-        Text('预计 '+this.selectedDayMinutes+' 分钟 · 20 题综合诊断')
-          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-      } else {
-        Text('预计 '+this.selectedDayMinutes+' 分钟 · 高频词 '+this.selectedDayVocabularyCount+
-          ' 个 · 阅读提速 '+this.selectedDaySentenceCount+' 句')
-          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-        Row({space:10}) {
-          Button((this.selectedVocabDone?'✓ ':'')+'高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
-            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .fontColor(this.selectedDayVocabularyCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
-            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(this.selectedDayVocabularyCount>0)
-            .onClick(()=>this.openVocabulary());
-          Button((this.selectedSentenceDone?'✓ ':'')+'阅读提速 '+this.selectedDaySentenceCount+' 句',{type:ButtonType.Normal})
-            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .fontColor(this.selectedDaySentenceCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
-            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(this.selectedDaySentenceCount>0)
-            .onClick(()=>this.openSentenceDrills());
+          Column({space:10}) {
+            this.TodayActions();
+          }
+          .layoutWeight(1);
         }
-        .width('100%');
+        .width('100%')
+        .alignItems(VerticalAlign.Top);
+      } else {
+        this.TodaySummary();
+        this.TodayActions();
       }
 
       if (this.selectedStudyDay===1 || this.selectedStudyDay===12 || this.selectedStudyDay===13 ||
@@ -1030,54 +1072,87 @@ export struct ToeicHomePage {
       }
       .width('100%');
 
-      Row({space:8}) {
-        this.DayButton(1);
-        this.DayButton(2);
-        this.DayButton(3);
-        this.DayButton(4);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(5);
-        this.DayButton(6);
-        this.DayButton(7);
-        this.DayButton(8);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(9);
-        this.DayButton(10);
-        this.DayButton(11);
-        this.DayButton(12);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(13);
-        this.DayButton(14);
-        this.DayButton(15);
-        this.DayButton(16);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(17);
-        this.DayButton(18);
-        this.DayButton(19);
-        this.DayButton(20);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(21);
-        Blank().layoutWeight(1);
-        Blank().layoutWeight(1);
-        Blank().layoutWeight(1);
-      }
-      .width('100%');
-
+      if (this.canUseWideComposition()) {
+        Row({space:8}) {
+          this.DayButton(1);
+          this.DayButton(2);
+          this.DayButton(3);
+          this.DayButton(4);
+          this.DayButton(5);
+          this.DayButton(6);
+          this.DayButton(7);
+        }
+        .width('100%');
+        Row({space:8}) {
+          this.DayButton(8);
+          this.DayButton(9);
+          this.DayButton(10);
+          this.DayButton(11);
+          this.DayButton(12);
+          this.DayButton(13);
+          this.DayButton(14);
+        }
+        .width('100%');
+        Row({space:8}) {
+          this.DayButton(15);
+          this.DayButton(16);
+          this.DayButton(17);
+          this.DayButton(18);
+          this.DayButton(19);
+          this.DayButton(20);
+          this.DayButton(21);
+        }
+        .width('100%');
+      } else {
+        Row({space:8}) {
+          this.DayButton(1);
+          this.DayButton(2);
+          this.DayButton(3);
+          this.DayButton(4);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(5);
+          this.DayButton(6);
+          this.DayButton(7);
+          this.DayButton(8);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(9);
+          this.DayButton(10);
+          this.DayButton(11);
+          this.DayButton(12);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(13);
+          this.DayButton(14);
+          this.DayButton(15);
+          this.DayButton(16);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(17);
+          this.DayButton(18);
+          this.DayButton(19);
+          this.DayButton(20);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(21);
+          Blank().layoutWeight(1);
+          Blank().layoutWeight(1);
+          Blank().layoutWeight(1);
+        }
+        .width('100%');
+  
+        }
       Text('可自由复习或预习任意一天；只有完成当前进度日才会推进学习进度。')
         .width('100%').fontSize(AppTheme.META_SIZE)
         .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
@@ -1161,8 +1236,7 @@ export struct ToeicHomePage {
       }
     }
     .width('100%')
-    .constraintSize({maxWidth:this.mode===ToeicPageMode.HOME?
-      AppTheme.CONTENT_STANDARD_MAX_WIDTH:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+    .constraintSize({maxWidth:this.contentMaxWidth()})
     .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       top:this.mode===ToeicPageMode.HOME?20:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:8})
@@ -1174,7 +1248,8 @@ export struct ToeicHomePage {
     Column() {
       if (this.mode===ToeicPageMode.HOME) {
         Button((this.selectedTrainingDone?'✓ ':'')+this.trainingButtonLabel(),{type:ButtonType.Normal})
-          .width('100%').height(AppTheme.BUTTON_HEIGHT)
+          .width(this.canUseWideComposition()?AppTheme.HOME_PAD_PRIMARY_ACTION_MAX_WIDTH:'100%')
+          .height(AppTheme.BUTTON_HEIGHT)
           .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
           .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
           .onClick(()=>this.startTraining());
@@ -1223,11 +1298,11 @@ export struct ToeicHomePage {
       }
     }
     .width('100%')
-    .constraintSize({maxWidth:this.mode===ToeicPageMode.HOME?
-      AppTheme.CONTENT_STANDARD_MAX_WIDTH:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+    .constraintSize({maxWidth:this.actionMaxWidth()})
     .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),top:8,
       bottom:AppTheme.DEEP_PAGE_BOTTOM_PADDING})
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 
@@ -1401,7 +1476,7 @@ export struct ToeicHomePage {
           }
         }
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_STANDARD_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),top:8,bottom:8});
     }
@@ -1443,79 +1518,82 @@ export struct ToeicHomePage {
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .borderRadius(AppTheme.CONTROL_RADIUS);
         }
+        Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
         ForEach(items,(item:ToeicVocabularyItem)=>{
-          Column({space:8}) {
-            Row() {
-              Text(item.word)
-                .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-              Text('  '+item.partOfSpeech)
-                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              Blank();
-              Text(item.level)
-                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY)
-                .padding({left:8,right:8,top:4,bottom:4})
-                .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
-            }
-            .width('100%');
-
-            Row({space:10}) {
-              Text('美 '+item.ipa)
-                .layoutWeight(1)
-                .fontSize(AppTheme.BODY_SIZE)
-                .fontColor(AppTheme.SUBTEXT);
-              Button('发音',{type:ButtonType.Normal})
-                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                .fontSize(AppTheme.ACTION_TEXT_SIZE)
-                .fontColor(AppTheme.PRIMARY)
-                .backgroundColor(AppTheme.PRIMARY_SOFT)
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .onClick(()=>{ void this.pronounce(item); });
-            }
-            .width('100%')
-            .alignItems(VerticalAlign.Center);
-            if (this.unrememberedVocabularyIds.indexOf(item.id)>=0) {
-              Text('待加强 · 排在最前')
-                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.DANGER);
-            }
-
-            Text(item.meaning)
-              .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
-            Text('场景：'+item.scenario)
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            if (item.exampleSentence.length>0) {
-              Text('例句：'+item.exampleSentence)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            }
-            if (item.collocations.length>0) {
-              Text('搭配：'+item.collocations.join(' · '))
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
-            }
-            if (item.paraphrases.length>0) {
-              Text('同义：'+item.paraphrases.join(' · '))
-                .width('100%').fontSize(AppTheme.META_SIZE)
-                .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            }
-            Button(this.updatingVocabularyId===item.id?'保存中…':
-              (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'记住了':'没记住'),
-              {type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .fontColor(AppTheme.PRIMARY)
-              .backgroundColor(this.unrememberedVocabularyIds.indexOf(item.id)>=0?
-                AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(this.updatingVocabularyId.length===0)
-              .onClick(()=>{void this.recordWordRecall(item);});
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE)
-          .border({width:1,color:AppTheme.BORDER})
-          .borderRadius(AppTheme.CARD_RADIUS);
-        },(item:ToeicVocabularyItem)=>item.id+
-          (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'-weak':'-normal'));
+                  Column({space:8}) {
+                    Row() {
+                      Text(item.word)
+                        .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+                      Text('  '+item.partOfSpeech)
+                        .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Blank();
+                      Text(item.level)
+                        .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY)
+                        .padding({left:8,right:8,top:4,bottom:4})
+                        .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
+                    }
+                    .width('100%');
+        
+                    Row({space:10}) {
+                      Text('美 '+item.ipa)
+                        .layoutWeight(1)
+                        .fontSize(AppTheme.BODY_SIZE)
+                        .fontColor(AppTheme.SUBTEXT);
+                      Button('发音',{type:ButtonType.Normal})
+                        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                        .fontColor(AppTheme.PRIMARY)
+                        .backgroundColor(AppTheme.PRIMARY_SOFT)
+                        .borderRadius(AppTheme.CONTROL_RADIUS)
+                        .onClick(()=>{ void this.pronounce(item); });
+                    }
+                    .width('100%')
+                    .alignItems(VerticalAlign.Center);
+                    if (this.unrememberedVocabularyIds.indexOf(item.id)>=0) {
+                      Text('待加强 · 排在最前')
+                        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.DANGER);
+                    }
+        
+                    Text(item.meaning)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
+                    Text('场景：'+item.scenario)
+                      .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                    if (item.exampleSentence.length>0) {
+                      Text('例句：'+item.exampleSentence)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                    }
+                    if (item.collocations.length>0) {
+                      Text('搭配：'+item.collocations.join(' · '))
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+                    }
+                    if (item.paraphrases.length>0) {
+                      Text('同义：'+item.paraphrases.join(' · '))
+                        .width('100%').fontSize(AppTheme.META_SIZE)
+                        .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                    }
+                    Button(this.updatingVocabularyId===item.id?'保存中…':
+                      (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'记住了':'没记住'),
+                      {type:ButtonType.Normal})
+                      .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                      .fontColor(AppTheme.PRIMARY)
+                      .backgroundColor(this.unrememberedVocabularyIds.indexOf(item.id)>=0?
+                        AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+                      .borderRadius(AppTheme.CONTROL_RADIUS)
+                      .enabled(this.updatingVocabularyId.length===0)
+                      .onClick(()=>{void this.recordWordRecall(item);});
+                  }
+                  .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                  .backgroundColor(AppTheme.CARD_SURFACE)
+                  .border({width:1,color:AppTheme.BORDER})
+                  .borderRadius(AppTheme.CARD_RADIUS);
+                },(item:ToeicVocabularyItem)=>item.id+
+                  (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'-weak':'-normal'));
+        }
+        .width('100%');
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1531,61 +1609,64 @@ export struct ToeicHomePage {
           Text(this.quizStem)
             .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE)
             .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Button({type:ButtonType.Normal}) {
-            Text('A. '+this.quizOptionA)
-              .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE)
-              .fontColor(AppTheme.TEXT)
-              .padding({left:14,right:14,top:12,bottom:12});
+          Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(10)}}) {
+            Button({type:ButtonType.Normal}) {
+              Text('A. '+this.quizOptionA)
+                .width('100%').textAlign(TextAlign.Start)
+                .fontSize(AppTheme.FORM_TEXT_SIZE)
+                .fontColor(AppTheme.TEXT)
+                .padding({left:14,right:14,top:12,bottom:12});
+            }
+            .width(this.responsiveCardWidth()).constraintSize({minHeight:50}).padding(0)
+            .backgroundColor(this.quizSelectedIndex===0?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+            .border({width:1,color:this.quizSelectedIndex===0?AppTheme.PRIMARY:AppTheme.BORDER})
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>this.answerVocabularyQuiz(0));
+            Button({type:ButtonType.Normal}) {
+              Text('B. '+this.quizOptionB)
+                .width('100%').textAlign(TextAlign.Start)
+                .fontSize(AppTheme.FORM_TEXT_SIZE)
+                .fontColor(AppTheme.TEXT)
+                .padding({left:14,right:14,top:12,bottom:12});
+            }
+            .width(this.responsiveCardWidth()).constraintSize({minHeight:50}).padding(0)
+            .backgroundColor(this.quizSelectedIndex===1?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+            .border({width:1,color:this.quizSelectedIndex===1?AppTheme.PRIMARY:AppTheme.BORDER})
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>this.answerVocabularyQuiz(1));
+            Button({type:ButtonType.Normal}) {
+              Text('C. '+this.quizOptionC)
+                .width('100%').textAlign(TextAlign.Start)
+                .fontSize(AppTheme.FORM_TEXT_SIZE)
+                .fontColor(AppTheme.TEXT)
+                .padding({left:14,right:14,top:12,bottom:12});
+            }
+            .width(this.responsiveCardWidth()).constraintSize({minHeight:50}).padding(0)
+            .backgroundColor(this.quizSelectedIndex===2?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+            .border({width:1,color:this.quizSelectedIndex===2?AppTheme.PRIMARY:AppTheme.BORDER})
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>this.answerVocabularyQuiz(2));
+            Button({type:ButtonType.Normal}) {
+              Text('D. '+this.quizOptionD)
+                .width('100%').textAlign(TextAlign.Start)
+                .fontSize(AppTheme.FORM_TEXT_SIZE)
+                .fontColor(AppTheme.TEXT)
+                .padding({left:14,right:14,top:12,bottom:12});
+            }
+            .width(this.responsiveCardWidth()).constraintSize({minHeight:50}).padding(0)
+            .backgroundColor(this.quizSelectedIndex===3?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+            .border({width:1,color:this.quizSelectedIndex===3?AppTheme.PRIMARY:AppTheme.BORDER})
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>this.answerVocabularyQuiz(3));
           }
-          .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===0?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
-          .border({width:1,color:this.quizSelectedIndex===0?AppTheme.PRIMARY:AppTheme.BORDER})
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.answerVocabularyQuiz(0));
-          Button({type:ButtonType.Normal}) {
-            Text('B. '+this.quizOptionB)
-              .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE)
-              .fontColor(AppTheme.TEXT)
-              .padding({left:14,right:14,top:12,bottom:12});
-          }
-          .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===1?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
-          .border({width:1,color:this.quizSelectedIndex===1?AppTheme.PRIMARY:AppTheme.BORDER})
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.answerVocabularyQuiz(1));
-          Button({type:ButtonType.Normal}) {
-            Text('C. '+this.quizOptionC)
-              .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE)
-              .fontColor(AppTheme.TEXT)
-              .padding({left:14,right:14,top:12,bottom:12});
-          }
-          .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===2?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
-          .border({width:1,color:this.quizSelectedIndex===2?AppTheme.PRIMARY:AppTheme.BORDER})
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.answerVocabularyQuiz(2));
-          Button({type:ButtonType.Normal}) {
-            Text('D. '+this.quizOptionD)
-              .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE)
-              .fontColor(AppTheme.TEXT)
-              .padding({left:14,right:14,top:12,bottom:12});
-          }
-          .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===3?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
-          .border({width:1,color:this.quizSelectedIndex===3?AppTheme.PRIMARY:AppTheme.BORDER})
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.answerVocabularyQuiz(3));
+          .width('100%');
           Text('请选择一个答案，系统会直接进入下一题。完成后统一查看正确率和解析。')
             .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1607,37 +1688,40 @@ export struct ToeicHomePage {
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
 
+        Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
         ForEach(items,(item:ToeicSentenceDrill)=>{
-          Column({space:8}) {
-            Text(item.sentence)
-              .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
-              .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-            Button(this.revealedSentenceIds.indexOf(item.id)>=0?'收起解析':'查看主干与译文',
-              {type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.toggleSentenceReveal(item.id));
-            if (this.revealedSentenceIds.indexOf(item.id)>=0) {
-              Text('译：'+item.translation)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-              Text('主干：'+item.core)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-              Text('重点：'+item.focus)
-                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              Text(item.explanation)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-            }
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE)
-          .border({width:1,color:AppTheme.BORDER})
-          .borderRadius(AppTheme.CARD_RADIUS);
-        },(item:ToeicSentenceDrill)=>item.id);
+                  Column({space:8}) {
+                    Text(item.sentence)
+                      .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
+                      .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                    Button(this.revealedSentenceIds.indexOf(item.id)>=0?'收起解析':'查看主干与译文',
+                      {type:ButtonType.Normal})
+                      .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                      .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+                      .onClick(()=>this.toggleSentenceReveal(item.id));
+                    if (this.revealedSentenceIds.indexOf(item.id)>=0) {
+                      Text('译：'+item.translation)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                      Text('主干：'+item.core)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+                      Text('重点：'+item.focus)
+                        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Text(item.explanation)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                    }
+                  }
+                  .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                  .backgroundColor(AppTheme.CARD_SURFACE)
+                  .border({width:1,color:AppTheme.BORDER})
+                  .borderRadius(AppTheme.CARD_RADIUS);
+                },(item:ToeicSentenceDrill)=>item.id);
+        }
+        .width('100%');
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1695,45 +1779,48 @@ export struct ToeicHomePage {
           Text('逐题复盘 · '+this.practiceReviewItems.length+' 道')
             .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
             .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          ForEach(this.practiceReviewItems,(item:ToeicPracticeReviewItem,index:number)=>{
-            Column({space:7}) {
-              Row() {
-                Text('题 '+(index+1)+' · '+item.part)
-                  .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-                Blank();
-                Text(item.correct?'✓ 正确':'× 错误 / 未作答')
-                  .fontSize(AppTheme.META_SIZE)
-                  .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
-              }
-              .width('100%');
-              if (!item.correct && item.passage.length>0) {
-                Text(item.passage)
-                  .width('100%').fontSize(AppTheme.BODY_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-              }
-              Text(item.stem)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-              Text('所选：'+item.chosen)
-                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
-              Text('正确：'+item.correctAnswer)
-                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
-              Text('解析：'+item.explanation)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-              if (item.evidence.length>0) {
-                Text('证据：'+item.evidence)
-                  .width('100%').fontSize(AppTheme.META_SIZE)
-                  .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-              }
-            }
-            .width('100%').padding(AppTheme.CARD_PADDING)
-            .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-          },(item:ToeicPracticeReviewItem)=>item.id);
+          Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
+        ForEach(this.practiceReviewItems,(item:ToeicPracticeReviewItem,index:number)=>{
+                    Column({space:7}) {
+                      Row() {
+                        Text('题 '+(index+1)+' · '+item.part)
+                          .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                        Blank();
+                        Text(item.correct?'✓ 正确':'× 错误 / 未作答')
+                          .fontSize(AppTheme.META_SIZE)
+                          .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
+                      }
+                      .width('100%');
+                      if (!item.correct && item.passage.length>0) {
+                        Text(item.passage)
+                          .width('100%').fontSize(AppTheme.BODY_SIZE)
+                          .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                      }
+                      Text(item.stem)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                      Text('所选：'+item.chosen)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Text('正确：'+item.correctAnswer)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
+                      Text('解析：'+item.explanation)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                      if (item.evidence.length>0) {
+                        Text('证据：'+item.evidence)
+                          .width('100%').fontSize(AppTheme.META_SIZE)
+                          .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                      }
+                    }
+                    .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                    .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+                  },(item:ToeicPracticeReviewItem)=>item.id);
+        }
+        .width('100%')
         }
 
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1759,52 +1846,55 @@ export struct ToeicHomePage {
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
 
+        Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
         ForEach(this.practiceReviewItems,(item:ToeicPracticeReviewItem,index:number)=>{
-          Column({space:8}) {
-            Row() {
-              Text('第 '+(index+1)+' 题 · '+item.part)
-                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              Blank();
-              Text(item.correct?'✓ 正确':'× 错误')
-                .fontSize(AppTheme.META_SIZE)
-                .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
-            }
-            .width('100%');
-            if (item.passage.length>0 && !item.correct) {
-              Text(item.passage)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
-                .padding(AppTheme.CARD_PADDING_COMPACT)
-                .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                .borderRadius(AppTheme.CONTROL_RADIUS);
-            }
-            Text(item.stem)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT)
-              .fontWeight(FontWeight.Medium);
-            Text('你的答案：'+item.chosen)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-              .fontColor(item.correct?AppTheme.SUBTEXT:AppTheme.DANGER);
-            Text('正确答案：'+item.correctAnswer)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .fontColor(AppTheme.SUCCESS);
-            Text('解析：'+item.explanation)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-            if (item.evidence.length>0) {
-              Text('证据：'+item.evidence)
-                .width('100%').fontSize(AppTheme.META_SIZE)
-                .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            }
-            Text('累计已做 '+item.attemptCount+' 次 · 累计错误 '+item.wrongCount+' 次')
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-        },(item:ToeicPracticeReviewItem)=>item.id);
+                  Column({space:8}) {
+                    Row() {
+                      Text('第 '+(index+1)+' 题 · '+item.part)
+                        .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Blank();
+                      Text(item.correct?'✓ 正确':'× 错误')
+                        .fontSize(AppTheme.META_SIZE)
+                        .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
+                    }
+                    .width('100%');
+                    if (item.passage.length>0 && !item.correct) {
+                      Text(item.passage)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
+                        .padding(AppTheme.CARD_PADDING_COMPACT)
+                        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                        .borderRadius(AppTheme.CONTROL_RADIUS);
+                    }
+                    Text(item.stem)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT)
+                      .fontWeight(FontWeight.Medium);
+                    Text('你的答案：'+item.chosen)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+                      .fontColor(item.correct?AppTheme.SUBTEXT:AppTheme.DANGER);
+                    Text('正确答案：'+item.correctAnswer)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .fontColor(AppTheme.SUCCESS);
+                    Text('解析：'+item.explanation)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                    if (item.evidence.length>0) {
+                      Text('证据：'+item.evidence)
+                        .width('100%').fontSize(AppTheme.META_SIZE)
+                        .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                    }
+                    Text('累计已做 '+item.attemptCount+' 次 · 累计错误 '+item.wrongCount+' 次')
+                      .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                  }
+                  .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                  .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+                },(item:ToeicPracticeReviewItem)=>item.id);
+        }
+        .width('100%');
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
@@ -1825,30 +1915,231 @@ export struct ToeicHomePage {
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
+        Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
         ForEach(this.quizQuestions,(question:ToeicVocabularyQuizQuestion,index:number)=>{
-          Column({space:7}) {
-            Text('第 '+(index+1)+' 题 · '+question.stem)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('你的答案：'+question.options[this.quizAnswers[index]])
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .fontColor(this.quizAnswers[index]===question.correctIndex?AppTheme.SUBTEXT:AppTheme.DANGER);
-            Text('正确答案：'+question.options[question.correctIndex])
-              .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
-            Text('解析：'+question.explanation)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-        },(question:ToeicVocabularyQuizQuestion)=>question.vocabularyId);
+                  Column({space:7}) {
+                    Text('第 '+(index+1)+' 题 · '+question.stem)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+                    Text('你的答案：'+question.options[this.quizAnswers[index]])
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .fontColor(this.quizAnswers[index]===question.correctIndex?AppTheme.SUBTEXT:AppTheme.DANGER);
+                    Text('正确答案：'+question.options[question.correctIndex])
+                      .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
+                    Text('解析：'+question.explanation)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                  }
+                  .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                  .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+                },(question:ToeicVocabularyQuizQuestion)=>question.vocabularyId);
+        }
+        .width('100%');
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
+  }
+
+  @Builder
+  private QuestionPassagePane() {
+    if (this.currentPassage.length>0) {
+      if (this.currentGroupCount>1) {
+        Text('共用阅读材料 · 本组第 '+this.currentGroupPosition+'/'+this.currentGroupCount+' 题')
+          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
+      }
+      ForEach(this.currentPassageBlocks,(block:string,index:number)=>{
+        Text(block)
+          .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
+          .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
+          .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+      },(block:string,index:number)=>String(index));
+    }
+  }
+
+  @Builder
+  private QuestionAnswerPane() {
+    Text(this.currentStem)
+      .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE).lineHeight(AppTheme.QUESTION_TEXT_LINE_HEIGHT)
+      .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+    
+    Column({space:9}) {
+      Button({type:ButtonType.Normal}) {
+        Row({space:8}) {
+          Text('A.')
+            .width(22)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.optionText(0));
+          Text(this.currentOptionA)
+            .layoutWeight(1)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+            .fontColor(this.optionText(0))
+            .textAlign(TextAlign.Start);
+        }
+        .width('100%')
+        .constraintSize({minHeight:50})
+        .alignItems(VerticalAlign.Center)
+        .padding({left:14,right:14,top:12,bottom:12});
+      }
+      .width('100%')
+      .constraintSize({minHeight:50})
+      .padding(0)
+      .backgroundColor(this.optionBackground(0))
+      .border({width:1,color:this.optionBorder(0)})
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .onClick(()=>this.chooseAnswer(0));
+      Button({type:ButtonType.Normal}) {
+        Row({space:8}) {
+          Text('B.')
+            .width(22)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.optionText(1));
+          Text(this.currentOptionB)
+            .layoutWeight(1)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+            .fontColor(this.optionText(1))
+            .textAlign(TextAlign.Start);
+        }
+        .width('100%')
+        .constraintSize({minHeight:50})
+        .alignItems(VerticalAlign.Center)
+        .padding({left:14,right:14,top:12,bottom:12});
+      }
+      .width('100%')
+      .constraintSize({minHeight:50})
+      .padding(0)
+      .backgroundColor(this.optionBackground(1))
+      .border({width:1,color:this.optionBorder(1)})
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .onClick(()=>this.chooseAnswer(1));
+      Button({type:ButtonType.Normal}) {
+        Row({space:8}) {
+          Text('C.')
+            .width(22)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.optionText(2));
+          Text(this.currentOptionC)
+            .layoutWeight(1)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+            .fontColor(this.optionText(2))
+            .textAlign(TextAlign.Start);
+        }
+        .width('100%')
+        .constraintSize({minHeight:50})
+        .alignItems(VerticalAlign.Center)
+        .padding({left:14,right:14,top:12,bottom:12});
+      }
+      .width('100%')
+      .constraintSize({minHeight:50})
+      .padding(0)
+      .backgroundColor(this.optionBackground(2))
+      .border({width:1,color:this.optionBorder(2)})
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .onClick(()=>this.chooseAnswer(2));
+      if (this.currentOptionCount>3) {
+        Button({type:ButtonType.Normal}) {
+          Row({space:8}) {
+            Text('D.')
+              .width(22)
+              .fontSize(AppTheme.FORM_TEXT_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.optionText(3));
+            Text(this.currentOptionD)
+              .layoutWeight(1)
+              .fontSize(AppTheme.FORM_TEXT_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(this.optionText(3))
+              .textAlign(TextAlign.Start);
+          }
+          .width('100%')
+          .constraintSize({minHeight:50})
+          .alignItems(VerticalAlign.Center)
+          .padding({left:14,right:14,top:12,bottom:12});
+        }
+        .width('100%')
+        .constraintSize({minHeight:50})
+        .padding(0)
+        .backgroundColor(this.optionBackground(3))
+        .border({width:1,color:this.optionBorder(3)})
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .onClick(()=>this.chooseAnswer(3));
+      }
+    }
+    .width('100%');
+    
+    if (!this.isMockSession() && this.currentTranslationStem.length>0) {
+      Button(this.showQuestionTranslation?'收起中文翻译':'查看中文翻译',{type:ButtonType.Normal})
+        .width('100%').height(AppTheme.BUTTON_HEIGHT)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
+        .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+        .onClick(()=>this.toggleQuestionTranslation());
+    
+      if (this.showQuestionTranslation) {
+        Column({space:8}) {
+          Text('中文翻译 · 辅助理解')
+            .width('100%').fontSize(AppTheme.META_SIZE)
+            .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+          if (this.currentTranslationPassage.length>0) {
+            Text(this.currentTranslationPassage)
+              .width('100%').fontSize(AppTheme.BODY_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+          }
+          Text(this.currentTranslationStem)
+            .width('100%').fontSize(AppTheme.BODY_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Row({space:8}) {
+            Text('A.').width(22).fontSize(AppTheme.BODY_SIZE)
+              .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+            Text(this.currentTranslationOptionA).layoutWeight(1)
+              .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%').alignItems(VerticalAlign.Top);
+          Row({space:8}) {
+            Text('B.').width(22).fontSize(AppTheme.BODY_SIZE)
+              .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+            Text(this.currentTranslationOptionB).layoutWeight(1)
+              .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%').alignItems(VerticalAlign.Top);
+          Row({space:8}) {
+            Text('C.').width(22).fontSize(AppTheme.BODY_SIZE)
+              .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+            Text(this.currentTranslationOptionC).layoutWeight(1)
+              .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%').alignItems(VerticalAlign.Top);
+          if (this.currentOptionCount>3) {
+            Row({space:8}) {
+              Text('D.').width(22).fontSize(AppTheme.BODY_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+              Text(this.currentTranslationOptionD).layoutWeight(1)
+                .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+                .fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%').alignItems(VerticalAlign.Top);
+          }
+        }
+        .width('100%').padding(AppTheme.CARD_PADDING)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .border({width:1,color:AppTheme.BORDER})
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+    }
   }
 
   @Builder
@@ -1913,203 +2204,30 @@ export struct ToeicHomePage {
           }
           .width('100%');
 
-          if (this.currentPassage.length>0) {
-            if (this.currentGroupCount>1) {
-              Text('共用阅读材料 · 本组第 '+this.currentGroupPosition+'/'+this.currentGroupCount+' 题')
-                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
-            }
-            ForEach(this.currentPassageBlocks,(block:string,index:number)=>{
-              Text(block)
-                .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
-                .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
-                .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
-                .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                .borderRadius(AppTheme.CONTROL_RADIUS);
-            },(block:string,index:number)=>String(index));
-          }
-
-          Text(this.currentStem)
-            .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE).lineHeight(AppTheme.QUESTION_TEXT_LINE_HEIGHT)
-            .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-
-          Column({space:9}) {
-            Button({type:ButtonType.Normal}) {
-              Row({space:8}) {
-                Text('A.')
-                  .width(22)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(this.optionText(0));
-                Text(this.currentOptionA)
-                  .layoutWeight(1)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                  .fontColor(this.optionText(0))
-                  .textAlign(TextAlign.Start);
+          if (this.canUseWideComposition() && this.currentPassage.length>0) {
+            Row({space:AppTheme.SPLIT_PANE_GAP}) {
+              Column() {
+                this.QuestionPassagePane();
               }
-              .width('100%')
-              .constraintSize({minHeight:50})
-              .alignItems(VerticalAlign.Center)
-              .padding({left:14,right:14,top:12,bottom:12});
+              .layoutWeight(1);
+
+              Column() {
+                this.QuestionAnswerPane();
+              }
+              .layoutWeight(1);
             }
             .width('100%')
-            .constraintSize({minHeight:50})
-            .padding(0)
-            .backgroundColor(this.optionBackground(0))
-            .border({width:1,color:this.optionBorder(0)})
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>this.chooseAnswer(0));
-            Button({type:ButtonType.Normal}) {
-              Row({space:8}) {
-                Text('B.')
-                  .width(22)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(this.optionText(1));
-                Text(this.currentOptionB)
-                  .layoutWeight(1)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                  .fontColor(this.optionText(1))
-                  .textAlign(TextAlign.Start);
-              }
-              .width('100%')
-              .constraintSize({minHeight:50})
-              .alignItems(VerticalAlign.Center)
-              .padding({left:14,right:14,top:12,bottom:12});
-            }
-            .width('100%')
-            .constraintSize({minHeight:50})
-            .padding(0)
-            .backgroundColor(this.optionBackground(1))
-            .border({width:1,color:this.optionBorder(1)})
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>this.chooseAnswer(1));
-            Button({type:ButtonType.Normal}) {
-              Row({space:8}) {
-                Text('C.')
-                  .width(22)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(this.optionText(2));
-                Text(this.currentOptionC)
-                  .layoutWeight(1)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                  .fontColor(this.optionText(2))
-                  .textAlign(TextAlign.Start);
-              }
-              .width('100%')
-              .constraintSize({minHeight:50})
-              .alignItems(VerticalAlign.Center)
-              .padding({left:14,right:14,top:12,bottom:12});
-            }
-            .width('100%')
-            .constraintSize({minHeight:50})
-            .padding(0)
-            .backgroundColor(this.optionBackground(2))
-            .border({width:1,color:this.optionBorder(2)})
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>this.chooseAnswer(2));
-            if (this.currentOptionCount>3) {
-              Button({type:ButtonType.Normal}) {
-                Row({space:8}) {
-                  Text('D.')
-                    .width(22)
-                    .fontSize(AppTheme.FORM_TEXT_SIZE)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor(this.optionText(3));
-                  Text(this.currentOptionD)
-                    .layoutWeight(1)
-                    .fontSize(AppTheme.FORM_TEXT_SIZE)
-                    .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(this.optionText(3))
-                    .textAlign(TextAlign.Start);
-                }
-                .width('100%')
-                .constraintSize({minHeight:50})
-                .alignItems(VerticalAlign.Center)
-                .padding({left:14,right:14,top:12,bottom:12});
-              }
-              .width('100%')
-              .constraintSize({minHeight:50})
-              .padding(0)
-              .backgroundColor(this.optionBackground(3))
-              .border({width:1,color:this.optionBorder(3)})
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.chooseAnswer(3));
-            }
-          }
-          .width('100%');
-
-          if (!this.isMockSession() && this.currentTranslationStem.length>0) {
-            Button(this.showQuestionTranslation?'收起中文翻译':'查看中文翻译',{type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT)
-              .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
-              .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.toggleQuestionTranslation());
-
-            if (this.showQuestionTranslation) {
-              Column({space:8}) {
-                Text('中文翻译 · 辅助理解')
-                  .width('100%').fontSize(AppTheme.META_SIZE)
-                  .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-                if (this.currentTranslationPassage.length>0) {
-                  Text(this.currentTranslationPassage)
-                    .width('100%').fontSize(AppTheme.BODY_SIZE)
-                    .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-                }
-                Text(this.currentTranslationStem)
-                  .width('100%').fontSize(AppTheme.BODY_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT);
-                Row({space:8}) {
-                  Text('A.').width(22).fontSize(AppTheme.BODY_SIZE)
-                    .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-                  Text(this.currentTranslationOptionA).layoutWeight(1)
-                    .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                .width('100%').alignItems(VerticalAlign.Top);
-                Row({space:8}) {
-                  Text('B.').width(22).fontSize(AppTheme.BODY_SIZE)
-                    .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-                  Text(this.currentTranslationOptionB).layoutWeight(1)
-                    .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                .width('100%').alignItems(VerticalAlign.Top);
-                Row({space:8}) {
-                  Text('C.').width(22).fontSize(AppTheme.BODY_SIZE)
-                    .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-                  Text(this.currentTranslationOptionC).layoutWeight(1)
-                    .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                .width('100%').alignItems(VerticalAlign.Top);
-                if (this.currentOptionCount>3) {
-                  Row({space:8}) {
-                    Text('D.').width(22).fontSize(AppTheme.BODY_SIZE)
-                      .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-                    Text(this.currentTranslationOptionD).layoutWeight(1)
-                      .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                      .fontColor(AppTheme.SUBTEXT);
-                  }
-                  .width('100%').alignItems(VerticalAlign.Top);
-                }
-              }
-              .width('100%').padding(AppTheme.CARD_PADDING)
-              .backgroundColor(AppTheme.SURFACE_SUBTLE)
-              .border({width:1,color:AppTheme.BORDER})
-              .borderRadius(AppTheme.CONTROL_RADIUS);
-            }
+            .alignItems(VerticalAlign.Top);
+          } else {
+            this.QuestionPassagePane();
+            this.QuestionAnswerPane();
           }
 
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
       }
-      .width('100%').constraintSize({maxWidth:AppTheme.CONTENT_NARROW_MAX_WIDTH})
+      .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});

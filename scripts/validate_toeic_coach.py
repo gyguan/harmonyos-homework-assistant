@@ -702,19 +702,59 @@ def main() -> None:
     question_builder = question_builder_match.group(0)
     require("this.questions[" not in question_builder,
             "QuestionContent must not render fields directly from class objects in the questions array")
+    answer_builder_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private QuestionAnswerPane\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    passage_builder_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private QuestionPassagePane\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    require(answer_builder_match is not None and passage_builder_match is not None,
+            "responsive QuestionAnswerPane / QuestionPassagePane builders must exist")
+    answer_builder = answer_builder_match.group(0)
+    passage_builder = passage_builder_match.group(0)
+    require("this.QuestionAnswerPane();" in question_builder and
+            "this.QuestionPassagePane();" in question_builder,
+            "QuestionContent must compose the reactive question panes directly")
     for token in [
         "Text(this.currentOptionA)", "Text(this.currentOptionB)",
         "Text(this.currentOptionC)", "Text(this.currentOptionD)",
         "Text(this.currentTranslationOptionA)", "Text(this.currentTranslationOptionB)",
         "Text(this.currentTranslationOptionC)", "Text(this.currentTranslationOptionD)",
     ]:
-        require(token in question_builder,
-                f"QuestionContent must bind option text directly to reactive state: {token}")
+        require(token in answer_builder,
+                f"QuestionAnswerPane must bind option text directly to reactive state: {token}")
     for token in [
-        "this.currentStem", "this.currentPassage", "this.currentOptionA",
-        "this.currentOptionB", "this.currentOptionC",
+        "this.currentStem", "this.currentOptionA", "this.currentOptionB", "this.currentOptionC",
     ]:
-        require(token in question_builder, f"QuestionContent must render reactive snapshot field: {token}")
+        require(token in answer_builder, f"QuestionAnswerPane must render reactive snapshot field: {token}")
+    require("this.currentPassage" in passage_builder and
+            "this.currentPassageBlocks" in passage_builder,
+            "QuestionPassagePane must render reactive reading passage state")
+
+    layout_policy = read("entry/src/main/ets/common/responsive/LayoutPolicy.ets")
+    require("static contentMaxWidthForWidth(availableWidthVp: number): number" in layout_policy and
+            "static toeicStudyRequirement(): LayoutRequirement" in layout_policy and
+            "AppTheme.TOEIC_PRIMARY_MIN_WIDTH" in layout_policy and
+            "AppTheme.TOEIC_SECONDARY_MIN_WIDTH" in layout_policy,
+            "TOEIC PAD layout must use the shared LayoutPolicy split contract")
+    for token in [
+        "private canUseWideComposition():boolean",
+        "LayoutPolicy.canSplit(this.availableWidthVp,LayoutPolicy.toeicStudyRequirement())",
+        "private contentMaxWidth():number",
+        "LayoutPolicy.contentMaxWidthForWidth(this.availableWidthVp)",
+        "private responsiveCardWidth():string",
+        "this.canUseWideComposition()?'49%':'100%'",
+        "if (this.canUseWideComposition() && this.currentPassage.length>0)",
+        "Row({space:AppTheme.SPLIT_PANE_GAP})",
+        "if (this.canUseWideComposition()) {",
+    ]:
+        require(token in ui, f"TOEIC PAD responsive contract missing: {token}")
+    require(ui.count("Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)") >= 5,
+            "TOEIC PAD vocabulary, drills and result cards must use responsive wrap layouts")
+    require(".width(this.canUseWideComposition()?AppTheme.HOME_PAD_PRIMARY_ACTION_MAX_WIDTH:'100%')" in ui,
+            "TOEIC PAD primary footer action must not stretch across the full screen")
     require("index===this.currentCorrectIndex" not in ui and
             "return this.answerLocked && index===this.selectedIndex?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE;" in ui,
             "question options must not reveal the correct answer during training")
@@ -835,12 +875,12 @@ def main() -> None:
             "Button('C. '+this.currentOptionC" not in ui and
             "Button('D. '+this.currentOptionD" not in ui,
             "TOEIC answer options must not regress to single-label Button rendering")
-    require(question_builder.count("Button({type:ButtonType.Normal})") >= 4 and
-            ".constraintSize({minHeight:50})" in question_builder and
-            ".padding({left:14,right:14,top:12,bottom:12})" in question_builder and
-            ".textAlign(TextAlign.Start)" in question_builder,
+    require(answer_builder.count("Button({type:ButtonType.Normal})") >= 4 and
+            ".constraintSize({minHeight:50})" in answer_builder and
+            ".padding({left:14,right:14,top:12,bottom:12})" in answer_builder and
+            ".textAlign(TextAlign.Start)" in answer_builder,
             "TOEIC answer options must keep custom multiline Button content and touch-safe layout")
-    require(".maxLines(" not in question_builder and ".textOverflow(" not in question_builder,
+    require(".maxLines(" not in answer_builder and ".textOverflow(" not in answer_builder,
             "TOEIC answer text must not be truncated by maxLines or ellipsis")
 
 
@@ -862,14 +902,27 @@ def main() -> None:
         r"(?ms)^\s*@Builder\s*\n\s*private TodayCard\(\).*?(?=^\s*@Builder)",
         ui,
     )
-    require(today_match is not None, "TodayCard builder could not be identified")
+    today_summary_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private TodaySummary\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    today_actions_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private TodayActions\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    require(today_match is not None and today_summary_match is not None and
+            today_actions_match is not None,
+            "responsive TodayCard / TodaySummary / TodayActions builders could not be identified")
     today_builder = today_match.group(0)
+    today_state = today_summary_match.group(0) + today_actions_match.group(0) + today_builder
+    require("this.TodaySummary();" in today_builder and "this.TodayActions();" in today_builder,
+            "TodayCard must compose reactive summary/actions builders directly")
     for token in [
         "this.selectedStudyDay", "this.selectedDayTitle", "this.selectedDayFocus",
         "this.selectedDayMinutes", "this.selectedDayVocabularyCount",
         "this.selectedDaySentenceCount",
     ]:
-        require(token in today_builder, f"TodayCard must bind selected-day reactive state directly: {token}")
+        require(token in today_state, f"TodayCard composition must bind selected-day reactive state directly: {token}")
 
     # Persistent exam clock and draft/resume cannot be replaced with a label-only timer.
     model = read("entry/src/main/ets/toeic/domain/ToeicModels.ets")
@@ -1161,7 +1214,7 @@ def main() -> None:
 
     # A single 20-item Day 1 baseline replaces the two former separate entry points.
     # Preserve all original question IDs and the draft-based resume path.
-    day_one = ui[ui.index("  private TodayCard()"):ui.index("  private DayButton(")]
+    day_one = ui[ui.index("  private TodaySummary()"):ui.index("  private DayButton(")]
     day_one_entry = ui[ui.index("  private startTraining()"):ui.index("  private openVocabulary()")]
     view_model = read("entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets")
     training_service = read("entry/src/main/ets/toeic/application/ToeicTrainingService.ets")
