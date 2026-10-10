@@ -65,9 +65,12 @@ export class ToeicCoachViewModel {
       PresetToeicContent.readingGroupValidationQuestions(live,readyGroups),readyGroups).errors;
     let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
     let sentenceErrors=ToeicContentValidator.validateSentenceDrills(PresetToeicContent.sentenceDrills()).errors;
+    let translationQuestions=PresetToeicContent.questionsRequiringTranslation();
+    let translationQuestionIds:string[]=[];
+    for (let question of translationQuestions) translationQuestionIds.push(question.id);
     let translationErrors=ToeicContentValidator.validateQuestionTranslations(
-      PresetToeicContent.questionsRequiringTranslation(),
-      ToeicQuestionTranslationCatalog.items()
+      translationQuestions,
+      ToeicQuestionTranslationCatalog.validationItems(translationQuestionIds)
     ).errors;
     return questionErrors.concat(vocabularyErrors).concat(sentenceErrors).concat(translationErrors).concat(groupErrors);
   }
