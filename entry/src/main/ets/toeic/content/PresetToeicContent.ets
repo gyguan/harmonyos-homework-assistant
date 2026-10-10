@@ -344,7 +344,10 @@ export class PresetToeicContent {
     // Keep the published v1 100-question bank unchanged for historical drafts.
     // Only *new* Day14 sessions use the structurally corrected v2 Part7.
     for (let plan of plans) {
-      if (plan.day===3) {
+      if (plan.day===1) {
+        plan.questionIds=plan.questionIds.map((id:string):string =>
+          id==='R-DX-P5-05' ? 'R-FP1-DX-P5-05' : id);
+      } else if (plan.day===3) {
         plan.questionIds=plan.questionIds.map((id:string):string => id==='R-P5-VERB-0206' ? 'R-FP5-VERB-0206' : id);
       } else if (plan.day===15) {
         plan.questionIds=plan.questionIds.map((id:string):string => {
