@@ -7,7 +7,6 @@ import time
 
 from e2e_smoke import DEFAULT_BASE_URL, DEFAULT_TOKEN_FILE, SmokeFailure, expect, http, load_token, require
 
-STUDENT_ID = "student-xiaoyu-001"
 VOCABULARY_ID = "V-001"
 
 
@@ -25,7 +24,7 @@ def verify_persisted(base_url: str, token: str) -> None:
         http(
             base_url,
             "GET",
-            f"/api/v1/students/{STUDENT_ID}/toeic/vocabulary-recalls",
+            "/api/v1/toeic/vocabulary-recalls",
             token=token,
         ),
         (200,),
@@ -55,7 +54,7 @@ def main() -> int:
             http(
                 base_url,
                 "PUT",
-                f"/api/v1/students/{STUDENT_ID}/toeic/vocabulary-recalls/{VOCABULARY_ID}",
+                f"/api/v1/toeic/vocabulary-recalls/{VOCABULARY_ID}",
                 token=token,
                 payload={
                     "remembered": False,
@@ -75,7 +74,7 @@ def main() -> int:
             http(
                 base_url,
                 "PUT",
-                f"/api/v1/students/{STUDENT_ID}/toeic/vocabulary-recalls/{VOCABULARY_ID}",
+                f"/api/v1/toeic/vocabulary-recalls/{VOCABULARY_ID}",
                 token=token,
                 payload={
                     "remembered": True,
@@ -94,7 +93,7 @@ def main() -> int:
             http(
                 base_url,
                 "PUT",
-                f"/api/v1/students/{STUDENT_ID}/toeic/vocabulary-recalls/{VOCABULARY_ID}",
+                f"/api/v1/toeic/vocabulary-recalls/{VOCABULARY_ID}",
                 token=token,
                 payload={
                     "remembered": False,
