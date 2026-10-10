@@ -702,19 +702,58 @@ def main() -> None:
     question_builder = question_builder_match.group(0)
     require("this.questions[" not in question_builder,
             "QuestionContent must not render fields directly from class objects in the questions array")
+    answer_builder_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private QuestionAnswerPane\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    passage_builder_match = re.search(
+        r"(?ms)^\s*@Builder\s*\n\s*private QuestionPassagePane\(\).*?(?=^\s*@Builder)",
+        ui,
+    )
+    require(answer_builder_match is not None and passage_builder_match is not None,
+            "responsive QuestionAnswerPane / QuestionPassagePane builders must exist")
+    answer_builder = answer_builder_match.group(0)
+    passage_builder = passage_builder_match.group(0)
+    require("this.QuestionAnswerPane();" in question_builder and
+            "this.QuestionPassagePane();" in question_builder,
+            "QuestionContent must compose the reactive question panes directly")
     for token in [
         "Text(this.currentOptionA)", "Text(this.currentOptionB)",
         "Text(this.currentOptionC)", "Text(this.currentOptionD)",
         "Text(this.currentTranslationOptionA)", "Text(this.currentTranslationOptionB)",
         "Text(this.currentTranslationOptionC)", "Text(this.currentTranslationOptionD)",
     ]:
-        require(token in question_builder,
-                f"QuestionContent must bind option text directly to reactive state: {token}")
+        require(token in answer_builder,
+                f"QuestionAnswerPane must bind option text directly to reactive state: {token}")
     for token in [
-        "this.currentStem", "this.currentPassage", "this.currentOptionA",
-        "this.currentOptionB", "this.currentOptionC",
+        "this.currentStem", "this.currentOptionA", "this.currentOptionB", "this.currentOptionC",
     ]:
-        require(token in question_builder, f"QuestionContent must render reactive snapshot field: {token}")
+        require(token in answer_builder, f"QuestionAnswerPane must render reactive snapshot field: {token}")
+    require("this.currentPassage" in passage_builder and
+            "this.currentPassageBlocks" in passage_builder,
+            "QuestionPassagePane must render reactive reading passage state")
+
+    layout_policy = read("entry/src/main/ets/common/responsive/LayoutPolicy.ets")
+    require("static toeicStudyRequirement(): LayoutRequirement" in layout_policy and
+            "AppTheme.TOEIC_PRIMARY_MIN_WIDTH" in layout_policy and
+            "AppTheme.TOEIC_SECONDARY_MIN_WIDTH" in layout_policy,
+            "TOEIC PAD layout must use the shared LayoutPolicy split contract")
+    for token in [
+        "private canUseWideComposition():boolean",
+        "LayoutPolicy.canSplit(this.availableWidthVp,LayoutPolicy.toeicStudyRequirement())",
+        "private contentMaxWidth():number",
+        "AppTheme.CONTENT_WIDE_MAX_WIDTH",
+        "private responsiveCardWidth():string",
+        "this.canUseWideComposition()?'49%':'100%'",
+        "if (this.canUseWideComposition() && this.currentPassage.length>0)",
+        "Row({space:AppTheme.SPLIT_PANE_GAP})",
+        "if (this.canUseWideComposition()) {",
+    ]:
+        require(token in ui, f"TOEIC PAD responsive contract missing: {token}")
+    require(ui.count("Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)") >= 5,
+            "TOEIC PAD vocabulary, drills and result cards must use responsive wrap layouts")
+    require(".width(this.canUseWideComposition()?AppTheme.HOME_PAD_PRIMARY_ACTION_MAX_WIDTH:'100%')" in ui,
+            "TOEIC PAD primary footer action must not stretch across the full screen")
     require("index===this.currentCorrectIndex" not in ui and
             "return this.answerLocked && index===this.selectedIndex?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE;" in ui,
             "question options must not reveal the correct answer during training")
