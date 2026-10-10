@@ -60,8 +60,9 @@ export class ToeicCoachViewModel {
       if (question.reviewStatus===ToeicReviewStatus.PUBLISHED) live.push(question);
     }
     let questionErrors=ToeicContentValidator.validateAll(live).errors;
+    let readyGroups=PresetToeicContent.publishedReadingGroups();
     let groupErrors=ToeicContentValidator.validateReadingGroups(
-      live,PresetToeicContent.publishedReadingGroups()).errors;
+      PresetToeicContent.readingGroupValidationQuestions(live,readyGroups),readyGroups).errors;
     let vocabularyErrors=ToeicContentValidator.validateVocabulary(PresetToeicContent.vocabulary()).errors;
     let sentenceErrors=ToeicContentValidator.validateSentenceDrills(PresetToeicContent.sentenceDrills()).errors;
     let translationErrors=ToeicContentValidator.validateQuestionTranslations(

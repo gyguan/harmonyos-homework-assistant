@@ -950,8 +950,15 @@ def main() -> None:
     require("let readyGroups=PresetToeicContent.publishedReadingGroups()" in preset and
             "if (q.groupId.length>0)" in preset and
             "if (!groupReady) continue;" in preset and
-            "validateReadingGroups(published,readyGroups)" in preset,
+            "readingGroupValidationQuestions(published,readyGroups)" in preset,
             "incomplete P7 shared-passage group must not leak through publishedQuestions")
+    require("ToeicMockPart7EvidenceRevisionContent.activeId(id)" in preset and
+            "ToeicP3FinalCorrections.activePart7Id(active)" in preset and
+            "static readingGroupValidationQuestions(" in preset and
+            "PresetToeicContent.readingGroupValidationQuestions(live,readyGroups)" in view_model and
+            "ToeicMockPart7EvidenceRevisionContent.activeId(id)" in group_service and
+            "ToeicP3FinalCorrections.activePart7Id(active)" in group_service,
+            "runtime reading-group validation must use current release IDs while preserving historic draft compatibility")
     require("static vocabularyForReview():ToeicVocabularyItem[]" in preset and
             "item.reviewStatus===ToeicReviewStatus.PUBLISHED" in preset and
             "reviewStatus:ToeicReviewStatus" in model,

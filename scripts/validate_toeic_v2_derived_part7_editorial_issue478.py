@@ -235,7 +235,9 @@ def validate() -> None:
         raise AssertionError("complete evidence editions must be in both published and group catalogs")
     if preset.count("ToeicMockPart7EvidenceRevisionContent.activeId(question.id)") != 2:
         raise AssertionError("Day14 and Day19 must both pick the revised IDs")
-    if "group.questionIds.indexOf(question.id)>=0" not in reading:
+    if ("compatibleIds.indexOf(question.id)>=0" not in reading or
+            "ToeicMockPart7EvidenceRevisionContent.activeId(id)" not in reading or
+            "ToeicP3FinalCorrections.activePart7Id(active)" not in reading):
         raise AssertionError("group navigation must support both historical and revised question editions")
     if "if (group===0 || group===3) ids.push('R-FM1-P7-M'" not in groups14:
         raise AssertionError("revised Day14 group IDs not available to linked passage validator")
