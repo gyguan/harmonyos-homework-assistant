@@ -8,7 +8,7 @@ import { ToeicPronunciationService, ToeicPronunciationStatus } from '../applicat
 import { ToeicDayTaskProgress, ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicReviewStatus, ToeicSessionReport, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem, ToeicVocabularyRecall } from '../domain/ToeicModels';
 import { ToeicVocabularyRemoteApi, RemoteToeicVocabularyRecall } from '../application/ToeicVocabularyRemoteApi';
 import { BackendSession } from '../../application/remote/BackendSession';
-import { DefaultFamilyContextRepository } from '../../data/repository/DefaultFamilyContextRepository';
+import { ActiveStudentContext } from '../../application/session/ActiveStudentContext';
 
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
@@ -113,7 +113,7 @@ export class ToeicCoachViewModel {
   async recordVocabularyRecall(id:string,remembered:boolean):Promise<boolean> {
     await ToeicProgressStore.instance.recordVocabularyRecall(id,remembered);
     if (!BackendSession.instance.isConnected()) return false;
-    let studentId=DefaultFamilyContextRepository.instance.getActiveStudentId();
+    let studentId=ActiveStudentContext.instance.get();
     if (studentId.length===0) return false;
     let local=ToeicProgressStore.instance.vocabularyRecall(id);
     if (local===null) return false;
@@ -136,7 +136,7 @@ export class ToeicCoachViewModel {
 
   async syncVocabularyRecalls():Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;
-    let studentId=DefaultFamilyContextRepository.instance.getActiveStudentId();
+    let studentId=ActiveStudentContext.instance.get();
     if (studentId.length===0) return false;
     try {
       let remote=await ToeicVocabularyRemoteApi.instance.list(studentId);
