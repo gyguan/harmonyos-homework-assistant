@@ -8,7 +8,6 @@ import { ToeicPronunciationService, ToeicPronunciationStatus } from '../applicat
 import { ToeicDayTaskProgress, ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicReviewStatus, ToeicSessionReport, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem, ToeicVocabularyRecall } from '../domain/ToeicModels';
 import { ToeicVocabularyRemoteApi, RemoteToeicVocabularyRecall } from '../application/ToeicVocabularyRemoteApi';
 import { BackendSession } from '../../application/remote/BackendSession';
-import { ActiveStudentContext } from '../../application/session/ActiveStudentContext';
 
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
@@ -113,12 +112,10 @@ export class ToeicCoachViewModel {
   async recordVocabularyRecall(id:string,remembered:boolean):Promise<boolean> {
     await ToeicProgressStore.instance.recordVocabularyRecall(id,remembered);
     if (!BackendSession.instance.isConnected()) return false;
-    let studentId=ActiveStudentContext.instance.get();
-    if (studentId.length===0) return false;
     let local=ToeicProgressStore.instance.vocabularyRecall(id);
     if (local===null) return false;
     try {
-      let remote=await ToeicVocabularyRemoteApi.instance.save(studentId,local,remembered);
+      let remote=await ToeicVocabularyRemoteApi.instance.save(local,remembered);
       if (remote.lastReviewedAtEpochMs>local.lastReviewedAtMs) {
         let recalls:ToeicVocabularyRecall[]=[
           new ToeicVocabularyRecall(
@@ -136,10 +133,8 @@ export class ToeicCoachViewModel {
 
   async syncVocabularyRecalls():Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;
-    let studentId=ActiveStudentContext.instance.get();
-    if (studentId.length===0) return false;
     try {
-      let remote=await ToeicVocabularyRemoteApi.instance.list(studentId);
+      let remote=await ToeicVocabularyRemoteApi.instance.list();
       let cloudWinners:ToeicVocabularyRecall[]=[];
       let cloudWeak:string[]=[];
       for (let cloud of remote) {
@@ -163,7 +158,7 @@ export class ToeicCoachViewModel {
         }
         if (cloud!==null && cloud.lastReviewedAtEpochMs>=local.lastReviewedAtMs) continue;
         let remembered=!ToeicProgressStore.instance.isUnrememberedVocabulary(local.vocabularyId);
-        await ToeicVocabularyRemoteApi.instance.save(studentId,local,remembered);
+        await ToeicVocabularyRemoteApi.instance.save(local,remembered);
       }
       return true;
     } catch {
