@@ -137,7 +137,7 @@ export class RemoteAssignmentResourceApi {
     let size = 0;
     try {
       size += await this.writeFilePart(writer.fd, boundary, 'file', sourceUri, name, mime);
-      size += await this.writeText(writer.fd, '--' + boundary + '--\\r\\n', '附件上传封装失败');
+      size += await this.writeText(writer.fd, '--' + boundary + '--\r\n', '附件上传封装失败');
     } finally {
       try { await fileIo.close(writer); } catch {}
     }
@@ -169,7 +169,7 @@ export class RemoteAssignmentResourceApi {
       let headers = BackendHttpClient.instance.traceHeaders(route, http.RequestMethod.POST, 'assignment.resource.upload');
       headers['Authorization'] = 'Bearer ' + BackendSession.instance.getToken();
       headers['Content-Type'] = 'multipart/form-data; boundary=' + boundary;
-      let response;
+      let response: http.HttpResponse;
       try {
         response = await client.request(BackendSession.instance.getBaseUrl() + route, {
         method: http.RequestMethod.POST, header: headers, extraData: bytes,
@@ -181,7 +181,7 @@ export class RemoteAssignmentResourceApi {
       if (response.responseCode < 200 || response.responseCode >= 300) {
         throw new Error('附件上传失败：HTTP ' + response.responseCode);
       }
-      let result = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
+      let result: string = typeof response.result === 'string' ? response.result : JSON.stringify(response.result);
       return this.toDomain(JSON.parse(result) as RemoteAssignmentResource);
     } finally {
       try { client.destroy(); } catch {}
