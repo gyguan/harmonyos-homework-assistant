@@ -4,6 +4,7 @@ import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { AssignmentCountdownCard } from '../../../components/assignment/AssignmentCountdownCard';
+import { AssignmentAttachmentViewer } from '../../../components/assignment/AssignmentAttachmentViewer';
 import { VoiceAssignmentPane } from '../../../components/assignment/VoiceAssignmentPane';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
@@ -540,6 +541,10 @@ export struct StudyWorkspacePage {
             .fontColor(AppTheme.TEXT)
             .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .textOverflow({ overflow: TextOverflow.Ellipsis });
+
+          if (this.assignment()!.contentType !== AssignmentContentType.AUDIO_IMAGE) {
+            AssignmentAttachmentViewer({ assignmentId: this.assignment()!.id });
+          }
 
           if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT ||
             this.assignment()!.status === AssignmentStatus.SUBMITTED ||
