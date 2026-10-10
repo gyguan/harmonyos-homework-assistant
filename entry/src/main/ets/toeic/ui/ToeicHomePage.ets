@@ -1886,6 +1886,204 @@ export struct ToeicHomePage {
   }
 
   @Builder
+  private QuestionPassagePane() {
+    if (this.currentPassage.length>0) {
+      if (this.currentGroupCount>1) {
+        Text('共用阅读材料 · 本组第 '+this.currentGroupPosition+'/'+this.currentGroupCount+' 题')
+          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
+      }
+      ForEach(this.currentPassageBlocks,(block:string,index:number)=>{
+        Text(block)
+          .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
+          .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
+          .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
+      },(block:string,index:number)=>String(index));
+    }
+  }
+
+  @Builder
+  private QuestionAnswerPane() {
+    Text(this.currentStem)
+      .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE).lineHeight(AppTheme.QUESTION_TEXT_LINE_HEIGHT)
+      .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+    
+    Column({space:9}) {
+      Button({type:ButtonType.Normal}) {
+        Row({space:8}) {
+          Text('A.')
+            .width(22)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.optionText(0));
+          Text(this.currentOptionA)
+            .layoutWeight(1)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+            .fontColor(this.optionText(0))
+            .textAlign(TextAlign.Start);
+        }
+        .width('100%')
+        .constraintSize({minHeight:50})
+        .alignItems(VerticalAlign.Center)
+        .padding({left:14,right:14,top:12,bottom:12});
+      }
+      .width('100%')
+      .constraintSize({minHeight:50})
+      .padding(0)
+      .backgroundColor(this.optionBackground(0))
+      .border({width:1,color:this.optionBorder(0)})
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .onClick(()=>this.chooseAnswer(0));
+      Button({type:ButtonType.Normal}) {
+        Row({space:8}) {
+          Text('B.')
+            .width(22)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.optionText(1));
+          Text(this.currentOptionB)
+            .layoutWeight(1)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+            .fontColor(this.optionText(1))
+            .textAlign(TextAlign.Start);
+        }
+        .width('100%')
+        .constraintSize({minHeight:50})
+        .alignItems(VerticalAlign.Center)
+        .padding({left:14,right:14,top:12,bottom:12});
+      }
+      .width('100%')
+      .constraintSize({minHeight:50})
+      .padding(0)
+      .backgroundColor(this.optionBackground(1))
+      .border({width:1,color:this.optionBorder(1)})
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .onClick(()=>this.chooseAnswer(1));
+      Button({type:ButtonType.Normal}) {
+        Row({space:8}) {
+          Text('C.')
+            .width(22)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.optionText(2));
+          Text(this.currentOptionC)
+            .layoutWeight(1)
+            .fontSize(AppTheme.FORM_TEXT_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+            .fontColor(this.optionText(2))
+            .textAlign(TextAlign.Start);
+        }
+        .width('100%')
+        .constraintSize({minHeight:50})
+        .alignItems(VerticalAlign.Center)
+        .padding({left:14,right:14,top:12,bottom:12});
+      }
+      .width('100%')
+      .constraintSize({minHeight:50})
+      .padding(0)
+      .backgroundColor(this.optionBackground(2))
+      .border({width:1,color:this.optionBorder(2)})
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .onClick(()=>this.chooseAnswer(2));
+      if (this.currentOptionCount>3) {
+        Button({type:ButtonType.Normal}) {
+          Row({space:8}) {
+            Text('D.')
+              .width(22)
+              .fontSize(AppTheme.FORM_TEXT_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.optionText(3));
+            Text(this.currentOptionD)
+              .layoutWeight(1)
+              .fontSize(AppTheme.FORM_TEXT_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(this.optionText(3))
+              .textAlign(TextAlign.Start);
+          }
+          .width('100%')
+          .constraintSize({minHeight:50})
+          .alignItems(VerticalAlign.Center)
+          .padding({left:14,right:14,top:12,bottom:12});
+        }
+        .width('100%')
+        .constraintSize({minHeight:50})
+        .padding(0)
+        .backgroundColor(this.optionBackground(3))
+        .border({width:1,color:this.optionBorder(3)})
+        .borderRadius(AppTheme.CONTROL_RADIUS)
+        .onClick(()=>this.chooseAnswer(3));
+      }
+    }
+    .width('100%');
+    
+    if (!this.isMockSession() && this.currentTranslationStem.length>0) {
+      Button(this.showQuestionTranslation?'收起中文翻译':'查看中文翻译',{type:ButtonType.Normal})
+        .width('100%').height(AppTheme.BUTTON_HEIGHT)
+        .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
+        .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+        .onClick(()=>this.toggleQuestionTranslation());
+    
+      if (this.showQuestionTranslation) {
+        Column({space:8}) {
+          Text('中文翻译 · 辅助理解')
+            .width('100%').fontSize(AppTheme.META_SIZE)
+            .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+          if (this.currentTranslationPassage.length>0) {
+            Text(this.currentTranslationPassage)
+              .width('100%').fontSize(AppTheme.BODY_SIZE)
+              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+          }
+          Text(this.currentTranslationStem)
+            .width('100%').fontSize(AppTheme.BODY_SIZE)
+            .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Row({space:8}) {
+            Text('A.').width(22).fontSize(AppTheme.BODY_SIZE)
+              .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+            Text(this.currentTranslationOptionA).layoutWeight(1)
+              .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%').alignItems(VerticalAlign.Top);
+          Row({space:8}) {
+            Text('B.').width(22).fontSize(AppTheme.BODY_SIZE)
+              .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+            Text(this.currentTranslationOptionB).layoutWeight(1)
+              .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%').alignItems(VerticalAlign.Top);
+          Row({space:8}) {
+            Text('C.').width(22).fontSize(AppTheme.BODY_SIZE)
+              .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+            Text(this.currentTranslationOptionC).layoutWeight(1)
+              .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .width('100%').alignItems(VerticalAlign.Top);
+          if (this.currentOptionCount>3) {
+            Row({space:8}) {
+              Text('D.').width(22).fontSize(AppTheme.BODY_SIZE)
+                .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
+              Text(this.currentTranslationOptionD).layoutWeight(1)
+                .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
+                .fontColor(AppTheme.SUBTEXT);
+            }
+            .width('100%').alignItems(VerticalAlign.Top);
+          }
+        }
+        .width('100%').padding(AppTheme.CARD_PADDING)
+        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+        .border({width:1,color:AppTheme.BORDER})
+        .borderRadius(AppTheme.CONTROL_RADIUS);
+      }
+    }
+  }
+
+  @Builder
   private QuestionContent() {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
@@ -1947,196 +2145,23 @@ export struct ToeicHomePage {
           }
           .width('100%');
 
-          if (this.currentPassage.length>0) {
-            if (this.currentGroupCount>1) {
-              Text('共用阅读材料 · 本组第 '+this.currentGroupPosition+'/'+this.currentGroupCount+' 题')
-                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY);
-            }
-            ForEach(this.currentPassageBlocks,(block:string,index:number)=>{
-              Text(block)
-                .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
-                .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
-                .fontColor(AppTheme.TEXT).padding(AppTheme.CARD_PADDING)
-                .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                .borderRadius(AppTheme.CONTROL_RADIUS);
-            },(block:string,index:number)=>String(index));
-          }
-
-          Text(this.currentStem)
-            .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE).lineHeight(AppTheme.QUESTION_TEXT_LINE_HEIGHT)
-            .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-
-          Column({space:9}) {
-            Button({type:ButtonType.Normal}) {
-              Row({space:8}) {
-                Text('A.')
-                  .width(22)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(this.optionText(0));
-                Text(this.currentOptionA)
-                  .layoutWeight(1)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                  .fontColor(this.optionText(0))
-                  .textAlign(TextAlign.Start);
+          if (this.canUseWideComposition() && this.currentPassage.length>0) {
+            Row({space:AppTheme.SPLIT_PANE_GAP}) {
+              Column() {
+                this.QuestionPassagePane();
               }
-              .width('100%')
-              .constraintSize({minHeight:50})
-              .alignItems(VerticalAlign.Center)
-              .padding({left:14,right:14,top:12,bottom:12});
+              .layoutWeight(1);
+
+              Column() {
+                this.QuestionAnswerPane();
+              }
+              .layoutWeight(1);
             }
             .width('100%')
-            .constraintSize({minHeight:50})
-            .padding(0)
-            .backgroundColor(this.optionBackground(0))
-            .border({width:1,color:this.optionBorder(0)})
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>this.chooseAnswer(0));
-            Button({type:ButtonType.Normal}) {
-              Row({space:8}) {
-                Text('B.')
-                  .width(22)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(this.optionText(1));
-                Text(this.currentOptionB)
-                  .layoutWeight(1)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                  .fontColor(this.optionText(1))
-                  .textAlign(TextAlign.Start);
-              }
-              .width('100%')
-              .constraintSize({minHeight:50})
-              .alignItems(VerticalAlign.Center)
-              .padding({left:14,right:14,top:12,bottom:12});
-            }
-            .width('100%')
-            .constraintSize({minHeight:50})
-            .padding(0)
-            .backgroundColor(this.optionBackground(1))
-            .border({width:1,color:this.optionBorder(1)})
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>this.chooseAnswer(1));
-            Button({type:ButtonType.Normal}) {
-              Row({space:8}) {
-                Text('C.')
-                  .width(22)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor(this.optionText(2));
-                Text(this.currentOptionC)
-                  .layoutWeight(1)
-                  .fontSize(AppTheme.FORM_TEXT_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                  .fontColor(this.optionText(2))
-                  .textAlign(TextAlign.Start);
-              }
-              .width('100%')
-              .constraintSize({minHeight:50})
-              .alignItems(VerticalAlign.Center)
-              .padding({left:14,right:14,top:12,bottom:12});
-            }
-            .width('100%')
-            .constraintSize({minHeight:50})
-            .padding(0)
-            .backgroundColor(this.optionBackground(2))
-            .border({width:1,color:this.optionBorder(2)})
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .onClick(()=>this.chooseAnswer(2));
-            if (this.currentOptionCount>3) {
-              Button({type:ButtonType.Normal}) {
-                Row({space:8}) {
-                  Text('D.')
-                    .width(22)
-                    .fontSize(AppTheme.FORM_TEXT_SIZE)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor(this.optionText(3));
-                  Text(this.currentOptionD)
-                    .layoutWeight(1)
-                    .fontSize(AppTheme.FORM_TEXT_SIZE)
-                    .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(this.optionText(3))
-                    .textAlign(TextAlign.Start);
-                }
-                .width('100%')
-                .constraintSize({minHeight:50})
-                .alignItems(VerticalAlign.Center)
-                .padding({left:14,right:14,top:12,bottom:12});
-              }
-              .width('100%')
-              .constraintSize({minHeight:50})
-              .padding(0)
-              .backgroundColor(this.optionBackground(3))
-              .border({width:1,color:this.optionBorder(3)})
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.chooseAnswer(3));
-            }
-          }
-          .width('100%');
-
-          if (!this.isMockSession() && this.currentTranslationStem.length>0) {
-            Button(this.showQuestionTranslation?'收起中文翻译':'查看中文翻译',{type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT)
-              .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.PRIMARY)
-              .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.toggleQuestionTranslation());
-
-            if (this.showQuestionTranslation) {
-              Column({space:8}) {
-                Text('中文翻译 · 辅助理解')
-                  .width('100%').fontSize(AppTheme.META_SIZE)
-                  .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-                if (this.currentTranslationPassage.length>0) {
-                  Text(this.currentTranslationPassage)
-                    .width('100%').fontSize(AppTheme.BODY_SIZE)
-                    .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-                }
-                Text(this.currentTranslationStem)
-                  .width('100%').fontSize(AppTheme.BODY_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontWeight(FontWeight.Medium)
-                  .fontColor(AppTheme.TEXT);
-                Row({space:8}) {
-                  Text('A.').width(22).fontSize(AppTheme.BODY_SIZE)
-                    .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-                  Text(this.currentTranslationOptionA).layoutWeight(1)
-                    .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                .width('100%').alignItems(VerticalAlign.Top);
-                Row({space:8}) {
-                  Text('B.').width(22).fontSize(AppTheme.BODY_SIZE)
-                    .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-                  Text(this.currentTranslationOptionB).layoutWeight(1)
-                    .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                .width('100%').alignItems(VerticalAlign.Top);
-                Row({space:8}) {
-                  Text('C.').width(22).fontSize(AppTheme.BODY_SIZE)
-                    .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-                  Text(this.currentTranslationOptionC).layoutWeight(1)
-                    .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                    .fontColor(AppTheme.SUBTEXT);
-                }
-                .width('100%').alignItems(VerticalAlign.Top);
-                if (this.currentOptionCount>3) {
-                  Row({space:8}) {
-                    Text('D.').width(22).fontSize(AppTheme.BODY_SIZE)
-                      .fontWeight(FontWeight.Medium).fontColor(AppTheme.SUBTEXT);
-                    Text(this.currentTranslationOptionD).layoutWeight(1)
-                      .fontSize(AppTheme.BODY_SIZE).lineHeight(AppTheme.BODY_LINE_HEIGHT)
-                      .fontColor(AppTheme.SUBTEXT);
-                  }
-                  .width('100%').alignItems(VerticalAlign.Top);
-                }
-              }
-              .width('100%').padding(AppTheme.CARD_PADDING)
-              .backgroundColor(AppTheme.SURFACE_SUBTLE)
-              .border({width:1,color:AppTheme.BORDER})
-              .borderRadius(AppTheme.CONTROL_RADIUS);
-            }
+            .alignItems(VerticalAlign.Top);
+          } else {
+            this.QuestionPassagePane();
+            this.QuestionAnswerPane();
           }
 
         }
