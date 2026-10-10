@@ -920,9 +920,7 @@ export struct ToeicHomePage {
   }
 
   private contentMaxWidth():number {
-    if (this.canUseWideComposition()) return AppTheme.CONTENT_WIDE_MAX_WIDTH;
-    if (this.availableWidthVp>600) return AppTheme.CONTENT_STANDARD_MAX_WIDTH;
-    return AppTheme.CONTENT_NARROW_MAX_WIDTH;
+    return LayoutPolicy.contentMaxWidthForWidth(this.availableWidthVp);
   }
 
   private actionMaxWidth():number {
