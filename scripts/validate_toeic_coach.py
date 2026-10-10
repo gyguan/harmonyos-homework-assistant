@@ -542,6 +542,9 @@ def main() -> None:
                 "DeepPageHeader({" not in section.group(1) and
                 ".layoutWeight(1).scrollBar(BarState.Off)" in section.group(1),
                 f"TOEIC {name} must be the scroll-only middle pane")
+        require("Scroll() {\n      Column() {" in section.group(1) and
+                ".width('100%')\n      .alignItems(HorizontalAlign.Center);" in section.group(1),
+                f"TOEIC {name} must center its constrained content inside the full-width scroll pane")
     require(ui.count(".layoutWeight(1).scrollBar(BarState.Off)") == 8,
             "TOEIC all eight content panes including deferred result screens must fill available space")
     footer = ui[ui.index("  private FixedFooter()"):ui.index("  @Builder\n  private HomeContent()")]

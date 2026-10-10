@@ -1309,6 +1309,7 @@ export struct ToeicHomePage {
   @Builder
   private HomeContent() {
     Scroll() {
+      Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         if (this.viewModel.contentErrors().length>0) {
           Column({space:6}) {
@@ -1479,6 +1480,9 @@ export struct ToeicHomePage {
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),top:8,bottom:8});
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
   }
@@ -1486,6 +1490,7 @@ export struct ToeicHomePage {
   @Builder
   private VocabularyContent(items:ToeicVocabularyItem[]) {
     Scroll() {
+      Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Row({space:8}) {
           Button('词义测验',{type:ButtonType.Normal})
@@ -1597,6 +1602,9 @@ export struct ToeicHomePage {
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
   }
@@ -1604,6 +1612,7 @@ export struct ToeicHomePage {
   @Builder
   private VocabularyQuizContent() {
     Scroll() {
+      Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Column({space:10}) {
           Text(this.quizStem)
@@ -1670,6 +1679,9 @@ export struct ToeicHomePage {
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
   }
@@ -1677,6 +1689,7 @@ export struct ToeicHomePage {
   @Builder
   private SentenceContent(items:ToeicSentenceDrill[]) {
     Scroll() {
+      Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Column({space:8}) {
           Text('训练方法')
@@ -1725,6 +1738,9 @@ export struct ToeicHomePage {
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
   }
@@ -1732,6 +1748,7 @@ export struct ToeicHomePage {
   @Builder
   private MockResultContent() {
     Scroll() {
+      Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Column({space:10}) {
           Text(this.mockResultCorrect+' / '+this.mockResultTotal)
@@ -1824,6 +1841,9 @@ export struct ToeicHomePage {
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
   }
@@ -1831,6 +1851,7 @@ export struct ToeicHomePage {
   @Builder
   private PracticeResultContent() {
     Scroll() {
+      Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Column({space:8}) {
           Text(this.practiceResultCorrect+' / '+this.practiceResultTotal)
@@ -1898,6 +1919,9 @@ export struct ToeicHomePage {
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
   }
@@ -1905,6 +1929,7 @@ export struct ToeicHomePage {
   @Builder
   private VocabularyResultContent() {
     Scroll() {
+      Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Column({space:8}) {
           Text(this.quizCorrectCount+' / '+this.quizQuestions.length)
@@ -1940,6 +1965,9 @@ export struct ToeicHomePage {
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
   }
@@ -2145,6 +2173,7 @@ export struct ToeicHomePage {
   @Builder
   private QuestionContent() {
     Scroll() {
+      Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         Column({space:12}) {
           if (this.isMockSession()) {
@@ -2231,6 +2260,9 @@ export struct ToeicHomePage {
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
         top:AppTheme.DEEP_PAGE_TOP_PADDING,bottom:AppTheme.DEEP_PAGE_TOP_PADDING});
+      }
+      .width('100%')
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%').layoutWeight(1).scrollBar(BarState.Off).align(Alignment.TopStart);
   }
