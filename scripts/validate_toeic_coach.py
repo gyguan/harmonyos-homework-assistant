@@ -484,10 +484,19 @@ def main() -> None:
             "ToeicQuestionTranslationCatalog.find(questionId)" in view_model,
             "TOEIC view model must expose question translations by stable question id")
     require("validateQuestionTranslations" in view_model and
-            "PresetToeicContent.questionsRequiringTranslation()" in view_model,
-            "TOEIC contentErrors must include question translation validation")
+            "PresetToeicContent.questionsRequiringTranslation()" in view_model and
+            "ToeicQuestionTranslationCatalog.validationItems(translationQuestionIds)" in view_model,
+            "TOEIC contentErrors must validate the current release translation overlays")
+    translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
+    require("static validationItems(questionIds:string[]):ToeicQuestionTranslation[]" in translation_catalog and
+            "let resolved=ToeicQuestionTranslationCatalog.find(questionId);" in translation_catalog and
+            "if (resolved!==null) result.push(resolved);" in translation_catalog,
+            "current versioned question translations must participate in runtime validation")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
+    require("校验详情：" in ui and
+            "this.viewModel.contentErrors().slice(0,5)" in ui,
+            "TOEIC fail-closed UI must surface concrete runtime validation errors")
     require("标记重点" not in ui and
             "取消重点" not in ui and
             "toggleVocabularyImportant" not in ui and
