@@ -65,6 +65,11 @@ export class LayoutPolicy {
       8, AppTheme.PAGE_PADDING);
   }
 
+  static toeicStudyRequirement(): LayoutRequirement {
+    return new LayoutRequirement(AppTheme.TOEIC_PRIMARY_MIN_WIDTH, AppTheme.TOEIC_SECONDARY_MIN_WIDTH,
+      AppTheme.SPLIT_PANE_GAP, AppTheme.PAGE_PADDING_WIDE);
+  }
+
   static requiredWidth(requirement: LayoutRequirement): number {
     return requirement.primaryMinWidth + requirement.secondaryMinWidth + requirement.gap +
       requirement.horizontalPadding * 2;
