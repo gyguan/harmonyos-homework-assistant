@@ -875,12 +875,12 @@ def main() -> None:
             "Button('C. '+this.currentOptionC" not in ui and
             "Button('D. '+this.currentOptionD" not in ui,
             "TOEIC answer options must not regress to single-label Button rendering")
-    require(question_builder.count("Button({type:ButtonType.Normal})") >= 4 and
-            ".constraintSize({minHeight:50})" in question_builder and
-            ".padding({left:14,right:14,top:12,bottom:12})" in question_builder and
-            ".textAlign(TextAlign.Start)" in question_builder,
+    require(answer_builder.count("Button({type:ButtonType.Normal})") >= 4 and
+            ".constraintSize({minHeight:50})" in answer_builder and
+            ".padding({left:14,right:14,top:12,bottom:12})" in answer_builder and
+            ".textAlign(TextAlign.Start)" in answer_builder,
             "TOEIC answer options must keep custom multiline Button content and touch-safe layout")
-    require(".maxLines(" not in question_builder and ".textOverflow(" not in question_builder,
+    require(".maxLines(" not in answer_builder and ".textOverflow(" not in answer_builder,
             "TOEIC answer text must not be truncated by maxLines or ellipsis")
 
 
