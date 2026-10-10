@@ -193,8 +193,8 @@ export class RemoteAssignmentResourceApi {
   private toDomain(item: RemoteAssignmentResource): AssignmentResource {
     return {
       id: item.id,
-      resourceType: item.resourceType === AssignmentResourceType.AUDIO ?
-        AssignmentResourceType.AUDIO : AssignmentResourceType.IMAGE,
+      resourceType: item.resourceType === AssignmentResourceType.AUDIO ? AssignmentResourceType.AUDIO :
+        (item.resourceType === AssignmentResourceType.VIDEO ? AssignmentResourceType.VIDEO : AssignmentResourceType.IMAGE),
       originalName: item.originalName,
       contentType: item.contentType,
       sizeBytes: item.sizeBytes,
@@ -383,6 +383,7 @@ export class RemoteAssignmentResourceApi {
     if (type.indexOf('webp') >= 0) return 'webp';
     if (type.indexOf('heic') >= 0) return 'heic';
     if (type.indexOf('mpeg') >= 0) return 'mp3';
+    if (resource.resourceType === AssignmentResourceType.VIDEO) return 'mp4';
     if (type.indexOf('mp4') >= 0 || type.indexOf('m4a') >= 0) return 'm4a';
     if (type.indexOf('wav') >= 0) return 'wav';
     return resource.resourceType === AssignmentResourceType.AUDIO ? 'mp3' : 'jpg';
