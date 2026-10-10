@@ -959,48 +959,74 @@ export struct ToeicHomePage {
 
 
   @Builder
+  private TodaySummary() {
+    Row() {
+      Text('本日任务 · '+this.dayContextLabel(this.selectedStudyDay))
+        .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+      Blank();
+      Text('已完成 '+this.completedTasksCount()+(this.selectedStudyDay===1?'/1':'/3'))
+        .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+    }
+    .width('100%').alignItems(VerticalAlign.Center);
+
+    Text(this.selectedDayTitle)
+      .width('100%').fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
+      .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
+      .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+    Text(this.selectedDayFocus)
+      .width('100%').fontSize(AppTheme.BODY_SIZE)
+      .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+  }
+
+  @Builder
+  private TodayActions() {
+    if (this.selectedStudyDay===1) {
+      Text('预计 '+this.selectedDayMinutes+' 分钟 · 20 题综合诊断')
+        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+    } else {
+      Text('预计 '+this.selectedDayMinutes+' 分钟 · 高频词 '+this.selectedDayVocabularyCount+
+        ' 个 · 阅读提速 '+this.selectedDaySentenceCount+' 句')
+        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+      Row({space:10}) {
+        Button((this.selectedVocabDone?'✓ ':'')+'高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
+          .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(this.selectedDayVocabularyCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
+          .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(this.selectedDayVocabularyCount>0)
+          .onClick(()=>this.openVocabulary());
+        Button((this.selectedSentenceDone?'✓ ':'')+'阅读提速 '+this.selectedDaySentenceCount+' 句',{type:ButtonType.Normal})
+          .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .fontColor(this.selectedDaySentenceCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
+          .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(this.selectedDaySentenceCount>0)
+          .onClick(()=>this.openSentenceDrills());
+      }
+      .width('100%');
+    }
+  }
+
+  @Builder
   private TodayCard() {
     Column({space:12}) {
-      Row() {
-        Text('本日任务 · '+this.dayContextLabel(this.selectedStudyDay))
-          .fontSize(AppTheme.META_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-        Blank();
-        Text('已完成 '+this.completedTasksCount()+(this.selectedStudyDay===1?'/1':'/3'))
-          .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-      }
-      .width('100%').alignItems(VerticalAlign.Center);
+      if (this.canUseWideComposition()) {
+        Row({space:AppTheme.SPLIT_PANE_GAP}) {
+          Column({space:10}) {
+            this.TodaySummary();
+          }
+          .layoutWeight(1);
 
-      Text(this.selectedDayTitle)
-        .width('100%').fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
-        .lineHeight(AppTheme.PAGE_NAV_TITLE_LINE_HEIGHT)
-        .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-      Text(this.selectedDayFocus)
-        .width('100%').fontSize(AppTheme.BODY_SIZE)
-        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-      if (this.selectedStudyDay===1) {
-        Text('预计 '+this.selectedDayMinutes+' 分钟 · 20 题综合诊断')
-          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-      } else {
-        Text('预计 '+this.selectedDayMinutes+' 分钟 · 高频词 '+this.selectedDayVocabularyCount+
-          ' 个 · 阅读提速 '+this.selectedDaySentenceCount+' 句')
-          .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-        Row({space:10}) {
-          Button((this.selectedVocabDone?'✓ ':'')+'高频词 '+this.selectedDayVocabularyCount+' 个',{type:ButtonType.Normal})
-            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .fontColor(this.selectedDayVocabularyCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
-            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(this.selectedDayVocabularyCount>0)
-            .onClick(()=>this.openVocabulary());
-          Button((this.selectedSentenceDone?'✓ ':'')+'阅读提速 '+this.selectedDaySentenceCount+' 句',{type:ButtonType.Normal})
-            .layoutWeight(1).height(AppTheme.BUTTON_HEIGHT)
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .fontColor(this.selectedDaySentenceCount>0?AppTheme.PRIMARY:AppTheme.TERTIARY_TEXT)
-            .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(this.selectedDaySentenceCount>0)
-            .onClick(()=>this.openSentenceDrills());
+          Column({space:10}) {
+            this.TodayActions();
+          }
+          .layoutWeight(1);
         }
-        .width('100%');
+        .width('100%')
+        .alignItems(VerticalAlign.Top);
+      } else {
+        this.TodaySummary();
+        this.TodayActions();
       }
 
       if (this.selectedStudyDay===1 || this.selectedStudyDay===12 || this.selectedStudyDay===13 ||
@@ -1050,18 +1076,33 @@ export struct ToeicHomePage {
 
       if (this.canUseWideComposition()) {
         Row({space:8}) {
-          this.DayButton(1); this.DayButton(2); this.DayButton(3); this.DayButton(4);
-          this.DayButton(5); this.DayButton(6); this.DayButton(7);
+          this.DayButton(1);
+          this.DayButton(2);
+          this.DayButton(3);
+          this.DayButton(4);
+          this.DayButton(5);
+          this.DayButton(6);
+          this.DayButton(7);
         }
         .width('100%');
         Row({space:8}) {
-          this.DayButton(8); this.DayButton(9); this.DayButton(10); this.DayButton(11);
-          this.DayButton(12); this.DayButton(13); this.DayButton(14);
+          this.DayButton(8);
+          this.DayButton(9);
+          this.DayButton(10);
+          this.DayButton(11);
+          this.DayButton(12);
+          this.DayButton(13);
+          this.DayButton(14);
         }
         .width('100%');
         Row({space:8}) {
-          this.DayButton(15); this.DayButton(16); this.DayButton(17); this.DayButton(18);
-          this.DayButton(19); this.DayButton(20); this.DayButton(21);
+          this.DayButton(15);
+          this.DayButton(16);
+          this.DayButton(17);
+          this.DayButton(18);
+          this.DayButton(19);
+          this.DayButton(20);
+          this.DayButton(21);
         }
         .width('100%');
       } else {
