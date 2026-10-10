@@ -1532,7 +1532,7 @@ export struct ToeicHomePage {
                 },(item:ToeicVocabularyItem)=>item.id+
                   (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'-weak':'-normal'));
         }
-        .width('100%')
+        .width('100%');
       }
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1550,54 +1550,57 @@ export struct ToeicHomePage {
           Text(this.quizStem)
             .width('100%').fontSize(AppTheme.QUESTION_TEXT_SIZE)
             .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-          Button({type:ButtonType.Normal}) {
-            Text('A. '+this.quizOptionA)
-              .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE)
-              .fontColor(AppTheme.TEXT)
-              .padding({left:14,right:14,top:12,bottom:12});
+          Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(10)}}) {
+            Button({type:ButtonType.Normal}) {
+              Text('A. '+this.quizOptionA)
+                .width('100%').textAlign(TextAlign.Start)
+                .fontSize(AppTheme.FORM_TEXT_SIZE)
+                .fontColor(AppTheme.TEXT)
+                .padding({left:14,right:14,top:12,bottom:12});
+            }
+            .width(this.responsiveCardWidth()).constraintSize({minHeight:50}).padding(0)
+            .backgroundColor(this.quizSelectedIndex===0?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+            .border({width:1,color:this.quizSelectedIndex===0?AppTheme.PRIMARY:AppTheme.BORDER})
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>this.answerVocabularyQuiz(0));
+            Button({type:ButtonType.Normal}) {
+              Text('B. '+this.quizOptionB)
+                .width('100%').textAlign(TextAlign.Start)
+                .fontSize(AppTheme.FORM_TEXT_SIZE)
+                .fontColor(AppTheme.TEXT)
+                .padding({left:14,right:14,top:12,bottom:12});
+            }
+            .width(this.responsiveCardWidth()).constraintSize({minHeight:50}).padding(0)
+            .backgroundColor(this.quizSelectedIndex===1?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+            .border({width:1,color:this.quizSelectedIndex===1?AppTheme.PRIMARY:AppTheme.BORDER})
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>this.answerVocabularyQuiz(1));
+            Button({type:ButtonType.Normal}) {
+              Text('C. '+this.quizOptionC)
+                .width('100%').textAlign(TextAlign.Start)
+                .fontSize(AppTheme.FORM_TEXT_SIZE)
+                .fontColor(AppTheme.TEXT)
+                .padding({left:14,right:14,top:12,bottom:12});
+            }
+            .width(this.responsiveCardWidth()).constraintSize({minHeight:50}).padding(0)
+            .backgroundColor(this.quizSelectedIndex===2?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+            .border({width:1,color:this.quizSelectedIndex===2?AppTheme.PRIMARY:AppTheme.BORDER})
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>this.answerVocabularyQuiz(2));
+            Button({type:ButtonType.Normal}) {
+              Text('D. '+this.quizOptionD)
+                .width('100%').textAlign(TextAlign.Start)
+                .fontSize(AppTheme.FORM_TEXT_SIZE)
+                .fontColor(AppTheme.TEXT)
+                .padding({left:14,right:14,top:12,bottom:12});
+            }
+            .width(this.responsiveCardWidth()).constraintSize({minHeight:50}).padding(0)
+            .backgroundColor(this.quizSelectedIndex===3?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
+            .border({width:1,color:this.quizSelectedIndex===3?AppTheme.PRIMARY:AppTheme.BORDER})
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onClick(()=>this.answerVocabularyQuiz(3));
           }
-          .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===0?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
-          .border({width:1,color:this.quizSelectedIndex===0?AppTheme.PRIMARY:AppTheme.BORDER})
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.answerVocabularyQuiz(0));
-          Button({type:ButtonType.Normal}) {
-            Text('B. '+this.quizOptionB)
-              .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE)
-              .fontColor(AppTheme.TEXT)
-              .padding({left:14,right:14,top:12,bottom:12});
-          }
-          .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===1?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
-          .border({width:1,color:this.quizSelectedIndex===1?AppTheme.PRIMARY:AppTheme.BORDER})
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.answerVocabularyQuiz(1));
-          Button({type:ButtonType.Normal}) {
-            Text('C. '+this.quizOptionC)
-              .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE)
-              .fontColor(AppTheme.TEXT)
-              .padding({left:14,right:14,top:12,bottom:12});
-          }
-          .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===2?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
-          .border({width:1,color:this.quizSelectedIndex===2?AppTheme.PRIMARY:AppTheme.BORDER})
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.answerVocabularyQuiz(2));
-          Button({type:ButtonType.Normal}) {
-            Text('D. '+this.quizOptionD)
-              .width('100%').textAlign(TextAlign.Start)
-              .fontSize(AppTheme.FORM_TEXT_SIZE)
-              .fontColor(AppTheme.TEXT)
-              .padding({left:14,right:14,top:12,bottom:12});
-          }
-          .width('100%').constraintSize({minHeight:50}).padding(0)
-          .backgroundColor(this.quizSelectedIndex===3?AppTheme.PRIMARY_SOFT:AppTheme.SURFACE)
-          .border({width:1,color:this.quizSelectedIndex===3?AppTheme.PRIMARY:AppTheme.BORDER})
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .onClick(()=>this.answerVocabularyQuiz(3));
+          .width('100%');
           Text('请选择一个答案，系统会直接进入下一题。完成后统一查看正确率和解析。')
             .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
         }
@@ -1657,7 +1660,7 @@ export struct ToeicHomePage {
                   .borderRadius(AppTheme.CARD_RADIUS);
                 },(item:ToeicSentenceDrill)=>item.id);
         }
-        .width('100%')
+        .width('100%');
       }
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1830,7 +1833,7 @@ export struct ToeicHomePage {
                   .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
                 },(item:ToeicPracticeReviewItem)=>item.id);
         }
-        .width('100%')
+        .width('100%');
       }
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1872,7 +1875,7 @@ export struct ToeicHomePage {
                   .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
                 },(question:ToeicVocabularyQuizQuestion)=>question.vocabularyId);
         }
-        .width('100%')
+        .width('100%');
       }
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
