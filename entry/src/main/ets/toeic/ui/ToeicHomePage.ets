@@ -1235,7 +1235,7 @@ export struct ToeicHomePage {
               Text('• '+error)
                 .width('100%').fontSize(AppTheme.META_SIZE)
                 .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.DANGER);
-            },(error:string,index:number)=>String(index)+'-'+error);
+            },(error:string)=>error);
           }
           .width('100%').padding(AppTheme.CARD_PADDING_COMPACT)
           .backgroundColor(AppTheme.DANGER_SOFT)
