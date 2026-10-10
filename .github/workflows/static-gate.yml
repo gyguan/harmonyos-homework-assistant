@@ -429,6 +429,9 @@ jobs:
       - name: Run Practice attempt E2E
         run: python backend/scripts/practice_e2e.py
 
+      - name: Run TOEIC vocabulary recall E2E
+        run: python backend/scripts/toeic_vocabulary_recall_e2e.py
+
       - name: Run parent review command E2E
         run: python backend/scripts/parent_review_e2e.py
 
@@ -475,6 +478,9 @@ jobs:
 
       - name: Verify persisted auth session after backend restart
         run: python backend/scripts/e2e_smoke.py --session-only
+
+      - name: Verify persisted TOEIC vocabulary recall after backend restart
+        run: python backend/scripts/toeic_vocabulary_recall_e2e.py --verify-only
 
       - name: Dump backend logs on failure
         if: failure()
