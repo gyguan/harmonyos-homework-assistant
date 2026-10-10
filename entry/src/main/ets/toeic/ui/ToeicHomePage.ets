@@ -1048,54 +1048,72 @@ export struct ToeicHomePage {
       }
       .width('100%');
 
-      Row({space:8}) {
-        this.DayButton(1);
-        this.DayButton(2);
-        this.DayButton(3);
-        this.DayButton(4);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(5);
-        this.DayButton(6);
-        this.DayButton(7);
-        this.DayButton(8);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(9);
-        this.DayButton(10);
-        this.DayButton(11);
-        this.DayButton(12);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(13);
-        this.DayButton(14);
-        this.DayButton(15);
-        this.DayButton(16);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(17);
-        this.DayButton(18);
-        this.DayButton(19);
-        this.DayButton(20);
-      }
-      .width('100%');
-
-      Row({space:8}) {
-        this.DayButton(21);
-        Blank().layoutWeight(1);
-        Blank().layoutWeight(1);
-        Blank().layoutWeight(1);
-      }
-      .width('100%');
-
+      if (this.canUseWideComposition()) {
+        Row({space:8}) {
+          this.DayButton(1); this.DayButton(2); this.DayButton(3); this.DayButton(4);
+          this.DayButton(5); this.DayButton(6); this.DayButton(7);
+        }
+        .width('100%');
+        Row({space:8}) {
+          this.DayButton(8); this.DayButton(9); this.DayButton(10); this.DayButton(11);
+          this.DayButton(12); this.DayButton(13); this.DayButton(14);
+        }
+        .width('100%');
+        Row({space:8}) {
+          this.DayButton(15); this.DayButton(16); this.DayButton(17); this.DayButton(18);
+          this.DayButton(19); this.DayButton(20); this.DayButton(21);
+        }
+        .width('100%');
+      } else {
+        Row({space:8}) {
+          this.DayButton(1);
+          this.DayButton(2);
+          this.DayButton(3);
+          this.DayButton(4);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(5);
+          this.DayButton(6);
+          this.DayButton(7);
+          this.DayButton(8);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(9);
+          this.DayButton(10);
+          this.DayButton(11);
+          this.DayButton(12);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(13);
+          this.DayButton(14);
+          this.DayButton(15);
+          this.DayButton(16);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(17);
+          this.DayButton(18);
+          this.DayButton(19);
+          this.DayButton(20);
+        }
+        .width('100%');
+  
+        Row({space:8}) {
+          this.DayButton(21);
+          Blank().layoutWeight(1);
+          Blank().layoutWeight(1);
+          Blank().layoutWeight(1);
+        }
+        .width('100%');
+  
+        }
       Text('可自由复习或预习任意一天；只有完成当前进度日才会推进学习进度。')
         .width('100%').fontSize(AppTheme.META_SIZE)
         .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
@@ -1191,7 +1209,8 @@ export struct ToeicHomePage {
     Column() {
       if (this.mode===ToeicPageMode.HOME) {
         Button((this.selectedTrainingDone?'✓ ':'')+this.trainingButtonLabel(),{type:ButtonType.Normal})
-          .width('100%').height(AppTheme.BUTTON_HEIGHT)
+          .width(this.canUseWideComposition()?AppTheme.HOME_PAD_PRIMARY_ACTION_MAX_WIDTH:'100%')
+          .height(AppTheme.BUTTON_HEIGHT)
           .fontSize(AppTheme.ACTION_TEXT_SIZE).fontColor(AppTheme.TEXT_ON_PRIMARY)
           .backgroundColor(AppTheme.PRIMARY).borderRadius(AppTheme.CONTROL_RADIUS)
           .onClick(()=>this.startTraining());
@@ -1244,6 +1263,7 @@ export struct ToeicHomePage {
     .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
       right:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),top:8,
       bottom:AppTheme.DEEP_PAGE_BOTTOM_PADDING})
+    .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND);
   }
 
