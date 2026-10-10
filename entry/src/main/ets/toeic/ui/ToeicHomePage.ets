@@ -142,7 +142,17 @@ export struct ToeicHomePage {
     if (this.selectedStudyDay<=0) this.selectedStudyDay=this.progressCurrentDay;
     this.loadStudyDay(this.selectedStudyDay);
     this.refreshRevision++;
+    void this.syncVocabularyCloud();
     if (this.isMockSession() && this.mode===ToeicPageMode.TRAINING) this.startMockClock();
+  }
+
+  private async syncVocabularyCloud():Promise<void> {
+    let synced=await this.viewModel.syncVocabularyRecalls();
+    if (!synced) return;
+    this.loadProgressSnapshot();
+    this.refreshVocabularyItems();
+    this.loadStudyDay(this.selectedStudyDay);
+    this.refreshRevision++;
   }
 
   aboutToDisappear():void {
@@ -536,17 +546,18 @@ export struct ToeicHomePage {
     this.updatingVocabularyId=item.id;
     this.vocabularyActionMessage='';
     try {
-      // recordVocabularyRecall mutates the local snapshot before its awaited save.
-      // Publish that state immediately so the user sees the toggle and reordering.
+      // Local Preferences update first for instant/offline UX, then await the cloud write.
+      // A cloud failure never rolls back the local recall state; the next TOEIC entry retries reconciliation.
       let saving=this.viewModel.recordVocabularyRecall(item.id,remembered);
       this.refreshVocabularyItems();
-      await saving;
+      let cloudSynced=await saving;
       this.loadProgressSnapshot();
       this.refreshVocabularyItems();
       this.loadStudyDay(this.selectedStudyDay);
       this.refreshRevision++;
+      if (!cloudSynced) this.vocabularyActionMessage='已保存到本机，云端暂未同步；联网并登录后会自动重试。';
     } catch {
-      this.vocabularyActionMessage='单词状态更新失败，请重试。';
+      this.vocabularyActionMessage='单词状态本地保存失败，请重试。';
       this.loadProgressSnapshot();
       this.refreshVocabularyItems();
     } finally {
