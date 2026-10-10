@@ -24,10 +24,10 @@ export class ToeicVocabularyRemoteApi {
   static readonly instance:ToeicVocabularyRemoteApi=new ToeicVocabularyRemoteApi();
   private constructor() {}
 
-  async list(studentId:string):Promise<RemoteToeicVocabularyRecall[]> {
+  async list():Promise<RemoteToeicVocabularyRecall[]> {
     let response=await BackendHttpClient.instance.requestFor(
       'toeic.vocabularyRecall.list',
-      `/api/v1/students/${encodeURIComponent(studentId)}/toeic/vocabulary-recalls`,
+      '/api/v1/toeic/vocabulary-recalls',
       http.RequestMethod.GET);
     if (response.statusCode<200 || response.statusCode>=300) {
       throw new Error(`读取 TOEIC 单词云端进度失败: ${response.statusCode}`);
@@ -35,7 +35,7 @@ export class ToeicVocabularyRemoteApi {
     return JSON.parse(response.body) as RemoteToeicVocabularyRecall[];
   }
 
-  async save(studentId:string, recall:ToeicVocabularyRecall,
+  async save(recall:ToeicVocabularyRecall,
     remembered:boolean):Promise<RemoteToeicVocabularyRecall> {
     let body:ToeicVocabularyRecallUpsertBody={
       remembered:remembered,
@@ -46,7 +46,7 @@ export class ToeicVocabularyRemoteApi {
     };
     let response=await BackendHttpClient.instance.requestFor(
       'toeic.vocabularyRecall.save',
-      `/api/v1/students/${encodeURIComponent(studentId)}/toeic/vocabulary-recalls/${encodeURIComponent(recall.vocabularyId)}`,
+      `/api/v1/toeic/vocabulary-recalls/${encodeURIComponent(recall.vocabularyId)}`,
       http.RequestMethod.PUT,body);
     if (response.statusCode<200 || response.statusCode>=300) {
       throw new Error(`保存 TOEIC 单词云端进度失败: ${response.statusCode}`);
