@@ -66,7 +66,7 @@ export class ToeicQuestionTranslationCatalog {
       return new ToeicQuestionTranslation(questionId,
         '社区讲座报名\n十月讲座现已开放报名。参加者可以在线报名，也可以到前台报名。[1] _____ 班级人数限制为24人，因此建议尽早报名。付款 [2] _____ 后，将发送确认邮件。需要取消报名的参加者应至少提前两天通知我们。[3] _____，报名费可以转到之后的场次使用。讲师会提供全部材料，因此参加者无需携带 [4] _____。',
         '第 [2] 空选择哪个词最合适？',
-        ['接收（主动单数）','被收到','正在接收','已经接收（形式错误）']);
+        ['接收（主动单数）','被收到','已经接收（主动完成时）','接收（现在分词）']);
     }
     if (questionId==='R-FP1-DX-P5-05') {
       return new ToeicQuestionTranslation(questionId,'',
