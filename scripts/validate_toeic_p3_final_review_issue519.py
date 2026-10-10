@@ -80,11 +80,17 @@ def validate()->None:
         "R-FM1-P7-S09-01","R-FM2-P7-S07-03",
     ):
         assert f"question.id==='{archived}'" in preset, f"{archived}: must be excluded from new live queues"
-    assert "group.groupId==='FM1-G2'" in preset
-    assert "group.questionIds.push('R-FP3-FM1-P7-M2-03')" in preset
+    assert "active=ToeicMockPart7EvidenceRevisionContent.activeId(id);" in preset
+    assert "active=ToeicP3FinalCorrections.activePart7Id(active);" in preset
+    assert "static readingGroupValidationQuestions(" in preset
+    assert "new ToeicReadingGroup('FM1-G2',[" in p3
+    assert "'R-FP3-FM1-P7-M2-03'" in p3
 
     service=(ROOT/"entry/src/main/ets/toeic/application/ToeicReadingGroupService.ets").read_text(encoding="utf-8")
-    assert "group.questionIds.push('R-FP3-FM1-P7-M2-03')" in service
+    assert "let compatibleIds:string[]=group.questionIds.slice();" in service
+    assert "active=ToeicMockPart7EvidenceRevisionContent.activeId(id);" in service
+    assert "active=ToeicP3FinalCorrections.activePart7Id(active);" in service
+    assert "compatibleIds.indexOf(question.id)>=0" in service
 
     translations=(CONTENT/"ToeicQuestionTranslationCatalog.ets").read_text(encoding="utf-8")
     for id in (
