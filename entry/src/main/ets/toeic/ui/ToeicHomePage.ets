@@ -1459,77 +1459,80 @@ export struct ToeicHomePage {
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .borderRadius(AppTheme.CONTROL_RADIUS);
         }
+        Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
         ForEach(items,(item:ToeicVocabularyItem)=>{
-          Column({space:8}) {
-            Row() {
-              Text(item.word)
-                .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-              Text('  '+item.partOfSpeech)
-                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              Blank();
-              Text(item.level)
-                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY)
-                .padding({left:8,right:8,top:4,bottom:4})
-                .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
-            }
-            .width('100%');
-
-            Row({space:10}) {
-              Text('美 '+item.ipa)
-                .layoutWeight(1)
-                .fontSize(AppTheme.BODY_SIZE)
-                .fontColor(AppTheme.SUBTEXT);
-              Button('发音',{type:ButtonType.Normal})
-                .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-                .fontSize(AppTheme.ACTION_TEXT_SIZE)
-                .fontColor(AppTheme.PRIMARY)
-                .backgroundColor(AppTheme.PRIMARY_SOFT)
-                .borderRadius(AppTheme.CONTROL_RADIUS)
-                .onClick(()=>{ void this.pronounce(item); });
-            }
-            .width('100%')
-            .alignItems(VerticalAlign.Center);
-            if (this.unrememberedVocabularyIds.indexOf(item.id)>=0) {
-              Text('待加强 · 排在最前')
-                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.DANGER);
-            }
-
-            Text(item.meaning)
-              .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
-            Text('场景：'+item.scenario)
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            if (item.exampleSentence.length>0) {
-              Text('例句：'+item.exampleSentence)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            }
-            if (item.collocations.length>0) {
-              Text('搭配：'+item.collocations.join(' · '))
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
-            }
-            if (item.paraphrases.length>0) {
-              Text('同义：'+item.paraphrases.join(' · '))
-                .width('100%').fontSize(AppTheme.META_SIZE)
-                .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            }
-            Button(this.updatingVocabularyId===item.id?'保存中…':
-              (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'记住了':'没记住'),
-              {type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .fontColor(AppTheme.PRIMARY)
-              .backgroundColor(this.unrememberedVocabularyIds.indexOf(item.id)>=0?
-                AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
-              .borderRadius(AppTheme.CONTROL_RADIUS)
-              .enabled(this.updatingVocabularyId.length===0)
-              .onClick(()=>{void this.recordWordRecall(item);});
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE)
-          .border({width:1,color:AppTheme.BORDER})
-          .borderRadius(AppTheme.CARD_RADIUS);
-        },(item:ToeicVocabularyItem)=>item.id+
-          (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'-weak':'-normal'));
+                  Column({space:8}) {
+                    Row() {
+                      Text(item.word)
+                        .fontSize(AppTheme.CARD_TITLE_SIZE).fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
+                      Text('  '+item.partOfSpeech)
+                        .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Blank();
+                      Text(item.level)
+                        .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.PRIMARY)
+                        .padding({left:8,right:8,top:4,bottom:4})
+                        .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CHIP_RADIUS);
+                    }
+                    .width('100%');
+        
+                    Row({space:10}) {
+                      Text('美 '+item.ipa)
+                        .layoutWeight(1)
+                        .fontSize(AppTheme.BODY_SIZE)
+                        .fontColor(AppTheme.SUBTEXT);
+                      Button('发音',{type:ButtonType.Normal})
+                        .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+                        .fontSize(AppTheme.ACTION_TEXT_SIZE)
+                        .fontColor(AppTheme.PRIMARY)
+                        .backgroundColor(AppTheme.PRIMARY_SOFT)
+                        .borderRadius(AppTheme.CONTROL_RADIUS)
+                        .onClick(()=>{ void this.pronounce(item); });
+                    }
+                    .width('100%')
+                    .alignItems(VerticalAlign.Center);
+                    if (this.unrememberedVocabularyIds.indexOf(item.id)>=0) {
+                      Text('待加强 · 排在最前')
+                        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.DANGER);
+                    }
+        
+                    Text(item.meaning)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.TEXT);
+                    Text('场景：'+item.scenario)
+                      .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                    if (item.exampleSentence.length>0) {
+                      Text('例句：'+item.exampleSentence)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                    }
+                    if (item.collocations.length>0) {
+                      Text('搭配：'+item.collocations.join(' · '))
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.PRIMARY);
+                    }
+                    if (item.paraphrases.length>0) {
+                      Text('同义：'+item.paraphrases.join(' · '))
+                        .width('100%').fontSize(AppTheme.META_SIZE)
+                        .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                    }
+                    Button(this.updatingVocabularyId===item.id?'保存中…':
+                      (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'记住了':'没记住'),
+                      {type:ButtonType.Normal})
+                      .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                      .fontColor(AppTheme.PRIMARY)
+                      .backgroundColor(this.unrememberedVocabularyIds.indexOf(item.id)>=0?
+                        AppTheme.PRIMARY_SOFT:AppTheme.SURFACE_SUBTLE)
+                      .borderRadius(AppTheme.CONTROL_RADIUS)
+                      .enabled(this.updatingVocabularyId.length===0)
+                      .onClick(()=>{void this.recordWordRecall(item);});
+                  }
+                  .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                  .backgroundColor(AppTheme.CARD_SURFACE)
+                  .border({width:1,color:AppTheme.BORDER})
+                  .borderRadius(AppTheme.CARD_RADIUS);
+                },(item:ToeicVocabularyItem)=>item.id+
+                  (this.unrememberedVocabularyIds.indexOf(item.id)>=0?'-weak':'-normal'));
+        }
+        .width('100%')
       }
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1623,35 +1626,38 @@ export struct ToeicHomePage {
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
 
+        Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
         ForEach(items,(item:ToeicSentenceDrill)=>{
-          Column({space:8}) {
-            Text(item.sentence)
-              .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
-              .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-            Button(this.revealedSentenceIds.indexOf(item.id)>=0?'收起解析':'查看主干与译文',
-              {type:ButtonType.Normal})
-              .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
-              .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
-              .onClick(()=>this.toggleSentenceReveal(item.id));
-            if (this.revealedSentenceIds.indexOf(item.id)>=0) {
-              Text('译：'+item.translation)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-              Text('主干：'+item.core)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
-              Text('重点：'+item.focus)
-                .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              Text(item.explanation)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-            }
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE)
-          .border({width:1,color:AppTheme.BORDER})
-          .borderRadius(AppTheme.CARD_RADIUS);
-        },(item:ToeicSentenceDrill)=>item.id);
+                  Column({space:8}) {
+                    Text(item.sentence)
+                      .width('100%').fontSize(AppTheme.READING_BODY_SIZE)
+                      .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                    Button(this.revealedSentenceIds.indexOf(item.id)>=0?'收起解析':'查看主干与译文',
+                      {type:ButtonType.Normal})
+                      .width('100%').height(AppTheme.BUTTON_HEIGHT).fontSize(AppTheme.ACTION_TEXT_SIZE)
+                      .fontColor(AppTheme.PRIMARY).backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CONTROL_RADIUS)
+                      .onClick(()=>this.toggleSentenceReveal(item.id));
+                    if (this.revealedSentenceIds.indexOf(item.id)>=0) {
+                      Text('译：'+item.translation)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                      Text('主干：'+item.core)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .fontWeight(FontWeight.Medium).fontColor(AppTheme.PRIMARY);
+                      Text('重点：'+item.focus)
+                        .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Text(item.explanation)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                    }
+                  }
+                  .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                  .backgroundColor(AppTheme.CARD_SURFACE)
+                  .border({width:1,color:AppTheme.BORDER})
+                  .borderRadius(AppTheme.CARD_RADIUS);
+                },(item:ToeicSentenceDrill)=>item.id);
+        }
+        .width('100%')
       }
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1711,41 +1717,44 @@ export struct ToeicHomePage {
           Text('逐题复盘 · '+this.practiceReviewItems.length+' 道')
             .width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE)
             .fontWeight(FontWeight.Bold).fontColor(AppTheme.TEXT);
-          ForEach(this.practiceReviewItems,(item:ToeicPracticeReviewItem,index:number)=>{
-            Column({space:7}) {
-              Row() {
-                Text('题 '+(index+1)+' · '+item.part)
-                  .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-                Blank();
-                Text(item.correct?'✓ 正确':'× 错误 / 未作答')
-                  .fontSize(AppTheme.META_SIZE)
-                  .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
-              }
-              .width('100%');
-              if (!item.correct && item.passage.length>0) {
-                Text(item.passage)
-                  .width('100%').fontSize(AppTheme.BODY_SIZE)
-                  .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-              }
-              Text(item.stem)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-              Text('所选：'+item.chosen)
-                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
-              Text('正确：'+item.correctAnswer)
-                .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
-              Text('解析：'+item.explanation)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-              if (item.evidence.length>0) {
-                Text('证据：'+item.evidence)
-                  .width('100%').fontSize(AppTheme.META_SIZE)
-                  .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-              }
-            }
-            .width('100%').padding(AppTheme.CARD_PADDING)
-            .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-          },(item:ToeicPracticeReviewItem)=>item.id);
+          Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
+        ForEach(this.practiceReviewItems,(item:ToeicPracticeReviewItem,index:number)=>{
+                    Column({space:7}) {
+                      Row() {
+                        Text('题 '+(index+1)+' · '+item.part)
+                          .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                        Blank();
+                        Text(item.correct?'✓ 正确':'× 错误 / 未作答')
+                          .fontSize(AppTheme.META_SIZE)
+                          .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
+                      }
+                      .width('100%');
+                      if (!item.correct && item.passage.length>0) {
+                        Text(item.passage)
+                          .width('100%').fontSize(AppTheme.BODY_SIZE)
+                          .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                      }
+                      Text(item.stem)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                      Text('所选：'+item.chosen)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Text('正确：'+item.correctAnswer)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
+                      Text('解析：'+item.explanation)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                      if (item.evidence.length>0) {
+                        Text('证据：'+item.evidence)
+                          .width('100%').fontSize(AppTheme.META_SIZE)
+                          .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                      }
+                    }
+                    .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                    .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+                  },(item:ToeicPracticeReviewItem)=>item.id);
+        }
+        .width('100%')
         }
 
       }
@@ -1775,50 +1784,53 @@ export struct ToeicHomePage {
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
 
+        Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
         ForEach(this.practiceReviewItems,(item:ToeicPracticeReviewItem,index:number)=>{
-          Column({space:8}) {
-            Row() {
-              Text('第 '+(index+1)+' 题 · '+item.part)
-                .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-              Blank();
-              Text(item.correct?'✓ 正确':'× 错误')
-                .fontSize(AppTheme.META_SIZE)
-                .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
-            }
-            .width('100%');
-            if (item.passage.length>0 && !item.correct) {
-              Text(item.passage)
-                .width('100%').fontSize(AppTheme.BODY_SIZE)
-                .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
-                .padding(AppTheme.CARD_PADDING_COMPACT)
-                .backgroundColor(AppTheme.SURFACE_SUBTLE)
-                .borderRadius(AppTheme.CONTROL_RADIUS);
-            }
-            Text(item.stem)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT)
-              .fontWeight(FontWeight.Medium);
-            Text('你的答案：'+item.chosen)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT)
-              .fontColor(item.correct?AppTheme.SUBTEXT:AppTheme.DANGER);
-            Text('正确答案：'+item.correctAnswer)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .fontColor(AppTheme.SUCCESS);
-            Text('解析：'+item.explanation)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-            if (item.evidence.length>0) {
-              Text('证据：'+item.evidence)
-                .width('100%').fontSize(AppTheme.META_SIZE)
-                .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
-            }
-            Text('累计已做 '+item.attemptCount+' 次 · 累计错误 '+item.wrongCount+' 次')
-              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-        },(item:ToeicPracticeReviewItem)=>item.id);
+                  Column({space:8}) {
+                    Row() {
+                      Text('第 '+(index+1)+' 题 · '+item.part)
+                        .fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                      Blank();
+                      Text(item.correct?'✓ 正确':'× 错误')
+                        .fontSize(AppTheme.META_SIZE)
+                        .fontColor(item.correct?AppTheme.SUCCESS:AppTheme.DANGER);
+                    }
+                    .width('100%');
+                    if (item.passage.length>0 && !item.correct) {
+                      Text(item.passage)
+                        .width('100%').fontSize(AppTheme.BODY_SIZE)
+                        .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT)
+                        .padding(AppTheme.CARD_PADDING_COMPACT)
+                        .backgroundColor(AppTheme.SURFACE_SUBTLE)
+                        .borderRadius(AppTheme.CONTROL_RADIUS);
+                    }
+                    Text(item.stem)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT)
+                      .fontWeight(FontWeight.Medium);
+                    Text('你的答案：'+item.chosen)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT)
+                      .fontColor(item.correct?AppTheme.SUBTEXT:AppTheme.DANGER);
+                    Text('正确答案：'+item.correctAnswer)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .fontColor(AppTheme.SUCCESS);
+                    Text('解析：'+item.explanation)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                    if (item.evidence.length>0) {
+                      Text('证据：'+item.evidence)
+                        .width('100%').fontSize(AppTheme.META_SIZE)
+                        .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+                    }
+                    Text('累计已做 '+item.attemptCount+' 次 · 累计错误 '+item.wrongCount+' 次')
+                      .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+                  }
+                  .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                  .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+                },(item:ToeicPracticeReviewItem)=>item.id);
+        }
+        .width('100%')
       }
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
@@ -1841,23 +1853,26 @@ export struct ToeicHomePage {
         }
         .width('100%').padding(AppTheme.CARD_PADDING)
         .backgroundColor(AppTheme.PRIMARY_SOFT).borderRadius(AppTheme.CARD_RADIUS);
+        Flex({wrap:FlexWrap.Wrap,space:{main:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP),cross:LengthMetrics.vp(AppTheme.SPLIT_PANE_GAP)}}) {
         ForEach(this.quizQuestions,(question:ToeicVocabularyQuizQuestion,index:number)=>{
-          Column({space:7}) {
-            Text('第 '+(index+1)+' 题 · '+question.stem)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-            Text('你的答案：'+question.options[this.quizAnswers[index]])
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .fontColor(this.quizAnswers[index]===question.correctIndex?AppTheme.SUBTEXT:AppTheme.DANGER);
-            Text('正确答案：'+question.options[question.correctIndex])
-              .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
-            Text('解析：'+question.explanation)
-              .width('100%').fontSize(AppTheme.BODY_SIZE)
-              .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
-          }
-          .width('100%').padding(AppTheme.CARD_PADDING)
-          .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
-        },(question:ToeicVocabularyQuizQuestion)=>question.vocabularyId);
+                  Column({space:7}) {
+                    Text('第 '+(index+1)+' 题 · '+question.stem)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
+                    Text('你的答案：'+question.options[this.quizAnswers[index]])
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .fontColor(this.quizAnswers[index]===question.correctIndex?AppTheme.SUBTEXT:AppTheme.DANGER);
+                    Text('正确答案：'+question.options[question.correctIndex])
+                      .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUCCESS);
+                    Text('解析：'+question.explanation)
+                      .width('100%').fontSize(AppTheme.BODY_SIZE)
+                      .lineHeight(AppTheme.BODY_LINE_HEIGHT).fontColor(AppTheme.TEXT);
+                  }
+                  .width(this.responsiveCardWidth()).padding(AppTheme.CARD_PADDING)
+                  .backgroundColor(AppTheme.CARD_SURFACE).borderRadius(AppTheme.CARD_RADIUS);
+                },(question:ToeicVocabularyQuizQuestion)=>question.vocabularyId);
+        }
+        .width('100%')
       }
       .width('100%').constraintSize({maxWidth:this.contentMaxWidth()})
       .padding({left:LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
