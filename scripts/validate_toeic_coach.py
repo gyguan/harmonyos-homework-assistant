@@ -734,7 +734,8 @@ def main() -> None:
             "QuestionPassagePane must render reactive reading passage state")
 
     layout_policy = read("entry/src/main/ets/common/responsive/LayoutPolicy.ets")
-    require("static toeicStudyRequirement(): LayoutRequirement" in layout_policy and
+    require("static contentMaxWidthForWidth(availableWidthVp: number): number" in layout_policy and
+            "static toeicStudyRequirement(): LayoutRequirement" in layout_policy and
             "AppTheme.TOEIC_PRIMARY_MIN_WIDTH" in layout_policy and
             "AppTheme.TOEIC_SECONDARY_MIN_WIDTH" in layout_policy,
             "TOEIC PAD layout must use the shared LayoutPolicy split contract")
@@ -742,7 +743,7 @@ def main() -> None:
         "private canUseWideComposition():boolean",
         "LayoutPolicy.canSplit(this.availableWidthVp,LayoutPolicy.toeicStudyRequirement())",
         "private contentMaxWidth():number",
-        "AppTheme.CONTENT_WIDE_MAX_WIDTH",
+        "LayoutPolicy.contentMaxWidthForWidth(this.availableWidthVp)",
         "private responsiveCardWidth():string",
         "this.canUseWideComposition()?'49%':'100%'",
         "if (this.canUseWideComposition() && this.currentPassage.length>0)",
