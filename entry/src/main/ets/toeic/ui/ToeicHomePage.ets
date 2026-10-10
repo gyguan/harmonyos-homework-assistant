@@ -1225,10 +1225,21 @@ export struct ToeicHomePage {
     Scroll() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
         if (this.viewModel.contentErrors().length>0) {
-          Text('内容校验未通过，正式训练内容已暂停。')
-            .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.DANGER)
-            .padding(AppTheme.CARD_PADDING_COMPACT).backgroundColor(AppTheme.DANGER_SOFT)
-            .borderRadius(AppTheme.CONTROL_RADIUS);
+          Column({space:6}) {
+            Text('内容校验未通过，正式训练内容已暂停。')
+              .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.DANGER)
+              .fontWeight(FontWeight.Medium);
+            Text('校验详情：')
+              .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
+            ForEach(this.viewModel.contentErrors().slice(0,5),(error:string)=>{
+              Text('• '+error)
+                .width('100%').fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.DANGER);
+            },(error:string,index:number)=>String(index)+'-'+error);
+          }
+          .width('100%').padding(AppTheme.CARD_PADDING_COMPACT)
+          .backgroundColor(AppTheme.DANGER_SOFT)
+          .borderRadius(AppTheme.CONTROL_RADIUS);
         } else {
           if (this.draftLabel.length>0) {
             Column({space:8}) {
