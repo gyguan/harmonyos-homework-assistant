@@ -1214,7 +1214,7 @@ def main() -> None:
 
     # A single 20-item Day 1 baseline replaces the two former separate entry points.
     # Preserve all original question IDs and the draft-based resume path.
-    day_one = ui[ui.index("  private TodayCard()"):ui.index("  private DayButton(")]
+    day_one = ui[ui.index("  private TodaySummary()"):ui.index("  private DayButton(")]
     day_one_entry = ui[ui.index("  private startTraining()"):ui.index("  private openVocabulary()")]
     view_model = read("entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets")
     training_service = read("entry/src/main/ets/toeic/application/ToeicTrainingService.ets")
