@@ -10,5 +10,11 @@
       "SystemCapability.Multimedia.Media.AVPlayer",
       "SystemCapability.Multimedia.Media.Core"
     ]
+  },
+  "production": {
+    "addedSysCaps": [
+      "SystemCapability.Multimedia.Media.AVPlayer"
+    ],
+    "removedSysCaps": []
   }
 }
