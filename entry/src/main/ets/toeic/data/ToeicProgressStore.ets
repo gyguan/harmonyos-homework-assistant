@@ -41,6 +41,45 @@ export class ToeicProgressStore {
     return this.snapshot.unrememberedVocabularyIds.indexOf(vocabularyId)>=0;
   }
 
+  vocabularyRecall(vocabularyId:string):ToeicVocabularyRecall|null {
+    for (let item of this.snapshot.vocabularyRecalls) {
+      if (item.vocabularyId===vocabularyId) {
+        return new ToeicVocabularyRecall(
+          item.vocabularyId,item.streak,item.totalReviews,item.nextDueAtMs,item.lastReviewedAtMs);
+      }
+    }
+    return null;
+  }
+
+  async mergeVocabularyRecalls(
+    recalls:ToeicVocabularyRecall[], unrememberedIds:string[]):Promise<void> {
+    let changed=false;
+    for (let incoming of recalls) {
+      let local:ToeicVocabularyRecall|null=null;
+      for (let item of this.snapshot.vocabularyRecalls) {
+        if (item.vocabularyId===incoming.vocabularyId) { local=item; break; }
+      }
+      if (local!==null && local.lastReviewedAtMs>incoming.lastReviewedAtMs) continue;
+      if (local===null) {
+        local=new ToeicVocabularyRecall(
+          incoming.vocabularyId,incoming.streak,incoming.totalReviews,
+          incoming.nextDueAtMs,incoming.lastReviewedAtMs);
+        this.snapshot.vocabularyRecalls.push(local);
+      } else {
+        local.streak=incoming.streak;
+        local.totalReviews=incoming.totalReviews;
+        local.nextDueAtMs=incoming.nextDueAtMs;
+        local.lastReviewedAtMs=incoming.lastReviewedAtMs;
+      }
+      let weakIndex=this.snapshot.unrememberedVocabularyIds.indexOf(incoming.vocabularyId);
+      let shouldBeWeak=unrememberedIds.indexOf(incoming.vocabularyId)>=0;
+      if (shouldBeWeak && weakIndex<0) this.snapshot.unrememberedVocabularyIds.push(incoming.vocabularyId);
+      if (!shouldBeWeak && weakIndex>=0) this.snapshot.unrememberedVocabularyIds.splice(weakIndex,1);
+      changed=true;
+    }
+    if (changed) await this.save();
+  }
+
   vocabularyDueIds(nowMs:number=Date.now()):string[] {
     let ids:string[]=[];
     for (let review of this.snapshot.vocabularyRecalls) {

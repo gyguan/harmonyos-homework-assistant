@@ -938,6 +938,40 @@ def main() -> None:
             "this.loadProgressSnapshot()" in recall_handler and
             "this.updatingVocabularyId=''" in recall_handler,
             "recall must update the visible state immediately, guard double taps and persist the same word status")
+    require("void this.syncVocabularyCloud();" in ui and
+            "let cloudSynced=await saving;" in recall_handler and
+            "已保存到本机，云端暂未同步" in recall_handler,
+            "TOEIC vocabulary recall must keep instant local UX and report deferred cloud sync")
+    remote_vocab = read("entry/src/main/ets/toeic/application/ToeicVocabularyRemoteApi.ets")
+    require("/toeic/vocabulary-recalls" in remote_vocab and
+            "http.RequestMethod.PUT" in remote_vocab and
+            "http.RequestMethod.GET" in remote_vocab and
+            "lastReviewedAtEpochMs" in remote_vocab,
+            "TOEIC vocabulary cloud API must support realtime upsert and restore")
+    require("ToeicVocabularyRemoteApi.instance.save" in view_model and
+            "ToeicVocabularyRemoteApi.instance.list" in view_model and
+            "async syncVocabularyRecalls():Promise<boolean>" in view_model and
+            "BackendSession.instance.isConnected()" in view_model,
+            "TOEIC view model must synchronize recalls for the authenticated account")
+    require("vocabularyRecall(vocabularyId:string):ToeicVocabularyRecall|null" in progress and
+            "async mergeVocabularyRecalls(" in progress and
+            "local.lastReviewedAtMs>incoming.lastReviewedAtMs" in progress,
+            "TOEIC local recall store must merge cloud state without accepting stale data")
+
+    backend_toeic = read("backend/src/main/java/com/xiaoban/homework/toeic/ToeicVocabularyRecallService.java")
+    backend_controller = read("backend/src/main/java/com/xiaoban/homework/toeic/ToeicVocabularyRecallController.java")
+    migration = read("backend/src/main/resources/db/migration/V24__toeic_vocabulary_recall.sql")
+    require("findByAccountIdAndVocabularyId" in backend_toeic and
+            "!incomingReviewedAt.isAfter(entity.lastReviewedAt)" in backend_toeic and
+            "entity.accountId = accountId" in backend_toeic,
+            "TOEIC backend recall upsert must be account-scoped and stale-write safe")
+    require('@PutMapping("/{vocabularyId}")' in backend_controller and
+            "@GetMapping" in backend_controller,
+            "TOEIC backend recall API must expose list and idempotent upsert")
+    require("create table toeic_vocabulary_recall" in migration and
+            "unique (account_id, vocabulary_id)" in migration and
+            "references account(id) on delete cascade" in migration,
+            "TOEIC vocabulary recall schema must persist one state per account and word")
     require("this.questions.length===0 || this.sessionStartedAtMs===0" in ui,
             "subsequent submission callbacks must not double commit a closed session")
 

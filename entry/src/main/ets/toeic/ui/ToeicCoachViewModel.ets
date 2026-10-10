@@ -5,7 +5,9 @@ import { ToeicQuestionTranslation } from '../content/ToeicQuestionTranslationMod
 import { ToeicTrainingService } from '../application/ToeicTrainingService';
 import { ToeicProgressStore } from '../data/ToeicProgressStore';
 import { ToeicPronunciationService, ToeicPronunciationStatus } from '../application/ToeicPronunciationService';
-import { ToeicDayTaskProgress, ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicReviewStatus, ToeicSessionReport, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem } from '../domain/ToeicModels';
+import { ToeicDayTaskProgress, ToeicLearningSnapshot, ToeicMockReport, ToeicPart, ToeicQuestion, ToeicQuestionAttempt, ToeicReviewStatus, ToeicSessionReport, ToeicSessionDraft, ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem, ToeicVocabularyRecall } from '../domain/ToeicModels';
+import { ToeicVocabularyRemoteApi, RemoteToeicVocabularyRecall } from '../application/ToeicVocabularyRemoteApi';
+import { BackendSession } from '../../application/remote/BackendSession';
 
 export class ToeicCoachViewModel {
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
@@ -107,8 +109,61 @@ export class ToeicCoachViewModel {
     return weak.concat(regular);
   }
 
-  async recordVocabularyRecall(id:string,remembered:boolean):Promise<void> {
+  async recordVocabularyRecall(id:string,remembered:boolean):Promise<boolean> {
     await ToeicProgressStore.instance.recordVocabularyRecall(id,remembered);
+    if (!BackendSession.instance.isConnected()) return false;
+    let local=ToeicProgressStore.instance.vocabularyRecall(id);
+    if (local===null) return false;
+    try {
+      let remote=await ToeicVocabularyRemoteApi.instance.save(local,remembered);
+      if (remote.lastReviewedAtEpochMs>local.lastReviewedAtMs) {
+        let recalls:ToeicVocabularyRecall[]=[
+          new ToeicVocabularyRecall(
+            remote.vocabularyId,remote.streak,remote.totalReviews,
+            remote.nextDueAtEpochMs,remote.lastReviewedAtEpochMs)
+        ];
+        let weak:string[]=remote.remembered?[]:[remote.vocabularyId];
+        await ToeicProgressStore.instance.mergeVocabularyRecalls(recalls,weak);
+      }
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async syncVocabularyRecalls():Promise<boolean> {
+    if (!BackendSession.instance.isConnected()) return false;
+    try {
+      let remote=await ToeicVocabularyRemoteApi.instance.list();
+      let cloudWinners:ToeicVocabularyRecall[]=[];
+      let cloudWeak:string[]=[];
+      for (let cloud of remote) {
+        let local=ToeicProgressStore.instance.vocabularyRecall(cloud.vocabularyId);
+        if (local===null || cloud.lastReviewedAtEpochMs>=local.lastReviewedAtMs) {
+          cloudWinners.push(new ToeicVocabularyRecall(
+            cloud.vocabularyId,cloud.streak,cloud.totalReviews,
+            cloud.nextDueAtEpochMs,cloud.lastReviewedAtEpochMs));
+          if (!cloud.remembered) cloudWeak.push(cloud.vocabularyId);
+        }
+      }
+      if (cloudWinners.length>0) {
+        await ToeicProgressStore.instance.mergeVocabularyRecalls(cloudWinners,cloudWeak);
+      }
+
+      let localItems=ToeicProgressStore.instance.current().vocabularyRecalls.slice();
+      for (let local of localItems) {
+        let cloud:RemoteToeicVocabularyRecall|null=null;
+        for (let item of remote) {
+          if (item.vocabularyId===local.vocabularyId) { cloud=item; break; }
+        }
+        if (cloud!==null && cloud.lastReviewedAtEpochMs>=local.lastReviewedAtMs) continue;
+        let remembered=!ToeicProgressStore.instance.isUnrememberedVocabulary(local.vocabularyId);
+        await ToeicVocabularyRemoteApi.instance.save(local,remembered);
+      }
+      return true;
+    } catch {
+      return false;
+    }
   }
   todaySentenceDrills():ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(this.snapshot().currentDay); }
   sentenceDrillsForDay(day:number):ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(day); }
