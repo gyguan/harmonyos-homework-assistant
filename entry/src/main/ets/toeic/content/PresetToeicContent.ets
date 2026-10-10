@@ -160,7 +160,7 @@ export class PresetToeicContent {
       for (let id of group.questionIds) {
         let active=ToeicMockPart7EvidenceRevisionContent.activeId(id);
         active=ToeicP3FinalCorrections.activePart7Id(active);
-        activeIds.push(active);
+        if (activeIds.indexOf(active)<0) activeIds.push(active);
       }
       group.questionIds=activeIds;
     }
