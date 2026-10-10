@@ -498,6 +498,14 @@ def main() -> None:
     ]:
         require(f"questionId==='{active_translation_id}'" in translation_catalog,
                 f"active non-mock replacement translation missing: {active_translation_id}")
+    for active_p6_translation_id in ["R-FP1-P6-1606","R-FP6-SPRINT-1610"]:
+        block = re.search(
+            rf"if \(questionId==='{re.escape(active_p6_translation_id)}'\) \{{\s*"
+            rf"return new ToeicQuestionTranslation\(questionId,\s*'((?:\\.|[^'])*)'",
+            translation_catalog,
+        )
+        require(block is not None and block.group(1).strip() != "",
+                f"active Part6 translation passage missing: {active_p6_translation_id}")
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
     require("校验详情：" in ui and

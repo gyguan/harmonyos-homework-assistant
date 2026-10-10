@@ -63,9 +63,10 @@ export class ToeicQuestionTranslationCatalog {
         ['它自己','他自己','他们自己（单数 they）','我们自己']);
     }
     if (questionId==='R-FP1-P6-1606') {
-      return new ToeicQuestionTranslation(questionId,'',
-        '付款_____后，将发送确认邮件。',
-        ['接收（主动单数）','被收到','已经收到（主动）','正在接收']);
+      return new ToeicQuestionTranslation(questionId,
+        '社区讲座报名\n十月讲座现已开放报名。参加者可以在线报名，也可以到前台报名。[1] _____ 班级人数限制为24人，因此建议尽早报名。付款 [2] _____ 后，将发送确认邮件。需要取消报名的参加者应至少提前两天通知我们。[3] _____，报名费可以转到之后的场次使用。讲师会提供全部材料，因此参加者无需携带 [4] _____。',
+        '第 [2] 空选择哪个词最合适？',
+        ['接收（主动单数）','被收到','已经接收（主动完成时）','接收（现在分词）']);
     }
     if (questionId==='R-FP1-DX-P5-05') {
       return new ToeicQuestionTranslation(questionId,'',
@@ -83,8 +84,9 @@ export class ToeicQuestionTranslationCatalog {
         ['到达（一般现在时）','到达了（过去时）','将到达','到达（名词）']);
     }
     if (questionId==='R-FP6-SPRINT-1610') {
-      return new ToeicQuestionTranslation(questionId,'',
-        '如果椅子无法现场修复，我们_____提供临时替换椅。',
+      return new ToeicQuestionTranslation(questionId,
+        'Rivera 女士您好：\n感谢您反馈办公椅的问题。技术人员将于明天上午10点至中午之间到您的办公室。请确保技术人员到达前，椅子周围区域处于 [1] _____ 状态。如果椅子无法现场修复，我们 [2] _____ 一把临时替换椅。设施团队预计大多数维修可在30分钟内完成。[3] _____，更复杂的问题可能需要把椅子送到维修间。感谢您的 [4] _____ 配合。',
+        '第 [2] 空选择哪个词最合适？',
         ['提供（单数谓语）','曾提供（过去式）','将提供（将来时）','提供（非谓语）']);
     }
     // Revised active questions keep translated feedback without altering the
