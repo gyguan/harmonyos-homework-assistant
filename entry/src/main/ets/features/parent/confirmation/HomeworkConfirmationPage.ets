@@ -1,6 +1,11 @@
 import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { RemoteAssignmentResourceApi } from '../../../application/remote/RemoteAssignmentResourceApi';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
+import {
+  PendingAssignmentAttachment,
+  PendingAssignmentAttachmentPicker
+} from '../../../components/assignment/PendingAssignmentAttachmentPicker';
 import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
 import { HomeworkConfirmationViewModel } from './HomeworkConfirmationViewModel';
 import { ConfirmationCandidateCard, ConfirmationCandidateEditor } from './ConfirmationCandidateComponents';
@@ -19,11 +24,13 @@ export struct HomeworkConfirmationPage {
   @State private bulkMode: boolean = false;
   @State private selectedCandidateIds: string[] = [];
   @State private batchDeleteConfirm: boolean = false;
+  @State private pendingAttachments: PendingAssignmentAttachment[] = [];
   onBack: () => void = () => {};
   onPublished: () => void = () => {};
   onStoreChanged: () => void = () => {};
 
   private readonly viewModel: HomeworkConfirmationViewModel = new HomeworkConfirmationViewModel();
+  private readonly resourceApi: RemoteAssignmentResourceApi = RemoteAssignmentResourceApi.instance;
 
   private touchRevision(): number { return this.revision + this.localRevision; }
 
@@ -117,10 +124,46 @@ export struct HomeworkConfirmationPage {
 
   private commitCandidateRemoval(candidateId: string): void {
     if (!this.viewModel.removeCandidate(candidateId)) return;
+    this.removeCandidateAttachments(candidateId);
     this.selectedCandidateIds = SelectionIds.without(this.selectedCandidateIds, candidateId);
     this.localRevision++;
     if (this.candidates().length === 0) this.exitBulkMode();
     this.onStoreChanged();
+  }
+
+  private attachmentsFor(candidateId: string): PendingAssignmentAttachment[] {
+    let result: PendingAssignmentAttachment[] = [];
+    for (let item of this.pendingAttachments) {
+      if (item.candidateId === candidateId) result.push(item);
+    }
+    return result;
+  }
+
+  private updateCandidateAttachments(candidateId: string, attachments: PendingAssignmentAttachment[]): void {
+    let next: PendingAssignmentAttachment[] = [];
+    for (let item of this.pendingAttachments) {
+      if (item.candidateId !== candidateId) next.push(item);
+    }
+    for (let item of attachments) next.push(item);
+    this.pendingAttachments = next;
+  }
+
+  private removeCandidateAttachments(candidateId: string): void {
+    let next: PendingAssignmentAttachment[] = [];
+    for (let item of this.pendingAttachments) {
+      if (item.candidateId !== candidateId) next.push(item);
+    }
+    this.pendingAttachments = next;
+  }
+
+  private pruneCandidateAttachments(): void {
+    let candidateIds: Set<string> = new Set<string>();
+    for (let candidate of this.candidates()) candidateIds.add(candidate.id);
+    let next: PendingAssignmentAttachment[] = [];
+    for (let item of this.pendingAttachments) {
+      if (candidateIds.has(item.candidateId)) next.push(item);
+    }
+    this.pendingAttachments = next;
   }
 
   private isCandidateSelected(candidateId: string): boolean {
@@ -161,6 +204,7 @@ export struct HomeworkConfirmationPage {
       if (this.viewModel.removeCandidate(id)) removed++;
     }
     if (removed > 0) {
+      this.pruneCandidateAttachments();
       this.localRevision++;
       this.onStoreChanged();
     }
@@ -174,10 +218,32 @@ export struct HomeworkConfirmationPage {
     this.publishError = false;
     try {
       let result = await this.viewModel.publish();
+      let attachmentCount = 0;
+      let uploadFailures = 0;
+      for (let assignment of result.assignments) {
+        let attachments = this.attachmentsFor(assignment.candidateId);
+        for (let attachment of attachments) {
+          try {
+            await this.resourceApi.uploadAttachment(
+              assignment.id, attachment.uri, attachment.resourceType);
+            attachmentCount++;
+          } catch {
+            uploadFailures++;
+          }
+        }
+      }
+      this.pendingAttachments = [];
       this.localRevision++;
       this.onStoreChanged();
-      this.publishMessage = `已发布 ${result.publishedCount} 项作业`;
-      this.onPublished();
+      if (uploadFailures > 0) {
+        this.publishError = true;
+        this.publishMessage = `作业已发布，${attachmentCount} 个附件上传成功，${uploadFailures} 个失败；可在作业编辑中继续补充。`;
+      } else {
+        this.publishMessage = attachmentCount > 0 ?
+          `已发布 ${result.publishedCount} 项作业，并上传 ${attachmentCount} 个附件` :
+          `已发布 ${result.publishedCount} 项作业`;
+        this.onPublished();
+      }
     } catch (error) {
       this.publishError = true;
       let message = `${error}`;
@@ -269,38 +335,51 @@ export struct HomeworkConfirmationPage {
     } else {
       Column({ space: 7 }) {
         ForEach(this.candidates(), (item: CandidateAssignment) => {
-          Row({ space: 8 }) {
-            if (this.bulkMode) {
-              Text(this.isCandidateSelected(item.id) ? '✓' : '')
-                .width(28)
-                .height(28)
-                .fontSize(15)
-                .fontWeight(FontWeight.Bold)
-                .fontColor(this.isCandidateSelected(item.id) ? AppTheme.TEXT_ON_PRIMARY : AppTheme.SUBTEXT)
-                .textAlign(TextAlign.Center)
-                .backgroundColor(this.isCandidateSelected(item.id) ? AppTheme.PRIMARY : AppTheme.SURFACE_EMPHASIS)
-                .border({ width: 1, color: this.isCandidateSelected(item.id) ? AppTheme.PRIMARY : AppTheme.BORDER })
-                .borderRadius(14)
-                .accessibilityRole(AccessibilityRoleType.BUTTON)
-                .accessibilityText(this.isCandidateSelected(item.id) ? '取消选择这项作业' : '选择这项作业')
-                .onClick(() => this.toggleCandidateSelection(item.id));
-            }
+          Column({ space: 6 }) {
+            Row({ space: 8 }) {
+              if (this.bulkMode) {
+                Text(this.isCandidateSelected(item.id) ? '✓' : '')
+                  .width(28)
+                  .height(28)
+                  .fontSize(15)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(this.isCandidateSelected(item.id) ? AppTheme.TEXT_ON_PRIMARY : AppTheme.SUBTEXT)
+                  .textAlign(TextAlign.Center)
+                  .backgroundColor(this.isCandidateSelected(item.id) ? AppTheme.PRIMARY : AppTheme.SURFACE_EMPHASIS)
+                  .border({ width: 1, color: this.isCandidateSelected(item.id) ? AppTheme.PRIMARY : AppTheme.BORDER })
+                  .borderRadius(14)
+                  .accessibilityRole(AccessibilityRoleType.BUTTON)
+                  .accessibilityText(this.isCandidateSelected(item.id) ? '取消选择这项作业' : '选择这项作业')
+                  .onClick(() => this.toggleCandidateSelection(item.id));
+              }
 
-            ConfirmationCandidateCard({
-              item: item,
-              selected: this.bulkMode ? this.isCandidateSelected(item.id) :
-                (this.showEditorSheet && this.editingCandidateId === item.id),
-              onSelect: () => {
-                if (this.bulkMode) this.toggleCandidateSelection(item.id);
-                else this.openEditor(item.id);
-              },
-              onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
-                this.setExpectedMinutes(candidate, minutes)
-            })
-            .layoutWeight(1);
+              ConfirmationCandidateCard({
+                item: item,
+                selected: this.bulkMode ? this.isCandidateSelected(item.id) :
+                  (this.showEditorSheet && this.editingCandidateId === item.id),
+                onSelect: () => {
+                  if (this.bulkMode) this.toggleCandidateSelection(item.id);
+                  else this.openEditor(item.id);
+                },
+                onMinutesChange: (candidate: CandidateAssignment, minutes: number) =>
+                  this.setExpectedMinutes(candidate, minutes)
+              })
+              .layoutWeight(1);
+            }
+            .width('100%')
+            .alignItems(VerticalAlign.Center);
+
+            if (!this.bulkMode) {
+              PendingAssignmentAttachmentPicker({
+                candidateId: item.id,
+                attachments: this.attachmentsFor(item.id),
+                disabled: this.publishing,
+                onChange: (attachments: PendingAssignmentAttachment[]) =>
+                  this.updateCandidateAttachments(item.id, attachments)
+              });
+            }
           }
-          .width('100%')
-          .alignItems(VerticalAlign.Center);
+          .width('100%');
         }, (item: CandidateAssignment) => this.candidateRenderKey(item));
       }
       .width('100%');
