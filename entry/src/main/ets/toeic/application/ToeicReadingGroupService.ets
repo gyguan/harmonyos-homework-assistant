@@ -7,6 +7,8 @@ import { ToeicExtraReadingBatchFive } from '../content/ToeicExtraReadingBatchFiv
 import { ToeicExtraReadingBatchSix } from '../content/ToeicExtraReadingBatchSix';
 import { ToeicMockDay14V2Content } from '../content/ToeicMockDay14V2Content';
 import { ToeicMockDay19V2Content } from '../content/ToeicMockDay19V2Content';
+import { ToeicMockPart7EvidenceRevisionContent } from '../content/ToeicMockPart7EvidenceRevisionContent';
+import { ToeicP3FinalCorrections } from '../content/ToeicP3FinalCorrections';
 
 /**
  * Build a view of existing published shared passages without changing any
@@ -19,16 +21,19 @@ export class ToeicReadingGroupService {
     if (current.groupId.length>0) {
       for (let group of ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups()).concat(ToeicMockDay19V2Content.groups())) {
         if (group.groupId!==current.groupId) continue;
-        if (group.groupId==='FM1-G2' && group.questionIds.indexOf('R-FP3-FM1-P7-M2-03')<0) {
-          group.questionIds.push('R-FP3-FM1-P7-M2-03');
+        // The source group keeps the original v2 IDs. Build a compatibility
+        // set that accepts both those historic IDs and the current evidence/P3
+        // revisions. The active session itself decides which five IDs are shown.
+        let compatibleIds:string[]=group.questionIds.slice();
+        for (let id of group.questionIds) {
+          let active=ToeicMockPart7EvidenceRevisionContent.activeId(id);
+          active=ToeicP3FinalCorrections.activePart7Id(active);
+          if (compatibleIds.indexOf(active)<0) compatibleIds.push(active);
         }
-        // The group catalog contains both archived v1 question IDs and
-        // new evidence-complete editions. Preserve the current exam order:
-        // each draft/report may carry a different published edition.
         let presentIds:string[]=[];
         for (let question of questions) {
           if (question.groupId===group.groupId &&
-              group.questionIds.indexOf(question.id)>=0) presentIds.push(question.id);
+              compatibleIds.indexOf(question.id)>=0) presentIds.push(question.id);
         }
         return new ToeicReadingGroup(group.groupId,presentIds,group.passageBlocks);
       }
