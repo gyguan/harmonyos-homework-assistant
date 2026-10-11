@@ -10,6 +10,12 @@ oh_modules/
 **/build/
 **/.preview/
 
+# Native (CMake) 中间产物
+entry/.cxx/
+
+# Agent 工作区本地记忆 / 会话数据，不入库
+.workbuddy/
+
 # Backend local secrets / overrides - never commit
 backend/config/application-local.yml
 backend/.e2e-session.json
@@ -34,6 +40,11 @@ Thumbs.db
 
 # Logs
 *.log
+build_*log*.txt
+
+# 客户端安装包本体不入库（构建产物，由 scripts/publish_hap_release.sh 上传到服务器）
+releases/*.hap
+releases/*.app
 
 # Python validation cache
 __pycache__/
