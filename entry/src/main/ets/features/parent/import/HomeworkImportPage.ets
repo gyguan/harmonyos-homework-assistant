@@ -10,6 +10,7 @@ export struct HomeworkImportPage {
   @Prop embeddedInDeepPage: boolean = false;
   @State private localRevision: number = 0;
   @State private parseBusy: boolean = false;
+  @State private busyHint: string = '';
   @State private parseMessage: string = '';
   @State private parseError: boolean = false;
   @State private textDraft: string = '';
@@ -53,6 +54,10 @@ export struct HomeworkImportPage {
     if (candidateCount > 0) this.onOpenConfirmation();
   }
 
+  private usesImageAiParse(): boolean {
+    return this.imageMode === HomeworkImageRecognitionMode.AI_IMAGE && this.sourceImageRef.length > 0;
+  }
+
   private async organize(): Promise<void> {
     if (this.parseBusy) return;
     let studentId = this.viewModel.activeStudentId();
@@ -63,6 +68,7 @@ export struct HomeworkImportPage {
     }
 
     this.parseBusy = true;
+    this.busyHint = this.usesImageAiParse() ? '正在识别图片中的作业，约 3–8 秒，请稍候' : '正在整理作业内容…';
     this.parseMessage = '';
     this.parseError = false;
     try {
@@ -109,6 +115,7 @@ export struct HomeworkImportPage {
     if (this.parseBusy) return;
     let studentId = this.viewModel.activeStudentId();
     this.parseBusy = true;
+    this.busyHint = '正在读取照片…';
     this.parseMessage = '';
     this.parseError = false;
     try {
@@ -126,6 +133,7 @@ export struct HomeworkImportPage {
     if (this.parseBusy) return;
     let studentId = this.viewModel.activeStudentId();
     this.parseBusy = true;
+    this.busyHint = '正在读取图片…';
     this.parseMessage = '';
     this.parseError = false;
     try {
@@ -157,6 +165,7 @@ export struct HomeworkImportPage {
     if (this.parseBusy || this.sourceImageRef.length === 0) return;
     let studentId = this.viewModel.activeStudentId();
     this.parseBusy = true;
+    this.busyHint = '正在识别图片文字，约 2–5 秒，请稍候';
     this.parseMessage = '';
     this.parseError = false;
     try {
@@ -310,6 +319,39 @@ export struct HomeworkImportPage {
       .padding(10)
       .backgroundColor(this.parseError ? AppTheme.DANGER_SOFT : AppTheme.SUCCESS_SOFT)
       .borderRadius(AppTheme.CONTROL_RADIUS);
+    }
+  }
+
+  @Builder
+  private BusyBanner() {
+    if (this.parseBusy) {
+      Row({ space: 10 }) {
+        LoadingProgress()
+          .width(18)
+          .height(18)
+          .color(AppTheme.PRIMARY);
+        Column({ space: 2 }) {
+          Text(this.busyHint.length > 0 ? this.busyHint : '正在处理，请稍候')
+            .width('100%')
+            .fontSize(AppTheme.META_SIZE)
+            .lineHeight(AppTheme.META_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('请保持页面停留，完成后可继续核对')
+            .width('100%')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+      }
+      .width('100%')
+      .padding(10)
+      .backgroundColor(AppTheme.PRIMARY_SOFT)
+      .borderRadius(AppTheme.CONTROL_RADIUS)
+      .accessibilityGroup(true)
+      .accessibilityText(`处理中：${this.busyHint.length > 0 ? this.busyHint : '正在处理，请稍候'}`);
     }
   }
 
@@ -522,9 +564,11 @@ export struct HomeworkImportPage {
   @Builder
   private ActionFooter() {
     Column({ space: 8 }) {
+      this.BusyBanner();
       this.FeedbackBanner();
 
-      Button(this.parseBusy ? '正在处理…' : '整理并继续', { type: ButtonType.Normal })
+      Button(this.parseBusy ? (this.usesImageAiParse() ? '正在识别图片…' : '正在处理…') : '整理并继续',
+        { type: ButtonType.Normal })
         .width('100%')
         .constraintSize({ minHeight: AppTheme.BUTTON_HEIGHT })
         .padding({ top: 12, bottom: 12 })
