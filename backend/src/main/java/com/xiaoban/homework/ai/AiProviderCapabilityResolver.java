@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 public class AiProviderCapabilityResolver {
   private static final Pattern GLM_VERSION =
       Pattern.compile("^glm-(\\d+)(?:\\.(\\d+))?(?:[-_].*)?$", Pattern.CASE_INSENSITIVE);
+  private static final Pattern GLM_VISION =
+      Pattern.compile("^glm-(?:\\d+(?:\\.\\d+)?)v(?:[-_].*)?$", Pattern.CASE_INSENSITIVE);
 
   private final AiProviderProperties properties;
 
@@ -46,7 +48,8 @@ public class AiProviderCapabilityResolver {
           List.of(
               StructuredOutputMode.JSON_SCHEMA,
               StructuredOutputMode.JSON_OBJECT,
-              StructuredOutputMode.TEXT));
+              StructuredOutputMode.TEXT),
+          true);
       case DEEPSEEK -> new AiProviderCapabilities(
           provider,
           configuredProtocol,
@@ -56,7 +59,8 @@ public class AiProviderCapabilityResolver {
           List.of(
               StructuredOutputMode.JSON_SCHEMA,
               StructuredOutputMode.JSON_OBJECT,
-              StructuredOutputMode.TEXT));
+              StructuredOutputMode.TEXT),
+          true);
       case ZHIPU_GLM -> zhipuCapabilities(model);
       case GENERIC_OPENAI_COMPATIBLE -> new AiProviderCapabilities(
           provider,
@@ -66,7 +70,8 @@ public class AiProviderCapabilityResolver {
               StructuredOutputMode.TEXT),
           List.of(
               StructuredOutputMode.JSON_OBJECT,
-              StructuredOutputMode.TEXT));
+              StructuredOutputMode.TEXT),
+          true);
     };
   }
 
@@ -84,7 +89,21 @@ public class AiProviderCapabilityResolver {
         Provider.ZHIPU_GLM,
         ApiProtocol.CHAT_COMPLETIONS,
         chatModes,
-        List.of());
+        List.of(),
+        isZhipuVisionModel(model));
+  }
+
+  /**
+   * Zhipu exposes text-only and vision models under the same base URL. Pointing the image flow at a
+   * text-only model (for example {@code glm-4-flash}) is accepted by the provider guard but rejected
+   * upstream with {@code 1210 messages.content.type 参数非法}. Only GLM is refined here; other
+   * providers stay optimistic so an unknown-but-valid vision endpoint is never disabled.
+   */
+  static boolean isZhipuVisionModel(String model) {
+    if (model == null) return false;
+    String normalized = model.trim().toLowerCase(Locale.ROOT);
+    if (normalized.isEmpty()) return false;
+    return GLM_VISION.matcher(normalized).matches() || normalized.startsWith("glm-ocr");
   }
 
   private Provider configuredProvider() {

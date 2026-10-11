@@ -45,7 +45,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   @Override
-  public boolean imageAvailable() { return transport.available(properties.getImageOrganizerModel()); }
+  public boolean imageAvailable() {
+    String model = properties.getImageOrganizerModel();
+    return transport.available(model) && transport.capabilities(model).acceptsImages();
+  }
 
   @Override
   public Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student,

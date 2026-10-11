@@ -12,7 +12,8 @@ public record AiProviderCapabilities(
     Provider provider,
     ApiProtocol preferredProtocol,
     List<StructuredOutputMode> chatCompletionsModes,
-    List<StructuredOutputMode> responsesModes) {
+    List<StructuredOutputMode> responsesModes,
+    boolean acceptsImages) {
 
   public enum Provider {
     OPENAI,

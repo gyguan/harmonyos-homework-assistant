@@ -143,4 +143,53 @@ class AiProviderCapabilityResolverTest {
     assertTrue(AiProviderCapabilityResolver.isGlm47OrAbove("glm-5"));
     assertTrue(AiProviderCapabilityResolver.isGlm47OrAbove("glm-5.3"));
   }
+
+  @Test
+  void keepsZhipuTextOnlyModelsOutOfTheImageFlow() {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setBaseUrl("https://open.bigmodel.cn/api/paas/v4");
+    AiProviderCapabilityResolver resolver = new AiProviderCapabilityResolver(properties);
+
+    for (String model : List.of(
+        "glm-4-flash",
+        "glm-4.7",
+        "glm-4.7-flash",
+        "glm-4.6",
+        "glm-4.5-air",
+        "glm-5.3")) {
+      assertEquals(Provider.ZHIPU_GLM, resolver.resolve(model).provider(), model);
+      assertFalse(resolver.resolve(model).acceptsImages(), model);
+    }
+  }
+
+  @Test
+  void acceptsImagesForZhipuVisionModels() {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setBaseUrl("https://open.bigmodel.cn/api/paas/v4");
+    AiProviderCapabilityResolver resolver = new AiProviderCapabilityResolver(properties);
+
+    for (String model : List.of(
+        "glm-4v",
+        "glm-4v-flash",
+        "glm-4v-plus",
+        "glm-4.5v",
+        "glm-4.6v-flashx",
+        "glm-4.6v-flash",
+        "glm-4.1v-thinking-flash",
+        "glm-5v-turbo",
+        "GLM-4.6V-FlashX",
+        "glm-ocr")) {
+      assertTrue(resolver.resolve(model).acceptsImages(), model);
+    }
+  }
+
+  @Test
+  void unknownProvidersStayOptimisticAboutImages() {
+    AiProviderProperties properties = new AiProviderProperties();
+    properties.setBaseUrl("https://llm.example.internal/v1");
+    properties.setProtocol("chat-completions");
+
+    assertTrue(
+        new AiProviderCapabilityResolver(properties).resolve("company-model-v3").acceptsImages());
+  }
 }

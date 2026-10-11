@@ -307,7 +307,42 @@ AI_STRUCTURED_OUTPUT=false
 - **AI 答疑** `POST /api/v1/assignments/{id}/tutor/messages` → 200，2.7 s，`available=true`
   问「48乘7怎么算」，返回**引导式**回答（提示拆成 8×7 与 40×7，反问"你先算出 8 乘以 7 是多少"），符合 `guidanceFirst=true / directAnswerAllowed=false` 的语义。
 
-### 9.7 成本
+### 9.7 ⚠️ 截图识别必须单独配视觉模型（2026-10-11 实测）
+
+截图识别走 `POST /api/v1/students/{studentId}/homework/organize-image`，用的是 **`AI_IMAGE_ORGANIZER_MODEL`**，不是 `AI_ORGANIZER_MODEL`。
+它留空时会**回退到 `AI_ORGANIZER_MODEL`**；而 `glm-4-flash` 是**纯文本模型**，喂图片直接失败：
+
+```
+glm-4-flash + image -> HTTP 400 {"error":{"code":"1210","message":"messages.content.type 参数非法，取值范围 ['text']"}}
+```
+
+这个错误码不在 `imageFailureReason()` 的允许列表里，只会被归成 `HTTP_ERROR` → 家长侧看到笼统的"AI图片解析失败"，很难定位。
+现在 `AiProviderCapabilityResolver` 会按模型名判定 `acceptsImages`，`imageAvailable()` 在**调用上游之前**就会拦下纯文本模型。
+
+同一账号实测（2026-10-11，含图片输入 + 结构化提示词）：
+
+| 模型 | 图片 | max_tokens | 可用性 | 延迟 | 价格（元/百万 tokens） |
+|---|---|---|---|---|---|
+| `glm-4-flash`（当时的线上值） | ❌ 400 `1210` | — | — | — | 免费 |
+| `glm-4v-flash` | ✅ | **上限 1024** | 稳定（8/8） | 1.4–9.7 s | 免费，4K 上下文 |
+| `glm-4.1v-thinking-flash` | ✅ | 6000 | 稳定 | 2.1–2.7 s | 免费，但输出带 `<think>` 包裹，会污染 JSON |
+| `glm-4.6v-flash` | ✅ | 6000 | **1/8 成功**（其余 429 `1305`） | 8–10 s | 免费，128K |
+| **`glm-4.6v-flashx`** | ✅ | 6000 | 稳定 | 1.7–17 s | 0.15 / 1.5（[0,32K)），128K |
+| `glm-4.6v` | ✅ | 6000 | 稳定 | 2.7 s | 1 / 3（[0,32K)），128K |
+| `glm-ocr` | ⚠️ | — | — | — | 0.2 / 0.2，但**只收文件上传**，`image_url` data URL 会报 `1214` |
+
+**结论：线上选 `glm-4.6v-flashx`。** 免费档两个候选都不可用——`glm-4.6v-flash` 挤不进去（与 9.5 的 `glm-4.7-flash` 同一现象），`glm-4v-flash` 的 `max_tokens` 硬上限 1024 会把长作业通知截断，而且它不吃 `6000` 这个后端写死的值（直接 400）。
+按 `glm-4.6v-flashx` 单价估算，**一次截图约 0.002 元**。
+
+配置（`.env`，键已加入 `docker-compose.prod.yml` 透传）：
+
+```bash
+AI_IMAGE_ORGANIZER_MODEL=glm-4.6v-flashx
+```
+
+启动日志里 `[AI] config ... imageOrganizerModel=glm-4.6v-flashx` 是唯一可靠判据。
+
+### 9.8 成本
 
 `glm-4-flash` 单价 0 元，但**免费档有并发与速率限制**（智谱免费模型并发很低），适合家庭单用户场景，**不要用于多用户并发**。
 

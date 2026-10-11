@@ -43,6 +43,8 @@ services:
       # AI 能力（可选；不配则 Tutor 降级，作业主流程不受影响）
       # 注意：国内厂商（智谱/百炼/硅基流动/火山/混元/千帆）都必须用 chat-completions 协议，
       # 默认的 responses 协议只有 OpenAI 支持，照默认值配国内地址会拿到 404 并静默降级。
+      # 注意：这里的键必须与 application.yml 的 app.ai.* 一一对应，
+      # 漏配的键不会报错，只会静默沿用镜像默认值（AI_IMAGE_ORGANIZER_MODEL 曾因此失效）。
       AI_PROTOCOL: ${AI_PROTOCOL:-responses}
       AI_API_KEY: ${AI_API_KEY:-}
       AI_BASE_URL: ${AI_BASE_URL:-https://api.openai.com}
@@ -50,6 +52,11 @@ services:
       AI_CHAT_COMPLETIONS_PATH: ${AI_CHAT_COMPLETIONS_PATH:-/v1/chat/completions}
       AI_TUTOR_MODEL: ${AI_TUTOR_MODEL:-}
       AI_ORGANIZER_MODEL: ${AI_ORGANIZER_MODEL:-}
+      # 图片/截图识别必须指向视觉模型（如 glm-4.6v-flashx）。
+      # 留空会回退到 AI_ORGANIZER_MODEL，若它是纯文本模型（如 glm-4-flash），
+      # 接口调用前会被能力判定拦下，截图识别不可用。
+      AI_IMAGE_ORGANIZER_MODEL: ${AI_IMAGE_ORGANIZER_MODEL:-}
+      AI_PRACTICE_MODEL: ${AI_PRACTICE_MODEL:-}
       AI_ALLOW_UNAUTHENTICATED: ${AI_ALLOW_UNAUTHENTICATED:-false}
       AI_STRUCTURED_OUTPUT: ${AI_STRUCTURED_OUTPUT:-true}
       AI_LOG_PAYLOADS: ${AI_LOG_PAYLOADS:-false}

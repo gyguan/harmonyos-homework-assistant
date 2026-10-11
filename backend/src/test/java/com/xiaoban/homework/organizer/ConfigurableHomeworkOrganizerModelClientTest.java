@@ -67,6 +67,26 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(client.parseImageOutput("{\"recognizedText\":\"班级通知\",\"assignments\":[]}")
         .orElseThrow().assignments().isEmpty());
   }
+  @Test
+  void imageAvailabilityFollowsTheConfiguredModelCapabilityNotJustTheApiKey() {
+    var properties = new AiProviderProperties();
+    properties.setBaseUrl("https://open.bigmodel.cn/api/paas/v4");
+    properties.setApiKey("test-key");
+    properties.setOrganizerModel("glm-4-flash");
+    var transport = new com.xiaoban.homework.ai.OpenAiCompatibleTransport(properties,
+        new com.xiaoban.homework.ai.AiProviderCapabilityResolver(properties),
+        JsonMapper.builder().build());
+    var client = new ConfigurableHomeworkOrganizerModelClient(properties, transport,
+        JsonMapper.builder().build());
+
+    // 线上真实故障：把图片流程指向纯文本模型时，接口调用前就必须判定为不可用。
+    assertTrue(client.available());
+    assertFalse(client.imageAvailable());
+
+    properties.setImageOrganizerModel("glm-4.6v-flashx");
+    assertTrue(client.imageAvailable());
+  }
+
   static class TestStudent extends StudentEntity {
     TestStudent() { super(); }
   }
