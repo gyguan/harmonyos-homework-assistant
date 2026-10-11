@@ -14,7 +14,8 @@
   },
   "production": {
     "addedSysCaps": [
-      "SystemCapability.AI.TextToSpeech"
+      "SystemCapability.AI.TextToSpeech",
+      "SystemCapability.Multimedia.Media.AVPlayer"
     ],
     "removedSysCaps": []
   }

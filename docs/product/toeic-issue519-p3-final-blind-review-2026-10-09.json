@@ -1,0 +1,826 @@
+{
+  "schemaVersion": 1,
+  "issueNumber": 519,
+  "reviewDate": "2026-10-09",
+  "reviewMode": "AI_RELEASE_BLIND_REVIEW",
+  "reviewer": "AI-GPT5.6-SOL",
+  "expertCertification": "NO",
+  "method": "answer hidden -> independently solve from passage/stem/options -> compare to repository answer -> editorial precision review",
+  "activeV2Part7": {
+    "count": 108,
+    "answerMatches": 108,
+    "answerMismatches": 0,
+    "items": [
+      {
+        "id": "R-FM1-P7-M1-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M1-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M1-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M1-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M1-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M2-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M2-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M2-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M2-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M2-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M3-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M3-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M3-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M3-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M3-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M4-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M4-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M4-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M4-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M4-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M5-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M5-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M5-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M5-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-M5-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S01-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S01-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S01-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S02-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S02-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S02-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S03-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S03-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S03-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S04-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S04-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S04-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S05-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S05-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S05-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S06-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S06-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S06-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S07-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S07-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S07-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S08-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S08-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S08-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S09-01",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S09-02",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S09-03",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S10-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM1-P7-S10-02",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M1-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M1-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M1-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M1-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M1-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M2-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M2-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M2-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M2-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M2-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M3-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M3-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M3-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M3-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M3-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M4-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M4-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M4-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M4-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M4-05",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M5-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M5-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M5-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M5-04",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-M5-05",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S01-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S01-02",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S01-03",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S02-01",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S02-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S02-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S03-01",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S03-02",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S03-03",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S04-01",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S04-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S04-03",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S05-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S05-02",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S05-03",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S06-01",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S06-02",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S06-03",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S07-01",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S07-02",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S07-03",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S08-01",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S08-02",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S08-03",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S09-01",
+        "blindAnswerIndex": 0,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S09-02",
+        "blindAnswerIndex": 2,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S09-03",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S10-01",
+        "blindAnswerIndex": 1,
+        "answerMatch": true
+      },
+      {
+        "id": "R-FM2-P7-S10-02",
+        "blindAnswerIndex": 3,
+        "answerMatch": true
+      }
+    ]
+  },
+  "replacementReview": {
+    "count": 14,
+    "passCount": 13,
+    "replacedAgainCount": 1,
+    "items": [
+      {
+        "originalId": "R-DX-P5-05",
+        "reviewedReplacementId": "R-FP1-DX-P5-05",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-M1-P5-022",
+        "reviewedReplacementId": "R-FM1-P5-022",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-M1-P6-033",
+        "reviewedReplacementId": "R-FM1-P6-033",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-M2-P5-007",
+        "reviewedReplacementId": "R-FM2-P5-007",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-M2-P5-010",
+        "reviewedReplacementId": "R-FP1-M2-P5-010",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-M2-P6-002",
+        "reviewedReplacementId": "R-FP1-M2-P6-002",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-M2-P6-004",
+        "reviewedReplacementId": "R-FM2-P6-017",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-M2-P6-008",
+        "reviewedReplacementId": "R-FM2-P6-018",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-M2-P6-009",
+        "reviewedReplacementId": "R-FM2-P6-009",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-P5-SPRINT-1517",
+        "reviewedReplacementId": "R-FP5-SPRINT-1517",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-P5-SPRINT-1528",
+        "reviewedReplacementId": "R-FP1-P5-1528",
+        "decision": "REPLACED_AGAIN_P3",
+        "p3ReplacementId": "R-FP3-P5-1528"
+      },
+      {
+        "originalId": "R-P5-VERB-0206",
+        "reviewedReplacementId": "R-FP5-VERB-0206",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-P6-SPRINT-1606",
+        "reviewedReplacementId": "R-FP1-P6-1606",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      },
+      {
+        "originalId": "R-P6-SPRINT-1610",
+        "reviewedReplacementId": "R-FP6-SPRINT-1610",
+        "decision": "PASS_BLIND_RELEASE_REVIEW",
+        "p3ReplacementId": null
+      }
+    ]
+  },
+  "corrections": [
+    {
+      "sourceId": "R-FP1-P5-1528",
+      "newId": "R-FP3-P5-1528",
+      "reason": "singular each applicant left a traditional himself reading available; pluralized subject makes themselves unique",
+      "answerIndex": 2
+    },
+    {
+      "sourceId": "R-FM1-P7-M2-03",
+      "newId": "R-FP3-FM1-P7-M2-03",
+      "reason": "do not need express did not strictly prove a preference for standard delivery; stem now asks which option is available free for this order",
+      "answerIndex": 2
+    },
+    {
+      "sourceId": "R-FM1-P7-S09-01",
+      "newId": "R-FP3-FM1-P7-S09-01",
+      "reason": "badge holders was broader than employees with active staff badges in the source",
+      "answerIndex": 1
+    },
+    {
+      "sourceId": "R-FM2-P7-S07-03",
+      "newId": "R-FP3-FM2-P7-S07-03",
+      "reason": "sentence-position wording could fit before the collection sentence; anaphoric that collection makes position [4] uniquely coherent",
+      "answerIndex": 3
+    }
+  ],
+  "semanticBoundaryScan": {
+    "terms": [
+      "by",
+      "before",
+      "until",
+      "through",
+      "within",
+      "no later than",
+      "over",
+      "at least",
+      "up to",
+      "unless",
+      "except",
+      "only",
+      "not",
+      "may",
+      "must",
+      "can"
+    ],
+    "outcome": "NO_ADDITIONAL_SYSTEMIC_DEFECTS_AFTER_FOUR_P3_PRECISION_FIXES"
+  },
+  "stratifiedSamples": {
+    "vocabulary": {
+      "count": 30,
+      "ids": [
+        "V-010",
+        "V-020",
+        "V-030",
+        "V-040",
+        "V-050",
+        "V-060",
+        "V-070",
+        "V-080",
+        "V-090",
+        "V-100",
+        "V-110",
+        "V-120",
+        "V-130",
+        "V-140",
+        "V-150",
+        "V-160",
+        "V-170",
+        "V-180",
+        "V-190",
+        "V-200",
+        "V-210",
+        "V-220",
+        "V-230",
+        "V-240",
+        "V-250",
+        "V-260",
+        "V-270",
+        "V-280",
+        "V-290",
+        "V-300"
+      ],
+      "outcome": "PASS"
+    },
+    "translations": {
+      "count": 30,
+      "ids": [
+        "R-DX-P5-01",
+        "R-P5-COL-0005",
+        "R-P5-MIX-0602",
+        "R-P5-SPRINT-1505",
+        "R-P5-SPRINT-1512",
+        "R-P5-SPRINT-1520",
+        "R-P5-SPRINT-1528",
+        "R-P5-VOC-0006",
+        "R-P5-WF-0104",
+        "R-P6-MIX-0603",
+        "R-P6-SPRINT-1606",
+        "R-P6-SPRINT-1613",
+        "R-P7-CATERING-02",
+        "R-P7-DELIVERY-05",
+        "R-P7-DETAIL-0802",
+        "R-P7-DOUBLE-1104",
+        "R-P7-FILTER-05",
+        "R-P7-LICENSE-03",
+        "R-P7-LONG-1006",
+        "R-P7-MIX-0606",
+        "R-P7-PARA-0506",
+        "R-P7-PERDIEM-01",
+        "R-P7-PURPOSE-0702",
+        "R-P7-RETAIL-03",
+        "R-P7-TIMED-1701",
+        "R-P7-TIMED-1709",
+        "R-P7-TIMED-1716",
+        "R-P7-TRAVEL-01",
+        "R-P7-TRIPLE-1203",
+        "R-P7-VENUE-05"
+      ],
+      "outcome": "PASS"
+    },
+    "sentenceDrills": {
+      "count": 15,
+      "ids": [
+        "S-001",
+        "S-006",
+        "S-011",
+        "S-016",
+        "S-021",
+        "S-026",
+        "S-031",
+        "S-036",
+        "S-040",
+        "S-045",
+        "S-050",
+        "S-055",
+        "S-060",
+        "S-065",
+        "S-070"
+      ],
+      "outcome": "PASS"
+    },
+    "ordinaryPart5Part6": {
+      "count": 30,
+      "ids": [
+        "R-DX-P5-01",
+        "R-DX-P6-02",
+        "R-M1-P5-006",
+        "R-M1-P5-012",
+        "R-M1-P5-017",
+        "R-M1-P5-024",
+        "R-M1-P5-030",
+        "R-M1-P6-037",
+        "R-M1-P6-043",
+        "R-M2-P5-003",
+        "R-M2-P5-011",
+        "R-M2-P5-016",
+        "R-M2-P5-022",
+        "R-M2-P5-028",
+        "R-M2-P6-006",
+        "R-M2-P6-014",
+        "R-P5-COL-0305",
+        "R-P5-PREP-0003",
+        "R-P5-SPRINT-1504",
+        "R-P5-SPRINT-1509",
+        "R-P5-SPRINT-1515",
+        "R-P5-SPRINT-1522",
+        "R-P5-SPRINT-1529",
+        "R-P5-VOC-0006",
+        "R-P5-WF-0102",
+        "R-P6-CONJ-0403",
+        "R-P6-MIX-0604",
+        "R-P6-SPRINT-1605",
+        "R-P6-SPRINT-1613",
+        "R-P6-WF-0406"
+      ],
+      "outcome": "PASS"
+    }
+  },
+  "conclusion": "P3_COMPLETE_INCREMENTAL_REVIEW_ONLY_AFTER_THIS_POINT"
+}

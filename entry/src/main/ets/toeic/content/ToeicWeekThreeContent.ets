@@ -8,10 +8,10 @@ export class ToeicWeekThreeContent {
     return [
       new ToeicStudyDay(15,"Part 5 极速","30 题目标 ≤10 分钟：词性、动词、介词、连词与高频搭配快速决策",45,["V-001","V-004","V-007","V-009","V-010","V-013","V-014","V-023","V-027","V-028","V-029","V-030","V-051","V-058","V-082"],[],ToeicWeekThreeContent.p5SprintQuestionIds()),
       new ToeicStudyDay(16,"Part 6 + 长句","16 题目标 ≤10 分钟：先做局部语法，再用上下文确认连接与指代",60,["V-011","V-012","V-015","V-016","V-025","V-026","V-044","V-049","V-061","V-071"],["S-061","S-062","S-063","S-064","S-065"],ToeicWeekThreeContent.p6SprintQuestionIds()),
-      new ToeicStudyDay(17,"Part 7 限时","单篇快速取证；双/三篇先分工再联动，控制回读次数",70,["V-019","V-020","V-021","V-022","V-027","V-044","V-059","V-065","V-073","V-078"],["S-066","S-067","S-068","S-069","S-070"],ToeicWeekThreeContent.p7TimedQuestionIds()),
-      new ToeicStudyDay(18,"动态补弱","按当前薄弱能力、错题与慢题动态组题；优先修复高价值失分",60,[],[],[]),
+      new ToeicStudyDay(17,"Part 7 限时","单篇限时 + 4 组双篇 / 三篇，控制回读次数",95,["V-019","V-020","V-021","V-022","V-027","V-044","V-059","V-065","V-073","V-078"],["S-066","S-067","S-068","S-069","S-070"],ToeicWeekThreeContent.p7TimedQuestionIds()),
+      new ToeicStudyDay(18,"动态补弱","薄弱题回练 + 3 组完整多篇阅读，检验跨文档能力",90,[],[],[]),
       new ToeicStudyDay(19,"第二次完整 Reading 模考","75 分钟完成 100 题：Part 5 30题 + Part 6 16题 + Part 7 54题；固定题序，结束后统一复盘",75,[],[],ToeicWeekThreeContent.mockQuestionIds()),
-      new ToeicStudyDay(20,"错题收口","优先复盘累计错 2 次及以上题目，再补当前错题、慢题与薄弱能力",55,[],[],[]),
+      new ToeicStudyDay(20,"错题收口","高频错题收口 + 2 组三篇新题作最终强化",80,[],[],[]),
       new ToeicStudyDay(21,"轻量训练 + 最终验证","P5 15题 + P6 2篇(8题) + P7 4组(12题)，只做高价值复验，不再堆新难题",50,[],[],ToeicWeekThreeContent.finalCheckQuestionIds())
     ];
   }
@@ -19,14 +19,14 @@ export class ToeicWeekThreeContent {
   static sentenceDrills():ToeicSentenceDrill[] {
     return [
       new ToeicSentenceDrill("S-061","Although the revised procedure appears more complex at first, employees who follow the checklist usually complete the task more quickly.","虽然修订后的流程起初看起来更复杂，但按清单操作的员工通常能更快完成任务。","employees usually complete the task more quickly","P6 长句：让步背景 + 主句结论","先跳过 Although 从句，抓主干 employees ... complete the task more quickly。"),
-      new ToeicSentenceDrill("S-062","The confirmation message, which is sent automatically after payment is received, contains the reference number needed at check-in.","付款收到后自动发送的确认信息包含签到时所需的参考编号。","The confirmation message contains the reference number.","P6 长句：which 插入语","主干是 message contains number；which 从句只解释发送方式。"),
-      new ToeicSentenceDrill("S-063","Customers whose orders cannot be delivered on the scheduled date will be contacted before a new delivery time is assigned.","无法按计划日期送达的订单客户将在安排新送货时间前收到联系。","Customers will be contacted.","P6 长句：whose 限定对象","先找主句 Customers will be contacted，再处理 whose 从句。"),
+      new ToeicSentenceDrill("S-062","The confirmation message, which is sent automatically after payment is received, contains the reference number needed at check-in.","收到付款后自动发送的确认信息包含签到时所需的参考编号。","The confirmation message contains the reference number.","P6 长句：which 插入语","主干是 message contains number；which 从句只解释发送方式。"),
+      new ToeicSentenceDrill("S-063","Customers whose orders cannot be delivered on the scheduled date will be contacted before a new delivery time is assigned.","订单无法按原定日期送达的顾客，会在重新安排送货时间前收到联系。","Customers will be contacted.","P6 长句：whose 限定对象","先找主句 Customers will be contacted，再处理 whose 从句。"),
       new ToeicSentenceDrill("S-064","Once the inspection has been completed and the report has been signed, the equipment may be returned to regular service.","检查完成且报告签字后，设备可以恢复正常使用。","The equipment may be returned to service.","P6 长句：Once 条件链","两个完成动作都是条件，核心结果是 equipment may be returned。"),
       new ToeicSentenceDrill("S-065","Because the original supplier was unable to meet the deadline, the purchasing team selected a local vendor that could deliver within three days.","由于原供应商无法满足截止日期，采购团队选择了可在三天内交货的本地供应商。","The purchasing team selected a local vendor.","P6 长句：原因 + 定语从句","Because 说明原因，that could deliver 修饰 vendor，主句是 selected。"),
-      new ToeicSentenceDrill("S-066","The notice gives the closing time, so locate that hard fact before reading the rest of the paragraph again.","通知给出了关闭时间，因此先定位这个硬信息，再决定是否需要重读其余段落。","locate the closing time first","P7 限时：先抓硬信息","时间、金额、地点优先定位，避免从头重读。"),
+      new ToeicSentenceDrill("S-066","The notice gives the closing time, so locate that hard fact before reading the rest of the paragraph again.","通知给出了关闭时间，因此应先定位这个明确事实，再重读该段其余内容。","locate the closing time first","P7 限时：先抓硬信息","时间、金额、地点优先定位，避免从头重读。"),
       new ToeicSentenceDrill("S-067","When two documents mention different dates, write down each date with its event before comparing them.","当两份材料提到不同日期时，先把日期和对应事件配对，再进行比较。","pair each date with its event","P7 限时：日期绑定事件","跨篇题先建立日期—事件映射，减少串信息。"),
       new ToeicSentenceDrill("S-068","If a question asks why a message was sent, read the opening request and final action before checking minor details.","如果题目问信息为何发送，先看开头请求和结尾行动，再核对细节。","read the main request and action first","P7 限时：目的题","目的题优先找请求、通知、提醒等主动作。"),
-      new ToeicSentenceDrill("S-069","A repeated noun in the question may appear as a synonym in the passage, so search by meaning rather than exact wording.","题干中重复出现的名词在原文中可能被同义词替换，因此应按语义而非逐字搜索。","search by meaning","P7 限时：同义替换定位","不要只等原词复现，要把题干词和常见改写绑定。"),
+      new ToeicSentenceDrill("S-069","A repeated noun in the question may appear as a synonym in the passage, so search by meaning rather than exact wording.","题干中的某个名词在原文中可能以同义词形式出现，因此应按语义而非逐字搜索。","search by meaning","P7 限时：同义替换定位","不要只等原词复现，要把题干词和常见改写绑定。"),
       new ToeicSentenceDrill("S-070","For a triple-passage set, decide what role each document plays before combining evidence across all three.","面对三篇组合题，先判断每篇材料的职责，再跨三篇合并证据。","decide each document's role first","P7 限时：三篇分工","先标记规则、事实、补充条件分别在哪篇，再组合。")
     ];
   }
@@ -79,7 +79,7 @@ export class ToeicWeekThreeContent {
       ToeicWeekThreeContent.q("R-P5-SPRINT-1525",ToeicPart.PART_5,ToeicSkill.WORD_FORM,"","Customers responded very _____ to the extended service hours.",["positive","positively","position","positivity"],1,"responded 为动词，使用副词 positively 修饰。","","respond positively = react favorably",12,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
       ToeicWeekThreeContent.q("R-P5-SPRINT-1526",ToeicPart.PART_5,ToeicSkill.VERB,"","The accounting team _____ the invoice before issuing payment yesterday.",["verifies","verified","has verified","will verify"],1,"yesterday 指明确过去时间，用一般过去时 verified。","","verified yesterday",10,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
       ToeicWeekThreeContent.q("R-P5-SPRINT-1527",ToeicPart.PART_5,ToeicSkill.CONJUNCTION,"","The meeting room is small; _____, it is equipped with a high-quality video system.",["however","therefore","because","otherwise"],0,"前后是转折关系，选 however。","","however = nevertheless",15,ToeicDifficulty.MEDIUM,ToeicScoreValue.MUST_GET),
-      ToeicWeekThreeContent.q("R-P5-SPRINT-1528",ToeicPart.PART_5,ToeicSkill.PRONOUN,"","Each applicant must provide _____ with a photo ID at reception.",["itself","himself","themselves","ourselves"],2,"现代英语中 each applicant 可用单数 they，对应反身代词 themselves。","","provide themselves with ID",15,ToeicDifficulty.MEDIUM,ToeicScoreValue.MUST_GET),
+      ToeicWeekThreeContent.q("R-P5-SPRINT-1528",ToeicPart.PART_5,ToeicSkill.PRONOUN,"","Each applicant must identify _____ with a photo ID at reception.",["itself","himself","themselves","ourselves"],2,"现代英语中 each applicant 可用单数 they，对应反身代词 themselves。","","provide themselves with ID",15,ToeicDifficulty.MEDIUM,ToeicScoreValue.MUST_GET),
       ToeicWeekThreeContent.q("R-P5-SPRINT-1529",ToeicPart.PART_5,ToeicSkill.PREPOSITION,"","The maintenance work will take place _____ regular business hours.",["outside","among","onto","besides"],0,"outside regular business hours 表示营业时间之外。","","outside business hours",12,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
       ToeicWeekThreeContent.q("R-P5-SPRINT-1530",ToeicPart.PART_5,ToeicSkill.VOCABULARY,"","Please _____ the confirmation e-mail until your reservation is complete.",["retain","dispatch","estimate","notify"],0,"retain 表示保留。","","retain = keep",10,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET)
     ];
@@ -237,7 +237,9 @@ export class ToeicWeekThreeContent {
   private static q(id:string,part:ToeicPart,skill:ToeicSkill,passage:string,stem:string,options:string[],
     correctIndex:number,explanation:string,evidence:string,paraphrase:string,recommendedSeconds:number,
     difficulty:ToeicDifficulty,scoreValue:ToeicScoreValue):ToeicQuestion {
-    return new ToeicQuestion(id,ToeicSection.READING,part,skill,passage,stem,options,correctIndex,
+    let question=new ToeicQuestion(id,ToeicSection.READING,part,skill,passage,stem,options,correctIndex,
       explanation,evidence,paraphrase,recommendedSeconds,difficulty,scoreValue);
+    if (id==='R-P5-SPRINT-1528') question.version=2;
+    return question;
   }
 }

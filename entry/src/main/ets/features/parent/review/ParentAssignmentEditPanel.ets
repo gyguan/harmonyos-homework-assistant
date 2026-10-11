@@ -1,5 +1,6 @@
 import { AssignmentEditChangeDetector, AssignmentEditValues } from '../../../common/state/AssignmentEditChangeDetector';
 import { AppTheme } from '../../../common/theme/AppTheme';
+import { AssignmentAttachmentEditor } from '../../../components/assignment/AssignmentAttachmentEditor';
 import { AssignmentEditForm } from '../../../components/assignment/AssignmentEditForm';
 import { EditSheetHeader } from '../../../components/navigation/EditSheetHeader';
 import { Assignment } from '../../../domain/model/HomeworkModels';
@@ -173,7 +174,8 @@ export struct ParentAssignmentEditPanel {
       Divider().color(AppTheme.DIVIDER);
 
       Scroll() {
-        AssignmentEditForm({
+        Column() {
+          AssignmentEditForm({
           subject: this.item.subject,
           subjectEditable: false,
           title: this.titleDraft,
@@ -195,6 +197,10 @@ export struct ParentAssignmentEditPanel {
           onMinutesChange: (minutes: number) => this.setMinutes(minutes)
         })
         .padding({ left: 16, right: 16, top: 12, bottom: 16 });
+          AssignmentAttachmentEditor({ assignmentId: this.item.id })
+            .padding({ left: 16, right: 16, bottom: 16 });
+        }
+        .width('100%');
       }
       .width('100%')
       .layoutWeight(1)

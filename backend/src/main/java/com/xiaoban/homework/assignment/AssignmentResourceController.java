@@ -11,6 +11,7 @@ import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,6 +39,20 @@ public class AssignmentResourceController {
       @RequestPart("audio") MultipartFile audio,
       @RequestPart("images") List<MultipartFile> images) {
     return service.createVoiceAssignment(familyId, studentId, metadata, audio, images);
+  }
+
+  @PostMapping(value = "/assignments/{assignmentId}/resources", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public AssignmentResourceDtos.Response addResource(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String assignmentId, @RequestPart("file") MultipartFile file) {
+    return service.addResource(familyId, assignmentId, file);
+  }
+
+  @DeleteMapping("/assignments/{assignmentId}/resources/{resourceId}")
+  public void removeResource(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String assignmentId, @PathVariable UUID resourceId) {
+    service.removeResource(familyId, assignmentId, resourceId);
   }
 
   @GetMapping("/assignments/{assignmentId}/resources")

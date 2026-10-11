@@ -1,12 +1,38 @@
 import {
-  ToeicDifficulty, ToeicPart, ToeicQuestion, ToeicReviewStatus, ToeicScoreValue, ToeicSection,
+  ToeicDifficulty, ToeicPart, ToeicQuestion, ToeicReadingGroup, ToeicReviewStatus, ToeicScoreValue, ToeicSection,
   ToeicSentenceDrill, ToeicSkill, ToeicStudyDay, ToeicVocabularyItem, ToeicVocabularyLevel
 } from '../domain/ToeicModels';
 import { ToeicContentValidator } from './ToeicContentValidator';
 import { ToeicWeekOneContent } from './ToeicWeekOneContent';
 import { ToeicWeekTwoContent } from './ToeicWeekTwoContent';
+import { ToeicMockDay14V2Content } from './ToeicMockDay14V2Content';
+import { ToeicMockDay19V2Content } from './ToeicMockDay19V2Content';
+import { ToeicMockPart7EvidenceRevisionContent } from './ToeicMockPart7EvidenceRevisionContent';
+import { ToeicMockDay19Part6V2Content } from './ToeicMockDay19Part6V2Content';
+import { ToeicMockDay19Part5V2Content } from './ToeicMockDay19Part5V2Content';
+import { ToeicMockDay14Part5V2Content } from './ToeicMockDay14Part5V2Content';
+import { ToeicP5UniqueAnswerIssue478 } from './ToeicP5UniqueAnswerIssue478';
+import { ToeicP6ConditionalIssue478 } from './ToeicP6ConditionalIssue478';
+import { ToeicP1FinalQuestionCorrections } from './ToeicP1FinalQuestionCorrections';
+import { ToeicP3FinalCorrections } from './ToeicP3FinalCorrections';
+import { ToeicMockPart6V2RepairContent } from './ToeicMockPart6V2RepairContent';
+import { ToeicMockDay19Part6CompletionContent } from './ToeicMockDay19Part6CompletionContent';
 import { ToeicWeekThreeContent } from './ToeicWeekThreeContent';
 import { ToeicPronunciationCatalog } from './ToeicPronunciationCatalog';
+import { ToeicVocabularyExpansion } from './ToeicVocabularyExpansion';
+import { ToeicVocabularyBatchTwo } from './ToeicVocabularyBatchTwo';
+import { ToeicVocabularyBatchThree } from './ToeicVocabularyBatchThree';
+import { ToeicVocabularyBatchFour } from './ToeicVocabularyBatchFour';
+import { ToeicVocabularyBatchFive } from './ToeicVocabularyBatchFive';
+import { ToeicVocabularyBatchSix } from './ToeicVocabularyBatchSix';
+import { ToeicVocabularyBatchSeven } from './ToeicVocabularyBatchSeven';
+import { ToeicStandardDiagnosticContent } from './ToeicStandardDiagnosticContent';
+import { ToeicExtraReadingContent } from './ToeicExtraReadingContent';
+import { ToeicExtraReadingBatchTwo } from './ToeicExtraReadingBatchTwo';
+import { ToeicExtraReadingBatchThree } from './ToeicExtraReadingBatchThree';
+import { ToeicExtraReadingBatchFour } from './ToeicExtraReadingBatchFour';
+import { ToeicExtraReadingBatchFive } from './ToeicExtraReadingBatchFive';
+import { ToeicExtraReadingBatchSix } from './ToeicExtraReadingBatchSix';
 
 export class PresetToeicContent {
   static questions():ToeicQuestion[] {
@@ -43,16 +69,18 @@ export class PresetToeicContent {
         '','postpone = delay',22,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL),
       new ToeicQuestion('R-P6-CTX-0001',ToeicSection.READING,ToeicPart.PART_6,ToeicSkill.CONTEXT,
         'Due to scheduled maintenance, online ordering will be unavailable from 10 P.M. to midnight. _____, customers may place orders by phone at 555-0186. Normal online service will resume after midnight.',
-        'Choose the best phrase for the blank.',
+        'Which phrase best completes the online-ordering notice?',
         ['During this period','For example','Last month','In the same building'],0,
         '前句给出线上服务不可用的时间段，后句说明该时段可改用电话下单。During this period 能准确承接时间关系。',
-        '','During this period = while online ordering is unavailable',35,ToeicDifficulty.MEDIUM,ToeicScoreValue.MUST_GET),
+        '','During this period = while online ordering is unavailable',35,ToeicDifficulty.MEDIUM,ToeicScoreValue.MUST_GET,
+        ToeicReviewStatus.PUBLISHED,2),
       new ToeicQuestion('R-P6-WF-0002',ToeicSection.READING,ToeicPart.PART_6,ToeicSkill.WORD_FORM,
         'Thank you for applying for the sales coordinator position. We will review all applications this week. _____ candidates will be contacted by Friday to arrange an interview.',
-        'Choose the best word for the blank.',
-        ['Qualification','Qualified','Qualify','Qualifyingly'],1,
+        'Which word best completes the applicant notification?',
+        ['Qualification','Qualified','Qualify','Qualifies'],1,
         '空格修饰 candidates，需要形容词。qualified candidates 表示“符合条件的候选人”。',
-        '','qualified candidates = candidates who meet the requirements',30,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET),
+        '','qualified candidates = candidates who meet the requirements',30,ToeicDifficulty.EASY,ToeicScoreValue.MUST_GET,
+        ToeicReviewStatus.PUBLISHED,2),
       new ToeicQuestion('R-P7-DETAIL-0001',ToeicSection.READING,ToeicPart.PART_7,ToeicSkill.DETAIL,
         'To: Office Staff\nFrom: Facilities Team\nThe new printer for the third floor will be delivered on Tuesday morning. Installation will begin immediately after delivery. Please send any installation questions to Nina Patel.',
         'When will the new printer be delivered?',
@@ -119,28 +147,154 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions());
+    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat(ToeicMockDay14Part5V2Content.questions()).concat(ToeicP5UniqueAnswerIssue478.questions()).concat(ToeicP6ConditionalIssue478.questions()).concat(ToeicP1FinalQuestionCorrections.questions()).concat(ToeicP3FinalCorrections.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19(),ToeicMockDay19Part6CompletionContent.inventory(),ToeicMockDay19Part6CompletionContent.library()]);
+  }
+
+  static publishedReadingGroups():ToeicReadingGroup[] {
+    let candidates=ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups()).concat(ToeicMockDay19V2Content.groups());
+    // The group catalog represents the CURRENT release only. Historic question
+    // IDs remain published/addressable for saved drafts and reports, but they
+    // must not be counted as extra members of an active five-question group.
+    for (let group of candidates) {
+      let activeIds:string[]=[];
+      for (let id of group.questionIds) {
+        let active=ToeicMockPart7EvidenceRevisionContent.activeId(id);
+        active=ToeicP3FinalCorrections.activePart7Id(active);
+        if (activeIds.indexOf(active)<0) activeIds.push(active);
+      }
+      group.questionIds=activeIds;
+    }
+    let items=ToeicExtraReadingContent.questions().concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicP3FinalCorrections.questions()).concat(ToeicMockDay19Part6V2Content.questions());
+    let groups:ToeicReadingGroup[]=[];
+    for (let group of candidates) {
+      let everyPublished=true;
+      for (let id of group.questionIds) {
+        let published=false;
+        for (let q of items) {
+          if (q.id===id && q.reviewStatus===ToeicReviewStatus.PUBLISHED) {
+            published=true; break;
+          }
+        }
+        if (!published) { everyPublished=false; break; }
+      }
+      if (everyPublished) groups.push(group);
+    }
+    return groups;
+  }
+
+  /** Return only the CURRENT members of published reading groups for group
+   * integrity validation. Historic published revisions intentionally remain
+   * outside this set so they can still restore old drafts/reports without
+   * being mistaken for extra members of today's paper.
+   */
+  static readingGroupValidationQuestions(questions:ToeicQuestion[],
+    groups:ToeicReadingGroup[]):ToeicQuestion[] {
+    let activeIds:string[]=[];
+    for (let group of groups) {
+      for (let id of group.questionIds) {
+        if (activeIds.indexOf(id)<0) activeIds.push(id);
+      }
+    }
+    let result:ToeicQuestion[]=[];
+    for (let question of questions) {
+      if (activeIds.indexOf(question.id)>=0) result.push(question);
+    }
+    return result;
   }
 
   static publishedQuestions():ToeicQuestion[] {
     let source=PresetToeicContent.questions();
-    let validation=ToeicContentValidator.validateAll(source);
-    if (!validation.valid) return [];
-    let result:ToeicQuestion[]=[];
-    for (let q of source) if (q.reviewStatus===ToeicReviewStatus.PUBLISHED) result.push(q);
-    return result;
+    let readyGroups=PresetToeicContent.publishedReadingGroups();
+    let published:ToeicQuestion[]=[];
+    for (let q of source) {
+      if (q.reviewStatus!==ToeicReviewStatus.PUBLISHED) continue;
+      // A published individual question cannot expose an incomplete shared
+      // passage. Every sibling of its group must first be PUBLISHED too.
+      if (q.groupId.length>0) {
+        let groupReady=false;
+        for (let group of readyGroups) {
+          if (group.groupId===q.groupId) { groupReady=true; break; }
+        }
+        if (!groupReady) continue;
+      }
+      published.push(q);
+    }
+    let validation=ToeicContentValidator.validateAll(published);
+    let groupValidation=ToeicContentValidator.validateReadingGroups(
+      PresetToeicContent.readingGroupValidationQuestions(published,readyGroups),readyGroups);
+    if (!validation.valid || !groupValidation.valid) return [];
+    return published;
   }
 
+  /** Exclude editorially flagged archived items from new learning queues only.
+   * Keep publishedQuestions() intact for saved mock v1 reports/drafts.
+   * Issue #478: the old R-M1-P7-094 date inference is not independently supported.
+   */
+  static liveTrainingQuestions():ToeicQuestion[] {
+    let published=PresetToeicContent.publishedQuestions();
+    let live:ToeicQuestion[]=[];
+    for (let question of published) {
+      if (question.id==='R-FM1-P7-M1-01' || question.id==='R-FM1-P7-M4-01' || question.id==='R-FM2-P7-M1-01' || question.id==='R-FM2-P7-M5-03' || question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P5-022' || question.id==='R-P5-VERB-0206' || question.id==='R-P5-SPRINT-1517' || question.id==='R-P6-SPRINT-1610' || question.id==='R-P5-SPRINT-1528' || question.id==='R-P6-SPRINT-1606' || question.id==='R-DX-P5-05' || question.id==='R-M2-P5-010' || question.id==='R-M2-P6-002' || question.id==='R-M2-P6-004' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008' || question.id==='R-FP1-P5-1528' || question.id==='R-FM1-P7-M2-03' || question.id==='R-FM1-P7-S09-01' || question.id==='R-FM2-P7-S07-03') continue;
+      live.push(question);
+    }
+    return live;
+  }
+
+  /** The Day 1 plan is the only source of truth for the comprehensive diagnostic. */
   static diagnosticQuestions():ToeicQuestion[] {
+    return PresetToeicContent.questionsForDay(1);
+  }
+
+  // Every published extra reading group has exactly one assigned day. Keep all five
+  // sibling questions adjacent; changing the plan does not change their stable IDs.
+  static supplementaryGroupIdsForDay(day:number):string[] {
+    if (day===12) return ['P7-EX-VENUE','P7-EX-DELIVERY'];
+    if (day===13) return ['P7-EX-TRAVEL','P7-EX-FILTER'];
+    if (day===17) return ['P7-EX-ONBOARD','P7-EX-RETAIL','P7-EX-SUPPORT','P7-EX-LEASE'];
+    if (day===18) return ['P7-EX-TRAINING','P7-EX-MIGRATION','P7-EX-LICENSE'];
+    if (day===20) return ['P7-EX-PERDIEM','P7-EX-CATERING'];
+    return [];
+  }
+
+  static supplementaryReadingQuestionsForDay(day:number):ToeicQuestion[] {
+    let ids=PresetToeicContent.supplementaryGroupIdsForDay(day);
+    let groups=PresetToeicContent.publishedReadingGroups();
     let all=PresetToeicContent.publishedQuestions();
-    let ids:string[]=['R-P5-WF-0001','R-P5-VOICE-0002','R-P5-PREP-0003','R-P5-CONJ-0004','R-P5-COL-0005','R-P5-VOC-0006',
-      'R-P6-CTX-0001','R-P6-WF-0002','R-P7-DETAIL-0001','R-P7-PURPOSE-0002','R-P7-PARA-0003','R-P7-DETAIL-0004'];
     let result:ToeicQuestion[]=[];
-    for (let id of ids) for (let q of all) if (q.id===id) { result.push(q); break; }
+    for (let id of ids) {
+      for (let group of groups) {
+        if (group.groupId!==id) continue;
+        // Fail closed: never expose an incomplete five-question passage as a daily exercise.
+        let ordered:ToeicQuestion[]=[];
+        for (let questionId of group.questionIds) {
+          for (let question of all) {
+            if (question.id===questionId) { ordered.push(question); break; }
+          }
+        }
+        if (ordered.length===group.questionIds.length) {
+          for (let question of ordered) result.push(question);
+        }
+        break;
+      }
+    }
     return result;
   }
 
-  static vocabulary():ToeicVocabularyItem[] {
+  static supplementaryReadingQuestions():ToeicQuestion[] {
+    let all=PresetToeicContent.publishedQuestions();
+    let ids:string[]=[];
+    for (let group of PresetToeicContent.publishedReadingGroups()) {
+      for (let id of group.questionIds) ids.push(id);
+    }
+    let result:ToeicQuestion[]=[];
+    for (let id of ids) {
+      for (let question of all) if (question.id===id) { result.push(question); break; }
+    }
+    return result;
+  }
+
+  /** Includes unpublished candidates strictly for validation and editorial review. */
+  static vocabularyForReview():ToeicVocabularyItem[] {
     let base:ToeicVocabularyItem[]=[
       new ToeicVocabularyItem('V-001','applicant','n.','申请人；求职者',ToeicVocabularyLevel.L1,'招聘',['job applicant'],['candidate']),
       new ToeicVocabularyItem('V-002','candidate','n.','候选人；应聘者',ToeicVocabularyLevel.L1,'招聘',['qualified candidate'],['applicant']),
@@ -173,11 +327,69 @@ export class PresetToeicContent {
       new ToeicVocabularyItem('V-029','retain','v.','保留；保持',ToeicVocabularyLevel.L2,'办公/人事',['retain records'],['keep']),
       new ToeicVocabularyItem('V-030','supplier','n.','供应商',ToeicVocabularyLevel.L1,'采购',['contact a supplier'],['vendor'])
     ];
-    return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()));
+    return ToeicPronunciationCatalog.apply(base.concat(ToeicWeekOneContent.vocabulary()).concat(ToeicVocabularyExpansion.items()).concat(ToeicVocabularyBatchTwo.items()).concat(ToeicVocabularyBatchThree.items()).concat(ToeicVocabularyBatchFour.items()).concat(ToeicVocabularyBatchFive.items()).concat(ToeicVocabularyBatchSix.items()).concat(ToeicVocabularyBatchSeven.items()));
+  }
+
+  static vocabulary():ToeicVocabularyItem[] {
+    let all=PresetToeicContent.vocabularyForReview();
+    let published:ToeicVocabularyItem[]=[];
+    for (let item of all) {
+      if (item.reviewStatus===ToeicReviewStatus.PUBLISHED) published.push(item);
+    }
+    return published;
   }
 
   static studyDays():ToeicStudyDay[] {
-    return ToeicWeekOneContent.studyDays().concat(ToeicWeekTwoContent.studyDays()).concat(ToeicWeekThreeContent.studyDays());
+    let plans=ToeicWeekOneContent.studyDays().concat(ToeicWeekTwoContent.studyDays()).concat(ToeicWeekThreeContent.studyDays());
+    // Keep the published v1 100-question bank unchanged for historical drafts.
+    // Only *new* Day14 sessions use the structurally corrected v2 Part7.
+    for (let plan of plans) {
+      if (plan.day===1) {
+        plan.questionIds=plan.questionIds.map((id:string):string =>
+          id==='R-DX-P5-05' ? 'R-FP1-DX-P5-05' : id);
+      } else if (plan.day===3) {
+        plan.questionIds=plan.questionIds.map((id:string):string => id==='R-P5-VERB-0206' ? 'R-FP5-VERB-0206' : id);
+      } else if (plan.day===15) {
+        plan.questionIds=plan.questionIds.map((id:string):string => {
+          if (id==='R-P5-SPRINT-1517') return 'R-FP5-SPRINT-1517';
+          if (id==='R-P5-SPRINT-1528') return 'R-FP1-P5-1528';
+          return id;
+        });
+      } else if (plan.day===16) {
+        plan.questionIds=plan.questionIds.map((id:string):string => {
+          if (id==='R-P6-SPRINT-1606') return 'R-FP1-P6-1606';
+          if (id==='R-P6-SPRINT-1610') return 'R-FP6-SPRINT-1610';
+          return id;
+        });
+      } else if (plan.day===14) {
+        let ids=ToeicWeekTwoContent.mockQuestionIds().slice(0,46);
+        ids[21]=ToeicMockDay14Part5V2Content.questions()[0].id;
+        ids[32]=ToeicMockPart6V2RepairContent.day14().id;
+        for (let question of ToeicMockDay14V2Content.questions()) ids.push(ToeicMockPart7EvidenceRevisionContent.activeId(question.id));
+        plan.questionIds=ids;
+      } else if (plan.day===19) {
+        let ids=ToeicWeekThreeContent.mockQuestionIds().slice(0,46);
+        // Archive old mock question R-M2-P5-007; v2 paper uses a distinct ID.
+        ids[6]=ToeicMockDay19Part5V2Content.questions()[0].id;
+        ids[38]=ToeicMockPart6V2RepairContent.day19().id;
+        // Keep the old four published questions for historic drafts and reports;
+        // only new Day19 sessions use the independent sentence-completion IDs.
+        let revisedPart6=ToeicMockDay19Part6V2Content.questions();
+        for (let i=0;i<revisedPart6.length;i++) ids[30+i]=revisedPart6[i].id;
+        // Reapply editorial replacements AFTER the initial P6 group override.
+        ids[33]=ToeicMockDay19Part6CompletionContent.inventory().id;
+        ids[37]=ToeicMockDay19Part6CompletionContent.library().id;
+        for (let question of ToeicMockDay19V2Content.questions()) ids.push(ToeicMockPart7EvidenceRevisionContent.activeId(question.id));
+        plan.questionIds=ids;
+      }
+      // P3 is a release-state overlay: preserve the prior replacement IDs for
+      // history, then route only current sessions to blind-review revisions.
+      plan.questionIds=plan.questionIds.map((id:string):string => {
+        if (id==='R-FP1-P5-1528') return 'R-FP3-P5-1528';
+        return ToeicP3FinalCorrections.activePart7Id(id);
+      });
+    }
+    return plans;
   }
 
   static sentenceDrills():ToeicSentenceDrill[] {
@@ -199,7 +411,7 @@ export class PresetToeicContent {
   static isHighErrorReviewDay(day:number):boolean { return day===20; }
 
   static questionsThroughDay(maxDay:number):ToeicQuestion[] {
-    let all=PresetToeicContent.publishedQuestions();
+    let all=PresetToeicContent.liveTrainingQuestions();
     let plans=PresetToeicContent.studyDays();
     let result:ToeicQuestion[]=[];
     for (let plan of plans) {
@@ -213,22 +425,41 @@ export class PresetToeicContent {
         }
       }
     }
+    // A v2 paper replaces only new Day14/19 sessions, never the archived
+    // Part 7 answers stored in existing learners' error and slow-item queues.
+    // Include published v1 P7 IDs as review candidates only after their day.
+    // Do NOT re-add them to studyDays()/questionsForDay() for fresh mock runs.
+    for (let question of all) {
+      let oldDay14=maxDay>=14 && question.id.startsWith('R-M1-P7-');
+      let oldDay19=maxDay>=19 && question.id.startsWith('R-M2-P7-');
+      // Day19 v2 also replaces the first archived Part6 passage with four
+      // independent sentence-completion IDs. Preserve historic P6 mistakes.
+      let oldDay19Part6=maxDay>=19 && question.id.startsWith('R-M2-P6-');
+      if ((oldDay14 || oldDay19 || oldDay19Part6) &&
+          !PresetToeicContent.containsQuestionId(result,question.id)) result.push(question);
+    }
     return result;
   }
 
   static questionsForDay(day:number):ToeicQuestion[] {
     let plan=PresetToeicContent.studyDay(day);
-    let all=PresetToeicContent.publishedQuestions();
+    let all=PresetToeicContent.liveTrainingQuestions();
     let result:ToeicQuestion[]=[];
     for (let id of plan.questionIds) {
       for (let question of all) if (question.id===id) { result.push(question); break; }
+    }
+    // Daily extra passages are genuine planned exercises, not a separate bonus session.
+    // Historical Day14/19 items remain unchanged; new sessions use the two v2 banks.
+    for (let question of PresetToeicContent.supplementaryReadingQuestionsForDay(day)) {
+      if (!PresetToeicContent.containsQuestionId(result,question.id)) result.push(question);
     }
     return result;
   }
 
   static questionsRequiringTranslation():ToeicQuestion[] {
     let result:ToeicQuestion[]=[];
-    for (let day=1; day<=13; day++) {
+    for (let day=1; day<=21; day++) {
+      if (PresetToeicContent.isMockDay(day)) continue;
       let dayQuestions=PresetToeicContent.questionsForDay(day);
       for (let question of dayQuestions) result.push(question);
     }
@@ -239,7 +470,8 @@ export class PresetToeicContent {
     let plan=PresetToeicContent.studyDay(day);
     let all=PresetToeicContent.vocabulary();
     let result:ToeicVocabularyItem[]=[];
-    for (let id of plan.vocabularyIds) {
+    let assigned=plan.vocabularyIds.concat(ToeicVocabularyExpansion.idsForDay(day)).concat(ToeicVocabularyBatchTwo.idsForDay(day)).concat(ToeicVocabularyBatchThree.idsForDay(day)).concat(ToeicVocabularyBatchFour.idsForDay(day)).concat(ToeicVocabularyBatchFive.idsForDay(day)).concat(ToeicVocabularyBatchSix.idsForDay(day)).concat(ToeicVocabularyBatchSeven.idsForDay(day));
+    for (let id of assigned) {
       for (let item of all) if (item.id===id) { result.push(item); break; }
     }
     return result;

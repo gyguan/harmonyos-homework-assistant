@@ -1,0 +1,32 @@
+R-M1-P6-031|办公室会计团队搬迁公告中，客户服务时间不受影响自然承接搬迁安排|食堂早餐与办公室搬迁无关|去年招聘实习生不属于此次搬迁信息|停车证十二月到期与搬迁无关
+R-M1-P6-032|Please label every box clearly 需副词修饰标注动作|clear 是形容词不能直接修饰 label 动词|clarity 是名词|clearing 是动词分词不表示清晰标注
+R-FM1-P6-033|The IT team 将断线也将重新连线，and 后主语需要 they|them 是宾格不可作主语|their 需跟名词|themselves 不能单独代替主语
+R-M1-P6-034|周五断线周一到岗前重连，周一即可在新区域工作|七月野餐不相关|发票墨色不相关|大堂盆栽不相关
+R-M1-P6-035|make assistance more accessible 形容词表示服务更易获得|access 是名词或动词|accessibly 是副词|accessibility 是名词
+R-M1-P6-036|客服更早开门后说明试行三个月，能够承接时间调整|仓库位置不涉及客服|员工停车证无关|印刷产品目录不属于延时客服
+R-M1-P6-037|requests are answered 使用 be 动词被动过去分词|answer 为原形不能紧跟 are 表被动|answering 为主动进行|answers 第三人称词形无法紧跟 are
+R-M1-P6-038|the new schedule is implemented 表被动，需过去分词|implement 为原形|implementing 为进行分词而未用 being|implementation 是名词
+R-M1-P6-039|participants are advised to bring 为被动过去分词|advise 为原形|advising 为现在分词|advice 是名词
+R-M1-P6-040|签到点在北侧大堂，补充注册台领胸牌紧接上下文|去年搬仓库是无关往事|开票项目代码不属于研讨会签到|车站午夜关门无关
+R-M1-P6-041|notify us by October 12 表示饮食限制通知的最迟日期|among 用于群体内部|beside 表地点|through 是经过过程不表示最迟截止
+R-M1-P6-042|look forward to welcoming you 中 to 为介词，接动名词|welcome 原形不能直接跟此前置词|welcomes 为单数动词|welcomed 为过去分词
+R-M1-P6-043|revised delivery estimate 要形容词，指更新后的预计到货日|revise 为动词原形|revision 为名词|revising 为主动分词非被修改的预估
+R-M1-P6-044|线上订单查询后继续说明物流扫描后更新轨迹，顺序连贯|会议室座位数无关物流|应聘推荐人无关|食堂菜单无关天气配送
+R-M1-P6-045|refund will appear within five business days 指五工作日内到账|across 不表示期限内|beside 表位置|until five business days 不构成规范期限表达
+R-M1-P6-046|this delay may cause inconvenience，情态动词后需动词原形|causes 为第三人称单数|caused 是过去时|causing 为现在分词
+R-FM2-P6-001|Because the warehouse is normally closed，解释仅指派员工能入场的背景|Despite 后不能直接接完整从句|Unless 表条件例外不符合已定的入场限制|During 为介词不能接完整从句
+R-FM2-P6-002|when they arrive 未来时间从句用一般现在时|arrived 为过去时不符合将来盘点|will arriving 结构错误|arrival 为名词
+R-FM2-P6-003|文档要求各产品货架与盘点清单一致，因此不能在盘点时跨货架移动产品，应选择完整句D|A允许任意变动位置编码违背账实一致|B把库存检查单改成销售册违背已发清单|C允许未获指派者入库违背仅限指派人员
+R-FM2-P6-017|work to be completed by noon 表示工作被完成，答案是 B completed|completes 为单数谓语不能接 to be|completing 不能构成工作作为受事的被动|completion 名词不能在此与 be 构成所需完成结构
+R-M2-P6-005|While this work is underway 后完整从句表示施工期间|Unless 表除非不适合关闭期间事实|Because of 不能接完整从句|Therefore 是副词不能在此直接引导从句
+R-M2-P6-006|首层关闭，访客可 instead 使用二楼作为替代区域|rarely 表频率不是替代地点|already 表已发生不符|still 表仍继续却未解释替代关系
+R-M2-P6-007|desk 移近入口是为了让工作人员容易 find|borrow 表借阅不是找到员工|repair 维修人员不合|publish 发表人员不合
+R-FM2-P6-018|improvements are completed 采用过去分词被动表示施工完成，答案为 B|completion 是名词不能直接作被动谓语|completing 为主动分词且改善工程不是施动者|completeness 名词不能作被动谓语
+R-FM2-P6-009|the instructor was required to attend 被动描述被安排出席会议|were required 与单数 instructor 不一致|is requiring 后不能直接不定式作受事人要求|have been required 与单数主语不一致
+R-M2-P6-010|reservations will be transferred automatically 副词修饰被动|automatic 为形容词|automation 为名词|automate 为动词
+R-M2-P6-011|Cancellation requests 是取消申请的名词修饰语|Cancel 为动词原形|Canceled 带已取消意味且不表示申请取消|Canceling 为分词，取消申请通常名词定语
+R-M2-P6-012|may have caused 已有不便，用情态完成式后过去分词|cause 为原形|causing 为现在分词|causes 为单数谓语
+R-M2-P6-013|destination code 单数，谓语 matches|match 缺第三人称单数 -es|matching 缺助动词|matched 为过去时与新规定现在一般描述不符
+R-M2-P6-014|which 引导逗号后非限定关系从句指前句可能退回纠错|who 只能指人|where 表地点不符|whose 是所有格需接名词
+R-M2-P6-015|主管会介绍新流程，Therefore 所有包装员工应到会，表结果|Although 表让步不具结果连接含义|Unless 为条件不是独立副词|Meanwhile 表同时而非因此
+R-M2-P6-016|if you are uncertain about any step 中形容词作表语|uncertainty 为名词|uncertainly 是副词|certify 是动词

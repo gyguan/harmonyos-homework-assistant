@@ -38,6 +38,21 @@ export class ToeicCoachFixture {
       return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
         sentenceDrills.length,studyDays.length);
     }
+    for (let day=1; day<=21; day++) {
+      let fixedDayQuestions=PresetToeicContent.questionsForDay(day);
+      if (fixedDayQuestions.length>1) {
+        let optionSignatures:string[]=[];
+        for (let fixedQuestion of fixedDayQuestions) {
+          let signature=fixedQuestion.options.join('\u0001');
+          if (optionSignatures.indexOf(signature)<0) optionSignatures.push(signature);
+        }
+        if (optionSignatures.length===1) {
+          return new ToeicCoachFixtureResult(false,questions.length,diagnostic.length,vocabulary.length,
+            sentenceDrills.length,studyDays.length);
+        }
+      }
+    }
+
     for (let day=2; day<=7; day++) {
       let dayQuestions=PresetToeicContent.questionsForDay(day);
       if (dayQuestions.length!==6 ||

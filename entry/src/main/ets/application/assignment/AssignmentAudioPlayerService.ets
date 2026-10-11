@@ -9,6 +9,12 @@ export interface AssignmentAudioPlayerCallbacks {
   onError: (message: string) => void;
 }
 
+/**
+ * AVPlayer and Media.Core are optional device capabilities.
+ * AVPlayer is a required product capability because voice/video playback is a core app feature.
+ * The matching production SysCap is declared in syscap.json so unsupported devices are filtered
+ * at distribution/install time. Keep canIUse as a defensive runtime guard for device variations.
+ */
 export class AssignmentAudioPlayerService {
   private player: media.AVPlayer | null = null;
   private sourceFile: fileIo.File | null = null;
@@ -83,11 +89,7 @@ export class AssignmentAudioPlayerService {
       let duration = player.duration > 0 ? player.duration : 0;
       let target = Math.floor(Math.max(0, duration > 0 ? Math.min(timeMs, duration) : timeMs));
       try {
-        if (canIUse('SystemCapability.Multimedia.Media.Core')) {
-          player.seek(target, media.SeekMode.SEEK_PREV_SYNC);
-        } else {
-          player.seek(target);
-        }
+        player.seek(target);
       } catch {
         if (this.callbacks !== null) this.callbacks.onError('无法跳转到该播放位置');
       }

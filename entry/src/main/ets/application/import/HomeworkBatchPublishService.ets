@@ -22,6 +22,7 @@ import { AssignmentDueDate } from '../../domain/service/AssignmentDueDate';
 
 export interface HomeworkBatchPublishResult {
   publishedCount: number;
+  assignments: Assignment[];
 }
 
 export class HomeworkBatchPublishService {
@@ -77,7 +78,7 @@ export class HomeworkBatchPublishService {
     DefaultAssignmentRepository.instance.applyAuthoritativeBatch(mapped);
     inbox.markBatchPublished(batchId);
     if (clearCurrentDraft) this.drafts.clearCandidates();
-    return { publishedCount: mapped.length };
+    return { publishedCount: mapped.length, assignments: mapped.slice() };
   }
 
   private sourceBatchId(candidate: CandidateAssignment): string {

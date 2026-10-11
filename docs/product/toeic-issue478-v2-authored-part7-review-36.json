@@ -1,0 +1,1061 @@
+{
+  "schemaVersion": 1,
+  "issue": 478,
+  "reviewDate": "2026-10-09",
+  "reviewMode": "AI_FIRST_PASS",
+  "notExpertCertified": true,
+  "scope": {
+    "authoredNewPart7": 36,
+    "day14": 15,
+    "day19": 21,
+    "incorrectOptionExclusions": 108,
+    "derivedPart7Separate": 72,
+    "part6Excluded": true
+  },
+  "items": [
+    {
+      "assetId": "R-FM1-P7-S09-01",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-S09-01",
+        "skill": "DETAIL",
+        "passage": "AFTER-HOURS ACCESS NOTICE\n[1] After 6 P.M., the west lobby entrance is locked. [2] Employees with active staff badges may use the north entrance until 9 P.M. [3] Visitors must call the reception desk before entering and check in with Security. [4] Any temporary badges must be returned before leaving.",
+        "stem": "Which entrance can badge holders use after 6 P.M.?",
+        "options": [
+          "The west lobby",
+          "The north entrance",
+          "The loading dock",
+          "The south garage"
+        ],
+        "answerIndex": 1,
+        "explanation": "员工晚上可使用北侧入口。",
+        "evidence": "Employees with active staff badges may use the north entrance until 9 P.M.",
+        "version": 1
+      },
+      "correctBasis": "员工工牌持有人晚间走北门",
+      "distractorReasons": [
+        "西大堂已上锁",
+        "没写使用装卸区",
+        "没有南车库权限"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-S09-02",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-S09-02",
+        "skill": "DETAIL",
+        "passage": "AFTER-HOURS ACCESS NOTICE\n[1] After 6 P.M., the west lobby entrance is locked. [2] Employees with active staff badges may use the north entrance until 9 P.M. [3] Visitors must call the reception desk before entering and check in with Security. [4] Any temporary badges must be returned before leaving.",
+        "stem": "What must visitors do before entering?",
+        "options": [
+          "Pay an access fee",
+          "Use the loading dock",
+          "Call reception and check in with Security",
+          "Return a staff badge"
+        ],
+        "answerIndex": 2,
+        "explanation": "访客先联系接待处并向安保登记。",
+        "evidence": "Visitors must call the reception desk before entering and check in with Security.",
+        "version": 1
+      },
+      "correctBasis": "访客须联系前台并登记安保",
+      "distractorReasons": [
+        "并无入场费",
+        "没要求走卸货口",
+        "临时证离开才归还"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-S09-03",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-S09-03",
+        "skill": "SENTENCE_LOCATION",
+        "passage": "AFTER-HOURS ACCESS NOTICE\n[1] After 6 P.M., the west lobby entrance is locked. [2] Employees with active staff badges may use the north entrance until 9 P.M. [3] Visitors must call the reception desk before entering and check in with Security. [4] Any temporary badges must be returned before leaving.",
+        "stem": "Where should this sentence be inserted? 'Security will issue a temporary badge to each approved visitor.'",
+        "options": [
+          "[1]",
+          "[2]",
+          "[3]",
+          "[4]"
+        ],
+        "answerIndex": 3,
+        "explanation": "登记后发临时卡，之后说明卡片归还。",
+        "evidence": "Visitors must call the reception desk before entering and check in with Security. [4] Any temporary badges must be returned before leaving.",
+        "version": 1
+      },
+      "correctBasis": "安保登记后发临时证、离开时还证，位置4最连贯",
+      "distractorReasons": [
+        "位置1还未提访客",
+        "位置2介绍员工通道",
+        "位置3在登记之前发证"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-S10-01",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-S10-01",
+        "skill": "DETAIL",
+        "passage": "COURSE REGISTRATION NOTICE\nThe October 21 project-planning workshop is limited to 24 participants. Online registration closes at 5 P.M. on October 15. Employees who receive confirmation must bring a laptop with the spreadsheet template already installed. A waiting list will open if the class fills.",
+        "stem": "By when must employees register for the workshop?",
+        "options": [
+          "At 5 P.M. on October 15",
+          "On October 21",
+          "At noon on October 15",
+          "On October 24"
+        ],
+        "answerIndex": 0,
+        "explanation": "截止日期是10月15日下午5点。",
+        "evidence": "Online registration closes at 5 P.M. on October 15.",
+        "version": 1
+      },
+      "correctBasis": "线上报名截止十月十五日下午五点",
+      "distractorReasons": [
+        "二十一日为开课日",
+        "并非十月十五日中午",
+        "二十四日无关"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-S10-02",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-S10-02",
+        "skill": "DETAIL",
+        "passage": "COURSE REGISTRATION NOTICE\nThe October 21 project-planning workshop is limited to 24 participants. Online registration closes at 5 P.M. on October 15. Employees who receive confirmation must bring a laptop with the spreadsheet template already installed. A waiting list will open if the class fills.",
+        "stem": "What should confirmed participants bring?",
+        "options": [
+          "A printed invoice",
+          "An external monitor",
+          "A signed travel claim",
+          "A laptop with the template installed"
+        ],
+        "answerIndex": 3,
+        "explanation": "需携带装有表格模板的笔记本电脑。",
+        "evidence": "Employees who receive confirmation must bring a laptop with the spreadsheet template already installed.",
+        "version": 1
+      },
+      "correctBasis": "学员必须带预装模板的笔记本",
+      "distractorReasons": [
+        "没有发票要求",
+        "无需外接显示器",
+        "不要求差旅审批单"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M1-04",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M1-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "What event is scheduled to begin at 9:15?",
+        "options": [
+          "A training seminar",
+          "A hotel check-in",
+          "A supplier call",
+          "A presentation"
+        ],
+        "answerIndex": 3,
+        "explanation": "9:15开始的是演示汇报。",
+        "evidence": "Our presentation at Central Tower starts at 9:15.",
+        "version": 1
+      },
+      "correctBasis": "客户演示明确九点十五开始",
+      "distractorReasons": [
+        "不是培训会议",
+        "没有酒店登记",
+        "并非供应商电话"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M1-05",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M1-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "At which station does Train 52 arrive at 8:35?",
+        "options": [
+          "Easton",
+          "Central",
+          "Northgate",
+          "Union Park"
+        ],
+        "answerIndex": 1,
+        "explanation": "列车52于8:35到达Central。",
+        "evidence": "Train 52: Easton 7:50 → Central 8:35",
+        "version": 1
+      },
+      "correctBasis": "52次列车8点35到Central",
+      "distractorReasons": [
+        "Easton是出发站",
+        "没有Northgate",
+        "没有Union Park"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M2-04",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M2-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "When does the free-delivery offer end?",
+        "options": [
+          "October 28",
+          "November 1",
+          "September 30",
+          "October 31"
+        ],
+        "answerIndex": 3,
+        "explanation": "优惠截至10月31日。",
+        "evidence": "Offer ends October 31.",
+        "version": 1
+      },
+      "correctBasis": "免标准运送截至十月三十一日",
+      "distractorReasons": [
+        "二十八日是邮件日期",
+        "不是十一月一日",
+        "不是九月三十日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M2-05",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M2-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "On what date was the customer email sent?",
+        "options": [
+          "October 31",
+          "October 28",
+          "October 20",
+          "November 28"
+        ],
+        "answerIndex": 1,
+        "explanation": "邮件日期是10月28日。",
+        "evidence": "CUSTOMER E-MAIL dated October 28",
+        "version": 1
+      },
+      "correctBasis": "顾客邮件署日期十月二十八日",
+      "distractorReasons": [
+        "三十一日为优惠截止",
+        "二十日没有标注",
+        "十一月二十八日无关"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M3-04",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M3-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "When must invoice 3118 be paid?",
+        "options": [
+          "November 7",
+          "November 5",
+          "October 31",
+          "November 6"
+        ],
+        "answerIndex": 3,
+        "explanation": "付款截止日为11月6日。",
+        "evidence": "Due date: Nov. 6",
+        "version": 1
+      },
+      "correctBasis": "3118发票到期日为十一月六日",
+      "distractorReasons": [
+        "七日晚于到期",
+        "五日不是合同到期日",
+        "十月三十一日非截止"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M3-05",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M3-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "What did Finance advise the customer to do?",
+        "options": [
+          "Cancel the invoice",
+          "Submit the bank transfer early",
+          "Pay an additional service charge",
+          "Request a new due date"
+        ],
+        "answerIndex": 1,
+        "explanation": "财务建议提前汇款，以便最迟11月6日完成入账。",
+        "evidence": "Finance has advised submitting the transfer early enough for it to post by November 6.",
+        "version": 1
+      },
+      "correctBasis": "财务建议提前转账保证六日前到账",
+      "distractorReasons": [
+        "没取消发票",
+        "没增缴费用建议",
+        "没有提出延期"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M4-04",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M4-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "Where will the team meeting be held?",
+        "options": [
+          "At the bus station",
+          "At Easton",
+          "At the training center",
+          "At the Downtown office"
+        ],
+        "answerIndex": 3,
+        "explanation": "会议地点是Downtown办公室。",
+        "evidence": "The team meeting begins at 9:00 in the Downtown office.",
+        "version": 1
+      },
+      "correctBasis": "团队会议将在Downtown办公室举行",
+      "distractorReasons": [
+        "不是公交车站",
+        "不是Easton",
+        "未指定培训中心"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M4-05",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M4-05",
+        "skill": "CROSS_DOCUMENT",
+        "passage": "",
+        "stem": "At what time would Harper reach the office after taking the bus mentioned in the message?",
+        "options": [
+          "8:40",
+          "8:50",
+          "9:00",
+          "9:10"
+        ],
+        "answerIndex": 1,
+        "explanation": "Harper乘坐8:40到站的巴士，步行10分钟后8:50到办公室。",
+        "evidence": "I will take the Route 7 bus that reaches Downtown at 8:40. || It takes about 10 minutes to walk from the bus stop.",
+        "version": 1
+      },
+      "correctBasis": "8点40下车再走十分钟，8点50到办公室",
+      "distractorReasons": [
+        "8点40只是到站",
+        "9点是会议开始",
+        "9点10是后车到站"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M5-04",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M5-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "When is the marketing assistant position scheduled to begin?",
+        "options": [
+          "November 8",
+          "November 10",
+          "November 25",
+          "December 1"
+        ],
+        "answerIndex": 3,
+        "explanation": "职位计划12月1日开始。",
+        "evidence": "start date Dec. 1",
+        "version": 1
+      },
+      "correctBasis": "招聘信息表明12月1日开始",
+      "distractorReasons": [
+        "8日为申请邮件日期",
+        "10日为报名截止",
+        "25日为申请者可入职"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM1-P7-M5-05",
+      "mockDay": 14,
+      "sourceFile": "ToeicMockDay14V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM1-P7-M5-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "What will the recruiter do before the application deadline?",
+        "options": [
+          "Arrange office equipment",
+          "Review the candidate's résumé",
+          "Issue a travel voucher",
+          "Cancel the job posting"
+        ],
+        "answerIndex": 1,
+        "explanation": "招聘人员表示将在11月10日截止前审阅简历。",
+        "evidence": "We have received the résumé and will review it before the application deadline on November 10.",
+        "version": 1
+      },
+      "correctBasis": "招聘跟进信将在截止前审查简历",
+      "distractorReasons": [
+        "不是购买器材",
+        "没有赠送旅游券",
+        "职位没有取消"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S07-01",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S07-01",
+        "skill": "DETAIL",
+        "passage": "PRODUCT SAFETY UPDATE\n[1] Production of the Model R desk lamp is temporarily paused while the power adapter is inspected. [2] Customers who bought the lamp after May 1 should contact the service desk with their receipt number. [3] The service desk will arrange collection of eligible units at no charge. [4] Replacement adapters will be sent within five working days after the lamps are checked.",
+        "stem": "Why was production of the desk lamp paused?",
+        "options": [
+          "A supplier raised prices",
+          "Adapters require inspection",
+          "A new color was introduced",
+          "Demand declined"
+        ],
+        "answerIndex": 1,
+        "explanation": "暂停生产是为了检查电源适配器。",
+        "evidence": "Production of the Model R desk lamp is temporarily paused while the power adapter is inspected.",
+        "version": 1
+      },
+      "correctBasis": "暂停生产是检查电源适配器",
+      "distractorReasons": [
+        "未提供应商涨价",
+        "没有新配色",
+        "需求未说减少"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S07-02",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S07-02",
+        "skill": "DETAIL",
+        "passage": "PRODUCT SAFETY UPDATE\n[1] Production of the Model R desk lamp is temporarily paused while the power adapter is inspected. [2] Customers who bought the lamp after May 1 should contact the service desk with their receipt number. [3] The service desk will arrange collection of eligible units at no charge. [4] Replacement adapters will be sent within five working days after the lamps are checked.",
+        "stem": "What must eligible customers provide?",
+        "options": [
+          "A copy of the warranty policy",
+          "An installation photo",
+          "Their receipt number",
+          "A shipping label"
+        ],
+        "answerIndex": 2,
+        "explanation": "需提供收据编号。",
+        "evidence": "contact the service desk with their receipt number.",
+        "version": 1
+      },
+      "correctBasis": "符合条件者须报收据编号",
+      "distractorReasons": [
+        "无需保修政策副本",
+        "未要求安装照片",
+        "不需要顾客寄标签"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S07-03",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S07-03",
+        "skill": "SENTENCE_LOCATION",
+        "passage": "PRODUCT SAFETY UPDATE\n[1] Production of the Model R desk lamp is temporarily paused while the power adapter is inspected. [2] Customers who bought the lamp after May 1 should contact the service desk with their receipt number. [3] The service desk will arrange collection of eligible units at no charge. [4] Replacement adapters will be sent within five working days after the lamps are checked.",
+        "stem": "Where best insert: 'Customers will be contacted to arrange a convenient pickup time.'",
+        "options": [
+          "[1]",
+          "[2]",
+          "[3]",
+          "[4]"
+        ],
+        "answerIndex": 3,
+        "explanation": "回收安排后紧接具体联系取件时间，再说更换发货。",
+        "evidence": "The service desk will arrange collection of eligible units at no charge. [4] Replacement adapters will be sent",
+        "version": 1
+      },
+      "correctBasis": "先安排回收、后安排具体取件时间，位置4最佳",
+      "distractorReasons": [
+        "位置1未提出问题",
+        "位置2早于回收流程",
+        "位置3仍未提出回收"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S08-01",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S08-01",
+        "skill": "DETAIL",
+        "passage": "EMPLOYEE BENEFITS NOTICE\nStarting January 1, staff who have worked at the company for at least six months can claim up to $120 annually for approved professional books. Claims must include the original purchase receipt and be submitted through the employee portal by December 15. Unused allowances do not carry into the following year.",
+        "stem": "Who is eligible for the professional-book allowance?",
+        "options": [
+          "All temporary visitors",
+          "Only department managers",
+          "Employees with at least six months of service",
+          "Only new hires"
+        ],
+        "answerIndex": 2,
+        "explanation": "须任职至少六个月。",
+        "evidence": "staff who have worked at the company for at least six months",
+        "version": 1
+      },
+      "correctBasis": "图书津贴面向工龄半年以上员工",
+      "distractorReasons": [
+        "访客不符合工龄",
+        "不是经理专享",
+        "不是新员工专享"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S08-02",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S08-02",
+        "skill": "DETAIL",
+        "passage": "EMPLOYEE BENEFITS NOTICE\nStarting January 1, staff who have worked at the company for at least six months can claim up to $120 annually for approved professional books. Claims must include the original purchase receipt and be submitted through the employee portal by December 15. Unused allowances do not carry into the following year.",
+        "stem": "What must accompany an allowance claim?",
+        "options": [
+          "A course certificate",
+          "An original purchase receipt",
+          "A travel approval",
+          "A library card"
+        ],
+        "answerIndex": 1,
+        "explanation": "报销需原始购买收据。",
+        "evidence": "Claims must include the original purchase receipt",
+        "version": 1
+      },
+      "correctBasis": "图书报销需原始购买小票",
+      "distractorReasons": [
+        "不要求课程证书",
+        "不是差旅报销",
+        "借书卡不是购买证明"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S08-03",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S08-03",
+        "skill": "DETAIL",
+        "passage": "EMPLOYEE BENEFITS NOTICE\nStarting January 1, staff who have worked at the company for at least six months can claim up to $120 annually for approved professional books. Claims must include the original purchase receipt and be submitted through the employee portal by December 15. Unused allowances do not carry into the following year.",
+        "stem": "What happens to any unused annual allowance?",
+        "options": [
+          "It is refunded in cash",
+          "It doubles next year",
+          "It can be transferred to another employee",
+          "It does not carry over"
+        ],
+        "answerIndex": 3,
+        "explanation": "未使用金额不能结转下一年。",
+        "evidence": "Unused allowances do not carry into the following year.",
+        "version": 1
+      },
+      "correctBasis": "年度剩余额度不可结转",
+      "distractorReasons": [
+        "没有现金退付",
+        "次年不能翻倍",
+        "没说可转给同事"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S09-01",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S09-01",
+        "skill": "DETAIL",
+        "passage": "CUSTOMER SUPPORT CHAT\n09:12 — Customer: The wireless headset I ordered arrived without a charging cable.\n09:14 — Support: I am sorry about that. Please provide order number 5824 in the support form. We will ship the missing cable at no cost by express post tomorrow.\n09:16 — Customer: Thank you. The headset itself works normally, so I do not need a replacement unit.",
+        "stem": "What problem does the customer report?",
+        "options": [
+          "A missing charging cable",
+          "A damaged headset",
+          "A late invoice",
+          "An incorrect billing address"
+        ],
+        "answerIndex": 0,
+        "explanation": "缺少充电线。",
+        "evidence": "arrived without a charging cable.",
+        "version": 1
+      },
+      "correctBasis": "耳机缺失充电电缆",
+      "distractorReasons": [
+        "耳机本身正常",
+        "没有延期发票",
+        "账单地址未错"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S09-02",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S09-02",
+        "skill": "DETAIL",
+        "passage": "CUSTOMER SUPPORT CHAT\n09:12 — Customer: The wireless headset I ordered arrived without a charging cable.\n09:14 — Support: I am sorry about that. Please provide order number 5824 in the support form. We will ship the missing cable at no cost by express post tomorrow.\n09:16 — Customer: Thank you. The headset itself works normally, so I do not need a replacement unit.",
+        "stem": "How will Support send the missing part?",
+        "options": [
+          "By ordinary surface mail",
+          "With the next headset order",
+          "By express post",
+          "Through in-store pickup"
+        ],
+        "answerIndex": 2,
+        "explanation": "将免费使用加急邮寄。",
+        "evidence": "ship the missing cable at no cost by express post tomorrow.",
+        "version": 1
+      },
+      "correctBasis": "客服会免费加急邮寄缺件",
+      "distractorReasons": [
+        "不走普通平邮",
+        "不是连下次耳机订单",
+        "不需要门店领取"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S09-03",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S09-03",
+        "skill": "DETAIL",
+        "passage": "CUSTOMER SUPPORT CHAT\n09:12 — Customer: The wireless headset I ordered arrived without a charging cable.\n09:14 — Support: I am sorry about that. Please provide order number 5824 in the support form. We will ship the missing cable at no cost by express post tomorrow.\n09:16 — Customer: Thank you. The headset itself works normally, so I do not need a replacement unit.",
+        "stem": "Why is a replacement headset unnecessary?",
+        "options": [
+          "The customer canceled the order",
+          "The store is closed",
+          "The order has already been refunded",
+          "The headset itself works normally"
+        ],
+        "answerIndex": 3,
+        "explanation": "耳机主机工作正常，无需更换。",
+        "evidence": "The headset itself works normally, so I do not need a replacement unit.",
+        "version": 1
+      },
+      "correctBasis": "耳机本体正常因此无需换整机",
+      "distractorReasons": [
+        "未取消订单",
+        "没有关店记录",
+        "没有退款"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S10-01",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S10-01",
+        "skill": "DETAIL",
+        "passage": "DELIVERY OPERATIONS NOTICE\nThe central warehouse will change its truck dispatch time from 4 P.M. to 3:30 P.M. beginning June 8. Orders entered after 2 P.M. will be scheduled for the next business day. Drivers should collect revised route sheets at the dispatch office before departure.",
+        "stem": "When will the new dispatch time take effect?",
+        "options": [
+          "June 7",
+          "June 8",
+          "June 18",
+          "July 8"
+        ],
+        "answerIndex": 1,
+        "explanation": "新时间6月8日起生效。",
+        "evidence": "beginning June 8.",
+        "version": 1
+      },
+      "correctBasis": "发车时刻变更六月八日生效",
+      "distractorReasons": [
+        "不是六月七日",
+        "六月十八日无关",
+        "不是七月八日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-S10-02",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-S10-02",
+        "skill": "DETAIL",
+        "passage": "DELIVERY OPERATIONS NOTICE\nThe central warehouse will change its truck dispatch time from 4 P.M. to 3:30 P.M. beginning June 8. Orders entered after 2 P.M. will be scheduled for the next business day. Drivers should collect revised route sheets at the dispatch office before departure.",
+        "stem": "What should drivers collect before leaving?",
+        "options": [
+          "New uniforms",
+          "Fuel vouchers",
+          "Purchase receipts",
+          "Revised route sheets"
+        ],
+        "answerIndex": 3,
+        "explanation": "司机出发前领取更新路线单。",
+        "evidence": "Drivers should collect revised route sheets at the dispatch office before departure.",
+        "version": 1
+      },
+      "correctBasis": "司机出发前须领取新版行驶路线单",
+      "distractorReasons": [
+        "未换制服",
+        "无燃油代金券",
+        "不领购物票据"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M1-04",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M1-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "At what time does Train 102 arrive at Central?",
+        "options": [
+          "9:00",
+          "8:35",
+          "7:40",
+          "9:25"
+        ],
+        "answerIndex": 3,
+        "explanation": "102次列车9:25到达Central。",
+        "evidence": "102: Bayview 8:30 → Central 9:25",
+        "version": 1
+      },
+      "correctBasis": "102次车9点25抵达Central",
+      "distractorReasons": [
+        "9点是94次",
+        "8点35是88次",
+        "7点40是88次出发"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M1-05",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M1-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "How much time before the briefing does the message request?",
+        "options": [
+          "10 minutes",
+          "20 minutes",
+          "30 minutes",
+          "45 minutes"
+        ],
+        "answerIndex": 1,
+        "explanation": "需要至少提前20分钟到站。",
+        "evidence": "Please arrive at Central Station at least 20 minutes before the meeting",
+        "version": 1
+      },
+      "correctBasis": "通知要求至少提前二十分钟到车站",
+      "distractorReasons": [
+        "十分钟不足",
+        "三十分钟并非题问最低值",
+        "四十五分钟未指定"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M2-04",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M2-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "Which product is eligible for the coupon?",
+        "options": [
+          "A desk organizer",
+          "A printer",
+          "A standing desk",
+          "An office chair"
+        ],
+        "answerIndex": 3,
+        "explanation": "优惠适用于办公椅。",
+        "evidence": "20% off one office chair.",
+        "version": 1
+      },
+      "correctBasis": "券优惠对象明确是办公椅",
+      "distractorReasons": [
+        "收纳器不是优惠商品",
+        "打印机非适用范围",
+        "不含升降桌"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M2-05",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M2-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "Can the coupon be combined with another discount?",
+        "options": [
+          "Yes, for all products",
+          "No, the conditions prohibit it",
+          "Yes, on weekends only",
+          "Only when purchasing two chairs"
+        ],
+        "answerIndex": 1,
+        "explanation": "优惠券不能与其他折扣叠加。",
+        "evidence": "Cannot be combined with other discounts.",
+        "version": 1
+      },
+      "correctBasis": "优惠券不得与其他优惠叠加",
+      "distractorReasons": [
+        "不是任意商品可组合",
+        "周末也无例外",
+        "两把椅子不是例外"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M3-04",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M3-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "On what date will the Leadership Forum be held?",
+        "options": [
+          "November 3",
+          "November 10",
+          "November 6",
+          "November 5"
+        ],
+        "answerIndex": 3,
+        "explanation": "论坛于11月5日举行。",
+        "evidence": "Leadership Forum — November 5",
+        "version": 1
+      },
+      "correctBasis": "论坛日期十一月五日",
+      "distractorReasons": [
+        "非十一月三日",
+        "非十一月十日",
+        "非十一月六日"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M3-05",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M3-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "What is the venue's parking fee?",
+        "options": [
+          "$10",
+          "$12",
+          "$20",
+          "Parking is free"
+        ],
+        "answerIndex": 1,
+        "explanation": "停车费为12美元。",
+        "evidence": "Parking at the venue costs $12.",
+        "version": 1
+      },
+      "correctBasis": "会场停车费用十二美元",
+      "distractorReasons": [
+        "不是十美元",
+        "不是二十美元",
+        "不是免费停车"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M4-04",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M4-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "When was the scanner originally purchased?",
+        "options": [
+          "February 20",
+          "April 12",
+          "May 12",
+          "March 12"
+        ],
+        "answerIndex": 3,
+        "explanation": "收据日期为3月12日。",
+        "evidence": "Scanner purchased March 12.",
+        "version": 1
+      },
+      "correctBasis": "扫码器三月十二日买入",
+      "distractorReasons": [
+        "二月二十日是报修",
+        "四月十二日没出现",
+        "五月十二日没出现"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M4-05",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M4-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "What kind of damage is excluded from warranty coverage?",
+        "options": [
+          "Manufacturing defects",
+          "Damage caused by dropping or water",
+          "Failure to power on without damage",
+          "A defective internal component"
+        ],
+        "answerIndex": 1,
+        "explanation": "跌落或进水损坏不在保修范围。",
+        "evidence": "Damage caused by dropping or water is excluded.",
+        "version": 1
+      },
+      "correctBasis": "保修明文排除进水和跌落损坏",
+      "distractorReasons": [
+        "制造缺陷可保",
+        "无碰撞而无法开机不属排除",
+        "内部故障可能可保"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M5-04",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M5-04",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "What spreadsheet qualification does Dario list?",
+        "options": [
+          "Basic orientation attendance",
+          "A manager recommendation",
+          "No spreadsheet experience",
+          "An advanced spreadsheet certification"
+        ],
+        "answerIndex": 3,
+        "explanation": "简历列明高级电子表格认证。",
+        "evidence": "advanced spreadsheet certification.",
+        "version": 1
+      },
+      "correctBasis": "简历列有高级电子表格认证",
+      "distractorReasons": [
+        "不是基础培训",
+        "无经理推荐",
+        "不是没有表格经验"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    },
+    {
+      "assetId": "R-FM2-P7-M5-05",
+      "mockDay": 19,
+      "sourceFile": "ToeicMockDay19V2Content.ets",
+      "questionSnapshot": {
+        "id": "R-FM2-P7-M5-05",
+        "skill": "DETAIL",
+        "passage": "",
+        "stem": "What position is advertised?",
+        "options": [
+          "Operations Coordinator",
+          "Sales Assistant",
+          "Warehouse Driver",
+          "Marketing Intern"
+        ],
+        "answerIndex": 0,
+        "explanation": "招聘职位是运营协调员。",
+        "evidence": "Operations Coordinator: minimum two years of logistics experience",
+        "version": 1
+      },
+      "correctBasis": "职位标题Operations Coordinator",
+      "distractorReasons": [
+        "不是销售助理",
+        "不是仓库司机",
+        "不是市场实习生"
+      ],
+      "reviewOutcome": "AI_FIRST_PASS",
+      "isExpertCertified": false
+    }
+  ]
+}

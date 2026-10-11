@@ -6,9 +6,14 @@ import {
 export class ToeicWeekOneContent {
   static studyDays():ToeicStudyDay[] {
     return [
-      new ToeicStudyDay(1,'快速诊断','先判断词汇、Part 5/6/7 与速度瓶颈',15,[],[],[
+      // 20-question comprehensive baseline: P5 10 / P6 4 / P7 6.
+      // Reuse existing published IDs and keep shared P6 and P7 passages adjacent.
+      new ToeicStudyDay(1,'综合诊断','一次测出词汇语法、篇章理解与跨文档阅读的薄弱点',25,[],[],[
         'R-P5-WF-0001','R-P5-VOICE-0002','R-P5-PREP-0003','R-P5-CONJ-0004','R-P5-COL-0005','R-P5-VOC-0006',
-        'R-P6-CTX-0001','R-P6-WF-0002','R-P7-DETAIL-0001','R-P7-PURPOSE-0002','R-P7-PARA-0003','R-P7-DETAIL-0004'
+        'R-DX-P5-01','R-DX-P5-02','R-DX-P5-03','R-DX-P5-04',
+        'R-P6-CTX-0001','R-P6-WF-0002','R-DX-P6-01','R-DX-P6-02',
+        'R-P7-DETAIL-0001','R-P7-PURPOSE-0002','R-P7-PARA-0003','R-P7-DETAIL-0004',
+        'R-DX-P7-03','R-DX-P7-04'
       ]),
       new ToeicStudyDay(2,'词性秒杀','HR 高频词 + 主干识别 + Part 5 词性',75,
         ['V-001','V-002','V-003','V-004','V-031','V-032','V-033','V-034','V-035','V-036','V-037','V-038','V-039','V-040','V-041'],
@@ -104,7 +109,7 @@ export class ToeicWeekOneContent {
 
   static sentenceDrills():ToeicSentenceDrill[] {
     return [
-      new ToeicSentenceDrill('S-001','Applicants for the sales position must submit a resume by Friday.','销售岗位的申请人必须在周五前提交简历。','Applicants must submit a resume.','先找主语 + 谓语 + 宾语','for the sales position 和 by Friday 都是补充信息，先抓主干再补职位和时间。'),
+      new ToeicSentenceDrill('S-001','Applicants for the sales position must submit a resume by Friday.','销售岗位的申请人最迟须在周五当天提交简历。','Applicants must submit a resume.','先找主语 + 谓语 + 宾语','for the sales position 和 by Friday 都是补充信息；by Friday 指最迟周五（含当天），先抓主干再补条件。'),
       new ToeicSentenceDrill('S-002','The candidates selected for interviews will receive an email this afternoon.','入选面试的候选人将在今天下午收到一封电子邮件。','The candidates will receive an email.','过去分词作后置修饰','selected for interviews 修饰 candidates，不要误当成句子的谓语。'),
       new ToeicSentenceDrill('S-003','Employees in the accounting department attend training every quarter.','会计部门的员工每个季度都参加培训。','Employees attend training.','介词短语修饰主语','in the accounting department 只是限定哪些员工。'),
       new ToeicSentenceDrill('S-004','The manager responsible for recruitment will review all applications.','负责招聘的经理将审核所有申请。','The manager will review all applications.','形容词短语修饰主语','responsible for recruitment 修饰 manager，真正谓语是 will review。'),
@@ -121,7 +126,7 @@ export class ToeicWeekOneContent {
       new ToeicSentenceDrill('S-015','If the client approves the contract, work will begin next month.','如果客户批准合同，工作将于下个月开始。','Work will begin next month.','条件从句','If 从句是条件，主句才是结果。'),
       new ToeicSentenceDrill('S-016','The equipment that was installed last month requires additional maintenance.','上个月安装的设备需要额外维护。','The equipment requires additional maintenance.','定语从句','that was installed last month 修饰 equipment。'),
       new ToeicSentenceDrill('S-017','Employees working in the temporary office should use the east entrance.','在临时办公室工作的员工应使用东侧入口。','Employees should use the east entrance.','现在分词修饰','working in the temporary office 修饰 employees。'),
-      new ToeicSentenceDrill('S-018','The building will remain closed while electrical repairs are being completed.','在电气维修完成期间，大楼将继续关闭。','The building will remain closed.','时间从句 + 被动进行','while 后说明关闭期间发生的工作。'),
+      new ToeicSentenceDrill('S-018','The building will remain closed while electrical repairs are being completed.','在电气维修进行期间，大楼将继续关闭。','The building will remain closed.','时间从句 + 被动进行','while 后说明关闭期间发生的工作。'),
       new ToeicSentenceDrill('S-019','A notice explaining the new access policy was posted near the main entrance.','一则说明新门禁政策的通知张贴在主入口附近。','A notice was posted.','现在分词后置修饰','explaining the new access policy 修饰 notice。'),
       new ToeicSentenceDrill('S-020','The branch, which is currently under renovation, will reopen on Monday.','目前正在装修的该分店将于周一重新营业。','The branch will reopen on Monday.','非限制性定语从句','逗号中的 which 从句是补充说明，可先跳过。'),
       new ToeicSentenceDrill('S-021','Orders placed before noon are usually dispatched on the same business day.','中午前下的订单通常会在同一个工作日发出。','Orders are usually dispatched.','过去分词修饰 + 被动','placed before noon 修饰 orders，are dispatched 是谓语。'),

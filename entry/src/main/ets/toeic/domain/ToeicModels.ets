@@ -22,28 +22,32 @@ export class ToeicQuestion {
   id:string; section:ToeicSection; part:ToeicPart; skill:ToeicSkill; passage:string; stem:string; options:string[];
   correctIndex:number; explanation:string; evidence:string; paraphrase:string; recommendedSeconds:number;
   difficulty:ToeicDifficulty; scoreValue:ToeicScoreValue; reviewStatus:ToeicReviewStatus; version:number;
-  audioAssetId:string; transcript:string; evidenceStartMs:number; evidenceEndMs:number;
+  audioAssetId:string; transcript:string; evidenceStartMs:number; evidenceEndMs:number; groupId:string;
   constructor(id:string, section:ToeicSection, part:ToeicPart, skill:ToeicSkill, passage:string, stem:string,
     options:string[], correctIndex:number, explanation:string, evidence:string, paraphrase:string,
     recommendedSeconds:number, difficulty:ToeicDifficulty, scoreValue:ToeicScoreValue,
     reviewStatus:ToeicReviewStatus=ToeicReviewStatus.PUBLISHED, version:number=1,
-    audioAssetId:string='', transcript:string='', evidenceStartMs:number=0, evidenceEndMs:number=0) {
+    audioAssetId:string='', transcript:string='', evidenceStartMs:number=0, evidenceEndMs:number=0,
+    groupId:string='') {
     this.id=id; this.section=section; this.part=part; this.skill=skill; this.passage=passage; this.stem=stem;
     this.options=options; this.correctIndex=correctIndex; this.explanation=explanation; this.evidence=evidence;
     this.paraphrase=paraphrase; this.recommendedSeconds=recommendedSeconds; this.difficulty=difficulty;
     this.scoreValue=scoreValue; this.reviewStatus=reviewStatus; this.version=version; this.audioAssetId=audioAssetId;
     this.transcript=transcript; this.evidenceStartMs=evidenceStartMs; this.evidenceEndMs=evidenceEndMs;
+    this.groupId=groupId;
   }
 }
 
 export class ToeicVocabularyItem {
   id:string; word:string; partOfSpeech:string; meaning:string; level:ToeicVocabularyLevel; scenario:string;
   collocations:string[]; paraphrases:string[]; ipa:string; pronunciationLocale:string; pronunciationText:string;
+  exampleSentence:string; reviewStatus:ToeicReviewStatus;
   constructor(id:string, word:string, partOfSpeech:string, meaning:string, level:ToeicVocabularyLevel,
-    scenario:string, collocations:string[], paraphrases:string[], ipa:string='', pronunciationLocale:string='en-US', pronunciationText:string='') {
+    scenario:string, collocations:string[], paraphrases:string[], ipa:string='', pronunciationLocale:string='en-US', pronunciationText:string='', exampleSentence:string='', reviewStatus:ToeicReviewStatus=ToeicReviewStatus.PUBLISHED) {
     this.id=id; this.word=word; this.partOfSpeech=partOfSpeech; this.meaning=meaning; this.level=level;
     this.scenario=scenario; this.collocations=collocations; this.paraphrases=paraphrases;
     this.ipa=ipa; this.pronunciationLocale=pronunciationLocale; this.pronunciationText=pronunciationText.length>0?pronunciationText:word;
+    this.exampleSentence=exampleSentence; this.reviewStatus=reviewStatus;
   }
 }
 
@@ -60,7 +64,7 @@ export class ToeicQuestionAttempt {
 export class ToeicDiagnosticSummary {
   correctCount:number=0; totalCount:number=0; slowCount:number=0; weakSkill:ToeicSkill=ToeicSkill.PARAPHRASE;
   part5Correct:number=0; part5Total:number=0; part6Correct:number=0; part6Total:number=0;
-  part7Correct:number=0; part7Total:number=0;
+  part7Correct:number=0; part7Total:number=0; hasWeakSkill:boolean=false;
 }
 
 export class ToeicQuestionHistory {
@@ -76,9 +80,15 @@ export class ToeicQuestionHistory {
 }
 
 export class ToeicLearningSnapshot {
-  schemaVersion:number=3; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
-  totalAnswered:number=0; totalCorrect:number=0; weakSkill:string=ToeicSkill.PARAPHRASE;
+  schemaVersion:number=10; diagnosticCompleted:boolean=false; currentDay:number=1; completedTrainingSessions:number=0;
+  totalAnswered:number=0; totalCorrect:number=0; weakSkill:string='';
   reviewQuestionIds:string[]=[]; slowQuestionIds:string[]=[]; questionHistories:ToeicQuestionHistory[]=[];
+  activeDraft:ToeicSessionDraft|null=null; mockReports:ToeicMockReport[]=[];
+  vocabularyRecalls:ToeicVocabularyRecall[]=[];
+  // Only "not remembered" words are flagged; this persists across study days.
+  unrememberedVocabularyIds:string[]=[];
+  dayTasks:ToeicDayTaskProgress[]=[]; sessionReports:ToeicSessionReport[]=[];
+  skillStats:ToeicSkillStat[]=[];
 }
 
 export class ToeicStudyPlan {
@@ -127,5 +137,117 @@ export class ToeicStudyDay {
     this.vocabularyIds=vocabularyIds;
     this.sentenceDrillIds=sentenceDrillIds;
     this.questionIds=questionIds;
+  }
+}
+
+/** A local snapshot of the active training session. Persisted without scoring until submission. */
+export class ToeicQuestionTime {
+  questionId:string; spentSeconds:number;
+  constructor(questionId:string,spentSeconds:number) {
+    this.questionId=questionId; this.spentSeconds=spentSeconds;
+  }
+}
+
+export class ToeicSessionDraft {
+  day:number; mode:string; questionIds:string[]; currentIndex:number;
+  attempts:ToeicQuestionAttempt[]; questionTimes:ToeicQuestionTime[];
+  startedAtMs:number; advancesProgress:boolean; markedQuestionIds:string[];
+  constructor(day:number,mode:string,questionIds:string[],currentIndex:number,
+    attempts:ToeicQuestionAttempt[],questionTimes:ToeicQuestionTime[],
+    startedAtMs:number,advancesProgress:boolean,markedQuestionIds:string[]=[]) {
+    this.day=day; this.mode=mode; this.questionIds=questionIds;
+    this.currentIndex=currentIndex; this.attempts=attempts; this.questionTimes=questionTimes;
+    this.startedAtMs=startedAtMs; this.advancesProgress=advancesProgress;
+    this.markedQuestionIds=markedQuestionIds;
+  }
+}
+
+/** Canonical option index for one mock item. Old reports may have no records. */
+export class ToeicMockAnswerRecord {
+  questionId:string; questionVersion:number; selectedIndex:number; correct:boolean;
+  constructor(questionId:string,questionVersion:number,selectedIndex:number,correct:boolean) {
+    this.questionId=questionId; this.questionVersion=questionVersion;
+    this.selectedIndex=selectedIndex; this.correct=correct;
+  }
+}
+
+/** A full mock report is kept separately from mutable daily progress statistics. */
+export class ToeicMockReport {
+  day:number; completedAtMs:number; correctCount:number; answeredCount:number;
+  totalCount:number; elapsedSeconds:number; part5Correct:number; part6Correct:number; part7Correct:number;
+  answers:ToeicMockAnswerRecord[];
+  constructor(day:number,completedAtMs:number,correctCount:number,answeredCount:number,
+    totalCount:number,elapsedSeconds:number,part5Correct:number,part6Correct:number,part7Correct:number,
+    answers:ToeicMockAnswerRecord[]=[]) {
+    this.day=day; this.completedAtMs=completedAtMs; this.correctCount=correctCount;
+    this.answeredCount=answeredCount; this.totalCount=totalCount;
+    this.elapsedSeconds=elapsedSeconds; this.part5Correct=part5Correct;
+    this.part6Correct=part6Correct; this.part7Correct=part7Correct;
+    this.answers=answers;
+  }
+}
+
+/** Lightweight scheduled repetition, independent of Homework / Practice. */
+export class ToeicVocabularyRecall {
+  vocabularyId:string; streak:number; totalReviews:number; nextDueAtMs:number; lastReviewedAtMs:number;
+  constructor(vocabularyId:string,streak:number,totalReviews:number,nextDueAtMs:number,lastReviewedAtMs:number) {
+    this.vocabularyId=vocabularyId; this.streak=streak; this.totalReviews=totalReviews;
+    this.nextDueAtMs=nextDueAtMs; this.lastReviewedAtMs=lastReviewedAtMs;
+  }
+}
+
+/** Task completion is independent from a single question session. */
+export class ToeicDayTaskProgress {
+  day:number; vocabularyCompleted:boolean; sentenceCompleted:boolean; trainingCompleted:boolean;
+  constructor(day:number,vocabularyCompleted:boolean=false,
+    sentenceCompleted:boolean=false,trainingCompleted:boolean=false) {
+    this.day=day; this.vocabularyCompleted=vocabularyCompleted;
+    this.sentenceCompleted=sentenceCompleted; this.trainingCompleted=trainingCompleted;
+  }
+}
+
+/** Diagnostic and daily session breakdown, not a TOEIC scaled score. */
+export class ToeicSessionReport {
+  day:number; completedAtMs:number; answered:number; correct:number; slow:number;
+  part5Answered:number; part5Correct:number; part5Seconds:number;
+  part6Answered:number; part6Correct:number; part6Seconds:number;
+  part7Answered:number; part7Correct:number; part7Seconds:number;
+  constructor(day:number,completedAtMs:number=0) {
+    this.day=day; this.completedAtMs=completedAtMs;
+    this.answered=0; this.correct=0; this.slow=0;
+    this.part5Answered=0; this.part5Correct=0; this.part5Seconds=0;
+    this.part6Answered=0; this.part6Correct=0; this.part6Seconds=0;
+    this.part7Answered=0; this.part7Correct=0; this.part7Seconds=0;
+  }
+}
+
+/** Stable runtime grouping of consecutive questions that share the same article. */
+export class ToeicReadingGroup {
+  groupId:string; questionIds:string[]; passageBlocks:string[];
+  constructor(groupId:string,questionIds:string[],passageBlocks:string[]) {
+    this.groupId=groupId; this.questionIds=questionIds; this.passageBlocks=passageBlocks;
+  }
+}
+
+export enum ToeicVocabularyQuizMode {
+  MEANING='MEANING', COLLOCATION='COLLOCATION', PARAPHRASE='PARAPHRASE'
+}
+
+/** Built from reviewed source vocabulary; not a generated exam question. */
+export class ToeicVocabularyQuizQuestion {
+  vocabularyId:string; mode:ToeicVocabularyQuizMode; stem:string;
+  options:string[]; correctIndex:number; explanation:string;
+  constructor(vocabularyId:string,mode:ToeicVocabularyQuizMode,stem:string,
+    options:string[],correctIndex:number,explanation:string) {
+    this.vocabularyId=vocabularyId; this.mode=mode; this.stem=stem;
+    this.options=options; this.correctIndex=correctIndex; this.explanation=explanation;
+  }
+}
+
+/** Aggregated, count-normalized skill statistics across submitted sessions. */
+export class ToeicSkillStat {
+  skill:ToeicSkill; answered:number; correct:number; slow:number;
+  constructor(skill:ToeicSkill,answered:number=0,correct:number=0,slow:number=0) {
+    this.skill=skill; this.answered=answered; this.correct=correct; this.slow=slow;
   }
 }

@@ -1,13 +1,106 @@
 import { ToeicQuestionTranslation } from './ToeicQuestionTranslationModels';
 import { ToeicQuestionTranslationWeekOneCatalog } from './ToeicQuestionTranslationWeekOneCatalog';
 import { ToeicQuestionTranslationWeekTwoCatalog } from './ToeicQuestionTranslationWeekTwoCatalog';
+import { ToeicQuestionTranslationWeekThreeCatalog } from './ToeicQuestionTranslationWeekThreeCatalog';
+import { ToeicQuestionTranslationSupplementaryCatalog } from './ToeicQuestionTranslationSupplementaryCatalog';
+import { ToeicQuestionTranslationDay17Catalog } from './ToeicQuestionTranslationDay17Catalog';
+import { ToeicQuestionTranslationDay18And20Catalog } from './ToeicQuestionTranslationDay18And20Catalog';
 
 export class ToeicQuestionTranslationCatalog {
   static items():ToeicQuestionTranslation[] {
-    return ToeicQuestionTranslationWeekOneCatalog.items().concat(ToeicQuestionTranslationWeekTwoCatalog.items());
+    return ToeicQuestionTranslationWeekOneCatalog.items()
+      .concat(ToeicQuestionTranslationWeekTwoCatalog.items())
+      .concat(ToeicQuestionTranslationWeekThreeCatalog.items())
+      .concat(ToeicQuestionTranslationSupplementaryCatalog.items())
+      .concat(ToeicQuestionTranslationDay17Catalog.items())
+      .concat(ToeicQuestionTranslationDay18And20Catalog.items());
+  }
+
+  /** Historical 221-row catalog plus current release-only translation overlays.
+   * Keep items() stable for historical audits; runtime publication validation
+   * must include versioned replacement IDs that are resolved by find().
+   */
+  static validationItems(questionIds:string[]):ToeicQuestionTranslation[] {
+    let result=ToeicQuestionTranslationCatalog.items().slice();
+    for (let questionId of questionIds) {
+      let exists=false;
+      for (let item of result) {
+        if (item.questionId===questionId) { exists=true; break; }
+      }
+      if (exists) continue;
+      let resolved=ToeicQuestionTranslationCatalog.find(questionId);
+      if (resolved!==null) result.push(resolved);
+    }
+    return result;
   }
 
   static find(questionId:string):ToeicQuestionTranslation|null {
+    if (questionId==='R-FP3-P5-1528') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '所有申请人都必须在前台用带照片的证件证明_____身份。',
+        ['它自己','他自己','他们自己','我们自己']);
+    }
+    if (questionId==='R-FP3-FM1-P7-M2-03') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '这笔订单可以免费使用哪种配送方式？',
+        ['到店自取','国际货运','标准配送','加急配送']);
+    }
+    if (questionId==='R-FP3-FM1-P7-S09-01') {
+      return new ToeicQuestionTranslation(questionId,
+        '非工作时间门禁通知\n晚上6点后，西侧大堂入口上锁。持有效员工证的员工可使用北侧入口至晚上9点。访客进入前必须致电前台并向安保登记。任何临时访客证离开前都必须归还。',
+        '晚上6点后，持有效员工证的员工可以使用哪个入口？',
+        ['西侧大堂','北侧入口','装卸区','南侧车库']);
+    }
+    if (questionId==='R-FP3-FM2-P7-S07-03') {
+      return new ToeicQuestionTranslation(questionId,
+        '产品安全更新\n[1] Model R 台灯暂停生产，以检查电源适配器。[2] 5月1日之后购买该台灯的顾客应携收据编号联系服务台。[3] 服务台将免费安排回收符合条件的产品。[4] 台灯检查完成后，更换用适配器将在五个工作日内寄出。',
+        '句子“为安排上述回收，工作人员将联系顾客商定方便的取件时间。”最适合插入哪里？',
+        ['[1]','[2]','[3]','[4]']);
+    }
+    if (questionId==='R-FP1-P5-1528') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '每位申请人都必须在前台用带照片的证件证明_____身份。',
+        ['它自己','他自己','他们自己（单数 they）','我们自己']);
+    }
+    if (questionId==='R-FP1-P6-1606') {
+      return new ToeicQuestionTranslation(questionId,
+        '社区讲座报名\n十月讲座现已开放报名。参加者可以在线报名，也可以到前台报名。[1] _____ 班级人数限制为24人，因此建议尽早报名。付款 [2] _____ 后，将发送确认邮件。需要取消报名的参加者应至少提前两天通知我们。[3] _____，报名费可以转到之后的场次使用。讲师会提供全部材料，因此参加者无需携带 [4] _____。',
+        '第 [2] 空选择哪个词最合适？',
+        ['接收（主动单数）','被收到','已经接收（主动完成时）','接收（现在分词）']);
+    }
+    if (questionId==='R-FP1-DX-P5-05') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '更新后的政策上周_____到所有区域办公室。',
+        ['发送（原形）','被发送','曾经发送（主动）','正在发送']);
+    }
+    if (questionId==='R-FP1-M2-P5-010') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '公司上个月更新了_____隐私政策。',
+        ['它','它的','它自己',"it's（it is/has）"]);
+    }
+    if (questionId==='R-FP1-M2-P6-002') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '团队负责人在他们_____时会收到打印的检查清单。',
+        ['到达（一般现在时）','到达了（过去时）','将到达','到达（名词）']);
+    }
+    if (questionId==='R-FP6-SPRINT-1610') {
+      return new ToeicQuestionTranslation(questionId,
+        'Rivera 女士您好：\n感谢您反馈办公椅的问题。技术人员将于明天上午10点至中午之间到您的办公室。请确保技术人员到达前，椅子周围区域处于 [1] _____ 状态。如果椅子无法现场修复，我们 [2] _____ 一把临时替换椅。设施团队预计大多数维修可在30分钟内完成。[3] _____，更复杂的问题可能需要把椅子送到维修间。感谢您的 [4] _____ 配合。',
+        '第 [2] 空选择哪个词最合适？',
+        ['提供（单数谓语）','曾提供（过去式）','将提供（将来时）','提供（非谓语）']);
+    }
+    // Revised active questions keep translated feedback without altering the
+    // fixed 221-row historical translation catalog or old mock reports.
+    if (questionId==='R-FP5-VERB-0206') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '在周五前_____培训的员工将获得证书。',
+        ['完成（复数主语谓语）','完成（第三人称单数）','完成（名词）','正在完成（非谓语）']);
+    }
+    if (questionId==='R-FP5-SPRINT-1517') {
+      return new ToeicQuestionTranslation(questionId,'',
+        '到明天客户到达时，演示文稿_____准备就绪。',
+        ['过去已经是','正在是（非谓语）','将会是（将来时）','已经是（复数完成时）']);
+    }
     let items=ToeicQuestionTranslationCatalog.items();
     for (let item of items) if (item.questionId===questionId) return item;
     return null;
