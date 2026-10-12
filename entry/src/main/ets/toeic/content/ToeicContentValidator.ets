@@ -172,8 +172,7 @@ export class ToeicContentValidator {
     for (let item of translations) translationById.set(item.questionId,item);
     for (let question of questions) {
       let translation=translationById.get(question.id);
-      if (translation===undefined) translation=null;
-      if (translation===null) {
+      if (translation===undefined) {
         errors.push(question.id + ': Chinese translation is required for assigned non-mock training');
         continue;
       }

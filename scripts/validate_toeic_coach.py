@@ -509,8 +509,11 @@ def main() -> None:
 
     ui = read("entry/src/main/ets/toeic/ui/ToeicHomePage.ets")
     require("校验详情：" in ui and
-            "this.viewModel.contentErrors().slice(0,5)" in ui,
-            "TOEIC fail-closed UI must surface concrete runtime validation errors")
+            "this.contentValidationErrors.slice(0,5)" in ui and
+            "this.contentValidationErrors=this.viewModel.contentErrors();" in ui and
+            "if (!this.contentValidationReady)" in ui and
+            "return this.contentValidationReady && this.contentValidationErrors.length===0;" in ui,
+            "TOEIC fail-closed UI must show cached validation errors and block training until validated")
     require("标记重点" not in ui and
             "取消重点" not in ui and
             "toggleVocabularyImportant" not in ui and

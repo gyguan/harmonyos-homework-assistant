@@ -10,8 +10,8 @@ export interface AssignmentAudioPlayerCallbacks {
 }
 
 /**
- * AVPlayer and Media.Core are optional device capabilities.
  * AVPlayer is a required product capability because voice/video playback is a core app feature.
+ * Media.Core remains optional. Avoid accessing its SeekMode from the regular playback path.
  * The matching production SysCap is declared in syscap.json so unsupported devices are filtered
  * at distribution/install time. Keep canIUse as a defensive runtime guard for device variations.
  */
@@ -23,8 +23,10 @@ export class AssignmentAudioPlayerService {
   async prepare(sourceUri: string, callbacks: AssignmentAudioPlayerCallbacks): Promise<void> {
     await this.release();
     this.callbacks = callbacks;
-    if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
-      try {
+    try {
+      // Keep the guarded MediaKit call directly inside the canIUse branch;
+      // some ArkTS SysCap analyzers do not track the guard through nested try blocks.
+      if (canIUse('SystemCapability.Multimedia.Media.AVPlayer')) {
         let player = await media.createAVPlayer();
         this.player = player;
         player.on('stateChange', (state: media.AVPlayerState) => {
@@ -49,10 +51,11 @@ export class AssignmentAudioPlayerService {
         this.sourceFile = source;
         let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };
         player.fdSrc = descriptor;
-      } catch {
-        callbacks.onError('语音准备失败');
-        await this.release();
+        return;
       }
+    } catch {
+      callbacks.onError('语音准备失败');
+      await this.release();
       return;
     }
     callbacks.onError('当前设备不支持语音播放');
