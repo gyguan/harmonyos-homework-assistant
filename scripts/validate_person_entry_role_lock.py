@@ -40,6 +40,29 @@ require("HomeworkSyncService" not in index and
         "DefaultAssignmentRepository.instance.requestSync()" in index,
         "root identity switch must keep repository background sync")
 
+# A student-to-student switch does not change AppRole.STUDENT; the root must
+# propagate a separate identity epoch and the shell must invalidate cached pages.
+require("@State private studentContextRevision: number = 0;" in index and
+        "this.studentContextRevision++;" in index and
+        "studentContextRevision: this.studentContextRevision" in index,
+        "student-to-student switch must emit an independently observed identity revision")
+require("@Prop @Watch('onStudentContextChanged') studentContextRevision: number = 0;" in app_shell and
+        "private onStudentContextChanged(): void" in app_shell and
+        "this.invalidateStudentScopedPages();" in app_shell and
+        "this.resetPersonaNavigation();" in app_shell.split("private onStudentContextChanged(): void {", 1)[1].split(
+            "private openIdentitySwitcher()", 1)[0],
+        "shell must reset old child navigation and invalidate assignment/practice/import pages")
+require("studentId: this.activeStudentId" in app_shell and
+        "this.syncFamilyContext();" in app_shell and
+        "void this.refreshActiveStudent();" in app_shell,
+        "child context must propagate to pages before asynchronous repository refresh")
+require("finally {" in index.split("private async prepareStudentAssignments(studentId: string): Promise<void> {", 1)[1].split(
+            "  build()", 1)[0] and
+        "DefaultAssignmentRepository.instance.requestSync();" in index.split(
+            "private async prepareStudentAssignments(studentId: string): Promise<void> {", 1)[1].split(
+            "  build()", 1)[0],
+        "failed auto-creation must not suppress task synchronization")
+
 require("HomeworkStore" not in entry_page and "FamilyContextRepository" in entry_page and
         "this.familyContext.getStudents()" in entry_page,
         "person entry page must continue using FamilyContextRepository")

@@ -77,6 +77,7 @@ enum ParentRoute {
 @Component
 export struct AppShell {
   @Prop @Watch('onRoleChanged') role: AppRole = AppRole.STUDENT;
+  @Prop @Watch('onStudentContextChanged') studentContextRevision: number = 0;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
@@ -235,9 +236,27 @@ export struct AppShell {
     this.resetPersonaNavigation();
     this.identityParentActive = this.role === AppRole.PARENT;
     this.syncFamilyContext();
+    this.invalidateStudentScopedPages();
+  }
+
+  private invalidateStudentScopedPages(): void {
     this.storeRevision++;
     this.practiceRevision++;
     this.importRevision++;
+  }
+
+  private onStudentContextChanged(): void {
+    // The role stays STUDENT when changing from one child to another, so
+    // onRoleChanged cannot invalidate these cached page trees.
+    let previousStudentId = this.activeStudentId;
+    this.syncFamilyContext();
+    if (previousStudentId !== this.activeStudentId) {
+      this.resetPersonaNavigation();
+    }
+    this.invalidateStudentScopedPages();
+    // Repository refresh reads the selected identity at request start; stale
+    // completions never publish an earlier student's snapshot as the active one.
+    if (previousStudentId !== this.activeStudentId) void this.refreshActiveStudent();
   }
 
   private openIdentitySwitcher(): void {
@@ -272,9 +291,7 @@ export struct AppShell {
     // the previous child, return to Parent Home, update visible identity immediately, then refresh.
     this.resetPersonaNavigation();
     this.syncFamilyContext();
-    this.storeRevision++;
-    this.practiceRevision++;
-    this.importRevision++;
+    this.invalidateStudentScopedPages();
     void this.refreshActiveStudent();
   }
 
@@ -398,6 +415,7 @@ export struct AppShell {
   private StudentContent() {
     if (this.studentRoute === StudentRoute.ASSIGNMENTS) {
       StudentAssignmentsPage({
+        studentId: this.activeStudentId,
         revision: this.storeRevision,
         attentionKind: this.studentAttentionKind,
         onOpenDetail: (assignmentId: string) => this.openAssignmentDetail(assignmentId),
@@ -416,6 +434,7 @@ export struct AppShell {
       });
     } else {
       StudentHomePage({
+        studentId: this.activeStudentId,
         offlineMode: this.demoScenario === DemoScenario.OFFLINE,
         revision: this.storeRevision,
         onOpenStudy: (assignmentId: string) => this.openStudy(assignmentId),
@@ -623,6 +642,7 @@ export struct AppShell {
   private ParentContent() {
     if (this.parentRoute === ParentRoute.PROGRESS) {
       ParentProgressPage({
+        studentId: this.activeStudentId,
         revision: this.storeRevision,
         attentionKind: this.parentAttentionKind,
         onOpenReview: (assignmentId: string) => this.openParentReview(assignmentId),

@@ -131,17 +131,25 @@ struct StudentTodayTaskCard {
 
 @Component
 export struct StudentHomePage {
+  @Prop @Watch('onStudentIdChanged') studentId: string = '';
   @Prop offlineMode: boolean = false;
   @Prop revision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private actionAssignmentId: string = '';
   @State private actionMessage: string = '';
+  private identityGeneration: number = 0;
   onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
   onOpenAttention: (kind: AssignmentAttentionKind) => void = (_kind: AssignmentAttentionKind) => {};
   onStoreChanged: () => void = () => {};
 
   private readonly viewModel: StudentHomeViewModel =
     new StudentHomeViewModel(DefaultAssignmentRepository.instance);
+
+  private onStudentIdChanged(): void {
+    this.identityGeneration++;
+    this.actionAssignmentId = '';
+    this.actionMessage = '';
+  }
 
   private assignments(): Assignment[] {
     let currentRevision = this.revision;
@@ -162,28 +170,39 @@ export struct StudentHomePage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${item.studentId}|${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private async openAssignment(assignmentId: string): Promise<void> {
     if (this.actionAssignmentId.length > 0) return;
     let item = this.viewModel.assignment(assignmentId);
-    if (item === null) return;
+    if (item === null || item.studentId !== this.studentId) return;
+    let actionStudentId = this.studentId;
+    let actionGeneration = this.identityGeneration;
     this.actionMessage = '';
     if (item.status === AssignmentStatus.IN_PROGRESS || item.status === AssignmentStatus.READY_TO_SUBMIT) {
-      this.onOpenStudy(item.id);
+      if (actionGeneration === this.identityGeneration && actionStudentId === this.studentId) {
+        this.onOpenStudy(item.id);
+      }
       return;
     }
 
     this.actionAssignmentId = assignmentId;
     try {
       await this.viewModel.performAction(assignmentId, AssignmentAction.START);
+      // A pending action from the previous child must never navigate the new
+      // child's shell to its assignment.
+      if (actionGeneration !== this.identityGeneration || actionStudentId !== this.studentId) return;
       this.onStoreChanged();
       this.onOpenStudy(assignmentId);
     } catch {
-      this.actionMessage = '暂时无法开始，请稍后再试';
+      if (actionGeneration === this.identityGeneration && actionStudentId === this.studentId) {
+        this.actionMessage = '暂时无法开始，请稍后再试';
+      }
     } finally {
-      this.actionAssignmentId = '';
+      if (actionGeneration === this.identityGeneration && actionStudentId === this.studentId) {
+        this.actionAssignmentId = '';
+      }
     }
   }
 
