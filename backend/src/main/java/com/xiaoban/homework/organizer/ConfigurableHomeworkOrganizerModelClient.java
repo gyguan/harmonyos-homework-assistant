@@ -1,5 +1,8 @@
 package com.xiaoban.homework.organizer;
 
+import com.xiaoban.homework.ai.AiProviderCapabilities;
+import com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol;
+import com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode;
 import com.xiaoban.homework.ai.AiProviderProperties;
 import com.xiaoban.homework.ai.ImageAiRequestException;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
@@ -16,6 +19,7 @@ import java.util.Map;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,6 +33,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   private final AiProviderProperties properties;
   private final OpenAiCompatibleTransport transport;
   private final JsonMapper jsonMapper;
+  private final Map<String, StructuredOutputMode> duplicateReviewModeCache = new ConcurrentHashMap<>();
 
   record StructuredCandidate(String subject, String title, String instruction, String textbookRef,
       String dueText, int expectedMinutes, String sourceExcerpt, double confidence,
@@ -40,6 +45,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       int unsupportedSubjectCount, int blankTitleCount, List<String> unsupportedSubjects) {}
   record DuplicateDecision(int candidateIndex, String duplicateAssignmentId, double confidence, String reason) {}
   record DuplicateReviewResult(List<DuplicateDecision> matches) {}
+  record DuplicateReviewContractResult(
+      DuplicateReviewProviderAdapter.Result adapted,
+      StructuredOutputMode mode,
+      boolean repaired) {}
 
   public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
       OpenAiCompatibleTransport transport, JsonMapper jsonMapper) {
@@ -195,34 +204,119 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     String reviewInput = duplicateReviewInput(clean, existingAssignments, sourceText);
     if (reviewInput.isBlank()) return Optional.of(clean);
 
-    Optional<String> output = transport.complete(
-        properties.getOrganizerModel(),
-        duplicateReviewInstructions(),
-        reviewInput,
-        800,
-        "homework_duplicate_review",
-        duplicateReviewSchema());
-    if (output.isEmpty()) return Optional.empty();
+    List<Integer> candidateIndices = duplicateReviewCandidateIndices(clean);
+    List<String> existingIds = duplicateReviewExistingIds(clean, existingAssignments);
+    Map<String, Object> schema = duplicateReviewSchema(candidateIndices, existingIds);
 
-    try {
-      DuplicateReviewProviderAdapter.Result adapted =
-          DuplicateReviewProviderAdapter.adapt(jsonMapper, output.get());
-      List<HomeworkOrganizerDtos.Candidate> reviewed =
-          applyAiDuplicateDecisions(clean, existingAssignments, adapted.review());
-      long duplicateCount = reviewed.stream()
-          .filter(item -> item.duplicateAssignmentId() != null && !item.duplicateAssignmentId().isBlank())
-          .count();
-      log.info(
-          "[AI] duplicate_review parsed model={} candidates={} existing={} matches={} shape={} coercedFields={}",
-          properties.getOrganizerModel(), clean.size(), existingAssignments.size(), duplicateCount,
-          adapted.shape(), adapted.coercedPaths());
-      return Optional.of(reviewed);
-    } catch (Exception error) {
-      log.warn("[AI] duplicate_review parse_failed model={} outputChars={} exception={} message={}",
-          properties.getOrganizerModel(), output.get().length(), error.getClass().getSimpleName(),
-          safeParseMessage(error.getMessage()));
-      return Optional.empty();
+    Optional<DuplicateReviewContractResult> contract =
+        requestDuplicateReviewContract(reviewInput, candidateIndices, existingIds, schema);
+    if (contract.isEmpty()) return Optional.empty();
+
+    DuplicateReviewContractResult result = contract.get();
+    List<HomeworkOrganizerDtos.Candidate> reviewed =
+        applyAiDuplicateDecisions(clean, existingAssignments, result.adapted().review());
+    long duplicateCount = reviewed.stream()
+        .filter(item -> item.duplicateAssignmentId() != null && !item.duplicateAssignmentId().isBlank())
+        .count();
+    log.info(
+        "[AI] duplicate_review parsed model={} mode={} repaired={} candidates={} existing={} matches={} shape={} coercedFields={}",
+        properties.getOrganizerModel(), result.mode(), result.repaired(), clean.size(),
+        existingAssignments.size(), duplicateCount, result.adapted().shape(),
+        result.adapted().coercedPaths());
+    return Optional.of(reviewed);
+  }
+
+  private Optional<DuplicateReviewContractResult> requestDuplicateReviewContract(
+      String reviewInput,
+      List<Integer> candidateIndices,
+      List<String> existingIds,
+      Map<String, Object> schema) {
+    String model = properties.getOrganizerModel();
+    AiProviderCapabilities capabilities = transport.capabilities(model);
+    ApiProtocol protocol = capabilities == null
+        ? (properties.usesChatCompletions() ? ApiProtocol.CHAT_COMPLETIONS : ApiProtocol.RESPONSES)
+        : capabilities.preferredProtocol();
+    String cacheKey = model + "|" + protocol;
+    StructuredOutputMode cached = duplicateReviewModeCache.get(cacheKey);
+
+    List<StructuredOutputMode> modes = new ArrayList<>();
+    if (cached != null) modes.add(cached);
+    if (!modes.contains(StructuredOutputMode.JSON_SCHEMA)) modes.add(StructuredOutputMode.JSON_SCHEMA);
+    if (!modes.contains(StructuredOutputMode.JSON_OBJECT)) modes.add(StructuredOutputMode.JSON_OBJECT);
+
+    for (StructuredOutputMode mode : modes) {
+      Optional<String> output = transport.complete(
+          model,
+          duplicateReviewInstructions(),
+          reviewInput,
+          800,
+          "homework_duplicate_review",
+          schema,
+          protocol,
+          mode);
+      if (output.isEmpty()) {
+        log.info(
+            "[AI] duplicate_review contract_attempt_empty model={} protocol={} mode={} cachedMode={}",
+            model, protocol, mode, cached);
+        continue;
+      }
+
+      try {
+        DuplicateReviewProviderAdapter.Result adapted =
+            DuplicateReviewProviderAdapter.adapt(jsonMapper, output.get());
+        duplicateReviewModeCache.put(cacheKey, mode);
+        return Optional.of(new DuplicateReviewContractResult(adapted, mode, false));
+      } catch (Exception error) {
+        log.info(
+            "[AI] duplicate_review contract_rejected model={} protocol={} mode={} outputChars={} exception={} message={}",
+            model, protocol, mode, output.get().length(), error.getClass().getSimpleName(),
+            safeParseMessage(error.getMessage()));
+
+        Optional<String> repaired = transport.complete(
+            model,
+            duplicateReviewRepairInstructions(),
+            duplicateReviewRepairInput(output.get(), candidateIndices, existingIds),
+            500,
+            "homework_duplicate_review_repair",
+            schema,
+            protocol,
+            StructuredOutputMode.JSON_OBJECT);
+        if (repaired.isEmpty()) continue;
+
+        try {
+          DuplicateReviewProviderAdapter.Result adapted =
+              DuplicateReviewProviderAdapter.adapt(jsonMapper, repaired.get());
+          duplicateReviewModeCache.put(cacheKey, StructuredOutputMode.JSON_OBJECT);
+          return Optional.of(new DuplicateReviewContractResult(
+              adapted, StructuredOutputMode.JSON_OBJECT, true));
+        } catch (Exception repairError) {
+          log.info(
+              "[AI] duplicate_review repair_rejected model={} protocol={} outputChars={} exception={} message={}",
+              model, protocol, repaired.get().length(), repairError.getClass().getSimpleName(),
+              safeParseMessage(repairError.getMessage()));
+        }
+      }
     }
+
+    log.warn(
+        "[AI] duplicate_review contract_failed model={} protocol={} attemptedModes={} candidates={} existingIds={}",
+        model, protocol, modes, candidateIndices.size(), existingIds.size());
+    return Optional.empty();
+  }
+
+  static String duplicateReviewRepairInstructions() {
+    return "你只做JSON格式纠正，不重新判断作业是否重复，也不得增加、删除或改变原有匹配关系。"
+        + "输出只能包含根字段 matches；matches 每项只能包含 candidateIndex、duplicateAssignmentId、confidence、reason。"
+        + "禁止翻译、缩写或改写字段名。candidateIndex 必须是整数，confidence 必须是0到1的小数。"
+        + "如果原结果没有任何匹配，输出 {\"matches\":[]}。只输出JSON。";
+  }
+
+  static String duplicateReviewRepairInput(
+      String invalidOutput, List<Integer> candidateIndices, List<String> existingIds) {
+    return "允许的candidateIndex=" + candidateIndices
+        + "\n允许的duplicateAssignmentId=" + existingIds
+        + "\n请仅把下面输出转换为固定字段JSON，不重新做语义判断：\n"
+        + compact(invalidOutput, 4000);
   }
 
   static String duplicateReviewInstructions() {
@@ -282,10 +376,50 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     return existingCount == 0 ? "" : input.toString();
   }
 
-  static Map<String, Object> duplicateReviewSchema() {
+  static List<Integer> duplicateReviewCandidateIndices(
+      List<HomeworkOrganizerDtos.Candidate> candidates) {
+    List<Integer> result = new ArrayList<>();
+    if (candidates == null) return result;
+    LocalDate today = LocalDate.now(BUSINESS_ZONE);
+    for (int i = 0; i < candidates.size(); i++) {
+      HomeworkOrganizerDtos.Candidate candidate = candidates.get(i);
+      if (candidate != null && today.equals(candidateDueDate(candidate.dueText()))) result.add(i);
+    }
+    return List.copyOf(result);
+  }
+
+  static List<String> duplicateReviewExistingIds(
+      List<HomeworkOrganizerDtos.Candidate> candidates,
+      List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments) {
+    if (candidates == null || existingAssignments == null) return List.of();
+    Set<String> subjects = new LinkedHashSet<>();
+    LocalDate today = LocalDate.now(BUSINESS_ZONE);
+    for (HomeworkOrganizerDtos.Candidate candidate : candidates) {
+      if (candidate == null || !today.equals(candidateDueDate(candidate.dueText()))) continue;
+      if (!blank(candidate.subject())) subjects.add(candidate.subject());
+    }
+    List<String> result = new ArrayList<>();
+    for (HomeworkOrganizerDtos.ExistingAssignment existing : existingAssignments) {
+      if (existing == null || blank(existing.id())) continue;
+      String subject = normalizeSubject(existing.subject());
+      if (subject != null && subjects.contains(subject)) result.add(existing.id().trim());
+    }
+    return List.copyOf(new LinkedHashSet<>(result));
+  }
+
+  static Map<String, Object> duplicateReviewSchema(
+      List<Integer> candidateIndices, List<String> existingIds) {
+    Map<String, Object> candidateIndex = new LinkedHashMap<>();
+    candidateIndex.put("type", "integer");
+    candidateIndex.put("enum", candidateIndices);
+
+    Map<String, Object> assignmentId = new LinkedHashMap<>();
+    assignmentId.put("type", "string");
+    assignmentId.put("enum", existingIds);
+
     Map<String, Object> properties = new LinkedHashMap<>();
-    properties.put("candidateIndex", Map.of("type", "integer", "minimum", 0, "maximum", 29));
-    properties.put("duplicateAssignmentId", Map.of("type", "string", "maxLength", 120));
+    properties.put("candidateIndex", candidateIndex);
+    properties.put("duplicateAssignmentId", assignmentId);
     properties.put("confidence", Map.of("type", "number", "minimum", 0, "maximum", 1));
     properties.put("reason", Map.of("type", "string", "maxLength", 240));
 
@@ -295,13 +429,23 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     match.put("properties", properties);
     match.put("required", List.of("candidateIndex", "duplicateAssignmentId", "confidence", "reason"));
 
+    Map<String, Object> matches = new LinkedHashMap<>();
+    matches.put("type", "array");
+    matches.put("maxItems", candidateIndices.size());
+    matches.put("items", match);
+
     Map<String, Object> schema = new LinkedHashMap<>();
     schema.put("type", "object");
     schema.put("additionalProperties", false);
-    schema.put("properties", Map.of(
-        "matches", Map.of("type", "array", "maxItems", 30, "items", match)));
+    schema.put("properties", Map.of("matches", matches));
     schema.put("required", List.of("matches"));
     return schema;
+  }
+
+  static Map<String, Object> duplicateReviewSchema() {
+    return duplicateReviewSchema(
+        java.util.stream.IntStream.range(0, 30).boxed().toList(),
+        List.of("existing-task-id"));
   }
 
   static List<HomeworkOrganizerDtos.Candidate> applyAiDuplicateDecisions(
