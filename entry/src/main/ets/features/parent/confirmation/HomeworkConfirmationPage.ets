@@ -40,6 +40,17 @@ export struct HomeworkConfirmationPage {
     return this.viewModel.candidates();
   }
 
+  private semanticWarningCount(): number {
+    let count = 0;
+    for (let item of this.candidates()) {
+      let sameTaskGroup = item.sameTaskGroup === undefined ? '' : item.sameTaskGroup.trim();
+      let duplicateAssignmentId =
+        item.duplicateAssignmentId === undefined ? '' : item.duplicateAssignmentId.trim();
+      if (sameTaskGroup.length > 0 || duplicateAssignmentId.length > 0) count++;
+    }
+    return count;
+  }
+
   private editingCandidate(): CandidateAssignment | null {
     if (this.manualCandidateDraft !== null && this.manualCandidateDraft.id === this.editingCandidateId) {
       return this.manualCandidateDraft;
@@ -49,7 +60,7 @@ export struct HomeworkConfirmationPage {
   }
 
   private candidateRenderKey(item: CandidateAssignment): string {
-    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.dueText}|${item.textbookRef}|${item.expectedMinutes}|${item.sameTaskGroup}|${item.duplicateAssignmentId}|${item.duplicateConfidence}|${item.duplicateReason}`;
+    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.dueText}|${item.textbookRef}|${item.expectedMinutes}|${item.sameTaskGroup}|${item.duplicateAssignmentId}|${item.duplicateAssignmentTitle}|${item.duplicateConfidence}|${item.duplicateReason}`;
   }
 
   private openEditor(candidateId: string): void {
@@ -473,7 +484,9 @@ export struct HomeworkConfirmationPage {
       Column({ space: 10 }) {
         DeepPageHeader({
           title: '确认发布',
-          subtitle: `${this.candidates().length} 项待确认`,
+          subtitle: this.semanticWarningCount() > 0 ?
+            `${this.candidates().length} 项待确认 · ${this.semanticWarningCount()} 项疑似重复` :
+            `${this.candidates().length} 项待确认`,
           backAccessibilityText: '返回导入',
           onBack: () => this.onBack()
         });
