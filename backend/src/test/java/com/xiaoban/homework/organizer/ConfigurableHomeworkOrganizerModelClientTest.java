@@ -212,14 +212,41 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
-  void secondStageAiReviewsOnlyTodaySameSubjectAndReturnsCompactDuplicateMapping() {
+  void secondStageAiRepairsNonCanonicalProviderOutputAndCachesWorkingMode() {
     var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    var capabilities = new com.xiaoban.homework.ai.AiProviderCapabilities(
+        com.xiaoban.homework.ai.AiProviderCapabilities.Provider.GENERIC_OPENAI_COMPATIBLE,
+        com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol.CHAT_COMPLETIONS,
+        java.util.List.of(
+            com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode.JSON_OBJECT,
+            com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode.TEXT),
+        java.util.List.of());
+    when(transport.capabilities(anyString())).thenReturn(capabilities);
+
     when(transport.complete(anyString(), anyString(), anyString(), eq(800),
-        eq("homework_duplicate_review"), anyMap()))
+        eq("homework_duplicate_review"), anyMap(),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol.CHAT_COMPLETIONS),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode.JSON_SCHEMA)))
+        .thenReturn(java.util.Optional.of("""
+            {"matches":[{"candidate":"C0","existing_task_id":"a-math","confidence":0.91}]}
+            """));
+    when(transport.complete(anyString(), anyString(), anyString(), eq(500),
+        eq("homework_duplicate_review_repair"), anyMap(),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol.CHAT_COMPLETIONS),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode.JSON_OBJECT)))
         .thenReturn(java.util.Optional.of("""
             {"matches":[{"candidateIndex":0,"duplicateAssignmentId":"a-math",
             "confidence":0.91,"reason":"页码题号和订正要求一致"}]}
             """));
+    when(transport.complete(anyString(), anyString(), anyString(), eq(800),
+        eq("homework_duplicate_review"), anyMap(),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol.CHAT_COMPLETIONS),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode.JSON_OBJECT)))
+        .thenReturn(java.util.Optional.of("""
+            {"matches":[{"candidateIndex":0,"duplicateAssignmentId":"a-math",
+            "confidence":0.92,"reason":"第二次直接使用已缓存格式"}]}
+            """));
+
     var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
         JsonMapper.builder().build());
 
@@ -237,26 +264,45 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         new HomeworkOrganizerDtos.ExistingAssignment(
             "a-english", "英语", "听读第3课", "听读第3课", "", "今天", 0L, "听读第3课"));
 
-    var reviewed = client.reviewDuplicates(
+    var first = client.reviewDuplicates(
         candidates, existing, "数学第三单元练习第26页1到6题").orElseThrow();
+    assertEquals("a-math", first.get(0).duplicateAssignmentId());
+    assertEquals(0.91, first.get(0).duplicateConfidence());
 
-    assertEquals("a-math", reviewed.get(0).duplicateAssignmentId());
-    assertEquals(0.91, reviewed.get(0).duplicateConfidence());
-    assertEquals("", reviewed.get(1).duplicateAssignmentId());
+    var second = client.reviewDuplicates(
+        candidates, existing, "数学第三单元练习第26页1到6题").orElseThrow();
+    assertEquals(0.92, second.get(0).duplicateConfidence());
 
-    var instructions = org.mockito.ArgumentCaptor.forClass(String.class);
-    var input = org.mockito.ArgumentCaptor.forClass(String.class);
-    verify(transport).complete(anyString(), instructions.capture(), input.capture(), eq(800),
-        eq("homework_duplicate_review"), anyMap());
-    assertTrue(instructions.getValue().contains("只判断"));
-    assertTrue(instructions.getValue().contains("字段名必须严格使用 candidateIndex、duplicateAssignmentId、confidence、reason"));
-    assertTrue(instructions.getValue().contains("\"matches\":[]"));
-    assertTrue(input.getValue().contains("candidateIndex=0"));
-    assertTrue(input.getValue().contains("duplicateAssignmentId=a-math"));
-    assertFalse(input.getValue().contains("\n- C0"));
-    assertFalse(input.getValue().contains("\n- ID=a-math"));
-    assertFalse(input.getValue().contains("a-english"));
-    assertFalse(input.getValue().contains("背诵第12课"));
+    var firstInput = org.mockito.ArgumentCaptor.forClass(String.class);
+    @SuppressWarnings("unchecked")
+    var schemaCaptor = org.mockito.ArgumentCaptor.forClass(java.util.Map.class);
+    verify(transport).complete(anyString(), contains("字段名必须严格使用"),
+        firstInput.capture(), eq(800), eq("homework_duplicate_review"), schemaCaptor.capture(),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol.CHAT_COMPLETIONS),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode.JSON_SCHEMA));
+
+    assertTrue(firstInput.getValue().contains("candidateIndex=0"));
+    assertTrue(firstInput.getValue().contains("duplicateAssignmentId=a-math"));
+    assertFalse(firstInput.getValue().contains("a-english"));
+
+    java.util.Map<?, ?> schema = schemaCaptor.getValue();
+    java.util.Map<?, ?> rootProperties = (java.util.Map<?, ?>) schema.get("properties");
+    java.util.Map<?, ?> matches = (java.util.Map<?, ?>) rootProperties.get("matches");
+    java.util.Map<?, ?> item = (java.util.Map<?, ?>) matches.get("items");
+    java.util.Map<?, ?> itemProperties = (java.util.Map<?, ?>) item.get("properties");
+    java.util.Map<?, ?> candidateIndex = (java.util.Map<?, ?>) itemProperties.get("candidateIndex");
+    java.util.Map<?, ?> assignmentId = (java.util.Map<?, ?>) itemProperties.get("duplicateAssignmentId");
+    assertEquals(java.util.List.of(0), candidateIndex.get("enum"));
+    assertEquals(java.util.List.of("a-math"), assignmentId.get("enum"));
+
+    verify(transport, times(1)).complete(anyString(), anyString(), anyString(), eq(500),
+        eq("homework_duplicate_review_repair"), anyMap(),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol.CHAT_COMPLETIONS),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode.JSON_OBJECT));
+    verify(transport, times(1)).complete(anyString(), anyString(), anyString(), eq(800),
+        eq("homework_duplicate_review"), anyMap(),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.ApiProtocol.CHAT_COMPLETIONS),
+        eq(com.xiaoban.homework.ai.AiProviderCapabilities.StructuredOutputMode.JSON_OBJECT));
   }
 
   @Test
