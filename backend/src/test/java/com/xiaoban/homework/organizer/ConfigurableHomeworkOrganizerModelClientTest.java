@@ -170,9 +170,9 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         student, "老师通知", "数学第三单元练习第26页1到6题", existing);
     assertTrue(input.contains("ID=a-existing-1"));
     assertTrue(input.contains("练习册 P26 第1～6题"));
+    assertTrue(input.contains("完成时间=今天"));
     assertTrue(input.contains("原文=数学练习册第26页1-6题，完成后订正"));
     assertFalse(input.contains("；教材="));
-    assertFalse(input.contains("；时间="));
 
     var accepted = ConfigurableHomeworkOrganizerModelClient.toCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
@@ -244,6 +244,38 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals("a-existing-old", reviewed.get(1).duplicateAssignmentId());
     assertEquals(1.0, reviewed.get(1).duplicateConfidence());
     assertTrue(reviewed.get(1).duplicateReason().contains("标题"));
+  }
+
+  @Test
+  void sourceInputFallbackDetectsSameTomorrowHomeworkEvenWhenModelMissesIt() {
+    var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
+        "a-tomorrow", "数学", "练习册 P26 第1～6题", "完成后订正", "", "明天",
+        "数学练习册第26页1-6题，完成后订正"));
+    var candidates = java.util.List.of(new HomeworkOrganizerDtos.Candidate(
+        "数学", "数学第三单元练习", "第26页1到6题，完成后订正", "", "明日", 20,
+        "第26页1到6题", 0.95, "", "", "", 0.0, ""));
+
+    var reviewed = ConfigurableHomeworkOrganizerModelClient.applySourceInputDuplicateFallback(
+        candidates, existing, "数学练习册第26页1到6题，完成后订正");
+
+    assertEquals("a-tomorrow", reviewed.getFirst().duplicateAssignmentId());
+    assertEquals(1.0, reviewed.getFirst().duplicateConfidence());
+    assertTrue(reviewed.getFirst().duplicateReason().contains("同一份作业原文"));
+  }
+
+  @Test
+  void removesModelDuplicateHintWhenCompletionDateDiffers() {
+    var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
+        "a-today", "数学", "口算20题", "完成口算20题", "", "今天", "口算20题"));
+    var candidates = java.util.List.of(new HomeworkOrganizerDtos.Candidate(
+        "数学", "口算20题", "完成口算20题", "", "明天", 10,
+        "口算20题", 0.95, "", "a-today", "口算20题", 0.98, "内容一致"));
+
+    var reviewed = ConfigurableHomeworkOrganizerModelClient.enforceSameDueForModelHints(
+        candidates, existing);
+
+    assertEquals("", reviewed.getFirst().duplicateAssignmentId());
+    assertEquals(0.0, reviewed.getFirst().duplicateConfidence());
   }
 
   @Test
