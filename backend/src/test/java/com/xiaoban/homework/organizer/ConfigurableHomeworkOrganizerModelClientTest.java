@@ -155,13 +155,13 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(schema.contains("minimum=5"));
     assertTrue(schema.contains("maximum=120"));
     assertTrue(schema.contains("sameTaskGroup"));
-    assertTrue(schema.contains("duplicateAssignmentId"));
-    assertTrue(schema.contains("duplicateConfidence"));
-    assertTrue(schema.contains("duplicateReason"));
+    assertFalse(schema.contains("duplicateAssignmentId"));
+    assertFalse(schema.contains("duplicateConfidence"));
+    assertFalse(schema.contains("duplicateReason"));
   }
 
   @Test
-  void includesExistingAssignmentsInPromptAndKeepsOnlyValidatedDuplicateReferences() {
+  void historicalAssignmentsStayOutOfAiPromptAndModelDuplicateHintsAreIgnored() {
     TestStudent student = new TestStudent();
     student.grade = "二年级";
     var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
@@ -170,52 +170,45 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     String input = ConfigurableHomeworkOrganizerModelClient.buildInput(
         student, "老师通知", "数学第三单元练习第26页1到6题", existing);
-    assertTrue(input.contains("ID=a-existing-1"));
-    assertTrue(input.contains("练习册 P26 第1～6题"));
-    assertTrue(input.contains("原文=数学练习册第26页1-6题，完成后订正"));
-    assertFalse(input.contains("；教材="));
+    assertTrue(input.contains("数学第三单元练习第26页1到6题"));
+    assertFalse(input.contains("a-existing-1"));
+    assertFalse(input.contains("当前已有任务"));
+    assertFalse(input.contains("数学练习册第26页1-6题，完成后订正"));
 
-    var accepted = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+    var converted = ConfigurableHomeworkOrganizerModelClient.toCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
                 "数学", "数学第三单元练习", "第26页1到6题，完成后订正", "", "今天", 20,
                 "数学第三单元练习第26页1到6题", 0.95, "G1", "a-existing-1", 0.93,
-                "页码、题号和订正要求一致"))),
+                "模型不再负责历史任务重复判断"))),
         java.util.Map.of("a-existing-1", "练习册 P26 第1～6题"));
-    assertEquals("G1", accepted.candidates().getFirst().sameTaskGroup());
-    assertEquals("a-existing-1", accepted.candidates().getFirst().duplicateAssignmentId());
-    assertEquals("练习册 P26 第1～6题", accepted.candidates().getFirst().duplicateAssignmentTitle());
-    assertEquals(0.93, accepted.candidates().getFirst().duplicateConfidence());
-    assertTrue(accepted.candidates().getFirst().duplicateReason().contains("页码"));
-
-    var rejected = ConfigurableHomeworkOrganizerModelClient.toCandidates(
-        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
-            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "数学", "口算", "口算20题", "", "今天", 10, "口算20题", 0.9,
-                "", "a-not-in-context", 0.99, "标题相似"))),
-        java.util.Map.of("a-existing-1", "练习册 P26 第1～6题"));
-    assertEquals("", rejected.candidates().getFirst().duplicateAssignmentId());
-    assertEquals(0.0, rejected.candidates().getFirst().duplicateConfidence());
+    assertEquals("G1", converted.candidates().getFirst().sameTaskGroup());
+    assertEquals("", converted.candidates().getFirst().duplicateAssignmentId());
+    assertEquals(0.0, converted.candidates().getFirst().duplicateConfidence());
   }
 
   @Test
-  void limitsExistingAssignmentPromptContextToTenAndTruncatesFields() {
-    TestStudent student = new TestStudent();
-    java.util.List<HomeworkOrganizerDtos.ExistingAssignment> existing = new java.util.ArrayList<>();
-    for (int i = 0; i < 12; i++) {
-      existing.add(new HomeworkOrganizerDtos.ExistingAssignment(
-          "a-" + i, "数学", "标题" + "很长".repeat(60), "要求" + "很长".repeat(90), "", "今天", 0L,
-          "原文" + "很长".repeat(120)));
-    }
+  void textOrganizerUsesCompactPromptAndFourteenHundredTokenBudget() {
+    var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
+    when(transport.complete(anyString(), anyString(), anyString(), anyInt(), anyString(), anyMap()))
+        .thenReturn(java.util.Optional.of("""
+            {"assignments":[{"subject":"数学","title":"口算20题","instruction":"完成口算20题",
+            "textbookRef":"","dueText":"今天","expectedMinutes":10,"sourceExcerpt":"口算20题",
+            "confidence":0.95,"sameTaskGroup":""}]}
+            """));
+    var client = new ConfigurableHomeworkOrganizerModelClient(new AiProviderProperties(), transport,
+        JsonMapper.builder().build());
 
-    String input = ConfigurableHomeworkOrganizerModelClient.buildInput(
-        student, "老师通知", "数学作业", existing);
+    var result = client.organize(new TestStudent(), "老师通知", "数学：口算20题").orElseThrow();
+    assertEquals(1, result.size());
 
-    assertTrue(input.contains("ID=a-0"));
-    assertTrue(input.contains("ID=a-9"));
-    assertFalse(input.contains("ID=a-10"));
-    assertFalse(input.contains("ID=a-11"));
-    assertTrue(input.length() < 6000);
+    var instructions = org.mockito.ArgumentCaptor.forClass(String.class);
+    var input = org.mockito.ArgumentCaptor.forClass(String.class);
+    verify(transport).complete(anyString(), instructions.capture(), input.capture(), eq(1400),
+        eq("homework_organization"), anyMap());
+    assertFalse(instructions.getValue().contains("duplicateAssignmentId"));
+    assertFalse(instructions.getValue().contains("历史任务"));
+    assertFalse(input.getValue().contains("当前已有任务"));
   }
 
   @Test
