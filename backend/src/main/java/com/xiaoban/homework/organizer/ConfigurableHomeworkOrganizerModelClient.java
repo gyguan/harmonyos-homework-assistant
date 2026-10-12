@@ -5,6 +5,10 @@ import com.xiaoban.homework.ai.ImageAiRequestException;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentEntity;
+import java.time.DayOfWeek;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -20,6 +24,7 @@ import tools.jackson.databind.json.JsonMapper;
 @Service
 public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganizerModelClient {
   private static final Logger log = LoggerFactory.getLogger(ConfigurableHomeworkOrganizerModelClient.class);
+  private static final ZoneId BUSINESS_ZONE = ZoneId.of("Asia/Shanghai");
 
   private final AiProviderProperties properties;
   private final OpenAiCompatibleTransport transport;
@@ -368,7 +373,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       }
       HomeworkOrganizerDtos.ExistingAssignment existing =
           existingById.get(candidate.duplicateAssignmentId());
-      if (existing != null && sameDue(candidate.dueText(), existing.dueText())) {
+      if (existing != null && sameDue(candidate.dueText(), existing)) {
         result.add(candidate);
         continue;
       }
@@ -399,7 +404,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         if (existing == null || blank(existing.id())) continue;
         String existingSubject = normalizeSubject(existing.subject());
         if (existingSubject == null || !existingSubject.equals(candidate.subject())) continue;
-        if (!sameDue(candidate.dueText(), existing.dueText())) continue;
+        if (!sameDue(candidate.dueText(), existing)) continue;
         if (!sameEvidence(sourceText, existing.sourceExcerpt())) continue;
         if (best == null || sameStructuredTask(candidate, existing)) {
           best = existing;
@@ -437,7 +442,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         if (existing == null || blank(existing.id())) continue;
         String existingSubject = normalizeSubject(existing.subject());
         if (existingSubject == null || !existingSubject.equals(candidate.subject())) continue;
-        if (!sameDue(candidate.dueText(), existing.dueText())) continue;
+        if (!sameDue(candidate.dueText(), existing)) continue;
 
         if (sameEvidence(candidate.sourceExcerpt(), existing.sourceExcerpt())) {
           match = existing;
@@ -462,19 +467,81 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     return result;
   }
 
-  private static boolean sameDue(String left, String right) {
-    String a = dueKey(left);
-    String b = dueKey(right);
-    return !a.isBlank() && a.equals(b);
+  private static boolean sameDue(String candidateDueText,
+      HomeworkOrganizerDtos.ExistingAssignment existing) {
+    LocalDate candidateDate = candidateDueDate(candidateDueText);
+    if (candidateDate == null || existing == null) return false;
+    LocalDate existingDate = existing.dueAtEpochMs() > 0
+        ? Instant.ofEpochMilli(existing.dueAtEpochMs()).atZone(BUSINESS_ZONE).toLocalDate()
+        : candidateDueDate(existing.dueText());
+    return existingDate != null && candidateDate.equals(existingDate);
   }
 
-  private static String dueKey(String value) {
-    String key = semanticKey(value);
-    if (key.isBlank()) return "";
-    if (key.contains("后天")) return "后天";
-    if (key.contains("明天") || key.contains("明日")) return "明天";
-    if (key.contains("今天") || key.contains("今日") || key.contains("今晚")) return "今天";
-    return key;
+  static LocalDate candidateDueDate(String value) {
+    if (blank(value)) return null;
+    String text = value.trim();
+    LocalDate today = LocalDate.now(BUSINESS_ZONE);
+    if (text.contains("后天")) return today.plusDays(2);
+    if (text.contains("明天") || text.contains("明日")) return today.plusDays(1);
+    if (text.contains("今天") || text.contains("今日") || text.contains("今晚")) return today;
+
+    java.util.regex.Matcher fullChinese =
+        java.util.regex.Pattern.compile("(\\d{4})年(\\d{1,2})月(\\d{1,2})[日号]?").matcher(text);
+    if (fullChinese.find()) {
+      return validDate(
+          Integer.parseInt(fullChinese.group(1)),
+          Integer.parseInt(fullChinese.group(2)),
+          Integer.parseInt(fullChinese.group(3)));
+    }
+
+    java.util.regex.Matcher fullNumeric =
+        java.util.regex.Pattern.compile("(\\d{4})[-/.](\\d{1,2})[-/.](\\d{1,2})").matcher(text);
+    if (fullNumeric.find()) {
+      return validDate(
+          Integer.parseInt(fullNumeric.group(1)),
+          Integer.parseInt(fullNumeric.group(2)),
+          Integer.parseInt(fullNumeric.group(3)));
+    }
+
+    java.util.regex.Matcher monthDay =
+        java.util.regex.Pattern.compile("(\\d{1,2})月(\\d{1,2})[日号]?").matcher(text);
+    if (monthDay.find()) {
+      return validDate(today.getYear(),
+          Integer.parseInt(monthDay.group(1)), Integer.parseInt(monthDay.group(2)));
+    }
+
+    java.util.regex.Matcher numericMonthDay =
+        java.util.regex.Pattern.compile("(^|[^\\d])(\\d{1,2})[-/.](\\d{1,2})($|[^\\d])").matcher(text);
+    if (numericMonthDay.find()) {
+      return validDate(today.getYear(),
+          Integer.parseInt(numericMonthDay.group(2)), Integer.parseInt(numericMonthDay.group(3)));
+    }
+
+    java.util.regex.Matcher weekday =
+        java.util.regex.Pattern.compile("(?:周|星期)([一二三四五六日天])").matcher(text);
+    if (weekday.find()) {
+      int target = switch (weekday.group(1)) {
+        case "一" -> 1;
+        case "二" -> 2;
+        case "三" -> 3;
+        case "四" -> 4;
+        case "五" -> 5;
+        case "六" -> 6;
+        default -> 7;
+      };
+      int current = today.getDayOfWeek().getValue();
+      int delta = (target - current + 7) % 7;
+      return today.plusDays(delta);
+    }
+    return null;
+  }
+
+  private static LocalDate validDate(int year, int month, int day) {
+    try {
+      return LocalDate.of(year, month, day);
+    } catch (java.time.DateTimeException error) {
+      return null;
+    }
   }
 
   private static boolean sameEvidence(String left, String right) {
