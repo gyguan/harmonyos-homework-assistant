@@ -40,6 +40,8 @@ app:
   http:
     log-payloads: ${HTTP_LOG_PAYLOADS:false}
     max-payload-chars: ${HTTP_MAX_PAYLOAD_CHARS:20000}
+  media-sync:
+    worker-delay-ms: ${MEDIA_SYNC_WORKER_DELAY_MS:5000}
   ai:
     provider: ${AI_PROVIDER:AUTO}
     protocol: ${AI_PROTOCOL:responses}
@@ -51,6 +53,11 @@ app:
     organizer-model: ${AI_ORGANIZER_MODEL:${OPENAI_ORGANIZER_MODEL:}}
     image-organizer-model: ${AI_IMAGE_ORGANIZER_MODEL:}
     practice-model: ${AI_PRACTICE_MODEL:${OPENAI_PRACTICE_MODEL:}}
+    media-sync-transcription-model: ${AI_AUDIO_TRANSCRIPTION_MODEL:${AI_MEDIA_SYNC_TRANSCRIPTION_MODEL:}}
+    media-sync-transcriptions-path: ${AI_MEDIA_SYNC_TRANSCRIPTIONS_PATH:/v1/audio/transcriptions}
+    media-sync-image-model: ${AI_MEDIA_SYNC_IMAGE_MODEL:}
+    media-sync-alignment-model: ${AI_MEDIA_SYNC_ALIGNMENT_MODEL:}
+    media-sync-max-ai-images: ${AI_MEDIA_SYNC_MAX_AI_IMAGES:12}
     allow-unauthenticated: ${AI_ALLOW_UNAUTHENTICATED:false}
     structured-output: ${AI_STRUCTURED_OUTPUT:true}
     log-payloads: ${AI_LOG_PAYLOADS:false}

@@ -16,6 +16,11 @@ public class AiProviderProperties {
   private String organizerModel = "";
   private String imageOrganizerModel = "";
   private String practiceModel = "";
+  private String mediaSyncTranscriptionModel = "";
+  private String mediaSyncTranscriptionsPath = "/v1/audio/transcriptions";
+  private String mediaSyncImageModel = "";
+  private String mediaSyncAlignmentModel = "";
+  private int mediaSyncMaxAiImages = 12;
   private boolean allowUnauthenticated = false;
   private boolean structuredOutput = true;
   private boolean logPayloads = false;
@@ -45,6 +50,33 @@ public class AiProviderProperties {
   public String getPracticeModel() { return blank(practiceModel) ? getOrganizerModel() : practiceModel; }
   public void setPracticeModel(String practiceModel) {
     this.practiceModel = practiceModel == null ? "" : practiceModel.trim();
+  }
+  public String getMediaSyncTranscriptionModel() { return mediaSyncTranscriptionModel; }
+  public void setMediaSyncTranscriptionModel(String mediaSyncTranscriptionModel) {
+    this.mediaSyncTranscriptionModel =
+        mediaSyncTranscriptionModel == null ? "" : mediaSyncTranscriptionModel.trim();
+  }
+  public String getMediaSyncTranscriptionsPath() { return mediaSyncTranscriptionsPath; }
+  public void setMediaSyncTranscriptionsPath(String mediaSyncTranscriptionsPath) {
+    this.mediaSyncTranscriptionsPath =
+        path(mediaSyncTranscriptionsPath, "/v1/audio/transcriptions");
+  }
+  public String getMediaSyncImageModel() {
+    return blank(mediaSyncImageModel) ? getImageOrganizerModel() : mediaSyncImageModel;
+  }
+  public void setMediaSyncImageModel(String mediaSyncImageModel) {
+    this.mediaSyncImageModel = mediaSyncImageModel == null ? "" : mediaSyncImageModel.trim();
+  }
+  public String getMediaSyncAlignmentModel() {
+    return blank(mediaSyncAlignmentModel) ? getOrganizerModel() : mediaSyncAlignmentModel;
+  }
+  public void setMediaSyncAlignmentModel(String mediaSyncAlignmentModel) {
+    this.mediaSyncAlignmentModel =
+        mediaSyncAlignmentModel == null ? "" : mediaSyncAlignmentModel.trim();
+  }
+  public int getMediaSyncMaxAiImages() { return mediaSyncMaxAiImages; }
+  public void setMediaSyncMaxAiImages(int mediaSyncMaxAiImages) {
+    this.mediaSyncMaxAiImages = Math.max(1, Math.min(30, mediaSyncMaxAiImages));
   }
   public boolean isAllowUnauthenticated() { return allowUnauthenticated; }
   public void setAllowUnauthenticated(boolean allowUnauthenticated) { this.allowUnauthenticated = allowUnauthenticated; }
