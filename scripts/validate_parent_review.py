@@ -60,8 +60,10 @@ require("async delete(assignmentId: string)" in remote_api and "http.RequestMeth
 require("@DeleteMapping(\"/assignments/{id}\")" in controller and "service.delete(familyId, id)" in controller,
         "backend must expose owned assignment deletion")
 require("public void delete(UUID familyId, String id)" in service and
-        "fileTransactions.deleteAfterCommit(photo.storagePath)" in service,
-        "backend assignment deletion must clean stored submission photos only after the database commit")
+        "submissionResources.findBySubmissionIdOrderBySortOrderAscIdAsc" in service and
+        "submissionStoragePaths.add" in service and
+        "fileTransactions.deleteAfterCommit(storagePath)" in service,
+        "backend assignment deletion must clean generic submission resources only after commit")
 require("on delete cascade" in delete_migration.lower() and "submission_assignment_id_fkey" in delete_migration,
         "assignment deletion migration must cascade submission relations")
 require("void delete(String storagePath)" in file_storage,

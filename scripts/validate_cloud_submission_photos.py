@@ -28,12 +28,13 @@ require("HttpDataType.ARRAY_BUFFER" in api,
         "cloud submission photos must use binary NetworkKit responses")
 require("Authorization" in api and "Bearer ${BackendSession.instance.getToken()}" in api,
         "cloud photo download must carry the authenticated family session")
-require("/api/v1/submission-photos/${encodeURIComponent(photo.id)}" in api,
-        "client must use the authenticated submission-photo endpoint")
+require("/api/v1/submission-resources/${encodeURIComponent(resource.id)}" in api and
+        "resource.downloadPath" in api,
+        "client must use the authenticated generic submission-resource endpoint")
 require("context.cacheDir" in api and "fileUri.getUriFromPath" in api,
         "downloaded cloud photos must be written to app cache")
-require("photoCache" in api and "cachedPhotoUri" in api,
-        "downloaded photos must be reused by photo id")
+require("resourceCache" in api and "cachedPhotoUri" in api,
+        "downloaded photos must be reused by submission resource id")
 require("downloadPhoto(photo)" in strip and "aboutToAppear" in strip,
         "photo strip must lazy-load missing photos when shown")
 require("sys.symbol.photo" not in strip,
@@ -53,8 +54,9 @@ require("CloudSubmissionPhotoStrip" in review,
         "parent review surface must render cloud photo thumbnails")
 require("PhotoPreviewDialog" in review and ".onClick(() => this.openPreview(uri))" in review,
         "local submission thumbnails must open the same large photo preview")
-require("@GetMapping(\"/submission-photos/{photoId}\")" in controller,
-        "backend must retain the authenticated photo endpoint")
+require("@GetMapping(\"/submission-resources/{resourceId}\")" in controller and
+        "@GetMapping(\"/submission-photos/{photoId}\")" in controller,
+        "backend must expose generic submission resources while retaining the legacy photo endpoint")
 require("?token=" not in api.lower() and "access_token" not in api.lower(),
         "authentication token must never be placed in the photo URL")
 

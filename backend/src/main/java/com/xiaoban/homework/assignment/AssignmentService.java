@@ -7,6 +7,8 @@ import com.xiaoban.homework.submission.SubmissionEntity;
 import com.xiaoban.homework.submission.SubmissionPhotoEntity;
 import com.xiaoban.homework.submission.SubmissionPhotoRepository;
 import com.xiaoban.homework.submission.SubmissionRepository;
+import com.xiaoban.homework.submission.SubmissionResourceEntity;
+import com.xiaoban.homework.submission.SubmissionResourceRepository;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -42,16 +44,19 @@ public class AssignmentService {
   private final StudentService students;
   private final SubmissionRepository submissions;
   private final SubmissionPhotoRepository photos;
+  private final SubmissionResourceRepository submissionResources;
   private final AssignmentResourceRepository resources;
   private final FileTransactionCoordinator fileTransactions;
 
   public AssignmentService(AssignmentRepository repository, StudentService students,
       SubmissionRepository submissions, SubmissionPhotoRepository photos,
+      SubmissionResourceRepository submissionResources,
       AssignmentResourceRepository resources, FileTransactionCoordinator fileTransactions) {
     this.repository = repository;
     this.students = students;
     this.submissions = submissions;
     this.photos = photos;
+    this.submissionResources = submissionResources;
     this.resources = resources;
     this.fileTransactions = fileTransactions;
   }
@@ -358,10 +363,24 @@ public class AssignmentService {
     if ("COMPLETED".equals(assignment.status)) {
       throw new ApiExceptions.BadRequest("已完成作业不能删除");
     }
+    Set<String> submissionStoragePaths = new HashSet<>();
     for (SubmissionEntity submission : submissions.findByFamilyIdAndAssignmentIdOrderBySubmittedAtDesc(familyId, id)) {
-      for (SubmissionPhotoEntity photo : photos.findBySubmissionIdOrderById(submission.id)) {
-        fileTransactions.deleteAfterCommit(photo.storagePath);
+      for (SubmissionResourceEntity submissionResource :
+          submissionResources.findBySubmissionIdOrderBySortOrderAscIdAsc(submission.id)) {
+        if (submissionResource.storagePath != null && !submissionResource.storagePath.isBlank()) {
+          submissionStoragePaths.add(submissionResource.storagePath);
+        }
       }
+      // Legacy rows remain readable during the compatibility window. V26 migrates them into
+      // submission_resource, so a Set prevents the same physical file from being scheduled twice.
+      for (SubmissionPhotoEntity photo : photos.findBySubmissionIdOrderById(submission.id)) {
+        if (photo.storagePath != null && !photo.storagePath.isBlank()) {
+          submissionStoragePaths.add(photo.storagePath);
+        }
+      }
+    }
+    for (String storagePath : submissionStoragePaths) {
+      fileTransactions.deleteAfterCommit(storagePath);
     }
     for (AssignmentResourceEntity resource : resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(familyId, id)) {
       if (resource.assetId == null && resource.storagePath != null && !resource.storagePath.isBlank()) {
