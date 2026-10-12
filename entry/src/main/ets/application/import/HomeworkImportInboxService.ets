@@ -124,7 +124,12 @@ export class HomeworkImportInboxService {
           imageRef: candidate.sourceEvidence.imageRef,
           capturedAtEpochMs: candidate.sourceEvidence.capturedAtEpochMs
         },
-        confidence: candidate.confidence
+        confidence: candidate.confidence,
+        sameTaskGroup: candidate.sameTaskGroup,
+        duplicateAssignmentId: candidate.duplicateAssignmentId,
+        duplicateAssignmentTitle: candidate.duplicateAssignmentTitle,
+        duplicateConfidence: candidate.duplicateConfidence,
+        duplicateReason: candidate.duplicateReason
       });
     }
 
@@ -234,7 +239,12 @@ export class HomeworkImportInboxService {
         imageRef: message.sourceEvidence.imageRef,
         capturedAtEpochMs: message.sourceEvidence.capturedAtEpochMs
       },
-      confidence: candidate.confidence
+      confidence: candidate.confidence,
+      sameTaskGroup: candidate.sameTaskGroup,
+      duplicateAssignmentId: candidate.duplicateAssignmentId,
+      duplicateAssignmentTitle: candidate.duplicateAssignmentTitle,
+      duplicateConfidence: candidate.duplicateConfidence,
+      duplicateReason: candidate.duplicateReason
     };
   }
 
