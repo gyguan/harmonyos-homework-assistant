@@ -71,6 +71,42 @@ require("TodayScopeNote" not in student_home,
 require("this.assignmentRenderKey(item)" in student_home,
         "student home task rows must use content-aware assignment keys")
 
+# Family switching must update every student-scoped tab immediately, not only
+# when the role changes or when an unrelated network request completes.
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+index_page = read("entry/src/main/ets/pages/Index.ets")
+require("studentContextRevision: this.studentContextRevision" in index_page and
+        "private onStudentContextChanged(): void" in app_shell and
+        "this.invalidateStudentScopedPages();" in app_shell and
+        "this.practiceRevision++;" in app_shell and
+        "this.importRevision++;" in app_shell and
+        "this.storeRevision++;" in app_shell,
+        "same-role child switching must refresh assignments, practice and import tabs")
+require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in student_home and
+        "private onStudentIdChanged(): void" in student_home and
+        "item.studentId !== this.studentId" in student_home and
+        "item.studentId}|\u0024{item.id}" in student_home and
+        "actionGeneration !== this.identityGeneration" in student_home,
+        "student home must show identity-scoped today cards and reject late old-child actions")
+require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in student_assignments and
+        "private onStudentIdChanged(): void" in student_assignments and
+        "this.snapshotRevision = -1;" in student_assignments and
+        "queryStudentId === this.studentId" in student_assignments and
+        "querySequence === this.querySequence" in student_assignments and
+        "item.studentId}|\u0024{item.id}" in student_assignments,
+        "student assignments must clear stale tabs, master selection and old-child queries")
+require("@Prop @Watch('onStudentIdChanged') studentId: string = '';" in parent_progress and
+        "private onStudentIdChanged(): void" in parent_progress and
+        "queryStudentId === this.studentId" in parent_progress and
+        "this.selectedDeleteIds = [];" in parent_progress,
+        "parent progress must isolate in-flight queries and selection across children")
+require("@Prop @Watch('onRevisionChanged') revision: number = 0" in practice_home and
+        "private onRevisionChanged(): void" in practice_home and
+        "sequence !== this.loadSequence" in practice_home and
+        "@Prop @Watch('onRevisionChanged') revision: number = 0" in practice_history and
+        "sequence !== this.loadSequence" in practice_history,
+        "practice home and history must reload and reject stale results after identity revision")
+
 require("CandidatePane" not in parent_import and "继续确认" not in parent_import and
         "this.onOpenConfirmation()" in parent_import,
         "import page must use one direct confirmation step after organization")
