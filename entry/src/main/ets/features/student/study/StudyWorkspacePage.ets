@@ -999,6 +999,7 @@ export struct StudyWorkspacePage {
       .indicator(false)
       .loop(true)
       .onChange((index: number) => {
+        if (index === this.voiceImageIndex) return;
         this.voiceImageIndex = index;
         this.voiceSelectImage(index);
       });
