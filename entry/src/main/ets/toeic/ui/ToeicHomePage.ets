@@ -37,6 +37,7 @@ export struct ToeicHomePage {
   @State private contentValidationReady:boolean=false;
   @State private contentValidationErrors:string[]=[];
   private contentValidationTimer:number=-1;
+  private homeEnterAtMs:number=0;
   @State private pronunciationMessage:string='';
   @State private selectedStudyDay:number=0;
   @State private selectedDayTitle:string='';
@@ -141,14 +142,30 @@ export struct ToeicHomePage {
   private currentOptionOrder:number[]=[0,1,2,3];
 
   aboutToAppear():void {
-    this.contentValidationReady=false;
-    this.scheduleContentValidation();
+    this.homeEnterAtMs=Date.now();
+    let cached=this.viewModel.cachedErrors();
+    if (cached===null) {
+      this.contentValidationReady=false;
+      this.scheduleContentValidation();
+    } else {
+      // Cached validation is authoritative for the bundled release. Do not
+      // hide the home content or footer for an artificial 100ms on re-entry.
+      this.contentValidationErrors=cached;
+      this.contentValidationReady=true;
+    }
+    let progressStartedAtMs=Date.now();
     this.loadProgressSnapshot();
+    console.info('[TOEIC-PERF] progress.snapshot costMs='+String(Date.now()-progressStartedAtMs));
     if (this.selectedStudyDay<=0) this.selectedStudyDay=this.progressCurrentDay;
+    let dayStartedAtMs=Date.now();
     this.loadStudyDay(this.selectedStudyDay);
+    console.info('[TOEIC-PERF] studyDay.load costMs='+String(Date.now()-dayStartedAtMs));
     this.refreshRevision++;
     void this.syncVocabularyCloud();
     if (this.isMockSession() && this.mode===ToeicPageMode.TRAINING) this.startMockClock();
+    if (cached!==null) {
+      console.info('[TOEIC-PERF] home.ready cached=true costMs='+String(Date.now()-this.homeEnterAtMs));
+    }
   }
 
   private scheduleContentValidation():void {
@@ -157,14 +174,26 @@ export struct ToeicHomePage {
     // The HOME action is disabled until validation completes (fail closed).
     this.contentValidationTimer=setTimeout(()=>{
       this.contentValidationTimer=-1;
-      this.contentValidationErrors=this.viewModel.contentErrors();
+      let validationStartedAtMs=Date.now();
+      try {
+        this.contentValidationErrors=this.viewModel.contentErrors();
+      } catch {
+        // Never enable training if bundled content could not be validated.
+        this.contentValidationErrors=['训练内容初始化失败，请重新进入后重试'];
+      }
       this.contentValidationReady=true;
-    },100);
+      console.info('[TOEIC-PERF] content.validate costMs='+String(Date.now()-validationStartedAtMs)+
+        ' errors='+String(this.contentValidationErrors.length));
+      console.info('[TOEIC-PERF] home.ready cached=false costMs='+String(Date.now()-this.homeEnterAtMs));
+    },16);
   }
 
   private async syncVocabularyCloud():Promise<void> {
-    let synced=await this.viewModel.syncVocabularyRecalls();
-    if (!synced) return;
+    let startedAtMs=Date.now();
+    let changed=await this.viewModel.syncVocabularyRecalls();
+    console.info('[TOEIC-PERF] vocabulary.sync costMs='+String(Date.now()-startedAtMs)+
+      ' localChanged='+String(changed));
+    if (!changed) return;
     this.loadProgressSnapshot();
     this.refreshVocabularyItems();
     this.loadStudyDay(this.selectedStudyDay);
