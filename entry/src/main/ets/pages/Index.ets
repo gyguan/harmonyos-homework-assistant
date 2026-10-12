@@ -17,6 +17,9 @@ struct Index {
   private shareImportForceParent: boolean = false;
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private cloudRevision: number = 0;
+  // Student identity changes are independent of the role: STUDENT -> STUDENT
+  // must invalidate the existing shell just as PARENT -> STUDENT does.
+  @State private studentContextRevision: number = 0;
   @State private parentAccessCodeInput: string = '';
   @State private parentAccessMessage: string = '';
   private shellBackHandler: () => boolean = () => false;
@@ -55,7 +58,10 @@ struct Index {
   private async restoreCloud(): Promise<void> {
     let valid = await BackendAuthService.instance.validateSession();
     if (!valid) return;
-    if (await FamilyCloudService.instance.syncStudents()) this.cloudRevision++;
+    if (await FamilyCloudService.instance.syncStudents()) {
+      this.cloudRevision++;
+      this.studentContextRevision++;
+    }
   }
 
   private requestParentAccess(): void {
@@ -88,14 +94,21 @@ struct Index {
 
   private enterStudent(studentId: string): void {
     if (this.familyContext.setActiveStudent(studentId)) {
+      this.studentContextRevision++;
       this.selectedRole = AppRole.STUDENT;
       void this.prepareStudentAssignments(studentId);
     }
   }
 
   private async prepareStudentAssignments(studentId: string): Promise<void> {
-    await VoiceMaterialAutoCreateService.instance.checkToday(studentId);
-    DefaultAssignmentRepository.instance.requestSync();
+    try {
+      await VoiceMaterialAutoCreateService.instance.checkToday(studentId);
+    } catch {
+      console.warn('Student voice task initialization failed; refreshing assignments anyway');
+    } finally {
+      // Even if auto-create fails, the selected student's task list must sync.
+      DefaultAssignmentRepository.instance.requestSync();
+    }
   }
 
   build() {
@@ -109,6 +122,7 @@ struct Index {
       } else {
         AppShell({
           role: this.selectedRole,
+          studentContextRevision: this.studentContextRevision,
           onSwitchParent: () => this.requestParentAccess(),
           onSwitchStudent: (studentId: string) => this.enterStudent(studentId),
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
