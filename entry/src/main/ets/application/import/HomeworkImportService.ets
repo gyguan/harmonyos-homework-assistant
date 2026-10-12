@@ -215,7 +215,12 @@ export class HomeworkImportService {
         dueText: candidate.dueText,
         expectedMinutes: candidate.expectedMinutes,
         sourceEvidence: candidate.sourceEvidence,
-        confidence: candidate.confidence
+        confidence: candidate.confidence,
+        sameTaskGroup: candidate.sameTaskGroup,
+        duplicateAssignmentId: candidate.duplicateAssignmentId,
+        duplicateAssignmentTitle: candidate.duplicateAssignmentTitle,
+        duplicateConfidence: candidate.duplicateConfidence,
+        duplicateReason: candidate.duplicateReason
       });
     }
     return result;
