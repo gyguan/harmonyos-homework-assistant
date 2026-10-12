@@ -27,7 +27,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
 
   record StructuredCandidate(String subject, String title, String instruction, String textbookRef,
       String dueText, int expectedMinutes, String sourceExcerpt, double confidence,
-      String sameTaskGroup, String duplicateAssignmentId, double duplicateConfidence,
+      String sameTaskGroup, String duplicateAssignmentId, Double duplicateConfidence,
       String duplicateReason) {}
   record StructuredResult(List<StructuredCandidate> assignments) {}
   record StructuredImageResult(String recognizedText, List<StructuredCandidate> assignments) {}
@@ -244,10 +244,12 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       String duplicateAssignmentTitle = "";
       double duplicateConfidence = 0.0;
       String duplicateReason = "";
+      double semanticConfidence = item.duplicateConfidence() == null ? 0.0 :
+          clamp(item.duplicateConfidence());
       if (!duplicateAssignmentId.isBlank() && existingTitles.containsKey(duplicateAssignmentId)
-          && item.duplicateConfidence() >= 0.70) {
+          && semanticConfidence >= 0.70) {
         duplicateAssignmentTitle = existingTitles.get(duplicateAssignmentId);
-        duplicateConfidence = clamp(item.duplicateConfidence());
+        duplicateConfidence = semanticConfidence;
         duplicateReason = compact(item.duplicateReason(), 240);
       } else {
         duplicateAssignmentId = "";
