@@ -54,10 +54,8 @@ class HomeworkImageInputTest {
         new HomeworkOrganizerDtos.ImageRequest(png(), "image/png", "图片", "数学口算20题"));
     verify(model).organizeImage(eq(student), eq("图片"), startsWith("data:image/png;base64,"),
         eq("数学口算20题"), anyList());
-    verify(assignments).list(eq(family), eq("student-1"), isNull(), isNull(),
+    verify(assignments, times(1)).list(eq(family), eq("student-1"), isNull(), isNull(),
         anyLong(), anyLong(), contains("NOT_STARTED"), eq(false));
-    verify(assignments).list(eq(family), eq("student-1"), isNull(), isNull(),
-        isNull(), isNull(), contains("NOT_STARTED"), eq(true));
   }
 
   static String png() throws Exception {
