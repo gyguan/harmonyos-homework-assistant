@@ -32,7 +32,8 @@ public final class HomeworkOrganizerDtos {
       String title,
       String instruction,
       String textbookRef,
-      String dueText) {}
+      String dueText,
+      String sourceExcerpt) {}
 
   public record Response(List<Candidate> assignments, String mode) {}
 
