@@ -51,7 +51,7 @@ export class HomeworkBatchPublishService {
         candidateId: candidate.id,
         assignment: assignment,
         sourceLabel: candidate.sourceEvidence.sourceLabel,
-        sourceExcerpt: candidate.sourceEvidence.excerpt
+        sourceExcerpt: this.sourceEvidenceText(candidate)
       });
       localByCandidateId.set(candidate.id, assignment);
     }
@@ -84,6 +84,12 @@ export class HomeworkBatchPublishService {
     inbox.markBatchPublished(batchId);
     if (clearCurrentDraft) this.drafts.clearCandidates();
     return { publishedCount: mapped.length, assignments: mapped.slice() };
+  }
+
+  private sourceEvidenceText(candidate: CandidateAssignment): string {
+    let rawText = candidate.sourceEvidence.rawText;
+    if (rawText !== undefined && rawText.trim().length > 0) return rawText.trim();
+    return candidate.sourceEvidence.excerpt.trim();
   }
 
   private sourceBatchId(candidate: CandidateAssignment): string {
