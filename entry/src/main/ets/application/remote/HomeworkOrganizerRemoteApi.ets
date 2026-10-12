@@ -151,12 +151,12 @@ export class HomeworkOrganizerRemoteApi {
     return result;
   }
 
-  private optionalText(value: string | undefined): string {
+  private optionalText(value?: string): string {
     if (value === undefined) return '';
     return value.trim();
   }
 
-  private optionalConfidence(value: number | undefined): number {
+  private optionalConfidence(value?: number): number {
     if (value === undefined || !Number.isFinite(value)) return 0;
     return Math.max(0, Math.min(1, value));
   }
