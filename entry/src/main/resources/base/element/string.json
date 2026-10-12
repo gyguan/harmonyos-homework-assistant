@@ -3,6 +3,7 @@
     { "name": "module_desc", "value": "小伴作业主模块" },
     { "name": "EntryAbility_desc", "value": "小伴作业入口" },
     { "name": "EntryAbility_label", "value": "小伴作业" },
+    { "name": "microphone_permission_reason", "value": "用于学生录制并提交朗读、口语等语音作业" },
     {
       "name": "share_extension_label",
       "value": "小伴作业"

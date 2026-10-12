@@ -12,6 +12,9 @@ import { RemoteSubmissionApi } from '../remote/RemoteSubmissionApi';
 const MAX_SUBMISSION_PHOTOS: number = 6;
 const MIN_SUBMISSION_PHOTO_EDGE: number = 640;
 const MIN_SUBMISSION_PHOTO_BYTES: number = 24 * 1024;
+const MIN_SUBMISSION_AUDIO_MS: number = 3 * 1000;
+const MAX_SUBMISSION_AUDIO_MS: number = 10 * 60 * 1000;
+const MAX_SUBMISSION_AUDIO_BYTES: number = 20 * 1024 * 1024;
 
 export interface SubmissionPreflightResult {
   passed: boolean;
@@ -161,7 +164,7 @@ export class HomeworkSubmissionService {
     if (assignment.remoteVersion <= 0) return false;
 
     try {
-      let result = await RemoteSubmissionApi.instance.upload(
+      let result = await RemoteSubmissionApi.instance.uploadPhotos(
         assignmentId, assignment.remoteVersion, durableUris);
 
       // Record the durable local photo copies only after the server accepted the submission.
@@ -175,6 +178,53 @@ export class HomeworkSubmissionService {
       // A lost success response is indistinguishable from a transport failure. Refreshing here
       // makes a committed server submission visible and prevents an old client version from
       // performing a second submission on retry.
+      await DefaultAssignmentRepository.instance.refresh();
+      let refreshed = DefaultAssignmentRepository.instance.getCached(assignmentId);
+      return refreshed !== null && refreshed.status === AssignmentStatus.SUBMITTED;
+    }
+  }
+
+  async preflightAudio(audioUri: string, durationMs: number): Promise<SubmissionPreflightResult> {
+    if (audioUri.length === 0) return { passed: false, message: '请先录制作业' };
+    if (durationMs < MIN_SUBMISSION_AUDIO_MS) return { passed: false, message: '录音至少需要 3 秒' };
+    if (durationMs > MAX_SUBMISSION_AUDIO_MS) return { passed: false, message: '单次录音不能超过 10 分钟' };
+    try {
+      let file = await fileIo.open(audioUri, fileIo.OpenMode.READ_ONLY);
+      try {
+        let stat = fileIo.statSync(file.fd);
+        if (stat.size <= 0) return { passed: false, message: '录音文件为空，请重新录制' };
+        if (stat.size > MAX_SUBMISSION_AUDIO_BYTES) {
+          return { passed: false, message: '录音文件不能超过 20MB' };
+        }
+      } finally {
+        try { await fileIo.close(file); } catch {}
+      }
+    } catch {
+      return { passed: false, message: '录音文件无法读取，请重新录制' };
+    }
+    return { passed: true, message: '' };
+  }
+
+  async submitAudio(assignmentId: string, audioUri: string, durationMs: number): Promise<boolean> {
+    let assignment = DefaultAssignmentRepository.instance.getCached(assignmentId);
+    if (assignment === null) return false;
+    let preflight = await this.preflightAudio(audioUri, durationMs);
+    if (!preflight.passed) return false;
+
+    if (assignment.remoteVersion <= 0 && assignment.candidateId.length === 0) {
+      return this.local.submitAudio(assignmentId, audioUri, durationMs, this.nowText());
+    }
+    if (assignment.remoteVersion <= 0) return false;
+
+    try {
+      let result = await RemoteSubmissionApi.instance.uploadAudio(
+        assignmentId, assignment.remoteVersion, audioUri, durationMs);
+      this.local.submitAudio(
+        assignmentId, audioUri, durationMs, this.submittedAtText(result.submission.submittedAt));
+      let authoritative = RemoteAssignmentMapper.toLocal(result.assignment, assignment);
+      DefaultAssignmentRepository.instance.applyAuthoritative(authoritative);
+      return true;
+    } catch {
       await DefaultAssignmentRepository.instance.refresh();
       let refreshed = DefaultAssignmentRepository.instance.getCached(assignmentId);
       return refreshed !== null && refreshed.status === AssignmentStatus.SUBMITTED;
