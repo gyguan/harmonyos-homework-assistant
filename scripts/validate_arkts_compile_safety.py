@@ -22,6 +22,7 @@ HVIGOR_CONFIG = ROOT / "hvigor/hvigor-config.json5"
 VERIFY_HARMONY = ROOT / "scripts/verify_harmony_client.ps1"
 ETS_ROOT = ROOT / "entry/src/main/ets"
 TOEIC_WEEK_THREE = ROOT / "entry/src/main/ets/toeic/content/ToeicWeekThreeContent.ets"
+TOEIC_VALIDATOR = ROOT / "entry/src/main/ets/toeic/content/ToeicContentValidator.ets"
 QUALIFIED_MODEL_SYMBOLS = [
     "AssignmentStatus",
     "AssignmentType",
@@ -172,8 +173,8 @@ def main() -> int:
     avplayer_syscap = "SystemCapability.Multimedia.Media.AVPlayer"
     require(audio.count(f"if (canIUse('{avplayer_syscap}'))") >= 2,
             "AVPlayer create/seek paths must be directly guarded by AVPlayer canIUse")
-    require(f"if (canIUse('{media_core_syscap}'))" in audio,
-            "SeekMode access must be directly guarded by Media.Core canIUse")
+    require("media.SeekMode." not in audio,
+            "optional Media.Core SeekMode must not leak into the AVPlayer seek path")
     require("当前设备不支持语音播放" in audio,
             "audio capability fallback must provide a user-facing error")
     require("let player = await media.createAVPlayer();" in audio,
@@ -182,8 +183,8 @@ def main() -> int:
             "AVPlayer must not restore the runtime-regressing dynamic MediaKit import")
     require("let descriptor: media.AVFileDescriptor = { fd: source.fd, offset: 0, length: -1 };" in audio,
             "AVPlayer must keep the known-good local file descriptor shape")
-    require("player.seek(target, media.SeekMode.SEEK_PREV_SYNC);" in audio,
-            "AVPlayer seek must keep the known-good synchronized seek mode")
+    require("player.seek(target, media.SeekMode." not in audio,
+            "AVPlayer seek must not require optional Media.Core SeekMode")
     require("player.seek(target);" in audio,
             "AVPlayer seek must have a capability-safe fallback when SeekMode is unavailable")
 
@@ -200,8 +201,10 @@ def main() -> int:
     for required_syscap in [avplayer_syscap, media_core_syscap]:
         require(required_syscap in development_syscaps,
                 f"syscap.json development.addedSysCaps missing {required_syscap}")
-        require(required_syscap not in production_syscaps,
-                f"Media SysCap must stay optional at runtime, not production-required: {required_syscap}")
+    require(avplayer_syscap in production_syscaps,
+            "AVPlayer must remain a required production capability for voice/video playback")
+    require(media_core_syscap not in production_syscaps,
+            "Media.Core must remain optional in production")
     require("default" in syscap.get("devices", {}).get("general", []) and
             "tablet" in syscap.get("devices", {}).get("general", []),
             "syscap.json must keep phone/default and tablet development device coverage")
@@ -255,6 +258,10 @@ def main() -> int:
         require(not (ROOT / retired_capture_path).exists(),
                 f"retired screen-capture source must stay removed: {retired_capture_path}")
 
+    validator = TOEIC_VALIDATOR.read_text(encoding="utf-8")
+    require("if (translation===undefined) translation=null;" not in validator and
+            "if (translation===undefined) {" in validator,
+            "TOEIC translation lookup must narrow undefined without assigning null")
     week_three = TOEIC_WEEK_THREE.read_text(encoding="utf-8")
     require(re.search(r"\[[^\]\n]*\bnull\b[^\]\n]*\]", week_three) is None,
             "week-three TOEIC options must not contain null placeholders")
