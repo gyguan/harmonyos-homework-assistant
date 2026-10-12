@@ -272,8 +272,14 @@ export struct VoiceAssignmentPane {
     let cursor = index;
     while (cursor < this.imageResources.length) {
       if (lifecycleVersion !== this.lifecycleVersion) return;
-      await RemoteAssignmentResourceApi.instance.preload(this.imageResources[cursor]);
+      let uri = await RemoteAssignmentResourceApi.instance.preload(this.imageResources[cursor]);
       if (lifecycleVersion !== this.lifecycleVersion) return;
+      if (uri.length > 0 && cursor < this.imageUris.length && this.imageUris[cursor].length === 0) {
+        let next = this.imageUris.slice();
+        next[cursor] = uri;
+        this.imageUris = next;
+        this.notifyMediaState();
+      }
       cursor += stride;
     }
   }
