@@ -493,7 +493,7 @@ export struct VoiceAssignmentPane {
         .index(this.imageIndex)
         .indicator(false)
         .loop(true)
-        .onChange((index: number) => { void this.showImage(index); })
+        .onChange((index: number) => this.selectImage(index))
         .borderRadius(AppTheme.CONTROL_RADIUS);
 
         Row({ space: 6 }) {

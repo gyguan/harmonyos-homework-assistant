@@ -48,30 +48,34 @@ export class AssignmentMediaSyncApi {
   async get(assignmentId: string): Promise<AssignmentMediaSyncState> {
     if (!BackendSession.instance.isConnected()) return this.unavailable();
 
-    let path = '/api/v1/assignments/' + encodeURIComponent(assignmentId) + '/media-sync';
-    let response = await BackendHttpClient.instance.requestFor(
-      'assignment.media_sync.get', path, http.RequestMethod.GET);
-    if (response.statusCode !== 200) return this.unavailable();
+    try {
+      let path = '/api/v1/assignments/' + encodeURIComponent(assignmentId) + '/media-sync';
+      let response = await BackendHttpClient.instance.requestFor(
+        'assignment.media_sync.get', path, http.RequestMethod.GET);
+      if (response.statusCode !== 200) return this.unavailable();
 
-    let remote = JSON.parse(response.body) as RemoteAssignmentMediaSyncState;
-    let items: AssignmentMediaSyncItem[] = [];
-    if (remote.items !== undefined && remote.items !== null) {
-      for (let item of remote.items) {
-        items.push({
-          imageResourceId: item.imageResourceId,
-          startMs: Math.max(0, item.startMs),
-          endMs: Math.max(0, item.endMs),
-          confidence: Math.max(0, item.confidence)
-        });
+      let remote = JSON.parse(response.body) as RemoteAssignmentMediaSyncState;
+      let items: AssignmentMediaSyncItem[] = [];
+      if (remote.items !== undefined && remote.items !== null) {
+        for (let item of remote.items) {
+          items.push({
+            imageResourceId: item.imageResourceId,
+            startMs: Math.max(0, item.startMs),
+            endMs: Math.max(0, item.endMs),
+            confidence: Math.max(0, item.confidence)
+          });
+        }
       }
+      return {
+        status: this.status(remote.status),
+        available: remote.available === true,
+        confidence: Math.max(0, remote.confidence),
+        durationMs: Math.max(0, remote.durationMs),
+        items: items
+      };
+    } catch {
+      return this.unavailable();
     }
-    return {
-      status: this.status(remote.status),
-      available: remote.available === true,
-      confidence: Math.max(0, remote.confidence),
-      durationMs: Math.max(0, remote.durationMs),
-      items: items
-    };
   }
 
   private status(value: string): AssignmentMediaSyncStatus {
