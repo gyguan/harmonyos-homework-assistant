@@ -294,6 +294,22 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void legacyTaskWithoutSourceEvidenceCanStillMatchByStructuredSimilarity() {
+    var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
+        "a-legacy", "数学", "数学练习册 P26 1-6题", "完成后订正", "", "今天", 0L, ""));
+    var candidates = java.util.List.of(new HomeworkOrganizerDtos.Candidate(
+        "数学", "数学第三单元练习第26页1到6题", "完成后订正", "", "今天", 20,
+        "第26页1到6题，完成后订正", 0.95, "", "", "", 0.0, ""));
+
+    var reviewed = ConfigurableHomeworkOrganizerModelClient.applyEvidenceDuplicateFallback(
+        candidates, existing);
+
+    assertEquals("a-legacy", reviewed.getFirst().duplicateAssignmentId());
+    assertEquals(1.0, reviewed.getFirst().duplicateConfidence());
+    assertTrue(reviewed.getFirst().duplicateReason().contains("高度相似"));
+  }
+
+  @Test
   void evidenceFallbackDoesNotMergeDifferentActionsOrDueDates() {
     var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
         "a-read", "语文", "朗读第2课", "朗读第2课", "", "今天", 0L, "朗读第2课"));
