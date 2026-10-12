@@ -12,6 +12,13 @@ import { BackendSession } from '../../application/remote/BackendSession';
 export class ToeicCoachViewModel {
   // Catalog content is bundled and immutable during a running app session.
   private static cachedContentErrors:string[]|null=null;
+  private static syncInFlight:Promise<boolean>|null=null;
+  private static lastSuccessfulSyncAtMs:number=0;
+
+  cachedErrors():string[]|null {
+    return ToeicCoachViewModel.cachedContentErrors===null
+      ?null:ToeicCoachViewModel.cachedContentErrors.slice();
+  }
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
   diagnosticQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.diagnosticQuestions(); }
   dailyQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.dailyQuestions(this.snapshot()); }
@@ -115,6 +122,8 @@ export class ToeicCoachViewModel {
 
   async recordVocabularyRecall(id:string,remembered:boolean):Promise<boolean> {
     await ToeicProgressStore.instance.recordVocabularyRecall(id,remembered);
+    // An explicit learner action must not be delayed by the navigation sync throttle.
+    ToeicCoachViewModel.lastSuccessfulSyncAtMs=0;
     if (!BackendSession.instance.isConnected()) return false;
     let local=ToeicProgressStore.instance.vocabularyRecall(id);
     if (local===null) return false;
@@ -137,11 +146,29 @@ export class ToeicCoachViewModel {
 
   async syncVocabularyRecalls():Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;
+    // Navigating between tabs should not repeatedly download the same recalls.
+    if (ToeicCoachViewModel.syncInFlight!==null) {
+      return await ToeicCoachViewModel.syncInFlight;
+    }
+    if (Date.now()-ToeicCoachViewModel.lastSuccessfulSyncAtMs<60000) return false;
+    let pending=this.syncVocabularyRecallsOnce();
+    ToeicCoachViewModel.syncInFlight=pending;
+    try {
+      return await pending;
+    } finally {
+      ToeicCoachViewModel.syncInFlight=null;
+    }
+  }
+
+  private async syncVocabularyRecallsOnce():Promise<boolean> {
     try {
       let remote=await ToeicVocabularyRemoteApi.instance.list();
       let cloudWinners:ToeicVocabularyRecall[]=[];
       let cloudWeak:string[]=[];
+      let remoteById:Map<string,RemoteToeicVocabularyRecall>=
+        new Map<string,RemoteToeicVocabularyRecall>();
       for (let cloud of remote) {
+        if (!remoteById.has(cloud.vocabularyId)) remoteById.set(cloud.vocabularyId,cloud);
         let local=ToeicProgressStore.instance.vocabularyRecall(cloud.vocabularyId);
         if (local===null || cloud.lastReviewedAtEpochMs>=local.lastReviewedAtMs) {
           cloudWinners.push(new ToeicVocabularyRecall(
@@ -150,25 +177,25 @@ export class ToeicCoachViewModel {
           if (!cloud.remembered) cloudWeak.push(cloud.vocabularyId);
         }
       }
+      let localChanged=false;
       if (cloudWinners.length>0) {
-        await ToeicProgressStore.instance.mergeVocabularyRecalls(cloudWinners,cloudWeak);
+        localChanged=await ToeicProgressStore.instance.mergeVocabularyRecalls(cloudWinners,cloudWeak);
       }
-
       let localItems=ToeicProgressStore.instance.current().vocabularyRecalls.slice();
       for (let local of localItems) {
-        let cloud:RemoteToeicVocabularyRecall|null=null;
-        for (let item of remote) {
-          if (item.vocabularyId===local.vocabularyId) { cloud=item; break; }
-        }
-        if (cloud!==null && cloud.lastReviewedAtEpochMs>=local.lastReviewedAtMs) continue;
+        let cloud=remoteById.get(local.vocabularyId);
+        if (cloud!==undefined && cloud.lastReviewedAtEpochMs>=local.lastReviewedAtMs) continue;
         let remembered=!ToeicProgressStore.instance.isUnrememberedVocabulary(local.vocabularyId);
         await ToeicVocabularyRemoteApi.instance.save(local,remembered);
       }
-      return true;
+      ToeicCoachViewModel.lastSuccessfulSyncAtMs=Date.now();
+      // UI state only needs refreshing when cloud data really changed local data.
+      return localChanged;
     } catch {
       return false;
     }
   }
+
   todaySentenceDrills():ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(this.snapshot().currentDay); }
   sentenceDrillsForDay(day:number):ToeicSentenceDrill[] { return PresetToeicContent.sentenceDrillsForDay(day); }
   async pronounce(item:ToeicVocabularyItem):Promise<ToeicPronunciationStatus> {

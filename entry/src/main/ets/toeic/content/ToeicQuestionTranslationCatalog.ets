@@ -7,13 +7,28 @@ import { ToeicQuestionTranslationDay17Catalog } from './ToeicQuestionTranslation
 import { ToeicQuestionTranslationDay18And20Catalog } from './ToeicQuestionTranslationDay18And20Catalog';
 
 export class ToeicQuestionTranslationCatalog {
+  private static cachedItems:ToeicQuestionTranslation[]|null=null;
+  private static cachedById:Map<string,ToeicQuestionTranslation>|null=null;
+
+  private static baseById():Map<string,ToeicQuestionTranslation> {
+    if (ToeicQuestionTranslationCatalog.cachedById===null) {
+      let index:Map<string,ToeicQuestionTranslation>=new Map<string,ToeicQuestionTranslation>();
+      for (let item of ToeicQuestionTranslationCatalog.items()) {
+        if (!index.has(item.questionId)) index.set(item.questionId,item);
+      }
+      ToeicQuestionTranslationCatalog.cachedById=index;
+    }
+    return ToeicQuestionTranslationCatalog.cachedById;
+  }
   static items():ToeicQuestionTranslation[] {
-    return ToeicQuestionTranslationWeekOneCatalog.items()
+    if (ToeicQuestionTranslationCatalog.cachedItems!==null) return ToeicQuestionTranslationCatalog.cachedItems.slice();
+    ToeicQuestionTranslationCatalog.cachedItems=ToeicQuestionTranslationWeekOneCatalog.items()
       .concat(ToeicQuestionTranslationWeekTwoCatalog.items())
       .concat(ToeicQuestionTranslationWeekThreeCatalog.items())
       .concat(ToeicQuestionTranslationSupplementaryCatalog.items())
       .concat(ToeicQuestionTranslationDay17Catalog.items())
       .concat(ToeicQuestionTranslationDay18And20Catalog.items());
+    return ToeicQuestionTranslationCatalog.cachedItems.slice();
   }
 
   /** Historical 221-row catalog plus current release-only translation overlays.
@@ -21,15 +36,16 @@ export class ToeicQuestionTranslationCatalog {
    * must include versioned replacement IDs that are resolved by find().
    */
   static validationItems(questionIds:string[]):ToeicQuestionTranslation[] {
-    let result=ToeicQuestionTranslationCatalog.items().slice();
+    let result=ToeicQuestionTranslationCatalog.items();
+    let known:Map<string,boolean>=new Map<string,boolean>();
+    for (let item of result) known.set(item.questionId,true);
     for (let questionId of questionIds) {
-      let exists=false;
-      for (let item of result) {
-        if (item.questionId===questionId) { exists=true; break; }
-      }
-      if (exists) continue;
+      if (known.has(questionId)) continue;
       let resolved=ToeicQuestionTranslationCatalog.find(questionId);
-      if (resolved!==null) result.push(resolved);
+      if (resolved!==null) {
+        result.push(resolved);
+        known.set(questionId,true);
+      }
     }
     return result;
   }
@@ -101,8 +117,7 @@ export class ToeicQuestionTranslationCatalog {
         '到明天客户到达时，演示文稿_____准备就绪。',
         ['过去已经是','正在是（非谓语）','将会是（将来时）','已经是（复数完成时）']);
     }
-    let items=ToeicQuestionTranslationCatalog.items();
-    for (let item of items) if (item.questionId===questionId) return item;
-    return null;
+    let item=ToeicQuestionTranslationCatalog.baseById().get(questionId);
+    return item===undefined?null:item;
   }
 }

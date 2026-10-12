@@ -35,7 +35,19 @@ import { ToeicExtraReadingBatchFive } from './ToeicExtraReadingBatchFive';
 import { ToeicExtraReadingBatchSix } from './ToeicExtraReadingBatchSix';
 
 export class PresetToeicContent {
+  // Bundled release assets do not change while the app is running. Cache the
+  // assembled catalogs, but return new arrays so callers can reorder their own
+  // lists without mutating catalog membership.
+  private static cachedQuestions:ToeicQuestion[]|null=null;
+  private static cachedReadingGroups:ToeicReadingGroup[]|null=null;
+  private static cachedPublishedQuestions:ToeicQuestion[]|null=null;
+  private static cachedLiveQuestions:ToeicQuestion[]|null=null;
+  private static cachedVocabulary:ToeicVocabularyItem[]|null=null;
+  private static cachedStudyDays:ToeicStudyDay[]|null=null;
+  private static cachedSentenceDrills:ToeicSentenceDrill[]|null=null;
+  private static cachedLiveQuestionIndex:Map<string,ToeicQuestion>|null=null;
   static questions():ToeicQuestion[] {
+    if (PresetToeicContent.cachedQuestions!==null) return PresetToeicContent.cachedQuestions.slice();
     let base:ToeicQuestion[]=[
       new ToeicQuestion('R-P5-WF-0001',ToeicSection.READING,ToeicPart.PART_5,ToeicSkill.WORD_FORM,'',
         'The instructions in the training manual are _____ written.',
@@ -147,10 +159,12 @@ export class PresetToeicContent {
         'Train 84 arrives at 9:05 A.M.; the message requires at least 15 minutes before the 9:30 presentation.',
         '9:30 minus 15 minutes = latest acceptable arrival 9:15',75,ToeicDifficulty.MEDIUM,ToeicScoreValue.NORMAL)
     ];
-    return base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat(ToeicMockDay14Part5V2Content.questions()).concat(ToeicP5UniqueAnswerIssue478.questions()).concat(ToeicP6ConditionalIssue478.questions()).concat(ToeicP1FinalQuestionCorrections.questions()).concat(ToeicP3FinalCorrections.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19(),ToeicMockDay19Part6CompletionContent.inventory(),ToeicMockDay19Part6CompletionContent.library()]);
+    PresetToeicContent.cachedQuestions=base.concat(ToeicWeekOneContent.questions()).concat(ToeicWeekTwoContent.questions()).concat(ToeicWeekThreeContent.questions()).concat(ToeicStandardDiagnosticContent.questions()).concat(ToeicExtraReadingContent.questions()).concat(ToeicExtraReadingBatchTwo.questions()).concat(ToeicExtraReadingBatchThree.questions()).concat(ToeicExtraReadingBatchFour.questions()).concat(ToeicExtraReadingBatchFive.questions()).concat(ToeicExtraReadingBatchSix.questions()).concat(ToeicMockDay14V2Content.questions()).concat(ToeicMockDay19V2Content.questions()).concat(ToeicMockPart7EvidenceRevisionContent.questions()).concat(ToeicMockDay19Part6V2Content.questions()).concat(ToeicMockDay19Part5V2Content.questions()).concat(ToeicMockDay14Part5V2Content.questions()).concat(ToeicP5UniqueAnswerIssue478.questions()).concat(ToeicP6ConditionalIssue478.questions()).concat(ToeicP1FinalQuestionCorrections.questions()).concat(ToeicP3FinalCorrections.questions()).concat([ToeicMockPart6V2RepairContent.day14(),ToeicMockPart6V2RepairContent.day19(),ToeicMockDay19Part6CompletionContent.inventory(),ToeicMockDay19Part6CompletionContent.library()]);
+    return PresetToeicContent.cachedQuestions.slice();
   }
 
   static publishedReadingGroups():ToeicReadingGroup[] {
+    if (PresetToeicContent.cachedReadingGroups!==null) return PresetToeicContent.cachedReadingGroups.slice();
     let candidates=ToeicExtraReadingContent.groups().concat(ToeicExtraReadingBatchTwo.groups()).concat(ToeicExtraReadingBatchThree.groups()).concat(ToeicExtraReadingBatchFour.groups()).concat(ToeicExtraReadingBatchFive.groups()).concat(ToeicExtraReadingBatchSix.groups()).concat(ToeicMockDay14V2Content.groups()).concat(ToeicMockDay19V2Content.groups());
     // The group catalog represents the CURRENT release only. Historic question
     // IDs remain published/addressable for saved drafts and reports, but they
@@ -179,7 +193,8 @@ export class PresetToeicContent {
       }
       if (everyPublished) groups.push(group);
     }
-    return groups;
+    PresetToeicContent.cachedReadingGroups=groups;
+    return groups.slice();
   }
 
   /** Return only the CURRENT members of published reading groups for group
@@ -203,6 +218,7 @@ export class PresetToeicContent {
   }
 
   static publishedQuestions():ToeicQuestion[] {
+    if (PresetToeicContent.cachedPublishedQuestions!==null) return PresetToeicContent.cachedPublishedQuestions.slice();
     let source=PresetToeicContent.questions();
     let readyGroups=PresetToeicContent.publishedReadingGroups();
     let published:ToeicQuestion[]=[];
@@ -222,8 +238,8 @@ export class PresetToeicContent {
     let validation=ToeicContentValidator.validateAll(published);
     let groupValidation=ToeicContentValidator.validateReadingGroups(
       PresetToeicContent.readingGroupValidationQuestions(published,readyGroups),readyGroups);
-    if (!validation.valid || !groupValidation.valid) return [];
-    return published;
+    PresetToeicContent.cachedPublishedQuestions=(!validation.valid || !groupValidation.valid)?[]:published;
+    return PresetToeicContent.cachedPublishedQuestions.slice();
   }
 
   /** Exclude editorially flagged archived items from new learning queues only.
@@ -231,13 +247,15 @@ export class PresetToeicContent {
    * Issue #478: the old R-M1-P7-094 date inference is not independently supported.
    */
   static liveTrainingQuestions():ToeicQuestion[] {
+    if (PresetToeicContent.cachedLiveQuestions!==null) return PresetToeicContent.cachedLiveQuestions.slice();
     let published=PresetToeicContent.publishedQuestions();
     let live:ToeicQuestion[]=[];
     for (let question of published) {
       if (question.id==='R-FM1-P7-M1-01' || question.id==='R-FM1-P7-M4-01' || question.id==='R-FM2-P7-M1-01' || question.id==='R-FM2-P7-M5-03' || question.id==='R-M1-P7-094' || question.id==='R-M2-P5-007' || question.id==='R-M1-P5-022' || question.id==='R-P5-VERB-0206' || question.id==='R-P5-SPRINT-1517' || question.id==='R-P6-SPRINT-1610' || question.id==='R-P5-SPRINT-1528' || question.id==='R-P6-SPRINT-1606' || question.id==='R-DX-P5-05' || question.id==='R-M2-P5-010' || question.id==='R-M2-P6-002' || question.id==='R-M2-P6-004' || question.id==='R-M1-P6-033' || question.id==='R-M2-P6-009' || question.id==='R-FM2-P6-004' || question.id==='R-M2-P6-008' || question.id==='R-FP1-P5-1528' || question.id==='R-FM1-P7-M2-03' || question.id==='R-FM1-P7-S09-01' || question.id==='R-FM2-P7-S07-03') continue;
       live.push(question);
     }
-    return live;
+    PresetToeicContent.cachedLiveQuestions=live;
+    return live.slice();
   }
 
   /** The Day 1 plan is the only source of truth for the comprehensive diagnostic. */
@@ -331,15 +349,18 @@ export class PresetToeicContent {
   }
 
   static vocabulary():ToeicVocabularyItem[] {
+    if (PresetToeicContent.cachedVocabulary!==null) return PresetToeicContent.cachedVocabulary.slice();
     let all=PresetToeicContent.vocabularyForReview();
     let published:ToeicVocabularyItem[]=[];
     for (let item of all) {
       if (item.reviewStatus===ToeicReviewStatus.PUBLISHED) published.push(item);
     }
-    return published;
+    PresetToeicContent.cachedVocabulary=published;
+    return published.slice();
   }
 
   static studyDays():ToeicStudyDay[] {
+    if (PresetToeicContent.cachedStudyDays!==null) return PresetToeicContent.cachedStudyDays.slice();
     let plans=ToeicWeekOneContent.studyDays().concat(ToeicWeekTwoContent.studyDays()).concat(ToeicWeekThreeContent.studyDays());
     // Keep the published v1 100-question bank unchanged for historical drafts.
     // Only *new* Day14 sessions use the structurally corrected v2 Part7.
@@ -389,11 +410,15 @@ export class PresetToeicContent {
         return ToeicP3FinalCorrections.activePart7Id(id);
       });
     }
-    return plans;
+    PresetToeicContent.cachedStudyDays=plans;
+    return plans.slice();
   }
 
   static sentenceDrills():ToeicSentenceDrill[] {
-    return ToeicWeekOneContent.sentenceDrills().concat(ToeicWeekTwoContent.sentenceDrills()).concat(ToeicWeekThreeContent.sentenceDrills());
+    if (PresetToeicContent.cachedSentenceDrills===null) {
+      PresetToeicContent.cachedSentenceDrills=ToeicWeekOneContent.sentenceDrills().concat(ToeicWeekTwoContent.sentenceDrills()).concat(ToeicWeekThreeContent.sentenceDrills());
+    }
+    return PresetToeicContent.cachedSentenceDrills.slice();
   }
 
   static studyDay(day:number):ToeicStudyDay {
@@ -444,9 +469,17 @@ export class PresetToeicContent {
   static questionsForDay(day:number):ToeicQuestion[] {
     let plan=PresetToeicContent.studyDay(day);
     let all=PresetToeicContent.liveTrainingQuestions();
+    if (PresetToeicContent.cachedLiveQuestionIndex===null) {
+      let index:Map<string,ToeicQuestion>=new Map<string,ToeicQuestion>();
+      for (let question of all) {
+        if (!index.has(question.id)) index.set(question.id,question);
+      }
+      PresetToeicContent.cachedLiveQuestionIndex=index;
+    }
     let result:ToeicQuestion[]=[];
     for (let id of plan.questionIds) {
-      for (let question of all) if (question.id===id) { result.push(question); break; }
+      let question=PresetToeicContent.cachedLiveQuestionIndex.get(id);
+      if (question!==undefined) result.push(question);
     }
     // Daily extra passages are genuine planned exercises, not a separate bonus session.
     // Historical Day14/19 items remain unchanged; new sessions use the two v2 banks.
