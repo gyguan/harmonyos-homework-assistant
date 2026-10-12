@@ -207,12 +207,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         if (item == null || blank(item.id()) || blank(item.title())) continue;
         input.append("\n- ID=").append(item.id())
             .append("；科目=").append(value(item.subject(), "其他"))
-            .append("；标题=").append(item.title().trim())
-            .append("；要求=").append(value(item.instruction(), ""))
-            .append("；教材=").append(value(item.textbookRef(), ""))
-            .append("；时间=").append(value(item.dueText(), ""))
-            .append("；老师原文片段=").append(value(item.sourceExcerpt(), ""));
-        if (++count >= 20) break;
+            .append("；标题=").append(compact(item.title(), 80))
+            .append("；要求=").append(compact(item.instruction(), 120))
+            .append("；原文=").append(compact(item.sourceExcerpt(), 160));
+        if (++count >= 10) break;
       }
       if (count == 0) input.append("\n无");
     }
@@ -427,7 +425,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     for (HomeworkOrganizerDtos.ExistingAssignment item : existingAssignments) {
       if (item == null || blank(item.id()) || blank(item.title())) continue;
       titles.put(item.id().trim(), item.title().trim());
-      if (titles.size() >= 20) break;
+      if (titles.size() >= 10) break;
     }
     return titles;
   }
