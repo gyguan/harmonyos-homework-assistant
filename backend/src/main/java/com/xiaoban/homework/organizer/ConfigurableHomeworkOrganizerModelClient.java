@@ -110,7 +110,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         existingAssignmentTitles(existingAssignments));
     if (converted.candidates().size() != parsed.assignments().size()) return Optional.empty();
     List<HomeworkOrganizerDtos.Candidate> reviewed =
-        applyEvidenceDuplicateFallback(converted.candidates(), existingAssignments);
+        enforceSameDueForModelHints(converted.candidates(), existingAssignments);
+    reviewed = applyEvidenceDuplicateFallback(reviewed, existingAssignments);
+    reviewed = applySourceInputDuplicateFallback(
+        reviewed, existingAssignments, parsed.recognizedText().trim());
     return Optional.of(new HomeworkOrganizerDtos.ImageResponse(
         reviewed, "AI_IMAGE", parsed.recognizedText().trim()));
   }
@@ -145,7 +148,9 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       StructuredResult structured = jsonMapper.readValue(stripCodeFence(outputText.get()), StructuredResult.class);
       ConversionResult converted = toCandidates(structured, existingAssignmentTitles(existingAssignments));
       List<HomeworkOrganizerDtos.Candidate> reviewed =
-          applyEvidenceDuplicateFallback(converted.candidates(), existingAssignments);
+          enforceSameDueForModelHints(converted.candidates(), existingAssignments);
+      reviewed = applyEvidenceDuplicateFallback(reviewed, existingAssignments);
+      reviewed = applySourceInputDuplicateFallback(reviewed, existingAssignments, text);
       log.info(
           "[AI] organizer parsed model={} assignments={} accepted={} unsupportedSubject={} blankTitle={} unsupportedValues={}",
           properties.getOrganizerModel(), converted.sourceCount(), converted.candidates().size(),
@@ -180,7 +185,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         + "title 要简洁，instruction 保留完成任务所需信息。"
         + "还要进行语义重复判断：不要只比较标题，要综合科目、教材或练习册、页码题号、核心动作和截止时间。"
         + "如果本次输出的多个候选疑似属于同一项作业，为这些候选填写相同的 sameTaskGroup（如 G1）；否则填写空字符串。"
-        + "输入中会提供当前已有任务，这些已有任务均为今天且未完成；只有候选任务也是今天时，才允许判断为与已有任务重复。"
+        + "输入中会提供近期未完成任务。只有候选任务与已有任务的完成日期是同一天时，才允许判断为重复。"
         + "若候选与某个已有任务实质上是同一项作业且置信度至少 0.70，"
         + "duplicateAssignmentId 填已有任务 ID，duplicateConfidence 填 0 到 1，duplicateReason 用一句话说明依据；"
         + "否则 duplicateAssignmentId 和 duplicateReason 填空字符串，duplicateConfidence 填 0。"
@@ -210,6 +215,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
             .append("；科目=").append(value(item.subject(), "其他"))
             .append("；标题=").append(compact(item.title(), 80))
             .append("；要求=").append(compact(item.instruction(), 120))
+            .append("；完成时间=").append(compact(item.dueText(), 40))
             .append("；原文=").append(compact(item.sourceExcerpt(), 160));
         if (++count >= 10) break;
       }
@@ -343,6 +349,76 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     return compact;
   }
 
+  static List<HomeworkOrganizerDtos.Candidate> enforceSameDueForModelHints(
+      List<HomeworkOrganizerDtos.Candidate> candidates,
+      List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments) {
+    if (candidates == null || candidates.isEmpty()) return candidates == null ? List.of() : candidates;
+    Map<String, HomeworkOrganizerDtos.ExistingAssignment> existingById = new LinkedHashMap<>();
+    if (existingAssignments != null) {
+      for (HomeworkOrganizerDtos.ExistingAssignment item : existingAssignments) {
+        if (item == null || blank(item.id())) continue;
+        existingById.put(item.id(), item);
+      }
+    }
+    List<HomeworkOrganizerDtos.Candidate> result = new ArrayList<>();
+    for (HomeworkOrganizerDtos.Candidate candidate : candidates) {
+      if (candidate == null || blank(candidate.duplicateAssignmentId())) {
+        result.add(candidate);
+        continue;
+      }
+      HomeworkOrganizerDtos.ExistingAssignment existing =
+          existingById.get(candidate.duplicateAssignmentId());
+      if (existing != null && sameDue(candidate.dueText(), existing.dueText())) {
+        result.add(candidate);
+        continue;
+      }
+      result.add(new HomeworkOrganizerDtos.Candidate(
+          candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
+          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.sameTaskGroup(), "", "", 0.0, ""));
+    }
+    return result;
+  }
+
+  static List<HomeworkOrganizerDtos.Candidate> applySourceInputDuplicateFallback(
+      List<HomeworkOrganizerDtos.Candidate> candidates,
+      List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments,
+      String sourceText) {
+    if (candidates == null || candidates.isEmpty() || existingAssignments == null ||
+        existingAssignments.isEmpty() || blank(sourceText)) {
+      return candidates == null ? List.of() : candidates;
+    }
+    List<HomeworkOrganizerDtos.Candidate> result = new ArrayList<>();
+    for (HomeworkOrganizerDtos.Candidate candidate : candidates) {
+      if (candidate == null || !blank(candidate.duplicateAssignmentId())) {
+        result.add(candidate);
+        continue;
+      }
+      HomeworkOrganizerDtos.ExistingAssignment best = null;
+      for (HomeworkOrganizerDtos.ExistingAssignment existing : existingAssignments) {
+        if (existing == null || blank(existing.id())) continue;
+        String existingSubject = normalizeSubject(existing.subject());
+        if (existingSubject == null || !existingSubject.equals(candidate.subject())) continue;
+        if (!sameDue(candidate.dueText(), existing.dueText())) continue;
+        if (!sameEvidence(sourceText, existing.sourceExcerpt())) continue;
+        if (best == null || sameStructuredTask(candidate, existing)) {
+          best = existing;
+          if (sameStructuredTask(candidate, existing)) break;
+        }
+      }
+      if (best == null) {
+        result.add(candidate);
+        continue;
+      }
+      result.add(new HomeworkOrganizerDtos.Candidate(
+          candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
+          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.sameTaskGroup(), best.id(), best.title(), 1.0,
+          "与已有任务来自同一份作业原文且完成日期一致"));
+    }
+    return result;
+  }
+
   static List<HomeworkOrganizerDtos.Candidate> applyEvidenceDuplicateFallback(
       List<HomeworkOrganizerDtos.Candidate> candidates,
       List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments) {
@@ -387,9 +463,18 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   private static boolean sameDue(String left, String right) {
-    String a = semanticKey(left);
-    String b = semanticKey(right);
-    return a.isBlank() || b.isBlank() || a.equals(b);
+    String a = dueKey(left);
+    String b = dueKey(right);
+    return !a.isBlank() && a.equals(b);
+  }
+
+  private static String dueKey(String value) {
+    String key = semanticKey(value);
+    if (key.isBlank()) return "";
+    if (key.contains("后天")) return "后天";
+    if (key.contains("明天") || key.contains("明日")) return "明天";
+    if (key.contains("今天") || key.contains("今日") || key.contains("今晚")) return "今天";
+    return key;
   }
 
   private static boolean sameEvidence(String left, String right) {
