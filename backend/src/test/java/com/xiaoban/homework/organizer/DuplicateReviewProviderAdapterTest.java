@@ -59,6 +59,19 @@ class DuplicateReviewProviderAdapterTest {
   }
 
   @Test
+  void acceptsObservedQwenCandidateAndExistingTaskIdAliases() throws Exception {
+    var adapted = DuplicateReviewProviderAdapter.adapt(mapper, """
+        {"matches":[{"candidate":"C0","existing_task_id":"assignment-456","confidence":0.94}]}
+        """);
+
+    var decision = adapted.review().matches().getFirst();
+    assertEquals(0, decision.candidateIndex());
+    assertEquals("assignment-456", decision.duplicateAssignmentId());
+    assertEquals(0.94, decision.confidence());
+    assertEquals("AI语义判重", decision.reason());
+  }
+
+  @Test
   void acceptsStringifiedMatchesAndMissingReason() throws Exception {
     var adapted = DuplicateReviewProviderAdapter.adapt(mapper,
         "{\"matches\":\"[{\\\"candidateIndex\\\":\\\"0\\\","

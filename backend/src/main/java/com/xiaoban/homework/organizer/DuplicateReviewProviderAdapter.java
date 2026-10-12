@@ -50,8 +50,9 @@ final class DuplicateReviewProviderAdapter {
           base + ".candidateIndex", tracker);
       String assignmentId = stringValue(
           pick(item, base + ".duplicateAssignmentId",
-              "duplicateAssignmentId", "duplicate_assignment_id", "existing_id", "existingId",
-              "assignmentId", "assignment_id"),
+              "duplicateAssignmentId", "duplicate_assignment_id",
+              "existing_task_id", "existingTaskId", "existing_id", "existingId",
+              "matched_task_id", "matchedTaskId", "assignmentId", "assignment_id"),
           base + ".duplicateAssignmentId", tracker);
       double confidence = confidenceValue(
           pick(item, base + ".confidence", "confidence", "duplicateConfidence", "score"),

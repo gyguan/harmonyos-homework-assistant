@@ -231,6 +231,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         + "只能在同科目内匹配。综合核心动作、教材或练习册、页码题号、范围、完成要求和老师原文证据判断。"
         + "标题写法不同不代表不同任务；但朗读与背诵、不同页码、不同题号范围或不同核心动作应视为不同任务。"
         + "每个候选最多匹配一个已有任务。只有置信度至少0.70时才输出匹配；否则不要输出该候选。"
+        + "输出字段名必须严格使用 candidateIndex、duplicateAssignmentId、confidence、reason，禁止改名、翻译或使用别名。"
+        + "有匹配时示例：{\"matches\":[{\"candidateIndex\":0,\"duplicateAssignmentId\":\"existing-task-id\","
+        + "\"confidence\":0.92,\"reason\":\"页码题号和完成要求一致\"}]}。"
+        + "无匹配时必须输出：{\"matches\":[]}。"
         + "最终只输出JSON对象，根字段为matches，不要输出额外解释。";
   }
 
@@ -251,7 +255,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       HomeworkOrganizerDtos.Candidate candidate = candidates.get(i);
       if (candidate == null || !today.equals(candidateDueDate(candidate.dueText()))) continue;
       subjects.add(candidate.subject());
-      input.append("\n- C").append(i)
+      input.append("\n- candidateIndex=").append(i)
           .append("；科目=").append(value(candidate.subject(), "其他"))
           .append("；标题=").append(compact(candidate.title(), 80))
           .append("；要求=").append(compact(candidate.instruction(), 120))
@@ -267,7 +271,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       if (existing == null || blank(existing.id())) continue;
       String subject = normalizeSubject(existing.subject());
       if (subject == null || !subjects.contains(subject)) continue;
-      input.append("\n- ID=").append(existing.id())
+      input.append("\n- duplicateAssignmentId=").append(existing.id())
           .append("；科目=").append(subject)
           .append("；标题=").append(compact(existing.title(), 80))
           .append("；要求=").append(compact(existing.instruction(), 120))
