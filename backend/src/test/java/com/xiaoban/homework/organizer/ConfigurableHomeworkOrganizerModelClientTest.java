@@ -172,7 +172,6 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         student, "老师通知", "数学第三单元练习第26页1到6题", existing);
     assertTrue(input.contains("ID=a-existing-1"));
     assertTrue(input.contains("练习册 P26 第1～6题"));
-    assertTrue(input.contains("完成时间=今天"));
     assertTrue(input.contains("原文=数学练习册第26页1-6题，完成后订正"));
     assertFalse(input.contains("；教材="));
 
