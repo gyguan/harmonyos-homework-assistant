@@ -516,6 +516,34 @@ def main() -> None:
             "if (!this.contentValidationReady)" in ui and
             "return this.contentValidationReady && this.contentValidationErrors.length===0;" in ui,
             "TOEIC fail-closed UI must show cached validation errors and block training until validated")
+    # Cached, immutable release catalogs must not be rebuilt for every
+    # non-mock day, and hot tab navigation must reuse completed validation.
+    preset = read("entry/src/main/ets/toeic/content/PresetToeicContent.ets")
+    view_model = read("entry/src/main/ets/toeic/ui/ToeicCoachViewModel.ets")
+    progress_store = read("entry/src/main/ets/toeic/data/ToeicProgressStore.ets")
+    require(all(token in preset for token in [
+        "private static cachedQuestions:", "private static cachedReadingGroups:",
+        "private static cachedPublishedQuestions:", "private static cachedLiveQuestions:",
+        "private static cachedStudyDays:", "private static cachedVocabulary:",
+        "private static cachedSentenceDrills:", "cachedLiveQuestionIndex.get(id)"
+    ]), "TOEIC bundled catalogs must remain cached and indexed for navigation")
+    require("private static cachedItems:" in translation_catalog and
+            "private static cachedById:" in translation_catalog and
+            "ToeicQuestionTranslationCatalog.baseById().get(questionId)" in translation_catalog,
+            "TOEIC historical translations must be cached and indexed")
+    require("this.viewModel.cachedErrors()" in ui and
+            "this.contentValidationReady=true;" in ui and
+            "this.contentValidationTimer=setTimeout" in ui and
+            "},16);" in ui and
+            "content.validate costMs=" in ui,
+            "TOEIC home must reuse completed validation and measure cold validation cost")
+    require("private static syncInFlight:" in view_model and
+            "lastSuccessfulSyncAtMs" in view_model and
+            "return localChanged;" in view_model and
+            "if (!changed) return;" in ui and
+            "local.streak===incoming.streak" in progress_store and
+            "if (changed) await this.save();" in progress_store,
+            "TOEIC cloud recall sync must avoid redundant requests, writes and renders")
     require("标记重点" not in ui and
             "取消重点" not in ui and
             "toggleVocabularyImportant" not in ui and
