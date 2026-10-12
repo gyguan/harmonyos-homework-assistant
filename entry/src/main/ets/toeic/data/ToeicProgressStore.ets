@@ -52,32 +52,49 @@ export class ToeicProgressStore {
   }
 
   async mergeVocabularyRecalls(
-    recalls:ToeicVocabularyRecall[], unrememberedIds:string[]):Promise<void> {
+    recalls:ToeicVocabularyRecall[], unrememberedIds:string[]):Promise<boolean> {
     let changed=false;
+    let localById:Map<string,ToeicVocabularyRecall>=new Map<string,ToeicVocabularyRecall>();
+    for (let item of this.snapshot.vocabularyRecalls) {
+      if (!localById.has(item.vocabularyId)) localById.set(item.vocabularyId,item);
+    }
+    let weakIds:Set<string>=new Set<string>(this.snapshot.unrememberedVocabularyIds);
+    let cloudWeakIds:Set<string>=new Set<string>(unrememberedIds);
     for (let incoming of recalls) {
-      let local:ToeicVocabularyRecall|null=null;
-      for (let item of this.snapshot.vocabularyRecalls) {
-        if (item.vocabularyId===incoming.vocabularyId) { local=item; break; }
-      }
-      if (local!==null && local.lastReviewedAtMs>incoming.lastReviewedAtMs) continue;
-      if (local===null) {
+      let local=localById.get(incoming.vocabularyId);
+      if (local!==undefined && local.lastReviewedAtMs>incoming.lastReviewedAtMs) continue;
+      let shouldBeWeak=cloudWeakIds.has(incoming.vocabularyId);
+      let wasWeak=weakIds.has(incoming.vocabularyId);
+      if (local!==undefined && local.streak===incoming.streak &&
+          local.totalReviews===incoming.totalReviews &&
+          local.nextDueAtMs===incoming.nextDueAtMs &&
+          local.lastReviewedAtMs===incoming.lastReviewedAtMs &&
+          wasWeak===shouldBeWeak) continue;
+      if (local===undefined) {
         local=new ToeicVocabularyRecall(
           incoming.vocabularyId,incoming.streak,incoming.totalReviews,
           incoming.nextDueAtMs,incoming.lastReviewedAtMs);
         this.snapshot.vocabularyRecalls.push(local);
+        localById.set(incoming.vocabularyId,local);
       } else {
         local.streak=incoming.streak;
         local.totalReviews=incoming.totalReviews;
         local.nextDueAtMs=incoming.nextDueAtMs;
         local.lastReviewedAtMs=incoming.lastReviewedAtMs;
       }
-      let weakIndex=this.snapshot.unrememberedVocabularyIds.indexOf(incoming.vocabularyId);
-      let shouldBeWeak=unrememberedIds.indexOf(incoming.vocabularyId)>=0;
-      if (shouldBeWeak && weakIndex<0) this.snapshot.unrememberedVocabularyIds.push(incoming.vocabularyId);
-      if (!shouldBeWeak && weakIndex>=0) this.snapshot.unrememberedVocabularyIds.splice(weakIndex,1);
+      if (shouldBeWeak && !wasWeak) {
+        this.snapshot.unrememberedVocabularyIds.push(incoming.vocabularyId);
+        weakIds.add(incoming.vocabularyId);
+      }
+      if (!shouldBeWeak && wasWeak) {
+        let index=this.snapshot.unrememberedVocabularyIds.indexOf(incoming.vocabularyId);
+        if (index>=0) this.snapshot.unrememberedVocabularyIds.splice(index,1);
+        weakIds.delete(incoming.vocabularyId);
+      }
       changed=true;
     }
     if (changed) await this.save();
+    return changed;
   }
 
   vocabularyDueIds(nowMs:number=Date.now()):string[] {
