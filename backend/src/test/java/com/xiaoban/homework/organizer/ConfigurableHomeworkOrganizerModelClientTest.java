@@ -170,7 +170,9 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         student, "老师通知", "数学第三单元练习第26页1到6题", existing);
     assertTrue(input.contains("ID=a-existing-1"));
     assertTrue(input.contains("练习册 P26 第1～6题"));
-    assertTrue(input.contains("老师原文片段=数学练习册第26页1-6题，完成后订正"));
+    assertTrue(input.contains("原文=数学练习册第26页1-6题，完成后订正"));
+    assertFalse(input.contains("；教材="));
+    assertFalse(input.contains("；时间="));
 
     var accepted = ConfigurableHomeworkOrganizerModelClient.toCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
@@ -193,6 +195,26 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         java.util.Map.of("a-existing-1", "练习册 P26 第1～6题"));
     assertEquals("", rejected.candidates().getFirst().duplicateAssignmentId());
     assertEquals(0.0, rejected.candidates().getFirst().duplicateConfidence());
+  }
+
+  @Test
+  void limitsExistingAssignmentPromptContextToTenAndTruncatesFields() {
+    TestStudent student = new TestStudent();
+    java.util.List<HomeworkOrganizerDtos.ExistingAssignment> existing = new java.util.ArrayList<>();
+    for (int i = 0; i < 12; i++) {
+      existing.add(new HomeworkOrganizerDtos.ExistingAssignment(
+          "a-" + i, "数学", "标题" + "很长".repeat(60), "要求" + "很长".repeat(90), "", "今天",
+          "原文" + "很长".repeat(120)));
+    }
+
+    String input = ConfigurableHomeworkOrganizerModelClient.buildInput(
+        student, "老师通知", "数学作业", existing);
+
+    assertTrue(input.contains("ID=a-0"));
+    assertTrue(input.contains("ID=a-9"));
+    assertFalse(input.contains("ID=a-10"));
+    assertFalse(input.contains("ID=a-11"));
+    assertTrue(input.length() < 6000);
   }
 
   @Test
