@@ -570,8 +570,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     Set<String> existingNumbers = numberTokens(existingText);
     if (!candidateNumbers.equals(existingNumbers)) return false;
 
-    double similarity = bigramDice(candidateText, existingText);
-    return candidateNumbers.isEmpty() ? similarity >= 0.72 : similarity >= 0.55;
+    if (!candidateNumbers.isEmpty()) return true;
+    return bigramDice(candidateText, existingText) >= 0.72;
   }
 
   private static boolean compatibleActionTokens(String left, String right) {
