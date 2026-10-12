@@ -27,7 +27,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     verify(transport).completeWithImage(anyString(), instructions.capture(), input.capture(),
         eq("data:image/jpeg;base64,PRIVATE"), eq(6000), anyString(), anyMap());
     assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
-    assertTrue(instructions.getValue().contains("重复任务只保留一项"));
+    assertTrue(instructions.getValue().contains("sameTaskGroup"));
     assertFalse(instructions.getValue().contains("数学口算20题"));
     assertFalse(ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null)
         .endsWith("null"));
@@ -130,9 +130,11 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var result = ConfigurableHomeworkOrganizerModelClient.toCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "科学", "观察植物", "观察并记录", "", "今天", 20, "观察植物", 0.9),
+                "科学", "观察植物", "观察并记录", "", "今天", 20, "观察植物", 0.9,
+                "", "", 0.0, ""),
             new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
-                "语文作业", "背诵第12课", "背诵课文", "", "明天", 15, "背诵第12课", 0.95))));
+                "语文作业", "背诵第12课", "背诵课文", "", "明天", 15, "背诵第12课", 0.95,
+                "", "", 0.0, ""))));
 
     assertEquals(2, result.sourceCount());
     assertEquals(1, result.candidates().size());
@@ -150,5 +152,44 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(schema.contains("expectedMinutes"));
     assertTrue(schema.contains("minimum=5"));
     assertTrue(schema.contains("maximum=120"));
+    assertTrue(schema.contains("sameTaskGroup"));
+    assertTrue(schema.contains("duplicateAssignmentId"));
+    assertTrue(schema.contains("duplicateConfidence"));
+    assertTrue(schema.contains("duplicateReason"));
+  }
+
+  @Test
+  void includesExistingAssignmentsInPromptAndKeepsOnlyValidatedDuplicateReferences() {
+    TestStudent student = new TestStudent();
+    student.grade = "二年级";
+    var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
+        "a-existing-1", "数学", "练习册 P26 第1～6题", "完成后订正", "北师大版", "今天"));
+
+    String input = ConfigurableHomeworkOrganizerModelClient.buildInput(
+        student, "老师通知", "数学第三单元练习第26页1到6题", existing);
+    assertTrue(input.contains("ID=a-existing-1"));
+    assertTrue(input.contains("练习册 P26 第1～6题"));
+
+    var accepted = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "数学", "数学第三单元练习", "第26页1到6题，完成后订正", "", "今天", 20,
+                "数学第三单元练习第26页1到6题", 0.95, "G1", "a-existing-1", 0.93,
+                "页码、题号和订正要求一致"))),
+        java.util.Map.of("a-existing-1", "练习册 P26 第1～6题"));
+    assertEquals("G1", accepted.candidates().getFirst().sameTaskGroup());
+    assertEquals("a-existing-1", accepted.candidates().getFirst().duplicateAssignmentId());
+    assertEquals("练习册 P26 第1～6题", accepted.candidates().getFirst().duplicateAssignmentTitle());
+    assertEquals(0.93, accepted.candidates().getFirst().duplicateConfidence());
+    assertTrue(accepted.candidates().getFirst().duplicateReason().contains("页码"));
+
+    var rejected = ConfigurableHomeworkOrganizerModelClient.toCandidates(
+        new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
+            new ConfigurableHomeworkOrganizerModelClient.StructuredCandidate(
+                "数学", "口算", "口算20题", "", "今天", 10, "口算20题", 0.9,
+                "", "a-not-in-context", 0.99, "标题相似"))),
+        java.util.Map.of("a-existing-1", "练习册 P26 第1～6题"));
+    assertEquals("", rejected.candidates().getFirst().duplicateAssignmentId());
+    assertEquals(0.0, rejected.candidates().getFirst().duplicateConfidence());
   }
 }
