@@ -47,10 +47,10 @@ class DuplicateReviewProviderAdapterTest {
 
   @Test
   void acceptsStringifiedMatchesAndMissingReason() throws Exception {
-    var adapted = DuplicateReviewProviderAdapter.adapt(mapper, """
-        {"matches":"[{\"candidateIndex\":\"0\",\"duplicateAssignmentId\":\"a-2\",
-        \"confidence\":\"0.86\"}]"}
-        """);
+    var adapted = DuplicateReviewProviderAdapter.adapt(mapper,
+        "{\"matches\":\"[{\\\"candidateIndex\\\":\\\"0\\\","
+            + "\\\"duplicateAssignmentId\\\":\\\"a-2\\\","
+            + "\\\"confidence\\\":\\\"0.86\\\"}]\"}");
 
     var decision = adapted.review().matches().getFirst();
     assertEquals(0, decision.candidateIndex());
