@@ -192,7 +192,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         + "sourceExcerpt 必须尽量直接摘取对应老师原文，confidence 为 0 到 1。"
         + "title 要简洁，instruction 保留完成任务所需信息。"
         + "如果本次输出的多个候选疑似属于同一项作业，为这些候选填写相同的 sameTaskGroup（如 G1）；否则填写空字符串。"
-        + "sameTaskGroup 只用于本次输入内部的候选关联，不需要与历史任务比较。"
+        + "sameTaskGroup 仅表示本次输入内部的候选关联。"
         + "最终只输出一个 JSON 对象，根字段为 assignments，不要输出 Markdown 或额外解释。";
   }
 
