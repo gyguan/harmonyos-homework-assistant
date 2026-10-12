@@ -10,6 +10,7 @@ import {
 } from '../../application/assignment/AssignmentAudioPlayerService';
 
 const IMAGE_PREFETCH_CONCURRENCY: number = 2;
+const MANUAL_IMAGE_OVERRIDE_MS: number = 5000;
 
 @Component
 export struct VoiceAssignmentPane {
@@ -57,6 +58,7 @@ export struct VoiceAssignmentPane {
   private audioResource: AssignmentResource | null = null;
   private imageRequestVersion: number = 0;
   private lifecycleVersion: number = 0;
+  private manualImageOverrideUntilEpochMs: number = 0;
 
   aboutToAppear(): void {
     this.lifecycleVersion++;
@@ -106,6 +108,7 @@ export struct VoiceAssignmentPane {
     this.imageResources = [];
     this.imageUris = [];
     this.imageIndex = 0;
+    this.manualImageOverrideUntilEpochMs = 0;
     try {
       let resources = await RemoteAssignmentResourceApi.instance.list(this.assignmentId);
       if (lifecycleVersion !== this.lifecycleVersion) return;
@@ -172,6 +175,7 @@ export struct VoiceAssignmentPane {
         this.prepared = true;
         this.durationMs = durationMs;
         this.currentTimeMs = 0;
+        this.syncImageToAudio(0, true);
         this.notifyMediaState();
       },
       onState: (state) => {
@@ -181,6 +185,7 @@ export struct VoiceAssignmentPane {
       },
       onTime: (timeMs: number) => {
         this.currentTimeMs = timeMs;
+        this.syncImageToAudio(timeMs, false);
         this.notifyMediaState();
       },
       onError: (message: string) => {
@@ -272,10 +277,41 @@ export struct VoiceAssignmentPane {
     let cursor = index;
     while (cursor < this.imageResources.length) {
       if (lifecycleVersion !== this.lifecycleVersion) return;
-      await RemoteAssignmentResourceApi.instance.preload(this.imageResources[cursor]);
+      let uri = await RemoteAssignmentResourceApi.instance.download(this.imageResources[cursor]);
       if (lifecycleVersion !== this.lifecycleVersion) return;
+      if (uri.length > 0 && cursor < this.imageUris.length && this.imageUris[cursor].length === 0) {
+        let next = this.imageUris.slice();
+        next[cursor] = uri;
+        this.imageUris = next;
+        this.notifyMediaState();
+      }
       cursor += stride;
     }
+  }
+
+  private markManualImageOverride(): void {
+    this.manualImageOverrideUntilEpochMs = Date.now() + MANUAL_IMAGE_OVERRIDE_MS;
+  }
+
+  private syncImageToAudio(timeMs: number, force: boolean): void {
+    let count = this.imageResources.length;
+    if (count <= 1 || this.durationMs <= 0) return;
+    if (!force && Date.now() < this.manualImageOverrideUntilEpochMs) return;
+
+    let bounded = Math.max(0, Math.min(timeMs, this.durationMs));
+    let segmentMs = this.durationMs / count;
+    if (segmentMs <= 0) return;
+
+    let target = bounded >= this.durationMs ? count - 1 : Math.floor(bounded / segmentMs);
+    target = Math.max(0, Math.min(target, count - 1));
+    if (target === this.imageIndex) return;
+    void this.showImage(target);
+  }
+
+  private onSwiperImageChanged(index: number): void {
+    if (index === this.imageIndex) return;
+    this.markManualImageOverride();
+    void this.showImage(index);
   }
 
   private async showImage(index: number): Promise<void> {
@@ -316,18 +352,21 @@ export struct VoiceAssignmentPane {
 
   private previousImage(): void {
     if (this.imageResources.length <= 1) return;
+    this.markManualImageOverride();
     let index = this.imageIndex <= 0 ? this.imageResources.length - 1 : this.imageIndex - 1;
     void this.showImage(index);
   }
 
   private nextImage(): void {
     if (this.imageResources.length <= 1) return;
+    this.markManualImageOverride();
     let index = this.imageIndex >= this.imageResources.length - 1 ? 0 : this.imageIndex + 1;
     void this.showImage(index);
   }
 
   private selectImage(index: number): void {
     if (index < 0 || index >= this.imageResources.length) return;
+    this.markManualImageOverride();
     void this.showImage(index);
   }
 
@@ -373,7 +412,7 @@ export struct VoiceAssignmentPane {
         .index(this.imageIndex)
         .indicator(false)
         .loop(true)
-        .onChange((index: number) => { void this.showImage(index); })
+        .onChange((index: number) => this.onSwiperImageChanged(index))
         .borderRadius(AppTheme.CONTROL_RADIUS);
 
         Row({ space: 6 }) {
@@ -533,6 +572,8 @@ export struct VoiceAssignmentPane {
               .onChange((value: number, mode: SliderChangeMode) => {
                 this.currentTimeMs = value;
                 if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
+                  this.manualImageOverrideUntilEpochMs = 0;
+                  this.syncImageToAudio(value, true);
                   this.player.seek(value);
                 }
               });
