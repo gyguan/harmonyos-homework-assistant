@@ -19,7 +19,7 @@ checks = {
     'submitted and completed tasks are excluded from actionable home list': 'private static isActionable' in view_model and 'return StudentHomeViewModel.priority(status) < 100;' in view_model,
     'submitted task has no actionable priority': 'AssignmentStatus.SUBMITTED' not in view_model.split('private static priority', 1)[1].split('return 100;', 1)[0],
     'completed task has no actionable priority': 'AssignmentStatus.COMPLETED' not in view_model.split('private static priority', 1)[1].split('return 100;', 1)[0],
-    'home task candidates are today-only': 'todayActionableAssignments()' in view_model and 'private static isToday(item: Assignment)' in view_model,
+    'home task candidates are today-only': 'todayActionableAssignments(studentId: string = \'\')' in view_model and 'item.studentId === studentId' in view_model and 'private static isToday(item: Assignment)' in view_model,
     'authoritative assignment mutation invalidates home summary': 'this.remoteSummary = null;' in repository and 'applyAuthoritative(updated: Assignment)' in repository,
     'study workspace still owns all execution commands': 'AssignmentAction.START' in study and 'executeAction' in study,
     'shell never starts assignment locally': 'HomeworkStore.instance.startAssignment(assignmentId);' not in app_shell,
