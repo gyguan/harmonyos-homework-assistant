@@ -38,6 +38,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   record StructuredImageResult(String recognizedText, List<StructuredCandidate> assignments) {}
   record ConversionResult(List<HomeworkOrganizerDtos.Candidate> candidates, int sourceCount,
       int unsupportedSubjectCount, int blankTitleCount, List<String> unsupportedSubjects) {}
+  record DuplicateDecision(int candidateIndex, String duplicateAssignmentId, double confidence, String reason) {}
+  record DuplicateReviewResult(List<DuplicateDecision> matches) {}
 
   public ConfigurableHomeworkOrganizerModelClient(AiProviderProperties properties,
       OpenAiCompatibleTransport transport, JsonMapper jsonMapper) {
@@ -86,8 +88,10 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       Optional<HomeworkOrganizerDtos.ImageResponse> parsed = parseImageOutput(output.get());
       if (parsed.isEmpty() || existingAssignments == null || existingAssignments.isEmpty()) return parsed;
       var result = parsed.get();
-      List<HomeworkOrganizerDtos.Candidate> reviewed =
-          reviewLocalDuplicates(result.assignments(), existingAssignments, result.recognizedText());
+      List<HomeworkOrganizerDtos.Candidate> reviewed = reviewDuplicates(
+          result.assignments(), existingAssignments, result.recognizedText())
+          .orElseGet(() -> reviewLocalDuplicates(
+              result.assignments(), existingAssignments, result.recognizedText()));
       return Optional.of(new HomeworkOrganizerDtos.ImageResponse(
           reviewed, result.mode(), result.recognizedText()));
     } catch (Exception error) {
@@ -143,7 +147,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       String text, List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments) {
     Optional<List<HomeworkOrganizerDtos.Candidate>> organized = organizeRaw(student, sourceLabel, text);
     if (organized.isEmpty() || existingAssignments == null || existingAssignments.isEmpty()) return organized;
-    return Optional.of(reviewLocalDuplicates(organized.get(), existingAssignments, text));
+    return reviewDuplicates(organized.get(), existingAssignments, text)
+        .or(() -> Optional.of(reviewLocalDuplicates(organized.get(), existingAssignments, text)));
   }
 
   private Optional<List<HomeworkOrganizerDtos.Candidate>> organizeRaw(
@@ -176,6 +181,173 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
           properties.getOrganizerModel(), outputText.get().length(), error.getClass().getSimpleName());
       return Optional.empty();
     }
+  }
+
+  @Override
+  public Optional<List<HomeworkOrganizerDtos.Candidate>> reviewDuplicates(
+      List<HomeworkOrganizerDtos.Candidate> candidates,
+      List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments,
+      String sourceText) {
+    List<HomeworkOrganizerDtos.Candidate> clean = clearHistoricalDuplicateHints(candidates);
+    if (clean.isEmpty() || existingAssignments == null || existingAssignments.isEmpty()) {
+      return Optional.of(clean);
+    }
+    String reviewInput = duplicateReviewInput(clean, existingAssignments, sourceText);
+    if (reviewInput.isBlank()) return Optional.of(clean);
+
+    Optional<String> output = transport.complete(
+        properties.getOrganizerModel(),
+        duplicateReviewInstructions(),
+        reviewInput,
+        800,
+        "homework_duplicate_review",
+        duplicateReviewSchema());
+    if (output.isEmpty()) return Optional.empty();
+
+    try {
+      DuplicateReviewResult parsed =
+          jsonMapper.readValue(stripCodeFence(output.get()), DuplicateReviewResult.class);
+      List<HomeworkOrganizerDtos.Candidate> reviewed =
+          applyAiDuplicateDecisions(clean, existingAssignments, parsed);
+      long duplicateCount = reviewed.stream()
+          .filter(item -> item.duplicateAssignmentId() != null && !item.duplicateAssignmentId().isBlank())
+          .count();
+      log.info("[AI] duplicate_review parsed model={} candidates={} existing={} matches={}",
+          properties.getOrganizerModel(), clean.size(), existingAssignments.size(), duplicateCount);
+      return Optional.of(reviewed);
+    } catch (Exception error) {
+      log.warn("[AI] duplicate_review parse_failed model={} outputChars={} exception={}",
+          properties.getOrganizerModel(), output.get().length(), error.getClass().getSimpleName());
+      return Optional.empty();
+    }
+  }
+
+  static String duplicateReviewInstructions() {
+    return "你是作业重复判定器。只判断本次候选任务是否与已有任务实质上是同一项作业，不重新整理或改写任务。"
+        + "输入中的候选和已有任务都属于同一学生，并且只比较今天需要完成的任务。"
+        + "只能在同科目内匹配。综合核心动作、教材或练习册、页码题号、范围、完成要求和老师原文证据判断。"
+        + "标题写法不同不代表不同任务；但朗读与背诵、不同页码、不同题号范围或不同核心动作应视为不同任务。"
+        + "每个候选最多匹配一个已有任务。只有置信度至少0.70时才输出匹配；否则不要输出该候选。"
+        + "最终只输出JSON对象，根字段为matches，不要输出额外解释。";
+  }
+
+  static String duplicateReviewInput(
+      List<HomeworkOrganizerDtos.Candidate> candidates,
+      List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments,
+      String sourceText) {
+    if (candidates == null || candidates.isEmpty() || existingAssignments == null ||
+        existingAssignments.isEmpty()) return "";
+
+    LocalDate today = LocalDate.now(BUSINESS_ZONE);
+    Set<String> subjects = new LinkedHashSet<>();
+    StringBuilder input = new StringBuilder();
+    input.append("本次原始通知：").append(compact(sourceText, 800));
+    input.append("\n\n本次候选：");
+    int candidateCount = 0;
+    for (int i = 0; i < candidates.size(); i++) {
+      HomeworkOrganizerDtos.Candidate candidate = candidates.get(i);
+      if (candidate == null || !today.equals(candidateDueDate(candidate.dueText()))) continue;
+      subjects.add(candidate.subject());
+      input.append("\n- C").append(i)
+          .append("；科目=").append(value(candidate.subject(), "其他"))
+          .append("；标题=").append(compact(candidate.title(), 80))
+          .append("；要求=").append(compact(candidate.instruction(), 120))
+          .append("；教材=").append(compact(candidate.textbookRef(), 80))
+          .append("；原文=").append(compact(candidate.sourceExcerpt(), 160));
+      candidateCount++;
+    }
+    if (candidateCount == 0) return "";
+
+    input.append("\n\n今天已有未完成任务：");
+    int existingCount = 0;
+    for (HomeworkOrganizerDtos.ExistingAssignment existing : existingAssignments) {
+      if (existing == null || blank(existing.id())) continue;
+      String subject = normalizeSubject(existing.subject());
+      if (subject == null || !subjects.contains(subject)) continue;
+      input.append("\n- ID=").append(existing.id())
+          .append("；科目=").append(subject)
+          .append("；标题=").append(compact(existing.title(), 80))
+          .append("；要求=").append(compact(existing.instruction(), 120))
+          .append("；教材=").append(compact(existing.textbookRef(), 80))
+          .append("；原文=").append(compact(existing.sourceExcerpt(), 160));
+      existingCount++;
+    }
+    return existingCount == 0 ? "" : input.toString();
+  }
+
+  static Map<String, Object> duplicateReviewSchema() {
+    Map<String, Object> properties = new LinkedHashMap<>();
+    properties.put("candidateIndex", Map.of("type", "integer", "minimum", 0, "maximum", 29));
+    properties.put("duplicateAssignmentId", Map.of("type", "string", "maxLength", 120));
+    properties.put("confidence", Map.of("type", "number", "minimum", 0, "maximum", 1));
+    properties.put("reason", Map.of("type", "string", "maxLength", 240));
+
+    Map<String, Object> match = new LinkedHashMap<>();
+    match.put("type", "object");
+    match.put("additionalProperties", false);
+    match.put("properties", properties);
+    match.put("required", List.of("candidateIndex", "duplicateAssignmentId", "confidence", "reason"));
+
+    Map<String, Object> schema = new LinkedHashMap<>();
+    schema.put("type", "object");
+    schema.put("additionalProperties", false);
+    schema.put("properties", Map.of(
+        "matches", Map.of("type", "array", "maxItems", 30, "items", match)));
+    schema.put("required", List.of("matches"));
+    return schema;
+  }
+
+  static List<HomeworkOrganizerDtos.Candidate> applyAiDuplicateDecisions(
+      List<HomeworkOrganizerDtos.Candidate> candidates,
+      List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments,
+      DuplicateReviewResult review) {
+    List<HomeworkOrganizerDtos.Candidate> clean = clearHistoricalDuplicateHints(candidates);
+    if (clean.isEmpty() || review == null || review.matches() == null || review.matches().isEmpty()) {
+      return clean;
+    }
+
+    Map<String, HomeworkOrganizerDtos.ExistingAssignment> existingById = new LinkedHashMap<>();
+    for (HomeworkOrganizerDtos.ExistingAssignment existing : existingAssignments) {
+      if (existing == null || blank(existing.id())) continue;
+      existingById.put(existing.id(), existing);
+    }
+
+    Map<Integer, DuplicateDecision> bestByCandidate = new LinkedHashMap<>();
+    for (DuplicateDecision decision : review.matches()) {
+      if (decision == null || decision.candidateIndex() < 0 ||
+          decision.candidateIndex() >= clean.size() || decision.confidence() < 0.70 ||
+          blank(decision.duplicateAssignmentId())) continue;
+      HomeworkOrganizerDtos.Candidate candidate = clean.get(decision.candidateIndex());
+      HomeworkOrganizerDtos.ExistingAssignment existing =
+          existingById.get(decision.duplicateAssignmentId());
+      if (candidate == null || existing == null) continue;
+      String existingSubject = normalizeSubject(existing.subject());
+      if (existingSubject == null || !existingSubject.equals(candidate.subject())) continue;
+      if (!sameDue(candidate.dueText(), existing)) continue;
+
+      DuplicateDecision current = bestByCandidate.get(decision.candidateIndex());
+      if (current == null || decision.confidence() > current.confidence()) {
+        bestByCandidate.put(decision.candidateIndex(), decision);
+      }
+    }
+
+    List<HomeworkOrganizerDtos.Candidate> result = new ArrayList<>();
+    for (int i = 0; i < clean.size(); i++) {
+      HomeworkOrganizerDtos.Candidate candidate = clean.get(i);
+      DuplicateDecision decision = bestByCandidate.get(i);
+      if (decision == null) {
+        result.add(candidate);
+        continue;
+      }
+      HomeworkOrganizerDtos.ExistingAssignment existing =
+          existingById.get(decision.duplicateAssignmentId());
+      result.add(new HomeworkOrganizerDtos.Candidate(
+          candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
+          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.sameTaskGroup(), existing.id(), existing.title(), clamp(decision.confidence()),
+          compact(decision.reason(), 240)));
+    }
+    return result;
   }
 
   static String instructions() {
