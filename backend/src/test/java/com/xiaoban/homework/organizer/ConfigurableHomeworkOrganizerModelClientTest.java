@@ -10,6 +10,8 @@ import static org.mockito.Mockito.*;
 import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.ai.AiProviderProperties;
 import tools.jackson.databind.json.JsonMapper;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import org.junit.jupiter.api.Test;
 
 class ConfigurableHomeworkOrganizerModelClientTest {
@@ -163,16 +165,16 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     TestStudent student = new TestStudent();
     student.grade = "二年级";
     var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
-        "a-existing-1", "数学", "练习册 P26 第1～6题", "完成后订正", "北师大版", "今天",
+        "a-existing-1", "数学", "练习册 P26 第1～6题", "完成后订正", "北师大版", "今天", 0L,
         "数学练习册第26页1-6题，完成后订正"));
 
     String input = ConfigurableHomeworkOrganizerModelClient.buildInput(
         student, "老师通知", "数学第三单元练习第26页1到6题", existing);
     assertTrue(input.contains("ID=a-existing-1"));
     assertTrue(input.contains("练习册 P26 第1～6题"));
+    assertTrue(input.contains("完成时间=今天"));
     assertTrue(input.contains("原文=数学练习册第26页1-6题，完成后订正"));
     assertFalse(input.contains("；教材="));
-    assertFalse(input.contains("；时间="));
 
     var accepted = ConfigurableHomeworkOrganizerModelClient.toCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
@@ -203,7 +205,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     java.util.List<HomeworkOrganizerDtos.ExistingAssignment> existing = new java.util.ArrayList<>();
     for (int i = 0; i < 12; i++) {
       existing.add(new HomeworkOrganizerDtos.ExistingAssignment(
-          "a-" + i, "数学", "标题" + "很长".repeat(60), "要求" + "很长".repeat(90), "", "今天",
+          "a-" + i, "数学", "标题" + "很长".repeat(60), "要求" + "很长".repeat(90), "", "今天", 0L,
           "原文" + "很长".repeat(120)));
     }
 
@@ -221,10 +223,10 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   void fallsBackToPublishedEvidenceWhenModelMissesDuplicateHint() {
     var existing = java.util.List.of(
         new HomeworkOrganizerDtos.ExistingAssignment(
-            "a-existing-1", "数学", "练习册 P26 第1～6题", "完成后订正", "北师大版", "今天",
+            "a-existing-1", "数学", "练习册 P26 第1～6题", "完成后订正", "北师大版", "今天", 0L,
             "数学练习册第26页1-6题，完成后订正"),
         new HomeworkOrganizerDtos.ExistingAssignment(
-            "a-existing-old", "语文", "背诵第12课", "背诵第12课", "", "今天", ""));
+            "a-existing-old", "语文", "背诵第12课", "背诵第12课", "", "今天", 0L, ""));
 
     var candidates = java.util.List.of(
         new HomeworkOrganizerDtos.Candidate(
@@ -247,9 +249,54 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void sourceInputFallbackDetectsSameTomorrowHomeworkEvenWhenModelMissesIt() {
+    var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
+        "a-tomorrow", "数学", "练习册 P26 第1～6题", "完成后订正", "", "明天", 0L,
+        "数学练习册第26页1-6题，完成后订正"));
+    var candidates = java.util.List.of(new HomeworkOrganizerDtos.Candidate(
+        "数学", "数学第三单元练习", "第26页1到6题，完成后订正", "", "明日", 20,
+        "第26页1到6题", 0.95, "", "", "", 0.0, ""));
+
+    var reviewed = ConfigurableHomeworkOrganizerModelClient.applySourceInputDuplicateFallback(
+        candidates, existing, "数学练习册第26页1到6题，完成后订正");
+
+    assertEquals("a-tomorrow", reviewed.getFirst().duplicateAssignmentId());
+    assertEquals(1.0, reviewed.getFirst().duplicateConfidence());
+    assertTrue(reviewed.getFirst().duplicateReason().contains("同一份作业原文"));
+  }
+
+  @Test
+  void removesModelDuplicateHintWhenCompletionDateDiffers() {
+    var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
+        "a-today", "数学", "口算20题", "完成口算20题", "", "今天", 0L, "口算20题"));
+    var candidates = java.util.List.of(new HomeworkOrganizerDtos.Candidate(
+        "数学", "口算20题", "完成口算20题", "", "明天", 10,
+        "口算20题", 0.95, "", "a-today", "口算20题", 0.98, "内容一致"));
+
+    var reviewed = ConfigurableHomeworkOrganizerModelClient.enforceSameDueForModelHints(
+        candidates, existing);
+
+    assertEquals("", reviewed.getFirst().duplicateAssignmentId());
+    assertEquals(0.0, reviewed.getFirst().duplicateConfidence());
+  }
+
+  @Test
+  void resolvesDifferentDueTextFormsToSameShanghaiBusinessDate() {
+    LocalDate tomorrow = LocalDate.now(ZoneId.of("Asia/Shanghai")).plusDays(1);
+    String explicit = tomorrow.toString();
+    assertEquals(
+        ConfigurableHomeworkOrganizerModelClient.candidateDueDate("明天"),
+        ConfigurableHomeworkOrganizerModelClient.candidateDueDate(explicit));
+    assertEquals(
+        ConfigurableHomeworkOrganizerModelClient.candidateDueDate("明日"),
+        ConfigurableHomeworkOrganizerModelClient.candidateDueDate(
+            tomorrow.getMonthValue() + "月" + tomorrow.getDayOfMonth() + "日"));
+  }
+
+  @Test
   void evidenceFallbackDoesNotMergeDifferentActionsOrDueDates() {
     var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
-        "a-read", "语文", "朗读第2课", "朗读第2课", "", "今天", "朗读第2课"));
+        "a-read", "语文", "朗读第2课", "朗读第2课", "", "今天", 0L, "朗读第2课"));
     var candidates = java.util.List.of(
         new HomeworkOrganizerDtos.Candidate(
             "语文", "背诵第2课", "背诵第2课", "", "今天", 15,

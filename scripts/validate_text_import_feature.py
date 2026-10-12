@@ -103,6 +103,11 @@ require("this.assignmentType(candidate.subject)" in publisher and
         "return AssignmentType.SCHOOL" in publisher,
         "unified create flow must preserve school versus extracurricular AssignmentType")
 
+require("private sourceEvidenceText(candidate: CandidateAssignment): string" in publisher and
+        "candidate.sourceEvidence.rawText" in publisher and
+        "sourceExcerpt: this.sourceEvidenceText(candidate)" in publisher,
+        "published AI homework must preserve deterministic raw source text for duplicate review")
+
 require("getRawImport" in draft_port and "getCandidates" in draft_port and
         "replaceRawImport" in draft_port and "replaceCandidates" in draft_port,
         "draft repository port must own import draft reads and writes")
