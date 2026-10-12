@@ -749,9 +749,9 @@ export struct StudyWorkspacePage {
 
   @Builder
   private SubmissionPane() {
-    if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
-      if (this.isVoiceSubmission()) this.VoiceSubmissionPane();
-      else this.PhotoSubmissionPane();
+    if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT &&
+      !this.isVoiceSubmission()) {
+      this.PhotoSubmissionPane();
     }
 
     if (this.submissions().length > 0) {
@@ -818,6 +818,41 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
+  private VoiceAssignmentContent(playbackEnabled: boolean, imageOnlyMode: boolean) {
+    VoiceAssignmentPane({
+      assignmentId: this.assignmentId,
+      playbackEnabled: playbackEnabled,
+      imageOnlyMode: imageOnlyMode,
+      onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause,
+      onFullscreenRequest: () => this.voiceFullscreenOpen = true,
+      onFullscreenDismissed: () => this.voiceFullscreenOpen = false,
+      onMediaStateChanged: (
+        imageUris: string[],
+        imageIndex: number,
+        playing: boolean,
+        currentTimeMs: number,
+        durationMs: number,
+        currentPlaybackEnabled: boolean,
+        prepared: boolean
+      ) => this.applyVoiceMediaState(
+        imageUris, imageIndex, playing, currentTimeMs, durationMs, currentPlaybackEnabled, prepared),
+      onFullscreenControlsReady: (
+        toggleAudio: () => void,
+        seek: (value: number) => void,
+        previousImage: () => void,
+        nextImage: () => void,
+        selectImage: (index: number) => void
+      ) => {
+        this.voiceToggleAudio = toggleAudio;
+        this.voiceSeek = seek;
+        this.voicePreviousImage = previousImage;
+        this.voiceNextImage = nextImage;
+        this.voiceSelectImage = selectImage;
+      }
+    });
+  }
+
+  @Builder
   private StudyContent(showPrimaryAction: boolean) {
     if (this.assignment() === null) {
       Column({ space: 8 }) {
@@ -871,7 +906,7 @@ export struct StudyWorkspacePage {
                 .fontSize(24)
                 .fontColor([AppTheme.SUCCESS]);
               Text(this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT ?
-                (this.isVoiceSubmission() ? '最后一步：录下你的朗读或口语作业。' :
+                (this.isVoiceSubmission() ? '看着图片完成朗读，录音时可以左右切换图片。' :
                   '最后一步：添加清晰、完整的作业照片。') :
                 (this.assignment()!.status === AssignmentStatus.SUBMITTED ?
                   (this.isVoiceSubmission() ? '录音已提交，等待家长确认。' :
@@ -886,7 +921,13 @@ export struct StudyWorkspacePage {
             .backgroundColor(AppTheme.SUCCESS_SOFT)
             .borderRadius(AppTheme.CONTROL_RADIUS);
 
-            this.SubmissionPane();
+            if (this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT &&
+              this.isVoiceSubmission()) {
+              this.VoiceAssignmentContent(false, true);
+              this.VoiceSubmissionPane();
+            } else {
+              this.SubmissionPane();
+            }
           } else {
             if (this.assignment()!.reviewNote.length > 0) {
               Column({ space: 5 }) {
@@ -918,36 +959,8 @@ export struct StudyWorkspacePage {
             }
 
             if (this.assignment()!.contentType === AssignmentContentType.AUDIO_IMAGE) {
-              VoiceAssignmentPane({
-                assignmentId: this.assignment()!.id,
-                playbackEnabled: this.assignment()!.status === AssignmentStatus.IN_PROGRESS,
-                onPauseReady: (pause: () => void) => this.pauseEmbeddedMedia = pause,
-                onFullscreenRequest: () => this.voiceFullscreenOpen = true,
-                onFullscreenDismissed: () => this.voiceFullscreenOpen = false,
-                onMediaStateChanged: (
-                  imageUris: string[],
-                  imageIndex: number,
-                  playing: boolean,
-                  currentTimeMs: number,
-                  durationMs: number,
-                  playbackEnabled: boolean,
-                  prepared: boolean
-                ) => this.applyVoiceMediaState(
-                  imageUris, imageIndex, playing, currentTimeMs, durationMs, playbackEnabled, prepared),
-                onFullscreenControlsReady: (
-                  toggleAudio: () => void,
-                  seek: (value: number) => void,
-                  previousImage: () => void,
-                  nextImage: () => void,
-                  selectImage: (index: number) => void
-                ) => {
-                  this.voiceToggleAudio = toggleAudio;
-                  this.voiceSeek = seek;
-                  this.voicePreviousImage = previousImage;
-                  this.voiceNextImage = nextImage;
-                  this.voiceSelectImage = selectImage;
-                }
-              });
+              this.VoiceAssignmentContent(
+                this.assignment()!.status === AssignmentStatus.IN_PROGRESS, false);
             }
 
             AssignmentCountdownCard({ assignment: this.assignment()! });

@@ -20,6 +20,7 @@ const IMAGE_PREFETCH_CONCURRENCY: number = 2;
 export struct VoiceAssignmentPane {
   @Prop assignmentId: string = '';
   @Prop playbackEnabled: boolean = false;
+  @Prop imageOnlyMode: boolean = false;
   @State private loading: boolean = true;
   @State private message: string = '';
   @State private imageUris: string[] = [];
@@ -143,7 +144,9 @@ export struct VoiceAssignmentPane {
         this.compareImageResources(left, right));
       this.imageResources = images;
       this.audioResource = audio;
-      void this.loadMediaSync(lifecycleVersion);
+      if (!this.imageOnlyMode) {
+        void this.loadMediaSync(lifecycleVersion);
+      }
 
       let slots: string[] = [];
       for (let i = 0; i < images.length; i++) slots.push('');
@@ -159,7 +162,9 @@ export struct VoiceAssignmentPane {
       this.imageIndex = 0;
       this.notifyMediaState();
       this.loading = false;
-      void this.loadAudio(audio);
+      if (!this.imageOnlyMode) {
+        void this.loadAudio(audio);
+      }
       this.startImagePrefetch(1, lifecycleVersion);
     } catch {
       this.message = '作业资料加载失败，请检查网络后重试';
@@ -747,8 +752,16 @@ export struct VoiceAssignmentPane {
       } else if (this.imageUris.length > 0 && this.imageUris[this.imageIndex].length > 0) {
         Column({ space: 10 }) {
           this.ImageViewer();
-          this.MediaSyncControls();
-          this.AudioControls();
+          if (this.imageOnlyMode) {
+            Text('录音时可以左右滑动或点击缩略图切换图片')
+              .width('100%')
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+              .fontColor(AppTheme.SUBTEXT);
+          } else {
+            this.MediaSyncControls();
+            this.AudioControls();
+          }
         }
         .width('100%')
         .padding(10)
