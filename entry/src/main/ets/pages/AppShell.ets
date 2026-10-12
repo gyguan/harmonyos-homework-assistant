@@ -78,6 +78,7 @@ enum ParentRoute {
 export struct AppShell {
   @Prop @Watch('onRoleChanged') role: AppRole = AppRole.STUDENT;
   @Prop @Watch('onStudentContextChanged') studentContextRevision: number = 0;
+  @Prop @Watch('onRootStudentIdChanged') rootStudentId: string = '';
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   @State private widthVp: number = 390;
   @State private heightVp: number = 844;
@@ -243,6 +244,15 @@ export struct AppShell {
     this.storeRevision++;
     this.practiceRevision++;
     this.importRevision++;
+  }
+
+  private onRootStudentIdChanged(): void {
+    // Observe the selected student ID itself, not only a revision counter.
+    // This also covers ArkUI reusing an existing STUDENT page tree.
+    if (this.role === AppRole.STUDENT && this.rootStudentId.length > 0 &&
+      this.activeStudentId !== this.rootStudentId) {
+      this.onStudentContextChanged();
+    }
   }
 
   private onStudentContextChanged(): void {
