@@ -47,7 +47,12 @@ export class HomeworkBatchPublishService {
       let candidateBatchId = this.sourceBatchId(candidate);
       if (candidateBatchId !== batchId) throw new Error('待发布作业不属于同一导入批次');
       let assignment = this.toAssignment(candidate);
-      entries.push({ candidateId: candidate.id, assignment: assignment });
+      entries.push({
+        candidateId: candidate.id,
+        assignment: assignment,
+        sourceLabel: candidate.sourceEvidence.sourceLabel,
+        sourceExcerpt: candidate.sourceEvidence.excerpt
+      });
       localByCandidateId.set(candidate.id, assignment);
     }
 
