@@ -205,19 +205,22 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     if (output.isEmpty()) return Optional.empty();
 
     try {
-      DuplicateReviewResult parsed =
-          jsonMapper.readValue(stripCodeFence(output.get()), DuplicateReviewResult.class);
+      DuplicateReviewProviderAdapter.Result adapted =
+          DuplicateReviewProviderAdapter.adapt(jsonMapper, output.get());
       List<HomeworkOrganizerDtos.Candidate> reviewed =
-          applyAiDuplicateDecisions(clean, existingAssignments, parsed);
+          applyAiDuplicateDecisions(clean, existingAssignments, adapted.review());
       long duplicateCount = reviewed.stream()
           .filter(item -> item.duplicateAssignmentId() != null && !item.duplicateAssignmentId().isBlank())
           .count();
-      log.info("[AI] duplicate_review parsed model={} candidates={} existing={} matches={}",
-          properties.getOrganizerModel(), clean.size(), existingAssignments.size(), duplicateCount);
+      log.info(
+          "[AI] duplicate_review parsed model={} candidates={} existing={} matches={} shape={} coercedFields={}",
+          properties.getOrganizerModel(), clean.size(), existingAssignments.size(), duplicateCount,
+          adapted.shape(), adapted.coercedPaths());
       return Optional.of(reviewed);
     } catch (Exception error) {
-      log.warn("[AI] duplicate_review parse_failed model={} outputChars={} exception={}",
-          properties.getOrganizerModel(), output.get().length(), error.getClass().getSimpleName());
+      log.warn("[AI] duplicate_review parse_failed model={} outputChars={} exception={} message={}",
+          properties.getOrganizerModel(), output.get().length(), error.getClass().getSimpleName(),
+          safeParseMessage(error.getMessage()));
       return Optional.empty();
     }
   }
@@ -802,6 +805,12 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       if (titles.size() >= 10) break;
     }
     return titles;
+  }
+
+  private static String safeParseMessage(String message) {
+    if (message == null || message.isBlank()) return "";
+    String sanitized = message.replace('\r', ' ').replace('\n', ' ').replace('\t', ' ').trim();
+    return sanitized.length() <= 240 ? sanitized : sanitized.substring(0, 240);
   }
 
   private static String compact(String value, int maxLength) {
