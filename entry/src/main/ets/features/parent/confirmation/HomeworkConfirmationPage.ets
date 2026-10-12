@@ -49,7 +49,7 @@ export struct HomeworkConfirmationPage {
   }
 
   private candidateRenderKey(item: CandidateAssignment): string {
-    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.dueText}|${item.textbookRef}|${item.expectedMinutes}`;
+    return `${item.id}|${item.subject}|${item.title}|${item.instruction}|${item.dueText}|${item.textbookRef}|${item.expectedMinutes}|${item.sameTaskGroup}|${item.duplicateAssignmentId}|${item.duplicateConfidence}|${item.duplicateReason}`;
   }
 
   private openEditor(candidateId: string): void {
@@ -101,7 +101,12 @@ export struct HomeworkConfirmationPage {
         imageRef: item.sourceEvidence.imageRef,
         capturedAtEpochMs: item.sourceEvidence.capturedAtEpochMs
       },
-      confidence: item.confidence
+      confidence: item.confidence,
+      sameTaskGroup: item.sameTaskGroup,
+      duplicateAssignmentId: item.duplicateAssignmentId,
+      duplicateAssignmentTitle: item.duplicateAssignmentTitle,
+      duplicateConfidence: item.duplicateConfidence,
+      duplicateReason: item.duplicateReason
     });
   }
 
