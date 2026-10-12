@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 import com.xiaoban.homework.assignment.AssignmentResourceEntity;
 import com.xiaoban.homework.assignment.AssignmentResourceRepository;
 import com.xiaoban.homework.assignment.AssignmentService;
@@ -38,7 +38,7 @@ class AssignmentMediaSyncServiceTest {
     when(resources.findByFamilyIdAndAssignmentIdOrderBySortOrderAscCreatedAtAsc(
         familyId, "assignment-1")).thenReturn(List.of(audio, image10, image2));
 
-    ObjectMapper mapper = new ObjectMapper();
+    JsonMapper mapper = JsonMapper.builder().build();
     AssignmentMediaSyncService service = new AssignmentMediaSyncService(
         syncs, resources, mock(MediaAssetRepository.class), mock(FileStorage.class),
         mock(AssignmentService.class), mapper);

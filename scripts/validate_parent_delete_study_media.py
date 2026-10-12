@@ -101,7 +101,9 @@ require("确认并发布" in confirmation and "ConfirmationCandidateCard" in con
         "final confirmation page must retain review/edit/publish behavior")
 
 # Voice/image assignment workspace must support touch paging inline and fullscreen.
-require("Swiper()" in voice and ".onChange((index: number) => { void this.showImage(index); })" in voice,
+require("Swiper()" in voice and (
+        ".onChange((index: number) => { void this.showImage(index); })" in voice or
+        ".onChange((index: number) => this.selectImage(index))" in voice),
         "inline assignment images must support swipe paging")
 require("Swiper()" in study and "this.voiceSelectImage(index)" in study,
         "fullscreen assignment images must support swipe paging")

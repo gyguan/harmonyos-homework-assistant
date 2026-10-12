@@ -1,7 +1,5 @@
 package com.xiaoban.homework.mediasync;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xiaoban.homework.assignment.AssignmentResourceEntity;
 import com.xiaoban.homework.assignment.AssignmentResourceRepository;
 import com.xiaoban.homework.assignment.AssignmentService;
@@ -27,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import tools.jackson.databind.json.JsonMapper;
 
 @Service
 public class AssignmentMediaSyncService {
@@ -40,11 +39,11 @@ public class AssignmentMediaSyncService {
   private final MediaAssetRepository mediaAssets;
   private final FileStorage storage;
   private final AssignmentService assignments;
-  private final ObjectMapper mapper;
+  private final JsonMapper mapper;
 
   public AssignmentMediaSyncService(AssignmentMediaSyncRepository syncs,
       AssignmentResourceRepository resources, MediaAssetRepository mediaAssets,
-      FileStorage storage, AssignmentService assignments, ObjectMapper mapper) {
+      FileStorage storage, AssignmentService assignments, JsonMapper mapper) {
     this.syncs = syncs;
     this.resources = resources;
     this.mediaAssets = mediaAssets;
@@ -114,7 +113,7 @@ public class AssignmentMediaSyncService {
           mapper.readValue(sync.timelineJson, AssignmentMediaSyncDtos.Timeline.class);
       return new AssignmentMediaSyncDtos.Response(
           "READY", true, timeline.confidence(), timeline.durationMs(), timeline.items());
-    } catch (JsonProcessingException error) {
+    } catch (Exception error) {
       log.warn("media_sync response_parse_failed assignmentId={} syncId={} message={}",
           assignmentId, sync.id, error.getMessage());
       return AssignmentMediaSyncDtos.Response.unavailable("FAILED");
@@ -367,7 +366,7 @@ public class AssignmentMediaSyncService {
       }
       return new AssignmentMediaSyncDtos.Timeline(
           source.version(), source.durationMs(), source.confidence(), remapped);
-    } catch (JsonProcessingException error) {
+    } catch (Exception error) {
       log.warn("media_sync reuse_parse_failed message={}", error.getMessage());
       return null;
     }
@@ -376,7 +375,7 @@ public class AssignmentMediaSyncService {
   private String toJson(AssignmentMediaSyncDtos.Timeline timeline) {
     try {
       return mapper.writeValueAsString(timeline);
-    } catch (JsonProcessingException error) {
+    } catch (Exception error) {
       throw new IllegalStateException("序列化图文同步时间轴失败", error);
     }
   }
