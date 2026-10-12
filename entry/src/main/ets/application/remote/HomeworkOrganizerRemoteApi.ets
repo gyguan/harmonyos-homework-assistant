@@ -19,6 +19,11 @@ interface RemoteCandidate {
   expectedMinutes: number;
   sourceExcerpt: string;
   confidence: number;
+  sameTaskGroup?: string;
+  duplicateAssignmentId?: string;
+  duplicateAssignmentTitle?: string;
+  duplicateConfidence?: number;
+  duplicateReason?: string;
 }
 
 interface OrganizeResponse {
@@ -135,10 +140,25 @@ export class HomeworkOrganizerRemoteApi {
           sourceLabel: input.sourceLabel,
           excerpt: this.value(remote.sourceExcerpt, remote.title)
         },
-        confidence: confidence
+        confidence: confidence,
+        sameTaskGroup: this.optionalText(remote.sameTaskGroup),
+        duplicateAssignmentId: this.optionalText(remote.duplicateAssignmentId),
+        duplicateAssignmentTitle: this.optionalText(remote.duplicateAssignmentTitle),
+        duplicateConfidence: this.optionalConfidence(remote.duplicateConfidence),
+        duplicateReason: this.optionalText(remote.duplicateReason)
       });
     }
     return result;
+  }
+
+  private optionalText(value: string | undefined): string {
+    if (value === undefined) return '';
+    return value.trim();
+  }
+
+  private optionalConfidence(value: number | undefined): number {
+    if (value === undefined || !Number.isFinite(value)) return 0;
+    return Math.max(0, Math.min(1, value));
   }
 
   private subject(value: string): Subject | null {
