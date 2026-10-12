@@ -81,9 +81,29 @@ public class HomeworkOrganizerService {
         .orElseGet(() -> {
           log.warn("homework_import duplicate_ai_fallback candidates={} existingContext={}",
               candidates == null ? 0 : candidates.size(), existingAssignments.size());
-          return ConfigurableHomeworkOrganizerModelClient.reviewLocalDuplicates(
-              candidates, existingAssignments, sourceText);
+          return markLocalFallback(ConfigurableHomeworkOrganizerModelClient.reviewLocalDuplicates(
+              candidates, existingAssignments, sourceText));
         });
+  }
+
+  private List<HomeworkOrganizerDtos.Candidate> markLocalFallback(
+      List<HomeworkOrganizerDtos.Candidate> candidates) {
+    if (candidates == null || candidates.isEmpty()) return candidates == null ? List.of() : candidates;
+    List<HomeworkOrganizerDtos.Candidate> result = new ArrayList<>();
+    for (HomeworkOrganizerDtos.Candidate candidate : candidates) {
+      if (candidate == null) continue;
+      String reason = candidate.duplicateReason();
+      if (candidate.duplicateAssignmentId() != null && !candidate.duplicateAssignmentId().isBlank()) {
+        String detail = reason == null || reason.isBlank() ? "本地规则识别为疑似重复" : reason.trim();
+        reason = "【本地兜底】" + detail;
+      }
+      result.add(new HomeworkOrganizerDtos.Candidate(
+          candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
+          candidate.dueText(), candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
+          candidate.sameTaskGroup(), candidate.duplicateAssignmentId(), candidate.duplicateAssignmentTitle(),
+          candidate.duplicateConfidence(), reason));
+    }
+    return result;
   }
 
   private boolean needsTodayDuplicateReview(List<HomeworkOrganizerDtos.Candidate> candidates) {

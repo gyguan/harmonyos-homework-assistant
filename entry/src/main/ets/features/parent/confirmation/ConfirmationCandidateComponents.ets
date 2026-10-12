@@ -93,6 +93,16 @@ export struct ConfirmationCandidateCard {
     return value === undefined ? '' : value.trim();
   }
 
+  private isLocalFallbackDuplicate(): boolean {
+    return this.duplicateReason().startsWith('【本地兜底】');
+  }
+
+  private duplicateReasonText(): string {
+    let reason = this.duplicateReason();
+    if (!reason.startsWith('【本地兜底】')) return reason;
+    return reason.substring('【本地兜底】'.length).trim();
+  }
+
   private hasSemanticWarning(): boolean {
     return this.sameTaskGroup().length > 0 || this.duplicateAssignmentId().length > 0;
   }
@@ -114,6 +124,15 @@ export struct ConfirmationCandidateCard {
               .padding({ left: 7, right: 7, top: 3, bottom: 3 })
               .backgroundColor(AppTheme.WARNING_SOFT)
               .borderRadius(AppTheme.CHIP_RADIUS);
+            if (this.isLocalFallbackDuplicate()) {
+              Text('本地兜底')
+                .fontSize(AppTheme.META_SIZE)
+                .lineHeight(AppTheme.META_LINE_HEIGHT)
+                .fontColor(AppTheme.WARNING)
+                .padding({ left: 7, right: 7, top: 3, bottom: 3 })
+                .backgroundColor(AppTheme.WARNING_SOFT)
+                .borderRadius(AppTheme.CHIP_RADIUS);
+            }
           } else if (this.item.confidence < 0.8) {
             Text('重点确认')
               .fontSize(AppTheme.META_SIZE)
@@ -159,8 +178,16 @@ export struct ConfirmationCandidateCard {
               .maxLines(2)
               .textOverflow({ overflow: TextOverflow.Ellipsis });
           }
-          if (this.duplicateReason().length > 0) {
-            Text(this.duplicateReason())
+          if (this.isLocalFallbackDuplicate()) {
+            Text('AI 判重暂不可用，本次由本地规则辅助判断，请重点确认。')
+              .width('100%')
+              .fontSize(AppTheme.CAPTION_SIZE)
+              .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+              .fontColor(AppTheme.WARNING)
+              .maxLines(2);
+          }
+          if (this.duplicateReasonText().length > 0) {
+            Text(this.duplicateReasonText())
               .width('100%')
               .fontSize(AppTheme.CAPTION_SIZE)
               .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)

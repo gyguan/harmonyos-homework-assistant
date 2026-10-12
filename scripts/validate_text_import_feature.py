@@ -28,6 +28,7 @@ draft_local = read("entry/src/main/ets/data/local/HomeworkImportLocalDataSource.
 parser = read("entry/src/main/ets/infrastructure/ai/LocalHomeworkAssignmentParser.ets")
 publisher = read("entry/src/main/ets/application/import/HomeworkBatchPublishService.ets")
 inbox_service = read("entry/src/main/ets/application/import/HomeworkImportInboxService.ets")
+confirmation_candidate = read("entry/src/main/ets/features/parent/confirmation/ConfirmationCandidateComponents.ets")
 
 # One parent-facing assignment input: pasted teacher copy, direct parent instructions and
 # screenshot OCR all converge before organization.
@@ -115,6 +116,11 @@ for field in ["sameTaskGroup", "duplicateAssignmentId", "duplicateAssignmentTitl
             f"subject override must preserve AI duplicate metadata: {field}")
     require(inbox_service.count(f"{field}: candidate.{field}") >= 2,
             f"import inbox enrichment and normalization must preserve AI duplicate metadata: {field}")
+
+require("【本地兜底】" in confirmation_candidate and
+        "本地兜底" in confirmation_candidate and
+        "AI 判重暂不可用，本次由本地规则辅助判断，请重点确认。" in confirmation_candidate,
+        "confirmation must clearly identify local duplicate-review fallback to parents")
 
 require("getRawImport" in draft_port and "getCandidates" in draft_port and
         "replaceRawImport" in draft_port and "replaceCandidates" in draft_port,
