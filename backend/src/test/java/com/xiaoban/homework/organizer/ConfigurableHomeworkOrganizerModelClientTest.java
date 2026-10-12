@@ -249,8 +249,12 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     verify(transport).complete(anyString(), instructions.capture(), input.capture(), eq(800),
         eq("homework_duplicate_review"), anyMap());
     assertTrue(instructions.getValue().contains("只判断"));
-    assertTrue(input.getValue().contains("C0"));
-    assertTrue(input.getValue().contains("a-math"));
+    assertTrue(instructions.getValue().contains("字段名必须严格使用 candidateIndex、duplicateAssignmentId、confidence、reason"));
+    assertTrue(instructions.getValue().contains("\"matches\":[]"));
+    assertTrue(input.getValue().contains("candidateIndex=0"));
+    assertTrue(input.getValue().contains("duplicateAssignmentId=a-math"));
+    assertFalse(input.getValue().contains("\n- C0"));
+    assertFalse(input.getValue().contains("\n- ID=a-math"));
     assertFalse(input.getValue().contains("a-english"));
     assertFalse(input.getValue().contains("背诵第12课"));
   }
