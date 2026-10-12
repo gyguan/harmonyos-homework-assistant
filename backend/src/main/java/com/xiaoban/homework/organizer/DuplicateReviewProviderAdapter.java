@@ -45,11 +45,13 @@ final class DuplicateReviewProviderAdapter {
       Map<String, Object> item = objectMap(source.get(i), base);
 
       int candidateIndex = candidateIndex(
-          pick(item, base + ".candidateIndex", "candidateIndex", "candidate_index", "candidate"),
+          pick(item, base + ".candidateIndex",
+              "candidateIndex", "candidate_index", "candidate_id", "candidateId", "candidate"),
           base + ".candidateIndex", tracker);
       String assignmentId = stringValue(
           pick(item, base + ".duplicateAssignmentId",
-              "duplicateAssignmentId", "duplicate_assignment_id", "assignmentId", "assignment_id"),
+              "duplicateAssignmentId", "duplicate_assignment_id", "existing_id", "existingId",
+              "assignmentId", "assignment_id"),
           base + ".duplicateAssignmentId", tracker);
       double confidence = confidenceValue(
           pick(item, base + ".confidence", "confidence", "duplicateConfidence", "score"),
