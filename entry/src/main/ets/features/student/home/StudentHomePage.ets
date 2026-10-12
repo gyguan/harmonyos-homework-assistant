@@ -140,6 +140,7 @@ export struct StudentHomePage {
   @State private todayTaskItems: Assignment[] = [];
   @State private remainingTaskItems: Assignment[] = [];
   @State private todaySummaryTotal: number = 0;
+  @State private taskRenderEpoch: number = 0;
   @State private attentionMessage: string = '';
   @State private attentionCategory: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
   private identityGeneration: number = 0;
@@ -186,11 +187,17 @@ export struct StudentHomePage {
     let attention = this.viewModel.attention(this.studentId);
     this.todayTaskItems = items;
     this.remainingTaskItems = remaining;
+    // Force ForEach child component recreation after an identity/repository snapshot change.
+    // Assignment is a plain object, so reusing an existing child with the same key can retain
+    // stale @Prop values even though the parent array/count has already changed.
+    this.taskRenderEpoch++;
     this.todaySummaryTotal = this.viewModel.summary().total;
     this.attentionMessage = attention.text;
     this.attentionCategory = attention.kind;
+    let firstTaskId=items.length>0?items[0].id:'';
     console.info('[STUDENT-HOME] refresh studentId=' + this.studentId +
-      ' tasks=' + String(items.length) + ' revision=' + String(this.revision));
+      ' tasks=' + String(items.length) + ' firstTaskId=' + firstTaskId +
+      ' revision=' + String(this.revision) + ' renderEpoch=' + String(this.taskRenderEpoch));
   }
 
   private canUsePadComposition(): boolean {
@@ -199,7 +206,7 @@ export struct StudentHomePage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${item.studentId}|${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${this.taskRenderEpoch}|${item.studentId}|${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private async openAssignment(assignmentId: string): Promise<void> {
@@ -310,9 +317,23 @@ export struct StudentHomePage {
   }
 
   @Builder
-  private TaskList(items: Assignment[]) {
+  private TodayTaskList() {
     Column({ space: 10 }) {
-      ForEach(items, (item: Assignment) => {
+      ForEach(this.todayTaskItems, (item: Assignment) => {
+        StudentTodayTaskCard({
+          assignment: item,
+          busy: this.actionAssignmentId === item.id,
+          onAction: (assignmentId: string) => { void this.openAssignment(assignmentId); }
+        });
+      }, (item: Assignment) => this.assignmentRenderKey(item));
+    }
+    .width('100%');
+  }
+
+  @Builder
+  private RemainingTaskList() {
+    Column({ space: 10 }) {
+      ForEach(this.remainingTaskItems, (item: Assignment) => {
         StudentTodayTaskCard({
           assignment: item,
           busy: this.actionAssignmentId === item.id,
@@ -343,7 +364,7 @@ export struct StudentHomePage {
       .width('100%');
 
       if (this.todayTaskItems.length === 0) this.EmptyState();
-      else this.TaskList(this.todayTaskItems);
+      else this.TodayTaskList();
 
       if (this.actionMessage.length > 0) {
         Text(this.actionMessage)
@@ -402,7 +423,7 @@ export struct StudentHomePage {
               .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%');
-          this.TaskList(this.remainingTaskItems);
+          this.RemainingTaskList();
         }
         .layoutWeight(1)
         .constraintSize({ minWidth: AppTheme.HOME_SECONDARY_MIN_WIDTH })
