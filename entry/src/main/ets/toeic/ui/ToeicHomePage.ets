@@ -34,6 +34,9 @@ export struct ToeicHomePage {
   @State private answerCorrect:boolean=false;
   @State private questionStartedAtMs:number=0;
   @State private refreshRevision:number=0;
+  @State private contentValidationReady:boolean=false;
+  @State private contentValidationErrors:string[]=[];
+  private contentValidationTimer:number=-1;
   @State private pronunciationMessage:string='';
   @State private selectedStudyDay:number=0;
   @State private selectedDayTitle:string='';
@@ -138,12 +141,25 @@ export struct ToeicHomePage {
   private currentOptionOrder:number[]=[0,1,2,3];
 
   aboutToAppear():void {
+    this.contentValidationReady=false;
+    this.scheduleContentValidation();
     this.loadProgressSnapshot();
     if (this.selectedStudyDay<=0) this.selectedStudyDay=this.progressCurrentDay;
     this.loadStudyDay(this.selectedStudyDay);
     this.refreshRevision++;
     void this.syncVocabularyCloud();
     if (this.isMockSession() && this.mode===ToeicPageMode.TRAINING) this.startMockClock();
+  }
+
+  private scheduleContentValidation():void {
+    if (this.contentValidationTimer>=0) clearTimeout(this.contentValidationTimer);
+    // Keep expensive full-catalog validation out of ArkUI build evaluation.
+    // The HOME action is disabled until validation completes (fail closed).
+    this.contentValidationTimer=setTimeout(()=>{
+      this.contentValidationTimer=-1;
+      this.contentValidationErrors=this.viewModel.contentErrors();
+      this.contentValidationReady=true;
+    },100);
   }
 
   private async syncVocabularyCloud():Promise<void> {
@@ -156,6 +172,10 @@ export struct ToeicHomePage {
   }
 
   aboutToDisappear():void {
+    if (this.contentValidationTimer>=0) {
+      clearTimeout(this.contentValidationTimer);
+      this.contentValidationTimer=-1;
+    }
     this.stopMockClock();
     if (!this.finishingSession && this.questions.length>0 &&
       (this.mode===ToeicPageMode.TRAINING || this.mode===ToeicPageMode.DIAGNOSTIC)) {
@@ -1166,7 +1186,7 @@ export struct ToeicHomePage {
 
   // Fixed chrome is a sibling of Scroll; only the central content pane scrolls.
   private hasFixedFooter():boolean {
-    if (this.mode===ToeicPageMode.HOME) return this.viewModel.contentErrors().length===0;
+    if (this.mode===ToeicPageMode.HOME) return this.contentValidationReady && this.contentValidationErrors.length===0;
     if (this.mode===ToeicPageMode.VOCABULARY) return this.selectedDayVocabularyCount>0 && !this.selectedVocabDone;
     if (this.mode===ToeicPageMode.SENTENCE) return this.selectedDaySentenceCount>0 && !this.selectedSentenceDone;
     return this.mode===ToeicPageMode.VOCABULARY_RESULT ||
@@ -1311,14 +1331,17 @@ export struct ToeicHomePage {
     Scroll() {
       Column() {
       Column({space:AppTheme.DEEP_PAGE_CONTENT_GAP}) {
-        if (this.viewModel.contentErrors().length>0) {
+        if (!this.contentValidationReady) {
+          Text('正在检查训练内容…')
+            .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.SUBTEXT);
+        } else if (this.contentValidationErrors.length>0) {
           Column({space:6}) {
             Text('内容校验未通过，正式训练内容已暂停。')
               .width('100%').fontSize(AppTheme.BODY_SIZE).fontColor(AppTheme.DANGER)
               .fontWeight(FontWeight.Medium);
             Text('校验详情：')
               .width('100%').fontSize(AppTheme.META_SIZE).fontColor(AppTheme.SUBTEXT);
-            ForEach(this.viewModel.contentErrors().slice(0,5),(error:string)=>{
+            ForEach(this.contentValidationErrors.slice(0,5),(error:string)=>{
               Text('• '+error)
                 .width('100%').fontSize(AppTheme.META_SIZE)
                 .lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.DANGER);
