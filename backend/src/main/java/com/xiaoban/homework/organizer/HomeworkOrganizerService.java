@@ -35,16 +35,19 @@ public class HomeworkOrganizerService {
     if (!familyId.equals(student.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
     if (!model.available()) throw new ApiExceptions.ServiceUnavailable("AI整理暂未配置");
 
-    List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments =
-        existingAssignments(familyId, studentId);
     List<HomeworkOrganizerDtos.Candidate> organized = model
-        .organize(student, request.sourceLabel(), request.text(), existingAssignments)
+        .organize(student, request.sourceLabel(), request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI整理暂时不可用"));
+    List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments =
+        needsTodayDuplicateReview(organized) ? existingAssignments(familyId, studentId) : List.of();
+    List<HomeworkOrganizerDtos.Candidate> reviewed =
+        ConfigurableHomeworkOrganizerModelClient.reviewLocalDuplicates(
+            organized, existingAssignments, request.text());
     log.info("homework_import organized studentId={} assignments={} existingContext={} duplicateHints={}",
-        studentId, organized.size(), existingAssignments.size(),
-        organized.stream().filter(item -> item.duplicateAssignmentId() != null &&
+        studentId, reviewed.size(), existingAssignments.size(),
+        reviewed.stream().filter(item -> item.duplicateAssignmentId() != null &&
             !item.duplicateAssignmentId().isBlank()).count());
-    return new HomeworkOrganizerDtos.Response(organized, "AI");
+    return new HomeworkOrganizerDtos.Response(reviewed, "AI");
   }
 
   public HomeworkOrganizerDtos.ImageResponse organizeImage(UUID familyId, String studentId,
@@ -54,16 +57,32 @@ public class HomeworkOrganizerService {
     if (!familyId.equals(student.familyId)) throw new ApiExceptions.NotFound("孩子不存在");
     String imageDataUrl = HomeworkImageInput.dataUrl(request);
     if (!model.imageAvailable()) throw new ApiExceptions.ServiceUnavailable("AI图片解析暂未配置，请使用识别图片文字");
-    List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments =
-        existingAssignments(familyId, studentId);
     var result = model.organizeImage(
-        student, request.sourceLabel(), imageDataUrl, request.text(), existingAssignments)
+        student, request.sourceLabel(), imageDataUrl, request.text())
         .orElseThrow(() -> new ApiExceptions.ServiceUnavailable("AI图片解析失败，请确认模型支持图片，或点击识别图片文字"));
+    List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments =
+        needsTodayDuplicateReview(result.assignments()) ? existingAssignments(familyId, studentId) : List.of();
+    List<HomeworkOrganizerDtos.Candidate> reviewed =
+        ConfigurableHomeworkOrganizerModelClient.reviewLocalDuplicates(
+            result.assignments(), existingAssignments, result.recognizedText());
+    var reviewedResult = new HomeworkOrganizerDtos.ImageResponse(
+        reviewed, result.mode(), result.recognizedText());
     log.info("homework_import image_parsed studentId={} assignments={} existingContext={} duplicateHints={}",
-        studentId, result.assignments().size(), existingAssignments.size(),
-        result.assignments().stream().filter(item -> item.duplicateAssignmentId() != null &&
+        studentId, reviewed.size(), existingAssignments.size(),
+        reviewed.stream().filter(item -> item.duplicateAssignmentId() != null &&
             !item.duplicateAssignmentId().isBlank()).count());
-    return result;
+    return reviewedResult;
+  }
+
+  private boolean needsTodayDuplicateReview(List<HomeworkOrganizerDtos.Candidate> candidates) {
+    if (candidates == null || candidates.isEmpty()) return false;
+    LocalDate today = LocalDate.now(BUSINESS_ZONE);
+    for (HomeworkOrganizerDtos.Candidate candidate : candidates) {
+      if (candidate == null) continue;
+      LocalDate dueDate = ConfigurableHomeworkOrganizerModelClient.candidateDueDate(candidate.dueText());
+      if (today.equals(dueDate)) return true;
+    }
+    return false;
   }
 
   private List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments(
