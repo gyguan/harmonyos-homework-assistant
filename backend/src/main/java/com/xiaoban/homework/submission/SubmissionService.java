@@ -120,7 +120,7 @@ public class SubmissionService {
         AssignmentDtos.Response.from(assignmentRepository.saveAndFlush(assignment));
 
     SubmissionDtos.Response created =
-        new SubmissionDtos.Response(submissionId, assignmentId, now, result);
+        new SubmissionDtos.Response(submissionId, assignmentId, now, result, legacyPhotos(result));
     log.info(
         "submission created assignmentId={} studentId={} submissionId={} resourceType={} resourceCount={} totalBytes={} from=READY_TO_SUBMIT to=SUBMITTED",
         assignmentId,
@@ -194,7 +194,24 @@ public class SubmissionService {
         .findBySubmissionIdOrderBySortOrderAscIdAsc(submission.id)
         .stream().map(this::toDto).toList();
     return new SubmissionDtos.Response(
-        submission.id, submission.assignmentId, submission.submittedAt, list);
+        submission.id, submission.assignmentId, submission.submittedAt, list, legacyPhotos(list));
+  }
+
+  private List<SubmissionDtos.Resource> legacyPhotos(List<SubmissionDtos.Resource> resources) {
+    List<SubmissionDtos.Resource> result = new ArrayList<>();
+    for (SubmissionDtos.Resource resource : resources) {
+      if (!"IMAGE".equals(resource.resourceType())) continue;
+      result.add(new SubmissionDtos.Resource(
+          resource.id(),
+          resource.resourceType(),
+          resource.originalName(),
+          resource.contentType(),
+          resource.sizeBytes(),
+          resource.durationMs(),
+          resource.sortOrder(),
+          "/api/v1/submission-photos/" + resource.id()));
+    }
+    return result;
   }
 
   private SubmissionDtos.Resource toDto(SubmissionResourceEntity resource) {

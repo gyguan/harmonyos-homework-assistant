@@ -22,7 +22,8 @@ public final class SubmissionDtos {
       UUID id,
       String assignmentId,
       Instant submittedAt,
-      List<Resource> resources) {}
+      List<Resource> resources,
+      List<Resource> photos) {}
 
   public record CreateResponse(Response submission, AssignmentDtos.Response assignment) {}
 }
