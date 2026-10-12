@@ -41,8 +41,7 @@ public class HomeworkOrganizerService {
     List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments =
         needsTodayDuplicateReview(organized) ? existingAssignments(familyId, studentId) : List.of();
     List<HomeworkOrganizerDtos.Candidate> reviewed =
-        ConfigurableHomeworkOrganizerModelClient.reviewLocalDuplicates(
-            organized, existingAssignments, request.text());
+        reviewDuplicates(organized, existingAssignments, request.text());
     log.info("homework_import organized studentId={} assignments={} existingContext={} duplicateHints={}",
         studentId, reviewed.size(), existingAssignments.size(),
         reviewed.stream().filter(item -> item.duplicateAssignmentId() != null &&
@@ -63,8 +62,7 @@ public class HomeworkOrganizerService {
     List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments =
         needsTodayDuplicateReview(result.assignments()) ? existingAssignments(familyId, studentId) : List.of();
     List<HomeworkOrganizerDtos.Candidate> reviewed =
-        ConfigurableHomeworkOrganizerModelClient.reviewLocalDuplicates(
-            result.assignments(), existingAssignments, result.recognizedText());
+        reviewDuplicates(result.assignments(), existingAssignments, result.recognizedText());
     var reviewedResult = new HomeworkOrganizerDtos.ImageResponse(
         reviewed, result.mode(), result.recognizedText());
     log.info("homework_import image_parsed studentId={} assignments={} existingContext={} duplicateHints={}",
@@ -72,6 +70,20 @@ public class HomeworkOrganizerService {
         reviewed.stream().filter(item -> item.duplicateAssignmentId() != null &&
             !item.duplicateAssignmentId().isBlank()).count());
     return reviewedResult;
+  }
+
+  private List<HomeworkOrganizerDtos.Candidate> reviewDuplicates(
+      List<HomeworkOrganizerDtos.Candidate> candidates,
+      List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments,
+      String sourceText) {
+    if (existingAssignments == null || existingAssignments.isEmpty()) return candidates;
+    return model.reviewDuplicates(candidates, existingAssignments, sourceText)
+        .orElseGet(() -> {
+          log.warn("homework_import duplicate_ai_fallback candidates={} existingContext={}",
+              candidates == null ? 0 : candidates.size(), existingAssignments.size());
+          return ConfigurableHomeworkOrganizerModelClient.reviewLocalDuplicates(
+              candidates, existingAssignments, sourceText);
+        });
   }
 
   private boolean needsTodayDuplicateReview(List<HomeworkOrganizerDtos.Candidate> candidates) {
