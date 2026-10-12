@@ -10,6 +10,8 @@ import { ToeicVocabularyRemoteApi, RemoteToeicVocabularyRecall } from '../applic
 import { BackendSession } from '../../application/remote/BackendSession';
 
 export class ToeicCoachViewModel {
+  // Catalog content is bundled and immutable during a running app session.
+  private static cachedContentErrors:string[]|null=null;
   snapshot():ToeicLearningSnapshot { return ToeicProgressStore.instance.current(); }
   diagnosticQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.diagnosticQuestions(); }
   dailyQuestions():ToeicQuestion[] { return ToeicTrainingService.instance.dailyQuestions(this.snapshot()); }
@@ -56,6 +58,7 @@ export class ToeicCoachViewModel {
   }
   recentSessionReports():ToeicSessionReport[] { return this.snapshot().sessionReports.slice(); }
   contentErrors():string[] {
+    if (ToeicCoachViewModel.cachedContentErrors!==null) return ToeicCoachViewModel.cachedContentErrors.slice();
     let all=PresetToeicContent.questions();
     let live:ToeicQuestion[]=[];
     for (let question of all) {
@@ -74,7 +77,8 @@ export class ToeicCoachViewModel {
       translationQuestions,
       ToeicQuestionTranslationCatalog.validationItems(translationQuestionIds)
     ).errors;
-    return questionErrors.concat(vocabularyErrors).concat(sentenceErrors).concat(translationErrors).concat(groupErrors);
+    ToeicCoachViewModel.cachedContentErrors=questionErrors.concat(vocabularyErrors).concat(sentenceErrors).concat(translationErrors).concat(groupErrors);
+    return ToeicCoachViewModel.cachedContentErrors.slice();
   }
   vocabularyCount():number { return PresetToeicContent.vocabulary().length; }
   allVocabulary():ToeicVocabularyItem[] { return PresetToeicContent.vocabulary(); }
