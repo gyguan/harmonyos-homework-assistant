@@ -20,6 +20,7 @@ struct Index {
   // Student identity changes are independent of the role: STUDENT -> STUDENT
   // must invalidate the existing shell just as PARENT -> STUDENT does.
   @State private studentContextRevision: number = 0;
+  @State private selectedStudentId: string = '';
   @State private parentAccessCodeInput: string = '';
   @State private parentAccessMessage: string = '';
   private shellBackHandler: () => boolean = () => false;
@@ -36,6 +37,7 @@ struct Index {
   });
 
   aboutToAppear(): void {
+    this.selectedStudentId = this.familyContext.getActiveStudentId();
     this.applyShareImportParentRole();
     if (BackendSession.instance.isConnected()) void this.restoreCloud();
   }
@@ -59,6 +61,7 @@ struct Index {
     let valid = await BackendAuthService.instance.validateSession();
     if (!valid) return;
     if (await FamilyCloudService.instance.syncStudents()) {
+      this.selectedStudentId = this.familyContext.getActiveStudentId();
       this.cloudRevision++;
       this.studentContextRevision++;
     }
@@ -94,6 +97,7 @@ struct Index {
 
   private enterStudent(studentId: string): void {
     if (this.familyContext.setActiveStudent(studentId)) {
+      this.selectedStudentId = studentId;
       this.studentContextRevision++;
       this.selectedRole = AppRole.STUDENT;
       void this.prepareStudentAssignments(studentId);
@@ -123,6 +127,7 @@ struct Index {
         AppShell({
           role: this.selectedRole,
           studentContextRevision: this.studentContextRevision,
+          rootStudentId: this.selectedStudentId,
           onSwitchParent: () => this.requestParentAccess(),
           onSwitchStudent: (studentId: string) => this.enterStudent(studentId),
           onRegisterBackHandler: (handler: () => boolean) => this.shellBackHandler = handler
