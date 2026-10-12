@@ -66,9 +66,9 @@ export class SubmissionAudioRecorderService {
       let profile: media.AVRecorderProfile = {
         audioBitrate: 96000,
         audioChannels: 1,
-        audioCodec: 'audio/mp4a-latm' as media.CodecMimeType,
+        audioCodec: media.CodecMimeType.AUDIO_AAC,
         audioSampleRate: 48000,
-        fileFormat: 'm4a' as media.ContainerFormatType
+        fileFormat: media.ContainerFormatType.CFT_MPEG_4A
       };
       let config: media.AVRecorderConfig = {
         audioSourceType: media.AudioSourceType.AUDIO_SOURCE_TYPE_MIC,
