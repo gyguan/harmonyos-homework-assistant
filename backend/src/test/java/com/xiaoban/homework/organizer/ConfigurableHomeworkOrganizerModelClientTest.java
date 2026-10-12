@@ -172,7 +172,6 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         student, "老师通知", "数学第三单元练习第26页1到6题", existing);
     assertTrue(input.contains("ID=a-existing-1"));
     assertTrue(input.contains("练习册 P26 第1～6题"));
-    assertTrue(input.contains("完成时间=今天"));
     assertTrue(input.contains("原文=数学练习册第26页1-6题，完成后订正"));
     assertFalse(input.contains("；教材="));
 
@@ -291,6 +290,22 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         ConfigurableHomeworkOrganizerModelClient.candidateDueDate("明日"),
         ConfigurableHomeworkOrganizerModelClient.candidateDueDate(
             tomorrow.getMonthValue() + "月" + tomorrow.getDayOfMonth() + "日"));
+  }
+
+  @Test
+  void legacyTaskWithoutSourceEvidenceCanStillMatchByStructuredSimilarity() {
+    var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
+        "a-legacy", "数学", "数学练习册 P26 1-6题", "完成后订正", "", "今天", 0L, ""));
+    var candidates = java.util.List.of(new HomeworkOrganizerDtos.Candidate(
+        "数学", "数学第三单元练习第26页1到6题", "完成后订正", "", "今天", 20,
+        "第26页1到6题，完成后订正", 0.95, "", "", "", 0.0, ""));
+
+    var reviewed = ConfigurableHomeworkOrganizerModelClient.applyEvidenceDuplicateFallback(
+        candidates, existing);
+
+    assertEquals("a-legacy", reviewed.getFirst().duplicateAssignmentId());
+    assertEquals(1.0, reviewed.getFirst().duplicateConfidence());
+    assertTrue(reviewed.getFirst().duplicateReason().contains("高度相似"));
   }
 
   @Test

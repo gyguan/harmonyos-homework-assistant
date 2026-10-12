@@ -70,23 +70,39 @@ public class HomeworkOrganizerService {
       UUID familyId, String studentId) {
     LocalDate today = LocalDate.now(BUSINESS_ZONE);
     long from = today.atStartOfDay(BUSINESS_ZONE).toInstant().toEpochMilli();
-    long toInclusive = today.plusDays(7).atStartOfDay(BUSINESS_ZONE).toInstant().toEpochMilli() - 1L;
+    long toInclusive = today.plusDays(1).atStartOfDay(BUSINESS_ZONE).toInstant().toEpochMilli() - 1L;
     String activeStatuses =
         "NOT_STARTED,IN_PROGRESS,PAUSED,READY_TO_SUBMIT,NEEDS_REWORK,OVERDUE";
 
     List<HomeworkOrganizerDtos.ExistingAssignment> result = new ArrayList<>();
-    List<AssignmentDtos.Response> upcoming = assignments.list(
+    List<AssignmentDtos.Response> dueToday = assignments.list(
         familyId, studentId, null, null, from, toInclusive, activeStatuses, false);
-    for (AssignmentDtos.Response item : upcoming) {
-      if (result.size() >= 10) break;
+    appendExisting(result, dueToday, false);
+
+    if (result.size() < 30) {
+      List<AssignmentDtos.Response> undated = assignments.list(
+          familyId, studentId, null, null, null, null, activeStatuses, true);
+      appendExisting(result, undated, true);
+    }
+
+    long evidenceCount =
+        result.stream().filter(item -> item.sourceExcerpt() != null && !item.sourceExcerpt().isBlank()).count();
+    log.info("homework_import duplicate_context studentId={} scope=TODAY selected={} evidence={}",
+        studentId, result.size(), evidenceCount);
+    return result;
+  }
+
+  private void appendExisting(List<HomeworkOrganizerDtos.ExistingAssignment> result,
+      List<AssignmentDtos.Response> items, boolean requireTextualToday) {
+    for (AssignmentDtos.Response item : items) {
+      if (result.size() >= 30) break;
+      if (requireTextualToday &&
+          (item.dueText() == null || (!item.dueText().contains("今天") && !item.dueText().contains("今日")))) {
+        continue;
+      }
       result.add(new HomeworkOrganizerDtos.ExistingAssignment(
           item.id(), item.subject(), item.title(), item.instruction(), item.textbookRef(),
           item.dueText(), item.dueAtEpochMs(), item.sourceExcerpt()));
     }
-    long evidenceCount =
-        result.stream().filter(item -> item.sourceExcerpt() != null && !item.sourceExcerpt().isBlank()).count();
-    log.info("homework_import duplicate_context studentId={} horizonDays=7 selected={} evidence={}",
-        studentId, result.size(), evidenceCount);
-    return result;
   }
 }
