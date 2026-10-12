@@ -84,7 +84,7 @@ export class HomeworkOrganizerRemoteApi {
       parsed.recognizedText.trim().length === 0 || !Array.isArray(parsed.assignments)) {
       throw new Error('AI图片解析结果不完整，可点击识别图片文字后重试');
     }
-    let candidates = this.toCandidates(input, parsed.assignments);
+    let candidates = this.toCandidates(input, parsed.assignments, parsed.recognizedText.trim());
     if (candidates.length !== parsed.assignments.length) {
       throw new Error('AI返回的作业科目或标题无效，请重试或点击识别图片文字');
     }
@@ -116,7 +116,8 @@ export class HomeworkOrganizerRemoteApi {
     }
   }
 
-  private toCandidates(input: ExtractedHomeworkText, assignments: RemoteCandidate[]): CandidateAssignment[] {
+  private toCandidates(input: ExtractedHomeworkText, assignments: RemoteCandidate[],
+    rawTextOverride?: string): CandidateAssignment[] {
     let result: CandidateAssignment[] = [];
     for (let i = 0; i < assignments.length; i++) {
       let remote = assignments[i];
@@ -139,7 +140,7 @@ export class HomeworkOrganizerRemoteApi {
         sourceEvidence: {
           sourceLabel: input.sourceLabel,
           excerpt: this.value(remote.sourceExcerpt, remote.title),
-          rawText: input.text
+          rawText: rawTextOverride === undefined ? input.text : rawTextOverride
         },
         confidence: confidence,
         sameTaskGroup: this.optionalText(remote.sameTaskGroup),
