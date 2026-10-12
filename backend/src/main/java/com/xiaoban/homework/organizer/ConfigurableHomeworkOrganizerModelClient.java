@@ -416,7 +416,8 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   private static String semanticKey(String value) {
     if (blank(value)) return "";
     return value.toLowerCase()
-        .replaceAll("[\\s，。；、,.!?！？:：()（）\\[\\]【】《》<>\"'“”‘’\\-—_]+", "");
+        .replaceAll("([0-9一二三四五六七八九十]+)[\\-—~～至]([0-9一二三四五六七八九十]+)", "$1到$2")
+        .replaceAll("[\\s，。；、,.!?！？:：()（）\\[\\]【】《》<>\"'“”‘’_]+", "");
   }
 
   private static Map<String, String> existingAssignmentTitles(
