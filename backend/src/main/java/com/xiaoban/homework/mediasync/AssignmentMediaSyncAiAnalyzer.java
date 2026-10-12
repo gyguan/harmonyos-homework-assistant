@@ -27,7 +27,8 @@ public class AssignmentMediaSyncAiAnalyzer {
   private final AiProviderProperties properties;
   private final AudioTranscriptionClient transcription;
   private final ImageContentAnalyzer imageAnalyzer;
-  private final MediaSyncAlignmentClient alignment;
+  private final RuleMediaTimelineAligner ruleAlignment;
+  private final MediaSyncAlignmentClient aiAlignment;
   private final JsonMapper mapper;
 
   public AssignmentMediaSyncAiAnalyzer(
@@ -38,7 +39,8 @@ public class AssignmentMediaSyncAiAnalyzer {
       AiProviderProperties properties,
       AudioTranscriptionClient transcription,
       ImageContentAnalyzer imageAnalyzer,
-      MediaSyncAlignmentClient alignment,
+      RuleMediaTimelineAligner ruleAlignment,
+      MediaSyncAlignmentClient aiAlignment,
       JsonMapper mapper) {
     this.syncs = syncs;
     this.resources = resources;
@@ -47,14 +49,13 @@ public class AssignmentMediaSyncAiAnalyzer {
     this.properties = properties;
     this.transcription = transcription;
     this.imageAnalyzer = imageAnalyzer;
-    this.alignment = alignment;
+    this.ruleAlignment = ruleAlignment;
+    this.aiAlignment = aiAlignment;
     this.mapper = mapper;
   }
 
   public boolean canAnalyze(UUID syncId) {
-    if (!transcription.available() || !imageAnalyzer.available() || !alignment.available()) {
-      return false;
-    }
+    if (!transcription.available()) return false;
     AssignmentMediaSyncEntity sync = syncs.findById(syncId).orElse(null);
     if (sync == null) return false;
     long imageCount = resources
@@ -87,52 +88,77 @@ public class AssignmentMediaSyncAiAnalyzer {
     log.info("media_sync transcription_completed assignmentId={} syncId={} segments={} durationMs={} model={}",
         sync.assignmentId, sync.id, transcript.segments().size(), transcript.durationMs(), transcript.model());
 
-    List<ImageContentAnalyzer.Result> summaries = new ArrayList<>();
+    List<String> imageIds = images.stream().map(item -> item.id.toString()).toList();
+    RuleMediaTimelineAligner.Result ruleResult =
+        ruleAlignment.align(transcript, imageIds).orElse(null);
+    if (ruleResult != null) {
+      log.info("media_sync alignment_completed assignmentId={} syncId={} alignmentMethod=RULE confidence={}",
+          sync.assignmentId, sync.id, ruleResult.confidence());
+      return result(audio, transcript.model(), "RULE",
+          ruleResult.durationMs(), ruleResult.confidence(), ruleResult.boundaries());
+    }
+
+    if (!imageAnalyzer.available() || !aiAlignment.available()) {
+      throw new IllegalStateException("图片理解或语义对齐模型未配置");
+    }
+
     List<MediaSyncAlignmentClient.ImageInput> alignmentImages = new ArrayList<>();
-    for (int i = 0; i < images.size(); i++) {
-      AssignmentResourceEntity image = images.get(i);
-      ImageContentAnalyzer.Result result = imageAnalyzer
+    String imageModel = "";
+    for (AssignmentResourceEntity image : images) {
+      ImageContentAnalyzer.Result analyzed = imageAnalyzer
           .analyze(resolve(sync.familyId, image), image.contentType, image.originalName)
-          .orElseThrow(() -> new IllegalStateException("第 " + (i + 1) + " 张图片分析失败"));
-      summaries.add(result);
-      alignmentImages.add(new MediaSyncAlignmentClient.ImageInput(i, result.summary()));
+          .orElseThrow(() -> new IllegalStateException("图片分析失败"));
+      imageModel = analyzed.model();
+      alignmentImages.add(new MediaSyncAlignmentClient.ImageInput(
+          image.id.toString(),
+          analyzed.visibleText(),
+          analyzed.summary(),
+          analyzed.keywords()));
     }
     log.info("media_sync image_analysis_completed assignmentId={} syncId={} imageCount={} model={}",
-        sync.assignmentId, sync.id, images.size(), summaries.get(0).model());
+        sync.assignmentId, sync.id, images.size(), imageModel);
 
     MediaSyncAlignmentClient.Result aligned =
-        alignment.align(transcript, alignmentImages)
+        aiAlignment.align(transcript, alignmentImages)
             .orElseThrow(() -> new IllegalStateException("语音与图片语义对齐失败"));
+    log.info("media_sync alignment_completed assignmentId={} syncId={} alignmentMethod=AI confidence={} model={}",
+        sync.assignmentId, sync.id, aligned.confidence(), aligned.model());
+    return result(audio, transcript.model(), aligned.model(),
+        aligned.durationMs(), aligned.confidence(), aligned.boundaries());
+  }
 
+  private AssignmentMediaSyncService.TimelineBuildResult result(
+      AssignmentResourceEntity audio,
+      String transcriptionModel,
+      String analysisModel,
+      long durationMs,
+      double confidence,
+      List<MediaSyncAlignmentClient.Boundary> boundaries) {
     List<AssignmentMediaSyncDtos.Item> items = new ArrayList<>();
-    for (MediaSyncAlignmentClient.Boundary boundary : aligned.boundaries()) {
-      AssignmentResourceEntity image = images.get(boundary.imageIndex());
+    for (MediaSyncAlignmentClient.Boundary boundary : boundaries) {
       items.add(new AssignmentMediaSyncDtos.Item(
-          image.id.toString(),
+          boundary.imageResourceId(),
           boundary.startMs(),
           boundary.endMs(),
           boundary.confidence()));
     }
     AssignmentMediaSyncDtos.Timeline timeline =
-        new AssignmentMediaSyncDtos.Timeline(
-            1, aligned.durationMs(), aligned.confidence(), List.copyOf(items));
+        new AssignmentMediaSyncDtos.Timeline(1, durationMs, confidence, List.copyOf(items));
     try {
       return new AssignmentMediaSyncService.TimelineBuildResult(
           audio.id,
-          aligned.durationMs(),
-          aligned.confidence(),
+          durationMs,
+          confidence,
           mapper.writeValueAsString(timeline),
-          compact(aligned.model(), 120),
-          compact(transcript.model(), 120));
+          compact(analysisModel, 120),
+          compact(transcriptionModel, 120));
     } catch (Exception error) {
-      throw new IllegalStateException("序列化AI图文同步时间轴失败", error);
+      throw new IllegalStateException("序列化图文同步时间轴失败", error);
     }
   }
 
   private Path resolve(UUID familyId, AssignmentResourceEntity resource) {
-    if (resource.assetId != null) {
-      return mediaAssets.resolveOwned(familyId, resource.assetId).path();
-    }
+    if (resource.assetId != null) return mediaAssets.resolveOwned(familyId, resource.assetId).path();
     if (resource.storagePath == null || resource.storagePath.isBlank()) {
       throw new IllegalStateException("媒体文件路径为空");
     }

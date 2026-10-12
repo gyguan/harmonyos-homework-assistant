@@ -84,7 +84,7 @@ public class AudioTranscriptionClient {
       long endMs = secondsToMs(item.get("end"));
       String text = item.get("text") == null ? "" : item.get("text").toString().trim();
       if (text.isBlank() || endMs <= startMs) continue;
-      result.add(new Segment(startMs, endMs, compact(text, 500)));
+      result.add(new Segment(result.size(), startMs, endMs, compact(text, 500)));
       if (result.size() >= 400) break;
     }
     return List.copyOf(result);
@@ -109,6 +109,6 @@ public class AudioTranscriptionClient {
     return value.length() <= max ? value : value.substring(0, max);
   }
 
-  public record Segment(long startMs, long endMs, String text) {}
+  public record Segment(int index, long startMs, long endMs, String text) {}
   public record Transcript(String model, long durationMs, List<Segment> segments) {}
 }
