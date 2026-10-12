@@ -490,7 +490,9 @@ def main() -> None:
     translation_catalog = read("entry/src/main/ets/toeic/content/ToeicQuestionTranslationCatalog.ets")
     require("static validationItems(questionIds:string[]):ToeicQuestionTranslation[]" in translation_catalog and
             "let resolved=ToeicQuestionTranslationCatalog.find(questionId);" in translation_catalog and
-            "if (resolved!==null) result.push(resolved);" in translation_catalog,
+            "if (resolved!==null) {" in translation_catalog and
+            "result.push(resolved);" in translation_catalog and
+            "known.set(questionId,true);" in translation_catalog,
             "current versioned question translations must participate in runtime validation")
     for active_translation_id in [
         "R-FP1-DX-P5-05","R-FP5-VERB-0206","R-FP5-SPRINT-1517",
