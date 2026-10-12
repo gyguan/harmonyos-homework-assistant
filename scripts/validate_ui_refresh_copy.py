@@ -89,7 +89,10 @@ require("@State private todayTaskItems: Assignment[]" in student_home and
         "this.todayTaskItems = [];" in student_home and
         "this.todayTaskItems = items;" in student_home and
         "this.viewModel.todayActionableAssignments(this.studentId)" in student_home and
-        "this.TaskList(this.todayTaskItems);" in student_home and
+        "this.TodayTaskList();" in student_home and
+        "ForEach(this.todayTaskItems" in student_home and
+        "ForEach(this.remainingTaskItems" in student_home and
+        "taskRenderEpoch" in student_home and
         "assignment: this.todayTaskItems[0]" in student_home and
         "this.assignments()" not in student_home,
         "student home must render a reactive student-owned task snapshot on phone and PAD")
