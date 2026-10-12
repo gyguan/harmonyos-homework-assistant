@@ -168,11 +168,11 @@ export class ToeicContentValidator {
         if (option.trim().length===0) errors.push(item.questionId + ': translated option is required');
       }
     }
+    let translationById:Map<string,ToeicQuestionTranslation>=new Map<string,ToeicQuestionTranslation>();
+    for (let item of translations) translationById.set(item.questionId,item);
     for (let question of questions) {
-      let translation:ToeicQuestionTranslation|null=null;
-      for (let item of translations) {
-        if (item.questionId===question.id) { translation=item; break; }
-      }
+      let translation=translationById.get(question.id);
+      if (translation===undefined) translation=null;
       if (translation===null) {
         errors.push(question.id + ': Chinese translation is required for assigned non-mock training');
         continue;
