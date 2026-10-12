@@ -99,7 +99,9 @@ require("private PhoneHome()" in home and "private PadHome()" in home and
 # Student Home is a strict Today surface with direct task actions. Summary cards and the
 # subject accordion were removed because they delayed the grade-two student's primary action.
 require("private TodayTasks()" in home and "StudentTodayTaskCard" in home and
-        "todayActionableAssignments()" in view_model and "AssignmentAction.START" in home,
+        "todayActionableAssignments(studentId: string = '')" in view_model and
+        "this.viewModel.todayActionableAssignments(this.studentId)" in home and
+        "this.TaskList(this.todayTaskItems);" in home and "AssignmentAction.START" in home,
         "V2 Student Home must preserve the simplified Today task hierarchy and command path")
 require("StudentHomeMetricCard" not in home and "StudentSubjectTaskGroupCard" not in home,
         "V2 Student Home must not restore summary-card or subject-accordion friction")

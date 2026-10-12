@@ -24,8 +24,16 @@ export class StudentHomeViewModel {
     return this.repository.getCachedSummary();
   }
 
-  assignments(): Assignment[] {
-    return this.repository.listCached();
+  assignments(studentId: string = ''): Assignment[] {
+    let source = this.repository.listCached();
+    if (studentId.length === 0) return source;
+    // The active identity can change without replacing the view-model instance.
+    // Enforce child ownership even if an old repository snapshot is still present.
+    let owned: Assignment[] = [];
+    for (let item of source) {
+      if (item.studentId === studentId) owned.push(item);
+    }
+    return owned;
   }
 
   assignment(assignmentId: string): Assignment | null {
@@ -36,8 +44,8 @@ export class StudentHomeViewModel {
     return this.repository.performAction(assignmentId, action);
   }
 
-  attention(): AssignmentAttentionResult {
-    return AssignmentAttentionPolicy.studentResult(this.assignments());
+  attention(studentId: string = ''): AssignmentAttentionResult {
+    return AssignmentAttentionPolicy.studentResult(this.assignments(studentId));
   }
 
   attentionText(): string {
@@ -48,9 +56,9 @@ export class StudentHomeViewModel {
     return this.attention().kind;
   }
 
-  todayActionableAssignments(): Assignment[] {
+  todayActionableAssignments(studentId: string = ''): Assignment[] {
     let result: Assignment[] = [];
-    for (let item of this.assignments()) {
+    for (let item of this.assignments(studentId)) {
       if (!StudentHomeViewModel.isToday(item)) continue;
       if (!StudentHomeViewModel.isActionable(item.status)) continue;
       StudentHomeViewModel.insertByPriority(result, item);

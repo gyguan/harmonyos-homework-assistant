@@ -25,7 +25,8 @@ workflow = read(".github/workflows/static-gate.yml")
 
 # Student Home remains a strict Today surface backed by structured dueAt data.
 for token in [
-    "todayActionableAssignments()",
+    "todayActionableAssignments(studentId: string = '')",
+    "item.studentId === studentId",
     "private static isToday(item: Assignment)",
     "item.dueAtEpochMs <= 0",
     "AssignmentDueDate.businessDayStart(item.dueAtEpochMs)",
@@ -42,7 +43,10 @@ for token in [
     "private TaskList(items: Assignment[])",
     "private TodayTasks()",
     "今天要做",
-    "this.viewModel.todayActionableAssignments()",
+    "this.viewModel.todayActionableAssignments(this.studentId)",
+    "@State private todayTaskItems: Assignment[]",
+    "this.todayTaskItems = items;",
+    "this.TaskList(this.todayTaskItems);",
     "AssignmentAction.START",
     "this.viewModel.performAction(assignmentId, AssignmentAction.START)",
     "@State private actionAssignmentId",

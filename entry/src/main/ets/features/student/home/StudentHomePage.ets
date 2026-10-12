@@ -133,10 +133,15 @@ struct StudentTodayTaskCard {
 export struct StudentHomePage {
   @Prop @Watch('onStudentIdChanged') studentId: string = '';
   @Prop offlineMode: boolean = false;
-  @Prop revision: number = 0;
+  @Prop @Watch('onRevisionChanged') revision: number = 0;
   @State private availableWidthVp: number = 390;
   @State private actionAssignmentId: string = '';
   @State private actionMessage: string = '';
+  @State private todayTaskItems: Assignment[] = [];
+  @State private remainingTaskItems: Assignment[] = [];
+  @State private todaySummaryTotal: number = 0;
+  @State private attentionMessage: string = '';
+  @State private attentionCategory: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
   private identityGeneration: number = 0;
   onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
   onOpenAttention: (kind: AssignmentAttentionKind) => void = (_kind: AssignmentAttentionKind) => {};
@@ -145,27 +150,51 @@ export struct StudentHomePage {
   private readonly viewModel: StudentHomeViewModel =
     new StudentHomeViewModel(DefaultAssignmentRepository.instance);
 
+  aboutToAppear(): void {
+    this.refreshTodaySnapshot();
+  }
+
+  private onRevisionChanged(): void {
+    this.refreshTodaySnapshot();
+  }
+
   private onStudentIdChanged(): void {
     this.identityGeneration++;
     this.actionAssignmentId = '';
     this.actionMessage = '';
+    // Clear all old-child rows synchronously before reading the new identity.
+    this.todayTaskItems = [];
+    this.remainingTaskItems = [];
+    this.todaySummaryTotal = 0;
+    this.attentionMessage = '';
+    this.attentionCategory = AssignmentAttentionKind.NONE;
+    this.refreshTodaySnapshot();
   }
 
-  private assignments(): Assignment[] {
-    let currentRevision = this.revision;
-    if (currentRevision < 0) return [];
-    return this.viewModel.todayActionableAssignments();
-  }
-
-  private remainingAssignments(): Assignment[] {
-    let source = this.assignments();
-    let result: Assignment[] = [];
-    for (let index = 1; index < source.length; index++) result.push(source[index]);
-    return result;
+  private refreshTodaySnapshot(): void {
+    if (this.studentId.length === 0) {
+      this.todayTaskItems = [];
+      this.remainingTaskItems = [];
+      this.todaySummaryTotal = 0;
+      this.attentionMessage = '';
+      this.attentionCategory = AssignmentAttentionKind.NONE;
+      return;
+    }
+    let items = this.viewModel.todayActionableAssignments(this.studentId);
+    let remaining: Assignment[] = [];
+    for (let index = 1; index < items.length; index++) remaining.push(items[index]);
+    let attention = this.viewModel.attention(this.studentId);
+    this.todayTaskItems = items;
+    this.remainingTaskItems = remaining;
+    this.todaySummaryTotal = this.viewModel.summary().total;
+    this.attentionMessage = attention.text;
+    this.attentionCategory = attention.kind;
+    console.info('[STUDENT-HOME] refresh studentId=' + this.studentId +
+      ' tasks=' + String(items.length) + ' revision=' + String(this.revision));
   }
 
   private canUsePadComposition(): boolean {
-    return this.assignments().length > 1 &&
+    return this.todayTaskItems.length > 1 &&
       LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.homeFocusSummaryRequirement());
   }
 
@@ -226,14 +255,14 @@ export struct StudentHomePage {
 
   @Builder
   private AttentionBanner() {
-    if (this.viewModel.attentionText().length > 0) {
+    if (this.attentionMessage.length > 0) {
       Row({ space: 8 }) {
         Text('提醒')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.WARNING);
-        Text(this.viewModel.attentionText())
+        Text(this.attentionMessage)
           .layoutWeight(1)
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -249,8 +278,8 @@ export struct StudentHomePage {
       .borderRadius(AppTheme.CONTROL_RADIUS)
       .accessibilityGroup(true)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
-      .accessibilityText(`提醒，${this.viewModel.attentionText()}，点击查看`)
-      .onClick(() => this.onOpenAttention(this.viewModel.attentionKind()));
+      .accessibilityText(`提醒，${this.attentionMessage}，点击查看`)
+      .onClick(() => this.onOpenAttention(this.attentionCategory));
     }
   }
 
@@ -261,7 +290,7 @@ export struct StudentHomePage {
         .fontSize(27)
         .fontColor([AppTheme.SUCCESS]);
       Column({ space: 3 }) {
-        Text(this.viewModel.summary().total > 0 ? '今天的任务完成啦' : '今天没有安排任务')
+        Text(this.todaySummaryTotal > 0 ? '今天的任务完成啦' : '今天没有安排任务')
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
@@ -304,8 +333,8 @@ export struct StudentHomePage {
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        if (this.assignments().length > 0) {
-          Text(`${this.assignments().length} 项`)
+        if (this.todayTaskItems.length > 0) {
+          Text(`${this.todayTaskItems.length} 项`)
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
@@ -313,8 +342,8 @@ export struct StudentHomePage {
       }
       .width('100%');
 
-      if (this.assignments().length === 0) this.EmptyState();
-      else this.TaskList(this.assignments());
+      if (this.todayTaskItems.length === 0) this.EmptyState();
+      else this.TaskList(this.todayTaskItems);
 
       if (this.actionMessage.length > 0) {
         Text(this.actionMessage)
@@ -352,9 +381,9 @@ export struct StudentHomePage {
             .fontWeight(FontWeight.Bold)
             .fontColor(AppTheme.TEXT);
           StudentTodayTaskCard({
-            assignment: this.assignments()[0],
+            assignment: this.todayTaskItems[0],
             emphasized: true,
-            busy: this.actionAssignmentId === this.assignments()[0].id,
+            busy: this.actionAssignmentId === this.todayTaskItems[0].id,
             onAction: (assignmentId: string) => { void this.openAssignment(assignmentId); }
           });
         }
@@ -368,12 +397,12 @@ export struct StudentHomePage {
               .fontWeight(FontWeight.Bold)
               .fontColor(AppTheme.TEXT);
             Blank();
-            Text(`${this.remainingAssignments().length} 项`)
+            Text(`${this.remainingTaskItems.length} 项`)
               .fontSize(13)
               .fontColor(AppTheme.SUBTEXT);
           }
           .width('100%');
-          this.TaskList(this.remainingAssignments());
+          this.TaskList(this.remainingTaskItems);
         }
         .layoutWeight(1)
         .constraintSize({ minWidth: AppTheme.HOME_SECONDARY_MIN_WIDTH })

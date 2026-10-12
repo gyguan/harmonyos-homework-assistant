@@ -127,7 +127,7 @@ if student_home_path.exists():
         fail("Pad Student Home must preserve distinct summary and primary task widths")
     if "this.TodayTasks();" not in student_home or "StudentTodayTaskCard" not in student_home:
         fail("Student Home must preserve the simplified Today task-list composition")
-    if "this.TaskList(this.remainingAssignments());" not in student_home or "先做这项" not in student_home:
+    if "this.TaskList(this.remainingTaskItems);" not in student_home or "先做这项" not in student_home:
         fail("Pad Student Home must preserve focus + remaining-task composition")
 
 repository_root = ROOT / "entry/src/main/ets/data/repository"

@@ -70,6 +70,34 @@ require("TodayScopeNote" not in student_home,
         "student home must not reference the removed TodayScopeNote builder")
 require("this.assignmentRenderKey(item)" in student_home,
         "student home task rows must use content-aware assignment keys")
+# Regression for an actual user-visible stale "Today tasks" list after A -> B.
+# Reading an observable revision while doing a repository lookup inside ArkUI
+# Builder is insufficient; a student-scoped @State snapshot must be reassigned.
+home_vm = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
+index_page = read("entry/src/main/ets/pages/Index.ets")
+app_shell = read("entry/src/main/ets/pages/AppShell.ets")
+require("@State private selectedStudentId: string" in index_page and
+        "this.selectedStudentId = studentId;" in index_page and
+        "rootStudentId: this.selectedStudentId" in index_page and
+        "@Prop @Watch('onRootStudentIdChanged') rootStudentId: string" in app_shell and
+        "private onRootStudentIdChanged(): void" in app_shell,
+        "root must publish observable selected student ID, not only a role/revision")
+require("@State private todayTaskItems: Assignment[]" in student_home and
+        "@Prop @Watch('onRevisionChanged') revision" in student_home and
+        "private onRevisionChanged(): void" in student_home and
+        "private onStudentIdChanged(): void" in student_home and
+        "this.todayTaskItems = [];" in student_home and
+        "this.todayTaskItems = items;" in student_home and
+        "this.viewModel.todayActionableAssignments(this.studentId)" in student_home and
+        "this.TaskList(this.todayTaskItems);" in student_home and
+        "assignment: this.todayTaskItems[0]" in student_home and
+        "this.assignments()" not in student_home,
+        "student home must render a reactive student-owned task snapshot on phone and PAD")
+require("assignments(studentId: string = '')" in home_vm and
+        "item.studentId === studentId" in home_vm and
+        "todayActionableAssignments(studentId: string = '')" in home_vm and
+        "this.assignments(studentId)" in home_vm,
+        "student home view model must filter tasks by explicit active student ID")
 
 # Family switching must update every student-scoped tab immediately, not only
 # when the role changes or when an unrelated network request completes.
