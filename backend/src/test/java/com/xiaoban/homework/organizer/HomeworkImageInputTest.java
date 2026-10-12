@@ -58,7 +58,9 @@ class HomeworkImageInputTest {
     var to = org.mockito.ArgumentCaptor.forClass(Long.class);
     verify(assignments, times(1)).list(eq(family), eq("student-1"), isNull(), isNull(),
         from.capture(), to.capture(), contains("NOT_STARTED"), eq(false));
-    assertTrue(to.getValue() - from.getValue() >= 6L * 24L * 60L * 60L * 1000L);
+    assertTrue(to.getValue() - from.getValue() < 24L * 60L * 60L * 1000L);
+    verify(assignments, times(1)).list(eq(family), eq("student-1"), isNull(), isNull(),
+        isNull(), isNull(), contains("NOT_STARTED"), eq(true));
   }
 
   static String png() throws Exception {
