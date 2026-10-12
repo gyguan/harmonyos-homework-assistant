@@ -59,7 +59,7 @@ for token in [
     "AppTheme.HOME_SECONDARY_MIN_WIDTH",
     "this.TodayTasks();",
     "StudentTodayTaskCard",
-    "this.TaskList(this.remainingTaskItems);",
+    "this.RemainingTaskList();",
     "先做这项",
     "接下来",
     ".onAreaChange",
