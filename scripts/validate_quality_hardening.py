@@ -56,9 +56,10 @@ require("deleteOnRollback" in coordinator and "deleteAfterCommit" in coordinator
         "file lifecycle must be coordinated with database transaction completion")
 require("fileTransactions.deleteOnRollback(stored.storagePath())" in submission,
         "submission uploads must delete newly written files on transaction rollback")
-require("fileTransactions.deleteAfterCommit(photo.storagePath)" in assignment and
-        "fileTransactions.deleteAfterCommit(resource.storagePath)" in assignment,
-        "assignment deletion must defer physical file deletion until commit")
+require("fileTransactions.deleteAfterCommit(storagePath)" in assignment and
+        "fileTransactions.deleteAfterCommit(resource.storagePath)" in assignment and
+        "submissionStoragePaths" in assignment,
+        "assignment deletion must defer generic submission and assignment resource file deletion until commit")
 require("fileTransactions.deleteOnRollback(stored.storagePath())" in resource and
         "fileTransactions.deleteOnRollback(stored.storagePath())" in media_asset,
         "all direct physical media writes must register rollback cleanup")
@@ -66,11 +67,13 @@ require("fileTransactions.deleteOnRollback(stored.storagePath())" in resource an
 require("prefix(image)" in media_policy and "detectImageKind" in media_policy and
         "detectAudioKind" in media_policy and "Content-Type" in media_policy,
         "media policy must validate content signatures, not only extensions")
-require("mediaPolicy.validateImage(file)" in submission,
-        "submission photos must be validated server-side")
-require("uploadContentType" in submission_client and "uploadExtension" in submission_client and
-        "Content-Type: ${contentType}" in submission_client,
-        "Harmony multipart uploads must preserve the selected image type")
+require("mediaPolicy.validateImage(file)" in submission and
+        "mediaPolicy.validateAudio(audio)" in submission,
+        "submission image and audio evidence must be validated server-side")
+require("imageContentType" in submission_client and "imageExtension" in submission_client and
+        "Content-Type: ${sourceInfo.contentType}" in submission_client and
+        "fieldName: 'photos'" in submission_client and "fieldName: 'audio'" in submission_client,
+        "Harmony multipart uploads must preserve typed image/audio submission resources")
 
 for transition in [
     ("READY_TO_SUBMIT", ["AssignmentStatus.SUBMITTED", "AssignmentStatus.IN_PROGRESS"]),
