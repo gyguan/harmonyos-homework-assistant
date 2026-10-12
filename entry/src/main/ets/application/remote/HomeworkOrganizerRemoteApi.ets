@@ -138,7 +138,8 @@ export class HomeworkOrganizerRemoteApi {
         expectedMinutes: this.expectedMinutes(remote.expectedMinutes),
         sourceEvidence: {
           sourceLabel: input.sourceLabel,
-          excerpt: this.value(remote.sourceExcerpt, remote.title)
+          excerpt: this.value(remote.sourceExcerpt, remote.title),
+          rawText: input.text
         },
         confidence: confidence,
         sameTaskGroup: this.optionalText(remote.sameTaskGroup),
