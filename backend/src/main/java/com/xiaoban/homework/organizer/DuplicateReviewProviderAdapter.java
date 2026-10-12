@@ -27,8 +27,17 @@ final class DuplicateReviewProviderAdapter {
     Map<String, Object> root = objectMap(parsed, "$");
     Tracker tracker = new Tracker();
 
-    Object matchesValue = pick(root, "$.matches", "matches", "duplicates", "duplicateMatches");
-    List<?> source = matchList(mapper, matchesValue, "$.matches", tracker);
+    Object matchesValue = pickOptional(root, "matches", "duplicates", "duplicateMatches");
+    List<?> source;
+    if (matchesValue == null && hasAnyKey(root, "matches", "duplicates", "duplicateMatches")) {
+      tracker.add("$.matches");
+      source = List.of();
+    } else {
+      if (matchesValue == null) {
+        throw invalid("$.matches", "is required; availableFields=" + root.keySet());
+      }
+      source = matchList(mapper, matchesValue, "$.matches", tracker);
+    }
     List<ConfigurableHomeworkOrganizerModelClient.DuplicateDecision> matches = new ArrayList<>();
 
     for (int i = 0; i < source.size(); i++) {
@@ -185,6 +194,13 @@ final class DuplicateReviewProviderAdapter {
       current = first;
     }
     throw invalid(path, "wrapper nesting is too deep");
+  }
+
+  private static boolean hasAnyKey(Map<String, Object> object, String... keys) {
+    for (String key : keys) {
+      if (object.containsKey(key)) return true;
+    }
+    return false;
   }
 
   private static Object pick(Map<String, Object> object, String path, String... keys) {
