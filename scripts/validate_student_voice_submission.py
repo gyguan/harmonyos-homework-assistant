@@ -29,12 +29,21 @@ migration = read("backend/src/main/resources/db/migration/V26__submission_resour
 review = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
 evidence = read("entry/src/main/ets/application/submission/ParentSubmissionEvidenceService.ets")
 player = read("entry/src/main/ets/components/submission/SubmissionAudioEvidencePlayer.ets")
+voice_pane = read("entry/src/main/ets/components/assignment/VoiceAssignmentPane.ets")
 
 require("AUDIO = 'AUDIO'" in models, "SubmissionType must support AUDIO")
 require("VoiceSubmissionPane" in study and "startSubmissionRecording" in study and
         "pauseSubmissionRecording" in study and "resumeSubmissionRecording" in study and
         "finishSubmissionRecording" in study and "submitRecordedAudio" in study,
         "student voice submission must support record/pause/resume/finish/submit")
+require("VoiceAssignmentContent(false, true)" in study and
+        "看着图片完成朗读" in study and
+        study.find("VoiceAssignmentContent(false, true)") < study.find("this.VoiceSubmissionPane();"),
+        "READY_TO_SUBMIT voice recording must keep the assignment image viewer above the recorder")
+require("@Prop imageOnlyMode: boolean = false;" in voice_pane and
+        "if (!this.imageOnlyMode)" in voice_pane and
+        "录音时可以左右滑动或点击缩略图切换图片" in voice_pane,
+        "recording image mode must keep image navigation while suppressing assignment audio/sync controls")
 require("this.pauseEmbeddedMedia()" in study,
         "student recording must pause assignment media to avoid recording the prompt")
 require("media.createAVRecorder()" in recorder and
