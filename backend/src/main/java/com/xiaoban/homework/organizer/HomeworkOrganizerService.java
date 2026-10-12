@@ -81,7 +81,7 @@ public class HomeworkOrganizerService {
       if (result.size() >= 10) break;
       result.add(new HomeworkOrganizerDtos.ExistingAssignment(
           item.id(), item.subject(), item.title(), item.instruction(), item.textbookRef(),
-          item.dueText(), item.sourceExcerpt()));
+          item.dueText(), item.dueAtEpochMs(), item.sourceExcerpt()));
     }
     long evidenceCount =
         result.stream().filter(item -> item.sourceExcerpt() != null && !item.sourceExcerpt().isBlank()).count();
