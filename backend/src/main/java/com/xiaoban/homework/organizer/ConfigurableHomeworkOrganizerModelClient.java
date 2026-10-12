@@ -98,7 +98,9 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   static String imageInput(StudentEntity student, String sourceLabel, String text) {
-    return imageInput(student, sourceLabel, text, List.of());
+    return buildInput(student, sourceLabel,
+        "请读取附图并整理全部作业。recognizedText仅保存图片可辨认的文字。")
+        + "\n补充文字（可能为空）：\n" + (text == null ? "" : text.trim());
   }
 
   static String imageInput(StudentEntity student, String sourceLabel, String text,
@@ -195,7 +197,11 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   static String buildInput(StudentEntity student, String sourceLabel, String text) {
-    return buildInput(student, sourceLabel, text, List.of());
+    String grade = student.grade == null ? "" : student.grade;
+    String semester = student.semester == null ? "" : student.semester;
+    String textbooks = student.textbookSummary == null ? "" : student.textbookSummary;
+    return "学生年级：" + grade + "\n学期：" + semester + "\n已知教材：" + textbooks
+        + "\n来源：" + (sourceLabel == null ? "" : sourceLabel) + "\n老师原文：\n" + text;
   }
 
   static String buildInput(StudentEntity student, String sourceLabel, String text,
