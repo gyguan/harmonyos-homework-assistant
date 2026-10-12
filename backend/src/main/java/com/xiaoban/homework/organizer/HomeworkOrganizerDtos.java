@@ -19,7 +19,20 @@ public final class HomeworkOrganizerDtos {
       String dueText,
       int expectedMinutes,
       String sourceExcerpt,
-      double confidence) {}
+      double confidence,
+      String sameTaskGroup,
+      String duplicateAssignmentId,
+      String duplicateAssignmentTitle,
+      double duplicateConfidence,
+      String duplicateReason) {}
+
+  public record ExistingAssignment(
+      String id,
+      String subject,
+      String title,
+      String instruction,
+      String textbookRef,
+      String dueText) {}
 
   public record Response(List<Candidate> assignments, String mode) {}
 

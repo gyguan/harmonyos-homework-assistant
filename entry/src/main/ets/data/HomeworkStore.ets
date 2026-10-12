@@ -207,7 +207,12 @@ export class HomeworkStore {
         imageRef: source.sourceEvidence.imageRef,
         capturedAtEpochMs: source.sourceEvidence.capturedAtEpochMs
       },
-      confidence: source.confidence };
+      confidence: source.confidence,
+      sameTaskGroup: source.sameTaskGroup,
+      duplicateAssignmentId: source.duplicateAssignmentId,
+      duplicateAssignmentTitle: source.duplicateAssignmentTitle,
+      duplicateConfidence: source.duplicateConfidence,
+      duplicateReason: source.duplicateReason };
   }
 
   private cloneSubmission(source: Submission): Submission {

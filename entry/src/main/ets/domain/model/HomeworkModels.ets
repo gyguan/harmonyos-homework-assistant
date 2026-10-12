@@ -116,6 +116,11 @@ export interface CandidateAssignment {
   expectedMinutes: number;
   sourceEvidence: SourceEvidence;
   confidence: number;
+  sameTaskGroup?: string;
+  duplicateAssignmentId?: string;
+  duplicateAssignmentTitle?: string;
+  duplicateConfidence?: number;
+  duplicateReason?: string;
 }
 
 export interface Assignment {

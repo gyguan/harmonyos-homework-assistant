@@ -7,7 +7,19 @@ import java.util.Optional;
 public interface HomeworkOrganizerModelClient {
   boolean available();
   Optional<List<HomeworkOrganizerDtos.Candidate>> organize(StudentEntity student, String sourceLabel, String text);
+
+  default Optional<List<HomeworkOrganizerDtos.Candidate>> organize(StudentEntity student, String sourceLabel,
+      String text, List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments) {
+    return organize(student, sourceLabel, text);
+  }
+
   boolean imageAvailable();
+
   Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student, String sourceLabel,
       String imageDataUrl, String text);
+
+  default Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student, String sourceLabel,
+      String imageDataUrl, String text, List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments) {
+    return organizeImage(student, sourceLabel, imageDataUrl, text);
+  }
 }
