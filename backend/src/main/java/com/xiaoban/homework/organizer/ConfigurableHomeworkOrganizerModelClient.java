@@ -190,7 +190,7 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
         + "title 要简洁，instruction 保留完成任务所需信息。"
         + "还要进行语义重复判断：不要只比较标题，要综合科目、教材或练习册、页码题号、核心动作和截止时间。"
         + "如果本次输出的多个候选疑似属于同一项作业，为这些候选填写相同的 sameTaskGroup（如 G1）；否则填写空字符串。"
-        + "输入中会提供近期未完成任务。只有候选任务与已有任务的完成日期是同一天时，才允许判断为重复。"
+        + "输入中只会提供今天未完成的已有任务；只有候选任务也是今天时，才允许判断为重复。"
         + "若候选与某个已有任务实质上是同一项作业且置信度至少 0.70，"
         + "duplicateAssignmentId 填已有任务 ID，duplicateConfidence 填 0 到 1，duplicateReason 用一句话说明依据；"
         + "否则 duplicateAssignmentId 和 duplicateReason 填空字符串，duplicateConfidence 填 0。"
@@ -220,7 +220,6 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
             .append("；科目=").append(value(item.subject(), "其他"))
             .append("；标题=").append(compact(item.title(), 80))
             .append("；要求=").append(compact(item.instruction(), 120))
-            .append("；完成时间=").append(compact(item.dueText(), 40))
             .append("；原文=").append(compact(item.sourceExcerpt(), 160));
         if (++count >= 10) break;
       }
@@ -454,6 +453,11 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
           reason = "科目、标题和完成要求与已有任务一致";
           break;
         }
+        if (similarStructuredTask(candidate, existing)) {
+          match = existing;
+          reason = "科目、题号/页码和完成要求与已有任务高度相似";
+          break;
+        }
       }
       if (match == null) {
         result.add(candidate);
@@ -551,6 +555,63 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     if (a.equals(b)) return true;
     int shorter = Math.min(a.length(), b.length());
     return shorter >= 10 && (a.contains(b) || b.contains(a));
+  }
+
+  private static boolean similarStructuredTask(HomeworkOrganizerDtos.Candidate candidate,
+      HomeworkOrganizerDtos.ExistingAssignment existing) {
+    String candidateText = semanticKey(
+        value(candidate.title(), "") + value(candidate.instruction(), "") + value(candidate.textbookRef(), ""));
+    String existingText = semanticKey(
+        value(existing.title(), "") + value(existing.instruction(), "") + value(existing.textbookRef(), ""));
+    if (candidateText.length() < 6 || existingText.length() < 6) return false;
+    if (!compatibleActionTokens(candidateText, existingText)) return false;
+
+    Set<String> candidateNumbers = numberTokens(candidateText);
+    Set<String> existingNumbers = numberTokens(existingText);
+    if (!candidateNumbers.equals(existingNumbers)) return false;
+
+    double similarity = bigramDice(candidateText, existingText);
+    return candidateNumbers.isEmpty() ? similarity >= 0.72 : similarity >= 0.55;
+  }
+
+  private static boolean compatibleActionTokens(String left, String right) {
+    Set<String> leftActions = actionTokens(left);
+    Set<String> rightActions = actionTokens(right);
+    if (leftActions.isEmpty() || rightActions.isEmpty()) return true;
+    for (String action : leftActions) {
+      if (rightActions.contains(action)) return true;
+    }
+    return false;
+  }
+
+  private static Set<String> actionTokens(String value) {
+    Set<String> result = new LinkedHashSet<>();
+    for (String action : List.of(
+        "朗读", "背诵", "默写", "听写", "抄写", "阅读", "口算", "订正", "预习", "复习", "练习", "完成")) {
+      if (value.contains(action)) result.add(action);
+    }
+    return result;
+  }
+
+  private static Set<String> numberTokens(String value) {
+    Set<String> result = new LinkedHashSet<>();
+    java.util.regex.Matcher matcher = java.util.regex.Pattern.compile("\\d+").matcher(value);
+    while (matcher.find()) result.add(matcher.group());
+    return result;
+  }
+
+  private static double bigramDice(String left, String right) {
+    if (left.equals(right)) return 1.0;
+    if (left.length() < 2 || right.length() < 2) return 0.0;
+    Set<String> leftPairs = new LinkedHashSet<>();
+    Set<String> rightPairs = new LinkedHashSet<>();
+    for (int i = 0; i < left.length() - 1; i++) leftPairs.add(left.substring(i, i + 2));
+    for (int i = 0; i < right.length() - 1; i++) rightPairs.add(right.substring(i, i + 2));
+    int intersection = 0;
+    for (String pair : leftPairs) {
+      if (rightPairs.contains(pair)) intersection++;
+    }
+    return (2.0 * intersection) / (leftPairs.size() + rightPairs.size());
   }
 
   private static boolean sameStructuredTask(HomeworkOrganizerDtos.Candidate candidate,
