@@ -13,6 +13,13 @@ public interface HomeworkOrganizerModelClient {
     return organize(student, sourceLabel, text);
   }
 
+  default Optional<List<HomeworkOrganizerDtos.Candidate>> reviewDuplicates(
+      List<HomeworkOrganizerDtos.Candidate> candidates,
+      List<HomeworkOrganizerDtos.ExistingAssignment> existingAssignments,
+      String sourceText) {
+    return Optional.empty();
+  }
+
   boolean imageAvailable();
 
   Optional<HomeworkOrganizerDtos.ImageResponse> organizeImage(StudentEntity student, String sourceLabel,
