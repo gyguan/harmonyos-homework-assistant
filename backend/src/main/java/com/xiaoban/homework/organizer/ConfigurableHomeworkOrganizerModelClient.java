@@ -559,16 +559,18 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
 
   private static boolean similarStructuredTask(HomeworkOrganizerDtos.Candidate candidate,
       HomeworkOrganizerDtos.ExistingAssignment existing) {
-    String candidateText = semanticKey(
-        value(candidate.title(), "") + value(candidate.instruction(), "") + value(candidate.textbookRef(), ""));
-    String existingText = semanticKey(
-        value(existing.title(), "") + value(existing.instruction(), "") + value(existing.textbookRef(), ""));
+    String candidateRaw =
+        value(candidate.title(), "") + " " + value(candidate.instruction(), "") + " " + value(candidate.textbookRef(), "");
+    String existingRaw =
+        value(existing.title(), "") + " " + value(existing.instruction(), "") + " " + value(existing.textbookRef(), "");
+    Set<String> candidateNumbers = numberTokens(candidateRaw);
+    Set<String> existingNumbers = numberTokens(existingRaw);
+    if (!candidateNumbers.equals(existingNumbers)) return false;
+
+    String candidateText = semanticKey(candidateRaw);
+    String existingText = semanticKey(existingRaw);
     if (candidateText.length() < 6 || existingText.length() < 6) return false;
     if (!compatibleActionTokens(candidateText, existingText)) return false;
-
-    Set<String> candidateNumbers = numberTokens(candidateText);
-    Set<String> existingNumbers = numberTokens(existingText);
-    if (!candidateNumbers.equals(existingNumbers)) return false;
 
     if (!candidateNumbers.isEmpty()) return true;
     return bigramDice(candidateText, existingText) >= 0.72;
