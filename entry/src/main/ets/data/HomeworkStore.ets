@@ -516,8 +516,20 @@ export class HomeworkStore {
     if (photoUris.length === 0 || photoUris.length > 6) return false;
     if (!this.transitionAssignment(assignmentId, AssignmentStatus.SUBMITTED)) return false;
     let submission: Submission = { id: `submission-${this.submissionSequence}`, assignmentId: assignmentId,
-      type: SubmissionType.IMAGE, photoUris: photoUris.slice(), fileLabel: `${photoUris.length} 张作业照片`,
-      submittedAtText: submittedAtText };
+      type: SubmissionType.IMAGE, photoUris: photoUris.slice(), audioUri: '', durationMs: 0,
+      fileLabel: `${photoUris.length} 张作业照片`, submittedAtText: submittedAtText };
+    this.submissionSequence++;
+    this.submissions.push(submission);
+    this.requestPersist();
+    return true;
+  }
+
+  submitAudio(assignmentId: string, audioUri: string, durationMs: number, submittedAtText: string): boolean {
+    if (audioUri.length === 0 || durationMs < 3000 || durationMs > 10 * 60 * 1000) return false;
+    if (!this.transitionAssignment(assignmentId, AssignmentStatus.SUBMITTED)) return false;
+    let submission: Submission = { id: `submission-${this.submissionSequence}`, assignmentId: assignmentId,
+      type: SubmissionType.AUDIO, photoUris: [], audioUri: audioUri, durationMs: durationMs,
+      fileLabel: '学生录音', submittedAtText: submittedAtText };
     this.submissionSequence++;
     this.submissions.push(submission);
     this.requestPersist();

@@ -27,15 +27,22 @@ public class SubmissionController {
   public SubmissionController(SubmissionService service) { this.service = service; }
 
   @PostMapping(value = "/assignments/{assignmentId}/submissions", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public SubmissionDtos.CreateResponse create(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String assignmentId, @RequestParam long version,
-      @RequestPart("photos") List<MultipartFile> photos) {
-    return service.create(familyId, assignmentId, version, photos);
+  public SubmissionDtos.CreateResponse create(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String assignmentId,
+      @RequestParam long version,
+      @RequestParam(defaultValue = "0") long audioDurationMs,
+      @RequestPart(value = "photos", required = false) List<MultipartFile> photos,
+      @RequestPart(value = "audio", required = false) MultipartFile audio) {
+    return service.create(familyId, assignmentId, version, photos, audio, audioDurationMs);
   }
 
   @GetMapping("/assignments/{assignmentId}/submissions")
-  public List<SubmissionDtos.Response> list(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable String assignmentId) { return service.list(familyId, assignmentId); }
+  public List<SubmissionDtos.Response> list(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable String assignmentId) {
+    return service.list(familyId, assignmentId);
+  }
 
   @GetMapping("/assignments/{assignmentId}/submissions/latest")
   public ResponseEntity<SubmissionDtos.Response> latest(
@@ -45,13 +52,33 @@ public class SubmissionController {
     return latest == null ? ResponseEntity.noContent().build() : ResponseEntity.ok(latest);
   }
 
-  @GetMapping("/submission-photos/{photoId}")
-  public ResponseEntity<Resource> photo(@RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
-      @PathVariable UUID photoId) throws MalformedURLException {
-    SubmissionService.PhotoDownload file = service.photo(familyId, photoId);
+  @GetMapping("/submission-resources/{resourceId}")
+  public ResponseEntity<Resource> resource(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID resourceId) throws MalformedURLException {
+    SubmissionService.ResourceDownload file = service.resource(familyId, resourceId, null);
     Resource resource = new UrlResource(file.path().toUri());
-    return ResponseEntity.ok().contentType(MediaType.parseMediaType(file.contentType()))
-        .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.inline().filename(file.originalName()).build().toString())
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(file.contentType()))
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.inline().filename(file.originalName()).build().toString())
+        .body(resource);
+  }
+
+  /**
+   * Legacy photo route retained for older app versions while submission resources migrate
+   * from photo-only storage to a generic resource model.
+   */
+  @GetMapping("/submission-photos/{photoId}")
+  public ResponseEntity<Resource> photo(
+      @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
+      @PathVariable UUID photoId) throws MalformedURLException {
+    SubmissionService.ResourceDownload file = service.resource(familyId, photoId, "IMAGE");
+    Resource resource = new UrlResource(file.path().toUri());
+    return ResponseEntity.ok()
+        .contentType(MediaType.parseMediaType(file.contentType()))
+        .header(HttpHeaders.CONTENT_DISPOSITION,
+            ContentDisposition.inline().filename(file.originalName()).build().toString())
         .body(resource);
   }
 }

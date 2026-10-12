@@ -331,6 +331,9 @@ jobs:
       - name: Validate cloud submission photos
         run: python scripts/validate_cloud_submission_photos.py
 
+      - name: Validate student voice submission
+        run: python scripts/validate_student_voice_submission.py
+
       - name: Validate persisted assignment sync metadata
         run: python scripts/validate_assignment_sync_metadata.py
 

@@ -108,6 +108,23 @@ def multipart_png() -> tuple[bytes, str]:
     return b"\r\n".join(parts), f"multipart/form-data; boundary={boundary}"
 
 
+def multipart_m4a() -> tuple[bytes, str]:
+    # SubmissionService validates the file signature, media type and extension.
+    # Playback decoding is intentionally outside this backend contract smoke.
+    m4a_fixture = b"\x00\x00\x00\x18ftypM4A \x00\x00\x00\x00M4A mp42"
+    boundary = "----xiaoban-e2e-audio-" + uuid.uuid4().hex
+    parts = [
+        f"--{boundary}".encode(),
+        b'Content-Disposition: form-data; name="audio"; filename="student-e2e.m4a"',
+        b"Content-Type: audio/mp4",
+        b"",
+        m4a_fixture,
+        f"--{boundary}--".encode(),
+        b"",
+    ]
+    return b"\r\n".join(parts), f"multipart/form-data; boundary={boundary}"
+
+
 def save_token(path: Path, base_url: str, login: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -495,6 +512,81 @@ def run_full(args: argparse.Namespace) -> None:
     require(saved.get("status") == "SUBMITTED", "submission did not move assignment to SUBMITTED")
     require(int(saved.get("version", -1)) == int(authoritative["version"]),
             "persisted assignment version differs from authoritative submission response")
+
+    # Voice assignments use student-recorded audio as submission evidence. The server derives
+    # this contract from contentType and rejects photo evidence for AUDIO_IMAGE assignments.
+    voice_submission_assignment_id = f"e2e-voice-submission-{run_id}"
+    voice_payload = dict(assignment_payload)
+    voice_payload.update({
+        "id": voice_submission_assignment_id,
+        "subject": "英语",
+        "subjectCode": "ENGLISH",
+        "title": "E2E 语音提交作业",
+        "contentType": "AUDIO_IMAGE",
+        "status": "NOT_STARTED",
+    })
+    voice_created = expect(
+        http(base_url, "POST", f"/api/v1/students/{student_id}/assignments",
+             token=token, payload=voice_payload),
+        (200,),
+        "create voice submission assignment",
+    ).json()
+    voice_started = patch_assignment(
+        base_url, token, voice_submission_assignment_id, int(voice_created["version"]),
+        status="IN_PROGRESS")
+    voice_ready = patch_assignment(
+        base_url, token, voice_submission_assignment_id, int(voice_started["version"]),
+        status="READY_TO_SUBMIT")
+
+    wrong_body, wrong_content_type = multipart_png()
+    expect(
+        http(
+            base_url,
+            "POST",
+            f"/api/v1/assignments/{voice_submission_assignment_id}/submissions?version={int(voice_ready['version'])}",
+            token=token,
+            raw=wrong_body,
+            content_type=wrong_content_type,
+        ),
+        (400,),
+        "voice assignment rejects photo submission",
+    )
+
+    audio_body, audio_content_type = multipart_m4a()
+    voice_create_response = expect(
+        http(
+            base_url,
+            "POST",
+            f"/api/v1/assignments/{voice_submission_assignment_id}/submissions"
+            f"?version={int(voice_ready['version'])}&audioDurationMs=5000",
+            token=token,
+            raw=audio_body,
+            content_type=audio_content_type,
+        ),
+        (200,),
+        "upload student voice submission",
+    ).json()
+    voice_submission = voice_create_response.get("submission") or {}
+    voice_authoritative = voice_create_response.get("assignment") or {}
+    require(voice_authoritative.get("status") == "SUBMITTED",
+            "voice submission response must include authoritative SUBMITTED assignment")
+    voice_resources = voice_submission.get("resources") or []
+    require(len(voice_resources) == 1, "voice submission must contain exactly one resource")
+    require(voice_resources[0].get("resourceType") == "AUDIO",
+            "voice submission resource type must be AUDIO")
+    require(int(voice_resources[0].get("durationMs", 0)) == 5000,
+            "voice submission duration must be preserved")
+    require((voice_submission.get("photos") or []) == [],
+            "voice submission legacy photos view must stay empty")
+    voice_download_path = voice_resources[0].get("downloadPath")
+    require(isinstance(voice_download_path, str) and
+            voice_download_path.startswith("/api/v1/submission-resources/"),
+            "voice submission missing authenticated generic resource path")
+    expect(http(base_url, "GET", voice_download_path), (401,),
+           "voice download rejects unauthenticated request")
+    voice_downloaded = expect(http(base_url, "GET", voice_download_path, token=token), (200,),
+                              "voice download with bearer token")
+    require(len(voice_downloaded.body) > 0, "authenticated voice download returned empty body")
 
     print(f"BACKEND_E2E_SMOKE_PASS studentId={student_id} assignmentId={assignment_id} tokenFile={args.token_file}")
     print("NEXT  restart Spring Boot (keep PostgreSQL), then run with --session-only")

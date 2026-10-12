@@ -1,10 +1,10 @@
-import { RemoteSubmissionApi, RemoteSubmissionPhoto } from '../../application/remote/RemoteSubmissionApi';
+import { RemoteSubmissionApi, RemoteSubmissionResource } from '../../application/remote/RemoteSubmissionApi';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { PhotoPreviewDialog } from './PhotoPreviewDialog';
 
 @Component
 export struct CloudSubmissionPhotoStrip {
-  @Prop photos: RemoteSubmissionPhoto[];
+  @Prop photos: RemoteSubmissionResource[];
   @State private cacheRevision: number = 0;
   @State private loading: boolean = false;
   @State private previewUri: string = '';
@@ -49,7 +49,7 @@ export struct CloudSubmissionPhotoStrip {
     Column({ space: 7 }) {
       Scroll() {
         Row({ space: 9 }) {
-          ForEach(this.photos, (photo: RemoteSubmissionPhoto) => {
+          ForEach(this.photos, (photo: RemoteSubmissionResource) => {
             if (this.photoUri(photo.id).length > 0) {
               Image(this.photoUri(photo.id))
                 .width(86)
@@ -78,7 +78,7 @@ export struct CloudSubmissionPhotoStrip {
               .backgroundColor(AppTheme.SURFACE_EMPHASIS)
               .borderRadius(12);
             }
-          }, (photo: RemoteSubmissionPhoto) => photo.id);
+          }, (photo: RemoteSubmissionResource) => photo.id);
         }
       }
       .width('100%')

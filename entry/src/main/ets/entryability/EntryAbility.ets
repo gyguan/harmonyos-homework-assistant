@@ -9,6 +9,7 @@ import { RemoteSubmissionApi } from '../application/remote/RemoteSubmissionApi';
 import { VoiceAssignmentMediaService } from '../application/assignment/VoiceAssignmentMediaService';
 import { VoiceMaterialDirectoryPicker } from '../application/assignment/VoiceMaterialDirectoryPicker';
 import { HomeworkSubmissionService } from '../application/submission/HomeworkSubmissionService';
+import { SubmissionAudioRecorderService } from '../application/submission/SubmissionAudioRecorderService';
 import { HomeworkLocalBootstrap } from '../data/local/HomeworkLocalBootstrap';
 import { HomeworkImportInboxBootstrap } from '../data/local/HomeworkImportInboxBootstrap';
 import { CoreVisionHomeworkTextExtractor } from '../infrastructure/ai/CoreVisionHomeworkTextExtractor';
@@ -55,6 +56,7 @@ export default class EntryAbility extends UIAbility {
       this.context, new CoreVisionHomeworkTextExtractor(), new LocalHomeworkAssignmentParser());
     HomeworkShareImportService.instance.configure(this.context);
     HomeworkSubmissionService.instance.configure(this.context);
+    SubmissionAudioRecorderService.instance.configure(this.context);
     VoiceAssignmentMediaService.instance.configure(this.context);
     VoiceMaterialDirectoryPicker.instance.configure(this.context);
     RemoteSubmissionApi.instance.configure(this.context);

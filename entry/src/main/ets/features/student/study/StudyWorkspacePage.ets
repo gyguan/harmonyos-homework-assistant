@@ -1,5 +1,7 @@
+import { AssignmentAudioPlayerService } from '../../../application/assignment/AssignmentAudioPlayerService';
 import { TutorChatMessage, TutorConversation, TutorRemoteApi } from '../../../application/remote/TutorRemoteApi';
 import { HomeworkSubmissionService } from '../../../application/submission/HomeworkSubmissionService';
+import { SubmissionAudioRecorderService } from '../../../application/submission/SubmissionAudioRecorderService';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { ResponsiveContext } from '../../../common/responsive/WindowSizeClass';
 import { AppTheme } from '../../../common/theme/AppTheme';
@@ -32,6 +34,14 @@ export struct StudyWorkspacePage {
   @State private capturingPhoto: boolean = false;
   @State private submittingPhotos: boolean = false;
   @State private submissionMessage: string = '';
+  @State private submissionAudioUri: string = '';
+  @State private submissionAudioDurationMs: number = 0;
+  @State private submissionAudioState: string = 'IDLE';
+  @State private submissionRecordingElapsedMs: number = 0;
+  @State private submittingAudio: boolean = false;
+  @State private submissionAudioPrepared: boolean = false;
+  @State private submissionAudioPlaying: boolean = false;
+  @State private submissionAudioCurrentMs: number = 0;
   @State private previewUri: string = '';
   @State private resumePhotoCount: number = 0;
   @State private tutorDraft: string = '';
@@ -73,12 +83,31 @@ export struct StudyWorkspacePage {
 
   private readonly viewModel: StudyWorkspaceViewModel =
     new StudyWorkspaceViewModel(DefaultAssignmentRepository.instance);
+  private readonly submissionAudioPlayer: AssignmentAudioPlayerService =
+    new AssignmentAudioPlayerService();
+  private submissionRecordingTimer: number = -1;
   private pauseEmbeddedMedia: () => void = () => {};
   private voiceToggleAudio: () => void = () => {};
   private voiceSeek: (value: number) => void = (_value: number) => {};
   private voicePreviousImage: () => void = () => {};
   private voiceNextImage: () => void = () => {};
   private voiceSelectImage: (index: number) => void = (_index: number) => {};
+
+  aboutToDisappear(): void {
+    this.stopSubmissionRecordingTimer();
+    void SubmissionAudioRecorderService.instance.release();
+    void this.submissionAudioPlayer.release();
+  }
+
+  private isVoiceSubmission(): boolean {
+    let item = this.assignment();
+    return item !== null && item.contentType === AssignmentContentType.AUDIO_IMAGE;
+  }
+
+  private submissionBusy(): boolean {
+    return this.selectingPhotos || this.capturingPhoto || this.submittingPhotos ||
+      this.submittingAudio || this.submissionAudioState === 'RECORDING';
+  }
 
   private applyVoiceMediaState(
     imageUris: string[],
@@ -196,6 +225,12 @@ export struct StudyWorkspacePage {
       case AssignmentStatus.PAUSED: return '继续作业';
       case AssignmentStatus.IN_PROGRESS: return '我做完了，准备提交';
       case AssignmentStatus.READY_TO_SUBMIT:
+        if (this.isVoiceSubmission()) {
+          if (this.submittingAudio) return '正在提交录音…';
+          if (this.submissionAudioState === 'RECORDING') return '请先完成录音';
+          if (this.submissionAudioState === 'PAUSED') return '请先完成录音';
+          return this.submissionAudioUri.length === 0 ? '请先录制作业' : '提交我的录音';
+        }
         if (this.selectingPhotos) return '正在打开图库…';
         if (this.capturingPhoto) return '正在打开相机…';
         if (this.submittingPhotos) return '正在检查并提交…';
@@ -208,9 +243,13 @@ export struct StudyWorkspacePage {
 
   private primaryActionEnabled(): boolean {
     let assignment = this.assignment();
-    if (assignment === null || this.actionRunning || this.selectingPhotos ||
-      this.capturingPhoto || this.submittingPhotos) return false;
-    if (assignment.status === AssignmentStatus.READY_TO_SUBMIT && this.submissionPhotoUris.length === 0) return false;
+    if (assignment === null || this.actionRunning || this.submissionBusy()) return false;
+    if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
+      if (this.isVoiceSubmission()) {
+        return this.submissionAudioUri.length > 0 && this.submissionAudioState === 'RECORDED';
+      }
+      return this.submissionPhotoUris.length > 0;
+    }
     return assignment.status !== AssignmentStatus.SUBMITTED && assignment.status !== AssignmentStatus.COMPLETED;
   }
 
@@ -224,8 +263,13 @@ export struct StudyWorkspacePage {
       this.pauseEmbeddedMedia();
       await this.executeAction(AssignmentAction.READY_TO_SUBMIT);
     } else if (assignment.status === AssignmentStatus.READY_TO_SUBMIT) {
-      if (this.submissionPhotoUris.length === 0) return;
-      await this.submitSelectedPhotos(assignment.id);
+      if (this.isVoiceSubmission()) {
+        if (this.submissionAudioUri.length === 0 || this.submissionAudioState !== 'RECORDED') return;
+        await this.submitRecordedAudio(assignment.id);
+      } else {
+        if (this.submissionPhotoUris.length === 0) return;
+        await this.submitSelectedPhotos(assignment.id);
+      }
     }
   }
 
@@ -256,20 +300,180 @@ export struct StudyWorkspacePage {
   private async resumeFromSubmission(): Promise<void> {
     let assignment = this.assignment();
     if (assignment === null || assignment.status !== AssignmentStatus.READY_TO_SUBMIT ||
-      this.actionRunning || this.submittingPhotos) return;
+      this.actionRunning || this.submissionBusy()) return;
     let resumed = await this.executeAction(AssignmentAction.START);
     if (!resumed) return;
-    this.submissionPhotoUris = [];
+    if (!this.isVoiceSubmission()) this.submissionPhotoUris = [];
     this.submissionMessage = '';
   }
 
   private requestResumeFromSubmission(): void {
-    if (this.submissionPhotoUris.length === 0) {
+    if (this.isVoiceSubmission() || this.submissionPhotoUris.length === 0) {
       void this.resumeFromSubmission();
       return;
     }
     this.resumePhotoCount = this.submissionPhotoUris.length;
     this.resumeConfirmController.open();
+  }
+
+  private formatSubmissionTime(ms: number): string {
+    let totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    let minutes = Math.floor(totalSeconds / 60);
+    let seconds = totalSeconds % 60;
+    return `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  }
+
+  private startSubmissionRecordingTimer(): void {
+    this.stopSubmissionRecordingTimer();
+    this.submissionRecordingTimer = setInterval(() => {
+      this.submissionRecordingElapsedMs = SubmissionAudioRecorderService.instance.elapsedMs();
+    }, 250);
+  }
+
+  private stopSubmissionRecordingTimer(): void {
+    if (this.submissionRecordingTimer >= 0) {
+      clearInterval(this.submissionRecordingTimer);
+      this.submissionRecordingTimer = -1;
+    }
+  }
+
+  private async startSubmissionRecording(): Promise<void> {
+    if (!this.isVoiceSubmission() || this.submittingAudio ||
+      this.submissionAudioState === 'RECORDING' || this.submissionAudioState === 'PAUSED') return;
+    this.pauseEmbeddedMedia();
+    await this.submissionAudioPlayer.release();
+    this.submissionAudioPrepared = false;
+    this.submissionAudioPlaying = false;
+    this.submissionAudioCurrentMs = 0;
+    this.submissionMessage = '';
+    try {
+      await SubmissionAudioRecorderService.instance.start(this.assignmentId);
+      this.submissionAudioUri = '';
+      this.submissionAudioDurationMs = 0;
+      this.submissionRecordingElapsedMs = 0;
+      this.submissionAudioState = 'RECORDING';
+      this.startSubmissionRecordingTimer();
+    } catch (error) {
+      this.submissionAudioState = 'IDLE';
+      this.submissionMessage = error instanceof Error ? error.message : '无法开始录音';
+    }
+  }
+
+  private async pauseSubmissionRecording(): Promise<void> {
+    if (this.submissionAudioState !== 'RECORDING') return;
+    try {
+      await SubmissionAudioRecorderService.instance.pause();
+      this.submissionRecordingElapsedMs = SubmissionAudioRecorderService.instance.elapsedMs();
+      this.submissionAudioState = 'PAUSED';
+      this.stopSubmissionRecordingTimer();
+    } catch {
+      this.submissionMessage = '暂停录音失败，请重试';
+    }
+  }
+
+  private async resumeSubmissionRecording(): Promise<void> {
+    if (this.submissionAudioState !== 'PAUSED') return;
+    try {
+      await SubmissionAudioRecorderService.instance.resume();
+      this.submissionAudioState = 'RECORDING';
+      this.startSubmissionRecordingTimer();
+    } catch {
+      this.submissionMessage = '继续录音失败，请重试';
+    }
+  }
+
+  private async finishSubmissionRecording(): Promise<void> {
+    if (this.submissionAudioState !== 'RECORDING' && this.submissionAudioState !== 'PAUSED') return;
+    try {
+      let recording = await SubmissionAudioRecorderService.instance.stop();
+      this.stopSubmissionRecordingTimer();
+      this.submissionAudioUri = recording.uri;
+      this.submissionAudioDurationMs = recording.durationMs;
+      this.submissionRecordingElapsedMs = recording.durationMs;
+      this.submissionAudioState = 'RECORDED';
+      let preflight = await HomeworkSubmissionService.instance.preflightAudio(
+        this.submissionAudioUri, this.submissionAudioDurationMs);
+      this.submissionMessage = preflight.passed ? '录音完成，可以试听后提交' : preflight.message;
+    } catch {
+      this.stopSubmissionRecordingTimer();
+      this.submissionAudioState = 'IDLE';
+      this.submissionMessage = '录音保存失败，请重新录制';
+    }
+  }
+
+  private async resetSubmissionRecording(): Promise<void> {
+    this.stopSubmissionRecordingTimer();
+    await SubmissionAudioRecorderService.instance.release();
+    await this.submissionAudioPlayer.release();
+    this.submissionAudioUri = '';
+    this.submissionAudioDurationMs = 0;
+    this.submissionRecordingElapsedMs = 0;
+    this.submissionAudioState = 'IDLE';
+    this.submissionAudioPrepared = false;
+    this.submissionAudioPlaying = false;
+    this.submissionAudioCurrentMs = 0;
+    this.submissionMessage = '';
+  }
+
+  private async toggleSubmissionAudioPreview(): Promise<void> {
+    if (this.submissionAudioUri.length === 0 || this.submissionAudioState !== 'RECORDED') return;
+    if (this.submissionAudioPlaying) {
+      await this.submissionAudioPlayer.pause();
+      return;
+    }
+    if (this.submissionAudioPrepared) {
+      await this.submissionAudioPlayer.play();
+      return;
+    }
+    this.submissionMessage = '正在准备试听…';
+    await this.submissionAudioPlayer.prepare(this.submissionAudioUri, {
+      onPrepared: (durationMs: number) => {
+        this.submissionAudioPrepared = true;
+        if (durationMs > 0) this.submissionAudioDurationMs = durationMs;
+        this.submissionMessage = '';
+        void this.submissionAudioPlayer.play();
+      },
+      onState: (state) => {
+        this.submissionAudioPlaying = state === 'playing';
+        if (state === 'completed') this.submissionAudioCurrentMs = 0;
+      },
+      onTime: (timeMs: number) => this.submissionAudioCurrentMs = timeMs,
+      onError: (_message: string) => {
+        this.submissionAudioPlaying = false;
+        this.submissionMessage = '录音试听暂不可用';
+      }
+    });
+  }
+
+  private async submitRecordedAudio(assignmentId: string): Promise<void> {
+    if (this.submittingAudio || this.submissionAudioUri.length === 0) return;
+    this.submittingAudio = true;
+    this.submissionMessage = '正在检查并提交录音…';
+    try {
+      let preflight = await HomeworkSubmissionService.instance.preflightAudio(
+        this.submissionAudioUri, this.submissionAudioDurationMs);
+      if (!preflight.passed) {
+        this.submissionMessage = preflight.message;
+        return;
+      }
+      await this.submissionAudioPlayer.release();
+      let submitted = await HomeworkSubmissionService.instance.submitAudio(
+        assignmentId, this.submissionAudioUri, this.submissionAudioDurationMs);
+      if (!submitted) {
+        this.submissionMessage = '提交失败，请确认作业状态后重试';
+        return;
+      }
+      this.submissionAudioState = 'IDLE';
+      this.submissionAudioPrepared = false;
+      this.submissionAudioPlaying = false;
+      this.submissionMessage = '';
+      this.actionRevision++;
+      this.onStoreChanged();
+    } catch {
+      this.submissionMessage = '录音提交失败，请检查网络后重试';
+    } finally {
+      this.submittingAudio = false;
+    }
   }
 
   private appendSubmissionPhotos(uris: string[]): void {
@@ -384,57 +588,170 @@ export struct StudyWorkspacePage {
   }
 
   @Builder
-  private SubmissionPane() {
-    if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
-      Column({ space: 10 }) {
-        Text('提交作业照片')
+  private VoiceSubmissionPane() {
+    Column({ space: 12 }) {
+      Text('录制我的作业')
+        .width('100%')
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+
+      if (this.submissionAudioState === 'IDLE') {
+        Button('🎙 开始录音', { type: ButtonType.Normal })
           .width('100%')
-          .fontSize(AppTheme.CARD_TITLE_SIZE)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
-        if (this.submissionPhotoUris.length > 0) {
-          this.PhotoStrip(this.submissionPhotoUris, true);
-        }
-        Row({ space: 10 }) {
-          Button(this.selectingPhotos ? '正在打开图库…' : '从图库选择', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
-              this.submissionPhotoUris.length < 6)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .onClick(() => { void this.selectSubmissionPhotos(); });
-          Button(this.capturingPhoto ? '正在打开相机…' : '拍照', { type: ButtonType.Normal })
-            .layoutWeight(1)
-            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
-            .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
-              this.submissionPhotoUris.length < 6)
-            .backgroundColor(AppTheme.PRIMARY_SOFT)
-            .fontColor(AppTheme.PRIMARY)
-            .onClick(() => { void this.captureSubmissionPhoto(); });
-        }
-        .width('100%');
-        Text(this.submissionPhotoUris.length === 0 ?
-          '可从图库选择或直接拍照，最多 6 张。' :
-          '请确认照片清晰、完整，页数和顺序无误。')
+          .height(AppTheme.BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.submittingAudio)
+          .backgroundColor(AppTheme.PRIMARY)
+          .fontColor(AppTheme.TEXT_ON_PRIMARY)
+          .onClick(() => { void this.startSubmissionRecording(); });
+        Text('完成朗读或口语练习后，在这里录下你的作业。')
           .width('100%')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
-        if (this.submissionMessage.length > 0) {
-          Text(this.submissionMessage)
-            .width('100%')
-            .fontSize(AppTheme.ACTION_TEXT_SIZE)
-            .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
-            .fontColor(AppTheme.PRIMARY);
+      } else if (this.submissionAudioState === 'RECORDING' || this.submissionAudioState === 'PAUSED') {
+        Column({ space: 8 }) {
+          Text(this.submissionAudioState === 'RECORDING' ? '● 正在录音' : '录音已暂停')
+            .fontSize(AppTheme.BODY_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.submissionAudioState === 'RECORDING' ? AppTheme.DANGER : AppTheme.WARNING);
+          Text(this.formatSubmissionTime(this.submissionRecordingElapsedMs))
+            .fontSize(30)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(AppTheme.TEXT);
         }
+        .width('100%')
+        .alignItems(HorizontalAlign.Center)
+        .padding({ top: 8, bottom: 8 });
+
+        Row({ space: 10 }) {
+          Button(this.submissionAudioState === 'RECORDING' ? '暂停' : '继续录音', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .onClick(() => {
+              if (this.submissionAudioState === 'RECORDING') void this.pauseSubmissionRecording();
+              else void this.resumeSubmissionRecording();
+            });
+          Button('完成录音', { type: ButtonType.Normal })
+            .layoutWeight(1)
+            .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .backgroundColor(AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .onClick(() => { void this.finishSubmissionRecording(); });
+        }
+        .width('100%');
+      } else {
+        Row({ space: 12 }) {
+          Button(this.submissionAudioPlaying ? 'Ⅱ' : '▶', { type: ButtonType.Circle })
+            .width(48)
+            .height(48)
+            .backgroundColor(AppTheme.PRIMARY)
+            .fontColor(AppTheme.TEXT_ON_PRIMARY)
+            .accessibilityText(this.submissionAudioPlaying ? '暂停试听' : '播放录音')
+            .onClick(() => { void this.toggleSubmissionAudioPreview(); });
+          Column({ space: 3 }) {
+            Text('我的录音')
+              .fontSize(AppTheme.BODY_SIZE)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(AppTheme.TEXT);
+            Text(`${this.formatSubmissionTime(this.submissionAudioCurrentMs)} / ${this.formatSubmissionTime(this.submissionAudioDurationMs)}`)
+              .fontSize(AppTheme.META_SIZE)
+              .fontColor(AppTheme.SUBTEXT);
+          }
+          .layoutWeight(1)
+          .alignItems(HorizontalAlign.Start);
+          Text('重新录音')
+            .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
+            .padding({ left: 8, right: 8 })
+            .fontSize(AppTheme.ACTION_TEXT_SIZE)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.PRIMARY)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .onClick(() => { void this.resetSubmissionRecording(); });
+        }
+        .width('100%')
+        .padding(10)
+        .backgroundColor(AppTheme.SURFACE)
+        .borderRadius(AppTheme.CONTROL_RADIUS);
       }
-      .width('100%')
-      .padding(14)
-      .backgroundColor(AppTheme.PRIMARY_FAINT)
-      .borderRadius(AppTheme.CONTROL_RADIUS);
+
+      if (this.submissionMessage.length > 0) {
+        Text(this.submissionMessage)
+          .width('100%')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+          .fontColor(AppTheme.PRIMARY);
+      }
+    }
+    .width('100%')
+    .padding(14)
+    .backgroundColor(AppTheme.PRIMARY_FAINT)
+    .borderRadius(AppTheme.CONTROL_RADIUS);
+  }
+
+  @Builder
+  private PhotoSubmissionPane() {
+    Column({ space: 10 }) {
+      Text('提交作业照片')
+        .width('100%')
+        .fontSize(AppTheme.CARD_TITLE_SIZE)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(AppTheme.TEXT);
+      if (this.submissionPhotoUris.length > 0) {
+        this.PhotoStrip(this.submissionPhotoUris, true);
+      }
+      Row({ space: 10 }) {
+        Button(this.selectingPhotos ? '正在打开图库…' : '从图库选择', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
+            this.submissionPhotoUris.length < 6)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { void this.selectSubmissionPhotos(); });
+        Button(this.capturingPhoto ? '正在打开相机…' : '拍照', { type: ButtonType.Normal })
+          .layoutWeight(1)
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos &&
+            this.submissionPhotoUris.length < 6)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { void this.captureSubmissionPhoto(); });
+      }
+      .width('100%');
+      Text(this.submissionPhotoUris.length === 0 ?
+        '可从图库选择或直接拍照，最多 6 张。' :
+        '请确认照片清晰、完整，页数和顺序无误。')
+        .width('100%')
+        .fontSize(AppTheme.META_SIZE)
+        .lineHeight(AppTheme.META_LINE_HEIGHT)
+        .fontColor(AppTheme.SUBTEXT);
+      if (this.submissionMessage.length > 0) {
+        Text(this.submissionMessage)
+          .width('100%')
+          .fontSize(AppTheme.ACTION_TEXT_SIZE)
+          .lineHeight(AppTheme.ACTION_TEXT_LINE_HEIGHT)
+          .fontColor(AppTheme.PRIMARY);
+      }
+    }
+    .width('100%')
+    .padding(14)
+    .backgroundColor(AppTheme.PRIMARY_FAINT)
+    .borderRadius(AppTheme.CONTROL_RADIUS);
+  }
+
+  @Builder
+  private SubmissionPane() {
+    if (this.assignment() !== null && this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT) {
+      if (this.isVoiceSubmission()) this.VoiceSubmissionPane();
+      else this.PhotoSubmissionPane();
     }
 
     if (this.submissions().length > 0) {
@@ -554,9 +871,11 @@ export struct StudyWorkspacePage {
                 .fontSize(24)
                 .fontColor([AppTheme.SUCCESS]);
               Text(this.assignment()!.status === AssignmentStatus.READY_TO_SUBMIT ?
-                '最后一步：添加清晰、完整的作业照片。' :
+                (this.isVoiceSubmission() ? '最后一步：录下你的朗读或口语作业。' :
+                  '最后一步：添加清晰、完整的作业照片。') :
                 (this.assignment()!.status === AssignmentStatus.SUBMITTED ?
-                  '照片已提交，等待家长确认。' : '这项作业已经完成。'))
+                  (this.isVoiceSubmission() ? '录音已提交，等待家长确认。' :
+                    '照片已提交，等待家长确认。') : '这项作业已经完成。'))
                 .layoutWeight(1)
                 .fontSize(AppTheme.READING_BODY_SIZE)
                 .lineHeight(AppTheme.READING_BODY_LINE_HEIGHT)
@@ -707,7 +1026,7 @@ export struct StudyWorkspacePage {
             .width(112)
             .height(AppTheme.BUTTON_HEIGHT)
             .borderRadius(AppTheme.CONTROL_RADIUS)
-            .enabled(!this.actionRunning && !this.selectingPhotos && !this.capturingPhoto && !this.submittingPhotos)
+            .enabled(!this.actionRunning && !this.submissionBusy())
             .backgroundColor(AppTheme.PRIMARY_SOFT)
             .fontColor(AppTheme.PRIMARY)
             .fontSize(AppTheme.ACTION_TEXT_SIZE)

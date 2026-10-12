@@ -9,6 +9,7 @@ import com.xiaoban.homework.storage.FileTransactionCoordinator;
 import com.xiaoban.homework.student.StudentService;
 import com.xiaoban.homework.submission.SubmissionPhotoRepository;
 import com.xiaoban.homework.submission.SubmissionRepository;
+import com.xiaoban.homework.submission.SubmissionResourceRepository;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -22,6 +23,7 @@ class AssignmentServiceVoiceTitleTest {
       students,
       mock(SubmissionRepository.class),
       mock(SubmissionPhotoRepository.class),
+      mock(SubmissionResourceRepository.class),
       mock(AssignmentResourceRepository.class),
       mock(FileTransactionCoordinator.class));
 

@@ -43,7 +43,8 @@ export enum Subject {
 }
 
 export enum SubmissionType {
-  IMAGE = 'IMAGE'
+  IMAGE = 'IMAGE',
+  AUDIO = 'AUDIO'
 }
 
 export enum HomeworkImportSourceKind {
@@ -156,6 +157,8 @@ export interface Submission {
   assignmentId: string;
   type: SubmissionType;
   photoUris: string[];
+  audioUri?: string;
+  durationMs?: number;
   fileLabel: string;
   submittedAtText: string;
 }
