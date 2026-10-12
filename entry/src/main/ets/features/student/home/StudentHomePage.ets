@@ -137,6 +137,7 @@ export struct StudentHomePage {
   @State private availableWidthVp: number = 390;
   @State private actionAssignmentId: string = '';
   @State private actionMessage: string = '';
+  private identityGeneration: number = 0;
   onOpenStudy: (assignmentId: string) => void = (_assignmentId: string) => {};
   onOpenAttention: (kind: AssignmentAttentionKind) => void = (_kind: AssignmentAttentionKind) => {};
   onStoreChanged: () => void = () => {};
@@ -145,6 +146,7 @@ export struct StudentHomePage {
     new StudentHomeViewModel(DefaultAssignmentRepository.instance);
 
   private onStudentIdChanged(): void {
+    this.identityGeneration++;
     this.actionAssignmentId = '';
     this.actionMessage = '';
   }
@@ -176,9 +178,12 @@ export struct StudentHomePage {
     let item = this.viewModel.assignment(assignmentId);
     if (item === null || item.studentId !== this.studentId) return;
     let actionStudentId = this.studentId;
+    let actionGeneration = this.identityGeneration;
     this.actionMessage = '';
     if (item.status === AssignmentStatus.IN_PROGRESS || item.status === AssignmentStatus.READY_TO_SUBMIT) {
-      if (actionStudentId === this.studentId) this.onOpenStudy(item.id);
+      if (actionGeneration === this.identityGeneration && actionStudentId === this.studentId) {
+        this.onOpenStudy(item.id);
+      }
       return;
     }
 
@@ -187,13 +192,17 @@ export struct StudentHomePage {
       await this.viewModel.performAction(assignmentId, AssignmentAction.START);
       // A pending action from the previous child must never navigate the new
       // child's shell to its assignment.
-      if (actionStudentId !== this.studentId) return;
+      if (actionGeneration !== this.identityGeneration || actionStudentId !== this.studentId) return;
       this.onStoreChanged();
       this.onOpenStudy(assignmentId);
     } catch {
-      if (actionStudentId === this.studentId) this.actionMessage = '暂时无法开始，请稍后再试';
+      if (actionGeneration === this.identityGeneration && actionStudentId === this.studentId) {
+        this.actionMessage = '暂时无法开始，请稍后再试';
+      }
     } finally {
-      if (actionStudentId === this.studentId) this.actionAssignmentId = '';
+      if (actionGeneration === this.identityGeneration && actionStudentId === this.studentId) {
+        this.actionAssignmentId = '';
+      }
     }
   }
 
