@@ -80,7 +80,8 @@ public class HomeworkOrganizerService {
           item.dueText().contains("今天");
       if (!dueToday && !textualToday) continue;
       result.add(new HomeworkOrganizerDtos.ExistingAssignment(
-          item.id(), item.subject(), item.title(), item.instruction(), item.textbookRef(), item.dueText()));
+          item.id(), item.subject(), item.title(), item.instruction(), item.textbookRef(), item.dueText(),
+          item.sourceExcerpt()));
     }
     return result;
   }
