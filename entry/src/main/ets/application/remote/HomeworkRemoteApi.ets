@@ -75,6 +75,8 @@ export interface RemoteBatchSyncResponse {
 export interface BatchPublishEntry {
   candidateId: string;
   assignment: Assignment;
+  sourceLabel: string;
+  sourceExcerpt: string;
 }
 
 export interface RemoteBatchPublishResult {
@@ -143,7 +145,8 @@ export class HomeworkRemoteApi {
   async batchPublish(studentId: string, entries: BatchPublishEntry[]): Promise<RemoteBatchPublishResponse> {
     let items: BatchPublishItemBody[] = [];
     for (let entry of entries) {
-      items.push({ candidateId: entry.candidateId, assignment: this.createBody(entry.assignment) });
+      items.push({ candidateId: entry.candidateId,
+        assignment: this.createBody(entry.assignment, entry.sourceLabel, entry.sourceExcerpt) });
     }
     let body: BatchPublishBody = { items: items };
     let response = await BackendHttpClient.instance.requestFor(
@@ -269,15 +272,18 @@ export class HomeworkRemoteApi {
     };
   }
 
-  private createBody(assignment: Assignment): CreateAssignmentBody {
+  private createBody(assignment: Assignment, sourceLabel: string = '',
+    sourceExcerpt: string = ''): CreateAssignmentBody {
     return { id: assignment.id, subject: assignment.subject, title: assignment.title, instruction: assignment.instruction,
       textbookRef: assignment.textbookRef, dueText: assignment.dueText,
       assignmentType: assignment.assignmentType, subjectCode: assignment.subjectCode,
       contentType: assignment.contentType === AssignmentContentType.AUDIO_IMAGE ?
         AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
       dueAtEpochMs: assignment.dueAtEpochMs, dueTimezone: assignment.dueTimezone,
-      status: assignment.status, sourceLabel: assignment.candidateId.length > 0 ? '家长确认发布' : '',
-      sourceExcerpt: '', expectedMinutes: assignment.expectedMinutes,
+      status: assignment.status,
+      sourceLabel: sourceLabel.length > 0 ? sourceLabel :
+        (assignment.candidateId.length > 0 ? '家长确认发布' : ''),
+      sourceExcerpt: sourceExcerpt, expectedMinutes: assignment.expectedMinutes,
       startedAtEpochMs: assignment.startedAtEpochMs, finishedAtEpochMs: assignment.finishedAtEpochMs,
       elapsedSeconds: assignment.elapsedSeconds, reviewNote: assignment.reviewNote };
   }

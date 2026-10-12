@@ -70,18 +70,32 @@ public class HomeworkOrganizerService {
       UUID familyId, String studentId) {
     LocalDate today = LocalDate.now(BUSINESS_ZONE);
     long from = today.atStartOfDay(BUSINESS_ZONE).toInstant().toEpochMilli();
-    long to = today.plusDays(1).atStartOfDay(BUSINESS_ZONE).toInstant().toEpochMilli();
+    long toInclusive = today.plusDays(1).atStartOfDay(BUSINESS_ZONE).toInstant().toEpochMilli() - 1L;
+    String activeStatuses =
+        "NOT_STARTED,IN_PROGRESS,PAUSED,READY_TO_SUBMIT,NEEDS_REWORK,OVERDUE";
+
     List<HomeworkOrganizerDtos.ExistingAssignment> result = new ArrayList<>();
-    for (AssignmentDtos.Response item : assignments.list(familyId, studentId)) {
-      if (result.size() >= 20) break;
-      if ("COMPLETED".equals(item.status()) || "SUBMITTED".equals(item.status())) continue;
-      boolean dueToday = item.dueAtEpochMs() >= from && item.dueAtEpochMs() < to;
-      boolean textualToday = item.dueAtEpochMs() <= 0 && item.dueText() != null &&
-          item.dueText().contains("今天");
-      if (!dueToday && !textualToday) continue;
-      result.add(new HomeworkOrganizerDtos.ExistingAssignment(
-          item.id(), item.subject(), item.title(), item.instruction(), item.textbookRef(), item.dueText()));
+    List<AssignmentDtos.Response> dueToday = assignments.list(
+        familyId, studentId, null, null, from, toInclusive, activeStatuses, false);
+    appendExisting(result, dueToday, false);
+
+    if (result.size() < 10) {
+      List<AssignmentDtos.Response> undated = assignments.list(
+          familyId, studentId, null, null, null, null, activeStatuses, true);
+      appendExisting(result, undated, true);
     }
     return result;
+  }
+
+  private void appendExisting(List<HomeworkOrganizerDtos.ExistingAssignment> result,
+      List<AssignmentDtos.Response> items, boolean requireTextualToday) {
+    for (AssignmentDtos.Response item : items) {
+      if (result.size() >= 10) break;
+      if (requireTextualToday &&
+          (item.dueText() == null || !item.dueText().contains("今天"))) continue;
+      result.add(new HomeworkOrganizerDtos.ExistingAssignment(
+          item.id(), item.subject(), item.title(), item.instruction(), item.textbookRef(),
+          item.dueText(), item.sourceExcerpt()));
+    }
   }
 }

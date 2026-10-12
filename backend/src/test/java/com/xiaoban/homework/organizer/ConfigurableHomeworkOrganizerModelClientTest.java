@@ -163,12 +163,16 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     TestStudent student = new TestStudent();
     student.grade = "二年级";
     var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
-        "a-existing-1", "数学", "练习册 P26 第1～6题", "完成后订正", "北师大版", "今天"));
+        "a-existing-1", "数学", "练习册 P26 第1～6题", "完成后订正", "北师大版", "今天",
+        "数学练习册第26页1-6题，完成后订正"));
 
     String input = ConfigurableHomeworkOrganizerModelClient.buildInput(
         student, "老师通知", "数学第三单元练习第26页1到6题", existing);
     assertTrue(input.contains("ID=a-existing-1"));
     assertTrue(input.contains("练习册 P26 第1～6题"));
+    assertTrue(input.contains("原文=数学练习册第26页1-6题，完成后订正"));
+    assertFalse(input.contains("；教材="));
+    assertFalse(input.contains("；时间="));
 
     var accepted = ConfigurableHomeworkOrganizerModelClient.toCandidates(
         new ConfigurableHomeworkOrganizerModelClient.StructuredResult(java.util.List.of(
@@ -191,5 +195,73 @@ class ConfigurableHomeworkOrganizerModelClientTest {
         java.util.Map.of("a-existing-1", "练习册 P26 第1～6题"));
     assertEquals("", rejected.candidates().getFirst().duplicateAssignmentId());
     assertEquals(0.0, rejected.candidates().getFirst().duplicateConfidence());
+  }
+
+  @Test
+  void limitsExistingAssignmentPromptContextToTenAndTruncatesFields() {
+    TestStudent student = new TestStudent();
+    java.util.List<HomeworkOrganizerDtos.ExistingAssignment> existing = new java.util.ArrayList<>();
+    for (int i = 0; i < 12; i++) {
+      existing.add(new HomeworkOrganizerDtos.ExistingAssignment(
+          "a-" + i, "数学", "标题" + "很长".repeat(60), "要求" + "很长".repeat(90), "", "今天",
+          "原文" + "很长".repeat(120)));
+    }
+
+    String input = ConfigurableHomeworkOrganizerModelClient.buildInput(
+        student, "老师通知", "数学作业", existing);
+
+    assertTrue(input.contains("ID=a-0"));
+    assertTrue(input.contains("ID=a-9"));
+    assertFalse(input.contains("ID=a-10"));
+    assertFalse(input.contains("ID=a-11"));
+    assertTrue(input.length() < 6000);
+  }
+
+  @Test
+  void fallsBackToPublishedEvidenceWhenModelMissesDuplicateHint() {
+    var existing = java.util.List.of(
+        new HomeworkOrganizerDtos.ExistingAssignment(
+            "a-existing-1", "数学", "练习册 P26 第1～6题", "完成后订正", "北师大版", "今天",
+            "数学练习册第26页1-6题，完成后订正"),
+        new HomeworkOrganizerDtos.ExistingAssignment(
+            "a-existing-old", "语文", "背诵第12课", "背诵第12课", "", "今天", ""));
+
+    var candidates = java.util.List.of(
+        new HomeworkOrganizerDtos.Candidate(
+            "数学", "数学第三单元练习", "第26页1到6题，完成后订正", "", "今天", 20,
+            "数学练习册第26页1到6题，完成后订正", 0.95, "", "", "", 0.0, ""),
+        new HomeworkOrganizerDtos.Candidate(
+            "语文", "背诵第12课", "背诵第12课", "", "今天", 15,
+            "背诵第12课", 0.9, "", "", "", 0.0, ""));
+
+    var reviewed = ConfigurableHomeworkOrganizerModelClient.applyEvidenceDuplicateFallback(
+        candidates, existing);
+
+    assertEquals("a-existing-1", reviewed.get(0).duplicateAssignmentId());
+    assertEquals(1.0, reviewed.get(0).duplicateConfidence());
+    assertTrue(reviewed.get(0).duplicateReason().contains("老师原文"));
+
+    assertEquals("a-existing-old", reviewed.get(1).duplicateAssignmentId());
+    assertEquals(1.0, reviewed.get(1).duplicateConfidence());
+    assertTrue(reviewed.get(1).duplicateReason().contains("标题"));
+  }
+
+  @Test
+  void evidenceFallbackDoesNotMergeDifferentActionsOrDueDates() {
+    var existing = java.util.List.of(new HomeworkOrganizerDtos.ExistingAssignment(
+        "a-read", "语文", "朗读第2课", "朗读第2课", "", "今天", "朗读第2课"));
+    var candidates = java.util.List.of(
+        new HomeworkOrganizerDtos.Candidate(
+            "语文", "背诵第2课", "背诵第2课", "", "今天", 15,
+            "背诵第2课", 0.9, "", "", "", 0.0, ""),
+        new HomeworkOrganizerDtos.Candidate(
+            "语文", "朗读第2课", "朗读第2课", "", "明天", 15,
+            "朗读第2课", 0.9, "", "", "", 0.0, ""));
+
+    var reviewed = ConfigurableHomeworkOrganizerModelClient.applyEvidenceDuplicateFallback(
+        candidates, existing);
+
+    assertEquals("", reviewed.get(0).duplicateAssignmentId());
+    assertEquals("", reviewed.get(1).duplicateAssignmentId());
   }
 }
