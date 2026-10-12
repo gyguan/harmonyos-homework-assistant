@@ -2,7 +2,7 @@ import { BackendSession } from '../remote/BackendSession';
 import {
   RemoteSubmission,
   RemoteSubmissionApi,
-  RemoteSubmissionPhoto
+  RemoteSubmissionResource
 } from '../remote/RemoteSubmissionApi';
 import { RemoteSubmissionCache } from '../remote/RemoteSubmissionCache';
 import { Submission } from '../../domain/model/HomeworkModels';
@@ -12,8 +12,10 @@ export interface ParentSubmissionEvidence {
   submissionId: string;
   assignmentId: string;
   submittedAtText: string;
-  remotePhotos: RemoteSubmissionPhoto[];
+  remoteResources: RemoteSubmissionResource[];
   localPhotoUris: string[];
+  localAudioUri: string;
+  localAudioDurationMs: number;
 }
 
 export class ParentSubmissionEvidenceService {
@@ -47,8 +49,10 @@ export class ParentSubmissionEvidenceService {
       submissionId: value.id,
       assignmentId: value.assignmentId,
       submittedAtText: this.formatRemoteTime(value.submittedAt),
-      remotePhotos: value.photos.slice(),
-      localPhotoUris: []
+      remoteResources: value.resources.slice(),
+      localPhotoUris: [],
+      localAudioUri: '',
+      localAudioDurationMs: 0
     };
   }
 
@@ -57,8 +61,10 @@ export class ParentSubmissionEvidenceService {
       submissionId: value.id,
       assignmentId: value.assignmentId,
       submittedAtText: value.submittedAtText,
-      remotePhotos: [],
-      localPhotoUris: value.photoUris.slice()
+      remoteResources: [],
+      localPhotoUris: value.photoUris.slice(),
+      localAudioUri: value.audioUri === undefined ? '' : value.audioUri,
+      localAudioDurationMs: value.durationMs === undefined ? 0 : value.durationMs
     };
   }
 
