@@ -65,7 +65,7 @@ export struct VoiceAssignmentPane {
     this.onPauseReady(() => { void this.pauseAudio(); });
     this.onFullscreenControlsReady(
       () => { void this.toggleAudio(); },
-      (value: number) => this.player.seek(value),
+      (value: number) => this.seekAudio(value),
       () => this.previousImage(),
       () => this.nextImage(),
       (index: number) => this.selectImage(index)
@@ -339,6 +339,14 @@ export struct VoiceAssignmentPane {
     this.notifyMediaState();
   }
 
+  private seekAudio(value: number): void {
+    this.manualImageOverrideUntilEpochMs = 0;
+    this.currentTimeMs = value;
+    this.syncImageToAudio(value, true);
+    this.player.seek(value);
+    this.notifyMediaState();
+  }
+
   private async toggleAudio(): Promise<void> {
     if (!this.playbackEnabled || !this.prepared) return;
     if (this.playing) await this.pauseAudio();
@@ -572,9 +580,7 @@ export struct VoiceAssignmentPane {
               .onChange((value: number, mode: SliderChangeMode) => {
                 this.currentTimeMs = value;
                 if (mode === SliderChangeMode.End || mode === SliderChangeMode.Click) {
-                  this.manualImageOverrideUntilEpochMs = 0;
-                  this.syncImageToAudio(value, true);
-                  this.player.seek(value);
+                  this.seekAudio(value);
                 }
               });
 
