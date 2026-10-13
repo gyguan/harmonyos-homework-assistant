@@ -43,12 +43,14 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var input = org.mockito.ArgumentCaptor.forClass(String.class);
     verify(transport).completeWithImage(
         anyString(), instructions.capture(), input.capture(),
-        eq("data:image/jpeg;base64,PRIVATE"), eq(6000), anyString(), anyMap());
+        eq("data:image/jpeg;base64,PRIVATE"), eq(3000), anyString(), anyMap());
 
     assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
     assertFalse(instructions.getValue().contains("sameTaskGroup"));
     assertFalse(instructions.getValue().contains("duplicateAssignmentId"));
     assertFalse(instructions.getValue().contains("数学口算20题"));
+    assertTrue(instructions.getValue().contains("不要额外") ||
+        ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null).contains("不要额外转写整张图片"));
     assertFalse(ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null)
         .endsWith("null"));
   }
@@ -75,7 +77,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var client = new ConfigurableHomeworkOrganizerModelClient(
         new AiProviderProperties(), null, JsonMapper.builder().build());
     String output = """
-        {"recognizedText":"语文背诵；数学口算","assignments":[
+        {"assignments":[
           {"subject":"语文","title":"背诵","instruction":"背诵课文","textbookRef":"","taskDate":"今天",
            "expectedMinutes":10,"sourceExcerpt":"语文背诵","confidence":0.9},
           {"subject":"数学","title":"口算","instruction":"口算20题","textbookRef":"","taskDate":"今天",
@@ -87,8 +89,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
 
     assertEquals(List.of("语文", "数学"),
         result.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
-    assertEquals("语文背诵；数学口算", result.recognizedText());
-    assertTrue(client.parseImageOutput(output.replace("\"recognizedText\"", "\"unused\"")).isEmpty());
+    assertEquals("语文背诵\n数学口算", result.recognizedText());
+    assertTrue(client.parseImageOutput("{\"assignments\":[]}").isEmpty());
     assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
   }
 
@@ -167,6 +169,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertFalse(schema.contains("duplicateAssignmentId"));
     assertFalse(schema.contains("duplicateConfidence"));
     assertFalse(schema.contains("duplicateReason"));
+    assertFalse(ConfigurableHomeworkOrganizerModelClient.imageSchema().toString().contains("recognizedText"));
   }
 
   @Test
