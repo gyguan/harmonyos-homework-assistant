@@ -3,6 +3,7 @@ package com.xiaoban.homework.organizer;
 import com.xiaoban.homework.ai.AiProviderProperties;
 import com.xiaoban.homework.ai.ImageAiRequestException;
 import com.xiaoban.homework.ai.OpenAiCompatibleTransport;
+import com.xiaoban.homework.ai.StructuredJsonNormalizer;
 import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentEntity;
 import java.time.LocalDate;
@@ -82,9 +83,38 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
   }
 
   Optional<HomeworkOrganizerDtos.ImageResponse> parseImageOutput(String output) {
-    JsonNode root = jsonMapper.readTree(stripCodeFence(output));
+    StructuredJsonNormalizer.Result normalized;
+    try {
+      normalized = StructuredJsonNormalizer.normalize(jsonMapper, output);
+    } catch (Exception error) {
+      log.warn(
+          "homework_import image_parse_failed model={} stage=normalize outputChars={} exception={}",
+          properties.getImageOrganizerModel(),
+          output == null ? 0 : output.length(),
+          error.getClass().getSimpleName());
+      return Optional.empty();
+    }
+
+    JsonNode root;
+    try {
+      root = jsonMapper.readTree(normalized.json());
+    } catch (Exception error) {
+      log.warn(
+          "homework_import image_parse_failed model={} stage=tree shape={} normalizedChars={} exception={}",
+          properties.getImageOrganizerModel(),
+          normalized.shape(),
+          normalized.json().length(),
+          error.getClass().getSimpleName());
+      return Optional.empty();
+    }
+
     List<JsonNode> nodes = imageAssignmentNodes(root);
-    if (nodes.isEmpty() || nodes.size() > 30) return Optional.empty();
+    if (nodes.isEmpty() || nodes.size() > 30) {
+      log.warn(
+          "homework_import image_parse_failed model={} stage=assignments shape={} assignments={}",
+          properties.getImageOrganizerModel(), normalized.shape(), nodes.size());
+      return Optional.empty();
+    }
 
     List<ImageStructuredCandidate> parsed = new ArrayList<>();
     for (JsonNode node : nodes) {
@@ -92,12 +122,23 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
       if (candidate != null) parsed.add(candidate);
     }
     List<HomeworkOrganizerDtos.Candidate> converted = toImageCandidates(parsed);
-    if (converted.isEmpty()) return Optional.empty();
+    if (converted.isEmpty()) {
+      log.warn(
+          "homework_import image_parse_failed model={} stage=fields shape={} assignments={} accepted=0",
+          properties.getImageOrganizerModel(), normalized.shape(), nodes.size());
+      return Optional.empty();
+    }
 
     int dropped = nodes.size() - converted.size();
     if (dropped > 0) {
-      log.warn("homework_import image_parse_normalized model={} assignments={} accepted={} dropped={}",
-          properties.getImageOrganizerModel(), nodes.size(), converted.size(), dropped);
+      log.warn(
+          "homework_import image_parse_normalized model={} shape={} assignments={} accepted={} dropped={}",
+          properties.getImageOrganizerModel(),
+          normalized.shape(), nodes.size(), converted.size(), dropped);
+    } else {
+      log.info(
+          "homework_import image_parse_ok model={} shape={} assignments={}",
+          properties.getImageOrganizerModel(), normalized.shape(), converted.size());
     }
     return Optional.of(new HomeworkOrganizerDtos.ImageResponse(
         converted, "AI_IMAGE", recognizedText(converted)));
