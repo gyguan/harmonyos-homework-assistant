@@ -1,6 +1,10 @@
 import { BackendAuthService } from '../../../application/remote/BackendAuthService';
 import { BackendSession } from '../../../application/remote/BackendSession';
 import { FamilyCloudService } from '../../../application/remote/FamilyCloudService';
+import {
+  FamilyAccountItem,
+  FamilyAccountRemoteApi
+} from '../../../application/remote/FamilyAccountRemoteApi';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
@@ -43,6 +47,13 @@ export struct BackendConnectionPage {
   @State private parentAccessCodeConfirm: string = '';
   @State private parentAccessMessage: string = '';
   @State private deleteStudentConfirmId: string = '';
+  @State private familyAccounts: FamilyAccountItem[] = [];
+  @State private accountLoginDraft: string = '';
+  @State private accountMyDisplayNameDraft: string = '';
+  @State private accountDisplayNameDraft: string = '';
+  @State private accountPasswordDraft: string = '';
+  @State private accountBusy: boolean = false;
+  @State private accountMessage: string = '';
   onStoreChanged: () => void = () => {};
 
   private phoneStudentEditorController: CustomDialogController = new CustomDialogController({
@@ -96,7 +107,10 @@ export struct BackendConnectionPage {
   aboutToAppear(): void {
     this.baseUrl = BackendSession.instance.getBaseUrl();
     this.syncLocalStudents();
-    if (BackendSession.instance.isConnected()) void this.refreshStudents();
+    if (BackendSession.instance.isConnected()) {
+      void this.refreshStudents();
+      void this.refreshFamilyAccounts();
+    }
   }
 
   private canInlineStudentFields(): boolean {
@@ -181,6 +195,7 @@ export struct BackendConnectionPage {
       let familySynced = await FamilyCloudService.instance.syncStudents();
       let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
       this.syncLocalStudents();
+      await this.refreshFamilyAccounts();
       this.pageRevision++;
       this.message = familySynced && homeworkSynced ? '' : '已登录，部分数据稍后再同步';
       this.onStoreChanged();
@@ -333,8 +348,215 @@ export struct BackendConnectionPage {
 
   private async disconnect(): Promise<void> {
     await BackendAuthService.instance.logout();
+    this.familyAccounts = [];
+    this.accountMessage = '';
     this.message = '';
     this.pageRevision++;
+  }
+
+  private async refreshFamilyAccounts(): Promise<void> {
+    if (!BackendSession.instance.isConnected()) {
+      this.familyAccounts = [];
+      return;
+    }
+    try {
+      this.familyAccounts = await FamilyAccountRemoteApi.instance.list();
+      for (let account of this.familyAccounts) {
+        if (account.mine) {
+          this.accountMyDisplayNameDraft = account.displayName;
+          break;
+        }
+      }
+      this.accountMessage = '';
+    } catch {
+      this.accountMessage = '家长账号加载失败，请稍后重试';
+    }
+  }
+
+  private async updateMyDisplayName(): Promise<void> {
+    if (this.accountBusy) return;
+    let displayName = this.accountMyDisplayNameDraft.trim();
+    if (displayName.length === 0) {
+      this.accountMessage = '显示名称不能为空';
+      return;
+    }
+    this.accountBusy = true;
+    this.accountMessage = '';
+    try {
+      let updated = await FamilyAccountRemoteApi.instance.updateMineDisplayName(displayName);
+      BackendSession.instance.connect(
+        BackendSession.instance.getBaseUrl(), BackendSession.instance.getToken(), updated.displayName);
+      await this.refreshFamilyAccounts();
+      this.accountMessage = '显示名称已更新';
+      this.onStoreChanged();
+    } catch {
+      this.accountMessage = '显示名称修改失败';
+    } finally {
+      this.accountBusy = false;
+    }
+  }
+
+  private async createFamilyAccount(): Promise<void> {
+    if (this.accountBusy) return;
+    let loginName = this.accountLoginDraft.trim();
+    let displayName = this.accountDisplayNameDraft.trim();
+    if (loginName.length === 0 || displayName.length === 0 || this.accountPasswordDraft.length < 6) {
+      this.accountMessage = '请填写登录名、显示名称，并设置至少 6 位密码';
+      return;
+    }
+    this.accountBusy = true;
+    this.accountMessage = '';
+    try {
+      await FamilyAccountRemoteApi.instance.create(
+        loginName, displayName, this.accountPasswordDraft);
+      this.accountLoginDraft = '';
+      this.accountDisplayNameDraft = '';
+      this.accountPasswordDraft = '';
+      await this.refreshFamilyAccounts();
+      this.accountMessage = '家长账号已添加';
+    } catch (error) {
+      this.accountMessage = error instanceof Error ? error.message : '新增家长账号失败';
+    } finally {
+      this.accountBusy = false;
+    }
+  }
+
+  @Builder
+  private FamilyAccountsSection() {
+    Column({ space: 10 }) {
+      Row() {
+        Column({ space: 3 }) {
+          Text('家长账号')
+            .fontSize(AppTheme.CARD_TITLE_SIZE)
+            .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(AppTheme.TEXT);
+          Text('所有家长权限相同，仅用显示名称区分谁完成了作业布置')
+            .fontSize(AppTheme.CAPTION_SIZE)
+            .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+            .fontColor(AppTheme.SUBTEXT);
+        }
+        .layoutWeight(1)
+        .alignItems(HorizontalAlign.Start);
+      }
+      .width('100%');
+
+      if (this.familyAccounts.length > 0) {
+        Column({ space: 0 }) {
+          ForEach(this.familyAccounts, (account: FamilyAccountItem) => {
+            Row({ space: 10 }) {
+              CenteredTextBadge({
+                badgeText: account.displayName.length > 0 ? account.displayName.substring(0, 1) : '家',
+                badgeWidth: 34,
+                badgeHeight: 34,
+                badgeFontSize: 14,
+                badgeRadius: 11,
+                badgeForeground: account.mine ? AppTheme.PRIMARY : AppTheme.TEXT,
+                badgeBackground: account.mine ? AppTheme.PRIMARY_SOFT : AppTheme.SURFACE_SUBTLE
+              });
+              Column({ space: 2 }) {
+                Text(account.displayName + (account.mine ? '（当前）' : ''))
+                  .width('100%')
+                  .fontSize(AppTheme.META_SIZE)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor(account.mine ? AppTheme.PRIMARY : AppTheme.TEXT);
+                Text('登录名 · ' + account.loginName)
+                  .width('100%')
+                  .fontSize(AppTheme.CAPTION_SIZE)
+                  .fontColor(AppTheme.SUBTEXT);
+              }
+              .layoutWeight(1)
+              .alignItems(HorizontalAlign.Start);
+            }
+            .width('100%')
+            .padding({ top: 8, bottom: 8 });
+          }, (account: FamilyAccountItem) => account.id);
+        }
+        .width('100%');
+      }
+
+      if (BackendSession.instance.isConnected()) {
+        Divider().color(AppTheme.DIVIDER);
+        Text('我的显示名称')
+          .width('100%')
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.SUBTEXT);
+        Row({ space: 8 }) {
+          TextInput({ placeholder: '例如 爸爸 / 妈妈 / Amy', text: this.accountMyDisplayNameDraft })
+            .layoutWeight(1)
+            .height(AppTheme.INPUT_HEIGHT)
+            .backgroundColor(AppTheme.SURFACE_SUBTLE)
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .onChange((value: string) => {
+              this.accountMyDisplayNameDraft = value;
+              this.accountMessage = '';
+            });
+          Button('保存', { type: ButtonType.Normal })
+            .height(AppTheme.INPUT_HEIGHT)
+            .padding({ left: 16, right: 16 })
+            .borderRadius(AppTheme.CONTROL_RADIUS)
+            .enabled(!this.accountBusy)
+            .backgroundColor(AppTheme.PRIMARY_SOFT)
+            .fontColor(AppTheme.PRIMARY)
+            .onClick(() => { void this.updateMyDisplayName(); });
+        }
+        .width('100%');
+
+        Divider().color(AppTheme.DIVIDER);
+        Text('添加同家庭家长账号')
+          .width('100%')
+          .fontSize(AppTheme.LABEL_TITLE_SIZE)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(AppTheme.SUBTEXT);
+        TextInput({ placeholder: '登录名，例如 dad', text: this.accountLoginDraft })
+          .width('100%')
+          .height(AppTheme.INPUT_HEIGHT)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => {
+            this.accountLoginDraft = value;
+            this.accountMessage = '';
+          });
+        TextInput({ placeholder: '显示名称，例如 爸爸 / 妈妈 / Amy', text: this.accountDisplayNameDraft })
+          .width('100%')
+          .height(AppTheme.INPUT_HEIGHT)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => {
+            this.accountDisplayNameDraft = value;
+            this.accountMessage = '';
+          });
+        TextInput({ placeholder: '密码（至少 6 位）', text: this.accountPasswordDraft })
+          .width('100%')
+          .height(AppTheme.INPUT_HEIGHT)
+          .type(InputType.Password)
+          .backgroundColor(AppTheme.SURFACE_SUBTLE)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .onChange((value: string) => {
+            this.accountPasswordDraft = value;
+            this.accountMessage = '';
+          });
+        Button(this.accountBusy ? '正在添加…' : '添加家长账号', { type: ButtonType.Normal })
+          .width('100%')
+          .height(AppTheme.SECONDARY_BUTTON_HEIGHT)
+          .borderRadius(AppTheme.CONTROL_RADIUS)
+          .enabled(!this.accountBusy)
+          .backgroundColor(AppTheme.PRIMARY_SOFT)
+          .fontColor(AppTheme.PRIMARY)
+          .onClick(() => { void this.createFamilyAccount(); });
+      }
+
+      if (this.accountMessage.length > 0) {
+        Text(this.accountMessage)
+          .width('100%')
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(this.accountMessage.indexOf('已添加') >= 0 ? AppTheme.SUCCESS : AppTheme.DANGER);
+      }
+    }
+    .width('100%')
+    .padding({ top: 14, bottom: 6 });
   }
 
   @Builder
@@ -379,6 +601,8 @@ export struct BackendConnectionPage {
           .fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
       }
 
+      Divider().color(AppTheme.DIVIDER);
+      this.FamilyAccountsSection();
     }
     .width('100%');
   }
@@ -545,7 +769,7 @@ export struct BackendConnectionPage {
             .fontWeight(FontWeight.Medium)
             .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
-          Text('孩子资料和教材信息')
+          Text('孩子资料、教材和家长账号')
             .fontSize(AppTheme.CAPTION_SIZE)
             .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
