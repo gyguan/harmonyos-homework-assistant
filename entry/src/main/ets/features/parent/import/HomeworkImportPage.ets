@@ -1,5 +1,5 @@
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { HomeworkImageTextResult, HomeworkTextImportResult } from '../../../domain/model/ImportModels';
+import { HomeworkTextImportResult } from '../../../domain/model/ImportModels';
 import { Subject } from '../../../domain/model/HomeworkModels';
 import { ChoiceSelectionChip, SegmentedSelectionButton } from '../../../components/selection/SelectionControls';
 import { HomeworkImportViewModel } from './HomeworkImportViewModel';
@@ -96,7 +96,7 @@ export struct HomeworkImportPage {
         this.afterOrganized(result.candidateCount);
       } else {
         this.showParseError(this.inputMode === HomeworkAssignmentInputMode.IMAGE ?
-          '没有整理出作业，请换一张图片或识别图片文字后重试' : '没有整理出作业，请核对文字内容后重试');
+          '没有整理出作业，请换一张图片后重试' : '没有整理出作业，请核对文字内容后重试');
       }
     } catch (error) {
       if (studentId !== this.viewModel.activeStudentId()) return;
@@ -104,20 +104,6 @@ export struct HomeworkImportPage {
     } finally {
       this.parseBusy = false;
     }
-  }
-
-  private applyRecognizedImage(result: HomeworkImageTextResult): void {
-    if (!result.selected) return;
-    if (result.recognizedText.trim().length === 0) {
-      this.showParseError('没有识别到清晰文字，请换一张图片重试');
-      return;
-    }
-    this.inputMode = HomeworkAssignmentInputMode.TEXT;
-    this.textDraft = result.recognizedText.trim();
-    this.sourceImageRef = '';
-    this.sourceImageLabel = '';
-    this.parseMessage = '已识别为文字，可修改后继续';
-    this.parseError = false;
   }
 
   private async recognizePhoto(): Promise<void> {
@@ -167,24 +153,6 @@ export struct HomeworkImportPage {
     this.sourceImageLabel = sourceLabel;
     this.parseMessage = '';
     this.parseError = false;
-  }
-
-  private async recognizeImageAsText(): Promise<void> {
-    if (this.parseBusy || this.sourceImageRef.length === 0) return;
-    let studentId = this.viewModel.activeStudentId();
-    this.parseBusy = true;
-    this.parseMessage = '';
-    this.parseError = false;
-    try {
-      let result = await this.viewModel.recognizeSelectedImageText(this.sourceImageRef, this.sourceImageLabel);
-      if (studentId !== this.viewModel.activeStudentId()) return;
-      this.applyRecognizedImage(result);
-    } catch (error) {
-      if (studentId !== this.viewModel.activeStudentId()) return;
-      this.showParseError(error instanceof Error ? error.message : '图片文字识别失败，请重试');
-    } finally {
-      this.parseBusy = false;
-    }
   }
 
   private selectInputMode(mode: HomeworkAssignmentInputMode): void {
@@ -461,14 +429,7 @@ export struct HomeworkImportPage {
         .fontSize(AppTheme.CAPTION_SIZE)
         .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
         .fontColor(AppTheme.TERTIARY_TEXT);
-      Text('识别图片文字')
-        .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-        .fontSize(AppTheme.ACTION_TEXT_SIZE)
-        .fontColor(AppTheme.PRIMARY)
-        .accessibilityRole(AccessibilityRoleType.BUTTON)
-        .accessibilityText('将图片识别为文字并切换到文字输入')
-        .enabled(!this.parseBusy)
-        .onClick(() => { void this.recognizeImageAsText(); });
+
     }
   }
 
