@@ -70,8 +70,7 @@ public class HomeworkOrganizerService {
       result.add(new HomeworkOrganizerDtos.Candidate(
           candidate.subject(), candidate.title(), candidate.instruction(), candidate.textbookRef(),
           today, candidate.expectedMinutes(), candidate.sourceExcerpt(), candidate.confidence(),
-          candidate.sameTaskGroup(), candidate.duplicateAssignmentId(), candidate.duplicateAssignmentTitle(),
-          candidate.duplicateConfidence(), candidate.duplicateReason()));
+          "", "", "", 0.0, ""));
     }
     return result;
   }
