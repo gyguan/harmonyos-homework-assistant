@@ -1,10 +1,10 @@
 import { AssignmentAttachmentEditor } from '../../../components/assignment/AssignmentAttachmentEditor';
 import { AppTheme } from '../../../common/theme/AppTheme';
-import { DeadlinePickerField } from '../../../components/assignment/DeadlinePickerField';
+import { TaskDatePickerField } from '../../../components/assignment/TaskDatePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Subject } from '../../../domain/model/HomeworkModels';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { ExtraAssignmentDraft, ParentExtraAssignmentViewModel } from './ParentExtraAssignmentViewModel';
 
 @Component
@@ -12,7 +12,7 @@ export struct ParentExtraAssignmentPage {
   @State private category: Subject = Subject.READING;
   @State private title: string = '';
   @State private instruction: string = '';
-  @State private dueText: string = '今天';
+  @State private taskDate: string = AssignmentTaskDate.today();
   @State private expectedMinutesText: string = '20';
   @State private busy: boolean = false;
   @State private createdAssignmentId: string = '';
@@ -28,13 +28,6 @@ export struct ParentExtraAssignmentPage {
     let value = Number(this.expectedMinutesText.trim());
     if (!Number.isFinite(value) || value < 1 || value > 240 || Math.floor(value) !== value) return -1;
     return value;
-  }
-
-  private dueAtEpochMs(): number {
-    let text = this.dueText.trim();
-    if (text.length === 0) return 0;
-    let value = AssignmentDueDate.resolveDueAtEpochMs(text, Date.now());
-    return value > 0 ? value : -1;
   }
 
   private async createTask(): Promise<void> {
@@ -54,9 +47,8 @@ export struct ParentExtraAssignmentPage {
       this.showError('预计用时请输入 1～240 分钟的整数');
       return;
     }
-    let dueAt = this.dueAtEpochMs();
-    if (dueAt < 0) {
-      this.showError('请选择有效的截止日期和时间');
+    if (!AssignmentTaskDate.isValid(this.taskDate)) {
+      this.showError('请选择有效的任务日期');
       return;
     }
 
@@ -64,13 +56,11 @@ export struct ParentExtraAssignmentPage {
     this.message = '';
     this.messageError = false;
     try {
-      let dueText = dueAt > 0 ? this.dueText.trim() : '未定';
       let draft: ExtraAssignmentDraft = {
         category: this.category,
         title: title,
         instruction: instruction,
-        dueAtEpochMs: dueAt,
-        dueText: dueText,
+        taskDate: this.taskDate,
         expectedMinutes: expectedMinutes
       };
       let created = await this.viewModel.create(draft);
@@ -169,10 +159,9 @@ export struct ParentExtraAssignmentPage {
   private TimingSection() {
     Column({ space: 10 }) {
       Text('时间安排').width('100%').fontSize(AppTheme.SECTION_TITLE_SIZE).fontWeight(FontWeight.Medium).fontColor(AppTheme.TEXT);
-      DeadlinePickerField({
-        value: this.dueText,
-        allowClear: true,
-        onChange: (value: string) => this.dueText = value
+      TaskDatePickerField({
+        value: this.taskDate,
+        onChange: (value: string) => this.taskDate = value
       });
       Column({ space: 5 }) {
         Text('预计用时（分钟）').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
