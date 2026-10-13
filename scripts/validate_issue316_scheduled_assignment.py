@@ -49,10 +49,11 @@ require("Propagation.REQUIRES_NEW" in attempt and
         attempt.count("Propagation.REQUIRES_NEW") >= 3,
         "scheduled execution and failure recording must use isolated transactions")
 require("ScheduledAssignmentSchedule.nextFire(plan, executionAt)" in attempt and
-        "dueAt(plan, template, executionAt)" in attempt,
-        "scheduled recovery must use one execution clock and fast-forward missed recurrences")
-require("MISSED_DUE_WINDOW" in attempt,
-        "same-day missed deadline must skip instead of creating an expired assignment")
+        "LocalDate taskDate = fireAt.atZone(ScheduledAssignmentSchedule.zone(plan.timezone)).toLocalDate();" in attempt and
+        "taskDate.toString()" in attempt,
+        "scheduled recovery must use one execution clock and generated assignments must use the scheduled fire date")
+require("MISSED_DUE_WINDOW" not in attempt and "duePolicy" not in attempt,
+        "scheduled assignments must not reintroduce deadline-window semantics")
 require("ScheduledAssignmentSchedule.fireAt(plan, businessDate)" in service,
         "student entry must evaluate today's fire time even when nextFireAt already advanced")
 require("students.requireOwned(familyId, studentId)" in service and
