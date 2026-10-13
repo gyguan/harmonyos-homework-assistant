@@ -3,6 +3,7 @@ import { RemoteVoiceFolderItem } from '../../../application/remote/RemoteVoiceMa
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { TaskDatePickerField } from '../../../components/assignment/TaskDatePickerField';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
+import { PhotoPreviewDialog } from '../../../components/submission/PhotoPreviewDialog';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { Subject } from '../../../domain/model/HomeworkModels';
 import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
@@ -27,6 +28,13 @@ export struct ParentVoiceAssignmentPage {
   @State private selectingImages: boolean = false;
   @State private message: string = '';
   @State private messageError: boolean = false;
+  @State private previewImageUri: string = '';
+  private previewController: CustomDialogController = new CustomDialogController({
+    builder: PhotoPreviewDialog({ uri: $previewImageUri }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
 
   @State private folderKeyword: string = '';
   @State private folderUsage: string = 'ALL';
@@ -153,6 +161,12 @@ export struct ParentVoiceAssignmentPage {
     this.audioUri = uri;
     this.audioName = VoiceAssignmentMediaService.instance.displayName(uri, '语音文件');
     this.message = '';
+  }
+
+  private openImagePreview(uri: string): void {
+    if (uri.length === 0) return;
+    this.previewImageUri = uri;
+    this.previewController.open();
   }
 
   private async selectImages(): Promise<void> {
@@ -471,7 +485,10 @@ export struct ParentVoiceAssignmentPage {
               Stack({ alignContent: Alignment.TopEnd }) {
                 Image(uri)
                   .width(88).height(88).objectFit(ImageFit.Cover)
-                  .borderRadius(12).backgroundColor(AppTheme.SURFACE_EMPHASIS);
+                  .borderRadius(12).backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                  .accessibilityRole(AccessibilityRoleType.BUTTON)
+                  .accessibilityText(`全屏查看第 ${index + 1} 张情景图片`)
+                  .onClick(() => this.openImagePreview(uri));
                 Text('×')
                   .width(28).height(28).fontSize(16).fontColor(AppTheme.TEXT_ON_PRIMARY)
                   .textAlign(TextAlign.Center)
