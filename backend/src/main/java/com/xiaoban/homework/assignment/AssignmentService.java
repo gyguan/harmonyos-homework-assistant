@@ -175,7 +175,7 @@ public class AssignmentService {
   @Transactional
   public AssignmentDtos.Response create(UUID familyId, String studentId, AssignmentDtos.Create input) {
     students.requireOwned(familyId, studentId);
-    LocalDate effectiveTaskDate = taskDate(input.taskDate());
+    LocalDate effectiveTaskDate = createTaskDate(input.taskDate());
     String createFingerprint = createFingerprint(studentId, input, effectiveTaskDate);
     AssignmentEntity existing = repository.findById(input.id()).orElse(null);
     if (existing != null) {
@@ -599,8 +599,13 @@ public class AssignmentService {
     return DEFAULT_SUBJECT_CODE;
   }
 
-  private LocalDate taskDate(String value) {
+  private LocalDate createTaskDate(String value) {
     if (value == null || value.isBlank()) return LocalDate.now(BUSINESS_ZONE);
+    return taskDate(value);
+  }
+
+  private LocalDate taskDate(String value) {
+    if (value == null || value.isBlank()) throw new ApiExceptions.BadRequest("任务日期不能为空");
     try {
       return LocalDate.parse(value.trim());
     } catch (java.time.format.DateTimeParseException error) {
