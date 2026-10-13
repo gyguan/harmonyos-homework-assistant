@@ -74,11 +74,6 @@ export struct ConfirmationCandidateCard {
   onMinutesChange: (candidate: CandidateAssignment, minutes: number) => void =
     (_candidate: CandidateAssignment, _minutes: number) => {};
 
-  private sameTaskGroup(): string {
-    let value = this.item.sameTaskGroup;
-    return value === undefined ? '' : value.trim();
-  }
-
   private duplicateAssignmentId(): string {
     let value = this.item.duplicateAssignmentId;
     return value === undefined ? '' : value.trim();
