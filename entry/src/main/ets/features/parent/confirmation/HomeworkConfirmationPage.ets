@@ -2,10 +2,7 @@ import { SelectionIds } from '../../../common/state/SelectionIds';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { RemoteAssignmentResourceApi } from '../../../application/remote/RemoteAssignmentResourceApi';
 import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
-import {
-  PendingAssignmentAttachment,
-  PendingAssignmentAttachmentPicker
-} from '../../../components/assignment/PendingAssignmentAttachmentPicker';
+import { PendingAssignmentAttachment } from '../../../components/assignment/PendingAssignmentAttachmentPicker';
 import { CandidateAssignment } from '../../../domain/model/HomeworkModels';
 import { HomeworkConfirmationViewModel } from './HomeworkConfirmationViewModel';
 import { ConfirmationCandidateCard, ConfirmationCandidateEditor } from './ConfirmationCandidateComponents';
@@ -76,6 +73,13 @@ export struct HomeworkConfirmationPage {
     if (!saved) return false;
     this.localRevision++;
     this.onStoreChanged();
+    return true;
+  }
+
+  private saveCandidateWithAttachments(
+    candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]): boolean {
+    if (!this.saveCandidate(candidate)) return false;
+    this.updateCandidateAttachments(candidate.id, attachments);
     return true;
   }
 
@@ -259,8 +263,10 @@ export struct HomeworkConfirmationPage {
     if (this.editingCandidate() !== null) {
       ConfirmationCandidateEditor({
         item: this.editingCandidate()!,
+        attachments: this.attachmentsFor(this.editingCandidate()!.id),
         onClose: () => this.closeEditor(),
-        onSave: (candidate: CandidateAssignment) => this.saveCandidate(candidate),
+        onSave: (candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]) =>
+          this.saveCandidateWithAttachments(candidate, attachments),
         onDelete: (candidateId: string) => this.removeCandidate(candidateId)
       });
     }
@@ -369,15 +375,6 @@ export struct HomeworkConfirmationPage {
             .width('100%')
             .alignItems(VerticalAlign.Center);
 
-            if (!this.bulkMode) {
-              PendingAssignmentAttachmentPicker({
-                candidateId: item.id,
-                attachments: this.attachmentsFor(item.id),
-                disabled: this.publishing,
-                onChange: (attachments: PendingAssignmentAttachment[]) =>
-                  this.updateCandidateAttachments(item.id, attachments)
-              });
-            }
           }
           .width('100%');
         }, (item: CandidateAssignment) => this.candidateRenderKey(item));
