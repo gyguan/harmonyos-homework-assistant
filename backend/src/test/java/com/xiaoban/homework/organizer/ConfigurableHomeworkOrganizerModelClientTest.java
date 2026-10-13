@@ -32,7 +32,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     var transport = mock(com.xiaoban.homework.ai.OpenAiCompatibleTransport.class);
     when(transport.completeWithImage(anyString(), anyString(), anyString(), anyString(), anyInt(),
         anyString(), anyMap())).thenReturn(java.util.Optional.of(
-            "{\"recognizedText\":\"语文朗读\",\"assignments\":[]} "));
+            "{\"assignments\":[{\"subject\":\"数学\",\"title\":\"口算20题\",\"instruction\":\"完成口算20题\",\"textbookRef\":\"\",\"taskDate\":\"今天\",\"expectedMinutes\":10,\"sourceExcerpt\":\"数学口算20题\",\"confidence\":0.9}]}"));
     var client = new ConfigurableHomeworkOrganizerModelClient(
         new AiProviderProperties(), transport, JsonMapper.builder().build());
 
@@ -170,6 +170,8 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertFalse(schema.contains("duplicateConfidence"));
     assertFalse(schema.contains("duplicateReason"));
     assertFalse(ConfigurableHomeworkOrganizerModelClient.imageSchema().toString().contains("recognizedText"));
+    assertTrue(schema.contains("maxLength=80"));
+    assertTrue(schema.contains("maxLength=400"));
   }
 
   @Test
