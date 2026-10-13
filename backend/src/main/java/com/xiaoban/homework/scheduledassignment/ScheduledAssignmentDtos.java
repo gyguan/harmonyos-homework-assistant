@@ -11,14 +11,9 @@ public final class ScheduledAssignmentDtos {
 
   public record TemplateInput(
       String assignmentType,
-      @NotBlank @Size(max = 80) String subject,
-      @NotBlank @Size(max = 64) String subjectCode,
       @NotBlank @Size(max = 300) String title,
       @NotBlank @Size(max = 1000) String instruction,
-      Integer expectedMinutes,
-      @NotBlank String duePolicy,
-      String dueTime,
-      Integer dueOffsetMinutes) {}
+      Integer expectedMinutes) {}
 
   public record UpsertRequest(
       @NotBlank String planType,
@@ -51,10 +46,7 @@ public final class ScheduledAssignmentDtos {
       String subjectCode,
       String title,
       String instruction,
-      int expectedMinutes,
-      String duePolicy,
-      String dueTime,
-      int dueOffsetMinutes) {}
+      int expectedMinutes) {}
 
   public record PlanResponse(
       String id,

@@ -7,7 +7,6 @@ import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -105,8 +104,7 @@ public class VoiceMaterialAssignmentService {
     AssignmentDtos.Response assignment = createFromFolder(
         familyId, item, targetStudentId, requestedSubjectCode,
         input.expectedMinutes() == null ? item.expectedMinutes : input.expectedMinutes(),
-        resolveDueAt(input.dueAtEpochMs(), item.dueAt),
-        input.dueText() == null ? "" : input.dueText().trim(),
+        taskDate(input.taskDate()),
         LocalDate.now(BUSINESS_ZONE),
         requestedTitle,
         requestedInstruction,
@@ -138,8 +136,8 @@ public class VoiceMaterialAssignmentService {
       String packageId = links.findByFamilyIdAndAssignmentId(familyId, current.id())
           .map(link -> link.packageId.toString())
           .orElse("");
-      log.info("voice_material auto_create_exit studentId={} businessDate={} reason=ACTIVE_TASK_EXISTS assignmentId={} packageId={} status={} dueAtEpochMs={}",
-          studentId, businessDate, current.id(), packageId, current.status(), current.dueAtEpochMs());
+      log.info("voice_material auto_create_exit studentId={} businessDate={} reason=ACTIVE_TASK_EXISTS assignmentId={} packageId={} status={} taskDate={}",
+          studentId, businessDate, current.id(), packageId, current.status(), current.taskDate());
       return new VoiceMaterialDtos.AutoCreateResponse(
           false, businessDate.toString(), packageId, current.id(), current);
     }
@@ -168,12 +166,9 @@ public class VoiceMaterialAssignmentService {
 
     item = packages.lockOwned(familyId, item.id)
         .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
-    Instant dailyDueAt = item.dueAt == null
-        ? businessDate.atTime(LocalTime.of(23, 59)).atZone(BUSINESS_ZONE).toInstant()
-        : null;
     AssignmentDtos.Response assignment = createFromFolder(
-        familyId, item, item.studentId, item.subjectCode, item.expectedMinutes, dailyDueAt,
-        item.dueAt == null ? "今天" : "", businessDate,
+        familyId, item, item.studentId, item.subjectCode, item.expectedMinutes, businessDate,
+        businessDate,
         "", "", "", "AUTO");
 
     VoiceMaterialAutoCreateRecordEntity record = new VoiceMaterialAutoCreateRecordEntity();
@@ -237,13 +232,10 @@ public class VoiceMaterialAssignmentService {
   private AssignmentDtos.Response createFromFolder(UUID familyId,
       VoiceMaterialPackageEntity item, String targetStudentId, String subjectCode,
       int expectedMinutes,
-      Instant dueAtOverride, String dueTextOverride, LocalDate businessDate,
+      LocalDate taskDate, LocalDate businessDate,
       String requestedTitle, String requestedInstruction, String requestId,
       String createMode) {
     String assignmentId = "a-voice-" + UUID.randomUUID();
-    Long dueAtEpochMs = null;
-    if (dueAtOverride != null) dueAtEpochMs = dueAtOverride.toEpochMilli();
-    else if (item.dueAt != null) dueAtEpochMs = item.dueAt.toEpochMilli();
 
     String title = requestedTitle == null || requestedTitle.isBlank()
         ? assignments.nextVoiceMaterialTaskTitle(
@@ -258,12 +250,10 @@ public class VoiceMaterialAssignmentService {
             ? "请听语音并结合图片完成任务。"
             : requestedInstruction.trim(),
         "",
-        dueTextOverride,
+        taskDate.toString(),
         item.assignmentType,
         subjectCode,
         "AUDIO_IMAGE",
-        dueAtEpochMs,
-        BUSINESS_ZONE.getId(),
         "NOT_STARTED",
         "语音素材库",
         item.directoryName,
@@ -330,11 +320,12 @@ public class VoiceMaterialAssignmentService {
     return fallback;
   }
 
-  private Instant resolveDueAt(Long requestedEpochMs, Instant fallback) {
-    if (requestedEpochMs != null && requestedEpochMs > 0) {
-      return Instant.ofEpochMilli(requestedEpochMs);
+  private LocalDate taskDate(String value) {
+    try {
+      return LocalDate.parse(value);
+    } catch (java.time.format.DateTimeParseException error) {
+      throw new ApiExceptions.BadRequest("任务日期格式应为 YYYY-MM-DD");
     }
-    return fallback;
   }
 
   private AssignmentDtos.Response loadAssignmentIfPresent(UUID familyId, String assignmentId) {
