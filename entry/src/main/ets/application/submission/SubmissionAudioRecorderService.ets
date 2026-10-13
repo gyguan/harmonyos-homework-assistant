@@ -55,6 +55,8 @@ export class SubmissionAudioRecorderService {
         this.outputUri = this.outputUriFromPath(path);
 
         try {
+          // Runtime SysCap guards above are intentional; API 26 compiler cannot narrow canIUse() for MediaKit.
+          // @SuppressWarnings syscap
           let recorder = await media.createAVRecorder();
           this.recorder = recorder;
           recorder.on('error', (error: BusinessError) => {
@@ -64,15 +66,20 @@ export class SubmissionAudioRecorderService {
           let profile: media.AVRecorderProfile = {
             audioBitrate: 96000,
             audioChannels: 1,
+            // @SuppressWarnings syscap
             audioCodec: media.CodecMimeType.AUDIO_AAC,
             audioSampleRate: 48000,
+            // @SuppressWarnings syscap
             fileFormat: media.ContainerFormatType.CFT_MPEG_4A
           };
           let config: media.AVRecorderConfig = {
+            // @SuppressWarnings syscap
             audioSourceType: media.AudioSourceType.AUDIO_SOURCE_TYPE_MIC,
             profile: profile,
             url: 'fd://' + file.fd.toString()
           };
+          // MICROPHONE is declared in module.json5 and granted immediately before this call.
+          // @SuppressWarnings permission
           await recorder.prepare(config);
           await recorder.start();
           this.accumulatedMs = 0;
