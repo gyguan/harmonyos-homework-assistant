@@ -119,6 +119,7 @@ public class DailyHomeworkCoverageService {
 
   static String normalizeParentIdentity(String value) {
     String normalized = value == null ? "" : value.trim().toUpperCase();
+    if (normalized.isEmpty()) return "DAD";
     if (!ALLOWED_IDENTITIES.contains(normalized)) {
       throw new ApiExceptions.BadRequest("不支持的家长身份");
     }
