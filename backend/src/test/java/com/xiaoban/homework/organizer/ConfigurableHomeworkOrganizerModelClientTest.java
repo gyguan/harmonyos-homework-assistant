@@ -149,6 +149,44 @@ class ConfigurableHomeworkOrganizerModelClientTest {
   }
 
   @Test
+  void imageParserNormalizesQuotedFencedAndEmbeddedJson() throws Exception {
+    var mapper = JsonMapper.builder().build();
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), null, mapper);
+    String json = """
+        {"assignments":[
+          {"subject":"数学","title":"口算20题","instruction":"完成20题",
+           "textbookRef":"","sourceExcerpt":"数学口算20题"}
+        ]}
+        """.trim();
+
+    var quoted = client.parseImageOutput(mapper.writeValueAsString(json)).orElseThrow();
+    var fenced = client.parseImageOutput("```json\n" + json + "\n```").orElseThrow();
+    var embedded = client.parseImageOutput("以下为整理结果：\n" + json + "\n请核对").orElseThrow();
+
+    assertEquals(1, quoted.assignments().size());
+    assertEquals(1, fenced.assignments().size());
+    assertEquals(1, embedded.assignments().size());
+    assertEquals("数学", quoted.assignments().getFirst().subject());
+  }
+
+  @Test
+  void imageParserNormalizesCommonProviderWrapper() {
+    var client = new ConfigurableHomeworkOrganizerModelClient(
+        new AiProviderProperties(), null, JsonMapper.builder().build());
+    String output = """
+        {"result":{"assignments":[
+          {"subject":"英语","title":"朗读课文","instruction":"朗读两遍",
+           "textbookRef":"","sourceExcerpt":"英语朗读"}
+        ]}}
+        """;
+
+    var result = client.parseImageOutput(output).orElseThrow();
+
+    assertEquals(1, result.assignments().size());
+    assertEquals("英语", result.assignments().getFirst().subject());
+  }
+  @Test
   void promptKeepsOnlyNecessaryStudentContext() {
     TestStudent student = new TestStudent();
     student.name = "小宇";
