@@ -22,6 +22,7 @@ import { PageStateView } from '../components/state/PageStateView';
 import { DefaultAssignmentRepository } from '../data/repository/DefaultAssignmentRepository';
 import { DefaultFamilyContextRepository } from '../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../domain/model/HomeworkModels';
+import { ParentIdentity, ParentIdentityHelper } from '../domain/model/ParentIdentity';
 import { AssignmentAttentionKind } from '../domain/service/AssignmentAttentionPolicy';
 import {
   PracticeDifficulty,
@@ -76,6 +77,7 @@ enum ParentRoute {
 @Component
 export struct AppShell {
   @Prop @Watch('onRoleChanged') role: AppRole = AppRole.STUDENT;
+  @Prop @Watch('onParentIdentityChanged') parentIdentity: ParentIdentity = ParentIdentity.DAD;
   @Prop @Watch('onStudentContextChanged') studentContextRevision: number = 0;
   @Prop @Watch('onRootStudentIdChanged') rootStudentId: string = '';
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
@@ -92,8 +94,9 @@ export struct AppShell {
   @State private activeStudentId: string = '';
   @State private familyStudents: StudentProfile[] = [];
   @State private identityParentActive: boolean = false;
+  @State private identityParentIdentity: ParentIdentity = ParentIdentity.DAD;
   @StorageLink('shareImportToken') private shareImportToken: string = '';
-  onSwitchParent: () => void = () => {};
+  onSwitchParent: (identity: ParentIdentity) => void = (_identity: ParentIdentity) => {};
   onSwitchStudent: (studentId: string) => void = (_studentId: string) => {};
   onRegisterBackHandler: (handler: () => boolean) => void = (_handler: () => boolean) => {};
 
@@ -104,7 +107,8 @@ export struct AppShell {
       students: $familyStudents,
       activeStudentId: $activeStudentId,
       parentActive: $identityParentActive,
-      onSelectParent: () => this.switchToParent(),
+      parentIdentity: $identityParentIdentity,
+      onSelectParent: (identity: ParentIdentity) => this.switchToParent(identity),
       onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
     }),
     autoCancel: true,
@@ -117,7 +121,8 @@ export struct AppShell {
       students: $familyStudents,
       activeStudentId: $activeStudentId,
       parentActive: $identityParentActive,
-      onSelectParent: () => this.switchToParent(),
+      parentIdentity: $identityParentIdentity,
+      onSelectParent: (identity: ParentIdentity) => this.switchToParent(identity),
       onSelectStudent: (studentId: string) => this.switchToStudent(studentId)
     }),
     autoCancel: true,
@@ -235,8 +240,16 @@ export struct AppShell {
   private onRoleChanged(): void {
     this.resetPersonaNavigation();
     this.identityParentActive = this.role === AppRole.PARENT;
+    this.identityParentIdentity = this.parentIdentity;
     this.syncFamilyContext();
     this.invalidateStudentScopedPages();
+  }
+
+  private onParentIdentityChanged(): void {
+    this.identityParentIdentity = this.parentIdentity;
+    if (this.role !== AppRole.PARENT) return;
+    this.resetPersonaNavigation();
+    this.storeRevision++;
   }
 
   private invalidateStudentScopedPages(): void {
@@ -270,13 +283,14 @@ export struct AppShell {
 
   private openIdentitySwitcher(): void {
     this.identityParentActive = this.role === AppRole.PARENT;
+    this.identityParentIdentity = this.parentIdentity;
     if (this.sizeClass === WindowSizeClass.EXPANDED) this.wideIdentitySwitcherController.open();
     else this.phoneIdentitySwitcherController.open();
   }
 
-  private switchToParent(): void {
-    if (this.role === AppRole.PARENT) return;
-    this.onSwitchParent();
+  private switchToParent(identity: ParentIdentity): void {
+    if (this.role === AppRole.PARENT && this.parentIdentity === identity) return;
+    this.onSwitchParent(identity);
   }
 
   private switchToStudent(studentId: string): void {
@@ -568,6 +582,7 @@ export struct AppShell {
       NavDestination() {
         HomeworkConfirmationPage({
           revision: this.storeRevision,
+          parentIdentity: this.parentIdentity,
           onBack: () => this.navPathStack.pop(),
           onPublished: () => this.finishParentImportPublished(),
           onStoreChanged: () => this.notifyUiChanged()
@@ -652,6 +667,7 @@ export struct AppShell {
       ParentDashboardPage({
         revision: this.storeRevision,
         studentId: this.activeStudentId,
+        parentIdentity: this.parentIdentity,
         onOpenAssignment: () => ParentImportNavigator.openImport(this.navPathStack),
         onOpenVoice: () => this.openParentVoiceCreate(),
         onOpenScheduled: () => this.openParentScheduledAssignments(),
@@ -773,7 +789,7 @@ export struct AppShell {
 
       Column({ space: 3 }) {
         CenteredTextBadge({
-          badgeText: this.role === AppRole.PARENT ? '家' :
+          badgeText: this.role === AppRole.PARENT ? ParentIdentityHelper.badge(this.parentIdentity) :
             (this.currentStudent().name.length > 0 ? this.currentStudent().name.substring(0, 1) : '伴'),
           badgeWidth: 34,
           badgeHeight: 34,
@@ -783,7 +799,7 @@ export struct AppShell {
           badgeForeground: AppTheme.PRIMARY,
           badgeBackground: AppTheme.PRIMARY_SOFT
         });
-        Text(this.role === AppRole.PARENT ? '家长' : this.currentStudent().name)
+        Text(this.role === AppRole.PARENT ? ParentIdentityHelper.label(this.parentIdentity) : this.currentStudent().name)
           .width(68)
           .fontSize(AppTheme.CAPTION_SIZE)
           .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
@@ -806,7 +822,8 @@ export struct AppShell {
       .accessibilityGroup(true)
       .accessibilityRole(AccessibilityRoleType.BUTTON)
       .accessibilityText(this.role === AppRole.PARENT ?
-        '当前身份家长，点击切换身份' : '当前身份 ' + this.currentStudent().name + '，点击切换身份')
+        '当前身份' + ParentIdentityHelper.label(this.parentIdentity) + '，点击切换身份' :
+        '当前身份 ' + this.currentStudent().name + '，点击切换身份')
       .onClick(() => this.openIdentitySwitcher());
 
       if (this.role === AppRole.PARENT && this.familyStudents.length > 1) {
@@ -847,6 +864,8 @@ export struct AppShell {
       if (!this.hideIdentityBarForToeic()) {
         IdentityContextBar({
           isParent: this.role === AppRole.PARENT,
+          parentName: ParentIdentityHelper.label(this.parentIdentity),
+          parentBadge: ParentIdentityHelper.badge(this.parentIdentity),
           studentName: this.currentStudent().name,
           studentGrade: this.currentStudent().grade,
           studentClassName: this.currentStudent().className,
