@@ -28,7 +28,7 @@ export class HomeworkImageEncoder {
       if (width <= 0 || height <= 0 || width * height > 40000000) {
         throw new Error('图片尺寸过大，请换一张截图重试');
       }
-      let ratio = Math.min(1, 2048 / Math.max(width, height));
+      let ratio = Math.min(1, 1600 / Math.max(width, height));
       let options: image.DecodingOptions = {
         desiredSize: {
           width: Math.max(1, Math.round(width * ratio)),
@@ -37,7 +37,7 @@ export class HomeworkImageEncoder {
       };
       pixelMap = await source.createPixelMap(options);
       packer = image.createImagePacker();
-      let packing: image.PackingOption = { format: 'image/jpeg', quality: 84 };
+      let packing: image.PackingOption = { format: 'image/jpeg', quality: 82 };
       let encoded: ArrayBuffer;
       try {
         encoded = await packer.packToData(pixelMap, packing);
