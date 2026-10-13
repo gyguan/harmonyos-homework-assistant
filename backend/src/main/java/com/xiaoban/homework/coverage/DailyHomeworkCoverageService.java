@@ -71,8 +71,8 @@ public class DailyHomeworkCoverageService {
           displayName, accountId.equals(entry.getKey()), List.copyOf(subjects), updatedAt));
     }
     parents.sort(Comparator
-        .comparing(DailyHomeworkCoverageDtos.ParentCoverage::mine).reversed()
-        .thenComparing(DailyHomeworkCoverageDtos.ParentCoverage::updatedAt).reversed());
+        .comparing((DailyHomeworkCoverageDtos.ParentCoverage item) -> !item.mine())
+        .thenComparing(DailyHomeworkCoverageDtos.ParentCoverage::updatedAt, Comparator.reverseOrder()));
 
     return new DailyHomeworkCoverageDtos.Response(
         studentId, student.name, taskDate, List.copyOf(parents));
