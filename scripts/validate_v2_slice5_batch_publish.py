@@ -35,12 +35,6 @@ mock_parser = read("entry/src/main/ets/infrastructure/ai/MockHomeworkAssignmentP
 task_date_service = read("entry/src/main/ets/domain/service/AssignmentTaskDate.ets")
 e2e = read("backend/scripts/batch_publish_e2e.py")
 workflow = read(".github/workflows/static-gate.yml")
-shanghai_resolver = ""
-if "private static resolveShanghaiDate" in due_date_service and "private static resolveTimeMinutes" in due_date_service:
-    start = due_date_service.index("private static resolveShanghaiDate")
-    end = due_date_service.index("private static resolveTimeMinutes", start)
-    shanghai_resolver = due_date_service[start:end]
-
 require("BatchPublishRequest" in dtos and "BatchPublishResponse" in dtos and "boolean atomic" in dtos,
         "batch publish DTO must make atomic semantics explicit")
 require('@PostMapping("/students/{studentId}/assignments/batch")' in controller and
