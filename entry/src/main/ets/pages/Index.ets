@@ -34,7 +34,7 @@ struct Index {
     builder: ParentAccessDialog({
       code: $parentAccessCodeInput,
       message: $parentAccessMessage,
-      onConfirm: () => this.confirmParentAccess()
+      onConfirm: () => { void this.confirmParentAccess(); }
     }),
     autoCancel: true,
     alignment: DialogAlignment.Center,
