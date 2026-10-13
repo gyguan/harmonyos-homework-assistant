@@ -12,6 +12,9 @@ public final class FamilyAccountDtos {
       @NotBlank @Size(min = 6, max = 120) String password,
       @NotBlank @Size(max = 120) String displayName) {}
 
+  public record UpdateMineRequest(
+      @NotBlank @Size(max = 120) String displayName) {}
+
   public record Item(
       String id,
       String loginName,
