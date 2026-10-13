@@ -8,10 +8,14 @@ import { Assignment, AssignmentStatus, Subject } from '../../../domain/model/Hom
 import { AssignmentAttentionKind } from '../../../domain/service/AssignmentAttentionPolicy';
 import { StudentHomeViewModel } from './StudentHomeViewModel';
 
+interface StudentHomeSubjectGroup {
+  subject: Subject;
+  items: Assignment[];
+}
+
 @Component
-struct StudentTodayTaskCard {
+struct StudentPendingTaskCard {
   @Prop assignment: Assignment;
-  @Prop emphasized: boolean = false;
   @Prop busy: boolean = false;
   onAction: (assignmentId: string) => void = (_assignmentId: string) => {};
 
@@ -66,9 +70,9 @@ struct StudentTodayTaskCard {
     Row({ space: 10 }) {
       CenteredTextBadge({
         badgeText: this.assignment.subject.substring(0, 1),
-        badgeWidth: this.emphasized ? 46 : 40,
-        badgeHeight: this.emphasized ? 46 : 40,
-        badgeFontSize: this.emphasized ? 18 : 16,
+        badgeWidth: 40,
+        badgeHeight: 40,
+        badgeFontSize: 16,
         badgeRadius: 12,
         badgeBold: true,
         badgeForeground: this.subjectColor(),
@@ -78,8 +82,8 @@ struct StudentTodayTaskCard {
       Column({ space: 5 }) {
         Text(this.assignment.title)
           .width('100%')
-          .fontSize(this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE)
-          .lineHeight(this.emphasized ? AppTheme.SECTION_TITLE_LINE_HEIGHT : AppTheme.CARD_TITLE_LINE_HEIGHT)
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT)
           .maxLines(2)
@@ -106,7 +110,7 @@ struct StudentTodayTaskCard {
       .alignItems(HorizontalAlign.Start);
 
       Button(this.actionLabel(), { type: ButtonType.Normal })
-        .width(this.emphasized ? 96 : 82)
+        .width(82)
         .height(AppTheme.MIN_TOUCH_TARGET)
         .borderRadius(AppTheme.CONTROL_RADIUS)
         .enabled(!this.busy)
@@ -119,13 +123,12 @@ struct StudentTodayTaskCard {
     }
     .width('100%')
     .alignItems(VerticalAlign.Center)
-    .padding(this.emphasized ? 16 : 13)
+    .padding(13)
     .backgroundColor(AppTheme.CARD_SURFACE)
-    .border({ width: this.emphasized ? 1 : 0, color: this.emphasized ? AppTheme.PRIMARY : Color.Transparent })
     .borderRadius(AppTheme.CARD_RADIUS_COMPACT)
     .accessibilityGroup(true)
-    .accessibilityText(`${this.assignment.subject}，${this.assignment.title}，${this.statusLabel()}，预计${this.assignment.expectedMinutes}分钟`);
-
+    .accessibilityText(
+      `${this.assignment.subject}，${this.assignment.title}，${this.statusLabel()}，预计${this.assignment.expectedMinutes}分钟`);
   }
 }
 
@@ -137,9 +140,8 @@ export struct StudentHomePage {
   @State private availableWidthVp: number = 390;
   @State private actionAssignmentId: string = '';
   @State private actionMessage: string = '';
-  @State private todayTaskItems: Assignment[] = [];
-  @State private remainingTaskItems: Assignment[] = [];
-  @State private todaySummaryTotal: number = 0;
+  @State private pendingTaskItems: Assignment[] = [];
+  @State private subjectGroups: StudentHomeSubjectGroup[] = [];
   @State private taskRenderEpoch: number = 0;
   @State private attentionMessage: string = '';
   @State private attentionCategory: AssignmentAttentionKind = AssignmentAttentionKind.NONE;
@@ -152,61 +154,79 @@ export struct StudentHomePage {
     new StudentHomeViewModel(DefaultAssignmentRepository.instance);
 
   aboutToAppear(): void {
-    this.refreshTodaySnapshot();
+    this.refreshPendingSnapshot();
   }
 
   private onRevisionChanged(): void {
-    this.refreshTodaySnapshot();
+    this.refreshPendingSnapshot();
   }
 
   private onStudentIdChanged(): void {
     this.identityGeneration++;
     this.actionAssignmentId = '';
     this.actionMessage = '';
-    // Clear all old-child rows synchronously before reading the new identity.
-    this.todayTaskItems = [];
-    this.remainingTaskItems = [];
-    this.todaySummaryTotal = 0;
+    this.pendingTaskItems = [];
+    this.subjectGroups = [];
     this.attentionMessage = '';
     this.attentionCategory = AssignmentAttentionKind.NONE;
-    this.refreshTodaySnapshot();
+    this.refreshPendingSnapshot();
   }
 
-  private refreshTodaySnapshot(): void {
+  private subjectOrder(): Subject[] {
+    return [
+      Subject.CHINESE,
+      Subject.MATH,
+      Subject.ENGLISH,
+      Subject.READING,
+      Subject.READ_ALOUD,
+      Subject.SPORTS,
+      Subject.PRACTICE,
+      Subject.INTEREST,
+      Subject.OTHER
+    ];
+  }
+
+  private buildSubjectGroups(items: Assignment[]): StudentHomeSubjectGroup[] {
+    let result: StudentHomeSubjectGroup[] = [];
+    let order = this.subjectOrder();
+    for (let subject of order) {
+      let subjectItems: Assignment[] = [];
+      for (let item of items) {
+        if (item.subject === subject) subjectItems.push(item);
+      }
+      if (subjectItems.length > 0) result.push({ subject: subject, items: subjectItems });
+    }
+    return result;
+  }
+
+  private refreshPendingSnapshot(): void {
     if (this.studentId.length === 0) {
-      this.todayTaskItems = [];
-      this.remainingTaskItems = [];
-      this.todaySummaryTotal = 0;
+      this.pendingTaskItems = [];
+      this.subjectGroups = [];
       this.attentionMessage = '';
       this.attentionCategory = AssignmentAttentionKind.NONE;
       return;
     }
-    let items = this.viewModel.todayActionableAssignments(this.studentId);
-    let remaining: Assignment[] = [];
-    for (let index = 1; index < items.length; index++) remaining.push(items[index]);
+    let items = this.viewModel.pendingAssignments(this.studentId);
     let attention = this.viewModel.attention(this.studentId);
-    this.todayTaskItems = items;
-    this.remainingTaskItems = remaining;
-    // Force ForEach child component recreation after an identity/repository snapshot change.
-    // Assignment is a plain object, so reusing an existing child with the same key can retain
-    // stale @Prop values even though the parent array/count has already changed.
+    this.pendingTaskItems = items;
+    this.subjectGroups = this.buildSubjectGroups(items);
     this.taskRenderEpoch++;
-    this.todaySummaryTotal = this.viewModel.summary().total;
     this.attentionMessage = attention.text;
     this.attentionCategory = attention.kind;
-    let firstTaskId=items.length>0?items[0].id:'';
+    let firstTaskId = items.length > 0 ? items[0].id : '';
     console.info('[STUDENT-HOME] refresh studentId=' + this.studentId +
-      ' tasks=' + String(items.length) + ' firstTaskId=' + firstTaskId +
-      ' revision=' + String(this.revision) + ' renderEpoch=' + String(this.taskRenderEpoch));
-  }
-
-  private canUsePadComposition(): boolean {
-    return this.todayTaskItems.length > 1 &&
-      LayoutPolicy.canSplit(this.availableWidthVp, LayoutPolicy.homeFocusSummaryRequirement());
+      ' pendingTasks=' + String(items.length) + ' subjectGroups=' + String(this.subjectGroups.length) +
+      ' firstTaskId=' + firstTaskId + ' revision=' + String(this.revision) +
+      ' renderEpoch=' + String(this.taskRenderEpoch));
   }
 
   private assignmentRenderKey(item: Assignment): string {
     return `${this.taskRenderEpoch}|${item.studentId}|${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+  }
+
+  private subjectRenderKey(group: StudentHomeSubjectGroup): string {
+    return `${this.taskRenderEpoch}|${group.subject}|${group.items.length}`;
   }
 
   private async openAssignment(assignmentId: string): Promise<void> {
@@ -226,8 +246,6 @@ export struct StudentHomePage {
     this.actionAssignmentId = assignmentId;
     try {
       await this.viewModel.performAction(assignmentId, AssignmentAction.START);
-      // A pending action from the previous child must never navigate the new
-      // child's shell to its assignment.
       if (actionGeneration !== this.identityGeneration || actionStudentId !== this.studentId) return;
       this.onStoreChanged();
       this.onOpenStudy(assignmentId);
@@ -247,7 +265,7 @@ export struct StudentHomePage {
     if (this.offlineMode) {
       Row({ space: 8 }) {
         SymbolGlyph($r('sys.symbol.wifi_slash')).fontSize(17).fontColor([AppTheme.WARNING]);
-        Text('当前离线，可以查看已缓存的今日作业。')
+        Text('当前离线，可以查看已缓存的待完成作业。')
           .layoutWeight(1)
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
@@ -297,12 +315,12 @@ export struct StudentHomePage {
         .fontSize(27)
         .fontColor([AppTheme.SUCCESS]);
       Column({ space: 3 }) {
-        Text(this.todaySummaryTotal > 0 ? '今天的任务完成啦' : '今天没有安排任务')
+        Text('作业都完成啦')
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Medium)
           .fontColor(AppTheme.TEXT);
-        Text('去休息一下，或者看看练习内容。')
+        Text('首页只保留还需要完成的作业。')
           .fontSize(AppTheme.META_SIZE)
           .lineHeight(AppTheme.META_LINE_HEIGHT)
           .fontColor(AppTheme.SUBTEXT);
@@ -317,45 +335,48 @@ export struct StudentHomePage {
   }
 
   @Builder
-  private TodayTaskList() {
-    Column({ space: 10 }) {
-      ForEach(this.todayTaskItems, (item: Assignment) => {
-        StudentTodayTaskCard({
-          assignment: item,
-          busy: this.actionAssignmentId === item.id,
-          onAction: (assignmentId: string) => { void this.openAssignment(assignmentId); }
-        });
-      }, (item: Assignment) => this.assignmentRenderKey(item));
-    }
-    .width('100%');
-  }
-
-  @Builder
-  private RemainingTaskList() {
-    Column({ space: 10 }) {
-      ForEach(this.remainingTaskItems, (item: Assignment) => {
-        StudentTodayTaskCard({
-          assignment: item,
-          busy: this.actionAssignmentId === item.id,
-          onAction: (assignmentId: string) => { void this.openAssignment(assignmentId); }
-        });
-      }, (item: Assignment) => this.assignmentRenderKey(item));
-    }
-    .width('100%');
-  }
-
-  @Builder
-  private TodayTasks() {
-    Column({ space: 12 }) {
+  private SubjectTaskSection(group: StudentHomeSubjectGroup) {
+    Column({ space: 9 }) {
       Row() {
-        Text('今天要做')
+        Text(group.subject)
           .fontSize(AppTheme.SECTION_TITLE_SIZE)
           .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
           .fontWeight(FontWeight.Bold)
           .fontColor(AppTheme.TEXT);
         Blank();
-        if (this.todayTaskItems.length > 0) {
-          Text(`${this.todayTaskItems.length} 项`)
+        Text(`${group.items.length} 项`)
+          .fontSize(AppTheme.META_SIZE)
+          .lineHeight(AppTheme.META_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT);
+      }
+      .width('100%');
+
+      Column({ space: 10 }) {
+        ForEach(group.items, (item: Assignment) => {
+          StudentPendingTaskCard({
+            assignment: item,
+            busy: this.actionAssignmentId === item.id,
+            onAction: (assignmentId: string) => { void this.openAssignment(assignmentId); }
+          });
+        }, (item: Assignment) => this.assignmentRenderKey(item));
+      }
+      .width('100%');
+    }
+    .width('100%');
+  }
+
+  @Builder
+  private PendingTasks() {
+    Column({ space: AppTheme.SECTION_GAP_STANDARD }) {
+      Row() {
+        Text('待完成作业')
+          .fontSize(AppTheme.SECTION_TITLE_SIZE)
+          .lineHeight(AppTheme.SECTION_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Bold)
+          .fontColor(AppTheme.TEXT);
+        Blank();
+        if (this.pendingTaskItems.length > 0) {
+          Text(`${this.pendingTaskItems.length} 项`)
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
@@ -363,8 +384,13 @@ export struct StudentHomePage {
       }
       .width('100%');
 
-      if (this.todayTaskItems.length === 0) this.EmptyState();
-      else this.TodayTaskList();
+      if (this.subjectGroups.length === 0) {
+        this.EmptyState();
+      } else {
+        ForEach(this.subjectGroups, (group: StudentHomeSubjectGroup) => {
+          this.SubjectTaskSection(group);
+        }, (group: StudentHomeSubjectGroup) => this.subjectRenderKey(group));
+      }
 
       if (this.actionMessage.length > 0) {
         Text(this.actionMessage)
@@ -378,74 +404,26 @@ export struct StudentHomePage {
   }
 
   @Builder
-  private PhoneHome() {
+  private HomeContent() {
     Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
       this.OfflineBanner();
       this.AttentionBanner();
-      this.TodayTasks();
+      this.PendingTasks();
     }
     .width('100%')
     .constraintSize({ maxWidth: AppTheme.CONTENT_STANDARD_MAX_WIDTH })
-    .padding({ left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp), top: 14, bottom: 20 });
-  }
-
-  @Builder
-  private PadHome() {
-    Column({ space: AppTheme.SECTION_GAP_COMPACT }) {
-      this.OfflineBanner();
-      this.AttentionBanner();
-      Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-        Column({ space: 12 }) {
-          Text('先做这项')
-            .width('100%')
-            .fontSize(AppTheme.SECTION_TITLE_SIZE)
-            .fontWeight(FontWeight.Bold)
-            .fontColor(AppTheme.TEXT);
-          StudentTodayTaskCard({
-            assignment: this.todayTaskItems[0],
-            emphasized: true,
-            busy: this.actionAssignmentId === this.todayTaskItems[0].id,
-            onAction: (assignmentId: string) => { void this.openAssignment(assignmentId); }
-          });
-        }
-        .width(AppTheme.HOME_PRIMARY_MIN_WIDTH)
-        .alignItems(HorizontalAlign.Start);
-
-        Column({ space: 12 }) {
-          Row() {
-            Text('接下来')
-              .fontSize(AppTheme.SECTION_TITLE_SIZE)
-              .fontWeight(FontWeight.Bold)
-              .fontColor(AppTheme.TEXT);
-            Blank();
-            Text(`${this.remainingTaskItems.length} 项`)
-              .fontSize(13)
-              .fontColor(AppTheme.SUBTEXT);
-          }
-          .width('100%');
-          this.RemainingTaskList();
-        }
-        .layoutWeight(1)
-        .constraintSize({ minWidth: AppTheme.HOME_SECONDARY_MIN_WIDTH })
-        .alignItems(HorizontalAlign.Start);
-      }
-      .width('100%')
-      .alignItems(VerticalAlign.Top);
-
-      if (this.actionMessage.length > 0) {
-        Text(this.actionMessage).width('100%').fontSize(AppTheme.META_SIZE).lineHeight(AppTheme.META_LINE_HEIGHT).fontColor(AppTheme.WARNING);
-      }
-    }
-    .width('100%')
-    .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
-    .padding({ left: AppTheme.PAGE_PADDING_EXPANDED, right: AppTheme.PAGE_PADDING_EXPANDED, top: 18, bottom: 24 });
+    .padding({
+      left: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+      right: LayoutPolicy.pagePaddingForWidth(this.availableWidthVp),
+      top: 14,
+      bottom: 24
+    });
   }
 
   build() {
     Scroll() {
       Column() {
-        if (this.canUsePadComposition()) this.PadHome();
-        else this.PhoneHome();
+        this.HomeContent();
       }
       .width('100%')
       .alignItems(HorizontalAlign.Center)

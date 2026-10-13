@@ -79,9 +79,11 @@ require("text.indexOf('今晚') >= 0 || text.indexOf('晚上') >= 0" not in due_
         "if (text.indexOf('晚上') >= 0) return today;" in due_date,
         "generic evening text must be resolved only after explicit/relative dates so 明天晚上 does not become today")
 require("AssignmentDueDate.businessDayStart" in store and
-        "AssignmentDueDate.businessDayStart" in student_home and
         "AssignmentDueDate.businessDayStart" in date_range,
-        "parent summary, student home and assignment date filters must use the same business-day boundary")
+        "parent summary and explicit assignment date filters must use the same business-day boundary")
+require("pendingAssignments(studentId: string = '')" in student_home and
+        "AssignmentDueDate.businessDayStart" not in student_home,
+        "Student Home pending work is intentionally cross-date and must not reintroduce a Today boundary")
 require(not (ROOT / "entry/src/main/ets/features/student/assignments/AssignmentCalendarPanel.ets").exists(),
         "retired Assignment calendar must stay removed from the sustainable foundation")
 require("export class AssignmentFilterFactory" in filter_factory and

@@ -537,8 +537,9 @@ for card_title_name, card_title_source in [
 ]:
     require("AppTheme.CARD_TITLE_SIZE" in card_title_source,
             f"{card_title_name} visible list/card titles must use the shared card-title size")
-require("this.emphasized ? AppTheme.SECTION_TITLE_SIZE : AppTheme.CARD_TITLE_SIZE" in student_home,
-        "Student home task cards must express emphasis through shared title tokens")
+require("fontSize(AppTheme.CARD_TITLE_SIZE)" in student_home and
+        "fontSize(AppTheme.SECTION_TITLE_SIZE)" in student_home,
+        "Student home task cards and subject headers must use shared title tokens")
 require("fontSize(AppTheme.PAGE_TITLE_SIZE)" in parent_review_pane,
         "Parent review business object title must use the shared page-title size")
 require("AppTheme.PAGE_NAV_TITLE_SIZE" in voice_material and

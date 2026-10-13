@@ -48,23 +48,22 @@ for token in [
 ]:
     require(token in policy, f"LayoutPolicy missing Pad prototype capability: {token}")
 
-# Home: wide composition must be materially different from Phone single column. The current
-# Student Home uses a first-task focus pane plus the remaining priority-ordered tasks.
+# Home: Phone and Pad intentionally share one readable single-column task stream.
+# Pad-specific density comes from shared width/padding tokens, not a forced two-pane split.
 for token in [
     "@State private availableWidthVp",
-    "LayoutPolicy.homeFocusSummaryRequirement()",
-    "private PhoneHome()",
-    "private PadHome()",
-    "AppTheme.HOME_PRIMARY_MIN_WIDTH",
-    "AppTheme.HOME_SECONDARY_MIN_WIDTH",
-    "this.TodayTasks();",
-    "StudentTodayTaskCard",
-    "this.RemainingTaskList();",
-    "先做这项",
-    "接下来",
+    "private HomeContent()",
+    "AppTheme.CONTENT_STANDARD_MAX_WIDTH",
+    "LayoutPolicy.pagePaddingForWidth(this.availableWidthVp)",
+    "private PendingTasks()",
+    "private SubjectTaskSection(group: StudentHomeSubjectGroup)",
+    "StudentPendingTaskCard",
     ".onAreaChange",
 ]:
-    require(token in home, f"Student Home missing Pad prototype behavior: {token}")
+    require(token in home, f"Student Home missing shared Phone/Pad single-column behavior: {token}")
+for removed in ["private PhoneHome()", "private PadHome()", "先做这项", "接下来",
+                "AppTheme.HOME_PRIMARY_MIN_WIDTH", "AppTheme.HOME_SECONDARY_MIN_WIDTH"]:
+    require(removed not in home, f"Student Home must not keep obsolete Pad split behavior: {removed}")
 require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,
         "Student Home must use container capability, not size-class branching")
 

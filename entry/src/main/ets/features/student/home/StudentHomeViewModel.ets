@@ -6,7 +6,6 @@ import {
 } from '../../../domain/model/HomeworkModels';
 import { AssignmentAction } from '../../../domain/model/AssignmentAction';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
-import { AssignmentDueDate } from '../../../domain/service/AssignmentDueDate';
 import { AssignmentAttentionKind, AssignmentAttentionPolicy, AssignmentAttentionResult } from '../../../domain/service/AssignmentAttentionPolicy';
 
 export class StudentHomeViewModel {
@@ -27,8 +26,6 @@ export class StudentHomeViewModel {
   assignments(studentId: string = ''): Assignment[] {
     let source = this.repository.listCached();
     if (studentId.length === 0) return source;
-    // The active identity can change without replacing the view-model instance.
-    // Enforce child ownership even if an old repository snapshot is still present.
     let owned: Assignment[] = [];
     for (let item of source) {
       if (item.studentId === studentId) owned.push(item);
@@ -56,34 +53,21 @@ export class StudentHomeViewModel {
     return this.attention().kind;
   }
 
-  todayActionableAssignments(studentId: string = ''): Assignment[] {
+  pendingAssignments(studentId: string = ''): Assignment[] {
     let result: Assignment[] = [];
     for (let item of this.assignments(studentId)) {
-      if (!StudentHomeViewModel.isToday(item)) continue;
-      if (!StudentHomeViewModel.isActionable(item.status)) continue;
+      if (!StudentHomeViewModel.isUnfinished(item.status)) continue;
       StudentHomeViewModel.insertByPriority(result, item);
     }
     return result;
-  }
-
-  dateLabel(): string {
-    let now = AssignmentDueDate.businessDateParts(Date.now());
-    let weekday: string[] = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
-    return `今天 · ${now.month}月${now.day}日 ${weekday[AssignmentDueDate.businessWeekday(Date.now())]}`;
   }
 
   async refresh(): Promise<boolean> {
     return this.repository.refresh();
   }
 
-  private static isToday(item: Assignment): boolean {
-    if (item.dueAtEpochMs <= 0) return false;
-    return AssignmentDueDate.businessDayStart(item.dueAtEpochMs) ===
-      AssignmentDueDate.businessDayStart(Date.now());
-  }
-
-  private static isActionable(status: AssignmentStatus): boolean {
-    return StudentHomeViewModel.priority(status) < 100;
+  private static isUnfinished(status: AssignmentStatus): boolean {
+    return status !== AssignmentStatus.SUBMITTED && status !== AssignmentStatus.COMPLETED;
   }
 
   private static priority(status: AssignmentStatus): number {
@@ -110,7 +94,10 @@ export class StudentHomeViewModel {
     let candidatePriority = StudentHomeViewModel.priority(candidate.status);
     let currentPriority = StudentHomeViewModel.priority(current.status);
     if (candidatePriority !== currentPriority) return candidatePriority < currentPriority;
-    if (candidate.dueAtEpochMs !== current.dueAtEpochMs) return candidate.dueAtEpochMs < current.dueAtEpochMs;
+
+    let candidateDue = candidate.dueAtEpochMs > 0 ? candidate.dueAtEpochMs : Number.MAX_SAFE_INTEGER;
+    let currentDue = current.dueAtEpochMs > 0 ? current.dueAtEpochMs : Number.MAX_SAFE_INTEGER;
+    if (candidateDue !== currentDue) return candidateDue < currentDue;
     return candidate.id < current.id;
   }
 }
