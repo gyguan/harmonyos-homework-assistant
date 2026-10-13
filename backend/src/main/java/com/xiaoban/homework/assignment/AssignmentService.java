@@ -175,7 +175,8 @@ public class AssignmentService {
   @Transactional
   public AssignmentDtos.Response create(UUID familyId, String studentId, AssignmentDtos.Create input) {
     students.requireOwned(familyId, studentId);
-    String createFingerprint = createFingerprint(studentId, input);
+    LocalDate effectiveTaskDate = taskDate(input.taskDate());
+    String createFingerprint = createFingerprint(studentId, input, effectiveTaskDate);
     AssignmentEntity existing = repository.findById(input.id()).orElse(null);
     if (existing != null) {
       if (!familyId.equals(existing.familyId) || !studentId.equals(existing.studentId)) {
@@ -200,7 +201,7 @@ public class AssignmentService {
     e.title = input.title();
     e.instruction = input.instruction();
     e.textbookRef = text(input.textbookRef());
-    e.taskDate = taskDate(input.taskDate());
+    e.taskDate = effectiveTaskDate;
     e.status = initialStatus(input.status());
     e.sourceLabel = text(input.sourceLabel());
     e.sourceExcerpt = text(input.sourceExcerpt());
@@ -542,7 +543,8 @@ public class AssignmentService {
     };
   }
 
-  private String createFingerprint(String studentId, AssignmentDtos.Create input) {
+  private String createFingerprint(
+      String studentId, AssignmentDtos.Create input, LocalDate effectiveTaskDate) {
     String canonical = String.join("\n",
         text(studentId),
         assignmentType(input.assignmentType()),
@@ -552,7 +554,7 @@ public class AssignmentService {
         text(input.title()),
         text(input.instruction()),
         text(input.textbookRef()),
-        taskDate(input.taskDate()).toString(),
+        effectiveTaskDate.toString(),
         initialStatus(input.status()),
         text(input.sourceLabel()),
         text(input.sourceExcerpt()),
@@ -598,7 +600,7 @@ public class AssignmentService {
   }
 
   private LocalDate taskDate(String value) {
-    if (value == null || value.isBlank()) throw new ApiExceptions.BadRequest("任务日期不能为空");
+    if (value == null || value.isBlank()) return LocalDate.now(BUSINESS_ZONE);
     try {
       return LocalDate.parse(value.trim());
     } catch (java.time.format.DateTimeParseException error) {
