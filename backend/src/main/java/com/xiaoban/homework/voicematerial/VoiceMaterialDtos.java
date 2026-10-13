@@ -100,7 +100,7 @@ public final class VoiceMaterialDtos {
       @NotBlank @Size(max = 80) String studentId,
       @Size(max = 64) String subjectCode,
       @Min(1) @Max(240) Integer expectedMinutes,
-      @NotBlank @Size(max = 10) String taskDate,
+      @Size(max = 10) String taskDate,
       @Size(max = 300) String title,
       @Size(max = 1000) String instruction,
       @Size(max = 120) String requestId) {}

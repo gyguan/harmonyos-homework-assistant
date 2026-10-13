@@ -12,7 +12,7 @@ public final class AssignmentDtos {
   private AssignmentDtos() {}
 
   public record Create(@NotBlank String id, @NotBlank String subject, @NotBlank String title,
-      @NotBlank String instruction, String textbookRef, @NotBlank String taskDate,
+      @NotBlank String instruction, String textbookRef, String taskDate,
       String assignmentType, String subjectCode, String contentType,
       @NotBlank String status, String sourceLabel, String sourceExcerpt,
       @Min(1) @Max(240) Integer expectedMinutes,
