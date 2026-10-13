@@ -54,7 +54,7 @@ public class VoiceMaterialAssignmentService {
         .orElseThrow(() -> new ApiExceptions.NotFound("语音文件夹不存在"));
     return createManually(familyId, packageId,
         new VoiceMaterialDtos.CreateAssignmentRequest(
-            studentId, null, null, 0L, "", "", "", ""));
+            studentId, null, null, LocalDate.now(BUSINESS_ZONE).toString(), "", "", ""));
   }
 
   @Transactional
