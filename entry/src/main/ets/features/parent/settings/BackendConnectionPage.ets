@@ -769,7 +769,7 @@ export struct BackendConnectionPage {
             .fontWeight(FontWeight.Medium)
             .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
-          Text('孩子资料和教材信息')
+          Text('孩子资料、教材和家长账号')
             .fontSize(AppTheme.CAPTION_SIZE)
             .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
