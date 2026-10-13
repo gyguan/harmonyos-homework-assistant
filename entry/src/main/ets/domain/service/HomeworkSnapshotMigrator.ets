@@ -7,9 +7,10 @@ import {
   Subject
 } from '../model/HomeworkModels';
 import { StudentTextbookProfile } from './StudentTextbookProfile';
+import { AssignmentTaskDate } from './AssignmentTaskDate';
 import { HomeworkSnapshot } from '../model/PersistenceModels';
 
-export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 10;
+export const HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 11;
 
 export class HomeworkSnapshotMigrator {
   static migrate(snapshot: HomeworkSnapshot): HomeworkSnapshot {
@@ -47,6 +48,10 @@ export class HomeworkSnapshotMigrator {
         current = HomeworkSnapshotMigrator.migrateV9ToV10(current);
         continue;
       }
+      if (current.schemaVersion === 10) {
+        current = HomeworkSnapshotMigrator.migrateV10ToV11(current);
+        continue;
+      }
       throw new Error(`缺少本地作业数据迁移步骤: ${current.schemaVersion}`);
     }
     HomeworkSnapshotMigrator.validateSnapshot(current);
@@ -81,10 +86,7 @@ export class HomeworkSnapshotMigrator {
         title: source.title,
         instruction: source.instruction,
         textbookRef: source.textbookRef,
-        dueAtEpochMs: 0,
-        dueTimezone: 'Asia/Shanghai',
-        dueText: source.dueText,
-        dueDateKey: source.dueDateKey,
+        taskDate: AssignmentTaskDate.today(),
         status: source.status,
         expectedMinutes: source.expectedMinutes,
         startedAtEpochMs: source.startedAtEpochMs,
@@ -125,10 +127,7 @@ export class HomeworkSnapshotMigrator {
         title: source.title,
         instruction: source.instruction,
         textbookRef: source.textbookRef,
-        dueAtEpochMs: source.dueAtEpochMs,
-        dueTimezone: source.dueTimezone,
-        dueText: source.dueText,
-        dueDateKey: source.dueDateKey,
+        taskDate: AssignmentTaskDate.isValid(source.taskDate) ? source.taskDate : AssignmentTaskDate.today(),
         status: source.status,
         expectedMinutes: source.expectedMinutes,
         startedAtEpochMs: source.startedAtEpochMs,
@@ -169,10 +168,7 @@ export class HomeworkSnapshotMigrator {
         title: source.title,
         instruction: source.instruction,
         textbookRef: source.textbookRef,
-        dueAtEpochMs: source.dueAtEpochMs,
-        dueTimezone: source.dueTimezone,
-        dueText: source.dueText,
-        dueDateKey: source.dueDateKey,
+        taskDate: AssignmentTaskDate.isValid(source.taskDate) ? source.taskDate : AssignmentTaskDate.today(),
         status: source.status,
         expectedMinutes: source.expectedMinutes,
         startedAtEpochMs: source.startedAtEpochMs,
@@ -245,6 +241,51 @@ export class HomeworkSnapshotMigrator {
       rawImports: snapshot.rawImports,
       assignments: snapshot.assignments,
       candidates: snapshot.candidates,
+      submissions: snapshot.submissions,
+      tutorSessions: snapshot.tutorSessions,
+      submissionSequence: snapshot.submissionSequence
+    };
+  }
+
+  private static migrateV10ToV11(snapshot: HomeworkSnapshot): HomeworkSnapshot {
+    let assignments: Assignment[] = [];
+    for (let source of snapshot.assignments) {
+      assignments.push({
+        id: source.id,
+        studentId: source.studentId,
+        candidateId: source.candidateId,
+        backing: HomeworkSnapshotMigrator.legacyBacking(source),
+        assignmentType: source.assignmentType,
+        subjectCode: source.subjectCode,
+        contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE ?
+          AssignmentContentType.AUDIO_IMAGE : AssignmentContentType.NORMAL,
+        subject: source.subject,
+        title: source.title,
+        instruction: source.instruction,
+        textbookRef: source.textbookRef,
+        taskDate: AssignmentTaskDate.isValid(source.taskDate) ? source.taskDate : AssignmentTaskDate.today(),
+        status: source.status,
+        expectedMinutes: source.expectedMinutes,
+        startedAtEpochMs: source.startedAtEpochMs,
+        finishedAtEpochMs: source.finishedAtEpochMs,
+        elapsedSeconds: source.elapsedSeconds,
+        reviewNote: source.reviewNote,
+        remoteVersion: source.remoteVersion,
+        syncDirty: source.syncDirty,
+        lastSyncedAtEpochMs: source.lastSyncedAtEpochMs,
+        resourceLabels: source.resourceLabels.slice()
+      });
+    }
+    let candidates = snapshot.candidates;
+    for (let candidate of candidates) {
+      if (!AssignmentTaskDate.isValid(candidate.taskDate)) candidate.taskDate = AssignmentTaskDate.today();
+    }
+    return {
+      schemaVersion: 11,
+      settings: snapshot.settings,
+      rawImports: snapshot.rawImports,
+      assignments: assignments,
+      candidates: candidates,
       submissions: snapshot.submissions,
       tutorSessions: snapshot.tutorSessions,
       submissionSequence: snapshot.submissionSequence
