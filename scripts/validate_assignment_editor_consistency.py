@@ -25,14 +25,14 @@ confirmation_components = read(
 confirmation_page = read("entry/src/main/ets/features/parent/confirmation/HomeworkConfirmationPage.ets")
 review_editor = read("entry/src/main/ets/features/parent/review/ParentAssignmentEditPanel.ets")
 review_pane = read("entry/src/main/ets/features/parent/review/ParentReviewPane.ets")
-deadline = read("entry/src/main/ets/components/assignment/DeadlinePickerField.ets")
+task_date_picker = read("entry/src/main/ets/components/assignment/TaskDatePickerField.ets")
 import_service = read("entry/src/main/ets/application/import/HomeworkImportService.ets")
 extra_page = read("entry/src/main/ets/features/parent/extra/ParentExtraAssignmentPage.ets")
 voice_page = read("entry/src/main/ets/features/parent/voice/ParentVoiceAssignmentPage.ets")
 practice_generation = read("entry/src/main/ets/features/parent/practice/ParentPracticeGenerationPage.ets")
 change_detector = read("entry/src/main/ets/common/state/AssignmentEditChangeDetector.ets")
 
-for token in ["作业标题", "完成要求", "截止时间", "预计用时（分钟）"]:
+for token in ["作业标题", "完成要求", "任务日期", "预计用时（分钟）"]:
     require(token in shared, f"shared assignment editor missing field: {token}")
 require("AssignmentEditForm({" in confirmation_components,
         "create-time confirmation editor must reuse AssignmentEditForm")
@@ -73,20 +73,21 @@ require("Scroll() {" in duration and ".scrollable(ScrollDirection.Horizontal)" i
         duration.count("Row({ space: 6 })") == 1,
         "shared expected-duration choices must stay on one horizontal row")
 
-require("let today = new Date();" in deadline and "this.selectedDate = today;" in deadline,
-        "empty deadline picker must default to today")
-require("@State private dueText: string = '今天';" in extra_page,
-        "extra assignment creation must default due date to today")
-require("@State private dueText: string = '今天';" in voice_page,
-        "voice assignment creation must default due date to today")
-require("normalizeCandidateDates" in import_service and "candidate.dueText = '今天'" in import_service,
-        "imported candidates with no date must default to today")
+require("AssignmentTaskDate.parse(this.value)" in task_date_picker and "new Date()" in task_date_picker,
+        "task-date picker must default an empty selection to today")
+require("@State private taskDate: string = AssignmentTaskDate.today();" in extra_page,
+        "extra assignment creation must default taskDate to today")
+require("@State private taskDate: string = AssignmentTaskDate.today();" in voice_page,
+        "voice assignment creation must default taskDate to today")
+require("normalizeCandidateDates" in import_service and
+        "candidate.taskDate = AssignmentTaskDate.resolve(candidate.taskDate)" in import_service,
+        "imported candidates must normalize to an absolute taskDate")
 
 require("candidateRenderKey" in confirmation_page,
         "confirmation list must use a render key that changes with edited task content")
 require("this.candidateRenderKey(item)" in confirmation_page,
         "confirmation ForEach must rebuild the edited card immediately")
-for field in ["item.subject", "item.title", "item.instruction", "item.dueText", "item.textbookRef", "item.expectedMinutes"]:
+for field in ["item.subject", "item.title", "item.instruction", "item.taskDate", "item.textbookRef", "item.expectedMinutes"]:
     require(field in confirmation_page, f"confirmation render key missing edited field: {field}")
 
 if errors:

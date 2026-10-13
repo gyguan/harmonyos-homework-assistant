@@ -23,8 +23,8 @@ migrator = read("entry/src/main/ets/domain/service/HomeworkSnapshotMigrator.ets"
 store = read("entry/src/main/ets/data/HomeworkStore.ets")
 persistence = read("entry/src/main/ets/infrastructure/persistence/PreferencesHomeworkPersistence.ets")
 
-require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 10" in migrator,
-        "snapshot migration framework must advance the current schema to V10")
+require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 11" in migrator,
+        "snapshot migration framework must advance the current schema to V11")
 require("migrateV4ToV5" in migrator and "schemaVersion: 5" in migrator,
         "snapshot migrator must retain the explicit V4 -> V5 step")
 require("migrateV5ToV6" in migrator and "schemaVersion: 6" in migrator,
@@ -42,6 +42,9 @@ require("migrateV9ToV10" in migrator and "schemaVersion: 10" in migrator and
         "chineseTextbook:" in migrator and "mathTextbook:" in migrator and
         "englishTextbook:" in migrator and "otherTextbooks:" in migrator,
         "student textbook structure must use an explicit V9 -> V10 migration step")
+require("migrateV10ToV11" in migrator and "schemaVersion: 11" in migrator and
+        "taskDate: AssignmentTaskDate.isValid(source.taskDate)" in migrator,
+        "Assignment task date must use an explicit V10 -> V11 migration step")
 for field in [
     "settings: snapshot.settings",
     "rawImports: snapshot.rawImports",
@@ -54,8 +57,7 @@ for field in [
 for assignment_field in [
     "assignmentType: AssignmentType.SCHOOL",
     "subjectCode: HomeworkSnapshotMigrator.subjectCode(source.subject)",
-    "dueAtEpochMs: 0",
-    "dueTimezone: 'Asia/Shanghai'",
+    "taskDate: AssignmentTaskDate.today()",
     "contentType: AssignmentContentType.NORMAL",
     "resourceLabels: source.resourceLabels.slice()",
 ]:
@@ -76,8 +78,9 @@ require("contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE" 
         "HomeworkStore clone must preserve AUDIO_IMAGE contentType instead of dropping it")
 require("contentType: source.contentType === AssignmentContentType.AUDIO_IMAGE" in migrator,
         "V6 -> V7 migration must preserve AUDIO_IMAGE and default missing contentType to NORMAL")
-require("dueAtEpochMs: source.dueAtEpochMs" in store and "dueTimezone:" in store,
-        "HomeworkStore clone must preserve Assignment V2 due-time fields")
+require("taskDate: AssignmentTaskDate.isValid(source.taskDate)" in store and
+        "dueAtEpochMs" not in store and "dueText" not in store,
+        "HomeworkStore clone must preserve required taskDate without deadline fields")
 require("backing: source.backing," in store and
         "source.backing === AssignmentBacking.REMOTE ?" not in store,
         "HomeworkStore clone must preserve explicit Assignment backing without guessing after migration")
