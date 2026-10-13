@@ -6,36 +6,37 @@ export struct PhotoPreviewDialog {
   @Link uri: string;
 
   build() {
-    Column({ space: 10 }) {
+    Column() {
       Row() {
-        Text('查看作业照片')
+        Text('查看图片')
           .fontSize(AppTheme.PAGE_NAV_TITLE_SIZE)
           .fontWeight(FontWeight.Medium)
-          .fontColor(AppTheme.TEXT);
+          .fontColor(Color.White);
         Blank();
         Text('关闭')
-          .fontSize(13)
-          .fontColor(AppTheme.PRIMARY)
+          .fontSize(14)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(Color.White)
           .constraintSize({ minHeight: AppTheme.MIN_TOUCH_TARGET })
-          .padding({ left: 12, right: 4 })
+          .padding({ left: 12, right: 8 })
           .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText('关闭照片预览')
+          .accessibilityText('关闭图片全屏预览')
           .onClick(() => this.controller.close());
       }
-      .width('100%');
+      .width('100%')
+      .height(56)
+      .padding({ left: 16, right: 8 });
 
       if (this.uri.length > 0) {
         Image(this.uri)
           .width('100%')
           .layoutWeight(1)
           .objectFit(ImageFit.Contain)
-          .backgroundColor(AppTheme.BACKGROUND);
+          .backgroundColor(Color.Black);
       }
     }
-    .width('92%')
-    .height('78%')
-    .padding(16)
-    .backgroundColor(AppTheme.SURFACE)
-    .borderRadius(20);
+    .width('100%')
+    .height('100%')
+    .backgroundColor(Color.Black);
   }
 }
