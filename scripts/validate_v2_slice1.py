@@ -61,7 +61,7 @@ require("dueAtEpochMs" not in models and "dueTimezone" not in models and "dueTex
         "client Assignment must expose taskDate instead of legacy deadline fields")
 require("assignments/summary" in controller and "TodaySummary" in dtos and "todaySummary" in service,
         "backend must expose the Student Home summary query")
-require("e.taskDate.equals(date)" in service and "undated" not in dtos,
+require("assignment.taskDate.equals(date)" in service and "undated" not in dtos,
         "today summary must use required taskDate without an undated bucket")
 
 require("HOMEWORK_SNAPSHOT_SCHEMA_VERSION: number = 11" in migrator and
