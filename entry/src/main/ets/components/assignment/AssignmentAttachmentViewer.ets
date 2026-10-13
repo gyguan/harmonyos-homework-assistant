@@ -5,6 +5,7 @@ import {
 import { RemoteAssignmentResourceApi } from '../../application/remote/RemoteAssignmentResourceApi';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { AssignmentResource, AssignmentResourceType } from '../../domain/model/HomeworkModels';
+import { PhotoPreviewDialog } from '../submission/PhotoPreviewDialog';
 
 @Component
 export struct AssignmentAttachmentViewer {
@@ -16,6 +17,13 @@ export struct AssignmentAttachmentViewer {
   @State private audioReady: boolean = false;
   @State private audioPlaying: boolean = false;
   @State private message: string = '';
+  @State private fullPreviewUri: string = '';
+  private fullPreviewController: CustomDialogController = new CustomDialogController({
+    builder: PhotoPreviewDialog({ uri: $fullPreviewUri }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
   private readonly api: RemoteAssignmentResourceApi = RemoteAssignmentResourceApi.instance;
   private readonly player: AssignmentAudioPlayerService = new AssignmentAudioPlayerService();
 
@@ -31,6 +39,12 @@ export struct AssignmentAttachmentViewer {
     catch { this.message = '暂时无法加载作业附件'; }
   }
 
+  private openFullPreview(uri: string): void {
+    if (uri.length === 0) return;
+    this.fullPreviewUri = uri;
+    this.fullPreviewController.open();
+  }
+
   private async open(item: AssignmentResource): Promise<void> {
     await this.player.release();
     this.audioReady = false;
@@ -42,6 +56,10 @@ export struct AssignmentAttachmentViewer {
     this.selectedUri = uri;
     this.selectedType = item.resourceType;
     this.selectedName = item.originalName;
+    if (item.resourceType === AssignmentResourceType.IMAGE) {
+      this.openFullPreview(uri);
+      return;
+    }
     if (item.resourceType === AssignmentResourceType.AUDIO) {
       let callbacks: AssignmentAudioPlayerCallbacks = {
         onPrepared: (_duration: number) => { this.audioReady = true; },
@@ -80,7 +98,11 @@ export struct AssignmentAttachmentViewer {
         }, (item: AssignmentResource) => item.id);
         if (this.selectedUri.length > 0) {
           if (this.selectedType === AssignmentResourceType.IMAGE) {
-            Image(this.selectedUri).width('100%').height(280).objectFit(ImageFit.Contain);
+            Image(this.selectedUri)
+              .width('100%').height(280).objectFit(ImageFit.Contain)
+              .accessibilityRole(AccessibilityRoleType.BUTTON)
+              .accessibilityText('全屏查看作业图片')
+              .onClick(() => this.openFullPreview(this.selectedUri));
           } else if (this.selectedType === AssignmentResourceType.VIDEO) {
             Video({ src: this.selectedUri }).width('100%').height(250).controls(true);
           } else {
