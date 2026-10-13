@@ -93,21 +93,25 @@ require("HomeworkStore.instance" not in view_model and "HomeworkStore.instance" 
         "V2 ViewModel/Page must not directly access HomeworkStore")
 require("WindowSizeClass." not in home and "@Prop sizeClass" not in home and "this.sizeClass" not in home,
         "V2 Student Home must use LayoutPolicy/container capability instead of size-class business branching")
-require("private PhoneHome()" in home and "private PadHome()" in home and
-        "LayoutPolicy.homeFocusSummaryRequirement()" in home,
-        "V2 Student Home must keep the Phone single-column fallback and the approved Pad focus/summary composition")
-# Student Home is a strict Today surface with direct task actions. Summary cards and the
-# subject accordion were removed because they delayed the grade-two student's primary action.
-require("private TodayTasks()" in home and "StudentTodayTaskCard" in home and
-        "todayActionableAssignments(studentId: string = '')" in view_model and
-        "this.viewModel.todayActionableAssignments(this.studentId)" in home and
-        "this.TodayTaskList();" in home and "ForEach(this.todayTaskItems" in home and
+require("private HomeContent()" in home and
+        "LayoutPolicy.pagePaddingForWidth(this.availableWidthVp)" in home and
+        "private PhoneHome()" not in home and "private PadHome()" not in home,
+        "V2 Student Home must use one shared Phone/Pad single-column composition")
+# Student Home is an unfinished-work surface. Direct task actions remain, while subject headers
+# organize the list without introducing an accordion or a second navigation step.
+require("private PendingTasks()" in home and "StudentPendingTaskCard" in home and
+        "pendingAssignments(studentId: string = '')" in view_model and
+        "this.viewModel.pendingAssignments(this.studentId)" in home and
+        "ForEach(this.subjectGroups" in home and "ForEach(group.items" in home and
         "taskRenderEpoch" in home and "AssignmentAction.START" in home,
-        "V2 Student Home must preserve the simplified Today task hierarchy and command path")
-require("StudentHomeMetricCard" not in home and "StudentSubjectTaskGroupCard" not in home,
+        "V2 Student Home must preserve direct actions in subject-grouped unfinished work")
+require("StudentHomeMetricCard" not in home and "StudentSubjectTaskGroupCard" not in home and
+        "expandedSubjectKey" not in home,
         "V2 Student Home must not restore summary-card or subject-accordion friction")
-require("dueAtEpochMs <= 0" in view_model and "dueText" not in view_model,
-        "V2 Student Home must use structured dueAt for Today and leave undated work to Assignments")
+require("status !== AssignmentStatus.SUBMITTED" in view_model and
+        "status !== AssignmentStatus.COMPLETED" in view_model and
+        "dueText" not in view_model and "AssignmentDueDate.businessDayStart" not in view_model,
+        "V2 Student Home must show unfinished work across dates without legacy Today inference")
 require("StudentHomePage" in shell and "StudentTodayPage" not in shell,
         "AppShell must cut over to V2 Student Home")
 require("HOME = 'HOME'" in shell and "TODAY = 'TODAY'" not in shell,
