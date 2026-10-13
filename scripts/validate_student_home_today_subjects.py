@@ -5,7 +5,6 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 errors: list[str] = []
 
-
 def read(path: str) -> str:
     file = ROOT / path
     if not file.exists():
@@ -13,49 +12,49 @@ def read(path: str) -> str:
         return ""
     return file.read_text(encoding="utf-8")
 
-
 def require(condition: bool, message: str) -> None:
     if not condition:
         errors.append(message)
-
 
 page = read("entry/src/main/ets/features/student/home/StudentHomePage.ets")
 view_model = read("entry/src/main/ets/features/student/home/StudentHomeViewModel.ets")
 workflow = read(".github/workflows/static-gate.yml")
 
-# Student Home remains a strict Today surface backed by structured dueAt data.
+# Home is an unfinished-work surface across dates. Submitted/completed work belongs in 作业/history.
 for token in [
-    "todayActionableAssignments(studentId: string = '')",
+    "pendingAssignments(studentId: string = '')",
     "item.studentId === studentId",
-    "private static isToday(item: Assignment)",
-    "item.dueAtEpochMs <= 0",
-    "AssignmentDueDate.businessDayStart(item.dueAtEpochMs)",
-    "AssignmentDueDate.businessDayStart(Date.now())",
+    "private static isUnfinished(status: AssignmentStatus)",
+    "status !== AssignmentStatus.SUBMITTED",
+    "status !== AssignmentStatus.COMPLETED",
     "private static insertByPriority",
 ]:
-    require(token in view_model, f"Student Home ViewModel missing today-only contract: {token}")
-require("dueText" not in view_model,
-        "Student Home must not infer Today from legacy dueText")
+    require(token in view_model, f"Student Home ViewModel missing pending-work contract: {token}")
+for removed in ["todayActionableAssignments", "private static isToday", "AssignmentDueDate.businessDayStart"]:
+    require(removed not in view_model,
+            f"Student Home must not restrict the home list to Today: {removed}")
 
-# Grade-two Today UX is a direct, priority-ordered task list with one action per card.
+# Tasks are grouped by subject but remain direct, one-action cards (no accordion/drill-down).
 for token in [
-    "StudentTodayTaskCard",
-    "private TodayTaskList()",
-    "private RemainingTaskList()",
-    "private TodayTasks()",
-    "今天要做",
-    "this.viewModel.todayActionableAssignments(this.studentId)",
-    "@State private todayTaskItems: Assignment[]",
-    "this.todayTaskItems = items;",
-    "this.TodayTaskList();",
-    "ForEach(this.todayTaskItems",
+    "StudentPendingTaskCard",
+    "interface StudentHomeSubjectGroup",
+    "private buildSubjectGroups(items: Assignment[])",
+    "private SubjectTaskSection(group: StudentHomeSubjectGroup)",
+    "private PendingTasks()",
+    "待完成作业",
+    "this.viewModel.pendingAssignments(this.studentId)",
+    "@State private pendingTaskItems: Assignment[]",
+    "@State private subjectGroups: StudentHomeSubjectGroup[]",
+    "ForEach(this.subjectGroups",
+    "ForEach(group.items",
+    "Subject.CHINESE",
+    "Subject.MATH",
+    "Subject.ENGLISH",
     "taskRenderEpoch",
     "AssignmentAction.START",
     "this.viewModel.performAction(assignmentId, AssignmentAction.START)",
-    "@State private actionAssignmentId",
-    "onStoreChanged: () => void",
 ]:
-    require(token in page, f"Student Home missing simplified Today UX: {token}")
+    require(token in page, f"Student Home missing subject-grouped pending UX: {token}")
 
 for removed in [
     "StudentHomeMetricCard",
@@ -63,33 +62,37 @@ for removed in [
     "expandedSubjectKey",
     "TodayOverview",
     "todaySubjectGroups",
+    "private PadHome()",
+    "private PhoneHome()",
+    "先做这项",
+    "接下来",
+    "homeFocusSummaryRequirement()",
 ]:
     require(removed not in page,
-            f"Student Home must not restore summary or subject-accordion friction: {removed}")
+            f"Student Home must not restore old summary/accordion/two-column behavior: {removed}")
 
 require("Text(this.assignment.subject)" not in page and
         "AssignmentType.EXTRA" not in page and
         "${this.assignment.expectedMinutes} 分钟" in page,
-        "Student Home task cards must avoid repeating subject/type metadata and keep only compact duration")
+        "subject grouping must avoid repeating subject/type metadata inside every task card")
 require("Button(this.actionLabel()" in page and
         ".alignItems(VerticalAlign.Center)" in page,
         "Student Home task actions must share the main task row and stay vertically centered")
-require("private Header()" not in page and "今天先完成一项" not in page,
-        "Student Home must not repeat a greeting/title block above 今天要做")
+require("private HomeContent()" in page and
+        "AppTheme.CONTENT_STANDARD_MAX_WIDTH" in page and
+        "this.HomeContent();" in page,
+        "Phone and Pad Student Home must share one single-column content composition")
 require("${item.subjectCode}|${item.subject}|" in page,
         "Student Home render keys must refresh when authoritative subject data changes")
 
-require("先做这项" in page and "接下来" in page and
-        "LayoutPolicy.homeFocusSummaryRequirement()" in page,
-        "Pad Student Home must keep a distinct focus + next-tasks composition")
-require("Validate student home Today task list" in workflow and
+require("Validate student home pending subject groups" in workflow and
         "python scripts/validate_student_home_today_subjects.py" in workflow,
-        "CI must run the simplified Student Home Today gate")
+        "CI must run the Student Home pending/subject-group gate")
 
 if errors:
-    print("STUDENT_HOME_TODAY_TASKS_GATE_FAIL")
+    print("STUDENT_HOME_PENDING_SUBJECTS_GATE_FAIL")
     for error in errors:
         print(f"- {error}")
     sys.exit(1)
 
-print("STUDENT_HOME_TODAY_TASKS_GATE_PASS")
+print("STUDENT_HOME_PENDING_SUBJECTS_GATE_PASS")

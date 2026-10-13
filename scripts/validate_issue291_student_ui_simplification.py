@@ -33,9 +33,10 @@ practice_history = read("entry/src/main/ets/features/student/practice/PracticeHi
 profile = read("entry/src/main/ets/features/student/profile/StudentProfilePage.ets")
 shell = read("entry/src/main/ets/pages/AppShell.ets")
 
-# Home: show today's work directly and keep command execution behind the existing repository.
-require("StudentTodayTaskCard" in home and "private TodayTasks()" in home,
-        "#291 Home must render a direct Today task list")
+# Home: show unfinished work directly, grouped by subject, and keep command execution behind the repository.
+require("StudentPendingTaskCard" in home and "private PendingTasks()" in home and
+        "private SubjectTaskSection(group: StudentHomeSubjectGroup)" in home,
+        "#291 Home must render direct unfinished tasks grouped by subject")
 for removed in ["StudentHomeMetricCard", "StudentSubjectTaskGroupCard", "expandedSubjectKey"]:
     require(removed not in home, f"#291 Home must remove distracting layer: {removed}")
 require("this.viewModel.performAction(assignmentId, AssignmentAction.START)" in home and
@@ -44,8 +45,8 @@ require("this.viewModel.performAction(assignmentId, AssignmentAction.START)" in 
 require("onStoreChanged: () => this.notifyUiChanged()" in shell,
         "AppShell must invalidate the shared cache after a Home command")
 require("private Header()" not in home and "今天先完成一项" not in home and
-        "private TodayTasks()" in home,
-        "#291 Home must avoid a duplicate greeting/title block above Today tasks")
+        "private PendingTasks()" in home and "private PadHome()" not in home,
+        "#291 Home must avoid duplicate page chrome and Pad-only task splitting")
 
 # Assignments: active work is one list and history stays collapsed until requested.
 require("private TodoSection()" in assignments and "private HistorySection()" in assignments,

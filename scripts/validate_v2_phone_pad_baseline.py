@@ -63,10 +63,11 @@ for legacy_helper in ["resolveContent", "canUseTwoPane", "twoPaneRequiredWidthVp
     require(legacy_helper not in responsive,
             f"responsive migration helper must be removed after V2 content adopts LayoutPolicy: {legacy_helper}")
 
-require("LayoutPolicy" in home and "homeFocusSummaryRequirement" in home,
-        "Student Home content capability must use LayoutPolicy directly")
-require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in home,
-        "Student Home must use the shared standard-width fallback")
+require("LayoutPolicy" in home and "pagePaddingForWidth" in home,
+        "Student Home must use shared LayoutPolicy padding without a Pad-only split")
+require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in home and
+        "private PadHome()" not in home and "private PhoneHome()" not in home,
+        "Student Home must use one shared standard-width single-column surface")
 require("alignItems(HorizontalAlign.Center)" in home,
         "Student Home must center its fallback/wide content surfaces")
 require("AppTheme.CONTENT_STANDARD_MAX_WIDTH" in assignments,
