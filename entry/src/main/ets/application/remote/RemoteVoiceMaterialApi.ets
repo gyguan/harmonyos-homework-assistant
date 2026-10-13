@@ -30,7 +30,6 @@ export interface RemoteVoiceMaterialPackage {
   subjectCode: string;
   title: string;
   expectedMinutes: number;
-  dueAtEpochMs: number;
   assignmentType: string;
   status: string;
   errorMessage: string;
@@ -45,7 +44,6 @@ export interface RemoteVoiceMaterialRegisterPackageRequest {
   subjectCode: string;
   title: string;
   expectedMinutes: number;
-  dueAtEpochMs: number;
   assignmentType: string;
 }
 
@@ -53,8 +51,7 @@ export interface RemoteVoiceMaterialCreateAssignmentRequest {
   studentId: string;
   subjectCode?: string;
   expectedMinutes: number;
-  dueAtEpochMs: number;
-  dueText: string;
+  taskDate: string;
   title?: string;
   instruction?: string;
   requestId?: string;

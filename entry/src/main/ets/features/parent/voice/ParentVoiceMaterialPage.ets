@@ -11,13 +11,9 @@ import { DeepPageHeader } from '../../../components/navigation/DeepPageHeader';
 import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAssignmentRepository';
 import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import { ParentVoiceMaterialViewModel } from './ParentVoiceMaterialViewModel';
+import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 
 const VOICE_SUBJECT_CODES: string[] = ['CHINESE', 'MATH', 'ENGLISH', 'OTHER'];
-
-interface VoiceCreateDueResult {
-  epochMs: number;
-  text: string;
-}
 
 @Component
 export struct ParentVoiceMaterialPage {
@@ -31,8 +27,8 @@ export struct ParentVoiceMaterialPage {
   @State private creatingPackageId: string = '';
   @State private createPackageId: string = '';
   @State private createStudentId: string = '';
-  @State private createDueOption: string = 'TODAY';
-  @State private createCustomDueDate: string = '';
+  @State private createDateOption: string = 'TODAY';
+  @State private createCustomTaskDate: string = '';
   @State private createMinutesText: string = '15';
   @State private creatingAssignment: boolean = false;
   @State private message: string = '';
@@ -223,8 +219,8 @@ export struct ParentVoiceMaterialPage {
       (item.status !== 'READY' && item.status !== 'CONSUMED')) return;
     this.createPackageId = item.id;
     this.createStudentId = item.studentId;
-    this.createDueOption = 'TODAY';
-    this.createCustomDueDate = '';
+    this.createDateOption = 'TODAY';
+    this.createCustomTaskDate = '';
     this.createMinutesText = `${item.expectedMinutes || 15}`;
     this.clearMessage();
   }
@@ -239,17 +235,14 @@ export struct ParentVoiceMaterialPage {
     return null;
   }
 
-  private createDue(): VoiceCreateDueResult | null {
-    let now = new Date();
-    let base = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
-    if (this.createDueOption === 'TODAY') return { epochMs: base.getTime(), text: '今天' };
-    if (this.createDueOption === 'TOMORROW') return { epochMs: base.getTime() + 24 * 60 * 60 * 1000, text: '明天' };
-    if (this.createDueOption === 'THREE_DAYS') return { epochMs: base.getTime() + 3 * 24 * 60 * 60 * 1000, text: '3天后' };
-    let value = this.createCustomDueDate.trim();
-    if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return null;
-    let timestamp = Date.parse(value + 'T23:59:59');
-    if (!Number.isFinite(timestamp) || timestamp < base.getTime()) return null;
-    return { epochMs: timestamp, text: '自定义' };
+  private createTaskDate(): string {
+    let today = AssignmentTaskDate.today();
+    if (this.createDateOption === 'TODAY') return today;
+    if (this.createDateOption === 'TOMORROW') return AssignmentTaskDate.addDays(today, 1);
+    if (this.createDateOption === 'THREE_DAYS') return AssignmentTaskDate.addDays(today, 3);
+    let value = this.createCustomTaskDate.trim();
+    if (!AssignmentTaskDate.isValid(value) || value < today) return '';
+    return value;
   }
 
   private async confirmCreateAssignment(): Promise<void> {
@@ -260,9 +253,9 @@ export struct ParentVoiceMaterialPage {
       this.showError('预计时长请输入 1～240 分钟的整数');
       return;
     }
-    let due = this.createDue();
-    if (due === null) {
-      this.showError('请选择有效的截止日期');
+    let taskDate = this.createTaskDate();
+    if (taskDate.length === 0) {
+      this.showError('请选择有效的任务日期');
       return;
     }
     this.creatingAssignment = true;
@@ -272,8 +265,7 @@ export struct ParentVoiceMaterialPage {
       let request: RemoteVoiceMaterialCreateAssignmentRequest = {
         studentId: this.createStudentId,
         expectedMinutes: minutes,
-        dueAtEpochMs: due.epochMs,
-        dueText: due.text
+        taskDate: taskDate
       };
       let assignment = await this.viewModel.createAssignment(item, request);
       await this.reload();
@@ -620,18 +612,18 @@ export struct ParentVoiceMaterialPage {
               });
             }, (student: StudentProfile) => 'create-' + student.id);
           }.width('100%');
-          Text('截止时间').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
+          Text('任务日期').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
           Row({ space: 6 }) {
-            this.SubjectChip('今天', 'TODAY', this.createDueOption, () => this.createDueOption = 'TODAY');
-            this.SubjectChip('明天', 'TOMORROW', this.createDueOption, () => this.createDueOption = 'TOMORROW');
-            this.SubjectChip('3天后', 'THREE_DAYS', this.createDueOption, () => this.createDueOption = 'THREE_DAYS');
-            this.SubjectChip('自定义', 'CUSTOM', this.createDueOption, () => this.createDueOption = 'CUSTOM');
+            this.SubjectChip('今天', 'TODAY', this.createDateOption, () => this.createDateOption = 'TODAY');
+            this.SubjectChip('明天', 'TOMORROW', this.createDateOption, () => this.createDateOption = 'TOMORROW');
+            this.SubjectChip('3天后', 'THREE_DAYS', this.createDateOption, () => this.createDateOption = 'THREE_DAYS');
+            this.SubjectChip('自定义', 'CUSTOM', this.createDateOption, () => this.createDateOption = 'CUSTOM');
           }.width('100%');
-          if (this.createDueOption === 'CUSTOM') {
-            TextInput({ placeholder: 'YYYY-MM-DD', text: this.createCustomDueDate })
+          if (this.createDateOption === 'CUSTOM') {
+            TextInput({ placeholder: 'YYYY-MM-DD', text: this.createCustomTaskDate })
               .width('100%').height(AppTheme.INPUT_HEIGHT).fontSize(AppTheme.FORM_TEXT_SIZE)
               .backgroundColor(AppTheme.SURFACE_SUBTLE).borderRadius(AppTheme.CONTROL_RADIUS)
-              .onChange((value: string) => this.createCustomDueDate = value);
+              .onChange((value: string) => this.createCustomTaskDate = value);
           }
           Text('预计时长（分钟）').width('100%').fontSize(AppTheme.LABEL_TITLE_SIZE).lineHeight(AppTheme.LABEL_TITLE_LINE_HEIGHT).fontColor(AppTheme.SUBTEXT);
           TextInput({ text: this.createMinutesText })
