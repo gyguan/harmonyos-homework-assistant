@@ -4,7 +4,6 @@ import {
 } from '../../../domain/model/AssignmentFilter';
 import { Assignment, AssignmentStatus } from '../../../domain/model/HomeworkModels';
 import { AssignmentRepository } from '../../../domain/port/AssignmentRepository';
-import { AssignmentDateRange } from '../../../domain/service/AssignmentDateRange';
 import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { AssignmentFilterFactory } from '../../../domain/service/AssignmentFilterFactory';
 

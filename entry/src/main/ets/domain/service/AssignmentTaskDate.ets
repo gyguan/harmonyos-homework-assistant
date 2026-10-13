@@ -56,6 +56,12 @@ export class AssignmentTaskDate {
     return today;
   }
 
+  static weekday(taskDate: string): number {
+    let parts = AssignmentTaskDate.parse(taskDate);
+    if (parts === null) return -1;
+    return new Date(Date.UTC(parts.year, parts.month - 1, parts.day)).getUTCDay();
+  }
+
   static addDays(taskDate: string, days: number): string {
     let parts = AssignmentTaskDate.parse(taskDate);
     if (parts === null) return '';
