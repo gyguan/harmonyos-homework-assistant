@@ -2,6 +2,7 @@ package com.xiaoban.homework.assignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 
 class AssignmentTimingDtoTest {
@@ -10,11 +11,14 @@ class AssignmentTimingDtoTest {
     AssignmentEntity entity = new AssignmentEntity();
     entity.id = "a-1";
     entity.studentId = "student-1";
+    entity.assignmentType = "SCHOOL";
+    entity.subjectCode = "MATH";
+    entity.contentType = "NORMAL";
     entity.subject = "数学";
     entity.title = "口算 20 题";
     entity.instruction = "独立完成";
     entity.textbookRef = "数学三年级";
-    entity.dueText = "今晚";
+    entity.taskDate = LocalDate.of(2026, 10, 13);
     entity.status = "NEEDS_REWORK";
     entity.sourceLabel = "test";
     entity.sourceExcerpt = "test";
