@@ -28,7 +28,7 @@ public class DailyHomeworkCoverageController {
   public DailyHomeworkCoverageDtos.Response get(
       @RequestAttribute(AuthInterceptor.FAMILY_ID) UUID familyId,
       @PathVariable String studentId,
-      @RequestParam String parentIdentity,
+      @RequestParam(defaultValue = "DAD") String parentIdentity,
       @RequestParam(required = false) LocalDate taskDate) {
     LocalDate date = taskDate == null ? LocalDate.now(BUSINESS_ZONE) : taskDate;
     return service.get(familyId, parentIdentity, studentId, date);
