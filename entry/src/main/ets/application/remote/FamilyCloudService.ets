@@ -1,13 +1,33 @@
 import { DefaultFamilyContextRepository } from '../../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../../domain/model/HomeworkModels';
 import { FamilyContextRepository } from '../../domain/port/FamilyContextRepository';
+import { ParentAccessState } from '../../domain/service/ParentAccessState';
 import { BackendSession } from './BackendSession';
+import { ParentAccessRemoteApi } from './ParentAccessRemoteApi';
 import { RemoteStudent, StudentRemoteApi } from './StudentRemoteApi';
 
 export class FamilyCloudService {
   static readonly instance: FamilyCloudService = new FamilyCloudService();
   private readonly familyContext: FamilyContextRepository = DefaultFamilyContextRepository.instance;
   private constructor() {}
+
+  async syncParentAccess(): Promise<boolean> {
+    if (!BackendSession.instance.isConnected()) return false;
+    try {
+      let localValue = this.familyContext.getSettings().parentAccessCode;
+      let status = await ParentAccessRemoteApi.instance.status();
+
+      if (!status.enabled && ParentAccessState.isLegacyCode(localValue)) {
+        status = await ParentAccessRemoteApi.instance.setCode(localValue);
+      }
+
+      this.familyContext.updateParentAccessCode(
+        status.enabled ? ParentAccessState.CLOUD_ENABLED : '');
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   async syncStudents(): Promise<boolean> {
     if (!BackendSession.instance.isConnected()) return false;

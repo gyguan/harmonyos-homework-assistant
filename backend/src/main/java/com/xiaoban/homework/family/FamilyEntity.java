@@ -9,6 +9,7 @@ import java.util.UUID;
 public class FamilyEntity {
   @Id public UUID id;
   public String name;
+  public String parentAccessCodeHash;
   public Instant createdAt;
   public Instant updatedAt;
 

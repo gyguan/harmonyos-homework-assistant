@@ -17,7 +17,7 @@ export struct ParentAccessDialog {
             .fontWeight(FontWeight.Medium)
             .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
-          Text('请输入设备家长码')
+          Text('请输入家庭家长码')
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT);
