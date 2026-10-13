@@ -127,7 +127,7 @@ export class HomeworkImportInboxStore {
       title: source.title,
       instruction: source.instruction,
       textbookRef: source.textbookRef,
-      dueText: source.dueText,
+      taskDate: source.taskDate,
       expectedMinutes: source.expectedMinutes,
       sourceEvidence: {
         sourceLabel: source.sourceEvidence.sourceLabel,

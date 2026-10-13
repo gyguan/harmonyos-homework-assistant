@@ -222,7 +222,7 @@ export struct StudentHomePage {
   }
 
   private assignmentRenderKey(item: Assignment): string {
-    return `${this.taskRenderEpoch}|${item.studentId}|${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.dueText}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
+    return `${this.taskRenderEpoch}|${item.studentId}|${item.id}|${item.remoteVersion}|${item.subjectCode}|${item.subject}|${item.status}|${item.title}|${item.taskDate}|${item.expectedMinutes}|${item.elapsedSeconds}|${item.reviewNote}`;
   }
 
   private subjectRenderKey(group: StudentHomeSubjectGroup): string {
