@@ -3,6 +3,7 @@ import { VoiceAssignmentMediaService } from '../../application/assignment/VoiceA
 import { RemoteAssignmentResourceApi } from '../../application/remote/RemoteAssignmentResourceApi';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { AssignmentResource, AssignmentResourceType } from '../../domain/model/HomeworkModels';
+import { PhotoPreviewDialog } from '../submission/PhotoPreviewDialog';
 
 /** Attachments are optional and independent of the legacy voice-assignment workflow. */
 @Component
@@ -13,6 +14,13 @@ export struct AssignmentAttachmentEditor {
   @State private feedback: string = '';
   @State private previewUri: string = '';
   @State private previewType: AssignmentResourceType = AssignmentResourceType.IMAGE;
+  @State private fullPreviewUri: string = '';
+  private fullPreviewController: CustomDialogController = new CustomDialogController({
+    builder: PhotoPreviewDialog({ uri: $fullPreviewUri }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
   private readonly api: RemoteAssignmentResourceApi = RemoteAssignmentResourceApi.instance;
 
   aboutToAppear(): void { void this.reload(); }
@@ -65,12 +73,19 @@ export struct AssignmentAttachmentEditor {
     } finally { this.busy = false; }
   }
 
+  private openFullPreview(uri: string): void {
+    if (uri.length === 0) return;
+    this.fullPreviewUri = uri;
+    this.fullPreviewController.open();
+  }
+
   private async preview(item: AssignmentResource): Promise<void> {
     this.feedback = '';
     let uri = await this.api.download(item);
     if (uri.length === 0) { this.feedback = '附件下载失败，请重试'; return; }
     this.previewType = item.resourceType;
     this.previewUri = uri;
+    if (item.resourceType === AssignmentResourceType.IMAGE) this.openFullPreview(uri);
   }
 
   @Builder
@@ -116,7 +131,11 @@ export struct AssignmentAttachmentEditor {
       if (this.feedback.length > 0) Text(this.feedback).fontSize(12).fontColor(AppTheme.DANGER);
       if (this.previewUri.length > 0) {
         if (this.previewType === AssignmentResourceType.IMAGE) {
-          Image(this.previewUri).width('100%').height(220).objectFit(ImageFit.Contain);
+          Image(this.previewUri)
+            .width('100%').height(220).objectFit(ImageFit.Contain)
+            .accessibilityRole(AccessibilityRoleType.BUTTON)
+            .accessibilityText('全屏查看作业图片')
+            .onClick(() => this.openFullPreview(this.previewUri));
         } else if (this.previewType === AssignmentResourceType.VIDEO) {
           Video({ src: this.previewUri }).width('100%').height(220).controls(true);
         } else {
