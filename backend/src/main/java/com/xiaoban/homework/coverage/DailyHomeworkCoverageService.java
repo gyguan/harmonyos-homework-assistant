@@ -65,8 +65,8 @@ public class DailyHomeworkCoverageService {
 
     String parentIdentity = normalizeParentIdentity(input.parentIdentity());
     List<String> normalized = normalize(input.subjects());
-    coverage.deleteByFamilyIdAndStudentIdAndTaskDateAndAccountIdAndParentIdentity(
-        familyId, studentId, taskDate, accountId, parentIdentity);
+    coverage.deleteByFamilyIdAndStudentIdAndTaskDateAndParentIdentity(
+        familyId, studentId, taskDate, parentIdentity);
     coverage.flush();
 
     Instant now = Instant.now();
