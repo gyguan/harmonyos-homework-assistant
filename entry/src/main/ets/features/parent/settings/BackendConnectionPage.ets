@@ -1,6 +1,7 @@
 import { BackendAuthService } from '../../../application/remote/BackendAuthService';
 import { BackendSession } from '../../../application/remote/BackendSession';
 import { FamilyCloudService } from '../../../application/remote/FamilyCloudService';
+import { ParentAccessRemoteApi } from '../../../application/remote/ParentAccessRemoteApi';
 import { LayoutPolicy } from '../../../common/responsive/LayoutPolicy';
 import { AppTheme } from '../../../common/theme/AppTheme';
 import { CenteredTextBadge } from '../../../components/family/CenteredTextBadge';
@@ -10,6 +11,7 @@ import { DefaultAssignmentRepository } from '../../../data/repository/DefaultAss
 import { DefaultFamilyContextRepository } from '../../../data/repository/DefaultFamilyContextRepository';
 import { StudentProfile } from '../../../domain/model/HomeworkModels';
 import { FamilyContextRepository } from '../../../domain/port/FamilyContextRepository';
+import { ParentAccessState } from '../../../domain/service/ParentAccessState';
 import { StudentTextbookProfile } from '../../../domain/service/StudentTextbookProfile';
 
 @Component
@@ -96,7 +98,10 @@ export struct BackendConnectionPage {
   aboutToAppear(): void {
     this.baseUrl = BackendSession.instance.getBaseUrl();
     this.syncLocalStudents();
-    if (BackendSession.instance.isConnected()) void this.refreshStudents();
+    if (BackendSession.instance.isConnected()) {
+      void this.refreshStudents();
+      void this.refreshParentAccess();
+    }
   }
 
   private canInlineStudentFields(): boolean {
@@ -113,7 +118,18 @@ export struct BackendConnectionPage {
   }
 
   private parentAccessEnabled(): boolean {
-    return this.familyContext.getSettings().parentAccessCode.length > 0;
+    return ParentAccessState.isEnabled(this.familyContext.getSettings().parentAccessCode);
+  }
+
+  private async refreshParentAccess(): Promise<void> {
+    if (!BackendSession.instance.isConnected()) return;
+    let synced = await FamilyCloudService.instance.syncParentAccess();
+    if (!synced) {
+      this.parentAccessMessage = '家长码状态同步失败，请检查家庭云端连接';
+      return;
+    }
+    this.parentAccessMessage = '';
+    this.pageRevision++;
   }
 
   private validParentAccessCode(value: string): boolean {
@@ -125,7 +141,7 @@ export struct BackendConnectionPage {
     return true;
   }
 
-  private saveParentAccessCode(): void {
+  private async saveParentAccessCode(): Promise<void> {
     let code = this.parentAccessCodeDraft.trim();
     if (!this.validParentAccessCode(code)) {
       this.parentAccessMessage = '家长码需要设置为 4 位数字';
@@ -135,21 +151,40 @@ export struct BackendConnectionPage {
       this.parentAccessMessage = '两次输入的家长码不一致';
       return;
     }
-    this.familyContext.updateParentAccessCode(code);
-    this.parentAccessCodeDraft = '';
-    this.parentAccessCodeConfirm = '';
-    this.parentAccessMessage = '家长码已启用';
-    this.pageRevision++;
-    this.onStoreChanged();
+    if (!BackendSession.instance.isConnected()) {
+      this.parentAccessMessage = '请先连接家庭云端';
+      return;
+    }
+    try {
+      await ParentAccessRemoteApi.instance.setCode(code);
+      this.familyContext.updateParentAccessCode(ParentAccessState.CLOUD_ENABLED);
+      this.parentAccessCodeDraft = '';
+      this.parentAccessCodeConfirm = '';
+      this.parentAccessMessage = this.parentAccessEnabled() ? '家长码已更新并同步到家庭云端' :
+        '家长码已启用并同步到家庭云端';
+      this.pageRevision++;
+      this.onStoreChanged();
+    } catch {
+      this.parentAccessMessage = '家长码保存失败，请检查家庭云端连接';
+    }
   }
 
-  private clearParentAccessCode(): void {
-    this.familyContext.updateParentAccessCode('');
-    this.parentAccessCodeDraft = '';
-    this.parentAccessCodeConfirm = '';
-    this.parentAccessMessage = '家长码已关闭';
-    this.pageRevision++;
-    this.onStoreChanged();
+  private async clearParentAccessCode(): Promise<void> {
+    if (!BackendSession.instance.isConnected()) {
+      this.parentAccessMessage = '请先连接家庭云端';
+      return;
+    }
+    try {
+      await ParentAccessRemoteApi.instance.clear();
+      this.familyContext.updateParentAccessCode('');
+      this.parentAccessCodeDraft = '';
+      this.parentAccessCodeConfirm = '';
+      this.parentAccessMessage = '家长码已关闭并同步到家庭云端';
+      this.pageRevision++;
+      this.onStoreChanged();
+    } catch {
+      this.parentAccessMessage = '关闭家长码失败，请检查家庭云端连接';
+    }
   }
 
   private tutorGuidanceFirst(): boolean {
@@ -179,10 +214,11 @@ export struct BackendConnectionPage {
     try {
       await BackendAuthService.instance.login(this.baseUrl, this.loginName, this.password);
       let familySynced = await FamilyCloudService.instance.syncStudents();
+      let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
       let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
       this.syncLocalStudents();
       this.pageRevision++;
-      this.message = familySynced && homeworkSynced ? '' : '已登录，部分数据稍后再同步';
+      this.message = familySynced && parentAccessSynced && homeworkSynced ? '' : '已登录，部分数据稍后再同步';
       this.onStoreChanged();
     } catch {
       this.message = '连接失败，请检查电脑局域网地址、后端服务和账号密码';
@@ -201,10 +237,11 @@ export struct BackendConnectionPage {
 
   private async syncCloudData(): Promise<void> {
     let familySynced = await FamilyCloudService.instance.syncStudents();
+    let parentAccessSynced = await FamilyCloudService.instance.syncParentAccess();
     let homeworkSynced = await DefaultAssignmentRepository.instance.refresh();
     this.syncLocalStudents();
     this.pageRevision++;
-    this.message = familySynced && homeworkSynced ? '' : '部分数据同步失败，请稍后重试';
+    this.message = familySynced && parentAccessSynced && homeworkSynced ? '' : '部分数据同步失败，请稍后重试';
     this.onStoreChanged();
   }
 
@@ -388,14 +425,14 @@ export struct BackendConnectionPage {
     Column({ space: 12 }) {
       Row() {
         Column({ space: 3 }) {
-          Text('设备家长码')
+          Text('家庭家长码')
             .fontSize(AppTheme.CARD_TITLE_SIZE)
             .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.TEXT);
           Text(this.parentAccessEnabled() ?
-            '已启用 · 学生切回家长模式时需要验证' :
-            '未启用 · 可设置 4 位数字防止孩子误入家长操作')
+            '已启用 · 手机和 PAD 使用同一家庭家长码' :
+            '未启用 · 设置 4 位数字防止孩子误入家长操作')
             .fontSize(AppTheme.META_SIZE)
             .lineHeight(AppTheme.META_LINE_HEIGHT)
             .fontColor(this.parentAccessEnabled() ? AppTheme.SUCCESS : AppTheme.SUBTEXT);
@@ -437,7 +474,7 @@ export struct BackendConnectionPage {
             .borderRadius(AppTheme.CONTROL_RADIUS)
             .backgroundColor(AppTheme.SURFACE_EMPHASIS)
             .fontColor(AppTheme.TEXT)
-            .onClick(() => this.clearParentAccessCode());
+            .onClick(() => { void this.clearParentAccessCode(); });
         }
         Button(this.parentAccessEnabled() ? '修改家长码' : '启用家长码', { type: ButtonType.Normal })
           .layoutWeight(1)
@@ -445,7 +482,7 @@ export struct BackendConnectionPage {
           .borderRadius(AppTheme.CONTROL_RADIUS)
           .backgroundColor(AppTheme.PRIMARY)
           .fontColor(AppTheme.TEXT_ON_PRIMARY)
-          .onClick(() => this.saveParentAccessCode());
+          .onClick(() => { void this.saveParentAccessCode(); });
       }
       .width('100%');
 
@@ -457,7 +494,7 @@ export struct BackendConnectionPage {
           .fontColor(this.parentAccessMessage.indexOf('已') === 0 ? AppTheme.SUCCESS : AppTheme.DANGER);
       }
 
-      Text('家长码只保存在当前设备，不会上传家庭云端。')
+      Text('家长码加密保存到家庭云端，不会在设备或数据库中保存明文。')
         .width('100%')
         .fontSize(AppTheme.CAPTION_SIZE)
         .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
