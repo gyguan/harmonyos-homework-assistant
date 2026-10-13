@@ -6,6 +6,7 @@ import {
   HomeworkCoveragePicker,
   HomeworkCoverageSubject
 } from '../../../components/assignment/HomeworkCoveragePicker';
+import { ParentIdentity } from '../../../domain/model/ParentIdentity';
 import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { AssignmentAttentionKind } from '../../../domain/service/AssignmentAttentionPolicy';
 import { ParentDashboardViewModel } from './ParentDashboardViewModel';
@@ -14,6 +15,7 @@ import { ParentDashboardViewModel } from './ParentDashboardViewModel';
 export struct ParentDashboardPage {
   @Prop @Watch('onCoverageContextChanged') revision: number = 0;
   @Prop @Watch('onCoverageContextChanged') studentId: string = '';
+  @Prop @Watch('onCoverageContextChanged') parentIdentity: ParentIdentity = ParentIdentity.DAD;
   @State private availableWidthVp: number = 390;
   @State private coverageParents: HomeworkCoverageParent[] = [];
   @State private coverageStudentName: string = '';
@@ -46,7 +48,8 @@ export struct ParentDashboardPage {
     }
     this.coverageBusy = true;
     try {
-      let response = await this.coverageApi.get(this.studentId, AssignmentTaskDate.today());
+      let response = await this.coverageApi.get(
+        this.studentId, AssignmentTaskDate.today(), this.parentIdentity);
       if (response.studentId !== this.studentId) return;
       this.coverageParents = response.parents.slice();
       this.coverageStudentName = response.studentName;
@@ -76,7 +79,7 @@ export struct ParentDashboardPage {
     this.coverageMessage = '';
     try {
       let response = await this.coverageApi.updateMine(
-        this.studentId, AssignmentTaskDate.today(), this.coverageDraft);
+        this.studentId, AssignmentTaskDate.today(), this.parentIdentity, this.coverageDraft);
       this.coverageParents = response.parents.slice();
       this.coverageStudentName = response.studentName;
       this.showCoverageEditor = false;
