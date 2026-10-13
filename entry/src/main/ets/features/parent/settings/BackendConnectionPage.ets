@@ -155,12 +155,13 @@ export struct BackendConnectionPage {
       this.parentAccessMessage = '请先连接家庭云端';
       return;
     }
+    let wasEnabled = this.parentAccessEnabled();
     try {
       await ParentAccessRemoteApi.instance.setCode(code);
       this.familyContext.updateParentAccessCode(ParentAccessState.CLOUD_ENABLED);
       this.parentAccessCodeDraft = '';
       this.parentAccessCodeConfirm = '';
-      this.parentAccessMessage = this.parentAccessEnabled() ? '家长码已更新并同步到家庭云端' :
+      this.parentAccessMessage = wasEnabled ? '家长码已更新并同步到家庭云端' :
         '家长码已启用并同步到家庭云端';
       this.pageRevision++;
       this.onStoreChanged();
