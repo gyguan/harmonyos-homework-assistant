@@ -52,7 +52,7 @@ struct Index {
   private applyShareImportParentRole(): void {
     if (!this.shareImportForceParent) return;
     this.shareImportForceParent = false;
-    this.requestParentAccess(ParentIdentity.DAD);
+    this.requestParentAccess(this.selectedParentIdentity);
   }
 
   onBackPress(): boolean {
