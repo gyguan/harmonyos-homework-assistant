@@ -15,7 +15,8 @@
   "production": {
     "addedSysCaps": [
       "SystemCapability.Multimedia.Media.AVPlayer",
-      "SystemCapability.Multimedia.Media.AVRecorder"
+      "SystemCapability.Multimedia.Media.AVRecorder",
+      "SystemCapability.Multimedia.Media.Core"
     ],
     "removedSysCaps": []
   }

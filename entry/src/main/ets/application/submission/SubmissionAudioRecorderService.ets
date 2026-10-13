@@ -51,10 +51,9 @@ export class SubmissionAudioRecorderService {
 
     let safeAssignmentId = assignmentId.replace(/[^a-zA-Z0-9_-]/g, '-');
     let path = `${this.context.filesDir}/submission-${safeAssignmentId}-${Date.now()}.m4a`;
-    let file = await fileIo.open(path,
-      fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+    let file = await this.openOutputFile(path);
     this.outputFile = file;
-    this.outputUri = fileUri.getUriFromPath(path);
+    this.outputUri = this.outputUriFromPath(path);
 
     try {
       let recorder = await media.createAVRecorder();
@@ -91,18 +90,30 @@ export class SubmissionAudioRecorderService {
   async pause(): Promise<void> {
     let recorder = this.recorder;
     if (recorder === null || this.stateValue !== 'RECORDING') return;
-    await recorder.pause();
-    this.accumulatedMs += Math.max(0, Date.now() - this.activeStartedAtMs);
-    this.activeStartedAtMs = 0;
-    this.stateValue = 'PAUSED';
+    try {
+      await recorder.pause();
+      this.accumulatedMs += Math.max(0, Date.now() - this.activeStartedAtMs);
+      this.activeStartedAtMs = 0;
+      this.stateValue = 'PAUSED';
+    } catch (error) {
+      let err = error as BusinessError;
+      console.error(`student submission recorder pause failed: ${err.code} ${err.message}`);
+      throw new Error('暂停录音失败，请重试');
+    }
   }
 
   async resume(): Promise<void> {
     let recorder = this.recorder;
     if (recorder === null || this.stateValue !== 'PAUSED') return;
-    await recorder.resume();
-    this.activeStartedAtMs = Date.now();
-    this.stateValue = 'RECORDING';
+    try {
+      await recorder.resume();
+      this.activeStartedAtMs = Date.now();
+      this.stateValue = 'RECORDING';
+    } catch (error) {
+      let err = error as BusinessError;
+      console.error(`student submission recorder resume failed: ${err.code} ${err.message}`);
+      throw new Error('继续录音失败，请重试');
+    }
   }
 
   async stop(): Promise<SubmissionAudioRecording> {
@@ -115,7 +126,14 @@ export class SubmissionAudioRecorderService {
       this.accumulatedMs += Math.max(0, Date.now() - this.activeStartedAtMs);
       this.activeStartedAtMs = 0;
     }
-    await recorder.stop();
+    try {
+      await recorder.stop();
+    } catch (error) {
+      let err = error as BusinessError;
+      console.error(`student submission recorder stop failed: ${err.code} ${err.message}`);
+      this.stateValue = 'ERROR';
+      throw new Error('停止录音失败，请重试');
+    }
     let duration = Math.max(0, this.accumulatedMs);
     let uri = this.outputUri;
     await this.releaseRecorderOnly();
@@ -135,6 +153,27 @@ export class SubmissionAudioRecorderService {
     this.stateValue = 'IDLE';
     this.accumulatedMs = 0;
     this.activeStartedAtMs = 0;
+  }
+
+  private async openOutputFile(path: string): Promise<fileIo.File> {
+    try {
+      return await fileIo.open(path,
+        fileIo.OpenMode.READ_WRITE | fileIo.OpenMode.CREATE | fileIo.OpenMode.TRUNC);
+    } catch (error) {
+      let err = error as BusinessError;
+      console.error(`student submission recorder open file failed: ${err.code} ${err.message}`);
+      throw new Error('无法创建录音文件');
+    }
+  }
+
+  private outputUriFromPath(path: string): string {
+    try {
+      return fileUri.getUriFromPath(path);
+    } catch (error) {
+      let err = error as BusinessError;
+      console.error(`student submission recorder uri failed: ${err.code} ${err.message}`);
+      throw new Error('无法读取录音文件地址');
+    }
   }
 
   private async requestMicrophonePermission(): Promise<boolean> {
