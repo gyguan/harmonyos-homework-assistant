@@ -18,6 +18,7 @@ import com.xiaoban.homework.common.ApiExceptions;
 import com.xiaoban.homework.student.StudentService;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -244,6 +245,40 @@ class VoiceMaterialAssignmentServiceTest {
     assertEquals(existing.id(), result.assignmentId());
     assertEquals(existing.id(), result.assignment().id());
     verify(assignments, never()).create(any(), anyString(), any());
+  }
+
+
+  @Test
+  void manualCreationDefaultsMissingTaskDateToBusinessToday() {
+    UUID familyId = UUID.randomUUID();
+    UUID packageId = UUID.randomUUID();
+    VoiceMaterialPackageEntity item = packageEntity(familyId, packageId, "001-课文朗读", "READY");
+    when(packages.findOwnedStudentId(familyId, packageId)).thenReturn(Optional.of("student-1"));
+    when(packages.lockOwned(familyId, packageId)).thenReturn(Optional.of(item));
+    when(files.findByFamilyIdAndPackageIdOrderBySortOrderAscCreatedAtAsc(
+        familyId, packageId)).thenReturn(List.of());
+    when(assignments.create(any(UUID.class), anyString(), any(AssignmentDtos.Create.class)))
+        .thenAnswer(invocation -> {
+          AssignmentDtos.Create input = invocation.getArgument(2);
+          return new AssignmentDtos.Response(
+              input.id(), "student-1", input.assignmentType(), input.subjectCode(),
+              input.contentType(), input.subject(), input.title(), input.instruction(),
+              input.textbookRef(), input.taskDate(), input.status(), input.sourceLabel(),
+              input.sourceExcerpt(), input.expectedMinutes(), 0L, 0L, 0L, "", 0L);
+        });
+
+    LocalDate expectedToday = LocalDate.now(ZoneId.of("Asia/Shanghai"));
+    VoiceMaterialDtos.CreateAssignmentResponse result = service().createManually(
+        familyId,
+        packageId,
+        new VoiceMaterialDtos.CreateAssignmentRequest(
+            "student-1", "CHINESE", 20, null, "当天语音作业", "完成当天语音任务", "req-default-date"));
+
+    ArgumentCaptor<AssignmentDtos.Create> input =
+        ArgumentCaptor.forClass(AssignmentDtos.Create.class);
+    verify(assignments).create(any(UUID.class), org.mockito.ArgumentMatchers.eq("student-1"), input.capture());
+    assertEquals(expectedToday.toString(), input.getValue().taskDate());
+    assertTrue(result.created());
   }
 
   @Test
