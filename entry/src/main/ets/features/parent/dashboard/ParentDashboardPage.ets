@@ -549,45 +549,49 @@ export struct ParentDashboardPage {
   @Builder
   private WideHome() {
     Scroll() {
-      Column({ space: 18 }) {
-        this.HomeworkCoverageCard();
-        this.AttentionBanner();
-        Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-          Column() {
-            this.CreateAssignmentAction();
-          }
-          .layoutWeight(1);
+      Column() {
+        Column({ space: 18 }) {
+          this.HomeworkCoverageCard();
+          this.AttentionBanner();
+          Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+            Column() {
+              this.CreateAssignmentAction();
+            }
+            .layoutWeight(1);
 
-          Column() {
-            this.CreateVoiceAction();
+            Column() {
+              this.CreateVoiceAction();
+            }
+            .layoutWeight(1);
           }
-          .layoutWeight(1);
+          .width('100%')
+          .alignItems(VerticalAlign.Top);
+
+          Row({ space: AppTheme.SPLIT_PANE_GAP }) {
+            Column() {
+              this.ScheduledAssignmentAction();
+            }
+            .layoutWeight(1);
+
+            Column() {
+              this.AiPracticeAction();
+            }
+            .layoutWeight(1);
+          }
+          .width('100%')
+          .alignItems(VerticalAlign.Top);
         }
         .width('100%')
-        .alignItems(VerticalAlign.Top);
-
-        Row({ space: AppTheme.SPLIT_PANE_GAP }) {
-          Column() {
-            this.ScheduledAssignmentAction();
-          }
-          .layoutWeight(1);
-
-          Column() {
-            this.AiPracticeAction();
-          }
-          .layoutWeight(1);
-        }
-        .width('100%')
-        .alignItems(VerticalAlign.Top);
+        .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
+        .padding({
+          left: AppTheme.PAGE_PADDING_WIDE,
+          right: AppTheme.PAGE_PADDING_WIDE,
+          top: 24,
+          bottom: 24
+        });
       }
       .width('100%')
-      .constraintSize({ maxWidth: AppTheme.CONTENT_WIDE_MAX_WIDTH })
-      .padding({
-        left: AppTheme.PAGE_PADDING_WIDE,
-        right: AppTheme.PAGE_PADDING_WIDE,
-        top: 24,
-        bottom: 24
-      });
+      .alignItems(HorizontalAlign.Center);
     }
     .width('100%')
     .height('100%')
