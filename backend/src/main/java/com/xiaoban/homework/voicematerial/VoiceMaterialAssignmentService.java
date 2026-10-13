@@ -321,8 +321,9 @@ public class VoiceMaterialAssignmentService {
   }
 
   private LocalDate taskDate(String value) {
+    if (value == null || value.isBlank()) return LocalDate.now(BUSINESS_ZONE);
     try {
-      return LocalDate.parse(value);
+      return LocalDate.parse(value.trim());
     } catch (java.time.format.DateTimeParseException error) {
       throw new ApiExceptions.BadRequest("任务日期格式应为 YYYY-MM-DD");
     }
