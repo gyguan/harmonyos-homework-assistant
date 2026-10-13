@@ -601,7 +601,7 @@ export struct HomeworkConfirmationPage {
     .height('100%')
     .alignItems(HorizontalAlign.Center)
     .backgroundColor(AppTheme.BACKGROUND)
-    .bindSheet($this.showEditorSheet, this.CandidateEditorSheet(), {
+    .bindSheet($$this.showEditorSheet, this.CandidateEditorSheet(), {
       height: '82%',
       showClose: false,
       preferType: SheetType.BOTTOM,
