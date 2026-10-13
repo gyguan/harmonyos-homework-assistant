@@ -14,6 +14,7 @@ import sys
 import time
 import uuid
 from dataclasses import dataclass
+from datetime import datetime, time as datetime_time, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib import error, request
@@ -241,7 +242,12 @@ def run_full(args: argparse.Namespace) -> None:
     require(any(item.get("id") == student_id for item in students), "created student missing from list")
     require(not any(item.get("id") == delete_id for item in students), "deleted student still present")
 
-    due_at_ms = int(time.time() * 1000) + 24 * 60 * 60 * 1000
+    shanghai = timezone(timedelta(hours=8))
+    task_day = datetime.now(shanghai).date() + timedelta(days=1)
+    task_date = task_day.isoformat()
+    task_date_epoch_ms = int(
+        datetime.combine(task_day, datetime_time(12, 0), tzinfo=shanghai).timestamp() * 1000
+    )
     assignment_payload = {
         "id": assignment_id,
         "assignmentType": "SCHOOL",
@@ -250,9 +256,7 @@ def run_full(args: argparse.Namespace) -> None:
         "title": "E2E 作业",
         "instruction": "完成 1 道 E2E 验证题",
         "textbookRef": "E2E P1",
-        "dueText": "明天",
-        "dueAtEpochMs": due_at_ms,
-        "dueTimezone": "Asia/Shanghai",
+        "taskDate": task_date,
         "status": "NOT_STARTED",
         "sourceLabel": "backend e2e smoke",
         "sourceExcerpt": "E2E source evidence",
@@ -276,7 +280,7 @@ def run_full(args: argparse.Namespace) -> None:
     require(assignment.get("id") == assignment_id, "created assignment id mismatch")
     require(assignment.get("assignmentType") == "SCHOOL", "assignmentType not persisted")
     require(assignment.get("subjectCode") == "MATH", "subjectCode not persisted")
-    require(int(assignment.get("dueAtEpochMs", 0)) == due_at_ms, "dueAtEpochMs not persisted")
+    require(assignment.get("taskDate") == task_date, "taskDate not persisted")
 
     deletable_assignment_id = f"e2e-delete-assignment-{run_id}"
     deletable_payload = dict(assignment_payload)
@@ -379,13 +383,13 @@ def run_full(args: argparse.Namespace) -> None:
 
     by_date = expect(
         http(base_url, "GET",
-             f"/api/v1/students/{student_id}/assignments?from={due_at_ms - 1000}&to={due_at_ms + 1000}",
+             f"/api/v1/students/{student_id}/assignments?from={task_date_epoch_ms - 1000}&to={task_date_epoch_ms + 1000}",
              token=token),
         (200,),
-        "filter assignments by structured dueAt range",
+        "filter assignments by structured task-date range",
     ).json()
     require(any(item.get("id") == assignment_id for item in by_date),
-            "structured dueAt range filter did not return matching assignment")
+            "structured task-date range filter did not return matching assignment")
 
     version0 = int(assignment["version"])
 
