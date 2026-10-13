@@ -632,7 +632,7 @@ export struct ParentDashboardPage {
     .onAreaChange((_oldValue, newValue) => {
       this.availableWidthVp = LayoutPolicy.areaLengthToVp(newValue.width, this.availableWidthVp);
     })
-    .bindSheet($this.showCoverageEditor, this.HomeworkCoverageEditor(), {
+    .bindSheet($$this.showCoverageEditor, this.HomeworkCoverageEditor(), {
       height: '72%',
       showClose: false,
       preferType: SheetType.BOTTOM
