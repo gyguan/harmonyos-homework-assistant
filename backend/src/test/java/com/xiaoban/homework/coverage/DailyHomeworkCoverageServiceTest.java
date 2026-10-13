@@ -13,6 +13,7 @@ import com.xiaoban.homework.student.StudentEntity;
 import com.xiaoban.homework.student.StudentRepository;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,7 +45,7 @@ class DailyHomeworkCoverageServiceTest {
     UUID familyId = UUID.randomUUID();
     UUID accountId = UUID.randomUUID();
     String studentId = "student-1";
-    LocalDate date = LocalDate.of(2026, 10, 13);
+    LocalDate date = LocalDate.now(ZoneId.of("Asia/Shanghai"));
 
     TestStudent student = new TestStudent();
     student.id = studentId;
