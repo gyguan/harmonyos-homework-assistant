@@ -30,7 +30,7 @@ export struct HomeworkImportPage {
   private readonly viewModel: HomeworkImportViewModel = new HomeworkImportViewModel();
 
   aboutToAppear(): void {
-    this.syncDraft();
+    this.resetInputDraft();
   }
 
   private touchRevision(): number {
@@ -43,21 +43,13 @@ export struct HomeworkImportPage {
     return this.viewModel.candidates().length;
   }
 
-  private syncDraft(): void {
-    let raw = this.viewModel.rawImport();
-    if (raw.rawText.trim().length > 0) {
-      this.inputMode = HomeworkAssignmentInputMode.TEXT;
-      this.textDraft = raw.rawText;
-      this.sourceImageRef = '';
-      this.sourceImageLabel = '';
-      return;
-    }
-    if (raw.resourceUri.length > 0) {
-      this.inputMode = HomeworkAssignmentInputMode.IMAGE;
-      this.textDraft = '';
-      this.sourceImageRef = raw.resourceUri;
-      this.sourceImageLabel = raw.sourceLabel;
-    }
+  private resetInputDraft(): void {
+    this.inputMode = HomeworkAssignmentInputMode.TEXT;
+    this.textDraft = '';
+    this.sourceImageRef = '';
+    this.sourceImageLabel = '';
+    this.parseMessage = '';
+    this.parseError = false;
   }
 
   private afterOrganized(candidateCount: number): void {
