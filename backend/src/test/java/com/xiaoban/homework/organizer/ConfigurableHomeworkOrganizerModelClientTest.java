@@ -95,7 +95,10 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertEquals(15, result.assignments().get(1).expectedMinutes());
     assertEquals(0.85, result.assignments().getFirst().confidence(), 0.0001);
     assertTrue(client.parseImageOutput("{\"assignments\":[]}").isEmpty());
-    assertTrue(client.parseImageOutput(output.replace("\"数学\"", "\"InvalidSubject\"")).isEmpty());
+    var partiallyValid = client.parseImageOutput(
+        output.replace("\"数学\"", "\"InvalidSubject\"")).orElseThrow();
+    assertEquals(List.of("语文"),
+        partiallyValid.assignments().stream().map(HomeworkOrganizerDtos.Candidate::subject).toList());
   }
 
   @Test
