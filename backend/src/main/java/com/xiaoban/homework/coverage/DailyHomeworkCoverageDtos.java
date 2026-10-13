@@ -10,7 +10,7 @@ public final class DailyHomeworkCoverageDtos {
   private DailyHomeworkCoverageDtos() {}
 
   public record UpdateRequest(
-      @NotNull String parentIdentity,
+      String parentIdentity,
       @NotNull @Size(max = 4) List<String> subjects) {}
 
   public record ParentCoverage(
