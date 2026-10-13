@@ -18,6 +18,10 @@ interface FamilyAccountCreateRequest {
   displayName: string;
 }
 
+interface FamilyAccountUpdateMineRequest {
+  displayName: string;
+}
+
 export class FamilyAccountRemoteApi {
   static readonly instance: FamilyAccountRemoteApi = new FamilyAccountRemoteApi();
   private constructor() {}
@@ -30,6 +34,16 @@ export class FamilyAccountRemoteApi {
     }
     let parsed = JSON.parse(response.body) as FamilyAccountListResponse;
     return parsed.accounts.slice();
+  }
+
+  async updateMineDisplayName(displayName: string): Promise<FamilyAccountItem> {
+    let payload: FamilyAccountUpdateMineRequest = { displayName: displayName.trim() };
+    let response = await BackendHttpClient.instance.requestFor(
+      'family.accounts.updateMine', '/api/v1/auth/family-accounts/me', http.RequestMethod.PUT, payload);
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw new Error('显示名称修改失败');
+    }
+    return JSON.parse(response.body) as FamilyAccountItem;
   }
 
   async create(loginName: string, displayName: string, password: string): Promise<FamilyAccountItem> {
