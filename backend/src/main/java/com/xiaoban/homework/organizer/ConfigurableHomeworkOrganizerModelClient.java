@@ -209,12 +209,12 @@ public class ConfigurableHomeworkOrganizerModelClient implements HomeworkOrganiz
     Map<String, Object> candidateProperties = new LinkedHashMap<>();
     candidateProperties.put("subject", Map.of("type", "string", "enum",
         List.of("语文", "数学", "英语", "阅读", "朗读", "体育", "实践", "兴趣", "其他")));
-    candidateProperties.put("title", Map.of("type", "string"));
-    candidateProperties.put("instruction", Map.of("type", "string"));
-    candidateProperties.put("textbookRef", Map.of("type", "string"));
-    candidateProperties.put("taskDate", Map.of("type", "string"));
+    candidateProperties.put("title", Map.of("type", "string", "maxLength", 80));
+    candidateProperties.put("instruction", Map.of("type", "string", "maxLength", 800));
+    candidateProperties.put("textbookRef", Map.of("type", "string", "maxLength", 120));
+    candidateProperties.put("taskDate", Map.of("type", "string", "maxLength", 20));
     candidateProperties.put("expectedMinutes", Map.of("type", "integer", "minimum", 5, "maximum", 120));
-    candidateProperties.put("sourceExcerpt", Map.of("type", "string"));
+    candidateProperties.put("sourceExcerpt", Map.of("type", "string", "maxLength", 400));
     candidateProperties.put("confidence", Map.of("type", "number", "minimum", 0, "maximum", 1));
 
     Map<String, Object> candidate = new LinkedHashMap<>();
