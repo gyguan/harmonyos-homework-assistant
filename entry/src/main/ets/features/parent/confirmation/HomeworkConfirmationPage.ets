@@ -78,8 +78,12 @@ export struct HomeworkConfirmationPage {
 
   private saveCandidateWithAttachments(
     candidate: CandidateAssignment, attachments: PendingAssignmentAttachment[]): boolean {
-    if (!this.saveCandidate(candidate)) return false;
+    let saved = this.manualCandidateDraft !== null && this.manualCandidateDraft.id === candidate.id ?
+      this.viewModel.addCandidate(candidate) : this.viewModel.updateCandidate(candidate);
+    if (!saved) return false;
     this.updateCandidateAttachments(candidate.id, attachments);
+    this.localRevision++;
+    this.onStoreChanged();
     return true;
   }
 
