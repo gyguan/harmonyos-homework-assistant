@@ -29,7 +29,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     verify(transport).completeWithImage(anyString(), instructions.capture(), input.capture(),
         eq("data:image/jpeg;base64,PRIVATE"), eq(6000), anyString(), anyMap());
     assertTrue(input.getValue().contains("补充文字（可能为空）：\n数学口算20题"));
-    assertTrue(instructions.getValue().contains("sameTaskGroup"));
+    assertFalse(instructions.getValue().contains("sameTaskGroup"));
     assertFalse(instructions.getValue().contains("数学口算20题"));
     assertFalse(ConfigurableHomeworkOrganizerModelClient.imageInput(new TestStudent(), "相册", null)
         .endsWith("null"));
@@ -154,7 +154,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
     assertTrue(schema.contains("expectedMinutes"));
     assertTrue(schema.contains("minimum=5"));
     assertTrue(schema.contains("maximum=120"));
-    assertTrue(schema.contains("sameTaskGroup"));
+    assertFalse(schema.contains("sameTaskGroup"));
     assertFalse(schema.contains("duplicateAssignmentId"));
     assertFalse(schema.contains("duplicateConfidence"));
     assertFalse(schema.contains("duplicateReason"));
@@ -182,7 +182,7 @@ class ConfigurableHomeworkOrganizerModelClientTest {
                 "数学第三单元练习第26页1到6题", 0.95, "G1", "a-existing-1", 0.93,
                 "模型不再负责历史任务重复判断"))),
         java.util.Map.of("a-existing-1", "练习册 P26 第1～6题"));
-    assertEquals("G1", converted.candidates().getFirst().sameTaskGroup());
+    assertEquals("", converted.candidates().getFirst().sameTaskGroup());
     assertEquals("", converted.candidates().getFirst().duplicateAssignmentId());
     assertEquals(0.0, converted.candidates().getFirst().duplicateConfidence());
   }
