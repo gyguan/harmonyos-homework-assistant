@@ -2,6 +2,7 @@ import { photoAccessHelper } from '@kit.MediaLibraryKit';
 import { VoiceAssignmentMediaService } from '../../application/assignment/VoiceAssignmentMediaService';
 import { AppTheme } from '../../common/theme/AppTheme';
 import { AssignmentResourceType } from '../../domain/model/HomeworkModels';
+import { PhotoPreviewDialog } from '../submission/PhotoPreviewDialog';
 
 export interface PendingAssignmentAttachment {
   candidateId: string;
@@ -15,8 +16,21 @@ export struct PendingAssignmentAttachmentPicker {
   @Prop candidateId: string = '';
   @Prop attachments: PendingAssignmentAttachment[] = [];
   @Prop disabled: boolean = false;
+  @State private previewUri: string = '';
+  private previewController: CustomDialogController = new CustomDialogController({
+    builder: PhotoPreviewDialog({ uri: $previewUri }),
+    autoCancel: true,
+    alignment: DialogAlignment.Center,
+    customStyle: true
+  });
   onChange: (attachments: PendingAssignmentAttachment[]) => void =
     (_attachments: PendingAssignmentAttachment[]) => {};
+
+  private openPreview(uri: string): void {
+    if (uri.length === 0) return;
+    this.previewUri = uri;
+    this.previewController.open();
+  }
 
   private remaining(): number {
     return Math.max(0, 10 - this.attachments.length);
@@ -128,10 +142,21 @@ export struct PendingAssignmentAttachmentPicker {
         Column({ space: 4 }) {
           ForEach(this.attachments, (item: PendingAssignmentAttachment, index: number) => {
             Row({ space: 8 }) {
-              Text(item.resourceType === AssignmentResourceType.IMAGE ? '图片' :
-                (item.resourceType === AssignmentResourceType.VIDEO ? '视频' : '语音'))
-                .fontSize(12)
-                .fontColor(AppTheme.PRIMARY);
+              if (item.resourceType === AssignmentResourceType.IMAGE) {
+                Image(item.uri)
+                  .width(44)
+                  .height(44)
+                  .objectFit(ImageFit.Cover)
+                  .borderRadius(8)
+                  .backgroundColor(AppTheme.SURFACE_EMPHASIS)
+                  .accessibilityRole(AccessibilityRoleType.BUTTON)
+                  .accessibilityText('全屏查看已添加作业图片')
+                  .onClick(() => this.openPreview(item.uri));
+              } else {
+                Text(item.resourceType === AssignmentResourceType.VIDEO ? '视频' : '语音')
+                  .fontSize(12)
+                  .fontColor(AppTheme.PRIMARY);
+              }
               Text(item.displayName)
                 .layoutWeight(1)
                 .maxLines(1)
