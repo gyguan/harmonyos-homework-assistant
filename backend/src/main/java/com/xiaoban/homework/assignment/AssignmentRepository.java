@@ -1,6 +1,7 @@
 package com.xiaoban.homework.assignment;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,9 +18,8 @@ public interface AssignmentRepository extends JpaRepository<AssignmentEntity, St
   Optional<AssignmentEntity> findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotOrderByUpdatedAtDesc(
       UUID familyId, String studentId, String contentType, String status);
   Optional<AssignmentEntity>
-      findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotAndDueAtGreaterThanEqualAndDueAtLessThanOrderByUpdatedAtDesc(
-          UUID familyId, String studentId, String contentType, String status,
-          Instant dueFrom, Instant dueTo);
+      findFirstByFamilyIdAndStudentIdAndContentTypeAndStatusNotAndTaskDateOrderByUpdatedAtDesc(
+          UUID familyId, String studentId, String contentType, String status, LocalDate taskDate);
   long countByFamilyIdAndStudentIdAndSubjectCodeAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
       UUID familyId, String studentId, String subjectCode, Instant from, Instant to);
   long countByFamilyIdAndStudentIdAndSubjectCodeAndContentTypeAndTitleStartingWithAndCreatedAtGreaterThanEqualAndCreatedAtLessThan(
