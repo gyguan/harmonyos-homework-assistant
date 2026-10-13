@@ -1,5 +1,6 @@
 import { AppTheme } from '../../common/theme/AppTheme';
 import { StudentProfile } from '../../domain/model/HomeworkModels';
+import { ParentIdentity, ParentIdentityHelper } from '../../domain/model/ParentIdentity';
 import { CenteredTextBadge } from './CenteredTextBadge';
 
 @CustomDialog
@@ -8,17 +9,72 @@ export struct IdentitySwitcherDialog {
   @Link students: StudentProfile[];
   @Link activeStudentId: string;
   @Link parentActive: boolean;
-  onSelectParent: () => void = () => {};
+  @Link parentIdentity: ParentIdentity;
+  onSelectParent: (identity: ParentIdentity) => void = (_identity: ParentIdentity) => {};
   onSelectStudent: (studentId: string) => void = (_studentId: string) => {};
 
-  private chooseParent(): void {
-    this.onSelectParent();
+  private chooseParent(identity: ParentIdentity): void {
+    this.onSelectParent(identity);
     this.controller.close();
   }
 
   private chooseStudent(studentId: string): void {
     this.onSelectStudent(studentId);
     this.controller.close();
+  }
+
+  private isCurrentParent(identity: ParentIdentity): boolean {
+    return this.parentActive && this.parentIdentity === identity;
+  }
+
+  @Builder
+  private ParentRow(identity: ParentIdentity) {
+    Row({ space: 12 }) {
+      CenteredTextBadge({
+        badgeText: ParentIdentityHelper.badge(identity),
+        badgeWidth: 42,
+        badgeHeight: 42,
+        badgeFontSize: 16,
+        badgeRadius: 14,
+        badgeBold: true,
+        badgeForeground: this.isCurrentParent(identity) ? AppTheme.TEXT_ON_PRIMARY : AppTheme.PRIMARY,
+        badgeBackground: this.isCurrentParent(identity) ? AppTheme.PRIMARY : AppTheme.PRIMARY_SOFT
+      });
+      Column({ space: 3 }) {
+        Text(ParentIdentityHelper.label(identity))
+          .width('100%')
+          .fontSize(AppTheme.CARD_TITLE_SIZE)
+          .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
+          .fontWeight(FontWeight.Medium)
+          .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
+          .fontColor(AppTheme.TEXT);
+        Text('布置作业、查看进度、验收任务')
+          .width('100%')
+          .fontSize(AppTheme.CAPTION_SIZE)
+          .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
+          .fontColor(AppTheme.SUBTEXT)
+          .maxLines(2);
+      }
+      .layoutWeight(1)
+      .alignItems(HorizontalAlign.Start);
+      if (this.isCurrentParent(identity)) {
+        SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
+          .fontSize(20)
+          .fontColor([AppTheme.PRIMARY]);
+      }
+    }
+    .width('100%')
+    .constraintSize({ minHeight: 64 })
+    .padding({ left: 12, right: 12, top: 10, bottom: 10 })
+    .backgroundColor(AppTheme.CARD_SURFACE)
+    .border({ width: 1, color: this.isCurrentParent(identity) ? AppTheme.PRIMARY : AppTheme.BORDER })
+    .borderRadius(AppTheme.CONTROL_RADIUS)
+    .accessibilityGroup(true)
+    .accessibilityRole(AccessibilityRoleType.BUTTON)
+    .accessibilityText(this.isCurrentParent(identity) ?
+      ParentIdentityHelper.label(identity) + '，当前身份' :
+      ParentIdentityHelper.label(identity) + '，点击切换')
+    .onClick(() => this.chooseParent(identity));
   }
 
   build() {
@@ -31,7 +87,7 @@ export struct IdentitySwitcherDialog {
             .fontWeight(FontWeight.Medium)
             .maxLines(AppTheme.NAV_TITLE_MAX_LINES)
             .fontColor(AppTheme.TEXT);
-          Text('选择家长或学生，切换后自动进入对应界面')
+          Text('选择爸爸、妈妈或学生，切换后自动进入对应界面')
             .fontSize(AppTheme.CAPTION_SIZE)
             .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
             .fontColor(AppTheme.SUBTEXT)
@@ -61,50 +117,8 @@ export struct IdentitySwitcherDialog {
             .fontWeight(FontWeight.Medium)
             .fontColor(AppTheme.SUBTEXT);
 
-          Row({ space: 12 }) {
-            CenteredTextBadge({
-              badgeText: '家',
-              badgeWidth: 42,
-              badgeHeight: 42,
-              badgeFontSize: 16,
-              badgeRadius: 14,
-              badgeBold: true,
-              badgeForeground: this.parentActive ? AppTheme.TEXT_ON_PRIMARY : AppTheme.PRIMARY,
-              badgeBackground: this.parentActive ? AppTheme.PRIMARY : AppTheme.PRIMARY_SOFT
-            });
-            Column({ space: 3 }) {
-              Text('家长')
-                .width('100%')
-                .fontSize(AppTheme.CARD_TITLE_SIZE)
-                .lineHeight(AppTheme.CARD_TITLE_LINE_HEIGHT)
-                .fontWeight(FontWeight.Medium)
-                .maxLines(AppTheme.CARD_TITLE_MAX_LINES)
-                .fontColor(AppTheme.TEXT);
-              Text('布置作业、查看进度、验收任务')
-                .width('100%')
-                .fontSize(AppTheme.CAPTION_SIZE)
-                .lineHeight(AppTheme.CAPTION_LINE_HEIGHT)
-                .fontColor(AppTheme.SUBTEXT)
-                .maxLines(2);
-            }
-            .layoutWeight(1)
-            .alignItems(HorizontalAlign.Start);
-            if (this.parentActive) {
-              SymbolGlyph($r('sys.symbol.checkmark_circle_fill'))
-                .fontSize(20)
-                .fontColor([AppTheme.PRIMARY]);
-            }
-          }
-          .width('100%')
-          .constraintSize({ minHeight: 64 })
-          .padding({ left: 12, right: 12, top: 10, bottom: 10 })
-          .backgroundColor(AppTheme.CARD_SURFACE)
-          .border({ width: 1, color: this.parentActive ? AppTheme.PRIMARY : AppTheme.BORDER })
-          .borderRadius(AppTheme.CONTROL_RADIUS)
-          .accessibilityGroup(true)
-          .accessibilityRole(AccessibilityRoleType.BUTTON)
-          .accessibilityText(this.parentActive ? '家长，当前身份' : '家长，点击切换')
-          .onClick(() => this.chooseParent());
+          this.ParentRow(ParentIdentity.DAD);
+          this.ParentRow(ParentIdentity.MOM);
 
           Text('学生')
             .width('100%')
@@ -170,7 +184,7 @@ export struct IdentitySwitcherDialog {
         .padding({ left: 20, right: 20, top: 4, bottom: 20 });
       }
       .width('100%')
-      .constraintSize({ maxHeight: 500 })
+      .constraintSize({ maxHeight: 560 })
       .scrollBar(BarState.Off);
     }
     .width('100%')
