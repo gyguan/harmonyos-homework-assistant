@@ -9,6 +9,7 @@ import {
   HomeworkCoverageSubject
 } from '../../../components/assignment/HomeworkCoveragePicker';
 import { CandidateAssignment, Subject } from '../../../domain/model/HomeworkModels';
+import { ParentIdentity } from '../../../domain/model/ParentIdentity';
 import { AssignmentTaskDate } from '../../../domain/service/AssignmentTaskDate';
 import { HomeworkConfirmationViewModel } from './HomeworkConfirmationViewModel';
 import { ConfirmationCandidateCard, ConfirmationCandidateEditor } from './ConfirmationCandidateComponents';
@@ -16,6 +17,7 @@ import { ConfirmationCandidateCard, ConfirmationCandidateEditor } from './Confir
 @Component
 export struct HomeworkConfirmationPage {
   @Prop revision: number = 0;
+  @Prop parentIdentity: ParentIdentity = ParentIdentity.DAD;
   @State private localRevision: number = 0;
   @State private editingCandidateId: string = '';
   @State private manualCandidateDraft: CandidateAssignment | null = null;
@@ -71,7 +73,8 @@ export struct HomeworkConfirmationPage {
     let items = this.viewModel.candidates();
     if (items.length === 0) return;
     try {
-      let response = await this.coverageApi.get(items[0].studentId, AssignmentTaskDate.today());
+      let response = await this.coverageApi.get(
+        items[0].studentId, AssignmentTaskDate.today(), this.parentIdentity);
       let mine: string[] = [];
       for (let parent of response.parents) {
         if (parent.mine) {
@@ -287,7 +290,8 @@ export struct HomeworkConfirmationPage {
       let coverageSyncFailed = false;
       if (coverageSubjects.length > 0) {
         try {
-          await this.coverageApi.updateMine(coverageStudentId, coverageDate, coverageSubjects);
+          await this.coverageApi.updateMine(
+            coverageStudentId, coverageDate, this.parentIdentity, coverageSubjects);
         } catch {
           coverageSyncFailed = true;
         }
