@@ -13,7 +13,7 @@ import { ParentDashboardViewModel } from './ParentDashboardViewModel';
 @Component
 export struct ParentDashboardPage {
   @Watch('onCoverageContextChanged') @Prop revision: number = 0;
-  @Watch('onCoverageContextChanged') @Prop studentId: string = '';
+  @Prop studentId: string = '';
   @State private availableWidthVp: number = 390;
   @State private coverageParents: HomeworkCoverageParent[] = [];
   @State private coverageStudentName: string = '';
@@ -117,10 +117,15 @@ export struct ParentDashboardPage {
     if (BackendSession.instance.isConnected()) {
       Column({ space: 9 }) {
         Row({ space: 8 }) {
-          SymbolGlyph(this.coverageComplete() ?
-            $r('sys.symbol.checkmark_circle_fill') : $r('sys.symbol.person_2_fill'))
-            .fontSize(20)
-            .fontColor([this.coverageComplete() ? AppTheme.SUCCESS : AppTheme.PRIMARY]);
+          Text(this.coverageComplete() ? '✓' : '协')
+            .width(30)
+            .height(30)
+            .fontSize(16)
+            .fontWeight(FontWeight.Bold)
+            .fontColor(this.coverageComplete() ? AppTheme.SUCCESS : AppTheme.PRIMARY)
+            .textAlign(TextAlign.Center)
+            .backgroundColor(this.coverageComplete() ? AppTheme.SUCCESS_SOFT : AppTheme.PRIMARY_SOFT)
+            .borderRadius(10);
           Column({ space: 2 }) {
             Text(this.coverageComplete() ? '今日作业已安排完成' : '今日作业协同')
               .width('100%')
